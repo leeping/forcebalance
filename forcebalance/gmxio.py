@@ -6,9 +6,10 @@
 @date 12/2011
 """
 
-from re import match
+from re import match, sub
 from nifty import isint
 from numpy import array
+from basereader import BaseReader
 
 ## VdW interaction function types
 nftypes = [None, 'VDW', 'VDW_BHAM']
@@ -140,103 +141,126 @@ def parse_atomtype_line(line):
     answer = {'atomtype':atomtype, 'batomtype':batomtype, 'atomicnum':atomicnum, 'mass':mass, 'chg':chg, 'ptp':ptp, 'param':param, 'bonus':bonus}
     return answer
 
-def makeaftype(line, section):
-    """ Given a line, section name and list of atom names, return the interaction type and the atoms involved.
-    
-    For example, we want \n
-    <tt> H    O    H    5    1.231258497536e+02    4.269161426840e+02   -1.033397697685e-02   1.304674117410e+04 ; PARM 4 5 6 7 </tt> \n
-    to return [H,O,H],'UREY_BRADLEY'
-    
-    If we are in a TypeSection, it returns a list of atom types; \n
-    If we are in a TopolSection, it returns a list of atom names.
+class Reader(BaseReader):
+    """Finite state machine for parsing GROMACS force field files.
 
-    The section is essentially a case statement that picks out the
-    appropriate interaction type and makes a list of the atoms
-    involved Note that we can call gmxdump for this as well, but I
-    prefer to read the force field file directly.
-
-    ToDo: [ atoms ] section might need to be more flexible to accommodate optional fields
+    This class is instantiated when we begin to read in a file.  The
+    feed(line) method updates the state of the machine, giving it
+    information like the residue we're currently on, the nonbonded
+    interaction type, and the section that we're in.  Using this
+    information we can look up the interaction type and parameter type
+    for building the parameter ID.
     
     """
-    sline = line.split()
-    atom = []
-    ftype = None
-    # No sense in doing anything for an empty line or a comment line.
-    if len(sline) == 0 or match('^;',line): return None, None
-    # Now go through all the cases.
-    if section == 'defaults':
-        makeaftype.nbtype = int(sline[0])
-        makeaftype.crule  = int(sline[1])
-    elif section == 'moleculetype':
-        makeaftype.res    = sline[0]
-    elif section == 'atomtypes':
-        atype = parse_atomtype_line(line)
-        # This kind of makes me uncomfortable.  Basically we're shifting the word positions
-        # based on the syntax of the line in 'atomtype', but it allows the parameter typing to
-        # keep up with the flexibility of the syntax of these lines.
-        if atype['bonus'] > 0:
-            pdict['VDW'] = {4+atype['bonus']:'S',5+atype['bonus']:'T'}
-            pdict['VDW_BHAM'] = {4+atype['bonus']:'A', 5+atype['bonus']:'B', 6+atype['bonus']:'C'}
-        atom = atype['atomtype']
-        ftype = fdict[section][makeaftype.nbtype]
-    elif section == 'nonbond_params':
-        atom = sline[0] < sline[1] and [sline[0], sline[1]] or [sline[1], sline[0]]
-        ftype = pftypes[makeaftype.nbtype]
-    elif section == 'atoms':
-        atom = [sline[4]]
-        ftype = 'COUL'
-        # Build the adict here.
-        makeaftype.adict.setdefault(sline[3],[]).append(sline[4])
-    elif section == 'qtpie':
-        # The atom involved is labeled by the atomic number.
-        atom = [sline[0]]
-        ftype = 'QTPIE'
-    elif section == 'bonds':
-        atom = [makeaftype.adict[makeaftype.res][int(i) - 1] for i in sline[:2]]
-        ftype = fdict[section][int(sline[2])]
-    elif section == 'bondtypes':
-        # We have several of these conditional expressions.
-        # Their purpose is to enforce a unique ordering of atom names
-        # so as to avoid duplication of interaction types.
-        atom = sline[0] < sline[1] and [sline[0], sline[1]] or [sline[1], sline[0]]
-        ftype = fdict[section][int(sline[2])]
-    elif section == 'angles':
-        atom = [makeaftype.adict[makeaftype.res][int(i) - 1] for i in sline[:3]]
-        ftype = fdict[section][int(sline[3])]
-    elif section == 'angletypes':
-        atom = sline[0] < sline[2] and [sline[0], sline[1], sline[2]] or [sline[2], sline[1], sline[0]]
-        ftype = fdict[section][int(sline[3])]
-    elif section == 'dihedrals':
-        atom = [makeaftype.adict[makeaftype.res][int(i)-1] for i in sline[:4]]
-        ftype = fdict[section][int(sline[4])]
-        if ftype == 'PDIHS' and len(sline) >= 7:
-            # Add the multiplicity of the dihedrals to the interaction type. :)
-            ftype += sline[7]
-    elif section == 'dihedraltypes':
-        atom = sline[0] < sline[3] and [sline[0], sline[1], sline[2], sline[3]] or [sline[3], sline[2], sline[1], sline[0]]
-        ftype = fdict[section][int(sline[4])]
-        if ftype == 'PDIHS' and len(sline) >= 7:
-            ftype += sline[7]
-    elif section == 'virtual_sites2':
-        atom = [sline[0]]
-        ftype = fdict[section][int(sline[3])]
-    elif section == 'virtual_sites3':
-        atom = [sline[0]]
-        ftype = fdict[section][int(sline[4])]
-    elif section == 'virtual_sites4':
-        atom = [sline[0]]
-        ftype = fdict[section][int(sline[5])]
-    else:
-        return [],"Confused"
-    return atom, ftype
-# Nonbonded type
-makeaftype.nbtype = None
-# Combination rule
-makeaftype.crule  = None
-# The current residue (set by the moleculetype keyword)
-makeaftype.res    = None
-# The mapping of (this residue, atom number) to (atom name) for building atom-specific interactions in [ bonds ], [ angles ] etc.
-makeaftype.adict  = {}
+    
+    def __init__(self,fnm):
+        # Initialize the superclass. :)
+        super(Reader,self).__init__(fnm)
+        ## The current section that we're in
+        self.sec = None
+        ## Nonbonded type
+        self.nbtype = None
+        ## The current residue (set by the moleculetype keyword)
+        self.res    = None
+        ## The mapping of (this residue, atom number) to (atom name) for building atom-specific interactions in [ bonds ], [ angles ] etc.
+        self.adict  = {}
+        ## The parameter dictionary (defined in this file)
+        self.pdict  = pdict
+
+    def feed(self, line):
+        """ Given a line, determine the interaction type and the atoms involved (the suffix).
+        
+        For example, we want \n
+        <tt> H    O    H    5    1.231258497536e+02    4.269161426840e+02   -1.033397697685e-02   1.304674117410e+04 ; PARM 4 5 6 7 </tt> \n
+        to give us itype = 'UREY_BRADLEY' and suffix = 'HOH'
+        
+        If we are in a TypeSection, it returns a list of atom types; \n
+        If we are in a TopolSection, it returns a list of atom names.
+        
+        The section is essentially a case statement that picks out the
+        appropriate interaction type and makes a list of the atoms
+        involved
+
+        Note that we can call gmxdump for this as well, but I
+        prefer to read the force field file directly.
+        
+        ToDo: [ atoms ] section might need to be more flexible to accommodate optional fields
+        
+        """
+        s          = line.split()
+        atom       = []
+        self.itype = None
+        self.ln   += 1
+        # No sense in doing anything for an empty line or a comment line.
+        if len(s) == 0 or match('^;',line): return None, None
+        # Now go through all the cases.
+        if match('^\[.*\]',line):
+            # Makes a word like "atoms", "bonds" etc.
+            self.sec = sub('[\[\] \n]','',line)
+        elif self.sec == 'defaults':
+            self.nbtype = int(s[0])
+        elif self.sec == 'moleculetype':
+            self.res    = s[0]
+        elif self.sec == 'atomtypes':
+            atype = parse_atomtype_line(line)
+            # Basically we're shifting the word positions
+            # based on the syntax of the line in 'atomtype', but it allows the parameter typing to
+            # keep up with the flexibility of the syntax of these lines.
+            if atype['bonus'] > 0:
+                pdict['VDW'] = {4+atype['bonus']:'S',5+atype['bonus']:'T'}
+                pdict['VDW_BHAM'] = {4+atype['bonus']:'A', 5+atype['bonus']:'B', 6+atype['bonus']:'C'}
+            atom = atype['atomtype']
+            self.itype = fdict[self.sec][self.nbtype]
+        elif self.sec == 'nonbond_params':
+            atom = [s[0], s[1]]
+            self.itype = pftypes[self.nbtype]
+        elif self.sec == 'atoms':
+            atom = [s[4]]
+            self.itype = 'COUL'
+            # Build the adict here.
+            self.adict.setdefault(s[3],[]).append(s[4])
+        elif self.sec == 'qtpie':
+            # The atom involved is labeled by the atomic number.
+            atom = [s[0]]
+            self.itype = 'QTPIE'
+        elif self.sec == 'bonds':
+            atom = [self.adict[self.res][int(i) - 1] for i in s[:2]]
+            self.itype = fdict[self.sec][int(s[2])]
+        elif self.sec == 'bondtypes':
+            atom = [s[0], s[1]]
+            self.itype = fdict[self.sec][int(s[2])]
+        elif self.sec == 'angles':
+            atom = [self.adict[self.res][int(i) - 1] for i in s[:3]]
+            self.itype = fdict[self.sec][int(s[3])]
+        elif self.sec == 'angletypes':
+            atom = [s[0], s[1], s[2]]
+            self.itype = fdict[self.sec][int(s[3])]
+        elif self.sec == 'dihedrals':
+            atom = [self.adict[self.res][int(i)-1] for i in s[:4]]
+            self.itype = fdict[self.sec][int(s[4])]
+            if self.itype == 'PDIHS' and len(s) >= 7:
+                # Add the multiplicity of the dihedrals to the interaction type.
+                self.itype += s[7]
+        elif self.sec == 'dihedraltypes':
+            atom = [s[0], s[1], s[2], s[3]]
+            self.itype = fdict[self.sec][int(s[4])]
+            if self.itype == 'PDIHS' and len(s) >= 7:
+                self.itype += s[7]
+        elif self.sec == 'virtual_sites2':
+            atom = [s[0]]
+            self.itype = fdict[self.sec][int(s[3])]
+        elif self.sec == 'virtual_sites3':
+            atom = [s[0]]
+            self.itype = fdict[self.sec][int(s[4])]
+        elif self.sec == 'virtual_sites4':
+            atom = [s[0]]
+            self.itype = fdict[self.sec][int(s[5])]
+        else:
+            return [],"Confused"
+        if len(atom) > 1 and atom[0] > atom[-1]:
+            # Enforce a canonical ordering of the atom labels in a parameter ID
+            atom = atom[::-1]
+        self.suffix = ''.join(atom)
 
 def gmxprint(fnm, vec, type):
     """ Prints a vector to a file to feed it to the modified GROMACS.

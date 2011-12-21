@@ -5,7 +5,7 @@
 Executable script for starting ForceBalance. """
 
 import sys
-from project import Project
+from forcebalance.project import Project
 
 def main():
     """ Instantiate a ForceBalance project and call the optimizer. """

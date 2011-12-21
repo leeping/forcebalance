@@ -96,11 +96,53 @@ we need more modules!
 import os
 import sys
 from re import match, sub, split
-import gmxio, custom_io
+import gmxio
+import qchemio
+import custom_io
+import basereader
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, zeros
 from numpy.linalg import norm
 from nifty import col, flat, kb, orthogonalize, pmat2d, printcool, row
 from string import count
+
+FF_Extensions = {"itp" : "gmx",
+                 "in"  : "qchem",
+                 "gen" : "custom"
+                 }
+
+""" Recognized force field formats. """
+FF_IOModules = {"gmx": gmxio.Reader ,
+                "qchem": qchemio.Reader ,
+                "custom": custom_io.Reader
+                }
+
+def determine_fftype(ffname):
+    fsplit = ffname.split('/')[-1].split(':')
+    fftype = None
+    print "Determining file type of %s ..." % fsplit[0],
+    if len(fsplit) == 2:
+        if fsplit[1] in FF_IOModules:
+            print "We're golden! (%s)" % fsplit[1]
+            fftype = fsplit[1]
+        else:
+            print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(keys(FF_IOModules)))
+    elif len(fsplit) == 1:
+        print "Guessing from extension (you may specify type with filename:type) ...", 
+        ffname = fsplit[0]
+        ffext = ffname.split('.')[-1]
+        if ffext in FF_Extensions:
+            guesstype = FF_Extensions[ffext]
+            if guesstype in FF_IOModules:
+                print "guessing %s -> %s!" % (ffext, guesstype)
+                fftype = guesstype
+            else:
+                print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(keys(FF_IOModules)))
+        else:
+            print "\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!" % (ffext,', '.join(keys(FF_Extensions)))
+    if fftype == None:
+        print "Force field type not determined! Exiting..."
+        sys.exit(1)
+    return fftype
 
 class FF(object):
     """ Force field class.
@@ -126,9 +168,11 @@ class FF(object):
         #======================================#
 
         ## The root directory of the project
-        self.root        = options['root']
+        self.root        = os.getcwd()
         ## File names of force fields
         self.fnms        = options['forcefield']
+        ## Directory containing force fields, relative to project directory
+        self.ffdir       = options['ffdir']
         
         #======================================#
         #     Variables which are set here     #
@@ -164,11 +208,7 @@ class FF(object):
         # Read the force fields into memory.
         for fnm in self.fnms:
             print "Reading force field from file: %s" % fnm
-            if fnm[-4:] in ['.itp','.gen']:
-                self.addff(fnm)
-            else:
-                print "I don't recognize this force field format!"
-                sys.exit()
+            self.addff(fnm)
 
         # Set the initial values of parameter arrays.
         ## Initial value of physical parameters
@@ -262,61 +302,44 @@ class FF(object):
         @param[in] ffname Name of the force field file
 
         """
-        b_gmx = ffname[-4:] == '.itp'
-        iomod = b_gmx and gmxio or custom_io
-        absff = os.path.join(self.root,'forcefield',ffname)
+        fftype = determine_fftype(ffname)
+        ffname = ffname.split(':')[0]
+        
+        Reader = FF_IOModules.get(fftype,basereader.BaseReader)
+
+        # Open the force field using an absolute path and read its contents into memory.
+        absff = os.path.join(self.root,self.ffdir,ffname)
         self.stuff[ffname] = open(absff).readlines()
-        section = None
-        # @todo Can use "enumerate" here.
-        for ln in range(len(self.stuff[ffname])):
-            line = self.stuff[ffname][ln]
-            # Applies to lines like [ atoms ]
-            if match('^\[.*\]',line):
-                # Makes a word like "atoms", "bonds" etc.
-                section = sub('[\[\] \n]','',line)
-            else:
-                # There's no sense in running 'makeaftype' on the header lines.
-                atom, ftype = iomod.makeaftype(line, section)
-                sline = line.split()
-                if 'PARM' in sline:
-                    pmark = (array(sline) == 'PARM').argmax() # The position of the 'PARM' word
-                    pflds = [int(i) for i in sline[pmark+1:]] # The integers that specify the parameter word positions
-                    for pfld in pflds:
-                        # For each of the fields that are to be parameterized (indicated by PARM #),
-                        # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
-                        # Note that NDDO does not assign parameter types here.
-                        if section == 'NDDO':
-                            ptype = ''
-                        else:
-                            ptype = iomod.pdict[ftype][pfld]
-                        pid = ftype+ptype+''.join(atom)
-                        # Add pid into the dictionary.
-                        self.map[pid] = self.np
-                        # Also append pid to the parameter list
-                        self.assign_p0(self.np,float(sline[pfld]))
-                        self.assign_field(self.np,ffname,ln,pfld,1)
-                        # Again here we need to account for reversal of atom labels.
-                        # I think I added this because GROMACS might reverse the atom labels internally...
-                        if 'types' in section:
-                            pid_rev = ftype+ptype+''.join([i for i in atom[::-1]])
-                            self.map[pid_rev] = self.np
-                        self.np += 1
-                if "RPT" in sline:
-                    parse = (array(sline)=='RPT').argmax()+1 # The position of the 'RPT' word
-                    while parse < (array(sline)=='/RPT').argmax():
-                        # Between RPT and /RPT, the words occur in pairs.
-                        # First is a number corresponding to the field that contains the dependent parameter.
-                        # Second is a string corresponding to the 'pid' that this parameter depends on.
-                        pfld = int(sline[parse])
-                        prep = self.map[sline[parse+1].replace('MINUS_','')]
-                        ptype = iomod.pdict[ftype][pfld]
-                        pid = ftype+ptype+''.join([j for j in atom])
-                        self.map[pid] = prep
-                        self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
-                        if 'types' in section:
-                            pid_rev = ftype+ptype+''.join([i for i in atom[::-1]])
-                            self.map[pid_rev] = prep
-                        parse += 2
+        
+        R = Reader(ffname)
+        for ln, line in enumerate(self.stuff[ffname]):
+            R.feed(line)
+            sline = line.split()
+            if 'PARM' in sline:
+                pmark = (array(sline) == 'PARM').argmax() # The position of the 'PARM' word
+                pflds = [int(i) for i in sline[pmark+1:]] # The integers that specify the parameter word positions
+                for pfld in pflds:
+                    # For each of the fields that are to be parameterized (indicated by PARM #),
+                    # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
+                    pid = R.build_pid(pfld)
+                    # Add pid into the dictionary.
+                    self.map[pid] = self.np
+                    # Also append pid to the parameter list
+                    self.assign_p0(self.np,float(sline[pfld]))
+                    self.assign_field(self.np,ffname,ln,pfld,1)
+                    self.np += 1
+            if "RPT" in sline:
+                parse = (array(sline)=='RPT').argmax()+1 # The position of the 'RPT' word
+                while parse < (array(sline)=='/RPT').argmax():
+                    # Between RPT and /RPT, the words occur in pairs.
+                    # First is a number corresponding to the field that contains the dependent parameter.
+                    # Second is a string corresponding to the 'pid' that this parameter depends on.
+                    pfld = int(sline[parse])
+                    prep = self.map[sline[parse+1].replace('MINUS_','')]
+                    pid = R.build_pid(pfld)
+                    self.map[pid] = prep
+                    self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
+                    parse += 2
         
     def make(self,printdir,vals,usepvals):
         """ Create a new force field using provided parameter values.
@@ -574,9 +597,11 @@ def rs_override(tvgeomean,termtype,Temperature=298.15):
     @param[in] Temperature The temperature for computing the kT energy scale
     
     """
-    if match('PDIHS[1-6]K|RBDIHSK[1-5]|ANGLESK|UREY_BRADLEYK1|MORSEC',termtype):
+    if match('PDIHS[1-6]K|RBDIHSK[1-5]|MORSEC',termtype):
         # eV or eV rad^-2
         tvgeomean[termtype] = 96.4853
+    elif match('UREY_BRADLEYK1|ANGLESK',termtype):
+        tvgeomean[termtype] = 96.4853 * 6.28
     elif match('COUL|VPAIR_BHAMC|QTPIEA',termtype):
         # elementary charge, or unitless, or already in atomic unit
         tvgeomean[termtype] = 1.0
@@ -587,8 +612,8 @@ def rs_override(tvgeomean,termtype,Temperature=298.15):
         # nm to atomic unit
         tvgeomean[termtype] = 0.05291772
     elif match('BONDSK|UREY_BRADLEYK2',termtype):
-        # eV bohr^-2, this is on the small side
-        tvgeomean[termtype] = 34455.5275
+        # au bohr^-2
+        tvgeomean[termtype] = 34455.5275 * 27.2114
     elif match('PDIHS[1-6]B|ANGLESB|UREY_BRADLEYB',termtype):
         # radian
         tvgeomean[termtype] = 57.295779513

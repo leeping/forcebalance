@@ -58,7 +58,8 @@ gen_opts_types = {
                  "gmxtoolpath"               : None,    # Path for GROMACS tools, may override GMXPATH
                  "gmxsuffix"                 : "",      # The suffix of GROMACS executables
                  "penalty_type"              : "L2",    # Type of the penalty, L2 or L1 in the optimizer
-                 "scan_vals"                 : None     # Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1
+                 "scan_vals"                 : None,    # Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1
+                 "ffdir"                : 'forcefield'  # Directory containing force fields, relative to project directory
                  },
     'allcaps' : {"jobtype"                   : "sp"     # The job type, defaults to a single-point evaluation of objective function
                  },
@@ -110,7 +111,7 @@ sim_opts_types = {
                  "fdgrad"                    : 1,       # Finite difference gradients
                  "fdhess"                    : 1,       # Finite difference Hessian diagonals (costs np times a gradient calculation)
                  "fdhessdiag"                : 1,       # Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)
-                 "use_pvals"                 : 0        # Bypass the transformation matrix and use the physical parameters directly
+                 "use_pvals"                 : 0,       # Bypass the transformation matrix and use the physical parameters directly
                  },
     'floats'  : {"weight"                    : 1.0,     # Weight of the current simulation (with respect to other simulations)
                  "efweight"                  : 0.5,     # 1.0 for all energy and 0.0 for all force (force+energy match), defaults to 0.5

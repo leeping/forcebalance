@@ -215,6 +215,9 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
             # Create a file called "sampcorr" if the sampcorr option is turned on.
             # This functionality is VERY VERY OLD
             open(os.path.join(abstempdir,"sampcorr"),'w').close()
+        if self.covariance == False:
+            # Gromacs-X2 defaults to using the covariance, so we can turn it off here
+            open(os.path.join(abstempdir,"NoCovariance"),'w').close()
         fqmm = self.fqm.reshape(self.ns, -1)
         if self.fitatoms > 0:
             # Indicate to Gromacs that we're only fitting the first however-many atoms.
