@@ -100,7 +100,7 @@ import gmxio
 import qchemio
 import custom_io
 import basereader
-from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, zeros
+from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros
 from numpy.linalg import norm
 from nifty import col, flat, kb, orthogonalize, pmat2d, printcool, row
 from string import count
@@ -480,32 +480,35 @@ class FF(object):
         fragments of molecules or other types of parameters.
         """
         qmap   = []
-        qid = []
-        qnr = 1
+        qid    = []
+        qnr    = 1
+        concern= ['COUL']
         for i in range(self.np):
-            if 'COUL' in self.plist[i]:
+            if any([j in self.plist[i] for j in concern]):
                 qmap.append(i)
-                nq = count(self.plist[i], 'COUL')
+                nq = sum(array([count(self.plist[i], j) for j in concern]))
                 qid.append(qnr+arange(nq))
                 qnr += nq
         tq = qnr - 1
         cons0 = ones((1,tq))
         #print qmap
         #print qid
-        chargegrp = []
+        #chargegrp = []
         # LPW Charge groups aren't implemented at this time
-        # for group in pkg.chargegrp:
-        #     a = min(group[0]-1, group[1])
-        #     b = max(group[0]-1, group[1])
-        #     constemp = zeros(tq, dtype=float)
-        #     for i in range(constemp.shape[0]):
-        #         if i >= a and i < b:
-        #             constemp[i] += 1
-        #         else:
-        #             constemp[i] -= 1
-        #     cons0 = vstack((cons0, constemp))
-        # Here is where we build the qtrans2 matrix.
-        # 
+        ## chargegrp = [[1,3],[4,5],[6,7]]
+        ## for group in chargegrp:
+        ##     a = min(group[0]-1, group[1])
+        ##     b = max(group[0]-1, group[1])
+        ##     constemp = zeros(tq, dtype=float)
+        ##     for i in range(constemp.shape[0]):
+        ##         if i >= a and i < b:
+        ##             constemp[i] += 1
+        ##         else:
+        ##             constemp[i] -= 1
+        ##     cons0 = vstack((cons0, constemp))
+        ## print cons0
+        #Here is where we build the qtrans2 matrix.
+        
         nq = len(qmap)
         if nq > 0:
             cons = zeros((cons0.shape[0], nq), dtype=float)

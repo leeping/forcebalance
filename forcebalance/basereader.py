@@ -30,6 +30,7 @@ class BaseReader(object):
         'filename.line_num.field_num'
         
         """
+        #print self.pdict[self.itype][pfld]
         ptype = self.pdict.get(self.itype,{}).get(pfld,':%i.%i' % (self.ln,pfld))
         return self.itype+ptype+self.suffix
 

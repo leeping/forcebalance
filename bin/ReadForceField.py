@@ -13,6 +13,7 @@ def main():
     options = {'forcefield':argv[1:],
                'ffdir':''}
     MyFF = FF(options)
+    print MyFF.tm
 
 if __name__ == "__main__":
     main()
