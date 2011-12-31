@@ -1,4 +1,4 @@
-"""@package nifty Nifty functions for ForceBalance, intended to be imported by any module.
+"""@package nifty Nifty functions, intended to be imported by any module.
 
 Named after the mighty Sniffy Handy Nifty (King Sniffy)
 
@@ -159,4 +159,42 @@ def floatornan(word):
     else:
         print "Setting %s to % .1e" % big
         return big
+
+def multiopen(arg):
+    """
+    This function be given any of several variable types
+    (single file name, file object, or list of lines, or a list of )
+    and give a list of files:
+
+    [file1, file2, file3 ... ]
+
+    each of which can then be iterated over:
+
+    [[file1_line1, file1_line2 ... ], [file2_line1, file2_line2 ... ]]
+    """
+    if type(arg) == str:
+        # A single file name
+        fins = [open(arg)]
+    elif type(arg) == file:
+        # A file object
+        fins = [[arg]]
+    elif type(arg) == list:
+        if all([type(l) == str for l in arg]):
+            # A list of lines (as in, open(file).readlines()) is expected to end with \n on most of the lines.
+            if any([match("^.*\n$",l) for l in arg]):
+                fins = [[arg]]
+            # In contrast, a list of file names doesn't have \n characters.
+            else:
+                fins = [open(l) for l in arg]
+        elif all([type(l) == file or type(l) == list for l in arg]):
+            fins = arg
+        else:
+            print "What did you give this program as input?"
+            print arg
+            exit(1)
+    else:
+        print "What did you give this program as input?"
+        print arg
+        exit(1)
+    return fins
 
