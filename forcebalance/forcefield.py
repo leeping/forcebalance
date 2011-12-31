@@ -102,7 +102,7 @@ import custom_io
 import basereader
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros
 from numpy.linalg import norm
-from nifty import col, flat, kb, orthogonalize, pmat2d, printcool, row
+from nifty import col, flat, invert_svd, kb, orthogonalize, pmat2d, printcool, row
 from string import count
 
 FF_Extensions = {"itp" : "gmx",
@@ -213,18 +213,14 @@ class FF(object):
         # Set the initial values of parameter arrays.
         ## Initial value of physical parameters
         self.pvals0 = array(self.pvals0)
-        ## Current physical parameters
-        self.pvals = self.pvals0.copy()
-        ## Initial value of mathematical parameters
-        self.mvals0 = zeros(len(self.pvals))
-        ## Current mathematical parameters
-        self.mvals  = zeros(len(self.pvals))
 
         # Prepare various components of the class for first use.
         ## Creates plist from map.
         self.list_map()
         ## Prints the plist to screen.
+        bar = printcool("Starting parameter indices, physical values and IDs")
         self.print_map()                       
+        print bar
         ## Make the rescaling factors.
         self.rsmake(printfacs=True)            
         ## Make the transformation matrix.
@@ -361,11 +357,12 @@ class FF(object):
         
         """
         if usepvals:
-            self.pvals = vals.copy()
+            pvals = vals.copy()
         else:
-            self.create_pvals(vals)
-        self.replace_pvals()
+            pvals = self.create_pvals(vals)
+        self.replace_pvals(pvals)
         self.print_newstuff(printdir)
+        return pvals
         
     def create_pvals(self,mvals):
         """Converts mathematical to physical parameters.
@@ -375,17 +372,30 @@ class FF(object):
         the original physical parameters.
 
         @param[in] mvals The mathematical parameters
+        @return pvals The physical parameters
         
         """
-        self.pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0
+        pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0
+        return pvals
+
+    def create_mvals(self,pvals):
+        """Converts physical to mathematical parameters.
+
+        We create the inverse transformation matrix using SVD.
+
+        @param[in] pvals The physical parameters
+        @return mvals The mathematical parameters
+        """
+        mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
+        return mvals
         
-    def replace_pvals(self):
+    def replace_pvals(self,pvals):
         """Replaces numerical fields in stored force field files with the stored physical parameter values.
         
         Unless you really know what you're doing, you probably shouldn't be calling this directly.
 
         """
-        vals = list(self.pvals)
+        vals = list(pvals)
         for fnm in self.stuff:
             self.newstuff[fnm] = list(self.stuff[fnm])
         for i in range(len(self.pfields)):
@@ -553,11 +563,11 @@ class FF(object):
         for i in range(self.np):
             self.plist[i] = ' '.join(self.plist[i])
             
-    def print_map(self):
-        """Prints out the parameter indices, IDs and values in a visually appealing way."""
-        bar = printcool("Parameter indices and their corresponding IDs:")
-        print '\n'.join(["%4i [ % .4e ]" % (self.plist.index(i),self.pvals[self.plist.index(i)]) + " : " + "%s" % i for i in self.plist])
-        print bar
+    def print_map(self,vals = None):
+        """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
+        if vals == None:
+            vals = self.pvals0
+        print '\n'.join(["%4i [ % .4e ]" % (self.plist.index(i),vals[self.plist.index(i)]) + " : " + "%s" % i for i in self.plist])
         
     def assign_p0(self,idx,val):
         """ Assign physical parameter values to the 'pvals0' array.

@@ -45,7 +45,7 @@ def buildKeywordDictionary():
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
     setupKeywords["packages"]          = ["forcebalance"]
-    setupKeywords["scripts"]           = glob.glob("bin/*.py")
+    setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh")
     setupKeywords["package_data"]      = {
         "ForceBalance"                   : ["AUTHORS","LICENSE.txt"]
                                          }

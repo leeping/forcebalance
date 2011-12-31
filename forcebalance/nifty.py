@@ -6,9 +6,10 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 @date 12/2011
 """
 
+import os
 from re import match, sub
-from numpy import array, dot, mat
-from numpy.linalg import norm
+from numpy import array, diag, dot, mat, transpose
+from numpy.linalg import norm, svd
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -198,3 +199,20 @@ def multiopen(arg):
         exit(1)
     return fins
 
+def remove_if_exists(fnm):
+    if os.path.exists(fnm):
+        os.remove(fnm)
+
+def invert_svd(X,thresh=1e-8):
+    u,s,vh = svd(X, full_matrices=0)
+    uh     = mat(transpose(u))
+    v      = mat(transpose(vh))
+    si     = s.copy()
+    for i in range(s.shape[0]):
+        if abs(s[i]) > 1e-8:
+            si[i] = 1./s[i]
+        else:
+            si[i] = 0.0
+    si     = mat(diag(si))
+    Xt     = v*si*uh
+    return Xt

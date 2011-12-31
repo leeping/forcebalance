@@ -90,6 +90,8 @@ class FittingSimulation(object):
         self.name        = sim_opts['name']
         ## Type of fitting simulation
         self.simtype     = sim_opts['simtype']
+        ## Relative weight of the fitting simulation
+        self.weight      = sim_opts['weight']
         ## Switch for finite difference gradients
         self.fdgrad      = sim_opts['fdgrad']
         ## Switch for finite difference Hessians
