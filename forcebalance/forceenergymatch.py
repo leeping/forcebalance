@@ -60,6 +60,8 @@ class ForceEnergyMatch(FittingSimulation):
         self.whamboltz     = sim_opts['whamboltz']
         ## Whether to use the Sampling Correction
         self.sampcorr      = sim_opts['sampcorr']
+        ## Whether to use the Covariance Matrix
+        self.covariance    = sim_opts['covariance']
         ## Whether to use QM Boltzmann weights
         self.qmboltz       = sim_opts['qmboltz']
         ## The temperature for QM Boltzmann weights
@@ -85,6 +87,12 @@ class ForceEnergyMatch(FittingSimulation):
         self.fqm           = []
         ## The qdata.txt file that contains the QM energies and forces
         self.qfnm = os.path.join(self.simdir,"qdata.txt")
+        ## The number of true atoms 
+        self.natoms      = 0
+        ## Qualitative Indicator: average energy error (in kJ/mol)
+        self.e_err = 0.0
+        ## Qualitative Indicator: average force error (fractional)
+        self.f_err = 0.0
         
         # Read in the reference data
         self.readrefdata()
@@ -169,6 +177,7 @@ class ForceEnergyMatch(FittingSimulation):
         self.eqm -= mean(self.eqm)
         self.fqm = array(self.fqm)
         self.fqm *= fqcgmx
+        self.natoms = self.fqm.shape[1]/3
         self.emd0 = array(self.emd0)
         self.emd0 -= mean(self.emd0)
         if self.whamboltz == True:
@@ -203,3 +212,6 @@ class ForceEnergyMatch(FittingSimulation):
             print "Quantum Boltzmann weights are ON, the formula is exp(-b(E_qm-E_mm)),",
             print "distribution entropy is %.3f, equivalent to %.2f snapshots" % (qmboltzent, exp(qmboltzent))
             print "%.1f%% is mixed into the MM boltzmann weights." % (self.qmboltz*100)
+            
+    def indicate(self):
+        print "Sim: %-15s E_err(kJ/mol)= %10.4f F_err(%%)= %10.4f" % (self.name, self.e_err, self.f_err*100)

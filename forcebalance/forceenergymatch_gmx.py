@@ -14,7 +14,7 @@ call the modified GROMACS to compute the objective function for us.
 
 import os
 import shutil
-from nifty import col, flat, floatornan
+from nifty import col, flat, floatornan, remove_if_exists
 from numpy import append, array, mat, zeros
 from gmxio import gmxprint
 from re import match
@@ -91,8 +91,6 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         #======================================#
         ## The number of particles (includes atoms, Drudes, and virtual sites)
         self.nparticles  = 0
-        ## The number of true atoms 
-        self.natoms      = 0
         set_gmx_paths(self, options)
         ## Path to the all.gro file
         self.grofnm      = os.path.join(self.simdir,"all.gro")
@@ -175,7 +173,6 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         - pids      : Information for building interaction name -> parameter number hashtable
 
         @param[in] tempdir The temporary directory to be prepared.
-        @todo Currently we don't have a switch to turn the covariance off. Should be simple to add in.
         @todo Someday I'd like to use WHAM to put AIMD simulations in. :)
         @todo The fitatoms shouldn't be the first however many atoms, it should be a list.
 
@@ -288,13 +285,16 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         Answer = {}
         cwd = os.getcwd()
         # Create the new force field!!
-        self.FF.make(tempdir,mvals,self.usepvals)
-        gmxprint(os.path.join(os.path.join(self.root,tempdir,"pvals")),append([0],self.FF.pvals),"double")
+        pvals = self.FF.make(tempdir,mvals,self.usepvals)
+        gmxprint(os.path.join(os.path.join(self.root,tempdir,"pvals")),append([0],pvals),"double")
         os.chdir(os.path.join(self.root,tempdir))
         if AHess:
             AGrad = True
+            remove_if_exists("FirstDerivativesOnly")
+            remove_if_exists("NoDerivatives")
         elif AGrad:
             with open("FirstDerivativesOnly",'w') as f: f.close()
+            remove_if_exists("NoDerivatives")
         else:
             with open("NoDerivatives",'w') as f: f.close()
         print "GMX: %s\r" % tempdir,
@@ -305,14 +305,13 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
             if match('^Objective Function',line):
                 X = floatornan(sline[-1])
                 Answer['X'] = X
-            # Do we want to pass out the qualitative indicators?
-            # elif match('^Energy Error \(kJ/mol\)',line):
-            #     E = floatornan(sline[-1])
-            #     Answer['E'] = E
-            # elif match('^Force Error',line):
-            #     F = floatornan(sline[-1])
-            #     Answer['F'] = F
-        #if AGrad or AHess:
+                # Pass out the qualitative indicator
+            elif match('^Energy Error \(kJ/mol\)',line):
+                E = floatornan(sline[-1])
+                self.e_err = E
+            elif match('^Force Error',line):
+                F = floatornan(sline[-1])
+                self.f_err = F
         # Derivatives in the physical parameter values
         GR = array([float(i.split()[2]) for i in open('a1dbc').readlines()])
         # If we're working in the rescaled space, rescale and transform to the 'mathematical' derivatives

@@ -7,8 +7,8 @@ from forcefield import FF
 from simtab import SimTab
 from parser import parse_inputs
 from penalty import Penalty
-from nifty import printcool_dictionary
-from numpy import zeros
+from nifty import printcool_dictionary, printcool
+from numpy import array, zeros
 
 class Project(object):
     """Container for a ForceBalance force field optimization project.
@@ -46,9 +46,8 @@ class Project(object):
         self.Simulations = [SimTab[opts['simtype']](self.options,opts,self.FF) for opts in self.sim_opts]
         ## The optimizer component of the project
         self.Optimizer   = Optimizer(self.options,self.Objective,self.FF,self.Simulations)
-        printcool_dictionary(self.options, title="Setup for optimizer")
         
-    def Objective(self,mvals,Order=0,usepvals=False):
+    def Objective(self,mvals,Order=0,usepvals=False,verbose=False):
         """ Objective function defined within Project; can you think of a better place?
 
         The objective function is a combination of contributions from the different
@@ -69,22 +68,23 @@ class Project(object):
         Objective = {'X':0.0, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
         Letters = ['X','G','H']
+        ## Obtain the denominator.
+        WTot = sum([i.weight for i in self.Simulations])
         # Loop through the simulations.
         for Sim in self.Simulations:
             # List of functions that I can call.
             Funcs   = [Sim.get_X, Sim.get_G, Sim.get_H]
             # Call the appropriate function
             Ans = Funcs[Order](mvals)
+            # Print out the qualitative indicators
+            if verbose:
+                Sim.indicate()
             # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
             for i in range(3):
-                Objective[Letters[i]] += Ans[Letters[i]]
+                Objective[Letters[i]] += Ans[Letters[i]]*Sim.weight/WTot
         ## Compute the penalty function.
         Extra = Penalty(mvals,Objective,self.options['penalty_type'],self.options['penalty_additive'],self.options['penalty_multiplicative'])
         for i in range(3):
             Objective[Letters[i]] += Extra[i]
         return Objective
-
-    def Run(self):
-        """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
-        self.Optimizer.OptTab[self.options['jobtype']]()
 

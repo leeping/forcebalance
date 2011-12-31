@@ -117,7 +117,7 @@ class CounterpoiseMatch(FittingSimulation):
         """
 
         # Create the force field physical values from the mathematical values
-        self.FF.make(self.tempdir,mvals,self.usepvals)
+        pvals = self.FF.create_pvals(mvals)
         cpmm = []
         print "CPMM: %s   \r" % self.tempdir,
         # Loop through the snapshots

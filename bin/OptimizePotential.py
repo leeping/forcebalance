@@ -14,7 +14,7 @@ def main():
         print "Please call this program with only one argument - the name of the input file."
         sys.exit(1)
     P = Project(sys.argv[1])
-    P.Run()
+    P.Optimizer.Run()
 
 if __name__ == "__main__":
     main()

@@ -59,7 +59,9 @@ gen_opts_types = {
                  "gmxsuffix"                 : "",      # The suffix of GROMACS executables
                  "penalty_type"              : "L2",    # Type of the penalty, L2 or L1 in the optimizer
                  "scan_vals"                 : None,    # Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1
-                 "ffdir"                : 'forcefield'  # Directory containing force fields, relative to project directory
+                 "readchk"                   : None,    # Name of the restart file we're reading from
+                 "writechk"                  : None,    # Name of the restart file we're writing to (can be same as readchk)
+                 "ffdir"               : 'forcefield',  # Directory containing force fields, relative to project directory
                  },
     'allcaps' : {"jobtype"                   : "sp"     # The job type, defaults to a single-point evaluation of objective function
                  },
@@ -70,19 +72,19 @@ gen_opts_types = {
     'ints'    : {"maxstep"                   : 100      # Maximum number of steps in an optimization
                  },
     'bools'   : {"backup"                    : 1,       # Write temp directories to backup before wiping them (always used)
-                 "readchk"                   : 1,       # Read in a checkpoint file (for the optimizer)
-                 "writechk"                  : 1        # Write the checkpoint file (for the optimizer)
+                 "writechk_step"             : 0,       # Write the checkpoint file at every optimization step
                  },
-    'floats'  : {"trust0"                    : 1e-4,    # Trust radius for the MainOptimizer
+    'floats'  : {"trust0"                    : 1e-2,    # Trust radius for the MainOptimizer
                  "convergence_objective"     : 1e-4,    # Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)
+                 "convergence_gradient"      : 1e-4,    # Convergence criterion of gradient norm
                  "convergence_step"          : 1e-4,    # Convergence criterion of step size (just needs to fall below this threshold)
                  "eig_lowerbound"            : 1e-4,    # Minimum eigenvalue for applying steepest descent correction in the MainOptimizer
                  "finite_difference_h"       : 1e-4,    # Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)
                  "penalty_additive"          : 0.0,     # Factor for additive penalty function in objective function
                  "penalty_multiplicative"    : 0.1      # Factor for multiplicative penalty function in objective function
                  },
-    'sections': {"readmvals"                 : None,    # Paste mathematical parameters into the input file for them to be read in directly
-                 "readpvals"                 : None     # Paste physical parameters into the input file for them to be read in directly
+    'sections': {"read_mvals"                : None,    # Paste mathematical parameters into the input file for them to be read in directly
+                 "read_pvals"                : None     # Paste physical parameters into the input file for them to be read in directly
                  }
     }
 
@@ -128,8 +130,31 @@ for t in sim_opts_types:
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","OPTIONS","END","NONE"]
-## Listing of subsections.
-subsections  = {"OPTIONS":["READ_MVALS", "READ_PVALS"]}
+
+def read_mvals(fobj):
+    Answer = []
+    for line in fobj:
+        if re.match("(/read_mvals)|(^\$end)",line):
+            break
+        Answer.append(float(line.split('[')[-1].split(']')[0].split()[0]))
+    return Answer
+        
+def read_pvals(fobj):
+    Answer = []
+    for line in fobj:
+        if re.match("(/read_pvals)|(^\$end)",line):
+            break
+        Answer.append(float(line.split('[')[-1].split(']')[0].split()[0]))
+    return Answer
+
+def read_internals(fobj):
+    return
+
+## ParsTab that refers to subsection parsers.
+ParsTab  = {"read_mvals" : read_mvals,
+            "read_pvals" : read_pvals,
+            "internal"   : read_internals
+            }
 
 def parse_inputs(input_file):
     """ Parse through the input file and read all user-supplied options.
@@ -160,7 +185,8 @@ def parse_inputs(input_file):
     options.update(gen_opts_defaults)
     sim_opts = []
     this_sim_opt = deepcopy(sim_opts_defaults)
-    for line in open(input_file):
+    fobj = open(input_file)
+    for line in fobj:
         # Anything after "#" is a comment
         line = line.split("#")[0].strip()
         s = line.split()
@@ -178,7 +204,7 @@ def parse_inputs(input_file):
         elif section in ["OPTIONS","SIMULATION"]:
             # Depending on which section we are in, we choose the correct type dictionary
             # and add stuff to 'options' and 'this_sim_opt'
-            (this_opt, opts_types) = section == "OPTIONS" and (options, gen_opts_types) or (this_sim_opt, sim_opts_types)
+            (this_opt, opts_types) = (options, gen_opts_types) if section == "OPTIONS" else (this_sim_opt, sim_opts_types)
             if key in opts_types['strings']:
                 this_opt[key] = s[1]
             elif key in opts_types['allcaps']:
@@ -198,7 +224,7 @@ def parse_inputs(input_file):
             elif key in opts_types['floats']:
                 this_opt[key] = float(s[1])
             elif key in opts_types['sections']:
-                pass # Not implemented yet
+                this_opt[key] = ParsTab[key](fobj)
             else:
                 print "Unrecognized keyword: --- \x1b[1;91m%s\x1b[0m --- in %s section" \
                       % (key, section == "OPTIONS" and "general" or "simulation")

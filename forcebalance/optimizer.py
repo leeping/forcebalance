@@ -12,12 +12,10 @@ contained inside.
 
 """
 
-import os
-import sys
-import re
-from numpy import append, array, delete, exp, eye, insert, linspace, mat, sort, std, zeros
+import os, pickle, re, sys
+from numpy import append, array, delete, exp, eye, insert, linspace, mat, ones, sort, std, zeros
 from numpy.linalg import eig, norm, solve
-from nifty import col, flat, row, printcool
+from nifty import col, flat, row, printcool, printcool_dictionary
 from finite_difference import f1d5p, fdwrap
 
 class Optimizer(object):
@@ -42,6 +40,10 @@ class Optimizer(object):
         #======================================#
         # Options that are given by the parser #
         #======================================#
+        ## The root directory
+        self.root      = options['root']
+        ## The job type
+        self.jobtype   = options['jobtype']
         ## Initial step size trust radius
         self.trust0    = options['trust0']
         ## Lower bound on Hessian eigenvalue (below this, we add in steepest descent)
@@ -52,6 +54,8 @@ class Optimizer(object):
         self.conv_obj  = options['convergence_objective']
         ## Step size convergence threshold
         self.conv_stp  = options['convergence_step']
+        ## Gradient convergence threshold
+        self.conv_grd  = options['convergence_gradient']
         ## Maximum number of optimization steps
         self.maxstep   = options['maxstep']
         ## For scan[mp]vals: The parameter index to scan over
@@ -60,6 +64,12 @@ class Optimizer(object):
         self.idxname   = options['scanindex_name']
         ## For scan[mp]vals: The values that are fed into the scanner
         self.scan_vals = options['scan_vals']
+        ## Name of the checkpoint file that we're reading in
+        self.rchk_fnm  = options['readchk']
+        ## Name of the checkpoint file that we're writing out
+        self.wchk_fnm  = options['writechk']
+        ## Whether to write the checkpoint file at every step
+        self.wchk_step = options['writechk_step']
         
         #======================================#
         #     Variables which are set here     #
@@ -71,18 +81,19 @@ class Optimizer(object):
         ## The force field itself
         self.FF        = FF
         ## A list of all the things we can ask the optimizer to do.
-        self.OptTab    = {'NEWTONRAPHSON' : self.NewtonRaphson, 
-                          'BFGS'          : self.BFGS,
-                          'POWELL'        : self.Powell,
-                          'SIMPLEX'       : self.Simplex,
-                          'ANNEAL'        : self.Anneal,
-                          'SCAN_MVALS'    : self.ScanMVals,
-                          'SCAN_PVALS'    : self.ScanPVals,
-                          'SINGLE'        : self.SinglePoint,
-                          'GRADIENT'      : self.Gradient,
-                          'HESSIAN'       : self.Hessian,
-                          'FDCHECKG'      : self.FDCheckG,
-                          'FDCHECKH'      : self.FDCheckH
+        self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
+                          'BFGS'              : self.BFGS,
+                          'POWELL'            : self.Powell,
+                          'SIMPLEX'           : self.Simplex,
+                          'ANNEAL'            : self.Anneal,
+                          'CONJUGATEGRADIENT' : self.ConjugateGradient,
+                          'SCAN_MVALS'        : self.ScanMVals,
+                          'SCAN_PVALS'        : self.ScanPVals,
+                          'SINGLE'            : self.SinglePoint,
+                          'GRADIENT'          : self.Gradient,
+                          'HESSIAN'           : self.Hessian,
+                          'FDCHECKG'          : self.FDCheckG,
+                          'FDCHECKH'          : self.FDCheckH
                           }
         
         #======================================#
@@ -90,12 +101,52 @@ class Optimizer(object):
         #======================================#
         ## The indices to be excluded from the Hessian update
         self.excision  = list(FF.excision)
-        ## The original parameter values
-        self.mvals0    = FF.mvals0.copy()
         ## Number of parameters
         self.np        = FF.np
+        ## The original parameter values
+        if options['read_mvals'] != None:
+            self.mvals0    = array(options['read_mvals'])
+        elif options['read_pvals'] != None:
+            self.mvals0    = FF.create_mvals(options['read_pvals'])
+        else:
+            self.mvals0    = zeros(self.np)
+
+        ## Print the optimizer options.
+        printcool_dictionary(options, title="Setup for optimizer")
+        ## Load the checkpoint file.
+        self.readchk()
         
+    def Run(self):
+        """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
+
+        xk = self.OptTab[self.jobtype]()
         
+        ## Sometimes the optimizer doesn't return anything (i.e. in the case of a single point calculation)
+        ## In these situations, don't do anything
+        if xk == None: return
+
+        ## Check derivatives by finite difference after the optimization is over (for good measure)
+        check_after = False
+        if check_after:
+            self.mvals0 = xk.copy()
+            self.FDCheckG()
+            
+        ## Print out final answer
+        final_print = True
+        if final_print:
+            bar = printcool("Final parameter values\n Paste to input file to restart\n Choose pvals or mvals",bold=True,color=4)
+            print "read_pvals"
+            self.FF.print_map(self.FF.create_pvals(xk))
+            print "/read_pvals"
+            print "read_mvals"
+            self.FF.print_map(xk)
+            print "/read_mvals"
+            print bar
+            self.FF.make('result',xk,False)
+
+        ## Write out stuff to checkpoint file
+        self.writechk()
+            
     def MainOptimizer(self,b_BFGS=0):
         """ The main ForceBalance trust-radius optimizer.
 
@@ -125,29 +176,62 @@ class Optimizer(object):
         @param[in] b_BFGS Switch to use BFGS (True) or Newton-Raphson (False)
 
         """
+        printcool( "Main Optimizer\n%s Mode" % ("BFGS" if b_BFGS else "Newton-Raphson"), color=7, bold=1)
         # First, set a bunch of starting values
-        xk_prev     = self.mvals0.copy()
-        xk          = self.mvals0.copy()
-        trust       = self.trust0
         Ord         = b_BFGS and 1 or 2
-        data        = self.Objective(xk,Ord)
-        ehist       = array([])
-        X, G, H = data['X'], data['G'], data['H']
-        X_best  = X
-        G_prev = G.copy()
-        H_stor = H.copy()
+        if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
+            print "Reading initial objective, gradient, Hessian from checkpoint file"
+            xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
+            X_best, xk_prev, trust = self.chk['x_best'], self.chk['xk_prev'], self.chk['trust']
+        else:
+            xk       = self.mvals0.copy()
+            print
+            data     = self.Objective(xk,Ord,verbose=True)
+            X, G, H  = data['X'], data['G'], data['H']
+            ehist    = array([X])
+            xk_prev  = xk.copy()
+            trust    = self.trust0
+            X_best   = X
+
+        G_prev   = G.copy()
+        H_stor   = H.copy()
         stepn  = 0
+        ndx    = 0.0
+        color  = "\x1b[97m"
         while 1: # Loop until convergence is reached.
+            ## Put data into the checkpoint file
+            self.chk = {'xk': xk, 'X' : X, 'G' : G, 'H': H, 'ehist': ehist,
+                        'x_best': X_best,'xk_prev': xk_prev, 'trust': trust}
+            if self.wchk_step:
+                self.writechk()
+            nxk = norm(xk)
+            ngr = norm(G)
+            stdfront = len(ehist) > 10 and std(sort(ehist)[:10]) or (len(ehist) > 0 and std(ehist) or 0.0)
+            print "\n%6s%12s%12s%12s%14s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)")
+            print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e" % (stepn, nxk, ndx, ngr, color, X, stdfront)
+            # Check the convergence criteria
+            if ngr < self.conv_grd:
+                print "Convergence criterion reached for gradient norm (%.2e)" % self.conv_grd
+                break
+            if stepn == self.maxstep:
+                print "Maximum number of optimization steps reached (%i)" % stepn
+                break
+            if ndx < self.conv_stp and stepn > 0:
+                print "Convergence criterion reached in step size (%.2e)" % self.conv_stp
+                break
+            if stdfront < self.conv_obj and len(ehist) > 10:
+                print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
+                break
             # Take a step in the parameter space.
             dx, over = self.step(G, H, trust)
             xk += dx
             # Evaluate the objective function and its derivatives.
-            data        = self.Objective(xk,Ord)
+            print
+            data        = self.Objective(xk,Ord,verbose=True)
             X, G, H = data['X'], data['G'], data['H']
             # if pkg.efweight > 0.99:
             #     dFc, patomax = cartesian_dforce(pkg)
             ndx = norm(dx)
-            nxk = norm(xk)
             if X > X_best:
                 goodstep = False
                 color = "\x1b[91m"
@@ -192,19 +276,11 @@ class Optimizer(object):
                 # End BFGS stuff
                 xk_prev = xk.copy()
                 ehist = append(ehist, X)
-            stdfront = len(ehist) > 10 and std(sort(ehist)[:10]) or (len(ehist) > 0 and std(ehist) or 0.0)
             drc = abs(flat(dx)).argmax()
             stepn += 1
-            print " %12.3e%12.3e%s%14.5e \x1b[0m           " % (stdfront, ndx, color, X)
-            if ndx < self.conv_stp:
-                print "Convergence criterion reached in step size (%.2e)" % self.conv_stp
-                break
-            elif stdfront < self.conv_obj and len(ehist) > 10:
-                print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
-                break
-            elif stepn == self.maxstep:
-                print "Maximum number of optimization steps reached (%i)" % stepn
             
+        return xk
+
     def step(self, G, H, trust):
         """ Computes the Newton-Raphson or BFGS step.
 
@@ -252,11 +328,11 @@ class Optimizer(object):
 
     def NewtonRaphson(self):
         """ Optimize the force field parameters using the Newton-Raphson method (@see MainOptimizer) """
-        self.MainOptimizer(b_BFGS=0)
+        return self.MainOptimizer(b_BFGS=0)
 
     def BFGS(self):
         """ Optimize the force field parameters using the BFGS method; currently the recommended choice (@see MainOptimizer) """
-        self.MainOptimizer(b_BFGS=1)
+        return self.MainOptimizer(b_BFGS=1)
 
     def ScipyOptimizer(self,Algorithm="None"):
         """ Driver for SciPy optimizations.
@@ -268,41 +344,70 @@ class Optimizer(object):
         @param[in] Algorithm The optimization algorithm to use, for example 'powell', 'simplex' or 'anneal'
 
         """
-        def xwrap(func):
+        from scipy import optimize
+        def xwrap(func,verbose=True):
             def my_func(mvals):
-                print ' '.join(["% .4f" % i for i in mvals])
-                Answer = func(mvals,Order=0)['X']
-                print Answer
+                if verbose: print
+                Answer = func(mvals,Order=0,verbose=verbose)['X']
+                dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
+                if Answer < my_func.x_best or my_func.x_best == None:
+                    color = "\x1b[92m"
+                    my_func.x_best = Answer
+                else:
+                    color = "\x1b[91m"
+                if verbose:
+                    print "k=", ' '.join(["% .4f" % i for i in mvals])
+                    print "X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (color,Answer,dx)
                 return Answer
+            my_func.x_best = None
             return my_func
-        def gwrap(func):
+        def gwrap(func,verbose=True):
             def my_gfunc(mvals):
-                print ' '.join(["% .4f" % i for i in mvals])
-                Answer = func(mvals,Order=1)['G']
-                print Answer
+                if verbose: print
+                Output = func(mvals,Order=1,verbose=verbose)
+                Answer = Output['G']
+                Objective = Output['X']
+                dx = (my_gfunc.x_best - Objective) if my_gfunc.x_best != None else 0.0
+                if Objective < my_gfunc.x_best or my_gfunc.x_best == None:
+                    color = "\x1b[92m"
+                    my_gfunc.x_best = Objective
+                else:
+                    color = "\x1b[91m"
+                if verbose:
+                    print "k=", ' '.join(["% .4f" % i for i in mvals])
+                    print "|Grad|= %12.3e X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (norm(Answer),color,Objective,dx)
+                    print
                 return Answer
+            my_gfunc.x_best = None
             return my_gfunc
         if Algorithm == "powell":
-            from scipy.optimize import fmin_powell
-            fmin_powell(swrap(self.Objective),self.mvals0)
+            printcool("Minimizing Objective Function using Powell's Method" , color=7, bold=1)
+            return optimize.fmin_powell(xwrap(self.Objective),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep)
         elif Algorithm == "simplex":
-            from scipy.optimize import fmin
-            fmin(swrap(self.Objective),self.mvals0)
+            printcool("Minimizing Objective Function using Simplex Method" , color=7, bold=1)
+            return optimize.fmin(xwrap(self.Objective),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep,maxfun=self.maxstep*10)
         elif Algorithm == "anneal":
-            from scipy.optimize import anneal
-            anneal(swrap(self.Objective),self.mvals0,lower=0,upper=2)
+            printcool("Minimizing Objective Function using Simulated Annealing" , color=7, bold=1)
+            return optimize.anneal(xwrap(self.Objective),self.mvals0,lower=-1*ones(self.np),upper=1*ones(self.np),schedule='boltzmann')
+        elif Algorithm == "cg":
+            printcool("Minimizing Objective Function using Conjugate Gradient" , color=7, bold=1)
+            return optimize.fmin_cg(xwrap(self.Objective,verbose=False),self.mvals0,fprime=gwrap(self.Objective),gtol=self.conv_grd)
 
     def Simplex(self):
         """ Use SciPy's built-in simplex algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
-        self.ScipyOptimizer(Algorithm="simplex")
+        return self.ScipyOptimizer(Algorithm="simplex")
 
     def Powell(self):
         """ Use SciPy's built-in Powell direction-set algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
-        self.ScipyOptimizer(Algorithm="powell")
+        return self.ScipyOptimizer(Algorithm="powell")
 
     def Anneal(self):
         """ Use SciPy's built-in simulated annealing algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
-        self.ScipyOptimizer(Algorithm="anneal")
+        return self.ScipyOptimizer(Algorithm="anneal")
+
+    def ConjugateGradient(self):
+        """ Use SciPy's built-in simulated annealing algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
+        return self.ScipyOptimizer(Algorithm="cg")
 
     def Scan_Values(self,MathPhys=1):
         """ Scan through parameter values.
@@ -353,7 +458,6 @@ class Optimizer(object):
             for i in scanvals:
                 vals[pidx] = i
                 data        = self.Objective(vals,Order=0)
-                print self.FF.pvals
                 print "Value = % .4e Objective = % .4e" % (i, data['X'])
 
     def ScanMVals(self):
@@ -446,3 +550,19 @@ class Optimizer(object):
                 cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
                 print "    %-8i%-20s%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
                       % (i, self.FF.plist[i][:20], self.FF.plist[j][:20], Adata[i,j], Fdata[i,j], cD, D, cQ, Q)
+
+    def readchk(self):
+        self.chk = {}
+        if self.rchk_fnm != None:
+            absfnm = os.path.join(self.root,self.rchk_fnm)
+            if os.path.exists(absfnm):
+                self.chk = pickle.load(open(absfnm))
+            else:
+                print "\x1b[1;93mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)"
+        return self.chk
+
+    def writechk(self):
+        if self.wchk_fnm != None:
+            print "Writing the checkpoint file %s" % self.wchk_fnm
+            with open(os.path.join(self.root,self.wchk_fnm),'w') as f: pickle.dump(self.chk,f)
+        
