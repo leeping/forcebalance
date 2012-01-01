@@ -19,23 +19,14 @@ class node:
     def __init__(self, nodeid = 0, name = '', parent = None, dtype = None):
         """
         Constructor
-        @param nodeid @todo document
-        @param name @todo document
-        @param parent @todo document
-        @param dtype @todo document
         """
-        ##@todo document
         self.oid = nodeid
-        ##@todo document
         self.name = name
-        ##@todo document
         self.parent = parent
-        ##@todo document
         self.dtype = dtype
 
 def main():
     """
-    @todo document
     """
     modulelist = []
     for filename in glob.glob('*.py'):
