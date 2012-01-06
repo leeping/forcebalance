@@ -74,7 +74,7 @@ gen_opts_types = {
                  },
     'ints'    : {"maxstep"      : (100, 'Maximum number of steps in an optimization'),
                  },
-    'bools'   : {"backup"         : (1, 'Write temp directories to backup before wiping them (always used)'),
+    'bools'   : {"backup"         : (1, 'Write temp directories to backup before wiping them'),
                  "writechk_step"  : (0, 'Write the checkpoint file at every optimization step')
                  },
     'floats'  : {"trust0"                 : (1e-2, 'Trust radius for the MainOptimizer'),
