@@ -1,6 +1,6 @@
-include doc/doxygen.cfg
-include doc/latex/refman.pdf
+include doc/ForceBalance-Manual.pdf
 include doc/Images/*
+include doc/doxygen.cfg
 include doc/callgraph/CallGraph.py
 include doc/callgraph/Run_To_Make_Cool_Picture.sh
 include doc/header.tex
