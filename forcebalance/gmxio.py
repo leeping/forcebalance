@@ -141,7 +141,7 @@ def parse_atomtype_line(line):
     answer = {'atomtype':atomtype, 'batomtype':batomtype, 'atomicnum':atomicnum, 'mass':mass, 'chg':chg, 'ptp':ptp, 'param':param, 'bonus':bonus}
     return answer
 
-class Reader(BaseReader):
+class ITP_Reader(BaseReader):
     """Finite state machine for parsing GROMACS force field files.
 
     This class is instantiated when we begin to read in a file.  The
@@ -155,7 +155,7 @@ class Reader(BaseReader):
     
     def __init__(self,fnm):
         # Initialize the superclass. :)
-        super(Reader,self).__init__(fnm)
+        super(ITP_Reader,self).__init__(fnm)
         ## The current section that we're in
         self.sec = None
         ## Nonbonded type
@@ -280,3 +280,18 @@ def gmxprint(fnm, vec, type):
         for i in vec:
             print >> fobj, "% .12e" % i,
     fobj.close()
+
+
+def set_gmx_paths(me,options):
+    """ Set the gmxrunpath, gmxtoolpath and gmxsuffix attributes of a class.
+    
+    \param[in] me The class whose attributes we want to set.
+    \param[in] options Simulation options dictionary
+    
+    """
+    ##  The path for main GROMACS executables like mdrun, grompp (if linking to just-built binaries)
+    me.gmxrunpath  = options['gmxrunpath'] != None and options['gmxrunpath'] or options['gmxpath']
+    ##  The path for GROMACS tools like g_energy (if linking to just-built binaries)
+    me.gmxtoolpath = options['gmxrunpath'] != None and options['gmxtoolpath'] or options['gmxpath']
+    ##  Suffix for GROMACS executables
+    me.gmxsuffix   = options['gmxsuffix']

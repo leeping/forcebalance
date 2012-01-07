@@ -115,7 +115,7 @@ def printcool_dictionary(dict,title="General options"):
     @param[in] title The title of the printout
     """
     bar = printcool(title)
-    print '\n'.join(["%-25s %s " % (key,str(dict[key])) for key in sorted([i for i in dict])])
+    print '\n'.join(["%-25s %s " % (key,str(dict[key])) for key in sorted([i for i in dict]) if dict[key] != None])
     print bar
 
 def col(vec):

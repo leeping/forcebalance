@@ -18,14 +18,14 @@ pdict = {'BASS':{0:'A', 1:'C'},
          'BASSP' :{0:'A', 1:'B', 2:'C'}
          }
 
-class Reader(BaseReader):
+class QCIn_Reader(BaseReader):
     """Finite state machine for parsing Q-Chem input files.
     
     """
     
     def __init__(self,fnm):
         # Initialize the superclass. :)
-        super(Reader,self).__init__(fnm)
+        super(QCIn_Reader,self).__init__(fnm)
         self.atom  = ''
         self.snum  = -1
         self.cnum  = -1

@@ -1,8 +1,11 @@
 """ Fitting simulation base class. """
 
 import os
+import subprocess
+import shutil
 from nifty import printcool_dictionary
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
+from gmxio import set_gmx_paths
 
 class FittingSimulation(object):
     
@@ -123,7 +126,19 @@ class FittingSimulation(object):
         self.gct         = 0
         ## Counts how often the Hessian was computed
         self.hct         = 0
+
+        #======================================#
+        #          UNDER DEVELOPMENT           #
+        #======================================#
+        ## The name of the simulation software that we're using
+        self.software = sim_opts['software']
+        ## Set the path for executables
+        if self.software in ['GMX','GROMACS']:
+            set_gmx_paths(self, options)
                                                                  
+        # Back up and then delete the temporary directory.
+        self.backup_temp_directory()
+        shutil.rmtree(os.path.join(self.root,self.tempdir),ignore_errors=True)
         # Print the options for this simulation to the terminal.
         printcool_dictionary(sim_opts,"Setup for fitting simulation %s :" % self.name)
 
@@ -181,3 +196,15 @@ class FittingSimulation(object):
         self.hct += 1
         return Ans
 
+    def backup_temp_directory(self):
+        """ Back up the temporary directory."""
+        cwd = os.getcwd()
+        if not os.path.exists(os.path.join(self.root,'backups')):
+            os.makedirs(os.path.join(self.root,'backups'))
+        if os.path.exists(os.path.join(self.root,self.tempdir)):
+            print "Backing up:", self.tempdir
+            os.chdir(os.path.join(self.root,"temp"))
+            # I could use the tarfile module here
+            subprocess.call(["tar","cjf",os.path.join(self.root,'backups',"%s.tar.bz2" % self.name),self.name,"--remove-files"])
+            os.chdir(cwd)
+            

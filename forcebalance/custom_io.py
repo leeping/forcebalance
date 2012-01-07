@@ -26,7 +26,7 @@ pdict = {'CPGAUSS':{3:'A', 4:'B', 5:'C'},
          'CPEXPG' :{3:'A1', 4:'B', 5:'X0', 6:'A2'}
          }
 
-class Reader(BaseReader):
+class Gen_Reader(BaseReader):
     """Finite state machine for parsing custom GROMACS force field files.
 
     This class is instantiated when we begin to read in a file.  The
@@ -40,7 +40,7 @@ class Reader(BaseReader):
     
     def __init__(self,fnm):
         # Initialize the superclass. :)
-        super(Reader,self).__init__(fnm)
+        super(Gen_Reader,self).__init__(fnm)
         ## The current section that we're in
         self.sec = None
         ## The parameter dictionary (defined in this file)

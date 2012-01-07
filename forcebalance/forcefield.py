@@ -111,9 +111,9 @@ FF_Extensions = {"itp" : "gmx",
                  }
 
 """ Recognized force field formats. """
-FF_IOModules = {"gmx": gmxio.Reader ,
-                "qchem": qchemio.Reader ,
-                "custom": custom_io.Reader
+FF_IOModules = {"gmx": gmxio.ITP_Reader ,
+                "qchem": qchemio.QCIn_Reader ,
+                "custom": custom_io.Gen_Reader
                 }
 
 def determine_fftype(ffname):

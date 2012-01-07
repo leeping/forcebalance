@@ -92,7 +92,7 @@ class CounterpoiseMatch(FittingSimulation):
     def get(self,mvals,AGrad=False,AHess=False,tempdir=None):
         """Gets the objective function for fitting the counterpoise correction.
 
-        As opposed to ForceEnergyMatch_GMX, which calls an external program,
+        As opposed to ForceEnergyMatch_GMXX2, which calls an external program,
         this script actually computes the empirical interaction given the
         force field parameters.
 

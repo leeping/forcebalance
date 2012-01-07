@@ -33,9 +33,11 @@ Each option is meant to be parsed as a certain variable type.
 plus if the option occurs more than once it will aggregate all of the values.
 - Integer and float option types are read in a pretty straightforward way
 - Boolean option types are always set to true, unless the second word is '0', 'no', or 'false' (not case sensitive)
-- Section option types haven't been implemented yet.  They are meant to treat more elaborate inputs, such as
-the user pasting in output parameters from a previous job as input, or a specification of internal coordinate system.
-I imagine that for every section type I would have to write my own parser.  Maybe a ParsTab of parsing functions would work. :)
+- Section option types are meant to treat more elaborate inputs, such
+as the user pasting in output parameters from a previous job as input,
+or a specification of internal coordinate system.  I imagine that for
+every section type I would have to write my own parser.  Maybe a
+ParsTab of parsing functions would work. :)
 
 To add a new option, simply add it to the dictionaries below and give it a default value if desired.
 If you add an entirely new type, make sure to implement the interpretation of that type in the parse_inputs function.
@@ -52,73 +54,77 @@ from nifty import printcool, printcool_dictionary
 from copy import deepcopy
 
 ## Default general options.
+## Note that the documentation is included in part of the key; this will aid in automatic doc-extraction. :)
 gen_opts_types = {
-    'strings' : {"gmxpath"                   : None,    # Overall path for GROMACS executables (i.e. if we ran "make install" for gmx) for *_gmx functionality
-                 "gmxrunpath"                : None,    # Path for GROMACS executables grompp and mdrun, may override GMXPATH (i.e. if we only ran "make")
-                 "gmxtoolpath"               : None,    # Path for GROMACS tools, may override GMXPATH
-                 "gmxsuffix"                 : "",      # The suffix of GROMACS executables
-                 "penalty_type"              : "L2",    # Type of the penalty, L2 or L1 in the optimizer
-                 "scan_vals"                 : None,    # Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1
-                 "readchk"                   : None,    # Name of the restart file we're reading from
-                 "writechk"                  : None,    # Name of the restart file we're writing to (can be same as readchk)
-                 "ffdir"               : 'forcefield',  # Directory containing force fields, relative to project directory
+    'strings' : {"gmxpath"      : (None, 'Overall path for GROMACS executables (i.e. if we ran "make install" for gmx) for *_gmx functionality'),
+                 "gmxrunpath"   : (None, 'Path for GROMACS executables grompp and mdrun, may override GMXPATH (i.e. if we only ran "make")'),
+                 "gmxtoolpath"  : (None, 'Path for GROMACS tools, may override GMXPATH'),
+                 "gmxsuffix"    : ('',   'The suffix of GROMACS executables'),
+                 "penalty_type" : ("L2", 'Type of the penalty, L2 or L1 in the optimizer'),
+                 "scan_vals"    : (None, 'Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1'),
+                 "readchk"      : (None, 'Name of the restart file we read from'),
+                 "writechk"     : (None, 'Name of the restart file we write to (can be same as readchk)'),
+                 "ffdir"        : ('forcefield', 'Directory containing force fields, relative to project directory')
                  },
-    'allcaps' : {"jobtype"                   : "sp"     # The job type, defaults to a single-point evaluation of objective function
+    'allcaps' : {"jobtype"      : ("sp", 'The job type, defaults to a single-point evaluation of objective function'),
                  },
-    'lists'   : {"forcefield"                : [],      # The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
-                 "scanindex_num"             : [],      # Numerical index of the parameter to scan over in job type "scan[mp]vals"
-                 "scanindex_name"            : []       # Parameter name to scan over (should convert to a numerical index) in job type "scan[mp]vals"
+    'lists'   : {"forcefield"     : ([], 'The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)'),
+                 "scanindex_num"  : ([], 'Numerical index of the parameter to scan over in job type "scan[mp]vals"'),
+                 "scanindex_name" : ([], 'Parameter name to scan over (should convert to a numerical index) in job type "scan[mp]vals"')
                  },
-    'ints'    : {"maxstep"                   : 100      # Maximum number of steps in an optimization
+    'ints'    : {"maxstep"      : (100, 'Maximum number of steps in an optimization'),
                  },
-    'bools'   : {"backup"                    : 1,       # Write temp directories to backup before wiping them (always used)
-                 "writechk_step"             : 0,       # Write the checkpoint file at every optimization step
+    'bools'   : {"backup"         : (1, 'Write temp directories to backup before wiping them'),
+                 "writechk_step"  : (0, 'Write the checkpoint file at every optimization step')
                  },
-    'floats'  : {"trust0"                    : 1e-2,    # Trust radius for the MainOptimizer
-                 "convergence_objective"     : 1e-4,    # Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)
-                 "convergence_gradient"      : 1e-4,    # Convergence criterion of gradient norm
-                 "convergence_step"          : 1e-4,    # Convergence criterion of step size (just needs to fall below this threshold)
-                 "eig_lowerbound"            : 1e-4,    # Minimum eigenvalue for applying steepest descent correction in the MainOptimizer
-                 "finite_difference_h"       : 1e-4,    # Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)
-                 "penalty_additive"          : 0.0,     # Factor for additive penalty function in objective function
-                 "penalty_multiplicative"    : 0.1      # Factor for multiplicative penalty function in objective function
+    'floats'  : {"trust0"                 : (1e-2, 'Trust radius for the MainOptimizer'),
+                 "convergence_objective"  : (1e-4, 'Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)'),
+                 "convergence_gradient"   : (1e-4, 'Convergence criterion of gradient norm'),
+                 "convergence_step"       : (1e-4, 'Convergence criterion of step size (just needs to fall below this threshold)'),
+                 "eig_lowerbound"         : (1e-4, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
+                 "finite_difference_h"    : (1e-4, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
+                 "penalty_additive"       : (0.0, 'Factor for additive penalty function in objective function'),
+                 "penalty_multiplicative" : (0.1, 'Factor for multiplicative penalty function in objective function')
                  },
-    'sections': {"read_mvals"                : None,    # Paste mathematical parameters into the input file for them to be read in directly
-                 "read_pvals"                : None     # Paste physical parameters into the input file for them to be read in directly
+    'sections': {"read_mvals" : (None, 'Paste mathematical parameters into the input file for them to be read in directly'),
+                 "read_pvals" : (None, 'Paste physical parameters into the input file for them to be read in directly')
                  }
     }
 
 ## Default general options - basically a collapsed veresion of gen_opts_types.
 gen_opts_defaults = {}
 for t in gen_opts_types:
-    gen_opts_defaults.update(gen_opts_types[t])
-
-# NOT IMPLEMENTED YET: Internal coordinates, 'Sampling correction', charge groups, parallel run
+    subdict = {}
+    for i in gen_opts_types[t]:
+        subdict[i] = gen_opts_types[t][i][0]
+    gen_opts_defaults.update(subdict)
 
 ## Default fitting simulation options.
 sim_opts_types = {
-    'strings' : {"name"                      : None,    # The name of the simulation, which corresponds to the directory simulations/dir_name
+    'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name'),
+                 "trajfnm"   : (None, 'The trajectory file name.  If not specified, a default will be chosen depending on the "software" variable.')
                  },
-    'allcaps' : {"simtype"                   : None     # The type of fitting simulation, for instance ForceEnergyMatching_GMX
+    'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance ForceEnergyMatch_GMXX2'),
+                 "software"  : ('GROMACS', 'The name of the software for this fitting simulation')
                  },
-    'lists'   : {"fd_ptypes"                 : []       # The parameter types that need to be differentiated using finite difference
+    'lists'   : {"fd_ptypes" : ([], 'The parameter types that need to be differentiated using finite difference')
                  },
-    'ints'    : {"shots"                     : -1,      # Number of snapshots (force+energy matching); defaults to all of the snapshots
-                 "fitatoms"                  : 0        # Number of fitting atoms (force+energy matching); defaults to all of them
+    'ints'    : {"shots"     : (-1, 'Number of snapshots (force+energy matching); defaults to all of the snapshots'),
+                 "fitatoms"  : (0, 'Number of fitting atoms (force+energy matching); defaults to all of them')
                  },
-    'bools'   : {"whamboltz"                 : 0,       # Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False
-                 "sampcorr"                  : 0,       # Whether to use the (archaic) sampling correction (force+energy match), defaults to False
-                 "covariance"                : 1,       # Whether to use the quantum covariance matrix (force+energy match), defaults to True
-                 "batch_fd"                  : 0,       # Whether to batch and queue up finite difference jobs, defaults to False
-                 "fdgrad"                    : 1,       # Finite difference gradients
-                 "fdhess"                    : 1,       # Finite difference Hessian diagonals (costs np times a gradient calculation)
-                 "fdhessdiag"                : 1,       # Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)
-                 "use_pvals"                 : 0,       # Bypass the transformation matrix and use the physical parameters directly
+    'bools'   : {"whamboltz"  : (0, 'Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False'),
+                 "sampcorr"   : (0, 'Whether to use the (archaic) sampling correction (force+energy match), defaults to False'),
+                 "covariance" : (1, 'Whether to use the quantum covariance matrix (force+energy match), defaults to True'),
+                 "batch_fd"   : (0, 'Whether to batch and queue up finite difference jobs, defaults to False'),
+                 "fdgrad"     : (1, 'Finite difference gradients'),
+                 "fdhess"     : (1, 'Finite difference Hessian diagonals (costs np times a gradient calculation)'),
+                 "fdhessdiag" : (1, 'Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)'),
+                 "use_pvals"  : (0, 'Bypass the transformation matrix and use the physical parameters directly')
                  },
-    'floats'  : {"weight"                    : 1.0,     # Weight of the current simulation (with respect to other simulations)
-                 "efweight"                  : 0.5,     # 1.0 for all energy and 0.0 for all force (force+energy match), defaults to 0.5
-                 "qmboltz"                   : 0.0,     # Fraction of Quantum Boltzmann Weights (force+energy match), 1.0 for full reweighting, 0.0 < 1.0 for hybrid
-                 "qmboltztemp"               : 298.15   # Temperature for Quantum Boltzmann Weights (force+energy match), defaults to room temperature
+    'floats'  : {"weight"      : (1.0, 'Weight of the current simulation (with respect to other simulations)'),
+                 "efweight"    : (0.5, '1.0 for all energy and 0.0 for all force (force+energy match), defaults to 0.5'),
+                 "qmboltz"     : (0.0, 'Fraction of Quantum Boltzmann Weights (force+energy match), 1.0 for full reweighting, 0.0 < 1.0 for hybrid'),
+                 "qmboltztemp" : (298.15, 'Temperature for Quantum Boltzmann Weights (force+energy match), defaults to room temperature')
                  },
     'sections': {}
     }
@@ -126,7 +132,10 @@ sim_opts_types = {
 ## Default simulation options - basically a collapsed version of sim_opts_types.
 sim_opts_defaults = {}
 for t in sim_opts_types:
-    sim_opts_defaults.update(sim_opts_types[t])
+    subdict = {}
+    for i in sim_opts_types[t]:
+        subdict[i] = sim_opts_types[t][i][0]
+    sim_opts_defaults.update(subdict)
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","OPTIONS","END","NONE"]
@@ -156,6 +165,37 @@ ParsTab  = {"read_mvals" : read_mvals,
             "internal"   : read_internals
             }
 
+def printsection(heading,optdict,typedict):
+    """ Print out a section of the input file in a parser-compliant and readable format.
+
+    At the time of writing of this function, it's mainly intended to be called by MakeInputFile.py.
+    The heading is printed first (it is something like $options or $simulation).  Then it loops
+    through the variable types (strings, allcaps, etc...) and the keys in each variable type.
+    The one-line description of each key is printed out as a comment, and then the key itself is
+    printed out along with the value provided in optdict.  If optdict is None, then the default
+    value is printed out instead.
+
+    @param[in] heading Heading, either $options or $simulation
+    @param[in] optdict Options dictionary or None.
+    @param[in] typedict Option type dictionary, either gen_opts_types or sim_opts_types specified in this file.
+    @return Answer List of strings for the section that we are printing out.
+    
+    """
+    Answer = [heading]
+    firstentry = 1
+    for i in ['strings','allcaps','lists','ints','bools','floats','sections']:
+        vartype = re.sub('s$','',i)
+        for j in typedict[i]:
+            val = optdict[j] if optdict != None else typedict[i][j][0]
+            if firstentry:
+                firstentry = 0
+            else:
+                Answer.append("")
+            Answer.append("# (%s) %s" % (vartype, typedict[i][j][1]))
+            Answer.append("%s %s" % (str(j),str(val)))
+    Answer.append("$end")
+    return Answer
+
 def parse_inputs(input_file):
     """ Parse through the input file and read all user-supplied options.
 
@@ -175,7 +215,9 @@ def parse_inputs(input_file):
     @return     options    General options.
     @return     sim_opts   List of fitting simulation options.
     
-    @todo The section variable type hasn't been implemented yet.
+    @todo Implement internal coordinates.
+    @todo Implement sampling correction.
+    @todo Implement charge groups.
     """
     
     print "Reading options from file: %s" % input_file
@@ -190,7 +232,7 @@ def parse_inputs(input_file):
         # Anything after "#" is a comment
         line = line.split("#")[0].strip()
         s = line.split()
-        # Capitalize the first letter to make the first field insensitive
+        # Skip over blank lines
         if len(s) == 0:
             continue
         key = s[0].lower()
@@ -202,10 +244,13 @@ def parse_inputs(input_file):
                 this_sim_opt = deepcopy(sim_opts_defaults)
             section = newsection
         elif section in ["OPTIONS","SIMULATION"]:
-            # Depending on which section we are in, we choose the correct type dictionary
-            # and add stuff to 'options' and 'this_sim_opt'
+            ## Depending on which section we are in, we choose the correct type dictionary
+            ## and add stuff to 'options' and 'this_sim_opt'
             (this_opt, opts_types) = (options, gen_opts_types) if section == "OPTIONS" else (this_sim_opt, sim_opts_types)
-            if key in opts_types['strings']:
+            ## Note that "None" is a special keyword!  The variable will ACTUALLY be set to None.
+            if len(s) > 1 and s[1].upper() == "NONE":
+                this_opt[key] = None
+            elif key in opts_types['strings']:
                 this_opt[key] = s[1]
             elif key in opts_types['allcaps']:
                 this_opt[key] = s[1].upper()
