@@ -1,0 +1,47 @@
+$options
+jobtype bfgs
+gmxpath /home/leeping/opt/gromacs-4.0.7-x2/bin
+forcefield water.itp
+penalty_additive       0.0
+penalty_multiplicative 0.01
+convergence_objective 1e-6
+convergence_step 1e-6
+backup
+read_mvals
+   0 [ -7.6736e-02 ] : VDWSOW
+   1 [  2.2255e-02 ] : VDWTOW
+   2 [ -1.6575e-03 ] : BONDSBHWOW
+   3 [ -8.8806e-02 ] : BONDSKHWOW
+   4 [  6.9938e-02 ] : ANGLESBHWOWHW
+   5 [ -4.7091e-01 ] : ANGLESKHWOWHW
+   6 [  0.0000e+00 ] : COULHW1 COULHW2
+   7 [ -5.0591e-03 ] : COULMW
+   8 [  1.2285e-01 ] : VSITE3B4 VSITE3A4
+/read_mvals
+$end
+
+$simulation
+simtype forceenergymatch_gmx
+name water12_sixpt
+weight 1
+efweight 0.5
+shots 300
+fd_ptypes VSITE
+fdgrad 0
+fdhess 0
+fdhessdiag 1
+covariance 0
+$end
+
+$simulation
+simtype forceenergymatch_gmx
+name water12_fourpt
+weight 1
+efweight 0.5
+shots 300
+fd_ptypes VSITE
+fdgrad 0
+fdhess 0
+fdhessdiag 1
+covariance 0
+$end

@@ -128,7 +128,11 @@ free energy of a solute.
 @section usage_sec Usage
 
 To run this program, you may execute the scripts located in the 'bin'
-directory.
+directory.  The main script that performs force field optimization
+is <tt>OptimizePotential.py</tt>.
+
+<tt>OptimizePotential.py</tt> takes only one argument - an input file.
+An example input file is given in the source distribution.
 
 @section create_doc_sec Creating documentation
 
