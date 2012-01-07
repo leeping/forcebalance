@@ -11,7 +11,7 @@ be found on the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>.
 
 \b Users of the program should read the <em>Introduction,
 Installation</em>, <em>Usage</em>, and <em>Tutorial</em> sections on
-the main page (Chapter 1 in the PDF manual).
+the main page.
 
 <b>Developers and contributors</b> should read the
 Introduction chapter, including the <em>Program Layout</em> and
@@ -210,77 +210,175 @@ at the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>.
 
 \page installation Installation
 
-This section covers how to install ForceBalance.  Currently only Linux
-is supported, though Mac OS X installation should also be straightforward.
+This section covers how to install ForceBalance and its companion
+software GROMACS-X2.  Currently only Linux is supported, though
+installation on other Unix-based systems (e.g. Mac OS) should also be
+straightforward.
 
-@section Prerequisites
-
-The only required software for installing ForceBalance are Python and
-NumPy.  However, <em>ForceBalance does not contain any simulation
+Importantly, note that <em>ForceBalance does not contain any simulation
 software or methods for generating the reference data</em>.  Fitting
 simulations are performed by interfacing ForceBalance with simulation
 software like GROMACS, TINKER or OpenMM; reference data is obtained
 from experimental measurements (consult the literature), or from
-quantum chemistry software packages such as Q-Chem or TeraChem.
+simulation / quantum chemistry software (for example, NWChem or Q-Chem).
 
-I have provided a heavily modified version of GROMACS (dubbed version
+I have provided a specialized version of GROMACS (dubbed version
 4.0.7-X2) on the <a href=https://simtk.org/home/forcebalance/>SimTK
 website</a> which interfaces with ForceBalance through the
-forceenergymatch_gmx module.  Although interfacing with unmodified
-simulation software should be straightforward, GROMACS 4.0.7-X2 is
-optimized for our task and makes things much faster.  Soon, I will
-also implement functions for grid-scale computation of reference
-energies and forces using Q-Chem (a commercial software).  However,
-you should be prepared to write some simple code to interface with a
-fitting simulation or quantum chemistry software of your choice.  If
-you choose to do so, please contact me as I would be happy to include
-your contribution in the main distribution.
+forceenergymatch_gmxx2 module.  Although interfacing with unmodified
+simulation software is straightforward, GROMACS-X2 is optimized
+for our task and makes things much faster.  Soon, I will also
+implement functions for grid-scale computation of reference energies
+and forces using Q-Chem (a commercial software).  However, you should
+be prepared to write some simple code to interface with a fitting
+simulation or quantum chemistry software of your choice.  If you
+choose to do so, please contact me as I would be happy to include your
+contribution in the main distribution.
 
-Additionally, there are some more packages you might like to add,
-especially if you'd like to \ref create_doc_sec.  Here is a list of
-Python packages and software:
-
-@li Python version 2.7.1
-@li NumPy version 1.5.0
-@li SciPy version 0.9.0 (optional; needed for some of the non-default optimizers)
-@li Doxygen version 1.7.6.1 (optional; for creating documentation)
-@li Doxypy plugin for Doxygen (for creating documentation)
-@li LaTeX software (for creating PDF documentation)
-@li GROMACS 4.0.7-X2 (for force and energy matching)
-@li Q-Chem 3.2 (for computing reference energies and forces)
-
-@section Installing
+@section installing_forcebalance Installing ForceBalance
 
 ForceBalance is an ordinary Python module, so if you know how to install Python
 modules, you shouldn't have any trouble with this.
 
-To install the package, first unzip the tarball that you downloaded from the
+@subsection installing_forcebalance_prereq Prerequisites
+
+The only required software for installing ForceBalance are Python and
+NumPy.  ForceBalance also allows the usage of SciPy optimizers; they
+aren't as effective as the internal optimizer but still often helpful
+- if you want to use these, then SciPy is needed.  A few more packages
+are required if you want to \ref create_doc.  Here is a list of Python
+packages and software:
+
+Needed for ForceBalance:
+@li Python version 2.7.1
+@li NumPy version 1.5.0
+@li SciPy version 0.9.0 (optional; needed for some of the non-default optimizers)
+Needed for making documentation:
+@li Doxygen version 1.7.6.1
+@li Doxypy plugin for Doxygen
+@li LaTeX software like TeXLive
+
+@subsection installing_forcebalance_install Installing
+
+To install the package, first extract the tarball that you downloaded from the
 webpage using the command:
 
-@code tar xvzf ForceBalance-[version].tar.gz @endcode
+@verbatim tar xvzf ForceBalance-[version].tar.gz @endverbatim
 
-Upon extracting the distribution you will notice three directories:
-'bin', 'doc', and 'forcebalance'.
+Upon extracting the distribution you will notice this directory structure:
 
-The 'bin' directory contains all executable scripts and
-programs, the 'forcebalance' directory contains all Python modules and
-libraries, and the 'doc' directory contains documentation.
+@verbatim
+<root>
+  +- bin
+  |   |- <Executable scripts>
+  +- forcebalance
+  |   |- <Python module files>
+  +- test
+  |   +- <ForceBalance example jobs>
+  +- doc
+  |   +- callgraph
+  |   |   |- <Stuff for making a call graph>
+  |   +- Images
+  |   |   |- <Images for the website and PDF manual>
+  |   |- mainpage.py (Contains most user documentation and this text)
+  |   |- header.tex (Customize the LaTex documentation)
+  |   |- add-tabs.py (Adds more navigation tabs to the webpage)
+  |   |- DoxygenLayout.xml (Removes a navigation tab from the webpage)
+  |   |- doxygen.cfg (Main configuration file for Doxygen)
+  |   |- ForceBalance-Manual.pdf (PDF manual, but the one on the SimTK website is probably newer)
+  |- PKG-INFO (Auto-generated package information)
+  |- README.txt (Points to the SimTK website)
+  |- setup.py (Python script for installation)
+@endverbatim
 
 To install the code into your default Python location, run this (you might need to be root):
 
-@code python setup.py install @endcode
+@verbatim python setup.py install @endverbatim
 
 Alternatively, you can do a local install by running:
 
-@code python setup.py install --prefix=/home/your_username/local_directory @endcode
+@verbatim python setup.py install --prefix=/home/your_username/local_directory @endverbatim
 
 where you would of course replace your_username and local_directory with your username and preferred install location.  The executable scripts will be placed into <tt>/home/your_username/local_directory/bin</tt> and the module will be placed into <tt>/home/your_username/local_directory/lib/python[version]/site-packages/forcebalance</tt>.
 
 Note that if you do a local installation, for Python to recognize the newly installed module you may need to append your PYTHONPATH environment variable using a command like the one below:
 
-@code export PYTHONPATH=$PYTHONPATH:/home/your_username/local_directory/lib/python[version] @endcode
+@verbatim export PYTHONPATH=$PYTHONPATH:/home/your_username/local_directory/lib/python[version] @endverbatim
 
-@section create_doc_sec Create documentation
+@section install_gmxx2 Installing GROMACS-X2
+
+GROMACS-X2 contains major modifications from GROMACS 4.0.7.
+Most importantly, it enables computation of the objective function
+<a>and its analytic derivatives</a> for rapid force matching.  There
+is also an implementation of the QTPIE fluctuating-charge polarizable
+force field, and the beginnings of a GROMACS/Q-Chem interface
+(carefully implemented but not extensively tested).  Most of the
+changes were added in several new source files (less than ten): \c
+qtpie.c, \c fortune.c, \c fortune_utils.c, \c fortune_vsite.c, \c
+fortune_nb_utils.c, \c zmatrix.c and their corresponding header files,
+and \c fortunerec.h for the force matching struct.  The name 'fortune'
+derives from back when this code was called ForTune.
+
+The force matching functions are turned on by calling \c mdrun with
+the command line argument \c '-fortune' ; without this option, there
+should be no impact on the performance of normal MD simulations.
+
+ForceBalance interfaces with GROMACS-X2 by calling the program
+with special options and input files; the objective function and
+derivatives are computed and printed to output files.  The interface
+is defined in \c fortune.c on the GROMACS side and \c
+forceenergymatch_gmxx2 on the Python side.  ForceBalance needs to know
+where the GROMACS-X2 executables are located, and this is specified
+using the \c gmxpath option in the input file.
+
+@subsection install_gmxx2_prerequisites Prerequisites for GROMACS-X2
+
+GROMACS-X2 needs the base GROMACS requirements and several other libraries.
+
+@li FFTW version 3.3
+@li GLib version 2.0
+@li Intel MKL library
+
+GLib is the utility library provided by the GNOME foundation (the
+folks who make the GNOME desktop manager and GTK+ libraries).
+GROMACS-X2 requires GLib for its hash table (dictionary)
+implementation.
+
+GLib and FFTW can be compiled from source, but it is much easier if
+you're using a Linux distribution with a package manager.  If you're
+running Ubuntu or Debian, run <tt>sudo apt-get install libglib2.0-dev
+libfftw3-dev</tt>; if you're using CentOS or some other distro with
+the yum package manager, run <tt>sudo yum install glib2-devel.x86_64
+fftw3-devel.x86_64</tt> (or replace \c x86_64 with \c i386 if you're
+not on a 64-bit system.
+
+GROMACS-X2 requires the Intel Math Kernel Library (MKL) for linear algebra.
+In principle this requirement can be lifted if I rewrite the source
+code, but it's a lot of trouble, plus MKL is faster than other
+implementations of BLAS and LAPACK.
+
+The Intel MKL can be obtained from the Intel website, free of charge
+for noncommercial use.  Currently GROMACS-X2 is built with MKL version
+10.2, which ships with compiler version 11.1/072 ; this is not the
+newest version, but it can still be obtained from the Intel website
+after you register for a free account.
+
+After installing these packages, extract the tarball that you downloaded
+from the website using the command:
+
+@verbatim tar xvjf gromacs-[version]-x2.tar.bz2 @endverbatim
+
+The directory structure is identical to GROMACS 4.0.7, but I added
+some shell scripts. \c Build.sh will run the configure script using
+some special options, compile the objects, create the executables and
+install them; you will probably need to modify it slightly for your
+environment.  The comments in the script will help further
+with installation.
+
+Don't forget to specify the install location of the GROMACS-X2 executables
+in the ForceBalance input file!
+
+@section create_doc Create documentation
 
 This documentation is created by Doxygen with the Doxypy plugin.
 To create new documentation or expand on what's here, follow the
@@ -301,15 +399,22 @@ This page describes how to use the ForceBalance software.
 A good starting point for using this software package is to run
 the scripts in the \c bin directory of the distribution.
 
-\c OptimizePotential.py is the executable script that performs
-force field optimization.  It requires an input file and a
-\ref directory_structure.
+\c OptimizePotential.py is the executable script that performs force
+field optimization.  It requires an input file and a \ref
+directory_structure.  \c MakeInputFile.py will create an example input
+file that contains all options, their default values, and a short
+description for each option.  There are plans to automatically
+generate the correct input file from the provided directory structure,
+but for now the autogenerated input file only provides the hardcoded
+default options.
+
+@todo The MakeInputFile.py script 
 
 @section input_file Input file
 
 A typical input file for ForceBalance might look something like this:
 
-@code
+@verbatim
 $options
 jobtype                  bfgs
 gmxpath                  /home/leeping/opt/gromacs-4.0.7-x2/bin
@@ -341,7 +446,7 @@ fd_ptypes                VSITE
 fdhessdiag               1
 covariance               0
 $end
-@endcode
+@endverbatim
 
 Global options for a ForceBalance job are given in the \c $options
 section while the settings for each fitting simulation are given in
@@ -356,11 +461,13 @@ type of fitting simulation and \c name specifies the simulation name
 (must correspond to a subdirectory in \c simulations/ ).  All options
 are explained in the Option Index.
 
+@todo I need to make the option index.
+
 @section directory_structure Directory structure
 
 The directory structure for our example job would look like:
 
-@code
+@verbatim
 <root>
   +- forcefield
   |   |- water.itp
@@ -376,7 +483,7 @@ The directory structure for our example job would look like:
   |   |   |- shot.mdp
   |   |   |- topol.top
   |- input_file.in
-@endcode
+@endverbatim
 
 The top-level directory names \b forcefield and \b simulations are
 fixed and cannot be changed.  \b forcefield contains the force field
@@ -397,16 +504,95 @@ entries in the input file.  There are two energy and force matching
 simulations here; each directory contains the relevant geometries (in
 \c all.gro ) and reference data (in \c qdata.txt ).
 
+\page tutorial Tutorial
+
+This is a tutorial page, but if you haven't installed ForceBalance yet
+please go to the Installation page first.  It is very much in process,
+and there are many more examples to come.
+
+\section tip4p Fitting a TIP4P potential using two fitting simulations
+After everything is installed, go to the \c test directory in the distribution
+and run:
+
+@verbatim
+cd 001_water12_tip4p/
+OptimizePotential.py 01_bfgs_from_start.in | tee my_job.out
+@endverbatim
+
+If the installation was successful, you will get an output file
+similar to \c 01_bfgs_from_start.out .  \c OptimizePotential.py begins
+by taking the force field files from the \c forcefield directory and
+the fitting simulations / reference data from the \c simulations
+directory.  Then it calls GROMACS-X2 to compute the objective function
+and its derivatives, uses the internal optimizer (based on BFGS) to
+take a step in the parameter space, and repeats the process until
+convergence criteria were made.
+
+At every step, you will see output like:
+@verbatim
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    35   6.370e-01   1.872e-02   9.327e-02   2.48773e-01   1.149e-04
+
+Sim: water12_sixpt   E_err(kJ/mol)=     8.8934 F_err(%)=    29.3236
+Sim: water12_fourpt  E_err(kJ/mol)=    14.7967 F_err(%)=    39.2558
+@endverbatim
+
+The first line reports the step number, the length of the parameter
+displacement vector, the gradient of the objective function, the
+objective function itself, and the standard deviation of the last ten
+\a improved steps in the objective function.  There are three kinds of
+convergence criteria - the step size, the gradient, and the objective
+function itself; all of them can be specified in the input file.
+
+The next two lines report on the two fitting simulations in this job,
+both of which use force/energy matching.  First, note that there are
+two fitting simulations named \c water12_sixpt and \c water12_fourpt;
+the names are because one set of geometries was sampled using a
+six-site QTPIE force field, and the other was sampled using the TIP4P
+force field.  However, the TIP4P force field is what we are fitting
+for this ForceBalance job.  This shows how only one force field or
+parameter set is optimized for each ForceBalance job, but the method
+for sampling the configuration space is completely up to the user.
+The geometries can be seen in the \c all.gro files, and the reference
+data is provided in \c qdata.txt .  Note that the extra virtual sites
+in \c water12_sixpt have been replaced with a single TIP4P site.
+
+\c E_err and \c F_err report the RMS energy error in kJ/mol and the
+percentage force error; note the significant difference in the quality
+of agreement!  This illustrates that the quality of fit depends not
+only on the functional form of the potential but also the
+configurations that are sampled.  \c E_err and \c F_err are
+'indicators' of our progress - that is, they are not quantities to be
+optimized but they give us a mental picture of how we're doing.
+
+The other input files in the directory use the same fitting
+simulations, but they go through the various options of
+reading/writing checkpoint files, testing gradients and Hessians by
+finite difference, and different optimizers in SciPy.  Feel free to
+explore some optimization jobs of your own - for example, vary the
+weights on the fitting simulations and see what happens.  You will
+notice that the optimizer will try very hard to fit one simulation but
+not the other.
+
 \page glossary Glossary
 
 This is a glossary page containing useful terms for the discussion of
 potential optimization.
+
+@li <b> Empirical parameter </b> : Any adjustable parameter in the
+empirical potential that affects the potential energy, such as the
+partial charge on an atom, the equilibrium length of a chemical
+bond, or the fraction of Hartree-Fock exchange in a density functional.
 
 @li <b> Empirical Potential </b> : A formula that contains empirical
 parameters and computes the potential energy of a collection of atoms.
 Note that in ForceBalance this is used very loosely; even a DFT
 functional may contain many empirical parameters, and ForceBalance has the
 ability to optimize these as well!
+
+@li <b> Fitting simulation </b> : A simulation protocol that allows
+a force field to predict a physical quantity, paired with some reference
+data.  The accuracy of the force field is given by its closeness 
 
 @li <b> Force field </b> : This term is used interchangeably with
 empirical potential; it is more prevalent in the biomolecular simulation
@@ -417,11 +603,6 @@ field.  For instance, a CHARMM-type functional form has harmonic interactions
 for bonds and angles, a cosine expansion for the dihedrals, Coulomb interactions
 between point charges and Lennard-Jones terms for van der Waals interactions.
 
-@li <b> Empirical parameter </b> : Any adjustable parameter in the
-empirical potential that affects the potential energy, such as the
-partial charge on an atom, the equilibrium length of a chemical
-bond, or the fraction of Hartree-Fock exchange in a density functional.
-
 @li <b> Reference data </b> : In general, any accurately known
 quantity that the force field is optimized to reproduce.  Reference
 data can come from either theory or experiment.  For instance,
@@ -430,10 +611,6 @@ reference data (for instance, a CHARMM-type force field can be fitted
 to reproduce forces from a DFT or MP2 calculation), or a force field
 can be optimized to reproduce the experimental density of a liquid,
 its enthalpy of vaporization or the solvation free energy of a solute.
-
-@li <b> Fitting simulation </b> : A simulation protocol that allows
-a force field to predict a physical quantity, paired with some reference
-data.  The accuracy of the force field is given by its closeness 
 
 @image latex ForceBalance.pdf "ForceBalance logo" width=2cm
 
