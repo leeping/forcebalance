@@ -1,14 +1,14 @@
-include doc/doxygen.cfg
-include doc/latex/refman.pdf
+include doc/ForceBalance-Manual.pdf
 include doc/Images/*
+include doc/doxygen.cfg
 include doc/callgraph/CallGraph.py
 include doc/callgraph/Run_To_Make_Cool_Picture.sh
 include doc/header.tex
 include doc/DoxygenLayout.xml
 include doc/add-tabs.py
 include doc/mainpage.py
-include test/001_water12_tip4p/forcefield
-include test/001_water12_tip4p/simulations
+recursive-include test/001_water12_tip4p/forcefield *
+recursive-include test/001_water12_tip4p/simulations *
 include test/001_water12_tip4p/*.in
 include test/001_water12_tip4p/*.out
 include test/001_water12_tip4p/*.chk
