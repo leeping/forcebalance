@@ -59,7 +59,7 @@ gen_opts_types = {
     'strings' : {"gmxpath"      : (None, 'Overall path for GROMACS executables (i.e. if we ran "make install" for gmx) for *_gmx functionality'),
                  "gmxrunpath"   : (None, 'Path for GROMACS executables grompp and mdrun, may override GMXPATH (i.e. if we only ran "make")'),
                  "gmxtoolpath"  : (None, 'Path for GROMACS tools, may override GMXPATH'),
-                 "gmxsuffix"    : (None, 'The suffix of GROMACS executables'),
+                 "gmxsuffix"    : ('',   'The suffix of GROMACS executables'),
                  "penalty_type" : ("L2", 'Type of the penalty, L2 or L1 in the optimizer'),
                  "scan_vals"    : (None, 'Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1'),
                  "readchk"      : (None, 'Name of the restart file we read from'),
@@ -101,9 +101,11 @@ for t in gen_opts_types:
 
 ## Default fitting simulation options.
 sim_opts_types = {
-    'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name')
+    'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name'),
+                 "trajfnm"   : (None, 'The trajectory file name.  If not specified, a default will be chosen depending on the "software" variable.')
                  },
-    'allcaps' : {"simtype"   : (None, 'The type of fitting simulation, for instance ForceEnergyMatching_GMX')
+    'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance ForceEnergyMatch_GMXX2'),
+                 "software"  : ('GROMACS', 'The name of the software for this fitting simulation')
                  },
     'lists'   : {"fd_ptypes" : ([], 'The parameter types that need to be differentiated using finite difference')
                  },
