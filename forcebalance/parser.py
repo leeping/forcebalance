@@ -56,10 +56,9 @@ from copy import deepcopy
 ## Default general options.
 ## Note that the documentation is included in part of the key; this will aid in automatic doc-extraction. :)
 gen_opts_types = {
-    'strings' : {"gmxpath"      : (None, 'Overall path for GROMACS executables (i.e. if we ran "make install" for gmx) for *_gmx functionality'),
-                 "gmxrunpath"   : (None, 'Path for GROMACS executables grompp and mdrun, may override GMXPATH (i.e. if we only ran "make")'),
-                 "gmxtoolpath"  : (None, 'Path for GROMACS tools, may override GMXPATH'),
+    'strings' : {"gmxpath"      : (None, 'Path for GROMACS executables'),
                  "gmxsuffix"    : ('',   'The suffix of GROMACS executables'),
+                 "tinkerpath"   : (None, 'Path for TINKER executables'),
                  "penalty_type" : ("L2", 'Type of the penalty, L2 or L1 in the optimizer'),
                  "scan_vals"    : (None, 'Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1'),
                  "readchk"      : (None, 'Name of the restart file we read from'),
@@ -82,7 +81,7 @@ gen_opts_types = {
                  "convergence_gradient"   : (1e-4, 'Convergence criterion of gradient norm'),
                  "convergence_step"       : (1e-4, 'Convergence criterion of step size (just needs to fall below this threshold)'),
                  "eig_lowerbound"         : (1e-4, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
-                 "finite_difference_h"    : (1e-4, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
+                 "finite_difference_h"    : (1e-2, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
                  "penalty_additive"       : (0.0, 'Factor for additive penalty function in objective function'),
                  "penalty_multiplicative" : (0.1, 'Factor for multiplicative penalty function in objective function')
                  },
@@ -101,11 +100,9 @@ for t in gen_opts_types:
 
 ## Default fitting simulation options.
 sim_opts_types = {
-    'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name'),
-                 "trajfnm"   : (None, 'The trajectory file name.  If not specified, a default will be chosen depending on the "software" variable.')
+    'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name')
                  },
-    'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance ForceEnergyMatch_GMXX2'),
-                 "software"  : ('GROMACS', 'The name of the software for this fitting simulation')
+    'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance ForceEnergyMatch_GMXX2')
                  },
     'lists'   : {"fd_ptypes" : ([], 'The parameter types that need to be differentiated using finite difference')
                  },

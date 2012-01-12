@@ -16,7 +16,7 @@ import os
 import shutil
 from nifty import col, flat, floatornan, remove_if_exists
 from numpy import append, array, mat, zeros
-from gmxio import gmxprint, set_gmx_paths
+from gmxio import gmxx2_print, rm_gmx_baks
 from re import match
 import subprocess
 from subprocess import PIPE
@@ -68,20 +68,17 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         - We prepare the temporary directory.
         
         """
-        
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## Set the software to GROMACS no matter what
-        sim_opts['software'] = "GROMACS"
+        self.trajfnm = "all.gro"
         ## Initialize the superclass. :)
         super(ForceEnergyMatch_GMXX2,self).__init__(options,sim_opts,forcefield)
         ## Put stuff for GROMACS-X2 into the temp directory.
-        self.prepare_gmxx2()
-        ## Disable the solvent optimizations, otherwise it'll call the wrong kernels. :)
-        os.putenv("GMX_NO_SOLV_OPT","TRUE")
+        #self.prepare_gmxx2()
         
-    def prepare_gmxx2(self,tempdir=None):
+    def prepare_temp_directory(self,options,sim_opts,tempdir=None):
         """ Prepare the temporary directory for running the modified GROMACS.
 
         This method creates the temporary directory, links in the
@@ -113,28 +110,26 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
             tempdir = self.tempdir
         # Create the temporary directory
         abstempdir = os.path.join(self.root,self.tempdir)
-        ## os.makedirs(abstempdir)
-        ## # Link the necessary programs into the temporary directory
-        ## os.symlink(os.path.join(self.gmxrunpath,"mdrun"+self.gmxsuffix),os.path.join(abstempdir,"mdrun"))
-        ## os.symlink(os.path.join(self.gmxrunpath,"grompp"+self.gmxsuffix),os.path.join(abstempdir,"grompp"))
-        ## os.symlink(os.path.join(self.gmxtoolpath,"g_energy"+self.gmxsuffix),os.path.join(abstempdir,"g_energy"))
-        ## os.symlink(os.path.join(self.gmxtoolpath,"g_traj"+self.gmxsuffix),os.path.join(abstempdir,"g_traj"))
-        ## # Link the run files
-        ## os.symlink(os.path.join(self.root,self.simdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        ## # Write the trajectory to the temp-directory
-        ## self.traj.write(os.path.join(abstempdir,"all.gro"))
-        ## os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
-        ## # Print out the first conformation in all.gro to use as conf.gro
-        ## self.traj.write(os.path.join(abstempdir,"conf.gro"),subset=[0])
-        # Print a number of things that Gromacs likes to use
+        # Link the necessary programs into the temporary directory
+        os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
+        os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
+        os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
+        os.symlink(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
+        # Link the run files
+        os.symlink(os.path.join(self.root,self.simdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        # Write the trajectory to the temp-directory
+        self.traj.write(os.path.join(abstempdir,"all.gro"))
+        os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
+        # Print out the first conformation in all.gro to use as conf.gro
+        self.traj.write(os.path.join(abstempdir,"conf.gro"),subset=[0])
         if self.qmboltz > 0.0:
             # QM Boltzmann Weights
-            gmxprint(os.path.join(abstempdir,"qmboltz"),self.qmboltz_wts,"double")
+            gmxx2_print(os.path.join(abstempdir,"qmboltz"),self.qmboltz_wts,"double")
             with open(os.path.join(abstempdir,"bp"),'w') as f: f.write("%.3f" % self.qmboltz)
         if self.whamboltz == True:
             # WHAM Boltzmann Weights
             # Might as well note here, they are compatible with QM Boltzmann weights! :)
-            gmxprint(os.path.join(abstempdir,"whamboltz"),self.whamboltz_wts[:self.ns],"double")
+            gmxx2_print(os.path.join(abstempdir,"whamboltz"),self.whamboltz_wts[:self.ns],"double")
         if self.sampcorr == True:
             # Create a file called "sampcorr" if the sampcorr option is turned on.
             # This functionality is VERY VERY OLD
@@ -142,31 +137,26 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         if self.covariance == False:
             # Gromacs-X2 defaults to using the covariance, so we can turn it off here
             open(os.path.join(abstempdir,"NoCovariance"),'w').close()
-        fqmm = self.fqm.reshape(self.ns, -1)
-        if self.fitatoms > 0:
-            # Indicate to Gromacs that we're only fitting the first however-many atoms.
-            print "We're only fitting the first %i atoms" % self.fitatoms
+        if self.fitatoms != self.natoms:
+            # The number of fitting atoms (since the objective function is built internally)
             with open(os.path.join(abstempdir,"fitatoms"),'w') as f: f.write("%i\n" % self.fitatoms)
-            print "The quantum force matrix appears to contain more components (%i) than those being fit (%i)." % (fqmm.shape[1], 3*self.fitatoms)
-            print "Pruning the quantum force matrix..."
-        else:
-            self.fitatoms = self.natoms
-        fqmprint    = fqmm[:, :3*self.fitatoms].copy().reshape(-1)
         # Print the QM energies and forces in such a way that Gromacs understands.
-        gmxprint(os.path.join(abstempdir,"energyqm"),self.eqm, "double")
-        gmxprint(os.path.join(abstempdir,"forcesqm"),fqmprint, "double")
+        gmxx2_print(os.path.join(abstempdir,"energyqm"),self.eqm, "double")
+        gmxx2_print(os.path.join(abstempdir,"forcesqm"),self.fqm.reshape(-1), "double")
         if os.path.exists(os.path.join(self.simdir,"ztemp")):
             shutil.copy2(os.path.join(self.simdir,"ztemp"),os.path.join(abstempdir,"ztemp"))
         # Print the parameter ID information.  
         # Todo: Inactivate certain pids for energy decomposition analysis.  I shouldn't have to worry about that here.
         pidsfile = open(os.path.join(abstempdir,"pids"),'w')
         print >> pidsfile, len(self.FF.map)+1,
-        # E0 (mean energy gap) is no longer an adjustable
-        # parameter because we subtract it out.  However, a "zero"
-        # entry is required by the hash tables in gromacs, because a
-        # "zero" dictionary lookup means that the parameter does not
-        # exist.  For now let's keep it, but if there's a better
-        # solution we should get rid of it.
+        #============================================================#
+        # E0 (mean energy gap) is no longer an adjustable parameter  #
+        # because we subtract it out.  However, a "zero" entry is    #
+        # required by the hash tables in gromacs, because a "zero"   #
+        # dictionary lookup means that the parameter does not exist. #
+        # For now let's keep it, but if there's a better solution we #
+        # should get rid of it.                                      #
+        #============================================================#
         print >> pidsfile, "E0 0",
         for i in self.FF.map:
             # LPW For the very reason described above, we add one to the
@@ -190,7 +180,7 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         - 'FirstDerivativesOnly' to prevent computation of the Hessian
         - 'NoDerivatives' to prevent computation of the Hessian AND the gradient
 
-        GROMACS is called in the callgmx() method.
+        GROMACS is called in the callgmxx2() method.
 
         The output files are then parsed for the objective function and its
         derivatives are read in.  The answer is passed out as a dictionary:
@@ -213,7 +203,7 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         cwd = os.getcwd()
         # Create the new force field!!
         pvals = self.FF.make(tempdir,mvals,self.usepvals)
-        gmxprint(os.path.join(os.path.join(self.root,tempdir,"pvals")),append([0],pvals),"double")
+        gmxx2_print(os.path.join(os.path.join(self.root,tempdir,"pvals")),append([0],pvals),"double")
         os.chdir(os.path.join(self.root,tempdir))
         if AHess:
             AGrad = True
@@ -224,8 +214,8 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
             remove_if_exists("NoDerivatives")
         else:
             with open("NoDerivatives",'w') as f: f.close()
-        print "GMX: %s\r" % tempdir,
-        self.callgmx()
+        print "GMXX2: %s\r" % tempdir,
+        self.callgmxx2()
         # Parse the output files
         for line in open('e2f2bc').readlines():
             sline = line.split()
@@ -263,13 +253,9 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         os.chdir(cwd)
         return Answer
     
-    def callgmx(self):
+    def callgmxx2(self):
         """ Call the modified GROMACS! """
-        # Delete the #-prepended files that GROMACS likes to make
-        for root, dirs, files in os.walk('.'):
-            for file in files:
-                if match('^#',file):
-                    os.remove(file)
+        rm_gmx_baks('.')
         # Call grompp followed by mdrun.
         o, e = subprocess.Popen(["./grompp", "-f", "shot.mdp"],stdout=PIPE,stderr=PIPE).communicate()
-        o, e = subprocess.Popen(["./mdrun", "-fortune", "-o", "sshot.trr", "-rerun", "all.gro", "-rerunvsite"], stdout=PIPE, stderr=PIPE).communicate()
+        o, e = subprocess.Popen(["./mdrun", "-fortune", "-o", "shot.trr", "-rerun", "all.gro", "-rerunvsite"], stdout=PIPE, stderr=PIPE).communicate()

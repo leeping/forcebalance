@@ -96,23 +96,23 @@ we need more modules!
 import os
 import sys
 from re import match, sub, split
-import gmxio
-import qchemio
-import custom_io
+import gmxio, qchemio, tinkerio, custom_io
 import basereader
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros
 from numpy.linalg import norm
-from nifty import col, flat, invert_svd, kb, orthogonalize, pmat2d, printcool, row
+from nifty import col, flat, invert_svd, isint, kb, orthogonalize, pmat2d, printcool, row
 from string import count
 
 FF_Extensions = {"itp" : "gmx",
                  "in"  : "qchem",
+                 "prm" : "tinker",
                  "gen" : "custom"
                  }
 
 """ Recognized force field formats. """
 FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "qchem": qchemio.QCIn_Reader ,
+                "tinker": tinkerio.Tinker_Reader ,
                 "custom": custom_io.Gen_Reader
                 }
 
@@ -125,7 +125,7 @@ def determine_fftype(ffname):
             print "We're golden! (%s)" % fsplit[1]
             fftype = fsplit[1]
         else:
-            print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(keys(FF_IOModules)))
+            print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(FF_IOModules.keys()))
     elif len(fsplit) == 1:
         print "Guessing from extension (you may specify type with filename:type) ...", 
         ffname = fsplit[0]
@@ -136,12 +136,12 @@ def determine_fftype(ffname):
                 print "guessing %s -> %s!" % (ffext, guesstype)
                 fftype = guesstype
             else:
-                print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(keys(FF_IOModules)))
+                print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[0],', '.join(FF_IOModules.keys()))
         else:
-            print "\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!" % (ffext,', '.join(keys(FF_Extensions)))
+            print "\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!" % (ffext,', '.join(FF_Extensions.keys()))
     if fftype == None:
-        print "Force field type not determined! Exiting..."
-        sys.exit(1)
+        print "Force field type not determined!"
+        #sys.exit(1)
     return fftype
 
 class FF(object):
@@ -300,16 +300,18 @@ class FF(object):
         """
         fftype = determine_fftype(ffname)
         ffname = ffname.split(':')[0]
-        
+
+        # Determine the appropriate parser from the FF_IOModules dictionary.
+        # If we can't figure it out, then use the base reader, it ain't so bad. :)
         Reader = FF_IOModules.get(fftype,basereader.BaseReader)
 
         # Open the force field using an absolute path and read its contents into memory.
         absff = os.path.join(self.root,self.ffdir,ffname)
         self.stuff[ffname] = open(absff).readlines()
         
-        R = Reader(ffname)
+        self.R = Reader(ffname)
         for ln, line in enumerate(self.stuff[ffname]):
-            R.feed(line)
+            self.R.feed(line)
             sline = line.split()
             if 'PARM' in sline:
                 pmark = (array(sline) == 'PARM').argmax() # The position of the 'PARM' word
@@ -317,7 +319,7 @@ class FF(object):
                 for pfld in pflds:
                     # For each of the fields that are to be parameterized (indicated by PARM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
-                    pid = R.build_pid(pfld)
+                    pid = self.R.build_pid(pfld)
                     # Add pid into the dictionary.
                     self.map[pid] = self.np
                     # Also append pid to the parameter list
@@ -332,7 +334,7 @@ class FF(object):
                     # Second is a string corresponding to the 'pid' that this parameter depends on.
                     pfld = int(sline[parse])
                     prep = self.map[sline[parse+1].replace('MINUS_','')]
-                    pid = R.build_pid(pfld)
+                    pid = self.R.build_pid(pfld)
                     self.map[pid] = prep
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
@@ -433,7 +435,7 @@ class FF(object):
         tvgeomean = {}
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
-        termtypelist = sum([[i+gmxio.pdict[i][j] for j in gmxio.pdict[i]] for i in gmxio.pdict],[])
+        termtypelist = sum([[i+self.R.pdict[i][j] for j in self.R.pdict[i] if isint(str(j))] for i in self.R.pdict],[])
         for termtype in termtypelist:
             for pid in self.map:
                 if termtype in pid:
