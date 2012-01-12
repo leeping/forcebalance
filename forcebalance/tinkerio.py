@@ -1,5 +1,8 @@
 """ @package tinkerio TINKER input/output.
 
+This serves as a good template for writing future force matching I/O
+modules for other programs because it's so simple.
+
 @author Lee-Ping Wang
 @date 01/2012
 """
@@ -12,7 +15,7 @@ from basereader import BaseReader
 from subprocess import Popen, PIPE
 from forceenergymatch import ForceEnergyMatch
 
-pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, damping
+pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
          'ANGLE'        : {'Atom':[1,2,3], 4:'K',5:'B'},   # Angle force constant and equilibrium angle
          'UREYBRAD'     : {'Atom':[1,2,3], 4:'K',5:'B'},   # Urey-Bradley force constant and equilibrium distance (Angstrom)
@@ -60,20 +63,33 @@ class Tinker_Reader(BaseReader):
 
         TINKER generally has stuff like this:
 
+        @verbatim
         bond-cubic              -2.55
         bond-quartic            3.793125
 
         vdw           1               3.4050     0.1100
-        vdw           2               2.6550     0.0135      0.910
+        vdw           2               2.6550     0.0135      0.910 # PARM 4
 
         multipole     2    1    2               0.25983
                                                -0.03859    0.00000   -0.05818
                                                -0.03673
                                                 0.00000   -0.10739
                                                -0.00203    0.00000    0.14412
+        @endverbatim
 
+        The '#PARM 4' has no effect on TINKER but it indicates that we
+        are tuning the fourth field on the line (the 0.910 value).
 
-        Unit of force is kcal / mole / angstrom squared
+        @todo Put the rescaling factors for TINKER parameters in here.
+        Currently we're using the initial value to determine the
+        rescaling factor which is not very good.
+
+        Every parameter line is prefaced by the interaction type
+        except for 'multipole' which is on multiple lines.  Because
+        the lines that come after 'multipole' are predictable, we just
+        determine the current line using the previous line.
+
+        Random note: Unit of force is kcal / mole / angstrom squared.
         
         """
         s          = line.split()
@@ -101,12 +117,17 @@ class Tinker_Reader(BaseReader):
 
         if self.itype in pdict:
             if 'Atom' in pdict[self.itype]:
+                # List the atoms in the interaction.
                 self.atom = [s[i] for i in pdict[self.itype]['Atom']]
+            # The suffix of the parameter ID is built from the atom    #
+            # types/classes involved in the interaction.
             self.suffix = '.'.join(self.atom)
 
 class ForceEnergyMatch_TINKER(ForceEnergyMatch):
-    """ Subclass of FittingSimulation for force and energy matching using TINKER.
-    Implements the prepare and energy_force_driver methods."""
+
+    """Subclass of FittingSimulation for force and energy matching
+    using TINKER.  Implements the prepare and energy_force_driver
+    methods.  The get method is in the superclass.  """
 
     def __init__(self,options,sim_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
@@ -122,7 +143,10 @@ class ForceEnergyMatch_TINKER(ForceEnergyMatch):
         os.symlink(os.path.join(self.root,self.simdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
 
     def energy_force_driver(self):
+        # This line actually runs TINKER
         o, e = Popen(["./testgrad","shot.arc",self.FF.fnms[0],"y","n"],stdout=PIPE,stderr=PIPE).communicate()
+        # Read data from stdout and stderr, and convert it to GROMACS
+        # units for consistency with existing code.
         F = []
         for line in o.split('\n'):
             s = line.split()
