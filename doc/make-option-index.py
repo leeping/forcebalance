@@ -10,25 +10,9 @@ GenOptionDoc = {"gmxpath" : {"scope" : "Fitting simulations that use GROMACS (GR
                              "required" : True,
                              "long" : "Specify the path where GROMACS executables are installed, most likely ending in 'bin'.
                              Note that executables are only installed 'bin' if the program is installed using 'make install';
-                             this will NOT be the case if you simply ran 'make'.  Built executables are located in the 'kernel'
-                             and 'tools' directories prior to installing, in those instances use 'gmxrunpath' and 'gmxtoolpath'
-                             respectively.",
+                             this will NOT be the case if you simply ran 'make'.",
                              "recommend" : "Depends on your local installation and environment."
                              },
-                "gmxrunpath" : {"scope" : "Fitting simulations that use GROMACS",
-                                "required" : False,
-                                "long" : "The path for built GROMACS executables, most likely ending in 'kernel'.  You only
-                                need to use this if you didn't install the built executables (which LPW often did during
-                                development of GROMACS-X2).  If specified, this overrides 'gmxpath' for the programs grompp
-                                and mdrun.",
-                                "recommend" : "Specify if GROMACS is built but not installed."
-                                },
-                "gmxtoolpath" : {"scope" : "Fitting simulations that use GROMACS",
-                                 "required" : False,
-                                 "long" : "The path for built GROMACS tools, most likely ending in 'tools'.  If specified, this
-                                 overrides 'gmxpath' for the programs trjconv, g_energy and some others.",
-                                 "recommend" : "Specify if GROMACS is built but not installed."
-                                 },
                 "gmxsuffix" : {"scope" : "Fitting simulations that use GROMACS",
                                "required" : False,
                                "long" : "Depending on how GROMACS is configured and installed, a suffix may be appended to executable

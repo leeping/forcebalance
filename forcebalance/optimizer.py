@@ -178,7 +178,7 @@ class Optimizer(object):
         """
         printcool( "Main Optimizer\n%s Mode" % ("BFGS" if b_BFGS else "Newton-Raphson"), color=7, bold=1)
         # First, set a bunch of starting values
-        Ord         = b_BFGS and 1 or 2
+        Ord         = 1 if b_BFGS else 2
         if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
             print "Reading initial objective, gradient, Hessian from checkpoint file"
             xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
@@ -498,8 +498,8 @@ class Optimizer(object):
 
         Adata        = self.Objective(self.mvals0,Order=1)['G']
         Fdata        = zeros(self.np,dtype=float)
-        printcool("Checking first derivatives by finite difference!\n%-8s%-35s%13s%13s%13s%13s" \
-                  % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),color=5)
+        printcool("Checking first derivatives by finite difference!\n%-8s%-20s%13s%13s%13s%13s" \
+                  % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
         for i in range(self.np):
             Fdata[i] = f1d5p(fdwrap(self.Objective,self.mvals0,i,'X',Order=0),self.h)
             Denom = max(abs(Adata[i]),abs(Fdata[i]))
@@ -508,8 +508,8 @@ class Optimizer(object):
             Q = (Adata[i] - Fdata[i])/Denom
             cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
             cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
-            print "    %-8i%35s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
-                  % (i, self.FF.plist[i][:35], Adata[i], Fdata[i], cD, D, cQ, Q)
+            print "    %-8i%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
+                  % (i, self.FF.plist[i][:20], Adata[i], Fdata[i], cD, D, cQ, Q)
 
     def FDCheckH(self):
         """ Finite-difference checker for the objective function Hessian.
@@ -528,8 +528,8 @@ class Optimizer(object):
         """
         Adata        = self.Objective(self.mvals0,Order=2)['H']
         Fdata        = zeros((self.np,self.np),dtype=float)
-        printcool("Checking second derivatives by finite difference!\n%-8s%-35s%13s%13s%13s%13s" \
-                  % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),color=5)
+        printcool("Checking second derivatives by finite difference!\n%-8s%-20s%-20s%13s%13s%13s%13s" \
+                  % ("Index", "Parameter1 ID", "Parameter2 ID", "Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
 
         # Whee, our double-wrapped finite difference second derivative!
         def wrap2(mvals0,pidxi,pidxj):

@@ -14,20 +14,23 @@ Not sure what's next on the chopping block, but please stay consistent when addi
 @date 12/2011
 """
 
-from re import match, sub
+from re import match, sub, split
 from sys import argv, exit, stdout
 from PT import PT
 from nifty import isint, isfloat
 from numpy import array
 
-def format_xyz_coord(element,xyz):
+def format_xyz_coord(element,xyz,tinker=False):
     """ Print a line consisting of (element, x, y, z) in accordance with .xyz file format
 
     @param[in] element A chemical element of a single atom
     @param[in] xyz A 3-element array containing x, y, z coordinates of that atom
 
     """
-    return "%-5s% 16.10f% 16.10f% 16.10f" % (element,xyz[0],xyz[1],xyz[2])
+    if tinker:
+        return "%-3s% 12.6f% 12.6f% 12.6f" % (element,xyz[0],xyz[1],xyz[2])
+    else:
+        return "%-5s% 16.10f% 16.10f% 16.10f" % (element,xyz[0],xyz[1],xyz[2])
 
 def format_gro_coord(resid, resname, aname, seqno, xyz):
     """ Print a line in accordance with .gro file format
@@ -63,6 +66,18 @@ def is_gro_coord(line):
     else:
         return 0
 
+def is_charmm_coord(line):
+    """ Determines whether a line contains CHARMM data or not
+
+    @param[in] line The line to be tested
+    
+    """
+    sline = line.split()
+    if len(sline) >= 7:
+        return all([isint(sline[0]), isint(sline[1]), isfloat(sline[4]), isfloat(sline[5]), isfloat(sline[6])])
+    else:
+        return 0
+
 def is_gro_box(line):
     """ Determines whether a line contains a GROMACS box vector or not
 
@@ -95,6 +110,8 @@ class Molecule:
         ## The table of file readers
         self.Read_Tab = {'com':self.read_com,
                          'gro':self.read_gro,
+                         'crd':self.read_charmm,
+                         'cor':self.read_charmm,
                          'xyz':self.read_xyz,
                          'arc':self.read_arc}
         ## The table of file writers
@@ -155,7 +172,7 @@ class Molecule:
         ## Optional variable: the atom name, which defaults to the elements
         self.atomname = Answer['atomname'] if 'atomname' in Answer else Answer['elem']
         ## Optional variable: raw .arc file in Tinker (because Tinker files are too hard to interpret!)
-        self.rawarc = Answer['rawarc'] if 'rawarc' in Answer else None
+        self.rawarcs = Answer['rawarcs'] if 'rawarcs' in Answer else None
 
     def na(self):
         return len(self.elem)
@@ -186,7 +203,7 @@ class Molecule:
         exit(1)
 
     def read_xyz(self,fnm):
-        """ Parse an XYZ file which contains several xyz coordinates, and return their elements.
+        """ Parse a .xyz file which contains several xyz coordinates, and return their elements.
 
         @param[in] fnm The input XYZ file name
         @return elem  A list of chemical elements in the XYZ file
@@ -259,6 +276,7 @@ class Molecule:
         """
         rawarcs  = []
         rawarc   = []
+        suffix   = []
         xyzs  = []
         xyz   = []
         resid = []
@@ -270,7 +288,7 @@ class Molecule:
         nframes = 0
         thisresid   = 1
         for line in open(fnm):
-            rawarc.append(line)
+            rawarc.append(line.strip())
             sline = line.split()
             # The first line always contains the number of atoms
             if title:
@@ -283,6 +301,11 @@ class Molecule:
                     if nframes == 0:
                         elem.append(sline[1])
                         resid.append(thisresid)
+                        whites      = split('[^ ]+',line)
+                        if len(sline) > 5:
+                            suffix.append(''.join([whites[j]+sline[j] for j in range(5,len(sline))]))
+                        else:
+                            suffix.append('')
                     thisatom = int(sline[0])
                     thisres.add(thisatom)
                     forwardres.add(thisatom)
@@ -308,7 +331,8 @@ class Molecule:
                   'resid'  : resid,
                   'elem'   : elem,
                   'comms'  : comms,
-                  'rawarcs': rawarcs}
+                  'rawarcs': rawarcs,
+                  'suffix' : suffix}
         return Answer
 
     def read_ndx(self, fnm):
@@ -408,6 +432,56 @@ class Molecule:
                   'comms'    : comms}
         return Answer
 
+    def read_charmm(self, fnm):
+        """ Read a CHARMM .cor (or .crd) file.
+
+        """
+        xyzs     = []
+        elem     = [] # The element, most useful for quantum chemistry calculations
+        atomname = [] # The atom name, for instance 'HW1'
+        comms    = []
+        resid    = []
+        resname  = []
+        xyz      = []
+        thiscomm = []
+        ln       = 0
+        frame    = 0
+        an       = 0
+        for line in open(fnm):
+            sline = line.split()
+            if match('^\*',line):
+                if len(sline) == 1:
+                    comms.append(';'.join(list(thiscomm)))
+                    thiscomm = []
+                else:
+                    thiscomm.append(' '.join(sline[1:]))
+            elif match('^ *[0-9]+ +(EXT)?$',line):
+                na = int(sline[0])
+            elif is_charmm_coord(line):
+                if frame == 0: # Create the list of residues, atom names etc. only if it's the first frame.
+                    resid.append(sline[1])
+                    resname.append(sline[2])
+                    atomname.append(sline[3])
+                    thiselem = sline[3]
+                    if len(thiselem) > 1:
+                        thiselem = thiselem[0] + sub('[A-Z0-9]','',thiselem[1:])
+                    elem.append(thiselem)
+                xyz.append([float(i) for i in sline[4:7]])
+                an += 1
+                if an == na:
+                    xyzs.append(array(xyz))
+                    xyz = []
+                    an = 0
+                    frame += 1
+            ln += 1
+        Answer = {'xyzs'     : xyzs,
+                  'elem'     : elem,
+                  'atomname' : atomname,
+                  'resid'    : resid,
+                  'resname'  : resname,
+                  'comms'    : comms}
+        return Answer
+
     def write_qcin(self, subset = None):
         """Write a Q-Chem input file from the template.
 
@@ -421,7 +495,7 @@ class Molecule:
         active    = True
         bas_sect  = False
 
-        out_lines = []
+        out = []
         temp_lines = []
         ln = 0
         xyz_insert = 0
@@ -466,53 +540,64 @@ class Molecule:
             if subset != None and I not in subset: continue
             for ln, line in enumerate(temp_lines):
                 if ln == xyz_insert:
-                    out_lines.append("%i %i" % (self.charge, self.mult))
+                    out.append("%i %i" % (self.charge, self.mult))
                     for i in range(self.na()):
-                        out_lines.append(format_xyz_coord(self.elem[i],xyz[i]))
+                        out.append(format_xyz_coord(self.elem[i],xyz[i]))
                 elif ln == comm_insert:
-                    out_lines.append(self.comms[I])
-                out_lines.append(line)
+                    out.append(self.comms[I])
+                out.append(line)
             if I < len(self.xyzs) - 1 and have_ats == 0:
-                out_lines.append('')
-                out_lines.append('@@@@')
-                out_lines.append('')
+                out.append('')
+                out.append('@@@@')
+                out.append('')
             
-        return out_lines
+        return out
 
     def write_xyz(self, subset = None):
-        xyzlines = []
+        out = []
         for I, xyz in enumerate(self.xyzs):
             if subset != None and I not in subset: continue
-            xyzlines.append("%-5i" % len(self.elem))
-            xyzlines.append(self.comms[I])
-            for i in range(len(self.elem)):
-                xyzlines.append(format_xyz_coord(self.elem[i],xyz[i]))
-        return xyzlines
+            out.append("%-5i" % self.na())
+            out.append(self.comms[I])
+            for i in range(self.na()):
+                out.append(format_xyz_coord(self.elem[i],xyz[i]))
+        return out
 
     def write_arc(self, subset = None):
-        if self.rawarc == None:
-            print "I can only create new TINKER .arc files from raw .arc data (useful only for splitting!)"
-            exit(1)
         out = []
-        for I, rawarc in enumerate(self.rawarc):
-            if subset != None and I not in subset: continue
-            out += rawarc
+        if self.rawarcs == None:
+            if self.tempfnm != None:
+                suffix = self.read_arc(self.tempfnm)['suffix']
+                print "Taking topology from template .arc file"
+            else:
+                suffix = ['' for i in range(self.na())]
+                print "Beware, this .arc file contains no atom type or topology info (to do that, you need an .arc file as the third argument"
+            for I, xyz in enumerate(self.xyzs):
+                if subset != None and I not in subset: continue
+                out.append("%6i  %s" % (self.na(), self.comms[I]))
+                for i in range(self.na()):
+                    out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),suffix[i]))
+        else:
+            for I, rawarc in enumerate(self.rawarcs):
+                if subset != None and I not in subset: continue
+                out += rawarc
         return out
 
     def write_gro(self, subset = None):
-        out_lines = []
+        out = []
         self.require_resname()
         self.require_resid()
         self.require_boxes()
         for I, xyz in enumerate(self.xyzs):
             if subset != None and I not in subset: continue
-            xyz /= 10.0 # GROMACS uses nanometers
-            out_lines.append("Generated by filecnv.py : " + self.comms[I])
-            out_lines.append("%5i" % self.na())
-            for an, line in enumerate(xyz):
-                out_lines.append(format_gro_coord(self.resid[an],self.resname[an],self.atomname[an],an+1,xyz[an]))
-            out_lines.append(format_gro_box(xyz = self.boxes[I]))
-        return out_lines
+            xyzwrite = xyz.copy()
+            xyzwrite /= 10.0 # GROMACS uses nanometers
+            out.append("Generated by filecnv.py : " + self.comms[I])
+            out.append("%5i" % self.na())
+            for an, line in enumerate(xyzwrite):
+                out.append(format_gro_coord(self.resid[an],self.resname[an],self.atomname[an],an+1,xyzwrite[an]))
+            out.append(format_gro_box(xyz = self.boxes[I]))
+        return out
 
     def require_resid(self):
         if self.resid == None:

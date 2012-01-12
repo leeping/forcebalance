@@ -5,7 +5,6 @@ import subprocess
 import shutil
 from nifty import printcool_dictionary
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
-from gmxio import set_gmx_paths
 
 class FittingSimulation(object):
     
@@ -102,9 +101,9 @@ class FittingSimulation(object):
         ## Switch for FD gradients + Hessian diagonals
         self.fdhessdiag  = sim_opts['fdhessdiag']
         ## Parameter types that trigger FD gradient elements
-        self.fd1_pids    = sim_opts['fd_ptypes']
+        self.fd1_pids    = [i.upper() for i in sim_opts['fd_ptypes']]
         ## Parameter types that trigger FD Hessian elements
-        self.fd2_pids    = sim_opts['fd_ptypes']
+        self.fd2_pids    = [i.upper() for i in sim_opts['fd_ptypes']]
         ## Finite difference step size
         self.h           = options['finite_difference_h']
         ## Manual override: bypass the parameter transformation and use
@@ -126,19 +125,13 @@ class FittingSimulation(object):
         self.gct         = 0
         ## Counts how often the Hessian was computed
         self.hct         = 0
-
+        
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
-        ## The name of the simulation software that we're using
-        self.software = sim_opts['software']
-        ## Set the path for executables
-        if self.software in ['GMX','GROMACS']:
-            set_gmx_paths(self, options)
-                                                                 
-        # Back up and then delete the temporary directory.
-        self.backup_temp_directory()
-        shutil.rmtree(os.path.join(self.root,self.tempdir),ignore_errors=True)
+        # Create a new temp directory.
+        self.refresh_temp_directory()
+
         # Print the options for this simulation to the terminal.
         printcool_dictionary(sim_opts,"Setup for fitting simulation %s :" % self.name)
 
@@ -160,11 +153,13 @@ class FittingSimulation(object):
         """
         Ans = self.get(mvals,1,0)
         for i in range(self.FF.np):
-            if any([j in self.FF.plist[i] for j in self.fd1_pids]):
+            if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
                 if self.fdgrad:
                     Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
                 elif self.fdhessdiag:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
+        # Additional call to build qualitative indicators
+        self.get(mvals,0,0)
         self.gct += 1
         return Ans
 
@@ -183,28 +178,36 @@ class FittingSimulation(object):
         Ans = self.get(mvals,1,1)
         if self.fdhess:
             for i in range(self.FF.np):
-                if any([j in self.FF.plist[i] for j in self.fd1_pids]):
+                if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
                     Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
             for i in range(self.FF.np):
-                if any([j in self.FF.plist[i] for j in self.fd2_pids]):
+                if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
                     FDSlice = f1d2p(fdwrap_H(self,mvals,i),self.h,f0 = Ans['G'])
                     Ans['H'][i,:] = FDSlice
                     Ans['H'][:,i] = FDSlice
         elif self.fdhessdiag:
             for i in range(self.FF.np):
                 Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h)
+        # This builds the qualitative indicators
+        self.get(mvals,0,0)
         self.hct += 1
         return Ans
 
-    def backup_temp_directory(self):
-        """ Back up the temporary directory."""
+    def refresh_temp_directory(self):
+        """ Back up the temporary directory if desired, delete it
+        and then create a new one."""
         cwd = os.getcwd()
         if not os.path.exists(os.path.join(self.root,'backups')):
             os.makedirs(os.path.join(self.root,'backups'))
-        if os.path.exists(os.path.join(self.root,self.tempdir)):
+        abstempdir = os.path.join(self.root,self.tempdir)
+        if os.path.exists(abstempdir):
             print "Backing up:", self.tempdir
             os.chdir(os.path.join(self.root,"temp"))
             # I could use the tarfile module here
             subprocess.call(["tar","cjf",os.path.join(self.root,'backups',"%s.tar.bz2" % self.name),self.name,"--remove-files"])
             os.chdir(cwd)
-            
+        # Delete the temporary directory
+        shutil.rmtree(abstempdir,ignore_errors=True)
+        # Create a new temporary directory from scratch
+        os.makedirs(abstempdir)
+
