@@ -72,6 +72,8 @@ class Project(object):
         WTot = sum([i.weight for i in self.Simulations])
         # Loop through the simulations.
         for Sim in self.Simulations:
+            # The first call is always done at the midpoint.
+            Sim.bSave = True
             # List of functions that I can call.
             Funcs   = [Sim.get_X, Sim.get_G, Sim.get_H]
             # Call the appropriate function
