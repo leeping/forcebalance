@@ -56,6 +56,21 @@ def f1d5p(f, h):
     fp = (-1*f2+8*f1-8*fm1+1*fm2)/(12*h)
     return fp
 
+def f1d7p(f, h):
+    """
+    A highly accurate seven-point finite difference stencil
+    for computing derivatives of a function.  
+    """
+    fm3, fm2, fm1, f1, f2, f3 = [f(i*h) for i in [-3, -2, -1, 1, 2, 3]]
+    fp = (f3-9*f2+45*f1-45*fm1+9*fm2-fm3)/(60*h)
+    return fp
+
+def f12d7p(f, h):
+    fm3, fm2, fm1, f0, f1, f2, f3 = [f(i*h) for i in [-3, -2, -1, 0, 1, 2, 3]]
+    fp = (f3-9*f2+45*f1-45*fm1+9*fm2-fm3)/(60*h)
+    fpp = (2*f3-27*f2+270*f1-490*f0+270*fm1-27*fm2+2*fm3)/(180*h*h)
+    return fp, fpp
+
 def f12d3p(f, h, f0 = None):
     """
     A three-point finite difference stencil.

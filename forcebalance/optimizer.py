@@ -16,7 +16,23 @@ import os, pickle, re, sys
 from numpy import append, array, delete, exp, eye, insert, linspace, mat, ones, sort, std, zeros
 from numpy.linalg import eig, norm, solve
 from nifty import col, flat, row, printcool, printcool_dictionary
-from finite_difference import f1d5p, fdwrap
+from finite_difference import f1d7p, f1d5p, fdwrap
+
+## A list of all the things we can ask the optimizer to do.
+self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
+                  'BFGS'              : self.BFGS,
+                  'POWELL'            : self.Powell,
+                  'SIMPLEX'           : self.Simplex,
+                  'ANNEAL'            : self.Anneal,
+                  'CONJUGATEGRADIENT' : self.ConjugateGradient,
+                  'SCAN_MVALS'        : self.ScanMVals,
+                  'SCAN_PVALS'        : self.ScanPVals,
+                  'SINGLE'            : self.SinglePoint,
+                  'GRADIENT'          : self.Gradient,
+                  'HESSIAN'           : self.Hessian,
+                  'FDCHECKG'          : self.FDCheckG,
+                  'FDCHECKH'          : self.FDCheckH
+                  }
 
 class Optimizer(object):
     """ Optimizer class.  Contains several methods for numerical optimization.
@@ -80,21 +96,6 @@ class Optimizer(object):
         self.Sims      = Simulations
         ## The force field itself
         self.FF        = FF
-        ## A list of all the things we can ask the optimizer to do.
-        self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
-                          'BFGS'              : self.BFGS,
-                          'POWELL'            : self.Powell,
-                          'SIMPLEX'           : self.Simplex,
-                          'ANNEAL'            : self.Anneal,
-                          'CONJUGATEGRADIENT' : self.ConjugateGradient,
-                          'SCAN_MVALS'        : self.ScanMVals,
-                          'SCAN_PVALS'        : self.ScanPVals,
-                          'SINGLE'            : self.SinglePoint,
-                          'GRADIENT'          : self.Gradient,
-                          'HESSIAN'           : self.Hessian,
-                          'FDCHECKG'          : self.FDCheckG,
-                          'FDCHECKH'          : self.FDCheckH
-                          }
         
         #======================================#
         #    Variables from the force field    #
@@ -119,7 +120,7 @@ class Optimizer(object):
     def Run(self):
         """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
 
-        xk = self.OptTab[self.jobtype]()
+        xk = OptTab[self.jobtype]()
         
         ## Sometimes the optimizer doesn't return anything (i.e. in the case of a single point calculation)
         ## In these situations, don't do anything
@@ -311,10 +312,8 @@ class Optimizer(object):
         H = delete(H, self.excision, axis=1)
         Eig = eig(H)[0]            # Diagonalize Hessian
         Emin = min(Eig)
-        if Emin < 0:               # Mix in SD step if Hessian minimum eigenvalue is negative
-            H += (2*abs(Emin) + self.eps)*eye(H.shape[0])
-        elif abs(Emin) < self.eps: # Do the same if Hessian is close to singular
-            H += (  abs(Emin) + self.eps)*eye(H.shape[0])
+        if Emin < self.eps:        # Mix in SD step if Hessian minimum eigenvalue is negative
+            H += (self.eps - Emin)*eye(H.shape[0])
         dx = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
         dx = flat(dx)
         for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
@@ -501,7 +500,7 @@ class Optimizer(object):
         printcool("Checking first derivatives by finite difference!\n%-8s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
         for i in range(self.np):
-            Fdata[i] = f1d5p(fdwrap(self.Objective,self.mvals0,i,'X',Order=0),self.h)
+            Fdata[i] = f1d7p(fdwrap(self.Objective,self.mvals0,i,'X',Order=0),self.h)
             Denom = max(abs(Adata[i]),abs(Fdata[i]))
             Denom = Denom > 1e-8 and Denom or 1e-8
             D = Adata[i] - Fdata[i]
