@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from forcebalance import parser, optimizer
+from simtab import SimTab
 
 """ The OptionDoc dictionary is a key : dictionary dictionary.
 Each variable can have several parts of the documentation: 'pert' = 
@@ -198,9 +199,22 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                           },
                 "simtype" : {"scope" : "All fitting simulations",
                              "required" : True,
-                             "long" : "There ",
-                             "recommend" : "If you run the main optimizer, it will print out this block at the very end for you to use and/or modify."
+                             "long" : "This is the type of fitting simulation that you are running.  The current accepted values for the fitting simulation are given in the SimTab.py file: %s." % ', '.join([i for i in SimTab]),
+                             "recommend" : "Choose the appropriate type, and if the fitting simulation is missing, feel free to implement your own (or ask me for help)."
                              },
+                "fd_ptypes" : {"scope" : "All fitting simulations",
+                             "required" : False,
+                             "long" : "To compute the objective function derivatives, some components may require numerical finite difference in the derivatives.  Here you may specify the parameter types that finite difference is applied to,
+                             or write 'ALL' to take finite-difference derivatives in all parameter types.",
+                             "recommend" : "If you aren't sure, either use 'ALL' to do finite difference in each component (this is costly), or run a fdcheckG(H) job with this option set to 'NONE' to check which analytic derivatives are missing.
+                             Usually analytic derivatives will be missing in anything but FORCEENERGYMATCH_GMXX2 jobs."
+                             },
+                "shots" : {"scope" : "Force and energy matching simulations",
+                           "required" : True,
+                           "long" : "",
+                           "recommend" : "If you aren't sure, either use 'ALL' to do finite difference in each component (this is costly), or run a fdcheckG(H) job with this option set to 'NONE' to check which analytic derivatives are missing.
+                           Usually analytic derivatives will be missing in anything but FORCEENERGYMATCH_GMXX2 jobs."
+                           },
                 
     }
 
