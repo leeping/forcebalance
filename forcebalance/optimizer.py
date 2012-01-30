@@ -37,6 +37,23 @@ class Optimizer(object):
         - Pass in the objective function, force field, all fitting simulations
 
         """
+        
+        ## A list of all the things we can ask the optimizer to do.
+        self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
+                          'BFGS'              : self.BFGS,
+                          'POWELL'            : self.Powell,
+                          'SIMPLEX'           : self.Simplex,
+                          'ANNEAL'            : self.Anneal,
+                          'CONJUGATEGRADIENT' : self.ConjugateGradient,
+                          'SCAN_MVALS'        : self.ScanMVals,
+                          'SCAN_PVALS'        : self.ScanPVals,
+                          'SINGLE'            : self.SinglePoint,
+                          'GRADIENT'          : self.Gradient,
+                          'HESSIAN'           : self.Hessian,
+                          'FDCHECKG'          : self.FDCheckG,
+                          'FDCHECKH'          : self.FDCheckH
+                          }
+        
         #======================================#
         # Options that are given by the parser #
         #======================================#

@@ -196,15 +196,18 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                           },
                 "simtype" : {"scope" : "All fitting simulations",
                              "required" : True,
-                             "long" : """This is the type of fitting simulation that you are running.  The current accepted values for the fitting simulation are given in the SimTab.py file: %s.""" % ', '.join([i for i in simtab.SimTab]),
-                             "recommend" : """Choose the appropriate type, and if the fitting simulation is missing, feel free to implement your own (or ask me for help)."""
+                             "long" : "This is the type of fitting simulation that you are running.  The current accepted values for the fitting simulation
+                             are given in the SimTab.py file: %s." % ', '.join([i for i in SimTab]),
+                             "recommend" : "Choose the appropriate type, and if the fitting simulation is missing, feel free to implement your own (or ask me for help)."
                              },
                 "fd_ptypes" : {"scope" : "All fitting simulations",
                              "required" : False,
-                             "long" : """To compute the objective function derivatives, some components may require numerical finite difference in the derivatives.  Here you may specify the parameter types that finite difference is applied to,
-                             or write 'ALL' to take finite-difference derivatives in all parameter types.""",
-                             "recommend" : """If you aren't sure, either use 'ALL' to do finite difference in each component (this is costly), or run a fdcheckG(H) job with this option set to 'NONE' to check which analytic derivatives are missing.
-                             Usually analytic derivatives will be missing in anything but FORCEENERGYMATCH_GMXX2 jobs."""
+                             "long" : "To compute the objective function derivatives, some components may require numerical finite difference in the derivatives.
+                             Here you may specify the parameter types that finite difference is applied to,
+                             or write 'ALL' to take finite-difference derivatives in all parameter types.",
+                             "recommend" : "If you aren't sure, either use 'ALL' to do finite difference in each component (this is costly), or run a fdcheckG(H)
+                             job with this option set to 'NONE' to check which analytic derivatives are missing.
+                             Usually analytic derivatives will be missing in anything but FORCEENERGYMATCH_GMXX2 jobs."
                              },
                 "shots" : {"scope" : "Force and energy matching simulations",
                            "required" : False,
@@ -271,6 +274,7 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                             },
                 "fdhessdiag" : {"scope" : "All fitting simulations",
                                 "required" : False,
+<<<<<<< HEAD
                                 "long" : """When this option is enabled, finite difference gradients and Hessian diagonal elements will be enabled 
                                 for selected parameter types (using the fd_ptypes option).  This is done using a three-point finite difference of
                                 the objective function.""",
@@ -321,6 +325,52 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                                  it does decrease the effect of moving toward the QM ensemble.""",
                                  "recommend" : """Irrelevant if 'qmboltz' is set to zero.  Leave at the default value unless you're performing experiments."""
                                  }
+=======
+                                "long" : "The components of the energy and force are rescaled to be on the same footing when the objective function is
+                                optimized.  This can be done by dividing each energy and force term by its variance - or it can be done by multiplying
+                                the outer product of the energy / force polyvector with the inverse of the covariance matrix and taking the trace.  In
+                                principle, the latter option normalizes each principal component of the force and this is supposed to be better - ideally
+                                this could decompose the force into different 'components', such as along bonds and between molecules.  However,
+                                I haven't found a situation in which this is definitively shown to be superior.",
+                                "recommend" : "No recommendation; more analysis is required."
+                                },
+                "batch_fd" : {"scope" : "All fitting simulations",
+                              "required" : False,
+                              "long" : "One way to take advantage of computational resources is to distribute jobs for computing finite-difference derivatives
+                              of the objective function contributions.  When this option is turned on, fitting simulations will be submitted to the queue
+                              instead of being run on the local workstation.  (This option is just a stub and hasn't been implemented yet.",
+                              "recommend" : "No recommendation; currently unused."
+                              },
+                "fdgrad" : {"scope" : "All fitting simulations",
+                            "required" : False,
+                            "long" : "When analytic objective function gradients are missing, turning on this option will enable the computation of finite
+                            difference gradients in selected components.  If this is the only activated 'fd' option, the derivative will be computed using
+                            a two-point forward difference.",
+                            "recommend" : "Turn on if analytic gradients are missing; run a fdcheckG job to determine if you have them."
+                            },
+                "fdhess" : {"scope" : "All fitting simulations",
+                            "required" : False,
+                            "long" : "When analytic objective function Hessians are missing, turning on this option will enable the computation of finite
+                            difference Hessians in selected components.",
+                            "recommend" : "Off; usually an analytic Hessian is not required for optimization, although you might want to compute a single-point
+                            Hessian in some circumstances."
+                            },
+                "fdhessdiag" : {"scope" : "All fitting simulations",
+                                "required" : False,
+                                "long" : "When analytic objective function Hessians are missing, turning on this option will enable the computation of the
+                                diagonal element of the Hessian by finite difference in selected components.  If this option is turned on but 'fdhess' is off,
+                                then the finite-difference gradient component and diagonal Hessian component are computed together using a two-point central
+                                difference.",
+                                "recommend" : "Turn on if analytic Hessian is missing and we are using (quasi)-Newton optimization methods like BFGS;
+                                diagonal Hessian components are especially useful in that they help to constrain the step size in optimizations."
+                                },
+                "use_pvals" : {"scope" : "All fitting simulations",
+                               "required" : False,
+                               "long" : ".",
+                               "recommend" : "Turn on if analytic Hessian is missing and we are using (quasi)-Newton optimization methods like BFGS;
+                               diagonal Hessian components are especially useful in that they help to constrain the step size in optimizations."
+                               },
+>>>>>>> d3f49e78a5f8386f25aedd9631ee5ae8e5bd1e78
                 
                 }
 

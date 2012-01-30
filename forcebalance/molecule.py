@@ -588,6 +588,12 @@ class Molecule:
         self.require_resname()
         self.require_resid()
         self.require_boxes()
+
+        # LPW I need to implement a more general template reader.
+        # if self.tempfnm != None:
+        #     GroTmp = self.read_gro(self.tempfnm)
+        #     print GroTmp['elem']
+
         for I, xyz in enumerate(self.xyzs):
             if subset != None and I not in subset: continue
             xyzwrite = xyz.copy()
