@@ -18,21 +18,6 @@ from numpy.linalg import eig, norm, solve
 from nifty import col, flat, row, printcool, printcool_dictionary
 from finite_difference import f1d7p, f1d5p, fdwrap
 
-## A list of all the things we can ask the optimizer to do.
-self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
-                  'BFGS'              : self.BFGS,
-                  'POWELL'            : self.Powell,
-                  'SIMPLEX'           : self.Simplex,
-                  'ANNEAL'            : self.Anneal,
-                  'CONJUGATEGRADIENT' : self.ConjugateGradient,
-                  'SCAN_MVALS'        : self.ScanMVals,
-                  'SCAN_PVALS'        : self.ScanPVals,
-                  'SINGLE'            : self.SinglePoint,
-                  'GRADIENT'          : self.Gradient,
-                  'HESSIAN'           : self.Hessian,
-                  'FDCHECKG'          : self.FDCheckG,
-                  'FDCHECKH'          : self.FDCheckH
-                  }
 
 class Optimizer(object):
     """ Optimizer class.  Contains several methods for numerical optimization.
@@ -53,6 +38,23 @@ class Optimizer(object):
         - Pass in the objective function, force field, all fitting simulations
 
         """
+        
+        ## A list of all the things we can ask the optimizer to do.
+        self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
+                          'BFGS'              : self.BFGS,
+                          'POWELL'            : self.Powell,
+                          'SIMPLEX'           : self.Simplex,
+                          'ANNEAL'            : self.Anneal,
+                          'CONJUGATEGRADIENT' : self.ConjugateGradient,
+                          'SCAN_MVALS'        : self.ScanMVals,
+                          'SCAN_PVALS'        : self.ScanPVals,
+                          'SINGLE'            : self.SinglePoint,
+                          'GRADIENT'          : self.Gradient,
+                          'HESSIAN'           : self.Hessian,
+                          'FDCHECKG'          : self.FDCheckG,
+                          'FDCHECKH'          : self.FDCheckH
+                          }
+        
         #======================================#
         # Options that are given by the parser #
         #======================================#
@@ -120,7 +122,7 @@ class Optimizer(object):
     def Run(self):
         """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
 
-        xk = OptTab[self.jobtype]()
+        xk = self.OptTab[self.jobtype]()
         
         ## Sometimes the optimizer doesn't return anything (i.e. in the case of a single point calculation)
         ## In these situations, don't do anything

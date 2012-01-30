@@ -1,5 +1,6 @@
 """ Fitting simulation base class. """
 
+import abc
 import os
 import subprocess
 import shutil
@@ -68,6 +69,8 @@ class FittingSimulation(object):
 
     """
 
+    __metaclass__ = abc.ABCMeta
+    
     def __init__(self,options,sim_opts,forcefield):
         """
         Instantiation of a fitting simulation.
@@ -211,3 +214,8 @@ class FittingSimulation(object):
         # Create a new temporary directory from scratch
         os.makedirs(abstempdir)
 
+    @abc.abstractmethod
+    def get(self,mvals,AGrad=False,AHess=False,tempdir=None):
+        """@todo Write documentation here later."""
+        
+        return
