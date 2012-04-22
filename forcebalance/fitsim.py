@@ -4,6 +4,7 @@ import abc
 import os
 import subprocess
 import shutil
+import numpy as np
 from nifty import printcool_dictionary
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 
@@ -142,6 +143,8 @@ class FittingSimulation(object):
         """Computes the objective function contribution without any parametric derivatives"""
         Ans = self.get(mvals,0,0)
         self.xct += 1
+        if Ans['X'] != Ans['X']:
+            return {'X':1e10, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         return Ans
 
     def get_G(self,mvals=None):
@@ -157,10 +160,10 @@ class FittingSimulation(object):
         Ans = self.get(mvals,1,0)
         for i in range(self.FF.np):
             if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
-                if self.fdgrad:
-                    Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
-                elif self.fdhessdiag:
+                if self.fdhessdiag:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
+                elif self.fdgrad:
+                    Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
         # Additional call to build qualitative indicators
         self.get(mvals,0,0)
         self.gct += 1

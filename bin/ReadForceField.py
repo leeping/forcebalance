@@ -6,6 +6,7 @@ from forcebalance.forcefield import FF
 from forcebalance.nifty import printcool
 from sys import argv
 import os
+import numpy as np
 
 def main():
     ## Set some basic options.  Note that 'forcefield' requires 'ffdir'
@@ -13,7 +14,8 @@ def main():
     options = {'forcefield':argv[1:],
                'ffdir':''}
     MyFF = FF(options)
-    print MyFF.tm
+
+    MyFF.make('NewFF',np.arange(len(MyFF.pvals0)),0)
 
 if __name__ == "__main__":
     main()

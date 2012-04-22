@@ -14,6 +14,7 @@ Not sure what's next on the chopping block, but please stay consistent when addi
 @date 12/2011
 """
 
+import os
 from re import match, sub, split
 from sys import argv, exit, stdout
 from PT import PT
@@ -216,12 +217,20 @@ class Molecule:
         comms = []
         elem  = []
         an    = 0
+        na    = 0
+        ln    = 0
+        # Accelerations - let's not use regular expressions.
+        # Okay, I got it two be twice as fast. :P
         for line in open(fnm):
-            strip = line.strip()
-            sline = line.split()
-            if match('^[0-9]+$',strip):
-                na = int(strip)
-            elif match('[A-Z][a-z]*( +[-+]?([0-9]*\.[0-9]+|[0-9]+)){3}$',strip):
+            #strip = line.strip()
+            #sline = line.split()
+            #if match('^[0-9]+$',strip):
+            if ln == 0:
+                na = int(line.strip())
+            elif ln == 1:
+                comms.append(line.strip())
+            else:
+                sline = line.split()
                 xyz.append([float(i) for i in sline[1:]])
                 if len(elem) < na:
                     elem.append(sline[0])
@@ -230,8 +239,21 @@ class Molecule:
                     xyzs.append(array(xyz))
                     xyz = []
                     an  = 0
-            elif an == 0:
-                comms.append(strip)
+            if ln == na+1:
+                ln = -1
+            ln += 1
+
+            # elif match('[A-Z][a-z]*( +[-+]?([0-9]*\.[0-9]+|[0-9]+)){3}$',strip):
+            #     xyz.append([float(i) for i in sline[1:]])
+            #     if len(elem) < na:
+            #         elem.append(sline[0])
+            #     an += 1
+            #     if an == na:
+            #         xyzs.append(array(xyz))
+            #         xyz = []
+            #         an  = 0
+            # elif an == 0:
+            #     comms.append(strip)
         Answer = {'elem' : elem,
                   'xyzs' : xyzs,
                   'comms': comms}
@@ -617,13 +639,16 @@ class Molecule:
             
     def require_boxes(self):
         if self.boxes == None:
-            boxstr = raw_input("Enter 1 / 3 / 9 numbers for a cubic / orthorhombic / triclinic box, use Angstrom -> ")
-            box    = [float(i) for i in boxstr.split()]
-            if len(box) == 3 or len(box) == 9:
-                self.boxes = [box for i in range(self.ns)]
-            elif len(box) == 1:
-                self.boxes = [[box[0],box[0],box[0]] for i in range(self.ns)]
+            boxstr = raw_input("Enter 1 / 3 / 9 numbers for box in Angstrom or name of timeseries file -> ")
+            if os.path.exists(boxstr):
+                self.boxes = [[float(i.strip()),float(i.strip()),float(i.strip())] for i in open(boxstr).readlines()]
             else:
-                print "Not sure what to do since you gave me %i numbers" % len(box)
-                exit(1)
+                box    = [float(i) for i in boxstr.split()]
+                if len(box) == 3 or len(box) == 9:
+                    self.boxes = [box for i in range(self.ns)]
+                elif len(box) == 1:
+                    self.boxes = [[box[0],box[0],box[0]] for i in range(self.ns)]
+                else:
+                    print "Not sure what to do since you gave me %i numbers" % len(box)
+                    exit(1)
                 

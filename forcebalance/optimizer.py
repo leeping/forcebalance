@@ -3,20 +3,17 @@
 My current implementation is to have a single optimizer class with several methods
 contained inside.
 
-@todo I might want to sample over different force fields and store past parameters
-@todo Pickle-loading is helpful mainly for non-initial parameter values, for reproducibility
-@todo Read in parameters from input file, that would be nice
-
 @author Lee-Ping Wang
 @date 12/2011
 
 """
 
 import os, pickle, re, sys
-from numpy import append, array, delete, exp, eye, insert, linspace, mat, ones, sort, std, zeros
+import numpy as np
 from numpy.linalg import eig, norm, solve
 from nifty import col, flat, row, printcool, printcool_dictionary
 from finite_difference import f1d7p, f1d5p, fdwrap
+import random
 
 class Optimizer(object):
     """ Optimizer class.  Contains several methods for numerical optimization.
@@ -44,6 +41,7 @@ class Optimizer(object):
                           'POWELL'            : self.Powell,
                           'SIMPLEX'           : self.Simplex,
                           'ANNEAL'            : self.Anneal,
+                          'GENETIC'           : self.GeneticAlgorithm,
                           'CONJUGATEGRADIENT' : self.ConjugateGradient,
                           'SCAN_MVALS'        : self.ScanMVals,
                           'SCAN_PVALS'        : self.ScanPVals,
@@ -107,31 +105,16 @@ class Optimizer(object):
         self.np        = FF.np
         ## The original parameter values
         if options['read_mvals'] != None:
-            self.mvals0    = array(options['read_mvals'])
+            self.mvals0    = np.array(options['read_mvals'])
         elif options['read_pvals'] != None:
             self.mvals0    = FF.create_mvals(options['read_pvals'])
         else:
-            self.mvals0    = zeros(self.np)
+            self.mvals0    = np.zeros(self.np)
 
         ## Print the optimizer options.
         printcool_dictionary(options, title="Setup for optimizer")
         ## Load the checkpoint file.
         self.readchk()
-        ## A list of all the things we can ask the optimizer to do.
-        self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
-                          'BFGS'              : self.BFGS,
-                          'POWELL'            : self.Powell,
-                          'SIMPLEX'           : self.Simplex,
-                          'ANNEAL'            : self.Anneal,
-                          'CONJUGATEGRADIENT' : self.ConjugateGradient,
-                          'SCAN_MVALS'        : self.ScanMVals,
-                          'SCAN_PVALS'        : self.ScanPVals,
-                          'SINGLE'            : self.SinglePoint,
-                          'GRADIENT'          : self.Gradient,
-                          'HESSIAN'           : self.Hessian,
-                          'FDCHECKG'          : self.FDCheckG,
-                          'FDCHECKH'          : self.FDCheckH
-                          }
         
     def Run(self):
         """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
@@ -205,7 +188,7 @@ class Optimizer(object):
             print
             data     = self.Objective(xk,Ord,verbose=True)
             X, G, H  = data['X'], data['G'], data['H']
-            ehist    = array([X])
+            ehist    = np.array([X])
             xk_prev  = xk.copy()
             trust    = self.trust0
             X_best   = X
@@ -223,7 +206,7 @@ class Optimizer(object):
                 self.writechk()
             nxk = norm(xk)
             ngr = norm(G)
-            stdfront = len(ehist) > 10 and std(sort(ehist)[:10]) or (len(ehist) > 0 and std(ehist) or 0.0)
+            stdfront = len(ehist) > 10 and np.std(np.sort(ehist)[:10]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
             print "\n%6s%12s%12s%12s%14s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)")
             print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e" % (stepn, nxk, ndx, ngr, color, X, stdfront)
             # Check the convergence criteria
@@ -263,12 +246,12 @@ class Optimizer(object):
                 color = "\x1b[92m"
                 # Adjust the trust radius using this funky formula
                 # Very conservative.  Multiplier is 1.5 and decreases to 1.1 when trust=4trust0
-                trust += over and 0.5*trust*exp(-0.5*(trust/self.trust0 - 1)) or 0
+                trust += over and 0.5*trust*np.exp(-0.5*(trust/self.trust0 - 1)) or 0
                 X_best = X
                 # So here's the deal.  I'm getting steepest-descent badness in some of the parameters (e.g. virtual site positions)
                 # The solution would be to build up a BFGS quasi-Hessian but only in that parameter block, since we have exact second
                 # derivatives for everything else.  I will leave the cross-terms alone.
-                Hnew = mat(H.copy())
+                Hnew = np.mat(H.copy())
                 if b_BFGS:
                     Hnew = H_stor.copy()
                 # for i in range(xk.shape[0]):
@@ -292,7 +275,7 @@ class Optimizer(object):
                 H_stor = H.copy()
                 # End BFGS stuff
                 xk_prev = xk.copy()
-                ehist = append(ehist, X)
+                ehist = np.append(ehist, X)
             drc = abs(flat(dx)).argmax()
             stepn += 1
             
@@ -323,17 +306,17 @@ class Optimizer(object):
         @param[in] trust The trust radius
         
         """
-        G = delete(G, self.excision)
-        H = delete(H, self.excision, axis=0)
-        H = delete(H, self.excision, axis=1)
+        G = np.delete(G, self.excision)
+        H = np.delete(H, self.excision, axis=0)
+        H = np.delete(H, self.excision, axis=1)
         Eig = eig(H)[0]            # Diagonalize Hessian
         Emin = min(Eig)
         if Emin < self.eps:        # Mix in SD step if Hessian minimum eigenvalue is negative
-            H += (self.eps - Emin)*eye(H.shape[0])
+            H += (self.eps - Emin)*np.eye(H.shape[0])
         dx = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
         dx = flat(dx)
         for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
-            dx = insert(dx, i, 0)
+            dx = np.insert(dx, i, 0)
         dxnorm = norm(dx)          # Length of step
         over = False
         if dxnorm > trust:
@@ -373,7 +356,10 @@ class Optimizer(object):
                 if verbose:
                     print "k=", ' '.join(["% .4f" % i for i in mvals])
                     print "X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (color,Answer,dx)
-                return Answer
+                if Answer != Answer:
+                    return 1e10
+                else:
+                    return Answer
             my_func.x_best = None
             return my_func
         def gwrap(func,verbose=True):
@@ -403,10 +389,128 @@ class Optimizer(object):
             return optimize.fmin(xwrap(self.Objective),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep,maxfun=self.maxstep*10)
         elif Algorithm == "anneal":
             printcool("Minimizing Objective Function using Simulated Annealing" , color=7, bold=1)
-            return optimize.anneal(xwrap(self.Objective),self.mvals0,lower=-1*ones(self.np),upper=1*ones(self.np),schedule='boltzmann')
+            return optimize.anneal(xwrap(self.Objective),self.mvals0,lower=-1*self.trust0*np.ones(self.np),upper=self.trust0*np.ones(self.np),schedule='boltzmann')
         elif Algorithm == "cg":
             printcool("Minimizing Objective Function using Conjugate Gradient" , color=7, bold=1)
             return optimize.fmin_cg(xwrap(self.Objective,verbose=False),self.mvals0,fprime=gwrap(self.Objective),gtol=self.conv_grd)
+
+    def GeneticAlgorithm(self):
+        """ Genetic algorithm.  Under development.
+
+        """
+        def generate_fresh(rows, cols):
+            new_guys = np.zeros((rows, cols))
+            for i in range(rows):
+                new_guys[i, int(cols*np.random.random())] = self.trust0 * np.random.randn()
+            return new_guys
+        
+        def cross_over(chrom1, chrom2):
+            crosspt = 1 + int((len(chrom1) - 1) * np.random.random())
+            Ans1 = np.hstack((chrom1[:crosspt],chrom2[crosspt:]))
+            Ans2 = np.hstack((chrom2[:crosspt],chrom1[crosspt:]))
+            return Ans1, Ans2
+
+        def mutate(chrom):
+            mutpt = int(len(chrom) * np.random.random())
+            chrom[mutpt] += self.trust0 * np.random.randn()
+            return chrom
+
+        def initial_generation():
+            return np.vstack((self.mvals0.copy(),np.random.randn(PopSize, self.np)*self.trust0)) / (self.np ** 0.5)
+            #return np.vstack((self.mvals0.copy(),generate_fresh(PopSize, self.np)))
+
+        def calculate_fitness(pop):
+            return [self.Objective(i,Order=0,verbose=False)['X'] for i in pop]
+
+        def sort_by_fitness(fits):
+            return np.sort(fits), np.argsort(fits)
+
+        def generate_new_population(sorted, pop):
+            newpop = pop[sorted[1]]
+            # Individuals in this range are kept
+            a = range(KeepNum)
+            print "Keeping:", a
+            random.shuffle(a)
+            for i in range(0, KeepNum, 2):
+                print "%i and %i reproducing to replace %i and %i" % (a[i],a[i+1],len(newpop)-i-2,len(newpop)-i-1)
+                newpop[-i-1], newpop[-i-2] = cross_over(newpop[a[i]],newpop[a[i+1]])
+            b = range(KeepNum, len(newpop))
+            random.shuffle(b)
+            for i in b[:MutNum]:
+                print "Randomly mutating %i" % i
+                newpop[i] = mutate(newpop[i])
+            
+            
+            # # Randomly mutate a random fraction of the kept ones
+            # random.shuffle(a)
+            # print "Randomizing the following:", a[:MutNum]
+            # for i in a[:MutNum]:
+            #     newpop[i] = mutate(newpop[i])
+            # # Cross over a random fraction of the kept ones
+            # random.shuffle(a)
+            # print "Crossing the following:", a[:CrosNum]
+            # for i in range(0,CrosNum,2):
+            #     newpop[a[i]], newpop[a[i+1]] = cross_over(newpop[a[i]],newpop[a[i+1]])
+            # # Completely randomize the dead ones
+            # for i in range(KeepNum,len(newpop)):
+            #     newpop[i] = np.random.randn(self.np)*self.trust0 / (self.np ** 0.5)
+
+                
+                #newpop[i] *= 0.0
+                #newpop[i,int(self.np * np.random.random())] = np.random.randn()*self.trust0
+                #print newpop[i]
+            return newpop
+            
+        def xwrap(func,verbose=True):
+            def my_func(mvals):
+                if verbose: print
+                Answer = func(mvals,Order=0,verbose=verbose)['X']
+                dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
+                if Answer < my_func.x_best or my_func.x_best == None:
+                    color = "\x1b[92m"
+                    my_func.x_best = Answer
+                else:
+                    color = "\x1b[91m"
+                if verbose:
+                    print "k=", ' '.join(["% .4f" % i for i in mvals])
+                    print "X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (color,Answer,dx)
+                return Answer
+            my_func.x_best = None
+            return my_func
+
+        PopSize = 120
+        KeepThresh = 0.5
+        MutProb = 0.1
+        CrosProb = 0.5
+        
+        KeepNum = int(KeepThresh * PopSize)
+        MutNum = int(MutProb * PopSize)
+        CrosNum = int(CrosProb/2 * PopSize) * 2
+        Population = initial_generation()
+        Gen = 0
+
+        Best = [[],[]]
+
+        while True:
+            #print Population
+            Fits = calculate_fitness(Population)
+            Sorted = sort_by_fitness(Fits)
+            print Sorted
+            Best[0].append(Sorted[0][0])
+            Best[1].append(Population[Sorted[1][0]])
+            print Best
+            if Gen == self.maxstep: break
+            Population = generate_new_population(Sorted, Population)
+            Gen += 1
+
+        print Best
+        
+        return Population[Sorted[1][0]]
+        
+        #for i in Population:
+        #    print self.Objective(i,Order=0,verbose=False)['X']
+            #print xwrap(i
+        
 
     def Simplex(self):
         """ Use SciPy's built-in simplex algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
@@ -460,7 +564,9 @@ class Optimizer(object):
         for j in self.idxname:
             idx += [self.FF.map[i] for i in self.FF.map if j in i]
         idx = set(idx)
-        scanvals = linspace(vals_in[0],vals_in[1],vals_in[2]+1)
+        scanvals = np.linspace(vals_in[0],vals_in[1],vals_in[2])
+        print vals_in
+        print scanvals
         for pidx in idx:
             if MathPhys:
                 print "Scanning parameter %i (%s) in the mathematical space" % (pidx,self.FF.plist[pidx])
@@ -512,7 +618,7 @@ class Optimizer(object):
         """
 
         Adata        = self.Objective(self.mvals0,Order=1)['G']
-        Fdata        = zeros(self.np,dtype=float)
+        Fdata        = np.zeros(self.np,dtype=float)
         printcool("Checking first derivatives by finite difference!\n%-8s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
         for i in range(self.np):
@@ -542,7 +648,7 @@ class Optimizer(object):
 
         """
         Adata        = self.Objective(self.mvals0,Order=2)['H']
-        Fdata        = zeros((self.np,self.np),dtype=float)
+        Fdata        = np.zeros((self.np,self.np),dtype=float)
         printcool("Checking second derivatives by finite difference!\n%-8s%-20s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter1 ID", "Parameter2 ID", "Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
 

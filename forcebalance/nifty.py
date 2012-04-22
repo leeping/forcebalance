@@ -10,6 +10,7 @@ import os
 from re import match, sub
 from numpy import array, diag, dot, mat, transpose
 from numpy.linalg import norm, svd
+import threading
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -216,3 +217,38 @@ def invert_svd(X,thresh=1e-8):
     si     = mat(diag(si))
     Xt     = v*si*uh
     return Xt
+
+def warn_press_key(warning):
+    if type(warning) is str:
+        print warning
+    elif type(warning) is list:
+        for line in warning:
+            print line
+    else:
+        print "You're not supposed to pass me a variable of this type:", type(warning)
+    print "Press any key (I assume no responsibility for what happens after this!)"
+    raw_input()
+
+def concurrent_map(func, data):
+    """
+    Similar to the bultin function map(). But spawn a thread for each argument
+    and apply `func` concurrently.
+
+    Note: unlike map(), we cannot take an iterable argument. `data` should be an
+    indexable sequence.
+    """
+
+    N = len(data)
+    result = [None] * N
+
+    # wrapper to dispose the result in the right slot
+    def task_wrapper(i):
+        result[i] = func(data[i])
+
+    threads = [threading.Thread(target=task_wrapper, args=(i,)) for i in xrange(N)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    return result

@@ -34,20 +34,20 @@ GenOptionDoc = {"gmxpath" : {"scope" : "Fitting simulations that use GROMACS (GR
                                   "recommend" : "L2; tested and known to be working.  Implementation of L1 in progress."
                                   },
                 "scan_vals" : {"scope" : "scan_mvals and scan_pvals job types",
-                               "required" : True,
+                               "required" : False,
                                "long" : """This specifies a range of parameter values to scan in a uniform grid.  scan_mvals works in
                                the mathematical parameter space while scan_pvals works in the physical parameter space.  The syntax
                                is lower:step:upper .  Both lower and upper limits are included in the range.""",
                                "recommend" : "For scan_mvals, a range of values between -1 and +1 is recommended; for scan_pvals, choose values close to the physical parameter value."
                                },
                 "scanindex_num" : {"scope" : "scan_mvals and scan_pvals job types",
-                                   "required" : True,
+                                   "required" : False,
                                    "long" : """ForceBalance assigns to each adjustable parameter a 'parameter number' corresponding to
                                    its position in the parameter vector.  This tells the parameter scanner which number to scan over.""",
                                    "recommend" : "Look at the printout from a single-point job to decide which parameter number you wish to scan over."
                                    },
                 "scanindex_name" : {"scope" : "scan_mvals and scan_pvals job types",
-                                    "required" : True,
+                                    "required" : False,
                                     "long" : """ForceBalance assigns to each adjustable parameter a 'parameter name'.  By specifying
                                     this option, this tells the parameter scanner to locate the correct parameter with the specified name and then
                                     scan over it.""",
@@ -159,16 +159,13 @@ GenOptionDoc = {"gmxpath" : {"scope" : "Fitting simulations that use GROMACS (GR
                 
                 "read_mvals" : {"scope" : "All force field optimizations",
                                 "required" : False,
-                                "long" : """Read in mathematical parameters before starting the optimization.  There is a standardized
-                                syntax, given by:
-                                
-                                read_mvals
-                                0 [ -2.9766e-01 ] : VDWSOW
-                                1 [  2.2283e-01 ] : VDWTOW
-                                2 [ -1.1138e-03 ] : BONDSBHWOW
-                                3 [ -9.0883e-02 ] : BONDSKHWOW
-                                \read_mvals
-                                """,
+                                "long" : """Read in mathematical parameters before starting the optimization.  There is a standardized syntax, given by:
+@verbatim read_mvals
+0 [ -2.9766e-01 ] : VDWSOW
+1 [  2.2283e-01 ] : VDWTOW
+2 [ -1.1138e-03 ] : BONDSBHWOW
+3 [ -9.0883e-02 ] : BONDSKHWOW
+\\read_mvals @endverbatim""",
                                 "recommend" : """If you run the main optimizer, it will print out this block at the very end for you to use and/or modify."""
                                 },
                 
@@ -176,16 +173,13 @@ GenOptionDoc = {"gmxpath" : {"scope" : "Fitting simulations that use GROMACS (GR
                                 "required" : False,
                                 "long" : """Read in physical parameters before starting the optimization.  There is a standardized
                                 syntax, given by:
-                                
-                                read_pvals
-                                0 [  2.9961e-01 ] : VDWSOW
-                                1 [  1.2009e+00 ] : VDWTOW
-                                2 [  9.5661e-02 ] : BONDSBHWOW
-                                3 [  4.1721e+05 ] : BONDSKHWOW
-                                \read_pvals
-                                
-                                These are the actual numbers that go into the force field file, so note the large changes in magnitude.
-                                """,
+@verbatim read_pvals
+ 0 [  2.9961e-01 ] : VDWSOW
+ 1 [  1.2009e+00 ] : VDWTOW
+ 2 [  9.5661e-02 ] : BONDSBHWOW
+ 3 [  4.1721e+05 ] : BONDSKHWOW
+ \\read_pvals @endverbatim
+                                These are the actual numbers that go into the force field file, so note the large changes in magnitude.""",
                                 "recommend" : """If you run the main optimizer, it will print out this block at the very end for you to use and/or modify."""
                                 },
                 }
@@ -196,18 +190,18 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                           },
                 "simtype" : {"scope" : "All fitting simulations",
                              "required" : True,
-                             "long" : "This is the type of fitting simulation that you are running.  The current accepted values for the fitting simulation
-                             are given in the SimTab.py file: %s." % ', '.join([i for i in SimTab]),
+                             "long" : """This is the type of fitting simulation that you are running.  The current accepted values for the fitting simulation
+                             are given in the SimTab.py file: %s.""" % ', '.join([i for i in simtab.SimTab]),
                              "recommend" : "Choose the appropriate type, and if the fitting simulation is missing, feel free to implement your own (or ask me for help)."
                              },
                 "fd_ptypes" : {"scope" : "All fitting simulations",
                              "required" : False,
-                             "long" : "To compute the objective function derivatives, some components may require numerical finite difference in the derivatives.
+                               "long" : """To compute the objective function derivatives, some components may require numerical finite difference in the derivatives.
                              Here you may specify the parameter types that finite difference is applied to,
-                             or write 'ALL' to take finite-difference derivatives in all parameter types.",
-                             "recommend" : "If you aren't sure, either use 'ALL' to do finite difference in each component (this is costly), or run a fdcheckG(H)
+                             or write 'ALL' to take finite-difference derivatives in all parameter types.""",
+                             "recommend" : """If you aren't sure, either use 'ALL' to do finite difference in each component (this is costly), or run a fdcheckG(H)
                              job with this option set to 'NONE' to check which analytic derivatives are missing.
-                             Usually analytic derivatives will be missing in anything but FORCEENERGYMATCH_GMXX2 jobs."
+                             Usually analytic derivatives will be missing in anything but FORCEENERGYMATCH_GMXX2 jobs."""
                              },
                 "shots" : {"scope" : "Force and energy matching simulations",
                            "required" : False,
@@ -274,7 +268,6 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                             },
                 "fdhessdiag" : {"scope" : "All fitting simulations",
                                 "required" : False,
-<<<<<<< HEAD
                                 "long" : """When this option is enabled, finite difference gradients and Hessian diagonal elements will be enabled 
                                 for selected parameter types (using the fd_ptypes option).  This is done using a three-point finite difference of
                                 the objective function.""",
@@ -325,67 +318,73 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                                  it does decrease the effect of moving toward the QM ensemble.""",
                                  "recommend" : """Irrelevant if 'qmboltz' is set to zero.  Leave at the default value unless you're performing experiments."""
                                  }
-=======
-                                "long" : "The components of the energy and force are rescaled to be on the same footing when the objective function is
-                                optimized.  This can be done by dividing each energy and force term by its variance - or it can be done by multiplying
-                                the outer product of the energy / force polyvector with the inverse of the covariance matrix and taking the trace.  In
-                                principle, the latter option normalizes each principal component of the force and this is supposed to be better - ideally
-                                this could decompose the force into different 'components', such as along bonds and between molecules.  However,
-                                I haven't found a situation in which this is definitively shown to be superior.",
-                                "recommend" : "No recommendation; more analysis is required."
-                                },
-                "batch_fd" : {"scope" : "All fitting simulations",
-                              "required" : False,
-                              "long" : "One way to take advantage of computational resources is to distribute jobs for computing finite-difference derivatives
-                              of the objective function contributions.  When this option is turned on, fitting simulations will be submitted to the queue
-                              instead of being run on the local workstation.  (This option is just a stub and hasn't been implemented yet.",
-                              "recommend" : "No recommendation; currently unused."
-                              },
-                "fdgrad" : {"scope" : "All fitting simulations",
-                            "required" : False,
-                            "long" : "When analytic objective function gradients are missing, turning on this option will enable the computation of finite
-                            difference gradients in selected components.  If this is the only activated 'fd' option, the derivative will be computed using
-                            a two-point forward difference.",
-                            "recommend" : "Turn on if analytic gradients are missing; run a fdcheckG job to determine if you have them."
-                            },
-                "fdhess" : {"scope" : "All fitting simulations",
-                            "required" : False,
-                            "long" : "When analytic objective function Hessians are missing, turning on this option will enable the computation of finite
-                            difference Hessians in selected components.",
-                            "recommend" : "Off; usually an analytic Hessian is not required for optimization, although you might want to compute a single-point
-                            Hessian in some circumstances."
-                            },
-                "fdhessdiag" : {"scope" : "All fitting simulations",
-                                "required" : False,
-                                "long" : "When analytic objective function Hessians are missing, turning on this option will enable the computation of the
-                                diagonal element of the Hessian by finite difference in selected components.  If this option is turned on but 'fdhess' is off,
-                                then the finite-difference gradient component and diagonal Hessian component are computed together using a two-point central
-                                difference.",
-                                "recommend" : "Turn on if analytic Hessian is missing and we are using (quasi)-Newton optimization methods like BFGS;
-                                diagonal Hessian components are especially useful in that they help to constrain the step size in optimizations."
-                                },
-                "use_pvals" : {"scope" : "All fitting simulations",
-                               "required" : False,
-                               "long" : ".",
-                               "recommend" : "Turn on if analytic Hessian is missing and we are using (quasi)-Newton optimization methods like BFGS;
-                               diagonal Hessian components are especially useful in that they help to constrain the step size in optimizations."
-                               },
->>>>>>> d3f49e78a5f8386f25aedd9631ee5ae8e5bd1e78
                 
                 }
 
-def main():
-    Answer = ["The option index is generated by running the make-option-index.py script, which is itself called using the make-all-documentation.sh script."]
-    
+def create_index(optiondoc,opt_types):
+    Glossary = {}
     for i in ['strings','allcaps','lists','ints','bools','floats','sections']:
         vartype = re.sub('s$','',i)
-        for j in parser.gen_opts_types[i]:
-            val =  parser.gen_opts_types[i][j][0]
-            Answer.append("%s (%s), %s" % (str(j), vartype, "Required" if GenOptionDoc[j]["required"] else "Optional"))
+        for j in opt_types[i]:
+            val =  opt_types[i][j][0]
+            #print j
+            Glossary[j] = ["@li <b> %s </b> (%s)" % (j.upper(), vartype.capitalize())]
+            if "scope" in optiondoc[j] and "required" in optiondoc[j]:
+                Glossary[j].append("\\n<b> Scope </b>: %s (%s)" % (optiondoc[j]["scope"],"<b><em>Required</em></b>" if optiondoc[j]["required"] else "Optional"))
+            Glossary[j].append("\\n<b> One-line description </b>: %s" % opt_types[i][j][1])
+            if "long" in optiondoc[j]:
+                Glossary[j].append("\\n<b> Full description </b>: %s" % optiondoc[j]["long"])
+            Glossary[j].append("\\n<b> Default Value </b>: %s" % val)
+            if "recommend" in optiondoc[j]:
+                Glossary[j].append("\\n<b> Recommendation </b>: %s" % optiondoc[j]["recommend"])
+    return Glossary
+
+
+def main():
+
+
+    Answer = ["""\section gen_option_index Option index: General options
+
+This section contains a listing of the general options available when running
+a ForceBalance job, which go into the $options section.  The general options
+are global for the ForceBalance job, in contrast to 'Simulation options' which apply to one
+fitting simulation within a job (described in the next section).
+The option index is generated by running make-option-index.py.
+"""]
+    GenIndex = create_index(GenOptionDoc,parser.gen_opts_types)
+
+    for i in sorted([j for j in GenIndex]):
+        Answer += GenIndex[i]
+        Answer.append("")
+
+    Answer.append("""\section sim_option_index Option index: Simulation options
+
+This section contains a listing of the simulation options available when running
+a ForceBalance job, which go into the $sim_opts section.  There can be multiple 
+$sim_opts sections in a ForceBalance input file, one for each fitting simulation.
+""")
+
+    SimIndex = create_index(SimOptionDoc,parser.sim_opts_types)
+
+    for i in sorted([j for j in SimIndex]):
+        Answer += SimIndex[i]
+        Answer.append("")
+    
+
+#[i.replace('\n','') for i in GenIndex[i]]
+        #for line in GenIndex[i]:
+            
+                
+                # # and GenOptionDoc[j]["required"] == True:
+
+                # "Scope: %s" % GenOptionDoc[j]["scope"],
+                #            "Full Description: %s" % GenOptionDoc[j]["long"],
+                #            "Recommendation: %s" % GenOptionDoc[j]["recommend"]]
             #Answer.append("%s (%s):%s" % (str(j), vartype, parser.gen_opts_types[i][j][1]))
             #Answer.append("%s %s" % (str(j),str(val)))
-    Answer.append("$end")
+    #Answer.append("$end")
     print '\n'.join(Answer)
+
 
 
 if __name__ == "__main__":

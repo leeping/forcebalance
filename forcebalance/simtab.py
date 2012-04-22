@@ -6,6 +6,7 @@ This is in a separate file to facilitate importing.  I would happily put it some
 
 from gmxio import ForceEnergyMatch_GMX
 from tinkerio import ForceEnergyMatch_TINKER
+from openmmio import ForceEnergyMatch_OpenMM, PropertyMatch_OpenMM
 from forceenergymatch_gmxx2 import ForceEnergyMatch_GMXX2
 from counterpoisematch import CounterpoiseMatch
 
@@ -13,6 +14,8 @@ from counterpoisematch import CounterpoiseMatch
 SimTab = {
     'FORCEENERGYMATCH_GMX':ForceEnergyMatch_GMX,
     'FORCEENERGYMATCH_TINKER':ForceEnergyMatch_TINKER,
+    'FORCEENERGYMATCH_OPENMM':ForceEnergyMatch_OpenMM,
     'FORCEENERGYMATCH_GMXX2':ForceEnergyMatch_GMXX2,
+    'PROPERTYMATCH_OPENMM':PropertyMatch_OpenMM,
     'COUNTERPOISEMATCH':CounterpoiseMatch
     }
