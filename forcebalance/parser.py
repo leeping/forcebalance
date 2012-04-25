@@ -112,7 +112,7 @@ sim_opts_types = {
                  },
     'bools'   : {"whamboltz"  : (0, 'Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False'),
                  "sampcorr"   : (0, 'Whether to use the (archaic) sampling correction (force+energy match), defaults to False'),
-                 "covariance" : (1, 'Whether to use the quantum covariance matrix (force+energy match), defaults to True'),
+                 "covariance" : (0, 'Whether to use the quantum covariance matrix (force+energy match), defaults to True'),
                  "batch_fd"   : (0, 'Whether to batch and queue up finite difference jobs, defaults to False'),
                  "fdgrad"     : (1, 'Finite difference gradients'),
                  "fdhess"     : (1, 'Finite difference Hessian diagonals (costs np times a gradient calculation)'),

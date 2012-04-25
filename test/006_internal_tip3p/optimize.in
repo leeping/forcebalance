@@ -16,9 +16,9 @@ scan_vals -1:1:11
 scanindex_num 0 1 2 3 4 5 6 7 
 
 # (allcap) The job type, defaults to a single-point evaluation of objective function
-jobtype single
+jobtype bfgs
 
-# (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
+# (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen|xml)
 forcefield tip3p.xml
 
 # (int) Maximum number of steps in an optimization
@@ -56,10 +56,10 @@ $end
 
 $simulation
 # (string) The name of the simulation, which corresponds to the directory simulations/dir_name
-name Density
+name Energy_Force
 
 # (allcap) The type of fitting simulation, for instance ForceEnergyMatch_GMXX2
-simtype PropertyMatch_OpenMM
+simtype ForceEnergyMatch_Internal
 
 # (list) The parameter types that need to be differentiated using finite difference
 fd_ptypes all
@@ -72,6 +72,12 @@ fdhess 1
 
 # (bool) Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)
 fdhessdiag 1
+
+# Number of snapshots
+shots 30
+
+# (float) Energy/force weighting
+efweight 1.0
 
 # (float) Weight of the current simulation (with respect to other simulations)
 weight 1.0

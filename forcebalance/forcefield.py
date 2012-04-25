@@ -121,31 +121,31 @@ FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "openmm" : openmmio.OpenMM_Reader
                 }
 
-def determine_fftype(ffname):
+def determine_fftype(ffname,verbose=False):
     fsplit = ffname.split('/')[-1].split(':')
     fftype = None
-    print "Determining file type of %s ..." % fsplit[0],
+    if verbose: print "Determining file type of %s ..." % fsplit[0],
     if len(fsplit) == 2:
         if fsplit[1] in FF_IOModules:
-            print "We're golden! (%s)" % fsplit[1]
+            if verbose: print "We're golden! (%s)" % fsplit[1]
             fftype = fsplit[1]
         else:
-            print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(FF_IOModules.keys()))
+            if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(FF_IOModules.keys()))
     elif len(fsplit) == 1:
-        print "Guessing from extension (you may specify type with filename:type) ...", 
+        if verbose: print "Guessing from extension (you may specify type with filename:type) ...", 
         ffname = fsplit[0]
         ffext = ffname.split('.')[-1]
         if ffext in FF_Extensions:
             guesstype = FF_Extensions[ffext]
             if guesstype in FF_IOModules:
-                print "guessing %s -> %s!" % (ffext, guesstype)
+                if verbose: print "guessing %s -> %s!" % (ffext, guesstype)
                 fftype = guesstype
             else:
-                print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[0],', '.join(FF_IOModules.keys()))
+                if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[0],', '.join(FF_IOModules.keys()))
         else:
-            print "\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!" % (ffext,', '.join(FF_Extensions.keys()))
+            if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!" % (ffext,', '.join(FF_Extensions.keys()))
     if fftype == None:
-        print "Force field type not determined!"
+        if verbose: print "Force field type not determined!"
         #sys.exit(1)
     return fftype
 
@@ -160,7 +160,7 @@ class FF(object):
     For details on force field parsing, see the detailed documentation for addff.
     
     """
-    def __init__(self, options):
+    def __init__(self, options, verbose=True):
 
         """Instantiation of force field class.
 
@@ -212,7 +212,8 @@ class FF(object):
         
         # Read the force fields into memory.
         for fnm in self.fnms:
-            print "Reading force field from file: %s" % fnm
+            if verbose:
+                print "Reading force field from file: %s" % fnm
             self.addff(fnm)
 
         # Set the initial values of parameter arrays.
@@ -222,12 +223,13 @@ class FF(object):
         # Prepare various components of the class for first use.
         ## Creates plist from map.
         self.list_map()
-        ## Prints the plist to screen.
-        bar = printcool("Starting parameter indices, physical values and IDs")
-        self.print_map()                       
-        print bar
+        if verbose:
+            ## Prints the plist to screen.
+            bar = printcool("Starting parameter indices, physical values and IDs")
+            self.print_map()                       
+            print bar
         ## Make the rescaling factors.
-        self.rsmake(printfacs=True)            
+        self.rsmake(printfacs=verbose)            
         ## Make the transformation matrix.
         self.mktransmat()                      
         

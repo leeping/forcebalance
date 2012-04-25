@@ -15,13 +15,13 @@ from propertymatch import PropertyMatch
 import numpy as np
 import sys
 import pickle
-import work_queue
 import shutil
 
 try:
     from simtk.openmm.app import *
     from simtk.openmm import *
     from simtk.unit import *
+    import work_queue
 except:
     pass
 
