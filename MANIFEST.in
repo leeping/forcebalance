@@ -12,3 +12,4 @@ recursive-include test/001_water12_tip4p/simulations *
 include test/001_water12_tip4p/*.in
 include test/001_water12_tip4p/*.out
 include test/001_water12_tip4p/*.chk
+recursive-include test/006_internal_tip3p *
