@@ -96,50 +96,56 @@ we need more modules!
 import os
 import sys
 from re import match, sub, split
-import gmxio, qchemio, tinkerio, custom_io
+import gmxio, qchemio, tinkerio, custom_io, openmmio
 import basereader
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros
 from numpy.linalg import norm
-from nifty import col, flat, invert_svd, isint, kb, orthogonalize, pmat2d, printcool, row
+from nifty import col, flat, invert_svd, isint, kb, orthogonalize, pmat2d, printcool, row, warn_press_key
 from string import count
+from copy import deepcopy
+from lxml import etree
+import itertools
 
 FF_Extensions = {"itp" : "gmx",
                  "in"  : "qchem",
                  "prm" : "tinker",
-                 "gen" : "custom"
+                 "gen" : "custom",
+                 "xml" : "openmm"
                  }
 
 """ Recognized force field formats. """
 FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "qchem": qchemio.QCIn_Reader ,
-                "custom": custom_io.Gen_Reader
+                "tinker": tinkerio.Tinker_Reader ,
+                "custom": custom_io.Gen_Reader , 
+                "openmm" : openmmio.OpenMM_Reader
                 }
 
-def determine_fftype(ffname):
+def determine_fftype(ffname,verbose=False):
     fsplit = ffname.split('/')[-1].split(':')
     fftype = None
-    print "Determining file type of %s ..." % fsplit[0],
+    if verbose: print "Determining file type of %s ..." % fsplit[0],
     if len(fsplit) == 2:
         if fsplit[1] in FF_IOModules:
-            print "We're golden! (%s)" % fsplit[1]
+            if verbose: print "We're golden! (%s)" % fsplit[1]
             fftype = fsplit[1]
         else:
-            print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(FF_IOModules.keys()))
+            if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(FF_IOModules.keys()))
     elif len(fsplit) == 1:
-        print "Guessing from extension (you may specify type with filename:type) ...", 
+        if verbose: print "Guessing from extension (you may specify type with filename:type) ...", 
         ffname = fsplit[0]
         ffext = ffname.split('.')[-1]
         if ffext in FF_Extensions:
             guesstype = FF_Extensions[ffext]
             if guesstype in FF_IOModules:
-                print "guessing %s -> %s!" % (ffext, guesstype)
+                if verbose: print "guessing %s -> %s!" % (ffext, guesstype)
                 fftype = guesstype
             else:
-                print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[0],', '.join(FF_IOModules.keys()))
+                if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[0],', '.join(FF_IOModules.keys()))
         else:
-            print "\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!" % (ffext,', '.join(FF_Extensions.keys()))
+            if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!" % (ffext,', '.join(FF_Extensions.keys()))
     if fftype == None:
-        print "Force field type not determined!"
+        if verbose: print "Force field type not determined!"
         #sys.exit(1)
     return fftype
 
@@ -154,7 +160,7 @@ class FF(object):
     For details on force field parsing, see the detailed documentation for addff.
     
     """
-    def __init__(self, options):
+    def __init__(self, options, verbose=True):
 
         """Instantiation of force field class.
 
@@ -172,6 +178,8 @@ class FF(object):
         self.fnms        = options['forcefield']
         ## Directory containing force fields, relative to project directory
         self.ffdir       = options['ffdir']
+        ## Priors given by the user :)
+        self.priors      = options['priors']
         
         #======================================#
         #     Variables which are set here     #
@@ -179,7 +187,7 @@ class FF(object):
         # A lot of these variables are filled out by calling the methods.
         
         ## The content of all force field files are stored in memory
-        self.stuff       = {}        
+        self.ffdata       = {}        
         ## The mapping of interaction type -> parameter number
         self.map         = {}
         ## The listing of parameter number -> interaction types
@@ -199,14 +207,13 @@ class FF(object):
         self.excision    = None
         ## The total number of parameters
         self.np          = 0
-        ## The force field content, but with parameter fields replaced with new parameters.
-        self.newstuff    = {}
         ## Initial value of physical parameters
         self.pvals0      = []
         
         # Read the force fields into memory.
         for fnm in self.fnms:
-            print "Reading force field from file: %s" % fnm
+            if verbose:
+                print "Reading force field from file: %s" % fnm
             self.addff(fnm)
 
         # Set the initial values of parameter arrays.
@@ -216,19 +223,20 @@ class FF(object):
         # Prepare various components of the class for first use.
         ## Creates plist from map.
         self.list_map()
-        ## Prints the plist to screen.
-        bar = printcool("Starting parameter indices, physical values and IDs")
-        self.print_map()                       
-        print bar
+        if verbose:
+            ## Prints the plist to screen.
+            bar = printcool("Starting parameter indices, physical values and IDs")
+            self.print_map()                       
+            print bar
         ## Make the rescaling factors.
-        self.rsmake(printfacs=True)            
+        self.rsmake(printfacs=verbose)            
         ## Make the transformation matrix.
         self.mktransmat()                      
         
     def addff(self,ffname):
         """ Parse a force field file and add it to the class.
 
-        First, we need to figure out the type of file file.  Currently this is done
+        First, we need to figure out the type of file.  Currently this is done
         using the three-letter file extension ('.itp' = gmx); that can be improved.
         
         First we open the force field file and read all of its lines.  As we loop
@@ -238,9 +246,6 @@ class FF(object):
 
         As we go through the file, we figure out the atoms involved in the interaction
         described on each line.
-
-        @todo This can be generalized to parameters that don't correspond to atoms.
-        @todo Fix the special treatment of NDDO.
 
         When a 'PARM' keyword is indicated, it is followed by a number which is the field
         in the line to be modified, starting with zero.  Based on the field number and the
@@ -306,10 +311,17 @@ class FF(object):
 
         # Open the force field using an absolute path and read its contents into memory.
         absff = os.path.join(self.root,self.ffdir,ffname)
-        self.stuff[ffname] = open(absff).readlines()
         
         self.R = Reader(ffname)
-        for ln, line in enumerate(self.stuff[ffname]):
+        if fftype == "openmm":
+            self.ffdata[ffname] = etree.parse(absff)
+            self.addff_xml(ffname)
+        else:
+            self.ffdata[ffname] = open(absff).readlines()
+            self.addff_txt(ffname)
+
+    def addff_txt(self, ffname):
+        for ln, line in enumerate(self.ffdata[ffname]):
             self.R.feed(line)
             sline = line.split()
             if 'PARM' in sline:
@@ -337,7 +349,29 @@ class FF(object):
                     self.map[pid] = prep
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
-        
+    
+    def addff_xml(self, ffname):
+        fflist = list(self.ffdata[ffname].iter())
+        for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
+            parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
+            for p in parameters_to_optimize:
+                pid = self.R.build_pid(e, p)
+                self.map[pid] = self.np
+                self.assign_p0(self.np,float(e.get(p)))
+                self.assign_field(self.np,ffname,fflist.index(e),p,1)
+                self.np += 1
+
+        for e in self.ffdata[ffname].getroot().xpath('//@param_repeat/..'):
+            for field in e.get('param_repeat').split(','):
+                dest = self.R.build_pid(e, field.strip().split('=')[0])
+                src  = field.strip().split('=')[1]
+                if src in self.map:
+                    self.map[dest] = self.map[src]
+                else:
+                    warn_press_key(["Warning: You wanted to copy parameter from %s to %s, " % (src, dest), 
+                                    "but the source parameter does not seem to exist!"])
+                self.assign_field(self.map[dest],ffname,fflist.index(e),dest.split('/')[1],1)
+            
     def make(self,printdir,vals,usepvals):
         """ Create a new force field using provided parameter values.
         
@@ -361,8 +395,34 @@ class FF(object):
             pvals = vals.copy()
         else:
             pvals = self.create_pvals(vals)
-        self.replace_pvals(pvals)
-        self.print_newstuff(printdir)
+
+        pvals = list(pvals)
+
+        
+        newffdata = deepcopy(self.ffdata)
+
+        for i in range(len(self.pfields)):
+            pfld_list = self.pfields[i]
+            for pfield in pfld_list:
+                fnm,ln,fld,mult = pfield
+                if type(newffdata[fnm]) is etree._ElementTree:
+                    list(newffdata[fnm].iter())[ln].attrib[fld] = "% .12e" % (mult*pvals[i])
+                else:
+                    sline       = newffdata[fnm][ln].split()
+                    whites      = split('[^ ]+',newffdata[fnm][ln])
+                    if not match('^-',sline[fld]) and len(whites[fld]) > 1:
+                        whites[fld] = whites[fld][:-1]
+                    sline[fld]  = "% .12e" % (mult*pvals[i])
+                    newffdata[fnm][ln] = ''.join([whites[j]+sline[j] for j in range(len(sline))])+'\n'
+
+        if not os.path.exists(os.path.join(self.root,printdir)):
+            os.makedirs(os.path.join(self.root,printdir))
+
+        for fnm in newffdata:
+            if type(newffdata[fnm]) is etree._ElementTree:
+                with open(os.path.join(self.root,printdir,fnm),'w') as f: newffdata[fnm].write(f)
+            else:
+                with open(os.path.join(self.root,printdir,fnm),'w') as f: f.writelines(newffdata[fnm])
         return pvals
         
     def create_pvals(self,mvals):
@@ -390,75 +450,55 @@ class FF(object):
         mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
         return mvals
         
-    def replace_pvals(self,pvals):
-        """Replaces numerical fields in stored force field files with the stored physical parameter values.
-        
-        Unless you really know what you're doing, you probably shouldn't be calling this directly.
-
-        """
-        vals = list(pvals)
-        for fnm in self.stuff:
-            self.newstuff[fnm] = list(self.stuff[fnm])
-        for i in range(len(self.pfields)):
-            pfld_list = self.pfields[i]
-            for pfield in pfld_list:
-                fnm,ln,fld,mult = pfield
-                sline       = self.newstuff[fnm][ln].split()
-                whites      = split('[^ ]+',self.newstuff[fnm][ln])
-                if not match('^-',sline[fld]) and len(whites[fld]) > 1:
-                    whites[fld] = whites[fld][:-1]
-                sline[fld]  = "% .12e" % (mult*vals[i])
-                self.newstuff[fnm][ln] = ''.join([whites[j]+sline[j] for j in range(len(sline))])+'\n'
-                
-    def print_newstuff(self,printdir):
-        """Prints out the new content of force fields to files in 'printdir'.
-
-        @param[in] printdir The directory to which new force fields are printed.
-
-        """
-        if not os.path.exists(os.path.join(self.root,printdir)):
-            os.makedirs(os.path.join(self.root,printdir))
-        for fnm in self.newstuff:
-            with open(os.path.join(self.root,printdir,fnm),'w') as f: f.writelines(self.newstuff[fnm])
-            
     def rsmake(self,printfacs=True):
         """Create the rescaling factors for the coordinate transformation in parameter space.
 
         The proper choice of rescaling factors (read: prior widths in maximum likelihood analysis)
         is still a black art.  This is a topic of current research.
 
+        @todo Pass in rsfactors through the input file
+
         @param[in] printfacs List for printing out the resecaling factors
 
         """
         typevals = {}
-        tvgeomean = {}
+        rsfactors = {}
+        rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
-        termtypelist = sum([[i+self.R.pdict[i][j] for j in self.R.pdict[i] if isint(str(j))] for i in self.R.pdict],[])
+        if self.R.pdict == "XML_Override":
+            termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
+        else:
+            termtypelist = sum([[i+self.R.pdict[i][j] for j in self.R.pdict[i] if isint(str(j))] for i in self.R.pdict],[])
         for termtype in termtypelist:
             for pid in self.map:
                 if termtype in pid:
                     typevals.setdefault(termtype, []).append(self.pvals0[self.map[pid]])
         for termtype in typevals:
             # The old, horrendously complicated rule
-            # tvgeomean[termtype] = exp(mean(log(abs(array(typevals[termtype]))+(abs(array(typevals[termtype]))==0))))
+            # rsfactors[termtype] = exp(mean(log(abs(array(typevals[termtype]))+(abs(array(typevals[termtype]))==0))))
             # The newer, maximum rule (thanks Baba)
-            tvgeomean[termtype] = max(abs(array(typevals[termtype])))
+            rsfactors[termtype] = max(abs(array(typevals[termtype])))
+            rsfac_list.append(termtype)
             # Physically motivated overrides
-            rs_override(tvgeomean,termtype)
-        # TODO: Pass in rsfactors through the input file
+            rs_override(rsfactors,termtype)
+        # Overrides from input file
+        for termtype in self.priors:
+            rsfac_list.append(termtype)
+            rsfactors[termtype] = self.priors[termtype]
+    
         # for line in os.popen("awk '/rsfactor/ {print $2,$3}' %s" % pkg.options).readlines():
-        #     tvgeomean[line.split()[0]] = float(line.split()[1])
+        #     rsfactors[line.split()[0]] = float(line.split()[1])
         if printfacs:
-            bar = printcool("Rescaling Factors for Different Parameter Types:",color=1)
-            print '\n'.join(sorted(["   %-15s  : %.5e" % (i, tvgeomean[i]) for i in tvgeomean]))
+            bar = printcool("Rescaling Factors (Lower Takes Precedence):",color=1)
+            print '\n'.join(["   %-35s  : %.5e" % (i, rsfactors[i]) for i in rsfac_list])
             print bar
         ## The array of rescaling factors
         self.rs = ones(len(self.pvals0))
         for pnum in range(len(self.pvals0)):
-            for termtype in tvgeomean:
+            for termtype in rsfac_list:
                 if termtype in self.plist[pnum]:
-                    self.rs[pnum] = tvgeomean[termtype]
+                    self.rs[pnum] = rsfactors[termtype]
                     
     def mktransmat(self):
         """ Create the transformation matrix to rescale and rotate the mathematical parameters.
@@ -489,21 +529,35 @@ class FF(object):
         
         @todo Only project out changes in total charge of a molecule, and perhaps generalize to
         fragments of molecules or other types of parameters.
+        @todo The AMOEBA selection of charge depends not only on the atom type, but what that atom is bonded to.
         """
         qmap   = []
         qid    = []
         qnr    = 1
-        concern= ['COUL']
+        concern= ['COUL','c0','charge']
+        if self.R.pdict == "XML_Override":
+            # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
+            ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata]))
+
         for i in range(self.np):
             if any([j in self.plist[i] for j in concern]):
                 qmap.append(i)
-                nq = sum(array([count(self.plist[i], j) for j in concern]))
+                if 'AmoebaMultipoleForce.Multipole/c0' in self.plist[i] or 'NonbondedForce.Atom/charge' in self.plist[i]:
+                    AType = self.plist[i].split('/')[-1].split('.')[0]
+                    nq = count(ListOfAtoms,AType)
+                else:
+                    nq = sum(array([count(self.plist[i], j) for j in concern]))
                 qid.append(qnr+arange(nq))
                 qnr += nq
+
         tq = qnr - 1
         cons0 = ones((1,tq))
-        #print qmap
-        #print qid
+
+        # print qmap
+        # print qid
+        # print tq
+        # print cons0
+        # raw_input()
         #chargegrp = []
         # LPW Charge groups aren't implemented at this time
         ## chargegrp = [[1,3],[4,5],[6,7]]
@@ -533,7 +587,7 @@ class FF(object):
                 qtrans2[i,:] = 0
                 for j in range(nq-i-1):
                     qtrans2[i+j+1, :] = orthogonalize(qtrans2[i+j+1, :], cons[i])
-            #print qtrans2
+
         qmat2 = eye(self.np,dtype=float)
         x = 0
         for i in range(self.np):
@@ -582,14 +636,14 @@ class FF(object):
             self.pvals0[idx] = val
             
     def assign_field(self,idx,fnm,ln,pfld,mult):
-        """ Record the locations of a parameter in a file; [[file name, line number, field number, and multiplier]].
+        """ Record the locations of a parameter in a txt file; [[file name, line number, field number, and multiplier]].
 
         Note that parameters can have multiple locations because of the repetition functionality.
 
         @param[in] idx  The index of the parameter.
         @param[in] fnm  The file name of the parameter field.
-        @param[in] ln   The line number within the file.
-        @param[in] pfld The field within the line.
+        @param[in] ln   The line number within the file (or the node index in the flattened xml)
+        @param[in] pfld The field within the line (or the name of the attribute in the xml)
         @param[in] mult The multiplier (this is usually 1.0)
         
         """
@@ -598,41 +652,41 @@ class FF(object):
         else:
             self.pfields[idx].append([fnm,ln,pfld,mult])
 
-def rs_override(tvgeomean,termtype,Temperature=298.15):
-    """ This function takes in a dictionary (tvgeomean) and a string (termtype).
+def rs_override(rsfactors,termtype,Temperature=298.15):
+    """ This function takes in a dictionary (rsfactors) and a string (termtype).
     
-    If termtype matches any of the strings below, tvgeomean[termtype] is assigned
+    If termtype matches any of the strings below, rsfactors[termtype] is assigned
     to one of the numbers below.
 
     This is LPW's attempt to simplify the rescaling factors.
 
-    @param[out] tvgeomean The computed rescaling factor.
+    @param[out] rsfactors The computed rescaling factor.
     @param[in] termtype The interaction type (corresponding to a physical unit)
     @param[in] Temperature The temperature for computing the kT energy scale
     
     """
     if match('PDIHS[1-6]K|RBDIHSK[1-5]|MORSEC',termtype):
         # eV or eV rad^-2
-        tvgeomean[termtype] = 96.4853
+        rsfactors[termtype] = 96.4853
     elif match('UREY_BRADLEYK1|ANGLESK',termtype):
-        tvgeomean[termtype] = 96.4853 * 6.28
+        rsfactors[termtype] = 96.4853 * 6.28
     elif match('COUL|VPAIR_BHAMC|QTPIEA',termtype):
         # elementary charge, or unitless, or already in atomic unit
-        tvgeomean[termtype] = 1.0
+        rsfactors[termtype] = 1.0
     elif match('QTPIEC|QTPIEH',termtype):
         # eV to atomic unit
-        tvgeomean[termtype] = 27.2114
+        rsfactors[termtype] = 27.2114
     elif match('BONDSB|UREY_BRADLEYB|MORSEB|VDWS|VPAIRS|VSITE|VDW_BHAMA|VPAIR_BHAMA',termtype):
         # nm to atomic unit
-        tvgeomean[termtype] = 0.05291772
+        rsfactors[termtype] = 0.05291772
     elif match('BONDSK|UREY_BRADLEYK2',termtype):
         # au bohr^-2
-        tvgeomean[termtype] = 34455.5275 * 27.2114
+        rsfactors[termtype] = 34455.5275 * 27.2114
     elif match('PDIHS[1-6]B|ANGLESB|UREY_BRADLEYB',termtype):
         # radian
-        tvgeomean[termtype] = 57.295779513
+        rsfactors[termtype] = 57.295779513
     elif match('VDWT|VDW_BHAMB|VPAIR_BHAMB',termtype):
         # VdW well depth; using kT.  This was a tough one because the energy scale is so darn small.
-        tvgeomean[termtype] = kb*Temperature
+        rsfactors[termtype] = kb*Temperature
     elif match('MORSEE',termtype):
-        tvgeomean[termtype] = 18.897261
+        rsfactors[termtype] = 18.897261

@@ -1,11 +1,12 @@
 """ Fitting simulation base class. """
 
+import abc
 import os
 import subprocess
 import shutil
+import numpy as np
 from nifty import printcool_dictionary
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
-from gmxio import set_gmx_paths
 
 class FittingSimulation(object):
     
@@ -69,6 +70,8 @@ class FittingSimulation(object):
 
     """
 
+    __metaclass__ = abc.ABCMeta
+    
     def __init__(self,options,sim_opts,forcefield):
         """
         Instantiation of a fitting simulation.
@@ -126,18 +129,13 @@ class FittingSimulation(object):
         self.gct         = 0
         ## Counts how often the Hessian was computed
         self.hct         = 0
+        
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
-        ## The name of the simulation software that we're using
-        self.software = sim_opts['software']
-        ## Set the path for executables
-        if self.software in ['GMX','GROMACS']:
-            set_gmx_paths(self, options)
-                                                                 
-        # Back up and then delete the temporary directory.
-        self.backup_temp_directory()
-        shutil.rmtree(os.path.join(self.root,self.tempdir),ignore_errors=True)
+        # Create a new temp directory.
+        self.refresh_temp_directory()
+
         # Print the options for this simulation to the terminal.
         printcool_dictionary(sim_opts,"Setup for fitting simulation %s :" % self.name)
 
@@ -145,6 +143,8 @@ class FittingSimulation(object):
         """Computes the objective function contribution without any parametric derivatives"""
         Ans = self.get(mvals,0,0)
         self.xct += 1
+        if Ans['X'] != Ans['X']:
+            return {'X':1e10, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         return Ans
 
     def get_G(self,mvals=None):
@@ -160,10 +160,10 @@ class FittingSimulation(object):
         Ans = self.get(mvals,1,0)
         for i in range(self.FF.np):
             if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
-                if self.fdgrad:
-                    Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
-                elif self.fdhessdiag:
+                if self.fdhessdiag:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
+                elif self.fdgrad:
+                    Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
         # Additional call to build qualitative indicators
         self.get(mvals,0,0)
         self.gct += 1
@@ -199,7 +199,6 @@ class FittingSimulation(object):
         self.hct += 1
         return Ans
 
-<<<<<<< HEAD
     def refresh_temp_directory(self):
         """ Back up the temporary directory if desired, delete it
         and then create a new one."""
@@ -208,25 +207,18 @@ class FittingSimulation(object):
             os.makedirs(os.path.join(self.root,'backups'))
         abstempdir = os.path.join(self.root,self.tempdir)
         if os.path.exists(abstempdir):
-=======
-    def backup_temp_directory(self):
-        """ Back up the temporary directory."""
-        cwd = os.getcwd()
-        if not os.path.exists(os.path.join(self.root,'backups')):
-            os.makedirs(os.path.join(self.root,'backups'))
-        if os.path.exists(os.path.join(self.root,self.tempdir)):
->>>>>>> Still working on making things installable
             print "Backing up:", self.tempdir
             os.chdir(os.path.join(self.root,"temp"))
             # I could use the tarfile module here
             subprocess.call(["tar","cjf",os.path.join(self.root,'backups',"%s.tar.bz2" % self.name),self.name,"--remove-files"])
             os.chdir(cwd)
-<<<<<<< HEAD
         # Delete the temporary directory
         shutil.rmtree(abstempdir,ignore_errors=True)
         # Create a new temporary directory from scratch
         os.makedirs(abstempdir)
 
-=======
-            
->>>>>>> Still working on making things installable
+    @abc.abstractmethod
+    def get(self,mvals,AGrad=False,AHess=False,tempdir=None):
+        """@todo Write documentation here later."""
+        
+        return

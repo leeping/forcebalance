@@ -61,12 +61,12 @@ gen_opts_types = {
                  "gmxtoolpath"  : (None, 'Path for GROMACS tools, may override GMXPATH'),
                  "gmxsuffix"    : ('',   'The suffix of GROMACS executables'),
                  "penalty_type" : ("L2", 'Type of the penalty, L2 or L1 in the optimizer'),
-                 "scan_vals"    : (None, 'Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1'),
+                 "scan_vals"    : (None, 'Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.1:11'),
                  "readchk"      : (None, 'Name of the restart file we read from'),
                  "writechk"     : (None, 'Name of the restart file we write to (can be same as readchk)'),
                  "ffdir"        : ('forcefield', 'Directory containing force fields, relative to project directory')
                  },
-    'allcaps' : {"jobtype"      : ("sp", 'The job type, defaults to a single-point evaluation of objective function'),
+    'allcaps' : {"jobtype"      : ("single", 'The job type, defaults to a single-point evaluation of objective function'),
                  },
     'lists'   : {"forcefield"     : ([], 'The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)'),
                  "scanindex_num"  : ([], 'Numerical index of the parameter to scan over in job type "scan[mp]vals"'),
@@ -87,7 +87,8 @@ gen_opts_types = {
                  "penalty_multiplicative" : (0.1, 'Factor for multiplicative penalty function in objective function')
                  },
     'sections': {"read_mvals" : (None, 'Paste mathematical parameters into the input file for them to be read in directly'),
-                 "read_pvals" : (None, 'Paste physical parameters into the input file for them to be read in directly')
+                 "read_pvals" : (None, 'Paste physical parameters into the input file for them to be read in directly'),
+                 "priors"     : ({}, 'Paste priors into the input file for them to be read in directly')
                  }
     }
 
@@ -114,12 +115,14 @@ sim_opts_types = {
                  },
     'bools'   : {"whamboltz"  : (0, 'Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False'),
                  "sampcorr"   : (0, 'Whether to use the (archaic) sampling correction (force+energy match), defaults to False'),
-                 "covariance" : (1, 'Whether to use the quantum covariance matrix (force+energy match), defaults to True'),
+                 "covariance" : (0, 'Whether to use the quantum covariance matrix (force+energy match), defaults to True'),
                  "batch_fd"   : (0, 'Whether to batch and queue up finite difference jobs, defaults to False'),
                  "fdgrad"     : (1, 'Finite difference gradients'),
                  "fdhess"     : (1, 'Finite difference Hessian diagonals (costs np times a gradient calculation)'),
                  "fdhessdiag" : (1, 'Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)'),
-                 "use_pvals"  : (0, 'Bypass the transformation matrix and use the physical parameters directly')
+                 "use_pvals"  : (0, 'Bypass the transformation matrix and use the physical parameters directly'),
+                 "all_at_once": (1, 'Compute all energies and forces in one fell swoop (as opposed to calling the simulation code once per snapshot)'),
+                 "run_internal": (1,'For OpenMM or other codes with Python interface: Compute energies and forces internally'),
                  },
     'floats'  : {"weight"      : (1.0, 'Weight of the current simulation (with respect to other simulations)'),
                  "efweight"    : (0.5, '1.0 for all energy and 0.0 for all force (force+energy match), defaults to 0.5'),
@@ -156,12 +159,21 @@ def read_pvals(fobj):
         Answer.append(float(line.split('[')[-1].split(']')[0].split()[0]))
     return Answer
 
+def read_priors(fobj):
+    Answer = {}
+    for line in fobj:
+        if re.match("(/priors)|(^\$end)",line):
+            break
+        Answer[line.split()[0]] = float(line.split()[-1])
+    return Answer
+
 def read_internals(fobj):
     return
 
 ## ParsTab that refers to subsection parsers.
 ParsTab  = {"read_mvals" : read_mvals,
             "read_pvals" : read_pvals,
+            "priors"     : read_priors,
             "internal"   : read_internals
             }
 

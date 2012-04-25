@@ -74,6 +74,11 @@ class ForceEnergyMatch(FittingSimulation):
         self.fitatoms      = sim_opts['fitatoms']
         ## The proportion of energy vs. force.
         self.efweight      = sim_opts['efweight']
+        ## Whether to do energy and force calculations for the whole trajectory, or to do
+        ## one calculation per snapshot.
+        self.all_at_once   = sim_opts['all_at_once']
+        ## OpenMM-only option - whether to run the energies and forces internally.
+        self.run_internal  = sim_opts['run_internal']
         
         #======================================#
         #     Variables which are set here     #
@@ -364,8 +369,10 @@ class ForceEnergyMatch(FittingSimulation):
         #==============================================================#
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
+        if self.all_at_once:
+            print "Computing forces\r",
+            M_all = self.energy_force_driver_all()
         for i in range(self.ns):
-            print "Shot %i\r" % i,
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
             Z  += P
@@ -377,7 +384,11 @@ class ForceEnergyMatch(FittingSimulation):
             # Increment the average quantities.
             QQ     = outer(Q,Q)
             # Call the simulation software to get the MM quantities.
-            M = self.energy_force_driver(i)
+            if self.all_at_once:
+                M = M_all[i]
+            else:
+                print "Shot %i\r" % i,
+                M = self.energy_force_driver(i)
             # Increment the average values.
             M0_M += P*M
             Q0_M += P*Q
@@ -399,7 +410,7 @@ class ForceEnergyMatch(FittingSimulation):
         WM      = zeros((NCP1,NCP1),dtype=float)
         WM[0,0] = sqrt(EFW)
         for i in range(1,NCP1):
-            WM[i,i] = sqrt(EFW/NC)
+            WM[i,i] = sqrt(CEFW/NC)
         #==============================================================#
         #                      The covariance matrix                   #
         #                                                              #
