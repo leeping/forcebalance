@@ -14,6 +14,11 @@ from re import match
 import subprocess
 from subprocess import PIPE
 
+trajfnm_default = {'GMX'    : "all.gro",
+                   'GROMACS': "all.gro",
+                   'TINKER' : "all.arc"
+                   }
+
 class ForceEnergyMatch(FittingSimulation):
 
     """ Subclass of FittingSimulation for force and energy matching.
@@ -92,17 +97,19 @@ class ForceEnergyMatch(FittingSimulation):
         self.e_err = 0.0
         ## Qualitative Indicator: average force error (fractional)
         self.f_err = 0.0
+        #======================================#
+        #          UNDER DEVELOPMENT           #
+        #======================================#
+        ## Trajectory file name.  I wanted to put all default values in parser.py, but unfortunately
+        ## I couldn't come up with a convenient way of making the default value depend on the
+        ## value of another key.  So we are setting it here *sigh*
+        self.trajfnm = sim_opts['trajfnm'] if sim_opts['trajfnm'] != None else trajfnm_default[self.software]
         ## Read in the trajectory file
         self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
-        self.prepare_temp_directory(options,sim_opts)
-
-        #======================================#
-        #          UNDER DEVELOPMENT           #
-        #======================================#
-        # Put stuff here that I'm not sure about. :)
+        self.prepare_temp_directory()
         
     def read_reference_data(self):
         
@@ -473,3 +480,34 @@ def build_objective(SPiXi,WCiW,Z,Q0,M0,NCP1):
     X2      = dot(XiZ.flatten(),WCiW.flatten())
     return X2
 
+    def prepare_temp_directory(self,tempdir=None):
+        """ Prepare the temporary directory for running the external program.
+
+        This method creates the temporary directory, links in the
+        necessary files for running (except for the force field), and
+        writes the coordinate file for the snapshots we've chosen.
+        
+        """
+        
+        if tempdir == None:
+            tempdir = self.tempdir
+        # Create the temporary directory
+        abstempdir = os.path.join(self.root,self.tempdir)
+        os.makedirs(abstempdir)
+        
+        if self.software in ['GMX','GROMACS']:
+            # Link the necessary programs into the temporary directory
+            os.symlink(os.path.join(self.gmxrunpath,"mdrun"+self.gmxsuffix),os.path.join(abstempdir,"mdrun"))
+            os.symlink(os.path.join(self.gmxrunpath,"grompp"+self.gmxsuffix),os.path.join(abstempdir,"grompp"))
+            os.symlink(os.path.join(self.gmxtoolpath,"g_energy"+self.gmxsuffix),os.path.join(abstempdir,"g_energy"))
+            os.symlink(os.path.join(self.gmxtoolpath,"g_traj"+self.gmxsuffix),os.path.join(abstempdir,"g_traj"))
+            # Link the run files
+            os.symlink(os.path.join(self.root,self.simdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+            # Write the trajectory to the temp-directory
+            self.traj.write(os.path.join(abstempdir,"all.gro"))
+            os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
+            # Print out the first conformation in all.gro to use as conf.gro
+            self.traj.write(os.path.join(abstempdir,"conf.gro"),subset=[0])
+        elif self.software == ['TINKER']:
+            ## LPW STILL IN DEVELOPMENT!
+            pass

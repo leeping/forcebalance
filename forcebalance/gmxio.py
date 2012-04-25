@@ -284,47 +284,17 @@ def gmxx2_print(fnm, vec, type):
             print >> fobj, "% .12e" % i,
     fobj.close()
 
-def rm_gmx_baks(dir):
-    # Delete the #-prepended files that GROMACS likes to make
-    for root, dirs, files in os.walk(dir):
-        for file in files:
-            if match('^#',file):
-                os.remove(file)
 
-class ForceEnergyMatch_GMX(ForceEnergyMatch):
-    """ Subclass of FittingSimulation for force and energy matching using normal GROMACS.
-    Implements the prepare_temp_directory and energy_force_driver methods."""
-
-    def __init__(self,options,sim_opts,forcefield):
-        ## Name of the trajectory, we need this BEFORE initializing the SuperClass
-        self.trajfnm = "all.gro"
-        ## Initialize the SuperClass!
-        super(ForceEnergyMatch_GMX,self).__init__(options,sim_opts,forcefield)
+def set_gmx_paths(me,options):
+    """ Set the gmxrunpath, gmxtoolpath and gmxsuffix attributes of a class.
     
-    def prepare_temp_directory(self, options, sim_opts):
-        os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
-        abstempdir = os.path.join(self.root,self.tempdir)
-        # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
-        os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
-        os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
-        os.symlink(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
-        # Link the run files
-        os.symlink(os.path.join(self.root,self.simdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
-
-    def energy_force_driver(self, shot):
-        # Remove backup files.
-        rm_gmx_baks(os.getcwd())
-        # Write the correct conformation.
-        self.traj.write('conf.gro',subset=[shot])
-        # Call grompp followed by mdrun.
-        o, e = Popen(["./grompp", "-f", "shot.mdp"],stdout=PIPE,stderr=PIPE).communicate()
-        o, e = Popen(["./mdrun", "-o", "shot.trr", "-rerunvsite"], stdout=PIPE, stderr=PIPE).communicate()
-        # Gather information
-        o, e = Popen(["./g_energy","-xvg","no"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('Potential')
-        o, e = Popen(["./g_traj","-xvg","no","-f","shot.trr","-of","force.xvg","-fp"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('System')
-        E = [float(open("energy.xvg").readlines()[0].split()[1])]
-        F = [float(i) for i in open("force.xvg").readlines()[0].split()[1:] if float(i) != 0.0]
-        M = array(E + F)
-        return M
+    \param[in] me The class whose attributes we want to set.
+    \param[in] options Simulation options dictionary
+    
+    """
+    ##  The path for main GROMACS executables like mdrun, grompp (if linking to just-built binaries)
+    me.gmxrunpath  = options['gmxrunpath'] != None and options['gmxrunpath'] or options['gmxpath']
+    ##  The path for GROMACS tools like g_energy (if linking to just-built binaries)
+    me.gmxtoolpath = options['gmxrunpath'] != None and options['gmxtoolpath'] or options['gmxpath']
+    ##  Suffix for GROMACS executables
+    me.gmxsuffix   = options['gmxsuffix']

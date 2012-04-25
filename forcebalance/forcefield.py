@@ -112,7 +112,6 @@ FF_Extensions = {"itp" : "gmx",
 """ Recognized force field formats. """
 FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "qchem": qchemio.QCIn_Reader ,
-                "tinker": tinkerio.Tinker_Reader ,
                 "custom": custom_io.Gen_Reader
                 }
 
