@@ -7,8 +7,8 @@
 import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros
 from fitsim import FittingSimulation
+import numpy as np
 from molecule import Molecule
 from re import match
 import subprocess
@@ -97,15 +97,32 @@ class PropertyMatch(FittingSimulation):
         # Go into the temporary directory
         os.chdir(os.path.join(self.root,tempdir))
 
+        DensityRef = {235.5 : 968.8, 248.0 : 989.2,
+                      260.5 : 997.1, 273.0 : 999.8,
+                      285.5 : 999.5, 298.0 : 997.2,
+                      323.0 : 988.3, 348.0 : 975.2,
+                      373.0 : 958.7, 400.0 : 938.0}
+
+        Denom = np.std(np.array([DensityRef[i] for i in DensityRef]))
+        
         # Launch a series of simulations
-        for Temperature in [248, 273, 278, 283, 288, 293, 298, 323, 348, 373]:
-            os.makedirs('%i' % Temperature)
-            os.chdir('%i' % Temperature)
+        for Temperature in DensityRef:
+            os.makedirs('%.1f' % Temperature)
+            os.chdir('%.1f' % Temperature)
             self.execute(Temperature,os.getcwd())
             os.chdir('..')
 
         wq_wait(self.wq)
-            
-        Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
+
+        for Temperature in DensityRef:
+            for line in open('./%.1f/npt.out' % Temperature):
+                if 'Density: mean' in line:
+                    DensityCalc[Temperature] = float(line.split()[2])
+
+        Delta = np.array([DensityRef[T] - DensityCalc[T] for T in DensityRef]) / Denom
+        Objective = np.mean(Delta*Delta)
+        print DensityRef, DensityCalc, Delta, Denom, Objective
+
+        Answer = {'X':Objective, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         os.chdir(cwd)
         return Answer

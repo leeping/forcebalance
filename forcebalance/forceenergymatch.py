@@ -363,9 +363,9 @@ class ForceEnergyMatch(FittingSimulation):
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
         if self.all_at_once:
+            print "Computing forces\r",
             M_all = self.energy_force_driver_all()
         for i in range(self.ns):
-            print "Shot %i\r" % i,
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
             Z  += P
@@ -380,6 +380,7 @@ class ForceEnergyMatch(FittingSimulation):
             if self.all_at_once:
                 M = M_all[i]
             else:
+                print "Shot %i\r" % i,
                 M = self.energy_force_driver(i)
             # Increment the average values.
             M0_M += P*M

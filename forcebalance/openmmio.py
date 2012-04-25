@@ -158,7 +158,8 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
 
         M = []
         # Loop through the snapshots
-        for xyz in self.traj.xyzs:
+        for I in range(self.ns):
+            xyz = self.traj.xyzs[I]
             xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
             # Set the positions using the trajectory
             simulation.context.setPositions(xyz_omm)
