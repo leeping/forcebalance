@@ -66,7 +66,7 @@ class PropertyMatch_OpenMM(PropertyMatch):
         self.wq.specify_name('forcebalance')
         print('THE PORT IS %d' % self.wq.port)
 
-    def prepare_temp_directory(self,options,sim_opts):
+    def prepare_temp_directory(self,options,sim_opts,forcefield):
         abstempdir = os.path.join(self.root,self.tempdir)
         shutil.copy2(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
         shutil.copy2(os.path.join(self.root,self.simdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
@@ -123,7 +123,7 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
         ## Initialize the SuperClass!
         super(ForceEnergyMatch_OpenMM,self).__init__(options,sim_opts,forcefield)
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, sim_opts, forcefield):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
         #os.symlink(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
