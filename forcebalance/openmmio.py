@@ -123,7 +123,7 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
         ## Initialize the SuperClass!
         super(ForceEnergyMatch_OpenMM,self).__init__(options,sim_opts,forcefield)
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, sim_opts, forcefield):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
         #os.symlink(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
