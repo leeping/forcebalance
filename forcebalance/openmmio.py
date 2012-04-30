@@ -66,7 +66,7 @@ class PropertyMatch_OpenMM(PropertyMatch):
         self.wq.specify_name('forcebalance')
         print('THE PORT IS %d' % self.wq.port)
 
-    def prepare_temp_directory(self,options,sim_opts,forcefield):
+    def prepare_temp_directory(self,options,sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         shutil.copy2(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
         shutil.copy2(os.path.join(self.root,self.simdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
