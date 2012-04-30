@@ -11,6 +11,11 @@ from re import match, sub
 from numpy import array, diag, dot, mat, transpose
 from numpy.linalg import norm, svd
 import threading
+try:
+    import pickle
+    from lxml import etree
+    from types import StringType
+except: pass
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -107,7 +112,7 @@ def printcool(text,sym="#",bold=False,color=2,bottom='-',minwidth=50):
     print bar
     return sub(sym,bottom,bar)
 
-def printcool_dictionary(dict,title="General options"):
+def printcool_dictionary(dict,title="General options",color=2):
     """See documentation for printcool; this is a nice way to print out keys/values in a dictionary.
 
     The keys in the dictionary are sorted before printing out.
@@ -115,7 +120,7 @@ def printcool_dictionary(dict,title="General options"):
     @param[in] dict The dictionary to be printed
     @param[in] title The title of the printout
     """
-    bar = printcool(title)
+    bar = printcool(title,color=color)
     print '\n'.join(["%-25s %s " % (key,str(dict[key])) for key in sorted([i for i in dict]) if dict[key] != None])
     print bar
 
@@ -252,3 +257,40 @@ def concurrent_map(func, data):
         t.join()
 
     return result
+
+XMLFILE='x'
+
+class Pickler_LP(pickle.Pickler):
+    def __init__(self, file, protocol=None):
+        pickle.Pickler.__init__(self, file, protocol)
+        def save_etree(self, obj):
+            String = etree.tostring(obj)
+            if self.bin:
+                print "self.bin is True, not sure what to do with myself"
+                raw_input()
+            else:
+                self.write(XMLFILE + repr(String) + '\n')
+            self.memoize(String)
+        self.dispatch[etree._ElementTree] = save_etree
+
+class Unpickler_LP(pickle.Unpickler):
+    def __init__(self, file):
+        pickle.Unpickler.__init__(self, file)
+        def load_etree(self):
+            rep = self.readline()[:-1]
+            for q in "\"'": # double or single quote
+                if rep.startswith(q):
+                    if not rep.endswith(q):
+                        raise ValueError, "insecure string pickle"
+                    rep = rep[len(q):-len(q)]
+                    break
+            else:
+                raise ValueError, "insecure string pickle"
+            self.append(etree.ElementTree(etree.fromstring(rep.decode("string-escape"))))
+        self.dispatch[XMLFILE] = load_etree
+
+def lp_dump(obj, file, protocol=None):
+    Pickler_LP(file, protocol).dump(obj)
+
+def lp_load(file):
+    return Unpickler_LP(file).load()
