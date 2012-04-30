@@ -6,13 +6,14 @@
 
 import os
 import shutil
-from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool
+from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool_dictionary, lp_dump, lp_load, printcool
 from fitsim import FittingSimulation
 import numpy as np
 from molecule import Molecule
 from re import match
 import subprocess
 from subprocess import PIPE
+from lxml import etree
 
 def wq_wait(wq):
     while not wq.empty():
@@ -96,6 +97,18 @@ class PropertyMatch(FittingSimulation):
         pvals = self.FF.make(tempdir,mvals,self.usepvals)
         # Go into the temporary directory
         os.chdir(os.path.join(self.root,tempdir))
+        # Dump the force field to a pickle file
+        with open(os.path.join(self.root,tempdir,'ff.p'),'w') as f: lp_dump(self.FF,f)
+        Mao = lp_load(open(os.path.join(self.root,tempdir,'ff.p')))
+        #print dir(Mao)
+        bar = printcool('Force field data')
+        print bar
+        for i in Mao.ffdata:
+            print type(Mao.ffdata[i])
+            if type(Mao.ffdata[i]) is etree._ElementTree:
+                print etree.tostring(Mao.ffdata[i])
+        #print "Sniffy"
+        raw_input()
 
         DensityRef = {235.5 : 968.8, 248.0 : 989.2,
                       260.5 : 997.1, 273.0 : 999.8,
@@ -103,10 +116,12 @@ class PropertyMatch(FittingSimulation):
                       323.0 : 988.3, 348.0 : 975.2,
                       373.0 : 958.7, 400.0 : 938.0}
 
-        Denom = np.std(np.array([DensityRef[i] for i in DensityRef]))
+        TempSeries = sorted([i for i in DensityRef])
+
+        Denom = np.std(np.array([DensityRef[i] for i in TempSeries]))
         
         # Launch a series of simulations
-        for Temperature in DensityRef:
+        for Temperature in TempSeries:
             os.makedirs('%.1f' % Temperature)
             os.chdir('%.1f' % Temperature)
             self.execute(Temperature,os.getcwd())
@@ -114,15 +129,37 @@ class PropertyMatch(FittingSimulation):
 
         wq_wait(self.wq)
 
-        for Temperature in DensityRef:
+        DensityCalc = {}
+        DensityErr = {}
+        for Temperature in TempSeries:
             for line in open('./%.1f/npt.out' % Temperature):
                 if 'Density: mean' in line:
-                    DensityCalc[Temperature] = float(line.split()[2])
+                    DensityCalc[Temperature] = float(line.split()[2]) * 1000
+                    DensityErr[Temperature] = float(line.split()[4]) * 1000
+        
+        DensityPrint = {T:"%.3f +- %.3f" % (DensityCalc[T],DensityErr[T]) for T in DensityCalc}
 
-        Delta = np.array([DensityRef[T] - DensityCalc[T] for T in DensityRef]) / Denom
+        Delta = np.array([DensityCalc[T] - DensityRef[T] for T in TempSeries]) / Denom
         Objective = np.mean(Delta*Delta)
-        print DensityRef, DensityCalc, Delta, Denom, Objective
+
+        printcool_dictionary(DensityRef,title='Reference Densities',color=3)
+        printcool_dictionary(DensityPrint,title='Calculated Densities',color=4)
+        print "Deltas:", Delta
+        print "Objective:", Objective
+
+        # Pseudocode for (future) analytic gradients.
+        # if AGrad:
+        #     Grad = np.zeros(self.FF.np)
+        #     for Temperature in TempSeries:
+        #         SimTraj = Load_SimTraj('%.1f/dynamics.dcd' % Temperature)
+        #         for frame in SimTraj:
+        #             rho = SimTraj.Densities[frame]
+        #             for parameter in FF:
+        #                 dEdk = finite_difference_derivative(Compute_Energy(SimTraj[frame]))
+        #                 Grad[parameter] += -1 * beta * rho * dEdk / nFrames
+                    
 
         Answer = {'X':Objective, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         os.chdir(cwd)
         return Answer
+

@@ -95,14 +95,14 @@ class PropertyMatch_OpenMM(PropertyMatch):
         for fnm in os.listdir(os.path.join(self.root,self.tempdir)):
             if os.path.isfile(os.path.join(self.root,self.tempdir,fnm)):
                 shutil.copy2(os.path.join(self.root,self.tempdir,fnm),os.path.join(run_dir,fnm))
-        self.queue_up(command = './runcuda.sh python npt.py conf.pdb %s %i 1.0 > npt.out 2> npt.err' % (self.FF.fnms[0], temperature),
+        self.queue_up(command = './runcuda.sh python npt.py conf.pdb %s %i 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
                       input_files = [(os.path.join(run_dir,'runcuda.sh'),'runcuda.sh'),
                                      (os.path.join(run_dir,'npt.py'),'npt.py'),
                                      (os.path.join(run_dir,'conf.pdb'),'conf.pdb'),
+                                     (os.path.join(run_dir,'ff.p'),'ff.p'),
                                      (os.path.join(run_dir,self.FF.fnms[0]),self.FF.fnms[0])],
                       output_files = [(os.path.join(run_dir,'npt.out'),'npt.out'),
-                                      (os.path.join(run_dir,'npt.err'),'npt.err')])
-                                      #(os.path.join(run_dir,'dynamics.dcd'),'dynamics.dcd')])
+                                      (os.path.join(run_dir,'dynamics.dcd'),'dynamics.dcd')])
         
 
 
@@ -169,6 +169,58 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
             Force = list(np.array(simulation.context.getState(getForces=True).getForces() / kilojoules_per_mole * nanometer).flatten())
             M.append(np.array([Energy] + Force))
         return M
+
+    def energy_observable_dot_internal_(self, O):
+        """Returns an array E_i dot O_i.  This is supposed to be part of a finite difference derivative."""
+
+        pdb = PDBFile("conf.pdb")
+        forcefield = ForceField(self.FF.fnms[0])
+        
+        # Use for Mutual
+        # system = forcefield.createSystem(pdb.topology,rigidWater=False,mutualInducedTargetEpsilon=1e-6)
+        # Use for Direct
+        system = forcefield.createSystem(pdb.topology,rigidWater=False,polarization='Direct')
+        # Create the simulation; we're not actually going to use the integrator
+        integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+        simulation = Simulation(pdb.topology, system, integrator)
+
+        E = []
+        # Loop through the snapshots
+        for I in range(self.ns):
+            xyz = self.traj.xyzs[I]
+            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            # Set the positions using the trajectory
+            simulation.context.setPositions(xyz_omm)
+            # Set the periodic box size
+            simulation.context.setPeriodicBoxVectors(self.traj.boxes[I])
+            # Compute the potential energy and append to list
+            Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+        return np.mean(np.array(E)*O)
+
+    def energy_total_internal_(self, O):
+        pdb = PDBFile("conf.pdb")
+        forcefield = ForceField(self.FF.fnms[0])
+        
+        # Use for Mutual
+        # system = forcefield.createSystem(pdb.topology,rigidWater=False,mutualInducedTargetEpsilon=1e-6)
+        # Use for Direct
+        system = forcefield.createSystem(pdb.topology,rigidWater=False,polarization='Direct')
+        # Create the simulation; we're not actually going to use the integrator
+        integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+        simulation = Simulation(pdb.topology, system, integrator)
+
+        E = []
+        # Loop through the snapshots
+        for I in range(self.ns):
+            xyz = self.traj.xyzs[I]
+            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            # Set the positions using the trajectory
+            simulation.context.setPositions(xyz_omm)
+            # Set the periodic box size
+            simulation.context.setPeriodicBoxVectors(self.traj.boxes[I])
+            # Compute the potential energy and append to list
+            Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+        return np.dot(np.array(E),O)
 
     def energy_force_driver_all(self):
         if self.run_internal:
