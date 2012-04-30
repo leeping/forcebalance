@@ -66,7 +66,7 @@ class PropertyMatch_OpenMM(PropertyMatch):
         self.wq.specify_name('forcebalance')
         print('THE PORT IS %d' % self.wq.port)
 
-    def prepare_temp_directory(self,options,sim_opts,forcefield):
+    def prepare_temp_directory(self,options,sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         shutil.copy2(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
         shutil.copy2(os.path.join(self.root,self.simdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
@@ -95,11 +95,11 @@ class PropertyMatch_OpenMM(PropertyMatch):
         for fnm in os.listdir(os.path.join(self.root,self.tempdir)):
             if os.path.isfile(os.path.join(self.root,self.tempdir,fnm)):
                 shutil.copy2(os.path.join(self.root,self.tempdir,fnm),os.path.join(run_dir,fnm))
-        self.queue_up(command = './runcuda.sh python npt.py conf.pdb %s %i 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
+        self.queue_up(command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
                       input_files = [(os.path.join(run_dir,'runcuda.sh'),'runcuda.sh'),
                                      (os.path.join(run_dir,'npt.py'),'npt.py'),
                                      (os.path.join(run_dir,'conf.pdb'),'conf.pdb'),
-                                     (os.path.join(run_dir,'ff.p'),'ff.p'),
+                                     (os.path.join(run_dir,'forcebalance.p'),'forcebalance.p'),
                                      (os.path.join(run_dir,self.FF.fnms[0]),self.FF.fnms[0])],
                       output_files = [(os.path.join(run_dir,'npt.out'),'npt.out'),
                                       (os.path.join(run_dir,'dynamics.dcd'),'dynamics.dcd')])

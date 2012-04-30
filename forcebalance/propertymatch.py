@@ -93,22 +93,10 @@ class PropertyMatch(FittingSimulation):
         abstempdir = os.path.join(self.root,self.tempdir)
         Answer = {}
         cwd = os.getcwd()
-        # Create the new force field!!
-        pvals = self.FF.make(tempdir,mvals,self.usepvals)
         # Go into the temporary directory
         os.chdir(os.path.join(self.root,tempdir))
         # Dump the force field to a pickle file
-        with open(os.path.join(self.root,tempdir,'ff.p'),'w') as f: lp_dump(self.FF,f)
-        Mao = lp_load(open(os.path.join(self.root,tempdir,'ff.p')))
-        #print dir(Mao)
-        bar = printcool('Force field data')
-        print bar
-        for i in Mao.ffdata:
-            print type(Mao.ffdata[i])
-            if type(Mao.ffdata[i]) is etree._ElementTree:
-                print etree.tostring(Mao.ffdata[i])
-        #print "Sniffy"
-        raw_input()
+        with open(os.path.join(self.root,tempdir,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals))
 
         DensityRef = {235.5 : 968.8, 248.0 : 989.2,
                       260.5 : 997.1, 273.0 : 999.8,
