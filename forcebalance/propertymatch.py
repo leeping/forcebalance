@@ -6,7 +6,7 @@
 
 import os
 import shutil
-from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool_dictionary, lp_dump, lp_load, printcool, wq_wait
+from nifty import *
 from fitsim import FittingSimulation
 import numpy as np
 from molecule import Molecule
@@ -50,6 +50,63 @@ class PropertyMatch(FittingSimulation):
     def indicate(self):
         print "Placeholder for the density error and stuff. :)"
         #print "Sim: %-15s E_err(kJ/mol)= %10.4f F_err(%%)= %10.4f" % (self.name, self.e_err, self.f_err*100)
+
+    def objective_term(self,temps, exp, calc, std, grad, fitorder, name="Quantity"):
+        # Assuming all uncertainties equal for now. :P
+        Uncerts = {}
+        for i in exp:
+            Uncerts[i] = 1.0
+        # Build an array of weights.  (Cumbersome)
+        weight_array = np.array([Uncerts[i] for i in temps])
+        weight_array = 1.0 / weight_array
+        weight_array /= sum(weight_array)
+        weight_array = list(weight_array)
+        Weights = {}
+        for T, W in zip(temps,weight_array):
+            Weights[T] = W
+        # The denominator
+        Denom = np.std(np.array([exp[i] for i in temps])) ** 2
+        # Now we have an array of rescaled temperatures from zero to one.
+        tarray = temps - min(temps)
+        tarray /= max(temps)
+        # Make a Vandermonde matrix
+        xmat   = np.mat(np.vander(tarray,fitorder+1)[:,::-1])
+        yarray = np.array([calc[T] for T in temps])
+        Beta, Hats, Yfit = get_least_squares(xmat, yarray)
+        # Curve-fitted densities
+        cfit = {T : r for T, r in zip(temps,Yfit)}
+        # Switch to fit the curve-fitted densities :P
+        FitFitted = 1
+        GradYMat = np.mat([grad[T] for T in temps])
+        GradZMat = Hats * GradYMat
+
+        Objective = 0.0
+        Gradient = np.zeros(self.FF.np, dtype=float)
+        Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        for i, T in enumerate(temps):
+            if FitFitted:
+                G = flat(GradZMat[i,:])
+                DRho = cfit[T] - exp[T]
+            else:
+                G = grad[T]
+                DRho = calc[T] - exp[T]
+            ThisObj = Weights[T] * DRho ** 2 / Denom
+            ThisGrad = 2.0 * Weights[T] * DRho * G / Denom
+            bar = printcool("%s at %.1f :%s Objective = % .3f, Gradient:" % (name, T, ' Smoothed' if FitFitted else '', ThisObj))
+            self.FF.print_map(vals=ThisGrad)
+            Objective += ThisObj
+            Gradient += ThisGrad
+            # The second derivatives are inaccurate; we estimate the objective function Hessian using first derivatives.
+            # If we had a good Hessian estimate the formula would be: 2.0 * Weights[T] * (np.outer(G, G) + DRho * np.diag(Hd))
+            Hessian += 2.0 * Weights[T] * (np.outer(G, G)) / Denom
+        print bar
+
+        Delta = np.array([calc[T] - exp[T] for T in temps])
+        Defit = np.array([cfit[T] - exp[T] for T in temps])
+        delt = {T : r for T, r in zip(temps,Delta)}
+        dfit = {T : r for T, r in zip(temps,Defit)}
+        print_out = {'    %8.3f' % T:"%9.3f   %9.3f +- %-7.3f % 7.3f  %9.3f  % 7.3f" % (exp[T],calc[T],std[T],delt[T],cfit[T],dfit[T]) for T in calc}
+        return Objective, Gradient, Hessian, print_out
 
     def get(self, mvals, AGrad=True, AHess=True, tempdir=None):
         
@@ -98,34 +155,34 @@ class PropertyMatch(FittingSimulation):
         # Dump the force field to a pickle file
         with open(os.path.join(self.root,tempdir,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h),f)
 
-        RhoRef = {235.5 : 968.8, 248.0 : 989.2,
-                      260.5 : 997.1, 273.0 : 999.8,
-                      285.5 : 999.5, 298.0 : 997.2,
-                      323.0 : 988.3, 348.0 : 975.2,
-                      373.0 : 958.7, 400.0 : 938.0}
+        # Reference densities from the CRC Handbook. :P
+        Rho_exp = {273.2 : 999.84300, 274.2 : 999.90170, 275.4 : 999.94910, 
+                   276.6 : 999.97220, 277.8 : 999.97190, 279.2 : 999.94310, 
+                   280.7 : 999.87970, 282.3 : 999.77640, 284.1 : 999.61820, 
+                   285.9 : 999.41760, 287.9 : 999.14730, 290.1 : 998.79510, 
+                   292.4 : 998.36860, 294.9 : 997.84070, 297.6 : 997.19920, 
+                   300.4 : 996.45990, 303.5 : 995.55780, 306.9 : 994.47280, 
+                   310.5 : 993.22070, 314.3 : 991.75010, 318.5 : 990.04400, 
+                   322.9 : 988.13200, 327.7 : 985.90000, 332.9 : 983.31300, 
+                   338.4 : 980.41000, 344.4 : 977.04400, 350.8 : 973.24400, 
+                   357.8 : 968.85000, 365.2 : 963.94000, 373.2 : 958.37000}
 
-        # Rough estimates of density simulation uncertainties (relative)
-        Uncerts = {235.5 : 9.0, 248.0 : 7.0,
-                   260.5 : 5.0, 273.0 : 4.0,
-                   285.5 : 3.0, 298.0 : 3.0,
-                   323.0 : 3.0, 348.0 : 3.0,
-                   373.0 : 3.0, 400.0 : 4.0}
+        Hvap_exp = {273.2 : 45.04377000, 274.2 : 45.00227882, 275.4 : 44.95242692, 
+                    276.6 : 44.90250684, 277.8 : 44.85251860, 279.2 : 44.79411281, 
+                    280.7 : 44.73143222, 282.3 : 44.66445551, 284.1 : 44.58896185, 
+                    285.9 : 44.51331480, 287.9 : 44.42908262, 290.1 : 44.33620851, 
+                    292.4 : 44.23886785, 294.9 : 44.13277874, 297.6 : 44.01787016, 
+                    300.4 : 43.89834117, 303.5 : 43.76557256, 306.9 : 43.61943226, 
+                    310.5 : 43.46409895, 314.3 : 43.29947040, 318.5 : 43.11671718, 
+                    322.9 : 42.92436572, 327.7 : 42.71348245, 332.9 : 42.48379470, 
+                    338.4 : 42.23946269, 344.4 : 41.97128539, 350.8 : 41.68335109, 
+                    357.8 : 41.36620261, 365.2 : 41.02840899, 373.2 : 40.66031044}
 
-        TempSeries = sorted([i for i in RhoRef])
-        Denom = np.std(np.array([RhoRef[i] for i in TempSeries])) ** 2
+        # Sorted list of temperatures.
+        Temps = np.array(sorted([i for i in Rho_exp]))
 
-        # Build an array of weights.
-        weight_array = np.array([Uncerts[i] for i in TempSeries])
-        weight_array = 1.0 / weight_array
-        weight_array /= sum(weight_array)
-        weight_array = list(weight_array)
-
-        Weights = {}
-        for T, W in zip(TempSeries,weight_array):
-            Weights[T] = W
-        
         # Launch a series of simulations
-        for T in TempSeries:
+        for T in Temps:
             if not os.path.exists('%.1f' % T):
                 os.makedirs('%.1f' % T)
             os.chdir('%.1f' % T)
@@ -135,39 +192,36 @@ class PropertyMatch(FittingSimulation):
         # Wait for simulations to finish
         wq_wait(self.wq)
 
-        RhoCalc = {}
-        RhoStd = {}
+        # Gather the calculation data
+        Results = {T : lp_load(open('./%.1f/npt_result.p' % T)) for T in Temps}
+        Rho_calc = {T : Results[T][0] for T in Temps}
+        Rho_std  = {T : Results[T][1] for T in Temps}
+        Rho_grad = {T : Results[T][2] for T in Temps}
+        Hvap_calc = {T : Results[T][3] for T in Temps}
+        Hvap_std  = {T : Results[T][4] for T in Temps}
+        Hvap_grad = {T : Results[T][5] for T in Temps}
         
-        Objective = 0.0
-        Gradient = np.zeros(self.FF.np, dtype=float)
-        Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        # Get contributions to the objective function
+        X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density")
+        X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap")
+
+        Objective = X_Rho + X_Hvap
+        if AGrad:
+            Gradient = G_Rho + G_Hvap
+        if AHess:
+            Hessian = H_Rho + H_Hvap
         
-        for T in TempSeries:
-            RhoCalc[T], RhoStd[T], G, Hd = lp_load(open('./%.1f/npt_result.p' % T))
-            DRho = RhoCalc[T] - RhoRef[T]
-            Objective += Weights[T] * DRho ** 2 / Denom
-            if AGrad:
-                Gradient += 2.0 * Weights[T] * DRho * G
-            if AHess:
-                print np.outer(G, G)
-                print DRho * np.diag(Hd)
-                #Hessian += 2.0 * Weights[T] * (np.outer(G, G) + DRho * np.diag(Hd))
-                Hessian += 2.0 * Weights[T] * (np.outer(G, G))# + DRho * np.diag(Hd))
-            
-            # for line in open('./%.1f/npt.out' % T):
-            #     if 'Rho: mean' in line:
-            #         RhoCalc[T] = float(line.split()[2]) * 1000
-            #         RhoStd[T] = float(line.split()[4]) * 1000
-        
-        RhoPrint = {T:"%.3f +- %.3f" % (RhoCalc[T],RhoStd[T]) for T in RhoCalc}
-        printcool_dictionary(RhoRef,title='Reference Densities',color=3)
-        printcool_dictionary(RhoPrint,title='Calculated Densities',color=4)
-        Delta = np.array([RhoCalc[T] - RhoRef[T] for T in TempSeries]) / Denom
-        print "Deltas:", Delta
-        print "Objective:", Objective
+        printcool_dictionary(RhoPrint,title='Rho vs T:   Reference  Calculated +- Stdev    Delta    CurveFit   D(Cfit)',bold=True,color=4,keywidth=15)
+        bar = printcool("Density objective function: % .3f, Derivative:" % X_Rho)
+        self.FF.print_map(vals=G_Rho)
+        print bar
+
+        printcool_dictionary(HvapPrint,title='Hvap vs T:  Reference  Calculated +- Stdev    Delta    CurveFit   D(Cfit)',bold=True,color=3,keywidth=15)
+        bar = printcool("H_vap objective function: % .3f, Derivative:" % X_Hvap)
+        self.FF.print_map(vals=G_Hvap)
+        print bar
         
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
-        print Answer
         os.chdir(cwd)
         return Answer
 

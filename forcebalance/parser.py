@@ -108,7 +108,8 @@ sim_opts_types = {
     'lists'   : {"fd_ptypes" : ([], 'The parameter types that need to be differentiated using finite difference')
                  },
     'ints'    : {"shots"     : (-1, 'Number of snapshots (force+energy matching); defaults to all of the snapshots'),
-                 "fitatoms"  : (0, 'Number of fitting atoms (force+energy matching); defaults to all of them')
+                 "fitatoms"  : (0, 'Number of fitting atoms (force+energy matching); defaults to all of them'),
+                 "wq_port"   : (9230, 'The port number to use for Work Queue')
                  },
     'bools'   : {"whamboltz"  : (0, 'Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False'),
                  "sampcorr"   : (0, 'Whether to use the (archaic) sampling correction (force+energy match), defaults to False'),

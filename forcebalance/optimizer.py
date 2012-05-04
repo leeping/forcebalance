@@ -226,13 +226,9 @@ class Optimizer(object):
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             # Take a step in the parameter space.
-            print "Taking a step"
-            print G, H
             dx, over = self.step(G, H, trust)
-            print dx
             xk += dx
             # Evaluate the objective function and its derivatives.
-            print
             data        = self.Objective(xk,Ord,verbose=True)
             X, G, H = data['X'], data['G'], data['H']
             # if pkg.efweight > 0.99:

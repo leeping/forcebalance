@@ -8,10 +8,11 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 
 import os
 from re import match, sub
-from numpy import array, diag, dot, mat, transpose
+from numpy import array, diag, dot, eye, mat, mean, transpose
 from numpy.linalg import norm, svd
 import threading
 import pickle
+import time, datetime
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -108,7 +109,7 @@ def printcool(text,sym="#",bold=False,color=2,bottom='-',minwidth=50):
     print bar
     return sub(sym,bottom,bar)
 
-def printcool_dictionary(dict,title="General options",color=2):
+def printcool_dictionary(dict,title="General options",bold=False,color=2,keywidth=25):
     """See documentation for printcool; this is a nice way to print out keys/values in a dictionary.
 
     The keys in the dictionary are sorted before printing out.
@@ -116,8 +117,13 @@ def printcool_dictionary(dict,title="General options",color=2):
     @param[in] dict The dictionary to be printed
     @param[in] title The title of the printout
     """
-    bar = printcool(title,color=color)
-    print '\n'.join(["%-25s %s " % (key,str(dict[key])) for key in sorted([i for i in dict]) if dict[key] != None])
+    bar = printcool(title,bold=bold,color=color)
+    def magic_string(str):
+        # This cryptic command returns a string with the number of characters specified as a variable. :P
+        # Useful for printing nice-looking dictionaries, i guess.
+        #print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
+        return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
+    print '\n'.join(["%s %s " % (magic_string(key),str(dict[key])) for key in sorted([i for i in dict]) if dict[key] != None])
     print bar
 
 def col(vec):
@@ -347,32 +353,91 @@ def queue_up(wq, command, input_files, output_files):
         task.specify_output_file(f[0],f[1])
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
+    print "Submitting command '%s' to the Work Queue" % command
     wq.submit(task)
 
 def wq_wait(wq):
     """ This function waits until the work queue is completely empty. """
+    Verbose = False
+    printcount = 1
     while not wq.empty():
-        print '---'
+        printcount += 1
+        if Verbose: print '---'
         task = wq.wait(10)
         if task:
-            print 'A job has finished!'
-            print 'Job name = ', task.tag, 'command = ', task.command
-            print 'output', task.output,
-            print 'id', task.id
-            print "preferred_host = ", task.preferred_host, 
-            print "status = ", task.status, 
-            print "return_status = ", task.return_status, 
-            print "result = ", task.result, 
-            print "host = ", task.host
-            print "computation_time = ", task.computation_time/1000000, 
-            print "total_bytes_transferred = ", task.total_bytes_transferred,
+            if Verbose:
+                print 'A job has finished!'
+                print 'Job name = ', task.tag, 'command = ', task.command
+                print "status = ", task.status, 
+                print "return_status = ", task.return_status, 
+                print "result = ", task.result, 
+                print "host = ", task.host
+                print "computation_time = ", task.computation_time/1000000, 
+                print "total_bytes_transferred = ", task.total_bytes_transferred
             if task.result != 0:
+                print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.host, task.computation_time/1000000)
                 wq.submit(task)
             else:
+                print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, task.computation_time/1000000)
                 del task
-        print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
-            % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed)
-        print "Tasks: %i running, %i waiting, %i total dispatched, %i total complete" \
-            % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete)
-        print "Data: %i / %i kb sent/received" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024)
+        if Verbose:
+            print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
+                % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed)
+            print "Tasks: %i running, %i waiting, %i total dispatched, %i total complete" \
+                % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete)
+            print "Data: %i / %i kb sent/received" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024)
+        else:
+            print "%s : %i/%i workers busy; %i/%i jobs complete\r" % (datetime.datetime.fromtimestamp(time.mktime(datetime.datetime.now().timetuple())).ctime(),
+                                                                      wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
+                                                                      wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched), 
+            if printcount % 90 == 89:
+                # Print a new line every 15 minutes.
+                print
 
+### Linear least squares stuff
+
+def get_least_squares(x, y, w = None):
+    """
+    @code
+     __                  __
+    |                      |
+    | 1 (x0) (x0)^2 (x0)^3 |
+    | 1 (x1) (x1)^2 (x1)^3 |
+    | 1 (x2) (x2)^2 (x2)^3 |
+    | 1 (x3) (x3)^2 (x3)^3 |
+    | 1 (x4) (x4)^2 (x4)^3 |
+    |__                  __|
+
+    @endcode
+
+    @param[in] X (2-D array) An array of X-values (see above)
+    @param[in] Y (array) An array of Y-values (only used in getting the least squares coefficients)
+    @param[in] w (array) An array of weights, hopefully normalized to one.
+    """
+    # X is a 'tall' matrix.
+    X = mat(x)
+    Y = col(y)
+    n_x = X.shape[0]
+    n_fit = X.shape[1]
+    if n_fit >= n_x:
+        warn_press_key("Argh? It seems like this problem is overdetermined!")
+    # Build the weight matrix.
+    if w != None:
+        if len(w) != n_x:
+            warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
+        w /= mean(w)
+        W = mat(diag(w))
+        #print W
+    else:
+        W = mat(eye(n_x))
+    # Make the Moore-Penrose Pseudoinverse.
+    MPPI = invert_svd(X.T * W * X) * X.T * W
+
+    Beta = MPPI * Y
+    Hat = X * MPPI
+    yfit = flat(Hat * Y)
+
+    # Return three things: the least-squares coefficients, the hat matrix (turns y into yfit), and yfit
+    # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
+
+    return Beta, Hat, yfit

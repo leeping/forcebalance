@@ -63,15 +63,16 @@ class PropertyMatch_OpenMM(PropertyMatch):
     def __init__(self,options,sim_opts,forcefield):
         ## Initialize the SuperClass!
         super(PropertyMatch_OpenMM,self).__init__(options,sim_opts,forcefield)
-        work_queue.set_debug_flag('all')
-        self.wq = work_queue.WorkQueue(port=9230, exclusive=False, shutdown=True)
+        #work_queue.set_debug_flag('all')
+        self.wq = work_queue.WorkQueue(port=self.wq_port, exclusive=False, shutdown=False)
         self.wq.specify_name('forcebalance')
-        print('THE PORT IS %d' % self.wq.port)
+        print('Work Queue for fitting simulation %s listening on %d' % (self.name, self.wq.port))
 
     def prepare_temp_directory(self,options,sim_opts,forcefield):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
         shutil.copy2(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
+        shutil.copy2(os.path.join(self.root,self.simdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
         shutil.copy2(os.path.join(self.root,self.simdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
         shutil.copy2(os.path.join(self.root,self.simdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
 
@@ -85,6 +86,7 @@ class PropertyMatch_OpenMM(PropertyMatch):
                  input_files = [(os.path.join(run_dir,'runcuda.sh'),'runcuda.sh'),
                                 (os.path.join(run_dir,'npt.py'),'npt.py'),
                                 (os.path.join(run_dir,'conf.pdb'),'conf.pdb'),
+                                (os.path.join(run_dir,'mono.pdb'),'mono.pdb'),
                                 (os.path.join(run_dir,'forcebalance.p'),'forcebalance.p')],
                  output_files = [(os.path.join(run_dir,'npt.out'),'npt.out'),
                                  (os.path.join(run_dir,'npt_result.p'),'npt_result.p')])

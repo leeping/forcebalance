@@ -110,6 +110,8 @@ class FittingSimulation(object):
         self.fd2_pids    = [i.upper() for i in sim_opts['fd_ptypes']]
         ## Finite difference step size
         self.h           = options['finite_difference_h']
+        ## Work Queue Port (The specific simulation itself may or may not actually use this.)
+        self.wq_port     = sim_opts['wq_port']
         ## Manual override: bypass the parameter transformation and use
         ## physical parameters directly.  For power users only! :)
         self.usepvals    = sim_opts['use_pvals']
