@@ -93,7 +93,7 @@ class PropertyMatch(FittingSimulation):
         # Go into the temporary directory
         os.chdir(os.path.join(self.root,tempdir))
         # Dump the force field to a pickle file
-        with open(os.path.join(self.root,tempdir,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals),f)
+        with open(os.path.join(self.root,tempdir,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h),f)
 
         DensityRef = {235.5 : 968.8, 248.0 : 989.2,
                       260.5 : 997.1, 273.0 : 999.8,

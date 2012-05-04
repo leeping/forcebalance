@@ -80,12 +80,12 @@ class PropertyMatch_OpenMM(PropertyMatch):
         for fnm in os.listdir(os.path.join(self.root,self.tempdir)):
             if os.path.isfile(os.path.join(self.root,self.tempdir,fnm)):
                 shutil.copy2(os.path.join(self.root,self.tempdir,fnm),os.path.join(run_dir,fnm))
-        queue_up(command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
+        queue_up(self.wq,
+                 command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
                  input_files = [(os.path.join(run_dir,'runcuda.sh'),'runcuda.sh'),
                                 (os.path.join(run_dir,'npt.py'),'npt.py'),
                                 (os.path.join(run_dir,'conf.pdb'),'conf.pdb'),
-                                (os.path.join(run_dir,'forcebalance.p'),'forcebalance.p'),
-                                (os.path.join(run_dir,self.FF.fnms[0]),self.FF.fnms[0])],
+                                (os.path.join(run_dir,'forcebalance.p'),'forcebalance.p')],
                  output_files = [(os.path.join(run_dir,'npt.out'),'npt.out')])
                        
 class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
@@ -106,8 +106,8 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
         os.symlink(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
 
     def energy_force_driver_all_external_(self):
-        ## This line actually runs OpenMM
-        o, e = Popen(["./openmm_energy_force.py","conf.pdb","all.gro","amoebawater.xml"],stdout=PIPE,stderr=PIPE).communicate()
+        ## This line actually runs OpenMM,
+        o, e = Popen(["./openmm_energy_force.py","conf.pdb","all.gro",self.FF.fnms[0]],stdout=PIPE,stderr=PIPE).communicate()
         Answer = pickle.load("Answer.dat")
         M = np.array(list(Answer['Energies']) + list(Answer['Forces']))
         return M
