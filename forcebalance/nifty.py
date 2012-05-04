@@ -13,18 +13,6 @@ from numpy.linalg import norm, svd
 import threading
 import pickle
 
-try:
-    from lxml import etree
-except: 
-    bar = printcool("Warning: XML library import fail (You can't use OpenMM)",sym='!',bold=True,color=2)
-    print bar
-
-try:
-    import work_queue
-except:
-    bar = printcool("Warning: Work Queue library import fail (You can't queue up jobs)",sym='!',bold=True,color=2)
-    print bar
-
 ## Boltzmann constant
 kb = 0.0083144100163
 ## Q-Chem to GMX unit conversion for energy
@@ -277,6 +265,12 @@ def concurrent_map(func, data):
 
     return result
 
+try:
+    from lxml import etree
+except: 
+    bar = printcool("Warning: XML library import fail (You can't use OpenMM)",sym='!',bold=True,color=2)
+    print bar
+
 ## Pickle uses 'flags' to pickle and unpickle different variable types.
 ## Here we use the letter 'x' to signify that the variable type is an XML file.
 XMLFILE='x'
@@ -324,6 +318,12 @@ def lp_dump(obj, file, protocol=None):
 def lp_load(file):
     """ Use this instead of pickle.load for unpickling anything that contains _ElementTree types. """
     return Unpickler_LP(file).load()
+
+try:
+    import work_queue
+except:
+    bar = printcool("Warning: Work Queue library import fail (You can't queue up jobs)",sym='!',bold=True,color=2)
+    print bar
 
 def queue_up(wq, command, input_files, output_files):
     """ 
