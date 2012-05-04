@@ -86,7 +86,8 @@ class PropertyMatch_OpenMM(PropertyMatch):
                                 (os.path.join(run_dir,'npt.py'),'npt.py'),
                                 (os.path.join(run_dir,'conf.pdb'),'conf.pdb'),
                                 (os.path.join(run_dir,'forcebalance.p'),'forcebalance.p')],
-                 output_files = [(os.path.join(run_dir,'npt.out'),'npt.out')])
+                 output_files = [(os.path.join(run_dir,'npt.out'),'npt.out'),
+                                 (os.path.join(run_dir,'npt_result.p'),'npt_result.p')])
                        
 class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
 

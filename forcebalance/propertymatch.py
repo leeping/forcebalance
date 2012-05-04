@@ -78,8 +78,8 @@ class PropertyMatch(FittingSimulation):
         an objective function.
 
         @param[in] mvals Mathematical parameter values
-        @param[in] AGrad Switch to turn on analytic gradient, useless here
-        @param[in] AHess Switch to turn on analytic Hessian, useless here
+        @param[in] AGrad Switch to turn on analytic gradient
+        @param[in] AHess Switch to turn on analytic Hessian
         @param[in] tempdir Temporary directory for running computation
         @return Answer Contribution to the objective function
         
@@ -95,44 +95,71 @@ class PropertyMatch(FittingSimulation):
         # Dump the force field to a pickle file
         with open(os.path.join(self.root,tempdir,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h),f)
 
-        DensityRef = {235.5 : 968.8, 248.0 : 989.2,
+        RhoRef = {235.5 : 968.8, 248.0 : 989.2,
                       260.5 : 997.1, 273.0 : 999.8,
                       285.5 : 999.5, 298.0 : 997.2,
                       323.0 : 988.3, 348.0 : 975.2,
                       373.0 : 958.7, 400.0 : 938.0}
 
-        TempSeries = sorted([i for i in DensityRef])
+        # Rough estimates of density simulation uncertainties (relative)
+        Uncerts = {235.5 : 9.0, 248.0 : 7.0,
+                   260.5 : 5.0, 273.0 : 4.0,
+                   285.5 : 3.0, 298.0 : 3.0,
+                   323.0 : 3.0, 348.0 : 3.0,
+                   373.0 : 3.0, 400.0 : 4.0}
 
-        Denom = np.std(np.array([DensityRef[i] for i in TempSeries]))
+        TempSeries = sorted([i for i in RhoRef])
+        Denom = np.std(np.array([RhoRef[i] for i in TempSeries])) ** 2
+
+        # Build an array of weights.
+        weight_array = np.array([Uncerts[i] for i in TempSeries])
+        weight_array = 1.0 / weight_array
+        weight_array /= sum(weight_array)
+        weight_array = list(weight_array)
+
+        Weights = {}
+        for T, W in zip(TempSeries,weight_array):
+            Weights[T] = W
         
         # Launch a series of simulations
-        for Temperature in TempSeries:
-            os.makedirs('%.1f' % Temperature)
-            os.chdir('%.1f' % Temperature)
-            self.execute(Temperature,os.getcwd())
+        for T in TempSeries:
+            os.makedirs('%.1f' % T)
+            os.chdir('%.1f' % T)
+            self.execute(T,os.getcwd())
             os.chdir('..')
 
+        # Wait for simulations to finish
         wq_wait(self.wq)
 
-        DensityCalc = {}
-        DensityErr = {}
-        for Temperature in TempSeries:
-            for line in open('./%.1f/npt.out' % Temperature):
-                if 'Density: mean' in line:
-                    DensityCalc[Temperature] = float(line.split()[2]) * 1000
-                    DensityErr[Temperature] = float(line.split()[4]) * 1000
+        RhoCalc = {}
+        RhoStd = {}
         
-        DensityPrint = {T:"%.3f +- %.3f" % (DensityCalc[T],DensityErr[T]) for T in DensityCalc}
-
-        Delta = np.array([DensityCalc[T] - DensityRef[T] for T in TempSeries]) / Denom
-        Objective = np.mean(Delta*Delta)
-
-        printcool_dictionary(DensityRef,title='Reference Densities',color=3)
-        printcool_dictionary(DensityPrint,title='Calculated Densities',color=4)
+        Objective = 0.0
+        Gradient = np.zeros(self.FF.np, dtype=float)
+        Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        
+        for T in TempSeries:
+            RhoCalc[T], RhoStd[T], G, Hd = lp_load(open('./%.1f/npt_result.p' % T))
+            DRho = RhoCalc[T] - RhoRef[T]
+            Objective += Weights[T] * DRho ** 2 / Denom
+            if AGrad:
+                Gradient += 2.0 * Weights[T] * DRho * G
+            if AHess:
+                Hessian += 2.0 * Weights[T] * (outer(G, G) + DRho * diag(Hd))
+            
+            # for line in open('./%.1f/npt.out' % T):
+            #     if 'Rho: mean' in line:
+            #         RhoCalc[T] = float(line.split()[2]) * 1000
+            #         RhoStd[T] = float(line.split()[4]) * 1000
+        
+        RhoPrint = {T:"%.3f +- %.3f" % (RhoCalc[T],RhoStd[T]) for T in RhoCalc}
+        printcool_dictionary(RhoRef,title='Reference Densities',color=3)
+        printcool_dictionary(RhoPrint,title='Calculated Densities',color=4)
+        Delta = np.array([RhoCalc[T] - RhoRef[T] for T in TempSeries]) / Denom
         print "Deltas:", Delta
         print "Objective:", Objective
-
-        Answer = {'X':Objective, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
+        
+        Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         os.chdir(cwd)
         return Answer
 

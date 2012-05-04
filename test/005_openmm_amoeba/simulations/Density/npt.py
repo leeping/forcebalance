@@ -74,8 +74,8 @@ from forcebalance.finite_difference import fdwrap, f12d3p
 # Select run parameters
 timestep = 0.5 * units.femtosecond # timestep for integrtion
 nsteps = 200                       # number of steps per data record
-nequiliterations = 100             # number of equilibration iterations
-niterations = 500                  # number of iterations to collect data for
+nequiliterations = 5             # number of equilibration iterations (hope 50 ps is enough)
+niterations = 50                 # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -376,6 +376,8 @@ def analyze(data):
    unit = (units.gram / units.centimeter**3)
    print "Density: mean %11.6f +- %11.6f  nm^3" % (statistics['density'] / unit, statistics['ddensity'] / unit),
    print "g = %11.6f ps" % (statistics['g_density'] / units.picoseconds)
+   unit = (units.kilogram / units.meter**3)
+   return statistics['density'] / unit, statistics['ddensity'] / unit
 
 def energy_driver(mvals,pdb,FF,xyzs,boxes,verbose=False):
 
@@ -483,35 +485,20 @@ def main():
    pvals = FF.make(os.getcwd(),mvals,False)
    # Run the simulation.
    Data, Xyzs, Boxes, Rhos = run_simulation(pdb)
-
-   #print Data['potential'].value_in_unit(units.kilojoule / units.mole)
-   #energy_driver(mvals, pdb, FF, Xyzs, Boxes, verbose=True)
    # Get statistics from our simulation.
-   analyze(Data)
+   Rho_avg, Rho_err = analyze(Data)
+
    # Now that we have the coordinates, we can compute the energy derivatives.
    G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, Boxes)
+
    # The density derivative can be computed using the energy derivative.
    N = len(Xyzs)
    kB = units.BOLTZMANN_CONSTANT_kB * units.AVOGADRO_CONSTANT_NA
    mBeta = (-1 / (temperature * kB)).value_in_unit(units.mole / units.kilojoule)
    Beta = (1 / (temperature * kB)).value_in_unit(units.mole / units.kilojoule)
-
-   #print flat(G[5,:]) - np.mean(G[5,:])
-   #print Rhos - np.mean(Rhos)
-   #print
-
-   # print G
-   # print Hd
-   # print flat((np.mat(G) * col(Rhos)) / N)
-   # print
-   # print np.mean(Rhos)
-   # print np.mean(G,axis=1)
-   # print
-   # print np.mean(Rhos) * np.mean(G, axis=1)
-
    # It becomes necessary to make the gradient squared for the second derivative.
    GG = G * G
-   
+   # Build the first and second derivatives.
    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / N - np.mean(Rhos) * np.mean(G, axis=1))
    HdRho = mBeta * (flat(np.mat(Hd) * col(Rhos)) / N
                     - Beta * flat(np.mat(GG) * col(Rhos)) / N
@@ -522,13 +509,33 @@ def main():
 
    bar = printcool("Density Derivative")
    FF.print_map(vals=GRho)
-
    print bar
 
-   bar = printcool("Density Second Derivative")
+   # bar = printcool("Density Second Derivative, Term 1")
+   # FF.print_map(vals=mBeta * (flat(np.mat(Hd) * col(Rhos)) / N))
+   # print bar
+   # bar = printcool("Density Second Derivative, Term 4")
+   # FF.print_map(vals=mBeta * (- np.mean(Rhos) * (np.mean(Hd, axis=1))))
+   # print bar
+   # bar = printcool("Density Second Derivative, Term 2")
+   # FF.print_map(vals=mBeta * (- Beta * flat(np.mat(GG) * col(Rhos)) / N))
+   # print bar
+   # bar = printcool("Density Second Derivative, Term 5")
+   # FF.print_map(vals=mBeta * (- np.mean(Rhos) * (- Beta * np.mean(GG, axis=1))))
+   # print bar
+   # bar = printcool("Density Second Derivative, Term 3")
+   # FF.print_map(vals=mBeta * (+ Beta * (flat(np.mat(G) * col(Rhos)) / N) * np.mean(G, axis=1)))
+   # print bar
+   # bar = printcool("Density Second Derivative, Term 6")
+   # FF.print_map(vals=mBeta * (- np.mean(Rhos) * (+ Beta * np.mean(G, axis=1) * np.mean(G, axis=1))))
+   # print bar
+   
+   bar = printcool("Density Second Derivative, Full")
    FF.print_map(vals=HdRho)
-
    print bar
+   
+   with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, HdRho),f)
+   
 
 if __name__ == "__main__":
    main()
