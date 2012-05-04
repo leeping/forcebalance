@@ -104,7 +104,7 @@ def printcool(text,sym="#",bold=False,color=2,bottom='-',minwidth=50):
     for line in text:
         padleft = ' ' * ((width - len(line)) / 2)
         padright = ' '* (width - len(line) - len(padleft))
-        print "%s\x1b[%s9%im%s" % (bold and "1;" or "", color,padleft),line,"%s\x1b[0m%s" % (''.join([sym for i in range(3)]), padright, ''.join([sym for i in range(3)]))
+        print "%s\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
     print bar
     return sub(sym,bottom,bar)
 
