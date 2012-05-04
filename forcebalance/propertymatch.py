@@ -48,9 +48,10 @@ class PropertyMatch(FittingSimulation):
         # Put stuff here that I'm not sure about. :)
             
     def indicate(self):
-        print "Sim: %-15s E_err(kJ/mol)= %10.4f F_err(%%)= %10.4f" % (self.name, self.e_err, self.f_err*100)
+        print "Placeholder for the density error and stuff. :)"
+        #print "Sim: %-15s E_err(kJ/mol)= %10.4f F_err(%%)= %10.4f" % (self.name, self.e_err, self.f_err*100)
 
-    def get(self, mvals, AGrad=False, AHess=False, tempdir=None):
+    def get(self, mvals, AGrad=True, AHess=True, tempdir=None):
         
         """
         Fitting of experimental properties.  This is the current major
@@ -84,6 +85,8 @@ class PropertyMatch(FittingSimulation):
         @return Answer Contribution to the objective function
         
         """
+
+        print "get has been called with mvals = ", mvals
 
         if tempdir == None:
             tempdir = self.tempdir
@@ -123,7 +126,8 @@ class PropertyMatch(FittingSimulation):
         
         # Launch a series of simulations
         for T in TempSeries:
-            os.makedirs('%.1f' % T)
+            if not os.path.exists('%.1f' % T):
+                os.makedirs('%.1f' % T)
             os.chdir('%.1f' % T)
             self.execute(T,os.getcwd())
             os.chdir('..')
@@ -145,7 +149,10 @@ class PropertyMatch(FittingSimulation):
             if AGrad:
                 Gradient += 2.0 * Weights[T] * DRho * G
             if AHess:
-                Hessian += 2.0 * Weights[T] * (outer(G, G) + DRho * diag(Hd))
+                print np.outer(G, G)
+                print DRho * np.diag(Hd)
+                #Hessian += 2.0 * Weights[T] * (np.outer(G, G) + DRho * np.diag(Hd))
+                Hessian += 2.0 * Weights[T] * (np.outer(G, G))# + DRho * np.diag(Hd))
             
             # for line in open('./%.1f/npt.out' % T):
             #     if 'Rho: mean' in line:
@@ -160,6 +167,7 @@ class PropertyMatch(FittingSimulation):
         print "Objective:", Objective
         
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
+        print Answer
         os.chdir(cwd)
         return Answer
 

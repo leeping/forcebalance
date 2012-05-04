@@ -178,7 +178,10 @@ class Optimizer(object):
         """
         printcool( "Main Optimizer\n%s Mode" % ("BFGS" if b_BFGS else "Newton-Raphson"), color=7, bold=1)
         # First, set a bunch of starting values
-        Ord         = 1 if b_BFGS else 2
+        #Ord         = 1 if b_BFGS else 2
+        ## @todo I need to accommodate the use case:
+        ## BFGS update but with Hessian elements still. :P
+        Ord         = 2
         if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
             print "Reading initial objective, gradient, Hessian from checkpoint file"
             xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
@@ -223,7 +226,10 @@ class Optimizer(object):
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             # Take a step in the parameter space.
+            print "Taking a step"
+            print G, H
             dx, over = self.step(G, H, trust)
+            print dx
             xk += dx
             # Evaluate the objective function and its derivatives.
             print

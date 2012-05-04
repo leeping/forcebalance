@@ -195,7 +195,8 @@ class FittingSimulation(object):
             for i in range(self.FF.np):
                 Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h)
         # This builds the qualitative indicators
-        self.get(mvals,0,0)
+        ##@todo I really shouldn't call 'get' one extra time 
+        #self.get(mvals,0,0)
         self.hct += 1
         return Ans
 
