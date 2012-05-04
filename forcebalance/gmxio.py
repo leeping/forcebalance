@@ -145,14 +145,59 @@ def parse_atomtype_line(line):
     return answer
 
 class ITP_Reader(BaseReader):
-    """Finite state machine for parsing GROMACS force field files.
 
-    This class is instantiated when we begin to read in a file.  The
-    feed(line) method updates the state of the machine, giving it
-    information like the residue we're currently on, the nonbonded
-    interaction type, and the section that we're in.  Using this
-    information we can look up the interaction type and parameter type
-    for building the parameter ID.
+    """Finite state machine for parsing GROMACS force field files.
+    
+    We open the force field file and read all of its lines.  As we loop
+    through the force field file, we look for two types of tags: (1) section
+    markers, in GMX indicated by [ section_name ], which allows us to determine
+    the section, and (2) parameter tags, indicated by the 'PARM' or 'RPT' keywords.
+    
+    As we go through the file, we figure out the atoms involved in the interaction
+    described on each line.
+    
+    When a 'PARM' keyword is indicated, it is followed by a number which is the field
+    in the line to be modified, starting with zero.  Based on the field number and the
+    section name, we can figure out the parameter type.  With the parameter type
+    and the atoms in hand, we construct a 'parameter identifier' or pid which uniquely
+    identifies that parameter.  We also store the physical parameter value in an array
+    called 'pvals0' and the precise location of that parameter (by filename, line number,
+    and field number) in a list called 'pfields'.
+    
+    An example: Suppose in 'my_ff.itp' I encounter the following on lines 146 and 147:
+    
+    @code
+    [ angletypes ]
+    CA   CB   O   1   109.47  350.00  ; PARM 4 5
+    @endcode
+    
+    From reading <tt>[ angletypes ]</tt> I know I'm in the 'angletypes' section.
+    
+    On the next line, I notice two parameters on fields 4 and 5.
+    
+    From the atom types, section type and field number I know the parameter IDs are <tt>'ANGLESBCACBO'</tt> and <tt>'ANGLESKCACBO'</tt>.
+    
+    After building <tt>map={'ANGLESBCACBO':1,'ANGLESKCACBO':2}</tt>, I store the values in
+    an array: <tt>pvals0=array([109.47,350.00])</tt>, and I put the parameter locations in
+    pfields: <tt>pfields=[['my_ff.itp',147,4,1.0],['my_ff.itp',146,5,1.0]]</tt>.  The 1.0
+    is a 'multiplier' and I will explain it below.
+    
+    Note that in the creation of parameter IDs, we run into the issue that the atoms
+    involved in the interaction may be labeled in reverse order (e.g. <tt>OCACB</tt>).  Thus,
+    we store both the normal and the reversed parameter ID in the map.
+    
+    Parameter repetition and multiplier:
+    
+    If <tt>'RPT'</tt> is encountered in the line, it is always in the syntax:
+    <tt>'RPT 4 ANGLESBCACAH 5 MINUS_ANGLESKCACAH /RPT'</tt>.  In this case, field 4 is replaced by
+    the stored parameter value corresponding to <tt>ANGLESBCACAH</tt> and field 5 is replaced by
+    -1 times the stored value of <tt>ANGLESKCACAH</tt>.  Now I just picked this as an example,
+    I don't think people actually want a negative angle force constant .. :) the <tt>MINUS</tt>
+    keyword does come in handy for assigning atomic charges and virtual site positions.
+    In order to achieve this, a multiplier of -1.0 is stored into pfields instead of 1.0.
+    
+    @todo Note that I can also create the opposite virtual site position by changing the atom
+    labeling, woo!
     
     """
     
@@ -314,6 +359,9 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
 
     def energy_force_driver(self, shot):
+        """ Computes the energy and force using GROMACS for a single
+        snapshot.  This does not require GROMACS-X2. """
+
         # Remove backup files.
         rm_gmx_baks(os.getcwd())
         # Write the correct conformation.

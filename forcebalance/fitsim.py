@@ -219,6 +219,14 @@ class FittingSimulation(object):
 
     @abc.abstractmethod
     def get(self,mvals,AGrad=False,AHess=False,tempdir=None):
-        """@todo Write documentation here later."""
+
+        """ 
         
-        return
+        Every fitting simulation must be able to return a contribution
+        to the objective function - however, this must be implemented
+        in the specific subclass.  See forceenergymatch for an
+        example.
+
+        """
+        
+        raise NotImplementedError('The get method is not implemented in the FittingSimulation base class')

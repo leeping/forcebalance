@@ -17,8 +17,23 @@ import itertools
 class ForceEnergyMatch_Internal(ForceEnergyMatch):
 
     """Subclass of FittingSimulation for force and energy matching
-    using Internal.  Implements the prepare and energy_force_driver
-    methods.  The get method is in the superclass.  """
+    using an internal implementation.  Implements the prepare and
+    energy_force_driver methods.  The get method is in the superclass.
+
+    The purpose of this class is to provide an extremely simple test
+    case that does not require the user to install any external
+    software.  It only runs with one of the included sample test
+    calculations (internal_tip3p), and the objective function is
+    energy matching.
+    
+    @warning This class is only intended to work with a very specific
+    test case (internal_tip3p).  This is because the topology and
+    ordering of the atoms is hard-coded (12 water molecules with 3
+    atoms each).
+
+    @warning This class does energy matching only (no forces)
+
+    """
 
     def __init__(self,options,sim_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
@@ -30,6 +45,10 @@ class ForceEnergyMatch_Internal(ForceEnergyMatch):
         return
 
     def energy_force_driver_all(self):
+        """ Here we actually compute the interactions and return the
+        energies and forces. I verified this to give the same answer
+        as GROMACS. """
+
         M = []
         # Loop through the snapshots
         ThisFF = FF({'forcefield':['tip3p.xml'], 'ffdir':'', 'priors':{}},verbose=False)

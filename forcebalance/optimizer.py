@@ -395,7 +395,13 @@ class Optimizer(object):
             return optimize.fmin_cg(xwrap(self.Objective,verbose=False),self.mvals0,fprime=gwrap(self.Objective),gtol=self.conv_grd)
 
     def GeneticAlgorithm(self):
-        """ Genetic algorithm.  Under development.
+        
+        """ 
+        Genetic algorithm, under development. It currently works but a
+        genetic algorithm is more like a concept; i.e. there is no
+        single way to implement it.
+        
+        @todo Massive parallelization hasn't been implemented yet
 
         """
         def generate_fresh(rows, cols):
@@ -439,26 +445,6 @@ class Optimizer(object):
             for i in b[:MutNum]:
                 print "Randomly mutating %i" % i
                 newpop[i] = mutate(newpop[i])
-            
-            
-            # # Randomly mutate a random fraction of the kept ones
-            # random.shuffle(a)
-            # print "Randomizing the following:", a[:MutNum]
-            # for i in a[:MutNum]:
-            #     newpop[i] = mutate(newpop[i])
-            # # Cross over a random fraction of the kept ones
-            # random.shuffle(a)
-            # print "Crossing the following:", a[:CrosNum]
-            # for i in range(0,CrosNum,2):
-            #     newpop[a[i]], newpop[a[i+1]] = cross_over(newpop[a[i]],newpop[a[i+1]])
-            # # Completely randomize the dead ones
-            # for i in range(KeepNum,len(newpop)):
-            #     newpop[i] = np.random.randn(self.np)*self.trust0 / (self.np ** 0.5)
-
-                
-                #newpop[i] *= 0.0
-                #newpop[i,int(self.np * np.random.random())] = np.random.randn()*self.trust0
-                #print newpop[i]
             return newpop
             
         def xwrap(func,verbose=True):
@@ -504,12 +490,7 @@ class Optimizer(object):
             Gen += 1
 
         print Best
-        
         return Population[Sorted[1][0]]
-        
-        #for i in Population:
-        #    print self.Objective(i,Order=0,verbose=False)['X']
-            #print xwrap(i
         
 
     def Simplex(self):
@@ -673,6 +654,7 @@ class Optimizer(object):
                       % (i, self.FF.plist[i][:20], self.FF.plist[j][:20], Adata[i,j], Fdata[i,j], cD, D, cQ, Q)
 
     def readchk(self):
+        """ Read the checkpoint file for the main optimizer. """
         self.chk = {}
         if self.rchk_fnm != None:
             absfnm = os.path.join(self.root,self.rchk_fnm)
@@ -683,6 +665,7 @@ class Optimizer(object):
         return self.chk
 
     def writechk(self):
+        """ Write the checkpoint file for the main optimizer. """
         if self.wchk_fnm != None:
             print "Writing the checkpoint file %s" % self.wchk_fnm
             with open(os.path.join(self.root,self.wchk_fnm),'w') as f: pickle.dump(self.chk,f)

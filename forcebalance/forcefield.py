@@ -89,7 +89,7 @@ Right now only GROMACS parameters are supported, but this class is extensible,
 we need more modules!
 
 @author Lee-Ping Wang
-@date 12/2011
+@date 04/2012
 
 """
 
@@ -103,8 +103,11 @@ from numpy.linalg import norm
 from nifty import col, flat, invert_svd, isint, kb, orthogonalize, pmat2d, printcool, row, warn_press_key
 from string import count
 from copy import deepcopy
-from lxml import etree
+try:
+    from lxml import etree
+except: pass
 import itertools
+
 
 FF_Extensions = {"itp" : "gmx",
                  "in"  : "qchem",
@@ -122,6 +125,11 @@ FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 }
 
 def determine_fftype(ffname,verbose=False):
+    """ Determine the type of a force field file.  It is possible to
+    specify the file type explicitly in the input file using the
+    syntax 'force_field.ext:type'.  Otherwise this function will try
+    to determine the force field type by extension. """
+
     fsplit = ffname.split('/')[-1].split(':')
     fftype = None
     if verbose: print "Determining file type of %s ..." % fsplit[0],
@@ -236,59 +244,62 @@ class FF(object):
     def addff(self,ffname):
         """ Parse a force field file and add it to the class.
 
-        First, we need to figure out the type of file.  Currently this is done
-        using the three-letter file extension ('.itp' = gmx); that can be improved.
+        First, figure out the type of force field file.  This is done
+        either by explicitly specifying the type using for example,
+        <tt> ffname force_field.xml:openmm </tt> or we figure it out
+        by looking at the file extension.
+
+        Next, parse the file.  Currently we support two classes of
+        files - text and XML.  The two types are treated very
+        differently; for XML we use the parsers in libxml (via the
+        python lxml module), and for text files we have our own
+        in-house parsing class.  Within text files, there is also a
+        specialized GROMACS and TINKER parser as well as a generic
+        text parser.
+
+        The job of the parser is to determine the following things:
+        1) Read the user-specified selection of parameters being fitted
+        2) Build a mapping (dictionary) of <tt> parameter identifier -> index in parameter vector </tt>
+        3) Build a list of physical parameter values
+        4) Figure out where to replace the parameter values in the force field file when the values are changed
+        5) Figure out which parameters need to be repeated or sign-flipped
         
-        First we open the force field file and read all of its lines.  As we loop
-        through the force field file, we look for two types of tags: (1) section
-        markers, in GMX indicated by [ section_name ], which allows us to determine
-        the section, and (2) parameter tags, indicated by the 'PARM' or 'RPT' keywords.
+        Generally speaking, each parameter value in the force field
+        file has a <tt> unique parameter identifier <tt>.  The
+        identifier consists of three parts - the interaction type, the
+        parameter subtype (within that interaction type), and the
+        atoms involved.
 
-        As we go through the file, we figure out the atoms involved in the interaction
-        described on each line.
+        --- If XML: ---
 
-        When a 'PARM' keyword is indicated, it is followed by a number which is the field
-        in the line to be modified, starting with zero.  Based on the field number and the
-        section name, we can figure out the parameter type.  With the parameter type
-        and the atoms in hand, we construct a 'parameter identifier' or pid which uniquely
-        identifies that parameter.  We also store the physical parameter value in an array
-        called 'pvals0' and the precise location of that parameter (by filename, line number,
-        and field number) in a list called 'pfields'.
+        The force field file is read in using the lxml Python module.  Specify
+        which parameter you want to fit using by adding a 'parameterize' element
+        to the end of the force field XML file, like so.
 
-        An example: Suppose in 'my_ff.itp' I encounter the following on lines 146 and 147:
-        
         @code
-        [ angletypes ]
-        CA   CB   O   1   109.47  350.00  ; PARM 4 5
+        <AmoebaVdwForce type="BUFFERED-14-7">
+           <Vdw class="74" sigma="0.2655" epsilon="0.056484" reduction="0.910" parameterize="sigma, epsilon, reduction" /> 
         @endcode
 
-        From reading <tt>[ angletypes ]</tt> I know I'm in the 'angletypes' section.
+        In this example, the parameter identifier would look like <tt> AmoebaVdwForce.Vdw_74_epsilon </tt>.
 
-        On the next line, I notice two parameters on fields 4 and 5.
+        --- If GROMACS (.itp) or TINKER (.prm) : ---
 
-        From the atom types, section type and field number I know the parameter IDs are <tt>'ANGLESBCACBO'</tt> and <tt>'ANGLESKCACBO'</tt>.
+        Follow the rules in the ITP_Reader or Tinker_Reader derived
+        class.  Read the documentation in the class documentation or
+        the 'feed' method to learn more.  In all cases the parameter
+        is tagged using <tt> # PARM 3 </tt> (where # denotes a comment,
+        the word PARM stays the same, and 3 is the field number starting
+        from zero.)
+
+        --- If normal text : ---
         
-        After building <tt>map={'ANGLESBCACBO':1,'ANGLESKCACBO':2}</tt>, I store the values in
-        an array: <tt>pvals0=array([109.47,350.00])</tt>, and I put the parameter locations in
-        pfields: <tt>pfields=[['my_ff.itp',147,4,1.0],['my_ff.itp',146,5,1.0]]</tt>.  The 1.0
-        is a 'multiplier' and I will explain it below.
-        
-        Note that in the creation of parameter IDs, we run into the issue that the atoms
-        involved in the interaction may be labeled in reverse order (e.g. <tt>OCACB</tt>).  Thus,
-        we store both the normal and the reversed parameter ID in the map.
+        The parameter identifier is simply built using the file name,
+        line number, and field.  Thus, the identifier is unique but
+        completely noninformative (which is not ideal for our
+        purposes, but it works.)
 
-        Parameter repetition and multiplier:
-        
-        If <tt>'RPT'</tt> is encountered in the line, it is always in the syntax:
-        <tt>'RPT 4 ANGLESBCACAH 5 MINUS_ANGLESKCACAH /RPT'</tt>.  In this case, field 4 is replaced by
-        the stored parameter value corresponding to <tt>ANGLESBCACAH</tt> and field 5 is replaced by
-        -1 times the stored value of <tt>ANGLESKCACAH</tt>.  Now I just picked this as an example,
-        I don't think people actually want a negative angle force constant .. :) the <tt>MINUS</tt>
-        keyword does come in handy for assigning atomic charges and virtual site positions.
-        In order to achieve this, a multiplier of -1.0 is stored into pfields instead of 1.0.
-
-        @todo Note that I can also create the opposite virtual site position by changing the atom
-        labeling, woo!
+        --- Endif ---
 
         @warning My program currently assumes that we are only using one MM program per job.
         If we use CHARMM and GROMACS to perform fitting simulations in the same job, we will
@@ -312,15 +323,45 @@ class FF(object):
         # Open the force field using an absolute path and read its contents into memory.
         absff = os.path.join(self.root,self.ffdir,ffname)
         
+        # Create an instance of the Reader.
+        # The reader is essentially a finite state machine that allows us to 
+        # build the pid.
         self.R = Reader(ffname)
         if fftype == "openmm":
+            ## Read in an XML force field file as an _ElementTree object
             self.ffdata[ffname] = etree.parse(absff)
+            # Process the file
             self.addff_xml(ffname)
         else:
+            ## Read in a text force field file as a list of lines
             self.ffdata[ffname] = open(absff).readlines()
+            # Process the file
             self.addff_txt(ffname)
 
     def addff_txt(self, ffname):
+        """ Parse a text force field and create several important instance variables.
+
+        Each line is processed using the 'feed' method as implemented
+        in the reader class.  This essentially allows us to create the
+        correct parameter identifier (pid), because the pid comes from
+        more than the current line, it also depends on the section that
+        we're in.
+
+        When 'PARM' or 'RPT' is encountered, we do several things:
+        - Build the parameter identifier and insert it into the map
+        - Point to the file name, line number, and field where the parameter may be modified
+        
+        Additionally, when 'PARM' is encountered:
+        - Store the physical parameter value (this is permanent; it's the original value)
+        - Increment the total number of parameters
+
+        When 'RPT' is encountered we don't expand the parameter vector
+        because this parameter is a copy of an existing one.  If the
+        parameter identifier is preceded by MINUS_, we chop off the
+        prefix but remember that the sign needs to be flipped.
+
+        """
+        
         for ln, line in enumerate(self.ffdata[ffname]):
             self.R.feed(line)
             sline = line.split()
@@ -351,6 +392,31 @@ class FF(object):
                     parse += 2
     
     def addff_xml(self, ffname):
+        """ Parse an XML force field file and create important instance variables.
+
+        This was modeled after addff_txt, but XML and text files are
+        fundamentally different, necessitating two different methods.
+
+        We begin with an _ElementTree object.  We search through the tree
+        for the 'parameterize' and 'param_repeat' keywords.  Each time
+        the keyword is encountered, we do the same four actions that
+        I describe in addff_txt.
+
+        It's hard to specify precisely the location in an XML file to
+        change a force field parameter.  I can create a list of tree
+        elements (essentially pointers to elements within a tree), but
+        this method breaks down when I copy the tree because I have no
+        way to refer to the copied tree elements.  Fortunately, lxml
+        gives me a way to represent a tree using a flat list, and my
+        XML file 'locations' are represented using the positions in
+        the list.
+
+        @warning The sign-flip hasn't been implemented yet.  This
+        shouldn't matter unless your calculation contains repeated
+        parameters with opposite sign.
+
+        """
+        
         fflist = list(self.ffdata[ffname].iter())
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
@@ -397,7 +463,6 @@ class FF(object):
             pvals = self.create_pvals(vals)
 
         pvals = list(pvals)
-
         
         newffdata = deepcopy(self.ffdata)
 

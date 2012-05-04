@@ -18,6 +18,8 @@ class ForceEnergyMatch(FittingSimulation):
 
     """ Subclass of FittingSimulation for force and energy matching.
 
+    Currently Gromacs-X2, Gromacs, Tinker and OpenMM are supported.
+
     In force and energy matching, we introduce the following concepts:
     - The number of snapshots
     - The reference energies and forces (eqm, fqm) and the file they belong in (qdata.txt)
@@ -471,6 +473,12 @@ class ForceEnergyMatch(FittingSimulation):
         return Answer
 
 def build_objective(SPiXi,WCiW,Z,Q0,M0,NCP1):
+
+    """ This function builds an objective function (number) from the
+    complicated polytensor and covariance matrices.  It is called
+    twice in the 'ForceEnergyMatch.get' method so we wrote a separate
+    function to save lines."""
+
     # These are the functions that we are building.
     X2    = 0.0
     # Divide by Z to normalize

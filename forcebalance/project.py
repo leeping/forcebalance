@@ -13,10 +13,11 @@ from numpy import array, zeros
 class Project(object):
     """Container for a ForceBalance force field optimization project.
 
-    The triumvirate or trinity of components are:
+    The triumvirate, trifecta, or trinity of components are:
     - The force field
     - The objective function
     - The optimizer
+    Apoc: "TRINITY" *chunk*
 
     The force field is a class defined in forcefield.py.
     The objective function is built here as a combination of fitting simulation classes.

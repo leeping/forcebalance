@@ -130,7 +130,6 @@ def fdwrap(func,mvals0,pidx,key=None,**kwargs):
     func1  = Wrapped version of func, which takes a single float argument.
     """
     def func1(arg):
-        #print "%i % .1e" % (pidx,arg),
         mvals = list(mvals0)
         mvals[pidx] += arg
         print "fdwrap:", func.__name__, "[%i] = % .1e" % (pidx, arg),
