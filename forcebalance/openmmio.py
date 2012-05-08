@@ -80,7 +80,7 @@ class PropertyMatch_OpenMM(PropertyMatch):
         """ Submit a NPT simulation to the Work Queue. """
         for fnm in os.listdir(os.path.join(self.root,self.tempdir)):
             if os.path.isfile(os.path.join(self.root,self.tempdir,fnm)):
-                shutil.copy2(os.path.join(self.root,self.tempdir,fnm),os.path.join(run_dir,fnm))
+                shutil.copy2(os.path.join(self.root,self.tempdir,fnm),os.path.join(run_dir,fnm)) # Mao
         queue_up(self.wq,
                  command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
                  input_files = [(os.path.join(run_dir,'runcuda.sh'),'runcuda.sh'),
