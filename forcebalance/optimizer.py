@@ -246,7 +246,6 @@ class Optimizer(object):
                 break
             # Take a step in the parameter space.
             dx, over = self.step(G, H, trust)
-            print dx
             xk += dx
             # Evaluate the objective function and its derivatives.
             data        = self.Objective(xk,Ord,verbose=True)
