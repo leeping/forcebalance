@@ -222,6 +222,7 @@ class PropertyMatch(FittingSimulation):
         print bar
         
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
+        print Answer
         os.chdir(cwd)
         return Answer
 
