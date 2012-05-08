@@ -205,6 +205,9 @@ class Optimizer(object):
             print
             data     = self.Objective(xk,Ord,verbose=True)
             X, G, H  = data['X'], data['G'], data['H']
+            # print "Computed G and H are equal to:"
+            # print G
+            # print H
             ehist    = np.array([X])
             xk_prev  = xk.copy()
             trust    = self.trust0
@@ -245,11 +248,17 @@ class Optimizer(object):
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             # Take a step in the parameter space.
+            # print "Taking a step using the following for G and H:"
+            # print G
+            # print H
             dx, over = self.step(G, H, trust)
             xk += dx
             # Evaluate the objective function and its derivatives.
             data        = self.Objective(xk,Ord,verbose=True)
             X, G, H = data['X'], data['G'], data['H']
+            # print "Computed G and H are equal to:"
+            # print G
+            # print H
             # if pkg.efweight > 0.99:
             #     dFc, patomax = cartesian_dforce(pkg)
             ndx = norm(dx)
@@ -286,6 +295,9 @@ class Optimizer(object):
                 H_stor = H.copy()
                 xk_prev = xk.copy()
                 ehist = np.append(ehist, X)
+            # print "At the end of the loop, G and H are equal to:"
+            # print G
+            # print H
             drc = abs(flat(dx)).argmax()
             stepn += 1
             
