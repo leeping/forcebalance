@@ -64,7 +64,7 @@ import simtk.unit as units
 import simtk.openmm as openmm
 from simtk.openmm.app import *
 from forcebalance.forcefield import FF
-from forcebalance.nifty import col, lp_load
+from forcebalance.nifty import col, flat, lp_load, printcool
 from forcebalance.finite_difference import fdwrap, f12d3p
 
 #======================================================#
@@ -75,7 +75,7 @@ from forcebalance.finite_difference import fdwrap, f12d3p
 timestep = 0.5 * units.femtosecond # timestep for integrtion
 nsteps = 200                       # number of steps per data record
 nequiliterations = 100             # number of equilibration iterations
-niterations = 100                  # number of iterations to collect data for
+niterations = 500                  # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -318,7 +318,7 @@ def run_simulation(pdb):
       data['kinetic_temperature'][iteration] = kinetic_temperature
       xyzs.append(state.getPositions())
       boxes.append(state.getPeriodicBoxVectors())
-      rhos.append(density * 1000)
+      rhos.append(density.value_in_unit(units.kilogram / units.meter**3))
       energies.append(potential) / units.kilojoules_per_mole
    return data, xyzs, boxes, rhos
    
@@ -373,12 +373,11 @@ def analyze(data):
    unit = (units.nanometer**3)
    print "Volume: mean %11.6f +- %11.6f  nm^3" % (statistics['volume'] / unit, statistics['dvolume'] / unit),
    print "g = %11.6f ps" % (statistics['g_volume'] / units.picoseconds)
-   print
    unit = (units.gram / units.centimeter**3)
    print "Density: mean %11.6f +- %11.6f  nm^3" % (statistics['density'] / unit, statistics['ddensity'] / unit),
    print "g = %11.6f ps" % (statistics['g_density'] / units.picoseconds)
 
-def energy_driver(mvals,pdb,FF,xyzs):
+def energy_driver(mvals,pdb,FF,xyzs,boxes,verbose=False):
 
    """
    Compute a set of snapshot energies as a function of the force field parameters.
@@ -406,19 +405,22 @@ def energy_driver(mvals,pdb,FF,xyzs):
    forcefield = ForceField(sys.argv[2])
    # Create the system, setup the simulation.
    system = forcefield.createSystem(pdb.topology, **direct_kwargs)
-   integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+   integrator = openmm.LangevinIntegrator(300*units.kelvin, 1/units.picosecond, 0.002*units.picoseconds)
    simulation = Simulation(pdb.topology, system, integrator)
    E = []
    # Loop through the snapshots
-   for xyz in xyzs:
-      # Set the positions using the trajectory
+   for xyz,box in zip(xyzs,boxes):
+      # Set the positions and the box vectors
       simulation.context.setPositions(xyz)
+      simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
       # Compute the potential energy and append to list
-      Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+      Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / units.kilojoules_per_mole
       E.append(Energy)
+   print "\r",
+   if verbose: print E
    return np.array(E)
 
-def energy_derivatives(mvals,pdb,FF,xyzs):
+def energy_derivatives(mvals,h,pdb,FF,xyzs,boxes):
 
    """
    Compute the first and second derivatives of a set of snapshot
@@ -437,10 +439,11 @@ def energy_derivatives(mvals,pdb,FF,xyzs):
 
    """
 
-   G        = np.zeros(FF.np,len(xyzs))
-   Hd       = np.zeros(FF.np,len(xyzs))
+   G        = np.zeros((FF.np,len(xyzs)))
+   Hd       = np.zeros((FF.np,len(xyzs)))
+   E0       = energy_driver(mvals, pdb, FF, xyzs, boxes)
    for i in range(FF.np):
-      G[i,:], Hd[i,:] = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs),FF.h)
+      G[i,:], Hd[i,:] = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,boxes=boxes),h,f0=E0)
    return G, Hd
        
 def main():
@@ -475,21 +478,57 @@ def main():
    # Specify the PDB here so we may make the Simulation class.
    pdb = PDBFile(sys.argv[1])
    # Load the force field in from the ForceBalance pickle.
-   FF,mvals = lp_load(open('forcebalance.p'))
+   FF,mvals,h = lp_load(open('forcebalance.p'))
    # Create the force field XML files.
    pvals = FF.make(os.getcwd(),mvals,False)
    # Run the simulation.
    Data, Xyzs, Boxes, Rhos = run_simulation(pdb)
+
+   #print Data['potential'].value_in_unit(units.kilojoule / units.mole)
+   #energy_driver(mvals, pdb, FF, Xyzs, Boxes, verbose=True)
    # Get statistics from our simulation.
    analyze(Data)
    # Now that we have the coordinates, we can compute the energy derivatives.
-   G, Hd = energy_derivatives(mvals, pdb, FF, Xyzs)
+   G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, Boxes)
    # The density derivative can be computed using the energy derivative.
    N = len(Xyzs)
-   mkT = -1 * temperature * boltzmann_constant
-   # The density derivative.
-   GRho = mKT * ((np.mat(G) * col(Rhos)) / N - np.mean(Rhos) * np.mean(G, axis=1))
-   print GRho
+   kB = units.BOLTZMANN_CONSTANT_kB * units.AVOGADRO_CONSTANT_NA
+   mBeta = (-1 / (temperature * kB)).value_in_unit(units.mole / units.kilojoule)
+   Beta = (1 / (temperature * kB)).value_in_unit(units.mole / units.kilojoule)
+
+   #print flat(G[5,:]) - np.mean(G[5,:])
+   #print Rhos - np.mean(Rhos)
+   #print
+
+   # print G
+   # print Hd
+   # print flat((np.mat(G) * col(Rhos)) / N)
+   # print
+   # print np.mean(Rhos)
+   # print np.mean(G,axis=1)
+   # print
+   # print np.mean(Rhos) * np.mean(G, axis=1)
+
+   # It becomes necessary to make the gradient squared for the second derivative.
+   GG = G * G
+   
+   GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / N - np.mean(Rhos) * np.mean(G, axis=1))
+   HdRho = mBeta * (flat(np.mat(Hd) * col(Rhos)) / N
+                    - Beta * flat(np.mat(GG) * col(Rhos)) / N
+                    + Beta * (flat(np.mat(G) * col(Rhos)) / N) * np.mean(G, axis=1)
+                    - np.mean(Rhos) * (np.mean(Hd, axis=1)
+                                       - Beta * np.mean(GG, axis=1)
+                                       + Beta * np.mean(G, axis=1) * np.mean(G, axis=1)))
+
+   bar = printcool("Density Derivative")
+   FF.print_map(vals=GRho)
+
+   print bar
+
+   bar = printcool("Density Second Derivative")
+   FF.print_map(vals=HdRho)
+
+   print bar
 
 if __name__ == "__main__":
    main()
