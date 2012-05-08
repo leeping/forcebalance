@@ -1,0 +1,449 @@
+[1;97m Welcome to ForceBalance version 0.11.0! =D[0m
+Reading options from file: 01_energy_force.in
+Reading force field from file: water.itp
+
+###########################################################
+###[92m Starting parameter indices, physical values and IDs [0m###
+###########################################################
+   0 [  9.9036e-01 ] : VPAIR_BHAMAHH
+   1 [  4.5984e-03 ] : VPAIR_BHAMBHH
+   2 [  8.9568e+00 ] : VPAIR_BHAMCHH
+   3 [  2.9294e-01 ] : VPAIR_BHAMAHO
+   4 [  1.5890e+00 ] : VPAIR_BHAMBHO
+   5 [  4.9863e+00 ] : VPAIR_BHAMCHO
+   6 [  3.6306e-01 ] : VPAIR_BHAMAOO
+   7 [  1.0790e+00 ] : VPAIR_BHAMBOO
+   8 [  1.3171e+01 ] : VPAIR_BHAMCOO
+   9 [  1.0247e-01 ] : MORSEBHO
+  10 [  1.8287e+02 ] : MORSECHO
+  11 [  2.8221e+01 ] : MORSEEHO
+  12 [  1.1305e+02 ] : UREY_BRADLEYTHOH
+  13 [  4.0307e+02 ] : UREY_BRADLEYK1HOH
+  14 [  3.5815e-02 ] : UREY_BRADLEYBHOH
+  15 [  6.1945e+03 ] : UREY_BRADLEYK2HOH
+  16 [ -1.1409e+00 ] : QTPIEC1
+  17 [  1.8085e+01 ] : QTPIEH1
+  18 [  3.5945e-01 ] : QTPIEA1
+  19 [  4.1358e+00 ] : QTPIEC2
+  20 [  1.1191e+01 ] : QTPIEH2
+  21 [  3.2720e-01 ] : QTPIEA2
+  22 [  4.5426e+00 ] : QTPIEC3
+  23 [  1.1559e+01 ] : QTPIEH3
+  24 [  3.2210e-01 ] : QTPIEA3
+  25 [  2.5942e-01 ] : VSITE3B4 VSITE3A4
+  26 [  1.1205e-01 ] : VSITE3OUTB6 VSITE3OUTB5 VSITE3OUTA6 VSITE3OUTA5
+  27 [ -2.2392e+00 ] : VSITE3OUTC6 VSITE3OUTC5
+-----------------------------------------------------------
+
+##########################################################
+###[91m    Rescaling Factors (Lower Takes Precedence):     [0m###
+##########################################################
+   QTPIEC                               : 2.72114e+01
+   VSITE3OUTA                           : 5.29177e-02
+   VSITE3OUTB                           : 5.29177e-02
+   VSITE3OUTC                           : 5.29177e-02
+   QTPIEH                               : 2.72114e+01
+   MORSEE                               : 1.88973e+01
+   UREY_BRADLEYB                        : 5.29177e-02
+   VPAIR_BHAMA                          : 5.29177e-02
+   VPAIR_BHAMB                          : 2.47894e+00
+   VPAIR_BHAMC                          : 1.00000e+00
+   MORSEC                               : 9.64853e+01
+   MORSEB                               : 5.29177e-02
+   VSITE3A                              : 5.29177e-02
+   VSITE3B                              : 5.29177e-02
+   QTPIEA                               : 1.00000e+00
+   UREY_BRADLEYK2                       : 9.37583e+05
+   UREY_BRADLEYK1                       : 6.05928e+02
+   UREY_BRADLEYT                        : 1.13049e+02
+----------------------------------------------------------
+Backing up: temp/water12_sixpt to: backups/water12_sixpt.7.tar.bz2
+
+##########################################################
+###[92m    Setup for fitting simulation water12_sixpt :    [0m###
+##########################################################
+all_at_once               1 
+batch_fd                  0 
+covariance                False 
+efweight                  0.5 
+fd_ptypes                 ['VSITE'] 
+fdgrad                    False 
+fdhess                    False 
+fdhessdiag                True 
+fitatoms                  0 
+name                      water12_sixpt 
+qmboltz                   0.0 
+qmboltztemp               298.15 
+run_internal              1 
+sampcorr                  0 
+shots                     300 
+simtype                   FORCEENERGYMATCH_GMXX2 
+use_pvals                 0 
+weight                    1.0 
+whamboltz                 0 
+wq_port                   9230 
+----------------------------------------------------------
+Backing up: temp/water12_fourpt to: backups/water12_fourpt.2.tar.bz2
+
+##########################################################
+###[92m   Setup for fitting simulation water12_fourpt :    [0m###
+##########################################################
+all_at_once               1 
+batch_fd                  0 
+covariance                False 
+efweight                  0.5 
+fd_ptypes                 ['VSITE'] 
+fdgrad                    False 
+fdhess                    False 
+fdhessdiag                True 
+fitatoms                  0 
+name                      water12_fourpt 
+qmboltz                   0.0 
+qmboltztemp               298.15 
+run_internal              1 
+sampcorr                  0 
+shots                     300 
+simtype                   FORCEENERGYMATCH_GMXX2 
+use_pvals                 0 
+weight                    1.0 
+whamboltz                 0 
+wq_port                   9230 
+----------------------------------------------------------
+
+##########################################################
+###[92m                Setup for optimizer                 [0m###
+##########################################################
+adaptive_damping          0.5 
+adaptive_factor           0.5 
+backup                    True 
+convergence_gradient      0.0001 
+convergence_objective     0.0001 
+convergence_step          0.0001 
+eig_lowerbound            0.0001 
+ffdir                     forcefield 
+finite_difference_h       0.0001 
+forcefield                ['water.itp'] 
+gmxpath                   /home/leeping/opt/gromacs-4.0.7-x2/bin 
+gmxsuffix                  
+jobtype                   BFGS 
+maxstep                   100 
+penalty_additive          0.0 
+penalty_multiplicative    0.1 
+penalty_type              L2 
+priors                    {} 
+root                      /home/leeping/src/forcebalance/studies/002_water12_qtpie 
+scanindex_name            [] 
+scanindex_num             [] 
+trust0                    0.01 
+writechk_step             0 
+----------------------------------------------------------
+
+##########################################################
+###[1;97m                   Main Optimizer                   [0m###
+###[1;97m                     BFGS Mode                      [0m###
+##########################################################
+
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     3.7804 F_err(%)=    11.0244
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    10.9486 F_err(%)=    57.8416
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     0   0.000e+00   0.000e+00   9.950e+01[97m   2.24415e-01[0m   0.000e+00
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     3.8954 F_err(%)=    11.1561
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    10.4352 F_err(%)=    54.0719
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     1   1.000e-02   1.000e-02   8.642e+01[92m   2.00090e-01[0m   1.216e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     3.9577 F_err(%)=    11.4774
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    10.3575 F_err(%)=    51.7398
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     2   1.613e-02   1.500e-02   8.476e+01[92m   1.87980e-01[0m   1.515e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     4.3421 F_err(%)=    12.2055
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     9.9342 F_err(%)=    47.9810
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     3   3.295e-02   2.084e-02   7.431e+01[92m   1.68871e-01[0m   2.014e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     4.8551 F_err(%)=    13.1441
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     9.4029 F_err(%)=    44.7859
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     4   5.511e-02   2.690e-02   6.385e+01[92m   1.54191e-01[0m   2.440e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     5.3107 F_err(%)=    14.2482
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     9.1154 F_err(%)=    41.9186
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     5   8.649e-02   3.268e-02   5.533e+01[92m   1.44071e-01[0m   2.745e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     5.8669 F_err(%)=    15.2979
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     8.6316 F_err(%)=    39.3234
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     6   1.211e-01   3.794e-02   4.362e+01[92m   1.35535e-01[0m   2.979e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     5.9905 F_err(%)=    15.9202
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     8.5330 F_err(%)=    37.4862
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     7   1.632e-01   4.263e-02   3.891e+01[92m   1.29960e-01[0m   3.138e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.6074 F_err(%)=    17.1802
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     8.0731 F_err(%)=    34.8690
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     8   2.071e-01   4.680e-02   2.535e+01[92m   1.24365e-01[0m   3.263e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.5899 F_err(%)=    17.3695
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.9363 F_err(%)=    33.7778
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     9   2.561e-01   5.052e-02   2.261e+01[92m   1.20386e-01[0m   3.352e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.8013 F_err(%)=    18.2047
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.8224 F_err(%)=    31.9252
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    10   3.091e-01   5.385e-02   1.612e+01[92m   1.17188e-01[0m   2.748e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.8385 F_err(%)=    18.3931
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.6945 F_err(%)=    31.0496
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    11   3.624e-01   5.685e-02   1.367e+01[92m   1.14771e-01[0m   2.293e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9773 F_err(%)=    18.8557
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.5889 F_err(%)=    29.8600
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    12   4.168e-01   5.958e-02   9.430e+00[92m   1.13009e-01[0m   1.756e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.0084 F_err(%)=    18.9737
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.5597 F_err(%)=    29.2187
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    13   4.663e-01   6.208e-02   9.084e+00[92m   1.11912e-01[0m   1.353e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.2411 F_err(%)=    19.2964
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.3773 F_err(%)=    28.4354
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    14   4.921e-01   5.420e-02   3.783e+00[92m   1.11349e-01[0m   1.055e-02
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.1818 F_err(%)=    19.2693
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.4976 F_err(%)=    28.1889
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    15   4.990e-01   4.904e-02   6.664e+00[92m   1.10884e-01[0m   8.099e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.2461 F_err(%)=    19.2719
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.4324 F_err(%)=    27.9858
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    16   4.824e-01   6.438e-02   5.075e+00[92m   1.10259e-01[0m   6.259e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.3050 F_err(%)=    19.3317
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.3835 F_err(%)=    27.7370
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    17   4.548e-01   6.650e-02   4.039e+00[92m   1.09595e-01[0m   4.616e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.3320 F_err(%)=    19.3490
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.3325 F_err(%)=    27.6073
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    18   4.261e-01   6.847e-02   2.926e+00[92m   1.08918e-01[0m   3.451e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.3649 F_err(%)=    19.4127
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.2808 F_err(%)=    27.4173
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    19   3.979e-01   7.031e-02   2.245e+00[92m   1.08252e-01[0m   2.611e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.3778 F_err(%)=    19.4714
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.2282 F_err(%)=    27.2730
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    20   3.738e-01   7.203e-02   1.689e+00[92m   1.07592e-01[0m   2.099e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.3883 F_err(%)=    19.5563
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1740 F_err(%)=    27.0991
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    21   3.549e-01   7.365e-02   1.830e+00[92m   1.06944e-01[0m   1.864e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.3777 F_err(%)=    19.6432
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1237 F_err(%)=    26.9535
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    22   3.426e-01   7.518e-02   2.280e+00[92m   1.06294e-01[0m   1.822e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.3492 F_err(%)=    19.7315
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0797 F_err(%)=    26.8195
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    23   3.370e-01   7.663e-02   2.682e+00[92m   1.05634e-01[0m   1.860e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.2862 F_err(%)=    19.8029
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0546 F_err(%)=    26.7377
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    24   3.372e-01   7.800e-02   2.767e+00[92m   1.04961e-01[0m   1.893e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.1945 F_err(%)=    19.8531
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0528 F_err(%)=    26.6938
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    25   3.412e-01   7.930e-02   2.381e+00[92m   1.04285e-01[0m   1.900e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.0783 F_err(%)=    19.8834
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0866 F_err(%)=    26.6782
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    26   3.434e-01   7.629e-02   1.581e+00[92m   1.03643e-01[0m   1.897e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.0088 F_err(%)=    19.8776
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1211 F_err(%)=    26.6457
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    27   3.325e-01   4.877e-02   8.583e-01[92m   1.03144e-01[0m   1.870e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9783 F_err(%)=    19.8855
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1483 F_err(%)=    26.5311
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    28   3.053e-01   5.962e-02   4.946e-01[92m   1.02606e-01[0m   1.832e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9998 F_err(%)=    19.8782
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1365 F_err(%)=    26.4170
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    29   2.733e-01   7.308e-02   7.680e-01[92m   1.02200e-01[0m   1.767e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.0381 F_err(%)=    19.8881
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1050 F_err(%)=    26.2982
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    30   2.566e-01   7.391e-02   9.511e-01[92m   1.01936e-01[0m   1.662e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.0663 F_err(%)=    19.8747
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0697 F_err(%)=    26.2387
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    31   2.570e-01   5.865e-02   8.914e-01[92m   1.01776e-01[0m   1.515e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.0887 F_err(%)=    19.8856
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0402 F_err(%)=    26.1543
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    32   2.667e-01   4.988e-02   8.692e-01[92m   1.01643e-01[0m   1.334e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.0284 F_err(%)=    19.7690
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0558 F_err(%)=    26.3190
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    33   2.799e-01   5.185e-02   6.819e-01[92m   1.01511e-01[0m   1.135e-03
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     7.1222 F_err(%)=    19.9385
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     6.9892 F_err(%)=    25.9377
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    34   3.112e-01   8.054e-02   1.658e+00[92m   1.01441e-01[0m   9.283e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9813 F_err(%)=    19.7633
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0742 F_err(%)=    26.3085
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    35   3.035e-01   2.706e-02   2.708e-01[92m   1.01353e-01[0m   7.354e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9510 F_err(%)=    19.7526
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0994 F_err(%)=    26.3528
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    36   2.959e-01   2.242e-02   4.366e-01[92m   1.01310e-01[0m   5.680e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9221 F_err(%)=    19.7790
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1269 F_err(%)=    26.3407
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    37   2.931e-01   2.957e-02   3.573e-01[92m   1.01252e-01[0m   4.137e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9099 F_err(%)=    19.8206
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1406 F_err(%)=    26.2915
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    38   2.939e-01   2.078e-02   2.592e-01[92m   1.01202e-01[0m   3.083e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9015 F_err(%)=    19.8731
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1486 F_err(%)=    26.2295
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    39   2.961e-01   2.545e-02   2.489e-01[92m   1.01141e-01[0m   2.467e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9048 F_err(%)=    19.9019
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1428 F_err(%)=    26.1923
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    40   2.973e-01   2.571e-02   2.989e-01[92m   1.01099e-01[0m   2.089e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9170 F_err(%)=    19.9131
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1284 F_err(%)=    26.1669
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    41   2.984e-01   2.553e-02   4.118e-01[92m   1.01070e-01[0m   1.776e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9307 F_err(%)=    19.8982
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.1096 F_err(%)=    26.1675
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    42   3.002e-01   2.428e-02   4.861e-01[92m   1.01045e-01[0m   1.516e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9405 F_err(%)=    19.8671
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0910 F_err(%)=    26.1870
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    43   3.035e-01   2.468e-02   5.335e-01[92m   1.01018e-01[0m   1.357e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9438 F_err(%)=    19.8327
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0757 F_err(%)=    26.2168
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    44   3.082e-01   2.048e-02   4.842e-01[92m   1.00990e-01[0m   1.197e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9411 F_err(%)=    19.8205
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0671 F_err(%)=    26.2276
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    45   3.135e-01   1.792e-02   3.939e-01[92m   1.00960e-01[0m   1.099e-04
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     6.9374 F_err(%)=    19.8355
+GMXX2: water12_fourptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_fourptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_fourptSim: water12_fourpt  E_err(kJ/mol)=     7.0647 F_err(%)=    26.2062
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    46   3.183e-01   1.839e-02   3.221e-01[92m   1.00930e-01[0m   9.893e-05
+Convergence criterion reached for objective function (1.00e-04)
+
+##########################################################
+###[1;94m               Final parameter values               [0m###
+###[1;94m           Paste to input file to restart           [0m###
+###[1;94m                Choose pvals or mvals               [0m###
+##########################################################
+read_pvals
+   0 [  9.9120e-01 ] : VPAIR_BHAMAHH
+   1 [  5.1453e-03 ] : VPAIR_BHAMBHH
+   2 [  8.9964e+00 ] : VPAIR_BHAMCHH
+   3 [  2.8732e-01 ] : VPAIR_BHAMAHO
+   4 [  1.9897e+00 ] : VPAIR_BHAMBHO
+   5 [  5.1193e+00 ] : VPAIR_BHAMCHO
+   6 [  3.6115e-01 ] : VPAIR_BHAMAOO
+   7 [  1.0667e+00 ] : VPAIR_BHAMBOO
+   8 [  1.3202e+01 ] : VPAIR_BHAMCOO
+   9 [  1.0271e-01 ] : MORSEBHO
+  10 [  1.7586e+02 ] : MORSECHO
+  11 [  2.7989e+01 ] : MORSEEHO
+  12 [  1.1398e+02 ] : UREY_BRADLEYTHOH
+  13 [  3.3969e+02 ] : UREY_BRADLEYK1HOH
+  14 [  3.6180e-02 ] : UREY_BRADLEYBHOH
+  15 [  6.0967e+03 ] : UREY_BRADLEYK2HOH
+  16 [ -1.2520e+00 ] : QTPIEC1
+  17 [  1.8708e+01 ] : QTPIEH1
+  18 [  3.8884e-01 ] : QTPIEA1
+  19 [  4.0956e+00 ] : QTPIEC2
+  20 [  1.1124e+01 ] : QTPIEH2
+  21 [  3.0279e-01 ] : QTPIEA2
+  22 [  4.5850e+00 ] : QTPIEC3
+  23 [  1.1579e+01 ] : QTPIEH3
+  24 [  3.2286e-01 ] : QTPIEA3
+  25 [  2.6339e-01 ] : VSITE3B4 VSITE3A4
+  26 [  1.0496e-01 ] : VSITE3OUTB6 VSITE3OUTB5 VSITE3OUTA6 VSITE3OUTA5
+  27 [ -2.2395e+00 ] : VSITE3OUTC6 VSITE3OUTC5
+/read_pvals
+read_mvals
+   0 [  1.5877e-02 ] : VPAIR_BHAMAHH
+   1 [  2.2062e-04 ] : VPAIR_BHAMBHH
+   2 [  3.9670e-02 ] : VPAIR_BHAMCHH
+   3 [ -1.0621e-01 ] : VPAIR_BHAMAHO
+   4 [  1.6167e-01 ] : VPAIR_BHAMBHO
+   5 [  1.3296e-01 ] : VPAIR_BHAMCHO
+   6 [ -3.6140e-02 ] : VPAIR_BHAMAOO
+   7 [ -4.9916e-03 ] : VPAIR_BHAMBOO
+   8 [  3.1190e-02 ] : VPAIR_BHAMCOO
+   9 [  4.5216e-03 ] : MORSEBHO
+  10 [ -7.2726e-02 ] : MORSECHO
+  11 [ -1.2299e-02 ] : MORSEEHO
+  12 [  8.2617e-03 ] : UREY_BRADLEYTHOH
+  13 [ -1.0460e-01 ] : UREY_BRADLEYK1HOH
+  14 [  6.8870e-03 ] : UREY_BRADLEYBHOH
+  15 [ -1.0435e-04 ] : UREY_BRADLEYK2HOH
+  16 [ -4.0818e-03 ] : QTPIEC1
+  17 [  2.2901e-02 ] : QTPIEH1
+  18 [  2.9384e-02 ] : QTPIEA1
+  19 [ -1.4779e-03 ] : QTPIEC2
+  20 [ -2.4624e-03 ] : QTPIEH2
+  21 [ -2.4409e-02 ] : QTPIEA2
+  22 [  1.5575e-03 ] : QTPIEC3
+  23 [  7.4702e-04 ] : QTPIEH3
+  24 [  7.5864e-04 ] : QTPIEA3
+  25 [  7.5016e-02 ] : VSITE3B4 VSITE3A4
+  26 [ -1.3392e-01 ] : VSITE3OUTB6 VSITE3OUTB5 VSITE3OUTA6 VSITE3OUTA5
+  27 [ -5.3476e-03 ] : VSITE3OUTC6 VSITE3OUTC5
+/read_mvals
+----------------------------------------------------------
+Creating the directory /home/leeping/src/forcebalance/studies/002_water12_qtpie/result to print the force field

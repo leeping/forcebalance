@@ -1,0 +1,69 @@
+\page tutorial Tutorial
+
+This is a tutorial page, but if you haven't installed ForceBalance yet
+please go to the Installation page first.  It is very much in process,
+and there are many more examples to come.
+
+\section tip4p Fitting a TIP4P potential using two fitting simulations
+After everything is installed, go to the \c test directory in the distribution
+and run:
+
+@verbatim
+cd 001_water12_tip4p/
+OptimizePotential.py 01_bfgs_from_start.in | tee my_job.out
+@endverbatim
+
+If the installation was successful, you will get an output file
+similar to \c 01_bfgs_from_start.out .  \c OptimizePotential.py begins
+by taking the force field files from the \c forcefield directory and
+the fitting simulations / reference data from the \c simulations
+directory.  Then it calls GROMACS-X2 to compute the objective function
+and its derivatives, uses the internal optimizer (based on BFGS) to
+take a step in the parameter space, and repeats the process until
+convergence criteria were made.
+
+At every step, you will see output like:
+@verbatim
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    35   6.370e-01   1.872e-02   9.327e-02   2.48773e-01   1.149e-04
+
+Sim: water12_sixpt   E_err(kJ/mol)=     8.8934 F_err(%)=    29.3236
+Sim: water12_fourpt  E_err(kJ/mol)=    14.7967 F_err(%)=    39.2558
+@endverbatim
+
+The first line reports the step number, the length of the parameter
+displacement vector, the gradient of the objective function, the
+objective function itself, and the standard deviation of the last ten
+\a improved steps in the objective function.  There are three kinds of
+convergence criteria - the step size, the gradient, and the objective
+function itself; all of them can be specified in the input file.
+
+The next two lines report on the two fitting simulations in this job,
+both of which use force/energy matching.  First, note that there are
+two fitting simulations named \c water12_sixpt and \c water12_fourpt;
+the names are because one set of geometries was sampled using a
+six-site QTPIE force field, and the other was sampled using the TIP4P
+force field.  However, the TIP4P force field is what we are fitting
+for this ForceBalance job.  This shows how only one force field or
+parameter set is optimized for each ForceBalance job, but the method
+for sampling the configuration space is completely up to the user.
+The geometries can be seen in the \c all.gro files, and the reference
+data is provided in \c qdata.txt .  Note that the extra virtual sites
+in \c water12_sixpt have been replaced with a single TIP4P site.
+
+\c E_err and \c F_err report the RMS energy error in kJ/mol and the
+percentage force error; note the significant difference in the quality
+of agreement!  This illustrates that the quality of fit depends not
+only on the functional form of the potential but also the
+configurations that are sampled.  \c E_err and \c F_err are
+'indicators' of our progress - that is, they are not quantities to be
+optimized but they give us a mental picture of how we're doing.
+
+The other input files in the directory use the same fitting
+simulations, but they go through the various options of
+reading/writing checkpoint files, testing gradients and Hessians by
+finite difference, and different optimizers in SciPy.  Feel free to
+explore some optimization jobs of your own - for example, vary the
+weights on the fitting simulations and see what happens.  You will
+notice that the optimizer will try very hard to fit one simulation but
+not the other.

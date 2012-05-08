@@ -64,7 +64,7 @@ import simtk.unit as units
 import simtk.openmm as openmm
 from simtk.openmm.app import *
 from forcebalance.forcefield import FF
-from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool
+from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary
 from forcebalance.finite_difference import fdwrap, f12d3p
 
 #======================================================#
@@ -87,6 +87,9 @@ nprint = 1
 # Flag to set verbose debug output
 verbose = True
 
+# Name of the simulation platform (Reference, Cuda, OpenCL)
+PlatName = 'Cuda'
+
 mutual_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanometer, 
                  'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 1.2, 
                  'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
@@ -107,6 +110,18 @@ if 'tip3p' in sys.argv[2]:
    print "Using TIP3P settings."
    timestep = 1.0 * units.femtosecond # timestep for integrtion
    nsteps   = 100                     # number of steps per data record
+   PlatName = 'OpenCL'
+
+#================================#
+# Create the simulation platform #
+#================================#
+print "Setting Platform to", PlatName
+platform = openmm.Platform.getPlatformByName(PlatName)
+# Set the device to the environment variable or zero otherwise
+device = os.environ.get('CUDA_DEVICE',"0")
+print "Setting Device to", device
+platform.setPropertyDefaultValue("CudaDevice", device)
+platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
 
 def generateMaxwellBoltzmannVelocities(system, temperature):
    """ Generate velocities from a Maxwell-Boltzmann distribution. """
@@ -249,14 +264,17 @@ def run_simulation(pdb,settings,pbc=True):
    # Create integrator.
    integrator = openmm.LangevinIntegrator(temperature, collision_frequency, timestep)        
    # Create simulation class.
-   simulation = Simulation(pdb.topology, system, integrator)
+   simulation = Simulation(pdb.topology, system, integrator, platform)
    # Set initial positions.
    simulation.context.setPositions(pdb.positions)
    # Assign velocities.
    velocities = generateMaxwellBoltzmannVelocities(system, temperature)
    simulation.context.setVelocities(velocities)
-   # Print out the platform used by the context
-   if verbose: print "I'm using the platform", simulation.context.getPlatform().getName()
+   if verbose:
+      # Print out the platform used by the context
+      print "I'm using the platform", simulation.context.getPlatform().getName()
+      # Print out the properties of the platform
+      printcool_dictionary({i:simulation.context.getPlatform().getPropertyValue(simulation.context,i) for i in simulation.context.getPlatform().getPropertyNames()},title="Platform %s has properties:" % simulation.context.getPlatform().getName())
    # Serialize the system if we want.
    Serialize = 0
    if Serialize:
@@ -312,7 +330,7 @@ def run_simulation(pdb,settings,pbc=True):
                                                           volume / units.nanometers**3, density / (units.kilogram / units.meter**3))
    # Collect production data.
    if verbose: print "Production..."
-   #simulation.reporters.append(DCDReporter('dynamics.dcd', 100))
+   simulation.reporters.append(DCDReporter('dynamics.dcd', 100))
    for iteration in range(niterations):
       # Propagate dynamics.
       simulation.step(nsteps)
@@ -436,7 +454,7 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,boxes=None,verbose=False):
    # Create the system, setup the simulation.
    system = forcefield.createSystem(pdb.topology, **settings)
    integrator = openmm.LangevinIntegrator(300*units.kelvin, 1/units.picosecond, 0.002*units.picoseconds)
-   simulation = Simulation(pdb.topology, system, integrator)
+   simulation = Simulation(pdb.topology, system, integrator, platform)
    E = []
    # Loop through the snapshots
    if boxes == None:
@@ -507,12 +525,6 @@ def main():
 
    """
    
-   # Select platform.
-   platform = openmm.Platform.getPlatformByName('Cuda')
-   # Set the CUDA device to the environment variable or zero otherwise
-   cuda_device = os.environ.get('CUDA_DEVICE',"0")
-   print "Setting CUDA Device to", cuda_device
-   platform.setPropertyDefaultValue("CudaDevice", cuda_device)
    # Specify the PDB here so we may make the Simulation class.
    pdb = PDBFile(sys.argv[1])
    # Load the force field in from the ForceBalance pickle.
@@ -583,6 +595,8 @@ def main():
    bar = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol, Derivatives below" % (Hvap_avg, Hvap_err))
    FF.print_map(vals=GHvap)
    print bar
+   # Print the final force field.
+   pvals = FF.make(os.getcwd(),mvals,False)
 
    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, Hvap_avg, Hvap_err, GHvap),f)
 

@@ -89,7 +89,7 @@ class CounterpoiseMatch(FittingSimulation):
         print "Loading CP Data!"
         return array([float(i.strip()) for i in open(fnm).readlines()])[:self.ns]
 
-    def get(self,mvals,AGrad=False,AHess=False,tempdir=None):
+    def get(self,mvals,AGrad=False,AHess=False):
         """Gets the objective function for fitting the counterpoise correction.
 
         As opposed to ForceEnergyMatch_GMXX2, which calls an external program,
@@ -111,7 +111,6 @@ class CounterpoiseMatch(FittingSimulation):
         @param[in] mvals Mathematical parameter values
         @param[in] AGrad Switch to turn on analytic gradient (not implemented)
         @param[in] AHess Switch to turn on analytic Hessian (not implemented)
-        @param[in] tempdir Temporary directory for running computation
         @return Answer Contribution to the objective function
         
         """
@@ -119,7 +118,7 @@ class CounterpoiseMatch(FittingSimulation):
         # Create the force field physical values from the mathematical values
         pvals = self.FF.create_pvals(mvals)
         cpmm = []
-        print "CPMM: %s   \r" % self.tempdir,
+        print "CPMM: %s   \r" % self.name,
         # Loop through the snapshots
         for s in range(self.ns):
             xyz = self.xyzs[s] # Harvest the xyz. :)
@@ -162,7 +161,7 @@ class CounterpoiseMatch(FittingSimulation):
         cpmm = array(cpmm)
         cpmm -= cpmm[-1] # This prevents craziness from happening
         # Write the results to a file for plotting
-        with open(os.path.join(self.root,self.tempdir,'results'),'w') as f: f.writelines(["% .4f % .4f\n" % (cpmm[i],self.cpqm[i]) for i in range(len(cpmm))])
+        with open('results','w') as f: f.writelines(["% .4f % .4f\n" % (cpmm[i],self.cpqm[i]) for i in range(len(cpmm))])
         # Compute the difference between MM and QM counterpoise corrections
         dcp  = cpmm - self.cpqm
         # Build the final answer and return it

@@ -41,9 +41,6 @@ class ForceEnergyMatch_Internal(ForceEnergyMatch):
         ## Initialize the SuperClass!
         super(ForceEnergyMatch_Internal,self).__init__(options,sim_opts,forcefield)
 
-    def prepare_temp_directory(self, options, sim_opts):
-        return
-
     def energy_force_driver_all(self):
         """ Here we actually compute the interactions and return the
         energies and forces. I verified this to give the same answer

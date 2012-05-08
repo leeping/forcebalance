@@ -1,0 +1,7 @@
+#include "water.itp"
+
+[ system ]
+Water
+
+[ molecules ]
+SOL 12

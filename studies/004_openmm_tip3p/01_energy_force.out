@@ -1,0 +1,236 @@
+[1;97m Welcome to ForceBalance version 0.11.0! =D[0m
+Reading options from file: 01_energy_force.in
+Reading force field from file: tip3p.xml
+
+###########################################################
+###[92m Starting parameter indices, physical values and IDs [0m###
+###########################################################
+   0 [  4.6275e+05 ] : HarmonicBondForce.Bond/k/OW.HW
+   1 [  9.5720e-02 ] : HarmonicBondForce.Bond/length/OW.HW
+   2 [  1.8242e+00 ] : HarmonicAngleForce.Angle/angle/HW.OW.HW
+   3 [  8.3680e+02 ] : HarmonicAngleForce.Angle/k/HW.OW.HW
+   4 [ -8.3400e-01 ] : NonbondedForce.Atom/charge/tip3p-O
+   5 [  6.3597e-01 ] : NonbondedForce.Atom/epsilon/tip3p-O
+   6 [  3.1508e-01 ] : NonbondedForce.Atom/sigma/tip3p-O
+   7 [  4.1700e-01 ] : NonbondedForce.Atom/charge/tip3p-H
+-----------------------------------------------------------
+
+##########################################################
+###[91m    Rescaling Factors (Lower Takes Precedence):     [0m###
+##########################################################
+   HarmonicAngleForce.Angle/k           : 8.36800e+02
+   NonbondedForce.Atom/epsilon          : 6.35968e-01
+   NonbondedForce.Atom/charge           : 1.00000e+00
+   HarmonicAngleForce.Angle/angle       : 5.00000e-01
+   NonbondedForce.Atom/sigma            : 1.00000e-01
+   HarmonicBondForce.Bond/length        : 1.00000e-02
+   HarmonicBondForce.Bond/k             : 4.62750e+05
+   NonbondedForce.Atom/charge           : 1.00000e+00
+   HarmonicAngleForce.Angle/angle       : 5.00000e-01
+   HarmonicBondForce.Bond/length        : 1.00000e-02
+   NonbondedForce.Atom/sigma            : 1.00000e-01
+----------------------------------------------------------
+Backing up: temp/Energy_Force to: backups/Energy_Force.7.tar.bz2
+
+##########################################################
+###[92m    Setup for fitting simulation Energy_Force :     [0m###
+##########################################################
+all_at_once               1 
+batch_fd                  0 
+covariance                0 
+efweight                  1.0 
+fd_ptypes                 ['all'] 
+fdgrad                    True 
+fdhess                    0 
+fdhessdiag                True 
+fitatoms                  0 
+name                      Energy_Force 
+qmboltz                   0.0 
+qmboltztemp               298.15 
+run_internal              1 
+sampcorr                  0 
+shots                     -1 
+simtype                   FORCEENERGYMATCH_OPENMM 
+use_pvals                 0 
+weight                    1.0 
+whamboltz                 0 
+wq_port                   9230 
+----------------------------------------------------------
+
+##########################################################
+###[92m                Setup for optimizer                 [0m###
+##########################################################
+adaptive_damping          0.5 
+adaptive_factor           0.5 
+backup                    1 
+convergence_gradient      0.0001 
+convergence_objective     0.0001 
+convergence_step          0.0001 
+eig_lowerbound            0.0001 
+ffdir                     forcefield 
+finite_difference_h       0.001 
+forcefield                ['tip3p.xml'] 
+gmxsuffix                  
+jobtype                   BFGS 
+maxstep                   100 
+penalty_additive          0.0 
+penalty_multiplicative    0.1 
+penalty_type              L2 
+priors                    {'NonbondedForce.Atom/charge': 1.0, 'HarmonicAngleForce.Angle/angle': 0.5, 'HarmonicBondForce.Bond/length': 0.01, 'NonbondedForce.Atom/sigma': 0.1} 
+root                      /home/leeping/src/forcebalance/studies/004_openmm_tip3p 
+scan_vals                 -1:1:11 
+scanindex_name            [] 
+scanindex_num             ['0', '1', '2', '3', '4', '5', '6', '7'] 
+trust0                    0.1 
+writechk_step             0 
+----------------------------------------------------------
+
+##########################################################
+###[1;97m                   Main Optimizer                   [0m###
+###[1;97m                     BFGS Mode                      [0m###
+##########################################################
+
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    13.1698 F_err(%)=    48.0824
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     0   0.000e+00   0.000e+00   1.849e+00[97m   3.73197e-01[0m   0.000e+00
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    12.2835 F_err(%)=    41.9948
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     1   1.000e-01   1.000e-01   1.436e+00[92m   3.24983e-01[0m   2.411e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    11.2758 F_err(%)=    33.9921
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     2   2.483e-01   1.500e-01   9.680e-01[92m   2.75271e-01[0m   3.998e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.4924 F_err(%)=    26.0861
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     3   4.447e-01   1.971e-01   5.254e-01[92m   2.41588e-01[0m   4.987e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.3401 F_err(%)=    24.7609
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     4   4.722e-01   4.072e-02   2.955e-01[92m   2.35235e-01[0m   5.236e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.2761 F_err(%)=    24.4059
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     5   4.861e-01   2.652e-02   1.230e-01[92m   2.32578e-01[0m   5.237e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.2587 F_err(%)=    24.0063
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     6   5.047e-01   2.934e-02   2.095e-01[92m   2.32326e-01[0m   5.133e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.2458 F_err(%)=    23.8749
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     7   5.119e-01   1.000e-02   5.693e-02[92m   2.31854e-01[0m   4.996e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.2414 F_err(%)=    23.8389
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     8   5.125e-01   1.001e-02   3.124e-02[92m   2.31653e-01[0m   4.850e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.2167 F_err(%)=    23.6761
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+     9   5.263e-01   6.408e-02   1.149e-01[92m   2.30814e-01[0m   4.709e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.1925 F_err(%)=    23.6759
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    10   5.455e-01   6.448e-02   1.557e-01[92m   2.30163e-01[0m   2.912e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.1528 F_err(%)=    23.7060
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    11   5.798e-01   8.658e-02   1.347e-01[92m   2.29237e-01[0m   1.316e-02
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.1106 F_err(%)=    23.7079
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    12   6.201e-01   8.180e-02   4.431e-02[92m   2.28435e-01[0m   3.558e-03
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0917 F_err(%)=    23.7263
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    13   6.429e-01   4.040e-02   1.804e-02[92m   2.28235e-01[0m   2.034e-03
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0844 F_err(%)=    23.7568
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    14   6.535e-01   1.765e-02   1.170e-02[92m   2.28206e-01[0m   1.645e-03
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0861 F_err(%)=    23.7758
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    15   6.505e-01   4.994e-03   1.431e-02[92m   2.28198e-01[0m   1.575e-03
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0869 F_err(%)=    23.7900
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    16   6.490e-01   3.237e-03   2.170e-03[92m   2.28192e-01[0m   1.422e-03
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0887 F_err(%)=    23.7822
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    17   6.461e-01   4.613e-03   1.541e-03[92m   2.28191e-01[0m   1.227e-03
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0896 F_err(%)=    23.7774
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    18   6.446e-01   2.345e-03   5.763e-04[92m   2.28190e-01[0m   9.157e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0907 F_err(%)=    23.7728
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    19   6.446e-01   2.982e-03   5.763e-04[91m   2.28191e-01[0m   9.157e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0903 F_err(%)=    23.7744
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    20   6.446e-01   1.988e-03   5.763e-04[91m   2.28190e-01[0m   9.157e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0901 F_err(%)=    23.7753
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    21   6.438e-01   1.325e-03   1.856e-04[92m   2.28190e-01[0m   6.276e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0897 F_err(%)=    23.7760
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    22   6.438e-01   8.868e-04   1.856e-04[91m   2.28190e-01[0m   6.276e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0899 F_err(%)=    23.7758
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    23   6.438e-01   5.912e-04   1.856e-04[91m   2.28190e-01[0m   6.276e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0899 F_err(%)=    23.7756
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    24   6.438e-01   3.941e-04   1.856e-04[91m   2.28190e-01[0m   6.276e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0900 F_err(%)=    23.7755
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    25   6.438e-01   2.628e-04   1.856e-04[91m   2.28191e-01[0m   6.276e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0900 F_err(%)=    23.7755
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    26   6.438e-01   1.752e-04   1.856e-04[91m   2.28190e-01[0m   6.276e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0900 F_err(%)=    23.7754
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    27   6.438e-01   1.168e-04   1.856e-04[91m   2.28191e-01[0m   6.276e-04
+Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forcesSim: Energy_Force    E_err(kJ/mol)=    10.0901 F_err(%)=    23.7754
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    28   6.438e-01   7.785e-05   1.856e-04[91m   2.28190e-01[0m   6.276e-04
+Convergence criterion reached in step size (1.00e-04)
+
+##########################################################
+###[1;94m               Final parameter values               [0m###
+###[1;94m           Paste to input file to restart           [0m###
+###[1;94m                Choose pvals or mvals               [0m###
+##########################################################
+read_pvals
+   0 [  4.6438e+05 ] : HarmonicBondForce.Bond/k/OW.HW
+   1 [  9.6178e-02 ] : HarmonicBondForce.Bond/length/OW.HW
+   2 [  1.8606e+00 ] : HarmonicAngleForce.Angle/angle/HW.OW.HW
+   3 [  4.2861e+02 ] : HarmonicAngleForce.Angle/k/HW.OW.HW
+   4 [ -8.1229e-01 ] : NonbondedForce.Atom/charge/tip3p-O
+   5 [  8.9048e-01 ] : NonbondedForce.Atom/epsilon/tip3p-O
+   6 [  3.0731e-01 ] : NonbondedForce.Atom/sigma/tip3p-O
+   7 [  4.0614e-01 ] : NonbondedForce.Atom/charge/tip3p-H
+/read_pvals
+read_mvals
+   0 [  3.5226e-03 ] : HarmonicBondForce.Bond/k/OW.HW
+   1 [  4.5751e-02 ] : HarmonicBondForce.Bond/length/OW.HW
+   2 [  7.2669e-02 ] : HarmonicAngleForce.Angle/angle/HW.OW.HW
+   3 [ -4.8780e-01 ] : HarmonicAngleForce.Angle/k/HW.OW.HW
+   4 [  0.0000e+00 ] : NonbondedForce.Atom/charge/tip3p-O
+   5 [  4.0020e-01 ] : NonbondedForce.Atom/epsilon/tip3p-O
+   6 [ -7.7662e-02 ] : NonbondedForce.Atom/sigma/tip3p-O
+   7 [ -5.4277e-02 ] : NonbondedForce.Atom/charge/tip3p-H
+/read_mvals
+----------------------------------------------------------

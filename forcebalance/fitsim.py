@@ -5,8 +5,9 @@ import os
 import subprocess
 import shutil
 import numpy as np
-from nifty import printcool_dictionary
+from nifty import col,printcool_dictionary, link_dir_contents
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
+from optimizer import Counter
 
 class FittingSimulation(object):
     
@@ -41,7 +42,7 @@ class FittingSimulation(object):
     variables apply to all types of fitting simulations.
 
     An important node: FittingSimulation requires that all subclasses
-    have a method get(self,mvals,AGrad=False,AHess=False,tempdir=None)
+    have a method get(self,mvals,AGrad=False,AHess=False)
     that does the following:
     
     Inputs: 
@@ -49,8 +50,6 @@ class FittingSimulation(object):
     (Note to self: We include mvals with each FitSim because we can create
     copies of the force field and do finite difference derivatives)
     AGrad, AHess = Boolean switches for computing analytic gradients and Hessians
-    tempdir      = Temporary directory; we can create multiple of these
-    for parallelization of our jobs (a future consideration)
 
     Outputs:
     Answer       = {'X': Number, 'G': numpy.array(np), 'H': numpy.array((np,np)) }
@@ -115,14 +114,19 @@ class FittingSimulation(object):
         ## Manual override: bypass the parameter transformation and use
         ## physical parameters directly.  For power users only! :)
         self.usepvals    = sim_opts['use_pvals']
+        ## Whether to make backup files
+        self.backup      = options['backup']
                                                                  
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## Relative directory of fitting simulation
         self.simdir      = os.path.join('simulations',self.name)
-        ## Temporary (working) directory
+        ## Temporary (working) directory; it is temp/(simulation_name)
+        ## Used for storing temporary variables that don't change through the course of the optimization
         self.tempdir     = os.path.join('temp',self.name)
+        ## The directory in which the simulation is running - this can be updated.
+        self.rundir      = self.tempdir
         ## Need the forcefield (here for now)
         self.FF          = forcefield
         ## Counts how often the objective function was computed
@@ -143,7 +147,7 @@ class FittingSimulation(object):
 
     def get_X(self,mvals=None):
         """Computes the objective function contribution without any parametric derivatives"""
-        Ans = self.get(mvals,0,0)
+        Ans = self.sget(mvals,0,0)
         self.xct += 1
         if Ans['X'] != Ans['X']:
             return {'X':1e10, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
@@ -159,15 +163,13 @@ class FittingSimulation(object):
         the gradient elements and diagonal Hessian elements at the same time
         using central difference if 'fdhessdiag' is turned on.
         """
-        Ans = self.get(mvals,1,0)
+        Ans = self.sget(mvals,1,0)
         for i in range(self.FF.np):
             if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
                 if self.fdhessdiag:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
                 elif self.fdgrad:
                     Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
-        # Additional call to build qualitative indicators
-        self.get(mvals,0,0)
         self.gct += 1
         return Ans
 
@@ -183,7 +185,7 @@ class FittingSimulation(object):
         Hessian elements by finite difference.  Forward finite difference is used
         throughout for the sake of speed.
         """
-        Ans = self.get(mvals,1,1)
+        Ans = self.sget(mvals,1,1)
         if self.fdhess:
             for i in range(self.FF.np):
                 if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
@@ -192,36 +194,45 @@ class FittingSimulation(object):
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
                     FDSlice = f1d2p(fdwrap_H(self,mvals,i),self.h,f0 = Ans['G'])
                     Ans['H'][i,:] = FDSlice
-                    Ans['H'][:,i] = FDSlice
+                    Ans['H'][:,i] = col(FDSlice.T)
         elif self.fdhessdiag:
             for i in range(self.FF.np):
-                Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h)
-        # This builds the qualitative indicators
-        ##@todo I really shouldn't call 'get' one extra time 
-        #self.get(mvals,0,0)
+                if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
+                    Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h)
         self.hct += 1
         return Ans
+    
+    def link_from_tempdir(self,absdestdir):
+        link_dir_contents(os.path.join(self.root,self.tempdir), absdestdir)
 
     def refresh_temp_directory(self):
         """ Back up the temporary directory if desired, delete it
         and then create a new one."""
         cwd = os.getcwd()
-        if not os.path.exists(os.path.join(self.root,'backups')):
-            os.makedirs(os.path.join(self.root,'backups'))
         abstempdir = os.path.join(self.root,self.tempdir)
-        if os.path.exists(abstempdir):
-            print "Backing up:", self.tempdir
-            os.chdir(os.path.join(self.root,"temp"))
-            # I could use the tarfile module here
-            subprocess.call(["tar","cjf",os.path.join(self.root,'backups',"%s.tar.bz2" % self.name),self.name,"--remove-files"])
-            os.chdir(cwd)
+        if self.backup:
+            if not os.path.exists(os.path.join(self.root,'backups')):
+                os.makedirs(os.path.join(self.root,'backups'))
+            if os.path.exists(abstempdir):
+                os.chdir(os.path.join(self.root,"temp"))
+                FileCount = 0
+                while True:
+                    CandFile = os.path.join(self.root,'backups',"%s.%i.tar.bz2" % (self.name,FileCount))
+                    if os.path.exists(CandFile):
+                        FileCount += 1
+                    else:
+                        # I could use the tarfile module here
+                        print "Backing up:", self.tempdir, 'to:', "backups/%s.%i.tar.bz2" % (self.name,FileCount)
+                        subprocess.call(["tar","cjf",CandFile,self.name,"--remove-files"])
+                        break
+                os.chdir(cwd)
         # Delete the temporary directory
         shutil.rmtree(abstempdir,ignore_errors=True)
         # Create a new temporary directory from scratch
         os.makedirs(abstempdir)
 
     @abc.abstractmethod
-    def get(self,mvals,AGrad=False,AHess=False,tempdir=None):
+    def get(self,mvals,AGrad=False,AHess=False):
 
         """ 
         
@@ -233,3 +244,34 @@ class FittingSimulation(object):
         """
         
         raise NotImplementedError('The get method is not implemented in the FittingSimulation base class')
+
+    def sget(self, mvals, AGrad=False, AHess=False, customdir=None):
+        """ 
+
+        Stages the directory for the fitting simulation, and then calls 'get'.
+        The 'get' method should not worry about the directory that it's running in.
+        
+        """
+        ## Directory of the current iteration; if not None, then the simulation runs under
+        ## temp/simulation_name/iteration_number
+        ## The 'customdir' is customizable and can go below anything
+        cwd = os.getcwd()
+        
+        absgetdir = os.path.join(self.root,self.tempdir)
+        if Counter() is not None:
+            # Not expecting more than ten thousand iterations
+            iterdir = "iter_%04i" % Counter()
+            absgetdir = os.path.join(absgetdir,iterdir)
+        if customdir is not None:
+            absgetdir = os.path.join(absgetdir,customdir)
+
+        if not os.path.exists(absgetdir):
+            os.makedirs(absgetdir)
+        os.chdir(absgetdir)
+        self.link_from_tempdir(absgetdir)
+        self.rundir = absgetdir.replace(self.root+'/','')
+
+        Answer = self.get(mvals, AGrad, AHess)
+        os.chdir(cwd)
+        
+        return Answer

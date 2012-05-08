@@ -1,0 +1,34 @@
+$options
+jobtype bfgs
+gmxpath /home/leeping/opt/gromacs-4.5.5/bin
+forcefield water.itp
+penalty_additive       0.0
+penalty_multiplicative 0.01
+backup
+$end
+
+$simulation
+simtype forceenergymatch_gmx
+name water12_sixpt
+weight 1
+efweight 0.5
+shots 300
+fd_ptypes ALL
+fdgrad 0
+fdhess 0
+fdhessdiag 1
+covariance 0
+$end
+
+$simulation
+simtype forceenergymatch_gmx
+name water12_fourpt
+weight 1
+efweight 0.5
+shots 300
+fd_ptypes ALL
+fdgrad 0
+fdhess 0
+fdhessdiag 1
+covariance 0
+$end

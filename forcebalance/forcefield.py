@@ -438,7 +438,7 @@ class FF(object):
                                     "but the source parameter does not seem to exist!"])
                 self.assign_field(self.map[dest],ffname,fflist.index(e),dest.split('/')[1],1)
             
-    def make(self,printdir,vals,usepvals):
+    def make(self,vals,usepvals,printdir=None):
         """ Create a new force field using provided parameter values.
         
         This big kahuna does a number of things:
@@ -480,14 +480,20 @@ class FF(object):
                     sline[fld]  = "% .12e" % (mult*pvals[i])
                     newffdata[fnm][ln] = ''.join([whites[j]+sline[j] for j in range(len(sline))])+'\n'
 
-        if not os.path.exists(os.path.join(self.root,printdir)):
-            os.makedirs(os.path.join(self.root,printdir))
+        if printdir != None:
+            absprintdir = os.path.join(self.root,printdir)
+        else:
+            absprintdir = os.getcwd()
+
+        if not os.path.exists(absprintdir):
+            print 'Creating the directory %s to print the force field' % absprintdir
+            os.makedirs(absprintdir)
 
         for fnm in newffdata:
             if type(newffdata[fnm]) is etree._ElementTree:
-                with open(os.path.join(self.root,printdir,fnm),'w') as f: newffdata[fnm].write(f)
+                with open(os.path.join(absprintdir,fnm),'w') as f: newffdata[fnm].write(f)
             else:
-                with open(os.path.join(self.root,printdir,fnm),'w') as f: f.writelines(newffdata[fnm])
+                with open(os.path.join(absprintdir,fnm),'w') as f: f.writelines(newffdata[fnm])
         return pvals
         
     def create_pvals(self,mvals):

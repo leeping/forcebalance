@@ -1,0 +1,7 @@
+       Study           Software Required
+001_water12_tip4p      GROMACS-X2 (except for 05_plaingmx.in)
+002_water12_qtpie      GROMACS-X2
+003_amoeba             TINKER
+004_openmm_tip3p       OpenMM
+005_openmm_amoeba      OpenMM
+006_tip3p_internal     None (but the system is hard-coded)

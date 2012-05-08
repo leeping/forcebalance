@@ -78,7 +78,7 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         ## Put stuff for GROMACS-X2 into the temp directory.
         #self.prepare_gmxx2()
         
-    def prepare_temp_directory(self,options,sim_opts,tempdir=None):
+    def prepare_temp_directory(self,options,sim_opts):
         """ Prepare the temporary directory for running the modified GROMACS.
 
         This method creates the temporary directory, links in the
@@ -101,14 +101,10 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         - ztemp     : Template for Z-matrix coordinates (for internal coordinate forces)
         - pids      : Information for building interaction name -> parameter number hashtable
 
-        @param[in] tempdir The temporary directory to be prepared.
         @todo Someday I'd like to use WHAM to put AIMD simulations in. :)
         @todo The fitatoms shouldn't be the first however many atoms, it should be a list.
 
         """
-        if tempdir == None:
-            tempdir = self.tempdir
-        # Create the temporary directory
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
@@ -165,7 +161,7 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         print >> pidsfile
         pidsfile.close()
         
-    def get(self,mvals,AGrad=False,AHess=False,tempdir=None):
+    def get(self,mvals,AGrad=False,AHess=False):
         """ Calls the modified GROMACS and collects the objective function contribution.
 
         First we create the force field using the parameter values that were
@@ -189,7 +185,6 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         @param[in] mvals Mathematical parameter values
         @param[in] AGrad Switch to turn on analytic gradient
         @param[in] AHess Switch to turn on analytic Hessian
-        @param[in] tempdir Temporary directory for running computation
         @return Answer Contribution to the objective function
 
         @todo Some of these files don't need to be printed, they can be passed
@@ -197,14 +192,11 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         @todo Currently I have no way to pass out the qualitative indicators.
 
         """
-        if tempdir == None:
-            tempdir = self.tempdir
         Answer = {}
         cwd = os.getcwd()
         # Create the new force field!!
-        pvals = self.FF.make(tempdir,mvals,self.usepvals)
-        gmxx2_print(os.path.join(os.path.join(self.root,tempdir,"pvals")),append([0],pvals),"double")
-        os.chdir(os.path.join(self.root,tempdir))
+        pvals = self.FF.make(mvals,self.usepvals)
+        gmxx2_print("pvals",append([0],pvals),"double")
         if AHess:
             AGrad = True
             remove_if_exists("FirstDerivativesOnly")
@@ -214,7 +206,7 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
             remove_if_exists("NoDerivatives")
         else:
             with open("NoDerivatives",'w') as f: f.close()
-        print "GMXX2: %s\r" % tempdir,
+        print "GMXX2: %s\r" % self.name,
         self.callgmxx2()
         # Parse the output files
         for line in open('e2f2bc').readlines():
@@ -250,7 +242,6 @@ class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
         else:
             H = mat(self.FF.tm)*mat(HR.copy())*mat(self.FF.tmI)                       # Projects charge constraints out of second derivative
             Answer['H'] = H
-        os.chdir(cwd)
         return Answer
     
     def callgmxx2(self):

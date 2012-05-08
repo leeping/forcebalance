@@ -11,7 +11,7 @@ if [[ $HOSTNAME =~ "leeping" ]] ; then
     export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/lib:$LD_LIBRARY_PATH
     export INCLUDE=$CUDA_HOME/include:$INCLUDE
 elif [[ $HOSTNAME =~ "fire" ]] ; then
-    module load cuda
+    module load cuda/4.1-experimental
     #export CUDA_HOME=/opt/CUDA/4.0
     #export PATH=$CUDA_HOME/bin:$PATH
     #export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/lib:$LD_LIBRARY_PATH
@@ -28,18 +28,21 @@ elif [[ $HOSTNAME =~ "kid" ]] ; then
     export INCLUDE=$CUDA_HOME/include:$INCLUDE
 elif [[ $HOSTNAME =~ "icme-gpu" || $HOSTNAME =~ "node0" ]] ; then
     module load gcc/4.4.6
-    module load cuda40/toolkit/4.0.17
+    module load cuda41/toolkit/4.1.28
 fi
 
-echo "#########################"
+echo "#=======================#"
 echo "# ENVIRONMENT VARIABLES #"
-echo "#########################"
+echo "#=======================#"
+echo
 
 set
 
-echo "#########################"
+echo
+echo "#=======================#"
 echo "# STARTING CALCULATION! #"
-echo "#########################"
+echo "#=======================#"
+echo
 
 time $@
 

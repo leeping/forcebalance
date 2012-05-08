@@ -134,6 +134,8 @@ class ForceEnergyMatch_TINKER(ForceEnergyMatch):
         self.trajfnm = "all.arc"
         ## Initialize the SuperClass!
         super(ForceEnergyMatch_TINKER,self).__init__(options,sim_opts,forcefield)
+        ## all_at_once is not implemented.
+        self.all_at_once = False
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
@@ -142,7 +144,8 @@ class ForceEnergyMatch_TINKER(ForceEnergyMatch):
         # Link the run parameter file
         os.symlink(os.path.join(self.root,self.simdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
 
-    def energy_force_driver(self):
+    def energy_force_driver(self, shot):
+        self.traj.write("shot.arc",subset=[shot])
         # This line actually runs TINKER
         o, e = Popen(["./testgrad","shot.arc",self.FF.fnms[0],"y","n"],stdout=PIPE,stderr=PIPE).communicate()
         # Read data from stdout and stderr, and convert it to GROMACS

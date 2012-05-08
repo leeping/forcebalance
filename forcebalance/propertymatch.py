@@ -40,7 +40,7 @@ class PropertyMatch(FittingSimulation):
         ## The number of true atoms 
         self.natoms      = 0
         ## Prepare the temporary directory
-        self.prepare_temp_directory(options,sim_opts,forcefield)
+        self.prepare_temp_directory(options,sim_opts)
 
         #======================================#
         #          UNDER DEVELOPMENT           #
@@ -48,10 +48,11 @@ class PropertyMatch(FittingSimulation):
         # Put stuff here that I'm not sure about. :)
             
     def indicate(self):
-        print "Placeholder for the density error and stuff. :)"
+        return
+        #print "Placeholder for the density error and stuff. :)"
         #print "Sim: %-15s E_err(kJ/mol)= %10.4f F_err(%%)= %10.4f" % (self.name, self.e_err, self.f_err*100)
 
-    def objective_term(self,temps, exp, calc, std, grad, fitorder, name="Quantity"):
+    def objective_term(self,temps, exp, calc, std, grad, fitorder, name="Quantity", verbose = False):
         # Assuming all uncertainties equal for now. :P
         Uncerts = {}
         for i in exp:
@@ -92,14 +93,16 @@ class PropertyMatch(FittingSimulation):
                 DRho = calc[T] - exp[T]
             ThisObj = Weights[T] * DRho ** 2 / Denom
             ThisGrad = 2.0 * Weights[T] * DRho * G / Denom
-            bar = printcool("%s at %.1f :%s Objective = % .3f, Gradient:" % (name, T, ' Smoothed' if FitFitted else '', ThisObj))
-            self.FF.print_map(vals=ThisGrad)
+            if verbose:
+                bar = printcool("%s at %.1f :%s Objective = % .3f, Gradient:" % (name, T, ' Smoothed' if FitFitted else '', ThisObj))
+                self.FF.print_map(vals=ThisGrad)
+            else:
+                print "%s at %.1f contributes % .3f to the objective function" % (name, T, ThisObj)
             Objective += ThisObj
             Gradient += ThisGrad
             # The second derivatives are inaccurate; we estimate the objective function Hessian using first derivatives.
             # If we had a good Hessian estimate the formula would be: 2.0 * Weights[T] * (np.outer(G, G) + DRho * np.diag(Hd))
             Hessian += 2.0 * Weights[T] * (np.outer(G, G)) / Denom
-        print bar
 
         Delta = np.array([calc[T] - exp[T] for T in temps])
         Defit = np.array([cfit[T] - exp[T] for T in temps])
@@ -108,7 +111,7 @@ class PropertyMatch(FittingSimulation):
         print_out = {'    %8.3f' % T:"%9.3f   %9.3f +- %-7.3f % 7.3f  %9.3f  % 7.3f" % (exp[T],calc[T],std[T],delt[T],cfit[T],dfit[T]) for T in calc}
         return Objective, Gradient, Hessian, print_out
 
-    def get(self, mvals, AGrad=True, AHess=True, tempdir=None):
+    def get(self, mvals, AGrad=True, AHess=True):
         
         """
         Fitting of experimental properties.  This is the current major
@@ -138,22 +141,15 @@ class PropertyMatch(FittingSimulation):
         @param[in] mvals Mathematical parameter values
         @param[in] AGrad Switch to turn on analytic gradient
         @param[in] AHess Switch to turn on analytic Hessian
-        @param[in] tempdir Temporary directory for running computation
         @return Answer Contribution to the objective function
         
         """
 
         print "get has been called with mvals = ", mvals
 
-        if tempdir == None:
-            tempdir = self.tempdir
-        abstempdir = os.path.join(self.root,self.tempdir)
         Answer = {}
-        cwd = os.getcwd()
-        # Go into the temporary directory
-        os.chdir(os.path.join(self.root,tempdir))
         # Dump the force field to a pickle file
-        with open(os.path.join(self.root,tempdir,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h),f)
+        with open('forcebalance.p','w') as f: lp_dump((self.FF,mvals,self.h),f)
 
         # Reference densities from the CRC Handbook. :P
         Rho_exp = {273.2 : 999.84300, 274.2 : 999.90170, 275.4 : 999.94910, 
@@ -205,6 +201,8 @@ class PropertyMatch(FittingSimulation):
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density")
         X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap")
 
+        Gradient = np.zeros(self.FF.np, dtype=float)
+        Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
         Objective = X_Rho + X_Hvap
         if AGrad:
             Gradient = G_Rho + G_Hvap
@@ -222,6 +220,5 @@ class PropertyMatch(FittingSimulation):
         print bar
         
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
-        os.chdir(cwd)
         return Answer
 

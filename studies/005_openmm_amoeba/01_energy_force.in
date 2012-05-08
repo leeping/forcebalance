@@ -81,32 +81,8 @@ shots -1
 # (bool) Finite difference gradients
 fdgrad 1
 
-# (bool) Finite difference Hessian diagonals (costs np times a gradient calculation)
-fdhess 1
-
 # (bool) Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)
 fdhessdiag 1
-
-# (bool) Whether to batch and queue up finite difference jobs, defaults to False
-batch_fd 0
-
-# (bool) Whether to use the quantum covariance matrix (force+energy match), defaults to True
-covariance 0
-
-# (bool) Bypass the transformation matrix and use the physical parameters directly
-use_pvals 0
-
-# (bool) Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False
-whamboltz 0
-
-# (bool) Whether to use the (archaic) sampling correction (force+energy match), defaults to False
-sampcorr 0
-
-# (float) Fraction of Quantum Boltzmann Weights (force+energy match), 1.0 for full reweighting, 0.0 < 1.0 for hybrid
-qmboltz 0.0
-
-# (float) Temperature for Quantum Boltzmann Weights (force+energy match), defaults to room temperature
-qmboltztemp 298.15
 
 # (float) 1.0 for all energy and 0.0 for all force (force+energy match), defaults to 0.5
 efweight 0.5

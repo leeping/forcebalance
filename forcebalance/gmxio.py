@@ -357,6 +357,10 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         # Link the run files
         os.symlink(os.path.join(self.root,self.simdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
         os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
+        # Write the trajectory to the temp-directory
+        self.traj.write(os.path.join(abstempdir,"all.gro"),subset=range(self.ns))
+        # Print out the first conformation in all.gro to use as conf.gro
+        self.traj.write(os.path.join(abstempdir,"conf.gro"),subset=[0])
 
     def energy_force_driver(self, shot):
         """ Computes the energy and force using GROMACS for a single
@@ -375,4 +379,25 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         E = [float(open("energy.xvg").readlines()[0].split()[1])]
         F = [float(i) for i in open("force.xvg").readlines()[0].split()[1:] if float(i) != 0.0]
         M = array(E + F)
+        return M
+
+    def energy_force_driver_all(self):
+        """ Computes the energy and force using GROMACS for a trajectory.  This does not require GROMACS-X2. """
+        # Remove backup files.
+        rm_gmx_baks(os.getcwd())
+        # Call grompp followed by mdrun.
+        o, e = Popen(["./grompp", "-f", "shot.mdp"],stdout=PIPE,stderr=PIPE).communicate()
+        o, e = Popen(["./mdrun", "-o", "shot.trr", "-rerunvsite", "-rerun", "all.gro"], stdout=PIPE, stderr=PIPE).communicate()
+        # Gather information
+        o, e = Popen(["./g_energy","-xvg","no"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('Potential')
+        o, e = Popen(["./g_traj","-xvg","no","-f","shot.trr","-of","force.xvg","-fp"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('System')
+        M = []
+        Efile = open("energy.xvg").readlines()
+        Ffile = open("force.xvg").readlines()
+        # Loop through the snapshots
+        for Eline, Fline in zip(Efile, Ffile):
+            # Compute the potential energy and append to list
+            Energy = [float(Eline.split()[1])]
+            Force = [float(i) for i in Fline.split()[1:] if float(i) != 0.0]
+            M.append(array(Energy + Force))
         return M

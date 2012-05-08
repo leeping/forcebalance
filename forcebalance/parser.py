@@ -83,7 +83,9 @@ gen_opts_types = {
                  "eig_lowerbound"         : (1e-4, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
                  "finite_difference_h"    : (1e-2, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
                  "penalty_additive"       : (0.0, 'Factor for additive penalty function in objective function'),
-                 "penalty_multiplicative" : (0.1, 'Factor for multiplicative penalty function in objective function')
+                 "penalty_multiplicative" : (0.1, 'Factor for multiplicative penalty function in objective function'),
+                 "adaptive_factor"        : (0.5, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.'),
+                 "adaptive_damping"       : (0.5, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.')
                  },
     'sections': {"read_mvals" : (None, 'Paste mathematical parameters into the input file for them to be read in directly'),
                  "read_pvals" : (None, 'Paste physical parameters into the input file for them to be read in directly'),
@@ -113,10 +115,10 @@ sim_opts_types = {
                  },
     'bools'   : {"whamboltz"  : (0, 'Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False'),
                  "sampcorr"   : (0, 'Whether to use the (archaic) sampling correction (force+energy match), defaults to False'),
-                 "covariance" : (0, 'Whether to use the quantum covariance matrix (force+energy match), defaults to True'),
+                 "covariance" : (0, 'Whether to use the quantum covariance matrix (force+energy match), defaults to False'),
                  "batch_fd"   : (0, 'Whether to batch and queue up finite difference jobs, defaults to False'),
                  "fdgrad"     : (1, 'Finite difference gradients'),
-                 "fdhess"     : (1, 'Finite difference Hessian diagonals (costs np times a gradient calculation)'),
+                 "fdhess"     : (0, 'Finite difference Hessian diagonals (costs np times a gradient calculation)'),
                  "fdhessdiag" : (1, 'Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)'),
                  "use_pvals"  : (0, 'Bypass the transformation matrix and use the physical parameters directly'),
                  "all_at_once": (1, 'Compute all energies and forces in one fell swoop (as opposed to calling the simulation code once per snapshot)'),

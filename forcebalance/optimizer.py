@@ -15,6 +15,14 @@ from nifty import col, flat, row, printcool, printcool_dictionary
 from finite_difference import f1d7p, f1d5p, fdwrap
 import random
 
+# Global variable corresponding to the iteration number.  This allows the
+# Main Optimizer to 
+ITERATION_NUMBER = None
+
+def Counter():
+    global ITERATION_NUMBER
+    return ITERATION_NUMBER
+
 class Optimizer(object):
     """ Optimizer class.  Contains several methods for numerical optimization.
 
@@ -37,6 +45,8 @@ class Optimizer(object):
         
         ## A list of all the things we can ask the optimizer to do.
         self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
+                          'NEWTON'            : self.NewtonRaphson, 
+                          'NR'                : self.NewtonRaphson, 
                           'BFGS'              : self.BFGS,
                           'POWELL'            : self.Powell,
                           'SIMPLEX'           : self.Simplex,
@@ -85,6 +95,10 @@ class Optimizer(object):
         self.wchk_fnm  = options['writechk']
         ## Whether to write the checkpoint file at every step
         self.wchk_step = options['writechk_step']
+        ## Adaptive trust radius adjustment factor
+        self.adapt_fac  = options['adaptive_factor']
+        ## Adaptive trust radius adjustment damping
+        self.adapt_damp = options['adaptive_damping']
         
         #======================================#
         #     Variables which are set here     #
@@ -142,21 +156,22 @@ class Optimizer(object):
             self.FF.print_map(xk)
             print "/read_mvals"
             print bar
-            self.FF.make('result',xk,False)
+            self.FF.make(xk,False,'result')
 
         ## Write out stuff to checkpoint file
         self.writechk()
             
     def MainOptimizer(self,b_BFGS=0):
-        """ The main ForceBalance trust-radius optimizer.
+        """ The main ForceBalance adaptive trust-radius pseudo-Newton optimizer.  Tried and true in many situations. :)
 
         Usually this function is called with the BFGS or NewtonRaphson
         method.  I've found the BFGS method to be most efficient,
         especially when we don't have access to the expensive analytic
-        second derivatives of the objective function.  If we are computing
-        derivatives by finite difference (which we often do), then the
-        diagonal elements of the second derivative can also be obtained
-        by taking a central difference.
+        second derivatives of the objective function.  If we are
+        computing derivatives by of the objective function by finite
+        difference (which we often do), then the diagonal elements of
+        the second derivative can also be obtained by taking a central
+        difference.
 
         BFGS is a pseudo-Newton method in the sense that it builds an
         approximate Hessian matrix from the gradient information in previous
@@ -178,10 +193,9 @@ class Optimizer(object):
         """
         printcool( "Main Optimizer\n%s Mode" % ("BFGS" if b_BFGS else "Newton-Raphson"), color=7, bold=1)
         # First, set a bunch of starting values
-        #Ord         = 1 if b_BFGS else 2
-        ## @todo I need to accommodate the use case:
-        ## BFGS update but with Hessian elements still. :P
-        Ord         = 2
+        Ord         = 1 if b_BFGS else 2
+        global ITERATION_NUMBER
+        ITERATION_NUMBER = 0
         if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
             print "Reading initial objective, gradient, Hessian from checkpoint file"
             xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
@@ -191,6 +205,9 @@ class Optimizer(object):
             print
             data     = self.Objective(xk,Ord,verbose=True)
             X, G, H  = data['X'], data['G'], data['H']
+            # print "Computed G and H are equal to:"
+            # print G
+            # print H
             ehist    = np.array([X])
             xk_prev  = xk.copy()
             trust    = self.trust0
@@ -201,7 +218,12 @@ class Optimizer(object):
         stepn  = 0
         ndx    = 0.0
         color  = "\x1b[97m"
+
+        # Parameters for the adaptive trust radius
+        a = self.adapt_fac  # Default value is 0.5, decrease to make more conservative
+        b = self.adapt_damp # Default value is 0.5, increase to make more conservative
         while 1: # Loop until convergence is reached.
+            ITERATION_NUMBER += 1
             ## Put data into the checkpoint file
             self.chk = {'xk': xk, 'X' : X, 'G' : G, 'H': H, 'ehist': ehist,
                         'x_best': X_best,'xk_prev': xk_prev, 'trust': trust}
@@ -226,11 +248,17 @@ class Optimizer(object):
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             # Take a step in the parameter space.
+            # print "Taking a step using the following for G and H:"
+            # print G
+            # print H
             dx, over = self.step(G, H, trust)
             xk += dx
             # Evaluate the objective function and its derivatives.
             data        = self.Objective(xk,Ord,verbose=True)
             X, G, H = data['X'], data['G'], data['H']
+            # print "Computed G and H are equal to:"
+            # print G
+            # print H
             # if pkg.efweight > 0.99:
             #     dFc, patomax = cartesian_dforce(pkg)
             ndx = norm(dx)
@@ -238,7 +266,7 @@ class Optimizer(object):
                 goodstep = False
                 color = "\x1b[91m"
                 # Decrease the trust radius and take a step back, if the step was bad.
-                trust = ndx*0.667
+                trust = ndx*(1./(1+a))
                 xk = xk_prev.copy()
                 # Hmm, we don't want to take a step at the "old" xk but with the "new" G and H, now do we?
                 G = G_prev.copy()
@@ -247,37 +275,29 @@ class Optimizer(object):
                 goodstep = True
                 color = "\x1b[92m"
                 # Adjust the trust radius using this funky formula
-                # Very conservative.  Multiplier is 1.5 and decreases to 1.1 when trust=4trust0
-                trust += over and 0.5*trust*np.exp(-0.5*(trust/self.trust0 - 1)) or 0
+                # Conservative.  Multiplier is 1.5 and decreases to 1.1 when trust=4trust0
+                trust += over and a*trust*np.exp(-b*(trust/self.trust0 - 1)) or 0
                 X_best = X
                 # So here's the deal.  I'm getting steepest-descent badness in some of the parameters (e.g. virtual site positions)
                 # The solution would be to build up a BFGS quasi-Hessian but only in that parameter block, since we have exact second
                 # derivatives for everything else.  I will leave the cross-terms alone.
-                Hnew = np.mat(H.copy())
                 if b_BFGS:
                     Hnew = H_stor.copy()
-                # for i in range(xk.shape[0]):
-                #     for j in range(xk.shape[0]):
-                #         if b_BFGS:
-                #             Hnew[i,j] = H_stor[i,j]
-                Dx   = col(xk - xk_prev)
-                Dy   = col(G  - G_prev)
-                Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
-                Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
-                Hnew += Mat1-Mat2
-                # After that bit of trickery, Hnew is now updated with BFGS stuff.
-                # We now want to put the BFGS-gradients into the Hessian that will be used to take the step.
-                if b_BFGS:
+                    Dx   = col(xk - xk_prev)
+                    Dy   = col(G  - G_prev)
+                    Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
+                    Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
+                    Hnew += Mat1-Mat2
+                    # After that bit of trickery, Hnew is now updated with BFGS stuff.
+                    # We now want to put the BFGS-gradients into the Hessian that will be used to take the step.
                     H = Hnew.copy()
-                # for i in range(xk.shape[0]):
-                #     for j in range(xk.shape[0]):
-                #         if b_BFGS:
-                #             H[i,j] = Hnew[i,j]
                 G_prev = G.copy()
                 H_stor = H.copy()
-                # End BFGS stuff
                 xk_prev = xk.copy()
                 ehist = np.append(ehist, X)
+            # print "At the end of the loop, G and H are equal to:"
+            # print G
+            # print H
             drc = abs(flat(dx)).argmax()
             stepn += 1
             

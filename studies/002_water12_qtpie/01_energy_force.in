@@ -1,12 +1,11 @@
 $options
-jobtype fdcheckH
+jobtype bfgs
 gmxpath /home/leeping/opt/gromacs-4.0.7-x2/bin
 forcefield water.itp
 penalty_additive       0.0
-penalty_multiplicative 0.01
-convergence_objective 1e-6
-convergence_step 1e-6
+penalty_multiplicative 0.1
 backup
+finite_difference_h 1e-4
 $end
 
 $simulation

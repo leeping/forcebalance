@@ -1,0 +1,146 @@
+[1;97m Welcome to ForceBalance version 0.11.0! =D[0m
+Reading options from file: 02_test_gradient.in
+Reading force field from file: water.itp
+
+###########################################################
+###[92m Starting parameter indices, physical values and IDs [0m###
+###########################################################
+   0 [  9.9036e-01 ] : VPAIR_BHAMAHH
+   1 [  4.5984e-03 ] : VPAIR_BHAMBHH
+   2 [  8.9568e+00 ] : VPAIR_BHAMCHH
+   3 [  2.9294e-01 ] : VPAIR_BHAMAHO
+   4 [  1.5890e+00 ] : VPAIR_BHAMBHO
+   5 [  4.9863e+00 ] : VPAIR_BHAMCHO
+   6 [  3.6306e-01 ] : VPAIR_BHAMAOO
+   7 [  1.0790e+00 ] : VPAIR_BHAMBOO
+   8 [  1.3171e+01 ] : VPAIR_BHAMCOO
+   9 [  1.0247e-01 ] : MORSEBHO
+  10 [  1.8287e+02 ] : MORSECHO
+  11 [  2.8221e+01 ] : MORSEEHO
+  12 [  1.1305e+02 ] : UREY_BRADLEYTHOH
+  13 [  4.0307e+02 ] : UREY_BRADLEYK1HOH
+  14 [  3.5815e-02 ] : UREY_BRADLEYBHOH
+  15 [  6.1945e+03 ] : UREY_BRADLEYK2HOH
+  16 [ -1.1409e+00 ] : QTPIEC1
+  17 [  1.8085e+01 ] : QTPIEH1
+  18 [  3.5945e-01 ] : QTPIEA1
+  19 [  4.1358e+00 ] : QTPIEC2
+  20 [  1.1191e+01 ] : QTPIEH2
+  21 [  3.2720e-01 ] : QTPIEA2
+  22 [  4.5426e+00 ] : QTPIEC3
+  23 [  1.1559e+01 ] : QTPIEH3
+  24 [  3.2210e-01 ] : QTPIEA3
+  25 [  2.5942e-01 ] : VSITE3B4 VSITE3A4
+  26 [  1.1205e-01 ] : VSITE3OUTB6 VSITE3OUTB5 VSITE3OUTA6 VSITE3OUTA5
+  27 [ -2.2392e+00 ] : VSITE3OUTC6 VSITE3OUTC5
+-----------------------------------------------------------
+
+##########################################################
+###[91m    Rescaling Factors (Lower Takes Precedence):     [0m###
+##########################################################
+   QTPIEC                               : 2.72114e+01
+   VSITE3OUTA                           : 5.29177e-02
+   VSITE3OUTB                           : 5.29177e-02
+   VSITE3OUTC                           : 5.29177e-02
+   QTPIEH                               : 2.72114e+01
+   MORSEE                               : 1.88973e+01
+   UREY_BRADLEYB                        : 5.29177e-02
+   VPAIR_BHAMA                          : 5.29177e-02
+   VPAIR_BHAMB                          : 2.47894e+00
+   VPAIR_BHAMC                          : 1.00000e+00
+   MORSEC                               : 9.64853e+01
+   MORSEB                               : 5.29177e-02
+   VSITE3A                              : 5.29177e-02
+   VSITE3B                              : 5.29177e-02
+   QTPIEA                               : 1.00000e+00
+   UREY_BRADLEYK2                       : 9.37583e+05
+   UREY_BRADLEYK1                       : 6.05928e+02
+   UREY_BRADLEYT                        : 1.13049e+02
+----------------------------------------------------------
+Backing up: temp/water12_sixpt to: backups/water12_sixpt.4.tar.bz2
+
+##########################################################
+###[92m    Setup for fitting simulation water12_sixpt :    [0m###
+##########################################################
+all_at_once               1 
+batch_fd                  0 
+covariance                False 
+efweight                  0.5 
+fd_ptypes                 ['VSITE'] 
+fdgrad                    False 
+fdhess                    False 
+fdhessdiag                True 
+fitatoms                  0 
+name                      water12_sixpt 
+qmboltz                   0.0 
+qmboltztemp               298.15 
+run_internal              1 
+sampcorr                  0 
+shots                     300 
+simtype                   FORCEENERGYMATCH_GMXX2 
+use_pvals                 0 
+weight                    1.0 
+whamboltz                 0 
+wq_port                   9230 
+----------------------------------------------------------
+
+##########################################################
+###[92m                Setup for optimizer                 [0m###
+##########################################################
+adaptive_damping          0.5 
+adaptive_factor           0.5 
+backup                    True 
+convergence_gradient      0.0001 
+convergence_objective     0.0001 
+convergence_step          0.0001 
+eig_lowerbound            0.0001 
+ffdir                     forcefield 
+finite_difference_h       0.0001 
+forcefield                ['water.itp'] 
+gmxpath                   /home/leeping/opt/gromacs-4.0.7-x2/bin 
+gmxsuffix                  
+jobtype                   FDCHECKG 
+maxstep                   100 
+penalty_additive          0.0 
+penalty_multiplicative    0.1 
+penalty_type              L2 
+priors                    {} 
+root                      /home/leeping/src/forcebalance/studies/002_water12_qtpie 
+scanindex_name            [] 
+scanindex_num             [] 
+trust0                    0.01 
+writechk_step             0 
+----------------------------------------------------------
+GMXX2: water12_sixptfdwrap: get_X [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: get_X [27] =  1.0e-04 GMXX2: water12_sixpt
+########################################################################################
+###[1;95m                 Checking first derivatives by finite difference!                 [0m###
+###[1;95m Index   Parameter ID             Analytic    Numerical   Difference   Fractional [0m###
+########################################################################################
+fdwrap: Objective [0] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [0] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [0] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [0] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [0] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [0] =  3.0e-04 GMXX2: water12_sixpt    0       VPAIR_BHAMAHH          7.4276e-04   7.4278e-04[92m  -2.5840e-08[93m  -3.4788e-05[0m
+fdwrap: Objective [1] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [1] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [1] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [1] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [1] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [1] =  3.0e-04 GMXX2: water12_sixpt    1       VPAIR_BHAMBHH          1.9356e+00   1.9356e+00[92m  -6.6563e-08[92m  -3.4388e-08[0m
+fdwrap: Objective [2] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [2] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [2] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [2] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [2] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [2] =  3.0e-04 GMXX2: water12_sixpt    2       VPAIR_BHAMCHH          1.8000e-03   1.7999e-03[92m   3.9572e-08[93m   2.1985e-05[0m
+fdwrap: Objective [3] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [3] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [3] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [3] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [3] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [3] =  3.0e-04 GMXX2: water12_sixpt    3       VPAIR_BHAMAHO          6.4223e-05   6.4154e-05[92m   6.8882e-08[93m   1.0725e-03[0m
+fdwrap: Objective [4] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [4] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [4] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [4] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [4] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [4] =  3.0e-04 GMXX2: water12_sixpt    4       VPAIR_BHAMBHO          5.4393e-03   5.4394e-03[92m  -2.7932e-08[92m  -5.1352e-06[0m
+fdwrap: Objective [5] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [5] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [5] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [5] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [5] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [5] =  3.0e-04 GMXX2: water12_sixpt    5       VPAIR_BHAMCHO          1.3398e-03   1.3400e-03[92m  -2.1175e-07[93m  -1.5802e-04[0m
+fdwrap: Objective [6] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [6] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [6] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [6] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [6] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [6] =  3.0e-04 GMXX2: water12_sixpt    6       VPAIR_BHAMAOO         -1.6215e-02  -1.6215e-02[92m  -7.3903e-08[92m  -4.5578e-06[0m
+fdwrap: Objective [7] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [7] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [7] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [7] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [7] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [7] =  3.0e-04 GMXX2: water12_sixpt    7       VPAIR_BHAMBOO         -2.4753e-02  -2.4753e-02[92m   1.5856e-07[92m   6.4055e-06[0m
+fdwrap: Objective [8] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [8] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [8] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [8] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [8] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [8] =  3.0e-04 GMXX2: water12_sixpt    8       VPAIR_BHAMCOO         -2.7350e-03  -2.7349e-03[92m  -8.7263e-08[93m  -3.1907e-05[0m
+fdwrap: Objective [9] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [9] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [9] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [9] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [9] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [9] =  3.0e-04 GMXX2: water12_sixpt    9       MORSEBHO              -9.0049e-02  -9.0050e-02[92m   1.3199e-07[92m   1.4658e-06[0m
+fdwrap: Objective [10] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [10] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [10] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [10] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [10] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [10] =  3.0e-04 GMXX2: water12_sixpt    10      MORSECHO              -8.8825e-03  -8.8825e-03[92m   3.1359e-08[92m   3.5304e-06[0m
+fdwrap: Objective [11] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [11] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [11] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [11] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [11] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [11] =  3.0e-04 GMXX2: water12_sixpt    11      MORSEEHO              -2.7189e-02  -2.7189e-02[92m  -1.4307e-07[92m  -5.2623e-06[0m
+fdwrap: Objective [12] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [12] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [12] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [12] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [12] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [12] =  3.0e-04 GMXX2: water12_sixpt    12      UREY_BRADLEYTHOH       1.2779e-01   1.2779e-01[92m   7.3405e-08[92m   5.7440e-07[0m
+fdwrap: Objective [13] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [13] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [13] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [13] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [13] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [13] =  3.0e-04 GMXX2: water12_sixpt    13      UREY_BRADLEYK1HOH      3.0232e-02   3.0232e-02[92m  -2.4160e-07[92m  -7.9914e-06[0m
+fdwrap: Objective [14] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [14] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [14] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [14] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [14] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [14] =  3.0e-04 GMXX2: water12_sixpt    14      UREY_BRADLEYBHOH       3.4416e-03   3.4415e-03[92m   7.6907e-08[93m   2.2346e-05[0m
+fdwrap: Objective [15] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [15] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [15] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [15] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [15] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [15] =  3.0e-04 GMXX2: water12_sixpt    15      UREY_BRADLEYK2HOH     -1.1520e+00  -1.1520e+00[92m   6.2018e-08[92m   5.3836e-08[0m
+fdwrap: Objective [16] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [16] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [16] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [16] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [16] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [16] =  3.0e-04 GMXX2: water12_sixpt    16      QTPIEC1                2.5156e-01   2.5156e-01[92m  -2.7652e-08[92m  -1.0992e-07[0m
+fdwrap: Objective [17] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [17] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [17] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [17] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [17] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [17] =  3.0e-04 GMXX2: water12_sixpt    17      QTPIEH1                1.3509e-01   1.3509e-01[92m   1.2173e-07[92m   9.0114e-07[0m
+fdwrap: Objective [18] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [18] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [18] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [18] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [18] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [18] =  3.0e-04 GMXX2: water12_sixpt    18      QTPIEA1               -6.8723e-02  -6.8724e-02[92m   6.3983e-07[92m   9.3102e-06[0m
+fdwrap: Objective [19] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [19] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [19] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [19] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [19] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [19] =  3.0e-04 GMXX2: water12_sixpt    19      QTPIEC2               -1.0833e+00  -1.0833e+00[92m   2.4474e-08[92m   2.2592e-08[0m
+fdwrap: Objective [20] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [20] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [20] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [20] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [20] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [20] =  3.0e-04 GMXX2: water12_sixpt    20      QTPIEH2               -1.7229e-01  -1.7229e-01[92m  -2.4517e-07[92m  -1.4230e-06[0m
+fdwrap: Objective [21] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [21] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [21] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [21] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [21] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [21] =  3.0e-04 GMXX2: water12_sixpt    21      QTPIEA2                2.5382e-01   2.5382e-01[92m   1.5807e-06[92m   6.2278e-06[0m
+fdwrap: Objective [22] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [22] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [22] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [22] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [22] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [22] =  3.0e-04 GMXX2: water12_sixpt    22      QTPIEC3                8.3178e-01   8.3178e-01[92m   1.1580e-06[92m   1.3921e-06[0m
+fdwrap: Objective [23] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [23] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [23] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [23] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [23] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [23] =  3.0e-04 GMXX2: water12_sixpt    23      QTPIEH3               -6.8602e-01  -6.8602e-01[92m   3.7366e-06[92m   5.4468e-06[0m
+fdwrap: Objective [24] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [24] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [24] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [24] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [24] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [24] =  3.0e-04 GMXX2: water12_sixpt    24      QTPIEA3                3.7959e-01   3.7959e-01[92m  -8.0021e-07[92m  -2.1081e-06[0m
+fdwrap: Objective [25] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [25] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [25] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [25] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [25] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [25] =  3.0e-04 GMXX2: water12_sixpt    25      VSITE3B4 VSITE3A4     -1.4565e-03  -1.4565e-03[92m  -3.2587e-08[93m  -2.2373e-05[0m
+fdwrap: Objective [26] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [26] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [26] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [26] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [26] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [26] =  3.0e-04 GMXX2: water12_sixpt    26      VSITE3OUTB6 VSITE3OU  -2.2172e-03  -2.2172e-03[92m   3.4303e-08[93m   1.5471e-05[0m
+fdwrap: Objective [27] = -3.0e-04 GMXX2: water12_sixptfdwrap: Objective [27] = -2.0e-04 GMXX2: water12_sixptfdwrap: Objective [27] = -1.0e-04 GMXX2: water12_sixptfdwrap: Objective [27] =  1.0e-04 GMXX2: water12_sixptfdwrap: Objective [27] =  2.0e-04 GMXX2: water12_sixptfdwrap: Objective [27] =  3.0e-04 GMXX2: water12_sixpt    27      VSITE3OUTC6 VSITE3OU   3.4123e-05   3.4116e-05[92m   7.3494e-09[93m   2.1538e-04[0m

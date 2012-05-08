@@ -110,7 +110,7 @@ class ForceEnergyMatch(FittingSimulation):
         #          UNDER DEVELOPMENT           #
         #======================================#
         # Put stuff here that I'm not sure about. :)
-        
+
     def read_reference_data(self):
         
         """ Read the reference data (for force and energy matching)
@@ -242,11 +242,15 @@ class ForceEnergyMatch(FittingSimulation):
             print "%.1f%% is mixed into the MM boltzmann weights." % (self.qmboltz*100)
         else:
             self.qmboltz_wts = ones(self.ns)
-            
+
+    def prepare_temp_directory(self, options, sim_opts):
+        """ Prepare the temporary directory, by default does nothing (gmxx2 needs it) """
+        return
+        
     def indicate(self):
         print "Sim: %-15s E_err(kJ/mol)= %10.4f F_err(%%)= %10.4f" % (self.name, self.e_err, self.f_err*100)
 
-    def get(self, mvals, AGrad=False, AHess=False, tempdir=None):
+    def get(self, mvals, AGrad=False, AHess=False):
         """
         LPW 01-11-2012
         
@@ -304,18 +308,12 @@ class ForceEnergyMatch(FittingSimulation):
         @param[in] mvals Mathematical parameter values
         @param[in] AGrad Switch to turn on analytic gradient, useless here
         @param[in] AHess Switch to turn on analytic Hessian, useless here
-        @param[in] tempdir Temporary directory for running computation
         @return Answer Contribution to the objective function
         """
-        if tempdir == None:
-            tempdir = self.tempdir
-        abstempdir = os.path.join(self.root,self.tempdir)
         Answer = {}
         cwd = os.getcwd()
         # Create the new force field!!
-        pvals = self.FF.make(tempdir,mvals,self.usepvals)
-        # Go into the temporary directory
-        os.chdir(os.path.join(self.root,tempdir))
+        pvals = self.FF.make(mvals,self.usepvals)
 
         #======================================#
         #   Copied from the old ForTune code   #
@@ -469,8 +467,8 @@ class ForceEnergyMatch(FittingSimulation):
         self.e_err = E
         self.f_err = F
         Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
-        os.chdir(cwd)
         return Answer
+
 
 def build_objective(SPiXi,WCiW,Z,Q0,M0,NCP1):
 

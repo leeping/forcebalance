@@ -17,6 +17,7 @@ class Project(object):
     - The force field
     - The objective function
     - The optimizer
+    Cipher: "All I gotta do here is pull this plug... and there you have to watch Apoc die"
     Apoc: "TRINITY" *chunk*
 
     The force field is a class defined in forcefield.py.

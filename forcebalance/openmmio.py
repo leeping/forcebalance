@@ -12,7 +12,7 @@ import numpy as np
 import sys
 import pickle
 import shutil
-from nifty import printcool, queue_up
+from nifty import printcool, queue_up, link_dir_contents
 
 try:
     from simtk.openmm.app import *
@@ -68,19 +68,17 @@ class PropertyMatch_OpenMM(PropertyMatch):
         self.wq.specify_name('forcebalance')
         print('Work Queue for fitting simulation %s listening on %d' % (self.name, self.wq.port))
 
-    def prepare_temp_directory(self,options,sim_opts,forcefield):
+    def prepare_temp_directory(self,options,sim_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        shutil.copy2(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
-        shutil.copy2(os.path.join(self.root,self.simdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
-        shutil.copy2(os.path.join(self.root,self.simdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
-        shutil.copy2(os.path.join(self.root,self.simdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
+        os.symlink(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
+        os.symlink(os.path.join(self.root,self.simdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
+        os.symlink(os.path.join(self.root,self.simdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
+        os.symlink(os.path.join(self.root,self.simdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
 
     def execute(self, temperature, run_dir):
         """ Submit a NPT simulation to the Work Queue. """
-        for fnm in os.listdir(os.path.join(self.root,self.tempdir)):
-            if os.path.isfile(os.path.join(self.root,self.tempdir,fnm)):
-                shutil.copy2(os.path.join(self.root,self.tempdir,fnm),os.path.join(run_dir,fnm)) # Mao
+        link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
         queue_up(self.wq,
                  command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
                  input_files = [(os.path.join(run_dir,'runcuda.sh'),'runcuda.sh'),
@@ -89,7 +87,9 @@ class PropertyMatch_OpenMM(PropertyMatch):
                                 (os.path.join(run_dir,'mono.pdb'),'mono.pdb'),
                                 (os.path.join(run_dir,'forcebalance.p'),'forcebalance.p')],
                  output_files = [(os.path.join(run_dir,'npt.out'),'npt.out'),
-                                 (os.path.join(run_dir,'npt_result.p'),'npt_result.p')])
+                                 (os.path.join(run_dir,'npt_result.p'),'npt_result.p'),
+                                 (os.path.join(run_dir,'dynamics.dcd'),'dynamics.dcd'),
+                                 (os.path.join(run_dir,'%s' % self.FF.fnms[0]),self.FF.fnms[0])])
                        
 class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
 
@@ -103,7 +103,7 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
         ## Initialize the SuperClass!
         super(ForceEnergyMatch_OpenMM,self).__init__(options,sim_opts,forcefield)
 
-    def prepare_temp_directory(self, options, sim_opts, forcefield):
+    def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         ## Link the PDB file
         os.symlink(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
@@ -119,7 +119,6 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
         """ Loop through the snapshots and compute the energies and forces using OpenMM."""
         pdb = PDBFile("conf.pdb")
         forcefield = ForceField(self.FF.fnms[0])
-        
         #==============================================#
         #       Simulation settings (IMPORTANT)        #
         # Agrees with TINKER to within 0.0001 kcal! :) #
@@ -128,7 +127,6 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
         # system = forcefield.createSystem(pdb.topology,rigidWater=False,mutualInducedTargetEpsilon=1e-6)
         ## Use for Direct
         system = forcefield.createSystem(pdb.topology,rigidWater=False,polarization='Direct')
-
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         simulation = Simulation(pdb.topology, system, integrator)

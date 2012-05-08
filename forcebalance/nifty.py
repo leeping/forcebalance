@@ -441,3 +441,17 @@ def get_least_squares(x, y, w = None):
     # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
 
     return Beta, Hat, yfit
+
+###
+
+def link_dir_contents(abssrcdir, absdestdir):
+    for fnm in os.listdir(abssrcdir):
+        srcfnm = os.path.join(abssrcdir, fnm)
+        destfnm = os.path.join(absdestdir, fnm)
+        if os.path.isfile(srcfnm):
+            if not os.path.exists(destfnm):
+                #print "Linking %s to %s" % (srcfnm, destfnm)
+                os.symlink(srcfnm, destfnm)
+
+def link_from_updir():
+    link_dir_contents(os.path.join(os.path.split(os.getcwd())[:-1])[0],os.getcwd())
