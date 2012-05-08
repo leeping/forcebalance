@@ -74,8 +74,8 @@ from forcebalance.finite_difference import fdwrap, f12d3p
 # Select run parameters
 timestep = 0.5 * units.femtosecond # timestep for integrtion
 nsteps = 200                       # number of steps per data record
-nequiliterations = 100             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 500                  # number of iterations to collect data for
+nequiliterations = 500             # number of equilibration iterations (hope 50 ps is enough)
+niterations = 5000                 # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -96,6 +96,17 @@ direct_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanomete
                  'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 1.2, 
                  'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
                  'polarization' : 'direct'}
+
+tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanometer, 
+                'vdwCutoff' : 1.2, 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24]}
+
+mono_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None, 
+               'rigidWater' : False, 'polarization' : 'direct'}
+
+if 'tip3p' in sys.argv[2]:
+   print "Using TIP3P settings."
+   timestep = 1.0 * units.femtosecond # timestep for integrtion
+   nsteps   = 100                     # number of steps per data record
 
 def generateMaxwellBoltzmannVelocities(system, temperature):
    """ Generate velocities from a Maxwell-Boltzmann distribution. """
@@ -184,7 +195,8 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
   sigma2_AB = (dA_n * dB_n).mean() # standard estimator to ensure C(0) = 1
   # Trap the case where this covariance is zero, and we cannot proceed.
   if(sigma2_AB == 0):
-    raise ParameterException('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency')
+    print 'Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency'
+    return 1.0
   # Accumulate the integrated correlation time by computing the normalized correlation time at
   # increasing values of t.  Stop accumulating if the correlation function goes negative, since
   # this is unlikely to occur unless the correlation function has decayed to the point where it
@@ -224,15 +236,16 @@ def compute_mass(system):
       mass += system.getParticleMass(i)
    return mass
 
-def run_simulation(pdb):
+def run_simulation(pdb,settings,pbc=True):
    """ Run a NPT simulation and gather statistics. """
 
    # Create the test system.
    forcefield = ForceField(sys.argv[2])
-   system = forcefield.createSystem(pdb.topology, **direct_kwargs)
-   barostat = openmm.MonteCarloBarostat(pressure, temperature, barostat_frequency)
-   # Add barostat.
-   system.addForce(barostat)
+   system = forcefield.createSystem(pdb.topology, **settings)
+   if pbc:
+      barostat = openmm.MonteCarloBarostat(pressure, temperature, barostat_frequency)
+      # Add barostat.
+      system.addForce(barostat)
    # Create integrator.
    integrator = openmm.LangevinIntegrator(temperature, collision_frequency, timestep)        
    # Create simulation class.
@@ -252,23 +265,23 @@ def run_simulation(pdb):
    #==========================================#
    # Computing a bunch of initial values here #
    #==========================================#
-   # Show initial system volume.
-   box_vectors = system.getDefaultPeriodicBoxVectors()
-   volume = compute_volume(box_vectors)
-   if verbose: print "initial system volume = %.1f nm^3" % (volume / units.nanometers**3)
+   if pbc:
+       # Show initial system volume.
+       box_vectors = system.getDefaultPeriodicBoxVectors()
+       volume = compute_volume(box_vectors)
+       if verbose: print "initial system volume = %.1f nm^3" % (volume / units.nanometers**3)
    # Determine number of degrees of freedom.
    kB = units.BOLTZMANN_CONSTANT_kB * units.AVOGADRO_CONSTANT_NA
    ndof = 3*system.getNumParticles() - system.getNumConstraints()
    # Compute total mass.
    mass = compute_mass(system).in_units_of(units.gram / units.mole) /  units.AVOGADRO_CONSTANT_NA # total system mass in g
-   if verbose: print "The total mass of the system is", mass / 216 * units.AVOGADRO_CONSTANT_NA
    # Initialize statistics.
    data = dict()
    data['time'] = units.Quantity(np.zeros([niterations], np.float64), units.picoseconds)
-   data['potential'] = units.Quantity(np.zeros([niterations], np.float64), units.kilocalories_per_mole)
-   data['kinetic'] = units.Quantity(np.zeros([niterations], np.float64), units.kilocalories_per_mole)
+   data['potential'] = units.Quantity(np.zeros([niterations], np.float64), units.kilojoules_per_mole)
+   data['kinetic'] = units.Quantity(np.zeros([niterations], np.float64), units.kilojoules_per_mole)
    data['volume'] = units.Quantity(np.zeros([niterations], np.float64), units.angstroms**3)
-   data['density'] = units.Quantity(np.zeros([niterations], np.float64), units.gram / units.centimeters**3)
+   data['density'] = units.Quantity(np.zeros([niterations], np.float64), units.kilogram / units.meters**3)
    data['kinetic_temperature'] = units.Quantity(np.zeros([niterations], np.float64), units.kelvin)
    # More data structures; stored coordinates, box sizes, densities, and potential energies
    xyzs = []
@@ -285,14 +298,18 @@ def run_simulation(pdb):
       state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=True,getForces=True)
       kinetic = state.getKineticEnergy()
       potential = state.getPotentialEnergy()
-      box_vectors = state.getPeriodicBoxVectors()
-      volume = compute_volume(box_vectors)
-      density = (mass / volume).in_units_of(units.gram / units.centimeter**3)
+      if pbc:
+         box_vectors = state.getPeriodicBoxVectors()
+         volume = compute_volume(box_vectors)
+         density = (mass / volume).in_units_of(units.kilogram / units.meter**3)
+      else:
+         volume = 0.0 * units.nanometers ** 3
+         density = 0.0 * units.kilogram / units.meter ** 3
       kinetic_temperature = 2.0 * kinetic / kB / ndof # (1/2) ndof * kB * T = KE
       if verbose and (iteration%nprint==0):
-         print "%6d %9.3f %16.3f %16.3f %16.4f %10.6f" % (iteration, state.getTime() / units.picoseconds, 
-                                                          kinetic_temperature / units.kelvin, potential / units.kilocalories_per_mole, 
-                                                          volume / units.nanometers**3, density / (units.gram / units.centimeter**3))
+         print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / units.picoseconds, 
+                                                          kinetic_temperature / units.kelvin, potential / units.kilojoules_per_mole, 
+                                                          volume / units.nanometers**3, density / (units.kilogram / units.meter**3))
    # Collect production data.
    if verbose: print "Production..."
    #simulation.reporters.append(DCDReporter('dynamics.dcd', 100))
@@ -303,12 +320,16 @@ def run_simulation(pdb):
       state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=True,getForces=True)
       kinetic = state.getKineticEnergy()
       potential = state.getPotentialEnergy()
-      box_vectors = state.getPeriodicBoxVectors()
-      volume = compute_volume(box_vectors)
-      density = (mass / volume).in_units_of(units.gram / units.centimeter**3)
+      if pbc:
+         box_vectors = state.getPeriodicBoxVectors()
+         volume = compute_volume(box_vectors)
+         density = (mass / volume).in_units_of(units.kilogram / units.meter**3)
+      else:
+         volume = 0.0 * units.nanometers ** 3
+         density = 0.0 * units.kilogram / units.meter ** 3
       kinetic_temperature = 2.0 * kinetic / kB / ndof
       if verbose and (iteration%nprint==0):
-         print "%6d %9.3f %16.3f %16.3f %16.3f %10.6f" % (iteration, state.getTime() / units.picoseconds, kinetic_temperature / units.kelvin, potential / units.kilocalories_per_mole, volume / units.nanometers**3, density / (units.gram / units.centimeter**3))
+         print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / units.picoseconds, kinetic_temperature / units.kelvin, potential / units.kilojoules_per_mole, volume / units.nanometers**3, density / (units.kilogram / units.meter**3))
       # Store properties.
       data['time'][iteration] = state.getTime() 
       data['potential'][iteration] = potential 
@@ -319,8 +340,8 @@ def run_simulation(pdb):
       xyzs.append(state.getPositions())
       boxes.append(state.getPeriodicBoxVectors())
       rhos.append(density.value_in_unit(units.kilogram / units.meter**3))
-      energies.append(potential) / units.kilojoules_per_mole
-   return data, xyzs, boxes, rhos
+      energies.append(potential / units.kilojoules_per_mole)
+   return data, xyzs, boxes, rhos, energies
    
 def analyze(data):
    """Analyze the data from the run_simulation function."""
@@ -328,10 +349,10 @@ def analyze(data):
    #===========================================================================================#
    # Compute statistical inefficiencies to determine effective number of uncorrelated samples. #
    #===========================================================================================#
-   data['g_potential'] = statisticalInefficiency(data['potential'] / units.kilocalories_per_mole)
-   data['g_kinetic'] = statisticalInefficiency(data['kinetic'] / units.kilocalories_per_mole, fast=True)
+   data['g_potential'] = statisticalInefficiency(data['potential'] / units.kilojoules_per_mole)
+   data['g_kinetic'] = statisticalInefficiency(data['kinetic'] / units.kilojoules_per_mole, fast=True)
    data['g_volume'] = statisticalInefficiency(data['volume'] / units.angstroms**3, fast=True)
-   data['g_density'] = statisticalInefficiency(data['density'] / (units.gram / units.centimeter**3), fast=True)
+   data['g_density'] = statisticalInefficiency(data['density'] / (units.kilogram / units.meter**3), fast=True)
    data['g_kinetic_temperature'] = statisticalInefficiency(data['kinetic_temperature'] / units.kelvin, fast=True)
    
    #=========================================#
@@ -339,11 +360,15 @@ def analyze(data):
    #=========================================#
    statistics = dict()
    # Kinetic energy.
-   statistics['KE']  = (data['kinetic'] / units.kilocalories_per_mole).mean() * units.kilocalories_per_mole
-   statistics['dKE'] = (data['kinetic'] / units.kilocalories_per_mole).std() / np.sqrt(niterations / data['g_kinetic']) * units.kilocalories_per_mole
+   statistics['KE']  = (data['kinetic'] / units.kilojoules_per_mole).mean() * units.kilojoules_per_mole
+   statistics['dKE'] = (data['kinetic'] / units.kilojoules_per_mole).std() / np.sqrt(niterations / data['g_kinetic']) * units.kilojoules_per_mole
    statistics['g_KE'] = data['g_kinetic'] * nsteps * timestep 
+   # Potential energy.
+   statistics['PE']  = (data['potential'] / units.kilojoules_per_mole).mean() * units.kilojoules_per_mole
+   statistics['dPE'] = (data['potential'] / units.kilojoules_per_mole).std() / np.sqrt(niterations / data['g_potential']) * units.kilojoules_per_mole
+   statistics['g_PE'] = data['g_potential'] * nsteps * timestep 
    # Density
-   unit = (units.gram / units.centimeter**3)
+   unit = (units.kilogram / units.meter**3)
    statistics['density']  = (data['density'] / unit).mean() * unit
    statistics['ddensity'] = (data['density'] / unit).std() / np.sqrt(niterations / data['g_density']) * unit
    statistics['g_density'] = data['g_density'] * nsteps * timestep
@@ -366,20 +391,23 @@ def analyze(data):
    print "Summary statistics (%.3f ns equil, %.3f ns production)" % (nequiliterations * nsteps * timestep / units.nanoseconds, niterations * nsteps * timestep / units.nanoseconds)
    print
    # Kinetic energies
-   print "Average kinetic energy: %11.6f +- %11.6f  kcal/mol  (g = %11.6f ps)" % (statistics['KE'] / units.kilocalories_per_mole, statistics['dKE'] / units.kilocalories_per_mole, statistics['g_KE'] / units.picoseconds)
+   print "Average kinetic energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['KE'] / units.kilojoules_per_mole, statistics['dKE'] / units.kilojoules_per_mole, statistics['g_KE'] / units.picoseconds)
+   # Potential energies
+   print "Average potential energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['PE'] / units.kilojoules_per_mole, statistics['dPE'] / units.kilojoules_per_mole, statistics['g_PE'] / units.picoseconds)
    # Kinetic temperature
    unit = units.kelvin
    print "Average kinetic temperature: %11.6f +- %11.6f  K         (g = %11.6f ps)" % (statistics['kinetic_temperature'] / unit, statistics['dkinetic_temperature'] / unit, statistics['g_kinetic_temperature'] / units.picoseconds)
    unit = (units.nanometer**3)
    print "Volume: mean %11.6f +- %11.6f  nm^3" % (statistics['volume'] / unit, statistics['dvolume'] / unit),
    print "g = %11.6f ps" % (statistics['g_volume'] / units.picoseconds)
-   unit = (units.gram / units.centimeter**3)
+   unit = (units.kilogram / units.meter**3)
    print "Density: mean %11.6f +- %11.6f  nm^3" % (statistics['density'] / unit, statistics['ddensity'] / unit),
    print "g = %11.6f ps" % (statistics['g_density'] / units.picoseconds)
-   unit = (units.kilogram / units.meter**3)
-   return statistics['density'] / unit, statistics['ddensity'] / unit
+   unit_rho = (units.kilogram / units.meter**3)
+   unit_ene = units.kilojoules_per_mole
+   return statistics['density'] / unit_rho, statistics['ddensity'] / unit_rho, statistics['PE'] / unit_ene, statistics['dPE'] / unit_ene
 
-def energy_driver(mvals,pdb,FF,xyzs,boxes,verbose=False):
+def energy_driver(mvals,pdb,FF,xyzs,settings,boxes=None,verbose=False):
 
    """
    Compute a set of snapshot energies as a function of the force field parameters.
@@ -406,23 +434,31 @@ def energy_driver(mvals,pdb,FF,xyzs,boxes,verbose=False):
    # Load the force field XML file to make the OpenMM object.
    forcefield = ForceField(sys.argv[2])
    # Create the system, setup the simulation.
-   system = forcefield.createSystem(pdb.topology, **direct_kwargs)
+   system = forcefield.createSystem(pdb.topology, **settings)
    integrator = openmm.LangevinIntegrator(300*units.kelvin, 1/units.picosecond, 0.002*units.picoseconds)
    simulation = Simulation(pdb.topology, system, integrator)
    E = []
    # Loop through the snapshots
-   for xyz,box in zip(xyzs,boxes):
-      # Set the positions and the box vectors
-      simulation.context.setPositions(xyz)
-      simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
-      # Compute the potential energy and append to list
-      Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / units.kilojoules_per_mole
-      E.append(Energy)
+   if boxes == None:
+       for xyz in xyzs:
+          # Set the positions and the box vectors
+          simulation.context.setPositions(xyz)
+          # Compute the potential energy and append to list
+          Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / units.kilojoules_per_mole
+          E.append(Energy)
+   else:
+       for xyz,box in zip(xyzs,boxes):
+          # Set the positions and the box vectors
+          simulation.context.setPositions(xyz)
+          simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
+          # Compute the potential energy and append to list
+          Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / units.kilojoules_per_mole
+          E.append(Energy)
    print "\r",
    if verbose: print E
    return np.array(E)
 
-def energy_derivatives(mvals,h,pdb,FF,xyzs,boxes):
+def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,boxes=None):
 
    """
    Compute the first and second derivatives of a set of snapshot
@@ -443,9 +479,9 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,boxes):
 
    G        = np.zeros((FF.np,len(xyzs)))
    Hd       = np.zeros((FF.np,len(xyzs)))
-   E0       = energy_driver(mvals, pdb, FF, xyzs, boxes)
+   E0       = energy_driver(mvals, pdb, FF, xyzs, settings, boxes)
    for i in range(FF.np):
-      G[i,:], Hd[i,:] = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,boxes=boxes),h,f0=E0)
+      G[i,:], Hd[i,:] = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,boxes=boxes),h,f0=E0)
    return G, Hd
        
 def main():
@@ -483,14 +519,15 @@ def main():
    FF,mvals,h = lp_load(open('forcebalance.p'))
    # Create the force field XML files.
    pvals = FF.make(os.getcwd(),mvals,False)
-   # Run the simulation.
-   Data, Xyzs, Boxes, Rhos = run_simulation(pdb)
+
+   #=================================================================#
+   # Run the simulation for the full system and analyze the results. #
+   #=================================================================#
+   Data, Xyzs, Boxes, Rhos, Energies = run_simulation(pdb, direct_kwargs)
    # Get statistics from our simulation.
-   Rho_avg, Rho_err = analyze(Data)
-
+   Rho_avg, Rho_err, Pot_avg, Pot_err = analyze(Data)
    # Now that we have the coordinates, we can compute the energy derivatives.
-   G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, Boxes)
-
+   G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, direct_kwargs, Boxes)
    # The density derivative can be computed using the energy derivative.
    N = len(Xyzs)
    kB = units.BOLTZMANN_CONSTANT_kB * units.AVOGADRO_CONSTANT_NA
@@ -498,41 +535,56 @@ def main():
    Beta = (1 / (temperature * kB)).value_in_unit(units.mole / units.kilojoule)
    # It becomes necessary to make the gradient squared for the second derivative.
    GG = G * G
-   # Build the first and second derivatives.
+   # Build the first density derivative .
    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / N - np.mean(Rhos) * np.mean(G, axis=1))
-   HdRho = mBeta * (flat(np.mat(Hd) * col(Rhos)) / N
-                    - Beta * flat(np.mat(GG) * col(Rhos)) / N
-                    + Beta * (flat(np.mat(G) * col(Rhos)) / N) * np.mean(G, axis=1)
-                    - np.mean(Rhos) * (np.mean(Hd, axis=1)
-                                       - Beta * np.mean(GG, axis=1)
-                                       + Beta * np.mean(G, axis=1) * np.mean(G, axis=1)))
+   # The second density derivative is so inaccurate we might as well not compute it. -_-
+   # HdRho = mBeta * (flat(np.mat(Hd) * col(Rhos)) / N
+   #                  - Beta * flat(np.mat(GG) * col(Rhos)) / N
+   #                  + Beta * (flat(np.mat(G) * col(Rhos)) / N) * np.mean(G, axis=1)
+   #                  - np.mean(Rhos) * (np.mean(Hd, axis=1)
+   #                                     - Beta * np.mean(GG, axis=1)
+   #                                     + Beta * np.mean(G, axis=1) * np.mean(G, axis=1)))
 
-   bar = printcool("Density Derivative")
+   #==============================================#
+   # Now run the simulation for just the monomer. #
+   #==============================================#
+   mpdb = PDBFile('mono.pdb')
+   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False)
+   # Get statistics from our simulation.
+   _trash, _crap, mPot_avg, mPot_err = analyze(mData)
+   # Now that we have the coordinates, we can compute the energy derivatives.
+   mG, mHd = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mono_kwargs)
+   # The enthalpy of vaporization in kJ/mol.
+   Hvap_avg = Pot_avg / 216 - mPot_avg
+   Hvap_err = np.sqrt(Pot_err**2 / 216 + mPot_err**2)
+
+   #print "mean(Energies) = ", np.mean(Energies)
+   #print "mean(mEnergies) = ", np.mean(mEnergies)
+   #print "Pot_avg = ", Pot_avg
+   #print "mPot_avg = ", mPot_avg
+
+   # Build the first Hvap derivative.
+
+   GHvap = np.mean(G,axis=1)
+   GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Pot_avg * np.mean(G, axis=1))
+   GHvap /= 216
+   GHvap -= np.mean(mG,axis=1)
+   GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mPot_avg * np.mean(mG, axis=1))
+
+   Hvap_avg *= -1
+   GHvap *= -1
+
+   bar = printcool("Density: % .4f +- % .4f kg/m^3, Derivatives below" % (Rho_avg, Rho_err))
    FF.print_map(vals=GRho)
    print bar
-
-   # bar = printcool("Density Second Derivative, Term 1")
-   # FF.print_map(vals=mBeta * (flat(np.mat(Hd) * col(Rhos)) / N))
-   # print bar
-   # bar = printcool("Density Second Derivative, Term 4")
-   # FF.print_map(vals=mBeta * (- np.mean(Rhos) * (np.mean(Hd, axis=1))))
-   # print bar
-   # bar = printcool("Density Second Derivative, Term 2")
-   # FF.print_map(vals=mBeta * (- Beta * flat(np.mat(GG) * col(Rhos)) / N))
-   # print bar
-   # bar = printcool("Density Second Derivative, Term 5")
-   # FF.print_map(vals=mBeta * (- np.mean(Rhos) * (- Beta * np.mean(GG, axis=1))))
-   # print bar
-   # bar = printcool("Density Second Derivative, Term 3")
-   # FF.print_map(vals=mBeta * (+ Beta * (flat(np.mat(G) * col(Rhos)) / N) * np.mean(G, axis=1)))
-   # print bar
-   # bar = printcool("Density Second Derivative, Term 6")
-   # FF.print_map(vals=mBeta * (- np.mean(Rhos) * (+ Beta * np.mean(G, axis=1) * np.mean(G, axis=1))))
-   # print bar
    
-   bar = printcool("Density Second Derivative, Full")
-   FF.print_map(vals=HdRho)
-   with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, HdRho),f)
+   print "Box energy:", np.mean(Energies)
+   print "Monomer energy:", np.mean(mEnergies)
+   bar = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol, Derivatives below" % (Hvap_avg, Hvap_err))
+   FF.print_map(vals=GHvap)
+   print bar
+
+   with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, Hvap_avg, Hvap_err, GHvap),f)
 
 if __name__ == "__main__":
    main()
