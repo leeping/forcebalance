@@ -12,7 +12,7 @@ from numpy import array, diag, dot, eye, mat, mean, transpose
 from numpy.linalg import norm, svd
 import threading
 import pickle
-import time, datetime
+import time, datetime # Sniffy
 
 ## Boltzmann constant
 kb = 0.0083144100163
