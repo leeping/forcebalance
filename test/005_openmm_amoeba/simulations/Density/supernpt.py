@@ -1,11 +1,25 @@
 #!/usr/bin/env python
 
 """
-Description
+@package supernpt
 
-NPT Amoeba simulation in OpenMM.  Adopted by Lee-Ping from John Chodera's script.
-This script computes the density from a simulation, and also gives the analytic
-derivative of the density with respect to the force field parameters.
+NPT simulation in OpenMM.  Runs a simulation to compute bulk properties
+(for example, the density or the enthalpy of vaporization) and compute the
+derivative with respect to changing the force field parameters.  
+
+The basic idea is this: First we run a density simulation to determine
+the average density.  This quantity of course has some uncertainty,
+and in general we want to avoid evaluating finite-difference
+derivatives of noisy quantities.  The key is to realize that the
+densities are sampled from a Boltzmann distribution, so the analytic
+derivative can be computed if the potential energy derivative is
+accessible.  We compute the potential energy derivative using
+finite-difference of snapshot energies and apply a simple formula to
+compute the density derivative.
+
+The enthalpy of vaporization should come just as easily.
+
+This script borrows from John Chodera's ideal gas simulation in PyOpenMM.
 
 References
 
@@ -36,41 +50,32 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
-#=============================================================================================
-# Global Imports
-#=============================================================================================
+#================#
+# Global Imports #
+#================#
 
 import os
 import os.path
 import sys
 import math
-import numpy
+import numpy as np
 import simtk
 import simtk.unit as units
 import simtk.openmm as openmm
 from simtk.openmm.app import *
 from forcebalance.forcefield import FF
-from forcebalance.nifty import lp_load
+from forcebalance.nifty import col, lp_load
+from forcebalance.finite_difference import fdwrap, f12d3p
 
-#from forcebalance.parser import parse_inputs
-# Okay, here's what I want.
-# I want to get the derivative of the density with respect to the force field parameters
-# Here's what I need from ForceBalance.
-# The parameter XML file.  But if I pass the derivative back as a vector won't it be scrambled?
-# The parameter map and rescaling factor matrices.  Rebuild everything here.
-# Here we're taking a derivative w/r.t. the physical parameters, not the mathematical ones.
-# Or are we?  What are we doing again?
-# In forceenergymatch_gmxx2.py, the analytic derivatives are built by ...
-
-#=============================================================================================
-# Global variables
-#=============================================================================================
+#======================================================#
+# Global, user-tunable variables (simulation settings) #
+#======================================================#
 
 # Select run parameters
 timestep = 0.5 * units.femtosecond # timestep for integrtion
 nsteps = 200                       # number of steps per data record
 nequiliterations = 100             # number of equilibration iterations
-niterations = 100                 # number of iterations to collect data for
+niterations = 100                  # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -92,15 +97,12 @@ direct_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanomete
                  'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
                  'polarization' : 'direct'}
 
-#=============================================================================================
-# Subroutines
-#=============================================================================================
-
 def generateMaxwellBoltzmannVelocities(system, temperature):
+   """ Generate velocities from a Maxwell-Boltzmann distribution. """
    # Get number of atoms
    natoms = system.getNumParticles()
    # Create storage for velocities.        
-   velocities = units.Quantity(numpy.zeros([natoms, 3], numpy.float32), units.nanometer / units.picosecond) # velocities[i,k] is the kth component of the velocity of atom i
+   velocities = units.Quantity(np.zeros([natoms, 3], np.float32), units.nanometer / units.picosecond) # velocities[i,k] is the kth component of the velocity of atom i
    # Compute thermal energy and inverse temperature from specified temperature.
    kB = units.BOLTZMANN_CONSTANT_kB * units.AVOGADRO_CONSTANT_NA
    kT = kB * temperature # thermal energy
@@ -110,30 +112,13 @@ def generateMaxwellBoltzmannVelocities(system, temperature):
       mass = system.getParticleMass(atom_index) # atomic mass
       sigma = units.sqrt(kT / mass) # standard deviation of velocity distribution for each coordinate for this atom
       for k in range(3):
-         velocities[atom_index,k] = sigma * numpy.random.normal()
+         velocities[atom_index,k] = sigma * np.random.normal()
    return velocities
    
 def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
+
   """
   Compute the (cross) statistical inefficiency of (two) timeseries.
-
-  Required Arguments  
-    A_n (numpy array) - A_n[n] is nth value of timeseries A.  Length is deduced from vector.
-
-  Optional Arguments
-    B_n (numpy array) - B_n[n] is nth value of timeseries B.  Length is deduced from vector.
-       If supplied, the cross-correlation of timeseries A and B will be estimated instead of the
-       autocorrelation of timeseries A.  
-    fast (boolean) - if True, will use faster (but less accurate) method to estimate correlation
-       time, described in Ref. [1] (default: False)
-    mintime (int) - minimum amount of correlation function to compute (default: 3)
-       The algorithm terminates after computing the correlation time out to mintime when the
-       correlation function furst goes negative.  Note that this time may need to be increased
-       if there is a strong initial negative peak in the correlation function.
-
-  Returns
-    g is the estimated statistical inefficiency (equal to 1 + 2 tau, where tau is the correlation time).
-       We enforce g >= 1.0.
 
   Notes 
     The same timeseries can be used for both A_n and B_n to get the autocorrelation statistical inefficiency.
@@ -151,15 +136,37 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
   >>> import timeseries
   >>> A_n = timeseries.generateCorrelatedTimeseries(N=100000, tau=5.0)
   >>> g = statisticalInefficiency(A_n, fast=True)
+
+  @param[in] A_n (required, numpy array) - A_n[n] is nth value of
+  timeseries A.  Length is deduced from vector.
+
+  @param[in] B_n (optional, numpy array) - B_n[n] is nth value of
+  timeseries B.  Length is deduced from vector.  If supplied, the
+  cross-correlation of timeseries A and B will be estimated instead of
+  the autocorrelation of timeseries A.
+
+  @param[in] fast (optional, boolean) - if True, will use faster (but
+  less accurate) method to estimate correlation time, described in
+  Ref. [1] (default: False)
+
+  @param[in] mintime (optional, int) - minimum amount of correlation
+  function to compute (default: 3) The algorithm terminates after
+  computing the correlation time out to mintime when the correlation
+  function furst goes negative.  Note that this time may need to be
+  increased if there is a strong initial negative peak in the
+  correlation function.
+
+  @return g The estimated statistical inefficiency (equal to 1 + 2
+  tau, where tau is the correlation time).  We enforce g >= 1.0.
   
   """
 
   # Create numpy copies of input arguments.
-  A_n = numpy.array(A_n)
+  A_n = np.array(A_n)
   if B_n is not None:  
-    B_n = numpy.array(B_n)
+    B_n = np.array(B_n)
   else:
-    B_n = numpy.array(A_n) 
+    B_n = np.array(A_n) 
   # Get the length of the timeseries.
   N = A_n.size
   # Be sure A_n and B_n have the same dimensions.
@@ -171,8 +178,8 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
   mu_A = A_n.mean()
   mu_B = B_n.mean()
   # Make temporary copies of fluctuation from mean.
-  dA_n = A_n.astype(numpy.float64) - mu_A
-  dB_n = B_n.astype(numpy.float64) - mu_B
+  dA_n = A_n.astype(np.float64) - mu_A
+  dB_n = B_n.astype(np.float64) - mu_B
   # Compute estimator of covariance of (A,B) using estimator that will ensure C(0) = 1.
   sigma2_AB = (dA_n * dB_n).mean() # standard estimator to ensure C(0) = 1
   # Trap the case where this covariance is zero, and we cannot proceed.
@@ -203,19 +210,23 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
   return g
 
 def compute_volume(box_vectors):
+   """ Compute the total volume of an OpenMM system. """
    [a,b,c] = box_vectors
-   A = numpy.array([a/a.unit, b/a.unit, c/a.unit])
+   A = np.array([a/a.unit, b/a.unit, c/a.unit])
    # Compute volume of parallelepiped.
-   volume = numpy.linalg.det(A) * a.unit**3
+   volume = np.linalg.det(A) * a.unit**3
    return volume
 
 def compute_mass(system):
+   """ Compute the total mass of an OpenMM system. """
    mass = 0.0 * units.amu
    for i in range(system.getNumParticles()):
       mass += system.getParticleMass(i)
    return mass
 
 def run_simulation(pdb):
+   """ Run a NPT simulation and gather statistics. """
+
    # Create the test system.
    forcefield = ForceField(sys.argv[2])
    system = forcefield.createSystem(pdb.topology, **direct_kwargs)
@@ -238,8 +249,9 @@ def run_simulation(pdb):
    if Serialize:
       serial = openmm.XmlSerializer.serializeSystem(system)
       with open('system.xml','w') as f: f.write(serial)
-   ###############################################
-   # Computing a bunch of initial values here
+   #==========================================#
+   # Computing a bunch of initial values here #
+   #==========================================#
    # Show initial system volume.
    box_vectors = system.getDefaultPeriodicBoxVectors()
    volume = compute_volume(box_vectors)
@@ -252,16 +264,20 @@ def run_simulation(pdb):
    if verbose: print "The total mass of the system is", mass / 216 * units.AVOGADRO_CONSTANT_NA
    # Initialize statistics.
    data = dict()
-   data['time'] = units.Quantity(numpy.zeros([niterations], numpy.float64), units.picoseconds)
-   data['potential'] = units.Quantity(numpy.zeros([niterations], numpy.float64), units.kilocalories_per_mole)
-   data['kinetic'] = units.Quantity(numpy.zeros([niterations], numpy.float64), units.kilocalories_per_mole)
-   data['volume'] = units.Quantity(numpy.zeros([niterations], numpy.float64), units.angstroms**3)
-   data['density'] = units.Quantity(numpy.zeros([niterations], numpy.float64), units.gram / units.centimeters**3)
-   data['kinetic_temperature'] = units.Quantity(numpy.zeros([niterations], numpy.float64), units.kelvin)
-   # More data!
+   data['time'] = units.Quantity(np.zeros([niterations], np.float64), units.picoseconds)
+   data['potential'] = units.Quantity(np.zeros([niterations], np.float64), units.kilocalories_per_mole)
+   data['kinetic'] = units.Quantity(np.zeros([niterations], np.float64), units.kilocalories_per_mole)
+   data['volume'] = units.Quantity(np.zeros([niterations], np.float64), units.angstroms**3)
+   data['density'] = units.Quantity(np.zeros([niterations], np.float64), units.gram / units.centimeters**3)
+   data['kinetic_temperature'] = units.Quantity(np.zeros([niterations], np.float64), units.kelvin)
+   # More data structures; stored coordinates, box sizes, densities, and potential energies
    xyzs = []
    boxes = []
    rhos = []
+   energies = []
+   #========================#
+   # Now run the simulation #
+   #========================#
    # Equilibrate.
    if verbose: print "Equilibrating..."
    for iteration in range(nequiliterations):
@@ -302,48 +318,51 @@ def run_simulation(pdb):
       data['kinetic_temperature'][iteration] = kinetic_temperature
       xyzs.append(state.getPositions())
       boxes.append(state.getPeriodicBoxVectors())
-      rhos.append(density)
+      rhos.append(density * 1000)
+      energies.append(potential) / units.kilojoules_per_mole
    return data, xyzs, boxes, rhos
    
 def analyze(data):
-   #=============================================================================================
-   # Compute statistical inefficiencies to determine effective number of uncorrelated samples.
-   #=============================================================================================
+   """Analyze the data from the run_simulation function."""
+
+   #===========================================================================================#
+   # Compute statistical inefficiencies to determine effective number of uncorrelated samples. #
+   #===========================================================================================#
    data['g_potential'] = statisticalInefficiency(data['potential'] / units.kilocalories_per_mole)
    data['g_kinetic'] = statisticalInefficiency(data['kinetic'] / units.kilocalories_per_mole, fast=True)
    data['g_volume'] = statisticalInefficiency(data['volume'] / units.angstroms**3, fast=True)
    data['g_density'] = statisticalInefficiency(data['density'] / (units.gram / units.centimeter**3), fast=True)
    data['g_kinetic_temperature'] = statisticalInefficiency(data['kinetic_temperature'] / units.kelvin, fast=True)
    
-   #=============================================================================================
-   # Compute expectations and uncertainties.
-   #=============================================================================================
+   #=========================================#
+   # Compute expectations and uncertainties. #
+   #=========================================#
    statistics = dict()
    # Kinetic energy.
    statistics['KE']  = (data['kinetic'] / units.kilocalories_per_mole).mean() * units.kilocalories_per_mole
-   statistics['dKE'] = (data['kinetic'] / units.kilocalories_per_mole).std() / numpy.sqrt(niterations / data['g_kinetic']) * units.kilocalories_per_mole
+   statistics['dKE'] = (data['kinetic'] / units.kilocalories_per_mole).std() / np.sqrt(niterations / data['g_kinetic']) * units.kilocalories_per_mole
    statistics['g_KE'] = data['g_kinetic'] * nsteps * timestep 
    # Density
    unit = (units.gram / units.centimeter**3)
    statistics['density']  = (data['density'] / unit).mean() * unit
-   statistics['ddensity'] = (data['density'] / unit).std() / numpy.sqrt(niterations / data['g_density']) * unit
+   statistics['ddensity'] = (data['density'] / unit).std() / np.sqrt(niterations / data['g_density']) * unit
    statistics['g_density'] = data['g_density'] * nsteps * timestep
    # Volume
    unit = units.nanometer**3
    statistics['volume']  = (data['volume'] / unit).mean() * unit
-   statistics['dvolume'] = (data['volume'] / unit).std() / numpy.sqrt(niterations / data['g_volume']) * unit
+   statistics['dvolume'] = (data['volume'] / unit).std() / np.sqrt(niterations / data['g_volume']) * unit
    statistics['g_volume'] = data['g_volume'] * nsteps * timestep
    statistics['std_volume']  = (data['volume'] / unit).std() * unit
-   statistics['dstd_volume'] = (data['volume'] / unit).std() / numpy.sqrt((niterations / data['g_volume'] - 1) * 2.0) * unit # uncertainty expression from Ref [1].
+   statistics['dstd_volume'] = (data['volume'] / unit).std() / np.sqrt((niterations / data['g_volume'] - 1) * 2.0) * unit # uncertainty expression from Ref [1].
    # Kinetic temperature
    unit = units.kelvin
    statistics['kinetic_temperature']  = (data['kinetic_temperature'] / unit).mean() * unit
-   statistics['dkinetic_temperature'] = (data['kinetic_temperature'] / unit).std() / numpy.sqrt(niterations / data['g_kinetic_temperature']) * unit
+   statistics['dkinetic_temperature'] = (data['kinetic_temperature'] / unit).std() / np.sqrt(niterations / data['g_kinetic_temperature']) * unit
    statistics['g_kinetic_temperature'] = data['g_kinetic_temperature'] * nsteps * timestep
 
-   #=============================================================================================
-   # Print summary statistics
-   #=============================================================================================
+   #==========================#
+   # Print summary statistics #
+   #==========================#
    print "Summary statistics (%.3f ns equil, %.3f ns production)" % (nequiliterations * nsteps * timestep / units.nanoseconds, niterations * nsteps * timestep / units.nanoseconds)
    print
    # Kinetic energies
@@ -358,12 +377,95 @@ def analyze(data):
    unit = (units.gram / units.centimeter**3)
    print "Density: mean %11.6f +- %11.6f  nm^3" % (statistics['density'] / unit, statistics['ddensity'] / unit),
    print "g = %11.6f ps" % (statistics['g_density'] / units.picoseconds)
+
+def energy_driver(mvals,pdb,FF,xyzs):
+
+   """
+   Compute a set of snapshot energies as a function of the force field parameters.
+
+   This is a combined OpenMM and ForceBalance function.  Note (importantly) that this
+   function creates a new force field XML file in the run directory.
+
+   ForceBalance creates the force field, OpenMM reads it in, and we loop through the snapshots
+   to compute the energies.
    
+   @todo I should be able to generate the OpenMM force field object without writing an external file.
+   @todo This is a sufficiently general function to be merged into openmmio.py?
+   @param[in] mvals Mathematical parameter values
+   @param[in] pdb OpenMM PDB object
+   @param[in] FF ForceBalance force field object
+   @param[in] xyzs List of OpenMM positions
+   @return G First derivative of the energies in a N_param x N_coord array
+   @return Hd Second derivative of the energies (i.e. diagonal Hessian elements) in a N_param x N_coord array
+
+   """
+
+   # Print the force field XML from the ForceBalance object, with modified parameters.
+   pvals = FF.make(os.getcwd(),mvals,False)
+   # Load the force field XML file to make the OpenMM object.
+   forcefield = ForceField(sys.argv[2])
+   # Create the system, setup the simulation.
+   system = forcefield.createSystem(pdb.topology, **direct_kwargs)
+   integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+   simulation = Simulation(pdb.topology, system, integrator)
+   E = []
+   # Loop through the snapshots
+   for xyz in xyzs:
+      # Set the positions using the trajectory
+      simulation.context.setPositions(xyz)
+      # Compute the potential energy and append to list
+      Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+      E.append(Energy)
+   return np.array(E)
+
+def energy_derivatives(mvals,pdb,FF,xyzs):
+
+   """
+   Compute the first and second derivatives of a set of snapshot
+   energies with respect to the force field parameters.
+
+   This basically calls the finite difference subroutine on the
+   energy_driver subroutine also in this script.
+
+   @todo This is a sufficiently general function to be merged into openmmio.py?
+   @param[in] mvals Mathematical parameter values
+   @param[in] pdb OpenMM PDB object
+   @param[in] FF ForceBalance force field object
+   @param[in] xyzs List of OpenMM positions
+   @return G First derivative of the energies in a N_param x N_coord array
+   @return Hd Second derivative of the energies (i.e. diagonal Hessian elements) in a N_param x N_coord array
+
+   """
+
+   G        = np.zeros(FF.np,len(xyzs))
+   Hd       = np.zeros(FF.np,len(xyzs))
+   for i in range(FF.np):
+      G[i,:], Hd[i,:] = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs),FF.h)
+   return G, Hd
        
 def main():
-   #############################################################
-   ### Set parameters that are relevant for all calculations ###
-   #############################################################
+   
+   """ 
+   Usage: (runcuda.sh) supernpt.py protein.pdb forcefield.xml <temperature> <pressure>
+
+   This program is meant to be called automatically by ForceBalance
+   (specifically, subroutines in openmmio.py).  It is not easy to use
+   manually.  This is because the force field is read in from a
+   ForceBalance 'FF' class.
+
+   I wrote this program because automatic fitting of the density (or
+   other equilibrium properties) is computationally intensive, and the
+   calculations need to be distributed to the queue.  The main instance
+   of ForceBalance (running on my workstation) queues up a bunch of these
+   jobs (using Work Queue).  Then, I submit a bunch of workers to GPU
+   clusters (e.g. Certainty, Keeneland).  The worker scripts connect to
+   the main instance and receives one of these jobs.
+
+   Of course this script can also be executed locally.  Just make sure
+   you have the pickled 'forcebalance.p' file.
+
+   """
+   
    # Select platform.
    platform = openmm.Platform.getPlatformByName('Cuda')
    # Set the CUDA device to the environment variable or zero otherwise
@@ -378,7 +480,16 @@ def main():
    pvals = FF.make(os.getcwd(),mvals,False)
    # Run the simulation.
    Data, Xyzs, Boxes, Rhos = run_simulation(pdb)
+   # Get statistics from our simulation.
    analyze(Data)
+   # Now that we have the coordinates, we can compute the energy derivatives.
+   G, Hd = energy_derivatives(mvals, pdb, FF, Xyzs)
+   # The density derivative can be computed using the energy derivative.
+   N = len(Xyzs)
+   mkT = -1 * temperature * boltzmann_constant
+   # The density derivative.
+   GRho = mKT * ((np.mat(G) * col(Rhos)) / N - np.mean(Rhos) * np.mean(G, axis=1))
+   print GRho
 
 if __name__ == "__main__":
    main()
