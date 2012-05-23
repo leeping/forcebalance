@@ -63,7 +63,7 @@ class PropertyMatch_OpenMM(PropertyMatch):
     def __init__(self,options,sim_opts,forcefield):
         ## Initialize the SuperClass!
         super(PropertyMatch_OpenMM,self).__init__(options,sim_opts,forcefield)
-        #work_queue.set_debug_flag('all')
+        work_queue.set_debug_flag('all')
         self.wq = work_queue.WorkQueue(port=self.wq_port, exclusive=False, shutdown=False)
         self.wq.specify_name('forcebalance')
         print('Work Queue for fitting simulation %s listening on %d' % (self.name, self.wq.port))
@@ -86,9 +86,9 @@ class PropertyMatch_OpenMM(PropertyMatch):
                                 (os.path.join(run_dir,'conf.pdb'),'conf.pdb'),
                                 (os.path.join(run_dir,'mono.pdb'),'mono.pdb'),
                                 (os.path.join(run_dir,'forcebalance.p'),'forcebalance.p')],
-                 output_files = [(os.path.join(run_dir,'npt.out'),'npt.out'),
+                 output_files = [#(os.path.join(run_dir,'dynamics.dcd'),'dynamics.dcd'),
                                  (os.path.join(run_dir,'npt_result.p'),'npt_result.p'),
-                                 (os.path.join(run_dir,'dynamics.dcd'),'dynamics.dcd'),
+                                 (os.path.join(run_dir,'npt.out'),'npt.out'),
                                  (os.path.join(run_dir,'%s' % self.FF.fnms[0]),self.FF.fnms[0])])
                        
 class ForceEnergyMatch_OpenMM(ForceEnergyMatch):

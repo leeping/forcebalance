@@ -100,7 +100,7 @@ import gmxio, qchemio, tinkerio, custom_io, openmmio
 import basereader
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros
 from numpy.linalg import norm
-from nifty import col, flat, invert_svd, isint, kb, orthogonalize, pmat2d, printcool, row, warn_press_key
+from nifty import col, flat, invert_svd, isint, isfloat, kb, orthogonalize, pmat2d, printcool, row, warn_press_key
 from string import count
 from copy import deepcopy
 try:
@@ -693,7 +693,7 @@ class FF(object):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
         if vals == None:
             vals = self.pvals0
-        print '\n'.join(["%4i [ % .4e ]" % (self.plist.index(i),vals[self.plist.index(i)]) + " : " + "%s" % i for i in self.plist])
+        print '\n'.join(["%4i [ %s ]" % (self.plist.index(i), "% .4e" % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i for i in self.plist])
         
     def assign_p0(self,idx,val):
         """ Assign physical parameter values to the 'pvals0' array.

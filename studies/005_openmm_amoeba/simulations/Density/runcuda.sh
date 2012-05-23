@@ -40,6 +40,18 @@ set
 
 echo
 echo "#=======================#"
+echo "#   GPU CONFIGURATION   #"
+echo "#=======================#"
+echo
+
+echo "I'm using GPU number $CUDA_DEVICE"
+echo "nvidia-smi output:"
+nvidia-smi
+echo "lspci output (to see buses):"
+/sbin/lspci -t
+
+echo
+echo "#=======================#"
 echo "# STARTING CALCULATION! #"
 echo "#=======================#"
 echo

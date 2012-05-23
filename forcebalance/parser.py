@@ -76,15 +76,16 @@ gen_opts_types = {
     'bools'   : {"backup"         : (1, 'Write temp directories to backup before wiping them'),
                  "writechk_step"  : (0, 'Write the checkpoint file at every optimization step')
                  },
-    'floats'  : {"trust0"                 : (1e-2, 'Trust radius for the MainOptimizer'),
+    'floats'  : {"trust0"                 : (1e-1, 'Trust radius for the MainOptimizer'),
+                 "mintrust"               : (1e-2, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)'),
                  "convergence_objective"  : (1e-4, 'Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)'),
                  "convergence_gradient"   : (1e-4, 'Convergence criterion of gradient norm'),
                  "convergence_step"       : (1e-4, 'Convergence criterion of step size (just needs to fall below this threshold)'),
-                 "eig_lowerbound"         : (1e-4, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
+                 "eig_lowerbound"         : (1e-3, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
                  "finite_difference_h"    : (1e-2, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
                  "penalty_additive"       : (0.0, 'Factor for additive penalty function in objective function'),
                  "penalty_multiplicative" : (0.1, 'Factor for multiplicative penalty function in objective function'),
-                 "adaptive_factor"        : (0.5, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.'),
+                 "adaptive_factor"        : (0.25, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.'),
                  "adaptive_damping"       : (0.5, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.')
                  },
     'sections': {"read_mvals" : (None, 'Paste mathematical parameters into the input file for them to be read in directly'),
@@ -125,6 +126,8 @@ sim_opts_types = {
                  "run_internal": (1,'For OpenMM or other codes with Python interface: Compute energies and forces internally'),
                  },
     'floats'  : {"weight"      : (1.0, 'Weight of the current simulation (with respect to other simulations)'),
+                 "w_rho"       : (1.0, 'Relative weight of fitting experimental density (property match), defaults to 1.0'),
+                 "w_hvap"      : (1.0, 'Relative weight of fitting enthalpy of vaporization (property match), defaults to 1.0'),
                  "efweight"    : (0.5, '1.0 for all energy and 0.0 for all force (force+energy match), defaults to 0.5'),
                  "qmboltz"     : (0.0, 'Fraction of Quantum Boltzmann Weights (force+energy match), 1.0 for full reweighting, 0.0 < 1.0 for hybrid'),
                  "qmboltztemp" : (298.15, 'Temperature for Quantum Boltzmann Weights (force+energy match), defaults to room temperature')
