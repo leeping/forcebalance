@@ -11,15 +11,11 @@ ffdir forcefield
 # (string) Type of the penalty, L2 or L1 in the optimizer
 penalty_type L2
 
-# (string) Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1
-scan_vals -1:1:11
-scanindex_num 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
-
 # (allcap) The job type, defaults to a single-point evaluation of objective function
 jobtype bfgs
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
-forcefield amoebawater.xml
+forcefield tip3p.xml
 
 # (int) Maximum number of steps in an optimization
 maxstep 100
@@ -45,20 +41,12 @@ penalty_multiplicative 0.1
 trust0 0.1
 
 priors
-   AmoebaHarmonicBondForce.Bond/length   : 1.0e-02
-   AmoebaHarmonicBondForce.Bond/k        : 3.0e+05
-   AmoebaHarmonicAngleForce.Angle/angle1 : 3.0e+01
-   AmoebaHarmonicAngleForce.Angle/k      : 1.0e-01
-   AmoebaVdwForce.Vdw/sigma              : 2.0e-01
-   AmoebaVdwForce.Vdw/epsilon/73         : 4.0e-01
-   AmoebaVdwForce.Vdw/epsilon/74         : 4.0e-02
-   AmoebaVdwForce.Vdw/reduction          : 0.1
-   AmoebaMultipoleForce.Multipole/c      : 1.0
-   AmoebaMultipoleForce.Multipole/d      : 0.05
-   AmoebaMultipoleForce.Multipole/q      : 0.001
-   AmoebaMultipoleForce.Polarize/polarizability/381 : 4.9600e-04
-   AmoebaUreyBradleyForce.UreyBradley/k  : 1.0e+05
+   NonbondedForce.Atom/charge           : 1.0
+   HarmonicAngleForce.Angle/angle       : 0.5
+   NonbondedForce.Atom/sigma            : 0.1
+   HarmonicBondForce.Bond/length        : 0.01
 /priors
+
 $end
 
 
