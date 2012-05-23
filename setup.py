@@ -9,6 +9,146 @@ from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
 import numpy
 import glob
+# These imports were required to install the mslib extension.
+import sys, os, re
+from os import path
+from distutils.file_util import copy_file
+from distutils.util import get_platform
+from distutils.cmd import Command
+from distutils.command.install_data import install_data
+from distutils.command.build import build
+from distutils.command.build_ext import build_ext
+from distutils.command.sdist import sdist
+
+#===============================================#
+# mslib stuff
+
+libVersion = "1.4.4"
+
+# platform we are building Python extension for:
+platform =  sys.platform
+
+# amd64
+if (platform == "linux2"):
+    lUname = os.uname()
+    if lUname[-1] == 'x86_64':
+        platform = lUname[-1] + lUname[0] + lUname[2][0]
+
+#location of prebuilt C-library libmsms:
+
+clib_dir = path.join(".", "ext", "mslib-1.5.4", "lib", platform)
+if platform == "darwin":
+    arch = os.uname()[-1]
+    if arch == 'Power Macintosh':
+        clib_dir = path.join(clib_dir, "ppcDarwin")
+    elif re.match("i*\d86", arch):
+        clib_dir = path.join(clib_dir, "i86Darwin")
+    else:
+        print "Unsupported architecture: ", os.uname()
+
+########################################################################
+# Overwrite the run method of the install_data class to install data
+# files in the package.
+########################################################################
+
+class modified_install_data(install_data):
+
+    def run(self):
+        install_cmd = self.get_finalized_command('install')
+        self.install_dir = getattr(install_cmd, 'install_lib')
+        return install_data.run(self)
+
+########################################################################
+# Overwrite the sub_commands list of the build command so that
+# the build_py is called after build_clib and build_ext. This way
+# a python module generated  by SWIG in 'build_ext'command is copied to
+#the build directory by 'build_py' command.
+########################################################################
+
+class modified_build(build):
+    sub_commands = [('build_clib',    build.has_c_libraries),
+                    ('build_ext',     build.has_ext_modules),
+                    ('build_py',      build.has_pure_modules),
+                    ('build_scripts', build.has_scripts),
+                   ]
+    
+########################################################################
+
+class modified_build_ext(build_ext):
+    def run(self):
+        if sys.platform == "darwin":
+            # on MacOS ranlib command should be used for updating
+            # the table of contents of archive library libmsms.a.
+            #staticlib = path.join("lib", "darwin", "libmsms"+libVersion+".a")
+            staticlib = path.join(clib_dir,  "libmsms"+libVersion+".a")
+            if path.isfile(staticlib):
+                self.spawn(["ranlib", "-s", staticlib]) 
+        build_ext.run(self)
+
+        
+pack_name = "ext/mslib-1.5.4/mslib"
+ext_name = "_msms"
+
+#####################################################################
+# Overwrite the prune_file_list method of sdist to not
+# remove automatically the RCS/CVS directory from the distribution.
+####################################################################
+
+class modified_sdist(sdist):
+    def prune_file_list(self):
+
+        build = self.get_finalized_command('build')
+        base_dir = self.distribution.get_fullname()
+        self.filelist.exclude_pattern(None, prefix=build.build_base)
+        self.filelist.exclude_pattern(None, prefix=base_dir)
+
+if platform == "win32":
+    clib_name = "mslib"
+else:
+    clib_name = "msms"+libVersion
+
+try:   
+    from version import VERSION
+except:
+    VERSION = "1.0"
+
+dist = setup(name="mslib",
+             version=VERSION,
+             description="MSMS library python extension module",
+             author="Michel F.Sanner",
+             author_email="sanner@scripps.edu",
+             url="http://www.scripps.edu/~sanner/software",
+             license="to be specified",
+             packages=['forcebalance/mslib'],
+             package_dir={'forcebalance/mslib':'ext/mslib-1.5.4/mslib'},
+             py_modules=[],
+             data_files=[],
+             cmdclass = {'build':modified_build,
+                         'build_ext':modified_build_ext,
+                         'sdist': modified_sdist,
+                         'install_data':modified_install_data},
+             ext_package="forcebalance/mslib",
+             ext_modules=[Extension (ext_name, [path.join(pack_name, "msms.i")],
+                                     include_dirs=[path.join(".","ext","mslib-1.5.4","include"), numpy.get_include()],
+                                     define_macros=[('LONGJMP_EXIT', None),],
+                                     library_dirs=[clib_dir],
+                                     libraries=[clib_name],
+                                     )])
+
+# Remove the .py and wrap.c files generated by swig from the
+# MyPack directory
+import os
+pyName = './ext/mslib-1.5.4/mslib/msms.py'
+if os.path.exists(pyName):
+    os.system("rm -f %s"%pyName)
+    print "Removing %s generated by swig"%pyName
+wrapName = './ext/mslib-1.5.4/mslib/msms_wrap.c'
+if os.path.exists(wrapName):
+    os.system("rm -f %s"%wrapName)
+    print "Removing %s generated by swig"%wrapName
+
+#===============================================#
+
 
 # Stuff from the msmbuilder setup script (external extensions)
 # Retained here for reference
@@ -35,7 +175,7 @@ import glob
 #                 include_dirs = ["molfile_plugin/include/","molfile_plugin"] 
 #                 )
 
-CMBAR = Extension('ext/pymbar/_pymbar',
+CMBAR = Extension('forcebalance/pymbar/_pymbar',
                   sources = ["ext/pymbar/_pymbar.c"],
                   extra_compile_args=["-std=c99","-O2","-shared","-msse2","-msse3"],
                   include_dirs = [numpy.get_include(),numpy.get_include()+"/numpy/"]
@@ -51,8 +191,10 @@ def buildKeywordDictionary():
     setupKeywords["license"]           = "GPL 3.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
-    setupKeywords["packages"]          = ["src","ext/pymbar"]
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh")
+    setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
+    setupKeywords["package_dir"]       = {"forcebalance"        : "src",
+                                          "forcebalance/pymbar" : "ext/pymbar"}
     setupKeywords["package_data"]      = {
         "ForceBalance"                   : ["AUTHORS","LICENSE.txt"]
                                          }

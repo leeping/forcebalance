@@ -1,0 +1,32 @@
+# This list all other files to be included in the distribution
+# which are not python modules
+# include, exclude.... which are not described in the setup.py.
+include MANIFEST.in
+include version.py
+
+# list of the non python module to be included in the distribution
+include include/*
+include lib/sunos5/*
+include lib/irix6/*
+include lib/linux2/*
+include lib/darwin/CVS/*
+include lib/darwin/i86Darwin/*
+include lib/darwin/ppcDarwin/*
+include lib/x86_64Linux2/*
+include lib/linux-ia64/*
+include mslib/*.i
+include mslib/arrayget.h
+include mslib/Tests/Data/*
+include mslib/doc.tar.gz
+
+# list of CVS directories
+include CVS/*
+include include/CVS/*
+include lib/CVS/*
+include lib/irix6/CVS/*
+include lib/linux2/CVS/*
+include lib/sunos5/CVS/*
+include lib/darwin/CVS/*
+include mslib/CVS/*
+include mslib/Tests/CVS/*
+include mslib/Tests/Data/CVS/*
