@@ -251,7 +251,7 @@ def compute_mass(system):
       mass += system.getParticleMass(i)
    return mass
 
-def run_simulation(pdb,settings,pbc=True,Trajectory=True):
+def run_simulation(pdb,settings,pbc=True):
    """ Run a NPT simulation and gather statistics. """
 
    # Create the test system.
@@ -330,8 +330,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
                                                           volume / units.nanometers**3, density / (units.kilogram / units.meter**3))
    # Collect production data.
    if verbose: print "Production..."
-   if Trajectory:
-      simulation.reporters.append(DCDReporter('dynamics.dcd', 100))
+   simulation.reporters.append(DCDReporter('dynamics.dcd', 100))
    for iteration in range(niterations):
       # Propagate dynamics.
       simulation.step(nsteps)
@@ -449,7 +448,7 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,boxes=None,verbose=False):
    """
 
    # Print the force field XML from the ForceBalance object, with modified parameters.
-   pvals = FF.make(mvals,False)
+   pvals = FF.make(os.getcwd(),mvals,False)
    # Load the force field XML file to make the OpenMM object.
    forcefield = ForceField(sys.argv[2])
    # Create the system, setup the simulation.
@@ -531,7 +530,7 @@ def main():
    # Load the force field in from the ForceBalance pickle.
    FF,mvals,h = lp_load(open('forcebalance.p'))
    # Create the force field XML files.
-   pvals = FF.make(mvals,False)
+   pvals = FF.make(os.getcwd(),mvals,False)
 
    #=================================================================#
    # Run the simulation for the full system and analyze the results. #
@@ -562,7 +561,7 @@ def main():
    # Now run the simulation for just the monomer. #
    #==============================================#
    mpdb = PDBFile('mono.pdb')
-   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False, Trajectory=False)
+   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False)
    # Get statistics from our simulation.
    _trash, _crap, mPot_avg, mPot_err = analyze(mData)
    # Now that we have the coordinates, we can compute the energy derivatives.
@@ -597,7 +596,7 @@ def main():
    FF.print_map(vals=GHvap)
    print bar
    # Print the final force field.
-   pvals = FF.make(mvals,False)
+   pvals = FF.make(os.getcwd(),mvals,False)
 
    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, Hvap_avg, Hvap_err, GHvap),f)
 
