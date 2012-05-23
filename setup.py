@@ -5,6 +5,7 @@ VERSION="0.12.0"
 __author__ = "Lee-Ping Wang"
 __version__ = VERSION
 
+from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
 import numpy
 import glob
@@ -34,6 +35,12 @@ import glob
 #                 include_dirs = ["molfile_plugin/include/","molfile_plugin"] 
 #                 )
 
+CMBAR = Extension('ext/pymbar/_pymbar',
+                  sources = ["ext/pymbar/_pymbar.c"],
+                  extra_compile_args=["-std=c99","-O2","-shared","-msse2","-msse3"],
+                  include_dirs = [numpy.get_include(),numpy.get_include()+"/numpy/"]
+                  )
+
 def buildKeywordDictionary():
     from distutils.core import Extension
     setupKeywords = {}
@@ -44,13 +51,13 @@ def buildKeywordDictionary():
     setupKeywords["license"]           = "GPL 3.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
-    setupKeywords["packages"]          = ["forcebalance"]
+    setupKeywords["packages"]          = ["src","ext/pymbar"]
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh")
     setupKeywords["package_data"]      = {
         "ForceBalance"                   : ["AUTHORS","LICENSE.txt"]
                                          }
     setupKeywords["data_files"]        = []
-    setupKeywords["ext_modules"]       = []
+    setupKeywords["ext_modules"]       = [CMBAR]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
     setupKeywords["long_description"]  = """
@@ -66,6 +73,9 @@ def buildKeywordDictionary():
     types of reference data to fit these potentials to, we do our best
     to provide an infrastructure which allows a user or a contributor
     to fit any type of potential to any type of reference data.
+
+    This code includes the pymbar package by Michael Shirts and John D. Chodera
+    (https://simtk.org/home/pymbar).
     
     """
     outputString=""

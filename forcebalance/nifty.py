@@ -8,6 +8,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 
 import os
 from re import match, sub
+import numpy as np
 from numpy import array, diag, dot, eye, mat, mean, transpose
 from numpy.linalg import norm, svd
 import threading
@@ -65,9 +66,10 @@ def pmat2d(mat2d):
 
     @param[in] mat2d a 2-D matrix
     """
-    for i in range(mat2d.shape[0]):
-        for j in range(mat2d.shape[1]):
-            print "% .1e" % mat2d[i][j],
+    m2a = array(mat2d)
+    for i in range(m2a.shape[0]):
+        for j in range(m2a.shape[1]):
+            print "% .1e" % m2a[i][j],
         print
 
 def printcool(text,sym="#",bold=False,color=2,bottom='-',minwidth=50):

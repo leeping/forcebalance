@@ -11,7 +11,7 @@ contained inside.
 import os, pickle, re, sys
 import numpy as np
 from numpy.linalg import eig, norm, solve
-from nifty import col, flat, row, printcool, printcool_dictionary
+from nifty import col, flat, row, printcool, printcool_dictionary, pmat2d
 from finite_difference import f1d7p, f1d5p, fdwrap
 import random
 
@@ -71,6 +71,8 @@ class Optimizer(object):
         self.jobtype   = options['jobtype']
         ## Initial step size trust radius
         self.trust0    = options['trust0']
+        ## Minimum trust radius (for noisy objective functions)
+        self.mintrust  = options['mintrust']
         ## Lower bound on Hessian eigenvalue (below this, we add in steepest descent)
         self.eps       = options['eig_lowerbound']
         ## Step size for numerical finite difference
@@ -191,7 +193,10 @@ class Optimizer(object):
         @param[in] b_BFGS Switch to use BFGS (True) or Newton-Raphson (False)
 
         """
-        printcool( "Main Optimizer\n%s Mode" % ("BFGS" if b_BFGS else "Newton-Raphson"), color=7, bold=1)
+        # Parameters for the adaptive trust radius
+        a = self.adapt_fac  # Default value is 0.5, decrease to make more conservative.  Zero to turn off all adaptive.
+        b = self.adapt_damp # Default value is 0.5, increase to make more conservative
+        printcool( "Main Optimizer\n%s Mode%s" % ("BFGS" if b_BFGS else "Newton-Raphson", " (Static Radius)" if a == 0.0 else " (Adaptive Radius)"), color=7, bold=1)
         # First, set a bunch of starting values
         Ord         = 1 if b_BFGS else 2
         global ITERATION_NUMBER
@@ -203,25 +208,26 @@ class Optimizer(object):
         else:
             xk       = self.mvals0.copy()
             print
-            data     = self.Objective(xk,Ord,verbose=True)
+            data     = self.Objective(xk,Ord,verbose=True) # Try to get a Hessian no matter what on the first step.
             X, G, H  = data['X'], data['G'], data['H']
-            # print "Computed G and H are equal to:"
-            # print G
-            # print H
             ehist    = np.array([X])
             xk_prev  = xk.copy()
             trust    = self.trust0
             X_best   = X
 
+        X_prev   = X
         G_prev   = G.copy()
         H_stor   = H.copy()
         stepn  = 0
         ndx    = 0.0
         color  = "\x1b[97m"
+        nxk = norm(xk)
+        ngr = norm(G)
 
-        # Parameters for the adaptive trust radius
-        a = self.adapt_fac  # Default value is 0.5, decrease to make more conservative
-        b = self.adapt_damp # Default value is 0.5, increase to make more conservative
+        wolfe_c1 = 1e-4
+        wolfe_c2 = 0.9
+        Quality  = 1.0
+
         while 1: # Loop until convergence is reached.
             ITERATION_NUMBER += 1
             ## Put data into the checkpoint file
@@ -229,11 +235,9 @@ class Optimizer(object):
                         'x_best': X_best,'xk_prev': xk_prev, 'trust': trust}
             if self.wchk_step:
                 self.writechk()
-            nxk = norm(xk)
-            ngr = norm(G)
             stdfront = len(ehist) > 10 and np.std(np.sort(ehist)[:10]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
-            print "\n%6s%12s%12s%12s%14s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)")
-            print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e" % (stepn, nxk, ndx, ngr, color, X, stdfront)
+            print "\n%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)", "StepQual")
+            print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f" % (stepn, nxk, ndx, ngr, color, X, stdfront, Quality)
             # Check the convergence criteria
             if ngr < self.conv_grd:
                 print "Convergence criterion reached for gradient norm (%.2e)" % self.conv_grd
@@ -248,59 +252,116 @@ class Optimizer(object):
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             # Take a step in the parameter space.
-            # print "Taking a step using the following for G and H:"
-            # print G
-            # print H
-            dx, over = self.step(G, H, trust)
+            #--- Print stuff
+            bar = printcool("Total Gradient",color=6)
+            self.FF.print_map(vals=G)
+            print bar
+            bar = printcool("Total Hessian",color=6)
+            pmat2d(H)
+            print bar
+            #---
+            dx, dX_expect, bump = self.step(G, H, trust)
+            #--- Print stuff
+            old_pk = self.FF.create_pvals(xk)
+            old_xk = xk.copy()
+            #---
             xk += dx
+            #--- Print stuff
+            pk = self.FF.create_pvals(xk)
+            dp = pk - old_pk
+            bar = printcool("Mathematical Parameters (Current + Step = Next)",color=3)
+            self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_xk[i], '+' if dx[i] >= 0 else '-', abs(dx[i]), xk[i]) for i in range(len(xk))])
+            print bar
+            bar = printcool("Physical Parameters (Current + Step = Next)",color=3)
+            self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
+            print bar
+            #---
             # Evaluate the objective function and its derivatives.
             data        = self.Objective(xk,Ord,verbose=True)
-            X, G, H = data['X'], data['G'], data['H']
-            # print "Computed G and H are equal to:"
-            # print G
-            # print H
-            # if pkg.efweight > 0.99:
-            #     dFc, patomax = cartesian_dforce(pkg)
-            ndx = norm(dx)
-            if X > X_best:
-                goodstep = False
-                color = "\x1b[91m"
-                # Decrease the trust radius and take a step back, if the step was bad.
-                trust = ndx*(1./(1+a))
-                xk = xk_prev.copy()
-                # Hmm, we don't want to take a step at the "old" xk but with the "new" G and H, now do we?
-                G = G_prev.copy()
-                H = H_stor.copy()
-            else:
-                goodstep = True
-                color = "\x1b[92m"
-                # Adjust the trust radius using this funky formula
-                # Conservative.  Multiplier is 1.5 and decreases to 1.1 when trust=4trust0
-                trust += over and a*trust*np.exp(-b*(trust/self.trust0 - 1)) or 0
-                X_best = X
-                # So here's the deal.  I'm getting steepest-descent badness in some of the parameters (e.g. virtual site positions)
-                # The solution would be to build up a BFGS quasi-Hessian but only in that parameter block, since we have exact second
-                # derivatives for everything else.  I will leave the cross-terms alone.
-                if b_BFGS:
-                    Hnew = H_stor.copy()
-                    Dx   = col(xk - xk_prev)
-                    Dy   = col(G  - G_prev)
-                    Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
-                    Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
-                    Hnew += Mat1-Mat2
-                    # After that bit of trickery, Hnew is now updated with BFGS stuff.
-                    # We now want to put the BFGS-gradients into the Hessian that will be used to take the step.
-                    H = Hnew.copy()
-                G_prev = G.copy()
-                H_stor = H.copy()
-                xk_prev = xk.copy()
-                ehist = np.append(ehist, X)
-            # print "At the end of the loop, G and H are equal to:"
-            # print G
-            # print H
-            drc = abs(flat(dx)).argmax()
             stepn += 1
+            X, G, H = data['X'], data['G'], data['H']
+            ndx = norm(dx)
+            nxk = norm(xk)
+            ngr = norm(G)
+            drc = abs(flat(dx)).argmax()
+
+            dX_actual = X - X_prev
+            Quality = dX_actual / dX_expect
+
+            if Quality <= 0.25:
+                # If the step quality is bad, then we should decrease the trust radius.
+                trust = max(ndx*(1./(1+a)), self.mintrust)
+            elif Quality >= 0.75 and bump:
+                # If the step quality is good, then we should increase the trust radius.  Capeesh?
+                # The 'a' factor is how much we should grow or shrink the trust radius each step
+                # and the 'b' factor determines how closely we are tied down to the original value.
+                # Recommend values 0.5 and 0.5
+                trust += a*trust*np.exp(-b*(trust/self.trust0 - 1))
             
+            if X > X_prev:
+                # Reject the step if the step taken was bad.
+                color = "\x1b[91m"
+                Rejects = True
+                if Rejects:
+                    xk = xk_prev.copy()
+                    G = G_prev.copy()
+                    H = H_stor.copy()
+                    continue
+            else:
+                color = "\x1b[92m"
+                X_best = X
+                ehist = np.append(ehist, X)
+            # Hessian update.
+            if b_BFGS:
+                Hnew = H_stor.copy()
+                #<---
+                # Wolfe condition stuff, currently being tested.
+                Wolfe1_Left  = X
+                Wolfe1_Right = X_prev + (wolfe_c1)*np.dot(dx,G_prev)
+                Wolfe2_Left  = np.dot(dx/norm(dx),G)
+                Wolfe2_Right = wolfe_c2 * np.dot(dx/norm(dx),G_prev)
+                print "X:", X, "X_prev:", X_prev, "Dot:", np.dot(dx,G_prev)
+                print "Wolfe1:", Wolfe1_Left, Wolfe1_Right
+                print "Dot_Left:", np.dot(dx/norm(dx),G), "Dot_Right:", np.dot(dx/norm(dx),G_prev)
+                print "Wolfe2:", Wolfe2_Left, Wolfe2_Right
+                if Wolfe1_Left < Wolfe1_Right:
+                    print "Wolfe condition 1 is satisfied"
+                else:
+                    print "Wolfe condition 1 is NOT satisfied"
+                if Wolfe2_Left > Wolfe2_Right:
+                    print "Wolfe condition 2 is satisfied"
+                else:
+                    print "Wolfe condition 2 is NOT satisfied"
+                bar = printcool("Loaded H_stor",color=1)
+                pmat2d(Hnew)
+                bar = printcool("Dx",color=6)
+                self.FF.print_map(vals=xk-xk_prev)
+                bar = printcool("Dy",color=6)
+                self.FF.print_map(vals=G-G_prev)
+                #--->
+                Dx   = col(xk - xk_prev)
+                Dy   = col(G  - G_prev)
+                Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
+                Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
+                Hnew += Mat1-Mat2
+                # After that bit of trickery, Hnew is now updated with BFGS stuff.
+                # We now want to put the BFGS-gradients into the Hessian that will be used to take the step.
+                H = Hnew.copy()
+                #<---
+                # bar = printcool("Mat1",color=1)
+                # pmat2d(Mat1)
+                # bar = printcool("Mat2",color=1)
+                # pmat2d(Mat2)
+                # bar = printcool("Mat1-Mat2",color=1)
+                # pmat2d(Mat1-Mat2)
+                # bar = printcool("New H",color=1)
+                # pmat2d(H)
+                #--->
+                
+            G_prev  = G.copy()
+            H_stor  = H.copy()
+            xk_prev = xk.copy()
+            X_prev  = X
         return xk
 
     def step(self, G, H, trust):
@@ -328,23 +389,48 @@ class Optimizer(object):
         @param[in] trust The trust radius
         
         """
+
+        # G0 and H0 are used for determining the expected function change.
+        G0 = G.copy()
+        H0 = H.copy()
         G = np.delete(G, self.excision)
         H = np.delete(H, self.excision, axis=0)
         H = np.delete(H, self.excision, axis=1)
+        
         Eig = eig(H)[0]            # Diagonalize Hessian
         Emin = min(Eig)
         if Emin < self.eps:        # Mix in SD step if Hessian minimum eigenvalue is negative
+            print "Warning: Hessian has a small or negative eigenvalue (%.3f), mixing in some steepest descent (%.3f) to correct this." % (Emin, self.eps - Emin)
             H += (self.eps - Emin)*np.eye(H.shape[0])
         dx = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
         dx = flat(dx)
         for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
             dx = np.insert(dx, i, 0)
         dxnorm = norm(dx)          # Length of step
-        over = False
+        bump = False
+
+        #<--------------------------
+        # Levenberg-Marquardt (Trust Region) code.  Added 05/19/2012.
+        from scipy import optimize
+        def trust_fun(L):
+            HT = H + L**2*np.diag(np.diag(H))
+            dx = -solve(HT, G)
+            ndx = norm(dx)
+            return (norm(dx) - (trust * (1.0-1e-6)))**2            
         if dxnorm > trust:
-            over = True
-            dx *= trust / dxnorm   # Normalize step length (Trust region)
-        return dx, over
+            bump = True
+            LOpt = optimize.brute(trust_fun,[[0,100]],Ns=101)**2
+            LOpt = optimize.fmin(trust_fun,LOpt,xtol=1e-8,disp=0)**2
+            H += LOpt*np.diag(np.diag(H))
+            dx = -solve(H, G)
+            dx = flat(dx)
+            for i in self.excision:
+                dx = np.insert(dx, i, 0)
+            dxnorm = norm(dx)
+            print "Levenberg-Marquardt: The Hessian's diagonal is scaled by % .3f" % (1+LOpt)
+        expect = 0.5*row(dx)*np.mat(H0)*col(dx) + np.dot(dx,G0)
+        #-------------------------->
+        return dx, expect, bump
 
     def NewtonRaphson(self):
         """ Optimize the force field parameters using the Newton-Raphson method (@see MainOptimizer) """

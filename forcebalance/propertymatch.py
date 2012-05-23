@@ -14,6 +14,22 @@ from re import match
 import subprocess
 from subprocess import PIPE
 from lxml import etree
+#from forcebalance.wham import WHAM
+from pymbar import pymbar
+import itertools
+
+def weight_info(W, T, N_k):
+    C = []
+    N = 0
+    I = np.exp(-1*np.sum((W*np.log(W))))
+    for ns in N_k:
+        C.append(sum(W[N:N+ns]))
+        N += ns
+    C = np.array(C)
+    print "MBAR Results for Temperature % .1f, Box, Contributions:" % T
+    print C
+    print "InfoContent: % .1f snapshots (%.2f %%)" % (I, 100*I/len(W))
+    return C
 
 class PropertyMatch(FittingSimulation):
     
@@ -32,6 +48,10 @@ class PropertyMatch(FittingSimulation):
         
         # Initialize the SuperClass!
         super(PropertyMatch,self).__init__(options,sim_opts,forcefield)
+        # Fractional weight of the density
+        self.W_Rho = sim_opts['w_rho']
+        # Fractional weight of the enthalpy of vaporization
+        self.W_Hvap = sim_opts['w_hvap']
         
         #======================================#
         #     Variables which are set here     #
@@ -46,6 +66,7 @@ class PropertyMatch(FittingSimulation):
         #          UNDER DEVELOPMENT           #
         #======================================#
         # Put stuff here that I'm not sure about. :)
+        np.set_printoptions(precision=4, linewidth=100)
             
     def indicate(self):
         return
@@ -87,21 +108,22 @@ class PropertyMatch(FittingSimulation):
         for i, T in enumerate(temps):
             if FitFitted:
                 G = flat(GradZMat[i,:])
-                DRho = cfit[T] - exp[T]
+                Delta = cfit[T] - exp[T]
             else:
                 G = grad[T]
-                DRho = calc[T] - exp[T]
-            ThisObj = Weights[T] * DRho ** 2 / Denom
-            ThisGrad = 2.0 * Weights[T] * DRho * G / Denom
+                Delta = calc[T] - exp[T]
+            ThisObj = Weights[T] * Delta ** 2 / Denom
+            ThisGrad = 2.0 * Weights[T] * Delta * G / Denom
             if verbose:
                 bar = printcool("%s at %.1f :%s Objective = % .3f, Gradient:" % (name, T, ' Smoothed' if FitFitted else '', ThisObj))
                 self.FF.print_map(vals=ThisGrad)
+                print "Denominator = % .3f Stdev(expt) = %.3f" % (Denom, np.std(np.array([exp[i] for i in temps])))
             else:
                 print "%s at %.1f contributes % .3f to the objective function" % (name, T, ThisObj)
             Objective += ThisObj
             Gradient += ThisGrad
             # The second derivatives are inaccurate; we estimate the objective function Hessian using first derivatives.
-            # If we had a good Hessian estimate the formula would be: 2.0 * Weights[T] * (np.outer(G, G) + DRho * np.diag(Hd))
+            # If we had a good Hessian estimate the formula would be: 2.0 * Weights[T] * (np.outer(G, G) + Delta * np.diag(Hd))
             Hessian += 2.0 * Weights[T] * (np.outer(G, G)) / Denom
 
         Delta = np.array([calc[T] - exp[T] for T in temps])
@@ -144,8 +166,6 @@ class PropertyMatch(FittingSimulation):
         @return Answer Contribution to the objective function
         
         """
-
-        print "get has been called with mvals = ", mvals
 
         Answer = {}
         # Dump the force field to a pickle file
@@ -190,25 +210,73 @@ class PropertyMatch(FittingSimulation):
 
         # Gather the calculation data
         Results = {T : lp_load(open('./%.1f/npt_result.p' % T)) for T in Temps}
-        Rho_calc = {T : Results[T][0] for T in Temps}
-        Rho_std  = {T : Results[T][1] for T in Temps}
-        Rho_grad = {T : Results[T][2] for T in Temps}
-        Hvap_calc = {T : Results[T][3] for T in Temps}
-        Hvap_std  = {T : Results[T][4] for T in Temps}
-        Hvap_grad = {T : Results[T][5] for T in Temps}
+
+        Rhos, Energies, Grads, mEnergies, mGrads, Rho_errs, Hvap_errs = ([Results[T][i] for T in Temps] for i in range(7))
+
+        R  = np.array(list(itertools.chain(*list(Rhos))))
+        E  = np.array(list(itertools.chain(*list(Energies))))
+        G  = np.hstack(tuple(Grads))
+        mE = np.array(list(itertools.chain(*list(mEnergies))))
+        mG = np.hstack(tuple(mGrads))
+
+        Rho_calc = {}
+        Rho_grad = {}
+        Rho_std  = {}
+        Hvap_calc = {}
+        Hvap_grad = {}
+        Hvap_std  = {}
+
+        Sims = len(Temps)
+        Shots = len(Energies[0])
+        N_k = np.ones(Sims)*Shots
+        # Use the value of the energy for snapshot t from simulation k at potential m
+        U_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
+        mU_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
+        for m, T in enumerate(Temps):
+            beta = 1. / (kb * T)
+            for k in range(len(Temps)):
+                U_kln[k, m, :]   = Energies[k]
+                U_kln[k, m, :]  *= beta
+                mU_kln[k, m, :]  = mEnergies[k]
+                mU_kln[k, m, :] *= beta
+
+        mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
+        mmbar = pymbar.MBAR(mU_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
+        W1 = mbar.getWeights()
+        mW1 = mmbar.getWeights()
         
+        for i, T in enumerate(Temps):
+            W = flat(W1[:,i])
+            C = weight_info(W, T, N_k)
+            mW = flat(mW1[:,i])
+            Gbar = flat(np.mat(G)*col(W))
+            mGbar = flat(np.mat(mG)*col(mW))
+            mBeta = -1/kb/T
+            Rho_calc[T]   = np.dot(W,R)
+            Rho_grad[T]   = mBeta*(flat(np.mat(G)*col(W*R)) - np.dot(W,R)*Gbar)
+            Hvap_calc[T]  = np.dot(mW,mE) - np.dot(W,E)/216
+
+            Hvap_grad[T]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
+            Hvap_grad[T] -= (Gbar + mBeta*(flat(np.mat(G)*col(W*E)) - np.dot(W,E)*Gbar)) / 216
+            Rho_std[T]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
+            Hvap_std[T]   = np.sqrt(sum(C**2 * np.array(Hvap_errs)**2))
+
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density")
         X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap")
 
         Gradient = np.zeros(self.FF.np, dtype=float)
         Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
-        Objective = X_Rho + X_Hvap
+
+        W1 = self.W_Rho / (self.W_Rho + self.W_Hvap)
+        W2 = self.W_Hvap / (self.W_Rho + self.W_Hvap)
+
+        Objective    = W1 * X_Rho + W2 * X_Hvap
         if AGrad:
-            Gradient = G_Rho + G_Hvap
+            Gradient = W1 * G_Rho + W2 * G_Hvap
         if AHess:
-            Hessian = H_Rho + H_Hvap
-        
+            Hessian  = W1 * H_Rho + W2 * H_Hvap
+
         printcool_dictionary(RhoPrint,title='Rho vs T:   Reference  Calculated +- Stdev    Delta    CurveFit   D(Cfit)',bold=True,color=4,keywidth=15)
         bar = printcool("Density objective function: % .3f, Derivative:" % X_Rho)
         self.FF.print_map(vals=G_Rho)

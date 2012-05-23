@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-@package supernpt
+@package npt
 
 NPT simulation in OpenMM.  Runs a simulation to compute bulk properties
 (for example, the density or the enthalpy of vaporization) and compute the
@@ -310,10 +310,12 @@ def run_simulation(pdb,settings,pbc=True):
    # Now run the simulation #
    #========================#
    # Equilibrate.
+   if verbose: print "Using timestep", timestep, "and %i steps per data record" % nsteps
+   if verbose: print "Special note: getVelocities and getForces has been turned off."
    if verbose: print "Equilibrating..."
    for iteration in range(nequiliterations):
       simulation.step(nsteps)
-      state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=True,getForces=True)
+      state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
       kinetic = state.getKineticEnergy()
       potential = state.getPotentialEnergy()
       if pbc:
@@ -335,7 +337,7 @@ def run_simulation(pdb,settings,pbc=True):
       # Propagate dynamics.
       simulation.step(nsteps)
       # Compute properties.
-      state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=True,getForces=True)
+      state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
       kinetic = state.getKineticEnergy()
       potential = state.getPotentialEnergy()
       if pbc:
@@ -505,7 +507,7 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,boxes=None):
 def main():
    
    """ 
-   Usage: (runcuda.sh) supernpt.py protein.pdb forcefield.xml <temperature> <pressure>
+   Usage: (runcuda.sh) npt.py protein.pdb forcefield.xml <temperature> <pressure>
 
    This program is meant to be called automatically by ForceBalance
    (specifically, subroutines in openmmio.py).  It is not easy to use
@@ -545,11 +547,10 @@ def main():
    kB = units.BOLTZMANN_CONSTANT_kB * units.AVOGADRO_CONSTANT_NA
    mBeta = (-1 / (temperature * kB)).value_in_unit(units.mole / units.kilojoule)
    Beta = (1 / (temperature * kB)).value_in_unit(units.mole / units.kilojoule)
-   # It becomes necessary to make the gradient squared for the second derivative.
-   GG = G * G
    # Build the first density derivative .
    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / N - np.mean(Rhos) * np.mean(G, axis=1))
    # The second density derivative is so inaccurate we might as well not compute it. -_-
+   # GG = G * G
    # HdRho = mBeta * (flat(np.mat(Hd) * col(Rhos)) / N
    #                  - Beta * flat(np.mat(GG) * col(Rhos)) / N
    #                  + Beta * (flat(np.mat(G) * col(Rhos)) / N) * np.mean(G, axis=1)
@@ -560,6 +561,10 @@ def main():
    #==============================================#
    # Now run the simulation for just the monomer. #
    #==============================================#
+   global timestep, nsteps
+   timestep = 0.1 * units.femtosecond # timestep for integrtion
+   nsteps   = 1000                    # number of steps per data record
+
    mpdb = PDBFile('mono.pdb')
    mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False)
    # Get statistics from our simulation.
@@ -568,7 +573,7 @@ def main():
    mG, mHd = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mono_kwargs)
    # The enthalpy of vaporization in kJ/mol.
    Hvap_avg = Pot_avg / 216 - mPot_avg
-   Hvap_err = np.sqrt(Pot_err**2 / 216 + mPot_err**2)
+   Hvap_err = np.sqrt(Pot_err**2 / 216**2 + mPot_err**2)
 
    #print "mean(Energies) = ", np.mean(Energies)
    #print "mean(mEnergies) = ", np.mean(mEnergies)
@@ -598,7 +603,8 @@ def main():
    # Print the final force field.
    pvals = FF.make(os.getcwd(),mvals,False)
 
-   with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, Hvap_avg, Hvap_err, GHvap),f)
+   #with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, Hvap_avg, Hvap_err, GHvap),f)
+   with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Energies, G, mEnergies, mG, Rho_err, Hvap_err),f)
 
 if __name__ == "__main__":
    main()
