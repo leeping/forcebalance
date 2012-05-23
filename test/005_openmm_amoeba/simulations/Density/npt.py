@@ -64,7 +64,7 @@ import simtk.unit as units
 import simtk.openmm as openmm
 from simtk.openmm.app import *
 from forcebalance.forcefield import FF
-from forcebalance.nifty import col, flat, lp_load, printcool
+from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool
 from forcebalance.finite_difference import fdwrap, f12d3p
 
 #======================================================#
@@ -74,8 +74,8 @@ from forcebalance.finite_difference import fdwrap, f12d3p
 # Select run parameters
 timestep = 0.5 * units.femtosecond # timestep for integrtion
 nsteps = 200                       # number of steps per data record
-nequiliterations = 5             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 50                 # number of iterations to collect data for
+nequiliterations = 100             # number of equilibration iterations (hope 50 ps is enough)
+niterations = 500                  # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -532,10 +532,7 @@ def main():
    
    bar = printcool("Density Second Derivative, Full")
    FF.print_map(vals=HdRho)
-   print bar
-   
    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, HdRho),f)
-   
 
 if __name__ == "__main__":
    main()

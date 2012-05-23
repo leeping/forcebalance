@@ -16,7 +16,7 @@ scan_vals -1:1:11
 scanindex_num 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
 
 # (allcap) The job type, defaults to a single-point evaluation of objective function
-jobtype single
+jobtype bfgs
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
 forcefield amoebawater.xml
@@ -68,18 +68,6 @@ name Density
 
 # (allcap) The type of fitting simulation, for instance ForceEnergyMatch_GMXX2
 simtype PropertyMatch_OpenMM
-
-# (list) The parameter types that need to be differentiated using finite difference
-fd_ptypes all
-
-# (bool) Finite difference gradients
-fdgrad 1
-
-# (bool) Finite difference Hessian diagonals (costs np times a gradient calculation)
-fdhess 1
-
-# (bool) Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)
-fdhessdiag 1
 
 # (float) Weight of the current simulation (with respect to other simulations)
 weight 1.0
