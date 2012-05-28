@@ -1,5 +1,13 @@
 """@package nifty Nifty functions, intended to be imported by any module within ForceBalance.
 
+Table of Contents:
+- I/O formatting
+- Math: Variable manipulation, linear algebra, least squares polynomial fitting
+- Pickle: Expand Python's own pickle to accommodate writing XML etree objects
+- Commands for submitting things to the Work Queue
+- Various file and process management functions
+- Development stuff (not commonly used)
+
 Named after the mighty Sniffy Handy Nifty (King Sniffy)
 
 @author Lee-Ping Wang
@@ -21,46 +29,12 @@ kb = 0.0083144100163
 eqcgmx = 2625.5002
 ## Q-Chem to GMX unit conversion for force
 fqcgmx = -49621.9
+## One bohr equals this many angstroms
+bohrang = 0.529177249
 
-def isint(word):
-    """ONLY matches integers! If you have a decimal point? None shall pass!
-
-    @param[in] word String (for instance, '123', '153.0', '2.', '-354')
-    @return answer Boolean which specifies whether the string is an integer (only +/- sign followed by digits)
-    
-    """
-    return match('^[-+]?[0-9]+$',word)
-
-def isfloat(word):
-    """Matches ANY number; it can be a decimal, scientific notation, what have you
-    CAUTION - this will also match an integer.
-
-    @param[in] word String (for instance, '123', '153.0', '2.', '-354')
-    @return answer Boolean which specifies whether the string is any number
-    
-    """
-    return match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
-
-def isdecimal(word):
-    """Matches things with a decimal only; see isint and isfloat.
-
-    @param[in] word String (for instance, '123', '153.0', '2.', '-354')
-    @return answer Boolean which specifies whether the string is a number with a decimal point
-    
-    """
-    return isfloat(word) and not isint(word)
-
-def orthogonalize(vec1, vec2):
-    """Given two vectors vec1 and vec2, project out the component of vec1
-    that is along the vec2-direction.
-
-    @param[in] vec1 The projectee (i.e. output is some modified version of vec1)
-    @param[in] vec2 The projector (component subtracted out from vec1 is parallel to this)
-    @return answer A copy of vec1 but with the vec2-component projected out.
-    """
-    v2u = vec2/norm(vec2)
-    return vec1 - v2u*dot(vec1, v2u)
-
+#=========================#
+#     I/O formatting      #
+#=========================#
 def pmat2d(mat2d):
     """Printout of a 2-D matrix.
 
@@ -128,6 +102,51 @@ def printcool_dictionary(dict,title="General options",bold=False,color=2,keywidt
     print '\n'.join(["%s %s " % (magic_string(key),str(dict[key])) for key in sorted([i for i in dict]) if dict[key] != None])
     print bar
 
+#===============================#
+#| Math: Variable manipulation |#
+#===============================#
+def isint(word):
+    """ONLY matches integers! If you have a decimal point? None shall pass!
+
+    @param[in] word String (for instance, '123', '153.0', '2.', '-354')
+    @return answer Boolean which specifies whether the string is an integer (only +/- sign followed by digits)
+    
+    """
+    return match('^[-+]?[0-9]+$',word)
+
+def isfloat(word):
+    """Matches ANY number; it can be a decimal, scientific notation, what have you
+    CAUTION - this will also match an integer.
+
+    @param[in] word String (for instance, '123', '153.0', '2.', '-354')
+    @return answer Boolean which specifies whether the string is any number
+    
+    """
+    return match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
+
+def isdecimal(word):
+    """Matches things with a decimal only; see isint and isfloat.
+
+    @param[in] word String (for instance, '123', '153.0', '2.', '-354')
+    @return answer Boolean which specifies whether the string is a number with a decimal point
+    
+    """
+    return isfloat(word) and not isint(word)
+
+def floatornan(word):
+    """Returns a big number if we encounter NaN.
+
+    @param[in] word The string to be converted
+    @return answer The string converted to a float; if not a float, return 1e10
+    @todo I could use suggestions for making this better.
+    """
+    big = 1e10
+    if isfloat(word):
+        return float(word)
+    else:
+        print "Setting %s to % .1e" % big
+        return big
+
 def col(vec):
     """
     Given any list, array, or matrix, return a 1-column matrix.
@@ -157,62 +176,19 @@ def flat(vec):
     """
     return array(vec).reshape(-1)
 
-def floatornan(word):
-    """Returns a big number if we encounter NaN.
+#====================================#
+#| Math: Vectors and linear algebra |#
+#====================================#
+def orthogonalize(vec1, vec2):
+    """Given two vectors vec1 and vec2, project out the component of vec1
+    that is along the vec2-direction.
 
-    @param[in] word The string to be converted
-    @return answer The string converted to a float; if not a float, return 1e10
-    @todo I could use suggestions for making this better.
+    @param[in] vec1 The projectee (i.e. output is some modified version of vec1)
+    @param[in] vec2 The projector (component subtracted out from vec1 is parallel to this)
+    @return answer A copy of vec1 but with the vec2-component projected out.
     """
-    big = 1e10
-    if isfloat(word):
-        return float(word)
-    else:
-        print "Setting %s to % .1e" % big
-        return big
-
-def multiopen(arg):
-    """
-    This function be given any of several variable types
-    (single file name, file object, or list of lines, or a list of )
-    and give a list of files:
-
-    [file1, file2, file3 ... ]
-
-    each of which can then be iterated over:
-
-    [[file1_line1, file1_line2 ... ], [file2_line1, file2_line2 ... ]]
-    """
-    if type(arg) == str:
-        # A single file name
-        fins = [open(arg)]
-    elif type(arg) == file:
-        # A file object
-        fins = [[arg]]
-    elif type(arg) == list:
-        if all([type(l) == str for l in arg]):
-            # A list of lines (as in, open(file).readlines()) is expected to end with \n on most of the lines.
-            if any([match("^.*\n$",l) for l in arg]):
-                fins = [[arg]]
-            # In contrast, a list of file names doesn't have \n characters.
-            else:
-                fins = [open(l) for l in arg]
-        elif all([type(l) == file or type(l) == list for l in arg]):
-            fins = arg
-        else:
-            print "What did you give this program as input?"
-            print arg
-            exit(1)
-    else:
-        print "What did you give this program as input?"
-        print arg
-        exit(1)
-    return fins
-
-def remove_if_exists(fnm):
-    """ Remove the file if it exists (doesn't return an error). """
-    if os.path.exists(fnm):
-        os.remove(fnm)
+    v2u = vec2/norm(vec2)
+    return vec1 - v2u*dot(vec1, v2u)
 
 def invert_svd(X,thresh=1e-8):
     
@@ -238,47 +214,62 @@ def invert_svd(X,thresh=1e-8):
     Xt     = v*si*uh
     return Xt
 
-def warn_press_key(warning):
-    if type(warning) is str:
-        print warning
-    elif type(warning) is list:
-        for line in warning:
-            print line
+#==============================#
+#|    Linear least squares    |#
+#==============================#
+def get_least_squares(x, y, w = None):
+    """
+    @code
+     __                  __
+    |                      |
+    | 1 (x0) (x0)^2 (x0)^3 |
+    | 1 (x1) (x1)^2 (x1)^3 |
+    | 1 (x2) (x2)^2 (x2)^3 |
+    | 1 (x3) (x3)^2 (x3)^3 |
+    | 1 (x4) (x4)^2 (x4)^3 |
+    |__                  __|
+
+    @endcode
+
+    @param[in] X (2-D array) An array of X-values (see above)
+    @param[in] Y (array) An array of Y-values (only used in getting the least squares coefficients)
+    @param[in] w (array) An array of weights, hopefully normalized to one.
+    @param[out] Beta The least-squares coefficients
+    @param[out] Hat The hat matrix that takes linear combinations of data y-values to give fitted y-values (weights)
+    @param[out] yfit The fitted y-values
+    """
+    # X is a 'tall' matrix.
+    X = mat(x)
+    Y = col(y)
+    n_x = X.shape[0]
+    n_fit = X.shape[1]
+    if n_fit >= n_x:
+        warn_press_key("Argh? It seems like this problem is underdetermined!")
+    # Build the weight matrix.
+    if w != None:
+        if len(w) != n_x:
+            warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
+        w /= mean(w)
+        W = mat(diag(w))
     else:
-        print "You're not supposed to pass me a variable of this type:", type(warning)
-    print "Press any key (I assume no responsibility for what happens after this!)"
-    raw_input()
+        W = mat(eye(n_x))
+    # Make the Moore-Penrose Pseudoinverse.
+    MPPI = invert_svd(X.T * W * X) * X.T * W
+    Beta = MPPI * Y
+    Hat = X * MPPI
+    yfit = flat(Hat * Y)
+    # Return three things: the least-squares coefficients, the hat matrix (turns y into yfit), and yfit
+    # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
+    return Beta, Hat, yfit
 
-def concurrent_map(func, data):
-    """
-    Similar to the bultin function map(). But spawn a thread for each argument
-    and apply `func` concurrently.
-
-    Note: unlike map(), we cannot take an iterable argument. `data` should be an
-    indexable sequence.
-    """
-
-    N = len(data)
-    result = [None] * N
-
-    # wrapper to dispose the result in the right slot
-    def task_wrapper(i):
-        result[i] = func(data[i])
-
-    threads = [threading.Thread(target=task_wrapper, args=(i,)) for i in xrange(N)]
-    for t in threads:
-        t.start()
-    for t in threads:
-        t.join()
-
-    return result
-
+#==============================#
+#|      XML Pickle stuff      |#
+#==============================#
 try:
     from lxml import etree
 except: 
     bar = printcool("Warning: XML library import fail (You can't use OpenMM)",sym='!',bold=True,color=2)
     print bar
-
 ## Pickle uses 'flags' to pickle and unpickle different variable types.
 ## Here we use the letter 'x' to signify that the variable type is an XML file.
 XMLFILE='x'
@@ -327,6 +318,9 @@ def lp_load(file):
     """ Use this instead of pickle.load for unpickling anything that contains _ElementTree types. """
     return Unpickler_LP(file).load()
 
+#==============================#
+#|      Work Queue stuff      |#
+#==============================#
 try:
     import work_queue
 except:
@@ -335,28 +329,51 @@ except:
 
 def queue_up(wq, command, input_files, output_files):
     """ 
-    Submit a job to the Work Queue. 
+    Submit a job to the Work Queue.
 
     @param[in] wq (Work Queue Object) A Work Queue (probably a member of a fitting simulation)
     
     @param[in] command (string) The command to run on the remote worker.
 
-    @param[in] input_files (list of 2-tuples) A list of local and
-    remote locations of the input files.
+    @param[in] input_files (list of files) A list of locations of the input files.
 
-    @param[in] output_files (list of 2-tuples) A list of local and
-    remote locations of the output files.
+    @param[in] output_files (list of files) A list of locations of the output files.
     """
 
     task = work_queue.Task(command)
+    cwd = os.getcwd()
     for f in input_files:
-        task.specify_input_file(f[0],f[1])
+        lf = os.path.join(cwd,f)
+        task.specify_input_file(lf,f)
     for f in output_files:
-        task.specify_output_file(f[0],f[1])
+        lf = os.path.join(cwd,f)
+        task.specify_output_file(lf,f)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
     print "Submitting command '%s' to the Work Queue" % command
     wq.submit(task)
+    
+# def queue_up(wq, command, input_files, output_files):
+#     """ 
+#     Submit a job to the Work Queue. 
+#     @param[in] wq (Work Queue Object) A Work Queue (probably a member of a fitting simulation)
+#     @param[in] command (string) The command to run on the remote worker.
+#     @param[in] input_files (list of 2-tuples) A list of local and
+#     remote locations of the input files.
+#     @param[in] output_files (list of 2-tuples) A list of local and
+#     remote locations of the output files.
+#     """
+#     task = work_queue.Task(command)
+#     for f in input_files:
+#         print f[0], f[1]
+#         task.specify_input_file(f[0],f[1])
+#     for f in output_files:
+#         print f[0], f[1]
+#         task.specify_output_file(f[0],f[1])
+#     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
+#     task.specify_tag(command)
+#     print "Submitting command '%s' to the Work Queue" % command
+#     wq.submit(task)
 
 def wq_wait(wq):
     """ This function waits until the work queue is completely empty. """
@@ -396,56 +413,9 @@ def wq_wait(wq):
                 # Print a new line every 15 minutes.
                 print
 
-### Linear least squares stuff
-
-def get_least_squares(x, y, w = None):
-    """
-    @code
-     __                  __
-    |                      |
-    | 1 (x0) (x0)^2 (x0)^3 |
-    | 1 (x1) (x1)^2 (x1)^3 |
-    | 1 (x2) (x2)^2 (x2)^3 |
-    | 1 (x3) (x3)^2 (x3)^3 |
-    | 1 (x4) (x4)^2 (x4)^3 |
-    |__                  __|
-
-    @endcode
-
-    @param[in] X (2-D array) An array of X-values (see above)
-    @param[in] Y (array) An array of Y-values (only used in getting the least squares coefficients)
-    @param[in] w (array) An array of weights, hopefully normalized to one.
-    """
-    # X is a 'tall' matrix.
-    X = mat(x)
-    Y = col(y)
-    n_x = X.shape[0]
-    n_fit = X.shape[1]
-    if n_fit >= n_x:
-        warn_press_key("Argh? It seems like this problem is overdetermined!")
-    # Build the weight matrix.
-    if w != None:
-        if len(w) != n_x:
-            warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
-        w /= mean(w)
-        W = mat(diag(w))
-        #print W
-    else:
-        W = mat(eye(n_x))
-    # Make the Moore-Penrose Pseudoinverse.
-    MPPI = invert_svd(X.T * W * X) * X.T * W
-
-    Beta = MPPI * Y
-    Hat = X * MPPI
-    yfit = flat(Hat * Y)
-
-    # Return three things: the least-squares coefficients, the hat matrix (turns y into yfit), and yfit
-    # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
-
-    return Beta, Hat, yfit
-
-###
-
+#=====================================#
+#| File and process management stuff |#
+#=====================================#
 def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
         srcfnm = os.path.join(abssrcdir, fnm)
@@ -455,5 +425,106 @@ def link_dir_contents(abssrcdir, absdestdir):
                 #print "Linking %s to %s" % (srcfnm, destfnm)
                 os.symlink(srcfnm, destfnm)
 
-def link_from_updir():
-    link_dir_contents(os.path.join(os.path.split(os.getcwd())[:-1])[0],os.getcwd())
+def remove_if_exists(fnm):
+    """ Remove the file if it exists (doesn't return an error). """
+    if os.path.exists(fnm):
+        os.remove(fnm)
+
+def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_command = True):
+    """Runs command line using subprocess, optionally returning stdout"""
+    print_to_file = (logfnm != None)
+    if print_to_file:
+        f = open(logfnm,'a')
+    if print_command:
+        print "Executing process: \x1b[92m%-50s\x1b[0m%s" % (command, " Logfile: %s" if logfnm != None else "")
+        if print_to_file:
+            print >> f, "Executing process: %s" % command
+    if stdin == None:
+        p = subprocess.Popen(command, shell=(type(command) is str), stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+        Output, _ = p.communicate()
+    else:
+        p = subprocess.Popen(command, shell=(type(command) is str), stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+        Output, _ = p.communicate(stdin)
+    if print_to_screen:
+        print Output
+    if logfnm != None:
+        f.write(Output)
+        f.close()
+    return Output
+
+def warn_press_key(warning):
+    if type(warning) is str:
+        print warning
+    elif type(warning) is list:
+        for line in warning:
+            print line
+    else:
+        print "You're not supposed to pass me a variable of this type:", type(warning)
+    print "Press any key (I assume no responsibility for what happens after this!)"
+    raw_input()
+
+#=========================================#
+#| Development stuff (not commonly used) |#
+#=========================================#
+def concurrent_map(func, data):
+    """
+    Similar to the bultin function map(). But spawn a thread for each argument
+    and apply `func` concurrently.
+
+    Note: unlike map(), we cannot take an iterable argument. `data` should be an
+    indexable sequence.
+    """
+
+    N = len(data)
+    result = [None] * N
+
+    # wrapper to dispose the result in the right slot
+    def task_wrapper(i):
+        result[i] = func(data[i])
+
+    threads = [threading.Thread(target=task_wrapper, args=(i,)) for i in xrange(N)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+
+    return result
+
+
+def multiopen(arg):
+    """
+    This function be given any of several variable types
+    (single file name, file object, or list of lines, or a list of the above)
+    and give a list of files:
+
+    [file1, file2, file3 ... ]
+
+    each of which can then be iterated over:
+
+    [[file1_line1, file1_line2 ... ], [file2_line1, file2_line2 ... ]]
+    """
+    if type(arg) == str:
+        # A single file name
+        fins = [open(arg)]
+    elif type(arg) == file:
+        # A file object
+        fins = [[arg]]
+    elif type(arg) == list:
+        if all([type(l) == str for l in arg]):
+            # A list of lines (as in, open(file).readlines()) is expected to end with \n on most of the lines.
+            if any([match("^.*\n$",l) for l in arg]):
+                fins = [[arg]]
+            # In contrast, a list of file names doesn't have \n characters.
+            else:
+                fins = [open(l) for l in arg]
+        elif all([type(l) == file or type(l) == list for l in arg]):
+            fins = arg
+        else:
+            print "What did you give this program as input?"
+            print arg
+            exit(1)
+    else:
+        print "What did you give this program as input?"
+        print arg
+        exit(1)
+    return fins

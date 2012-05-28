@@ -67,7 +67,7 @@ gen_opts_types = {
                  },
     'allcaps' : {"jobtype"      : ("single", 'The job type, defaults to a single-point evaluation of objective function'),
                  },
-    'lists'   : {"forcefield"     : ([], 'The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)'),
+    'lists'   : {"forcefield"     : ([], 'The names of force fields, corresponding to directory forcefields/file_name.(itp,xml,prm,frcmod,mol2)'),
                  "scanindex_num"  : ([], 'Numerical index of the parameter to scan over in job type "scan[mp]vals"'),
                  "scanindex_name" : ([], 'Parameter name to scan over (should convert to a numerical index) in job type "scan[mp]vals"')
                  },
