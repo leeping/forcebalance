@@ -11,10 +11,11 @@ backup
 $end
 
 $simulation
-simtype forceenergymatch_tinker
+simtype abinitio_tinker
 name water12_sixpt
 weight 1
-efweight 0.5
+w_energy 1.0
+w_force 1.0
 shots 300
 fd_ptypes ALL
 fdgrad 0

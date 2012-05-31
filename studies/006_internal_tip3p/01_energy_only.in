@@ -58,8 +58,8 @@ $simulation
 # (string) The name of the simulation, which corresponds to the directory simulations/dir_name
 name Energy_Force
 
-# (allcap) The type of fitting simulation, for instance ForceEnergyMatch_GMXX2
-simtype ForceEnergyMatch_Internal
+# (allcap) The type of fitting simulation, for instance AbInitio_GMXX2
+simtype AbInitio_Internal
 
 # (list) The parameter types that need to be differentiated using finite difference
 fd_ptypes all
@@ -77,7 +77,8 @@ fdhessdiag 1
 shots 30
 
 # (float) Energy/force weighting
-efweight 1.0
+w_energy 1.0
+w_force 0.0
 
 # (float) Weight of the current simulation (with respect to other simulations)
 weight 1.0

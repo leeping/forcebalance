@@ -1,4 +1,4 @@
-""" @package experiment Matching of experimental properties.  Under development.
+""" @package liquid Matching of liquid bulk properties.  Under development.
 
 @author Lee-Ping Wang
 @date 04/2012
@@ -31,9 +31,9 @@ def weight_info(W, T, N_k):
     print "InfoContent: % .1f snapshots (%.2f %%)" % (I, 100*I/len(W))
     return C
 
-class Experiment(FittingSimulation):
+class Liquid(FittingSimulation):
     
-    """ Subclass of FittingSimulation for experiment matching."""
+    """ Subclass of FittingSimulation for liquid property matching."""
     
     def __init__(self,options,sim_opts,forcefield):
         """Instantiation of the subclass.
@@ -47,7 +47,7 @@ class Experiment(FittingSimulation):
         """
         
         # Initialize the SuperClass!
-        super(Experiment,self).__init__(options,sim_opts,forcefield)
+        super(Liquid,self).__init__(options,sim_opts,forcefield)
         # Fractional weight of the density
         self.W_Rho = sim_opts['w_rho']
         # Fractional weight of the enthalpy of vaporization
@@ -136,7 +136,7 @@ class Experiment(FittingSimulation):
     def get(self, mvals, AGrad=True, AHess=True):
         
         """
-        Fitting of experimental properties.  This is the current major
+        Fitting of liquid bulk properties.  This is the current major
         direction of development for ForceBalance.  Basically, fitting
         the QM energies / forces alone does not always give us the
         best simulation behavior.  In many cases it makes more sense

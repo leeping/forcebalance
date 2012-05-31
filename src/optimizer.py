@@ -101,6 +101,12 @@ class Optimizer(object):
         self.adapt_fac  = options['adaptive_factor']
         ## Adaptive trust radius adjustment damping
         self.adapt_damp = options['adaptive_damping']
+        ## Whether to print gradient during each step of the optimization
+        self.print_grad = options['print_gradient']
+        ## Whether to print Hessian during each step of the optimization
+        self.print_hess = options['print_hessian']
+        ## Whether to print parameters during each step of the optimization
+        self.print_vals = options['print_parameters']
         
         #======================================#
         #     Variables which are set here     #
@@ -251,31 +257,28 @@ class Optimizer(object):
             if stdfront < self.conv_obj and len(ehist) > 10:
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
-            # Take a step in the parameter space.
-            #--- Print stuff
-            bar = printcool("Total Gradient",color=6)
-            self.FF.print_map(vals=G)
-            print bar
-            bar = printcool("Total Hessian",color=6)
-            pmat2d(H)
-            print bar
-            #---
+            if self.print_grad:
+                bar = printcool("Total Gradient",color=6)
+                self.FF.print_map(vals=G)
+                print bar
+            if self.print_hess:
+                bar = printcool("Total Hessian",color=6)
+                pmat2d(H)
+                print bar
             dx, dX_expect, bump = self.step(G, H, trust)
-            #--- Print stuff
             old_pk = self.FF.create_pvals(xk)
             old_xk = xk.copy()
-            #---
+            # Take a step in the parameter space.
             xk += dx
-            #--- Print stuff
-            pk = self.FF.create_pvals(xk)
-            dp = pk - old_pk
-            bar = printcool("Mathematical Parameters (Current + Step = Next)",color=3)
-            self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_xk[i], '+' if dx[i] >= 0 else '-', abs(dx[i]), xk[i]) for i in range(len(xk))])
-            print bar
-            bar = printcool("Physical Parameters (Current + Step = Next)",color=3)
-            self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
-            print bar
-            #---
+            if self.print_vals:
+                pk = self.FF.create_pvals(xk)
+                dp = pk - old_pk
+                bar = printcool("Mathematical Parameters (Current + Step = Next)",color=3)
+                self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_xk[i], '+' if dx[i] >= 0 else '-', abs(dx[i]), xk[i]) for i in range(len(xk))])
+                print bar
+                bar = printcool("Physical Parameters (Current + Step = Next)",color=3)
+                self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
+                print bar
             # Evaluate the objective function and its derivatives.
             data        = self.Objective(xk,Ord,verbose=True)
             stepn += 1
@@ -297,10 +300,9 @@ class Optimizer(object):
                 # and the 'b' factor determines how closely we are tied down to the original value.
                 # Recommend values 0.5 and 0.5
                 trust += a*trust*np.exp(-b*(trust/self.trust0 - 1))
-            
             if X > X_prev:
-                # Reject the step if the step taken was bad.
                 color = "\x1b[91m"
+                # Toggle switch for rejection (experimenting with no rejection)
                 Rejects = True
                 if Rejects:
                     xk = xk_prev.copy()
@@ -416,7 +418,6 @@ class Optimizer(object):
             HT = H + L**2*np.diag(np.diag(H))
             dx = -solve(HT, G)
             ndx = norm(dx)
-            print "In Levenberg-Marquardt, the trust radius is % .8f" % norm(dx)
             return (norm(dx) - (trust * (1.0-1e-6)))**2            
         if dxnorm > trust:
             bump = True
@@ -463,7 +464,8 @@ class Optimizer(object):
                 else:
                     color = "\x1b[91m"
                 if verbose:
-                    print "k=", ' '.join(["% .4f" % i for i in mvals])
+                    if self.print_vals:
+                        print "k=", ' '.join(["% .4f" % i for i in mvals])
                     print "X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (color,Answer,dx)
                 if Answer != Answer:
                     return 1e10
@@ -484,7 +486,8 @@ class Optimizer(object):
                 else:
                     color = "\x1b[91m"
                 if verbose:
-                    print "k=", ' '.join(["% .4f" % i for i in mvals])
+                    if self.print_vals:
+                        print "k=", ' '.join(["% .4f" % i for i in mvals])
                     print "|Grad|= %12.3e X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (norm(Answer),color,Objective,dx)
                     print
                 return Answer

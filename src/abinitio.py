@@ -113,7 +113,11 @@ class AbInitio(FittingSimulation):
         ## Qualitative Indicator: "relative RMS" for electrostatic potential
         self.esp_err = 0.0
         ## Read in the trajectory file
-        self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))[:self.ns]
+        if self.ns == -1:
+            self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))
+            self.ns = len(self.traj)
+        else:
+            self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))[:self.ns]
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
@@ -202,28 +206,25 @@ class AbInitio(FittingSimulation):
         self.fqm = array(self.fqm)
         self.fqm *= fqcgmx
         self.natoms = self.fqm.shape[1]/3
-        self.nesp = len(self.espval[1])
+        self.nesp = len(self.espval[0]) if len(self.espval) > 0 else 0
         # prepare the distance matrix for esp computations
-        TestESP = True
-
-        if TestESP:
-            if len(self.espxyz) > 0:
-                self.invdists = []
-                print "Preparing the distance matrix... it will have %i elements" % (self.ns * self.nesp * self.natoms)
-                sn = 0
-                for espset, xyz in zip(self.espxyz, self.traj.xyzs):
-                    print "\rGenerating ESP distances for snapshot %i" % sn,
-                    esparr = array(espset).reshape(-1,3)
-                    # Create a matrix with Nesp rows and Natoms columns.
-                    DistMat = array([[linalg.norm(i - j) for j in xyz] for i in esparr])
-                    xyztest = ['%i' % (self.nesp + self.natoms),'Testing ESP for frame number %i' % sn]
-                    for i, x in enumerate(xyz):
-                        xyztest.append(format_xyz_coord(sub('[0-9]','',self.FF.atomnames[i]),x))
-                    for i in esparr:
-                        xyztest.append(format_xyz_coord("He",i))
-                    #with open('test.xyz','w' if sn == 0 else 'a') as f: f.writelines([l+'\n' for l in xyztest])
-                    self.invdists.append(1. / (DistMat / bohrang))
-                    sn += 1
+        if len(self.espxyz) > 0:
+            self.invdists = []
+            print "Preparing the distance matrix... it will have %i elements" % (self.ns * self.nesp * self.natoms)
+            sn = 0
+            for espset, xyz in zip(self.espxyz, self.traj.xyzs):
+                print "\rGenerating ESP distances for snapshot %i" % sn,
+                esparr = array(espset).reshape(-1,3)
+                # Create a matrix with Nesp rows and Natoms columns.
+                DistMat = array([[linalg.norm(i - j) for j in xyz] for i in esparr])
+                xyztest = ['%i' % (self.nesp + self.natoms),'Testing ESP for frame number %i' % sn]
+                for i, x in enumerate(xyz):
+                    xyztest.append(format_xyz_coord(sub('[0-9]','',self.FF.atomnames[i]),x))
+                for i in esparr:
+                    xyztest.append(format_xyz_coord("He",i))
+                #with open('test.xyz','w' if sn == 0 else 'a') as f: f.writelines([l+'\n' for l in xyztest])
+                self.invdists.append(1. / (DistMat / bohrang))
+                sn += 1
         # Here we may choose a subset of atoms to do the force matching.
         if self.fitatoms == 0:
             self.fitatoms = self.natoms
@@ -284,7 +285,7 @@ class AbInitio(FittingSimulation):
         if self.energy or self.force:
             print "Energy error (kJ/mol) = %10.4f Force error (%%) = %10.4f" % (self.e_err, self.f_err*100), 
         if self.resp:
-            print "ESP_err (%%) = %10.4f" % (self.esp_err*100),
+            print "ESP_err (%%) = %10.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
         print
 
     def get_energy_force_no_covariance_(self, mvals, AGrad=False, AHess=False):
@@ -413,6 +414,7 @@ class AbInitio(FittingSimulation):
                 for p in range(np):
                     dM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)[0]
         for i in range(ns):
+            print "Incrementing quantities for snapshot %i\r" % i,
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
             Z  += P
@@ -468,7 +470,8 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         #      STEP 3: Build the variance vector and invert it.        #
         #==============================================================#
-        EFW     = self.efweight
+        print "\nBuilding variances."
+        EFW     = self.w_energy / (self.w_energy + self.w_force)
         CEFW    = 1.0 - EFW
         # Build the weight vector, so the force contribution is suppressed by 1/3N
         WM      = zeros(NCP1,dtype=float)
@@ -486,6 +489,7 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         # STEP 4: Build the objective function and its derivatives.    #
         #==============================================================#
+        print "Building objective function."
         X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1)
         X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1)
         for p in range(np):
@@ -505,6 +509,7 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         #            STEP 5: Build the return quantities.              #
         #==============================================================#
+        print "Building return quantities."
         # The objective function
         X2   = MBP * X2_M    + QBP * X2_Q
         # Derivatives of the objective function
@@ -676,7 +681,7 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         #     STEP 3: Build the covariance matrix and invert it.       #
         #==============================================================#
-        EFW     = self.efweight
+        EFW     = self.w_energy / (self.w_energy + self.w_force)
         CEFW    = 1.0 - EFW
         # Build the weight matrix, so the force contribution is suppressed by 1/3N
         WM      = zeros((NCP1,NCP1),dtype=float)
@@ -767,7 +772,8 @@ class AbInitio(FittingSimulation):
                     qatoms[j] = qvals[i]
             return qatoms
         # Obtain a derivative matrix the stupid way
-        dqPdqM = mat([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(np)]).T
+        if AGrad:
+            dqPdqM = mat([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(np)]).T
         xyzs = array(self.traj.xyzs)
         espqvals = array(self.espval)
         espxyz   = array(self.espxyz)
@@ -783,47 +789,56 @@ class AbInitio(FittingSimulation):
             espqval = espqvals[i]
             espmval = dVdqP * col(getqatoms(mvals))
             desp    = flat(espmval) - espqval
-            dVdqM   = (dVdqP * dqPdqM).T
             X      += P * dot(desp, desp) / self.nesp
-            G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
-            H      += array(P * 2 * dVdqM * dVdqM.T) / self.nesp
             D      += P * (dot(espqval, espqval) / self.nesp - (sum(espqval) / self.nesp)**2)
+            if AGrad:
+                dVdqM   = (dVdqP * dqPdqM).T
+                G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
+                if AHess:
+                    H      += array(P * 2 * dVdqM * dVdqM.T) / self.nesp
+        # Redundant but we keep it anyway
         D /= Z
         X /= Z
         X /= D
-        self.esp_err = sqrt(X)
         G /= Z
+        G /= D
         H /= Z
+        H /= D
+        self.esp_err = sqrt(X)
         # Following is the restraint part
         # RESP hyperbola "strength" parameter; 0.0005 is weak, 0.001 is strong
         # RESP hyperbola "tightness" parameter; don't need to change this
-        a = 0.0005
+        a = 0.001
         b = 0.1
         q = getqatoms(mvals)
-        R = a*sum((q**2 + b**2)**0.5 - b)
-        dR = a*q*(q**2 + b**2)**-0.5
+        R   = a*sum((q**2 + b**2)**0.5 - b)
+        dR  = a*q*(q**2 + b**2)**-0.5
         ddR = a*(q**2 + 2*b**2) / (2*(b**2 + q**2)**(1.25))
+        self.respterm = R
         X += R
-        G += flat(dqPdqM.T * col(dR))
-        H += array(dqPdqM.T * mat(diag(ddR)))
-        Answer = {'X':X+R,'G':G,'H':H}
+        if AGrad:
+            G += flat(dqPdqM.T * col(dR))
+            if AHess:
+                H += diag(flat(dqPdqM.T * col(ddR)))
+        Answer = {'X':X,'G':G,'H':H}
         return Answer
 
     def get_energy_force_(self, mvals, AGrad=False, AHess=False):
         if self.covariance:
-            Answer = self.get_energy_force_covariance_(mvals, AGrad, AHess)
+            return self.get_energy_force_covariance_(mvals, AGrad, AHess)
         else:
-            Answer = self.get_energy_force_no_covariance_(mvals, AGrad, AHess)
+            return self.get_energy_force_no_covariance_(mvals, AGrad, AHess)
+        
 
     def get(self, mvals, AGrad=False, AHess=False):
-        Answer = {'X':0.0, 'G':zeros(self.np, dtype=float), 'H':zeros((self.np, self.np), dtype=float)}
+        Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
         if self.energy or self.force:
             Answer_EF = self.get_energy_force_(mvals, AGrad, AHess)
             for i in Answer_EF:
                 Answer[i] += Answer_EF[i]
         if self.resp:
             Answer_ESP = self.get_resp_(mvals, AGrad, AHess)
-            for i in Answer_EF:
+            for i in Answer_ESP:
                 Answer[i] += Answer_ESP[i]
         if not any([self.energy, self.force, self.resp]):
             raise Exception("Ab initio fitting must have at least one of: Energy, Force, ESP")

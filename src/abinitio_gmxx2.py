@@ -1,10 +1,10 @@
-""" @package forceenergymatch_gmxx2 Force and energy matching with interface to modified GROMACS.
+""" @package abinitio_gmxx2 Force and energy matching with interface to modified GROMACS.
 
 In order for us to obtain the objective function in force and energy
 matching, we loop through the snapshots, compute the energy and force
 (as well as its derivatives), and sum them up.  The details of the
 process are complicated and I won't document them here.  The contents
-of this package (mainly the ForceEnergyMatch_GMXX2 class) allows us to
+of this package (mainly the AbInitio_GMXX2 class) allows us to
 call the modified GROMACS to compute the objective function for us.
 
 @author  Lee-Ping Wang
@@ -22,7 +22,7 @@ import subprocess
 from subprocess import PIPE
 from abinitio import AbInitio
 
-class ForceEnergyMatch_GMXX2(AbInitio):
+class AbInitio_GMXX2(AbInitio):
 
     """ForceBalance class for force and energy matching with the modified GROMACS.
 
@@ -34,10 +34,10 @@ class ForceEnergyMatch_GMXX2(AbInitio):
     I will write that documentation elsewhere, perhaps when I port
     GROMACS over to version 4.5.4.
 
-    This class implements the 'get' method.  When 'get' is called, the
-    force field is printed to the temporary directory along with
-    several files containing the information needed by the modified
-    GROMACS (the Boltzmann weights, the parameters that need
+    This class implements the 'get_energy_force_' method.  When it is
+    called, the force field is printed to the temporary directory
+    along with several files containing the information needed by the
+    modified GROMACS (the Boltzmann weights, the parameters that need
     derivatives and their values, the QM energies and forces, and the
     energy / force weighting.)
 
@@ -61,7 +61,7 @@ class ForceEnergyMatch_GMXX2(AbInitio):
     """
 
     def __init__(self,options,sim_opts,forcefield):
-        """Instantiation of ForceEnergyMatch_GMXX2.
+        """Instantiation of AbInitio_GMXX2.
 
         Several important things happen here:
         - We load in the coordinates from 'all.gro'.
@@ -74,7 +74,7 @@ class ForceEnergyMatch_GMXX2(AbInitio):
         ## Set the software to GROMACS no matter what
         self.trajfnm = "all.gro"
         ## Initialize the superclass. :)
-        super(ForceEnergyMatch_GMXX2,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_GMXX2,self).__init__(options,sim_opts,forcefield)
         ## Put stuff for GROMACS-X2 into the temp directory.
         #self.prepare_gmxx2()
         
@@ -161,7 +161,7 @@ class ForceEnergyMatch_GMXX2(AbInitio):
         print >> pidsfile
         pidsfile.close()
         
-    def get(self,mvals,AGrad=False,AHess=False):
+    def get_energy_force_(self,mvals,AGrad=False,AHess=False):
         """ Calls the modified GROMACS and collects the objective function contribution.
 
         First we create the force field using the parameter values that were
