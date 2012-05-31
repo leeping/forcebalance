@@ -54,7 +54,7 @@ $simulation
 # (string) The name of the simulation, which corresponds to the directory simulations/dir_name
 name Density
 
-# (allcap) The type of fitting simulation, for instance ForceEnergyMatch_GMXX2
+# (allcap) The type of fitting simulation, for instance AbInitio_GMXX2
 simtype PropertyMatch_OpenMM
 
 # (float) Weight of the current simulation (with respect to other simulations)

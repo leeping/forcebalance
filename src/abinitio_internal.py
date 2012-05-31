@@ -1,4 +1,4 @@
-""" @package forceenergymatch_internal Internal implementation of energies and forces (for TIP3P water only)
+""" @package abinitio_internal Internal implementation of energy matching (for TIP3P water only)
 
 @author Lee-Ping Wang
 @date 04/2012
@@ -14,7 +14,7 @@ import pickle
 import shutil
 import itertools
 
-class ForceEnergyMatch_Internal(AbInitio):
+class AbInitio_Internal(AbInitio):
 
     """Subclass of FittingSimulation for force and energy matching
     using an internal implementation.  Implements the prepare and
@@ -39,7 +39,7 @@ class ForceEnergyMatch_Internal(AbInitio):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
         self.trajfnm = "all.gro"
         ## Initialize the SuperClass!
-        super(ForceEnergyMatch_Internal,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_Internal,self).__init__(options,sim_opts,forcefield)
 
     def energy_force_driver_all(self):
         """ Here we actually compute the interactions and return the

@@ -7,7 +7,7 @@
 import os
 from basereader import BaseReader
 from abinitio import AbInitio
-from experiment import Experiment
+from liquid import Liquid
 import numpy as np
 import sys
 import pickle
@@ -59,10 +59,10 @@ class OpenMM_Reader(BaseReader):
         Involved = '.'.join([element.attrib[i] for i in suffix_dict[InteractionType]])#suffix_dict[InteractionType]
         return "/".join([InteractionType, parameter, Involved])
 
-class Experiment_OpenMM(Experiment):
+class Liquid_OpenMM(Liquid):
     def __init__(self,options,sim_opts,forcefield):
         ## Initialize the SuperClass!
-        super(Experiment_OpenMM,self).__init__(options,sim_opts,forcefield)
+        super(Liquid_OpenMM,self).__init__(options,sim_opts,forcefield)
         work_queue.set_debug_flag('all')
         self.wq = work_queue.WorkQueue(port=self.wq_port, exclusive=False, shutdown=False)
         self.wq.specify_name('forcebalance')
@@ -143,6 +143,7 @@ class AbInitio_OpenMM(AbInitio):
             # Compute the force and append to list
             Force = list(np.array(simulation.context.getState(getForces=True).getForces() / kilojoules_per_mole * nanometer).flatten())
             M.append(np.array([Energy] + Force))
+        M = np.array(M)
         return M
 
     def energy_force_driver_all(self):

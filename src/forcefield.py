@@ -349,7 +349,7 @@ class FF(object):
         if hasattr(self.R[ffname], 'atomnames'):
             print self.R[ffname].atomnames
             if len(self.atomnames) > 0:
-                warn('Found more than one force field containing atom names - ESP fitting might not work.')
+                warn_press_key('Found more than one force field containing atom names - ESP fitting might not work.')
             self.atomnames += self.R[ffname].atomnames
 
     def addff_txt(self, ffname, fftype):
@@ -666,7 +666,7 @@ class FF(object):
                 qnr += nq
 
         if len(self.qid2) == 0:
-            warn('Unable to match atom numbers up with atom names (minor issue, unless doing ESP fitting).  Are atom names implemented in the force field parser?')
+            sys.stderr.write('Unable to match atom numbers up with atom names (minor issue, unless doing ESP fitting).  \nAre atom names implemented in the force field parser?\n')
         else:
             self.qid = self.qid2
         tq = qnr - 1

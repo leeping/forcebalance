@@ -21,10 +21,11 @@ read_mvals
 $end
 
 $simulation
-simtype forceenergymatch_gmxx2
+simtype abinitio_gmxx2
 name water12_sixpt
 weight 1
-efweight 0.5
+w_energy 1.0
+w_force 1.0
 shots 300
 fd_ptypes VSITE
 fdgrad 0
@@ -34,10 +35,11 @@ covariance 0
 $end
 
 $simulation
-simtype forceenergymatch_gmxx2
+simtype abinitio_gmxx2
 name water12_fourpt
 weight 1
-efweight 0.5
+w_energy 1.0
+w_force 1.0
 shots 300
 fd_ptypes VSITE
 fdgrad 0
