@@ -21,7 +21,8 @@ from numpy import array, diag, dot, eye, mat, mean, transpose
 from numpy.linalg import norm, svd
 import threading
 import pickle
-import time, datetime # Sniffy
+import time, datetime
+import subprocess
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -327,7 +328,7 @@ except:
     bar = printcool("Warning: Work Queue library import fail (You can't queue up jobs)",sym='!',bold=True,color=2)
     print bar
 
-def queue_up(wq, command, input_files, output_files):
+def queue_up(wq, command, input_files, output_files, verbose=True):
     """ 
     Submit a job to the Work Queue.
 
@@ -350,7 +351,8 @@ def queue_up(wq, command, input_files, output_files):
         task.specify_output_file(lf,f)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
-    print "Submitting command '%s' to the Work Queue" % command
+    if verbose:
+        print "Submitting command '%s' to the Work Queue" % command
     wq.submit(task)
     
 # def queue_up(wq, command, input_files, output_files):
@@ -375,16 +377,15 @@ def queue_up(wq, command, input_files, output_files):
 #     print "Submitting command '%s' to the Work Queue" % command
 #     wq.submit(task)
 
-def wq_wait(wq):
+def wq_wait(wq, verbose=False):
     """ This function waits until the work queue is completely empty. """
-    Verbose = False
     printcount = 1
     while not wq.empty():
         printcount += 1
-        if Verbose: print '---'
+        if verbose: print '---'
         task = wq.wait(10)
         if task:
-            if Verbose:
+            if verbose:
                 print 'A job has finished!'
                 print 'Job name = ', task.tag, 'command = ', task.command
                 print "status = ", task.status, 
@@ -399,7 +400,7 @@ def wq_wait(wq):
             else:
                 print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, task.computation_time/1000000)
                 del task
-        if Verbose:
+        if verbose:
             print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
                 % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed)
             print "Tasks: %i running, %i waiting, %i total dispatched, %i total complete" \
@@ -436,7 +437,7 @@ def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_c
     if print_to_file:
         f = open(logfnm,'a')
     if print_command:
-        print "Executing process: \x1b[92m%-50s\x1b[0m%s" % (command, " Logfile: %s" if logfnm != None else "")
+        print "Executing process: \x1b[92m%-50s\x1b[0m%s" % (' '.join(command) if type(command) is list else command, " Logfile: %s" if logfnm != None else "")
         if print_to_file:
             print >> f, "Executing process: %s" % command
     if stdin == None:

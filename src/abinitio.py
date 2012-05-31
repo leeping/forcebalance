@@ -1,7 +1,7 @@
-""" @package forceenergymatch_gmxx2 Force and energy matching module.
+""" @package abinitio Ab-initio fitting module (energies, forces, resp).
 
 @author Lee-Ping Wang
-@date 12/2011
+@date 05/2012
 """
 
 import os
@@ -15,13 +15,13 @@ import subprocess
 from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p
 
-class ForceEnergyMatch(FittingSimulation):
+class AbInitio(FittingSimulation):
 
-    """ Subclass of FittingSimulation for force and energy matching.
+    """ Subclass of FittingSimulation for fitting force fields to ab initio data.
 
-    Currently Gromacs-X2, Gromacs, Tinker and OpenMM are supported.
+    Currently Gromacs-X2, Gromacs, Tinker, OpenMM and AMBER are supported.
 
-    In force and energy matching, we introduce the following concepts:
+    We introduce the following concepts:
     - The number of snapshots
     - The reference energies and forces (eqm, fqm) and the file they belong in (qdata.txt)
     - The sampling simulation energies (emd0)
@@ -36,7 +36,7 @@ class ForceEnergyMatch(FittingSimulation):
     This subclass contains the 'get' method for building the objective
     function from any simulation software (a driver to run the program and
     read output is still required).  The 'get' method can be overridden
-    by subclasses like ForceEnergyMatch_GMXX2."""
+    by subclasses like AbInitio_GMXX2."""
     
     def __init__(self,options,sim_opts,forcefield):
         """Instantiation of the subclass.
@@ -50,7 +50,7 @@ class ForceEnergyMatch(FittingSimulation):
         """
         
         # Initialize the SuperClass!
-        super(ForceEnergyMatch,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio,self).__init__(options,sim_opts,forcefield)
         
         #======================================#
         # Options that are given by the parser #
@@ -70,18 +70,24 @@ class ForceEnergyMatch(FittingSimulation):
         self.qmboltztemp   = sim_opts['qmboltztemp']
         ## Number of atoms that we are fitting
         self.fitatoms      = sim_opts['fitatoms']
-        ## The proportion of energy vs. force.
-        self.efweight      = sim_opts['efweight']
+        ## Whether to fit Energies.
+        self.energy        = sim_opts['energy']
+        ## Whether to fit Forces.
+        self.force         = sim_opts['force']
+        ## Whether to fit Electrostatic Potential.
+        self.resp          = sim_opts['resp']
+        ## Weights for the three components.
+        self.w_energy      = sim_opts['w_energy']
+        self.w_force       = sim_opts['w_force']
+        self.w_resp        = sim_opts['w_resp']
         ## Whether to do energy and force calculations for the whole trajectory, or to do
         ## one calculation per snapshot.
         self.all_at_once   = sim_opts['all_at_once']
         ## OpenMM-only option - whether to run the energies and forces internally.
         self.run_internal  = sim_opts['run_internal']
-        
         #======================================#
         #     Variables which are set here     #
         #======================================#
-        
         ## WHAM Boltzmann weights
         self.whamboltz_wts = []
         ## QM Boltzmann weights
@@ -104,6 +110,8 @@ class ForceEnergyMatch(FittingSimulation):
         self.e_err = 0.0
         ## Qualitative Indicator: average force error (fractional)
         self.f_err = 0.0
+        ## Qualitative Indicator: "relative RMS" for electrostatic potential
+        self.esp_err = 0.0
         ## Read in the trajectory file
         self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))[:self.ns]
         ## Read in the reference data
@@ -111,15 +119,9 @@ class ForceEnergyMatch(FittingSimulation):
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,sim_opts)
 
-        #======================================#
-        #          UNDER DEVELOPMENT           #
-        #======================================#
-        # Put stuff here that I'm not sure about. :)
-
     def read_reference_data(self):
         
-        """ Read the reference data (for force and energy matching)
-        from a file such as qdata.txt.
+        """ Read the reference ab initio data from a file such as qdata.txt.
 
         @todo Add an option for picking any slice out of
         qdata.txt, helpful for cross-validation
@@ -278,9 +280,14 @@ class ForceEnergyMatch(FittingSimulation):
         return
         
     def indicate(self):
-        print "Sim: %-15s E_err(kJ/mol)= %10.4f F_err(%%)= %10.4f" % (self.name, self.e_err, self.f_err*100)
+        print "Sim: %-15s" % self.name, 
+        if self.energy or self.force:
+            print "Energy error (kJ/mol) = %10.4f Force error (%%) = %10.4f" % (self.e_err, self.f_err*100), 
+        if self.resp:
+            print "ESP_err (%%) = %10.4f" % (self.esp_err*100),
+        print
 
-    def get_no_covariance_(self, mvals, AGrad=False, AHess=False):
+    def get_energy_force_no_covariance_(self, mvals, AGrad=False, AHess=False):
         """
         LPW 05-30-2012
         
@@ -523,7 +530,7 @@ class ForceEnergyMatch(FittingSimulation):
         Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
 
-    def get_covariance_(self, mvals, AGrad=False, AHess=False):
+    def get_energy_force_covariance_(self, mvals, AGrad=False, AHess=False):
         """
         LPW 01-11-2012
         
@@ -741,7 +748,7 @@ class ForceEnergyMatch(FittingSimulation):
         Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         return Answer
 
-    def get_esp_(self, mvals, AGrad=False, AHess=False):
+    def get_resp_(self, mvals, AGrad=False, AHess=False):
         """ Electrostatic potential fitting.  Implements the RESP objective function.  (In Python so obviously not optimized.) """
         Answer = {}
         pvals = self.FF.make(mvals,self.usepvals)
@@ -759,7 +766,6 @@ class ForceEnergyMatch(FittingSimulation):
                 for j in jj:
                     qatoms[j] = qvals[i]
             return qatoms
-
         # Obtain a derivative matrix the stupid way
         dqPdqM = mat([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(np)]).T
         xyzs = array(self.traj.xyzs)
@@ -782,16 +788,12 @@ class ForceEnergyMatch(FittingSimulation):
             G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
             H      += array(P * 2 * dVdqM * dVdqM.T) / self.nesp
             D      += P * (dot(espqval, espqval) / self.nesp - (sum(espqval) / self.nesp)**2)
-
         D /= Z
-        print "Total RMSD in QM esp value:", sqrt(D)
         X /= Z
-        print "RMS esp difference:", sqrt(X)
         X /= D
-        print "Relative RMS:", sqrt(X)
+        self.esp_err = sqrt(X)
         G /= Z
         H /= Z
-
         # Following is the restraint part
         # RESP hyperbola "strength" parameter; 0.0005 is weak, 0.001 is strong
         # RESP hyperbola "tightness" parameter; don't need to change this
@@ -801,19 +803,31 @@ class ForceEnergyMatch(FittingSimulation):
         R = a*sum((q**2 + b**2)**0.5 - b)
         dR = a*q*(q**2 + b**2)**-0.5
         ddR = a*(q**2 + 2*b**2) / (2*(b**2 + q**2)**(1.25))
-
         X += R
         G += flat(dqPdqM.T * col(dR))
         H += array(dqPdqM.T * mat(diag(ddR)))
         Answer = {'X':X+R,'G':G,'H':H}
-
         return Answer
 
-    def get(self, mvals, AGrad=False, AHess=False):
+    def get_energy_force_(self, mvals, AGrad=False, AHess=False):
         if self.covariance:
-            return self.get_covariance_(mvals, AGrad, AHess)
+            Answer = self.get_energy_force_covariance_(mvals, AGrad, AHess)
         else:
-            return self.get_no_covariance_(mvals, AGrad, AHess)
+            Answer = self.get_energy_force_no_covariance_(mvals, AGrad, AHess)
+
+    def get(self, mvals, AGrad=False, AHess=False):
+        Answer = {'X':0.0, 'G':zeros(self.np, dtype=float), 'H':zeros((self.np, self.np), dtype=float)}
+        if self.energy or self.force:
+            Answer_EF = self.get_energy_force_(mvals, AGrad, AHess)
+            for i in Answer_EF:
+                Answer[i] += Answer_EF[i]
+        if self.resp:
+            Answer_ESP = self.get_resp_(mvals, AGrad, AHess)
+            for i in Answer_EF:
+                Answer[i] += Answer_ESP[i]
+        if not any([self.energy, self.force, self.resp]):
+            raise Exception("Ab initio fitting must have at least one of: Energy, Force, ESP")
+        return Answer
 
 def weighted_variance(SPiXi,WCiW,Z,L,R,NCP1):
     """ A more generalized version of build_objective which is
@@ -831,9 +845,7 @@ def weighted_variance(SPiXi,WCiW,Z,L,R,NCP1):
 def build_objective(SPiXi,WCiW,Z,Q0,M0,NCP1):
 
     """ This function builds an objective function (number) from the
-    complicated polytensor and covariance matrices.  It is called
-    twice in the 'ForceEnergyMatch.get' method so we wrote a separate
-    function to save lines."""
+    complicated polytensor and covariance matrices. """
 
     # These are the functions that we are building.
     X2    = 0.0

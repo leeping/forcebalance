@@ -1,4 +1,4 @@
-""" @package property_match Matching of experimental properties.  Under development.
+""" @package experiment Matching of experimental properties.  Under development.
 
 @author Lee-Ping Wang
 @date 04/2012
@@ -31,9 +31,9 @@ def weight_info(W, T, N_k):
     print "InfoContent: % .1f snapshots (%.2f %%)" % (I, 100*I/len(W))
     return C
 
-class PropertyMatch(FittingSimulation):
+class Experiment(FittingSimulation):
     
-    """ Subclass of FittingSimulation for property matching."""
+    """ Subclass of FittingSimulation for experiment matching."""
     
     def __init__(self,options,sim_opts,forcefield):
         """Instantiation of the subclass.
@@ -47,7 +47,7 @@ class PropertyMatch(FittingSimulation):
         """
         
         # Initialize the SuperClass!
-        super(PropertyMatch,self).__init__(options,sim_opts,forcefield)
+        super(Experiment,self).__init__(options,sim_opts,forcefield)
         # Fractional weight of the density
         self.W_Rho = sim_opts['w_rho']
         # Fractional weight of the enthalpy of vaporization

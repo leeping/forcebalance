@@ -20,9 +20,9 @@ from gmxio import gmxx2_print, rm_gmx_baks
 from re import match
 import subprocess
 from subprocess import PIPE
-from forceenergymatch import ForceEnergyMatch
+from abinitio import AbInitio
 
-class ForceEnergyMatch_GMXX2(ForceEnergyMatch):
+class ForceEnergyMatch_GMXX2(AbInitio):
 
     """ForceBalance class for force and energy matching with the modified GROMACS.
 

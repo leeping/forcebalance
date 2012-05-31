@@ -12,10 +12,11 @@ def main():
     ## Set some basic options.  Note that 'forcefield' requires 'ffdir'
     ## which indicates the relative path of the force field.
     options = {'forcefield':argv[1:],
-               'ffdir':''}
+               'ffdir':'',
+               'priors':{}}
     MyFF = FF(options)
-
-    MyFF.make('NewFF',np.arange(len(MyFF.pvals0)),0)
+    
+    MyFF.make(np.arange(len(MyFF.pvals0)),False,'NewFF')
 
 if __name__ == "__main__":
     main()

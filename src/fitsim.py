@@ -81,7 +81,7 @@ class FittingSimulation(object):
 
         If we want to add attributes that are more specific
         (i.e. a set of reference forces for force matching), they
-        are added in the subclass ForceEnergyMatch that subclasses
+        are added in the subclass AbInitio that subclasses
         FittingSimulation.
 
         """
@@ -238,7 +238,7 @@ class FittingSimulation(object):
         
         Every fitting simulation must be able to return a contribution
         to the objective function - however, this must be implemented
-        in the specific subclass.  See forceenergymatch for an
+        in the specific subclass.  See abinitio for an
         example.
 
         """

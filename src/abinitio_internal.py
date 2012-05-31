@@ -6,7 +6,7 @@
 
 import os
 from basereader import BaseReader
-from forceenergymatch import ForceEnergyMatch
+from abinitio import AbInitio
 from forcefield import FF
 import numpy as np
 import sys
@@ -14,7 +14,7 @@ import pickle
 import shutil
 import itertools
 
-class ForceEnergyMatch_Internal(ForceEnergyMatch):
+class ForceEnergyMatch_Internal(AbInitio):
 
     """Subclass of FittingSimulation for force and energy matching
     using an internal implementation.  Implements the prepare and

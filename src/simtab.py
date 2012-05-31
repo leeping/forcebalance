@@ -4,20 +4,22 @@ This is in a separate file to facilitate importing.  I would happily put it some
 
 """
 
-from gmxio import ForceEnergyMatch_GMX
-from tinkerio import ForceEnergyMatch_TINKER
-from openmmio import ForceEnergyMatch_OpenMM, PropertyMatch_OpenMM
-from forceenergymatch_gmxx2 import ForceEnergyMatch_GMXX2
-from forceenergymatch_internal import ForceEnergyMatch_Internal
-from counterpoisematch import CounterpoiseMatch
+from gmxio import AbInitio_GMX
+from tinkerio import AbInitio_TINKER
+from openmmio import AbInitio_OpenMM, Experiment_OpenMM
+from abinitio_gmxx2 import AbInitio_GMXX2
+from abinitio_internal import AbInitio_Internal
+from counterpoise import Counterpoise
+from amberio import AbInitio_AMBER
 
 ## The table of fitting simulations
 SimTab = {
-    'FORCEENERGYMATCH_GMX':ForceEnergyMatch_GMX,
-    'FORCEENERGYMATCH_TINKER':ForceEnergyMatch_TINKER,
-    'FORCEENERGYMATCH_OPENMM':ForceEnergyMatch_OpenMM,
-    'FORCEENERGYMATCH_GMXX2':ForceEnergyMatch_GMXX2,
-    'FORCEENERGYMATCH_INTERNAL':ForceEnergyMatch_Internal,
-    'PROPERTYMATCH_OPENMM':PropertyMatch_OpenMM,
-    'COUNTERPOISEMATCH':CounterpoiseMatch
+    'ABINITIO_GMX':AbInitio_GMX,
+    'ABINITIO_TINKER':AbInitio_TINKER,
+    'ABINITIO_OPENMM':AbInitio_OpenMM,
+    'ABINITIO_AMBER':AbInitio_AMBER,
+    'ABINITIO_GMXX2':AbInitio_GMXX2,
+    'ABINITIO_INTERNAL':AbInitio_Internal,
+    'EXPERIMENT_OPENMM':Experiment_OpenMM,
+    'COUNTERPOISE':Counterpoise
     }
