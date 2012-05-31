@@ -13,7 +13,7 @@ from nifty import isint, isfloat
 from numpy import array
 from basereader import BaseReader
 from subprocess import Popen, PIPE
-from forceenergymatch import ForceEnergyMatch
+from abinitio import AbInitio
 
 pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
@@ -123,7 +123,7 @@ class Tinker_Reader(BaseReader):
             # types/classes involved in the interaction.
             self.suffix = '.'.join(self.atom)
 
-class ForceEnergyMatch_TINKER(ForceEnergyMatch):
+class AbInitio_TINKER(AbInitio):
 
     """Subclass of FittingSimulation for force and energy matching
     using TINKER.  Implements the prepare and energy_force_driver
@@ -133,7 +133,7 @@ class ForceEnergyMatch_TINKER(ForceEnergyMatch):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
         self.trajfnm = "all.arc"
         ## Initialize the SuperClass!
-        super(ForceEnergyMatch_TINKER,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_TINKER,self).__init__(options,sim_opts,forcefield)
         ## all_at_once is not implemented.
         self.all_at_once = False
 
@@ -145,7 +145,7 @@ class ForceEnergyMatch_TINKER(ForceEnergyMatch):
         os.symlink(os.path.join(self.root,self.simdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
 
     def energy_force_driver(self, shot):
-        self.traj.write("shot.arc",subset=[shot])
+        self.traj.write("shot.arc",select=[shot])
         # This line actually runs TINKER
         o, e = Popen(["./testgrad","shot.arc",self.FF.fnms[0],"y","n"],stdout=PIPE,stderr=PIPE).communicate()
         # Read data from stdout and stderr, and convert it to GROMACS
@@ -154,8 +154,8 @@ class ForceEnergyMatch_TINKER(ForceEnergyMatch):
         for line in o.split('\n'):
             s = line.split()
             if "Total Potential Energy" in line:
-                E = [float(s[4]) * 4.18]
+                E = [float(s[4]) * 4.184]
             elif len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
-                F += [-1 * float(i) * 4.18 * 10 for i in s[2:5]]
+                F += [-1 * float(i) * 4.184 * 10 for i in s[2:5]]
         M = array(E + F)
         return M

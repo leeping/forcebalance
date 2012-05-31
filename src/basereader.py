@@ -4,6 +4,8 @@
 @date 12/2011
 """
 
+from re import split, findall
+
 class BaseReader(object):
     """ The 'reader' class.  It serves two main functions:
 
@@ -24,6 +26,12 @@ class BaseReader(object):
         self.itype  = fnm
         self.suffix = ''
         self.pdict  = {}
+
+    def Split(self, line):
+        return line.split()
+    
+    def Whites(self, line):
+        return findall('[ ]+',line)
     
     def feed(self,line):
         self.ln += 1

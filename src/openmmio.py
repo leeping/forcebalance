@@ -6,8 +6,8 @@
 
 import os
 from basereader import BaseReader
-from forceenergymatch import ForceEnergyMatch
-from propertymatch import PropertyMatch
+from abinitio import AbInitio
+from experiment import Experiment
 import numpy as np
 import sys
 import pickle
@@ -59,10 +59,10 @@ class OpenMM_Reader(BaseReader):
         Involved = '.'.join([element.attrib[i] for i in suffix_dict[InteractionType]])#suffix_dict[InteractionType]
         return "/".join([InteractionType, parameter, Involved])
 
-class PropertyMatch_OpenMM(PropertyMatch):
+class Experiment_OpenMM(Experiment):
     def __init__(self,options,sim_opts,forcefield):
         ## Initialize the SuperClass!
-        super(PropertyMatch_OpenMM,self).__init__(options,sim_opts,forcefield)
+        super(Experiment_OpenMM,self).__init__(options,sim_opts,forcefield)
         work_queue.set_debug_flag('all')
         self.wq = work_queue.WorkQueue(port=self.wq_port, exclusive=False, shutdown=False)
         self.wq.specify_name('forcebalance')
@@ -91,9 +91,9 @@ class PropertyMatch_OpenMM(PropertyMatch):
                                  (os.path.join(run_dir,'npt.out'),'npt.out'),
                                  (os.path.join(run_dir,'%s' % self.FF.fnms[0]),self.FF.fnms[0])])
                        
-class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
+class AbInitio_OpenMM(AbInitio):
 
-    """Subclass of FittingSimulation for force and energy matching
+    """Subclass of AbInitio for force and energy matching
     using OpenMM.  Implements the prepare and energy_force_driver
     methods.  The get method is in the superclass.  """
 
@@ -101,7 +101,7 @@ class ForceEnergyMatch_OpenMM(ForceEnergyMatch):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
         self.trajfnm = "all.gro"
         ## Initialize the SuperClass!
-        super(ForceEnergyMatch_OpenMM,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_OpenMM,self).__init__(options,sim_opts,forcefield)
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)

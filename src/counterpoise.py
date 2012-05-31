@@ -1,4 +1,4 @@
-"""@package counterpoisematch
+"""@package counterpoise
 
 Match an empirical potential to the counterpoise correction for basis set superposition error (BSSE).
 
@@ -25,13 +25,13 @@ from re import match
 from fitsim import FittingSimulation
 from numpy import array, dot, exp, linalg, mean, ones, zeros
 
-class CounterpoiseMatch(FittingSimulation):
+class Counterpoise(FittingSimulation):
     """ FittingSimulation subclass for matching the counterpoise correction."""
 
     def __init__(self,options,sim_opts,forcefield):
-        """ To instantiate CounterpoiseMatch, we read the coordinates and counterpoise data."""
+        """ To instantiate Counterpoise, we read the coordinates and counterpoise data."""
         # Initialize the superclass. :)
-        super(CounterpoiseMatch,self).__init__(options,sim_opts,forcefield)
+        super(Counterpoise,self).__init__(options,sim_opts,forcefield)
         
         #======================================#
         # Options that are given by the parser #
@@ -92,7 +92,7 @@ class CounterpoiseMatch(FittingSimulation):
     def get(self,mvals,AGrad=False,AHess=False):
         """Gets the objective function for fitting the counterpoise correction.
 
-        As opposed to ForceEnergyMatch_GMXX2, which calls an external program,
+        As opposed to AbInitio_GMXX2, which calls an external program,
         this script actually computes the empirical interaction given the
         force field parameters.
 

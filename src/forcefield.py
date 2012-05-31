@@ -96,7 +96,7 @@ we need more modules!
 import os
 import sys
 from re import match, sub, split
-import gmxio, qchemio, tinkerio, custom_io, openmmio
+import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio
 import basereader
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros
 from numpy.linalg import norm
@@ -107,13 +107,16 @@ try:
     from lxml import etree
 except: pass
 import itertools
+from warnings import warn
 
 
 FF_Extensions = {"itp" : "gmx",
                  "in"  : "qchem",
                  "prm" : "tinker",
                  "gen" : "custom",
-                 "xml" : "openmm"
+                 "xml" : "openmm",
+                 "frcmod" : "frcmod",
+                 "mol2" : "mol2"
                  }
 
 """ Recognized force field formats. """
@@ -121,7 +124,9 @@ FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "qchem": qchemio.QCIn_Reader ,
                 "tinker": tinkerio.Tinker_Reader ,
                 "custom": custom_io.Gen_Reader , 
-                "openmm" : openmmio.OpenMM_Reader
+                "openmm" : openmmio.OpenMM_Reader,
+                "frcmod" : amberio.FrcMod_Reader,
+                "mol2" : amberio.Mol2_Reader
                 }
 
 def determine_fftype(ffname,verbose=False):
@@ -217,6 +222,10 @@ class FF(object):
         self.np          = 0
         ## Initial value of physical parameters
         self.pvals0      = []
+        ## A dictionary of force field reader classes
+        self.R           = {}
+        ## A list of atom names (this is new, for ESP fitting)
+        self.atomnames   = []
         
         # Read the force fields into memory.
         for fnm in self.fnms:
@@ -326,7 +335,7 @@ class FF(object):
         # Create an instance of the Reader.
         # The reader is essentially a finite state machine that allows us to 
         # build the pid.
-        self.R = Reader(ffname)
+        self.R[ffname] = Reader(ffname)
         if fftype == "openmm":
             ## Read in an XML force field file as an _ElementTree object
             self.ffdata[ffname] = etree.parse(absff)
@@ -334,11 +343,16 @@ class FF(object):
             self.addff_xml(ffname)
         else:
             ## Read in a text force field file as a list of lines
-            self.ffdata[ffname] = open(absff).readlines()
+            self.ffdata[ffname] = [line.expandtabs() for line in open(absff).readlines()]
             # Process the file
-            self.addff_txt(ffname)
+            self.addff_txt(ffname, fftype)
+        if hasattr(self.R[ffname], 'atomnames'):
+            print self.R[ffname].atomnames
+            if len(self.atomnames) > 0:
+                warn('Found more than one force field containing atom names - ESP fitting might not work.')
+            self.atomnames += self.R[ffname].atomnames
 
-    def addff_txt(self, ffname):
+    def addff_txt(self, ffname, fftype):
         """ Parse a text force field and create several important instance variables.
 
         Each line is processed using the 'feed' method as implemented
@@ -363,15 +377,15 @@ class FF(object):
         """
         
         for ln, line in enumerate(self.ffdata[ffname]):
-            self.R.feed(line)
-            sline = line.split()
+            self.R[ffname].feed(line)
+            sline = self.R[ffname].Split(line)
             if 'PARM' in sline:
                 pmark = (array(sline) == 'PARM').argmax() # The position of the 'PARM' word
                 pflds = [int(i) for i in sline[pmark+1:]] # The integers that specify the parameter word positions
                 for pfld in pflds:
                     # For each of the fields that are to be parameterized (indicated by PARM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
-                    pid = self.R.build_pid(pfld)
+                    pid = self.R[ffname].build_pid(pfld)
                     # Add pid into the dictionary.
                     self.map[pid] = self.np
                     # Also append pid to the parameter list
@@ -386,7 +400,7 @@ class FF(object):
                     # Second is a string corresponding to the 'pid' that this parameter depends on.
                     pfld = int(sline[parse])
                     prep = self.map[sline[parse+1].replace('MINUS_','')]
-                    pid = self.R.build_pid(pfld)
+                    pid = self.R[ffname].build_pid(pfld)
                     self.map[pid] = prep
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
@@ -421,7 +435,7 @@ class FF(object):
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
-                pid = self.R.build_pid(e, p)
+                pid = self.R[ffname].build_pid(e, p)
                 self.map[pid] = self.np
                 self.assign_p0(self.np,float(e.get(p)))
                 self.assign_field(self.np,ffname,fflist.index(e),p,1)
@@ -429,7 +443,7 @@ class FF(object):
 
         for e in self.ffdata[ffname].getroot().xpath('//@param_repeat/..'):
             for field in e.get('param_repeat').split(','):
-                dest = self.R.build_pid(e, field.strip().split('=')[0])
+                dest = self.R[ffname].build_pid(e, field.strip().split('=')[0])
                 src  = field.strip().split('=')[1]
                 if src in self.map:
                     self.map[dest] = self.map[src]
@@ -463,21 +477,42 @@ class FF(object):
             pvals = self.create_pvals(vals)
 
         pvals = list(pvals)
-        
         newffdata = deepcopy(self.ffdata)
-
+        #============================#
+        # Print the new force field. #
+        #============================#
         for i in range(len(self.pfields)):
             pfld_list = self.pfields[i]
             for pfield in pfld_list:
                 fnm,ln,fld,mult = pfield
+                # XML force fields are easy to print.  
+                # Our 'pointer' to where to replace the value
+                # is given by the position of this line in the
+                # iterable representation of the tree and the
+                # field number.
                 if type(newffdata[fnm]) is etree._ElementTree:
-                    list(newffdata[fnm].iter())[ln].attrib[fld] = "% .12e" % (mult*pvals[i])
+                    list(newffdata[fnm].iter())[ln].attrib[fld] = "%.12e" % (mult*pvals[i])
+                # Text force fields are a bit harder.
+                # Our pointer is given by the line and field number.
+                # We take care to preserve whitespace in the printout
+                # so that the new force field still has nicely formated
+                # columns.
                 else:
-                    sline       = newffdata[fnm][ln].split()
-                    whites      = split('[^ ]+',newffdata[fnm][ln])
+                    # Split the string into whitespace and data fields.
+                    sline       = self.R[fnm].Split(newffdata[fnm][ln])
+                    whites      = self.R[fnm].Whites(newffdata[fnm][ln])
+                    # Align whitespaces and fields (it should go white, field, white, field)
+                    if len(whites) == len(sline) - 1: 
+                        whites = [''] + whites
+                    # Subtract one whitespace, unless the line begins with a minus sign.
                     if not match('^-',sline[fld]) and len(whites[fld]) > 1:
                         whites[fld] = whites[fld][:-1]
-                    sline[fld]  = "% .12e" % (mult*pvals[i])
+                    # Subtract whitespace equal to (length of the data field minus two).
+                    if len(whites[fld]) > len(sline[fld])+2:
+                        whites[fld] = whites[fld][:len(sline[fld])+2]
+                    # Actually replace the field with the physical parameter value.
+                    sline[fld]  = "% 17.12e" % (mult*pvals[i])
+                    # Replace the line in the new force field.
                     newffdata[fnm][ln] = ''.join([whites[j]+sline[j] for j in range(len(sline))])+'\n'
 
         if printdir != None:
@@ -537,10 +572,11 @@ class FF(object):
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
-        if self.R.pdict == "XML_Override":
+        if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
             termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
         else:
-            termtypelist = sum([[i+self.R.pdict[i][j] for j in self.R.pdict[i] if isint(str(j))] for i in self.R.pdict],[])
+            termtypelist = itertools.chain(*sum([[[i+self.R[f].pdict[i][j] for j in self.R[f].pdict[i] if isint(str(j))] for i in self.R[f].pdict] for f in self.fnms],[]))
+            #termtypelist = sum([[i+self.R.pdict[i][j] for j in self.R.pdict[i] if isint(str(j))] for i in self.R.pdict],[])
         for termtype in termtypelist:
             for pid in self.map:
                 if termtype in pid:
@@ -602,25 +638,37 @@ class FF(object):
         fragments of molecules or other types of parameters.
         @todo The AMOEBA selection of charge depends not only on the atom type, but what that atom is bonded to.
         """
-        qmap   = []
-        qid    = []
+        self.qmap   = []
+        self.qid    = []
+        self.qid2   = []
         qnr    = 1
         concern= ['COUL','c0','charge']
-        if self.R.pdict == "XML_Override":
+        if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
             # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
             ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata]))
 
         for i in range(self.np):
             if any([j in self.plist[i] for j in concern]):
-                qmap.append(i)
+                self.qmap.append(i)
                 if 'AmoebaMultipoleForce.Multipole/c0' in self.plist[i] or 'NonbondedForce.Atom/charge' in self.plist[i]:
                     AType = self.plist[i].split('/')[-1].split('.')[0]
                     nq = count(ListOfAtoms,AType)
                 else:
+                    thisq = []
+                    for k in self.plist[i].split():
+                        for j in concern:
+                            if j in k:
+                                thisq.append(k.replace(j,''))
+                                break
+                    self.qid2.append(array([self.atomnames.index(k) for k in thisq]))
                     nq = sum(array([count(self.plist[i], j) for j in concern]))
-                qid.append(qnr+arange(nq))
+                self.qid.append(qnr+arange(nq))
                 qnr += nq
 
+        if len(self.qid2) == 0:
+            warn('Unable to match atom numbers up with atom names (minor issue, unless doing ESP fitting).  Are atom names implemented in the force field parser?')
+        else:
+            self.qid = self.qid2
         tq = qnr - 1
         cons0 = ones((1,tq))
 
@@ -644,14 +692,14 @@ class FF(object):
         ##     cons0 = vstack((cons0, constemp))
         ## print cons0
         #Here is where we build the qtrans2 matrix.
-        
-        nq = len(qmap)
+
+        nq = len(self.qmap)
         if nq > 0:
             cons = zeros((cons0.shape[0], nq), dtype=float)
             qtrans2 = eye(nq, dtype=float)
             for i in range(cons.shape[0]):
                 for j in range(cons.shape[1]):
-                    cons[i][j] = sum([cons0[i][k-1] for k in qid[j]])
+                    cons[i][j] = sum([cons0[i][k-1] for k in self.qid[j]])
                 cons[i] /= norm(cons[i])
                 for j in range(i):
                     cons[i] = orthogonalize(cons[i], cons[j])
@@ -662,9 +710,9 @@ class FF(object):
         qmat2 = eye(self.np,dtype=float)
         x = 0
         for i in range(self.np):
-            if i in qmap:
+            if i in self.qmap:
                 y = 0
-                for j in qmap:
+                for j in self.qmap:
                     qmat2[i, j] = qtrans2[x, y]
                     y += 1
                 x += 1

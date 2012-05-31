@@ -106,17 +106,17 @@ for t in gen_opts_types:
 sim_opts_types = {
     'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name')
                  },
-    'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance ForceEnergyMatch_GMXX2')
+    'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance AbInitio_GMXX2')
                  },
     'lists'   : {"fd_ptypes" : ([], 'The parameter types that need to be differentiated using finite difference')
                  },
-    'ints'    : {"shots"     : (-1, 'Number of snapshots (force+energy matching); defaults to all of the snapshots'),
-                 "fitatoms"  : (0, 'Number of fitting atoms (force+energy matching); defaults to all of them'),
+    'ints'    : {"shots"     : (-1, 'Number of snapshots (ab initio); defaults to all of the snapshots'),
+                 "fitatoms"  : (0, 'Number of fitting atoms (ab initio); defaults to all of them'),
                  "wq_port"   : (9230, 'The port number to use for Work Queue')
                  },
-    'bools'   : {"whamboltz"  : (0, 'Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False'),
-                 "sampcorr"   : (0, 'Whether to use the (archaic) sampling correction (force+energy match), defaults to False'),
-                 "covariance" : (0, 'Whether to use the quantum covariance matrix (force+energy match), defaults to False'),
+    'bools'   : {"whamboltz"  : (0, 'Whether to use WHAM Boltzmann Weights (ab initio), defaults to False'),
+                 "sampcorr"   : (0, 'Whether to use the (archaic) sampling correction (ab initio), defaults to False'),
+                 "covariance" : (0, 'Whether to use the quantum covariance matrix (ab initio), defaults to False'),
                  "batch_fd"   : (0, 'Whether to batch and queue up finite difference jobs, defaults to False'),
                  "fdgrad"     : (1, 'Finite difference gradients'),
                  "fdhess"     : (0, 'Finite difference Hessian diagonals (costs np times a gradient calculation)'),
@@ -124,13 +124,15 @@ sim_opts_types = {
                  "use_pvals"  : (0, 'Bypass the transformation matrix and use the physical parameters directly'),
                  "all_at_once": (1, 'Compute all energies and forces in one fell swoop (as opposed to calling the simulation code once per snapshot)'),
                  "run_internal": (1,'For OpenMM or other codes with Python interface: Compute energies and forces internally'),
-                 },
+                 "resp"       : (0, 'Enable the RESP objective function in ab initio (also set espweight)'), 
+                },
     'floats'  : {"weight"      : (1.0, 'Weight of the current simulation (with respect to other simulations)'),
-                 "w_rho"       : (1.0, 'Relative weight of fitting experimental density (property match), defaults to 1.0'),
-                 "w_hvap"      : (1.0, 'Relative weight of fitting enthalpy of vaporization (property match), defaults to 1.0'),
-                 "efweight"    : (0.5, '1.0 for all energy and 0.0 for all force (force+energy match), defaults to 0.5'),
-                 "qmboltz"     : (0.0, 'Fraction of Quantum Boltzmann Weights (force+energy match), 1.0 for full reweighting, 0.0 < 1.0 for hybrid'),
-                 "qmboltztemp" : (298.15, 'Temperature for Quantum Boltzmann Weights (force+energy match), defaults to room temperature')
+                 "w_rho"       : (1.0, 'Relative weight of fitting experimental density (experimental data), defaults to 1.0'),
+                 "w_hvap"      : (1.0, 'Relative weight of fitting enthalpy of vaporization (experimental data), defaults to 1.0'),
+                 "efweight"    : (0.5, '1.0 for all energy and 0.0 for all force (ab initio), defaults to 0.5'),
+                 "w_esp"       : (0.0, 'Weight of RESP objective function (then multiplied by overall weight)'),
+                 "qmboltz"     : (0.0, 'Fraction of Quantum Boltzmann Weights (ab initio), 1.0 for full reweighting, 0.0 < 1.0 for hybrid'),
+                 "qmboltztemp" : (298.15, 'Temperature for Quantum Boltzmann Weights (ab initio), defaults to room temperature')
                  },
     'sections': {}
     }

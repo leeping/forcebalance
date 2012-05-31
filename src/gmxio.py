@@ -8,11 +8,10 @@
 
 import os
 from re import match, sub
-from nifty import isint
+from nifty import isint, _exec
 from numpy import array
 from basereader import BaseReader
-from subprocess import Popen, PIPE
-from forceenergymatch import ForceEnergyMatch
+from abinitio import AbInitio
 
 ## VdW interaction function types
 nftypes = [None, 'VDW', 'VDW_BHAM']
@@ -336,15 +335,15 @@ def rm_gmx_baks(dir):
             if match('^#',file):
                 os.remove(file)
 
-class ForceEnergyMatch_GMX(ForceEnergyMatch):
-    """ Subclass of FittingSimulation for force and energy matching using normal GROMACS.
+class AbInitio_GMX(AbInitio):
+    """ Subclass of AbInitio for force and energy matching using normal GROMACS.
     Implements the prepare_temp_directory and energy_force_driver methods."""
 
     def __init__(self,options,sim_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
         self.trajfnm = "all.gro"
         ## Initialize the SuperClass!
-        super(ForceEnergyMatch_GMX,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_GMX,self).__init__(options,sim_opts,forcefield)
     
     def prepare_temp_directory(self, options, sim_opts):
         os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
@@ -358,9 +357,9 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         os.symlink(os.path.join(self.root,self.simdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
         os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
         # Write the trajectory to the temp-directory
-        self.traj.write(os.path.join(abstempdir,"all.gro"),subset=range(self.ns))
+        self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro
-        self.traj.write(os.path.join(abstempdir,"conf.gro"),subset=[0])
+        self.traj.write(os.path.join(abstempdir,"conf.gro"),select=[0])
 
     def energy_force_driver(self, shot):
         """ Computes the energy and force using GROMACS for a single
@@ -369,7 +368,7 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         # Remove backup files.
         rm_gmx_baks(os.getcwd())
         # Write the correct conformation.
-        self.traj.write('conf.gro',subset=[shot])
+        self.traj.write('conf.gro',select=[shot])
         # Call grompp followed by mdrun.
         o, e = Popen(["./grompp", "-f", "shot.mdp"],stdout=PIPE,stderr=PIPE).communicate()
         o, e = Popen(["./mdrun", "-o", "shot.trr", "-rerunvsite"], stdout=PIPE, stderr=PIPE).communicate()
@@ -386,11 +385,11 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
         # Remove backup files.
         rm_gmx_baks(os.getcwd())
         # Call grompp followed by mdrun.
-        o, e = Popen(["./grompp", "-f", "shot.mdp"],stdout=PIPE,stderr=PIPE).communicate()
-        o, e = Popen(["./mdrun", "-o", "shot.trr", "-rerunvsite", "-rerun", "all.gro"], stdout=PIPE, stderr=PIPE).communicate()
+        _exec(["./grompp", "-f", "shot.mdp"], print_command=False)
+        _exec(["./mdrun", "-o", "shot.trr", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
         # Gather information
-        o, e = Popen(["./g_energy","-xvg","no"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('Potential')
-        o, e = Popen(["./g_traj","-xvg","no","-f","shot.trr","-of","force.xvg","-fp"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('System')
+        _exec(["./g_energy","-xvg","no"], stdin='Potential', print_command=False)
+        _exec(["./g_traj","-xvg","no","-f","shot.trr","-of","force.xvg","-fp"], stdin='System', print_command=False)
         M = []
         Efile = open("energy.xvg").readlines()
         Ffile = open("force.xvg").readlines()
@@ -400,4 +399,4 @@ class ForceEnergyMatch_GMX(ForceEnergyMatch):
             Energy = [float(Eline.split()[1])]
             Force = [float(i) for i in Fline.split()[1:] if float(i) != 0.0]
             M.append(array(Energy + Force))
-        return M
+        return array(M)

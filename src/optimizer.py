@@ -416,6 +416,7 @@ class Optimizer(object):
             HT = H + L**2*np.diag(np.diag(H))
             dx = -solve(HT, G)
             ndx = norm(dx)
+            print "In Levenberg-Marquardt, the trust radius is % .8f" % norm(dx)
             return (norm(dx) - (trust * (1.0-1e-6)))**2            
         if dxnorm > trust:
             bump = True
@@ -680,8 +681,8 @@ class Optimizer(object):
 
     def SinglePoint(self):
         """ A single-point objective function computation. """
-        data        = self.Objective(self.mvals0,Order=0)
-        print data['X']
+        data        = self.Objective(self.mvals0,Order=0,verbose=True)
+        print "The objective function is:", data['X']
 
     def Gradient(self):
         """ A single-point gradient computation. """
