@@ -108,19 +108,27 @@ class Penalty:
     in the 'rsmake' method.
 
     """
-    def __init__(self, Penalty_Type, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1):
+    def __init__(self, User_Option, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1):
         self.fadd = Factor_Add
         self.fmul = Factor_Mult
         self.b    = Factor_B
-        self.ptyp = Penalty_Type
-        self.Pen_Tab = {'HYP' : self.HYP, 'HYPERBOLIC' : self.HYP, 'L2' : self.L2_norm, 'QUADRATIC' : self.L2_norm}
+        self.Pen_Names = {'HYP' : 1, 'HYPER' : 1, 'HYPERBOLIC' : 1, 'L1' : 1, 'HYPERBOLA' : 1,
+                          'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2}
+        self.ptyp = self.Pen_Names[User_Option.upper()]
+        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm}
+        if User_Option.upper() == 'L1':
+            print "L1 norm uses the hyperbolic penalty, make sure penalty_hyperbolic_b is set sufficiently small"
+        elif self.ptyp == 1:
+            print "Using hyperbolic regularization (Laplacian prior) with strength %.1e (+), %.1e (x) and tightness %.1e" % (Factor_Add, Factor_Mult, Factor_B)
+        elif self.ptyp == 2:
+            print "Using parabolic regularization (Gaussian prior) with strength %.1e (+), %.1e (x)" % (Factor_Add, Factor_Mult)
 
     def compute(self, mvals, Objective):
         X = Objective['X']
         G = Objective['G']
         H = Objective['H']
         np = len(mvals)
-        K0, K1, K2 = self.Pen_Tab[self.ptyp.upper()](mvals)
+        K0, K1, K2 = self.Pen_Tab[self.ptyp](mvals)
         XAdd = 0.0
         GAdd = zeros(np, dtype=float)
         HAdd = zeros((np, np), dtype=float)

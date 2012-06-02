@@ -107,14 +107,14 @@ class Optimizer(object):
         self.print_hess = options['print_hessian']
         ## Whether to print parameters during each step of the optimization
         self.print_vals = options['print_parameters']
-        ## Whether the penalty function is hyperbolic
-        self.bhyp       = options['penalty_type'].upper() in ['HYP','HYPERBOLIC']
         
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## The objective function (needs to pass in when I instantiate)
         self.Objective = Objective
+        ## Whether the penalty function is hyperbolic
+        self.bhyp      = Objective.Penalty.ptyp == 1
         ## The force field itself
         self.FF        = FF
         
@@ -152,7 +152,7 @@ class Optimizer(object):
         if check_after:
             self.mvals0 = xk.copy()
             self.FDCheckG()
-            
+
         ## Print out final answer
         final_print = True
         if final_print:
@@ -265,10 +265,11 @@ class Optimizer(object):
                 bar = printcool("Total Hessian",color=6)
                 pmat2d(H)
                 print bar
-            if self.bhyp:
-                dx, dX_expect, bump = self.step_hyperbolic(xk, data, trust)
-            else:
-                dx, dX_expect, bump = self.step_normal(G, H, trust)
+            dx, dX_expect, bump = self.step(xk, data, trust)
+            # if self.bhyp:
+            #     dx, dX_expect, bump = self.step_hyperbolic(xk, data, trust)
+            # else:
+            #     dx, dX_expect, bump = self.step_normal(G, H, trust)
             old_pk = self.FF.create_pvals(xk)
             old_xk = xk.copy()
             # Take a step in the parameter space.
@@ -372,66 +373,12 @@ class Optimizer(object):
             H_stor  = H.copy()
             xk_prev = xk.copy()
             X_prev  = X
+        
+        bar = printcool("Final objective function value\nFull: % .6e  Un-penalized: % .6e" % (data['X'],data['X0']), '@', bold=True, color=2)
         return xk
 
-    def step_hyperbolic(self, xk, data, trust):
-        from scipy import optimize
 
-        if self.Objective.Penalty.fmul != 0.0:
-            warn_press_key("Using the multiplicative hyperbolic penalty is discouraged!")
-        # This is the gradient and Hessian without the contributions
-        # from the hyperbolic constraint (which are kind of useless).
-        X = data['X0']
-        G = data['G0']
-        H = data['H0']
-        Obj0 = {'X':X,'G':G,'H':H}
-        # Delete the excised rows so we don't have to worry about them.
-        #G = np.delete(G, self.excision)
-        #H = np.delete(H, self.excision, axis=0)
-        #H = np.delete(H, self.excision, axis=1)
-
-        def hyperbola(dx, H1):
-            # Computes the value of the hyperbolic extrapolation.
-            # This is the Newton-Raphson component from the objective function.
-            ans = flat(X + np.dot(dx,G) + 0.5*row(dx)*np.mat(H1)*col(dx))[0]
-            # Add in the penalty from the new dx.
-            ans += self.Objective.Penalty.compute(xk+dx, Obj0)[0]
-            ans -= data['X']
-            return ans
-
-        def hyper_prime(dx, H1):
-            # Computes the derivative of the hyperbola.
-            ans = flat(col(G) + np.mat(H1)*col(dx))
-            ans += self.Objective.Penalty.compute(xk+dx, Obj0)[1]
-            return ans
-
-        def hyper_solver(L):
-            dx0 = np.zeros(len(xk),dtype=float)
-            HL = H + L**2*np.diag(np.diag(H))
-            Opt1 = optimize.fmin_bfgs(hyperbola,dx0,fprime=hyper_prime,args=(HL,),gtol=1e-8,full_output=True,disp=0)
-            Opt2 = optimize.fmin_bfgs(hyperbola,-xk,fprime=hyper_prime,args=(HL,),gtol=1e-8,full_output=True,disp=0)
-            dx1, sol1 = Opt1[0], Opt1[1]
-            dx2, sol2 = Opt2[0], Opt2[1]
-            dxb, sol = (dx1, sol1) if sol1 <= sol2 else (dx2, sol2)
-            return dxb, sol
-    
-        def trust_fun(L):
-            N = norm(hyper_solver(L)[0])
-            return (N - (trust * (1.0-1e-6)))**2            
-    
-        dx, expect = hyper_solver(0)
-        dxnorm = norm(dx)
-        bump = False
-        if dxnorm > trust:
-            bump = True
-            LOpt = optimize.brute(trust_fun,[[0,100]],Ns=101)
-            LOpt = optimize.fmin(trust_fun,LOpt,xtol=1e-5,disp=0)
-            dx, expect = hyper_solver(LOpt)
-            dxnorm = norm(dx)
-            print "Levenberg-Marquardt with hyperbolic penalty: The Hessian's diagonal is scaled by % .3f" % (1+LOpt)
-        return dx, expect, bump
-
-    def step_normal(self, G, H, trust):
+    def step(self, xk, data, trust):
         """ Computes the Newton-Raphson or BFGS step.
 
         The step is given by the inverse of the Hessian times the gradient.
@@ -456,47 +403,90 @@ class Optimizer(object):
         @param[in] trust The trust radius
         
         """
-
-        # G0 and H0 are used for determining the expected function change.
-        G0 = G.copy()
-        H0 = H.copy()
-        G = np.delete(G, self.excision)
-        H = np.delete(H, self.excision, axis=0)
-        H = np.delete(H, self.excision, axis=1)
-        
-        Eig = eig(H)[0]            # Diagonalize Hessian
-        Emin = min(Eig)
-        if Emin < self.eps:        # Mix in SD step if Hessian minimum eigenvalue is negative
-            print "Warning: Hessian has a small or negative eigenvalue (%.3f), mixing in some steepest descent (%.3f) to correct this." % (Emin, self.eps - Emin)
-            H += (self.eps - Emin)*np.eye(H.shape[0])
-        dx = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
-        dx = flat(dx)
-        for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
-            dx = np.insert(dx, i, 0)
-        dxnorm = norm(dx)          # Length of step
-        bump = False
-
-        #<--------------------------
-        # Levenberg-Marquardt (Trust Region) code.  Added 05/19/2012.
         from scipy import optimize
+
+        X, G, H = (data['X0'], data['G0'], data['H0']) if self.bhyp else (data['X'], data['G'], data['H'])
+        H1 = H.copy()
+        H1 = np.delete(H1, self.excision, axis=0)
+        H1 = np.delete(H1, self.excision, axis=1)
+        Eig = eig(H1)[0]            # Diagonalize Hessian
+        Emin = min(Eig)
+        if Emin < self.eps:         # Mix in SD step if Hessian minimum eigenvalue is negative
+            print "Hessian has a small or negative eigenvalue (%.1e), mixing in some steepest descent (%.1e) to correct this." % (Emin, self.eps - Emin)
+            H += (self.eps - Emin)*np.eye(H.shape[0])
+
+        if self.bhyp:
+            if self.Objective.Penalty.fmul != 0.0:
+                warn_press_key("Using the multiplicative hyperbolic penalty is discouraged!")
+            # This is the gradient and Hessian without the contributions from the hyperbolic constraint.
+            Obj0 = {'X':X,'G':G,'H':H}
+            class Hyper(object):
+                def __init__(self, HL, Penalty):
+                    self.H = HL.copy()
+                    self.dx = 1e10 * np.ones(len(HL),dtype=float)
+                    self.Val = 0
+                    self.Grad = np.zeros(len(HL),dtype=float)
+                    self.Penalty = Penalty
+                def _compute(self, dx):
+                    self.dx = dx.copy()
+                    Tmp = np.mat(self.H)*col(dx)
+                    Reg_Term   = self.Penalty.compute(xk+flat(dx), Obj0)
+                    self.Val   = (X + np.dot(dx, G) + 0.5*row(dx)*Tmp + Reg_Term[0] - data['X'])[0,0]
+                    self.Grad  = flat(col(G) + Tmp) + Reg_Term[1]
+                def compute_val(self, dx):
+                    if norm(dx - self.dx) > 1e-8:
+                        self._compute(dx)
+                    return self.Val
+                def compute_grad(self, dx):
+                    if norm(dx - self.dx) > 1e-8:
+                        self._compute(dx)
+                    return self.Grad
+            def hyper_solver(L):
+                dx0 = np.zeros(len(xk),dtype=float)
+                HL = H + L**2*np.diag(np.diag(H))
+                HYP = Hyper(HL, self.Objective.Penalty)
+                Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
+                Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xk,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
+                dx1, sol1 = Opt1[0], Opt1[1]
+                dx2, sol2 = Opt2[0], Opt2[1]
+                dxb, sol = (dx1, sol1) if sol1 <= sol2 else (dx2, sol2)
+                return dxb, sol
+        else:
+            # G0 and H0 are used for determining the expected function change.
+            G0 = G.copy()
+            H0 = H.copy()
+            G = np.delete(G, self.excision)
+            H = np.delete(H, self.excision, axis=0)
+            H = np.delete(H, self.excision, axis=1)
+            dx = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
+            dx = flat(dx)
+            for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
+                dx = np.insert(dx, i, 0)
+            def para_solver(L):
+                HT = H + L**2*np.diag(np.diag(H))
+                dx = -solve(HT, G)
+                sol = flat(0.5*row(dx)*np.mat(H)*col(dx))[0] + np.dot(dx,G)
+                for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
+                    dx = np.insert(dx, i, 0)
+                return dx, sol
+    
+        def solver(L):
+            return hyper_solver(L) if self.bhyp else para_solver(L)
+    
         def trust_fun(L):
-            HT = H + L**2*np.diag(np.diag(H))
-            dx = -solve(HT, G)
-            ndx = norm(dx)
-            return (norm(dx) - (trust * (1.0-1e-6)))**2
+            N = norm(solver(L)[0])
+            return (N - trust)**2
+
+        bump = False
+        dx, expect = solver(0)
+        dxnorm = norm(dx)
         if dxnorm > trust:
             bump = True
-            LOpt = optimize.brute(trust_fun,[[0,100]],Ns=101)**2
-            LOpt = optimize.fmin(trust_fun,LOpt,xtol=1e-8,disp=0)**2
-            H += LOpt*np.diag(np.diag(H))
-            dx = -solve(H, G)
-            dx = flat(dx)
-            for i in self.excision:
-                dx = np.insert(dx, i, 0)
+            # Tried a few optimizers here, seems like Brent works well.
+            LOpt = optimize.brent(trust_fun,brack=(0.0,3.0),tol=1e-4)
+            dx, expect = solver(LOpt)
             dxnorm = norm(dx)
-            print "Levenberg-Marquardt: The Hessian's diagonal is scaled by % .3f" % (1+LOpt)
-        expect = 0.5*row(dx)*np.mat(H0)*col(dx) + np.dot(dx,G0)
-        # Sign change detection code.  Added 05/30/2012.
+            print "Levenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)
         return dx, expect, bump
 
     def NewtonRaphson(self):

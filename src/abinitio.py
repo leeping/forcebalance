@@ -7,7 +7,7 @@
 import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg
+from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt
 from fitsim import FittingSimulation
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -415,6 +415,8 @@ class AbInitio(FittingSimulation):
                     return self.energy_force_driver_all()
                 for p in range(np):
                     dM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)[0]
+            # Dump energies and forces to disk.
+            savetxt('M.txt',M_all)
         for i in range(ns):
             print "Incrementing quantities for snapshot %i\r" % i,
             # Build Boltzmann weights and increment partition function.
