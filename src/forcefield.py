@@ -452,7 +452,7 @@ class FF(object):
                                     "but the source parameter does not seem to exist!"])
                 self.assign_field(self.map[dest],ffname,fflist.index(e),dest.split('/')[1],1)
             
-    def make(self,vals,usepvals,printdir=None):
+    def make(self,vals,usepvals=False,printdir=None):
         """ Create a new force field using provided parameter values.
         
         This big kahuna does a number of things:
@@ -660,7 +660,9 @@ class FF(object):
                             if j in k:
                                 thisq.append(k.replace(j,''))
                                 break
-                    self.qid2.append(array([self.atomnames.index(k) for k in thisq]))
+                    try:
+                        self.qid2.append(array([self.atomnames.index(k) for k in thisq]))
+                    except: pass
                     nq = sum(array([count(self.plist[i], j) for j in concern]))
                 self.qid.append(qnr+arange(nq))
                 qnr += nq

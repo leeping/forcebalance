@@ -6,6 +6,9 @@ penalty_additive       0.0
 penalty_multiplicative 0.01
 convergence_objective 1e-6
 convergence_step 1e-6
+print_parameters no
+print_gradient no
+print_hessian no
 backup
 $end
 

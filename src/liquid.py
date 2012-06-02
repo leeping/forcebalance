@@ -211,9 +211,10 @@ class Liquid(FittingSimulation):
         # Gather the calculation data
         Results = {T : lp_load(open('./%.1f/npt_result.p' % T)) for T in Temps}
 
-        Rhos, Energies, Grads, mEnergies, mGrads, Rho_errs, Hvap_errs = ([Results[T][i] for T in Temps] for i in range(7))
+        Rhos, pVs, Energies, Grads, mEnergies, mGrads, Rho_errs, Hvap_errs = ([Results[T][i] for T in Temps] for i in range(8))
 
         R  = np.array(list(itertools.chain(*list(Rhos))))
+        PV = np.array(list(itertools.chain(*list(pVs))))
         E  = np.array(list(itertools.chain(*list(Energies))))
         G  = np.hstack(tuple(Grads))
         mE = np.array(list(itertools.chain(*list(mEnergies))))
@@ -232,6 +233,7 @@ class Liquid(FittingSimulation):
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
         mU_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
+        ## Okay. This place definitely needs to be improved.  Mao with the plao:
         for m, T in enumerate(Temps):
             beta = 1. / (kb * T)
             for k in range(len(Temps)):
@@ -254,10 +256,11 @@ class Liquid(FittingSimulation):
             mBeta = -1/kb/T
             Rho_calc[T]   = np.dot(W,R)
             Rho_grad[T]   = mBeta*(flat(np.mat(G)*col(W*R)) - np.dot(W,R)*Gbar)
-            Hvap_calc[T]  = np.dot(mW,mE) - np.dot(W,E)/216
+            Hvap_calc[T]  = np.dot(mW,mE) - np.dot(W,E)/216 + kb*T - np.dot(W, PV)
 
             Hvap_grad[T]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
             Hvap_grad[T] -= (Gbar + mBeta*(flat(np.mat(G)*col(W*E)) - np.dot(W,E)*Gbar)) / 216
+            Hvap_grad[T] -= mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar)
             Rho_std[T]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             Hvap_std[T]   = np.sqrt(sum(C**2 * np.array(Hvap_errs)**2))
 

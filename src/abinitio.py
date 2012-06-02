@@ -76,6 +76,8 @@ class AbInitio(FittingSimulation):
         self.force         = sim_opts['force']
         ## Whether to fit Electrostatic Potential.
         self.resp          = sim_opts['resp']
+        self.resp_a        = sim_opts['resp_a']
+        self.resp_b        = sim_opts['resp_b']
         ## Weights for the three components.
         self.w_energy      = sim_opts['w_energy']
         self.w_force       = sim_opts['w_force']
@@ -470,7 +472,7 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         #      STEP 3: Build the variance vector and invert it.        #
         #==============================================================#
-        print "\nBuilding variances."
+        print "Done with snapshots, building objective function now\r",
         EFW     = self.w_energy / (self.w_energy + self.w_force)
         CEFW    = 1.0 - EFW
         # Build the weight vector, so the force contribution is suppressed by 1/3N
@@ -489,7 +491,6 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         # STEP 4: Build the objective function and its derivatives.    #
         #==============================================================#
-        print "Building objective function."
         X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1)
         X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1)
         for p in range(np):
@@ -509,7 +510,6 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         #            STEP 5: Build the return quantities.              #
         #==============================================================#
-        print "Building return quantities."
         # The objective function
         X2   = MBP * X2_M    + QBP * X2_Q
         # Derivatives of the objective function
@@ -808,12 +808,12 @@ class AbInitio(FittingSimulation):
         # Following is the restraint part
         # RESP hyperbola "strength" parameter; 0.0005 is weak, 0.001 is strong
         # RESP hyperbola "tightness" parameter; don't need to change this
-        a = 0.001
-        b = 0.1
+        a = self.resp_a
+        b = self.resp_b
         q = getqatoms(mvals)
         R   = a*sum((q**2 + b**2)**0.5 - b)
         dR  = a*q*(q**2 + b**2)**-0.5
-        ddR = a*(q**2 + 2*b**2) / (2*(b**2 + q**2)**(1.25))
+        ddR = a*b**2*(q**2 + b**2)**-1.5
         self.respterm = R
         X += R
         if AGrad:
