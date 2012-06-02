@@ -5,7 +5,7 @@ import os
 import subprocess
 import shutil
 import numpy as np
-from nifty import col,printcool_dictionary, link_dir_contents
+from nifty import row,col,printcool_dictionary, link_dir_contents
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from optimizer import Counter
 
@@ -194,7 +194,7 @@ class FittingSimulation(object):
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
                     FDSlice = f1d2p(fdwrap_H(self,mvals,i),self.h,f0 = Ans['G'])
                     Ans['H'][i,:] = FDSlice
-                    Ans['H'][:,i] = col(FDSlice.T)
+                    Ans['H'][:,i] = FDSlice
         elif self.fdhessdiag:
             for i in range(self.FF.np):
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:

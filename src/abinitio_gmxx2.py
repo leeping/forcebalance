@@ -117,7 +117,7 @@ class AbInitio_GMXX2(AbInitio):
         self.traj.write(os.path.join(abstempdir,"all.gro"))
         os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
         # Print out the first conformation in all.gro to use as conf.gro
-        self.traj.write(os.path.join(abstempdir,"conf.gro"),subset=[0])
+        self.traj.write(os.path.join(abstempdir,"conf.gro"),select=[0])
         if self.qmboltz > 0.0:
             # QM Boltzmann Weights
             gmxx2_print(os.path.join(abstempdir,"qmboltz"),self.qmboltz_wts,"double")

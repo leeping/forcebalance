@@ -1351,7 +1351,7 @@ class StateMBAR:
       if verbose: print "Initializing free energies with mean reduced potential for each state."
       for k in self.nonzero_N_k_indices:
         self.f_k[k] = self.u_kln[k,k,0:self.N_k[k]].mean()
-    elif (method == 'BAR')
+    elif (method == 'BAR'):
     # Initialize with BAR, if requested.
       # TODO: Can we guess a good path for this initial guess for arbitrary "topologies"?
       # For now, make a simple list of those states with samples.

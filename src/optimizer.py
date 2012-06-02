@@ -11,7 +11,7 @@ contained inside.
 import os, pickle, re, sys
 import numpy as np
 from numpy.linalg import eig, norm, solve
-from nifty import col, flat, row, printcool, printcool_dictionary, pmat2d
+from nifty import col, flat, row, printcool, printcool_dictionary, pmat2d, warn_press_key
 from finite_difference import f1d7p, f1d5p, fdwrap
 import random
 
@@ -31,7 +31,7 @@ class Optimizer(object):
     The dependency is rather weak which suggests that I can remove it someday.
     """
     
-    def __init__(self,options,Objective,FF,Simulations):
+    def __init__(self,options,Objective,FF):
         """ Instantiation of the optimizer.
 
         The optimizer depends on both the FF and the fitting simulations so there
@@ -107,14 +107,14 @@ class Optimizer(object):
         self.print_hess = options['print_hessian']
         ## Whether to print parameters during each step of the optimization
         self.print_vals = options['print_parameters']
+        ## Whether the penalty function is hyperbolic
+        self.bhyp       = options['penalty_type'].upper() in ['HYP','HYPERBOLIC']
         
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## The objective function (needs to pass in when I instantiate)
         self.Objective = Objective
-        ## The fitting simulations
-        self.Sims      = Simulations
         ## The force field itself
         self.FF        = FF
         
@@ -214,7 +214,7 @@ class Optimizer(object):
         else:
             xk       = self.mvals0.copy()
             print
-            data     = self.Objective(xk,Ord,verbose=True) # Try to get a Hessian no matter what on the first step.
+            data     = self.Objective.Full(xk,Ord,verbose=True) # Try to get a Hessian no matter what on the first step.
             X, G, H  = data['X'], data['G'], data['H']
             ehist    = np.array([X])
             xk_prev  = xk.copy()
@@ -265,11 +265,19 @@ class Optimizer(object):
                 bar = printcool("Total Hessian",color=6)
                 pmat2d(H)
                 print bar
-            dx, dX_expect, bump = self.step(G, H, trust)
+            if self.bhyp:
+                dx, dX_expect, bump = self.step_hyperbolic(xk, data, trust)
+            else:
+                dx, dX_expect, bump = self.step_normal(G, H, trust)
             old_pk = self.FF.create_pvals(xk)
             old_xk = xk.copy()
             # Take a step in the parameter space.
             xk += dx
+            #<-----
+            #for i in range(self.FF.np):
+            #    if old_xk[i] * xk[i] < 0:
+            #        print "Sign change detected in parameter %i (%.2e -> %.2e)" % (i, old_xk[i], xk[i])
+            #----->
             if self.print_vals:
                 pk = self.FF.create_pvals(xk)
                 dp = pk - old_pk
@@ -280,7 +288,7 @@ class Optimizer(object):
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
                 print bar
             # Evaluate the objective function and its derivatives.
-            data        = self.Objective(xk,Ord,verbose=True)
+            data        = self.Objective.Full(xk,Ord,verbose=True)
             stepn += 1
             X, G, H = data['X'], data['G'], data['H']
             ndx = norm(dx)
@@ -366,7 +374,64 @@ class Optimizer(object):
             X_prev  = X
         return xk
 
-    def step(self, G, H, trust):
+    def step_hyperbolic(self, xk, data, trust):
+        from scipy import optimize
+
+        if self.Objective.Penalty.fmul != 0.0:
+            warn_press_key("Using the multiplicative hyperbolic penalty is discouraged!")
+        # This is the gradient and Hessian without the contributions
+        # from the hyperbolic constraint (which are kind of useless).
+        X = data['X0']
+        G = data['G0']
+        H = data['H0']
+        Obj0 = {'X':X,'G':G,'H':H}
+        # Delete the excised rows so we don't have to worry about them.
+        #G = np.delete(G, self.excision)
+        #H = np.delete(H, self.excision, axis=0)
+        #H = np.delete(H, self.excision, axis=1)
+
+        def hyperbola(dx, H1):
+            # Computes the value of the hyperbolic extrapolation.
+            # This is the Newton-Raphson component from the objective function.
+            ans = flat(X + np.dot(dx,G) + 0.5*row(dx)*np.mat(H1)*col(dx))[0]
+            # Add in the penalty from the new dx.
+            ans += self.Objective.Penalty.compute(xk+dx, Obj0)[0]
+            ans -= data['X']
+            return ans
+
+        def hyper_prime(dx, H1):
+            # Computes the derivative of the hyperbola.
+            ans = flat(col(G) + np.mat(H1)*col(dx))
+            ans += self.Objective.Penalty.compute(xk+dx, Obj0)[1]
+            return ans
+
+        def hyper_solver(L):
+            dx0 = np.zeros(len(xk),dtype=float)
+            HL = H + L**2*np.diag(np.diag(H))
+            Opt1 = optimize.fmin_bfgs(hyperbola,dx0,fprime=hyper_prime,args=(HL,),gtol=1e-8,full_output=True,disp=0)
+            Opt2 = optimize.fmin_bfgs(hyperbola,-xk,fprime=hyper_prime,args=(HL,),gtol=1e-8,full_output=True,disp=0)
+            dx1, sol1 = Opt1[0], Opt1[1]
+            dx2, sol2 = Opt2[0], Opt2[1]
+            dxb, sol = (dx1, sol1) if sol1 <= sol2 else (dx2, sol2)
+            return dxb, sol
+    
+        def trust_fun(L):
+            N = norm(hyper_solver(L)[0])
+            return (N - (trust * (1.0-1e-6)))**2            
+    
+        dx, expect = hyper_solver(0)
+        dxnorm = norm(dx)
+        bump = False
+        if dxnorm > trust:
+            bump = True
+            LOpt = optimize.brute(trust_fun,[[0,100]],Ns=101)
+            LOpt = optimize.fmin(trust_fun,LOpt,xtol=1e-5,disp=0)
+            dx, expect = hyper_solver(LOpt)
+            dxnorm = norm(dx)
+            print "Levenberg-Marquardt with hyperbolic penalty: The Hessian's diagonal is scaled by % .3f" % (1+LOpt)
+        return dx, expect, bump
+
+    def step_normal(self, G, H, trust):
         """ Computes the Newton-Raphson or BFGS step.
 
         The step is given by the inverse of the Hessian times the gradient.
@@ -418,7 +483,7 @@ class Optimizer(object):
             HT = H + L**2*np.diag(np.diag(H))
             dx = -solve(HT, G)
             ndx = norm(dx)
-            return (norm(dx) - (trust * (1.0-1e-6)))**2            
+            return (norm(dx) - (trust * (1.0-1e-6)))**2
         if dxnorm > trust:
             bump = True
             LOpt = optimize.brute(trust_fun,[[0,100]],Ns=101)**2
@@ -431,7 +496,7 @@ class Optimizer(object):
             dxnorm = norm(dx)
             print "Levenberg-Marquardt: The Hessian's diagonal is scaled by % .3f" % (1+LOpt)
         expect = 0.5*row(dx)*np.mat(H0)*col(dx) + np.dot(dx,G0)
-        #-------------------------->
+        # Sign change detection code.  Added 05/30/2012.
         return dx, expect, bump
 
     def NewtonRaphson(self):
@@ -495,16 +560,16 @@ class Optimizer(object):
             return my_gfunc
         if Algorithm == "powell":
             printcool("Minimizing Objective Function using Powell's Method" , color=7, bold=1)
-            return optimize.fmin_powell(xwrap(self.Objective),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep)
+            return optimize.fmin_powell(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep)
         elif Algorithm == "simplex":
             printcool("Minimizing Objective Function using Simplex Method" , color=7, bold=1)
-            return optimize.fmin(xwrap(self.Objective),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep,maxfun=self.maxstep*10)
+            return optimize.fmin(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep,maxfun=self.maxstep*10)
         elif Algorithm == "anneal":
             printcool("Minimizing Objective Function using Simulated Annealing" , color=7, bold=1)
-            return optimize.anneal(xwrap(self.Objective),self.mvals0,lower=-1*self.trust0*np.ones(self.np),upper=self.trust0*np.ones(self.np),schedule='boltzmann')
+            return optimize.anneal(xwrap(self.Objective.Full),self.mvals0,lower=-1*self.trust0*np.ones(self.np),upper=self.trust0*np.ones(self.np),schedule='boltzmann')
         elif Algorithm == "cg":
             printcool("Minimizing Objective Function using Conjugate Gradient" , color=7, bold=1)
-            return optimize.fmin_cg(xwrap(self.Objective,verbose=False),self.mvals0,fprime=gwrap(self.Objective),gtol=self.conv_grd)
+            return optimize.fmin_cg(xwrap(self.Objective.Full,verbose=False),self.mvals0,fprime=gwrap(self.Objective.Full),gtol=self.conv_grd)
 
     def GeneticAlgorithm(self):
         
@@ -538,7 +603,7 @@ class Optimizer(object):
             #return np.vstack((self.mvals0.copy(),generate_fresh(PopSize, self.np)))
 
         def calculate_fitness(pop):
-            return [self.Objective(i,Order=0,verbose=False)['X'] for i in pop]
+            return [self.Objective.Full(i,Order=0,verbose=False)['X'] for i in pop]
 
         def sort_by_fitness(fits):
             return np.sort(fits), np.argsort(fits)
@@ -666,12 +731,12 @@ class Optimizer(object):
                 vals = self.mvals0.copy()
             else:
                 print "Scanning parameter %i (%s) in the physical space" % (pidx,self.FF.plist[pidx])
-                for Sim in self.Sims:
+                for Sim in self.Objective.Simulations:
                     Sim.usepvals = True
                 vals = self.FF.pvals0.copy()
             for i in scanvals:
                 vals[pidx] = i
-                data        = self.Objective(vals,Order=0)
+                data        = self.Objective.Full(vals,Order=0)
                 print "Value = % .4e Objective = % .4e" % (i, data['X'])
 
     def ScanMVals(self):
@@ -684,19 +749,19 @@ class Optimizer(object):
 
     def SinglePoint(self):
         """ A single-point objective function computation. """
-        data        = self.Objective(self.mvals0,Order=0,verbose=True)
+        data        = self.Objective.Full(self.mvals0,Order=0,verbose=True)
         print "The objective function is:", data['X']
 
     def Gradient(self):
         """ A single-point gradient computation. """
-        data        = self.Objective(self.mvals0,Order=1)
+        data        = self.Objective.Full(self.mvals0,Order=1)
         print data['X']
         print data['G']
         print data['H']
 
     def Hessian(self):
         """ A single-point Hessian computation. """
-        data        = self.Objective(self.mvals0,Order=2)
+        data        = self.Objective.Full(self.mvals0,Order=2)
         print data['X']
         print data['G']
         print data['H']
@@ -710,12 +775,12 @@ class Optimizer(object):
 
         """
 
-        Adata        = self.Objective(self.mvals0,Order=1)['G']
+        Adata        = self.Objective.Full(self.mvals0,Order=1)['G']
         Fdata        = np.zeros(self.np,dtype=float)
         printcool("Checking first derivatives by finite difference!\n%-8s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
         for i in range(self.np):
-            Fdata[i] = f1d7p(fdwrap(self.Objective,self.mvals0,i,'X',Order=0),self.h)
+            Fdata[i] = f1d7p(fdwrap(self.Objective.Full,self.mvals0,i,'X',Order=0),self.h)
             Denom = max(abs(Adata[i]),abs(Fdata[i]))
             Denom = Denom > 1e-8 and Denom or 1e-8
             D = Adata[i] - Fdata[i]
@@ -740,7 +805,7 @@ class Optimizer(object):
         function via the 'wrap2' function.
 
         """
-        Adata        = self.Objective(self.mvals0,Order=2)['H']
+        Adata        = self.Objective.Full(self.mvals0,Order=2)['H']
         Fdata        = np.zeros((self.np,self.np),dtype=float)
         printcool("Checking second derivatives by finite difference!\n%-8s%-20s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter1 ID", "Parameter2 ID", "Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
@@ -750,7 +815,7 @@ class Optimizer(object):
             def func1(arg):
                 mvals = list(mvals0)
                 mvals[pidxj] += arg
-                return f1d5p(fdwrap(self.Objective,mvals,pidxi,'X',Order=0),self.h)
+                return f1d5p(fdwrap(self.Objective.Full,mvals,pidxi,'X',Order=0),self.h)
             return func1
         
         for i in range(self.np):

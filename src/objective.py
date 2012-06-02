@@ -1,6 +1,71 @@
-# Here I'm just noting a constraint type that I've used in the past.
-# It is quartic at the origin and turns into a parabola.
-# OMG = 1 - exp(-dp**2/2)
+"""@package objective
+
+ForceBalance objective function."""
+
+from simtab import SimTab
+from numpy import array, diag, dot, eye, linalg, ones, reshape, sum, zeros
+
+## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
+Letters = ['X','G','H']
+
+class Objective(object):
+    """ Objective function.
+    
+    The objective function is a combination of contributions from the different
+    fitting simulations.  Basically, it loops through the fitting simulations,
+    gets their contributions to the objective function and then sums all of them
+    (although more elaborate schemes are conceivable).  The return value is the
+    same data type as calling the fitting simulation itself: a dictionary containing
+    the objective function, the gradient and the Hessian.
+
+    The penalty function is also computed here; it keeps the parameters from straying
+    too far from their initial values.
+
+    @param[in] mvals The mathematical parameters that enter into computing the objective function
+    @param[in] Order The requested order of differentiation
+    @param[in] usepvals Switch that determines whether to use physical parameter values
+    """
+    def __init__(self, options, sim_opts, forcefield):
+        ## The list of fitting simulations
+        self.Simulations = [SimTab[opts['simtype']](options,opts,forcefield) for opts in sim_opts]
+        ## The force field (it seems to be everywhere)
+        self.FF = forcefield
+        ## Initialize the penalty function.
+        self.Penalty = Penalty(options['penalty_type'],options['penalty_additive'],
+                               options['penalty_multiplicative'],options['penalty_hyperbolic_b'])
+        ## Obtain the denominator.
+        self.WTot = sum([i.weight for i in self.Simulations])
+        
+    def Simulation_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
+        ## This is the objective function; it's a dictionary containing the value, first and second derivatives
+        Objective = {'X':0.0, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
+        # Loop through the simulations.
+        for Sim in self.Simulations:
+            # The first call is always done at the midpoint.
+            Sim.bSave = True
+            # List of functions that I can call.
+            Funcs   = [Sim.get_X, Sim.get_G, Sim.get_H]
+            # Call the appropriate function
+            Ans = Funcs[Order](mvals)
+            # Print out the qualitative indicators
+            if verbose:
+                Sim.indicate()
+            # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
+            for i in range(3):
+                Objective[Letters[i]] += Ans[Letters[i]]*Sim.weight/self.WTot
+        return Objective
+
+    def Full(self, mvals, Order=0, usepvals=False, verbose=False):
+        Objective = self.Simulation_Terms(mvals, Order, usepvals, verbose)
+        ## Compute the penalty function.
+        Extra = self.Penalty.compute(mvals,Objective)
+        Objective['X0'] = Objective['X']
+        Objective['G0'] = Objective['G'].copy()
+        Objective['H0'] = Objective['H'].copy()
+        for i in range(3):
+            Objective[Letters[i]] += Extra[i]
+        return Objective
+
 class Penalty:
     """ Penalty functions for regularizing the force field optimizer.
 

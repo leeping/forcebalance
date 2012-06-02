@@ -72,10 +72,10 @@ from forcebalance.finite_difference import fdwrap, f12d3p
 #======================================================#
 
 # Select run parameters
-timestep = 0.5 * units.femtosecond # timestep for integrtion
+timestep = 0.5 * units.femtosecond # timestep for integration
 nsteps = 200                       # number of steps per data record
-nequiliterations = 500             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 5000                 # number of iterations to collect data for
+nequiliterations = 50             # number of equilibration iterations (hope 50 ps is enough)
+niterations = 50                 # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -572,24 +572,23 @@ def main():
    # Now that we have the coordinates, we can compute the energy derivatives.
    mG, mHd = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mono_kwargs)
    # The enthalpy of vaporization in kJ/mol.
-   Hvap_avg = Pot_avg / 216 - mPot_avg
+   Hvap_avg = mPot_avg - Pot_avg / 216 + kT - np.mean(pV)
    Hvap_err = np.sqrt(Pot_err**2 / 216**2 + mPot_err**2)
 
-   #print "mean(Energies) = ", np.mean(Energies)
-   #print "mean(mEnergies) = ", np.mean(mEnergies)
-   #print "Pot_avg = ", Pot_avg
-   #print "mPot_avg = ", mPot_avg
-
+   pV = (pressure * Data['volume'] * units.AVOGADRO_CONSTANT_NA).value_in_unit(units.kilojoule_per_mole)
+   kT = (kB * temperature).value_in_unit(units.kilojoule_per_mole)
+   
    # Build the first Hvap derivative.
-
+   # We don't pass it back, but nice for printing.
    GHvap = np.mean(G,axis=1)
    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Pot_avg * np.mean(G, axis=1))
    GHvap /= 216
    GHvap -= np.mean(mG,axis=1)
    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mPot_avg * np.mean(mG, axis=1))
-
-   Hvap_avg *= -1
    GHvap *= -1
+   
+   HVap_avg += kT - np.mean(pV)
+   GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1))
 
    bar = printcool("Density: % .4f +- % .4f kg/m^3, Derivatives below" % (Rho_avg, Rho_err))
    FF.print_map(vals=GRho)
@@ -603,7 +602,6 @@ def main():
    # Print the final force field.
    pvals = FF.make(os.getcwd(),mvals,False)
 
-   #with open(os.path.join('npt_result.p'),'w') as f: lp_dump((np.mean(Rhos), Rho_err, GRho, Hvap_avg, Hvap_err, GHvap),f)
    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Energies, G, mEnergies, mG, Rho_err, Hvap_err),f)
 
 if __name__ == "__main__":
