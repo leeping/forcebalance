@@ -23,6 +23,7 @@ import threading
 import pickle
 import time, datetime
 import subprocess
+from subprocess import PIPE, STDOUT
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -441,13 +442,20 @@ def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_c
         if print_to_file:
             print >> f, "Executing process: %s" % command
     if stdin == None:
-        p = subprocess.Popen(command, shell=(type(command) is str), stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
-        Output, _ = p.communicate()
+        p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = STDOUT)
+        if print_to_screen:
+            Output = []
+            while True:
+                line = p.stdout.readline()
+                if not line:
+                    break
+                print line,
+            Output.append(line)
+        else:
+            Output, _ = p.communicate()
     else:
-        p = subprocess.Popen(command, shell=(type(command) is str), stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.STDOUT)
+        p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = PIPE, stderr = STDOUT)
         Output, _ = p.communicate(stdin)
-    if print_to_screen:
-        print Output
     if logfnm != None:
         f.write(Output)
         f.close()

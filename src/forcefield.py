@@ -452,7 +452,7 @@ class FF(object):
                                     "but the source parameter does not seem to exist!"])
                 self.assign_field(self.map[dest],ffname,fflist.index(e),dest.split('/')[1],1)
             
-    def make(self,vals,usepvals=False,printdir=None):
+    def make(self,vals,usepvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.
         
         This big kahuna does a number of things:
@@ -476,6 +476,25 @@ class FF(object):
         else:
             pvals = self.create_pvals(vals)
 
+        OMMFormat = "%%.%ie" % precision
+        def TXTFormat(number, precision):
+            SciNot = "%%.%ie" % precision
+            if abs(number) < 1000:
+                Decimal = "%% .%if" % precision
+                Num = Decimal % number
+                Mum = Decimal % (-1 * number)
+                if (float(Num) == float(Mum)):
+                    return Decimal % abs(number)
+                else:
+                    return Decimal % number
+            else:
+                Num = SciNot % number 
+                Mum = SciNot % (-1 * number)
+                if (float(Num) == float(Mum)):
+                    return SciNot % abs(number)
+                else:
+                    return SciNot % number
+
         pvals = list(pvals)
         newffdata = deepcopy(self.ffdata)
         #============================#
@@ -491,7 +510,7 @@ class FF(object):
                 # iterable representation of the tree and the
                 # field number.
                 if type(newffdata[fnm]) is etree._ElementTree:
-                    list(newffdata[fnm].iter())[ln].attrib[fld] = "%.12e" % (mult*pvals[i])
+                    list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (mult*pvals[i])
                 # Text force fields are a bit harder.
                 # Our pointer is given by the line and field number.
                 # We take care to preserve whitespace in the printout
@@ -511,7 +530,11 @@ class FF(object):
                     if len(whites[fld]) > len(sline[fld])+2:
                         whites[fld] = whites[fld][:len(sline[fld])+2]
                     # Actually replace the field with the physical parameter value.
-                    sline[fld]  = "% 17.12e" % (mult*pvals[i])
+                    if precision == 12:
+                        sline[fld]  = "% 17.12e" % (mult*pvals[i])
+                    else:
+                        #sline[fld]  = TXTFormat % (mult*pvals[i])
+                        sline[fld]  = TXTFormat(mult*pvals[i], precision)
                     # Replace the line in the new force field.
                     newffdata[fnm][ln] = ''.join([whites[j]+sline[j] for j in range(len(sline))])+'\n'
 

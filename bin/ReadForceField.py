@@ -16,7 +16,8 @@ def main():
                'priors':{}}
     MyFF = FF(options)
     
-    MyFF.make(np.arange(len(MyFF.pvals0)),False,'NewFF')
+    Prec=3
+    MyFF.make(np.zeros(len(MyFF.pvals0)),False,'NewFF',precision=Prec)
 
 if __name__ == "__main__":
     main()
