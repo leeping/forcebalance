@@ -142,8 +142,29 @@ def do_quantum():
     Result.write('qdata.txt')
     return Result
 
+def gather_generations():
+    shots = Molecule('shots.gro')
+    qdata = Molecule('qdata.txt')
+    A1    = np.array(shots.xyzs)
+    A2    = np.array(qdata.xyzs)
+    if A1.shape != A2.shape:
+        raise Exception('shots.gro and qdata.txt appear to contain different data')
+    elif np.max(np.abs((A1 - A2).flatten())) > 1e-4:
+        raise Exception('shots.gro and qdata.txt appear to contain different xyz coordinates')
+    shots.qm_energies = qdata.qm_energies
+    shots.qm_forces   = qdata.qm_forces
+    shots.qm_espxyzs     = qdata.qm_espxyzs
+    shots.qm_espvals     = qdata.qm_espvals
+    First = True
+    if First:
+        All = shots
+    else:
+        All += shots
+    return All
+
 def Generate(sim_opt):
     print sim_opt['name']
+    cwd = os.getcwd()
     simdir = os.path.join('simulations',sim_opt['name'])
     if not os.path.exists(simdir):
         warn_press_key("%s doesn't exist!" % simdir)
@@ -152,30 +173,13 @@ def Generate(sim_opt):
     if len(GDirs) == 0:
         print "No gens exist."
         sys.exit()
-    First = True
     WriteAll = False
+    All = None # Heh
     for d in GDirs:
         print "Now checking", d
         os.chdir(d)
         if os.path.exists('shots.gro') and os.path.exists('qdata.txt'):
             print "Both shots.gro and qdata.txt exist"
-            shots = Molecule('shots.gro')
-            qdata = Molecule('qdata.txt')
-            A1    = np.array(shots.xyzs)
-            A2    = np.array(qdata.xyzs)
-            if A1.shape != A2.shape:
-                raise Exception('shots.gro and qdata.txt appear to contain different data')
-            elif np.max(np.abs((A1 - A2).flatten())) > 1e-4:
-                raise Exception('shots.gro and qdata.txt appear to contain different xyz coordinates')
-            shots.qm_energies = qdata.qm_energies
-            shots.qm_forces   = qdata.qm_forces
-            shots.qm_espxyzs     = qdata.qm_espxyzs
-            shots.qm_espvals     = qdata.qm_espvals
-            if First:
-                All = shots
-            else:
-                All += shots
-            WriteAll = True
         elif os.path.exists('shots.gro'):
             print "shots.gro exists"
             print "I need to GENERATE qdata.txt now."
@@ -185,12 +189,15 @@ def Generate(sim_opt):
         else:
             print "I need to GENERATE shots.gro now."
             generate_snapshots()
-            run_quantum()
+            do_quantum()
         os.chdir('..')
+        if All == None:
+            All = gather_generations()
+        else:
+            All += gather_generations()
     All.write('all.gro')
     All.write('qdata.txt')
-    os.chdir('..')
-        
+    os.chdir(cwd)
 
 def main():
     options, sim_opts = parse_inputs(sys.argv[1])
@@ -207,6 +214,7 @@ def main():
         sys.exit(1)
 
     for S in sim_opts:
+        print os.getcwd()
         Generate(S)
     
     # P = Project(sys.argv[1])

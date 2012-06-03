@@ -369,6 +369,9 @@ class AbInitio(FittingSimulation):
         # QQ_Q  = The unnormalized expected value of <Q(X)Q>           #
         # Later on we divide these quantities by Z to normalize.       #
         #==============================================================#
+        if (self.w_energy == 0.0 and self.w_force == 0.0):
+            AGrad = False
+            AHess = False
         Z       = 0
         Y       = 0
         Q = zeros(NCP1,dtype=float)
@@ -475,8 +478,12 @@ class AbInitio(FittingSimulation):
         #      STEP 3: Build the variance vector and invert it.        #
         #==============================================================#
         print "Done with snapshots, building objective function now\r",
-        EFW     = self.w_energy / (self.w_energy + self.w_force)
-        CEFW    = 1.0 - EFW
+        if (self.w_energy > 0.0 and self.w_force > 0.0):
+            EFW     = self.w_energy / (self.w_energy + self.w_force)
+            CEFW    = 1.0 - EFW
+        else:
+            EFW = 0.0
+            CEFW = 0.0
         # Build the weight vector, so the force contribution is suppressed by 1/3N
         WM      = zeros(NCP1,dtype=float)
         WM[0] = sqrt(EFW)
@@ -629,6 +636,9 @@ class AbInitio(FittingSimulation):
         # Later on we divide these quantities by Z to normalize,       #
         # and Q0(X)Q0 is subtracted from QQ to get the covariance.     #
         #==============================================================#
+        if (self.w_energy == 0.0 and self.w_force == 0.0):
+            AGrad = False
+            AHess = False
         Z       = 0
         Y       = 0
         Q = zeros(NCP1,dtype=float)
@@ -683,8 +693,12 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         #     STEP 3: Build the covariance matrix and invert it.       #
         #==============================================================#
-        EFW     = self.w_energy / (self.w_energy + self.w_force)
-        CEFW    = 1.0 - EFW
+        if (self.w_energy > 0.0 and self.w_force > 0.0):
+            EFW     = self.w_energy / (self.w_energy + self.w_force)
+            CEFW    = 1.0 - EFW
+        else:
+            EFW = 0.0
+            CEFW = 0.0
         # Build the weight matrix, so the force contribution is suppressed by 1/3N
         WM      = zeros((NCP1,NCP1),dtype=float)
         WM[0,0] = sqrt(EFW)
@@ -757,6 +771,9 @@ class AbInitio(FittingSimulation):
 
     def get_resp_(self, mvals, AGrad=False, AHess=False):
         """ Electrostatic potential fitting.  Implements the RESP objective function.  (In Python so obviously not optimized.) """
+        if (self.w_resp == 0.0):
+            AGrad = False
+            AHess = False
         Answer = {}
         pvals = self.FF.make(mvals,self.usepvals)
         ns = self.ns
@@ -834,14 +851,21 @@ class AbInitio(FittingSimulation):
 
     def get(self, mvals, AGrad=False, AHess=False):
         Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
+        tw = self.w_energy + self.w_force + self.w_resp
+        if tw > 0.0:
+            w_ef = (self.w_energy + self.w_force) / tw
+            w_resp = self.w_resp / tw
+        else:
+            w_ef = 0.0
+            w_resp = 0.0
         if self.energy or self.force:
             Answer_EF = self.get_energy_force_(mvals, AGrad, AHess)
             for i in Answer_EF:
-                Answer[i] += Answer_EF[i]
+                Answer[i] += w_ef * Answer_EF[i]
         if self.resp:
             Answer_ESP = self.get_resp_(mvals, AGrad, AHess)
             for i in Answer_ESP:
-                Answer[i] += Answer_ESP[i]
+                Answer[i] += w_resp * Answer_ESP[i]
         if not any([self.energy, self.force, self.resp]):
             raise Exception("Ab initio fitting must have at least one of: Energy, Force, ESP")
         return Answer
