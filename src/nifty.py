@@ -438,9 +438,11 @@ def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_c
     if print_to_file:
         f = open(logfnm,'a')
     if print_command:
-        print "Executing process: \x1b[92m%-50s\x1b[0m%s" % (' '.join(command) if type(command) is list else command, " Logfile: %s" if logfnm != None else "")
+        print "Executing process: \x1b[92m%-50s\x1b[0m%s%s" % (' '.join(command) if type(command) is list else command, 
+                                                               " Logfile: %s" % logfnm if logfnm != None else "", 
+                                                               " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
         if print_to_file:
-            print >> f, "Executing process: %s" % command
+            print >> f, "Executing process: %s%s" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
     if stdin == None:
         p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = STDOUT)
         if print_to_screen:
@@ -459,6 +461,8 @@ def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_c
     if logfnm != None:
         f.write(Output)
         f.close()
+    if p.returncode != 0:
+        warn_press_key("%s gave a return code of %i (it may have crashed)" % (command, p.returncode))
     return Output
 
 def warn_press_key(warning):

@@ -18,10 +18,13 @@ mol2_pdict = {'COUL':{'Atom':[1], 8:''}}
 
 frcmod_pdict = {'BONDS': {'Atom':[0], 1:'K', 2:'B'},
                 'ANGLES':{'Atom':[0], 1:'K', 2:'B'},
-                'PDIHS1':{'Atom':[0], 2:'K'},
-                'PDIHS2':{'Atom':[0], 2:'K'},
-                'PDIHS3':{'Atom':[0], 2:'K'},
-                'IDIHS' :{'Atom':[0], 1:'K'},
+                'PDIHS1':{'Atom':[0], 2:'K', 3:'B'},
+                'PDIHS2':{'Atom':[0], 2:'K', 3:'B'},
+                'PDIHS3':{'Atom':[0], 2:'K', 3:'B'},
+                'PDIHS4':{'Atom':[0], 2:'K', 3:'B'},
+                'PDIHS5':{'Atom':[0], 2:'K', 3:'B'},
+                'PDIHS6':{'Atom':[0], 2:'K', 3:'B'},
+                'IDIHS' :{'Atom':[0], 1:'K', 3:'B'},
                 'VDW':{'Atom':[0], 1:'S', 2:'T'}
                 }
 

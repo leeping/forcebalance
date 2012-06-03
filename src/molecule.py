@@ -259,10 +259,16 @@ class Molecule(dict):
 
     def __len__(self):
         """ Return the number of frames in the trajectory. """
-        if 'xyzs' in self:
-            return len(self.xyzs)
-        else:
-            return 0
+        L = 0
+        klast = None
+        for k in self.keys():
+            if k in self.PerFrameData:
+                if L != 0 and len(self[k]) != L:
+                    raise Exception('The keys %s and %s have different lengths, this isn\'t supposed to happen.' % (k, klast))
+                L = len(self[k])
+                klast = k
+            else: continue
+        return L
 
     def __getattr__(self, name):
         """ Whenever we try to get a class attribute, it first tries to get the attribute from the dictionary. """
@@ -294,11 +300,12 @@ class Molecule(dict):
         if isinstance(key, int) or isinstance(key, slice) or isinstance(key,np.ndarray):
             if isinstance(key, int):
                 key = [key]
-            New = copy.deepcopy(self)
-
-            for i in list(i for i in New if i in self.PerFrameData):
-                # When we want to slice a list, we need to convert it to an array and then back to a list.
-                setattr(New, i, list(np.array(self[i])[key]))
+            New = Molecule()
+            for k in self.keys():
+                if k in self.PerFrameData:
+                    setattr(New, k, list(np.array(self[k])[key]))
+                else:
+                    setattr(New, k, copy.deepcopy(self[k]))
             return New
         elif key == 'ns' or key == 'na':
             return self.__getattr__(key)
@@ -328,7 +335,7 @@ class Molecule(dict):
     def append(self,other):
         self += other
 
-    def __init__(self, fnm, ftype = None):
+    def __init__(self, fnm = None, ftype = None):
         """ To instantiate the class we simply define the table of
         file reading/writing functions and read in a file if it is
         provided."""
@@ -381,17 +388,18 @@ class Molecule(dict):
         self.QuantumData = ['qcrems', 'qc_template', 'charge', 'mult']
         self.Immutable = ['elem', 'na']
 
-        ## Read in stuff.
-        Parsed = self.read(fnm, ftype)
-        ## Set attributes.
-        for key, val in Parsed.items():
-            self[key] = val
-        ## Create a list of comment lines if we don't already have them from reading the file.
-        if hasattr(self, 'comms'):
-            for i in range(len(self.comms)):
-                self.comms[i] += ' (Converted using molecule.py from %s)' % fnm
-        else:
-            self.comms = ['Frame %i of %i : Converted using molecule.py from %s' % (i+1, self.ns, fnm) for i in range(self.ns)]
+        ## Read in stuff, if we passed in a file name, otherwise return an empty instance.
+        if fnm != None:
+            Parsed = self.read(fnm, ftype)
+            ## Set attributes.
+            for key, val in Parsed.items():
+                self[key] = val
+            ## Create a list of comment lines if we don't already have them from reading the file.
+            if hasattr(self, 'comms'):
+                for i in range(len(self.comms)):
+                    self.comms[i] += ' (Converted using molecule.py from %s)' % fnm
+            else:
+                self.comms = ['Frame %i of %i : Converted using molecule.py from %s' % (i+1, self.ns, fnm) for i in range(self.ns)]
 
     #=====================================#
     #|     Core read/write functions     |#
