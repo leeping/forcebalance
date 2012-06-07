@@ -5,25 +5,25 @@ software GROMACS-X2.  Currently only Linux is supported, though
 installation on other Unix-based systems (e.g. Mac OS) should also be
 straightforward.
 
-Importantly, note that <em>ForceBalance does not contain any simulation
-software or methods for generating the reference data</em>.  Fitting
-simulations are performed by interfacing ForceBalance with simulation
-software like GROMACS, TINKER or OpenMM; reference data is obtained
-from experimental measurements (consult the literature), or from
-simulation / quantum chemistry software (for example, NWChem or Q-Chem).
+Importantly, note that <em>ForceBalance is not a simulation software
+package</em>.  During force field optimizations, ForceBalance
+interfaces with simulation software like GROMACS, TINKER or OpenMM;
+reference data is obtained from experimental measurements (consult the
+literature), or from simulation / quantum chemistry software (for
+example, NWChem or Q-Chem).
 
 I have provided a specialized version of GROMACS (dubbed version
 4.0.7-X2) on the <a href=https://simtk.org/home/forcebalance/>SimTK
 website</a> which interfaces with ForceBalance through the
-forceenergymatch_gmxx2 module.  Although interfacing with unmodified
-simulation software is straightforward, GROMACS-X2 is optimized
-for our task and makes things much faster.  Soon, I will also
-implement functions for grid-scale computation of reference energies
-and forces using Q-Chem (a commercial software).  However, you should
-be prepared to write some simple code to interface with a fitting
-simulation or quantum chemistry software of your choice.  If you
-choose to do so, please contact me as I would be happy to include your
-contribution in the main distribution.
+abinitio_gmxx2 module.  Although interfacing with unmodified
+simulation software is straightforward, GROMACS-X2 is optimized for
+force field optimization and makes things much faster.  Soon, I will
+also implement functions for grid-scale computation of reference
+energies and forces using Q-Chem (a commercial software).  However,
+you should be prepared to write some simple code to interface with a
+fitting simulation or quantum chemistry software of your choice.  If
+you choose to do so, please contact me as I would be happy to include
+your contribution in the main distribution.
 
 @section installing_forcebalance Installing ForceBalance
 
@@ -32,18 +32,17 @@ modules, you shouldn't have any trouble with this.
 
 @subsection installing_forcebalance_prereq Prerequisites
 
-The only required software for installing ForceBalance are Python and
-NumPy.  ForceBalance also allows the usage of SciPy optimizers; they
-aren't as effective as the internal optimizer but still often helpful
-- if you want to use these, then SciPy is needed.  A few more packages
+ForceBalance requires the following software packages:
+
+@li Python version 2.7
+@li NumPy version 1.5
+@li SciPy version 0.9
+@li The lxml package (depends on libxml2 and libxslt)
+
+A few more packages
 are required if you want to \ref create_doc.  Here is a list of Python
 packages and software:
 
-Needed for ForceBalance:
-@li Python version 2.7.1
-@li NumPy version 1.5.0
-@li SciPy version 0.9.0 (optional; needed for some of the non-default optimizers)
-Needed for making documentation:
 @li Doxygen version 1.7.6.1
 @li Doxypy plugin for Doxygen
 @li LaTeX software like TeXLive
@@ -61,9 +60,9 @@ Upon extracting the distribution you will notice this directory structure:
 <root>
   +- bin
   |   |- <Executable scripts>
-  +- forcebalance
+  +- src
   |   |- <Python module files>
-  +- test
+  +- studies
   |   +- <ForceBalance example jobs>
   +- doc
   |   +- callgraph
@@ -95,29 +94,30 @@ Note that if you do a local installation, for Python to recognize the newly inst
 
 @verbatim export PYTHONPATH=$PYTHONPATH:/home/your_username/local_directory/lib/python[version] @endverbatim
 
+As with the installation of any Python software, there are potential issues with dependencies (for example, scipy and lxml.)  Please let me know if you encounter issues with dependencies.
+
 @section install_gmxx2 Installing GROMACS-X2
 
 GROMACS-X2 contains major modifications from GROMACS 4.0.7.
 Most importantly, it enables computation of the objective function
-<a>and its analytic derivatives</a> for rapid force matching.  There
+<a>and its analytic derivatives</a> for rapid energy and force matching.  There
 is also an implementation of the QTPIE fluctuating-charge polarizable
 force field, and the beginnings of a GROMACS/Q-Chem interface
 (carefully implemented but not extensively tested).  Most of the
 changes were added in several new source files (less than ten): \c
 qtpie.c, \c fortune.c, \c fortune_utils.c, \c fortune_vsite.c, \c
 fortune_nb_utils.c, \c zmatrix.c and their corresponding header files,
-and \c fortunerec.h for the force matching struct.  The name 'fortune'
+and \c fortunerec.h for the force matching data structure.  The name 'fortune'
 derives from back when this code was called ForTune.
 
 The force matching functions are turned on by calling \c mdrun with
 the command line argument \c '-fortune' ; without this option, there
 should be no impact on the performance of normal MD simulations.
 
-ForceBalance interfaces with GROMACS-X2 by calling the program
-with special options and input files; the objective function and
+ForceBalance interfaces with GROMACS-X2 through the functions in
+\c abinitio_gmxx2.py ; the objective function and
 derivatives are computed and printed to output files.  The interface
-is defined in \c fortune.c on the GROMACS side and \c
-forceenergymatch_gmxx2 on the Python side.  ForceBalance needs to know
+is defined in \c fortune.c on the GROMACS side.  ForceBalance needs to know
 where the GROMACS-X2 executables are located, and this is specified
 using the \c gmxpath option in the input file.
 
@@ -131,8 +131,7 @@ GROMACS-X2 needs the base GROMACS requirements and several other libraries.
 
 GLib is the utility library provided by the GNOME foundation (the
 folks who make the GNOME desktop manager and GTK+ libraries).
-GROMACS-X2 requires GLib for its hash table (dictionary)
-implementation.
+GROMACS-X2 requires GLib for its hash table (dictionary).
 
 GLib and FFTW can be compiled from source, but it is much easier if
 you're using a Linux distribution with a package manager.  If you're

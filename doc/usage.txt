@@ -5,7 +5,7 @@ This page describes how to use the ForceBalance software.
 A good starting point for using this software package is to run
 the scripts in the \c bin directory of the distribution.
 
-\c OptimizePotential.py is the executable script that performs force
+\c ForceBalance.py is the executable script that performs force
 field optimization.  It requires an input file and a \ref
 directory_structure.  \c MakeInputFile.py will create an example input
 file that contains all options, their default values, and a short

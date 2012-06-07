@@ -62,7 +62,7 @@ methods are used.  Some are <em>ab initio</em> methods ('from first
 principles') since they are derived directly from approximating
 Schrodinger's equation; examples include the independent electron
 approximation (Hartree-Fock) and perturbation theory (MP2).  However,
-the vast majority of methods contain some tunable constants or
+the majority of methods contain some tunable constants or
 <em>empirical parameters</em> which are carefully chosen to make the
 method as accurate as possible.  Three examples: the widely used B3LYP
 approximation in density functional theory (DFT) contains three
@@ -110,7 +110,7 @@ on the parameters (for example, adjusting the partial charges on a
 solvent molecule to reproduce the bulk dielectric constant.)
 Published force fields have been modified by hand over decades to
 maximize their agreement with experimental observations (for example,
-adjusting some parameters in order to reproduce a protein crystal
+adjusting some parameters in order to reproduce particular protein NMR
 structure) at the expense of reproducibility and predictive power.
 
 @subsection mission_statement Purpose and brief description of this program 
