@@ -107,7 +107,7 @@ try:
     from lxml import etree
 except: pass
 import itertools
-from warnings import warn
+from collections import OrderedDict
 
 
 FF_Extensions = {"itp" : "gmx",
@@ -193,6 +193,8 @@ class FF(object):
         self.ffdir       = options['ffdir']
         ## Priors given by the user :)
         self.priors      = options['priors']
+        ## Whether to constrain the charges.
+        self.constrain_charge  = options['constrain_charge']
         
         #======================================#
         #     Variables which are set here     #
@@ -205,6 +207,8 @@ class FF(object):
         self.map         = {}
         ## The listing of parameter number -> interaction types
         self.plist       = []
+        ## A listing of parameter number -> atoms involved
+        self.patoms      = []
         ## A list where pfields[pnum] = ['file',line,field,mult],
         ## basically a new way to modify force field files; when we modify the
         ## force field file, we go to the specific line/field in a given file
@@ -223,7 +227,7 @@ class FF(object):
         ## Initial value of physical parameters
         self.pvals0      = []
         ## A dictionary of force field reader classes
-        self.R           = {}
+        self.R           = OrderedDict()
         ## A list of atom names (this is new, for ESP fitting)
         self.atomnames   = []
         
@@ -347,10 +351,10 @@ class FF(object):
             # Process the file
             self.addff_txt(ffname, fftype)
         if hasattr(self.R[ffname], 'atomnames'):
-            print self.R[ffname].atomnames
             if len(self.atomnames) > 0:
-                warn_press_key('Found more than one force field containing atom names - ESP fitting might not work.')
-            self.atomnames += self.R[ffname].atomnames
+                sys.stderr.write('Found more than one force field containing atom names; skipping the second one (%s)\n' % ffname)
+            else:
+                self.atomnames += self.R[ffname].atomnames
 
     def addff_txt(self, ffname, fftype):
         """ Parse a text force field and create several important instance variables.
@@ -388,6 +392,8 @@ class FF(object):
                     pid = self.R[ffname].build_pid(pfld)
                     # Add pid into the dictionary.
                     self.map[pid] = self.np
+                    # This parameter ID has these atoms involved.
+                    self.patoms.append([self.R[ffname].resatom])
                     # Also append pid to the parameter list
                     self.assign_p0(self.np,float(sline[pfld]))
                     self.assign_field(self.np,ffname,ln,pfld,1)
@@ -399,9 +405,23 @@ class FF(object):
                     # First is a number corresponding to the field that contains the dependent parameter.
                     # Second is a string corresponding to the 'pid' that this parameter depends on.
                     pfld = int(sline[parse])
-                    prep = self.map[sline[parse+1].replace('MINUS_','')]
+                    try:
+                        prep = self.map[sline[parse+1].replace('MINUS_','')]
+                    except:
+                        sys.stderr.write("Valid parameter IDs:\n")
+                        count = 0
+                        for i in self.map:
+                            sys.stderr.write("%25s" % i)
+                            if count%3 == 2:
+                                sys.stderr.write("\n")
+                            count += 1
+                        sys.stderr.write("\nOffending ID: %s\n" % sline[parse+1])
+                        
+                        raise Exception('Parameter repetition entry in force field file is incorrect (see above)')
                     pid = self.R[ffname].build_pid(pfld)
                     self.map[pid] = prep
+                    # This repeated parameter ID also has these atoms involved.
+                    self.patoms[prep].append(self.R[ffname].resatom)
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
     
@@ -478,8 +498,8 @@ class FF(object):
 
         OMMFormat = "%%.%ie" % precision
         def TXTFormat(number, precision):
-            SciNot = "%%.%ie" % precision
-            if abs(number) < 1000:
+            SciNot = "%% .%ie" % precision
+            if abs(number) < 1000 and abs(number) > 2:
                 Decimal = "%% .%if" % precision
                 Num = Decimal % number
                 Mum = Decimal % (-1 * number)
@@ -666,81 +686,119 @@ class FF(object):
         self.qid2   = []
         qnr    = 1
         concern= ['COUL','c0','charge']
-        if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
-            # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
-            ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata]))
+        qmat2 = eye(self.np,dtype=float)
 
-        for i in range(self.np):
-            if any([j in self.plist[i] for j in concern]):
-                self.qmap.append(i)
-                if 'AmoebaMultipoleForce.Multipole/c0' in self.plist[i] or 'NonbondedForce.Atom/charge' in self.plist[i]:
-                    AType = self.plist[i].split('/')[-1].split('.')[0]
-                    nq = count(ListOfAtoms,AType)
-                else:
-                    thisq = []
-                    for k in self.plist[i].split():
-                        for j in concern:
-                            if j in k:
-                                thisq.append(k.replace(j,''))
-                                break
-                    try:
-                        self.qid2.append(array([self.atomnames.index(k) for k in thisq]))
-                    except: pass
-                    nq = sum(array([count(self.plist[i], j) for j in concern]))
-                self.qid.append(qnr+arange(nq))
-                qnr += nq
+        def insert_mat(qtrans2, qmap):
+            # Write the qtrans2 block into qmat2.
+            x = 0
+            for i in range(self.np):
+                if i in qmap:
+                    y = 0
+                    for j in qmap:
+                        qmat2[i, j] = qtrans2[x, y]
+                        y += 1
+                    x += 1
 
-        if len(self.qid2) == 0:
-            sys.stderr.write('Unable to match atom numbers up with atom names (minor issue, unless doing ESP fitting).  \nAre atom names implemented in the force field parser?\n')
-        else:
-            self.qid = self.qid2
-        tq = qnr - 1
-        cons0 = ones((1,tq))
-
-        # print qmap
-        # print qid
-        # print tq
-        # print cons0
-        # raw_input()
-        #chargegrp = []
-        # LPW Charge groups aren't implemented at this time
-        ## chargegrp = [[1,3],[4,5],[6,7]]
-        ## for group in chargegrp:
-        ##     a = min(group[0]-1, group[1])
-        ##     b = max(group[0]-1, group[1])
-        ##     constemp = zeros(tq, dtype=float)
-        ##     for i in range(constemp.shape[0]):
-        ##         if i >= a and i < b:
-        ##             constemp[i] += 1
-        ##         else:
-        ##             constemp[i] -= 1
-        ##     cons0 = vstack((cons0, constemp))
-        ## print cons0
-        #Here is where we build the qtrans2 matrix.
-
-        nq = len(self.qmap)
-        if nq > 0:
+        def build_qtrans2(tq, qid, qmap):
+            nq = len(qmap)
+            cons0 = ones((1,tq),dtype=float)
             cons = zeros((cons0.shape[0], nq), dtype=float)
             qtrans2 = eye(nq, dtype=float)
             for i in range(cons.shape[0]):
                 for j in range(cons.shape[1]):
-                    cons[i][j] = sum([cons0[i][k-1] for k in self.qid[j]])
+                    cons[i][j] = sum([cons0[i][k-1] for k in qid[j]])
                 cons[i] /= norm(cons[i])
                 for j in range(i):
                     cons[i] = orthogonalize(cons[i], cons[j])
                 qtrans2[i,:] = 0
                 for j in range(nq-i-1):
                     qtrans2[i+j+1, :] = orthogonalize(qtrans2[i+j+1, :], cons[i])
+            return qtrans2
 
-        qmat2 = eye(self.np,dtype=float)
-        x = 0
-        for i in range(self.np):
-            if i in self.qmap:
-                y = 0
-                for j in self.qmap:
-                    qmat2[i, j] = qtrans2[x, y]
-                    y += 1
-                x += 1
+        # Here we build a charge constraint for each molecule.
+        if all(len(r.adict) > 0 for r in self.R.values()):
+            print "Building charge constraints..."
+            # Build a concatenated dictionary
+            Adict = OrderedDict()
+            # This is a loop over files
+            for r in self.R.values():
+                # This is a loop over residues
+                for k, v in r.adict.items():
+                    Adict[k] = v
+            nres = 0
+            for resname, resatoms in Adict.items():
+                res_charge_count = zeros(self.np, dtype=float)
+                tq = 0
+                qmap = []
+                qid = []
+                for i in range(self.np):
+                    qct = 0
+                    qidx = []
+                    for ires, iatoms in self.patoms[i]:
+                        for iatom in iatoms:
+                            if ires == resname and iatom in resatoms:
+                                qct += 1
+                                tq += 1
+                                qidx.append(resatoms.index(iatom))
+                    if any([j in self.plist[i] for j in concern]) and qct > 0:
+                        qmap.append(i)
+                        qid.append(qidx)
+                        print "Parameter %i occurs %i times in residue %s in locations %s (%s)" % (i, qct, resname, str(qidx), self.plist[i])
+                #Here is where we build the qtrans2 matrix.
+                if len(qmap) > 0:
+                    qtrans2 = build_qtrans2(tq, qid, qmap)
+                    if self.constrain_charge:
+                        insert_mat(qtrans2, qmap)
+                if nres == 0:
+                    self.qid = qid
+                    self.qmap = qmap
+                else:
+                    print "Note: ESP fitting will be performed assuming that residue id %s is the FIRST residue and the only one being fitted." % resname
+                nres += 1
+        elif self.constrain_charge:
+            warn_press_key("Not all force field parsers have 'adict' {residue:atomnames} implemented.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
+            if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
+                # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
+                ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata]))
+            for i in range(self.np):
+                if any([j in self.plist[i] for j in concern]):
+                    self.qmap.append(i)
+                    if 'AmoebaMultipoleForce.Multipole/c0' in self.plist[i] or 'NonbondedForce.Atom/charge' in self.plist[i]:
+                        AType = self.plist[i].split('/')[-1].split('.')[0]
+                        nq = count(ListOfAtoms,AType)
+                    else:
+                        thisq = []
+                        for k in self.plist[i].split():
+                            for j in concern:
+                                if j in k:
+                                    thisq.append(k.replace(j,''))
+                                    break
+                        try:
+                            self.qid2.append(array([self.atomnames.index(k) for k in thisq]))
+                        except: pass
+                        nq = sum(array([count(self.plist[i], j) for j in concern]))
+                    self.qid.append(qnr+arange(nq))
+                    qnr += nq
+            if len(self.qid2) == 0:
+                sys.stderr.write('Unable to match atom numbers up with atom names (minor issue, unless doing ESP fitting).  \nAre atom names implemented in the force field parser?\n')
+            else:
+                self.qid = self.qid2
+            tq = qnr - 1
+            #Here is where we build the qtrans2 matrix.
+            cons0 = ones((1,tq))
+            if len(self.qmap) > 0:
+                qtrans2 = build_qtrans2(tq, self.qid, self.qmap)
+                # Insert qtrans2 into qmat2.
+                if self.constrain_charge:
+                    insert_mat(qtrans2, self.qmap)
+
+        # print "Charge parameter constraint matrix - feel free to check it"
+        # for i in qmat2:
+        #     for j in i:
+        #         print "% .3f" % j,
+        #     print
+        # print
+
         transmat = mat(qmat2) * diag(self.rs)
         transmatNS = array(transmat,copy=True)
         self.excision = []

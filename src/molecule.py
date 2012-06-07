@@ -1,73 +1,129 @@
 #!/usr/bin/env python
 
-#========================================================#
-#|                                                      |#
-#|       Chemical file format conversion module         |#
-#|                                                      |#
-#|         Lee-Ping Wang (leeping@stanford.edu)         |#
-#|              Last updated May 29, 2012               |#
-#|                                                      |#
-#|        [ IN PROGRESS, USE AT YOUR OWN RISK ]         |#
-#|                                                      |#
-#|    This is free software released under version 2    |#
-#|    of the GNU GPL, please use or redistribute as     |#
-#|    you see fit under the terms of this license.      |#
-#|    (http://www.gnu.org/licenses/gpl-2.0.html)        |#
-#|    Feedback and suggestions are encouraged.          |#
-#|                                                      |#
-#|    What this is for:                                 |#
-#|    Converting a molecule between file formats        |#
-#|    Loading and processing of trajectories            |#
-#|    (list of geometries for the same set of atoms)    |#
-#|    Concatenating or slicing trajectories             |#
-#|    Combining molecule metadata (charge, bonds,       |#
-#|    Q-Chem rem variables)                             |#
-#|                                                      |#
-#|    What this isn't for (yet):                        |#
-#|    Adding or removing atoms in a molecule            |#
-#|                                                      |#
-#|    Supported file formats:                           |#
-#|    See the __init__ method in the Molecule class.    |#
-#|                                                      |#
-#|    Note to self / developers:                        |#
-#|    Please make this file as standalone as possible   |#
-#|    (i.e. don't introduce too many dependencies)      |#
-#|    Please make sure this file is up-to-date in       |#
-#|    both the 'leeping' and 'forcebalance' modules     |#
-#|                                                      |#
-#|       Contents of this file:                         |#
-#|       1) Imports                                     |#
-#|       2) Subroutines                                 |#
-#|       3) Molecule class                              |#
-#|         a) Class customizations (add, getitem)       |#
-#|         b) Instantiation                             |#
-#|         c) Core functionality (read, write)          |#
-#|         d) Reading functions                         |#
-#|         e) Writing functions                         |#
-#|         f) Extra stuff                               |#
-#|       4) "main" function (if executed)               |#
-#|                                                      |#
-#|            Required: Python 2.7, Numpy 1.6           |#
-#|            Optional: Mol2, PDB, DCD readers          |#
-#|             (can be found in ForceBalance)           |#
-#|                                                      |#
-#|      Thanks: Todd Dolinsky, Yong Huang,              |#
-#|              Kyle Beauchamp (PDB)                    |#
-#|              John Stone (DCD Plugin)                 |#
-#|              Pierre Tuffery (Mol2 Plugin)            |#
-#|                                                      |#
-#|      Instructions:                                   |#
-#|                                                      |#
-#|        To import:                                    |#
-#|          from molecule import Molecule               |#
-#|        To create a Molecule object:                  |#
-#|          MyMol = Molecule(fnm)                       |#
-#|        To convert to a new file format:              |#
-#|          MyMol.write('newfnm.format')                |#
-#|        To concatenate geometries:                    |#
-#|          MyMol += MyMolB                             |#
-#|                                                      |#
-#========================================================#
+#======================================================================#
+#|                                                                    |#
+#|              Chemical file format conversion module                |#
+#|                                                                    |#
+#|                Lee-Ping Wang (leeping@stanford.edu)                |#
+#|                     Last updated June 6, 2012                      |#
+#|                                                                    |#
+#|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
+#|                                                                    |#
+#|   This is free software released under version 2 of the GNU GPL,   |#
+#|   please use or redistribute as you see fit under the terms of     |#
+#|   this license. (http://www.gnu.org/licenses/gpl-2.0.html)         |#
+#|   Feedback and suggestions are encouraged.                         |#
+#|                                                                    |#
+#|   What this is for:                                                |#
+#|   Converting a molecule between file formats                       |#
+#|   Loading and processing of trajectories                           |#
+#|   (list of geometries for the same set of atoms)                   |#
+#|   Concatenating or slicing trajectories                            |#
+#|   Combining molecule metadata (charge, Q-Chem rem variables)       |#
+#|                                                                    |#
+#|   Supported file formats:                                          |#
+#|   See the __init__ method in the Molecule class.                   |#
+#|                                                                    |#
+#|   Note to self / developers:                                       |#
+#|   Please make this file as standalone as possible                  |#
+#|   (i.e. don't introduce too many dependencies)                     |#
+#|   Please make sure this file is up-to-date in                      |#
+#|   both the 'leeping' and 'forcebalance' modules                    |#
+#|                                                                    |#
+#|   At present, when I perform operations like adding two objects,   |#
+#|   the sum is created from deep copies of data members in the       |#
+#|   originals. This is because copying by reference is confusing;    |#
+#|   suppose if I do B += A and modify something in B; it should not  |#
+#|   change in A.                                                     |#
+#|                                                                    |#
+#|   A consequence of this is that data members should not be too     |#
+#|   complicated; they should be things like lists or dicts, and NOT  |#
+#|   contain references to themselves.                                |#
+#|                                                                    |#
+#|              Contents of this file:                                |#
+#|              0) Names of data variables                            |#
+#|              1) Imports                                            |#
+#|              2) Subroutines                                        |#
+#|              3) Molecule class                                     |#
+#|                a) Class customizations (add, getitem)              |#
+#|                b) Instantiation                                    |#
+#|                c) Core functionality (read, write)                 |#
+#|                d) Reading functions                                |#
+#|                e) Writing functions                                |#
+#|                f) Extra stuff                                      |#
+#|              4) "main" function (if executed)                      |#
+#|                                                                    |#
+#|                   Required: Python 2.7, Numpy 1.6                  |#
+#|                   Optional: Mol2, PDB, DCD readers                 |#
+#|                    (can be found in ForceBalance)                  |#
+#|                                                                    |#
+#|             Thanks: Todd Dolinsky, Yong Huang,                     |#
+#|                     Kyle Beauchamp (PDB)                           |#
+#|                     John Stone (DCD Plugin)                        |#
+#|                     Pierre Tuffery (Mol2 Plugin)                   |#
+#|                     #python IRC chat on FreeNode                   |#
+#|                                                                    |#
+#|             Instructions:                                          |#
+#|                                                                    |#
+#|               To import:                                           |#
+#|                 from molecule import Molecule                      |#
+#|               To create a Molecule object:                         |#
+#|                 MyMol = Molecule(fnm)                              |#
+#|               To convert to a new file format:                     |#
+#|                 MyMol.write('newfnm.format')                       |#
+#|               To concatenate geometries:                           |#
+#|                 MyMol += MyMolB                                    |#
+#|                                                                    |#
+#======================================================================#
+
+#=========================================#
+#|     DEFINE VARIABLE NAMES HERE        |#
+#|                                       |#
+#|  Any member variable in the Molecule  |#
+#| class must be declared here otherwise |#
+#| the Molecule class won't recognize it |#
+#=========================================#
+#| Data attributes in FrameVariableNames |#
+#| must be a list along the frame axis,  |#
+#| and they must have the same length.   |#
+#=========================================#
+# xyzs       = List of numpy arrays of atomic xyz coordinates
+# comms      = List of comment strings
+# boxes      = List of 3-element or 9-element arrays for periodic boxes
+# qm_forces  = List of numpy arrays of atomistic forces from QM calculations
+# qm_espxyzs = List of numpy arrays of xyz coordinates for ESP evaluation
+# qm_espvals = List of numpy arrays of ESP values
+FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_espxyzs', 'qm_espvals'])
+#=========================================#
+#| Data attributes in AtomVariableNames  |#
+#| must be a list along the atom axis,   |#
+#| and they must have the same length.   |#
+#=========================================#
+# elem       = List of elements
+# partial_charge = List of atomic partial charges 
+# atomname   = List of atom names (can come from MM coordinate file)
+# atomtype   = List of atom types (can come from MM force field)
+# bonds      = For each atom, the list of higher-numbered atoms it's bonded to
+# suffix     = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
+# resid      = Residue IDs (can come from MM coordinate file)
+# resname    = Residue names
+AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'bonds', 'suffix', 'resid', 'resname'])
+#=========================================#
+#| This can be any data attribute we     |#
+#| want but it's usually some property   |#
+#| of the molecule not along the frame   |#
+#| atom axis.                            |#
+#=========================================#
+# fnm        = The file name that the class was built from
+# qcrems     = The Q-Chem 'rem' variables stored as a list of OrderedDicts
+# qctemplate = The Q-Chem template file, not including the coordinates or rem variables
+# charge     = The net charge of the molecule
+# mult       = The spin multiplicity of the molecule
+MetaVariableNames = set(['fnm', 'qcrems', 'qctemplate', 'charge', 'mult'])
+# Subset of MetaVariableNames relevant to quantum calculations explicitly
+QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult'])
+# Superset of all variable names.
+AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
 import os, sys, re, copy
 import numpy as np
@@ -75,7 +131,6 @@ import imp
 import itertools
 from collections import OrderedDict
 from ctypes import *
-from warnings import warn
 
 #============================#
 #| DCD read/write functions |#
@@ -85,19 +140,19 @@ from warnings import warn
 try: _dcdlib = CDLL("_dcdlib.so")
 except:
     try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
-    except: warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+    except: sys.stderr.write('The dcdlib module cannot be imported (Cannot read/write DCD files)\n')
 
 #============================#
 #| PDB read/write functions |#
 #============================#
 try: from PDB import *
-except: warn('The pdb module cannot be miported (Cannot read/write PDB files)')
+except: sys.stderr.write('The pdb module cannot be miported (Cannot read/write PDB files)\n')
 
 #=============================#
 #| Mol2 read/write functions |#
 #=============================#
 try: import Mol2
-except: warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
+except: sys.stderr.write('The Mol2 module cannot be imported (Cannot read/write Mol2 files)\n')
     
 #===========================#
 #| Convenience subroutines |#
@@ -218,7 +273,16 @@ class MolfileTimestep(Structure):
                 ("A",c_float), ("B",c_float), ("C",c_float), ("alpha",c_float), 
                 ("beta",c_float), ("gamma",c_float), ("physical_time",c_double)]
     
-class Molecule(dict):
+def both(A, B, key):
+    return key in A.Data and key in B.Data
+
+def diff(A, B, key):
+    return key in A.Data and key in B.Data and A.Data[key] != B.Data[key]
+
+def either(A, B, key):
+    return key in A.Data or key in B.Data
+
+class Molecule(object):
     """ Lee-Ping's general file format conversion class.
 
     The purpose of this class is to read and write chemical file formats in a
@@ -259,57 +323,78 @@ class Molecule(dict):
 
     def __len__(self):
         """ Return the number of frames in the trajectory. """
-        L = 0
+        L = -1
         klast = None
-        for k in self.keys():
-            if k in self.PerFrameData:
-                if L != 0 and len(self[k]) != L:
-                    raise Exception('The keys %s and %s have different lengths, this isn\'t supposed to happen.' % (k, klast))
-                L = len(self[k])
-                klast = k
-            else: continue
+        Defined = False
+        for key in self.FrameKeys:
+            Defined = True
+            if L != -1 and len(self.Data[key]) != L:
+                raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two PerFrame member variables.' % (key, klast))
+            L = len(self.Data[key])
+            klast = key
+        if not Defined:
+            return 0
         return L
 
-    def __getattr__(self, name):
-        """ Whenever we try to get a class attribute, it first tries to get the attribute from the dictionary. """
-        if name == 'ns':
+    def __getattr__(self, key):
+        """ Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. """
+        if key == 'ns':
             return len(self)
-        elif name == 'na':
-            if 'elem' in self:
-                return len(self.elem)
-            else:
+        elif key == 'na': # The 'na' attribute is the number of atoms.
+            L = -1
+            klast = None
+            Defined = False
+            for key in self.AtomKeys:
+                Defined = True
+                if L != -1 and len(self.Data[key]) != L:
+                    raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two PerAtom member variables.' % (key, klast))
+                L = len(self.Data[key])
+                klast = key
+            if Defined:
+                return L
+            elif 'xyzs' in self.Data:
                 return len(self.xyzs[0])
-        elif name in self:
-            return super(Molecule, self).__getitem__(name)
-        else:
-            raise AttributeError()
+            else:
+                raise Exception('na is ill-defined if the molecule has no PerAtom member variables.')
+        ## These attributes return a list of attribute names defined in this class, that belong in the chosen category.
+        ## For example: self.FrameKeys should return set(['xyzs','boxes']) if xyzs and boxes exist in self.Data
+        elif key == 'FrameKeys':
+            return set(self.Data) & FrameVariableNames
+        elif key == 'AtomKeys':
+            return set(self.Data) & AtomVariableNames
+        elif key == 'MetaKeys':
+            return set(self.Data) & MetaVariableNames
+        elif key == 'QuantumKeys':
+            return set(self.Data) & QuantumVariableNames
+        elif key in self.Data:
+            return self.Data[key]
+        return getattr(super(Molecule, self), key)
 
-    def __setattr__(self, name, value):
-        """ Whenever we set a class attribute, it's actually stored in the dictionary. """
-        if name in ['Read_Tab', 'Write_Tab', 'Funnel', 'Immutable', 'PerFrameData', 'QuantumData']:
-            return object.__setattr__(self, name, value)
-        else:
-            self[name] = value
+    def __setattr__(self, key, value):
+        """ Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. """
+        ## These attributes return a list of attribute names defined in this class, that belong in the chosen category.
+        ## For example: self.FrameKeys should return set(['xyzs','boxes']) if xyzs and boxes exist in self.Data
+        if key in AllVariableNames:
+            self.Data[key] = value
+        return super(Molecule,self).__setattr__(key, value)
 
     def __getitem__(self, key):
         """ 
+        The Molecule class has list-like behavior as well.
         If we say MyMolecule[0:10], then we'll return a copy of MyMolecule with frames 0 through 9.
-        If we say MyMolecule['xyzs'], then we'll return MyMolecule.xyzs
-        
+        Hopefully we can put in a lazy iterator someday.
         """
         if isinstance(key, int) or isinstance(key, slice) or isinstance(key,np.ndarray):
             if isinstance(key, int):
                 key = [key]
             New = Molecule()
-            for k in self.keys():
-                if k in self.PerFrameData:
-                    setattr(New, k, list(np.array(self[k])[key]))
-                else:
-                    setattr(New, k, copy.deepcopy(self[k]))
+            for k in self.FrameKeys:
+                New.Data[k] = list(np.array(self.Data[k])[key])
+            for k in self.AtomKeys | self.MetaKeys:
+                New.Data[k] = copy.deepcopy(self.Data[k])
             return New
-        elif key == 'ns' or key == 'na':
-            return self.__getattr__(key)
-        return super(Molecule, self).__getitem__(key)
+        else:
+            raise Exception('getitem is not implemented for keys of type %s' % str(key))
 
     def __add__(self,other):
         """ Add method for Molecule objects. """
@@ -317,20 +402,49 @@ class Molecule(dict):
         if not isinstance(other,Molecule):
             raise TypeError('A Molecule instance can only be added to another Molecule instance')
         # Create the sum of the two classes by copying the first class.
-        Sum = copy.deepcopy(self)
-        self.check_immutable(other)
-        # Information from the other class is added to this class (if said info doesn't exist.)
-        for key in list(k for k in other if k not in self):
-            Sum[key] = other[key]
-        # If the two objects have 'PerFrameData' attributes, then we simply string the attributes together.
-        # An example is the list of XYZ coordinates.
-        for key in self.PerFrameData:
-            if key in self and key in other:
-                Sum[key] = self[key] + other[key]
+        Sum = Molecule()
+        for key in (self.Meta | self.PerAtom):
+            if diff(self, other, key):
+                raise Exception('The data member called %s is not the same for these two objects' % key)
+            elif key in self.Data:
+                Sum.Data[key] = copy.deepcopy(self.Data[key])
+            elif key in other.Data:
+                Sum.Data[key] = copy.deepcopy(other.Data[key])
+        # PerFrame must be a list.
+        for key in self.PerFrame:
+            if both(self, other, key):
+                if type(self.Data[key]) is not list:
+                    raise Exception('Key %s in self is PerFrame, it must be a list' % key)
+                if type(other.Data[key]) is not list:
+                    raise Exception('Key %s in other is PerFrame, it must be a list' % key)
+                Sum.Data[key] = list(self.Data[key] + other.Data[key])
+            elif either(self, other, key):
+                raise Exception('Key %s is PerFrame must exist in both self and other for them to be added (for now).')
         return Sum
  
     def __iadd__(self,other):
-        return self + other
+        """ Add method for Molecule objects. """
+        # Check type of other
+        if not isinstance(other,Molecule):
+            raise TypeError('A Molecule instance can only be added to another Molecule instance')
+        # Create the sum of the two classes by copying the first class.
+        for key in (self.Meta | self.PerAtom):
+            if diff(self, other, key):
+                raise Exception('The data member called %s is not the same for these two objects' % key)
+            # Information from the other class is added to this class (if said info doesn't exist.)
+            elif key in other.Data:
+                self.Data[key] = copy.deepcopy(other.Data[key])
+        # PerFrame must be a list.
+        for key in self.PerFrame:
+            if both(self, other, key):
+                if type(self.Data[key]) is not list or type(other.Data[key]) is not list:
+                    raise Exception('Key %s in self is PerFrame, it must be a list' % key)
+                if type(other.Data[key]) is not list:
+                    raise Exception('Key %s in other is PerFrame, it must be a list' % key)
+                self.Data[key] += other.Data[key]
+            elif either(self, other, key):
+                raise Exception('Key %s is PerFrame must exist in both self and other for them to be added (for now).')
+        return self
 
     def append(self,other):
         self += other
@@ -339,11 +453,11 @@ class Molecule(dict):
         """ To instantiate the class we simply define the table of
         file reading/writing functions and read in a file if it is
         provided."""
-        #=====================================#
-        #|         File type tables          |#
-        #|  Feel free to edit these as more  |#
-        #|    readers / writers are added    |#
-        #=====================================#
+        #=========================================#
+        #|           File type tables            |#
+        #|    Feel free to edit these as more    |#
+        #|      readers / writers are added      |#
+        #=========================================#
         ## The table of file readers
         self.Read_Tab = {'gaussian' : self.read_com,
                          'gromacs'  : self.read_gro,
@@ -361,6 +475,7 @@ class Molecule(dict):
         ## The table of file writers
         self.Write_Tab = {'gromacs' : self.write_gro,
                           'xyz'     : self.write_xyz,
+                          'molproq' : self.write_molproq,
                           'dcd'     : self.write_dcd,
                           'mdcrd'   : self.write_mdcrd,
                           'pdb'     : self.write_pdb,
@@ -381,25 +496,28 @@ class Molecule(dict):
                           'cor'     : 'charmm',
                           'arc'     : 'tinker'}
         ## Creates entries like 'gromacs' : 'gromacs' and 'xyz' : 'xyz'
+        ## in the Funnel
         for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
             self.Funnel[i] = i
-
-        self.PerFrameData = ['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_espxyzs', 'qm_espvals']
-        self.QuantumData = ['qcrems', 'qc_template', 'charge', 'mult']
-        self.Immutable = ['elem', 'na']
-
-        ## Read in stuff, if we passed in a file name, otherwise return an empty instance.
+        # Data container.  All of the data is stored in here.
+        self.Data = {}
+        ## Read in stuff if we passed in a file name, otherwise return an empty instance.
         if fnm != None:
+            self.Data['fnm'] = fnm
             Parsed = self.read(fnm, ftype)
-            ## Set attributes.
+            ## Set member variables.
             for key, val in Parsed.items():
-                self[key] = val
+                self.Data[key] = val
             ## Create a list of comment lines if we don't already have them from reading the file.
-            if hasattr(self, 'comms'):
+            if 'comms' in self.Data:
                 for i in range(len(self.comms)):
-                    self.comms[i] += ' (Converted using molecule.py from %s)' % fnm
+                    if ' : from %s' % fnm not in self.comms[i]:
+                        self.comms[i] += ' : from %s' % fnm
             else:
-                self.comms = ['Frame %i of %i : Converted using molecule.py from %s' % (i+1, self.ns, fnm) for i in range(self.ns)]
+                self.comms = ['Frame %i of %i : from %s' % (i+1, self.ns, fnm) for i in range(self.ns)]
+            ## Make sure the comment line isn't too long
+            for i in range(len(self.comms)):
+                self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -407,19 +525,10 @@ class Molecule(dict):
     #|         these very often!         |#
     #=====================================#
 
-    def check_immutable(self, other):
-        # Sanity checks.  Crash if the two objects have any 'Immutable' attributes that are different.
-        # An example is the list of chemical elements; we can't add a benzene to a formaldehyde
-        for key in self.Immutable:
-            if key in self and key in other and self[key] != other[key]:
-                print self[key]
-                print other[key]
-                raise Exception("When adding two Molecule objects, the values for key %s must be identical." % key)
-
     def require(self, *args):
         for arg in args:
-            if arg not in self:
-                raise AttributeError("%s is a required attribute for writing this type of file but it's not present" % arg)
+            if arg not in self.Data:
+                raise Exception("%s is a required attribute for writing this type of file but it's not present" % arg)
 
     def read(self, fnm, ftype = None):
         """ Read in a file. """
@@ -456,26 +565,14 @@ class Molecule(dict):
 
     #=====================================#
     #|         Useful functions          |#
-    #|  For doing useful things like     |#
-    #|    readers / writers are added    |#
+    #|     For doing useful things       |#
     #=====================================#
 
     def read_frames(self, fnm):
         Parsed = self.read(fnm)
-        for key in self.PerFrameData:
-            self[key] = OtherMol[key]
+        for key in set(Parsed) & self.PerFrame:
+            self.Data[key] = Parsed[key]
 
-    def replace_frames(self, other):
-        if type(other) is Molecule:
-            self.check_immutable(other)
-            for key in self.PerFrameData:
-                self[key] = other[key]
-        elif type(other) is str:
-            OtherMol = self.__class__(other)
-            self.check_immutable(OtherMol)
-            for key in self.PerFrameData:
-                self[key] = OtherMol[key]
-    
     def edit_qcrems(self, in_dict, subcalc = None):
         if subcalc == None:
             for qcrem in self.qcrems:
@@ -487,12 +584,60 @@ class Molecule(dict):
 
     def add_quantum(self, other):
         if type(other) is Molecule:
-            for key in other.QuantumData:
-                self[key] = other[key]
+            OtherMol = other
         elif type(other) is str:
-            OtherMol = self.__class__(other)
-            for key in OtherMol.QuantumData:
-                self[key] = OtherMol[key]
+            OtherMol = Molecule(other)
+        for key in OtherMol.QuantumKeys:
+            self.Data[key] = OtherMol.Data[key]
+
+    def add_virtual_site(self, idx, **kwargs):
+        """ Add a virtual site to the system.  This does NOT set the position of the virtual site; it sits at the origin. """
+        for key in self.AtomKeys:
+            if key in kwargs:
+                self.Data[key].insert(idx,kwargs[key])
+            else:
+                raise Exception('You need to specify %s when adding a virtual site to this molecule.' % key)
+        if 'xyzs' in self.Data:
+            for i, xyz in enumerate(self.xyzs):
+                self.xyzs[i] = np.insert(xyz, idx, 0.0, axis=0)
+        else:
+            raise Exception('You need to have xyzs in this molecule to add a virtual site.')
+
+    def replace_peratom(self, key, orig, want):
+        """ Replace all of the data for a certain attribute in the system from orig to want. """
+        if key in self.Data:
+            for i in range(self.na):
+                if self.Data[key][i] == orig:
+                    self.Data[key][i] = want
+        else:
+            raise Exception('The key that we want to replace (%s) doesn\'t exist.' % key)
+
+    def replace_peratom_conditional(self, key1, cond, key2, orig, want):
+        """ Replace all of the data for a attribute key2 from orig to want, contingent on key1 being equal to cond. 
+        For instance: replace H1 with H2 if resname is SOL."""
+        if key2 in self.Data and key1 in self.Data:
+            for i in range(self.na):
+                if self.Data[key2][i] == orig and self.Data[key1][i] == cond:
+                    self.Data[key2][i] = want
+        else:
+            raise Exception('Either the comparison or replacement key (%s, %s) doesn\'t exist.' % (key1, key2))
+
+    def atom_select(self,atomslice):
+        """ Return a copy of the object with certain atoms selected. """
+        if isinstance(atomslice, int) or isinstance(atomslice, slice) or isinstance(atomslice,np.ndarray):
+            if isinstance(atomslice, int):
+                atomslice = [atomslice]
+        if isinstance(atomslice, list):
+            atomslice = np.array(atomslice)
+        New = Molecule()
+        for key in self.FrameKeys | self.MetaKeys:
+            New.Data[key] = copy.deepcopy(self.Data[key])
+        for key in self.AtomKeys:
+            New.Data[key] = list(np.array(self.Data[key])[atomslice])
+        if 'xyzs' in self.Data:
+            for i in range(self.ns):
+                New.xyzs[i] = self.xyzs[i][atomslice]
+        return New
 
     #=====================================#
     #|         Reading functions         |#
@@ -601,7 +746,7 @@ class Molecule(dict):
         elem     = []
         data = Mol2.mol2_set(fnm)
         if len(data.compounds) > 1:
-            warn("Not sure what to do if the MOL2 file contains multiple compounds")
+            sys.stderr.write("Not sure what to do if the MOL2 file contains multiple compounds\n")
         for i, atom in enumerate(data.compounds.items()[0][1].atoms):
             xyz.append([atom.x, atom.y, atom.z])
             charge.append(atom.charge)
@@ -620,7 +765,7 @@ class Molecule(dict):
             bonds[aL].append(aH)
 
         Answer = {'xyzs' : [np.array(xyz)],
-                  'atomic_charges' : charge,
+                  'partial_charge' : charge,
                   'atomname' : atomname,
                   'atomtype' : atomtype,
                   'elem'     : elem,
@@ -628,19 +773,14 @@ class Molecule(dict):
                   }
 
         return Answer
-        # print data.compounds
-        # print data
-        # print dir(data)
 
     def read_dcd(self, fnm):
         xyzs = []
         boxes = []
-        
         if _dcdlib.vmdplugin_init() != 0:
             raise IOError("Unable to init DCD plugin")
         natoms = c_int(-1)
         frame  = 0
-        ## Open the DCD file
         dcd       = _dcdlib.open_dcd_read(fnm, "dcd", byref(natoms))
         ts        = MolfileTimestep()
         _xyz      = c_float * (natoms.value * 3)
@@ -656,7 +796,6 @@ class Molecule(dict):
             xyz    = np.asfarray(npa)
             xyzs.append(xyz.reshape(-1, 3))
             boxes.append([ts.A, ts.B, ts.C])
-        ## Close the DCD file
         _dcdlib.close_file_read(dcd)
         dcd = None
         Answer = {'xyzs' : xyzs,
@@ -713,12 +852,9 @@ class Molecule(dict):
         @return resid   The residue ID numbers.  These are not easy to get!
         @return elem    A list of chemical elements in the XYZ file
         @return comms   A single-element list for the comment.
-        @return rawarcs The entire .arc file in list form (because some extra info is required for re-printing the .arc)
         @return suffix  The suffix that comes after lines in the XYZ coordinates; this is usually topology info
 
         """
-        rawarcs  = []
-        rawarc   = []
         suffix   = []
         xyzs  = []
         xyz   = []
@@ -732,7 +868,6 @@ class Molecule(dict):
         thisresid   = 1
         ln = 0
         for line in open(fnm):
-            rawarc.append(line.strip())
             sline = line.split()
             # The first line always contains the number of atoms
             # The words after the first line are comments
@@ -741,12 +876,11 @@ class Molecule(dict):
                 comms.append(' '.join(sline[1:]))
                 title = False
             elif len(sline) >= 6:
-                #print sline
                 if isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]): # A line of data better look like this
                     if nframes == 0:
                         elem.append(sline[1])
                         resid.append(thisresid)
-                        whites      = split('[^ ]+',line)
+                        whites      = re.split('[^ ]+',line)
                         if len(sline) > 5:
                             suffix.append(''.join([whites[j]+sline[j] for j in range(5,len(sline))]))
                         else:
@@ -766,14 +900,11 @@ class Molecule(dict):
                         title = True
                         xyzs.append(np.array(xyz))
                         xyz = []
-                        rawarcs.append(list(rawarc))
-                        rawarc = []
             ln += 1
         Answer = {'xyzs'   : xyzs,
                   'resid'  : resid,
                   'elem'   : elem,
                   'comms'  : comms,
-                  'rawarcs': rawarcs,
                   'suffix' : suffix}
         return Answer
 
@@ -972,7 +1103,7 @@ class Molecule(dict):
         if template_cut != 0:
             template = template[:template_cut]
 
-        Answer = {'qc_template' : template,
+        Answer = {'qctemplate'  : template,
                   'qcrems'      : qcrems,
                   'charge'      : charge,
                   'mult'        : mult,
@@ -1153,7 +1284,7 @@ class Molecule(dict):
         Answer = {'elem':elem, 'xyzs':xyzs}
         # Read the output file as an input file to get a Q-Chem template.
         Aux = self.read_qcin(fnm)
-        Answer['qc_template'] = Aux['qc_template']
+        Answer['qctemplate'] = Aux['qctemplate']
         Answer['qcrems'] = Aux['qcrems']
         # Copy out the charge and multiplicity
         Answer['charge'] = int(Floats['charge'][0])
@@ -1211,13 +1342,13 @@ class Molecule(dict):
     #=====================================#
 
     def write_qcin(self, select):
-        self.require('qc_template','qcrems','charge','mult','xyzs','elem')
+        self.require('qctemplate','qcrems','charge','mult','xyzs','elem')
         out = []
         for I in (select if select != None else range(len(self))):
             xyz = self.xyzs[I]
             remidx = 0
             molecule_printed = False
-            for SectName, SectData in self.qc_template:
+            for SectName, SectData in self.qctemplate:
                 if SectName != '@@@@':
                     out.append('$%s' % SectName)
                     for line in SectData:
@@ -1253,6 +1384,18 @@ class Molecule(dict):
                 out.append(format_xyz_coord(self.elem[i],xyz[i]))
         return out
 
+    def write_molproq(self, select):
+        self.require('xyzs','partial_charge')
+        out = []
+        for I in (select if select != None else range(len(self))):
+            xyz = self.xyzs[I]
+            # Comment comes first, then number of atoms.
+            out.append(self.comms[I])
+            out.append("%-5i" % self.na)
+            for i in range(self.na):
+                out.append("% 15.10f % 15.10f % 15.10f % 15.10f   0" % (xyz[i,0],xyz[i,1],xyz[i,2],self.partial_charge[i]))
+        return out
+
     def write_mdcrd(self, select):
         self.require('xyzs')
         # Groups a big long list into groups of ten.
@@ -1264,20 +1407,20 @@ class Molecule(dict):
         for I in (select if select != None else range(len(self))):
             xyz = self.xyzs[I]
             out += [''.join(["%8.3f" % i for i in g]) for g in grouper(10, list(xyz.flatten()))]
-            if 'boxes' in self:
+            if 'boxes' in self.Data:
                 out.append(''.join(["%8.3f" % i for i in self.boxes[I][:3]]))
         return out
 
     def write_arc(self, select):
         self.require('elem','xyzs')
         out = []
-        if 'suffix' not in self:
+        if 'suffix' not in self.Data:
             sys.stderr.write("Beware, this .arc file contains no atom type or topology info\n")
         for I in (select if select != None else range(len(self))):
             xyz = self.xyzs[I]
             out.append("%6i  %s" % (self.na, self.comms[I]))
             for i in range(self.na):
-                out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.suffix[i] if 'suffix' in self else ''))
+                out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.suffix[i] if 'suffix' in self.Data else ''))
         return out
 
     def write_gro(self, select):
@@ -1287,7 +1430,7 @@ class Molecule(dict):
         self.require_resid()
         self.require_boxes()
 
-        if 'atomname' not in self:
+        if 'atomname' not in self.Data:
             atomname = ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
         else:
             atomname = self.atomname
@@ -1296,7 +1439,7 @@ class Molecule(dict):
             xyz = self.xyzs[I]
             xyzwrite = xyz.copy()
             xyzwrite /= 10.0 # GROMACS uses nanometers
-            out.append("Generated by filecnv.py : " + self.comms[I])
+            out.append("Generated by ForceBalance from %s" % self.fnm)
             out.append("%5i" % self.na)
             for an, line in enumerate(xyzwrite):
                 out.append(format_gro_coord(self.resid[an],self.resname[an],atomname[an],an+1,xyzwrite[an]))
@@ -1313,9 +1456,9 @@ class Molecule(dict):
         for I in (select if select != None else range(len(self))):
             xyz = self.xyzs[I]
             ts.coords = _xyz(*list(xyz.flatten()))
-            ts.A      = self.boxes[I][0] if 'boxes' in self else 1.0
-            ts.B      = self.boxes[I][1] if 'boxes' in self else 1.0
-            ts.C      = self.boxes[I][2] if 'boxes' in self else 1.0
+            ts.A      = self.boxes[I][0] if 'boxes' in self.Data else 1.0
+            ts.B      = self.boxes[I][1] if 'boxes' in self.Data else 1.0
+            ts.C      = self.boxes[I][2] if 'boxes' in self.Data else 1.0
             result    = _dcdlib.write_timestep(dcd, byref(ts))
             if result != 0:
                 raise IOError("Error encountered when writing DCD")
@@ -1324,33 +1467,33 @@ class Molecule(dict):
         dcd = None
 
     def write_pdb(self, select):
-        """Save Conformation to a PDB. 
-                COLUMNS  TYPE   FIELD  DEFINITION
-                ---------------------------------------------
-                7-11      int   serial        Atom serial number.
-                13-16     string name          Atom name.
-                17        string altLoc        Alternate location indicator.
-                18-20 (17-21 KAB)    string resName       Residue name.
-                22        string chainID       Chain identifier.
-                23-26     int    resSeq        Residue sequence number.
-                27        string iCode         Code for insertion of residues.
-                31-38     float  x             Orthogonal coordinates for X in
-                                               Angstroms.
-                39-46     float  y             Orthogonal coordinates for Y in
-                                               Angstroms.
-                47-54     float  z             Orthogonal coordinates for Z in
-                                               Angstroms.
-                55-60     float  occupancy     Occupancy.
-                61-66     float  tempFactor    Temperature factor.
-                73-76     string segID         Segment identifier, left-justified.
-                77-78     string element       Element symbol, right-justified.
-                79-80     string charge        Charge on the atom.
-                """
+        """Save to a PDB. Copied wholesale from MSMBuilder.
+        COLUMNS  TYPE   FIELD  DEFINITION
+        ---------------------------------------------
+        7-11      int   serial        Atom serial number.
+        13-16     string name          Atom name.
+        17        string altLoc        Alternate location indicator.
+        18-20 (17-21 KAB)    string resName       Residue name.
+        22        string chainID       Chain identifier.
+        23-26     int    resSeq        Residue sequence number.
+        27        string iCode         Code for insertion of residues.
+        31-38     float  x             Orthogonal coordinates for X in
+        Angstroms.
+        39-46     float  y             Orthogonal coordinates for Y in
+        Angstroms.
+        47-54     float  z             Orthogonal coordinates for Z in
+        Angstroms.
+        55-60     float  occupancy     Occupancy.
+        61-66     float  tempFactor    Temperature factor.
+        73-76     string segID         Segment identifier, left-justified.
+        77-78     string element       Element symbol, right-justified.
+        79-80     string charge        Charge on the atom.
+        """
         self.require('xyzs')
         self.require_resname()
         self.require_resid()
-        ATOMS = self.atomname if 'atomname' in self else ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
-        CHAIN = self.chain if 'chain' in self else [1 for i in range(self.na)]
+        ATOMS = self.atomname if 'atomname' in self.Data else ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
+        CHAIN = self.chain if 'chain' in self.Data else [1 for i in range(self.na)]
         RESNAMES = self.resname
         RESNUMS = self.resid
 
@@ -1407,28 +1550,28 @@ class Molecule(dict):
             out.append("JOB %i" % I)
             out.append("COORDS"+pvec(xyz))
             out.append("ENERGY % .12e" % self.qm_energies[I])
-            if 'mm_energies' in self:
+            if 'mm_energies' in self.Data:
                 out.append("EMD0   % .12e" % self.mm_energies[I])
             out.append("FORCES"+pvec(self.qm_forces[I]))
-            if 'qm_espxyzs' in self and 'qm_espvals' in self:
+            if 'qm_espxyzs' in self.Data and 'qm_espvals' in self.Data:
                 out.append("ESPXYZ"+pvec(self.qm_espxyzs[I]))
                 out.append("ESPVAL"+pvec(self.qm_espvals[I]))
             out.append('')
         return out
 
     def require_resid(self):
-        if 'resid' not in self:
+        if 'resid' not in self.Data:
             na_res = int(raw_input("Enter how many atoms are in a residue -> "))
             self.resid = [1 + i/na_res for i in range(self.na)]
             
     def require_resname(self):
-        if 'resname' not in self:
+        if 'resname' not in self.Data:
             resname = raw_input("Enter a residue name (3-letter like 'SOL') -> ")
             self.resname = [resname for i in range(self.na)]
             
     def require_boxes(self):
-        if 'boxes' not in self or len(self.boxes) != self.ns:
-            warn("We're writing a file with boxes, but the file either contains no boxes or too few")
+        if 'boxes' not in self.Data or len(self.boxes) != self.ns:
+            sys.stderr.write("We're writing a file with boxes, but the file either contains no boxes or too few\n")
             boxstr = raw_input("Enter 1 / 3 / 9 numbers for box in Angstrom or name of timeseries file -> ")
             if os.path.exists(boxstr):
                 self.boxes = [[float(i.strip()),float(i.strip()),float(i.strip())] for i in open(boxstr).readlines()]
@@ -1440,54 +1583,6 @@ class Molecule(dict):
                     self.boxes = [[box[0],box[0],box[0]] for i in range(self.ns)]
                 else:
                     raise Exception("Not sure what to do since you gave me %i numbers" % len(box))
-
-    #=====================================#
-    #|      Stuff I'm not sure about     |#
-    #=====================================#
-
-    def read_ndx(self, fnm):
-        """ Read an index.ndx file and add an entry to the dictionary
-        {'index_name': [ num1, num2, num3 .. ]}
-        """
-
-        section = None
-        for line in open(fnm):
-            line = line.strip().expandtabs()
-            s = line.split()
-            if re.match('^\[.*\]',line):
-                section = re.sub('[\[\] \n]','',line)
-            elif all([isint(i) for i in s]):
-                for j in s:
-                    self.index.setdefault(section,[]).append(int(j)-1)
-
-    def reorder(self, idx_name=None):
-        """ Reorders an xyz file using data provided from an .ndx file. """
-        
-        if idx_name not in self.index:
-            raise Exception("ARGHH, %s doesn't exist in the index" % idx_name)
-
-        self.require_resid()
-        self.require_resname()
-
-        newatomname = list(self.atomname)
-        newelem = list(self.elem)
-        newresid = list(self.resid)
-        newresname = list(self.resname)
-        for an, assign in enumerate(self.index[idx_name]):
-            newatomname[an] = self.atomname[assign]
-            newelem[an] = self.elem[assign]
-            newresid[an] = self.resid[assign]
-            newresname[an] = self.resname[assign]
-        self.atomname = list(newatomname)
-        self.elem = list(newelem)
-        self.resid = list(newresid)
-        self.resname = list(newresname)
-
-        for sn, xyz in enumerate(self.xyzs):
-            newxyz = xyz.copy()
-            for an, assign in enumerate(self.index[idx_name]):
-                newxyz[an] = xyz[assign]
-            self.xyzs[sn] = newxyz.copy()
 
 def main():
     print "Basic usage as an executable: molecule.py input.format1 output.format2"

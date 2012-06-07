@@ -18,7 +18,7 @@ SOL          2
 [ atoms ]
 1       OW        1       SOL      OW     1       0.0
 2       HW        1       SOL     HW1     1       0.52 ; PARM 6
-3       HW        1       SOL     HW2     1       0.52 ; RPT 6 COULHW1 /RPT
+3       HW        1       SOL     HW2     1       0.52 ; RPT 6 COUL:SOL-HW1 /RPT
 4       MW        1       SOL      MW     1      -1.04 ; PARM 6
 
 [ bonds ]
@@ -35,5 +35,5 @@ SOL          2
 4     1     2     3
 
 [ virtual_sites3 ]
-4     1     2     3     1     0.1280     0.1280 ; RPT 6 VSITE3A4 /RPT PARM 5
+4     1     2     3     1     0.1280     0.1280 ; RPT 6 VSITE3A:SOL-MW /RPT PARM 5
 

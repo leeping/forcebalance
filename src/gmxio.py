@@ -8,10 +8,12 @@
 
 import os
 from re import match, sub
-from nifty import isint, _exec
+from nifty import isint, _exec, warn_press_key
 from numpy import array
 from basereader import BaseReader
 from abinitio import AbInitio
+from interaction import Interaction
+from molecule import Molecule
 
 ## VdW interaction function types
 nftypes = [None, 'VDW', 'VDW_BHAM']
@@ -23,7 +25,7 @@ bftypes = [None, 'BONDS', 'G96BONDS', 'MORSE']
 aftypes = [None, 'ANGLES', 'G96ANGLES', 'CROSS_BOND_BOND',
            'CROSS_BOND_ANGLE', 'UREY_BRADLEY', 'QANGLES']
 ## Dihedral interaction function types
-dftypes = [None, 'PDIHS', 'IDIHS', 'RBDIHS']
+dftypes = [None, 'PDIHS', 'IDIHS', 'RBDIHS', 'PIMPDIHS', 'FOURDIHS', None, None, 'TABDIHS', 'PDIHMULS']
 
 ## Section -> Interaction type dictionary.
 ## Based on the section you're in
@@ -42,7 +44,7 @@ fdict = {
     'dihedraltypes' : dftypes,
     'virtual_sites2': ['NONE','VSITE2'],
     'virtual_sites3': ['NONE','VSITE3','VSITE3FD','VSITE3FAD','VSITE3OUT'],
-    'virtual_sites4': ['NONE','VSITE4FD']
+    'virtual_sites4': ['NONE','VSITE4FD','VSITE4FDN']
     }
 
 ## Interaction type -> Parameter Dictionary.
@@ -63,12 +65,14 @@ pdict = {'BONDS':{3:'B', 4:'K'},
          'CROSS_BOND_ANGLE':{4:'1', 5:'2', 6:'3', 7:'K'},
          'QANGLES':{4:'B', 5:'K0', 6:'K1', 7:'K2', 8:'K3', 9:'K4'},
          'UREY_BRADLEY':{4:'T', 5:'K1', 6:'B', 7:'K2'},
-         'PDIHS1':{5:'B', 6:'K'},
-         'PDIHS2':{5:'B', 6:'K'},
-         'PDIHS3':{5:'B', 6:'K'},
-         'PDIHS4':{5:'B', 6:'K'},
-         'PDIHS5':{5:'B', 6:'K'},
-         'PDIHS6':{5:'B', 6:'K'},
+         'PDIHS1':{5:'B', 6:'K'}, 'PDIHS2':{5:'B', 6:'K'}, 'PDIHS3':{5:'B', 6:'K'},
+         'PDIHS4':{5:'B', 6:'K'}, 'PDIHS5':{5:'B', 6:'K'}, 'PDIHS6':{5:'B', 6:'K'},
+         'PIMPDIHS1':{5:'B', 6:'K'}, 'PIMPDIHS2':{5:'B', 6:'K'}, 'PIMPDIHS3':{5:'B', 6:'K'},
+         'PIMPDIHS4':{5:'B', 6:'K'}, 'PIMPDIHS5':{5:'B', 6:'K'}, 'PIMPDIHS6':{5:'B', 6:'K'},
+         'FOURDIHS1':{5:'B', 6:'K'}, 'FOURDIHS2':{5:'B', 6:'K'}, 'FOURDIHS3':{5:'B', 6:'K'},
+         'FOURDIHS4':{5:'B', 6:'K'}, 'FOURDIHS5':{5:'B', 6:'K'}, 'FOURDIHS6':{5:'B', 6:'K'},
+         'PDIHMULS1':{5:'B', 6:'K'}, 'PDIHMULS2':{5:'B', 6:'K'}, 'PDIHMULS3':{5:'B', 6:'K'},
+         'PDIHMULS4':{5:'B', 6:'K'}, 'PDIHMULS5':{5:'B', 6:'K'}, 'PDIHMULS6':{5:'B', 6:'K'},
          'IDIHS':{5:'B', 6:'K'},
          'VDW':{4:'S', 5:'T'},
          'VPAIR':{3:'S', 4:'T'},
@@ -83,6 +87,8 @@ pdict = {'BONDS':{3:'B', 4:'K'},
          'VSITE3FAD':{5:'T',6:'D'},
          'VSITE3OUT':{5:'A',6:'B',7:'C'},
          'VSITE4FD':{6:'A',7:'B',8:'D'},
+         'VSITE4FDN':{6:'A',7:'B',8:'C'},
+         'DEF':{3:'FLJ',4:'FQQ'},
          }
 
 def parse_atomtype_line(line):
@@ -209,10 +215,10 @@ class ITP_Reader(BaseReader):
         self.nbtype = None
         ## The current residue (set by the moleculetype keyword)
         self.res    = None
-        ## The mapping of (this residue, atom number) to (atom name) for building atom-specific interactions in [ bonds ], [ angles ] etc.
-        self.adict  = {}
         ## The parameter dictionary (defined in this file)
         self.pdict  = pdict
+        ## Listing of all atom names in the file, (probably unnecessary)
+        self.atomnames = []
 
     def feed(self, line):
         """ Given a line, determine the interaction type and the atoms involved (the suffix).
@@ -245,6 +251,7 @@ class ITP_Reader(BaseReader):
             # Makes a word like "atoms", "bonds" etc.
             self.sec = sub('[\[\] \n]','',line)
         elif self.sec == 'defaults':
+            self.itype = 'DEF'
             self.nbtype = int(s[0])
         elif self.sec == 'moleculetype':
             self.res    = s[0]
@@ -262,7 +269,9 @@ class ITP_Reader(BaseReader):
             atom = [s[0], s[1]]
             self.itype = pftypes[self.nbtype]
         elif self.sec == 'atoms':
+            # Ah, this is the atom name, not the atom number.
             atom = [s[4]]
+            self.atomnames.append(s[4])
             self.itype = 'COUL'
             # Build the adict here.
             self.adict.setdefault(s[3],[]).append(s[4])
@@ -271,13 +280,13 @@ class ITP_Reader(BaseReader):
             atom = [s[0]]
             self.itype = 'QTPIE'
         elif self.sec == 'bonds':
-            atom = [self.adict[self.res][int(i) - 1] for i in s[:2]]
+            atom = [self.adict[self.res][int(i)-1] for i in s[:2]]
             self.itype = fdict[self.sec][int(s[2])]
         elif self.sec == 'bondtypes':
             atom = [s[0], s[1]]
             self.itype = fdict[self.sec][int(s[2])]
         elif self.sec == 'angles':
-            atom = [self.adict[self.res][int(i) - 1] for i in s[:3]]
+            atom = [self.adict[self.res][int(i)-1] for i in s[:3]]
             self.itype = fdict[self.sec][int(s[3])]
         elif self.sec == 'angletypes':
             atom = [s[0], s[1], s[2]]
@@ -285,29 +294,40 @@ class ITP_Reader(BaseReader):
         elif self.sec == 'dihedrals':
             atom = [self.adict[self.res][int(i)-1] for i in s[:4]]
             self.itype = fdict[self.sec][int(s[4])]
-            if self.itype == 'PDIHS' and len(s) >= 7:
+            if self.itype in ['PDIHS', 'PIMPDIHS', 'FOURDIHS', 'PDIHMULS'] and len(s) >= 7:
                 # Add the multiplicity of the dihedrals to the interaction type.
                 self.itype += s[7]
         elif self.sec == 'dihedraltypes':
             atom = [s[0], s[1], s[2], s[3]]
             self.itype = fdict[self.sec][int(s[4])]
-            if self.itype == 'PDIHS' and len(s) >= 7:
+            if self.itype in ['PDIHS', 'PIMPDIHS', 'FOURDIHS', 'PDIHMULS'] and len(s) >= 7:
                 self.itype += s[7]
         elif self.sec == 'virtual_sites2':
-            atom = [s[0]]
+            atom = [self.adict[self.res][int(i)-1] for i in s[:1]]
+            #atom = [s[0]]
             self.itype = fdict[self.sec][int(s[3])]
         elif self.sec == 'virtual_sites3':
-            atom = [s[0]]
+            atom = [self.adict[self.res][int(i)-1] for i in s[:1]]
+            #atom = [self.adict[self.res][int(i)-1] for i in s[:3]]
+            #atom = [s[0]]
             self.itype = fdict[self.sec][int(s[4])]
         elif self.sec == 'virtual_sites4':
-            atom = [s[0]]
+            atom = [self.adict[self.res][int(i)-1] for i in s[:1]]
+            #atom = [self.adict[self.res][int(i)-1] for i in s[:4]]
+            #atom = [s[0]]
             self.itype = fdict[self.sec][int(s[5])]
         else:
             return [],"Confused"
-        if len(atom) > 1 and atom[0] > atom[-1]:
+        if type(atom) is list and (len(atom) > 1 and atom[0] > atom[-1]):
             # Enforce a canonical ordering of the atom labels in a parameter ID
             atom = atom[::-1]
-        self.suffix = ''.join(atom)
+        if self.res == None:
+            self.suffix = ':' + ''.join(atom)
+        elif self.sec == 'qtpie':
+            self.suffix = ':' + ''.join(atom)
+        else:
+            self.suffix = ':' + '-'.join([self.res,''.join(atom)])
+        self.resatom = (self.res, atom if type(atom) is list else [atom])
 
 def gmxx2_print(fnm, vec, type):
     """ Prints a vector to a file to feed it to the modified GROMACS.
@@ -340,22 +360,26 @@ class AbInitio_GMX(AbInitio):
     Implements the prepare_temp_directory and energy_force_driver methods."""
 
     def __init__(self,options,sim_opts,forcefield):
-        ## Name of the trajectory, we need this BEFORE initializing the SuperClass
+        ## Name of the trajectory
         self.trajfnm = "all.gro"
-        ## Initialize the SuperClass!
         super(AbInitio_GMX,self).__init__(options,sim_opts,forcefield)
     
     def prepare_temp_directory(self, options, sim_opts):
         os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
         abstempdir = os.path.join(self.root,self.tempdir)
+        if options['gmxpath'] == None or options['gmxsuffix'] == None:
+            warn_press_key('Please set the options gmxpath and gmxsuffix in the input file!')
+        if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
+            warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
         os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
         os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
         os.symlink(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
+        os.symlink(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
         # Link the run files
-        os.symlink(os.path.join(self.root,self.simdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","topol.top"),os.path.join(abstempdir,"topol.top"))
         # Write the trajectory to the temp-directory
         self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro
@@ -399,4 +423,68 @@ class AbInitio_GMX(AbInitio):
             Energy = [float(Eline.split()[1])]
             Force = [float(i) for i in Fline.split()[1:] if float(i) != 0.0]
             M.append(array(Energy + Force))
+        return array(M)
+
+    def generate_vsite_positions(self):
+        """ Call mdrun in order to update the virtual site positions. """
+        # Remove backup files.
+        rm_gmx_baks(os.getcwd())
+        # Call grompp followed by mdrun.
+        _exec(["./grompp", "-f", "shot.mdp"], print_command=False)
+        _exec(["./mdrun", "-o", "shot.trr", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
+        # Gather information
+        _exec(["./trjconv","-f","shot.trr","-o","trajout.gro","-ndec","6","-novel","-noforce"], stdin='System', print_command=False)
+        NewMol = Molecule("trajout.gro")
+        self.traj.xyzs = NewMol.xyzs
+
+class Interaction_GMX(Interaction):
+    """ Subclass of Interaction for interaction energy matching using GROMACS. """
+
+    def __init__(self,options,sim_opts,forcefield):
+        ## Name of the trajectory
+        self.trajfnm = "all.gro"
+        super(Interaction_GMX,self).__init__(options,sim_opts,forcefield)
+    
+    def prepare_temp_directory(self, options, sim_opts):
+        os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
+        abstempdir = os.path.join(self.root,self.tempdir)
+        if options['gmxpath'] == None or options['gmxsuffix'] == None:
+            warn_press_key('Please set the options gmxpath and gmxsuffix in the input file!')
+        if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
+            warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
+        # Link the necessary programs into the temporary directory
+        os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
+        os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
+        os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
+        # Link the run files
+        os.symlink(os.path.join(self.root,self.simdir,"settings","index.ndx"),os.path.join(abstempdir,"index.ndx"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","topol.top"),os.path.join(abstempdir,"topol.top"))
+        # Write the trajectory to the temp-directory
+        print set(self.traj.Data)
+        self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
+        # Print out the first conformation in all.gro to use as conf.gro
+        self.traj.write(os.path.join(abstempdir,"conf.gro"),select=[0])
+
+    def interaction_driver(self, shot):
+        """ Computes the energy and force using GROMACS for a single
+        snapshot.  This does not require GROMACS-X2. """
+        raise NotImplementedError('Per-snapshot interaction energies not implemented, consider using all-at-once')
+
+    def interaction_driver_all(self):
+        """ Computes the energy and force using GROMACS for a trajectory.  This does not require GROMACS-X2. """
+        # Remove backup files.
+        rm_gmx_baks(os.getcwd())
+        # Call grompp followed by mdrun.
+        _exec(["./grompp", "-f", "shot.mdp", "-n", "index.ndx"], print_command=False)
+        _exec(["./mdrun", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
+        # Gather information
+        _exec(["./g_energy","-xvg","no"], print_command=False, stdin="Coul-SR:FRAGA-FRAGB\nLJ-SR:FRAGA-FRAGB\nBuck-SR:FRAGA-FRAGB\n")
+        M = []
+        # Loop through the snapshots
+        for line in open("energy.xvg").readlines():
+            # Compute the potential energy and append to list
+            s = line.split()
+            Energy = float(s[1]) + float(s[2])
+            M.append(Energy)
         return array(M)

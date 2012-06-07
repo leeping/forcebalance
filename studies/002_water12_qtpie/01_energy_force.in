@@ -1,11 +1,15 @@
 $options
-jobtype bfgs
+jobtype newton
 gmxpath /home/leeping/opt/gromacs-4.0.7-x2/bin
 forcefield water.itp
 penalty_additive       0.0
 penalty_multiplicative 0.1
+trust0                 0.01
 backup
 finite_difference_h 1e-4
+print_hessian no
+print_gradient no
+print_parameters no
 $end
 
 $simulation

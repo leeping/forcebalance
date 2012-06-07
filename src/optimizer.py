@@ -242,8 +242,8 @@ class Optimizer(object):
             if self.wchk_step:
                 self.writechk()
             stdfront = len(ehist) > 10 and np.std(np.sort(ehist)[:10]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
-            print "\n%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)", "StepQual")
-            print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f" % (stepn, nxk, ndx, ngr, color, X, stdfront, Quality)
+            print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)", "StepQual")
+            print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (stepn, nxk, ndx, ngr, color, X, stdfront, Quality)
             # Check the convergence criteria
             if ngr < self.conv_grd:
                 print "Convergence criterion reached for gradient norm (%.2e)" % self.conv_grd
@@ -274,11 +274,6 @@ class Optimizer(object):
             old_xk = xk.copy()
             # Take a step in the parameter space.
             xk += dx
-            #<-----
-            #for i in range(self.FF.np):
-            #    if old_xk[i] * xk[i] < 0:
-            #        print "Sign change detected in parameter %i (%.2e -> %.2e)" % (i, old_xk[i], xk[i])
-            #----->
             if self.print_vals:
                 pk = self.FF.create_pvals(xk)
                 dp = pk - old_pk
@@ -325,49 +320,12 @@ class Optimizer(object):
             # Hessian update.
             if b_BFGS:
                 Hnew = H_stor.copy()
-                #<---
-                # Wolfe condition stuff, currently being tested.
-                Wolfe1_Left  = X
-                Wolfe1_Right = X_prev + (wolfe_c1)*np.dot(dx,G_prev)
-                Wolfe2_Left  = np.dot(dx/norm(dx),G)
-                Wolfe2_Right = wolfe_c2 * np.dot(dx/norm(dx),G_prev)
-                print "X:", X, "X_prev:", X_prev, "Dot:", np.dot(dx,G_prev)
-                print "Wolfe1:", Wolfe1_Left, Wolfe1_Right
-                print "Dot_Left:", np.dot(dx/norm(dx),G), "Dot_Right:", np.dot(dx/norm(dx),G_prev)
-                print "Wolfe2:", Wolfe2_Left, Wolfe2_Right
-                if Wolfe1_Left < Wolfe1_Right:
-                    print "Wolfe condition 1 is satisfied"
-                else:
-                    print "Wolfe condition 1 is NOT satisfied"
-                if Wolfe2_Left > Wolfe2_Right:
-                    print "Wolfe condition 2 is satisfied"
-                else:
-                    print "Wolfe condition 2 is NOT satisfied"
-                bar = printcool("Loaded H_stor",color=1)
-                pmat2d(Hnew)
-                bar = printcool("Dx",color=6)
-                self.FF.print_map(vals=xk-xk_prev)
-                bar = printcool("Dy",color=6)
-                self.FF.print_map(vals=G-G_prev)
-                #--->
                 Dx   = col(xk - xk_prev)
                 Dy   = col(G  - G_prev)
                 Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
                 Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
                 Hnew += Mat1-Mat2
-                # After that bit of trickery, Hnew is now updated with BFGS stuff.
-                # We now want to put the BFGS-gradients into the Hessian that will be used to take the step.
                 H = Hnew.copy()
-                #<---
-                # bar = printcool("Mat1",color=1)
-                # pmat2d(Mat1)
-                # bar = printcool("Mat2",color=1)
-                # pmat2d(Mat2)
-                # bar = printcool("Mat1-Mat2",color=1)
-                # pmat2d(Mat1-Mat2)
-                # bar = printcool("New H",color=1)
-                # pmat2d(H)
-                #--->
                 
             G_prev  = G.copy()
             H_stor  = H.copy()
@@ -416,6 +374,10 @@ class Optimizer(object):
             H += (self.eps - Emin)*np.eye(H.shape[0])
 
         if self.bhyp:
+            G = np.delete(G, self.excision)
+            H = np.delete(H, self.excision, axis=0)
+            H = np.delete(H, self.excision, axis=1)
+            xkd = np.delete(xk, self.excision)
             if self.Objective.Penalty.fmul != 0.0:
                 warn_press_key("Using the multiplicative hyperbolic penalty is discouraged!")
             # This is the gradient and Hessian without the contributions from the hyperbolic constraint.
@@ -430,7 +392,7 @@ class Optimizer(object):
                 def _compute(self, dx):
                     self.dx = dx.copy()
                     Tmp = np.mat(self.H)*col(dx)
-                    Reg_Term   = self.Penalty.compute(xk+flat(dx), Obj0)
+                    Reg_Term   = self.Penalty.compute(xkd+flat(dx), Obj0)
                     self.Val   = (X + np.dot(dx, G) + 0.5*row(dx)*Tmp + Reg_Term[0] - data['X'])[0,0]
                     self.Grad  = flat(col(G) + Tmp) + Reg_Term[1]
                 def compute_val(self, dx):
@@ -442,14 +404,19 @@ class Optimizer(object):
                         self._compute(dx)
                     return self.Grad
             def hyper_solver(L):
-                dx0 = np.zeros(len(xk),dtype=float)
+                dx0 = np.zeros(len(xkd),dtype=float)
+                #dx0 = np.delete(dx0, self.excision)
                 HL = H + L**2*np.diag(np.diag(H))
                 HYP = Hyper(HL, self.Objective.Penalty)
                 Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
-                Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xk,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
+                Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xkd,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
+                #Opt1 = optimize.fmin(HYP.compute_val,dx0,full_output=True,disp=0)
+                #Opt2 = optimize.fmin(HYP.compute_val,-xkd,full_output=True,disp=0)
                 dx1, sol1 = Opt1[0], Opt1[1]
                 dx2, sol2 = Opt2[0], Opt2[1]
                 dxb, sol = (dx1, sol1) if sol1 <= sol2 else (dx2, sol2)
+                for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
+                    dxb = np.insert(dxb, i, 0)
                 return dxb, sol
         else:
             # G0 and H0 are used for determining the expected function change.
@@ -475,6 +442,7 @@ class Optimizer(object):
     
         def trust_fun(L):
             N = norm(solver(L)[0])
+            print "\rHessian diagonal scaling = %.1e: found length %.1e" % (1+L**2,N),
             return (N - trust)**2
 
         bump = False
@@ -486,7 +454,7 @@ class Optimizer(object):
             LOpt = optimize.brent(trust_fun,brack=(0.0,3.0),tol=1e-4)
             dx, expect = solver(LOpt)
             dxnorm = norm(dx)
-            print "Levenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)
+            print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)
         return dx, expect, bump
 
     def NewtonRaphson(self):

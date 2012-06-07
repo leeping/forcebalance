@@ -14,7 +14,7 @@ call the modified GROMACS to compute the objective function for us.
 
 import os
 import shutil
-from nifty import col, flat, floatornan, remove_if_exists
+from nifty import col, flat, floatornan, remove_if_exists, warn_press_key, _exec
 from numpy import append, array, mat, zeros
 from gmxio import gmxx2_print, rm_gmx_baks
 from re import match
@@ -106,16 +106,20 @@ class AbInitio_GMXX2(AbInitio):
 
         """
         abstempdir = os.path.join(self.root,self.tempdir)
+        if options['gmxpath'] == None or options['gmxsuffix'] == None:
+            warn_press_key('Please set the options gmxpath and gmxsuffix in the input file!')
+        if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
+            warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
         os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
         os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
         os.symlink(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
         # Link the run files
-        os.symlink(os.path.join(self.root,self.simdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
         # Write the trajectory to the temp-directory
         self.traj.write(os.path.join(abstempdir,"all.gro"))
-        os.symlink(os.path.join(self.root,self.simdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","topol.top"),os.path.join(abstempdir,"topol.top"))
         # Print out the first conformation in all.gro to use as conf.gro
         self.traj.write(os.path.join(abstempdir,"conf.gro"),select=[0])
         if self.qmboltz > 0.0:
@@ -206,7 +210,7 @@ class AbInitio_GMXX2(AbInitio):
             remove_if_exists("NoDerivatives")
         else:
             with open("NoDerivatives",'w') as f: f.close()
-        print "GMXX2: %s\r" % self.name,
+        print "\rGMXX2: %s\r" % self.name,
         self.callgmxx2()
         # Parse the output files
         for line in open('e2f2bc').readlines():
@@ -248,5 +252,7 @@ class AbInitio_GMXX2(AbInitio):
         """ Call the modified GROMACS! """
         rm_gmx_baks('.')
         # Call grompp followed by mdrun.
-        o, e = subprocess.Popen(["./grompp", "-f", "shot.mdp"],stdout=PIPE,stderr=PIPE).communicate()
-        o, e = subprocess.Popen(["./mdrun", "-fortune", "-o", "shot.trr", "-rerun", "all.gro", "-rerunvsite"], stdout=PIPE, stderr=PIPE).communicate()
+        _exec(["./grompp", "-f", "shot.mdp"], print_command=False)
+        _exec(["./mdrun", "-fortune", "-o", "shot.trr", "-rerun", "all.gro", "-rerunvsite"], print_command=False)
+        #o, e = subprocess.Popen(["./grompp", "-f", "shot.mdp"],stdout=PIPE,stderr=PIPE).communicate()
+        #o, e = subprocess.Popen(["./mdrun", "-fortune", "-o", "shot.trr", "-rerun", "all.gro", "-rerunvsite"], stdout=PIPE, stderr=PIPE).communicate()
