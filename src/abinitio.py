@@ -87,6 +87,8 @@ class AbInitio(FittingSimulation):
         self.all_at_once   = sim_opts['all_at_once']
         ## OpenMM-only option - whether to run the energies and forces internally.
         self.run_internal  = sim_opts['run_internal']
+        ## Whether we have virtual sites (set at the global option level)
+        self.have_vsite    = options['have_vsite']
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -110,6 +112,7 @@ class AbInitio(FittingSimulation):
         self.natoms      = 0
         ## Qualitative Indicator: average energy error (in kJ/mol)
         self.e_err = 0.0
+        self.e_err_pct = None
         ## Qualitative Indicator: average force error (fractional)
         self.f_err = 0.0
         ## Qualitative Indicator: "relative RMS" for electrostatic potential
@@ -120,10 +123,53 @@ class AbInitio(FittingSimulation):
             self.ns = len(self.traj)
         else:
             self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))[:self.ns]
+        ## The number of (atoms + drude particles + virtual sites)
+        self.nparticles  = len(self.traj.elem)
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,sim_opts)
+        ## The below two options are related to whether we want to rebuild virtual site positions.
+        ## Rebuild the distance matrix if virtual site positions have changed
+        self.new_vsites = True
+        ## Save the mvals from the last time we updated the vsites.
+        self.save_vmvals = {}
+
+    def build_invdist(self, mvals):
+        for i in range(self.FF.np):
+            if 'VSITE' in self.FF.plist[i]:
+                if i in self.save_vmvals and mvals[i] != self.save_vmvals[i]:
+                    self.new_vsites = True
+                    break
+        if not self.new_vsites: return self.invdists
+        if any(['VSITE' in i for i in self.FF.map.keys()]) or self.have_vsite:
+            print "\rGenerating virtual site positions.%s" % (" "*30),
+            pvals = self.FF.make(mvals,self.usepvals)
+            self.generate_vsite_positions()
+        # prepare the distance matrix for esp computations
+        if len(self.espxyz) > 0:
+            invdists = []
+            print "\rPreparing the distance matrix... it will have %i * %i * %i = %i elements" % (self.ns, self.nesp, self.nparticles, self.ns * self.nesp * self.nparticles),
+            sn = 0
+            for espset, xyz in zip(self.espxyz, self.traj.xyzs):
+                print "\rGenerating ESP distances for snapshot %i%s" % (sn, " "*50),
+                esparr = array(espset).reshape(-1,3)
+                # Create a matrix with Nesp rows and Natoms columns.
+                DistMat = array([[linalg.norm(i - j) for j in xyz] for i in esparr])
+                #print "DistMat min/max: % .3f % .3f" % (min(flat(DistMat)), max(flat(DistMat)))
+                # xyztest = ['%i' % (self.nesp + self.nparticles),'Testing ESP for frame number %i' % sn]
+                # for i, x in enumerate(xyz):
+                #     xyztest.append(format_xyz_coord(sub('[0-9]','',self.FF.atomnames[i]),x))
+                # for i in esparr:
+                #     xyztest.append(format_xyz_coord("He",i))
+                #with open('test.xyz','w' if sn == 0 else 'a') as f: f.writelines([l+'\n' for l in xyztest])
+                invdists.append(1. / (DistMat / bohrang))
+                sn += 1
+        for i in range(self.FF.np):
+            if 'VSITE' in self.FF.plist[i]:
+                self.save_vmvals[i] = mvals[i]
+        self.new_vsites = False
+        return array(invdists)
 
     def read_reference_data(self):
         
@@ -209,24 +255,6 @@ class AbInitio(FittingSimulation):
         self.fqm *= fqcgmx
         self.natoms = self.fqm.shape[1]/3
         self.nesp = len(self.espval[0]) if len(self.espval) > 0 else 0
-        # prepare the distance matrix for esp computations
-        if len(self.espxyz) > 0:
-            self.invdists = []
-            print "Preparing the distance matrix... it will have %i elements" % (self.ns * self.nesp * self.natoms)
-            sn = 0
-            for espset, xyz in zip(self.espxyz, self.traj.xyzs):
-                print "\rGenerating ESP distances for snapshot %i" % sn,
-                esparr = array(espset).reshape(-1,3)
-                # Create a matrix with Nesp rows and Natoms columns.
-                DistMat = array([[linalg.norm(i - j) for j in xyz] for i in esparr])
-                xyztest = ['%i' % (self.nesp + self.natoms),'Testing ESP for frame number %i' % sn]
-                for i, x in enumerate(xyz):
-                    xyztest.append(format_xyz_coord(sub('[0-9]','',self.FF.atomnames[i]),x))
-                for i in esparr:
-                    xyztest.append(format_xyz_coord("He",i))
-                #with open('test.xyz','w' if sn == 0 else 'a') as f: f.writelines([l+'\n' for l in xyztest])
-                self.invdists.append(1. / (DistMat / bohrang))
-                sn += 1
         # Here we may choose a subset of atoms to do the force matching.
         if self.fitatoms == 0:
             self.fitatoms = self.natoms
@@ -285,9 +313,12 @@ class AbInitio(FittingSimulation):
     def indicate(self):
         print "Sim: %-15s" % self.name, 
         if self.energy or self.force:
-            print "Energy error (kJ/mol) = %10.4f Force error (%%) = %10.4f" % (self.e_err, self.f_err*100), 
+            if self.e_err_pct == None:
+                print "Energy error (kJ/mol) = %8.4f Force error (%%) = %8.4f" % (self.e_err, self.f_err*100), 
+            else:
+                print "Energy error = %8.4f kJ/mol (%.4f%%) Force error (%%) = %8.4f" % (self.e_err, self.e_err_pct*100, self.f_err*100), 
         if self.resp:
-            print "ESP_err (%%) = %10.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
+            print "ESP_err (%%) = %8.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
         print
 
     def get_energy_force_no_covariance_(self, mvals, AGrad=False, AHess=False):
@@ -334,8 +365,8 @@ class AbInitio(FittingSimulation):
         @todo Parallelization over snapshots is not implemented yet
 
         @param[in] mvals Mathematical parameter values
-        @param[in] AGrad Switch to turn on analytic gradient, useless here
-        @param[in] AHess Switch to turn on analytic Hessian, useless here
+        @param[in] AGrad Switch to turn on analytic gradient
+        @param[in] AHess Switch to turn on analytic Hessian
         @return Answer Contribution to the objective function
         """
         Answer = {}
@@ -377,6 +408,7 @@ class AbInitio(FittingSimulation):
         Q = zeros(NCP1,dtype=float)
         # Derivatives
         M_p     = zeros((np,NCP1),dtype=float)
+        M_pp    = zeros((np,NCP1),dtype=float)
         # Mean quantities
         M0_M    = zeros(NCP1,dtype=float)
         X0_M    = zeros(NCP1,dtype=float)
@@ -389,6 +421,8 @@ class AbInitio(FittingSimulation):
         # Means of gradients
         M0_M_p  = zeros((np,NCP1),dtype=float)
         M0_Q_p  = zeros((np,NCP1),dtype=float)
+        M0_M_pp = zeros((np,NCP1),dtype=float)
+        M0_Q_pp = zeros((np,NCP1),dtype=float)
         # Objective functions
         SPiXi = zeros(NCP1,dtype=float)
         SRiXi = zeros(NCP1,dtype=float)
@@ -405,11 +439,12 @@ class AbInitio(FittingSimulation):
         QBN = dot(self.qmboltz_wts[:ns],self.whamboltz_wts[:ns])
         if AGrad and self.all_at_once:
             dM_all = zeros((ns,np,NCP1),dtype=float)
+            ddM_all = zeros((ns,np,NCP1),dtype=float)
         #==============================================================#
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
         if self.all_at_once:
-            print "Executing\r",
+            print "\rExecuting\r",
             M_all = self.energy_force_driver_all()
             if AGrad or AHess:
                 def callM(mvals_):
@@ -417,11 +452,11 @@ class AbInitio(FittingSimulation):
                     pvals = self.FF.make(mvals_, self.usepvals)
                     return self.energy_force_driver_all()
                 for p in range(np):
-                    dM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)[0]
+                    dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
             # Dump energies and forces to disk.
             savetxt('M.txt',M_all)
         for i in range(ns):
-            print "Incrementing quantities for snapshot %i\r" % i,
+            print "\rIncrementing quantities for snapshot %i\r" % i,
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
             Z  += P
@@ -455,19 +490,23 @@ class AbInitio(FittingSimulation):
                 if not AGrad: continue
                 if self.all_at_once:
                     M_p[p] = dM_all[i, p]
+                    M_pp[p] = ddM_all[i, p]
                 else:
                     def callM(mvals_):
                         print "\r",
                         pvals = self.FF.make(mvals_, self.usepvals)
                         return self.energy_force_driver(i)
-                    M_p[p] = f1d2p(fdwrap(callM, mvals, p), h = self.h)
+                    M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                 M0_M_p[p]  += P * M_p[p]
                 M0_Q_p[p]  += R * M_p[p]
+                M0_M_pp[p] += P * M_pp[p]
+                M0_Q_pp[p] += R * M_pp[p]
                 Xi_p        = 2 * X * M_p[p]
                 SPiXi_p[p] += P * Xi_p
                 SRiXi_p[p] += R * Xi_p
                 if not AHess: continue
-                Xi_pq       = 2 * M_p[p] * M_p[p]
+                M_pp[p] = ddM_all[i, p]
+                Xi_pq       = 2 * (M_p[p] * M_p[p] + X * M_pp[p])
                 SPiXi_pq[p,p] += P * Xi_pq
                 SRiXi_pq[p,p] += R * Xi_pq
                 for q in range(p):
@@ -507,8 +546,8 @@ class AbInitio(FittingSimulation):
             X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1)
             X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1)
             if not AHess: continue
-            X2_M_pq[p,p] = weighted_variance(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],NCP1)
-            X2_Q_pq[p,p] = weighted_variance(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],NCP1)
+            X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1)
+            X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1)
             for q in range(p):
                 X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1)
                 X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1)
@@ -535,11 +574,12 @@ class AbInitio(FittingSimulation):
         E0_Q = (2*Q0_Q[0]*M0_Q[0] - Q0_Q[0]*Q0_Q[0] - M0_Q[0]*M0_Q[0])/Y/Y;
         E     = MBP * sqrt(SPiXi[0]/Z + E0_M) + QBP * sqrt(SRiXi[0]/Y + E0_Q)
         # Fractional energy error.
-        Efrac = MBP * sqrt(SPiXi[0]/QQ_M[0]) + QBP * sqrt(SRiXi[0]/QQ_Q[0])
+        Efrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
         # Fractional force error.
         F     = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,NCP1)]))) + \
                 QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,NCP1)])))
         self.e_err = E
+        self.e_err_pct = Efrac
         self.f_err = F
         Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
@@ -600,8 +640,8 @@ class AbInitio(FittingSimulation):
         @todo Parallelization over snapshots is not implemented yet
 
         @param[in] mvals Mathematical parameter values
-        @param[in] AGrad Switch to turn on analytic gradient, useless here
-        @param[in] AHess Switch to turn on analytic Hessian, useless here
+        @param[in] AGrad Switch to turn on analytic gradient
+        @param[in] AHess Switch to turn on analytic Hessian
         @return Answer Contribution to the objective function
         """
         Answer = {}
@@ -750,7 +790,7 @@ class AbInitio(FittingSimulation):
         # QQ both need to be divided by Z to be truly "averaged", but  #
         # since we're dividing them, the Z cancels out.                #
         #==============================================================#
-        Efrac = MBP * sqrt(SPiXi[0,0]/QQ_M[0,0]) + QBP * sqrt(SRiXi[0,0]/QQ_Q[0,0])
+        Efrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
         #==============================================================#
         # Fractional force error; this is the internal force error,    #
         # and for us this only means it is Boltzmann-averaged, because #
@@ -765,6 +805,7 @@ class AbInitio(FittingSimulation):
         #        End of the copied code        #
         #======================================#
         self.e_err = E
+        self.e_err_pct = Efrac
         self.f_err = F
         Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         return Answer
@@ -776,6 +817,10 @@ class AbInitio(FittingSimulation):
             AHess = False
         Answer = {}
         pvals = self.FF.make(mvals,self.usepvals)
+
+        # Build the distance matrix for ESP fitting.
+        self.invdists = self.build_invdist(mvals)
+
         ns = self.ns
         np = self.FF.np
         Z = 0
@@ -783,20 +828,35 @@ class AbInitio(FittingSimulation):
         def getqatoms(mvals_):
             """ This function takes the mathematical parameter values and returns the charges on the ATOMS (fancy mapping going on) """
             print "\r",
+            # Need to update the positions of atoms, if there are virtual sites.
             pvals = self.FF.create_pvals(mvals_)
             qvals = [pvals[i] for i in self.FF.qmap]
-            qatoms = zeros(self.natoms)
+            # All of a sudden I need the number of virtual sites.
+            qatoms = zeros(self.nparticles)
             for i, jj in enumerate(self.FF.qid):
                 for j in jj:
                     qatoms[j] = qvals[i]
             return qatoms
+
         # Obtain a derivative matrix the stupid way
         if AGrad:
+            # dqPdqM = []
+            # for i in range(np):
+            #     print "Now working on parameter number", i
+            #     dqPdqM.append(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0])
+            # dqPdqM = mat(dqPdqM).T
             dqPdqM = mat([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(np)]).T
         xyzs = array(self.traj.xyzs)
         espqvals = array(self.espval)
         espxyz   = array(self.espxyz)
 
+        ddVdqPdVS = {}
+        # Second derivative of the inverse distance matrix with respect to the virtual site position
+        dddVdqPdVS2 = {}
+        if AGrad:
+            for p in range(np):
+                if 'VSITE' in self.FF.plist[p]:
+                    ddVdqPdVS[p], dddVdqPdVS2[p] = f12d3p(fdwrap(self.build_invdist,mvals,p), h = self.h, f0 = self.invdists)
         X = 0
         D = 0
         G = zeros(np, dtype=float)
@@ -812,9 +872,14 @@ class AbInitio(FittingSimulation):
             D      += P * (dot(espqval, espqval) / self.nesp - (sum(espqval) / self.nesp)**2)
             if AGrad:
                 dVdqM   = (dVdqP * dqPdqM).T
+                for p, vsd in ddVdqPdVS.items():
+                    dVdqM[p,:] += flat(vsd[i] * col(getqatoms(mvals)))
                 G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
                 if AHess:
-                    H      += array(P * 2 * dVdqM * dVdqM.T) / self.nesp
+                    d2VdqM2 = zeros(dVdqM.shape, dtype=float)
+                    for p, vsd in dddVdqPdVS2.items():
+                        d2VdqM2[p,:] += flat(vsd[i] * col(getqatoms(mvals)))
+                    H      += array(P * 2 * (dVdqM * dVdqM.T + d2VdqM2 * col(desp))) / self.nesp
         # Redundant but we keep it anyway
         D /= Z
         X /= Z
@@ -839,6 +904,7 @@ class AbInitio(FittingSimulation):
             G += flat(dqPdqM.T * col(dR))
             if AHess:
                 H += diag(flat(dqPdqM.T * col(ddR)))
+            
         Answer = {'X':X,'G':G,'H':H}
         return Answer
 
@@ -879,6 +945,19 @@ def weighted_variance(SPiXi,WCiW,Z,L,R,NCP1):
     XiZ       = SPiXi/Z
     # Subtract out the average energy.
     XiZ[0] -= (L[0] * R[0])/Z/Z
+    # Return the answer.
+    X2      = dot(XiZ.flatten(),WCiW.flatten())
+    return X2
+
+def weighted_variance2(SPiXi,WCiW,Z,L,R,L2,R2,NCP1):
+    """ A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements. """
+    # These are the functions that we are building.
+    X2        = 0.0
+    # Divide by Z to normalize
+    XiZ       = SPiXi/Z
+    # Subtract out the average energy.
+    XiZ[0] -= (L[0] * R[0])/Z/Z
+    XiZ[0] -= (L2[0] * R2[0])/Z/Z
     # Return the answer.
     X2      = dot(XiZ.flatten(),WCiW.flatten())
     return X2

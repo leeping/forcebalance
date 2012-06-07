@@ -11,12 +11,13 @@ import numpy as np
 def main():
     ## Set some basic options.  Note that 'forcefield' requires 'ffdir'
     ## which indicates the relative path of the force field.
-    options = {'forcefield':argv[1:],
+    options = {'forcefield':[argv[1]],
                'ffdir':'',
-               'priors':{}}
+               'priors':{},
+               'constrain_charge':True}
     MyFF = FF(options)
     
-    Prec=3
+    Prec=int(argv[2])
     MyFF.make(np.zeros(len(MyFF.pvals0)),False,'NewFF',precision=Prec)
 
 if __name__ == "__main__":

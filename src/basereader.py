@@ -5,6 +5,7 @@
 """
 
 from re import split, findall
+from collections import OrderedDict
 
 class BaseReader(object):
     """ The 'reader' class.  It serves two main functions:
@@ -26,6 +27,10 @@ class BaseReader(object):
         self.itype  = fnm
         self.suffix = ''
         self.pdict  = {}
+        ## The mapping of (this residue, atom number) to (atom name) for building atom-specific interactions in [ bonds ], [ angles ] etc.
+        self.adict  = OrderedDict()
+        ## The listing of 'RES:ATOMNAMES' for atom names in the line
+        self.resatom = []
 
     def Split(self, line):
         return line.split()

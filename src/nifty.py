@@ -444,24 +444,31 @@ def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_c
         if print_to_file:
             print >> f, "Executing process: %s%s" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
     if stdin == None:
-        p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = STDOUT)
+        p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = PIPE)
         if print_to_screen:
             Output = []
+            Error = []
             while True:
                 line = p.stdout.readline()
+                try:
+                    Error.append(p.stderr.readline())
+                except: pass
                 if not line:
                     break
                 print line,
             Output.append(line)
+            print Error
         else:
-            Output, _ = p.communicate()
+            Output, Error = p.communicate()
     else:
-        p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = PIPE, stderr = STDOUT)
-        Output, _ = p.communicate(stdin)
+        p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = PIPE, stderr = PIPE)
+        Output, Error = p.communicate(stdin)
     if logfnm != None:
         f.write(Output)
         f.close()
     if p.returncode != 0:
+        print "Received an error message:"
+        print Error
         warn_press_key("%s gave a return code of %i (it may have crashed)" % (command, p.returncode))
     return Output
 
@@ -473,7 +480,7 @@ def warn_press_key(warning):
             print line
     else:
         print "You're not supposed to pass me a variable of this type:", type(warning)
-    print "Press any key (I assume no responsibility for what happens after this!)"
+    print "\x1b[1;91mPress any key (I assume no responsibility for what happens after this!)\x1b[0m"
     raw_input()
 
 #=========================================#

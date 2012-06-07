@@ -4,7 +4,7 @@ This is in a separate file to facilitate importing.  I would happily put it some
 
 """
 
-from gmxio import AbInitio_GMX
+from gmxio import AbInitio_GMX, Interaction_GMX
 from tinkerio import AbInitio_TINKER
 from openmmio import AbInitio_OpenMM, Liquid_OpenMM
 from abinitio_gmxx2 import AbInitio_GMXX2
@@ -15,6 +15,7 @@ from amberio import AbInitio_AMBER
 ## The table of fitting simulations
 SimTab = {
     'ABINITIO_GMX':AbInitio_GMX,
+    'INTERACTION_GMX':Interaction_GMX,
     'ABINITIO_TINKER':AbInitio_TINKER,
     'ABINITIO_OPENMM':AbInitio_OpenMM,
     'ABINITIO_AMBER':AbInitio_AMBER,
