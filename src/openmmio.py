@@ -44,6 +44,85 @@ suffix_dict = { "HarmonicBondForce.Bond" : ["class1","class2"],
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
 
+def liquid_energy_driver(mvals,pdb,FF,xyzs,settings,platform,boxes=None,verbose=False):
+
+   """
+   Compute a set of snapshot energies as a function of the force field parameters.
+
+   This is a combined OpenMM and ForceBalance function.  Note (importantly) that this
+   function creates a new force field XML file in the run directory.
+
+   ForceBalance creates the force field, OpenMM reads it in, and we loop through the snapshots
+   to compute the energies.
+   
+   @todo I should be able to generate the OpenMM force field object without writing an external file.
+   @todo This is a sufficiently general function to be merged into openmmio.py?
+   @param[in] mvals Mathematical parameter values
+   @param[in] pdb OpenMM PDB object
+   @param[in] FF ForceBalance force field object
+   @param[in] xyzs List of OpenMM positions
+   @param[in] settings OpenMM settings for creating the System
+   @param[in] boxes Periodic box vectors
+   @return E A numpy array of energies in kilojoules per mole
+
+   """
+   # Print the force field XML from the ForceBalance object, with modified parameters.
+   FF.make(mvals)
+   # Load the force field XML file to make the OpenMM object.
+   forcefield = ForceField(sys.argv[2])
+   # Create the system, setup the simulation.
+   system = forcefield.createSystem(pdb.topology, **settings)
+   integrator = openmm.LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+   simulation = Simulation(pdb.topology, system, integrator, platform)
+   E = []
+   # Loop through the snapshots
+   if boxes == None:
+       for xyz in xyzs:
+          # Set the positions and the box vectors
+          simulation.context.setPositions(xyz)
+          # Compute the potential energy and append to list
+          Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+          E.append(Energy)
+   else:
+       for xyz,box in zip(xyzs,boxes):
+          # Set the positions and the box vectors
+          simulation.context.setPositions(xyz)
+          simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
+          # Compute the potential energy and append to list
+          Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+          E.append(Energy)
+   print "\r",
+   if verbose: print E
+   return np.array(E)
+
+def liquid_energy_derivatives(mvals,h,pdb,FF,xyzs,settings,platform,boxes=None):
+
+   """
+   Compute the first and second derivatives of a set of snapshot
+   energies with respect to the force field parameters.
+
+   This basically calls the finite difference subroutine on the
+   energy_driver subroutine also in this script.
+
+   @todo This is a sufficiently general function to be merged into openmmio.py?
+   @param[in] mvals Mathematical parameter values
+   @param[in] pdb OpenMM PDB object
+   @param[in] FF ForceBalance force field object
+   @param[in] xyzs List of OpenMM positions
+   @param[in] settings OpenMM settings for creating the System
+   @param[in] boxes Periodic box vectors
+   @return G First derivative of the energies in a N_param x N_coord array
+   @return Hd Second derivative of the energies (i.e. diagonal Hessian elements) in a N_param x N_coord array
+
+   """
+
+   G        = np.zeros((FF.np,len(xyzs)))
+   Hd       = np.zeros((FF.np,len(xyzs)))
+   E0       = energy_driver(mvals, pdb, FF, xyzs, settings, boxes)
+   for i in range(FF.np):
+      G[i,:], Hd[i,:] = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,boxes=boxes),h,f0=E0)
+   return G, Hd
+
 class OpenMM_Reader(BaseReader):
     """ Class for parsing OpenMM force field files. """
     def __init__(self,fnm):
@@ -76,20 +155,21 @@ class Liquid_OpenMM(Liquid):
         os.symlink(os.path.join(self.root,self.simdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
         os.symlink(os.path.join(self.root,self.simdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
 
-    def execute(self, temperature, run_dir):
+    def run_npt_simulation(self, temperature, run_dir):
         """ Submit a NPT simulation to the Work Queue. """
         link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
         queue_up(self.wq,
                  command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
-                 input_files = [(os.path.join(run_dir,'runcuda.sh'),'runcuda.sh'),
-                                (os.path.join(run_dir,'npt.py'),'npt.py'),
-                                (os.path.join(run_dir,'conf.pdb'),'conf.pdb'),
-                                (os.path.join(run_dir,'mono.pdb'),'mono.pdb'),
-                                (os.path.join(run_dir,'forcebalance.p'),'forcebalance.p')],
-                 output_files = [#(os.path.join(run_dir,'dynamics.dcd'),'dynamics.dcd'),
-                                 (os.path.join(run_dir,'npt_result.p'),'npt_result.p'),
-                                 (os.path.join(run_dir,'npt.out'),'npt.out'),
-                                 (os.path.join(run_dir,'%s' % self.FF.fnms[0]),self.FF.fnms[0])])
+                 input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
+                 output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
+
+    def evaltraj_(self, temperature, run_dir):
+        """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
+        link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+        queue_up(self.wq,
+                 command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
+                 input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
+                 output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
                        
 class AbInitio_OpenMM(AbInitio):
 

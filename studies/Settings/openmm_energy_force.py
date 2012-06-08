@@ -7,6 +7,9 @@ import numpy as np
 import sys
 import pickle
 
+# This file might be deprecated because ForceBalance can call OpenMM library functions directly,
+# but we're retaining it here for reference.
+
 def main():
     ################################################
     # OpenMM Script for Computing Energy and Force #
