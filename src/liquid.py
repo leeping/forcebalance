@@ -218,9 +218,9 @@ class Liquid(FittingSimulation):
         wq_wait(self.wq)
 
         # Gather the calculation data
-        Results = {T : lp_load(open('./%.1f/npt_result.p' % T)) for T in Temps}
+        Results = {t : lp_load(open('./%.1f/npt_result.p' % T)) for t, T in enumerate(Temps)}
 
-        Rhos, pVs, Energies, Grads, mEnergies, mGrads, Rho_errs, Hvap_errs = ([Results[T][i] for T in Temps] for i in range(8))
+        Rhos, pVs, Energies, Grads, mEnergies, mGrads, Rho_errs, Hvap_errs = ([Results[t][i] for t in range(len(Temps))] for i in range(8))
 
         R  = np.array(list(itertools.chain(*list(Rhos))))
         PV = np.array(list(itertools.chain(*list(pVs))))
@@ -248,7 +248,7 @@ class Liquid(FittingSimulation):
         #     beta = 1. / (kb * T)
         #     for k in range(len(Temps)):
         #         U_kln[k, m, :]   = Energies[k]
-        #         U_kln[k, m, :]  *= beta
+        #         U_kln[k, m,: ]  *= beta
         #         mU_kln[k, m, :]  = mEnergies[k]
         #         mU_kln[k, m, :] *= beta
         ###
@@ -260,11 +260,11 @@ class Liquid(FittingSimulation):
         self.SavedMVal[IterNow] = mvals.copy()
         ## Evaluated gradients for all trajectories (i.e. all iterations and all temperatures) using current mvals
         ## This should be reinitialized at every iteration.
-        AllGradient = defaultdict(dict)
-        for T in Temps:
-            self.SavedTraj[IterNow][T] = NPT_Trajectory(os.path.abspath('%.1f' % T), *[Results[T][i] for i in range(8)])
-            self.MBarEnergy[IterNow][T][IterNow] = self.SavedTraj[IterNow][T].Energies.copy()
-            AllGradient[IterNow][T] = self.SavedTraj[IterNow][T].Grads.copy()
+        AllGDict = defaultdict(dict)
+        for Tidx, Temp in enumerate(Temps):
+            self.SavedTraj[IterNow][Tidx] = NPT_Trajectory(os.path.abspath('%.1f' % Temp), *[Results[Tidx][i] for i in range(8)])
+            self.MBarEnergy[IterNow][Tidx][IterNow] = np.array(self.SavedTraj[IterNow][Tidx].Energies).copy()
+            AllGDict[IterNow][Tidx] = np.array(self.SavedTraj[IterNow][Tidx].Grads).copy()
         # This is so I can use concurrent_map.
         def _func(args):
             # Arguments:
@@ -273,30 +273,41 @@ class Liquid(FittingSimulation):
             # The file name of the saved trajectory.
             # The mathematical parameter values to evaluate the energies with.
             # Boolean for gradient or energy evaluation.
-            Dict    = args[0]
-            Elem    = args[1]
-            TrajFnm = args[2]
-            MVals   = args[3]
-            bGrad   = args[4]
-            Dict[Elem] = self.evaluate_trajectory(TrajFnm, MVals, bGrad)
+            Dict     = args[0]
+            Name     = args[1]
+            Elem     = args[2]
+            TrajFnm  = args[3]+'/dynamics.dcd'
+            MVals    = args[4]
+            bGrad    = args[5]
+            Dict[Elem] = self.evaluate_trajectory(Name, TrajFnm, MVals, bGrad)
         _data = []
         # Build gradients and energy dictionaries
-        for DynIter in self.SavedMVal:
-            for DynTemp in Temps:
-                if DynTemp not in self.AllGradient[DynIter][DynTemp]:
+        for DynIter, DynMval in enumerate(self.SavedMVal):
+            for DynTidx, DynTemp in enumerate(Temps):
+                print "Checking force field %i, temperature % .1f" % (DynIter, DynTemp)
+                if DynTidx not in AllGDict[DynIter]:
                     print "Evaluating gradients for snapshots sampled using force field %i at temperature % .1f, using current force field" % (DynIter, DynTemp)
                     # The energy gradients are evaluated for the current force field for all trajectories.
-                    #AllGradient[DynIter][DynTemp] = self.evaluate_trajectory_gradient(self.SavedTraj[DynIter,DynTemp].fnm, mvals)
-                    _data.append((AllGradient[DynIter], DynTemp, self.SavedTraj[DynIter,DynTemp].fnm, mvals, True))
-                for EvalIter in self.SavedMVal:
-                    if EvalIter not in self.MBarEnergy[DynIter][DynTemp]:
+                    #AllGDict[DynIter][DynTemp] = self.evaluate_trajectory_gradient(self.SavedTraj[DynIter,DynTemp].fnm, mvals)
+                    Name = 'Gradient.%i.%i' % (DynIter, DynTidx)
+                    _data.append((AllGDict[DynIter], Name, DynTidx, self.SavedTraj[DynIter][DynTidx].fnm, mvals, True))
+                for EvalIter, EvalMval in enumerate(self.SavedMVal):
+                    print "Checking force field %i for evaluation" % EvalIter
+                    if EvalIter not in self.MBarEnergy[DynIter][DynTidx]:
                         print "Evaluating energies for snapshots sampled using force field %i at temperature % .1f, using force field %i" % (DynIter, DynTemp, EvalIter)
-                        #self.MBarEnergy[DynIter][DynTemp][EvalIter] = self.evaluate_trajectory_energy(self.SavedTraj[DynIter,DynTemp].fnm, self.SavedMVal[EvalIter])
-                        _data.append((self.MBarEnergy[DynIter][DynTemp], EvalIter, self.SavedTraj[DynIter,DynTemp].fnm, self.SavedMVal[EvalIter], False))
+                        Name = 'Energy.%i.%i.%i' % (DynIter, DynTidx, EvalIter)
+                        _data.append((self.MBarEnergy[DynIter][DynTidx], Name, EvalIter, self.SavedTraj[DynIter][DynTidx].fnm, self.SavedMVal[EvalIter], False))
         # If this doesn't work, I'm going to be hella pissed.
-        print _data
-        raw_input()
+        for d in _data:
+            print d[1:]
+        if len(_data) >= 1:
+            raw_input()
+        # Run all of the MBAR stuff on the cluster in the 'mbar' subdirectory.
+        if not os.path.exists('evaltraj'):
+            os.makedirs('evaltraj')
+        os.chdir('evaltraj')
         concurrent_map(_func, _data)
+        os.chdir('..')
 
         INP1 = IterNow + 1
         Dim1 = Sims * INP1
@@ -306,26 +317,47 @@ class Liquid(FittingSimulation):
         # We can combine a finite number of generations if we want to (leave for later).
         N_k = np.ones(Dim1)*Shots
         U_kln = np.zeros([Dim1,Dim1,Shots], dtype = np.float64)
-        mU_kln = np.zeros([Dim1,Dim1,Shots], dtype = np.float64)
         for DynIter in range(INP1):
-            for DynTempIdx, DynTemp in enumerate(Temps): # Not a temperature per se, but an index.
-                RowIdx = DynIter*Sims + DynTempIdx
+            for DynTidx, DynTval in enumerate(Temps): # Not a temperature per se, but an index.
+                RowIdx = DynIter*Sims + DynTidx
                 for EvalIter in range(INP1):
-                    for EvalTempIdx, EvalTemp in enumerate(Temps):
-                        ColIdx = EvalIter*Sims + EvalTempIdx
-                        U_kln[RowIdx, ColIdx, :] = self.MBarEnergy[DynIter][DynTemp][EvalIter] / (kb*EvalTemp)
+                    for EvalTidx, EvalTval in enumerate(Temps):
+                        ColIdx = EvalIter*Sims + EvalTidx
+                        U_kln[RowIdx, ColIdx, :] = self.MBarEnergy[DynIter][DynTidx][EvalIter] / (kb*EvalTval)
         # Result: Bunch of Boltzmann weights for all simulations at all temperatures.  Size would be 300 * (300*5000)  
         # After we're done, we should only be interested in some of the Boltzmann weights; in particular
         # the ones corresponding to the last iteration of the force field at all temperatures
         # :Sims * (IterNow - 1) : Sims * (IterNow)
         mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
         W1 = mbar.getWeights()
-        ###
-
-        mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
-        mmbar = pymbar.MBAR(mU_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
-        W1 = mbar.getWeights()
+        AllG = np.hstack((list(itertools.chain(*[[AllGDict[i][j] for j in range(Sims)] for i in range(INP1)]))))
+        print AllG.shape
+        print W1.shape
+        # Get WHAM weights for monomers.
+        # We don't need to go through the force field history for the monomers
+        # since their uncertainties are awfully darn small.
+        mN_k = np.ones(Sims)*Shots
+        # Use the value of the energy for snapshot t from simulation k at potential m
+        mU_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
+        ## This fills out a 'square' in the matrix with 30 trajectories and 30 temperatures
+        for m, T in enumerate(Temps):
+            beta = 1. / (kb * T)
+            for k in range(len(Temps)):
+                mU_kln[k, m, :]  = mEnergies[k]
+                mU_kln[k, m, :] *= beta
+        mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8)
         mW1 = mmbar.getWeights()
+        
+        #raw_input()
+
+        #BigG = hstack((*list(itertools.chain([list(itertools.chain([AllGDict[i][j] for j in range(Sims)])) for i in range(INP1)]))))
+        #print AllG.shape
+        ###
+        G = AllG.copy()
+        # mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
+        # mmbar = pymbar.MBAR(mU_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
+        # W1 = mbar.getWeights()
+        # mW1 = mmbar.getWeights()
         
         for i, T in enumerate(Temps):
             W = flat(W1[:,i])

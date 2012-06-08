@@ -164,19 +164,24 @@ class Liquid_OpenMM(Liquid):
                  input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                  output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
 
-    def evaluate_trajectory(self, trajectory, mvals, bGradient):
+    def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
         link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
         # We need to do something tricksy to prevent output files from overwriting each other.
-        queue_up(self.wq,
-                 command = './runcuda.sh python evaltraj.py conf.pdb %s %s %s &> evaltraj.out' % (self.FF.fnms[0], trajectory, "True" if bGradient else "False"),
-                 input_files = ['runcuda.sh', 'evaltraj.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p', trajectory],
-                 output_files = ['evaltraj_result.p', 'evaltraj.out', self.FF.fnms[0]])
+        pfx = 'evaltraj_%s' % name
+        infnm = pfx+'.in.p'
+        outfnm = pfx+'.out.p'
+        logfnm = pfx+'.log'
+        with open(infnm,'w') as f: lp_dump((self.FF,mvals,self.h),f)
+        queue_up_src_dest(self.wq, command = './runcuda.sh python evaltraj.py conf.pdb %s trajectory.dcd %s &> evaltraj.log' % (self.FF.fnms[0], "True" if bGradient else "False"),
+                          input_files = [('runcuda.sh','runcuda.sh'), ('evaltraj.py','evaltraj.py'), ('conf.pdb','conf.pdb'),
+                                         (infnm,'forcebalance.p'), (trajpath, 'trajectory.dcd')],
+                          output_files = [('evaltraj_result.p', outfnm), ('evaltraj.log', logfnm)])
         wq.wait(self.wq)
         if bGradient:
-            return lp_load('evaltraj_result.p')[1]
+            return lp_load('%s.out.p' % name)[1]
         else:
-            return lp_load('evaltraj_result.p')[0]
+            return lp_load('evaltraj_%s.out.p' % name)[0]
         
 class AbInitio_OpenMM(AbInitio):
 
