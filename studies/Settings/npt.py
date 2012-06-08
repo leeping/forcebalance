@@ -76,8 +76,8 @@ from forcebalance.openmmio import liquid_energy_driver, liquid_energy_derivative
 # Select run parameters
 timestep = 0.5 * units.femtosecond # timestep for integration
 nsteps = 200                       # number of steps per data record
-nequiliterations = 50             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 500                 # number of iterations to collect data for
+nequiliterations = 5             # number of equilibration iterations (hope 50 ps is enough)
+niterations = 5                  # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -578,7 +578,7 @@ def main():
    nsteps   = 1000                    # number of steps per data record
 
    mpdb = PDBFile('mono.pdb')
-   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False, Trajectory=False)
+   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False, Trajectory=True)
    # Get statistics from our simulation.
    _trash, _crap, mPot_avg, mPot_err, __trash, __crap = analyze(mData)
    # Now that we have the coordinates, we can compute the energy derivatives.
