@@ -12,6 +12,12 @@
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
 #|   this license. (http://www.gnu.org/licenses/gpl-2.0.html)         |#
+#|                                                                    |#
+#|   This program is distributed in the hope that it will be useful,  |#
+#|   but without any warranty; without even the implied warranty of   |#
+#|   merchantability or fitness for a particular purpose.  See the    |#
+#|   GNU General Public License for more details.                     |#
+#|                                                                    |#
 #|   Feedback and suggestions are encouraged.                         |#
 #|                                                                    |#
 #|   What this is for:                                                |#
@@ -26,7 +32,11 @@
 #|                                                                    |#
 #|   Note to self / developers:                                       |#
 #|   Please make this file as standalone as possible                  |#
-#|   (i.e. don't introduce too many dependencies)                     |#
+#|   (i.e. don't introduce dependencies).  If we load an external     |#
+#|   library to parse a file, do so with 'try / except' so that       |#
+#|   the module is still usable even if certain parts are missing.    |#
+#|   It's better to be like a Millennium Falcon. :P                   |#
+#|                                                                    |#
 #|   Please make sure this file is up-to-date in                      |#
 #|   both the 'leeping' and 'forcebalance' modules                    |#
 #|                                                                    |#
@@ -77,7 +87,7 @@
 #======================================================================#
 
 #=========================================#
-#|     DEFINE VARIABLE NAMES HERE        |#
+#|     DECLARE VARIABLE NAMES HERE       |#
 #|                                       |#
 #|  Any member variable in the Molecule  |#
 #| class must be declared here otherwise |#
@@ -125,6 +135,7 @@ QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult'])
 # Superset of all variable names.
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
+# OrderedDict requires Python 2.7 or higher
 import os, sys, re, copy
 import numpy as np
 import imp
@@ -146,13 +157,22 @@ except:
 #| PDB read/write functions |#
 #============================#
 try: from PDB import *
-except: sys.stderr.write('The pdb module cannot be miported (Cannot read/write PDB files)\n')
+except: sys.stderr.write('The pdb module cannot be imported (Cannot read/write PDB files)\n')
 
 #=============================#
 #| Mol2 read/write functions |#
 #=============================#
 try: import Mol2
 except: sys.stderr.write('The Mol2 module cannot be imported (Cannot read/write Mol2 files)\n')
+
+#==============================#
+#| OpenMM interface functions |#
+#==============================#
+try: 
+    from simtk.unit import *
+    from simtk.openmm import *
+    from simtk.openmm.app import *
+except: sys.stderr.write('The OpenMM modules cannot be imported (Cannot interface with OpenMM)\n')
     
 #===========================#
 #| Convenience subroutines |#
@@ -329,7 +349,7 @@ class Molecule(object):
         for key in self.FrameKeys:
             Defined = True
             if L != -1 and len(self.Data[key]) != L:
-                raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two PerFrame member variables.' % (key, klast))
+                raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two FrameKeys member variables.' % (key, klast))
             L = len(self.Data[key])
             klast = key
         if not Defined:
@@ -347,7 +367,7 @@ class Molecule(object):
             for key in self.AtomKeys:
                 Defined = True
                 if L != -1 and len(self.Data[key]) != L:
-                    raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two PerAtom member variables.' % (key, klast))
+                    raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two AtomKeys member variables.' % (key, klast))
                 L = len(self.Data[key])
                 klast = key
             if Defined:
@@ -355,8 +375,8 @@ class Molecule(object):
             elif 'xyzs' in self.Data:
                 return len(self.xyzs[0])
             else:
-                raise Exception('na is ill-defined if the molecule has no PerAtom member variables.')
-        ## These attributes return a list of attribute names defined in this class, that belong in the chosen category.
+                raise Exception('na is ill-defined if the molecule has no AtomKeys member variables.')
+        ## These attributes return a list of attribute names defined in this class that belong in the chosen category.
         ## For example: self.FrameKeys should return set(['xyzs','boxes']) if xyzs and boxes exist in self.Data
         elif key == 'FrameKeys':
             return set(self.Data) & FrameVariableNames
@@ -380,9 +400,8 @@ class Molecule(object):
 
     def __getitem__(self, key):
         """ 
-        The Molecule class has list-like behavior as well.
+        The Molecule class has list-like behavior, so we can get slices of it.
         If we say MyMolecule[0:10], then we'll return a copy of MyMolecule with frames 0 through 9.
-        Hopefully we can put in a lazy iterator someday.
         """
         if isinstance(key, int) or isinstance(key, slice) or isinstance(key,np.ndarray):
             if isinstance(key, int):
@@ -396,6 +415,19 @@ class Molecule(object):
         else:
             raise Exception('getitem is not implemented for keys of type %s' % str(key))
 
+    def __iter__(self, other):
+        """ List-like behavior for looping over trajectories. Note that these values are returned by reference. 
+        Note that this is intended to be more efficient than __getitem__, so when we loop over a trajectory,
+        it's best to go "for m in M" instead of "for i in range(len(M)): m = M[i]"
+        """
+        for frame in range(self.ns):
+            New = Molecule()
+            for k in self.FrameKeys:
+                New.Data[k] = self.Data[k][frame]
+            for k in self.AtomKeys | self.MetaKeys:
+                New.Data[k] = self.Data[k]
+            yield New
+
     def __add__(self,other):
         """ Add method for Molecule objects. """
         # Check type of other
@@ -403,23 +435,23 @@ class Molecule(object):
             raise TypeError('A Molecule instance can only be added to another Molecule instance')
         # Create the sum of the two classes by copying the first class.
         Sum = Molecule()
-        for key in (self.Meta | self.PerAtom):
+        for key in (self.MetaKeys | self.AtomKeys):
             if diff(self, other, key):
                 raise Exception('The data member called %s is not the same for these two objects' % key)
             elif key in self.Data:
                 Sum.Data[key] = copy.deepcopy(self.Data[key])
             elif key in other.Data:
                 Sum.Data[key] = copy.deepcopy(other.Data[key])
-        # PerFrame must be a list.
-        for key in self.PerFrame:
+        # FrameKeys must be a list.
+        for key in self.FrameKeys:
             if both(self, other, key):
                 if type(self.Data[key]) is not list:
-                    raise Exception('Key %s in self is PerFrame, it must be a list' % key)
+                    raise Exception('Key %s in self is a FrameKey, it must be a list' % key)
                 if type(other.Data[key]) is not list:
-                    raise Exception('Key %s in other is PerFrame, it must be a list' % key)
+                    raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
                 Sum.Data[key] = list(self.Data[key] + other.Data[key])
             elif either(self, other, key):
-                raise Exception('Key %s is PerFrame must exist in both self and other for them to be added (for now).')
+                raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).')
         return Sum
  
     def __iadd__(self,other):
@@ -428,22 +460,22 @@ class Molecule(object):
         if not isinstance(other,Molecule):
             raise TypeError('A Molecule instance can only be added to another Molecule instance')
         # Create the sum of the two classes by copying the first class.
-        for key in (self.Meta | self.PerAtom):
+        for key in (self.MetaKeys | self.AtomKeys):
             if diff(self, other, key):
                 raise Exception('The data member called %s is not the same for these two objects' % key)
             # Information from the other class is added to this class (if said info doesn't exist.)
             elif key in other.Data:
                 self.Data[key] = copy.deepcopy(other.Data[key])
-        # PerFrame must be a list.
-        for key in self.PerFrame:
+        # FrameKeys must be a list.
+        for key in self.FrameKeys:
             if both(self, other, key):
                 if type(self.Data[key]) is not list or type(other.Data[key]) is not list:
-                    raise Exception('Key %s in self is PerFrame, it must be a list' % key)
+                    raise Exception('Key %s in self is a FrameKey, it must be a list' % key)
                 if type(other.Data[key]) is not list:
-                    raise Exception('Key %s in other is PerFrame, it must be a list' % key)
+                    raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
                 self.Data[key] += other.Data[key]
             elif either(self, other, key):
-                raise Exception('Key %s is PerFrame must exist in both self and other for them to be added (for now).')
+                raise Exception('Key %s is FrameKeys must exist in both self and other for them to be added (for now).')
         return self
 
     def append(self,other):
@@ -509,15 +541,11 @@ class Molecule(object):
             for key, val in Parsed.items():
                 self.Data[key] = val
             ## Create a list of comment lines if we don't already have them from reading the file.
-            if 'comms' in self.Data:
-                for i in range(len(self.comms)):
-                    if ' : from %s' % fnm not in self.comms[i]:
-                        self.comms[i] += ' : from %s' % fnm
-            else:
+            if 'comms' not in self.Data:
                 self.comms = ['Frame %i of %i : from %s' % (i+1, self.ns, fnm) for i in range(self.ns)]
             ## Make sure the comment line isn't too long
-            for i in range(len(self.comms)):
-                self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
+            # for i in range(len(self.comms)):
+            #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -568,10 +596,10 @@ class Molecule(object):
     #|     For doing useful things       |#
     #=====================================#
 
-    def read_frames(self, fnm):
-        Parsed = self.read(fnm)
-        for key in set(Parsed) & self.PerFrame:
-            self.Data[key] = Parsed[key]
+    def load_frames(self, fnm):
+        NewMol = Molecule(fnm)
+        for key in NewMol.FrameKeys:
+            self.Data[key] = NewMol.Data[key]
 
     def edit_qcrems(self, in_dict, subcalc = None):
         if subcalc == None:
@@ -638,6 +666,20 @@ class Molecule(object):
             for i in range(self.ns):
                 New.xyzs[i] = self.xyzs[i][atomslice]
         return New
+
+    def openmm_positions(self):
+        Positions = []
+        self.require('xyzs')
+        for xyz in self.xyzs:
+            Pos = []
+            for xyzi in xyz:
+                Pos.append(Vec3(xyzi[0]/10,xyzi[1]/10,xyzi[2]/10))
+            Positions.append(Pos*nanometer)
+        return Positions
+
+    def openmm_boxes(self):
+        self.require('boxes')
+        return [(Vec3(box[0]/10,0.0,0.0), Vec3(0.0,box[1]/10,0.0), Vec3(0.0,0.0,box[2]/10)) * nanometer for box in self.boxes]
 
     #=====================================#
     #|         Reading functions         |#

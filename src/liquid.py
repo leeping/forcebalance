@@ -17,6 +17,8 @@ from lxml import etree
 #from forcebalance.wham import WHAM
 from pymbar import pymbar
 import itertools
+from collections import defaultdict, namedtuple
+from optimizer import Counter
 
 def weight_info(W, T, N_k):
     C = []
@@ -30,6 +32,8 @@ def weight_info(W, T, N_k):
     print C
     print "InfoContent: % .1f snapshots (%.2f %%)" % (I, 100*I/len(W))
     return C
+
+NPT_Trajectory = namedtuple('NPT_Trajectory', ['fnm', 'Rhos', 'pVs', 'Energies', 'Grads', 'mEnergies', 'mGrads', 'Rho_errs', 'Hvap_errs'])
 
 class Liquid(FittingSimulation):
     
@@ -61,7 +65,12 @@ class Liquid(FittingSimulation):
         self.natoms      = 0
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,sim_opts)
-
+        ## Saved force field mvals for all iterations
+        self.SavedMVal = {}
+        ## Saved trajectories for all iterations and all temperatures :)
+        self.SavedTraj = defaultdict(dict)
+        ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
+        self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
@@ -229,18 +238,66 @@ class Liquid(FittingSimulation):
 
         Sims = len(Temps)
         Shots = len(Energies[0])
-        N_k = np.ones(Sims)*Shots
-        # Use the value of the energy for snapshot t from simulation k at potential m
-        U_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
-        mU_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
-        ## Okay. This place definitely needs to be improved.  Mao with the plao:
-        for m, T in enumerate(Temps):
-            beta = 1. / (kb * T)
-            for k in range(len(Temps)):
-                U_kln[k, m, :]   = Energies[k]
-                U_kln[k, m, :]  *= beta
-                mU_kln[k, m, :]  = mEnergies[k]
-                mU_kln[k, m, :] *= beta
+        ###
+        # N_k = np.ones(Sims)*Shots
+        # # Use the value of the energy for snapshot t from simulation k at potential m
+        # U_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
+        # mU_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
+        # ## This fills out a 'square' in the matrix with 30 trajectories and 30 temperatures
+        # for m, T in enumerate(Temps):
+        #     beta = 1. / (kb * T)
+        #     for k in range(len(Temps)):
+        #         U_kln[k, m, :]   = Energies[k]
+        #         U_kln[k, m, :]  *= beta
+        #         mU_kln[k, m, :]  = mEnergies[k]
+        #         mU_kln[k, m, :] *= beta
+        ###
+        # Try to build some Inception-type dictionaries here.
+        if Counter() is None:
+            raise Exception('For organizational purposes, liquid property optimization requires an iteration number. (Counter is None)')
+
+        IterNow = Counter()
+        self.SavedMVal[IterNow] = mvals.copy()
+        ## Evaluated gradients for all trajectories (i.e. all iterations and all temperatures) using current mvals
+        ## This should be reinitialized at every iteration.
+        self.AllGradient = defaultdict(dict)
+        for T in Temps:
+            self.SavedTraj[IterNow][T] = NPT_Trajectory(os.path.abspath('%.1f' % T), *[Results[T][i] for i in range(8)])
+            self.MBarEnergy[IterNow][T][IterNow] = self.SavedTraj[IterNow][T].Energies.copy()
+            self.AllGradient[IterNow][T] = self.SavedTraj[IterNow][T].Grads.copy()
+        # Build gradients and 
+        for DynIter in self.SavedMVal:
+            for DynTemp in Temps:
+                if DynTemp not in self.AllGradient[DynIter][DynTemp]:
+                    # The energy gradients are evaluated for the current force field for all trajectories.
+                    self.Evaluate_Gradient(self.SavedTraj[DynIter, DynTemp], mvals)
+                for EvalIter in self.SavedMVal:
+                    if EvalIter not in self.MBarEnergy[DynIter][DynTemp]:
+                        self.Evaluate_Energy(self.SavedTraj[DynIter, DynTemp], self.SavedMVal[EvalIter])
+        wq_wait(self.wq)
+        INP1 = IterNow + 1
+        Dim1 = Sims * INP1
+        # Build the five-index Boltzmann weight array.
+        # These arrays are hufungus.  You mean humongous, Ant?  Hu-mong-ous? 
+        # At tenth iteration: size is 300 * 300 * 5000 = 4e4 * 5e3
+        # We can combine a finite number of generations if we want to (leave for later).
+        N_k = np.ones(Dim1)*Shots
+        U_kln = np.zeros([Dim1,Dim1,Shots], dtype = np.float64)
+        mU_kln = np.zeros([Dim1,Dim1,Shots], dtype = np.float64)
+        for DynIter in range(INP1):
+            for DynTempIdx, DynTemp in enumerate(Temps): # Not a temperature per se, but an index.
+                RowIdx = DynIter*Sims + DynTempIdx
+                for EvalIter in range(INP1):
+                    for EvalTempIdx, EvalTemp in enumerate(Temps):
+                        ColIdx = EvalIter*Sims + EvalTempIdx
+                        U_kln[RowIdx, ColIdx, :] = self.MBarEnergy[DynIter][DynTemp][EvalIter] / (kb*EvalTemp)
+        # Result: Bunch of Boltzmann weights for all simulations at all temperatures.  Size would be 300 * (300*5000)  
+        # After we're done, we should only be interested in some of the Boltzmann weights; in particular
+        # the ones corresponding to the last iteration of the force field at all temperatures
+        # :Sims * (IterNow - 1) : Sims * (IterNow)
+        mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
+        W1 = mbar.getWeights()
+        ###
 
         mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
         mmbar = pymbar.MBAR(mU_kln, N_k, verbose=False, relative_tolerance=5.0e-8)

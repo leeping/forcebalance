@@ -66,6 +66,8 @@ from simtk.openmm.app import *
 from forcebalance.forcefield import FF
 from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary
 from forcebalance.finite_difference import fdwrap, f12d3p
+from forcebalance.molecule import Molecule
+from forcebalance.openmmio import liquid_energy_driver, liquid_energy_derivatives
 
 #======================================================#
 # Global, user-tunable variables (simulation settings) #
@@ -75,7 +77,7 @@ from forcebalance.finite_difference import fdwrap, f12d3p
 timestep = 0.5 * units.femtosecond # timestep for integration
 nsteps = 200                       # number of steps per data record
 nequiliterations = 50             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 50                 # number of iterations to collect data for
+niterations = 500                 # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -106,11 +108,13 @@ tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanometer
 mono_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None, 
                'rigidWater' : False, 'polarization' : 'direct'}
 
+simulation_settings = direct_kwargs
 if 'tip3p' in sys.argv[2]:
    print "Using TIP3P settings."
    timestep = 1.0 * units.femtosecond # timestep for integrtion
    nsteps   = 100                     # number of steps per data record
    PlatName = 'OpenCL'
+   simulation_settings = tip3p_kwargs
 
 #================================#
 # Create the simulation platform #
@@ -251,7 +255,7 @@ def compute_mass(system):
       mass += system.getParticleMass(i)
    return mass
 
-def run_simulation(pdb,settings,pbc=True):
+def run_simulation(pdb,settings,pbc=True,Trajectory=True):
    """ Run a NPT simulation and gather statistics. """
 
    # Create the test system.
@@ -332,7 +336,8 @@ def run_simulation(pdb,settings,pbc=True):
                                                           volume / units.nanometers**3, density / (units.kilogram / units.meter**3))
    # Collect production data.
    if verbose: print "Production..."
-   simulation.reporters.append(DCDReporter('dynamics.dcd', 100))
+   if Trajectory:
+      simulation.reporters.append(DCDReporter('dynamics.dcd', 100))
    for iteration in range(niterations):
       # Propagate dynamics.
       simulation.step(nsteps)
@@ -425,7 +430,11 @@ def analyze(data):
    print "g = %11.6f ps" % (statistics['g_density'] / units.picoseconds)
    unit_rho = (units.kilogram / units.meter**3)
    unit_ene = units.kilojoules_per_mole
-   return statistics['density'] / unit_rho, statistics['ddensity'] / unit_rho, statistics['PE'] / unit_ene, statistics['dPE'] / unit_ene
+
+   pV_mean = (statistics['volume'] * pressure * units.AVOGADRO_CONSTANT_NA).value_in_unit(units.kilojoule_per_mole)   
+   pV_err = (statistics['dvolume'] * pressure * units.AVOGADRO_CONSTANT_NA).value_in_unit(units.kilojoule_per_mole)   
+   
+   return statistics['density'] / unit_rho, statistics['ddensity'] / unit_rho, statistics['PE'] / unit_ene, statistics['dPE'] / unit_ene, pV_mean, pV_err
 
 def energy_driver(mvals,pdb,FF,xyzs,settings,boxes=None,verbose=False):
 
@@ -444,13 +453,13 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,boxes=None,verbose=False):
    @param[in] pdb OpenMM PDB object
    @param[in] FF ForceBalance force field object
    @param[in] xyzs List of OpenMM positions
-   @return G First derivative of the energies in a N_param x N_coord array
-   @return Hd Second derivative of the energies (i.e. diagonal Hessian elements) in a N_param x N_coord array
+   @param[in] settings OpenMM settings for creating the System
+   @param[in] boxes Periodic box vectors
+   @return E A numpy array of energies in kilojoules per mole
 
    """
-
    # Print the force field XML from the ForceBalance object, with modified parameters.
-   pvals = FF.make(os.getcwd(),mvals,False)
+   FF.make(mvals)
    # Load the force field XML file to make the OpenMM object.
    forcefield = ForceField(sys.argv[2])
    # Create the system, setup the simulation.
@@ -492,6 +501,8 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,boxes=None):
    @param[in] pdb OpenMM PDB object
    @param[in] FF ForceBalance force field object
    @param[in] xyzs List of OpenMM positions
+   @param[in] settings OpenMM settings for creating the System
+   @param[in] boxes Periodic box vectors
    @return G First derivative of the energies in a N_param x N_coord array
    @return Hd Second derivative of the energies (i.e. diagonal Hessian elements) in a N_param x N_coord array
 
@@ -509,10 +520,10 @@ def main():
    """ 
    Usage: (runcuda.sh) npt.py protein.pdb forcefield.xml <temperature> <pressure>
 
-   This program is meant to be called automatically by ForceBalance
-   (specifically, subroutines in openmmio.py).  It is not easy to use
-   manually.  This is because the force field is read in from a
-   ForceBalance 'FF' class.
+   This program is meant to be called automatically by ForceBalance on
+   a GPU cluster (specifically, subroutines in openmmio.py).  It is
+   not easy to use manually.  This is because the force field is read
+   in from a ForceBalance 'FF' class.
 
    I wrote this program because automatic fitting of the density (or
    other equilibrium properties) is computationally intensive, and the
@@ -522,24 +533,25 @@ def main():
    clusters (e.g. Certainty, Keeneland).  The worker scripts connect to
    the main instance and receives one of these jobs.
 
-   Of course this script can also be executed locally.  Just make sure
-   you have the pickled 'forcebalance.p' file.
+   This script can also be executed locally, if you want to (e.g. for
+   debugging).  Just make sure you have the pickled 'forcebalance.p'
+   file.
 
    """
    
-   # Specify the PDB here so we may make the Simulation class.
+   # Create an OpenMM PDB object so we may make the Simulation class.
    pdb = PDBFile(sys.argv[1])
    # Load the force field in from the ForceBalance pickle.
    FF,mvals,h = lp_load(open('forcebalance.p'))
    # Create the force field XML files.
-   pvals = FF.make(os.getcwd(),mvals,False)
+   FF.make(mvals)
 
    #=================================================================#
    # Run the simulation for the full system and analyze the results. #
    #=================================================================#
    Data, Xyzs, Boxes, Rhos, Energies = run_simulation(pdb, direct_kwargs)
    # Get statistics from our simulation.
-   Rho_avg, Rho_err, Pot_avg, Pot_err = analyze(Data)
+   Rho_avg, Rho_err, Pot_avg, Pot_err, pV_avg, pV_err = analyze(Data)
    # Now that we have the coordinates, we can compute the energy derivatives.
    G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, direct_kwargs, Boxes)
    # The density derivative can be computed using the energy derivative.
@@ -566,17 +578,19 @@ def main():
    nsteps   = 1000                    # number of steps per data record
 
    mpdb = PDBFile('mono.pdb')
-   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False)
+   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False, Trajectory=False)
    # Get statistics from our simulation.
-   _trash, _crap, mPot_avg, mPot_err = analyze(mData)
+   _trash, _crap, mPot_avg, mPot_err, __trash, __crap = analyze(mData)
    # Now that we have the coordinates, we can compute the energy derivatives.
    mG, mHd = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mono_kwargs)
-   # The enthalpy of vaporization in kJ/mol.
-   Hvap_avg = mPot_avg - Pot_avg / 216 + kT - np.mean(pV)
-   Hvap_err = np.sqrt(Pot_err**2 / 216**2 + mPot_err**2)
 
+   # pV_avg and mean(pV) are exactly the same.
    pV = (pressure * Data['volume'] * units.AVOGADRO_CONSTANT_NA).value_in_unit(units.kilojoule_per_mole)
    kT = (kB * temperature).value_in_unit(units.kilojoule_per_mole)
+
+   # The enthalpy of vaporization in kJ/mol.
+   Hvap_avg = mPot_avg - Pot_avg / 216 + kT - np.mean(pV)
+   Hvap_err = np.sqrt(Pot_err**2 / 216**2 + mPot_err**2 + pV_err ** 2)
    
    # Build the first Hvap derivative.
    # We don't pass it back, but nice for printing.
@@ -587,8 +601,12 @@ def main():
    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mPot_avg * np.mean(mG, axis=1))
    GHvap *= -1
    
-   HVap_avg += kT - np.mean(pV)
    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1))
+
+   print "pV_avg = ", pV_avg, "pV_err = ", pV_err
+   print "kT, -pV", kT, -1 * np.mean(pV)
+   print "Derivative of pV term (note it is SUBTRACTED from enthalpy of vaporization, so the contribution to Hvap is minus one times this):"
+   FF.print_map(vals = mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)))
 
    bar = printcool("Density: % .4f +- % .4f kg/m^3, Derivatives below" % (Rho_avg, Rho_err))
    FF.print_map(vals=GRho)
@@ -600,9 +618,9 @@ def main():
    FF.print_map(vals=GHvap)
    print bar
    # Print the final force field.
-   pvals = FF.make(os.getcwd(),mvals,False)
+   pvals = FF.make(mvals)
 
-   with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Energies, G, mEnergies, mG, Rho_err, Hvap_err),f)
+   with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, pV, Energies, G, mEnergies, mG, Rho_err, Hvap_err),f)
 
 if __name__ == "__main__":
    main()
