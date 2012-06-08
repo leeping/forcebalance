@@ -222,10 +222,10 @@ class Liquid(FittingSimulation):
 
         Rhos, pVs, Energies, Grads, mEnergies, mGrads, Rho_errs, Hvap_errs = ([Results[t][i] for t in range(len(Temps))] for i in range(8))
 
-        R  = np.array(list(itertools.chain(*list(Rhos))))
-        PV = np.array(list(itertools.chain(*list(pVs))))
+        # R  = np.array(list(itertools.chain(*list(Rhos))))
+        # PV = np.array(list(itertools.chain(*list(pVs))))
         E  = np.array(list(itertools.chain(*list(Energies))))
-        G  = np.hstack(tuple(Grads))
+        # G  = np.hstack(tuple(Grads))
         mE = np.array(list(itertools.chain(*list(mEnergies))))
         mG = np.hstack(tuple(mGrads))
 
@@ -265,6 +265,7 @@ class Liquid(FittingSimulation):
             self.SavedTraj[IterNow][Tidx] = NPT_Trajectory(os.path.abspath('%.1f' % Temp), *[Results[Tidx][i] for i in range(8)])
             self.MBarEnergy[IterNow][Tidx][IterNow] = np.array(self.SavedTraj[IterNow][Tidx].Energies).copy()
             AllGDict[IterNow][Tidx] = np.array(self.SavedTraj[IterNow][Tidx].Grads).copy()
+
         # This is so I can use concurrent_map.
         def _func(args):
             # Arguments:
@@ -276,10 +277,10 @@ class Liquid(FittingSimulation):
             Dict     = args[0]
             Name     = args[1]
             Elem     = args[2]
-            TrajFnm  = args[3]+'/dynamics.dcd'
+            TrajPath = args[3]
             MVals    = args[4]
             bGrad    = args[5]
-            Dict[Elem] = self.evaluate_trajectory(Name, TrajFnm, MVals, bGrad)
+            Dict[Elem] = self.evaluate_trajectory(Name, TrajPath, MVals, bGrad)
         _data = []
         # Build gradients and energy dictionaries
         for DynIter, DynMval in enumerate(self.SavedMVal):
@@ -300,8 +301,6 @@ class Liquid(FittingSimulation):
         # If this doesn't work, I'm going to be hella pissed.
         for d in _data:
             print d[1:]
-        if len(_data) >= 1:
-            raw_input()
         # Run all of the MBAR stuff on the cluster in the 'mbar' subdirectory.
         if not os.path.exists('evaltraj'):
             os.makedirs('evaltraj')
@@ -330,8 +329,6 @@ class Liquid(FittingSimulation):
         # :Sims * (IterNow - 1) : Sims * (IterNow)
         mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
         W1 = mbar.getWeights()
-        AllG = np.hstack((list(itertools.chain(*[[AllGDict[i][j] for j in range(Sims)] for i in range(INP1)]))))
-        print AllG.shape
         print W1.shape
         # Get WHAM weights for monomers.
         # We don't need to go through the force field history for the monomers
@@ -353,14 +350,40 @@ class Liquid(FittingSimulation):
         #BigG = hstack((*list(itertools.chain([list(itertools.chain([AllGDict[i][j] for j in range(Sims)])) for i in range(INP1)]))))
         #print AllG.shape
         ###
-        G = AllG.copy()
+        
+        G = np.hstack((list(itertools.chain(*[[AllGDict[i][j] for j in range(Sims)] for i in range(INP1)]))))
+
+        
+        ##self.SavedTraj[IterNow][Tidx] = NPT_Trajectory(os.path.abspath('%.1f' % Temp), *[Results[Tidx][i] for i in range(8)])
+        ##NPT_Trajectory = namedtuple('NPT_Trajectory', ['fnm', 'Rhos', 'pVs', 'Energies', 'Grads', 'mEnergies', 'mGrads', 'Rho_errs', 'Hvap_errs'])
+
+        # Rhos, pVs, Energies, Grads, mEnergies, mGrads, Rho_errs, Hvap_errs = ([Results[t][i] for t in range(len(Temps))] for i in range(8))
+        
+        
+        R = np.hstack((list(itertools.chain(*[[self.SavedTraj[i][j].Rhos for j in range(Sims)] for i in range(INP1)]))))
+        PV = np.hstack((list(itertools.chain(*[[self.SavedTraj[i][j].pVs for j in range(Sims)] for i in range(INP1)]))))
+        E = np.hstack((list(itertools.chain(*[[self.SavedTraj[i][j].Energies for j in range(Sims)] for i in range(INP1)]))))
+        Rho_errs = np.array(list(itertools.chain(*[[self.SavedTraj[i][j].Rho_errs for j in range(Sims)] for i in range(INP1)])))
+        Hvap_errs = np.array(list(itertools.chain(*[[self.SavedTraj[i][j].Hvap_errs for j in range(Sims)] for i in range(INP1)])))
+
+        #(R, PV, E, Rho_errs, Hvap_errs) = (np.array(list(itertools.chain(*[[self.SavedTraj[i][j][key] for j in range(Sims)] 
+        #                                                                   for i in range(INP1)]))) for key in ('Rhos','pVs','Energies','Rho_errs','Hvap_errs'))
+
+        # R  = np.array(list(itertools.chain(*list(Rhos))))
+        # PV = np.array(list(itertools.chain(*list(pVs))))
+        # E  = np.array(list(itertools.chain(*list(Energies))))
+        # G  = np.hstack(tuple(Grads))
+        print R.shape
+        print Rho_errs.shape
+        print G.shape
         # mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
         # mmbar = pymbar.MBAR(mU_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
         # W1 = mbar.getWeights()
         # mW1 = mmbar.getWeights()
         
         for i, T in enumerate(Temps):
-            W = flat(W1[:,i])
+            # The weights that we want are the last ones.
+            W = flat(W1[:,-Sims+i])
             C = weight_info(W, T, N_k)
             mW = flat(mW1[:,i])
             Gbar = flat(np.mat(G)*col(W))
