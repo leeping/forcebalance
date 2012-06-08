@@ -334,11 +334,8 @@ def queue_up(wq, command, input_files, output_files, verbose=True):
     Submit a job to the Work Queue.
 
     @param[in] wq (Work Queue Object) A Work Queue (probably a member of a fitting simulation)
-    
     @param[in] command (string) The command to run on the remote worker.
-
     @param[in] input_files (list of files) A list of locations of the input files.
-
     @param[in] output_files (list of files) A list of locations of the output files.
     """
 
@@ -356,27 +353,30 @@ def queue_up(wq, command, input_files, output_files, verbose=True):
         print "Submitting command '%s' to the Work Queue" % command
     wq.submit(task)
     
-# def queue_up(wq, command, input_files, output_files):
-#     """ 
-#     Submit a job to the Work Queue. 
-#     @param[in] wq (Work Queue Object) A Work Queue (probably a member of a fitting simulation)
-#     @param[in] command (string) The command to run on the remote worker.
-#     @param[in] input_files (list of 2-tuples) A list of local and
-#     remote locations of the input files.
-#     @param[in] output_files (list of 2-tuples) A list of local and
-#     remote locations of the output files.
-#     """
-#     task = work_queue.Task(command)
-#     for f in input_files:
-#         print f[0], f[1]
-#         task.specify_input_file(f[0],f[1])
-#     for f in output_files:
-#         print f[0], f[1]
-#         task.specify_output_file(f[0],f[1])
-#     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-#     task.specify_tag(command)
-#     print "Submitting command '%s' to the Work Queue" % command
-#     wq.submit(task)
+def queue_up_src_dest(wq, command, input_files, output_files, verbose=True):
+    """ 
+    Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly
+    specify where the input files come from, and where the output files go to.
+
+    @param[in] wq (Work Queue Object) A Work Queue (probably a member of a fitting simulation)
+    @param[in] command (string) The command to run on the remote worker.
+    @param[in] input_files (list of 2-tuples) A list of local and
+    remote locations of the input files.
+    @param[in] output_files (list of 2-tuples) A list of local and
+    remote locations of the output files.
+    """
+    task = work_queue.Task(command)
+    for f in input_files:
+        print f[0], f[1]
+        task.specify_input_file(f[0],f[1])
+    for f in output_files:
+        print f[0], f[1]
+        task.specify_output_file(f[0],f[1])
+    task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
+    task.specify_tag(command)
+    if verbose:
+        print "Submitting command '%s' to the Work Queue" % command
+    wq.submit(task)
 
 def wq_wait(wq, verbose=False):
     """ This function waits until the work queue is completely empty. """

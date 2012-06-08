@@ -152,10 +152,11 @@ class Liquid_OpenMM(Liquid):
         abstempdir = os.path.join(self.root,self.tempdir)
         os.symlink(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
         os.symlink(os.path.join(self.root,self.simdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
-        os.symlink(os.path.join(self.root,self.simdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
-        os.symlink(os.path.join(self.root,self.simdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","npt.py"),os.path.join(abstempdir,"npt.py"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
 
-    def run_npt_simulation(self, temperature, run_dir):
+    def npt_simulation(self, temperature):
         """ Submit a NPT simulation to the Work Queue. """
         link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
         queue_up(self.wq,
@@ -163,14 +164,20 @@ class Liquid_OpenMM(Liquid):
                  input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                  output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
 
-    def evaltraj_(self, temperature, run_dir):
+    def evaluate_trajectory(self, trajectory, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
         link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+        # We need to do something tricksy to prevent output files from overwriting each other.
         queue_up(self.wq,
-                 command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
-                 input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
-                 output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
-                       
+                 command = './runcuda.sh python evaltraj.py conf.pdb %s %s %s &> evaltraj.out' % (self.FF.fnms[0], trajectory, "True" if bGradient else "False"),
+                 input_files = ['runcuda.sh', 'evaltraj.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p', trajectory],
+                 output_files = ['evaltraj_result.p', 'evaltraj.out', self.FF.fnms[0]])
+        wq.wait(self.wq)
+        if bGradient:
+            return lp_load('evaltraj_result.p')[1]
+        else:
+            return lp_load('evaltraj_result.p')[0]
+        
 class AbInitio_OpenMM(AbInitio):
 
     """Subclass of AbInitio for force and energy matching
