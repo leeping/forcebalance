@@ -415,7 +415,7 @@ class Molecule(object):
         else:
             raise Exception('getitem is not implemented for keys of type %s' % str(key))
 
-    def __iter__(self, other):
+    def __iter__(self):
         """ List-like behavior for looping over trajectories. Note that these values are returned by reference. 
         Note that this is intended to be more efficient than __getitem__, so when we loop over a trajectory,
         it's best to go "for m in M" instead of "for i in range(len(M)): m = M[i]"
@@ -469,7 +469,7 @@ class Molecule(object):
         # FrameKeys must be a list.
         for key in self.FrameKeys:
             if both(self, other, key):
-                if type(self.Data[key]) is not list or type(other.Data[key]) is not list:
+                if type(self.Data[key]) is not list:
                     raise Exception('Key %s in self is a FrameKey, it must be a list' % key)
                 if type(other.Data[key]) is not list:
                     raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
@@ -598,6 +598,8 @@ class Molecule(object):
 
     def load_frames(self, fnm):
         NewMol = Molecule(fnm)
+        if NewMol.na != self.na:
+            raise Exception('When loading frames, don\'t change the number of atoms.')
         for key in NewMol.FrameKeys:
             self.Data[key] = NewMol.Data[key]
 

@@ -180,7 +180,7 @@ class Liquid(FittingSimulation):
         # Dump the force field to a pickle file
         with open('forcebalance.p','w') as f: lp_dump((self.FF,mvals,self.h),f)
 
-        # Reference densities from the CRC Handbook. :P
+        # Reference densities from the CRC Handbook, interpolated. :P
         Rho_exp = {273.2 : 999.84300, 274.2 : 999.90170, 275.4 : 999.94910, 
                    276.6 : 999.97220, 277.8 : 999.97190, 279.2 : 999.94310, 
                    280.7 : 999.87970, 282.3 : 999.77640, 284.1 : 999.61820, 
@@ -211,7 +211,7 @@ class Liquid(FittingSimulation):
             if not os.path.exists('%.1f' % T):
                 os.makedirs('%.1f' % T)
             os.chdir('%.1f' % T)
-            self.execute(T,os.getcwd())
+            self.npt_simulation(T)
             os.chdir('..')
 
         # Wait for simulations to finish
@@ -260,21 +260,44 @@ class Liquid(FittingSimulation):
         self.SavedMVal[IterNow] = mvals.copy()
         ## Evaluated gradients for all trajectories (i.e. all iterations and all temperatures) using current mvals
         ## This should be reinitialized at every iteration.
-        self.AllGradient = defaultdict(dict)
+        AllGradient = defaultdict(dict)
         for T in Temps:
             self.SavedTraj[IterNow][T] = NPT_Trajectory(os.path.abspath('%.1f' % T), *[Results[T][i] for i in range(8)])
             self.MBarEnergy[IterNow][T][IterNow] = self.SavedTraj[IterNow][T].Energies.copy()
-            self.AllGradient[IterNow][T] = self.SavedTraj[IterNow][T].Grads.copy()
-        # Build gradients and 
+            AllGradient[IterNow][T] = self.SavedTraj[IterNow][T].Grads.copy()
+        # This is so I can use concurrent_map.
+        def _func(args):
+            # Arguments:
+            # The dictionary that the result is going into.
+            # The key of the dictionary.
+            # The file name of the saved trajectory.
+            # The mathematical parameter values to evaluate the energies with.
+            # Boolean for gradient or energy evaluation.
+            Dict    = args[0]
+            Elem    = args[1]
+            TrajFnm = args[2]
+            MVals   = args[3]
+            bGrad   = args[4]
+            Dict[Elem] = self.evaluate_trajectory(TrajFnm, MVals, bGrad)
+        _data = []
+        # Build gradients and energy dictionaries
         for DynIter in self.SavedMVal:
             for DynTemp in Temps:
                 if DynTemp not in self.AllGradient[DynIter][DynTemp]:
+                    print "Evaluating gradients for snapshots sampled using force field %i at temperature % .1f, using current force field" % (DynIter, DynTemp)
                     # The energy gradients are evaluated for the current force field for all trajectories.
-                    self.Evaluate_Gradient(self.SavedTraj[DynIter, DynTemp], mvals)
+                    #AllGradient[DynIter][DynTemp] = self.evaluate_trajectory_gradient(self.SavedTraj[DynIter,DynTemp].fnm, mvals)
+                    _data.append((AllGradient[DynIter], DynTemp, self.SavedTraj[DynIter,DynTemp].fnm, mvals, True))
                 for EvalIter in self.SavedMVal:
                     if EvalIter not in self.MBarEnergy[DynIter][DynTemp]:
-                        self.Evaluate_Energy(self.SavedTraj[DynIter, DynTemp], self.SavedMVal[EvalIter])
-        wq_wait(self.wq)
+                        print "Evaluating energies for snapshots sampled using force field %i at temperature % .1f, using force field %i" % (DynIter, DynTemp, EvalIter)
+                        #self.MBarEnergy[DynIter][DynTemp][EvalIter] = self.evaluate_trajectory_energy(self.SavedTraj[DynIter,DynTemp].fnm, self.SavedMVal[EvalIter])
+                        _data.append((self.MBarEnergy[DynIter][DynTemp], EvalIter, self.SavedTraj[DynIter,DynTemp].fnm, self.SavedMVal[EvalIter], False))
+        # If this doesn't work, I'm going to be hella pissed.
+        print _data
+        raw_input()
+        concurrent_map(_func, _data)
+
         INP1 = IterNow + 1
         Dim1 = Sims * INP1
         # Build the five-index Boltzmann weight array.
