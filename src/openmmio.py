@@ -12,7 +12,7 @@ import numpy as np
 import sys
 import pickle
 import shutil
-from nifty import printcool, queue_up, link_dir_contents
+from nifty import *
 
 try:
     from simtk.openmm.app import *
@@ -118,9 +118,9 @@ def liquid_energy_derivatives(mvals,h,pdb,FF,xyzs,settings,platform,boxes=None):
 
    G        = np.zeros((FF.np,len(xyzs)))
    Hd       = np.zeros((FF.np,len(xyzs)))
-   E0       = energy_driver(mvals, pdb, FF, xyzs, settings, boxes)
+   E0       = liquid_energy_driver(mvals, pdb, FF, xyzs, settings, boxes)
    for i in range(FF.np):
-      G[i,:], Hd[i,:] = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,boxes=boxes),h,f0=E0)
+      G[i,:], Hd[i,:] = f12d3p(fdwrap(liquid_energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,boxes=boxes),h,f0=E0)
    return G, Hd
 
 class OpenMM_Reader(BaseReader):
@@ -166,22 +166,27 @@ class Liquid_OpenMM(Liquid):
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
-        link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-        # We need to do something tricksy to prevent output files from overwriting each other.
-        pfx = 'evaltraj_%s' % name
-        infnm = pfx+'.in.p'
-        outfnm = pfx+'.out.p'
-        logfnm = pfx+'.log'
-        with open(infnm,'w') as f: lp_dump((self.FF,mvals,self.h),f)
-        queue_up_src_dest(self.wq, command = './runcuda.sh python evaltraj.py conf.pdb %s trajectory.dcd %s &> evaltraj.log' % (self.FF.fnms[0], "True" if bGradient else "False"),
-                          input_files = [('runcuda.sh','runcuda.sh'), ('evaltraj.py','evaltraj.py'), ('conf.pdb','conf.pdb'),
-                                         (infnm,'forcebalance.p'), (trajpath, 'trajectory.dcd')],
-                          output_files = [('evaltraj_result.p', outfnm), ('evaltraj.log', logfnm)])
-        wq.wait(self.wq)
+        cwd = os.getcwd()
+        rnd = os.path.join(cwd,name)
+        os.makedirs(name)
+        link_dir_contents(os.path.join(self.root,self.rundir),rnd)
+        infnm = os.path.join(rnd,'forcebalance.p')
+        os.remove(infnm)
+        with open(os.path.join(rnd,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h),f)
+        queue_up_src_dest(self.wq, command = './runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.fnms[0], "True" if bGradient else "False"),
+                          input_files = [(os.path.join(rnd,'runcuda.sh'),'runcuda.sh'), 
+                                         (os.path.join(rnd,'evaltraj.py'),'evaltraj.py'),
+                                         (os.path.join(rnd,'conf.pdb'),'conf.pdb'),
+                                         (os.path.join(rnd,'forcebalance.p'),'forcebalance.p'),
+                                         (os.path.join(trajpath,'dynamics.dcd'), 'dynamics.dcd')],
+                          output_files = [(os.path.join(rnd,'evaltraj_result.p'),'evaltraj_result.p'), 
+                                          (os.path.join(rnd,'evaltraj.log'),'evaltraj.log')])
+        wq_wait(self.wq)
         if bGradient:
-            return lp_load('%s.out.p' % name)[1]
+            Answer = lp_load(open(os.path.join(rnd,'evaltraj_result.p')))[1]
         else:
-            return lp_load('evaltraj_%s.out.p' % name)[0]
+            Answer = lp_load(open(os.path.join(rnd,'evaltraj_result.p')))[0]
+        return Answer
         
 class AbInitio_OpenMM(AbInitio):
 

@@ -549,7 +549,7 @@ def main():
    #=================================================================#
    # Run the simulation for the full system and analyze the results. #
    #=================================================================#
-   Data, Xyzs, Boxes, Rhos, Energies = run_simulation(pdb, direct_kwargs)
+   Data, Xyzs, Boxes, Rhos, Energies = run_simulation(pdb, direct_kwargs, Trajectory=True)
    # Get statistics from our simulation.
    Rho_avg, Rho_err, Pot_avg, Pot_err, pV_avg, pV_err = analyze(Data)
    # Now that we have the coordinates, we can compute the energy derivatives.
@@ -578,7 +578,7 @@ def main():
    nsteps   = 1000                    # number of steps per data record
 
    mpdb = PDBFile('mono.pdb')
-   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False, Trajectory=True)
+   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False, Trajectory=False)
    # Get statistics from our simulation.
    _trash, _crap, mPot_avg, mPot_err, __trash, __crap = analyze(mData)
    # Now that we have the coordinates, we can compute the energy derivatives.
