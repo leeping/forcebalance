@@ -10,6 +10,7 @@ from abinitio import AbInitio
 from liquid import Liquid
 import numpy as np
 import sys
+from finite_difference import *
 import pickle
 import shutil
 from nifty import *
@@ -118,9 +119,9 @@ def liquid_energy_derivatives(mvals,h,pdb,FF,xyzs,settings,platform,boxes=None):
 
    G        = np.zeros((FF.np,len(xyzs)))
    Hd       = np.zeros((FF.np,len(xyzs)))
-   E0       = liquid_energy_driver(mvals, pdb, FF, xyzs, settings, boxes)
+   E0       = liquid_energy_driver(mvals, pdb, FF, xyzs, settings, platform, boxes)
    for i in range(FF.np):
-      G[i,:], Hd[i,:] = f12d3p(fdwrap(liquid_energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,boxes=boxes),h,f0=E0)
+      G[i,:], Hd[i,:] = f12d3p(fdwrap(liquid_energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,platform=platform,boxes=boxes),h,f0=E0)
    return G, Hd
 
 class OpenMM_Reader(BaseReader):
