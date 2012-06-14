@@ -48,11 +48,11 @@ def create_esp_surfaces(Molecule):
     Mol_ESP = []
     printxyz=0
     for i, xyz in enumerate(Molecule.xyzs):
-        print "Generating grid points for snapshot %i\r" % i,
+        print "Generating grid points for snapshot %i\r" % i
         esp_pts = []
         for j in [1.4, 1.6, 1.8, 2.0]:
             MS = MSMS(coords = list(xyz), radii = list(np.array(Rads)*j))
-            MS.compute()
+            MS.compute(density=0.5)
             vfloat, vint, tri = MS.getTriangles()
             a = range(len(vfloat))
             random.shuffle(a)
@@ -76,10 +76,9 @@ def create_esp_surfaces(Molecule):
         Mol_ESP.append(esp_pts)
     return Mol_ESP
 
-def do_quantum():
-    wq_port = 5813
+def do_quantum(wq_port):
     M = Molecule('shots.gro')
-    M += Molecule(os.path.abspath('../settings/qchem.in'))
+    M.add_quantum('../settings/qchem.in')
     digits = len(str(len(M)-1))
     formstr = '\"%%0%ii\"' % digits
 
@@ -94,7 +93,11 @@ def do_quantum():
                 if os.path.exists('qchem.out'):
                     Output = Molecule('qchem.out')
                     if os.path.exists('plot.esp'):
-                        Output += Molecule('plot.esp')
+                        ESP = Molecule('plot.esp')
+                        #print ESP.Data.keys()
+                        Output.qm_espxyzs = list(ESP.qm_espxyzs)
+                        Output.qm_espvals = list(ESP.qm_espvals)
+                        #Output += Molecule('plot.esp')
                     if Result == None:
                         Result = Output
                     else:
@@ -123,7 +126,7 @@ def do_quantum():
             ESPBohr = np.array(ESP[i]) / bohrang
             np.savetxt('ESPGrid',ESPBohr)
             print "Queueing up job", dnm
-            queue_up(wq, command = 'qchem40 -np 8 qchem.in qchem.out', 
+            queue_up(wq, command = 'qchem40 qchem.in qchem.out', 
                      input_files = ["qchem.in", "ESPGrid"],
                      output_files = ["qchem.out", "plot.esp", "efield.dat"], verbose=False)
             os.chdir('..')
@@ -164,6 +167,7 @@ def gather_generations():
 
 def Generate(sim_opt):
     print sim_opt['name']
+    Port = sim_opt['wq_port']
     cwd = os.getcwd()
     simdir = os.path.join('simulations',sim_opt['name'])
     if not os.path.exists(simdir):
@@ -183,18 +187,18 @@ def Generate(sim_opt):
         elif os.path.exists('shots.gro'):
             print "shots.gro exists"
             print "I need to GENERATE qdata.txt now."
-            do_quantum()
+            do_quantum(Port)
         elif os.path.exists('qdata.txt'):
             warn_press_key('qdata.txt exists.')
         else:
             print "I need to GENERATE shots.gro now."
             generate_snapshots()
-            do_quantum()
-        os.chdir('..')
+            do_quantum(Port)
         if All == None:
             All = gather_generations()
         else:
             All += gather_generations()
+        os.chdir('..')
     All.write('all.gro')
     All.write('qdata.txt')
     os.chdir(cwd)

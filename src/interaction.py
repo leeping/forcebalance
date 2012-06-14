@@ -194,7 +194,7 @@ class Interaction(FittingSimulation):
         
     def indicate(self):
         print "Sim: %-15s" % self.name, 
-        print "Interaction Energy error = %8.4f kJ/mol (%.4f%%)" % (self.e_err, self.e_err_pct*100)
+        print "Interaction Energy error = %8.4f kJ/mol (%.4f%%), Objective = %.5e" % (self.e_err, self.e_err_pct*100, self.objective)
 
     def get(self, mvals, AGrad=False, AHess=False):
         """
@@ -370,4 +370,6 @@ class Interaction(FittingSimulation):
         self.e_err = E
         self.e_err_pct = Efrac
         Answer = {'X':X2, 'G':G, 'H':H}
+        if not in_fd():
+            self.objective = Answer['X']
         return Answer

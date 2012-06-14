@@ -213,8 +213,8 @@ class ITP_Reader(BaseReader):
         self.sec = None
         ## Nonbonded type
         self.nbtype = None
-        ## The current residue (set by the moleculetype keyword)
-        self.res    = None
+        ## The current molecule (set by the moleculetype keyword)
+        self.mol    = None
         ## The parameter dictionary (defined in this file)
         self.pdict  = pdict
         ## Listing of all atom names in the file, (probably unnecessary)
@@ -254,7 +254,7 @@ class ITP_Reader(BaseReader):
             self.itype = 'DEF'
             self.nbtype = int(s[0])
         elif self.sec == 'moleculetype':
-            self.res    = s[0]
+            self.mol    = s[0]
         elif self.sec == 'atomtypes':
             atype = parse_atomtype_line(line)
             # Basically we're shifting the word positions
@@ -274,25 +274,25 @@ class ITP_Reader(BaseReader):
             self.atomnames.append(s[4])
             self.itype = 'COUL'
             # Build the adict here.
-            self.adict.setdefault(s[3],[]).append(s[4])
+            self.adict.setdefault(self.mol,[]).append(s[0])
         elif self.sec == 'qtpie':
             # The atom involved is labeled by the atomic number.
             atom = [s[0]]
             self.itype = 'QTPIE'
         elif self.sec == 'bonds':
-            atom = [self.adict[self.res][int(i)-1] for i in s[:2]]
+            atom = [self.adict[self.mol][int(i)-1] for i in s[:2]]
             self.itype = fdict[self.sec][int(s[2])]
         elif self.sec == 'bondtypes':
             atom = [s[0], s[1]]
             self.itype = fdict[self.sec][int(s[2])]
         elif self.sec == 'angles':
-            atom = [self.adict[self.res][int(i)-1] for i in s[:3]]
+            atom = [self.adict[self.mol][int(i)-1] for i in s[:3]]
             self.itype = fdict[self.sec][int(s[3])]
         elif self.sec == 'angletypes':
             atom = [s[0], s[1], s[2]]
             self.itype = fdict[self.sec][int(s[3])]
         elif self.sec == 'dihedrals':
-            atom = [self.adict[self.res][int(i)-1] for i in s[:4]]
+            atom = [self.adict[self.mol][int(i)-1] for i in s[:4]]
             self.itype = fdict[self.sec][int(s[4])]
             if self.itype in ['PDIHS', 'PIMPDIHS', 'FOURDIHS', 'PDIHMULS'] and len(s) >= 7:
                 # Add the multiplicity of the dihedrals to the interaction type.
@@ -303,17 +303,17 @@ class ITP_Reader(BaseReader):
             if self.itype in ['PDIHS', 'PIMPDIHS', 'FOURDIHS', 'PDIHMULS'] and len(s) >= 7:
                 self.itype += s[7]
         elif self.sec == 'virtual_sites2':
-            atom = [self.adict[self.res][int(i)-1] for i in s[:1]]
+            atom = [self.adict[self.mol][int(i)-1] for i in s[:1]]
             #atom = [s[0]]
             self.itype = fdict[self.sec][int(s[3])]
         elif self.sec == 'virtual_sites3':
-            atom = [self.adict[self.res][int(i)-1] for i in s[:1]]
-            #atom = [self.adict[self.res][int(i)-1] for i in s[:3]]
+            atom = [self.adict[self.mol][int(i)-1] for i in s[:1]]
+            #atom = [self.adict[self.mol][int(i)-1] for i in s[:3]]
             #atom = [s[0]]
             self.itype = fdict[self.sec][int(s[4])]
         elif self.sec == 'virtual_sites4':
-            atom = [self.adict[self.res][int(i)-1] for i in s[:1]]
-            #atom = [self.adict[self.res][int(i)-1] for i in s[:4]]
+            atom = [self.adict[self.mol][int(i)-1] for i in s[:1]]
+            #atom = [self.adict[self.mol][int(i)-1] for i in s[:4]]
             #atom = [s[0]]
             self.itype = fdict[self.sec][int(s[5])]
         else:
@@ -321,13 +321,12 @@ class ITP_Reader(BaseReader):
         if type(atom) is list and (len(atom) > 1 and atom[0] > atom[-1]):
             # Enforce a canonical ordering of the atom labels in a parameter ID
             atom = atom[::-1]
-        if self.res == None:
+        if self.mol == None:
             self.suffix = ':' + ''.join(atom)
         elif self.sec == 'qtpie':
             self.suffix = ':' + ''.join(atom)
         else:
-            self.suffix = ':' + '-'.join([self.res,''.join(atom)])
-        self.resatom = (self.res, atom if type(atom) is list else [atom])
+            self.suffix = ':' + '-'.join([self.mol,''.join(atom)])
 
 def gmxx2_print(fnm, vec, type):
     """ Prints a vector to a file to feed it to the modified GROMACS.
@@ -458,10 +457,9 @@ class Interaction_GMX(Interaction):
         os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
         # Link the run files
         os.symlink(os.path.join(self.root,self.simdir,"settings","index.ndx"),os.path.join(abstempdir,"index.ndx"))
-        os.symlink(os.path.join(self.root,self.simdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        #os.symlink(os.path.join(self.root,self.simdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
         os.symlink(os.path.join(self.root,self.simdir,"settings","topol.top"),os.path.join(abstempdir,"topol.top"))
         # Write the trajectory to the temp-directory
-        print set(self.traj.Data)
         self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro
         self.traj.write(os.path.join(abstempdir,"conf.gro"),select=[0])
@@ -476,7 +474,7 @@ class Interaction_GMX(Interaction):
         # Remove backup files.
         rm_gmx_baks(os.getcwd())
         # Call grompp followed by mdrun.
-        _exec(["./grompp", "-f", "shot.mdp", "-n", "index.ndx"], print_command=False)
+        _exec(["./grompp", "-f", "interaction.mdp", "-n", "index.ndx"], print_command=False)
         _exec(["./mdrun", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
         # Gather information
         _exec(["./g_energy","-xvg","no"], print_command=False, stdin="Coul-SR:FRAGA-FRAGB\nLJ-SR:FRAGA-FRAGB\nBuck-SR:FRAGA-FRAGB\n")

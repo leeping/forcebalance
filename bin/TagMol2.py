@@ -140,7 +140,7 @@ def get_equivalent_atoms(MyG):
             Suffix.append(" # PARM 8")
         else:
             Map[MyList[j]].append(i)
-            Suffix.append(" # RPT 8 COUL%s /RPT" % Repeat)
+            Suffix.append(" # RPT 8 COUL:%s /RPT" % Repeat)
 
     QMat = np.zeros((len(GDat), len(GDat)),dtype=float)
     for i in Map:

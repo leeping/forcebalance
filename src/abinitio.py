@@ -13,7 +13,7 @@ from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
 from subprocess import PIPE
-from finite_difference import fdwrap, f1d2p, f12d3p
+from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 
 class AbInitio(FittingSimulation):
 
@@ -319,7 +319,7 @@ class AbInitio(FittingSimulation):
                 print "Energy error = %8.4f kJ/mol (%.4f%%) Force error (%%) = %8.4f" % (self.e_err, self.e_err_pct*100, self.f_err*100), 
         if self.resp:
             print "ESP_err (%%) = %8.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
-        print
+        print "Objective = %.5e" % self.objective
 
     def get_energy_force_no_covariance_(self, mvals, AGrad=False, AHess=False):
         """
@@ -578,9 +578,10 @@ class AbInitio(FittingSimulation):
         # Fractional force error.
         F     = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,NCP1)]))) + \
                 QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,NCP1)])))
-        self.e_err = E
-        self.e_err_pct = Efrac
-        self.f_err = F
+        if not in_fd():
+            self.e_err = E
+            self.e_err_pct = Efrac
+            self.f_err = F
         Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
 
@@ -804,9 +805,10 @@ class AbInitio(FittingSimulation):
         #======================================#
         #        End of the copied code        #
         #======================================#
-        self.e_err = E
-        self.e_err_pct = Efrac
-        self.f_err = F
+        if not in_fd():
+            self.e_err = E
+            self.e_err_pct = Efrac
+            self.f_err = F
         Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         return Answer
 
@@ -888,7 +890,8 @@ class AbInitio(FittingSimulation):
         G /= D
         H /= Z
         H /= D
-        self.esp_err = sqrt(X)
+        if not in_fd():
+            self.esp_err = sqrt(X)
         # Following is the restraint part
         # RESP hyperbola "strength" parameter; 0.0005 is weak, 0.001 is strong
         # RESP hyperbola "tightness" parameter; don't need to change this
@@ -934,6 +937,8 @@ class AbInitio(FittingSimulation):
                 Answer[i] += w_resp * Answer_ESP[i]
         if not any([self.energy, self.force, self.resp]):
             raise Exception("Ab initio fitting must have at least one of: Energy, Force, ESP")
+        if not in_fd():
+            self.objective = Answer['X']
         return Answer
 
 def weighted_variance(SPiXi,WCiW,Z,L,R,NCP1):

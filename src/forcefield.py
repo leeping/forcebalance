@@ -499,7 +499,7 @@ class FF(object):
         OMMFormat = "%%.%ie" % precision
         def TXTFormat(number, precision):
             SciNot = "%% .%ie" % precision
-            if abs(number) < 1000 and abs(number) > 2:
+            if abs(number) < 1000 and abs(number) > 0.001:
                 Decimal = "%% .%if" % precision
                 Num = Decimal % number
                 Mum = Decimal % (-1 * number)
@@ -757,6 +757,7 @@ class FF(object):
                 nres += 1
         elif self.constrain_charge:
             warn_press_key("Not all force field parsers have 'adict' {residue:atomnames} implemented.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
+            qnr = 0
             if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
                 # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
                 ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata]))
@@ -771,7 +772,7 @@ class FF(object):
                         for k in self.plist[i].split():
                             for j in concern:
                                 if j in k:
-                                    thisq.append(k.replace(j,''))
+                                    thisq.append(k.split('-')[-1])
                                     break
                         try:
                             self.qid2.append(array([self.atomnames.index(k) for k in thisq]))
@@ -785,8 +786,8 @@ class FF(object):
                 self.qid = self.qid2
             tq = qnr - 1
             #Here is where we build the qtrans2 matrix.
-            cons0 = ones((1,tq))
             if len(self.qmap) > 0:
+                cons0 = ones((1,tq))
                 qtrans2 = build_qtrans2(tq, self.qid, self.qmap)
                 # Insert qtrans2 into qmat2.
                 if self.constrain_charge:
