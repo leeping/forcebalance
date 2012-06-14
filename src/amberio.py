@@ -148,8 +148,8 @@ class AbInitio_AMBER(AbInitio):
         os.symlink(os.path.join(self.root,self.simdir,"settings","force.mdin"),os.path.join(abstempdir,"force.mdin"))
         os.symlink(os.path.join(self.root,self.simdir,"settings","stage.leap"),os.path.join(abstempdir,"stage.leap"))
         # I also need to write the trajectory
-        if 'boxes' in self.traj:
-            del self.traj['boxes']
+        if 'boxes' in self.traj.Data.keys():
+            del self.traj.Data['boxes']
         self.traj.write(os.path.join(abstempdir,"all.mdcrd"))
 
     def energy_force_driver_all_external_(self):

@@ -198,7 +198,7 @@ class FittingSimulation(object):
         elif self.fdhessdiag:
             for i in range(self.FF.np):
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
-                    Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h)
+                    Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h, f0 = Ans['X'])
         self.hct += 1
         return Ans
     

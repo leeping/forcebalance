@@ -5,7 +5,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                     Last updated June 6, 2012                      |#
+#|                    Last updated June 12, 2012                      |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -103,7 +103,7 @@
 # qm_forces  = List of numpy arrays of atomistic forces from QM calculations
 # qm_espxyzs = List of numpy arrays of xyz coordinates for ESP evaluation
 # qm_espvals = List of numpy arrays of ESP values
-FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_espxyzs', 'qm_espvals'])
+FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_interaction', 'qm_espxyzs', 'qm_espvals'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
 #| must be a list along the atom axis,   |#
@@ -117,7 +117,7 @@ FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 
 # suffix     = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
 # resid      = Residue IDs (can come from MM coordinate file)
 # resname    = Residue names
-AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'bonds', 'suffix', 'resid', 'resname'])
+AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'bonds', 'suffix', 'resid', 'resname', 'qcsuf', 'qm_ghost'])
 #=========================================#
 #| This can be any data attribute we     |#
 #| want but it's usually some property   |#
@@ -129,9 +129,9 @@ AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'bond
 # qctemplate = The Q-Chem template file, not including the coordinates or rem variables
 # charge     = The net charge of the molecule
 # mult       = The spin multiplicity of the molecule
-MetaVariableNames = set(['fnm', 'qcrems', 'qctemplate', 'charge', 'mult'])
-# Subset of MetaVariableNames relevant to quantum calculations explicitly
-QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult'])
+MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult'])
+# Variable names relevant to quantum calculations explicitly
+QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost'])
 # Superset of all variable names.
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
@@ -287,6 +287,23 @@ def add_strip_to_mat(mat,strip):
 def pvec(vec):
     return ''.join([' % .10e' % i for i in list(vec.flatten())])
 
+def grouper(n, iterable):
+    """ Groups a big long iterable into groups of ten or what have you. """
+    args = [iter(iterable)] * n
+    return list([e for e in t if e != None] for t in itertools.izip_longest(*args))
+
+def even_list(totlen, splitsize):
+    """ Creates a list of number sequences divided as evenly as possible.  """
+    joblens = np.zeros(splitsize,dtype=int)
+    subsets = []
+    for i in range(totlen):
+        joblens[i%splitsize] += 1
+    jobnow = 0
+    for i in range(splitsize):
+        subsets.append(range(jobnow, jobnow + joblens[i]))
+        jobnow += joblens[i]
+    return subsets
+
 class MolfileTimestep(Structure):
     """ Wrapper for the timestep C structure used in molfile plugins. """
     _fields_ = [("coords",POINTER(c_float)), ("velocities",POINTER(c_float)),
@@ -435,15 +452,18 @@ class Molecule(object):
             raise TypeError('A Molecule instance can only be added to another Molecule instance')
         # Create the sum of the two classes by copying the first class.
         Sum = Molecule()
-        for key in (self.MetaKeys | self.AtomKeys):
-            if diff(self, other, key):
+        for key in AtomVariableNames | MetaVariableNames:
+            # Because a molecule object can only have one 'file name' or 'file type' attribute,
+            # we only keep the original one.  This isn't perfect, but that's okay.
+            if key == 'fnm' or key == 'ftype' and key in self.Data:
+                Sum.Data[key] = self.Data[key]
+            elif diff(self, other, key):
                 raise Exception('The data member called %s is not the same for these two objects' % key)
             elif key in self.Data:
                 Sum.Data[key] = copy.deepcopy(self.Data[key])
             elif key in other.Data:
                 Sum.Data[key] = copy.deepcopy(other.Data[key])
-        # FrameKeys must be a list.
-        for key in self.FrameKeys:
+        for key in FrameVariableNames:
             if both(self, other, key):
                 if type(self.Data[key]) is not list:
                     raise Exception('Key %s in self is a FrameKey, it must be a list' % key)
@@ -460,14 +480,15 @@ class Molecule(object):
         if not isinstance(other,Molecule):
             raise TypeError('A Molecule instance can only be added to another Molecule instance')
         # Create the sum of the two classes by copying the first class.
-        for key in (self.MetaKeys | self.AtomKeys):
-            if diff(self, other, key):
+        for key in AtomVariableNames | MetaVariableNames:
+            if key == 'fnm' or key == 'ftype': pass
+            elif diff(self, other, key):
                 raise Exception('The data member called %s is not the same for these two objects' % key)
             # Information from the other class is added to this class (if said info doesn't exist.)
             elif key in other.Data:
                 self.Data[key] = copy.deepcopy(other.Data[key])
         # FrameKeys must be a list.
-        for key in self.FrameKeys:
+        for key in FrameVariableNames:
             if both(self, other, key):
                 if type(self.Data[key]) is not list:
                     raise Exception('Key %s in self is a FrameKey, it must be a list' % key)
@@ -475,7 +496,7 @@ class Molecule(object):
                     raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
                 self.Data[key] += other.Data[key]
             elif either(self, other, key):
-                raise Exception('Key %s is FrameKeys must exist in both self and other for them to be added (for now).')
+                raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
         return self
 
     def append(self,other):
@@ -536,7 +557,12 @@ class Molecule(object):
         ## Read in stuff if we passed in a file name, otherwise return an empty instance.
         if fnm != None:
             self.Data['fnm'] = fnm
-            Parsed = self.read(fnm, ftype)
+            if ftype == None:
+                ## Try to determine from the file name using the extension.
+                ftype = os.path.splitext(fnm)[1][1:]
+            self.Data['ftype'] = ftype
+            ## Actually read the file.
+            Parsed = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)
             ## Set member variables.
             for key, val in Parsed.items():
                 self.Data[key] = val
@@ -558,15 +584,15 @@ class Molecule(object):
             if arg not in self.Data:
                 raise Exception("%s is a required attribute for writing this type of file but it's not present" % arg)
 
-    def read(self, fnm, ftype = None):
-        """ Read in a file. """
-        if ftype == None:
-            ## Try to determine from the file name using the extension.
-            ftype = os.path.splitext(fnm)[1][1:]
-        ## This calls the table of reader functions and prints out an error message if it fails.
-        ## 'Answer' is a dictionary of data that is returned from the reader function.
-        Answer = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)
-        return Answer
+    # def read(self, fnm, ftype = None):
+    #     """ Read in a file. """
+    #     if ftype == None:
+    #         ## Try to determine from the file name using the extension.
+    #         ftype = os.path.splitext(fnm)[1][1:]
+    #     ## This calls the table of reader functions and prints out an error message if it fails.
+    #     ## 'Answer' is a dictionary of data that is returned from the reader function.
+    #     Answer = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)
+    #     return Answer
 
     def write(self,fnm=None,ftype=None,append=False,select=None):
         if fnm == None and ftype == None:
@@ -578,6 +604,8 @@ class Molecule(object):
         self.fout = fnm
         if type(select) is int:
             select = [select]
+        if select == None:
+            select = range(len(self))
         Answer = self.Write_Tab[self.Funnel[ftype.lower()]](select)
         ## Any method that returns text will give us a list of lines, which we then write to the file.
         if Answer != None:
@@ -618,6 +646,8 @@ class Molecule(object):
         elif type(other) is str:
             OtherMol = Molecule(other)
         for key in OtherMol.QuantumKeys:
+            if key in AtomVariableNames and len(OtherMol.Data[key]) != self.na:
+                raise Exception('The quantum-key %s is AtomData, but it doesn\'t have the same number of atoms as the Molecule object we\'re adding it to.')
             self.Data[key] = OtherMol.Data[key]
 
     def add_virtual_site(self, idx, **kwargs):
@@ -670,6 +700,12 @@ class Molecule(object):
         return New
 
     def openmm_positions(self):
+        """ Returns the Cartesian coordinates in the Molecule object in
+        a list of OpenMM-compatible positions, so it is possible to type
+        simulation.context.setPositions(Mol.openmm_positions()[0])
+        or something like that.
+        """
+
         Positions = []
         self.require('xyzs')
         for xyz in self.xyzs:
@@ -680,8 +716,36 @@ class Molecule(object):
         return Positions
 
     def openmm_boxes(self):
+        """ Returns the periodic box vectors in the Molecule object in
+        a list of OpenMM-compatible boxes, so it is possible to type
+        simulation.context.setPeriodicBoxVectors(Mol.openmm_boxes()[0])
+        or something like that.
+        """
+        
         self.require('boxes')
         return [(Vec3(box[0]/10,0.0,0.0), Vec3(0.0,box[1]/10,0.0), Vec3(0.0,0.0,box[2]/10)) * nanometer for box in self.boxes]
+
+    def split(self, fnm=None, ftype=None, method="chunks", num=None):
+
+        """ Split the molecule object into a number of separate files
+        (chunks), either by specifying the number of frames per chunk
+        or the number of chunks.  Only relevant for "trajectories".
+        The type of file may be specified; if they aren't specified
+        then the original file type is used.
+
+        The output file names are [name].[numbers].[extension] where
+        [name] can be specified by passing 'fnm' or taken from the
+        object's 'fnm' attribute by default.  [numbers] are integers
+        ranging from the lowest to the highest chunk number, prepended
+        by zeros.
+
+        If the number of chunks / frames is not specified, then one file
+        is written for each frame.
+        
+        @return fnms A list of the file names that were written.
+        """
+        
+        
 
     #=====================================#
     #|         Reading functions         |#
@@ -767,6 +831,7 @@ class Molecule(object):
         forces   = []
         espxyzs  = []
         espvals  = []
+        interaction = []
         for line in open(fnm):
             if 'COORDS' in line:
                 xyzs.append(np.array([float(i) for i in line.split()[1:]]).reshape(-1,3))
@@ -778,9 +843,22 @@ class Molecule(object):
                 espvals.append(np.array([float(i) for i in line.split()[1:]]))
             elif 'ENERGY' in line:
                 energies.append(float(line.split()[1]))
-            elif 'ENERGY' in line:
-                energies.append(float(line.split()[1]))
-        return {'xyzs' : xyzs, 'qm_energies' : energies, 'qm_forces' : forces, 'qm_espxyzs' : espxyzs, 'qm_espvals' : espvals}
+            elif 'INTERACTION' in line:
+                interaction.append(float(line.split()[1]))
+        Answer = {}
+        if len(xyzs) > 0:
+            Answer['xyzs'] = xyzs
+        if len(energies) > 0:
+            Answer['qm_energies'] = energies
+        if len(interaction) > 0:
+            Answer['qm_interaction'] = interaction
+        if len(forces) > 0:
+            Answer['qm_forces'] = forces
+        if len(espxyzs) > 0:
+            Answer['qm_espxyzs'] = espxyzs
+        if len(espvals) > 0:
+            Answer['qm_espvals'] = espvals
+        return Answer
 
     def read_mol2(self, fnm):
         xyz      = []
@@ -1055,7 +1133,7 @@ class Molecule(object):
     def read_qcin(self, fnm):
         """ Read a Q-Chem input file.
 
-        These files can be complicated, and I can't write a completely
+        These files can be very complicated, and I can't write a completely
         general parser for them.  It is important to keep our goal in
         mind:
 
@@ -1089,6 +1167,9 @@ class Molecule(object):
         Answer               = {}
         SectionData          = []
         template_cut         = 0
+        readsuf              = True
+        suffix               = [] # The suffix, which comes after every atom line in the $molecule section, is for determining the MM atom type and topology.
+        ghost                = [] # If the element in the $molecule section is preceded by an '@' sign, it's a ghost atom for counterpoise calculations.
 
         for line in open(fnm).readlines():
             line = line.strip().expandtabs()
@@ -1103,6 +1184,8 @@ class Molecule(object):
                             xyzs.append(np.array(xyz))
                         xyz = []
                         fff = True
+                        if suffix != []:
+                            readsuf = False
                     elif section == 'rem':
                         if reading_template:
                             qcrems.append(qcrem)
@@ -1115,13 +1198,20 @@ class Molecule(object):
                     inside_section = True
             elif inside_section:
                 if section == 'molecule':
-                    if len(dline) == 4 and all([isfloat(dline[i]) for i in range(1,4)]):
+                    if len(dline) >= 4 and all([isfloat(dline[i]) for i in range(1,4)]):
                         if fff:
                             reading_template = False
                             template_cut = list(i for i, dat in enumerate(template) if dat[0] == '@@@@')[-1]
                         else:
-                            elem.append(sline[0])
+                            if re.match('^@', sline[0]): # This is a ghost atom
+                                ghost.append(True)
+                            else:
+                                ghost.append(False)
+                            elem.append(re.sub('@','',sline[0]))
                         xyz.append([float(i) for i in sline[1:4]])
+                        if readsuf and len(sline) > 4:
+                            whites      = re.split('[^ ]+',line)
+                            suffix.append(''.join([whites[j]+sline[j] for j in range(4,len(sline))]))
                     elif re.match("[+-]?[0-9]+ +[0-9]+$",line.split('!')[0].strip()):
                         if not fff:
                             charge = int(sline[0])
@@ -1152,11 +1242,15 @@ class Molecule(object):
                   'charge'      : charge,
                   'mult'        : mult,
                   }
+        if suffix != []:
+            Answer['qcsuf'] = suffix
 
         if len(xyzs) > 0:
             Answer['xyzs'] = xyzs
         if len(elem) > 0:
             Answer['elem'] = elem
+        if len(ghost) > 0:
+            Answer['qm_ghost'] = ghost
         return Answer
 
 
@@ -1330,6 +1424,8 @@ class Molecule(object):
         Aux = self.read_qcin(fnm)
         Answer['qctemplate'] = Aux['qctemplate']
         Answer['qcrems'] = Aux['qcrems']
+        if 'qm_ghost' in Aux:
+            Answer['qm_ghost'] = Aux['qm_ghost']
         # Copy out the charge and multiplicity
         Answer['charge'] = int(Floats['charge'][0])
         Answer['mult']   = int(Floats['mult'][0]) + 1
@@ -1388,7 +1484,7 @@ class Molecule(object):
     def write_qcin(self, select):
         self.require('qctemplate','qcrems','charge','mult','xyzs','elem')
         out = []
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             xyz = self.xyzs[I]
             remidx = 0
             molecule_printed = False
@@ -1401,8 +1497,12 @@ class Molecule(object):
                         if molecule_printed == False:
                             molecule_printed = True
                             out.append("%i %i" % (self.charge, self.mult))
+                            an = 0
                             for e, x in zip(self.elem, xyz):
-                                out.append(format_xyz_coord(e, x))
+                                pre = '@' if ('qm_ghost' in self.Data and self.Data['qm_ghost'][an]) else ''
+                                suf =  self.Data['qcsuf'][an] if 'qcsuf' in self.Data else ''
+                                out.append(pre + format_xyz_coord(e, x) + suf)
+                                an += 1
                     if SectName == 'rem':
                         for key, val in self.qcrems[remidx].items():
                             out.append("%-21s %-s" % (key, str(val)))
@@ -1420,7 +1520,7 @@ class Molecule(object):
     def write_xyz(self, select):
         self.require('elem','xyzs')
         out = []
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             xyz = self.xyzs[I]
             out.append("%-5i" % self.na)
             out.append(self.comms[I])
@@ -1431,7 +1531,7 @@ class Molecule(object):
     def write_molproq(self, select):
         self.require('xyzs','partial_charge')
         out = []
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             xyz = self.xyzs[I]
             # Comment comes first, then number of atoms.
             out.append(self.comms[I])
@@ -1442,13 +1542,9 @@ class Molecule(object):
 
     def write_mdcrd(self, select):
         self.require('xyzs')
-        # Groups a big long list into groups of ten.
-        def grouper(n, iterable):
-            args = [iter(iterable)] * n
-            return list([e for e in t if e != None] for t in itertools.izip_longest(*args))
         # In mdcrd files, there is only one comment line
         out = ['mdcrd file generated using ForceBalance'] 
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             xyz = self.xyzs[I]
             out += [''.join(["%8.3f" % i for i in g]) for g in grouper(10, list(xyz.flatten()))]
             if 'boxes' in self.Data:
@@ -1460,7 +1556,7 @@ class Molecule(object):
         out = []
         if 'suffix' not in self.Data:
             sys.stderr.write("Beware, this .arc file contains no atom type or topology info\n")
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             xyz = self.xyzs[I]
             out.append("%6i  %s" % (self.na, self.comms[I]))
             for i in range(self.na):
@@ -1479,7 +1575,7 @@ class Molecule(object):
         else:
             atomname = self.atomname
 
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             xyz = self.xyzs[I]
             xyzwrite = xyz.copy()
             xyzwrite /= 10.0 # GROMACS uses nanometers
@@ -1497,7 +1593,7 @@ class Molecule(object):
         dcd       = _dcdlib.open_dcd_write(self.fout, "dcd", natoms)
         ts        = MolfileTimestep()
         _xyz      = c_float * (natoms.value * 3)
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             xyz = self.xyzs[I]
             ts.coords = _xyz(*list(xyz.flatten()))
             ts.A      = self.boxes[I][0] if 'boxes' in self.Data else 1.0
@@ -1543,7 +1639,7 @@ class Molecule(object):
 
         out = []
 
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             XYZ = self.xyzs[I]
             for i in range(self.na):
                 ATOMNUM = i + 1
@@ -1587,19 +1683,23 @@ class Molecule(object):
         
     def write_qdata(self, select):
         """ Text quantum data format. """
-        self.require('xyzs','qm_energies','qm_forces')
+        #self.require('xyzs','qm_energies','qm_forces')
         out = []
-        for I in (select if select != None else range(len(self))):
+        for I in select:
             xyz = self.xyzs[I]
             out.append("JOB %i" % I)
             out.append("COORDS"+pvec(xyz))
-            out.append("ENERGY % .12e" % self.qm_energies[I])
+            if 'qm_energies' in self.Data:
+                out.append("ENERGY % .12e" % self.qm_energies[I])
             if 'mm_energies' in self.Data:
                 out.append("EMD0   % .12e" % self.mm_energies[I])
-            out.append("FORCES"+pvec(self.qm_forces[I]))
+            if 'qm_forces' in self.Data:
+                out.append("FORCES"+pvec(self.qm_forces[I]))
             if 'qm_espxyzs' in self.Data and 'qm_espvals' in self.Data:
                 out.append("ESPXYZ"+pvec(self.qm_espxyzs[I]))
                 out.append("ESPVAL"+pvec(self.qm_espvals[I]))
+            if 'qm_interaction' in self.Data:
+                out.append("INTERACTION % .12e" % self.qm_interaction[I])
             out.append('')
         return out
 

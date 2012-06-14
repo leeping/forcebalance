@@ -12,7 +12,7 @@ ffdir forcefield
 penalty_type L2
 
 # (allcap) The job type, defaults to a single-point evaluation of objective function
-jobtype bfgs
+jobtype newton
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
 forcefield amoebawater.xml
@@ -36,7 +36,7 @@ eig_lowerbound 0.0001
 finite_difference_h 0.001
 
 # (float) Factor for multiplicative penalty function in objective function
-penalty_multiplicative 0.1
+penalty_additive 0.1
 
 trust0 0.1
 
@@ -64,8 +64,10 @@ $simulation
 name Density
 
 # (allcap) The type of fitting simulation, for instance AbInitio_GMXX2
-simtype PropertyMatch_OpenMM
+simtype Liquid_OpenMM
 
 # (float) Weight of the current simulation (with respect to other simulations)
 weight 1.0
+
+wq_port 9230
 $end

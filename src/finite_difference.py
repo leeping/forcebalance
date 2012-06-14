@@ -1,5 +1,6 @@
 """ Finite difference module. """
 
+import traceback
 from numpy import dot
 
 def f1d2p(f, h, f0 = None):
@@ -106,6 +107,12 @@ def f12d3p(f, h, f0 = None):
     fp = (f1-fm1)/(2*h)
     fpp = (fm1-2*f0+f1)/(h*h)
     return fp, fpp
+
+def in_fd():
+    """ Invoking this function from anywhere will tell us whether we're being called by a finite-difference function.
+    This is mainly useful for deciding when to update the 'qualitative indicators' and when not to. """
+
+    return any([i in [j[2] for j in traceback.extract_stack()] for i in ['f1d2p','f12d3p','f1d5p','f12d7p','f1d7p']])
 
 def fdwrap(func,mvals0,pidx,key=None,**kwargs):
     """

@@ -163,7 +163,8 @@ class Liquid_OpenMM(Liquid):
         queue_up(self.wq,
                  command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
                  input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
-                 output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
+                 #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]]
+                 output_files = ['npt_result.p', 'npt.out', self.FF.fnms[0]])
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
@@ -182,12 +183,16 @@ class Liquid_OpenMM(Liquid):
                                          (os.path.join(trajpath,'dynamics.dcd'), 'dynamics.dcd')],
                           output_files = [(os.path.join(rnd,'evaltraj_result.p'),'evaltraj_result.p'), 
                                           (os.path.join(rnd,'evaltraj.log'),'evaltraj.log')])
-        wq_wait(self.wq)
+        #wq_wait(self.wq)
+
+    def get_evaltraj_result(self, Dict, name, key, bGradient):
+        cwd = os.getcwd()
+        rnd = os.path.join(cwd,name)
         if bGradient:
             Answer = lp_load(open(os.path.join(rnd,'evaltraj_result.p')))[1]
         else:
             Answer = lp_load(open(os.path.join(rnd,'evaltraj_result.p')))[0]
-        return Answer
+        Dict[key] = Answer
         
 class AbInitio_OpenMM(AbInitio):
 

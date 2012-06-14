@@ -480,7 +480,7 @@ def warn_press_key(warning):
             print line
     else:
         print "You're not supposed to pass me a variable of this type:", type(warning)
-    print "\x1b[1;91mPress any key (I assume no responsibility for what happens after this!)\x1b[0m"
+    print "\x1b[1;91mPress Enter (I assume no responsibility for what happens after this!)\x1b[0m"
     raw_input()
 
 #=========================================#
