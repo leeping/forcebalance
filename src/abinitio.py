@@ -499,14 +499,17 @@ class AbInitio(FittingSimulation):
                     M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                 M0_M_p[p]  += P * M_p[p]
                 M0_Q_p[p]  += R * M_p[p]
-                M0_M_pp[p] += P * M_pp[p]
-                M0_Q_pp[p] += R * M_pp[p]
+                #M0_M_pp[p] += P * M_pp[p]
+                #M0_Q_pp[p] += R * M_pp[p]
                 Xi_p        = 2 * X * M_p[p]
                 SPiXi_p[p] += P * Xi_p
                 SRiXi_p[p] += R * Xi_p
                 if not AHess: continue
                 M_pp[p] = ddM_all[i, p]
-                Xi_pq       = 2 * (M_p[p] * M_p[p] + X * M_pp[p])
+                # This formula is more correct, but perhapsively convergence is slower.
+                #Xi_pq       = 2 * (M_p[p] * M_p[p] + X * M_pp[p])
+                # Gauss-Newton formula for approximate Hessian
+                Xi_pq       = 2 * (M_p[p] * M_p[p])
                 SPiXi_pq[p,p] += P * Xi_pq
                 SRiXi_pq[p,p] += R * Xi_pq
                 for q in range(p):

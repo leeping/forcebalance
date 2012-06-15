@@ -396,7 +396,7 @@ class FF(object):
                     # Add pid into the dictionary.
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
-                    self.patoms.append([self.R[ffname].resatom])
+                    self.patoms.append([self.R[ffname].molatom])
                     # Also append pid to the parameter list
                     self.assign_p0(self.np,float(sline[pfld]))
                     self.assign_field(self.np,ffname,ln,pfld,1)
@@ -424,7 +424,7 @@ class FF(object):
                     pid = self.R[ffname].build_pid(pfld)
                     self.map[pid] = prep
                     # This repeated parameter ID also has these atoms involved.
-                    self.patoms[prep].append(self.R[ffname].resatom)
+                    self.patoms[prep].append(self.R[ffname].molatom)
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
     
@@ -592,6 +592,12 @@ class FF(object):
             pvals = exp(mvals) * self.pvals0
         else:
             pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0
+        concern= ['polarizability','epsilon','VDWT']
+        # Guard against certain types of parameters changing sign.
+        for i in range(self.np):
+            if any([j in self.plist[i] for j in concern]) and pvals[i] * self.pvals0[i] < 0:
+                print "Parameter %s has changed sign but it's not allowed to! Setting to zero." % self.plist[i]
+                pvals[i] = 0.0
         return pvals
 
     def create_mvals(self,pvals):
@@ -730,44 +736,45 @@ class FF(object):
             Adict = OrderedDict()
             # This is a loop over files
             for r in self.R.values():
-                # This is a loop over residues
+                # This is a loop over molecules
                 for k, v in r.adict.items():
                     Adict[k] = v
-            nres = 0
-            for resname, resatoms in Adict.items():
-                res_charge_count = zeros(self.np, dtype=float)
+            nmol = 0
+            for molname, molatoms in Adict.items():
+                mol_charge_count = zeros(self.np, dtype=float)
                 tq = 0
                 qmap = []
                 qid = []
                 for i in range(self.np):
                     qct = 0
                     qidx = []
-                    for ires, iatoms in self.patoms[i]:
+                    for imol, iatoms in self.patoms[i]:
                         for iatom in iatoms:
-                            if ires == resname and iatom in resatoms:
+                            if imol == molname and iatom in molatoms:
                                 qct += 1
                                 tq += 1
-                                qidx.append(resatoms.index(iatom))
+                                qidx.append(molatoms.index(iatom))
                     if any([j in self.plist[i] for j in concern]) and qct > 0:
                         qmap.append(i)
                         qid.append(qidx)
-                        print "Parameter %i occurs %i times in residue %s in locations %s (%s)" % (i, qct, resname, str(qidx), self.plist[i])
+                        print "Parameter %i occurs %i times in molecule %s in locations %s (%s)" % (i, qct, molname, str(qidx), self.plist[i])
                 #Here is where we build the qtrans2 matrix.
                 if len(qmap) > 0:
                     qtrans2 = build_qtrans2(tq, qid, qmap)
                     if self.constrain_charge:
                         insert_mat(qtrans2, qmap)
-                if nres == 0:
+                if nmol == 0:
                     self.qid = qid
                     self.qmap = qmap
                 else:
-                    print "Note: ESP fitting will be performed assuming that residue id %s is the FIRST residue and the only one being fitted." % resname
-                nres += 1
+                    print "Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted." % molname
+                nmol += 1
         elif self.constrain_charge:
-            warn_press_key("Not all force field parsers have 'adict' {residue:atomnames} implemented.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
+            warn_press_key("Not all force field parsers have 'adict' {molecule:atomnames} implemented.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
             qnr = 0
             if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
                 # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
+                # This needs to be changed to Chain or Molecule
                 ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata]))
             for i in range(self.np):
                 if any([j in self.plist[i] for j in concern]):

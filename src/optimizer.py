@@ -214,7 +214,7 @@ class Optimizer(object):
         else:
             xk       = self.mvals0.copy()
             print
-            data     = self.Objective.Full(xk,Ord,verbose=True) # Try to get a Hessian no matter what on the first step.
+            data     = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H  = data['X'], data['G'], data['H']
             ehist    = np.array([X])
             xk_prev  = xk.copy()
@@ -337,24 +337,7 @@ class Optimizer(object):
 
 
     def step(self, xk, data, trust):
-        """ Computes the Newton-Raphson or BFGS step.
-
-        The step is given by the inverse of the Hessian times the gradient.
-        There are some extra considerations here:
-
-        First, certain eigenvalues of the Hessian may be negative.  Then the
-        NR optimization will take us to a saddle point and not a true minimum.
-        In these instances, we mix in some steepest descent by adding a multiple
-        of the identity matrix to the Hessian.
-
-        Second, certain eigenvalues may be very small.  If the Hessian is close to
-        being singular, then we also add in some steepest descent.
-
-        Third, certain components of the gradient / Hessian are strictly zero, or they
-        are excluded from our optimization.  These components are explicitly deleted
-        when we do the Hessian inversion, and reinserted as a zero in the step.
-
-        Fourth, we rescale the step size back to the trust radius.
+        """ Computes the next step in the parameter space.  There are lots of tricks here that I will document later.
 
         @param[in] G The gradient
         @param[in] H The Hessian
@@ -445,16 +428,34 @@ class Optimizer(object):
             print "\rHessian diagonal scaling = %.1e: found length %.1e" % (1+L**2,N),
             return (N - trust)**2
 
-        bump = False
-        dx, expect = solver(0)
-        dxnorm = norm(dx)
-        if dxnorm > trust:
-            bump = True
-            # Tried a few optimizers here, seems like Brent works well.
-            LOpt = optimize.brent(trust_fun,brack=(0.0,3.0),tol=1e-4)
-            dx, expect = solver(LOpt)
+        def search_fun(L):
+            # Evaluate ONLY the objective function.  Most useful when
+            # the objective is cheap, but the derivative is expensive.
+            dx, sol = solver(L) # dx is how much the step changes from the previous step.
+            # This is our trial step.
+            xk_ = dx + xk
+            Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
+            print "Searching! Hessian diagonal scaling = %.4e, length %.1e, result %.1e" % (1+L**2,norm(dx),Result)
+            return Result
+        
+        if self.trust0 > 0: # This is the trust region code.
+            bump = False
+            dx, expect = solver(0)
             dxnorm = norm(dx)
-            print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)
+            if dxnorm > trust:
+                bump = True
+                # Tried a few optimizers here, seems like Brent works well.
+                LOpt = optimize.brent(trust_fun,brack=(0.0,3.0),tol=1e-4)
+                dx, expect = solver(LOpt)
+                dxnorm = norm(dx)
+                print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)
+        else: # This is the search code.
+            # One percent tolerance, will tune later
+            bump = False
+            Result = optimize.brent(search_fun,brack=(0.0,3.0),tol=1e-1,full_output=1)
+            #optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
+            dx, _ = solver(Result[0])
+            expect = Result[1]
         return dx, expect, bump
 
     def NewtonRaphson(self):
