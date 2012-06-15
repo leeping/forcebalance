@@ -223,7 +223,8 @@ class FittingSimulation(object):
                     else:
                         # I could use the tarfile module here
                         print "Backing up:", self.tempdir, 'to:', "backups/%s.%i.tar.bz2" % (self.name,FileCount)
-                        subprocess.call(["tar","cjf",CandFile,self.name,"--remove-files"])
+                        subprocess.call(["tar","cjf",CandFile,self.name])
+                        shutil.rmtree(self.name)
                         break
                 os.chdir(cwd)
         # Delete the temporary directory
