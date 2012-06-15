@@ -78,6 +78,7 @@ gen_opts_types = {
                  "have_vsite"       : (0, 'Specify whether there are virtual sites in the simulation (being fitted or not).  Enforces calculation of vsite positions.'),
                  "constrain_charge" : (1, 'Specify whether to constrain the charges on the molecules.'),
                  "print_gradient"   : (1, 'Print the objective function gradient at every step'),
+                 "logarithmic_map"  : (0, 'Optimize in the space of log-variables'),
                  "print_hessian"    : (1, 'Print the objective function Hessian at every step'),
                  "print_parameters" : (1, 'Print the mathematical and physical parameters at every step')
                  },
