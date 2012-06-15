@@ -203,6 +203,18 @@ class Liquid(FittingSimulation):
                     322.9 : 42.92436572, 327.7 : 42.71348245, 332.9 : 42.48379470, 
                     338.4 : 42.23946269, 344.4 : 41.97128539, 350.8 : 41.68335109, 
                     357.8 : 41.36620261, 365.2 : 41.02840899, 373.2 : 40.66031044}
+        
+        # This is just the pV part
+        Hvap_exp = {273.2 : -0.394460540333, 274.2 : -0.394437383223, 275.4 : -0.394418685939, 
+                    276.6 : -0.394409574614, 277.8 : -0.394409692941, 279.2 : -0.394421052586, 
+                    280.7 : -0.39444606189,  282.3 : -0.394486817281, 284.1 : -0.394549248932, 
+                    285.9 : -0.394628441633, 287.9 : -0.394735200734, 290.1 : -0.394874394186, 
+                    292.4 : -0.395043083314, 294.9 : -0.39525207784,  297.6 : -0.395506344197, 
+                    300.4 : -0.395799780832, 303.5 : -0.396158424984, 306.9 : -0.396590645846, 
+                    310.5 : -0.397090606376, 314.3 : -0.397679425521, 318.5 : -0.398364729273, 
+                    322.9 : -0.399135550745, 327.7 : -0.400039162216, 332.9 : -0.401091625991, 
+                    338.4 : -0.402279260746, 344.4 : -0.403665147146, 350.8 : -0.405241244773, 
+                    357.8 : -0.407079124765, 365.2 : -0.409152654759, 373.2 : -0.411530630162}
 
         # Sorted list of temperatures.
         Temps = np.array(sorted([i for i in Rho_exp]))
@@ -416,11 +428,14 @@ class Liquid(FittingSimulation):
             mBeta = -1/kb/T
             Rho_calc[T]   = np.dot(W,R)
             Rho_grad[T]   = mBeta*(flat(np.mat(G)*col(W*R)) - np.dot(W,R)*Gbar)
-            Hvap_calc[T]  = np.dot(mW,mE) - np.dot(W,E)/216 + kb*T - np.dot(W, PV)
+            # Hvap_calc[T]  = np.dot(mW,mE) - np.dot(W,E)/216 + kb*T - np.dot(W, PV)
+            # Hvap_grad[T]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
+            # Hvap_grad[T] -= (Gbar + mBeta*(flat(np.mat(G)*col(W*E)) - np.dot(W,E)*Gbar)) / 216
+            # Hvap_grad[T] -= mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar)
 
-            Hvap_grad[T]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
-            Hvap_grad[T] -= (Gbar + mBeta*(flat(np.mat(G)*col(W*E)) - np.dot(W,E)*Gbar)) / 216
-            Hvap_grad[T] -= mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar)
+            Hvap_calc[T]  = - np.dot(W, PV)
+            Hvap_grad[T]  = -1*( mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar))
+
             Rho_std[T]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             Hvap_std[T]   = np.sqrt(sum(C**2 * np.array(Hvap_errs)**2))
 

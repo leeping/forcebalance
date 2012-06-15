@@ -87,9 +87,9 @@ gen_opts_types = {
                  "convergence_objective"  : (1e-4, 'Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)'),
                  "convergence_gradient"   : (1e-4, 'Convergence criterion of gradient norm'),
                  "convergence_step"       : (1e-4, 'Convergence criterion of step size (just needs to fall below this threshold)'),
-                 "eig_lowerbound"         : (1e-2, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
+                 "eig_lowerbound"         : (1e-4, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
                  "finite_difference_h"    : (1e-2, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
-                 "penalty_additive"       : (0.1,   'Factor for additive penalty function in objective function'),
+                 "penalty_additive"       : (0.0,   'Factor for additive penalty function in objective function'),
                  "penalty_multiplicative" : (0.0,   'Factor for multiplicative penalty function in objective function'),
                  "penalty_hyperbolic_b"   : (0.001, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b'),
                  "adaptive_factor"        : (0.25, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.'),
@@ -179,6 +179,7 @@ def read_pvals(fobj):
 def read_priors(fobj):
     Answer = {}
     for line in fobj:
+        line = line.split("#")[0]
         if re.match("(/priors)|(^\$end)",line):
             break
         Answer[line.split()[0]] = float(line.split()[-1])

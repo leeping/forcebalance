@@ -2,24 +2,24 @@
 1    2    yes   0.5   0.5
 
 [ atomtypes ]
-OW      8     15.99940     0.000       A    2.996148481318e-01  1.200825216994e+00 ; PARM 5 6
+OW      8     15.99940     0.000       A    3.124181497252e-01  7.399787961467e-01 ; PARM 5 6
 HW      1      1.00800     0.520       A    0.00000e+00  0.00000e+00
 MW      0      0.00000    -1.040       D    0.00000e+00  0.00000e+00
 
 [ bondtypes ]
-OW     HW     1          9.566105493004e-02     4.172052862651e+05 ; PARM 3 4
+OW     HW     1          9.606421095219e-02     4.625548202035e+05 ; PARM 3 4
 
 [ angletypes ]
-HW     OW     HW     1     1.083372679618e+02     3.521104542950e+02 ; PARM 4 5
+HW     OW     HW     1     1.060420201028e+02     3.610447384850e+02 ; PARM 4 5
 
 [ moleculetype ]
 SOL          2
 
 [ atoms ]
 1       OW        1       SOL      OW     1       0.0
-2       HW        1       SOL     HW1     1       5.125798422094e-01 ; PARM 6
-3       HW        1       SOL     HW2     1       5.125798422094e-01 ; RPT 6 COUL:SOL-HW1 /RPT
-4       MW        1       SOL      MW     1      -1.025159684419e+00 ; PARM 6
+2       HW        1       SOL     HW1     1       5.189809284274e-01 ; PARM 6
+3       HW        1       SOL     HW2     1       5.189809284274e-01 ; RPT 6 COUL:SOL-2 /RPT
+4       MW        1       SOL      MW     1      -1.037961856855e+00 ; PARM 6
 
 [ bonds ]
 1     2     1
@@ -35,5 +35,5 @@ SOL          2
 4     1     2     3
 
 [ virtual_sites3 ]
-4     1     2     3     1     1.327948025964e-01     1.327948025964e-01 ; RPT 6 VSITE3A:SOL-MW /RPT PARM 5
+4     1     2     3     1     1.379844065108e-01     1.379844065108e-01 ; RPT 6 VSITE3A:SOL-4 /RPT PARM 5
 

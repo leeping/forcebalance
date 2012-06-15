@@ -270,7 +270,8 @@ class ITP_Reader(BaseReader):
             self.itype = pftypes[self.nbtype]
         elif self.sec == 'atoms':
             # Ah, this is the atom name, not the atom number.
-            atom = [s[4]]
+            # Maybe I should use the atom number.
+            atom = [s[0]]
             self.atomnames.append(s[4])
             self.itype = 'COUL'
             # Build the adict here.
@@ -327,6 +328,7 @@ class ITP_Reader(BaseReader):
             self.suffix = ':' + ''.join(atom)
         else:
             self.suffix = ':' + '-'.join([self.mol,''.join(atom)])
+        self.molatom = (self.mol, atom if type(atom) is list else [atom])
 
 def gmxx2_print(fnm, vec, type):
     """ Prints a vector to a file to feed it to the modified GROMACS.
