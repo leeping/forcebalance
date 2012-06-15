@@ -39,7 +39,7 @@ class LeastSquares(FittingSimulation):
         return
         
     def indicate(self):
-        print "Sim: %-15s" % self.name, 
+        print "\rSim: %-15s" % self.name, 
         print "Objective = %.5e" % self.objective
         return
 

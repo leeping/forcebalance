@@ -23,6 +23,9 @@ class LRDF_Psi4(LeastSquares):
         os.symlink(os.path.join(self.root,self.simdir,"input.dat"),os.path.join(abstempdir,"input.dat"))
 
     def driver(self):
+        ## Delete objective.dat (because PSI4 appends it).
+        if os.path.exists("objective.dat"):
+            os.unlink("objective.dat")
         ## Actually run PSI4.
         _exec("psi4", print_command=False)
         return np.array([[float(i) for i in line.split()] for line in open("objective.dat").readlines()])
