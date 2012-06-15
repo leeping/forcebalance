@@ -184,7 +184,8 @@ class FF(object):
         #======================================#
         # Options that are given by the parser #
         #======================================#
-
+        ## As these options proliferate, the force field class becomes less standalone.
+        ## I need to think of a good solution here...
         ## The root directory of the project
         self.root        = os.getcwd()
         ## File names of force fields
@@ -195,6 +196,8 @@ class FF(object):
         self.priors      = options['priors']
         ## Whether to constrain the charges.
         self.constrain_charge  = options['constrain_charge']
+        ## Whether to constrain the charges.
+        self.logarithmic_map  = options['logarithmic_map']
         
         #======================================#
         #     Variables which are set here     #
@@ -585,7 +588,10 @@ class FF(object):
         @return pvals The physical parameters
         
         """
-        pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0
+        if self.logarithmic_map:
+            pvals = exp(mvals) * self.pvals0
+        else:
+            pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0
         return pvals
 
     def create_mvals(self,pvals):
@@ -596,6 +602,8 @@ class FF(object):
         @param[in] pvals The physical parameters
         @return mvals The mathematical parameters
         """
+        if self.logarithmic_map:
+            raise Exception('create_mvals has not been implemented for logarithmic_map')
         mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
         return mvals
         

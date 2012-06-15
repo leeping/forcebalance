@@ -745,7 +745,7 @@ class Optimizer(object):
             Q = (Adata[i] - Fdata[i])/Denom
             cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
             cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
-            print "    %-8i%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
+            print "\r    %-8i%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
                   % (i, self.FF.plist[i][:20], Adata[i], Fdata[i], cD, D, cQ, Q)
 
     def FDCheckH(self):
@@ -785,7 +785,7 @@ class Optimizer(object):
                 Q = (Adata[i,j] - Fdata[i,j])/Denom
                 cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
                 cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
-                print "    %-8i%-20s%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
+                print "\r    %-8i%-20s%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
                       % (i, self.FF.plist[i][:20], self.FF.plist[j][:20], Adata[i,j], Fdata[i,j], cD, D, cQ, Q)
 
     def readchk(self):
