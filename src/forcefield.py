@@ -728,7 +728,6 @@ class FF(object):
                 for j in range(nq-i-1):
                     qtrans2[i+j+1, :] = orthogonalize(qtrans2[i+j+1, :], cons[i])
             return qtrans2
-
         # Here we build a charge constraint for each molecule.
         if all(len(r.adict) > 0 for r in self.R.values()):
             print "Building charge constraints..."

@@ -431,8 +431,9 @@ class Liquid(FittingSimulation):
             Hvap_calc[T]  = np.dot(mW,mE) - np.dot(W,E)/216 + kb*T - np.dot(W, PV)
             Hvap_grad[T]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
             Hvap_grad[T] -= (Gbar + mBeta*(flat(np.mat(G)*col(W*E)) - np.dot(W,E)*Gbar)) / 216
+
             # The pV terms are behaving strangely, there's a chance I got the derivative wrong
-            # However, it contributes such a negligible amount to the gradient / Hessian that perhaps I'll just leave it out.
+            # However, it contributes such a negligible amount to the gradient / Hessian that perhaps I'll just leave the derivative term out.
             # Hvap_grad[T] -= mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar)
             # Hvap_calc[T]  = - np.dot(W, PV)
             # Hvap_grad[T]  = -1*( mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar))

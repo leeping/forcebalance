@@ -6,7 +6,7 @@
 
 import os
 import shutil
-from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
+from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
 from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt
 from fitsim import FittingSimulation
 from molecule import Molecule, format_xyz_coord
@@ -14,6 +14,7 @@ from re import match, sub
 import subprocess
 from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
+#from _increment import AbInitio_Build
 
 class AbInitio(FittingSimulation):
 
@@ -403,8 +404,8 @@ class AbInitio(FittingSimulation):
         if (self.w_energy == 0.0 and self.w_force == 0.0):
             AGrad = False
             AHess = False
-        Z       = 0
-        Y       = 0
+        Z       = 0.0
+        Y       = 0.0
         Q = zeros(NCP1,dtype=float)
         # Derivatives
         M_p     = zeros((np,NCP1),dtype=float)
@@ -455,6 +456,15 @@ class AbInitio(FittingSimulation):
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
             # Dump energies and forces to disk.
             savetxt('M.txt',M_all)
+        # My C helper code isn't fully functional yet.
+        # try:
+        #     AbInitio_Build(np, ns, NCP1, AGrad, AHess,
+        #                    self.whamboltz_wts, self.qmboltz_wts, QBN, Z, Y, self.eqm, self.fqm, M_all, 
+        #                    X0_M, M0_M, Q0_M, QQ_M, X0_Q, M0_Q, Q0_Q, QQ_Q, 
+        #                    SPiXi, SRiXi, dM_all, ddM_all, M0_M_p, M0_Q_p, 
+        #                    M0_M_pp, M0_Q_pp, SPiXi_p, SRiXi_p, SPiXi_pq, SRiXi_pq)
+        # except:
+        #     warn_press_key("AbInitio_Build has phailed!")
         for i in range(ns):
             print "\rIncrementing quantities for snapshot %i\r" % i,
             # Build Boltzmann weights and increment partition function.

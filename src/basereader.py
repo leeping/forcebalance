@@ -30,7 +30,8 @@ class BaseReader(object):
         ## The mapping of (this residue, atom number) to (atom name) for building atom-specific interactions in [ bonds ], [ angles ] etc.
         self.adict  = OrderedDict()
         ## The listing of 'RES:ATOMNAMES' for atom names in the line
-        self.molatom = []
+        ## This is obviously a placeholder.
+        self.molatom = ("Sniffy",["Mao","Schmao"])
 
     def Split(self, line):
         return line.split()

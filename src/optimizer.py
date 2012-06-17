@@ -425,7 +425,7 @@ class Optimizer(object):
     
         def trust_fun(L):
             N = norm(solver(L)[0])
-            print "\rHessian diagonal scaling = %.1e: found length %.1e" % (1+L**2,N),
+            print "\rHessian diagonal scaling = %.4e: found length %.4e" % (1+L**2,N),
             return (N - trust)**2
 
         def search_fun(L):
@@ -435,7 +435,7 @@ class Optimizer(object):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            print "Searching! Hessian diagonal scaling = %.4e, length %.1e, result %.1e" % (1+L**2,norm(dx),Result)
+            print "Searching! Hessian diagonal scaling = %.4e, length %.4e, result %.4e" % (1+L**2,norm(dx),Result)
             return Result
         
         if self.trust0 > 0: # This is the trust region code.

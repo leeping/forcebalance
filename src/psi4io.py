@@ -17,6 +17,8 @@ class LRDF_Psi4(LeastSquares):
 
     def __init__(self,options,sim_opts,forcefield):
         super(LRDF_Psi4,self).__init__(options,sim_opts,forcefield)
+        ## The frcmod file never has any atoms in it
+        self.adict = {None:None}
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)

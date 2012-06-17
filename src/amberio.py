@@ -71,8 +71,6 @@ class Mol2_Reader(BaseReader):
             #self.adict.setdefault(self.mol,[]).append(s[self.pdict[self.itype]['Atom'][0]])
             self.atomnames.append(s[0])
             self.adict.setdefault(self.mol,[]).append(s[0])
-            print self.adict
-            print self.atomnames
 
         if self.itype in self.pdict:
             if 'Atom' in self.pdict[self.itype] and match(' *[0-9]', line):
@@ -84,7 +82,6 @@ class Mol2_Reader(BaseReader):
                 self.suffix = ':' + '-'.join([self.mol,''.join(self.atom)])
             #self.suffix = '.'.join(self.atom)
                 self.molatom = (self.mol, self.atom if type(self.atom) is list else [self.atom])
-                print self.molatom
 
 class FrcMod_Reader(BaseReader):
     """Finite state machine for parsing FrcMod force field file."""
