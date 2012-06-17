@@ -211,7 +211,7 @@ def buildKeywordDictionary():
         "ForceBalance"                   : ["AUTHORS","LICENSE.txt"]
                                          }
     setupKeywords["data_files"]        = []
-    setupKeywords["ext_modules"]       = [CMBAR, DCD, INCR]
+    setupKeywords["ext_modules"]       = [CMBAR, DCD]#, INCR]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
     setupKeywords["long_description"]  = """
