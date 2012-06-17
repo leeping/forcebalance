@@ -36,7 +36,7 @@ def Run_ForceBalance(input_file):
     optimizer.Run()
 
 def main():
-    print "\x1b[1;97m Welcome to ForceBalance version 0.12! =D\x1b[0m"
+    print "\x1b[1;97m Welcome to ForceBalance version 0.13! =D\x1b[0m"
     if len(sys.argv) != 2:
         print "Please call this program with only one argument - the name of the input file."
         sys.exit(1)

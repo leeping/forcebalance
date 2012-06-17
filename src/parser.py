@@ -52,6 +52,7 @@ import sys
 import itertools
 from nifty import printcool, printcool_dictionary
 from copy import deepcopy
+from collections import OrderedDict
 
 ## Default general options.
 ## Note that the documentation is included in part of the key; this will aid in automatic doc-extraction. :)
@@ -97,7 +98,7 @@ gen_opts_types = {
                  },
     'sections': {"read_mvals" : (None, 'Paste mathematical parameters into the input file for them to be read in directly'),
                  "read_pvals" : (None, 'Paste physical parameters into the input file for them to be read in directly'),
-                 "priors"     : ({}, 'Paste priors into the input file for them to be read in directly')
+                 "priors"     : (OrderedDict(), 'Paste priors into the input file for them to be read in directly')
                  }
     }
 
@@ -177,7 +178,7 @@ def read_pvals(fobj):
     return Answer
 
 def read_priors(fobj):
-    Answer = {}
+    Answer = OrderedDict()
     for line in fobj:
         line = line.split("#")[0]
         if re.match("(/priors)|(^\$end)",line):
