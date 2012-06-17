@@ -46,6 +46,10 @@ class Mol2_Reader(BaseReader):
         self.atom   = []
         ## The mol2 file provides a list of atom names
         self.atomnames = []
+        ## The section that we're in
+        self.section = None
+        # The name of the molecule
+        self.mol = None
 
     def feed(self, line):
         s          = line.split()
@@ -53,19 +57,34 @@ class Mol2_Reader(BaseReader):
         # In mol2 files, the only defined interaction type is the Coulomb interaction.
         if line.strip().lower() == '@<tripos>atom':
             self.itype = 'COUL'
+            self.section = 'Atom'
+        elif line.strip().lower() == '@<tripos>molecule':
+            self.itype = 'None'
+            self.section = 'Molecule'
+        elif self.section == 'Molecule' and self.mol == None:
+            self.mol = '_'.join(s)
         elif not is_mol2_atom(line):
             self.itype = 'None'
 
         if is_mol2_atom(line) and self.itype == 'COUL':
-            self.atomnames.append(s[self.pdict[self.itype]['Atom'][0]])
+            #self.atomnames.append(s[self.pdict[self.itype]['Atom'][0]])
+            #self.adict.setdefault(self.mol,[]).append(s[self.pdict[self.itype]['Atom'][0]])
+            self.atomnames.append(s[0])
+            self.adict.setdefault(self.mol,[]).append(s[0])
+            print self.adict
+            print self.atomnames
 
         if self.itype in self.pdict:
             if 'Atom' in self.pdict[self.itype] and match(' *[0-9]', line):
                 # List the atoms in the interaction.
-                self.atom = [s[i] for i in self.pdict[self.itype]['Atom']]
-            # The suffix of the parameter ID is built from the atom    #
-            # types/classes involved in the interaction.
-            self.suffix = '.'.join(self.atom)
+                #self.atom = [s[i] for i in self.pdict[self.itype]['Atom']]
+                self.atom = [s[0]]
+                # The suffix of the parameter ID is built from the atom    #
+                # types/classes involved in the interaction.
+                self.suffix = ':' + '-'.join([self.mol,''.join(self.atom)])
+            #self.suffix = '.'.join(self.atom)
+                self.molatom = (self.mol, self.atom if type(self.atom) is list else [self.atom])
+                print self.molatom
 
 class FrcMod_Reader(BaseReader):
     """Finite state machine for parsing FrcMod force field file."""
@@ -79,6 +98,8 @@ class FrcMod_Reader(BaseReader):
         self.atom   = []
         ## Whether we're inside the dihedral section
         self.dihe  = False
+        ## The frcmod file never has any atoms in it
+        self.adict = {None:None}
         
     def Split(self, line):
         return split(' +(?!-(?![0-9.]))', line.replace('\n',''))
