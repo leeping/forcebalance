@@ -100,6 +100,12 @@ class THCDF_Psi4(LeastSquares):
         abstempdir = os.path.join(self.root,self.tempdir)
         os.symlink(os.path.join(self.root,self.simdir,"input.dat"),os.path.join(abstempdir,"input.dat"))
 
+    def indicate(self):
+        print "\rSim: %-15s" % self.name, 
+        print "Molecules =", self.Molecules,
+        print "Objective = %.5e" % self.objective
+        return
+
     def driver(self):
         ## Delete objective.dat (because PSI4 appends it).
         #if os.path.exists("objective.dat"):
