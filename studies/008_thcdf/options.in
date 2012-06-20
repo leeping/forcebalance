@@ -9,7 +9,7 @@ $options
 ffdir forcefield
 
 # (string) Type of the penalty, L2 or L1 in the optimizer
-penalty_type L2
+penalty_type L1
 
 # (allcap) The job type, defaults to a single-point evaluation of objective function
 jobtype newton
@@ -37,14 +37,14 @@ finite_difference_h 0.001
 
 # (float) Factor for multiplicative penalty function in objective function
 penalty_multiplicative 0.0
-penalty_additive 0.0
+penalty_additive 0.01
 
 trust0 -1
 
 logarithmic_map 1
 print_gradient no
 print_hessian no
-print_parameters no
+print_parameters yes
 
 $end
 
@@ -54,7 +54,7 @@ $simulation
 name ccpvdz
 
 # (allcap) The type of fitting simulation, for instance AbInitio_GMXX2
-simtype LRDF_Psi4
+simtype THCDF_Psi4
 
 # (float) Weight of the current simulation (with respect to other simulations)
 weight 1.0
