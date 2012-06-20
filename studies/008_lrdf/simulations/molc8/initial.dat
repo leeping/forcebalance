@@ -1,0 +1,39 @@
+import os
+
+os.system("rm -f objective.dat")
+
+molecules = []
+
+molecule C6H6 {
+
+C	0.0000	1.4057	0.0000
+C	1.2174	0.7029	0.0000
+C	1.2174	-0.7029	0.0000
+C	0.0000	-1.4057	0.0000
+C	-1.2174	-0.7029	0.0000
+C	-1.2174	0.7029	0.0000
+H	0.0000	2.5009	0.0000
+H	2.1659	1.2505	0.0000
+H	2.1659	-1.2505	0.0000
+H	0.0000	-2.5009	0.0000
+H	-2.1659	-1.2505	0.0000
+H	-2.1659	1.2505	0.0000
+
+symmetry c1
+}
+
+molecules.append(C6H6)
+
+plugin_load("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+
+for mol in molecules:
+    activate(mol)
+
+    set {
+      basis cc-pvdz
+      freeze_core true
+    }
+    
+    energy('scf')
+    plugin("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+    clean()
