@@ -659,7 +659,10 @@ class Molecule(object):
                 raise Exception('You need to specify %s when adding a virtual site to this molecule.' % key)
         if 'xyzs' in self.Data:
             for i, xyz in enumerate(self.xyzs):
-                self.xyzs[i] = np.insert(xyz, idx, 0.0, axis=0)
+                if 'pos' in kwargs:
+                    self.xyzs[i] = np.insert(xyz, idx, xyz[kwargs['pos']], axis=0)
+                else:
+                    self.xyzs[i] = np.insert(xyz, idx, 0.0, axis=0)
         else:
             raise Exception('You need to have xyzs in this molecule to add a virtual site.')
 

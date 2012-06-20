@@ -729,7 +729,7 @@ class FF(object):
                     qtrans2[i+j+1, :] = orthogonalize(qtrans2[i+j+1, :], cons[i])
             return qtrans2
         # Here we build a charge constraint for each molecule.
-        if all(len(r.adict) > 0 for r in self.R.values()):
+        if any(len(r.adict) > 0 for r in self.R.values()):
             print "Building charge constraints..."
             # Build a concatenated dictionary
             Adict = OrderedDict()
@@ -769,7 +769,7 @@ class FF(object):
                     print "Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted." % molname
                 nmol += 1
         elif self.constrain_charge:
-            warn_press_key("Not all force field parsers have 'adict' {molecule:atomnames} implemented.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
+            warn_press_key("'adict' {molecule:atomnames} was not found.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
             qnr = 0
             if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
                 # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.

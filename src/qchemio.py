@@ -1,8 +1,10 @@
 """ @package qchemio Q-Chem input file parser. """
 
+import os
 from re import match, sub
 from basereader import BaseReader
-from nifty import isfloat
+from nifty import *
+from molecule import Molecule
 
 ## Types of counterpoise correction
 #cptypes = [None, 'BASS', 'BASSP']
@@ -62,3 +64,26 @@ class QCIn_Reader(BaseReader):
                 self.cnum += 1
                 print line, self.snum, self.cnum
                 self.suffix = '_at%s.sh%i.cf%i' % (self.atom,self.snum,self.cnum)
+
+def QChem_Dielectric_Energy(fnm,wq):
+    QCIn = Molecule(fnm)
+    CalcDir=os.path.splitext(fnm)[0]+".d"
+    GoInto(CalcDir)
+    digits = len(str(QCIn.ns))
+    for i in range(QCIn.ns):
+        sdir = "%%0%ii" % digits % i
+        GoInto(sdir)
+        QCIn.write("qchem.in",select=i)
+        queue_up(wq,"qchem40 qchem.in qchem.out",input_files=["qchem.in"],output_files=["qchem.out"],verbose=False)
+        Leave(sdir)
+    wq_wait(wq,verbose=False)
+    PCM_Energies = []
+    for i in range(QCIn.ns):
+        sdir = "%%0%ii" % digits % i
+        GoInto(sdir)
+        for line in open("qchem.out"):
+            if "PCM electrostatic energy" in line:
+                PCM_Energies.append(float(line.split()[-2]))
+        Leave(sdir)
+    Leave(CalcDir)
+    return np.array(PCM_Energies) * 2625.5

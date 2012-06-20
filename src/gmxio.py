@@ -14,6 +14,8 @@ from basereader import BaseReader
 from abinitio import AbInitio
 from interaction import Interaction
 from molecule import Molecule
+from copy import deepcopy
+from qchemio import QChem_Dielectric_Energy
 
 ## VdW interaction function types
 nftypes = [None, 'VDW', 'VDW_BHAM']
@@ -471,7 +473,7 @@ class Interaction_GMX(Interaction):
         snapshot.  This does not require GROMACS-X2. """
         raise NotImplementedError('Per-snapshot interaction energies not implemented, consider using all-at-once')
 
-    def interaction_driver_all(self):
+    def interaction_driver_all(self, dielectric=True):
         """ Computes the energy and force using GROMACS for a trajectory.  This does not require GROMACS-X2. """
         # Remove backup files.
         rm_gmx_baks(os.getcwd())
@@ -487,4 +489,33 @@ class Interaction_GMX(Interaction):
             s = line.split()
             Energy = float(s[1]) + float(s[2])
             M.append(Energy)
-        return array(M)
+        # Now we have the MM interaction energy.
+        # We need the COSMO component of the interaction energy now...
+        traj_dimer = deepcopy(self.traj)
+        traj_dimer.add_quantum("qtemp_D.in")
+        traj_dimer.write("qchem_dimer.in",ftype="qcin")
+        traj_monoA = deepcopy(self.traj)
+        traj_monoA.add_quantum("qtemp_A.in")
+        traj_monoA.write("qchem_monoA.in",ftype="qcin")
+        traj_monoB = deepcopy(self.traj)
+        traj_monoB.add_quantum("qtemp_B.in")
+        traj_monoB.write("qchem_monoB.in",ftype="qcin")
+        if self.wq_port == 0:
+            warn_press_key("To proceed past this point, a port for the Work Queue must be defined")
+        if dielectric:
+            print "Computing the dielectric energy"
+            Diel_D = QChem_Dielectric_Energy("qchem_dimer.in",self.wq)
+            Diel_A = QChem_Dielectric_Energy("qchem_monoA.in",self.wq)
+            # The dielectric energy for a water molecule should never change.
+            if hasattr(self,"Diel_B"):
+                Diel_B = self.Diel_B
+            else:
+                Diel_B = QChem_Dielectric_Energy("qchem_monoB.in",self.wq)
+                self.Diel_B = Diel_B
+            self.Dielectric = Diel_D - Diel_A - Diel_B
+        else:
+            print "Reading the dielectric energy"
+        M = array(M)
+        M += self.Dielectric
+        return M
+    

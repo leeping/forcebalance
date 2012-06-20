@@ -298,6 +298,7 @@ class Optimizer(object):
             if Quality <= 0.25:
                 # If the step quality is bad, then we should decrease the trust radius.
                 trust = max(ndx*(1./(1+a)), self.mintrust)
+                print "Reducing the trust radius to % .4e" % trust
             elif Quality >= 0.75 and bump:
                 # If the step quality is good, then we should increase the trust radius.  Capeesh?
                 # The 'a' factor is how much we should grow or shrink the trust radius each step

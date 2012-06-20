@@ -8,6 +8,9 @@ import numpy as np
 from nifty import row,col,printcool_dictionary, link_dir_contents
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from optimizer import Counter
+try:
+    import work_queue
+except: pass
 
 class FittingSimulation(object):
     
@@ -141,6 +144,12 @@ class FittingSimulation(object):
         #======================================#
         # Create a new temp directory.
         self.refresh_temp_directory()
+        # Create the work queue here.
+        if self.wq_port != 0:
+            work_queue.set_debug_flag('all')
+            self.wq = work_queue.WorkQueue(port=self.wq_port, exclusive=False, shutdown=False)
+            self.wq.specify_name('forcebalance')
+            print('Work Queue for fitting simulation %s listening on %d' % (self.name, self.wq.port))
 
         # Print the options for this simulation to the terminal.
         printcool_dictionary(sim_opts,"Setup for fitting simulation %s :" % self.name)
