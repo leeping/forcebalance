@@ -82,6 +82,7 @@ gen_opts_types = {
                  "logarithmic_map"  : (0, 'Optimize in the space of log-variables'),
                  "print_hessian"    : (1, 'Print the objective function Hessian at every step'),
                  "print_parameters" : (1, 'Print the mathematical and physical parameters at every step')
+                 "normalize_weights": (1, 'Normalize the weights for the fitting simulations')
                  },
     'floats'  : {"trust0"                 : (1e-1, 'Trust radius for the MainOptimizer'),
                  "mintrust"               : (0.0, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)'),

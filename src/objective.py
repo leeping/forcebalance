@@ -34,7 +34,10 @@ class Objective(object):
         self.Penalty = Penalty(options['penalty_type'],options['penalty_additive'],
                                options['penalty_multiplicative'],options['penalty_hyperbolic_b'])
         ## Obtain the denominator.
-        self.WTot = sum([i.weight for i in self.Simulations])
+        if options['normalize_weights']:
+            self.WTot = sum([i.weight for i in self.Simulations])
+        else:
+            self.WTot = 1.0
         
     def Simulation_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives

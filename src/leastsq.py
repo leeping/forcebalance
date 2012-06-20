@@ -80,7 +80,6 @@ class LeastSquares(FittingSimulation):
             Ans2 = self.driver()
             M_ = Ans2[:,1]
             D_ = M_ - Q
-            print dot(W, D_**2) * Fac
 	    return Ans2[:,1]
         if AGrad:
             # Leaving comment here if we want to reintroduce second deriv someday.
@@ -89,7 +88,7 @@ class LeastSquares(FittingSimulation):
                 if self.call_derivatives[p] == False: continue
                 dM_arr = f1d2p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                 if max(abs(dM_arr)) == 0.0 and Counter() == 0:
-                    print "Skipping over parameter %i in subsequent steps" % p
+                    print "\r Simulation %s will skip over parameter %i in subsequent steps" % (self.name, p)
                     self.call_derivatives[p] = False
                 else:
                     dM[p] = dM_arr.copy()

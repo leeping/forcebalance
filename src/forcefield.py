@@ -96,7 +96,7 @@ we need more modules!
 import os
 import sys
 from re import match, sub, split
-import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio
+import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
 import basereader
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros
 from numpy.linalg import norm
@@ -116,7 +116,8 @@ FF_Extensions = {"itp" : "gmx",
                  "gen" : "custom",
                  "xml" : "openmm",
                  "frcmod" : "frcmod",
-                 "mol2" : "mol2"
+                 "mol2" : "mol2",
+                 "gbs" : "gbs"
                  }
 
 """ Recognized force field formats. """
@@ -126,7 +127,8 @@ FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "custom": custom_io.Gen_Reader , 
                 "openmm" : openmmio.OpenMM_Reader,
                 "frcmod" : amberio.FrcMod_Reader,
-                "mol2" : amberio.Mol2_Reader
+                "mol2" : amberio.Mol2_Reader,
+                "gbs" : psi4io.GBS_Reader
                 }
 
 def determine_fftype(ffname,verbose=False):

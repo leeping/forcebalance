@@ -11,7 +11,7 @@ from abinitio_gmxx2 import AbInitio_GMXX2
 from abinitio_internal import AbInitio_Internal
 from counterpoise import Counterpoise
 from amberio import AbInitio_AMBER
-from psi4io import LRDF_Psi4
+from psi4io import THCDF_Psi4
 
 ## The table of fitting simulations
 SimTab = {
@@ -24,5 +24,5 @@ SimTab = {
     'ABINITIO_INTERNAL':AbInitio_Internal,
     'LIQUID_OPENMM':Liquid_OpenMM,
     'COUNTERPOISE':Counterpoise,
-    'LRDF_PSI4':LRDF_Psi4,
+    'THCDF_PSI4':THCDF_Psi4,
     }
