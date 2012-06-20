@@ -7,13 +7,14 @@
 import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt
+from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, abs, max
 from fitsim import FittingSimulation
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
 from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
+from optimizer import Counter
 
 class LeastSquares(FittingSimulation):
 
@@ -33,6 +34,10 @@ class LeastSquares(FittingSimulation):
         #======================================#
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,sim_opts)
+        ## Dictionary for derivative terms
+        self.dM = {}
+        ## Which parameters are differentiated?
+        self.call_derivatives = [True for i in range(forcefield.np)]
 
     def prepare_temp_directory(self, options, sim_opts):
         """ Prepare the temporary directory, by default does nothing (gmxx2 needs it) """
@@ -44,7 +49,7 @@ class LeastSquares(FittingSimulation):
         return
 
     def get(self, mvals, AGrad=False, AHess=False):
-        """
+	"""
         LPW 05-30-2012
         
         This subroutine builds the objective function (and optionally
@@ -72,23 +77,33 @@ class LeastSquares(FittingSimulation):
         # Wrapper to the driver, which returns just the part that changes.
         def callM(mvals_):
             self.FF.make(mvals_)
-            return self.driver()[:,1]
+            Ans2 = self.driver()
+            M_ = Ans2[:,1]
+            D_ = M_ - Q
+            print dot(W, D_**2) * Fac
+	    return Ans2[:,1]
         if AGrad:
-            dM = zeros((np,ns),dtype=float)
-            ddM = zeros((np,ns),dtype=float)
-            # for p in range(np):
+            # Leaving comment here if we want to reintroduce second deriv someday.
             #     dM[p,:], ddM[p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
             for p in range(np):
-                dM[p,:] = f1d2p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
-        Objective = dot(W, D**2) * Fac
+                if self.call_derivatives[p] == False: continue
+                dM_arr = f1d2p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
+                if max(abs(dM_arr)) == 0.0 and Counter() == 0:
+                    print "Skipping over parameter %i in subsequent steps" % p
+                    self.call_derivatives[p] = False
+                else:
+                    dM[p] = dM_arr.copy()
+	Objective = dot(W, D**2) * Fac
         G = zeros(np,dtype=float)
         H = zeros((np,np),dtype=float)
         if AGrad:
             for p in range(np):
-                G[p] = 2 * dot(W, D*dM[p,:])
+                if self.call_derivatives[p] == False: continue
+                G[p] = 2 * dot(W, D*dM[p])
                 if not AHess: continue
-                H[p, p] = 2 * dot(W, D*ddM[p,:] + dM[p,:]**2)
+                H[p, p] = 2 * dot(W, dM[p]**2)
                 for q in range(p):
+                    if self.call_derivatives[q] == False: continue
                     GNP = 2 * dot(W, dM[p,:] * dM[q,:])
                     H[q,p] = GNP
                     H[p,q] = GNP
