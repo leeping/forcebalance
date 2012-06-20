@@ -1,0 +1,29 @@
+import os
+
+os.system("rm -f objective.dat")
+
+molecules = []
+
+molecule HNO {
+H	-0.9409	0.9101	0.0000
+N	0.0627	0.5855	0.0000
+O	0.0627	-0.6261	0.0000
+
+symmetry c1
+}
+
+molecules.append(HNO)
+
+plugin_load("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+
+for mol in molecules:
+    activate(mol)
+
+    set {
+      basis cc-pvdz
+      freeze_core true
+    }
+    
+    energy('scf')
+    plugin("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+    clean()

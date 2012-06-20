@@ -1,0 +1,40 @@
+import os
+
+os.system("rm -f objective.dat")
+
+molecules = []
+
+molecule CH4 {
+C	0.0000	0.0000	0.0000
+H	0.6279	0.6279	0.6279
+H	-0.6279	-0.6279	0.6279
+H	-0.6279	0.6279	-0.6279
+H	0.6279	-0.6279	-0.6279
+
+symmetry c1
+}     
+
+molecules.append(CH4)
+
+molecule CO {
+C	0.0000	0.0000	-0.6464
+O	0.0000	0.0000	0.4848
+
+symmetry c1
+}
+
+molecules.append(CO)
+
+plugin_load("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+
+for mol in molecules:
+    activate(mol)
+
+    set {
+      basis cc-pvdz
+      freeze_core true
+    }
+    
+    energy('scf')
+    plugin("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+    clean()
