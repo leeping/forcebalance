@@ -205,7 +205,8 @@ class FF(object):
         # A lot of these variables are filled out by calling the methods.
         
         ## The content of all force field files are stored in memory
-        self.ffdata       = {}        
+        self.ffdata       = {}
+        self.ffdata_isxml = {}
         ## The mapping of interaction type -> parameter number
         self.map         = {}
         ## The listing of parameter number -> interaction types
@@ -346,11 +347,13 @@ class FF(object):
         if fftype == "openmm":
             ## Read in an XML force field file as an _ElementTree object
             self.ffdata[ffname] = etree.parse(absff)
+            self.ffdata_isxml[ffname] = True
             # Process the file
             self.addff_xml(ffname)
         else:
             ## Read in a text force field file as a list of lines
             self.ffdata[ffname] = [line.expandtabs() for line in open(absff).readlines()]
+            self.ffdata_isxml[ffname] = False
             # Process the file
             self.addff_txt(ffname, fftype)
         if hasattr(self.R[ffname], 'atomnames'):
@@ -532,7 +535,8 @@ class FF(object):
                 # is given by the position of this line in the
                 # iterable representation of the tree and the
                 # field number.
-                if type(newffdata[fnm]) is etree._ElementTree:
+                #if type(newffdata[fnm]) is etree._ElementTree:
+                if self.ffdata_isxml[fnm]:
                     list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (mult*pvals[i])
                 # Text force fields are a bit harder.
                 # Our pointer is given by the line and field number.
@@ -571,7 +575,8 @@ class FF(object):
             os.makedirs(absprintdir)
 
         for fnm in newffdata:
-            if type(newffdata[fnm]) is etree._ElementTree:
+            #if type(newffdata[fnm]) is etree._ElementTree:
+            if self.ffdata_isxml[fnm]:
                 with open(os.path.join(absprintdir,fnm),'w') as f: newffdata[fnm].write(f)
             else:
                 with open(os.path.join(absprintdir,fnm),'w') as f: f.writelines(newffdata[fnm])

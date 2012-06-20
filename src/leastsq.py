@@ -34,8 +34,6 @@ class LeastSquares(FittingSimulation):
         #======================================#
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,sim_opts)
-        ## Dictionary for derivative terms
-        self.dM = {}
         ## Which parameters are differentiated?
         self.call_derivatives = [True for i in range(forcefield.np)]
 
@@ -65,6 +63,8 @@ class LeastSquares(FittingSimulation):
         """
         Answer = {}
         Fac = 1000000
+        ## Dictionary for derivative terms
+        dM = {}
         # Create the new force field!!
         np = len(mvals)
         pvals = self.FF.make(mvals,self.usepvals)
@@ -104,7 +104,7 @@ class LeastSquares(FittingSimulation):
                 H[p, p] = 2 * dot(W, dM[p]**2)
                 for q in range(p):
                     if self.call_derivatives[q] == False: continue
-                    GNP = 2 * dot(W, dM[p,:] * dM[q,:])
+                    GNP = 2 * dot(W, dM[p] * dM[q])
                     H[q,p] = GNP
                     H[p,q] = GNP
         G *= Fac
