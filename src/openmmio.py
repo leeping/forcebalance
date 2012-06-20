@@ -14,18 +14,12 @@ from finite_difference import *
 import pickle
 import shutil
 from nifty import *
-
 try:
     from simtk.openmm.app import *
     from simtk.openmm import *
     from simtk.unit import *
 except:
-    bar = printcool("Warning: OpenMM library import fail (you can't use OpenMM)",sym='!',bold=True,color=2)
-    print bar
-
-try:
-    import work_queue
-except: pass
+    pass
 
 ## Dictionary for building parameter identifiers.  As usual they go like this:
 ## HarmonicBondForce.Bond_length_OW.HW
@@ -141,12 +135,7 @@ class OpenMM_Reader(BaseReader):
 
 class Liquid_OpenMM(Liquid):
     def __init__(self,options,sim_opts,forcefield):
-        ## Initialize the SuperClass!
         super(Liquid_OpenMM,self).__init__(options,sim_opts,forcefield)
-        work_queue.set_debug_flag('all')
-        self.wq = work_queue.WorkQueue(port=self.wq_port, exclusive=False, shutdown=False)
-        self.wq.specify_name('forcebalance')
-        print('Work Queue for fitting simulation %s listening on %d' % (self.name, self.wq.port))
 
     def prepare_temp_directory(self,options,sim_opts):
         """ Prepare the temporary directory by copying in important files. """

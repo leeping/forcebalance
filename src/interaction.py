@@ -13,7 +13,7 @@ from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
 from subprocess import PIPE
-from finite_difference import fdwrap, f1d2p, f12d3p
+from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 
 class Interaction(FittingSimulation):
 
@@ -261,18 +261,24 @@ class Interaction(FittingSimulation):
         #==============================================================#
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
+        interpids = ['VPAIR','COUL','VDW']
+        coulpids = ['COUL']
         if self.all_at_once:
             print "Executing\r",
             M_all = self.interaction_driver_all()
             if AGrad or AHess:
-                def callM(mvals_):
+                def callM(mvals_, dielectric=True):
                     print "\r",
                     pvals = self.FF.make(mvals_, self.usepvals)
-                    return self.interaction_driver_all()
+                    return self.interaction_driver_all(dielectric)
                 for p in range(np):
-                    dM_all[:,p], ddM_all[:,p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
+                    if any([j in self.FF.plist[p] for j in interpids]):
+                        # Differentiate only if the parameter is relevant for intermolecular interactions. :)
+                        #dM_all[:,p], ddM_all[:,p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
+                        dM_all[:,p] = f1d2p(fdwrap(callM, mvals, p, dielectric=any([j in self.FF.plist[p] for j in coulpids])), h = self.h, f0 = M_all)
             # Dump interaction energies to disk.
             savetxt('M.txt',M_all)
+            savetxt('Q.txt',self.eqm)
         for i in range(ns):
             print "Incrementing quantities for snapshot %i\r" % i,
             # Build Boltzmann weights and increment partition function.

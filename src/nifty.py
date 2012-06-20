@@ -382,7 +382,6 @@ def wq_wait(wq, verbose=False):
     """ This function waits until the work queue is completely empty. """
     printcount = 1
     while not wq.empty():
-        printcount += 1
         if verbose: print '---'
         task = wq.wait(10)
         if task:
@@ -399,8 +398,10 @@ def wq_wait(wq, verbose=False):
                 print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.host, task.computation_time/1000000)
                 wq.submit(task)
             else:
-                print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, task.computation_time/1000000)
+                #print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, task.computation_time/1000000)
                 del task
+        else:
+            printcount += 1
         if verbose:
             print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
                 % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed)
@@ -418,6 +419,36 @@ def wq_wait(wq, verbose=False):
 #=====================================#
 #| File and process management stuff |#
 #=====================================#
+def GoInto(Dir):
+    if os.path.exists(Dir):
+        if os.path.isdir(Dir): pass
+        else: raise Exception("Tried to create directory %s, it exists but isn't a directory" % newdir)
+    else:
+        os.makedirs(Dir)
+    os.chdir(Dir)
+
+def allsplit(Dir):
+    # Split a directory into all directories involved.
+    s = os.path.split(os.path.normpath(Dir))
+    if s[1] == '' or s[1] == '.' : return []
+    return allsplit(s[0]) + [s[1]]
+
+def Leave(Dir):
+    if os.path.split(os.getcwd())[1] != Dir:
+        raise Exception("Trying to leave directory %s, but we're actually in directory %s (check your code)" % (Dir,os.path.split(os.getcwd())[1]))
+    for i in range(len(allsplit(Dir))):
+        os.chdir('..')
+
+def LinkFile(src, dest):
+    if os.path.exists(src):
+        if os.path.exists(dest):
+            if os.path.islink(dest): pass
+            else: raise Exception("Tried to create symbolic link %s to %s, destination exists but isn't a symbolic link" % (src, dest))
+        else:
+            os.path.symlink(src, dest)
+    else:
+        raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist" % src)
+
 def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
         srcfnm = os.path.join(abssrcdir, fnm)

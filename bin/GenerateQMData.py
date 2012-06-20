@@ -47,12 +47,22 @@ def create_esp_surfaces(Molecule):
     na = Molecule.na
     Mol_ESP = []
     printxyz=0
+    np.set_printoptions(precision=10, linewidth=120)
     for i, xyz in enumerate(Molecule.xyzs):
         print "Generating grid points for snapshot %i\r" % i
         esp_pts = []
         for j in [1.4, 1.6, 1.8, 2.0]:
-            MS = MSMS(coords = list(xyz), radii = list(np.array(Rads)*j))
+            Radii = list(np.array(Rads)*j)
+            #Molecule.write("coords_%i.xyz" % i,select=i)
+            #np.savetxt("coords_%i.txt" % i,xyz)
+            #np.savetxt("radii_%i.txt" % i,np.array(Radii))
+            #print xyz
+            #print Radii
+            print "Calling MSMS"
+            MS = MSMS(coords = list(xyz), radii = Radii)
+            print "Computing"
             MS.compute(density=0.5)
+            print "Getting triangles"
             vfloat, vint, tri = MS.getTriangles()
             a = range(len(vfloat))
             random.shuffle(a)

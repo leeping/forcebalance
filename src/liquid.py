@@ -13,7 +13,9 @@ from molecule import Molecule
 from re import match
 import subprocess
 from subprocess import PIPE
-from lxml import etree
+try:
+    from lxml import etree
+except: pass
 #from forcebalance.wham import WHAM
 from pymbar import pymbar
 import itertools

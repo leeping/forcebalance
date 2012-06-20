@@ -7,7 +7,7 @@
 import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt
+from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack
 from fitsim import FittingSimulation
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -454,8 +454,14 @@ class AbInitio(FittingSimulation):
                     return self.energy_force_driver_all()
                 for p in range(np):
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
+            
             # Dump energies and forces to disk.
-            savetxt('M.txt',M_all)
+            M_all_print = M_all.copy()
+            M_all_print[:,0] -= mean(M_all_print[:,0])
+            savetxt('M.txt',M_all_print)
+            Q_all_print = hstack((col(self.eqm),self.fqm))
+            Q_all_print[:,0] -= mean(Q_all_print[:,0])
+            savetxt('Q.txt',Q_all_print)
         # My C helper code isn't fully functional yet.
         # try:
         #     AbInitio_Build(np, ns, NCP1, AGrad, AHess,
