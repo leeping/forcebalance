@@ -102,7 +102,7 @@ class THCDF_Psi4(LeastSquares):
 
     def indicate(self):
         print "\rSim: %-15s" % self.name, 
-        print "Molecules =", self.Molecules,
+        print "Molecules = %-20s" % str(self.Molecules),
         print "Objective = %.5e" % self.objective
         return
 
