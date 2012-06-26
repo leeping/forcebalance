@@ -603,7 +603,7 @@ class FF(object):
         # Guard against certain types of parameters changing sign.
         for i in range(self.np):
             if any([j in self.plist[i] for j in concern]) and pvals[i] * self.pvals0[i] < 0:
-                print "Parameter %s has changed sign but it's not allowed to! Setting to zero." % self.plist[i]
+                #print "Parameter %s has changed sign but it's not allowed to! Setting to zero." % self.plist[i]
                 pvals[i] = 0.0
         return pvals
 
