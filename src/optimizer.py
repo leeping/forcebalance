@@ -77,6 +77,8 @@ class Optimizer(object):
         self.eps       = options['eig_lowerbound']
         ## Step size for numerical finite difference
         self.h         = options['finite_difference_h']
+        ## Number of steps to average over
+        self.hist      = options['objective_history']
         ## Function value convergence threshold
         self.conv_obj  = options['convergence_objective']
         ## Step size convergence threshold
@@ -241,7 +243,7 @@ class Optimizer(object):
                         'x_best': X_best,'xk_prev': xk_prev, 'trust': trust}
             if self.wchk_step:
                 self.writechk()
-            stdfront = len(ehist) > 10 and np.std(np.sort(ehist)[:10]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
+            stdfront = len(ehist) > self.hist and np.std(np.sort(ehist)[:self.hist]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
             print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)", "StepQual")
             print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (stepn, nxk, ndx, ngr, color, X, stdfront, Quality)
             # Check the convergence criteria
@@ -254,7 +256,7 @@ class Optimizer(object):
             if ndx < self.conv_stp and stepn > 0:
                 print "Convergence criterion reached in step size (%.2e)" % self.conv_stp
                 break
-            if stdfront < self.conv_obj and len(ehist) > 10:
+            if stdfront < self.conv_obj and len(ehist) > self.hist:
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             if self.print_grad:

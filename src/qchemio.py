@@ -67,6 +67,10 @@ class QCIn_Reader(BaseReader):
 
 def QChem_Dielectric_Energy(fnm,wq):
     QCIn = Molecule(fnm)
+    for i in range(QCIn.na):
+        # Q-Chem crashes if it doesn't recognize the chemical element
+        if QCIn.Data['elem'][i] in ['M','L']:
+            QCIn.Data['elem'][i] = 'He'
     CalcDir=os.path.splitext(fnm)[0]+".d"
     GoInto(CalcDir)
     digits = len(str(QCIn.ns))

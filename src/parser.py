@@ -73,6 +73,7 @@ gen_opts_types = {
                  "scanindex_name" : ([], 'Parameter name to scan over (should convert to a numerical index) in job type "scan[mp]vals"')
                  },
     'ints'    : {"maxstep"      : (100, 'Maximum number of steps in an optimization'),
+                 "objective_history"  : (10, 'Number of good optimization steps to average over when checking the objective convergence criterion'),
                  },
     'bools'   : {"backup"           : (1, 'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, 'Write the checkpoint file at every optimization step'),
@@ -86,7 +87,7 @@ gen_opts_types = {
                  },
     'floats'  : {"trust0"                 : (1e-1, 'Trust radius for the MainOptimizer'),
                  "mintrust"               : (0.0, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)'),
-                 "convergence_objective"  : (1e-4, 'Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)'),
+                 "convergence_objective"  : (1e-4, 'Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over [objective_history] steps)'),
                  "convergence_gradient"   : (1e-4, 'Convergence criterion of gradient norm'),
                  "convergence_step"       : (1e-4, 'Convergence criterion of step size (just needs to fall below this threshold)'),
                  "eig_lowerbound"         : (1e-4, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
