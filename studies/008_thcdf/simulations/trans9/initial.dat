@@ -1,0 +1,41 @@
+import os
+
+os.system("rm -f objective.dat")
+
+molecules = []
+
+molecule ring_closing {
+C       -1.2037160000    1.1406530000   -0.1060830000
+C        0.1198430000    1.4824890000    0.1887340000
+C        1.2423190000    0.7029640000   -0.1060830000
+C        1.2423190000   -0.7029640000   -0.1060830000
+C        0.1198430000   -1.4824890000    0.1887340000
+C       -1.2037160000   -1.1406530000   -0.1060830000
+H        0.2962760000    2.3404880000    0.8412800000
+H        2.2200000000    1.1751060000   -0.0165790000
+H        2.2200000000   -1.1751060000   -0.0165790000
+H        0.2962760000   -2.3404880000    0.8412800000
+H       -1.9992040000   -1.6411470000    0.4470500000
+H       -1.4677490000   -0.9362550000   -1.1311550000
+H       -1.9992040000    1.6411470000    0.4470500000
+H       -1.4677490000    0.9362550000   -1.1311550000
+
+symmetry c1
+}
+
+molecules.append(ring_closing)
+
+plugin_load("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+
+for mol in molecules:
+    activate(mol)
+
+    set {
+      basis cc-pvdz
+      freeze_core true
+    }
+    
+    energy('scf')
+    plugin("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+    clean()
+
