@@ -116,15 +116,18 @@ class Penalty:
         self.fmul = Factor_Mult
         self.b    = Factor_B
         self.Pen_Names = {'HYP' : 1, 'HYPER' : 1, 'HYPERBOLIC' : 1, 'L1' : 1, 'HYPERBOLA' : 1,
-                          'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2}
+                          'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2,
+                          'FUSE' : 3, 'FUSED' : 3, 'FUSION' : 3}
         self.ptyp = self.Pen_Names[User_Option.upper()]
-        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm}
+        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.FUSE}
         if User_Option.upper() == 'L1':
             print "L1 norm uses the hyperbolic penalty, make sure penalty_hyperbolic_b is set sufficiently small"
         elif self.ptyp == 1:
             print "Using hyperbolic regularization (Laplacian prior) with strength %.1e (+), %.1e (x) and tightness %.1e" % (Factor_Add, Factor_Mult, Factor_B)
         elif self.ptyp == 2:
             print "Using parabolic regularization (Gaussian prior) with strength %.1e (+), %.1e (x)" % (Factor_Add, Factor_Mult)
+        elif self.ptyp == 3:
+            print "Using FUSION PENALTY (only relevant for basis set optimizations at the moment) with strength %.1e" % Factor_Add
 
     def compute(self, mvals, Objective):
         X = Objective['X']
@@ -183,3 +186,7 @@ class Penalty:
         DC1   = mvals*(mvals**2 + self.b**2)**-0.5
         DC2   = diag(self.b**2*(mvals**2 + self.b**2)**-1.5)
         return DC0, DC1, DC2
+
+    def FUSE(self, mvals):
+        print self.FF.plist
+        return HYP(self, mvals)
