@@ -773,7 +773,9 @@ class Molecule(object):
         absln = 0
         for line in open(fnm):
             if ln == 0:
-                na = int(line.strip())
+                # Skip blank lines.
+                if len(line.strip()) > 0:
+                    na = int(line.strip())
             elif ln == 1:
                 comms.append(line.strip())
             else:
