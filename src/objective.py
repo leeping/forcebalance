@@ -31,8 +31,8 @@ class Objective(object):
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.
-        self.Penalty = Penalty(options['penalty_type'],options['penalty_additive'],
-                               options['penalty_multiplicative'],options['penalty_hyperbolic_b'],FF)
+        self.Penalty = Penalty(options['penalty_type'],forcefield,options['penalty_additive'],
+                               options['penalty_multiplicative'],options['penalty_hyperbolic_b'])
         ## Obtain the denominator.
         if options['normalize_weights']:
             self.WTot = sum([i.weight for i in self.Simulations])
@@ -111,7 +111,7 @@ class Penalty:
     in the 'rsmake' method.
 
     """
-    def __init__(self, User_Option, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1, ForceField):
+    def __init__(self, User_Option, ForceField, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1):
         self.fadd = Factor_Add
         self.fmul = Factor_Mult
         self.b    = Factor_B
