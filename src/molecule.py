@@ -1445,10 +1445,9 @@ class Molecule(object):
             Answer['qm_forces'] = Mats['gradient_dualbas']['All']
         elif len(Mats['gradient_scf']['All']) > 0:
             Answer['qm_forces'] = Mats['gradient_scf']['All']
-        else:
-            raise Exception('There are no forces in %s' % fnm)
+        #else:
+        #    raise Exception('There are no forces in %s' % fnm)
         # Also work our way down with the energies.
-
         if len(Floats['energy_ccsdt']) > 0:
             Answer['qm_energies'] = Floats['energy_ccsdt']
         elif len(Floats['energy_ccsd']) > 0:
@@ -1470,15 +1469,16 @@ class Molecule(object):
         # The molecule should have only one charge and one multiplicity
         if len(set(Floats['charge'])) != 1 or len(set(Floats['mult'])) != 1:
             raise Exception('Unexpected number of charges or multiplicities in parsing %s' % fnm)
-        lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs'], Answer['qm_forces']]
+        lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
         if len(set(lens)) != 1:
-            raise Exception('The number of energies, forces, and coordinates in %s are not the same : %s' % (fnm, str(lens)))
+            raise Exception('The number of energies and coordinates in %s are not the same : %s' % (fnm, str(lens)))
         # The number of atoms should all be the same
         if len(set([len(i) for i in Answer['xyzs']])) != 1:
             raise Exception('The numbers of atoms across frames in %s are not all the same' % (fnm))
 
-        for i, frc in enumerate(Answer['qm_forces']):
-            Answer['qm_forces'][i] = frc.T
+        if 'qm_forces' in Answer:
+            for i, frc in enumerate(Answer['qm_forces']):
+                Answer['qm_forces'][i] = frc.T
 
         return Answer
     
