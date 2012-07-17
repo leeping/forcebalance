@@ -142,7 +142,7 @@ class AbInitio_TINKER(AbInitio):
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
         # Link the run parameter file
-        os.symlink(os.path.join(self.root,self.simdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings","shot.key"),os.path.join(abstempdir,"shot.key"))
 
     def energy_force_driver(self, shot):
         self.traj.write("shot.arc",select=[shot])

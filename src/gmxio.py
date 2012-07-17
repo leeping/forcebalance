@@ -91,6 +91,7 @@ pdict = {'BONDS':{3:'B', 4:'K'},
          'VSITE4FD':{6:'A',7:'B',8:'D'},
          'VSITE4FDN':{6:'A',7:'B',8:'C'},
          'DEF':{3:'FLJ',4:'FQQ'},
+         'POL':{3:'ALPHA'},
          }
 
 def parse_atomtype_line(line):
@@ -278,6 +279,9 @@ class ITP_Reader(BaseReader):
             self.itype = 'COUL'
             # Build the adict here.
             self.adict.setdefault(self.mol,[]).append(s[0])
+        elif self.sec == 'polarization':
+            atom = [s[1]]
+            self.itype = 'POL'
         elif self.sec == 'qtpie':
             # The atom involved is labeled by the atomic number.
             atom = [s[0]]
@@ -398,13 +402,14 @@ class AbInitio_GMX(AbInitio):
         self.traj.write('conf.gro',select=[shot])
         # Call grompp followed by mdrun.
         o, e = Popen(["./grompp", "-f", "shot.mdp"],stdout=PIPE,stderr=PIPE).communicate()
-        o, e = Popen(["./mdrun", "-o", "shot.trr", "-rerunvsite"], stdout=PIPE, stderr=PIPE).communicate()
+        o, e = Popen(["./mdrun", "-nt", "1", "-o", "shot.trr", "-rerunvsite"], stdout=PIPE, stderr=PIPE).communicate()
         # Gather information
         o, e = Popen(["./g_energy","-xvg","no"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('Potential')
         o, e = Popen(["./g_traj","-xvg","no","-f","shot.trr","-of","force.xvg","-fp"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('System')
         E = [float(open("energy.xvg").readlines()[0].split()[1])]
         F = [float(i) for i in open("force.xvg").readlines()[0].split()[1:] if float(i) != 0.0]
         M = array(E + F)
+        M = M[:3*self.fitatoms+1]
         return M
 
     def energy_force_driver_all(self):
@@ -413,7 +418,7 @@ class AbInitio_GMX(AbInitio):
         rm_gmx_baks(os.getcwd())
         # Call grompp followed by mdrun.
         _exec(["./grompp", "-f", "shot.mdp"], print_command=False)
-        _exec(["./mdrun", "-o", "shot.trr", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
+        _exec(["./mdrun", "-nt", "1", "-o", "shot.trr", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
         # Gather information
         _exec(["./g_energy","-xvg","no"], stdin='Potential', print_command=False)
         _exec(["./g_traj","-xvg","no","-f","shot.trr","-of","force.xvg","-fp"], stdin='System', print_command=False)
@@ -425,7 +430,7 @@ class AbInitio_GMX(AbInitio):
             # Compute the potential energy and append to list
             Energy = [float(Eline.split()[1])]
             Force = [float(i) for i in Fline.split()[1:] if float(i) != 0.0]
-            M.append(array(Energy + Force))
+            M.append(array(Energy + Force)[:3*self.fitatoms+1])
         return array(M)
 
     def generate_vsite_positions(self):
@@ -434,7 +439,7 @@ class AbInitio_GMX(AbInitio):
         rm_gmx_baks(os.getcwd())
         # Call grompp followed by mdrun.
         _exec(["./grompp", "-f", "shot.mdp"], print_command=False)
-        _exec(["./mdrun", "-o", "shot.trr", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
+        _exec(["./mdrun", "-nt", "1", "-o", "shot.trr", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
         # Gather information
         _exec(["./trjconv","-f","shot.trr","-o","trajout.gro","-ndec","6","-novel","-noforce"], stdin='System', print_command=False)
         NewMol = Molecule("trajout.gro")
@@ -447,6 +452,7 @@ class Interaction_GMX(Interaction):
         ## Name of the trajectory
         self.trajfnm = "all.gro"
         super(Interaction_GMX,self).__init__(options,sim_opts,forcefield)
+        self.Dielectric = 0.0
     
     def prepare_temp_directory(self, options, sim_opts):
         os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
@@ -473,36 +479,38 @@ class Interaction_GMX(Interaction):
         snapshot.  This does not require GROMACS-X2. """
         raise NotImplementedError('Per-snapshot interaction energies not implemented, consider using all-at-once')
 
-    def interaction_driver_all(self, dielectric=True):
+    def interaction_driver_all(self, dielectric=False):
         """ Computes the energy and force using GROMACS for a trajectory.  This does not require GROMACS-X2. """
         # Remove backup files.
         rm_gmx_baks(os.getcwd())
-        # Call grompp followed by mdrun.
+        # Do the interacting calculation.
         _exec(["./grompp", "-f", "interaction.mdp", "-n", "index.ndx"], print_command=False)
-        _exec(["./mdrun", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
+        _exec(["./mdrun", "-nt", "1", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
         # Gather information
-        _exec(["./g_energy","-xvg","no"], print_command=False, stdin="Coul-SR:FRAGA-FRAGB\nLJ-SR:FRAGA-FRAGB\nBuck-SR:FRAGA-FRAGB\n")
-        M = []
-        # Loop through the snapshots
-        for line in open("energy.xvg").readlines():
-            # Compute the potential energy and append to list
-            s = line.split()
-            Energy = float(s[1]) + float(s[2])
-            M.append(Energy)
+        _exec(["./g_energy","-xvg","no"], print_command=False, stdin="Potential\n")
+        Interact = array([float(l.split()[1]) for l in open('energy.xvg').readlines()])
+        # Do the excluded calculation.
+        _exec(["./grompp", "-f", "excluded.mdp", "-n", "index.ndx"], print_command=False)
+        _exec(["./mdrun", "-nt", "1", "-rerunvsite", "-rerun", "all.gro"], print_command=False)
+        # Gather information
+        _exec(["./g_energy","-xvg","no"], print_command=False, stdin="Potential\n")
+        Excluded = array([float(l.split()[1]) for l in open('energy.xvg').readlines()])
+        # The interaction energy.
+        M = Interact - Excluded
         # Now we have the MM interaction energy.
         # We need the COSMO component of the interaction energy now...
-        traj_dimer = deepcopy(self.traj)
-        traj_dimer.add_quantum("qtemp_D.in")
-        traj_dimer.write("qchem_dimer.in",ftype="qcin")
-        traj_monoA = deepcopy(self.traj)
-        traj_monoA.add_quantum("qtemp_A.in")
-        traj_monoA.write("qchem_monoA.in",ftype="qcin")
-        traj_monoB = deepcopy(self.traj)
-        traj_monoB.add_quantum("qtemp_B.in")
-        traj_monoB.write("qchem_monoB.in",ftype="qcin")
-        if self.wq_port == 0:
-            warn_press_key("To proceed past this point, a port for the Work Queue must be defined")
         if dielectric:
+            traj_dimer = deepcopy(self.traj)
+            traj_dimer.add_quantum("qtemp_D.in")
+            traj_dimer.write("qchem_dimer.in",ftype="qcin")
+            traj_monoA = deepcopy(self.traj)
+            traj_monoA.add_quantum("qtemp_A.in")
+            traj_monoA.write("qchem_monoA.in",ftype="qcin")
+            traj_monoB = deepcopy(self.traj)
+            traj_monoB.add_quantum("qtemp_B.in")
+            traj_monoB.write("qchem_monoB.in",ftype="qcin")
+            if self.wq_port == 0:
+                warn_press_key("To proceed past this point, a port for the Work Queue must be defined")
             print "Computing the dielectric energy"
             Diel_D = QChem_Dielectric_Energy("qchem_dimer.in",self.wq)
             Diel_A = QChem_Dielectric_Energy("qchem_monoA.in",self.wq)
@@ -513,9 +521,6 @@ class Interaction_GMX(Interaction):
                 Diel_B = QChem_Dielectric_Energy("qchem_monoB.in",self.wq)
                 self.Diel_B = Diel_B
             self.Dielectric = Diel_D - Diel_A - Diel_B
-        else:
-            print "Reading the dielectric energy"
-        M = array(M)
         M += self.Dielectric
         return M
     

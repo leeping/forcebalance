@@ -11,7 +11,7 @@ contained inside.
 import os, pickle, re, sys
 import numpy as np
 from numpy.linalg import eig, norm, solve
-from nifty import col, flat, row, printcool, printcool_dictionary, pmat2d, warn_press_key
+from nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
 from finite_difference import f1d7p, f1d5p, fdwrap
 import random
 
@@ -109,6 +109,8 @@ class Optimizer(object):
         self.print_hess = options['print_hessian']
         ## Whether to print parameters during each step of the optimization
         self.print_vals = options['print_parameters']
+        ## Error tolerance (if objective function rises by less than this, then the optimizer will forge ahead!)
+        self.err_tol = options['error_tolerance']
         
         #======================================#
         #     Variables which are set here     #
@@ -297,28 +299,33 @@ class Optimizer(object):
             dX_actual = X - X_prev
             Quality = dX_actual / dX_expect
 
-            if Quality <= 0.25:
-                # If the step quality is bad, then we should decrease the trust radius.
-                trust = max(ndx*(1./(1+a)), self.mintrust)
-                print "Reducing the trust radius to % .4e" % trust
-            elif Quality >= 0.75 and bump:
+            #if Quality <= 0.25:
+            #    # If the step quality is bad, then we should decrease the trust radius.
+            #    trust = max(ndx*(1./(1+a)), self.mintrust)
+            #    print "Reducing the trust radius to % .4e" % trust
+            if Quality >= 0.75 and bump:
                 # If the step quality is good, then we should increase the trust radius.  Capeesh?
                 # The 'a' factor is how much we should grow or shrink the trust radius each step
                 # and the 'b' factor determines how closely we are tied down to the original value.
                 # Recommend values 0.5 and 0.5
                 trust += a*trust*np.exp(-b*(trust/self.trust0 - 1))
-            if X > X_prev:
+            if X > (X_prev + self.err_tol):
                 color = "\x1b[91m"
                 # Toggle switch for rejection (experimenting with no rejection)
                 Rejects = True
+                trust = max(ndx*(1./(1+a)), self.mintrust)
+                print "Rejecting step and reducing trust radius to % .4e" % trust
                 if Rejects:
                     xk = xk_prev.copy()
                     G = G_prev.copy()
                     H = H_stor.copy()
                     continue
             else:
-                color = "\x1b[92m"
-                X_best = X
+                if X > X_best:
+                    color = "\x1b[93m"
+                else:
+                    color = "\x1b[92m"
+                    X_best = X
                 ehist = np.append(ehist, X)
             # Hessian update.
             if b_BFGS:
@@ -357,6 +364,8 @@ class Optimizer(object):
         Emin = min(Eig)
         if Emin < self.eps:         # Mix in SD step if Hessian minimum eigenvalue is negative
             print "Hessian has a small or negative eigenvalue (%.1e), mixing in some steepest descent (%.1e) to correct this." % (Emin, self.eps - Emin)
+            print "Eigenvalues are:"   ###
+            pvec1d(Eig)                ###
             H += (self.eps - Emin)*np.eye(H.shape[0])
 
         if self.bhyp:
@@ -411,13 +420,38 @@ class Optimizer(object):
             G = np.delete(G, self.excision)
             H = np.delete(H, self.excision, axis=0)
             H = np.delete(H, self.excision, axis=1)
-            dx = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
-            dx = flat(dx)
+            # print "Inverting Hessian:"                 ###
+            # print " G:"                                ###
+            # pvec1d(G,precision=5)                      ###
+            # print " H:"                                ###
+            # pmat2d(H,precision=5)                      ###
+            Hi = invert_svd(np.mat(H))
+            dx = flat(-1 * Hi * col(G))
+            # print " dx:"                               ###
+            # pvec1d(dx,precision=5)                     ###
+            # dxa = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
+            # dxa = flat(dxa)
+            # print " dxa:"                              ###
+            # pvec1d(dxa,precision=5)                    ###
+            print                                      ###
             for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                 dx = np.insert(dx, i, 0)
             def para_solver(L):
                 HT = H + L**2*np.diag(np.diag(H))
-                dx = -solve(HT, G)
+                # print "Inverting Scaled Hessian:"                       ###
+                # print " G:"                                             ###
+                # pvec1d(G,precision=5)                                   ###
+                # print " HT: (Scal = %.4f)" % (1+L**2)                   ###
+                # pmat2d(HT,precision=5)                                  ###
+                Hi = invert_svd(np.mat(HT))
+                dx = flat(-1 * Hi * col(G))
+                # print " dx:"                                            ###
+                # pvec1d(dx,precision=5)                                  ###
+                # dxa = -solve(HT, G)
+                # dxa = flat(dxa)
+                # print " dxa:"                                           ###
+                # pvec1d(dxa,precision=5)                                 ###
+                # print                                                   ###
                 sol = flat(0.5*row(dx)*np.mat(H)*col(dx))[0] + np.dot(dx,G)
                 for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                     dx = np.insert(dx, i, 0)
@@ -428,7 +462,7 @@ class Optimizer(object):
     
         def trust_fun(L):
             N = norm(solver(L)[0])
-            print "\rHessian diagonal scaling = %.4e: found length %.4e" % (1+L**2,N),
+            print "\rL = %.4e, Hessian diagonal scaling = %.4e: found length %.4e, objective is %.4e" % (L, 1+L**2, N, (N - trust)**2)
             return (N - trust)**2
 
         def search_fun(L):
@@ -448,7 +482,7 @@ class Optimizer(object):
             if dxnorm > trust:
                 bump = True
                 # Tried a few optimizers here, seems like Brent works well.
-                LOpt = optimize.brent(trust_fun,brack=(0.0,3.0),tol=1e-4)
+                LOpt = optimize.brent(trust_fun,brack=(0.0,3.0),tol=trust*1e-4)
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
                 print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)

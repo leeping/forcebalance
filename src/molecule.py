@@ -5,7 +5,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                    Last updated June 12, 2012                      |#
+#|                    Last updated July 09, 2012                      |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -103,7 +103,7 @@
 # qm_forces  = List of numpy arrays of atomistic forces from QM calculations
 # qm_espxyzs = List of numpy arrays of xyz coordinates for ESP evaluation
 # qm_espvals = List of numpy arrays of ESP values
-FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_interaction', 'qm_espxyzs', 'qm_espvals'])
+FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_interaction', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
 #| must be a list along the atom axis,   |#
@@ -1196,7 +1196,8 @@ class Molecule(object):
                             qcrems.append(qcrem)
                             qcrem = OrderedDict()
                     if reading_template:
-                        template.append((section,SectionData))
+                        if section != 'external_charges': # Ignore the external charges section because it varies from frame to frame.
+                            template.append((section,SectionData))
                     SectionData = []
                 else:
                     section = wrd
@@ -1493,6 +1494,14 @@ class Molecule(object):
             xyz = self.xyzs[I]
             remidx = 0
             molecule_printed = False
+            # Each 'extchg' has number_of_atoms * 4 elements corresponding to x, y, z, q.
+            if 'qm_extchgs' in self.Data:
+                extchg = self.qm_extchgs[I]
+                out.append('$external_charges')
+                print extchg.shape
+                for i in range(len(extchg)):
+                    out.append("% 15.10f % 15.10f % 15.10f %15.10f" % (extchg[i,0],extchg[i,1],extchg[i,2],extchg[i,3]))
+                out.append('$end')
             for SectName, SectData in self.qctemplate:
                 if SectName != '@@@@':
                     out.append('$%s' % SectName)

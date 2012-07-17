@@ -37,7 +37,17 @@ bohrang = 0.529177249
 #=========================#
 #     I/O formatting      #
 #=========================#
-def pmat2d(mat2d):
+def pvec1d(vec1d, precision=1):
+    """Printout of a 1-D vector.
+
+    @param[in] vec1d a 1-D vector
+    """
+    v2a = array(vec1d)
+    for i in range(v2a.shape[0]):
+        print "%% .%ie" % precision % v2a[i],
+    print
+
+def pmat2d(mat2d, precision=1):
     """Printout of a 2-D matrix.
 
     @param[in] mat2d a 2-D matrix
@@ -45,7 +55,7 @@ def pmat2d(mat2d):
     m2a = array(mat2d)
     for i in range(m2a.shape[0]):
         for j in range(m2a.shape[1]):
-            print "% .1e" % m2a[i][j],
+            print "%% .%ie" % precision % m2a[i][j],
         print
 
 def printcool(text,sym="#",bold=False,color=2,bottom='-',minwidth=50):
@@ -246,7 +256,7 @@ def get_least_squares(x, y, w = None):
     n_x = X.shape[0]
     n_fit = X.shape[1]
     if n_fit >= n_x:
-        warn_press_key("Argh? It seems like this problem is underdetermined!")
+        print "Argh? It seems like this problem is underdetermined!"
     # Build the weight matrix.
     if w != None:
         if len(w) != n_x:

@@ -81,7 +81,7 @@ gen_opts_types = {
                  "constrain_charge" : (1, 'Specify whether to constrain the charges on the molecules.'),
                  "print_gradient"   : (1, 'Print the objective function gradient at every step'),
                  "logarithmic_map"  : (0, 'Optimize in the space of log-variables'),
-                 "print_hessian"    : (1, 'Print the objective function Hessian at every step'),
+                 "print_hessian"    : (0, 'Print the objective function Hessian at every step'),
                  "print_parameters" : (1, 'Print the mathematical and physical parameters at every step'),
                  "normalize_weights": (1, 'Normalize the weights for the fitting simulations')
                  },
@@ -96,7 +96,8 @@ gen_opts_types = {
                  "penalty_multiplicative" : (0.0,   'Factor for multiplicative penalty function in objective function'),
                  "penalty_hyperbolic_b"   : (0.001, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b'),
                  "adaptive_factor"        : (0.25, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.'),
-                 "adaptive_damping"       : (0.5, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.')
+                 "adaptive_damping"       : (0.5, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.'),
+                 "error_tolerance"        : (0.0, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.')
                  },
     'sections': {"read_mvals" : (None, 'Paste mathematical parameters into the input file for them to be read in directly'),
                  "read_pvals" : (None, 'Paste physical parameters into the input file for them to be read in directly'),
@@ -137,6 +138,7 @@ sim_opts_types = {
                  "energy"           : (1, 'Enable the energy objective function in ab initio'), 
                  "force"            : (1, 'Enable the force objective function in ab initio'), 
                  "resp"             : (0, 'Enable the RESP objective function in ab initio (remember to set espweight)'),
+                 "do_cosmo"         : (0, 'Call Q-Chem to do MM COSMO on MM snapshots.'),
                 },
     'floats'  : {"weight"      : (1.0, 'Weight of the simulation (vs. other simulations)'),
                  "w_rho"       : (1.0, 'Weight of experimental density within liquid properties'),

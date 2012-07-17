@@ -10,11 +10,13 @@ from forcebalance.forcefield import FF
 from forcebalance.simtab import SimTab
 from forcebalance.parser import parse_inputs
 from forcebalance.nifty import *
+from forcebalance.nifty import _exec
 from forcebalance.molecule import Molecule, format_xyz_coord
 import numpy as np
 import numpy.oldnumeric as nu
 import work_queue
 import random
+from forcebalance.mslib import MSMS
 
 # The default VdW radii from Chmiera, taken from AMBER.
 # See http://www.cgl.ucsf.edu/chimera/1.5/docs/UsersGuide/midas/vdwtables.html
@@ -40,55 +42,83 @@ def generate_snapshots():
     print "I haven't implemented this yet"
     sys.exit(1)
 
+def drive_msms(xyz, radii, density):
+    with open(os.path.join('msms_input.p'),'w') as f: lp_dump((xyz, radii, density),f)
+    _exec("CallMSMS.py", print_to_screen=False, print_command=False)
+    return lp_load(open('msms_output.p'))
+
 def create_esp_surfaces(Molecule):
-    from forcebalance.mslib import MSMS
     Rads = [VdW99[i] for i in Molecule.elem]
     #xyz = Molecule.xyzs[0]
     na = Molecule.na
-    Mol_ESP = []
-    printxyz=0
+    printxyz=True
     np.set_printoptions(precision=10, linewidth=120)
+    # Pass 1: This will determine the number of ESP points.
+    num_esp = []
     for i, xyz in enumerate(Molecule.xyzs):
         print "Generating grid points for snapshot %i\r" % i
-        esp_pts = []
+        num_esp_shell = []
         for j in [1.4, 1.6, 1.8, 2.0]:
             Radii = list(np.array(Rads)*j)
-            #Molecule.write("coords_%i.xyz" % i,select=i)
-            #np.savetxt("coords_%i.txt" % i,xyz)
-            #np.savetxt("radii_%i.txt" % i,np.array(Radii))
-            #print xyz
-            #print Radii
-            print "Calling MSMS"
-            MS = MSMS(coords = list(xyz), radii = Radii)
-            print "Computing"
-            MS.compute(density=0.5)
-            print "Getting triangles"
-            vfloat, vint, tri = MS.getTriangles()
-            a = range(len(vfloat))
-            random.shuffle(a)
+            vfloat = drive_msms(xyz, Radii, 20.0/j)
             if len(vfloat) < na:
                 warn_press_key("I generated less ESP points than atoms!")
-            for idx in a[:na]:
+            num_esp_shell.append(len(vfloat))
+        num_esp.append(num_esp_shell)
+
+    num_esp = np.array(num_esp)
+    num_pts = np.amin(num_esp,axis=0) / 100
+    print "Number of points: ", num_pts
+    raw_input()
+    # We do not store.
+    # Pass 2: This will actually print out the ESP grids.
+    Mol_ESP = []
+    for i, xyz in enumerate(Molecule.xyzs):
+        esp_pts = []
+        for sh, j in enumerate([1.4, 1.6, 1.8, 2.0]):
+            Radii = list(np.array(Rads)*j)
+            vfloat = drive_msms(xyz, Radii, 20.0/j)
+
+            # print "Calling MSMS"
+            # MS = MSMS(coords = list(xyz), radii = Radii)
+            # print "Computing"
+            # MS.compute(density=20.0/j)
+            # print "Getting triangles"
+            # vfloat, vint, tri = MS.getTriangles()
+            # #vfloat = vfloat_shell[sh]
+            a = range(len(vfloat))
+            random.shuffle(a)
+            # We'll be careful and generate lots of ESP points, mm.
+            # But we can't have a different number of points per snapshots, mm.
+            for idx in a[:num_pts[sh]]:
                 esp_pts.append(vfloat[idx][:3])
         if printxyz:
             Out = []
             Out.append("%i" % (len(xyz) + len(esp_pts)))
-            Out.append("Molecule plus ESP points")
+            Out.append("Molecule plus ESP points (heliums)")
             for j, x in enumerate(xyz):
                 Out.append(format_xyz_coord(Molecule.elem[j], x))
             for esp_pt in esp_pts:
-                Out.append(format_xyz_coord('chg',esp_pt))
-            fout = open('Mao.xyz','w')
+                Out.append(format_xyz_coord('He',esp_pt))
+            fout = open('molecule_esp.xyz','w' if i == 0 else 'a')
             for line in Out:
                 print >> fout, line
             fout.close()
-            sys.exit(1)
         Mol_ESP.append(esp_pts)
+
     return Mol_ESP
 
 def do_quantum(wq_port):
     M = Molecule('shots.gro')
     M.add_quantum('../settings/qchem.in')
+    # Special hack to add TIP3P waters.
+    if os.path.exists('waters.gro'):
+        print "Found waters.gro, loading as external waters and adding SPC charges."
+        Mext = Molecule('waters.gro')
+        Q = col([-0.82 if (i%3==0) else 0.41 for i in range(Mext.na)])
+        Qext = [np.hstack((xyz, Q)) for xyz in Mext.xyzs]
+        M.qm_extchgs = Qext
+    # End special hack.
     digits = len(str(len(M)-1))
     formstr = '\"%%0%ii\"' % digits
 
