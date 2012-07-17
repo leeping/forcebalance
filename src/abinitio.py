@@ -265,7 +265,7 @@ class AbInitio(FittingSimulation):
         else:
             # Indicate to Gromacs that we're only fitting the first however-many atoms.
             print "We're only fitting the first %i atoms" % self.fitatoms
-            print "The quantum force matrix appears to contain more components (%i) than those being fit (%i)." % (fqmm.shape[1], 3*self.fitatoms)
+            #print "The quantum force matrix appears to contain more components (%i) than those being fit (%i)." % (fqmm.shape[1], 3*self.fitatoms)
             print "Pruning the quantum force matrix..."
             self.fqm  = self.fqm[:, :3*self.fitatoms].copy()
         self.emd0 = array(self.emd0)

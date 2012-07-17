@@ -82,7 +82,7 @@ niterations = 5000                 # number of iterations to collect data for
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
 pressure = float(sys.argv[4]) * units.atmospheres 
-collision_frequency = 91.0 / units.picosecond 
+collision_frequency = 1.0 / units.picosecond 
 barostat_frequency = 25            # number of steps between MC volume adjustments
 nprint = 1
 
@@ -459,6 +459,20 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,boxes=None,verbose=False):
 
    """
    # Print the force field XML from the ForceBalance object, with modified parameters.
+   # Zero out the changes in the bonded terms.  This is a "cheat"
+   # but it looks like OpenMM is not happy when I do MD with these..
+   # for i, p in enumerate(FF.plist):
+   #    if any([j in p for j in ['Harmonic', 'Urey']]):
+   #       mvals[i] *= 0.0
+   # What about zeroing out the sum of the quadrupole terms?
+   quadsum1 = mvals[11] + mvals[12] + mvals[13]
+   quadsum2 = mvals[17] + mvals[18] + mvals[20]
+   mvals[11] -= quadsum1/3
+   mvals[12] -= quadsum1/3
+   mvals[13] -= quadsum1/3
+   mvals[17] -= quadsum2/3
+   mvals[18] -= quadsum2/3
+   mvals[20] -= quadsum2/3
    FF.make(mvals)
    # Load the force field XML file to make the OpenMM object.
    forcefield = ForceField(sys.argv[2])
@@ -544,6 +558,20 @@ def main():
    # Load the force field in from the ForceBalance pickle.
    FF,mvals,h = lp_load(open('forcebalance.p'))
    # Create the force field XML files.
+   # Zero out the changes in the bonded terms.  This is a "cheat"
+   # but it looks like OpenMM is not happy when I do MD with these..
+   # for i, p in enumerate(FF.plist):
+   #    if any([j in p for j in ['Harmonic', 'Urey']]):
+   #       mvals[i] *= 0.0
+   # What about zeroing out the sum of the quadrupole terms?
+   quadsum1 = mvals[11] + mvals[12] + mvals[13]
+   quadsum2 = mvals[17] + mvals[18] + mvals[20]
+   mvals[11] -= quadsum1/3
+   mvals[12] -= quadsum1/3
+   mvals[13] -= quadsum1/3
+   mvals[17] -= quadsum2/3
+   mvals[18] -= quadsum2/3
+   mvals[20] -= quadsum2/3
    FF.make(mvals)
 
    #=================================================================#
@@ -618,6 +646,14 @@ def main():
    FF.print_map(vals=GHvap)
    print bar
    # Print the final force field.
+   quadsum1 = mvals[11] + mvals[12] + mvals[13]
+   quadsum2 = mvals[17] + mvals[18] + mvals[20]
+   mvals[11] -= quadsum1/3
+   mvals[12] -= quadsum1/3
+   mvals[13] -= quadsum1/3
+   mvals[17] -= quadsum2/3
+   mvals[18] -= quadsum2/3
+   mvals[20] -= quadsum2/3
    pvals = FF.make(mvals)
 
    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, pV, Energies, G, mEnergies, mG, Rho_err, Hvap_err),f)

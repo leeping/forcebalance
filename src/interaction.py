@@ -59,6 +59,8 @@ class Interaction(FittingSimulation):
         self.all_at_once   = sim_opts['all_at_once']
         ## OpenMM-only option - whether to run the energies and forces internally.
         self.run_internal  = sim_opts['run_internal']
+        ## Do we call Q-Chem for dielectric energies?
+        self.do_cosmo      = sim_opts['do_cosmo']
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -261,13 +263,13 @@ class Interaction(FittingSimulation):
         #==============================================================#
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
-        interpids = ['VPAIR','COUL','VDW']
+        interpids = ['VPAIR','COUL','VDW','POL']
         coulpids = ['COUL']
         if self.all_at_once:
             print "Executing\r",
-            M_all = self.interaction_driver_all()
+            M_all = self.interaction_driver_all(dielectric=self.do_cosmo)
             if AGrad or AHess:
-                def callM(mvals_, dielectric=True):
+                def callM(mvals_, dielectric=False):
                     print "\r",
                     pvals = self.FF.make(mvals_, self.usepvals)
                     return self.interaction_driver_all(dielectric)
@@ -275,7 +277,7 @@ class Interaction(FittingSimulation):
                     if any([j in self.FF.plist[p] for j in interpids]):
                         # Differentiate only if the parameter is relevant for intermolecular interactions. :)
                         #dM_all[:,p], ddM_all[:,p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
-                        dM_all[:,p] = f1d2p(fdwrap(callM, mvals, p, dielectric=any([j in self.FF.plist[p] for j in coulpids])), h = self.h, f0 = M_all)
+                        dM_all[:,p] = f1d2p(fdwrap(callM, mvals, p, dielectric=self.do_cosmo and any([j in self.FF.plist[p] for j in coulpids])), h = self.h, f0 = M_all)
             # Dump interaction energies to disk.
             savetxt('M.txt',M_all)
             savetxt('Q.txt',self.eqm)
