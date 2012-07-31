@@ -64,7 +64,8 @@ gen_opts_types = {
                  "scan_vals"    : (None, 'Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.1:11'),
                  "readchk"      : (None, 'Name of the restart file we read from'),
                  "writechk"     : (None, 'Name of the restart file we write to (can be same as readchk)'),
-                 "ffdir"        : ('forcefield', 'Directory containing force fields, relative to project directory')
+                 "ffdir"        : ('forcefield', 'Directory containing force fields, relative to project directory'),
+                 "amoeba_polarization"        : ('direct', 'The AMOEBA polarization type, either direct or mutual.')
                  },
     'allcaps' : {"jobtype"      : ("single", 'The job type, defaults to a single-point evaluation of objective function'),
                  },

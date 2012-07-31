@@ -215,10 +215,10 @@ class AbInitio_OpenMM(AbInitio):
         #       Simulation settings (IMPORTANT)        #
         # Agrees with TINKER to within 0.0001 kcal! :) #
         #==============================================#
-        ## Use for Mutual
-        # system = forcefield.createSystem(pdb.topology,rigidWater=False,mutualInducedTargetEpsilon=1e-6)
-        ## Use for Direct
-        system = forcefield.createSystem(pdb.topology,rigidWater=False,polarization='Direct')
+        if self.FF.amoeba_pol == 'mutual':
+            system = forcefield.createSystem(pdb.topology,rigidWater=False,mutualInducedTargetEpsilon=1e-6)
+        elif self.FF.amoeba_pol == 'direct':
+            system = forcefield.createSystem(pdb.topology,rigidWater=False,polarization='Direct')
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         simulation = Simulation(pdb.topology, system, integrator)

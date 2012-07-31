@@ -65,7 +65,7 @@ import simtk.openmm as openmm
 from simtk.openmm.app import *
 from forcebalance.forcefield import FF
 from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary
-from forcebalance.finite_difference import fdwrap, f12d3p
+from forcebalance.finite_difference import fdwrap, f1d2p
 from forcebalance.molecule import Molecule
 from forcebalance.openmmio import liquid_energy_driver, liquid_energy_derivatives
 
@@ -105,16 +105,17 @@ direct_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanomete
 tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanometer, 
                 'vdwCutoff' : 1.2, 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24]}
 
-mono_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None, 
+mono_direct_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None, 
                'rigidWater' : False, 'polarization' : 'direct'}
 
-simulation_settings = direct_kwargs
+mono_mutual_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None, 
+               'rigidWater' : False, 'mutualInducedTargetEpsilon' : 1e-6}
+
 if 'tip3p' in sys.argv[2]:
    print "Using TIP3P settings."
    timestep = 1.0 * units.femtosecond # timestep for integrtion
    nsteps   = 100                     # number of steps per data record
    PlatName = 'OpenCL'
-   simulation_settings = tip3p_kwargs
 
 #================================#
 # Create the simulation platform #
@@ -465,14 +466,14 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,boxes=None,verbose=False):
    #    if any([j in p for j in ['Harmonic', 'Urey']]):
    #       mvals[i] *= 0.0
    # What about zeroing out the sum of the quadrupole terms?
-   quadsum1 = mvals[11] + mvals[12] + mvals[13]
-   quadsum2 = mvals[17] + mvals[18] + mvals[20]
-   mvals[11] -= quadsum1/3
-   mvals[12] -= quadsum1/3
-   mvals[13] -= quadsum1/3
-   mvals[17] -= quadsum2/3
-   mvals[18] -= quadsum2/3
-   mvals[20] -= quadsum2/3
+   # quadsum1 = mvals[11] + mvals[12] + mvals[13]
+   # quadsum2 = mvals[17] + mvals[18] + mvals[20]
+   # mvals[11] -= quadsum1/3
+   # mvals[12] -= quadsum1/3
+   # mvals[13] -= quadsum1/3
+   # mvals[17] -= quadsum2/3
+   # mvals[18] -= quadsum2/3
+   # mvals[20] -= quadsum2/3
    FF.make(mvals)
    # Load the force field XML file to make the OpenMM object.
    forcefield = ForceField(sys.argv[2])
@@ -526,7 +527,8 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,boxes=None):
    Hd       = np.zeros((FF.np,len(xyzs)))
    E0       = energy_driver(mvals, pdb, FF, xyzs, settings, boxes)
    for i in range(FF.np):
-      G[i,:], Hd[i,:] = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,boxes=boxes),h,f0=E0)
+      # Not doing the three-point finite difference anymore.
+      G[i,:] = f1d2p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,boxes=boxes),h,f0=E0)
    return G, Hd
        
 def main():
@@ -564,24 +566,24 @@ def main():
    #    if any([j in p for j in ['Harmonic', 'Urey']]):
    #       mvals[i] *= 0.0
    # What about zeroing out the sum of the quadrupole terms?
-   quadsum1 = mvals[11] + mvals[12] + mvals[13]
-   quadsum2 = mvals[17] + mvals[18] + mvals[20]
-   mvals[11] -= quadsum1/3
-   mvals[12] -= quadsum1/3
-   mvals[13] -= quadsum1/3
-   mvals[17] -= quadsum2/3
-   mvals[18] -= quadsum2/3
-   mvals[20] -= quadsum2/3
+   # quadsum1 = mvals[11] + mvals[12] + mvals[13]
+   # quadsum2 = mvals[17] + mvals[18] + mvals[20]
+   # mvals[11] -= quadsum1/3
+   # mvals[12] -= quadsum1/3
+   # mvals[13] -= quadsum1/3
+   # mvals[17] -= quadsum2/3
+   # mvals[18] -= quadsum2/3
+   # mvals[20] -= quadsum2/3
    FF.make(mvals)
 
    #=================================================================#
    # Run the simulation for the full system and analyze the results. #
    #=================================================================#
-   Data, Xyzs, Boxes, Rhos, Energies = run_simulation(pdb, direct_kwargs, Trajectory=True)
+   Data, Xyzs, Boxes, Rhos, Energies = run_simulation(pdb, mutual_kwargs if FF.amoeba_pol == 'mutual' else direct_kwargs, Trajectory=True)
    # Get statistics from our simulation.
    Rho_avg, Rho_err, Pot_avg, Pot_err, pV_avg, pV_err = analyze(Data)
    # Now that we have the coordinates, we can compute the energy derivatives.
-   G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, direct_kwargs, Boxes)
+   G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, mutual_kwargs if FF.amoeba_pol == 'mutual' else direct_kwargs, Boxes)
    # The density derivative can be computed using the energy derivative.
    N = len(Xyzs)
    kB = units.BOLTZMANN_CONSTANT_kB * units.AVOGADRO_CONSTANT_NA
@@ -606,11 +608,11 @@ def main():
    nsteps   = 1000                    # number of steps per data record
 
    mpdb = PDBFile('mono.pdb')
-   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_kwargs, pbc=False, Trajectory=False)
+   mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_mutual_kwargs if FF.amoeba_pol == 'mutual' else mono_direct_kwargs, pbc=False, Trajectory=False)
    # Get statistics from our simulation.
    _trash, _crap, mPot_avg, mPot_err, __trash, __crap = analyze(mData)
    # Now that we have the coordinates, we can compute the energy derivatives.
-   mG, mHd = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mono_kwargs)
+   mG, mHd = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mono_mutual_kwargs if FF.amoeba_pol == 'mutual' else mono_direct_kwargs)
 
    # pV_avg and mean(pV) are exactly the same.
    pV = (pressure * Data['volume'] * units.AVOGADRO_CONSTANT_NA).value_in_unit(units.kilojoule_per_mole)
@@ -646,14 +648,14 @@ def main():
    FF.print_map(vals=GHvap)
    print bar
    # Print the final force field.
-   quadsum1 = mvals[11] + mvals[12] + mvals[13]
-   quadsum2 = mvals[17] + mvals[18] + mvals[20]
-   mvals[11] -= quadsum1/3
-   mvals[12] -= quadsum1/3
-   mvals[13] -= quadsum1/3
-   mvals[17] -= quadsum2/3
-   mvals[18] -= quadsum2/3
-   mvals[20] -= quadsum2/3
+   # quadsum1 = mvals[11] + mvals[12] + mvals[13]
+   # quadsum2 = mvals[17] + mvals[18] + mvals[20]
+   # mvals[11] -= quadsum1/3
+   # mvals[12] -= quadsum1/3
+   # mvals[13] -= quadsum1/3
+   # mvals[17] -= quadsum2/3
+   # mvals[18] -= quadsum2/3
+   # mvals[20] -= quadsum2/3
    pvals = FF.make(mvals)
 
    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, pV, Energies, G, mEnergies, mG, Rho_err, Hvap_err),f)
