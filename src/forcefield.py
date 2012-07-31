@@ -200,6 +200,8 @@ class FF(object):
         self.constrain_charge  = options['constrain_charge']
         ## Whether to constrain the charges.
         self.logarithmic_map  = options['logarithmic_map']
+        ## Switch for AMOEBA direct or mutual.
+        self.amoeba_pol = options['amoeba_polarization'].lower()
         
         #======================================#
         #     Variables which are set here     #
