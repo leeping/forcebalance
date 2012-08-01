@@ -408,7 +408,8 @@ def wq_wait(wq, verbose=False):
                 print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.host, task.computation_time/1000000)
                 wq.submit(task)
             else:
-                #print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, task.computation_time/1000000)
+                if task.computation_time/1000000 > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
+                    print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, task.computation_time/1000000)
                 del task
         else:
             printcount += 1
