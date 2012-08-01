@@ -194,6 +194,15 @@ class AbInitio_OpenMM(AbInitio):
         self.trajfnm = "all.gro"
         ## Initialize the SuperClass!
         super(AbInitio_OpenMM,self).__init__(options,sim_opts,forcefield)
+        ## Copied over from npt.py (for now)
+        PlatName = 'Cuda'
+        print "Setting Platform to", PlatName
+        self.platform = openmm.Platform.getPlatformByName(PlatName)
+        ## Set the device to the environment variable or zero otherwise
+        device = os.environ.get('CUDA_DEVICE',"0")
+        print "Setting Device to", device
+        self.platform.setPropertyDefaultValue("CudaDevice", device)
+        self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
@@ -221,7 +230,7 @@ class AbInitio_OpenMM(AbInitio):
             system = forcefield.createSystem(pdb.topology,rigidWater=False,polarization='Direct')
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-        simulation = Simulation(pdb.topology, system, integrator)
+        simulation = Simulation(pdb.topology, system, integrator, self.platform)
 
         M = []
         # Loop through the snapshots
