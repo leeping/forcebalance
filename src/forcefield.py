@@ -217,7 +217,7 @@ class FF(object):
         self.plist       = []
         ## A listing of parameter number -> atoms involved
         self.patoms      = []
-        ## A list where pfields[pnum] = ['file',line,field,mult],
+        ## A list where pfields[pnum] = ['file',line,field,mult,cmd],
         ## basically a new way to modify force field files; when we modify the
         ## force field file, we go to the specific line/field in a given file
         ## and change the number.
@@ -434,6 +434,20 @@ class FF(object):
                     self.patoms[prep].append(self.R[ffname].molatom)
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
+            if "EVAL" in sline:
+                parse = (array(sline)=='EVAL').argmax()+1 # The position of the 'EVAL' word
+                while parse < (array(sline)=='/EVAL').argmax():
+                    # Between EVAL and /EVAL, the words occur in pairs.
+                    # First is a number corresponding to the field that contains the dependent parameter.
+                    # Second is a Python command that determines how to calculate the parameter.
+                    pfld = int(sline[parse])
+                    evalcmd = sline[parse+1] # This string is actually Python code!!
+                    #pid = self.R[ffname].build_pid(pfld)
+                    #self.map[pid] = prep
+                    # This repeated parameter ID also has these atoms involved.
+                    #self.patoms[prep].append(self.R[ffname].molatom)
+                    self.assign_field(None,ffname,ln,pfld,None,evalcmd)
+                    parse += 2
     
     def addff_xml(self, ffname):
         """ Parse an XML force field file and create important instance variables.
@@ -527,21 +541,33 @@ class FF(object):
 
         pvals = list(pvals)
         newffdata = deepcopy(self.ffdata)
-        #============================#
-        # Print the new force field. #
-        #============================#
+        # The dictionary that takes parameter names to physical values.
+        PARM = {i:pvals[self.map[i]] for i in self.map}
+        #======================================#
+        #     Print the new force field.       #
+        #   LPW Note: Is it really reasonable  #
+        # to restrict the length of "pfields"? # 
+        # Perhaps "eval" will make this obso.  #
+        #======================================#
         for i in range(len(self.pfields)):
             pfld_list = self.pfields[i]
             for pfield in pfld_list:
-                fnm,ln,fld,mult = pfield
+                fnm,ln,fld,mult,cmd = pfield
                 # XML force fields are easy to print.  
                 # Our 'pointer' to where to replace the value
                 # is given by the position of this line in the
                 # iterable representation of the tree and the
                 # field number.
                 #if type(newffdata[fnm]) is etree._ElementTree:
+                if cmd != None:
+                    try:
+                        wval = eval(cmd)
+                    except:
+                        raise Exception("The command %s (written in the force field file) cannot be evaluated!" % cmd)
+                else:
+                    wval = mult*pvals[i]
                 if self.ffdata_isxml[fnm]:
-                    list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (mult*pvals[i])
+                    list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
                 # Text force fields are a bit harder.
                 # Our pointer is given by the line and field number.
                 # We take care to preserve whitespace in the printout
@@ -562,10 +588,10 @@ class FF(object):
                         whites[fld] = whites[fld][:len(sline[fld])+2]
                     # Actually replace the field with the physical parameter value.
                     if precision == 12:
-                        sline[fld]  = "% 17.12e" % (mult*pvals[i])
+                        sline[fld]  = "% 17.12e" % (wval)
                     else:
-                        #sline[fld]  = TXTFormat % (mult*pvals[i])
-                        sline[fld]  = TXTFormat(mult*pvals[i], precision)
+                        #sline[fld]  = TXTFormat % (wval)
+                        sline[fld]  = TXTFormat(wval, precision)
                     # Replace the line in the new force field.
                     newffdata[fnm][ln] = ''.join([whites[j]+sline[j] for j in range(len(sline))])+'\n'
 
@@ -783,7 +809,8 @@ class FF(object):
             if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
                 # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
                 # This needs to be changed to Chain or Molecule
-                ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata]))
+                print [determine_fftype(k) for k in self.ffdata]
+                ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata if determine_fftype(k) == "openmm"]))
             for i in range(self.np):
                 if any([j in self.plist[i] for j in concern]):
                     self.qmap.append(i)
@@ -874,7 +901,7 @@ class FF(object):
         else:
             self.pvals0[idx] = val
             
-    def assign_field(self,idx,fnm,ln,pfld,mult):
+    def assign_field(self,idx,fnm,ln,pfld,mult,cmd=None):
         """ Record the locations of a parameter in a txt file; [[file name, line number, field number, and multiplier]].
 
         Note that parameters can have multiple locations because of the repetition functionality.
@@ -886,10 +913,10 @@ class FF(object):
         @param[in] mult The multiplier (this is usually 1.0)
         
         """
-        if idx == len(self.pfields):
-            self.pfields.append([[fnm,ln,pfld,mult]])
+        if idx == len(self.pfields) or idx == None:
+            self.pfields.append([[fnm,ln,pfld,mult,cmd]])
         else:
-            self.pfields[idx].append([fnm,ln,pfld,mult])
+            self.pfields[idx].append([fnm,ln,pfld,mult,cmd])
 
 def rs_override(rsfactors,termtype,Temperature=298.15):
     """ This function takes in a dictionary (rsfactors) and a string (termtype).

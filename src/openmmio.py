@@ -152,8 +152,8 @@ class Liquid_OpenMM(Liquid):
         queue_up(self.wq,
                  command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
                  input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
-                 #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]]
-                 output_files = ['npt_result.p', 'npt.out', self.FF.fnms[0]])
+                 output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
+                 #output_files = ['npt_result.p', 'npt.out', self.FF.fnms[0]])
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
@@ -194,15 +194,18 @@ class AbInitio_OpenMM(AbInitio):
         self.trajfnm = "all.gro"
         ## Initialize the SuperClass!
         super(AbInitio_OpenMM,self).__init__(options,sim_opts,forcefield)
-        ## Copied over from npt.py (for now)
-        PlatName = 'Cuda'
-        print "Setting Platform to", PlatName
-        self.platform = openmm.Platform.getPlatformByName(PlatName)
-        ## Set the device to the environment variable or zero otherwise
-        device = os.environ.get('CUDA_DEVICE',"0")
-        print "Setting Device to", device
-        self.platform.setPropertyDefaultValue("CudaDevice", device)
-        self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+        try:
+            ## Copied over from npt.py (for now)
+            PlatName = 'Cuda'
+            print "Setting Platform to", PlatName
+            self.platform = openmm.Platform.getPlatformByName(PlatName)
+            ## Set the device to the environment variable or zero otherwise
+            device = os.environ.get('CUDA_DEVICE',"0")
+            print "Setting Device to", device
+            self.platform.setPropertyDefaultValue("CudaDevice", device)
+            self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+        except:
+            self.platform = None
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
@@ -230,7 +233,10 @@ class AbInitio_OpenMM(AbInitio):
             system = forcefield.createSystem(pdb.topology,rigidWater=False,polarization='Direct')
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-        simulation = Simulation(pdb.topology, system, integrator, self.platform)
+        if self.platform != None:
+            simulation = Simulation(pdb.topology, system, integrator, self.platform)
+        else:
+            simulation = Simulation(pdb.topology, system, integrator)
 
         M = []
         # Loop through the snapshots
