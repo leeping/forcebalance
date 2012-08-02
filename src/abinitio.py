@@ -40,17 +40,14 @@ class AbInitio(FittingSimulation):
     by subclasses like AbInitio_GMXX2."""
     
     def __init__(self,options,sim_opts,forcefield):
-        """Instantiation of the subclass.
-
-        We begin by instantiating the superclass here and also
-        defining a number of core concepts for energy / force
-        matching.
+        """
+        Initialization; define a few core concepts.
 
         @todo Obtain the number of true atoms (or the particle -> atom mapping)
         from the force field.
         """
-        
-        # Initialize the SuperClass!
+
+        ## Initialize the base class
         super(AbInitio,self).__init__(options,sim_opts,forcefield)
         
         #======================================#

@@ -14,6 +14,7 @@ from numpy import array
 from basereader import BaseReader
 from subprocess import Popen, PIPE
 from abinitio import AbInitio
+from vibration import Vibration
 
 pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
@@ -51,7 +52,6 @@ class Tinker_Reader(BaseReader):
     """
     
     def __init__(self,fnm):
-        # Initialize the superclass. :)
         super(Tinker_Reader,self).__init__(fnm)
         ## The parameter dictionary (defined in this file)
         self.pdict  = pdict
@@ -127,12 +127,11 @@ class AbInitio_TINKER(AbInitio):
 
     """Subclass of FittingSimulation for force and energy matching
     using TINKER.  Implements the prepare and energy_force_driver
-    methods.  The get method is in the superclass.  """
+    methods.  """
 
     def __init__(self,options,sim_opts,forcefield):
-        ## Name of the trajectory, we need this BEFORE initializing the SuperClass
+        ## Name of the trajectory
         self.trajfnm = "all.arc"
-        ## Initialize the SuperClass!
         super(AbInitio_TINKER,self).__init__(options,sim_opts,forcefield)
         ## all_at_once is not implemented.
         self.all_at_once = False
@@ -159,3 +158,48 @@ class AbInitio_TINKER(AbInitio):
                 F += [-1 * float(i) * 4.184 * 10 for i in s[2:5]]
         M = array(E + F)
         return M
+
+class Vibration_TINKER(Vibration):
+
+    """Subclass of FittingSimulation for vibrational frequency matching
+    using TINKER.  Provides optimized geometry, vibrational frequencies (in cm-1),
+    and eigenvectors."""
+
+    def __init__(self,options,sim_opts,forcefield):
+        super(Vibration_TINKER,self).__init__(options,sim_opts,forcefield)
+
+    def prepare_temp_directory(self, options, sim_opts):
+        abstempdir = os.path.join(self.root,self.tempdir)
+        # Link the necessary programs into the temporary directory
+        os.symlink(os.path.join(options['tinkerpath'],"vibrate"),os.path.join(abstempdir,"vibrate"))
+        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
+        # Link the run parameter file
+        os.symlink(os.path.join(self.root,self.simdir,"input.key"),os.path.join(abstempdir,"input.key"))
+        os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
+
+    def vibration_driver(self):
+        # This line actually runs TINKER
+        o, e = Popen(["./optimize","input.xyz","1.0e-6"],stdout=PIPE,stderr=PIPE).communicate()
+        o, e = Popen(["./vibrate","input.xyz_2","a"],stdout=PIPE,stderr=PIPE).communicate()
+        # Read the TINKER output.  The vibrational frequencies are ordered.
+        # The first six modes are ignored
+        moden = -6
+        readev = False
+        eigenvalues = []
+        eigenvectors = []
+        for line in o.split('\n'):
+            s = line.split()
+            if "Vibrational Normal Mode" in line:
+                moden += 1
+                freq = float(s[-2])
+                readev = False
+                if moden > 0:
+                    eigenvalues.append(freq)
+                    eigenvectors.append([])
+            elif "Atom" in line and "Delta X" in line:
+                readev = True
+            elif moden > 0 and readev and len(s) == 4 and all([isint(s[0]), isfloat(s[1]), isfloat(s[2]), isfloat(s[3])]):
+                eigenvectors[-1].append([float(i) for i in s[1:]])
+        print eigenvalues
+        print eigenvectors
+        
