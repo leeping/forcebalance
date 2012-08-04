@@ -202,7 +202,7 @@ def orthogonalize(vec1, vec2):
     v2u = vec2/norm(vec2)
     return vec1 - v2u*dot(vec1, v2u)
 
-def invert_svd(X,thresh=1e-8):
+def invert_svd(X,thresh=1e-6):
     
     """ 
 

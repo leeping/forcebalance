@@ -5,7 +5,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                    Last updated July 09, 2012                      |#
+#|                   Last updated August 03, 2012                     |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -318,6 +318,88 @@ def diff(A, B, key):
 
 def either(A, B, key):
     return key in A.Data or key in B.Data
+
+#===========================#
+#|  Alignment subroutines  |#
+#| Moments added 08/03/12  |#
+#===========================#
+def EulerMatrix(T1,T2,T3):
+    """ Constructs an Euler matrix from three Euler angles. """
+    DMat = np.mat(np.zeros((3,3),dtype = float))
+    DMat[0,0] = np.cos(T1)
+    DMat[0,1] = np.sin(T1)
+    DMat[1,0] = -np.sin(T1)
+    DMat[1,1] = np.cos(T1)
+    DMat[2,2] = 1
+    CMat = np.mat(np.zeros((3,3),dtype = float))
+    CMat[0,0] = 1
+    CMat[1,1] = np.cos(T2)
+    CMat[1,2] = np.sin(T2)
+    CMat[2,1] = -np.sin(T2)
+    CMat[2,2] = np.cos(T2)
+    BMat = np.mat(np.zeros((3,3),dtype = float))
+    BMat[0,0] = np.cos(T3)
+    BMat[0,1] = np.sin(T3)
+    BMat[1,0] = -np.sin(T3)
+    BMat[1,1] = np.cos(T3)
+    BMat[2,2] = 1
+    EMat = BMat*CMat*DMat
+    return np.mat(EMat)
+
+def ComputeOverlap(theta,elem,xyz1,xyz2):
+    """ 
+    Computes an 'overlap' between two molecules based on some
+    fictitious density.  Good for fine-tuning alignment but gets stuck
+    in local minima.
+    """
+    xyz2R = np.array(EulerMatrix(theta[0],theta[1],theta[2])*np.mat(xyz2.T)).T
+    Obj = 0.0
+    elem = np.array(elem)
+    for i in set(elem):
+        for j in np.where(elem==i)[0]:
+            for k in np.where(elem==i)[0]:
+                dx = xyz1[j] - xyz2R[k]
+                dx2 = np.dot(dx,dx)
+                Obj -= np.exp(-0.5*dx2)
+    return Obj
+
+def AlignToDensity(elem,xyz1,xyz2,binary=False):
+    """ 
+    Computes a "overlap density" from two frames.
+    This function can be called by AlignToMoments to get rid of inversion problems
+    """
+    grid = np.pi*np.array(list(itertools.product([0,1],[0,1],[0,1])))
+    ovlp = np.array([ComputeOverlap(e, elem, xyz1, xyz2) for e in grid]) # Mao
+    t1 = grid[np.argmin(ovlp)]
+    xyz2R = (np.array(EulerMatrix(t1[0],t1[1],t1[2])*np.mat(xyz2.T)).T).copy()
+    return xyz2R
+
+def AlignToMoments(elem,xyz1,xyz2=None):
+    """Pre-aligns molecules to 'moment of inertia'.
+    If xyz2 is passed in, it will assume that xyz1 is already
+    aligned to the moment of inertia, and it simply does 180-degree
+    rotations to make sure nothing is inverted."""
+    xyz = xyz1 if xyz2 == None else xyz2
+    I = np.zeros((3,3))
+    for i, xi in enumerate(xyz):
+        I += (np.dot(xi,xi)*np.eye(3) - np.outer(xi,xi))
+        # This is the original line from MSMBuilder, but we're choosing not to use masses
+        # I += PT[elem[i]]*(np.dot(xi,xi)*np.eye(3) - np.outer(xi,xi))
+    A, B = np.linalg.eig(I)
+    # Sort eigenvectors by eigenvalue
+    BB   = B[:, np.argsort(A)]
+    determ = np.linalg.det(BB)
+    Thresh = 1e-3
+    if np.abs(determ - 1.0) > Thresh:
+        if np.abs(determ + 1.0) > Thresh:
+            print "in AlignToMoments, determinant is % .3f" % determ
+        BB[:,2] *= -1
+    xyzr = np.array(np.mat(BB).T * np.mat(xyz).T).T.copy()
+    if xyz2 != None:
+        xyzrr = AlignToDensity(elem,xyz1,xyzr,binary=True)
+        return xyzrr
+    else:
+        return xyzr
 
 class Molecule(object):
     """ Lee-Ping's general file format conversion class.
@@ -701,6 +783,18 @@ class Molecule(object):
             for i in range(self.ns):
                 New.xyzs[i] = self.xyzs[i][atomslice]
         return New
+
+    def align_by_moments(self):
+        """ Align molecules using the "moment of inertia."
+        Note that we're following the MSMBuilder convention 
+        of using all ones for the masses. """
+        xyz1  = self.xyzs[0]
+        xyz1 -= xyz1.mean(0)
+        xyz1  = AlignToMoments(self.elem,xyz1)
+        for index2, xyz2 in enumerate(self.xyzs):
+            xyz2 -= xyz2.mean(0)
+            xyz2 = AlignToMoments(self.elem,xyz1,xyz2)
+            self.xyzs[index2] = xyz2
 
     def openmm_positions(self):
         """ Returns the Cartesian coordinates in the Molecule object in

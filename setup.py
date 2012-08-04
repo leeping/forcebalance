@@ -20,9 +20,11 @@ from distutils.command.build import build
 from distutils.command.build_ext import build_ext
 from distutils.command.sdist import sdist
 
-#=============#
-# mslib stuff #
-#=============#
+#==================================================#
+#                   mslib stuff                    #
+#     Used for generating RESP fitting points      #
+# If this is causing problems, you may comment out #
+#==================================================#
 try:
     libVersion = "1.4.4"
 
@@ -193,6 +195,13 @@ CMBAR = Extension('forcebalance/pymbar/_pymbar',
                   include_dirs = [numpy.get_include(),numpy.get_include()+"/numpy/"]
                   )
 
+# Hungarian algorithm for permutations
+# Used for identifying normal modes
+PERMUTE = Extension('forcebalance/_assign',
+                    sources = ['ext/permute/apc.c', 'ext/permute/assign.c'],
+                    include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')]
+                    )
+
 def buildKeywordDictionary():
     from distutils.core import Extension
     setupKeywords = {}
@@ -211,7 +220,7 @@ def buildKeywordDictionary():
         "ForceBalance"                   : ["AUTHORS","LICENSE.txt"]
                                          }
     setupKeywords["data_files"]        = []
-    setupKeywords["ext_modules"]       = [CMBAR, DCD]#, INCR]
+    setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
     setupKeywords["long_description"]  = """

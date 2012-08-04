@@ -22,18 +22,18 @@ except:
     pass
 
 ## Dictionary for building parameter identifiers.  As usual they go like this:
-## HarmonicBondForce.Bond_length_OW.HW
-suffix_dict = { "HarmonicBondForce.Bond" : ["class1","class2"],
-                "HarmonicAngleForce.Angle" : ["class1","class2","class3"], 
+## Bond/length/OW.HW
+## The dictionary is two-layered because the same interaction type (Bond)
+## could be under two different parent types (HarmonicBondForce, AmoebaHarmonicBondForce)
+suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
+                "HarmonicAngleForce" : {"Angle" : ["class1","class2","class3"],},
                 "NonbondedForce" : [],
-                "NonbondedForce.Atom": ["type"],
-                "AmoebaHarmonicBondForce.Bond" : ["class1","class2"],
-                "AmoebaHarmonicAngleForce.Angle" : ["class1","class2","class3"],
-                "AmoebaVdwForce.Vdw" : ["class"],
-                "AmoebaMultipoleForce.Multipole" : ["type","kz","kx"],
-                "AmoebaMultipoleForce.Multipole" : ["type","kz","kx"],
-                "AmoebaMultipoleForce.Polarize" : ["type"],
-                "AmoebaUreyBradleyForce.UreyBradley" : ["class1","class2","class3"]
+                "NonbondedForce" : {"Atom": ["type"]},
+                "AmoebaHarmonicBondForce" : {"Bond" : ["class1","class2"]},
+                "AmoebaHarmonicAngleForce" : {"Angle" : ["class1","class2","class3"]},
+                "AmoebaVdwForce" : {"Vdw" : ["class"]},
+                "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
+                "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]}
                 }
 
 ## pdict is a useless variable if the force field is XML.
@@ -129,8 +129,10 @@ class OpenMM_Reader(BaseReader):
     def build_pid(self, element, parameter):
         """ Build the parameter identifier (see _link_ for an example)
         @todo Add a link here """
-        InteractionType = ".".join([i.tag for i in list(element.iterancestors())][::-1][1:] + [element.tag])
-        Involved = '.'.join([element.attrib[i] for i in suffix_dict[InteractionType]])#suffix_dict[InteractionType]
+        #InteractionType = ".".join([i.tag for i in list(element.iterancestors())][::-1][1:] + [element.tag])
+        ParentType = ".".join([i.tag for i in list(element.iterancestors())][::-1][1:])
+        InteractionType = element.tag
+        Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
         return "/".join([InteractionType, parameter, Involved])
 
 class Liquid_OpenMM(Liquid):
