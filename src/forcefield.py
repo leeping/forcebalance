@@ -302,7 +302,7 @@ class FF(object):
            <Vdw class="74" sigma="0.2655" epsilon="0.056484" reduction="0.910" parameterize="sigma, epsilon, reduction" /> 
         @endcode
 
-        In this example, the parameter identifier would look like <tt> AmoebaVdwForce.Vdw_74_epsilon </tt>.
+        In this example, the parameter identifier would look like <tt> Vdw/74/epsilon </tt>.
 
         --- If GROMACS (.itp) or TINKER (.prm) : ---
 
@@ -814,7 +814,7 @@ class FF(object):
             for i in range(self.np):
                 if any([j in self.plist[i] for j in concern]):
                     self.qmap.append(i)
-                    if 'AmoebaMultipoleForce.Multipole/c0' in self.plist[i] or 'NonbondedForce.Atom/charge' in self.plist[i]:
+                    if 'Multipole/c0' in self.plist[i] or 'Atom/charge' in self.plist[i]:
                         AType = self.plist[i].split('/')[-1].split('.')[0]
                         nq = count(ListOfAtoms,AType)
                     else:
@@ -845,8 +845,8 @@ class FF(object):
 
         ## Some customized constraints here.
         # Quadrupoles must be traceless
-        MultipoleAtoms = set([p.split('/')[-1] for p in self.plist if 'AmoebaMultipoleForce.Multipole' in p])
-        QuadrupoleGrps = [[i for i, p in enumerate(self.plist) if 'AmoebaMultipoleForce.Multipole' in p and p.split('/')[-1] == A and p.split('/')[1] in ['q11','q22','q33']] for A in MultipoleAtoms]
+        MultipoleAtoms = set([p.split('/')[-1] for p in self.plist if 'Multipole' in p])
+        QuadrupoleGrps = [[i for i, p in enumerate(self.plist) if 'Multipole' in p and p.split('/')[-1] == A and p.split('/')[1] in ['q11','q22','q33']] for A in MultipoleAtoms]
         for Grp in QuadrupoleGrps:
             qid = [array([i]) for i in range(3)]
             tq = 3
@@ -854,7 +854,7 @@ class FF(object):
             print "Making sure that quadrupoles are traceless (for parameter IDs %s)" % str(Grp)
             insert_mat(qtrans2, Grp)
 
-        #ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//AmoebaMultipoleForce/Multipole')] for k in self.ffdata]))
+        #ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Multipole')] for k in self.ffdata]))
 
         # print "Charge parameter constraint matrix - feel free to check it"
         # for i in qmat2:
