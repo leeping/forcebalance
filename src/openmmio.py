@@ -154,8 +154,8 @@ class Liquid_OpenMM(Liquid):
         queue_up(self.wq,
                  command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
                  input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
-                 output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
-                 #output_files = ['npt_result.p', 'npt.out', self.FF.fnms[0]])
+                 #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
+                 output_files = ['npt_result.p', 'npt.out', self.FF.fnms[0]])
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
