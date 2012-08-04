@@ -185,8 +185,8 @@ class Vibration_TINKER(Vibration):
         # The first six modes are ignored
         moden = -6
         readev = False
-        eigenvalues = []
-        eigenvectors = []
+        calc_eigvals = []
+        calc_eigvecs = []
         for line in o.split('\n'):
             s = line.split()
             if "Vibrational Normal Mode" in line:
@@ -194,12 +194,14 @@ class Vibration_TINKER(Vibration):
                 freq = float(s[-2])
                 readev = False
                 if moden > 0:
-                    eigenvalues.append(freq)
-                    eigenvectors.append([])
+                    calc_eigvals.append(freq)
+                    calc_eigvecs.append([])
             elif "Atom" in line and "Delta X" in line:
                 readev = True
             elif moden > 0 and readev and len(s) == 4 and all([isint(s[0]), isfloat(s[1]), isfloat(s[2]), isfloat(s[3])]):
-                eigenvectors[-1].append([float(i) for i in s[1:]])
-        print eigenvalues
-        print eigenvectors
-        
+                calc_eigvecs[-1].append([float(i) for i in s[1:]])
+        calc_eigvals = array(calc_eigvals)
+        calc_eigvecs = array(calc_eigvecs)
+        os.system("rm -rf *_* *[0-9][0-9][0-9]*")
+
+        return calc_eigvals, calc_eigvecs

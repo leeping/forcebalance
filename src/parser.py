@@ -150,7 +150,8 @@ sim_opts_types = {
                  "resp_a"      : (0.001, 'RESP "a" parameter for strength of penalty; 0.001 is strong, 0.0005 is weak'),
                  "resp_b"      : (0.1, 'RESP "b" parameter for hyperbolic behavior; 0.1 is recommended'),
                  "qmboltz"     : (0.0, 'Fraction of Quantum Boltzmann Weights (ab initio), 1.0 for full reweighting, 0.5 for hybrid'),
-                 "qmboltztemp" : (298.15, 'Temperature for Quantum Boltzmann Weights (ab initio), defaults to room temperature')
+                 "qmboltztemp" : (298.15, 'Temperature for Quantum Boltzmann Weights (ab initio), defaults to room temperature'),
+                 "wavenumber_tol" : (10.0, 'Normalizes the objective function when fitting vibrational frequencies')
                  },
     'sections': {}
     }
