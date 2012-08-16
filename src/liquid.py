@@ -363,8 +363,8 @@ class Liquid(FittingSimulation):
         print -1 * (mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar))
 
         # Get contributions to the objective function
-        X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density")
-        X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap")
+        X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density", verbose=False)
+        X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap", verbose=False)
 
         Gradient = np.zeros(self.FF.np, dtype=float)
         Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
@@ -388,9 +388,9 @@ class Liquid(FittingSimulation):
         self.FF.print_map(vals=G_Hvap)
         print bar
 
-        for i in range(1000):
-            print "Density objective function, random trial %i : " % i,
-            print random_temperature_trial()
+        #for i in range(1000):
+        #    print "Density objective function, random trial %i : " % i,
+        #    print random_temperature_trial()
         
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         return Answer
