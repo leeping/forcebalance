@@ -77,7 +77,7 @@ from forcebalance.openmmio import liquid_energy_driver, liquid_energy_derivative
 timestep = 0.5 * units.femtosecond # timestep for integration
 nsteps = 200                       # number of steps per data record
 nequiliterations = 500             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 5000                 # number of iterations to collect data for
+niterations = 20000                # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -93,17 +93,17 @@ verbose = True
 PlatName = 'Cuda'
 
 mutual_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanometer, 
-                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 1.2, 
+                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.9, 
                  'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
-                 'mutualInducedTargetEpsilon' : 1e-6}
+                 'mutualInducedTargetEpsilon' : 1e-6, 'useDispersionCorrection' : True}
 
 direct_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanometer, 
-                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 1.2, 
+                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.9, 
                  'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
-                 'polarization' : 'direct'}
+                 'polarization' : 'direct', 'useDispersionCorrection' : True}
 
 tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*units.nanometer, 
-                'vdwCutoff' : 1.2, 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24]}
+                'vdwCutoff' : 0.9, 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24], 'useDispersionCorrection' : True}
 
 mono_direct_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None, 
                'rigidWater' : False, 'polarization' : 'direct'}
