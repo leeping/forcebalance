@@ -9,12 +9,15 @@ modules for other programs because it's so simple.
 
 import os
 from re import match, sub
-from nifty import isint, isfloat
+from nifty import isint, isfloat, warn_press_key
 from numpy import array
 from basereader import BaseReader
 from subprocess import Popen, PIPE
 from abinitio import AbInitio
 from vibration import Vibration
+from interactions import Interactions
+from simtk.unit import *
+from finite_difference import in_fd
 
 pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
@@ -205,3 +208,55 @@ class Vibration_TINKER(Vibration):
         os.system("rm -rf *_* *[0-9][0-9][0-9]*")
 
         return calc_eigvals, calc_eigvecs
+
+class Interactions_TINKER(Interactions):
+
+    """Subclass of Interactions for interaction energy matching
+    using TINKER.  """
+
+    def __init__(self,options,sim_opts,forcefield):
+        super(Interactions_TINKER,self).__init__(options,sim_opts,forcefield)
+        self.prepare_temp_directory(options, sim_opts)
+
+    def prepare_temp_directory(self, options, sim_opts):
+        abstempdir = os.path.join(self.root,self.tempdir)
+        # Link the necessary programs into the temporary directory
+        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
+        os.symlink(os.path.join(options['tinkerpath'],"superpose"),os.path.join(abstempdir,"superpose"))
+        # Link the run parameter file
+        # The master file might be unneeded??
+        # os.symlink(os.path.join(self.root,self.simdir,self.masterfile),os.path.join(abstempdir,self.masterfile))
+        # os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
+        for sysopt in self.sys_opts.values():
+            os.symlink(os.path.join(self.root, self.simdir, sysopt['geometry']), os.path.join(abstempdir,sysopt['geometry']))
+
+    def system_driver(self,sysname):
+        sysopt = self.sys_opts[sysname]
+        rmsd = 0.0
+        # This line actually runs TINKER
+        # Implement geometry optimization later
+        # o, e = Popen(["./optimize","input.xyz","1.0e-6"],stdout=PIPE,stderr=PIPE).communicate()
+        if 'optimize' in sysopt and sysopt['optimize'] == True:
+            o, e = Popen(["./optimize",sysopt['geometry'],self.FF.tinkerprm,"1e-4"],stdout=PIPE,stderr=PIPE).communicate()
+            cnvgd = 0
+            for line in o.split('\n'):
+                if "Normal Termination" in line:
+                    cnvgd = 1
+            if not cnvgd:
+                print o
+                print "The system %s did not converge in the geometry optimization - printout is above." % sysname
+                #warn_press_key("The system %s did not converge in the geometry optimization" % sysname)
+            o, e = Popen(["./analyze",sysopt['geometry']+'_2',self.FF.tinkerprm,"E"],stdout=PIPE,stderr=PIPE).communicate()
+            oo, ee = Popen(['./superpose', sysopt['geometry'], self.FF.tinkerprm, sysopt['geometry']+'_2', self.FF.tinkerprm, '1', 'y', 'u', 'n', '0'], stdout=PIPE, stderr=PIPE).communicate()
+            for line in oo.split('\n'):
+                if "Root Mean Square Distance" in line:
+                    rmsd = float(line.split()[-1])
+            os.system("rm %s" % sysopt['geometry']+'_2')
+        else:
+            o, e = Popen(["./analyze",sysopt['geometry'],self.FF.tinkerprm,"E"],stdout=PIPE,stderr=PIPE).communicate()
+        # Read the TINKER output. 
+        for line in o.split('\n'):
+            if "Total Potential Energy" in line:
+                return float(line.split()[-2]) * kilocalories_per_mole, rmsd * angstrom
+        warn_press_key("Total potential energy wasn't encountered for system %s!" % sysname)
