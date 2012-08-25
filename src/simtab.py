@@ -5,7 +5,7 @@ This is in a separate file to facilitate importing.  I would happily put it some
 """
 
 from gmxio import AbInitio_GMX, Interaction_GMX
-from tinkerio import AbInitio_TINKER, Vibration_TINKER
+from tinkerio import AbInitio_TINKER, Vibration_TINKER, Interactions_TINKER
 from openmmio import AbInitio_OpenMM, Liquid_OpenMM
 from abinitio_gmxx2 import AbInitio_GMXX2
 from abinitio_internal import AbInitio_Internal
@@ -26,4 +26,5 @@ SimTab = {
     'LIQUID_OPENMM':Liquid_OpenMM,
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
+    'INTERACTIONS_TINKER':Interactions_TINKER,
     }

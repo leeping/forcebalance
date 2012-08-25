@@ -337,6 +337,13 @@ class FF(object):
         fftype = determine_fftype(ffname)
         ffname = ffname.split(':')[0]
 
+        # Set the Tinker PRM file, which will help for running programs like "analyze".
+        if fftype == "tinker":
+            if hasattr(self, "tinkerprm"):
+                warn_press_key("There should only be one TINKER parameter file")
+            else:
+                self.tinkerprm = ffname
+
         # Determine the appropriate parser from the FF_IOModules dictionary.
         # If we can't figure it out, then use the base reader, it ain't so bad. :)
         Reader = FF_IOModules.get(fftype,basereader.BaseReader)
@@ -456,7 +463,7 @@ class FF(object):
         fundamentally different, necessitating two different methods.
 
         We begin with an _ElementTree object.  We search through the tree
-        for the 'parameterize' and 'param_repeat' keywords.  Each time
+        for the 'parameterize' and 'parameter_repeat' keywords.  Each time
         the keyword is encountered, we do the same four actions that
         I describe in addff_txt.
 
@@ -485,8 +492,8 @@ class FF(object):
                 self.assign_field(self.np,ffname,fflist.index(e),p,1)
                 self.np += 1
 
-        for e in self.ffdata[ffname].getroot().xpath('//@param_repeat/..'):
-            for field in e.get('param_repeat').split(','):
+        for e in self.ffdata[ffname].getroot().xpath('//@parameter_repeat/..'):
+            for field in e.get('parameter_repeat').split(','):
                 dest = self.R[ffname].build_pid(e, field.strip().split('=')[0])
                 src  = field.strip().split('=')[1]
                 if src in self.map:
@@ -495,6 +502,12 @@ class FF(object):
                     warn_press_key(["Warning: You wanted to copy parameter from %s to %s, " % (src, dest), 
                                     "but the source parameter does not seem to exist!"])
                 self.assign_field(self.map[dest],ffname,fflist.index(e),dest.split('/')[1],1)
+
+        for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
+            for field in e.get('parameter_eval').split(','):
+                dest = self.R[ffname].build_pid(e, field.strip().split('=')[0])
+                evalcmd  = field.strip().split('=')[1]
+                self.assign_field(None,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
             
     def make(self,vals,usepvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.

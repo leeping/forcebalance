@@ -116,7 +116,8 @@ for t in gen_opts_types:
 
 ## Default fitting simulation options.
 sim_opts_types = {
-    'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name')
+    'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name'),
+                 "masterfile": ('interactions.txt', 'The name of the master file containing interacting systems')
                  },
     'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance AbInitio_GMXX2')
                  },
@@ -151,6 +152,8 @@ sim_opts_types = {
                  "resp_b"      : (0.1, 'RESP "b" parameter for hyperbolic behavior; 0.1 is recommended'),
                  "qmboltz"     : (0.0, 'Fraction of Quantum Boltzmann Weights (ab initio), 1.0 for full reweighting, 0.5 for hybrid'),
                  "qmboltztemp" : (298.15, 'Temperature for Quantum Boltzmann Weights (ab initio), defaults to room temperature'),
+                 "energy_denom"   : (0.0, 'Energy denominator for Interactions objective function (default is to use stdev)'),
+                 "rmsd_denom"     : (0.1, 'RMSD denominator for Interactions objective function'),
                  "wavenumber_tol" : (10.0, 'Normalizes the objective function when fitting vibrational frequencies')
                  },
     'sections': {}

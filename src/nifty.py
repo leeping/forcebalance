@@ -24,6 +24,7 @@ import pickle
 import time, datetime
 import subprocess
 from subprocess import PIPE, STDOUT
+from collections import OrderedDict
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -97,7 +98,7 @@ def printcool(text,sym="#",bold=False,color=2,bottom='-',minwidth=50):
     print bar
     return sub(sym,bottom,bar)
 
-def printcool_dictionary(dict,title="General options",bold=False,color=2,keywidth=25):
+def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidth=25,topwidth=50):
     """See documentation for printcool; this is a nice way to print out keys/values in a dictionary.
 
     The keys in the dictionary are sorted before printing out.
@@ -105,13 +106,16 @@ def printcool_dictionary(dict,title="General options",bold=False,color=2,keywidt
     @param[in] dict The dictionary to be printed
     @param[in] title The title of the printout
     """
-    bar = printcool(title,bold=bold,color=color)
+    bar = printcool(title,bold=bold,color=color,minwidth=topwidth)
     def magic_string(str):
         # This cryptic command returns a string with the number of characters specified as a variable. :P
         # Useful for printing nice-looking dictionaries, i guess.
         #print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
         return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
-    print '\n'.join(["%s %s " % (magic_string(key),str(dict[key])) for key in sorted([i for i in dict]) if dict[key] != None])
+    if isinstance(Dict, OrderedDict): 
+        print '\n'.join(["%s %s " % (magic_string(key),str(Dict[key])) for key in Dict if Dict[key] != None])
+    else:
+        print '\n'.join(["%s %s " % (magic_string(key),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None])
     print bar
 
 #===============================#
