@@ -16,7 +16,6 @@ from subprocess import PIPE
 try:
     from lxml import etree
 except: pass
-#from forcebalance.wham import WHAM
 from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple
@@ -302,10 +301,12 @@ class Liquid(FittingSimulation):
 
         Sims = len(Temps)
         Shots = len(Energies[0])
+        mShots = len(mEnergies[0])
         N_k = np.ones(Sims)*Shots
+        mN_k = np.ones(Sims)*mShots
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
-        mU_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
+        mU_kln = np.zeros([Sims,Sims,mShots], dtype = np.float64)
         ## This fills out a 'square' in the matrix with 30 trajectories and 30 temperatures
         for m, T in enumerate(Temps):
             beta = 1. / (kb * T)
@@ -315,7 +316,7 @@ class Liquid(FittingSimulation):
                 mU_kln[k, m, :]  = mEnergies[k]
                 mU_kln[k, m, :] *= beta
         mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
-        mmbar = pymbar.MBAR(mU_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
+        mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8)
         W1 = mbar.getWeights()
         mW1 = mmbar.getWeights()
 
