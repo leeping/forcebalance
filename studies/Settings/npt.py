@@ -77,7 +77,7 @@ from forcebalance.openmmio import liquid_energy_driver, liquid_energy_derivative
 timestep = 0.5 * units.femtosecond # timestep for integration
 nsteps = 200                       # number of steps per data record
 nequiliterations = 500             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 20000                # number of iterations to collect data for
+niterations = 10000                # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
