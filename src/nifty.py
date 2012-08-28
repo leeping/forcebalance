@@ -284,8 +284,7 @@ def get_least_squares(x, y, w = None):
 try:
     from lxml import etree
 except: 
-    bar = printcool("Warning: XML library import fail (You can't use OpenMM)",sym='!',bold=True,color=2)
-    print bar
+    print "lxml module import failed (You can't use OpenMM or XML force fields)"
 ## Pickle uses 'flags' to pickle and unpickle different variable types.
 ## Here we use the letter 'x' to signify that the variable type is an XML file.
 XMLFILE='x'
@@ -340,8 +339,7 @@ def lp_load(file):
 try:
     import work_queue
 except:
-    bar = printcool("Warning: Work Queue library import fail (You can't queue up jobs)",sym='!',bold=True,color=2)
-    print bar
+    print "Work Queue library import fail (You can't queue up jobs using Work Queue)"
 
 def queue_up(wq, command, input_files, output_files, verbose=True):
     """ 
