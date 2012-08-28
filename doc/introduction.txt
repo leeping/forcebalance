@@ -34,12 +34,10 @@ This is a <em> theoretical and computational chemistry </em> program
 primarily developed by Lee-Ping Wang.  The full list of people who
 made this project possible are given in the \ref credits.
 
-The function of ForceBalance is <em>automatic potential
-optimization</em>.  It addresses the problem of parameterizing
-empirical potential functions, colloquially called <em>force
-fields</em>.  Here I will provide some background, which for the sake
-of brevity and readability will lack precision and details.  In the
-future, this documentation will include literature citations which
+The function of ForceBalance is <em>automatic force field
+optimization</em>.  Here I will provide some background, which for the
+sake of brevity and readability will lack precision and details.  In
+the future, this documentation will include literature citations which
 will guide further reading.
 
 @subsection background Background: Empirical Potentials
@@ -62,9 +60,9 @@ methods are used.  Some are <em>ab initio</em> methods ('from first
 principles') since they are derived directly from approximating
 Schrodinger's equation; examples include the independent electron
 approximation (Hartree-Fock) and perturbation theory (MP2).  However,
-the majority of methods contain some tunable constants or
-<em>empirical parameters</em> which are carefully chosen to make the
-method as accurate as possible.  Three examples: the widely used B3LYP
+most methods contain some tunable constants or <em>empirical
+parameters</em> which are carefully chosen to make the method as
+accurate as possible.  Three examples: the widely used B3LYP
 approximation in density functional theory (DFT) contains three
 parameters, the semiempirical PM3 method has 10-20 parameters per
 chemical element, and classical force fields have hundreds to
@@ -74,24 +72,24 @@ parameterization to properly describe reality.
 \image html ladder_sm.png "An arrangement of simulation methods by accuracy vs. computational cost."
 \image latex ladder.png "An arrangement of simulation methods by accuracy vs. computational cost." width=10cm
 
-A major audience of ForceBalance is the scientific community that uses
-and develops classical force fields.  These force fields do not use
-the Schrodinger's equation as a starting point; instead, the potential
-is entirely specified using elementary mathematical functions.  Thus,
-the rigorous physical foundation is sacrificed but the computational
-cost is reduced by a factor of millions, enabling atomic-resolution
-simulations of large biomolecules on long timescales and allowing the
-study of problems like protein folding.
+The main audience of ForceBalance is the scientific community that
+uses and develops classical force fields.  These force fields do not
+use the Schrodinger's equation as a starting point; instead, the
+potential is entirely specified using elementary mathematical
+functions.  Thus, the rigorous physical foundation is sacrificed but
+the computational cost is reduced by a factor of millions, enabling
+atomic-resolution simulations of large biomolecules on long timescales
+and allowing the study of problems like protein folding.
 
 In classical force fields, relatively few parameters may be determined
 directly from experiment - for instance, a chemical bond may be
 described using a harmonic spring with the experimental bond length
 and vibrational frequency.  More often there is no experimentally
 measurable counterpart to a parameter - for example, electrostatic
-interactions are often described as interactions between pairs of
-point charges on atomic centers, but the fractional charge assigned to
-each atom has no rigorous experimental of theoretical definition.  To
-complicate matters further, most molecular motions arise from a
+interactions are often described as Coulomb interactions between pairs
+of atomic point "partial charges", but the fractional charge assigned
+to each atom has no rigorous experimental of theoretical definition.
+To complicate matters further, most molecular motions arise from a
 combination of interactions and are sensitive to many parameters at
 once - for example, the dihedral interaction term is intended to
 govern torsional motion about a bond, but these motions are modulated
@@ -105,29 +103,27 @@ For all of these reasons, force field parameterization is difficult.
 In the current practice, parameters are often determined by fitting to
 results from other calculations (for example, restrained electrostatic
 potential fitting (RESP) for determining the partial charges) or
-chosen to reproduce experimental measurements which depend indirectly
-on the parameters (for example, adjusting the partial charges on a
-solvent molecule to reproduce the bulk dielectric constant.)
-Published force fields have been modified by hand over decades to
-maximize their agreement with experimental observations (for example,
-adjusting some parameters in order to reproduce particular protein NMR
-structure) at the expense of reproducibility and predictive power.
+chosen so that the simulation results match experimental measurements
+(for example, adjusting the partial charges on a solvent molecule to
+reproduce the bulk dielectric constant.)  Published force fields have
+been modified by hand over decades to maximize their agreement with
+experimental observations (for example, adjusting some parameters in
+order to reproduce particular protein NMR structure) at the expense of
+reproducibility.
 
 @subsection mission_statement Purpose and brief description of this program 
 
-Given this background, I can make the following statement.
-<b>ForceBalance aims to advance the methods of empirical potential
-development by applying a highly general and systematic process with
-explicitly specified input data and mathematical optimization
-algorithms, paving the way to higher accuracy potentials, improved
-reproducibility of potential development, and well-defined scopes of
-validity and error estimation for the parameters. </b>
+Given this background, I can make the following statement.  <b>The
+purpose of ForceBalance is to create force fields by applying a highly
+general and systematic process with explicitly specified input data
+and optimization methods, paving the way to higher accuracy and
+improved reproducibility. </b>
 
-At a high level, ForceBalance takes an empirical potential and a set of
-reference data as inputs, and tunes the parameters such that the
-reference data is reproduced as accurately as possible.  Examples of
-reference data include energy and forces from high-level QM
-calculations, experimentally known molecular properties
+At a high level, ForceBalance takes an empirical potential and a set
+of reference data as inputs, and tunes the parameters such that the
+simulations are able to reproduce the data as accurately as possible.
+Examples of reference data include energy and forces from high-level
+QM calculations, experimentally known molecular properties
 (e.g. polarizabilities and multipole moments), and experimentally
 measured bulk properties (e.g. density and dielectric constant).
 
@@ -140,7 +136,7 @@ potential to any type of reference data.
 
 Conceptually, a set of reference data (usually a physical quantity of
 some kind), in combination with a method for computing the
-corresponding quantity with the empirical potential, is called a
+corresponding quantity with the force field, is called a
 <b>fitting simulation</b>.  For example:
 
 - A force field can predict the density of a liquid by running NPT

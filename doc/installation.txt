@@ -1,34 +1,25 @@
 \page installation Installation
 
-This section covers how to install ForceBalance and its companion
-software GROMACS-X2.  Currently only Linux is supported, though
-installation on other Unix-based systems (e.g. Mac OS) should also be
-straightforward.
+This section covers how to install ForceBalance.  Currently only Linux
+is supported, though installation on other Unix-based systems
+(e.g. Mac OS) should also be straightforward.
 
-Importantly, note that <em>ForceBalance is not a simulation software
-package</em>.  During force field optimizations, ForceBalance
-interfaces with simulation software like GROMACS, TINKER or OpenMM;
-reference data is obtained from experimental measurements (consult the
-literature), or from simulation / quantum chemistry software (for
-example, NWChem or Q-Chem).
+Importantly, note that <em>ForceBalance does not contain a simulation
+engine</em>.  Instead it interfaces with simulation software like
+GROMACS, TINKER, AMBER or OpenMM; reference data is obtained from
+experimental measurements (consult the literature) or from quantum
+chemistry software (for example, NWChem or Q-Chem).
 
-I have provided a specialized version of GROMACS (dubbed version
-4.0.7-X2) on the <a href=https://simtk.org/home/forcebalance/>SimTK
-website</a> which interfaces with ForceBalance through the
-abinitio_gmxx2 module.  Although interfacing with unmodified
-simulation software is straightforward, GROMACS-X2 is optimized for
-force field optimization and makes things much faster.  Soon, I will
-also implement functions for grid-scale computation of reference
-energies and forces using Q-Chem (a commercial software).  However,
-you should be prepared to write some simple code to interface with a
-fitting simulation or quantum chemistry software of your choice.  If
-you choose to do so, please contact me as I would be happy to include
-your contribution in the main distribution.
+Several interfaces to existing software packages are provided.
+However, if you use ForceBalance for a research project, you should be
+prepared to write some simple Python code to interface with a software
+package of your choice.  If you choose to do so, please contact me as
+I would be happy to include your contribution in the main
+distribution.
 
 @section installing_forcebalance Installing ForceBalance
 
-ForceBalance is an ordinary Python module, so if you know how to install Python
-modules, you shouldn't have any trouble with this.
+ForceBalance is packaged as a Python module.  Here are the installation instructions.  A quick preface: Installing software can be a real pain.  I tried to make ForceBalance as easy as possible to install by providing clear instructions and minimizing the number of dependencies; however, complications during installation happen all the time.  If you're running into installation problems or having trouble resolving a dependency, please contact me.
 
 @subsection installing_forcebalance_prereq Prerequisites
 
@@ -37,15 +28,17 @@ ForceBalance requires the following software packages:
 @li Python version 2.7
 @li NumPy version 1.5
 @li SciPy version 0.9
-@li The lxml package (depends on libxml2 and libxslt)
 
-A few more packages
-are required if you want to \ref create_doc.  Here is a list of Python
-packages and software:
+The following packages are required for certain functionality:
+
+@li lxml version 2.3.4 - Python interface to libxml2 for parsing OpenMM force field files
+@li cctools version 3.4.1 - Cooperative Computing Tools from Notre Dame for distributed computing
+
+The following packages are used for documentation:
 
 @li Doxygen version 1.7.6.1
 @li Doxypy plugin for Doxygen
-@li LaTeX software like TeXLive
+@li LaTeX software such as TeXLive
 
 @subsection installing_forcebalance_install Installing
 
@@ -54,6 +47,10 @@ webpage using the command:
 
 @verbatim tar xvzf ForceBalance-[version].tar.gz @endverbatim
 
+Alternatively, download the newest Subversion revision from the SimTK website:
+
+svn checkout https://simtk.org/svn/forcebalance
+
 Upon extracting the distribution you will notice this directory structure:
 
 @verbatim
@@ -61,7 +58,9 @@ Upon extracting the distribution you will notice this directory structure:
   +- bin
   |   |- <Executable scripts>
   +- src
-  |   |- <Python module files>
+  |   |- <ForceBalance source files>
+  +- ext
+  |   |- <Extensions; self-contained software packages that are used by ForceBalance>
   +- studies
   |   +- <ForceBalance example jobs>
   +- doc
@@ -69,7 +68,15 @@ Upon extracting the distribution you will notice this directory structure:
   |   |   |- <Stuff for making a call graph>
   |   +- Images
   |   |   |- <Images for the website and PDF manual>
-  |   |- mainpage.py (Contains most user documentation and this text)
+  |   |- make-all-documentation.sh (Create the documentation)
+  |   |- <Documentation chapters in Doxygen format>
+  |   |- introduction.txt
+  |   |- installation.txt
+  |   |- usage.txt
+  |   |- tutorial.txt
+  |   |- glossary.txt
+  |   |- <These files are concatenated into mainpage.py>
+  |   |- make-option-index.py (Create the option index documentation chapter)
   |   |- header.tex (Customize the LaTex documentation)
   |   |- add-tabs.py (Adds more navigation tabs to the webpage)
   |   |- DoxygenLayout.xml (Removes a navigation tab from the webpage)
@@ -84,19 +91,45 @@ To install the code into your default Python location, run this (you might need 
 
 @verbatim python setup.py install @endverbatim
 
-Alternatively, you can do a local install by running:
+You might not have root permissions, or you may want to install the package somewhere other than the default location.  You can install to a custom location (for example, to /home/leeping/local) by running:
 
-@verbatim python setup.py install --prefix=/home/your_username/local_directory @endverbatim
+@verbatim python setup.py install --prefix=/home/leeping/local @endverbatim
 
-where you would of course replace your_username and local_directory with your username and preferred install location.  The executable scripts will be placed into <tt>/home/your_username/local_directory/bin</tt> and the module will be placed into <tt>/home/your_username/local_directory/lib/python[version]/site-packages/forcebalance</tt>.
+Assuming your Python version is 2.7, the executable scripts will be placed into <tt>/home/leeping/local/bin</tt> and the module will be placed into <tt>/home/leeping/local/lib/python2.7/site-packages/forcebalance</tt>.
 
-Note that if you do a local installation, for Python to recognize the newly installed module you may need to append your PYTHONPATH environment variable using a command like the one below:
+Note that Python does not always recognize installed modules in custom locations.  Any one of the three below options will work for adding custom locations to the Python search path for installed modules:
 
-@verbatim export PYTHONPATH=$PYTHONPATH:/home/your_username/local_directory/lib/python[version] @endverbatim
+@verbatim 
+ln -s /home/leeping/local /home/leeping/.local
+export PYTHONUSERBASE=/home/leeping/local
+export PYTHONPATH=$PYTHONPATH:/home/leeping/local/lib/python2.7 
+@endverbatim
 
-As with the installation of any Python software, there are potential issues with dependencies (for example, scipy and lxml.)  Please let me know if you encounter issues with dependencies.
+As with the installation of any software, there are potential issues with dependencies (for example, scipy and lxml.)  One way to resolve dependencies is to use the Enthought Python Distribution (EPD), which contains all of the required packages and is free for academic users.  Install EPD from the <a href=http://www.enthought.com/products/epd.php>Enthought website</a>.  Configure your environment by running both of the below commands (assuming Enthought was installed to <tt> /home/leeping/opt/epd-7.3.2/bin </tt>:
+
+@verbatim
+export PATH=/home/leeping/opt/epd-7.3.2/bin:$PATH
+export PYTHONUSERBASE=/home/leeping/opt/epd-7.3.2
+@endverbatim
+
+Once you have done this, the Numpy, Scipy and lxml dependency issues should be resolved and ForceBalance will run without any problems.
+
+Here are a list of installation notes (not required if you install ForceBalance into the Enthought Python Distribution).  These notes assume that Python and other packages are installed into $HOME/local.
+
+@li The installation of Numpy, Scipy and lxml can be facilitated by installing the \c pip or \c setuptools packages.  However, you may need to resolve the dependencies of these packages first (see below).
+@li Scipy requires a BLAS (Basic Linear Algebra Subroutines) library to be installed.  BLAS is provided by libraries such as ATLAS (Automatically Tuned Linear Algebra Software) or the Intel MKL (Math Kernel Library) for Intel processors.  To compile Scipy with Intel's MKL, follow the guide on <a href=http://software.intel.com/en-us/articles/numpy-scipy-with-mkl>Intel's website</a>.  To use ATLAS, install the package fromthe <a href=http://math-atlas.sourceforge.net> ATLAS website and set the ATLAS environment variable (for example, <tt>export ATLAS=$HOME/local/lib/libatlas.so</tt>) before installing Scipy.
+@li \c lxml is a Python interface to the libxml2 XML parser.  After much ado, I decided to use \c lxml instead of the \c xml module in Python's standard library for several reasons (\c xml contains only limited support for XPath, scrambles the ordering of attributes in an element, etc.)  The downside is that it can be a pain to install.  Installation instructions can be found on the <a href=http://lxml.de/installation.html> lxml website</a> but summarized here.  The packages \c libxml2 and \c libxslt need to be installed first, and in that order.  For each package, run <tt>./configure --prefix=$HOME/local --with-python=$HOME/local</tt>.  Then run \c make followed by <tt>make install</tt>.  Python itself needs to be compiled with \c --enable-shared for this to work.  Finally, download and unzip lxml, then run <tt> python setup.py install --prefix=$HOME/local </tt>.
 
 @section install_gmxx2 Installing GROMACS-X2
+
+<em> GROMACS-X2 is not required for ForceBalance and is currently deprecated.  Installation is not recommended.  This section is retained for your information and in case I choose to revive the software. </em>
+
+I have provided a specialized version of GROMACS (dubbed version
+4.0.7-X2) on the <a href=https://simtk.org/home/forcebalance/>SimTK
+website</a> which interfaces with ForceBalance through the
+abinitio_gmxx2 module.  Although interfacing with unmodified
+simulation software is straightforward, GROMACS-X2 is optimized for
+force field optimization and makes things much faster.  
 
 GROMACS-X2 contains major modifications from GROMACS 4.0.7.
 Most importantly, it enables computation of the objective function
@@ -171,7 +204,7 @@ in the ForceBalance input file!
 
 This documentation is created by Doxygen with the Doxypy plugin.
 To create new documentation or expand on what's here, follow the
-examples on the source code or visit the Doxygen home page.
+examples in the source code or visit the Doxygen home page.
 
 To create this documentation from the source files, go to the \c doc
 directory in the distribution and run <tt> doxygen doxygen.cfg </tt>
@@ -179,5 +212,4 @@ to generate the HTML documentation and LaTeX source files.  Run the \c
 add-tabs.py script to generate the extra navigation tabs for the HTML
 documentation.  Then go to the \c latex directory and type in <tt> make
 </tt> to build the PDF manual (You might need a LaTeX distribution for
-this.)
-
+this.)  All of this is automated by running \c make-all-documentation.sh .

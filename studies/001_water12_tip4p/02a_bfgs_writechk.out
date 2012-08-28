@@ -1,290 +1,0 @@
-[1;97m Welcome to ForceBalance version 0.11.0! =D[0m
-Reading options from file: 02a_bfgs_writechk.in
-Reading force field from file: water.itp
-Determining file type of water.itp ... Guessing from extension (you may specify type with filename:type) ... guessing itp -> gmx!
-
-###########################################################
-###[92m Starting parameter indices, physical values and IDs [0m###
-###########################################################
-   0 [  3.1537e-01 ] : VDWSOW
-   1 [  6.4852e-01 ] : VDWTOW
-   2 [  9.5720e-02 ] : BONDSBHWOW
-   3 [  5.0242e+05 ] : BONDSKHWOW
-   4 [  1.0452e+02 ] : ANGLESBHWOWHW
-   5 [  6.2802e+02 ] : ANGLESKHWOWHW
-   6 [  5.2000e-01 ] : COULHW1 COULHW2
-   7 [ -1.0400e+00 ] : COULMW
-   8 [  1.2800e-01 ] : VSITE3B4 VSITE3A4
------------------------------------------------------------
-
-##########################################################
-###[91m  Rescaling Factors for Different Parameter Types:  [0m###
-##########################################################
-   ANGLESB          : 5.72958e+01
-   ANGLESK          : 6.05928e+02
-   BONDSB           : 5.29177e-02
-   BONDSK           : 9.37583e+05
-   COUL             : 1.00000e+00
-   VDWS             : 5.29177e-02
-   VDWT             : 2.47894e+00
-   VSITE3A          : 5.29177e-02
-   VSITE3B          : 5.29177e-02
-----------------------------------------------------------
-
-##########################################################
-###[92m    Setup for fitting simulation water12_sixpt :    [0m###
-##########################################################
-batch_fd                  0 
-covariance                False 
-efweight                  0.5 
-fd_ptypes                 ['VSITE'] 
-fdgrad                    False 
-fdhess                    False 
-fdhessdiag                True 
-fitatoms                  0 
-name                      water12_sixpt 
-qmboltz                   0.0 
-qmboltztemp               298.15 
-sampcorr                  0 
-shots                     300 
-simtype                   FORCEENERGYMATCH_GMX 
-use_pvals                 0 
-weight                    1.0 
-whamboltz                 0 
-----------------------------------------------------------
-
-##########################################################
-###[92m   Setup for fitting simulation water12_fourpt :    [0m###
-##########################################################
-batch_fd                  0 
-covariance                False 
-efweight                  0.5 
-fd_ptypes                 ['VSITE'] 
-fdgrad                    False 
-fdhess                    False 
-fdhessdiag                True 
-fitatoms                  0 
-name                      water12_fourpt 
-qmboltz                   0.0 
-qmboltztemp               298.15 
-sampcorr                  0 
-shots                     300 
-simtype                   FORCEENERGYMATCH_GMX 
-use_pvals                 0 
-weight                    1.0 
-whamboltz                 0 
-----------------------------------------------------------
-
-##########################################################
-###[92m                Setup for optimizer                 [0m###
-##########################################################
-backup                    True 
-convergence_gradient      0.0001 
-convergence_objective     1e-06 
-convergence_step          1e-06 
-eig_lowerbound            0.0001 
-ffdir                     forcefield 
-finite_difference_h       0.0001 
-forcefield                ['water.itp'] 
-gmxpath                   /home/leeping/opt/gromacs-4.0.7-x2/bin 
-gmxrunpath                None 
-gmxsuffix                  
-gmxtoolpath               None 
-jobtype                   BFGS 
-maxstep                   20 
-penalty_additive          0.0 
-penalty_multiplicative    0.01 
-penalty_type              L2 
-read_mvals                None 
-read_pvals                None 
-readchk                   None 
-root                      /home/leeping/src/forcebalance/test/001_water12_tip4p 
-scan_vals                 None 
-scanindex_name            [] 
-scanindex_num             [] 
-trust0                    0.01 
-writechk                  20step.chk 
-writechk_step             True 
-----------------------------------------------------------
-
-##########################################################
-###[1;97m                   Main Optimizer                   [0m###
-##########################################################
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.7920 F_err(%)=    35.3363
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0448 F_err(%)=    79.0405
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     0   0.000e+00   0.000e+00   1.818e+01[97m   5.02138e-01[0m   0.000e+00
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.7397 F_err(%)=    35.0810
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0627 F_err(%)=    77.9875
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     1   1.000e-02   1.000e-02   1.759e+01[92m   4.92724e-01[0m   4.707e-03
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.6904 F_err(%)=    34.6802
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0674 F_err(%)=    75.2235
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     2   2.231e-02   1.500e-02   1.631e+01[92m   4.70164e-01[0m   1.342e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.6585 F_err(%)=    34.6215
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.1121 F_err(%)=    72.3192
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     3   3.870e-02   2.084e-02   1.510e+01[92m   4.49379e-01[0m   2.048e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.7190 F_err(%)=    34.7546
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0754 F_err(%)=    68.3951
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     4   5.615e-02   2.690e-02   1.378e+01[92m   4.23349e-01[0m   2.871e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.7947 F_err(%)=    35.2038
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.1063 F_err(%)=    63.8521
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     5   8.557e-02   3.268e-02   1.216e+01[92m   3.97083e-01[0m   3.710e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     9.1373 F_err(%)=    35.5542
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    14.9724 F_err(%)=    56.0517
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     6   1.101e-01   3.794e-02   9.623e+00[92m   3.54854e-01[0m   4.927e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     9.1683 F_err(%)=    34.6540
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    14.9964 F_err(%)=    49.6142
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     7   9.728e-02   4.263e-02   6.986e+00[92m   3.18598e-01[0m   6.143e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     9.0561 F_err(%)=    33.3604
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    14.9643 F_err(%)=    48.4867
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     8   8.508e-02   4.680e-02   6.524e+00[92m   3.06776e-01[0m   6.898e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.9189 F_err(%)=    32.3737
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0124 F_err(%)=    46.8884
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-     9   1.038e-01   5.052e-02   5.486e+00[92m   2.94858e-01[0m   7.439e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.7885 F_err(%)=    31.2522
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0287 F_err(%)=    45.8651
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    10   1.402e-01   5.385e-02   4.770e+00[92m   2.85106e-01[0m   7.337e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.6905 F_err(%)=    30.4713
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0785 F_err(%)=    44.4301
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    11   1.896e-01   5.685e-02   3.667e+00[92m   2.75610e-01[0m   6.856e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.5986 F_err(%)=    29.6702
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.1069 F_err(%)=    43.4548
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    12   2.440e-01   5.958e-02   2.861e+00[92m   2.68059e-01[0m   6.185e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.5808 F_err(%)=    29.3185
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.1477 F_err(%)=    42.0748
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    13   3.035e-01   6.208e-02   1.710e+00[92m   2.61238e-01[0m   5.288e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.5482 F_err(%)=    28.9259
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.1590 F_err(%)=    41.3786
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    14   3.649e-01   6.438e-02   1.082e+00[92m   2.56724e-01[0m   4.246e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.6899 F_err(%)=    29.4113
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.1708 F_err(%)=    39.7701
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    15   4.299e-01   6.650e-02   5.019e-01[92m   2.53086e-01[0m   3.046e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.6276 F_err(%)=    29.0070
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.1113 F_err(%)=    40.2625
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    16   4.902e-01   6.847e-02   2.946e-01[92m   2.52154e-01[0m   2.221e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.7835 F_err(%)=    29.6242
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0719 F_err(%)=    39.3042
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    17   4.959e-01   1.045e-02   5.849e-01[92m   2.51416e-01[0m   1.853e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.8172 F_err(%)=    29.6535
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    15.0153 F_err(%)=    39.2994
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    18   5.036e-01   1.734e-02   4.077e-01[92m   2.51169e-01[0m   1.478e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.8333 F_err(%)=    29.5862
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    14.9573 F_err(%)=    39.4495
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    19   5.071e-01   1.560e-02   8.019e-02[92m   2.51046e-01[0m   1.135e-02
-
-GMX: temp/water12_sixptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_sixptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_sixptSim: water12_sixpt   E_err(kJ/mol)=     8.8337 F_err(%)=    29.5521
-GMX: temp/water12_fourptfdwrap: get_X [8] = -1.0e-04 GMX: temp/water12_fourptfdwrap: get_X [8] =  1.0e-04 GMX: temp/water12_fourptSim: water12_fourpt  E_err(kJ/mol)=    14.9449 F_err(%)=    39.5008
-Writing the checkpoint file 20step.chk
-
-  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
-    20   5.060e-01   3.262e-03   5.012e-02[92m   2.51013e-01[0m   8.135e-03
-Maximum number of optimization steps reached (20)
-
-##########################################################
-###[1;94m               Final parameter values               [0m###
-###[1;94m           Paste to input file to restart           [0m###
-###[1;94m                Choose pvals or mvals               [0m###
-##########################################################
-read_pvals
-   0 [  3.1130e-01 ] : VDWSOW
-   1 [  7.0369e-01 ] : VDWTOW
-   2 [  9.5632e-02 ] : BONDSBHWOW
-   3 [  4.1915e+05 ] : BONDSKHWOW
-   4 [  1.0853e+02 ] : ANGLESBHWOWHW
-   5 [  3.4268e+02 ] : ANGLESKHWOWHW
-   6 [  5.2202e-01 ] : COULHW1 COULHW2
-   7 [ -1.0440e+00 ] : COULMW
-   8 [  1.3450e-01 ] : VSITE3B4 VSITE3A4
-/read_pvals
-read_mvals
-   0 [ -7.6736e-02 ] : VDWSOW
-   1 [  2.2255e-02 ] : VDWTOW
-   2 [ -1.6575e-03 ] : BONDSBHWOW
-   3 [ -8.8806e-02 ] : BONDSKHWOW
-   4 [  6.9938e-02 ] : ANGLESBHWOWHW
-   5 [ -4.7091e-01 ] : ANGLESKHWOWHW
-   6 [  0.0000e+00 ] : COULHW1 COULHW2
-   7 [ -5.0591e-03 ] : COULMW
-   8 [  1.2285e-01 ] : VSITE3B4 VSITE3A4
-/read_mvals
-----------------------------------------------------------
-Writing the checkpoint file 20step.chk

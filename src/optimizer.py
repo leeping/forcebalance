@@ -177,25 +177,22 @@ class Optimizer(object):
         """ The main ForceBalance adaptive trust-radius pseudo-Newton optimizer.  Tried and true in many situations. :)
 
         Usually this function is called with the BFGS or NewtonRaphson
-        method.  I've found the BFGS method to be most efficient,
-        especially when we don't have access to the expensive analytic
-        second derivatives of the objective function.  If we are
-        computing derivatives by of the objective function by finite
-        difference (which we often do), then the diagonal elements of
-        the second derivative can also be obtained by taking a central
-        difference.
+        method.  The NewtonRaphson method is consistently the best
+        method I have, because I always provide at least an
+        approximate Hessian to the objective function.  The BFGS
+        method is vestigial and currently does not work.
 
         BFGS is a pseudo-Newton method in the sense that it builds an
         approximate Hessian matrix from the gradient information in previous
-        steps; true Newton-Raphson needs all of the second derivatives.
+        steps; Newton-Raphson requires the actual Hessian matrix.
         However, the algorithms are similar in that they both compute the
         step by inverting the Hessian and multiplying by the gradient.
 
-        As this method iterates toward convergence, it computes BFGS updates
-        of the Hessian matrix and adjusts the step size.  If the step
-        is good (i.e. the objective function goes down), then the step
-        size is increased; if the step is bad, then it steps back to the
-        original point and tries again with a smaller step size.
+        The method adaptively changes the step size.  If the step is
+        sufficiently good (i.e. the objective function goes down by a
+        large fraction of the predicted decrease), then the step size
+        is increased; if the step is bad, then it rejects the step and
+        tries again.
 
         The optimization is terminated after either a function value or
         step size tolerance is reached.
@@ -203,6 +200,8 @@ class Optimizer(object):
         @param[in] b_BFGS Switch to use BFGS (True) or Newton-Raphson (False)
 
         """
+        if b_BFGS:
+            warn_press_key("Using the BFGS optimization method is not recommended at this time!")
         # Parameters for the adaptive trust radius
         a = self.adapt_fac  # Default value is 0.5, decrease to make more conservative.  Zero to turn off all adaptive.
         b = self.adapt_damp # Default value is 0.5, increase to make more conservative
@@ -234,8 +233,6 @@ class Optimizer(object):
         nxk = norm(xk)
         ngr = norm(G)
 
-        wolfe_c1 = 1e-4
-        wolfe_c2 = 0.9
         Quality  = 1.0
 
         while 1: # Loop until convergence is reached.
@@ -270,10 +267,6 @@ class Optimizer(object):
                 pmat2d(H)
                 print bar
             dx, dX_expect, bump = self.step(xk, data, trust)
-            # if self.bhyp:
-            #     dx, dX_expect, bump = self.step_hyperbolic(xk, data, trust)
-            # else:
-            #     dx, dX_expect, bump = self.step_normal(G, H, trust)
             old_pk = self.FF.create_pvals(xk)
             old_xk = xk.copy()
             # Take a step in the parameter space.
@@ -327,7 +320,7 @@ class Optimizer(object):
                     color = "\x1b[92m"
                     X_best = X
                 ehist = np.append(ehist, X)
-            # Hessian update.
+            # Hessian update for BFGS.
             if b_BFGS:
                 Hnew = H_stor.copy()
                 Dx   = col(xk - xk_prev)
@@ -462,7 +455,7 @@ class Optimizer(object):
     
         def trust_fun(L):
             N = norm(solver(L)[0])
-            print "\rL = %.4e, Hessian diagonal scaling = %.4e: found length %.4e, objective is %.4e" % (L, 1+L**2, N, (N - trust)**2)
+            #print "\rL = %.4e, Hessian diagonal scaling = %.4e: found length %.4e, objective is %.4e" % (L, 1+L**2, N, (N - trust)**2)
             return (N - trust)**2
 
         def search_fun(L):
