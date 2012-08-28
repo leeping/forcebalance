@@ -120,6 +120,20 @@ Here are a list of installation notes (not required if you install ForceBalance 
 @li Scipy requires a BLAS (Basic Linear Algebra Subroutines) library to be installed.  BLAS is provided by libraries such as ATLAS (Automatically Tuned Linear Algebra Software) or the Intel MKL (Math Kernel Library) for Intel processors.  To compile Scipy with Intel's MKL, follow the guide on <a href=http://software.intel.com/en-us/articles/numpy-scipy-with-mkl>Intel's website</a>.  To use ATLAS, install the package fromthe <a href=http://math-atlas.sourceforge.net> ATLAS website and set the ATLAS environment variable (for example, <tt>export ATLAS=$HOME/local/lib/libatlas.so</tt>) before installing Scipy.
 @li \c lxml is a Python interface to the libxml2 XML parser.  After much ado, I decided to use \c lxml instead of the \c xml module in Python's standard library for several reasons (\c xml contains only limited support for XPath, scrambles the ordering of attributes in an element, etc.)  The downside is that it can be harder to install.  Installation instructions can be found on the <a href=http://lxml.de/installation.html> lxml website</a> but summarized here.  The packages \c libxml2 and \c libxslt need to be installed first, and in that order.  On Ubuntu, run <tt>sudo apt-get install libxml2-dev libxslt1-dev</tt>.  To compile from source, run <tt>./configure --prefix=$HOME/local --with-python=$HOME/local</tt>.  Then run \c make followed by <tt>make install</tt>.  Python itself needs to be compiled with \c --enable-shared for this to work.  Finally, download and unzip \c lxml, then run <tt> python setup.py install --prefix=$HOME/local </tt>.
 
+@section create_doc Create documentation
+
+This documentation is created by Doxygen with the Doxypy plugin.
+To create new documentation or expand on what's here, follow the
+examples in the source code or visit the Doxygen home page.
+
+To create this documentation from the source files, go to the \c doc
+directory in the distribution and run <tt> doxygen doxygen.cfg </tt>
+to generate the HTML documentation and LaTeX source files.  Run the \c
+add-tabs.py script to generate the extra navigation tabs for the HTML
+documentation.  Then go to the \c latex directory and type in <tt> make
+</tt> to build the PDF manual (You might need a LaTeX distribution for
+this.)  All of this is automated by running \c make-all-documentation.sh .
+
 @section install_gmxx2 Installing GROMACS-X2
 
 <em> GROMACS-X2 is not required for ForceBalance and is currently deprecated.  Installation is not recommended.  This section is retained for your information and in case I choose to revive the software. </em>
@@ -199,17 +213,3 @@ with installation.
 
 Don't forget to specify the install location of the GROMACS-X2 executables
 in the ForceBalance input file!
-
-@section create_doc Create documentation
-
-This documentation is created by Doxygen with the Doxypy plugin.
-To create new documentation or expand on what's here, follow the
-examples in the source code or visit the Doxygen home page.
-
-To create this documentation from the source files, go to the \c doc
-directory in the distribution and run <tt> doxygen doxygen.cfg </tt>
-to generate the HTML documentation and LaTeX source files.  Run the \c
-add-tabs.py script to generate the extra navigation tabs for the HTML
-documentation.  Then go to the \c latex directory and type in <tt> make
-</tt> to build the PDF manual (You might need a LaTeX distribution for
-this.)  All of this is automated by running \c make-all-documentation.sh .
