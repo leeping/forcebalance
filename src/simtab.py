@@ -4,14 +4,45 @@ This is in a separate file to facilitate importing.  I would happily put it some
 
 """
 
-from gmxio import AbInitio_GMX, Interaction_GMX
-from tinkerio import AbInitio_TINKER, Vibration_TINKER, Interactions_TINKER
-from openmmio import AbInitio_OpenMM, Liquid_OpenMM
-from abinitio_gmxx2 import AbInitio_GMXX2
-from abinitio_internal import AbInitio_Internal
-from counterpoise import Counterpoise
-from amberio import AbInitio_AMBER
-from psi4io import THCDF_Psi4
+try:
+    from gmxio import AbInitio_GMX, Interaction_GMX
+except:
+    print "Gromacs module import failed"
+
+try:
+    from tinkerio import AbInitio_TINKER, Vibration_TINKER, Interactions_TINKER
+except:
+    print "Tinker module import failed; check SimTK package (required for units)"
+
+try:
+    from openmmio import AbInitio_OpenMM, Liquid_OpenMM
+except:
+    print "OpenMM module import failed; check OpenMM package"
+
+try:
+    from abinitio_gmxx2 import AbInitio_GMXX2
+except:
+    print "Gromacs-X2 module import failed"
+
+try:
+    from abinitio_internal import AbInitio_Internal
+except:
+    print "Internal energy fitting module import failed"
+
+try:
+    from counterpoise import Counterpoise
+except:
+    print "Counterpoise module import failed"
+
+try:
+    from amberio import AbInitio_AMBER
+except:
+    print "Amber module import failed"
+
+try:
+    from psi4io import THCDF_Psi4
+except:
+    print "PSI4 module import failed"
 
 ## The table of fitting simulations
 SimTab = {
