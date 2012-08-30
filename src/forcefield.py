@@ -98,7 +98,7 @@ import sys
 from re import match, sub, split
 import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
 import basereader
-from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros
+from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros, sin, cos, pi, sqrt
 from numpy.linalg import norm
 from nifty import col, flat, invert_svd, isint, isfloat, kb, orthogonalize, pmat2d, printcool, row, warn_press_key
 from string import count

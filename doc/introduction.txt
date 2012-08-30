@@ -1,6 +1,6 @@
 @section preface_sec Preface: How to use this document
 
-The documentation for ForceBalance exists in two forms: a web page and
+The documentation for %ForceBalance exists in two forms: a web page and
 a PDF manual.  They contain equivalent content.  The newest versions
 of the software and documentation, along with relevant literature, can
 be found on the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>.
@@ -16,7 +16,7 @@ documentation</em>, which describes all of the modules, classes and
 functions in the program, is intended as a reference
 for contributors who are writing code.
 
-ForceBalance is a work in progress; using the program is nontrivial
+%ForceBalance is a work in progress; using the program is nontrivial
 and many features are still being actively developed.  Thus, users and
 developers are highly encouraged to contact me through
 the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>, either by sending me email or posting to the
@@ -28,13 +28,13 @@ Lee-Ping Wang
 
 @section intro_sec Introduction
 
-Welcome to ForceBalance! :)
+Welcome to %ForceBalance! :)
 
 This is a <em> theoretical and computational chemistry </em> program
 primarily developed by Lee-Ping Wang.  The full list of people who
 made this project possible are given in the \ref credits.
 
-The function of ForceBalance is <em>automatic force field
+The function of %ForceBalance is <em>automatic force field
 optimization</em>.  Here I will provide some background, which for the
 sake of brevity and readability will lack precision and details.  In
 the future, this documentation will include literature citations which
@@ -72,7 +72,7 @@ parameterization to properly describe reality.
 \image html ladder_sm.png "An arrangement of simulation methods by accuracy vs. computational cost."
 \image latex ladder.png "An arrangement of simulation methods by accuracy vs. computational cost." width=10cm
 
-The main audience of ForceBalance is the scientific community that
+The main audience of %ForceBalance is the scientific community that
 uses and develops classical force fields.  These force fields do not
 use the Schrodinger's equation as a starting point; instead, the
 potential is entirely specified using elementary mathematical
@@ -114,12 +114,12 @@ reproducibility.
 @subsection mission_statement Purpose and brief description of this program 
 
 Given this background, I can make the following statement.  <b>The
-purpose of ForceBalance is to create force fields by applying a highly
+purpose of %ForceBalance is to create force fields by applying a highly
 general and systematic process with explicitly specified input data
 and optimization methods, paving the way to higher accuracy and
 improved reproducibility. </b>
 
-At a high level, ForceBalance takes an empirical potential and a set
+At a high level, %ForceBalance takes an empirical potential and a set
 of reference data as inputs, and tunes the parameters such that the
 simulations are able to reproduce the data as accurately as possible.
 Examples of reference data include energy and forces from high-level
@@ -127,7 +127,7 @@ QM calculations, experimentally known molecular properties
 (e.g. polarizabilities and multipole moments), and experimentally
 measured bulk properties (e.g. density and dielectric constant).
 
-ForceBalance presents the problem of potential optimization in a
+%ForceBalance presents the problem of potential optimization in a
 unified and easily extensible framework.  Since there are many
 empirical potentials in theoretical chemistry and similarly many types
 of reference data, significant effort is taken to provide an
@@ -146,8 +146,8 @@ the experimental density.
 - A force field can be used to evaluate the energies and forces at
 several molecular geometries, and these can be compared against
 energies and forces from higher-level quantum chemistry calculations
-using these same geometries.  This is known as <tt>force and energy
-matching</tt>.
+using these same geometries.  This is known as <b>force and energy
+matching</b>.
 
 - A force field can predict the multipole moments and polarizabilities
 of a molecule isolated in vacuum, and these can be compared against
@@ -167,7 +167,7 @@ simulations.
 \image latex flowchart.png "The division of the potential optimization problem into three parts; the force field, fitting simulations and optimization algorithm." height=10cm
 
 The problem is now split into three main components; the force field,
-the fitting simulations, and the optimization algorithm.  ForceBalance
+the fitting simulations, and the optimization algorithm.  %ForceBalance
 uses this conceptual division to define three classes with minimal
 interdependence.  Thus, if a researcher wishes to explore a new
 functional form, incorporate a new type of reference data or try a new
