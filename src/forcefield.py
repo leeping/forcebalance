@@ -106,6 +106,7 @@ from copy import deepcopy
 try:
     from lxml import etree
 except: pass
+import traceback
 import itertools
 from collections import OrderedDict
 
@@ -556,7 +557,6 @@ class FF(object):
         newffdata = deepcopy(self.ffdata)
         # The dictionary that takes parameter names to physical values.
         PARM = {i:pvals[self.map[i]] for i in self.map}
-        print PARM
         #======================================#
         #     Print the new force field.       #
         #   LPW Note: Is it really reasonable  #
@@ -577,6 +577,7 @@ class FF(object):
                     try:
                         wval = eval(cmd)
                     except:
+                        print traceback.format_exc()
                         raise Exception("The command %s (written in the force field file) cannot be evaluated!" % cmd)
                 else:
                     wval = mult*pvals[i]
