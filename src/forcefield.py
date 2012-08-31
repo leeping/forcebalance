@@ -556,6 +556,7 @@ class FF(object):
         newffdata = deepcopy(self.ffdata)
         # The dictionary that takes parameter names to physical values.
         PARM = {i:pvals[self.map[i]] for i in self.map}
+        print PARM
         #======================================#
         #     Print the new force field.       #
         #   LPW Note: Is it really reasonable  #
