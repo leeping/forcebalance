@@ -31,6 +31,7 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "NonbondedForce" : {"Atom": ["type"]},
                 "AmoebaHarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaHarmonicAngleForce" : {"Angle" : ["class1","class2","class3"]},
+                "AmoebaStretchBendForce" : {"StretchBend" : ["class1","class2","class3"]},
                 "AmoebaVdwForce" : {"Vdw" : ["class"]},
                 "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
                 "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]}
@@ -132,8 +133,12 @@ class OpenMM_Reader(BaseReader):
         #InteractionType = ".".join([i.tag for i in list(element.iterancestors())][::-1][1:] + [element.tag])
         ParentType = ".".join([i.tag for i in list(element.iterancestors())][::-1][1:])
         InteractionType = element.tag
-        Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
-        return "/".join([InteractionType, parameter, Involved])
+        try:
+            Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
+            return "/".join([InteractionType, parameter, Involved])
+        except:
+            print "Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible" % ("/".join([InteractionType, parameter]))
+            return "/".join([InteractionType, parameter])
 
 class Liquid_OpenMM(Liquid):
     def __init__(self,options,sim_opts,forcefield):
