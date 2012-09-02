@@ -10,7 +10,7 @@ except:
     print "Gromacs module import failed"
 
 try:
-    from tinkerio import AbInitio_TINKER, Vibration_TINKER, Interactions_TINKER
+    from tinkerio import AbInitio_TINKER, Vibration_TINKER, Interactions_TINKER, Moments_TINKER
 except:
     print "Tinker module import failed; check SimTK package (required for units)"
 
@@ -58,4 +58,5 @@ SimTab = {
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'INTERACTIONS_TINKER':Interactions_TINKER,
+    'MOMENTS_TINKER':Moments_TINKER,
     }

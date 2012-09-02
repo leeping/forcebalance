@@ -154,7 +154,9 @@ sim_opts_types = {
                  "qmboltztemp" : (298.15, 'Temperature for Quantum Boltzmann Weights (ab initio), defaults to room temperature'),
                  "energy_denom"   : (0.0, 'Energy denominator for Interactions objective function (default is to use stdev)'),
                  "rmsd_denom"     : (0.1, 'RMSD denominator for Interactions objective function'),
-                 "wavenumber_tol" : (10.0, 'Normalizes the objective function when fitting vibrational frequencies')
+                 "wavenumber_tol" : (10.0, 'Normalizes the objective function when fitting vibrational frequencies'),
+                 "dipole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (dipole, in Debye)'),
+                 "quadrupole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (quadrupole, in Buckingham)')
                  },
     'sections': {}
     }

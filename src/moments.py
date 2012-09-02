@@ -1,7 +1,7 @@
-""" @package vibration Vibrational mode fitting module
+""" @package moments Multipole moment fitting module
 
 @author Lee-Ping Wang
-@date 08/2012
+@date 09/2012
 """
 
 import os
@@ -14,12 +14,11 @@ from re import match, sub
 import subprocess
 from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
-from _assign import Assign
-#from _increment import Vibration_Build
+from collections import OrderedDict
 
-class Vibration(FittingSimulation):
+class Moments(FittingSimulation):
 
-    """ Subclass of FittingSimulation for fitting force fields to vibrational spectra (from experiment or theory).
+    """ Subclass of FittingSimulation for fitting force fields to multipole moments (from experiment or theory).
 
     Currently Tinker is supported.
 
@@ -29,25 +28,29 @@ class Vibration(FittingSimulation):
         """Initialization."""
         
         # Initialize the SuperClass!
-        super(Vibration,self).__init__(options,sim_opts,forcefield)
+        super(Moments,self).__init__(options,sim_opts,forcefield)
         
         #======================================#
         # Options that are given by the parser #
         #======================================#
-        self.denom = sim_opts['wavenumber_tol']
+	self.denoms = {}
+        self.denoms['dipole'] = sim_opts['dipole_denom']
+        self.denoms['quadrupole'] = sim_opts['quad_denom']
         
         #======================================#
         #     Variables which are set here     #
         #======================================#
-        ## The vdata.txt file that contains the vibrations.
-        self.vfnm = os.path.join(self.simdir,"vdata.txt")
+        ## The mdata.txt file that contains the moments.
+        self.mfnm = os.path.join(self.simdir,"mdata.txt")
+        ##
+        self.ref_moments = OrderedDict()
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,sim_opts)
 
     def read_reference_data(self):
-        """ Read the reference vibrational data from a file. """
+        """ Read the reference data from a file. """
         ## Number of atoms
         self.na = -1
         self.ref_eigvals = []
@@ -55,7 +58,9 @@ class Vibration(FittingSimulation):
         an = 0
         ln = 0
         cn = -1
-        for line in open(self.vfnm):
+        dn = -1
+        qn = -1
+        for line in open(self.mfnm):
             line = line.split('#')[0] # Strip off comments
             s = line.split()
             if len(s) == 1 and self.na == -1:
@@ -67,21 +72,27 @@ class Vibration(FittingSimulation):
             elif an < self.na and len(s) == 4:
                 xyz[an, :] = array([float(i) for i in s[1:]])
                 an += 1
-            elif len(s) == 1:
-                self.ref_eigvals.append(float(s[0]))
-                self.ref_eigvecs.append(zeros((self.na, 3), dtype=float))
-                an = 0
-            elif len(s) == 3:
-                self.ref_eigvecs[-1][an, :] = array([float(i) for i in s])
-                an += 1
+            elif an == self.na and s[0].lower() == 'dipole':
+                dn = ln + 1
+            elif ln == dn:
+                self.ref_moments['dipole'] = OrderedDict(zip(['x','y','z'],[float(i) for i in s]))
+            elif an == self.na and s[0].lower() in ['quadrupole', 'quadrapole']:
+                qn = ln + 1
+            elif ln == qn:
+                self.ref_moments['quadrupole'] = OrderedDict([('xx',float(s[0]))])
+            elif ln == qn + 1:
+                self.ref_moments['quadrupole']['xy'] = float(s[0])
+                self.ref_moments['quadrupole']['yy'] = float(s[1])
+            elif ln == qn + 2:
+                self.ref_moments['quadrupole']['xz'] = float(s[0])
+                self.ref_moments['quadrupole']['yz'] = float(s[1])
+                self.ref_moments['quadrupole']['zz'] = float(s[2])
             elif len(s) == 0:
                 pass
             else:
                 print line
-                raise Exception("This line doesn't comply with our vibration file format!")
+                raise Exception("This line doesn't comply with our multipole file format!")
             ln += 1
-        self.ref_eigvals = array(self.ref_eigvals)
-        self.ref_eigvecs = array(self.ref_eigvecs)
 
         return
 
@@ -92,33 +103,36 @@ class Vibration(FittingSimulation):
     def indicate(self):
         """ Print qualitative indicator. """
         print "\rSim: %-15s" % self.name, 
-        print "Frequencies (wavenumbers), Reference:", self.ref_eigvals,
-        print "Calculated:", self.calc_eigvals,
+        print "Multipole Moments, Reference:", self.ref_moments,
+        print "Calculated:", self.calc_moments,
         print "Objective = %.5e" % self.objective
         return
+
+    def unpack_moments(moment_dict):
+        print moment_dict
+        answer = array(list(itertools.chain(*[[dct[i]/self.denoms[ord] for i in dct] for ord,dct in moment_dict.items()])))
+        return answer
 
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
         Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
-        def get_eigvals(mvals_):
+        def get_momvals(mvals_):
             self.FF.make(mvals_)
-            eigvals, eigvecs = self.vibration_driver()
-            # Put reference eigenvectors in the rows and calculated eigenvectors in the columns.
-            # Square the dot product (pointing in opposite direction is still the same eigenvector)
-            # Convert to integer for the "Assign" subroutine, subtract from a million.
-            a = array([[int(1e6*(1.0-min(1.0,dot(v1.flatten(),v2.flatten())**2))) for v2 in self.ref_eigvecs] for v1 in eigvecs])
-            # In the matrix that we constructed, these are the column numbers (reference mode numbers) 
-            # that are mapped to the row numbers (calculated mode numbers)
-            c2r = Assign(a)
-            return eigvals[c2r]
+            moments = self.moments_driver()
+            # Unpack from dictionary.
+            return self.unpack_moments(moments)
 
-        calc_eigvals = get_eigvals(mvals)
-        D = calc_eigvals - self.ref_eigvals
-        dV = zeros((self.FF.np,len(calc_eigvals)),dtype=float)
+        self.FF.make(mvals)
+        ref_momvals = self.unpack_moments(self.ref_moments)
+        calc_moments = self.moments_driver()
+        calc_momvals = self.unpack_moments(calc_moments)
+        
+        D = calc_momvals - self.ref_momvals
+        dV = zeros((self.FF.np,len(calc_momvals)),dtype=float)
 
         if AGrad or AHess:
             for p in range(self.FF.np):
-                dV[p,:], _ = f12d3p(fdwrap(get_eigvals, mvals, p), h = self.h, f0 = calc_eigvals)
+                dV[p,:], _ = f12d3p(fdwrap(get_momvals, mvals, p), h = self.h, f0 = calc_momvals)
                 
         Answer['X'] = dot(D,D) / self.denom**2
         for p in range(self.FF.np):
@@ -127,7 +141,8 @@ class Vibration(FittingSimulation):
                 Answer['H'][p,q] = 2*dot(dV[p,:], dV[q,:]) / self.denom**2
 
         if not in_fd():
-            self.calc_eigvals = calc_eigvals
+            self.FF.make(mvals)
+            self.calc_moments = calc_moments
             self.objective = Answer['X']
 
         return Answer

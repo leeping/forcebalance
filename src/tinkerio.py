@@ -15,6 +15,7 @@ from basereader import BaseReader
 from subprocess import Popen, PIPE
 from abinitio import AbInitio
 from vibration import Vibration
+from moments import Moments
 from interactions import Interactions
 from simtk.unit import *
 from finite_difference import in_fd
@@ -208,6 +209,52 @@ class Vibration_TINKER(Vibration):
         os.system("rm -rf *_* *[0-9][0-9][0-9]*")
 
         return calc_eigvals, calc_eigvecs
+
+class Moments_TINKER(Moments):
+
+    """Subclass of FittingSimulation for multipole moment matching
+    using TINKER."""
+
+    def __init__(self,options,sim_opts,forcefield):
+        super(Moments_TINKER,self).__init__(options,sim_opts,forcefield)
+
+    def prepare_temp_directory(self, options, sim_opts):
+        abstempdir = os.path.join(self.root,self.tempdir)
+        # Link the necessary programs into the temporary directory
+        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
+        # Link the run parameter file
+        os.symlink(os.path.join(self.root,self.simdir,"input.key"),os.path.join(abstempdir,"input.key"))
+        os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
+
+    def moments_driver(self):
+        # This line actually runs TINKER
+        o, e = Popen(["./optimize","input.xyz","1.0e-6"],stdout=PIPE,stderr=PIPE).communicate()
+        o, e = Popen(["./analyze","input.xyz_2","M"],stdout=PIPE,stderr=PIPE).communicate()
+        # Read the TINKER output.
+        qn = -1
+        ln = 0
+        for line in o.split('\n'):
+            s = line.split()
+            if "Dipole X,Y,Z-Components" in line:
+                dipole_dict = OrderedDict(zip(['x','y','z'], [float(i) for i in s[-3:]]))
+            elif "Quadrupole Moment Tensor" in line:
+                qn = ln
+                quadrupole_dict = OrderedDict([('xx',float(s[-3]))])
+            elif qn == ln + 1:
+                quadrupole_dict['xy'] = float(s[-3])
+                quadrupole_dict['yy'] = float(s[-2])
+            elif qn == ln + 2:
+                quadrupole_dict['xz'] = float(s[-3])
+                quadrupole_dict['yz'] = float(s[-2])
+                quadrupole_dict['zz'] = float(s[-1])
+            ln += 1
+
+        os.system("rm -rf *_* *[0-9][0-9][0-9]*")
+
+        calc_moments = OrderedDict([('dipole', dipoledict), ('quadrupole', quadrupole_dict)])
+
+        return calc_moments
 
 class Interactions_TINKER(Interactions):
 
