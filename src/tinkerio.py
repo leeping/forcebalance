@@ -19,6 +19,7 @@ from moments import Moments
 from interactions import Interactions
 from simtk.unit import *
 from finite_difference import in_fd
+from collections import OrderedDict
 
 pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
@@ -241,10 +242,10 @@ class Moments_TINKER(Moments):
             elif "Quadrupole Moment Tensor" in line:
                 qn = ln
                 quadrupole_dict = OrderedDict([('xx',float(s[-3]))])
-            elif qn == ln + 1:
+            elif qn > 0 and ln == qn + 1:
                 quadrupole_dict['xy'] = float(s[-3])
                 quadrupole_dict['yy'] = float(s[-2])
-            elif qn == ln + 2:
+            elif qn > 0 and ln == qn + 2:
                 quadrupole_dict['xz'] = float(s[-3])
                 quadrupole_dict['yz'] = float(s[-2])
                 quadrupole_dict['zz'] = float(s[-1])
@@ -252,7 +253,7 @@ class Moments_TINKER(Moments):
 
         os.system("rm -rf *_* *[0-9][0-9][0-9]*")
 
-        calc_moments = OrderedDict([('dipole', dipoledict), ('quadrupole', quadrupole_dict)])
+        calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
 
         return calc_moments
 
