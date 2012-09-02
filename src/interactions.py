@@ -172,8 +172,16 @@ class Interactions(FittingSimulation):
             # The return value is an array of normalized interaction energy differences.
             if not in_fd():
                 self.rmsd_part = dot(array(VectorD_),array(VectorD_))
-                self.energy_part = dot(array(VectorE_),array(VectorE_))
-            return array(VectorD_ + VectorE_)
+                if len(VectorE_) > 0:
+                    self.energy_part = dot(array(VectorE_),array(VectorE_))
+                else:
+                    self.energy_part = 0.0
+            if len(VectorE_) > 0 and len(VectorD_) > 0:
+                return array(VectorD_ + VectorE_)
+            elif len(VectorD_) > 0:
+                return array(VectorD_)
+            elif len(VectorE_) > 0:
+                return array(VectorE_)
                     
         V = compute(mvals)
 

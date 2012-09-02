@@ -12,6 +12,7 @@ from fitsim import FittingSimulation
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
+import itertools
 from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
@@ -35,7 +36,7 @@ class Moments(FittingSimulation):
         #======================================#
 	self.denoms = {}
         self.denoms['dipole'] = sim_opts['dipole_denom']
-        self.denoms['quadrupole'] = sim_opts['quad_denom']
+        self.denoms['quadrupole'] = sim_opts['quadrupole_denom']
         
         #======================================#
         #     Variables which are set here     #
@@ -63,7 +64,9 @@ class Moments(FittingSimulation):
         for line in open(self.mfnm):
             line = line.split('#')[0] # Strip off comments
             s = line.split()
-            if len(s) == 1 and self.na == -1:
+            if len(s) == 0:
+                pass
+            elif len(s) == 1 and self.na == -1:
                 self.na = int(s[0])
                 xyz = zeros((self.na, 3), dtype=float)
                 cn = ln + 1
@@ -80,15 +83,13 @@ class Moments(FittingSimulation):
                 qn = ln + 1
             elif ln == qn:
                 self.ref_moments['quadrupole'] = OrderedDict([('xx',float(s[0]))])
-            elif ln == qn + 1:
+            elif qn > 0 and ln == qn + 1:
                 self.ref_moments['quadrupole']['xy'] = float(s[0])
                 self.ref_moments['quadrupole']['yy'] = float(s[1])
-            elif ln == qn + 2:
+            elif qn > 0 and ln == qn + 2:
                 self.ref_moments['quadrupole']['xz'] = float(s[0])
                 self.ref_moments['quadrupole']['yz'] = float(s[1])
                 self.ref_moments['quadrupole']['zz'] = float(s[2])
-            elif len(s) == 0:
-                pass
             else:
                 print line
                 raise Exception("This line doesn't comply with our multipole file format!")
@@ -103,13 +104,13 @@ class Moments(FittingSimulation):
     def indicate(self):
         """ Print qualitative indicator. """
         print "\rSim: %-15s" % self.name, 
-        print "Multipole Moments, Reference:", self.ref_moments,
-        print "Calculated:", self.calc_moments,
+        print "Multipole Moments"
+        print "Reference :", self.ref_moments
+        print "Calculated:", self.calc_moments
         print "Objective = %.5e" % self.objective
         return
 
-    def unpack_moments(moment_dict):
-        print moment_dict
+    def unpack_moments(self, moment_dict):
         answer = array(list(itertools.chain(*[[dct[i]/self.denoms[ord] for i in dct] for ord,dct in moment_dict.items()])))
         return answer
 
@@ -126,19 +127,19 @@ class Moments(FittingSimulation):
         ref_momvals = self.unpack_moments(self.ref_moments)
         calc_moments = self.moments_driver()
         calc_momvals = self.unpack_moments(calc_moments)
-        
-        D = calc_momvals - self.ref_momvals
+
+        D = calc_momvals - ref_momvals
         dV = zeros((self.FF.np,len(calc_momvals)),dtype=float)
 
         if AGrad or AHess:
             for p in range(self.FF.np):
                 dV[p,:], _ = f12d3p(fdwrap(get_momvals, mvals, p), h = self.h, f0 = calc_momvals)
                 
-        Answer['X'] = dot(D,D) / self.denom**2
+        Answer['X'] = dot(D,D)
         for p in range(self.FF.np):
-            Answer['G'][p] = 2*dot(D, dV[p,:]) / self.denom**2
+            Answer['G'][p] = 2*dot(D, dV[p,:])
             for q in range(self.FF.np):
-                Answer['H'][p,q] = 2*dot(dV[p,:], dV[q,:]) / self.denom**2
+                Answer['H'][p,q] = 2*dot(dV[p,:], dV[q,:])
 
         if not in_fd():
             self.FF.make(mvals)
