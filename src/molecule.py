@@ -1470,6 +1470,8 @@ class Molecule(object):
     
         for line in open(fnm):
             line = line.strip().expandtabs()
+            if 'fatal error' in line:
+                raise Exception('Calculation encountered a fatal error!')
             if XMode >= 1:
                 # Perfectionist here; matches integer, element, and three floating points
                 if re.match("^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
