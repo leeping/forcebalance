@@ -86,6 +86,8 @@ def parse_interactions(input_file):
                 SystemName = s[1]
             elif key == 'geometry':
                 SystemDict[key] = s[1]
+            elif key == 'rmsd_weight':
+                SystemDict[key] = float(s[1])
             elif key == 'optimize':
                 if len(s) == 1 or s[1].lower() in ['y','yes','true']:
                     SystemDict[key] = True
@@ -100,6 +102,8 @@ def parse_interactions(input_file):
             elif key == 'equation':
                 InterDict[key] = ' '.join(s[1:])
             elif key == 'energy':
+                InterDict[key] = float(s[1])
+            elif key == 'weight':
                 InterDict[key] = float(s[1])
             else:
                 warn_press_key("Encountered unsupported key %s in section %s on line %i" % (key, section, ln))
@@ -154,21 +158,23 @@ class Interactions(FittingSimulation):
                 #print "Setting %s to" % sys_, Energy_
                 exec("%s = Energy_" % sys_) in locals()
                 RMSDNrm_ = RMSD_ / self.rmsd_denom
-                VectorD_.append(RMSDNrm_)
+                w_ = self.sys_opts[sys_]['rmsd_weight'] if 'rmsd_weight' in self.sys_opts[sys_] else 1.0
+                VectorD_.append(sqrt(w_)*RMSDNrm_)
                 if not in_fd() and RMSD_ != 0.0 * angstrom:
-                    self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_ / angstrom, RMSDNrm_**2)
+                    self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_ / angstrom, w_*RMSDNrm_**2)
             VectorE_ = []
-            for inter in self.inter_opts:
-                Calculated_ = eval(self.inter_opts[inter]['equation'])
-                Reference_ = self.inter_opts[inter]['reference_physical']
+            for inter_ in self.inter_opts:
+                Calculated_ = eval(self.inter_opts[inter_]['equation'])
+                Reference_ = self.inter_opts[inter_]['reference_physical']
                 Delta_ = Calculated_ - Reference_
                 DeltaNrm_ = Delta_ / self.energy_denom
-                VectorE_.append(DeltaNrm_)
+                w_ = self.inter_opts[inter_]['weight'] if 'weight' in self.inter_opts[inter_] else 1.0
+                VectorE_.append(sqrt(w_)*DeltaNrm_)
                 if not in_fd():
-                    self.PrintDict[inter] = "% 9.3f % 9.3f % 9.3f % 12.5f" % (Calculated_ / kilocalories_per_mole, 
+                    self.PrintDict[inter_] = "% 9.3f % 9.3f % 9.3f % 12.5f" % (Calculated_ / kilocalories_per_mole, 
                                                                                   Reference_ / kilocalories_per_mole, 
-                                                                                  Delta_ / kilocalories_per_mole, DeltaNrm_**2)
-                # print "%-20s" % inter, "Calculated:", Calculated_, "Reference:", Reference_, "Delta:", Delta_, "DeltaNrm:", DeltaNrm_
+                                                                                  Delta_ / kilocalories_per_mole, w_*DeltaNrm_**2)
+                # print "%-20s" % inter_, "Calculated:", Calculated_, "Reference:", Reference_, "Delta:", Delta_, "DeltaNrm:", DeltaNrm_
             # The return value is an array of normalized interaction energy differences.
             if not in_fd():
                 self.rmsd_part = dot(array(VectorD_),array(VectorD_))
