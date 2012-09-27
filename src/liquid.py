@@ -83,7 +83,7 @@ class Liquid(FittingSimulation):
     def indicate(self):
         return
 
-    def objective_term(self,temps, exp, calc, std, grad, fitorder, name="Quantity", verbose = True):
+    def objective_term(self,temps, exp, calc, std, grad, fitorder, name="Quantity", verbose = True, FitFitted = False, FitCoefs = False):
         # Assuming all uncertainties equal for now. :P
         Uncerts = {}
         for i in exp:
@@ -107,49 +107,76 @@ class Liquid(FittingSimulation):
         # Make a Vandermonde matrix
         xmat   = np.mat(np.vander(tarray,fitorder+1)[:,::-1])
         yarray = np.array([calc[T] for T in temps])
-        Beta, Hats, Yfit = get_least_squares(xmat, yarray)
-        # Curve-fitted densities
+        Beta, Hats, Yfit, MPPI = get_least_squares(xmat, yarray)
+        # Curve-fitted values
         cfit = {T : r for T, r in zip(temps,Yfit)}
-        # Switch to fit the curve-fitted densities :P
-        FitFitted = 0
         GradYMat = np.mat([grad[T] for T in temps])
         GradZMat = Hats * GradYMat
-
+        # Derivatives of least-squares coefficients
         Objective = 0.0
         Gradient = np.zeros(self.FF.np, dtype=float)
         Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
-        for i, T in enumerate(temps):
-            if FitFitted:
-                G = flat(GradZMat[i,:])
-                Delta = cfit[T] - exp[T]
-            else:
-                G = grad[T]
-                Delta = calc[T] - exp[T]
-            print "T = ", T
-            print "Weight = ", Weights[T]
-            print "Delta = ", Delta
-            print "G = ", G
-            ThisObj = Weights[T] * Delta ** 2 / Denom
-            ThisGrad = 2.0 * Weights[T] * Delta * G / Denom
-            if verbose:
-                bar = printcool("%s at %.1f :%s Objective = % .3f, Gradient:" % (name, T, ' Smoothed' if FitFitted else '', ThisObj))
-                self.FF.print_map(vals=ThisGrad)
-                print "Denominator = % .3f Stdev(expt) = %.3f" % (Denom, np.std(np.array([exp[i] for i in temps])))
-            else:
-                print "%s at %.1f contributes % .3f to the objective function" % (name, T, ThisObj)
-            Objective += ThisObj
-            Gradient += ThisGrad
-            # The second derivatives are inaccurate; we estimate the objective function Hessian using first derivatives.
-            # If we had a good Hessian estimate the formula would be: 2.0 * Weights[T] * (np.outer(G, G) + Delta * np.diag(Hd))
-            Hessian += 2.0 * Weights[T] * (np.outer(G, G)) / Denom
+        if FitCoefs:
+            # === This piece of code doesn't work yet, for some reason. ===
+            # For enthalpy of vaporization, we would like to add the derivative of the least squares coefficients to our fit.
+            # Center the temperature values around room temperature and normalize.
+            tarray = (temps - 298.0)
+            tarray /= (max(tarray) - min(tarray))
+            yarray_exp = np.array([exp[T] for T in temps])
+            xmat   = np.mat(np.vander(tarray,fitorder+1)[:,::-1])
+            # Perform the least-squares again.
+            Beta_calc, Hats_calc, Yfit_calc, MPPI_calc = get_least_squares(xmat, yarray)
+            Beta_exp, Hats_exp, Yfit_exp, MPPI_exp = get_least_squares(xmat, yarray_exp)
+            Beta_calc = flat(Beta_calc)
+            Beta_exp = flat(Beta_exp)
+            # Assume that we're only interested in the zeroth and first-order coefficients.
+            GradCoef = MPPI_calc * GradYMat
+            # Fractional tolerances.
+            # Shooting for error of 0.1 kJ/mol (0.2% error) in absolute Hvap
+            # Shooting for 5% error in slope
+            Denoms = [2e-3, 5e-2]
+            for i in range(2):
+                G = flat(GradCoef[i,:])
+                Delta = (Beta_calc[i] - Beta_exp[i]) / Beta_exp[i]
+                ThisObj = Delta ** 2 / Denoms[i] ** 2
+                ThisGrad = 2.0 * Delta * G / Denoms[i] ** 2
+                # Gauss-Newton approximation to the Hessian.
+                Hessian += 2.0 * (np.outer(G, G)) / Denoms[i] ** 2
+                bar = printcool("%s Least-Squares Coefficient %i : Calculated = % .3f, Experimental = % .3f, Objective = % .3f, Gradient of Coefficient:" % (name, i, Beta_calc[i], Beta_exp[i], ThisObj))
+                self.FF.print_map(vals=G)
+                Objective += ThisObj
+                print Gradient.shape
+                print ThisGrad.shape
+                Gradient += ThisGrad
+                
+        else:
+            for i, T in enumerate(temps):
+                if FitFitted:
+                    G = flat(GradZMat[i,:])
+                    Delta = cfit[T] - exp[T]
+                else:
+                    G = grad[T]
+                    Delta = calc[T] - exp[T]
+                # print "T = ", T
+                # print "Weight = ", Weights[T]
+                # print "Delta = ", Delta
+                # print "G = ", G
+                ThisObj = Weights[T] * Delta ** 2 / Denom
+                ThisGrad = 2.0 * Weights[T] * Delta * G / Denom
+                if verbose:
+                    bar = printcool("%s at %.1f : Calculated = % .3f, Experimental = % .3f, Objective = % .3f, Gradient:" % (name, T, cfit[T] if FitFitted else calc[T], exp[T], ThisObj))
+                    self.FF.print_map(vals=G)
+                    print "Denominator = % .3f Stdev(expt) = %.3f" % (Denom, np.std(np.array([exp[i] for i in temps])))
+                else:
+                    print "%s at %.1f contributes % .3f to the objective function" % (name, T, ThisObj)
+                Objective += ThisObj
+                Gradient += ThisGrad
+                # Gauss-Newton approximation to the Hessian.
+                Hessian += 2.0 * Weights[T] * (np.outer(G, G)) / Denom
             
         # Do this one thousand times!
         # Random_Objectives = []
         # for I in range(10000):
-        #     if FitFitted:
-        #         yarray = np.array([calc[T] + np.random.normal(0,std[T]) for T in temps])
-        #         Beta, Hats, Yfit = get_least_squares(xmat, yarray)
-        #         cfit_ = {T : r for T, r in zip(temps,Yfit)}
         #     Objective_ = 0.0
         #     for i, T in enumerate(temps):
         #         if FitFitted:
@@ -203,7 +230,7 @@ class Liquid(FittingSimulation):
 
         Answer = {}
         # Dump the force field to a pickle file
-        with open('forcebalance.p','w') as f: lp_dump((self.FF,mvals,self.h),f)
+        with open('forcebalance.p','w') as f: lp_dump((self.FF,mvals,self.h,AGrad),f)
 
         # Reference densities from the CRC Handbook, interpolated. :P
         # Rho_exp = {273.2 : 999.84300, 274.2 : 999.90170, 275.4 : 999.94910, 
@@ -315,10 +342,12 @@ class Liquid(FittingSimulation):
                 U_kln[k, m,: ]  *= beta
                 mU_kln[k, m, :]  = mEnergies[k]
                 mU_kln[k, m, :] *= beta
+        print "Running MBAR analysis..."
         mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
         mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8)
         W1 = mbar.getWeights()
         mW1 = mmbar.getWeights()
+        print "Done"
 
         def random_temperature_trial():
             rrnd = []
@@ -357,11 +386,11 @@ class Liquid(FittingSimulation):
             Rho_std[T]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             Hvap_std[T]   = np.sqrt(sum(C**2 * np.array(Hvap_errs)**2))
 
-            print "C = ", C
-            print "Rho_errs = ", Rho_errs
+            #print "C = ", C
+            #print "Rho_errs = ", Rho_errs
 
-        print "The -PV contribution to the gradient is: (Hopefully it is right)"
-        print -1 * (mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar))
+        #print "The -PV contribution to the gradient is: (Hopefully it is right)"
+        #print -1 * (mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar))
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density", verbose=False)

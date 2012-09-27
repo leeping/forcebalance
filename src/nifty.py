@@ -253,6 +253,7 @@ def get_least_squares(x, y, w = None):
     @param[out] Beta The least-squares coefficients
     @param[out] Hat The hat matrix that takes linear combinations of data y-values to give fitted y-values (weights)
     @param[out] yfit The fitted y-values
+    @param[out] MPPI The Moore-Penrose pseudoinverse (multiply by Y to get least-squares coefficients, multiply by dY/dk to get derivatives of least-squares coefficients)
     """
     # X is a 'tall' matrix.
     X = mat(x)
@@ -276,7 +277,7 @@ def get_least_squares(x, y, w = None):
     yfit = flat(Hat * Y)
     # Return three things: the least-squares coefficients, the hat matrix (turns y into yfit), and yfit
     # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
-    return Beta, Hat, yfit
+    return Beta, Hat, yfit, MPPI
 
 #==============================#
 #|      XML Pickle stuff      |#
