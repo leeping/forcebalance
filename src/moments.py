@@ -6,7 +6,7 @@
 
 import os
 import shutil
-from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
+from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
 from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack
 from fitsim import FittingSimulation
 from molecule import Molecule, format_xyz_coord
@@ -37,6 +37,7 @@ class Moments(FittingSimulation):
 	self.denoms = {}
         self.denoms['dipole'] = sim_opts['dipole_denom']
         self.denoms['quadrupole'] = sim_opts['quadrupole_denom']
+        self.denoms['polarizability'] = sim_opts['polarizability_denom']
         
         #======================================#
         #     Variables which are set here     #
@@ -61,6 +62,7 @@ class Moments(FittingSimulation):
         cn = -1
         dn = -1
         qn = -1
+        pn = -1
         for line in open(self.mfnm):
             line = line.split('#')[0] # Strip off comments
             s = line.split()
@@ -90,11 +92,24 @@ class Moments(FittingSimulation):
                 self.ref_moments['quadrupole']['xz'] = float(s[0])
                 self.ref_moments['quadrupole']['yz'] = float(s[1])
                 self.ref_moments['quadrupole']['zz'] = float(s[2])
+            elif an == self.na and s[0].lower() in ['polarizability', 'alpha']:
+                pn = ln + 1
+            elif ln == pn:
+                self.ref_moments['polarizability'] = OrderedDict([('xx',float(s[0]))])
+                self.ref_moments['polarizability']['yx'] = float(s[1])
+                self.ref_moments['polarizability']['zx'] = float(s[2])
+            elif pn > 0 and ln == pn + 1:
+                self.ref_moments['polarizability']['xy'] = float(s[0])
+                self.ref_moments['polarizability']['yy'] = float(s[1])
+                self.ref_moments['polarizability']['zy'] = float(s[2])
+            elif pn > 0 and ln == pn + 2:
+                self.ref_moments['polarizability']['xz'] = float(s[0])
+                self.ref_moments['polarizability']['yz'] = float(s[1])
+                self.ref_moments['polarizability']['zz'] = float(s[2])
             else:
                 print line
                 raise Exception("This line doesn't comply with our multipole file format!")
             ln += 1
-
         return
 
     def prepare_temp_directory(self, options, sim_opts):
@@ -103,11 +118,29 @@ class Moments(FittingSimulation):
         
     def indicate(self):
         """ Print qualitative indicator. """
-        print "\rSim: %-15s" % self.name, 
-        print "Multipole Moments"
-        print "Reference :", self.ref_moments
-        print "Calculated:", self.calc_moments
-        print "Objective = %.5e" % self.objective
+        print "\rSim: %-15s" % self.name
+        #print "Multipole Moments and Po"
+        #print "Reference :", self.ref_moments
+        #print "Calculated:", self.calc_moments
+        #print "Objective = %.5e" % self.objective
+
+        ref_momvals = self.unpack_moments(self.ref_moments)
+        calc_momvals = self.unpack_moments(self.calc_moments)
+        PrintDict = OrderedDict()
+        i = 0
+        for Ord in self.ref_moments:
+            for Comp in self.ref_moments[Ord]:
+                if abs(self.calc_moments[Ord][Comp]) > 1e-6 or abs(self.ref_moments[Ord][Comp]) > 1e-6:
+                    PrintDict["%s-%s" % (Ord, Comp)] = "% 9.3f % 9.3f % 9.3f % 12.5f" % (self.calc_moments[Ord][Comp],
+                                                                                         self.ref_moments[Ord][Comp],
+                                                                                         self.calc_moments[Ord][Comp]-self.ref_moments[Ord][Comp],
+                                                                                         (ref_momvals[i] - calc_momvals[i])**2)
+
+                i += 1
+                
+        printcool_dictionary(PrintDict,title="Moments and/or Polarizabilities, Objective = % .5e\n %-20s %9s %9s %9s %11s" % 
+                             (self.objective, "Component", "Calc.", "Ref.", "Delta", "Term"))
+
         return
 
     def unpack_moments(self, moment_dict):

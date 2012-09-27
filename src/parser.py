@@ -156,7 +156,8 @@ sim_opts_types = {
                  "rmsd_denom"     : (0.1, 'RMSD denominator for Interactions objective function'),
                  "wavenumber_tol" : (10.0, 'Normalizes the objective function when fitting vibrational frequencies'),
                  "dipole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (dipole, in Debye)'),
-                 "quadrupole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (quadrupole, in Buckingham)')
+                 "quadrupole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (quadrupole, in Buckingham)'),
+                 "polarizability_denom"   : (1.0, 'Normalizes the objective function when fitting molecular dipole polarizability tensor (dipole polarizability, in cubic Angstrom)')
                  },
     'sections': {}
     }

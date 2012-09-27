@@ -307,6 +307,10 @@ class Liquid(FittingSimulation):
         # Wait for simulations to finish
         wq_wait(self.wq)
 
+        # Uncomment in case I screwed up ...
+        #print "Extract the directory contents now please"
+        #raw_input()
+
         # Gather the calculation data
         Results = {t : lp_load(open('./%.1f/npt_result.p' % T)) for t, T in enumerate(Temps)}
 
