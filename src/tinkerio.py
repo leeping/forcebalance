@@ -223,6 +223,7 @@ class Moments_TINKER(Moments):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        os.symlink(os.path.join(options['tinkerpath'],"polarize"),os.path.join(abstempdir,"polarize"))
         os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
         os.symlink(os.path.join(self.root,self.simdir,"input.key"),os.path.join(abstempdir,"input.key"))
@@ -251,10 +252,34 @@ class Moments_TINKER(Moments):
                 quadrupole_dict['zz'] = float(s[-1])
             ln += 1
 
-        os.system("rm -rf *_* *[0-9][0-9][0-9]*")
-
         calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
 
+        if 'polarizability' in self.ref_moments:
+            o, e = Popen(["./polarize","input.xyz_2"],stdout=PIPE,stderr=PIPE).communicate()
+            # Read the TINKER output.
+            pn = -1
+            ln = 0
+            polarizability_dict = OrderedDict()
+            for line in o.split('\n'):
+                s = line.split()
+                if "Molecular Polarizability Tensor" in line:
+                    pn = ln
+                elif pn > 0 and ln == pn + 2:
+                    polarizability_dict['xx'] = float(s[-3])
+                    polarizability_dict['yx'] = float(s[-2])
+                    polarizability_dict['zx'] = float(s[-1])
+                elif pn > 0 and ln == pn + 3:
+                    polarizability_dict['xy'] = float(s[-3])
+                    polarizability_dict['yy'] = float(s[-2])
+                    polarizability_dict['zy'] = float(s[-1])
+                elif pn > 0 and ln == pn + 4:
+                    polarizability_dict['xz'] = float(s[-3])
+                    polarizability_dict['yz'] = float(s[-2])
+                    polarizability_dict['zz'] = float(s[-1])
+                ln += 1
+            calc_moments['polarizability'] = polarizability_dict
+
+        os.system("rm -rf *_* *[0-9][0-9][0-9]*")
         return calc_moments
 
 class Interactions_TINKER(Interactions):
