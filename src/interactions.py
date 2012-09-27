@@ -16,6 +16,7 @@ from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 from simtk.unit import *
+from multiprocessing import Pool
 
 def parse_interactions(input_file):
     """ Parse through the interactions input file.
@@ -148,6 +149,7 @@ class Interactions(FittingSimulation):
         Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
         self.PrintDict = OrderedDict()
         self.RMSDDict = OrderedDict()
+        #pool = Pool(processes=4)
         def compute(mvals_):
             # This function has automatically assigned variable names from the interaction master file
             # Thus, all variable names in here are protected using an underscore.

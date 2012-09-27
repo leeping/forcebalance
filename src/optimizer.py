@@ -482,7 +482,7 @@ class Optimizer(object):
         else: # This is the search code.
             # One percent tolerance, will tune later
             bump = False
-            Result = optimize.brent(search_fun,brack=(0.0,10.0),tol=1e-1,full_output=1)
+            Result = optimize.brent(search_fun,brack=(0.0,3.0),tol=1e-3,full_output=1)
             #optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
             dx, _ = solver(Result[0])
             expect = Result[1]

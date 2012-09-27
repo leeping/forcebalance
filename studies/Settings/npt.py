@@ -488,7 +488,7 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,boxes=None,verbose=False):
    if verbose: print E
    return np.array(E)
 
-def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,boxes=None):
+def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,boxes=None,AGrad=True):
 
    """
    Compute the first and second derivatives of a set of snapshot
@@ -511,6 +511,8 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,boxes=None):
 
    G        = np.zeros((FF.np,len(xyzs)))
    Hd       = np.zeros((FF.np,len(xyzs)))
+   if not AGrad:
+      return G, Hd
    E0       = energy_driver(mvals, pdb, FF, xyzs, settings, boxes)
    for i in range(FF.np):
       # Not doing the three-point finite difference anymore.
@@ -544,7 +546,7 @@ def main():
    # Create an OpenMM PDB object so we may make the Simulation class.
    pdb = PDBFile(sys.argv[1])
    # Load the force field in from the ForceBalance pickle.
-   FF,mvals,h = lp_load(open('forcebalance.p'))
+   FF,mvals,h,AGrad = lp_load(open('forcebalance.p'))
    # Create the force field XML files.
    FF.make(mvals)
 
@@ -555,7 +557,7 @@ def main():
    # Get statistics from our simulation.
    Rho_avg, Rho_err, Pot_avg, Pot_err, pV_avg, pV_err = analyze(Data)
    # Now that we have the coordinates, we can compute the energy derivatives.
-   G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, mutual_kwargs if FF.amoeba_pol == 'mutual' else direct_kwargs, Boxes)
+   G, Hd = energy_derivatives(mvals, h, pdb, FF, Xyzs, mutual_kwargs if FF.amoeba_pol == 'mutual' else direct_kwargs, Boxes, AGrad)
    # The density derivative can be computed using the energy derivative.
    N = len(Xyzs)
    kB = units.BOLTZMANN_CONSTANT_kB * units.AVOGADRO_CONSTANT_NA
@@ -585,7 +587,7 @@ def main():
    # Get statistics from our simulation.
    _trash, _crap, mPot_avg, mPot_err, __trash, __crap = analyze(mData)
    # Now that we have the coordinates, we can compute the energy derivatives.
-   mG, mHd = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mono_mutual_kwargs if FF.amoeba_pol == 'mutual' else mono_direct_kwargs)
+   mG, mHd = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mono_mutual_kwargs if FF.amoeba_pol == 'mutual' else mono_direct_kwargs, None, AGrad)
 
    # pV_avg and mean(pV) are exactly the same.
    pV = (pressure * Data['volume'] * units.AVOGADRO_CONSTANT_NA).value_in_unit(units.kilojoule_per_mole)
