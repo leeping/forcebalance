@@ -4,6 +4,9 @@ ForceBalance objective function."""
 
 from simtab import SimTab
 from numpy import array, diag, dot, eye, linalg, ones, reshape, sum, zeros
+from collections import OrderedDict
+from finite_difference import in_fd
+from nifty import printcool_dictionary
 
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
 Letters = ['X','G','H']
@@ -38,6 +41,8 @@ class Objective(object):
             self.WTot = sum([i.weight for i in self.Simulations])
         else:
             self.WTot = 1.0
+        self.ObjDict = OrderedDict()
+        
         
     def Simulation_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
@@ -54,9 +59,22 @@ class Objective(object):
             if verbose:
                 Sim.indicate()
             # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
+            if not in_fd():
+                self.ObjDict[Sim.name] = {'w' : Sim.weight/self.WTot , 'x' : Ans['X']}
             for i in range(3):
                 Objective[Letters[i]] += Ans[Letters[i]]*Sim.weight/self.WTot
         return Objective
+
+    def Indicate(self):
+        """ Print objective function contributions. """
+        PrintDict = OrderedDict()
+        Total = 0.0
+        for key, val in self.ObjDict.items():
+            PrintDict[key] = "% 12.5f % 10.3f % 16.5e" % (val['x'],val['w'],val['x']*val['w'])
+            Total += val['x']*val['w']
+        printcool_dictionary(PrintDict,color=1,title="Objective Function Breakdown, Total = % .5e\n %-20s %40s" % 
+                             (Total, "Simulation Name", "Residual  x  Weight  =  Contribution"))
+        return
 
     def Full(self, mvals, Order=0, usepvals=False, verbose=False):
         Objective = self.Simulation_Terms(mvals, Order, usepvals, verbose)
@@ -65,6 +83,9 @@ class Objective(object):
         Objective['X0'] = Objective['X']
         Objective['G0'] = Objective['G'].copy()
         Objective['H0'] = Objective['H'].copy()
+        if not in_fd():
+            self.ObjDict['Regularization'] = {'w' : 1.0, 'x' : Extra[0]}
+            self.Indicate()
         for i in range(3):
             Objective[Letters[i]] += Extra[i]
         return Objective
