@@ -533,7 +533,7 @@ class AbInitio(FittingSimulation):
         #      STEP 3: Build the variance vector and invert it.        #
         #==============================================================#
         print "Done with snapshots, building objective function now\r",
-        if (self.w_energy > 0.0 and self.w_force > 0.0):
+        if (self.w_energy > 0.0 or self.w_force > 0.0):
             EFW     = self.w_energy / (self.w_energy + self.w_force)
             CEFW    = 1.0 - EFW
         else:
