@@ -82,7 +82,6 @@ def buildKeywordDictionary():
 
     return setupKeywords
     
-
 def main():
     setupKeywords=buildKeywordDictionary()
     setup(**setupKeywords)

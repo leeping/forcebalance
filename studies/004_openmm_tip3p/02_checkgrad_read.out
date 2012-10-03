@@ -1,100 +1,0 @@
-[1;97m Welcome to ForceBalance version 0.11.0! =D[0m
-Reading options from file: 02_checkgrad_read.in
-Reading force field from file: tip3p.xml
-
-###########################################################
-###[92m Starting parameter indices, physical values and IDs [0m###
-###########################################################
-   0 [  4.6275e+05 ] : HarmonicBondForce.Bond/k/OW.HW
-   1 [  9.5720e-02 ] : HarmonicBondForce.Bond/length/OW.HW
-   2 [  1.8242e+00 ] : HarmonicAngleForce.Angle/angle/HW.OW.HW
-   3 [  8.3680e+02 ] : HarmonicAngleForce.Angle/k/HW.OW.HW
-   4 [ -8.3400e-01 ] : NonbondedForce.Atom/charge/tip3p-O
-   5 [  6.3597e-01 ] : NonbondedForce.Atom/epsilon/tip3p-O
-   6 [  3.1508e-01 ] : NonbondedForce.Atom/sigma/tip3p-O
-   7 [  4.1700e-01 ] : NonbondedForce.Atom/charge/tip3p-H
------------------------------------------------------------
-
-##########################################################
-###[91m    Rescaling Factors (Lower Takes Precedence):     [0m###
-##########################################################
-   HarmonicAngleForce.Angle/k           : 8.36800e+02
-   NonbondedForce.Atom/epsilon          : 6.35968e-01
-   NonbondedForce.Atom/charge           : 1.00000e+00
-   HarmonicAngleForce.Angle/angle       : 5.00000e-01
-   NonbondedForce.Atom/sigma            : 1.00000e-01
-   HarmonicBondForce.Bond/length        : 1.00000e-02
-   HarmonicBondForce.Bond/k             : 4.62750e+05
-   NonbondedForce.Atom/charge           : 1.00000e+00
-   HarmonicAngleForce.Angle/angle       : 5.00000e-01
-   HarmonicBondForce.Bond/length        : 1.00000e-02
-   NonbondedForce.Atom/sigma            : 1.00000e-01
-----------------------------------------------------------
-Backing up: temp/Energy_Force to: backups/Energy_Force.8.tar.bz2
-
-##########################################################
-###[92m    Setup for fitting simulation Energy_Force :     [0m###
-##########################################################
-all_at_once               1 
-batch_fd                  0 
-covariance                0 
-efweight                  1.0 
-fd_ptypes                 ['all'] 
-fdgrad                    True 
-fdhess                    0 
-fdhessdiag                True 
-fitatoms                  0 
-name                      Energy_Force 
-qmboltz                   0.0 
-qmboltztemp               298.15 
-run_internal              1 
-sampcorr                  0 
-shots                     -1 
-simtype                   FORCEENERGYMATCH_OPENMM 
-use_pvals                 0 
-weight                    1.0 
-whamboltz                 0 
-wq_port                   9230 
-----------------------------------------------------------
-
-##########################################################
-###[92m                Setup for optimizer                 [0m###
-##########################################################
-adaptive_damping          0.5 
-adaptive_factor           0.5 
-backup                    1 
-convergence_gradient      0.0001 
-convergence_objective     0.0001 
-convergence_step          0.0001 
-eig_lowerbound            0.0001 
-ffdir                     forcefield 
-finite_difference_h       0.001 
-forcefield                ['tip3p.xml'] 
-gmxsuffix                  
-jobtype                   FDCHECKG 
-maxstep                   100 
-penalty_additive          0.0 
-penalty_multiplicative    0.1 
-penalty_type              L2 
-priors                    {'NonbondedForce.Atom/charge': 1.0, 'HarmonicAngleForce.Angle/angle': 0.5, 'HarmonicBondForce.Bond/length': 0.01, 'NonbondedForce.Atom/sigma': 0.1} 
-read_mvals                [0.0035226, 0.045751, 0.072669, -0.4878, 0.0, 0.4002, -0.077662, -0.054277] 
-root                      /home/leeping/src/forcebalance/studies/004_openmm_tip3p 
-scan_vals                 -1:1:11 
-scanindex_name            [] 
-scanindex_num             ['0', '1', '2', '3', '4', '5', '6', '7'] 
-trust0                    0.1 
-writechk_step             0 
-----------------------------------------------------------
-Computing forcesfdwrap: get_X [0] = -1.0e-03 Computing forcesfdwrap: get_X [0] =  1.0e-03 Computing forcesfdwrap: get_X [1] = -1.0e-03 Computing forcesfdwrap: get_X [1] =  1.0e-03 Computing forcesfdwrap: get_X [2] = -1.0e-03 Computing forcesfdwrap: get_X [2] =  1.0e-03 Computing forcesfdwrap: get_X [3] = -1.0e-03 Computing forcesfdwrap: get_X [3] =  1.0e-03 Computing forcesfdwrap: get_X [4] = -1.0e-03 Computing forcesfdwrap: get_X [4] =  1.0e-03 Computing forcesfdwrap: get_X [5] = -1.0e-03 Computing forcesfdwrap: get_X [5] =  1.0e-03 Computing forcesfdwrap: get_X [6] = -1.0e-03 Computing forcesfdwrap: get_X [6] =  1.0e-03 Computing forcesfdwrap: get_X [7] = -1.0e-03 Computing forcesfdwrap: get_X [7] =  1.0e-03 Computing forces
-########################################################################################
-###[1;95m                 Checking first derivatives by finite difference!                 [0m###
-###[1;95m Index   Parameter ID             Analytic    Numerical   Difference   Fractional [0m###
-########################################################################################
-fdwrap: Objective [0] = -3.0e-03 Computing forcesfdwrap: Objective [0] = -2.0e-03 Computing forcesfdwrap: Objective [0] = -1.0e-03 Computing forcesfdwrap: Objective [0] =  1.0e-03 Computing forcesfdwrap: Objective [0] =  2.0e-03 Computing forcesfdwrap: Objective [0] =  3.0e-03 Computing forces    0       HarmonicBondForce.Bo  -3.1294e-05  -3.1837e-05[92m   5.4274e-07[91m   1.7047e-02[0m
-fdwrap: Objective [1] = -3.0e-03 Computing forcesfdwrap: Objective [1] = -2.0e-03 Computing forcesfdwrap: Objective [1] = -1.0e-03 Computing forcesfdwrap: Objective [1] =  1.0e-03 Computing forcesfdwrap: Objective [1] =  2.0e-03 Computing forcesfdwrap: Objective [1] =  3.0e-03 Computing forces    1       HarmonicBondForce.Bo  -2.5329e-05  -2.5295e-05[92m  -3.3487e-08[93m  -1.3221e-03[0m
-fdwrap: Objective [2] = -3.0e-03 Computing forcesfdwrap: Objective [2] = -2.0e-03 Computing forcesfdwrap: Objective [2] = -1.0e-03 Computing forcesfdwrap: Objective [2] =  1.0e-03 Computing forcesfdwrap: Objective [2] =  2.0e-03 Computing forcesfdwrap: Objective [2] =  3.0e-03 Computing forces    2       HarmonicAngleForce.A  -6.3217e-06  -5.7987e-06[92m  -5.2293e-07[91m  -8.2721e-02[0m
-fdwrap: Objective [3] = -3.0e-03 Computing forcesfdwrap: Objective [3] = -2.0e-03 Computing forcesfdwrap: Objective [3] = -1.0e-03 Computing forcesfdwrap: Objective [3] =  1.0e-03 Computing forcesfdwrap: Objective [3] =  2.0e-03 Computing forcesfdwrap: Objective [3] =  3.0e-03 Computing forces    3       HarmonicAngleForce.A   9.5898e-07   1.3820e-06[92m  -4.2297e-07[91m  -3.0607e-01[0m
-fdwrap: Objective [4] = -3.0e-03 Computing forcesfdwrap: Objective [4] = -2.0e-03 Computing forcesfdwrap: Objective [4] = -1.0e-03 Computing forcesfdwrap: Objective [4] =  1.0e-03 Computing forcesfdwrap: Objective [4] =  2.0e-03 Computing forcesfdwrap: Objective [4] =  3.0e-03 Computing forces    4       NonbondedForce.Atom/   0.0000e+00  -8.7893e-15[92m   8.7893e-15[92m   8.7893e-07[0m
-fdwrap: Objective [5] = -3.0e-03 Computing forcesfdwrap: Objective [5] = -2.0e-03 Computing forcesfdwrap: Objective [5] = -1.0e-03 Computing forcesfdwrap: Objective [5] =  1.0e-03 Computing forcesfdwrap: Objective [5] =  2.0e-03 Computing forcesfdwrap: Objective [5] =  3.0e-03 Computing forces    5       NonbondedForce.Atom/  -7.9065e-05  -8.8625e-05[92m   9.5599e-06[91m   1.0787e-01[0m
-fdwrap: Objective [6] = -3.0e-03 Computing forcesfdwrap: Objective [6] = -2.0e-03 Computing forcesfdwrap: Objective [6] = -1.0e-03 Computing forcesfdwrap: Objective [6] =  1.0e-03 Computing forcesfdwrap: Objective [6] =  2.0e-03 Computing forcesfdwrap: Objective [6] =  3.0e-03 Computing forces    6       NonbondedForce.Atom/  -2.1645e-04  -3.6357e-04[93m   1.4712e-04[91m   4.0465e-01[0m
-fdwrap: Objective [7] = -3.0e-03 Computing forcesfdwrap: Objective [7] = -2.0e-03 Computing forcesfdwrap: Objective [7] = -1.0e-03 Computing forcesfdwrap: Objective [7] =  1.0e-03 Computing forcesfdwrap: Objective [7] =  2.0e-03 Computing forcesfdwrap: Objective [7] =  3.0e-03 Computing forces    7       NonbondedForce.Atom/   2.7447e-05   1.1843e-04[93m  -9.0985e-05[1;91m  -7.6824e-01[0m

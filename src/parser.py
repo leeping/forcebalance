@@ -50,16 +50,16 @@ import os
 import re
 import sys
 import itertools
-from nifty import printcool, printcool_dictionary
+from nifty import printcool, printcool_dictionary, which
 from copy import deepcopy
 from collections import OrderedDict
 
 ## Default general options.
 ## Note that the documentation is included in part of the key; this will aid in automatic doc-extraction. :)
 gen_opts_types = {
-    'strings' : {"gmxpath"      : (None, 'Path for GROMACS executables'),
+    'strings' : {"gmxpath"      : (which('mdrun'),   'Path for GROMACS executables (if not the default)'),
                  "gmxsuffix"    : ('',   'The suffix of GROMACS executables'),
-                 "tinkerpath"   : (None, 'Path for TINKER executables'),
+                 "tinkerpath"   : (which('testgrad'),   'Path for TINKER executables (if not the default)'),
                  "penalty_type" : ("L2", 'Type of the penalty, L2 or Hyp in the optimizer'),
                  "scan_vals"    : (None, 'Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.1:11'),
                  "readchk"      : (None, 'Name of the restart file we read from'),
@@ -74,7 +74,7 @@ gen_opts_types = {
                  "scanindex_name" : ([], 'Parameter name to scan over (should convert to a numerical index) in job type "scan[mp]vals"')
                  },
     'ints'    : {"maxstep"      : (100, 'Maximum number of steps in an optimization'),
-                 "objective_history"  : (10, 'Number of good optimization steps to average over when checking the objective convergence criterion'),
+                 "objective_history"  : (3, 'Number of good optimization steps to average over when checking the objective convergence criterion'),
                  },
     'bools'   : {"backup"           : (1, 'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, 'Write the checkpoint file at every optimization step'),
@@ -92,7 +92,7 @@ gen_opts_types = {
                  "convergence_gradient"   : (1e-4, 'Convergence criterion of gradient norm'),
                  "convergence_step"       : (1e-4, 'Convergence criterion of step size (just needs to fall below this threshold)'),
                  "eig_lowerbound"         : (1e-4, 'Minimum eigenvalue for applying steepest descent correction in the MainOptimizer'),
-                 "finite_difference_h"    : (1e-2, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
+                 "finite_difference_h"    : (1e-3, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
                  "penalty_additive"       : (0.0,   'Factor for additive penalty function in objective function'),
                  "penalty_multiplicative" : (0.0,   'Factor for multiplicative penalty function in objective function'),
                  "penalty_hyperbolic_b"   : (0.001, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b'),
