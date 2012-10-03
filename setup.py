@@ -7,6 +7,7 @@ __version__ = VERSION
 
 from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
+import os
 import numpy
 import glob
 
