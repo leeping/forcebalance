@@ -72,7 +72,7 @@ class Objective(object):
         for key, val in self.ObjDict.items():
             PrintDict[key] = "% 12.5f % 10.3f % 16.5e" % (val['x'],val['w'],val['x']*val['w'])
             Total += val['x']*val['w']
-        printcool_dictionary(PrintDict,color=7,title="Objective Function Breakdown, Total = % .5e\n %-20s %40s" % 
+        printcool_dictionary(PrintDict,color=6,title="Objective Function Breakdown, Total = % .5e\n %-20s %40s" % 
                              (Total, "Simulation Name", "Residual  x  Weight  =  Contribution"))
         return
 
