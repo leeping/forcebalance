@@ -25,6 +25,7 @@ import time, datetime
 import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict
+import IPython as ip
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -398,6 +399,10 @@ def wq_wait(wq, verbose=False):
         if verbose: print '---'
         task = wq.wait(10)
         if task:
+            try:
+                exectime = task.cmd_execution_time/1000000 # Work Queue 3.6.0
+            except:
+                exectime = task.computation_time/1000000   # Work Queue <= 3.5.2
             if verbose:
                 print 'A job has finished!'
                 print 'Job name = ', task.tag, 'command = ', task.command
@@ -405,14 +410,15 @@ def wq_wait(wq, verbose=False):
                 print "return_status = ", task.return_status, 
                 print "result = ", task.result, 
                 print "host = ", task.host
-                print "computation_time = ", task.computation_time/1000000, 
+                print "execution time = ", exectime, 
                 print "total_bytes_transferred = ", task.total_bytes_transferred
             if task.result != 0:
-                print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.host, task.computation_time/1000000)
+                #ip.embed()
+                print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.host, exectime)
                 wq.submit(task)
             else:
-                if task.computation_time/1000000 > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
-                    print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, task.computation_time/1000000)
+                if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
+                    print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, exectime)
                 del task
         else:
             printcount += 1
