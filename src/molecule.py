@@ -514,6 +514,14 @@ class Molecule(object):
         else:
             raise Exception('getitem is not implemented for keys of type %s' % str(key))
 
+    def __delitem__(self, key):
+        """ 
+        Similarly, in order to delete a frame, we simply perform item deletion on
+        framewise variables.
+        """
+        for k in self.FrameKeys:
+            del self.Data[k][key]
+
     def __iter__(self):
         """ List-like behavior for looping over trajectories. Note that these values are returned by reference. 
         Note that this is intended to be more efficient than __getitem__, so when we loop over a trajectory,
