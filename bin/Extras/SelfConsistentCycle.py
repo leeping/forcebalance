@@ -5,22 +5,100 @@
 Executable script for generating QM data for force, energy, electrostatic potential, and
 other ab initio-based fitting simulations. """
 
-import os, sys, glob
+import os, sys, re, glob
 from forcebalance.forcefield import FF
 from forcebalance.simtab import SimTab
 from forcebalance.parser import parse_inputs
 from forcebalance.nifty import *
-from forcebalance.nifty import _exec
 from forcebalance.molecule import Molecule, format_xyz_coord
 import numpy as np
 import numpy.oldnumeric as nu
 import work_queue
 import random
-from forcebalance.mslib import MSMS
 
 # The default VdW radii from Chmiera, taken from AMBER.
 # See http://www.cgl.ucsf.edu/chimera/1.5/docs/UsersGuide/midas/vdwtables.html
 VdW99 = {'H' : 1.00, 'C' : 1.70, 'N' : 1.625, 'O' : 1.49, 'F' : 1.56, 'P' : 1.871, 'S' : 1.782, 'I' : 2.094, 'Cl' : 1.735, 'Br': 1.978}
+
+class SCF_Simulation(object):
+    def __init__(self, root, name):
+        self.name = name
+        self.root = os.path.join(os.path.abspath(root),name)
+        if not os.path.exists(self.root):
+            raise Exception("The root directory for simulation %s (%s) doesn't exist" % (self.name,self.root))
+            
+    def SetupGeneration(self):
+        os.chdir(self.root)
+        # Sanity checks
+        if not os.path.exists("settings"):
+            raise Exception("The settings directory doesn't exist for simulation %s - please create it and add the necessary files" % self.name)
+        if options['gmxpath'] == None or options['gmxsuffix'] == None:
+            warn_press_key('Please set the options gmxpath and gmxsuffix in the input file!')
+        if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
+            warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
+        GenDir = "gen_%03i" % self.generation
+        GoInto(GenDir)
+        GoInto("dynamics")
+        self.LinkFromSettings("grompp.mdp")
+        self.LinkFromSettings("min.mdp")
+        self.LinkFromSettings("conf.gro")
+        self.LinkFromSettings("topol.top")
+        self.LinkFromGmxpath("mdrun")
+        self.LinkFromGmxpath("grompp")
+        self.LinkFromGmxpath("g_energy")
+        self.LinkFromGmxpath("trjconv")
+        Leave("dynamics")
+        GoInto("msm")
+        self.LinkFromSettings("conf.pdb")
+        self.LinkFromSettings("AtomIndices.dat")
+        self.LinkFromGmxpath("trjconv")
+        os.chdir(self.root)
+        
+    def RunDynamics(self):
+        os.chdir(self.root)
+        GoInto(GenDir)
+        GoInto("dynamics")
+        if os.path.exists("md.log") and os.path.exists("traj.xtc"):
+            print "Trajectory exists, not running dynamics"
+            return
+        _exec("./grompp -f min.mdp")
+        _exec("./mdrun -v")
+        _exec("./grompp -c confout.gro")
+        _exec("./mdrun -v -stepout 10000")
+        os.chdir(self.root)
+    
+    def BuildMSM(self):
+        os.chdir(self.root)
+        GoInto(GenDir)
+        GoInto("msm")
+        if os.path.exists("shots.gro"):
+            print "shots.gro exists, not performing clustering"
+        GoInto("RawData/RUN00")
+        LinkFile(os.path.join(self.root,GenDir,"dynamics","traj.xtc"),os.path.join(os.getcwd(),"traj.xtc"))
+        Leave("RawData/RUN00")
+        _exec("ConvertDataToHDF.py -s conf.pdb -i RawData")
+
+class ForceBalance_SCF(object):
+    def __init__(self):
+        self.Mao = 0
+        self.root = os.getcwd()
+        options, sim_opts = parse_inputs(input_file)
+        self.forcefield  = FF(options)
+    
+    def DetermineState():
+        
+    def Cycle():
+        for Sim in self.SCF_Simulations:
+            os.chdir(Sim.root)
+            Sim.SetupGeneration()
+            Sim.RunDynamics()
+            Sim.BuildMSM()
+            Sim.DoMBAR()
+            Sim.RunQuantum()
+            Sim.Gather()
+        objective   = Objective(options, sim_opts, forcefield)
+        optimizer   = Optimizer(options, objective, forcefield)
+        optimizer.Run()
 
 def even_list(totlen, splitsize):
     """ Creates a list of number sequences divided as easily as possible.  
@@ -42,83 +120,45 @@ def generate_snapshots():
     print "I haven't implemented this yet"
     sys.exit(1)
 
-def drive_msms(xyz, radii, density):
-    with open(os.path.join('msms_input.p'),'w') as f: lp_dump((xyz, radii, density),f)
-    _exec("CallMSMS.py", print_to_screen=False, print_command=False)
-    return lp_load(open('msms_output.p'))
-
 def create_esp_surfaces(Molecule):
+    from forcebalance.mslib import MSMS
     Rads = [VdW99[i] for i in Molecule.elem]
     #xyz = Molecule.xyzs[0]
     na = Molecule.na
-    printxyz=True
-    np.set_printoptions(precision=10, linewidth=120)
-    # Pass 1: This will determine the number of ESP points.
-    num_esp = []
+    Mol_ESP = []
+    printxyz=0
     for i, xyz in enumerate(Molecule.xyzs):
         print "Generating grid points for snapshot %i\r" % i
-        num_esp_shell = []
-        for j in [1.4, 1.6, 1.8, 2.0]:
-            Radii = list(np.array(Rads)*j)
-            vfloat = drive_msms(xyz, Radii, 20.0/j)
-            if len(vfloat) < na:
-                warn_press_key("I generated less ESP points than atoms!")
-            num_esp_shell.append(len(vfloat))
-        num_esp.append(num_esp_shell)
-
-    num_esp = np.array(num_esp)
-    num_pts = np.amin(num_esp,axis=0) / 100
-    print "Number of points: ", num_pts
-    raw_input()
-    # We do not store.
-    # Pass 2: This will actually print out the ESP grids.
-    Mol_ESP = []
-    for i, xyz in enumerate(Molecule.xyzs):
         esp_pts = []
-        for sh, j in enumerate([1.4, 1.6, 1.8, 2.0]):
-            Radii = list(np.array(Rads)*j)
-            vfloat = drive_msms(xyz, Radii, 20.0/j)
-
-            # print "Calling MSMS"
-            # MS = MSMS(coords = list(xyz), radii = Radii)
-            # print "Computing"
-            # MS.compute(density=20.0/j)
-            # print "Getting triangles"
-            # vfloat, vint, tri = MS.getTriangles()
-            # #vfloat = vfloat_shell[sh]
+        for j in [1.4, 1.6, 1.8, 2.0]:
+            MS = MSMS(coords = list(xyz), radii = list(np.array(Rads)*j))
+            MS.compute(density=0.5)
+            vfloat, vint, tri = MS.getTriangles()
             a = range(len(vfloat))
             random.shuffle(a)
-            # We'll be careful and generate lots of ESP points, mm.
-            # But we can't have a different number of points per snapshots, mm.
-            for idx in a[:num_pts[sh]]:
+            if len(vfloat) < na:
+                warn_press_key("I generated less ESP points than atoms!")
+            for idx in a[:na]:
                 esp_pts.append(vfloat[idx][:3])
         if printxyz:
             Out = []
             Out.append("%i" % (len(xyz) + len(esp_pts)))
-            Out.append("Molecule plus ESP points (heliums)")
+            Out.append("Molecule plus ESP points")
             for j, x in enumerate(xyz):
                 Out.append(format_xyz_coord(Molecule.elem[j], x))
             for esp_pt in esp_pts:
-                Out.append(format_xyz_coord('He',esp_pt))
-            fout = open('molecule_esp.xyz','w' if i == 0 else 'a')
+                Out.append(format_xyz_coord('chg',esp_pt))
+            fout = open('Mao.xyz','w')
             for line in Out:
                 print >> fout, line
             fout.close()
+            sys.exit(1)
         Mol_ESP.append(esp_pts)
-
     return Mol_ESP
 
 def do_quantum(wq_port):
     M = Molecule('shots.gro')
     M.add_quantum('../settings/qchem.in')
-    # Special hack to add TIP3P waters.
-    if os.path.exists('waters.gro'):
-        print "Found waters.gro, loading as external waters and adding SPC charges."
-        Mext = Molecule('waters.gro')
-        Q = col([-0.82 if (i%3==0) else 0.41 for i in range(Mext.na)])
-        Qext = [np.hstack((xyz, Q)) for xyz in Mext.xyzs]
-        M.qm_extchgs = Qext
-    # End special hack.
     digits = len(str(len(M)-1))
     formstr = '\"%%0%ii\"' % digits
 
