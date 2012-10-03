@@ -1,0 +1,16 @@
+$options
+jobtype newton                   # Indicates Newton-Raphson type optimization
+forcefield water.itp             # Specify names of force field files (files with tunable constants).  Try changing the PARM tags on the ITP file.
+trust0 -1                        # Negative trust radius indicates "nonlinear search" algorithm.  Try a positive trust radius.
+penalty_additive       0.01      # Global prefactor for penalty function
+penalty_type L2                  # L2 indicates parabolic penalty or Gaussian prior.  Try L1 instead.
+$end
+
+$simulation
+simtype abinitio_gmx             # The simulation type; fitting ab initio data using GROMACS
+name water12_fourpt              # Also the subdirectory containing data within "simulations"
+w_energy 1.0                     # Relative weight of energy differences
+w_force 1.0                      # Relative weight of force differences
+shots 300                        # Number of snapshots
+$end
+

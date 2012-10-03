@@ -1,1 +1,0 @@
-/home/leeping/src/forcebalance/studies/Settings/runcuda.sh

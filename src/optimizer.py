@@ -479,8 +479,7 @@ class Optimizer(object):
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
                 print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)
-        else: # This is the search code.
-            # One percent tolerance, will tune later
+        else: # This is the nonlinear search code.
             bump = False
             Result = optimize.brent(search_fun,brack=(0.0,3.0),tol=1e-3,full_output=1)
             #optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)

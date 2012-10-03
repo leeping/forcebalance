@@ -483,6 +483,13 @@ def remove_if_exists(fnm):
     if os.path.exists(fnm):
         os.remove(fnm)
 
+def which(fnm):
+    # Get the location of a file.  Works only on UNIX-like file systems.
+    try:
+        return os.path.split(os.popen('which %s' % fnm).readlines()[0].strip())[0]
+    except:
+        return ''
+
 def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_command = True):
     """Runs command line using subprocess, optionally returning stdout"""
     print_to_file = (logfnm != None)
