@@ -1,0 +1,10 @@
+source leaprc.ff99SB
+source leaprc.gaff
+loadamberparams molecule.frcmod
+molecule = loadmol2 molecule.mol2 
+
+check molecule
+
+saveamberparm molecule molecule.prmtop molecule.inpcrd
+
+quit 
