@@ -1,0 +1,7 @@
+#include "molecule.itp"
+
+[ system ]
+Just one molecule
+
+[ molecules ]
+LIG 1
