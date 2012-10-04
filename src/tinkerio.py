@@ -17,9 +17,11 @@ from abinitio import AbInitio
 from vibration import Vibration
 from moments import Moments
 from interactions import Interactions
-from simtk.unit import *
 from finite_difference import in_fd
 from collections import OrderedDict
+try:
+    from simtk.unit import *
+except: pass
 
 pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)

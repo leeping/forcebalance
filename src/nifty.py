@@ -25,7 +25,7 @@ import time, datetime
 import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict
-import IPython as ip
+# import IPython as ip # For debugging
 
 ## Boltzmann constant
 kb = 0.0083144100163
