@@ -15,8 +15,10 @@ import subprocess
 from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
-from simtk.unit import *
 from multiprocessing import Pool
+try:
+    from simtk.unit import *
+except: pass
 
 def parse_interactions(input_file):
     """ Parse through the interactions input file.
