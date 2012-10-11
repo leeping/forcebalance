@@ -8,4 +8,28 @@ include doc/DoxygenLayout.xml
 include doc/*.txt
 include doc/*.py
 recursive-include ext *
-
+recursive-include bin *
+include studies/009_voelz_nspe/About.txt
+include studies/009_voelz_nspe/options.in
+include studies/009_voelz_nspe/forcebalance.out
+include studies/009_voelz_nspe/forcefield/molecule.itp
+include studies/009_voelz_nspe/forcefield/dih.itp
+include studies/009_voelz_nspe/forcefield/bondangdih.itp
+include studies/009_voelz_nspe/forcefield/dihang.itp
+include studies/009_voelz_nspe/simulations/2dscan/settings/shot.mdp
+include studies/009_voelz_nspe/simulations/2dscan/settings/topol.top
+include studies/009_voelz_nspe/simulations/2dscan/qdata.txt
+include studies/009_voelz_nspe/simulations/2dscan/all.gro
+include studies/009_voelz_nspe/Setup/shot.mdp
+include studies/009_voelz_nspe/Setup/convert.in
+include studies/009_voelz_nspe/Setup/convert.py
+include studies/009_voelz_nspe/Setup/collect.sh
+include studies/009_voelz_nspe/Setup/stage.leap
+include studies/009_voelz_nspe/Setup/structures.tar.bz2
+include studies/001_water_tutorial/options.in
+include studies/001_water_tutorial/forcebalance.out
+include studies/001_water_tutorial/forcefield/water.itp
+include studies/001_water_tutorial/simulations/water12_fourpt/settings/shot.mdp
+include studies/001_water_tutorial/simulations/water12_fourpt/settings/topol.top
+include studies/001_water_tutorial/simulations/water12_fourpt/qdata.txt
+include studies/001_water_tutorial/simulations/water12_fourpt/all.gro

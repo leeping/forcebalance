@@ -56,7 +56,7 @@ cp Setup/molecule.itp forcefield
 mkdir -p simulations/2dscan
 cp Setup/all.gro !$
 cp Setup/qdata.txt !$
-mkdir simulations/2dscan/Settings
+mkdir simulations/2dscan/settings
 cp Setup/shot.mdp !$
 cp Setup/topol.top !$
 
