@@ -77,7 +77,7 @@ from forcebalance.openmmio import liquid_energy_driver, liquid_energy_derivative
 timestep = 0.5 * units.femtosecond # timestep for integration
 nsteps = 200                       # number of steps per data record
 nequiliterations = 500             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 10000                # number of iterations to collect data for
+niterations = 5000                 # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -262,6 +262,15 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
    # Create the test system.
    forcefield = ForceField(sys.argv[2])
    system = forcefield.createSystem(pdb.topology, **settings)
+   ############
+   # LPW stuff for figuring out the ewald error tolerance.
+   print "There are %i forces" % system.getNumForces()
+   for i in range(system.getNumForces()):
+      if system.getForce(i).__class__.__name__ == 'AmoebaMultipoleForce':
+         Frc = system.getForce(i)
+         print Frc.getEwaldErrorTolerance()
+   #
+   ############
    if pbc:
       barostat = openmm.MonteCarloBarostat(pressure, temperature, barostat_frequency)
       # Add barostat.
