@@ -42,7 +42,7 @@ class Objective(object):
         else:
             self.WTot = 1.0
         self.ObjDict = OrderedDict()
-        
+        self.ObjDict_Last = OrderedDict()
         
     def Simulation_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
@@ -69,11 +69,26 @@ class Objective(object):
         """ Print objective function contributions. """
         PrintDict = OrderedDict()
         Total = 0.0
+        Change = False
         for key, val in self.ObjDict.items():
-            PrintDict[key] = "% 12.5f % 10.3f % 16.5e" % (val['x'],val['w'],val['x']*val['w'])
+            color = "\x1b[97m"
+            if key in self.ObjDict_Last:
+                if self.ObjDict[key] <= self.ObjDict_Last[key]:
+                    Change = True
+                    color = "\x1b[92m"
+                elif self.ObjDict[key] > self.ObjDict_Last[key]:
+                    color = "\x1b[91m"
+            PrintDict[key] = "% 12.5f % 10.3f %s% 16.5e%s" % (val['x'],val['w'],color,val['x']*val['w'],"\x1b[0m")
+            if Change:
+                xnew = self.ObjDict[key]['x'] * self.ObjDict[key]['w']
+                xold = self.ObjDict_Last[key]['x'] * self.ObjDict_Last[key]['w']
+                PrintDict[key] += " ( %+10.3e )" % (xnew - xold)
             Total += val['x']*val['w']
-        printcool_dictionary(PrintDict,color=6,title="Objective Function Breakdown, Total = % .5e\n %-20s %40s" % 
-                             (Total, "Simulation Name", "Residual  x  Weight  =  Contribution"))
+        if Change:
+            Title = "Objective Function Breakdown, Total = % .5e\n %-20s %55s" % (Total, "Simulation Name", "Residual  x  Weight  =  Contribution (Current-Last)")
+        else:
+            Title = "Objective Function Breakdown, Total = % .5e\n %-20s %40s" % (Total, "Simulation Name", "Residual  x  Weight  =  Contribution")
+        printcool_dictionary(PrintDict,color=6,title=Title)
         return
 
     def Full(self, mvals, Order=0, usepvals=False, verbose=False):
@@ -87,6 +102,8 @@ class Objective(object):
             self.ObjDict['Regularization'] = {'w' : 1.0, 'x' : Extra[0]}
             if verbose:
                 self.Indicate()
+            for key, val in self.ObjDict.items():
+                self.ObjDict_Last[key] = val
         for i in range(3):
             Objective[Letters[i]] += Extra[i]
         return Objective
