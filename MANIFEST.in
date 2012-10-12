@@ -9,6 +9,7 @@ include doc/*.txt
 include doc/*.py
 recursive-include ext *
 recursive-include bin *
+recursive-include src/data *
 include studies/009_voelz_nspe/About.txt
 include studies/009_voelz_nspe/options.in
 include studies/009_voelz_nspe/forcebalance.out

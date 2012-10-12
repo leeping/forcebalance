@@ -36,7 +36,7 @@ PERMUTE = Extension('forcebalance/_assign',
 def buildKeywordDictionary():
     from distutils.core import Extension
     setupKeywords = {}
-    setupKeywords["name"]              = "ForceBalance"
+    setupKeywords["name"]              = "forcebalance"
     setupKeywords["version"]           = VERSION
     setupKeywords["author"]            = "Lee-Ping Wang"
     setupKeywords["author_email"]      = "leeping@stanford.edu"
@@ -49,7 +49,7 @@ def buildKeywordDictionary():
                                           "forcebalance/pymbar" : "ext/pymbar"
                                           }
     setupKeywords["package_data"]      = {
-        "ForceBalance"                   : ["AUTHORS","LICENSE.txt"]
+        "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/uffparms.in","data/oplsaa.ff/*"]
                                          }
     setupKeywords["data_files"]        = []
     setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE]
