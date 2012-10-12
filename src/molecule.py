@@ -5,7 +5,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                   Last updated August 03, 2012                     |#
+#|                  Last updated October 12, 2012                     |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -142,6 +142,7 @@ import imp
 import itertools
 from collections import OrderedDict
 from ctypes import *
+from warnings import warn
 
 #============================#
 #| DCD read/write functions |#
@@ -151,19 +152,19 @@ from ctypes import *
 try: _dcdlib = CDLL("_dcdlib.so")
 except:
     try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
-    except: sys.stderr.write('The dcdlib module cannot be imported (Cannot read/write DCD files)\n')
+    except: warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
 
 #============================#
 #| PDB read/write functions |#
 #============================#
 try: from PDB import *
-except: sys.stderr.write('The pdb module cannot be imported (Cannot read/write PDB files)\n')
+except: warn('The pdb module cannot be miported (Cannot read/write PDB files)')
 
 #=============================#
 #| Mol2 read/write functions |#
 #=============================#
 try: import Mol2
-except: sys.stderr.write('The Mol2 module cannot be imported (Cannot read/write Mol2 files)\n')
+except: warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
 
 #==============================#
 #| OpenMM interface functions |#
@@ -172,7 +173,7 @@ try:
     from simtk.unit import *
     from simtk.openmm import *
     from simtk.openmm.app import *
-except: sys.stderr.write('The OpenMM modules cannot be imported (Cannot interface with OpenMM)\n')
+except: warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
     
 #===========================#
 #| Convenience subroutines |#
