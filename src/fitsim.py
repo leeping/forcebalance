@@ -5,14 +5,17 @@ import os
 import subprocess
 import shutil
 import numpy as np
+from baseclass import ForceBalanceBaseClass
+from collections import OrderedDict
 from nifty import row,col,printcool_dictionary, link_dir_contents
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from optimizer import Counter
+from parser import sim_opts_defaults
 try:
     import work_queue
 except: pass
 
-class FittingSimulation(object):
+class FittingSimulation(ForceBalanceBaseClass):
     
     """
     Base class for all fitting simulations.
@@ -88,43 +91,43 @@ class FittingSimulation(object):
         FittingSimulation.
 
         """
-        
+        super(FittingSimulation, self).__init__(options)
         #======================================#
         # Options that are given by the parser #
         #======================================#
         ## Root directory of the whole project
-        self.root        = options['root']
+        self.set_option(options, 'root')
         ## Name of the fitting simulation
-        self.name        = sim_opts['name']
+        self.set_option(sim_opts, 'name')
         ## Type of fitting simulation
-        self.simtype     = sim_opts['simtype']
+        self.set_option(sim_opts, 'simtype')
         ## Relative weight of the fitting simulation
-        self.weight      = sim_opts['weight']
+        self.set_option(sim_opts, 'weight')
         ## Switch for finite difference gradients
-        self.fdgrad      = sim_opts['fdgrad']
+        self.set_option(sim_opts, 'fdgrad')
         ## Switch for finite difference Hessians
-        self.fdhess      = sim_opts['fdhess']
+        self.set_option(sim_opts, 'fdhess')
         ## Switch for FD gradients + Hessian diagonals
-        self.fdhessdiag  = sim_opts['fdhessdiag']
+        self.set_option(sim_opts, 'fdhessdiag')
         ## Parameter types that trigger FD gradient elements
-        self.fd1_pids    = [i.upper() for i in sim_opts['fd_ptypes']]
+        self.set_option(None, None, 'fd1_pids', [i.upper() for i in sim_opts['fd_ptypes']], default = [])
+        self.set_option(None, None, 'fd2_pids', [i.upper() for i in sim_opts['fd_ptypes']], default = [])
         ## Parameter types that trigger FD Hessian elements
-        self.fd2_pids    = [i.upper() for i in sim_opts['fd_ptypes']]
         ## Finite difference step size
-        self.h           = options['finite_difference_h']
+        self.set_option(options, 'finite_difference_h', 'h')
         ## Work Queue Port (The specific simulation itself may or may not actually use this.)
-        self.wq_port     = sim_opts['wq_port']
+        self.set_option(sim_opts, 'wq_port')
         ## Manual override: bypass the parameter transformation and use
         ## physical parameters directly.  For power users only! :)
-        self.usepvals    = sim_opts['use_pvals']
+        self.set_option(sim_opts, 'use_pvals', 'usepvals')
         ## Whether to make backup files
-        self.backup      = options['backup']
+        self.set_option(options, 'backup')
                                                                  
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## Relative directory of fitting simulation
-        self.simdir      = os.path.join('simulations',self.name)
+        self.set_option(None, None, 'simdir', os.path.join('simulations',self.name))
         ## Temporary (working) directory; it is temp/(simulation_name)
         ## Used for storing temporary variables that don't change through the course of the optimization
         self.tempdir     = os.path.join('temp',self.name)
@@ -150,9 +153,6 @@ class FittingSimulation(object):
             self.wq = work_queue.WorkQueue(port=self.wq_port, exclusive=False, shutdown=False)
             self.wq.specify_name('forcebalance')
             print('Work Queue for fitting simulation %s listening on %d' % (self.name, self.wq.port))
-
-        # Print the options for this simulation to the terminal.
-        printcool_dictionary(sim_opts,"Setup for fitting simulation %s :" % self.name)
 
     def get_X(self,mvals=None):
         """Computes the objective function contribution without any parametric derivatives"""

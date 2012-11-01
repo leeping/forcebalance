@@ -37,7 +37,7 @@ class Counterpoise(FittingSimulation):
         # Options that are given by the parser #
         #======================================#
         ## Number of snapshots
-        self.ns   = sim_opts['shots']
+        self.set_option(sim_opts,'shots','ns')
         
         #======================================#
         #     Variables which are set here     #

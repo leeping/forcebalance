@@ -16,6 +16,8 @@ from interaction import Interaction
 from molecule import Molecule
 from copy import deepcopy
 from qchemio import QChem_Dielectric_Energy
+import itertools
+#import IPython
 
 ## VdW interaction function types
 nftypes = [None, 'VDW', 'VDW_BHAM']
@@ -222,6 +224,10 @@ class ITP_Reader(BaseReader):
         self.pdict  = pdict
         ## Listing of all atom names in the file, (probably unnecessary)
         self.atomnames = []
+        ## Listing of all atom types in the file, (probably unnecessary)
+        self.atomtypes = []
+        ## A dictionary of atomic masses
+        self.atomtype_to_mass = {}
 
     def feed(self, line):
         """ Given a line, determine the interaction type and the atoms involved (the suffix).
@@ -267,7 +273,13 @@ class ITP_Reader(BaseReader):
                 pdict['VDW'] = {4+atype['bonus']:'S',5+atype['bonus']:'T'}
                 pdict['VDW_BHAM'] = {4+atype['bonus']:'A', 5+atype['bonus']:'B', 6+atype['bonus']:'C'}
             atom = atype['atomtype']
+            self.atomtype_to_mass[atom] = atype['mass']
             self.itype = fdict[self.sec][self.nbtype]
+            self.AtomTypes[atype['atomtype']] = {'AtomClass'    : atype['batomtype'], 
+                                                 'AtomicNumber' : atype['atomicnum'], 
+                                                 'Mass'         : atype['mass'],
+                                                 'Charge'       : atype['chg'],
+                                                 'ParticleType' : atype['ptp']}
         elif self.sec == 'nonbond_params':
             atom = [s[0], s[1]]
             self.itype = pftypes[self.nbtype]
@@ -277,8 +289,11 @@ class ITP_Reader(BaseReader):
             atom = [s[0]]
             self.atomnames.append(s[4])
             self.itype = 'COUL'
-            # Build the adict here.
+            # Build dictionaries where the key is the residue name
+            # and the value is a list of atom numbers, atom types, and atomic masses.
             self.adict.setdefault(self.mol,[]).append(s[0])
+            ffAtom = {'AtomType' : s[1], 'ResidueNumber' : int(s[2]), 'ResidueName' : s[3], 'AtomName' : s[4], 'ChargeGroupNumber' : int(s[5]), 'Charge' : float(s[6])}
+            self.Molecules.setdefault(self.mol,[]).append(ffAtom)
         elif self.sec == 'polarization':
             atom = [s[1]]
             self.itype = 'POL'
@@ -369,8 +384,45 @@ class AbInitio_GMX(AbInitio):
     def __init__(self,options,sim_opts,forcefield):
         ## Name of the trajectory
         self.trajfnm = "all.gro"
+        self.topfnm = "topol.top"
         super(AbInitio_GMX,self).__init__(options,sim_opts,forcefield)
-    
+        
+    def read_topology(self):
+        section = None
+        ResidueCounter = -1
+        ChargeGroupCounter = -1
+        MoleculeCounter = -1
+        for line in open(os.path.join(self.root, self.simdir, "settings", self.topfnm)).readlines():
+            s          = line.split()
+            # No sense in doing anything for an empty line or a comment line.
+            if len(s) == 0 or match('^;',line): continue
+            # Now go through all the cases.
+            if match('^\[.*\]',line):
+                # Makes a word like "atoms", "bonds" etc.
+                section = sub('[\[\] \n]','',line)
+            elif section == 'molecules':
+                molname    = s[0]
+                nummol     = int(s[1])
+                FFMolecule = self.FF.FFMolecules[molname]
+                mollen = len(FFMolecule)
+                for i in range(nummol):
+                    resnum = -1
+                    cgnum  = -1
+                    MoleculeCounter += 1
+                    for j in FFMolecule:
+                        if j['ResidueNumber'] != resnum:
+                            resnum = j['ResidueNumber']
+                            ResidueCounter += 1
+                        if j['ChargeGroupNumber'] != cgnum:
+                            cgnum = j['ChargeGroupNumber']
+                            ChargeGroupCounter += 1
+                        self.AtomLists['ResidueNumber'].append(ResidueCounter)
+                        self.AtomLists['MoleculeNumber'].append(MoleculeCounter)
+                        self.AtomLists['ChargeGroupNumber'].append(ChargeGroupCounter)
+                        self.AtomLists['ParticleType'].append(j['ParticleType'])
+                        self.AtomLists['Mass'].append(j['Mass'])
+        return
+
     def prepare_temp_directory(self, options, sim_opts):
         os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
         abstempdir = os.path.join(self.root,self.tempdir)
@@ -386,7 +438,7 @@ class AbInitio_GMX(AbInitio):
         os.symlink(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
         # Link the run files
         os.symlink(os.path.join(self.root,self.simdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        os.symlink(os.path.join(self.root,self.simdir,"settings","topol.top"),os.path.join(abstempdir,"topol.top"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings",self.topfnm),os.path.join(abstempdir,self.topfnm))
         # Write the trajectory to the temp-directory
         self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro
@@ -451,6 +503,7 @@ class Interaction_GMX(Interaction):
     def __init__(self,options,sim_opts,forcefield):
         ## Name of the trajectory
         self.trajfnm = "all.gro"
+        self.topfnm = "topol.top"
         super(Interaction_GMX,self).__init__(options,sim_opts,forcefield)
         self.Dielectric = 0.0
     
@@ -468,7 +521,7 @@ class Interaction_GMX(Interaction):
         # Link the run files
         os.symlink(os.path.join(self.root,self.simdir,"settings","index.ndx"),os.path.join(abstempdir,"index.ndx"))
         #os.symlink(os.path.join(self.root,self.simdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        os.symlink(os.path.join(self.root,self.simdir,"settings","topol.top"),os.path.join(abstempdir,"topol.top"))
+        os.symlink(os.path.join(self.root,self.simdir,"settings",self.topfnm),os.path.join(abstempdir,self.topfnm))
         # Write the trajectory to the temp-directory
         self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro

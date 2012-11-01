@@ -56,9 +56,9 @@ class Liquid(FittingSimulation):
         # Initialize the SuperClass!
         super(Liquid,self).__init__(options,sim_opts,forcefield)
         # Fractional weight of the density
-        self.W_Rho = sim_opts['w_rho']
+        self.set_option(sim_opts,'w_rho','W_Rho')
         # Fractional weight of the enthalpy of vaporization
-        self.W_Hvap = sim_opts['w_hvap']
+        self.set_option(sim_opts,'w_hvap','W_Hvap')
         
         #======================================#
         #     Variables which are set here     #

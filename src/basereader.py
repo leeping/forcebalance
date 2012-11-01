@@ -28,10 +28,15 @@ class BaseReader(object):
         self.suffix = ''
         self.pdict  = {}
         ## The mapping of (this residue, atom number) to (atom name) for building atom-specific interactions in [ bonds ], [ angles ] etc.
-        self.adict  = OrderedDict()
+        self.adict      = OrderedDict()
+        ## The mapping of (molecule name) to a dictionary of  of atom types for the atoms in that residue.
+        #self.moleculedict = OrderedDict()
         ## The listing of 'RES:ATOMNAMES' for atom names in the line
         ## This is obviously a placeholder.
         self.molatom = ("Sniffy",["Mao","Schmao"])
+
+        self.Molecules = OrderedDict()
+        self.AtomTypes = OrderedDict()
 
     def Split(self, line):
         return line.split()

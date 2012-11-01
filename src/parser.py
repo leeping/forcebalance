@@ -84,7 +84,8 @@ gen_opts_types = {
                  "logarithmic_map"  : (0, 'Optimize in the space of log-variables'),
                  "print_hessian"    : (0, 'Print the objective function Hessian at every step'),
                  "print_parameters" : (1, 'Print the mathematical and physical parameters at every step'),
-                 "normalize_weights": (1, 'Normalize the weights for the fitting simulations')
+                 "normalize_weights": (1, 'Normalize the weights for the fitting simulations'),
+                 "verbose_options"  : (0, 'Print options that are equal to their defaults')
                  },
     'floats'  : {"trust0"                 : (1e-1, 'Trust radius for the MainOptimizer'),
                  "mintrust"               : (0.0, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)'),
@@ -117,7 +118,8 @@ for t in gen_opts_types:
 ## Default fitting simulation options.
 sim_opts_types = {
     'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name'),
-                 "masterfile": ('interactions.txt', 'The name of the master file containing interacting systems')
+                 "masterfile": ('interactions.txt', 'The name of the master file containing interacting systems'),
+                 "forceblock": ('residues', 'The resolution of condensing interactions down to net forces and torques; choose molecules > residues > charge-groups')
                  },
     'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance AbInitio_GMXX2')
                  },
@@ -147,6 +149,8 @@ sim_opts_types = {
                  "w_hvap"      : (1.0, 'Weight of enthalpy of vaporization within liquid properties'),
                  "w_energy"    : (0.0, 'Weight of energy within ab initio'),
                  "w_force"     : (0.0, 'Weight of force within ab initio'),
+                 "w_netforce"  : (0.0, 'Weight of net forces (condensed to molecules, residues, or charge groups) within ab initio'),
+                 "w_torque"    : (0.0, 'Weight of torques (condensed to molecules, residues, or charge groups) within ab initio'),
                  "w_resp"      : (0.0, 'Weight of RESP within ab initio'),
                  "resp_a"      : (0.001, 'RESP "a" parameter for strength of penalty; 0.001 is strong, 0.0005 is weak'),
                  "resp_b"      : (0.1, 'RESP "b" parameter for hyperbolic behavior; 0.1 is recommended'),
@@ -324,4 +328,6 @@ def parse_inputs(input_file):
             sys.exit(1)
     if section == "SIMULATION":
         sim_opts.append(this_sim_opt)
+    if not options['verbose_options']:
+        printcool("Options at their default values are not printed\n Use 'verbose_options True' to Enable", color=5)
     return options, sim_opts

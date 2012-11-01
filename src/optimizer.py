@@ -13,7 +13,9 @@ import numpy as np
 from numpy.linalg import eig, norm, solve
 from nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
 from finite_difference import f1d7p, f1d5p, fdwrap
+from collections import OrderedDict
 import random
+from baseclass import ForceBalanceBaseClass
 
 # Global variable corresponding to the iteration number.  This allows the
 # Main Optimizer to 
@@ -23,7 +25,7 @@ def Counter():
     global ITERATION_NUMBER
     return ITERATION_NUMBER
 
-class Optimizer(object):
+class Optimizer(ForceBalanceBaseClass):
     """ Optimizer class.  Contains several methods for numerical optimization.
 
     For various reasons, the optimizer depends on the force field and fitting
@@ -42,6 +44,7 @@ class Optimizer(object):
         - Pass in the objective function, force field, all fitting simulations
 
         """
+        super(Optimizer, self).__init__(options)
         
         ## A list of all the things we can ask the optimizer to do.
         self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
@@ -66,51 +69,53 @@ class Optimizer(object):
         # Options that are given by the parser #
         #======================================#
         ## The root directory
-        self.root      = options['root']
+        self.set_option(options,'root','root')
         ## The job type
-        self.jobtype   = options['jobtype']
+        self.set_option(options,'jobtype','jobtype')
         ## Initial step size trust radius
-        self.trust0    = options['trust0']
+        self.set_option(options,'trust0','trust0')
         ## Minimum trust radius (for noisy objective functions)
-        self.mintrust  = options['mintrust']
+        self.set_option(options,'mintrust','mintrust')
         ## Lower bound on Hessian eigenvalue (below this, we add in steepest descent)
-        self.eps       = options['eig_lowerbound']
+        self.set_option(options,'eig_lowerbound','eps')
         ## Step size for numerical finite difference
-        self.h         = options['finite_difference_h']
+        self.set_option(options,'finite_difference_h','h')
         ## Number of steps to average over
-        self.hist      = options['objective_history']
+        self.set_option(options,'objective_history','hist')
         ## Function value convergence threshold
-        self.conv_obj  = options['convergence_objective']
+        self.set_option(options,'convergence_objective','conv_obj')
         ## Step size convergence threshold
-        self.conv_stp  = options['convergence_step']
+        self.set_option(options,'convergence_step','conv_stp')
         ## Gradient convergence threshold
-        self.conv_grd  = options['convergence_gradient']
+        self.set_option(options,'convergence_gradient','conv_grd')
         ## Maximum number of optimization steps
-        self.maxstep   = options['maxstep']
+        self.set_option(options,'maxstep','maxstep')
         ## For scan[mp]vals: The parameter index to scan over
-        self.idxnum    = options['scanindex_num']
+        self.set_option(options,'scanindex_num','idxnum')
         ## For scan[mp]vals: The parameter name to scan over, it just looks up an index
-        self.idxname   = options['scanindex_name']
+        self.set_option(options,'scanindex_name','idxname')
         ## For scan[mp]vals: The values that are fed into the scanner
-        self.scan_vals = options['scan_vals']
+        self.set_option(options,'scan_vals','scan_vals')
         ## Name of the checkpoint file that we're reading in
-        self.rchk_fnm  = options['readchk']
+        self.set_option(options,'readchk','rchk_fnm')
         ## Name of the checkpoint file that we're writing out
-        self.wchk_fnm  = options['writechk']
+        self.set_option(options,'writechk','wchk_fnm')
         ## Whether to write the checkpoint file at every step
-        self.wchk_step = options['writechk_step']
+        self.set_option(options,'writechk_step','wchk_step')
         ## Adaptive trust radius adjustment factor
-        self.adapt_fac  = options['adaptive_factor']
+        self.set_option(options,'adaptive_factor','adapt_fac')
         ## Adaptive trust radius adjustment damping
-        self.adapt_damp = options['adaptive_damping']
+        self.set_option(options,'adaptive_damping','adapt_damp')
         ## Whether to print gradient during each step of the optimization
-        self.print_grad = options['print_gradient']
+        self.set_option(options,'print_gradient','print_grad')
         ## Whether to print Hessian during each step of the optimization
-        self.print_hess = options['print_hessian']
+        self.set_option(options,'print_hessian','print_hess')
         ## Whether to print parameters during each step of the optimization
-        self.print_vals = options['print_parameters']
+        self.set_option(options,'print_parameters','print_vals')
         ## Error tolerance (if objective function rises by less than this, then the optimizer will forge ahead!)
-        self.err_tol = options['error_tolerance']
+        self.set_option(options,'error_tolerance','err_tol')
+        self.set_option(options,'read_mvals')
+        self.set_option(options,'read_pvals')
         
         #======================================#
         #     Variables which are set here     #
@@ -138,7 +143,7 @@ class Optimizer(object):
             self.mvals0    = np.zeros(self.np)
 
         ## Print the optimizer options.
-        printcool_dictionary(options, title="Setup for optimizer")
+        printcool_dictionary(self.PrintOptionDict, title="Setup for optimizer")
         ## Load the checkpoint file.
         self.readchk()
         

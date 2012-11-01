@@ -34,10 +34,14 @@ class Moments(FittingSimulation):
         #======================================#
         # Options that are given by the parser #
         #======================================#
+        self.set_option(sim_opts, 'dipole_denom')
+        self.set_option(sim_opts, 'quadrupole_denom')
+        self.set_option(sim_opts, 'polarizability_denom')
+
 	self.denoms = {}
-        self.denoms['dipole'] = sim_opts['dipole_denom']
-        self.denoms['quadrupole'] = sim_opts['quadrupole_denom']
-        self.denoms['polarizability'] = sim_opts['polarizability_denom']
+        self.denoms['dipole'] = self.dipole_denom
+        self.denoms['quadrupole'] = self.quadrupole_denom
+        self.denoms['polarizability'] = self.polarizability_denom
         
         #======================================#
         #     Variables which are set here     #

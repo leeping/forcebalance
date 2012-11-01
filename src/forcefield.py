@@ -100,7 +100,7 @@ import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
 import basereader
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros, sin, cos, pi, sqrt
 from numpy.linalg import norm
-from nifty import col, flat, invert_svd, isint, isfloat, kb, orthogonalize, pmat2d, printcool, row, warn_press_key
+from nifty import col, flat, invert_svd, isint, isfloat, kb, orthogonalize, pmat2d, printcool, row, warn_press_key, printcool_dictionary
 from string import count
 from copy import deepcopy
 try:
@@ -108,8 +108,8 @@ try:
 except: pass
 import traceback
 import itertools
-from collections import OrderedDict
-
+from collections import OrderedDict, defaultdict
+from baseclass import ForceBalanceBaseClass
 
 FF_Extensions = {"itp" : "gmx",
                  "in"  : "qchem",
@@ -165,7 +165,18 @@ def determine_fftype(ffname,verbose=False):
         #sys.exit(1)
     return fftype
 
-class FF(object):
+# Thanks to tos9 from #python on freenode. :)
+class BackedUpDict(dict):
+    def __init__(self, backup_dict):
+        super(BackedUpDict, self).__init__()
+        self.backup_dict = backup_dict
+    def __missing__(self, key):
+        try:
+            return self.backup_dict[self['AtomType']][key]
+        except:
+            raise KeyError('The key %s does not exist as an atom attribute or as an atom type attribute!' % key)
+
+class FF(ForceBalanceBaseClass):
     """ Force field class.
 
     This class contains all methods for force field manipulation.
@@ -184,25 +195,26 @@ class FF(object):
         methods like addff, rsmake, and mktransmat.
         
         """
+        super(FF, self).__init__(options)
         #======================================#
         # Options that are given by the parser #
         #======================================#
         ## As these options proliferate, the force field class becomes less standalone.
         ## I need to think of a good solution here...
         ## The root directory of the project
-        self.root        = os.getcwd()
+        self.set_option(None, None, 'root', os.getcwd())
         ## File names of force fields
-        self.fnms        = options['forcefield']
+        self.set_option(options,'forcefield','fnms')
         ## Directory containing force fields, relative to project directory
-        self.ffdir       = options['ffdir']
+        self.set_option(options,'ffdir','ffdir')
         ## Priors given by the user :)
-        self.priors      = options['priors']
+        self.set_option(options,'priors','priors')
         ## Whether to constrain the charges.
-        self.constrain_charge  = options['constrain_charge']
+        self.set_option(options,'constrain_charge','constrain_charge')
         ## Whether to constrain the charges.
-        self.logarithmic_map  = options['logarithmic_map']
+        self.set_option(options,'logarithmic_map','logarithmic_map')
         ## Switch for AMOEBA direct or mutual.
-        self.amoeba_pol = options['amoeba_polarization'].lower()
+        self.set_option(None, None, 'amoeba_pol', options['amoeba_polarization'].lower())
         
         #======================================#
         #     Variables which are set here     #
@@ -236,7 +248,7 @@ class FF(object):
         ## Initial value of physical parameters
         self.pvals0      = []
         ## A dictionary of force field reader classes
-        self.R           = OrderedDict()
+        self.Readers           = OrderedDict()
         ## A list of atom names (this is new, for ESP fitting)
         self.atomnames   = []
         
@@ -245,6 +257,30 @@ class FF(object):
             if verbose:
                 print "Reading force field from file: %s" % fnm
             self.addff(fnm)
+
+        ## WORK IN PROGRESS ##
+        # This is a dictionary of {'AtomType':{'Mass' : float, 'Charge' : float, 'ParticleType' : string ('A', 'S', or 'D'), 'AtomicNumber' : int}}
+        self.FFAtomTypes = OrderedDict()
+        for Reader in self.Readers.values():
+            for k, v in Reader.AtomTypes.items():
+                if k in self.FFAtomTypes:
+                    warn_press_key('Trying to insert atomtype %s into the force field, but it is already there' % k)
+                self.FFAtomTypes[k] = v
+        # This is an ordered dictionary of {'Molecule' : [{'AtomType' : string, 'ResidueNumber' : int, 'ResidueName' : string, 
+        #                                                  'AtomName' : string, 'ChargeGroup' : int, 'Charge' : float}]}
+        # Each value in the dictionary is a list of BackedUpDictionaries.
+        # If we query a BackedUpDictionary and the value does not exist,
+        # then it will query the backup dictionary using the 'AtomType' value.
+        # Thus, if we look up the mass of 'HW1' or 'HW2' in the dictionary, it will
+        # return the mass for 'HW' in the AtomTypes dictionary.
+        self.FFMolecules = OrderedDict()
+        for Reader in self.Readers.values():
+            for Molecule, AtomList in Reader.Molecules.items():
+                for FFAtom in AtomList:
+                    FFAtomWithDefaults = BackedUpDict(self.FFAtomTypes)
+                    for k, v in FFAtom.items():
+                        FFAtomWithDefaults[k] = v
+                    self.FFMolecules.setdefault(Molecule, []).append(FFAtomWithDefaults)
 
         # Set the initial values of parameter arrays.
         ## Initial value of physical parameters
@@ -261,8 +297,10 @@ class FF(object):
         ## Make the rescaling factors.
         self.rsmake(printfacs=verbose)            
         ## Make the transformation matrix.
-        self.mktransmat()                      
-        
+        self.mktransmat()
+        ## Print the optimizer options.
+        printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
+
     def addff(self,ffname):
         """ Parse a force field file and add it to the class.
 
@@ -355,7 +393,7 @@ class FF(object):
         # Create an instance of the Reader.
         # The reader is essentially a finite state machine that allows us to 
         # build the pid.
-        self.R[ffname] = Reader(ffname)
+        self.Readers[ffname] = Reader(ffname)
         if fftype == "openmm":
             ## Read in an XML force field file as an _ElementTree object
             self.ffdata[ffname] = etree.parse(absff)
@@ -368,11 +406,11 @@ class FF(object):
             self.ffdata_isxml[ffname] = False
             # Process the file
             self.addff_txt(ffname, fftype)
-        if hasattr(self.R[ffname], 'atomnames'):
+        if hasattr(self.Readers[ffname], 'atomnames'):
             if len(self.atomnames) > 0:
                 sys.stderr.write('Found more than one force field containing atom names; skipping the second one (%s)\n' % ffname)
             else:
-                self.atomnames += self.R[ffname].atomnames
+                self.atomnames += self.Readers[ffname].atomnames
 
     def addff_txt(self, ffname, fftype):
         """ Parse a text force field and create several important instance variables.
@@ -399,19 +437,19 @@ class FF(object):
         """
         
         for ln, line in enumerate(self.ffdata[ffname]):
-            self.R[ffname].feed(line)
-            sline = self.R[ffname].Split(line)
+            self.Readers[ffname].feed(line)
+            sline = self.Readers[ffname].Split(line)
             if 'PARM' in sline:
                 pmark = (array(sline) == 'PARM').argmax() # The position of the 'PARM' word
                 pflds = [int(i) for i in sline[pmark+1:]] # The integers that specify the parameter word positions
                 for pfld in pflds:
                     # For each of the fields that are to be parameterized (indicated by PARM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
-                    pid = self.R[ffname].build_pid(pfld)
+                    pid = self.Readers[ffname].build_pid(pfld)
                     # Add pid into the dictionary.
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
-                    self.patoms.append([self.R[ffname].molatom])
+                    self.patoms.append([self.Readers[ffname].molatom])
                     # Also append pid to the parameter list
                     self.assign_p0(self.np,float(sline[pfld]))
                     self.assign_field(self.np,ffname,ln,pfld,1)
@@ -436,10 +474,10 @@ class FF(object):
                         sys.stderr.write("\nOffending ID: %s\n" % sline[parse+1])
                         
                         raise Exception('Parameter repetition entry in force field file is incorrect (see above)')
-                    pid = self.R[ffname].build_pid(pfld)
+                    pid = self.Readers[ffname].build_pid(pfld)
                     self.map[pid] = prep
                     # This repeated parameter ID also has these atoms involved.
-                    self.patoms[prep].append(self.R[ffname].molatom)
+                    self.patoms[prep].append(self.Readers[ffname].molatom)
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
             if "EVAL" in sline:
@@ -450,10 +488,10 @@ class FF(object):
                     # Second is a Python command that determines how to calculate the parameter.
                     pfld = int(sline[parse])
                     evalcmd = sline[parse+1] # This string is actually Python code!!
-                    #pid = self.R[ffname].build_pid(pfld)
+                    #pid = self.Readers[ffname].build_pid(pfld)
                     #self.map[pid] = prep
                     # This repeated parameter ID also has these atoms involved.
-                    #self.patoms[prep].append(self.R[ffname].molatom)
+                    #self.patoms[prep].append(self.Readers[ffname].molatom)
                     self.assign_field(None,ffname,ln,pfld,None,evalcmd)
                     parse += 2
     
@@ -487,7 +525,7 @@ class FF(object):
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
-                pid = self.R[ffname].build_pid(e, p)
+                pid = self.Readers[ffname].build_pid(e, p)
                 self.map[pid] = self.np
                 self.assign_p0(self.np,float(e.get(p)))
                 self.assign_field(self.np,ffname,fflist.index(e),p,1)
@@ -495,7 +533,7 @@ class FF(object):
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_repeat/..'):
             for field in e.get('parameter_repeat').split(','):
-                dest = self.R[ffname].build_pid(e, field.strip().split('=')[0])
+                dest = self.Readers[ffname].build_pid(e, field.strip().split('=')[0])
                 src  = field.strip().split('=')[1]
                 if src in self.map:
                     self.map[dest] = self.map[src]
@@ -506,7 +544,7 @@ class FF(object):
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
             for field in e.get('parameter_eval').split(','):
-                dest = self.R[ffname].build_pid(e, field.strip().split('=')[0])
+                dest = self.Readers[ffname].build_pid(e, field.strip().split('=')[0])
                 evalcmd  = field.strip().split('=')[1]
                 self.assign_field(None,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
             
@@ -590,8 +628,8 @@ class FF(object):
                 # columns.
                 else:
                     # Split the string into whitespace and data fields.
-                    sline       = self.R[fnm].Split(newffdata[fnm][ln])
-                    whites      = self.R[fnm].Whites(newffdata[fnm][ln])
+                    sline       = self.Readers[fnm].Split(newffdata[fnm][ln])
+                    whites      = self.Readers[fnm].Whites(newffdata[fnm][ln])
                     # Align whitespaces and fields (it should go white, field, white, field)
                     if len(whites) == len(sline) - 1: 
                         whites = [''] + whites
@@ -679,11 +717,11 @@ class FF(object):
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
-        if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
+        if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
             termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
         else:
-            termtypelist = itertools.chain(*sum([[[i+self.R[f].pdict[i][j] for j in self.R[f].pdict[i] if isint(str(j))] for i in self.R[f].pdict] for f in self.fnms],[]))
-            #termtypelist = sum([[i+self.R.pdict[i][j] for j in self.R.pdict[i] if isint(str(j))] for i in self.R.pdict],[])
+            termtypelist = itertools.chain(*sum([[[i+self.Readers[f].pdict[i][j] for j in self.Readers[f].pdict[i] if isint(str(j))] for i in self.Readers[f].pdict] for f in self.fnms],[]))
+            #termtypelist = sum([[i+self.Readers.pdict[i][j] for j in self.Readers.pdict[i] if isint(str(j))] for i in self.Readers.pdict],[])
         for termtype in termtypelist:
             for pid in self.map:
                 if termtype in pid:
@@ -779,12 +817,12 @@ class FF(object):
                     qtrans2[i+j+1, :] = orthogonalize(qtrans2[i+j+1, :], cons[i])
             return qtrans2
         # Here we build a charge constraint for each molecule.
-        if any(len(r.adict) > 0 for r in self.R.values()):
+        if any(len(r.adict) > 0 for r in self.Readers.values()):
             print "Building charge constraints..."
             # Build a concatenated dictionary
             Adict = OrderedDict()
             # This is a loop over files
-            for r in self.R.values():
+            for r in self.Readers.values():
                 # This is a loop over molecules
                 for k, v in r.adict.items():
                     Adict[k] = v
@@ -821,7 +859,7 @@ class FF(object):
         elif self.constrain_charge:
             warn_press_key("'adict' {molecule:atomnames} was not found.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
             qnr = 0
-            if any([self.R[i].pdict == "XML_Override" for i in self.fnms]):
+            if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
                 # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
                 # This needs to be changed to Chain or Molecule
                 print [determine_fftype(k) for k in self.ffdata]
