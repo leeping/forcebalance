@@ -4,11 +4,12 @@
 
 Executable script for starting ForceBalance. """
 
-import sys
+import sys, re
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
+from forcebalance.nifty import printcool
 
 def Run_ForceBalance(input_file):
     """ Create instances of ForceBalance components and run the optimizer.
@@ -35,8 +36,101 @@ def Run_ForceBalance(input_file):
     ## Actually run the optimizer.
     optimizer.Run()
 
+def process(word, color):
+    if color == 'black':
+        Answer = word
+    elif color == 'blue':
+        Answer = "\x1b[44m" + " ".join(['' for i in range(len(word)+1)]) +  "\x1b[0m"
+    elif color == 'gold':
+        Answer = "\x1b[43m" + " ".join(['' for i in range(len(word)+1)]) +  "\x1b[0m"
+    return Answer
+
 def main():
-    print "\x1b[1;97m Welcome to ForceBalance version 0.13! =D\x1b[0m"
+    printcool("Welcome to ForceBalance version 0.14! =D\nAuthor: Lee-Ping Wang", color=7, bold=True, minwidth=64)
+    logostr = """
+                          ,'+++                                        
+                       ,++++++.      .:,,.                              
+                    :+++++'`   `;    `,:::::.`                          
+                 '+++++'    `'++++      `,::::,,`                       
+             `;+++++:    ,+++++'.          `.:::::,`                    
+          `++++++,    :+++++'`                 .,::::,`                 
+       .+++++'.    ;+++++'                        `,,:::,`              
+    :+++++'`   `;+++++:                              `,::::,.`          
+   ++++;`   `++++++:               `.:+@@###@'          `,,::::.`       
+    :    ,++++++.          ,;'+###############.             .,::,       
+      :++++++`         +################':`                    .        
+      +++;`              `.,,...####+.                                  
+                                ,#####      +##.               +++   +++
+ ,,,,                            #####      ######             +++   +++
+ ,::,                ###'        ####'     :#####'             +++   +++
+ ,::,                :####@      ####.    ,####'               +++   +++
+ ,::,                 ######     ####    +###+                 +++   +++
+ ,::,                  #####     ####   ###;                   +++   +++
+ ,::,                   :##      ####  ++`                     +++   +++
+ ,::,                            ####``..:;+##############+`   +++   +++
+ ,::,             .,:;;'++##################################`  +++   +++
+ ,::,    `############################++++''';;;;;;;;;;;'';    +++   +++
+ ,::,      ,########':,.``       ####                          +++   +++
+ ,::,                            ####                          +++   +++
+ ,::,                            ####                          +++   +++
+ ,::,                            ####                          +++   +++
+ ,::,                            ####                          +++   +++
+ ,::,                            ####                          +++   +++
+ ,::,                            ####                          +++   +++
+ ,,,,                            ####                          +++   +++
+      ;++,                       ####                                   
+     `'+++++:                    ####                                   
+    `    '+++++;                 ####                       `.,:.       
+   ++++,    :+++++'`             ####                    `,:::::.       
+   .'+++++,    :++++++.          ###                  `,::::,.`         
+      `'+++++;    .++++++,        +`               .,::::,`             
+          ;+++++'`   `++++++:                   .,:::,,`                
+             :+++++'.   `;+++++;`           `.:::::,`                   
+                ,++++++`    '++++++      `,::::,,`                      
+                   .'+++++:    ,+;    `,:::::.                          
+                      `'+++++:       ,::,,.                             
+                          ;++++.      ,`                                
+                             ,`                                         
+"""
+    b = 'blue'
+    g = 'gold'
+    k = 'black'
+    colorlist = [[],[b],[b,g],[b,b,g],[b,b,g],[b,b,g],[b,b,g],[b,b,g],
+                 [b,b,g],[b,b,k,g],[b,b,k,g],[b,k,g],[b,k],[k,k,b,b],
+                 [g,k,k,b,b],[g,k,k,k,b,b],[g,k,k,k,b,b],[g,k,k,k,b,b],
+                 [g,k,k,k,b,b],[g,k,k,k,b,b],[g,k,b,b],[g,k,b,b],[g,k,b,b],
+                 [g,k,k,b,b],[g,k,b,b],[g,k,b,b],[g,k,b,b],[g,k,b,b],[g,k,b,b],
+                 [g,k,b,b],[g,k,b,b],[b,k],[b,k],[b,b,k,g],[b,b,k,g],[b,b,k,g],
+                 [b,b,k,g],[b,b,g],[b,b,g],[b,b,g],[b,b,g],[b,g],[b,g],[b],[]]
+
+    words = [l.split() for l in logostr.split('\n')]
+    for ln, line in enumerate(logostr.split('\n')):
+        # Reconstruct the line.
+        words = line.split()
+        whites = re.findall('[ ]+',line)
+        newline = ''
+        i = 0
+
+        if len(line) > 0 and line[0] == ' ':
+            while i < max(len(words), len(whites)):
+                try:
+                    newline += whites[i]
+                except: pass
+                try:
+                    newline += process(words[i], colorlist[ln][i])
+                except: pass
+                i += 1
+        elif len(line) > 0:
+            while i < max(len(words), len(whites)):
+                try:
+                    newline += process(words[i], colorlist[ln][i])
+                except: pass
+                try:
+                    newline += whites[i]
+                except: pass
+                i += 1
+        print newline
+
     if len(sys.argv) != 2:
         print "Please call this program with only one argument - the name of the input file."
         sys.exit(1)

@@ -34,7 +34,7 @@ class Vibration(FittingSimulation):
         #======================================#
         # Options that are given by the parser #
         #======================================#
-        self.denom = sim_opts['wavenumber_tol']
+        self.set_option(sim_opts,'wavenumber_tol','denom')
         
         #======================================#
         #     Variables which are set here     #

@@ -47,20 +47,20 @@ class Interaction(FittingSimulation):
         #======================================#
         
         ## Number of snapshots
-        self.ns            = sim_opts['shots']
+        self.set_option(sim_opts,'shots','ns')
         ## Whether to use WHAM Boltzmann weights
-        self.whamboltz     = sim_opts['whamboltz']
+        self.set_option(sim_opts,'whamboltz','whamboltz')
         ## Whether to use QM Boltzmann weights
-        self.qmboltz       = sim_opts['qmboltz']
+        self.set_option(sim_opts,'qmboltz','qmboltz')
         ## The temperature for QM Boltzmann weights
-        self.qmboltztemp   = sim_opts['qmboltztemp']
+        self.set_option(sim_opts,'qmboltztemp','qmboltztemp')
         ## Whether to do energy and force calculations for the whole trajectory, or to do
         ## one calculation per snapshot.
-        self.all_at_once   = sim_opts['all_at_once']
+        self.set_option(sim_opts,'all_at_once','all_at_once')
         ## OpenMM-only option - whether to run the energies and forces internally.
-        self.run_internal  = sim_opts['run_internal']
+        self.set_option(sim_opts,'run_internal','run_internal')
         ## Do we call Q-Chem for dielectric energies?
-        self.do_cosmo      = sim_opts['do_cosmo']
+        self.set_option(sim_opts,'do_cosmo','do_cosmo')
         #======================================#
         #     Variables which are set here     #
         #======================================#

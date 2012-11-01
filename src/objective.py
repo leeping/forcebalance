@@ -7,11 +7,12 @@ from numpy import array, diag, dot, eye, linalg, ones, reshape, sum, zeros
 from collections import OrderedDict
 from finite_difference import in_fd
 from nifty import printcool_dictionary
+from baseclass import ForceBalanceBaseClass
 
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
 Letters = ['X','G','H']
 
-class Objective(object):
+class Objective(ForceBalanceBaseClass):
     """ Objective function.
     
     The objective function is a combination of contributions from the different
@@ -29,20 +30,34 @@ class Objective(object):
     @param[in] usepvals Switch that determines whether to use physical parameter values
     """
     def __init__(self, options, sim_opts, forcefield):
+
+        super(Objective, self).__init__(options)
+        self.set_option(options, 'penalty_type')
+        self.set_option(options, 'penalty_additive')
+        self.set_option(options, 'penalty_multiplicative')
+        self.set_option(options, 'penalty_hyperbolic_b')
+        self.set_option(options, 'normalize_weights')
+
         ## The list of fitting simulations
         self.Simulations = [SimTab[opts['simtype']](options,opts,forcefield) for opts in sim_opts]
+        # Print the options for each simulation to the terminal.
+        for Sim in self.Simulations:
+            printcool_dictionary(Sim.PrintOptionDict,"Setup for fitting simulation %s :" % Sim.name)
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.
         self.Penalty = Penalty(options['penalty_type'],forcefield,options['penalty_additive'],
                                options['penalty_multiplicative'],options['penalty_hyperbolic_b'])
         ## Obtain the denominator.
-        if options['normalize_weights']:
+        if self.normalize_weights:
             self.WTot = sum([i.weight for i in self.Simulations])
         else:
             self.WTot = 1.0
         self.ObjDict = OrderedDict()
         self.ObjDict_Last = OrderedDict()
+
+        printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
+
         
     def Simulation_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
@@ -77,6 +92,7 @@ class Objective(object):
                     Change = True
                     color = "\x1b[92m"
                 elif self.ObjDict[key] > self.ObjDict_Last[key]:
+                    Change = True
                     color = "\x1b[91m"
             PrintDict[key] = "% 12.5f % 10.3f %s% 16.5e%s" % (val['x'],val['w'],color,val['x']*val['w'],"\x1b[0m")
             if Change:
@@ -89,6 +105,8 @@ class Objective(object):
         else:
             Title = "Objective Function Breakdown, Total = % .5e\n %-20s %40s" % (Total, "Simulation Name", "Residual  x  Weight  =  Contribution")
         printcool_dictionary(PrintDict,color=6,title=Title)
+        for key, val in self.ObjDict.items():
+            self.ObjDict_Last[key] = val
         return
 
     def Full(self, mvals, Order=0, usepvals=False, verbose=False):
@@ -102,8 +120,6 @@ class Objective(object):
             self.ObjDict['Regularization'] = {'w' : 1.0, 'x' : Extra[0]}
             if verbose:
                 self.Indicate()
-            for key, val in self.ObjDict.items():
-                self.ObjDict_Last[key] = val
         for i in range(3):
             Objective[Letters[i]] += Extra[i]
         return Objective

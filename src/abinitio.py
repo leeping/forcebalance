@@ -7,13 +7,15 @@
 import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack
+from numpy import append, array, cross, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack, sum
 from fitsim import FittingSimulation
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
 from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
+from collections import defaultdict
+import itertools
 #from _increment import AbInitio_Build
 
 class AbInitio(FittingSimulation):
@@ -55,38 +57,41 @@ class AbInitio(FittingSimulation):
         #======================================#
         
         ## Number of snapshots
-        self.ns            = sim_opts['shots']
+        self.set_option(sim_opts,'shots','ns')
         ## Whether to use WHAM Boltzmann weights
-        self.whamboltz     = sim_opts['whamboltz']
+        self.set_option(sim_opts,'whamboltz','whamboltz')
         ## Whether to use the Sampling Correction
-        self.sampcorr      = sim_opts['sampcorr']
+        self.set_option(sim_opts,'sampcorr','sampcorr')
         ## Whether to use the Covariance Matrix
-        self.covariance    = sim_opts['covariance']
+        self.set_option(sim_opts,'covariance','covariance')
         ## Whether to use QM Boltzmann weights
-        self.qmboltz       = sim_opts['qmboltz']
+        self.set_option(sim_opts,'qmboltz','qmboltz')
         ## The temperature for QM Boltzmann weights
-        self.qmboltztemp   = sim_opts['qmboltztemp']
+        self.set_option(sim_opts,'qmboltztemp','qmboltztemp')
         ## Number of atoms that we are fitting
-        self.fitatoms      = sim_opts['fitatoms']
+        self.set_option(sim_opts,'fitatoms','fitatoms')
         ## Whether to fit Energies.
-        self.energy        = sim_opts['energy']
+        self.set_option(sim_opts,'energy','energy')
         ## Whether to fit Forces.
-        self.force         = sim_opts['force']
+        self.set_option(sim_opts,'force','force')
         ## Whether to fit Electrostatic Potential.
-        self.resp          = sim_opts['resp']
-        self.resp_a        = sim_opts['resp_a']
-        self.resp_b        = sim_opts['resp_b']
+        self.set_option(sim_opts,'resp','resp')
+        self.set_option(sim_opts,'resp_a','resp_a')
+        self.set_option(sim_opts,'resp_b','resp_b')
         ## Weights for the three components.
-        self.w_energy      = sim_opts['w_energy']
-        self.w_force       = sim_opts['w_force']
-        self.w_resp        = sim_opts['w_resp']
+        self.set_option(sim_opts,'w_energy','w_energy')
+        self.set_option(sim_opts,'w_force','w_force')
+        self.set_option(sim_opts,'forceblock','forceblock')
+        self.set_option(sim_opts,'w_netforce','w_netforce')
+        self.set_option(sim_opts,'w_torque','w_torque')
+        self.set_option(sim_opts,'w_resp','w_resp')
         ## Whether to do energy and force calculations for the whole trajectory, or to do
         ## one calculation per snapshot.
-        self.all_at_once   = sim_opts['all_at_once']
+        self.set_option(sim_opts,'all_at_once','all_at_once')
         ## OpenMM-only option - whether to run the energies and forces internally.
-        self.run_internal  = sim_opts['run_internal']
+        self.set_option(sim_opts,'run_internal','run_internal')
         ## Whether we have virtual sites (set at the global option level)
-        self.have_vsite    = options['have_vsite']
+        self.set_option(options,'have_vsite','have_vsite')
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -115,6 +120,10 @@ class AbInitio(FittingSimulation):
         self.f_err = 0.0
         ## Qualitative Indicator: "relative RMS" for electrostatic potential
         self.esp_err = 0.0
+        self.nf_err = 0.0
+        self.tq_err = 0.0
+        ## Whether to compute net forces and torques, or not.
+        self.use_nft       = self.w_netforce > 0 or self.w_torque > 0
         ## Read in the trajectory file
         if self.ns == -1:
             self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))
@@ -123,6 +132,11 @@ class AbInitio(FittingSimulation):
             self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))[:self.ns]
         ## The number of (atoms + drude particles + virtual sites)
         self.nparticles  = len(self.traj.elem)
+        ## This is a default-dict containing a number of atom-wise lists, such as the
+        ## residue number of each atom, the mass of each atom, and so on.
+        self.AtomLists = defaultdict(list)
+        ## Read in the topology
+        self.read_topology()
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
@@ -132,6 +146,9 @@ class AbInitio(FittingSimulation):
         self.new_vsites = True
         ## Save the mvals from the last time we updated the vsites.
         self.save_vmvals = {}
+
+    def read_topology(self):
+        print "Topology reading is not available!"
 
     def build_invdist(self, mvals):
         for i in range(self.FF.np):
@@ -168,6 +185,61 @@ class AbInitio(FittingSimulation):
                 self.save_vmvals[i] = mvals[i]
         self.new_vsites = False
         return array(invdists)
+
+    def compute_netforce_torque(self, xyz, force, QM=False):
+        # Convert an array of (3 * n_atoms) atomistic forces
+        # to an array of (3 * (n_forces + n_torques)) net forces and torques.
+        # This code is rather slow.  It requires the system to have a list
+        # of masses and blocking numbers.
+        self.block_force = 'residue'
+        if self.block_force == 'molecule':
+            Block = self.AtomLists['MoleculeNumber']
+        elif self.block_force == 'residue':
+            Block = self.AtomLists['ResidueNumber']
+        elif self.block_force == 'chargegroup':
+            Block = self.AtomLists['ChargeGroupNumber']
+        else:
+            raise Exception('Not supposed to be in this function')
+
+        # Try to be intelligent here.  Before computing net forces and torques, first filter out all particles that are not atoms.
+        if len(xyz) > self.natoms:
+            xyz1 = array([xyz[i] for i in range(len(xyz)) if self.AtomLists['ParticleType'][i] == 'A'])
+        else:
+            xyz1 = xyz.copy()
+
+        if len(Block) > self.natoms:
+            Block = [Block[i] for i in range(len(Block)) if self.AtomLists['ParticleType'][i] == 'A']
+
+        if len(self.AtomLists['Mass']) > self.natoms:
+            Mass = array([self.AtomLists['Mass'][i] for i in range(len(xyz)) if self.AtomLists['ParticleType'][i] == 'A'])
+        else:
+            Mass = array(self.AtomLists['Mass'])
+
+        NetForces = []
+        Torques = []
+        for b in sorted(set(Block)):
+            AtomBlock = array([i for i in range(len(Block)) if Block[i] == b])
+            CrdBlock = array(list(itertools.chain(*[range(3*i, 3*i+3) for i in AtomBlock])))
+            com = sum(xyz1[AtomBlock]*outer(Mass[AtomBlock],ones(3)), axis=0) / sum(Mass[AtomBlock])
+            frc = force[CrdBlock].reshape(-1,3)
+            NetForce = sum(frc, axis=0)
+            xyzb = xyz1[AtomBlock]
+            Torque = zeros(3, dtype=float)
+            for a in range(len(xyzb)):
+                R = xyzb[a] - com
+                F = frc[a]
+                # I think the unit of torque is in Angstrom * kJ / nm.
+                # While not really nice, it does give a number roughly the same
+                # size as the net force.  Doesn't matter because we'll be normalizing.
+                Torque += cross(R, F)
+            NetForces += [i for i in NetForce]
+            # Increment the torques only if we have more than one atom in our block.
+            if len(xyzb) > 1:
+                Torques += [i for i in Torque]
+        netfrc_torque = array(NetForces + Torques)
+        self.nnf = len(NetForces)/3
+        self.ntq = len(Torques)/3
+        return netfrc_torque
 
     def read_reference_data(self):
         
@@ -303,6 +375,16 @@ class AbInitio(FittingSimulation):
             print "%.1f%% is mixed into the MM boltzmann weights." % (self.qmboltz*100)
         else:
             self.qmboltz_wts = ones(self.ns)
+        # At this point, self.fqm is a (number of snapshots) x (3 x number of atoms) array.
+        # Now we can transform it into a (number of snapshots) x (3 x number of residues + 3 x number of residues) array.
+        if self.use_nft:
+            self.nftqm = []
+            for i in range(len(self.fqm)):
+                self.nftqm.append(self.compute_netforce_torque(self.traj.xyzs[i], self.fqm[i]))
+            self.nftqm = array(self.nftqm)
+            self.fref = hstack((self.fqm, self.nftqm))
+        else:
+            self.fref = self.fqm
 
     def prepare_temp_directory(self, options, sim_opts):
         """ Prepare the temporary directory, by default does nothing (gmxx2 needs it) """
@@ -312,12 +394,36 @@ class AbInitio(FittingSimulation):
         print "Sim: %-15s" % self.name, 
         if self.energy or self.force:
             if self.e_err_pct == None:
-                print "Energy error (kJ/mol) = %8.4f Force error (%%) = %8.4f" % (self.e_err, self.f_err*100), 
+                print "Errors: Energy (kJ/mol) = %8.4f Atomic Force (%%) = %8.4f" % (self.e_err, self.f_err*100), 
             else:
-                print "Energy error = %8.4f kJ/mol (%.4f%%) Force error (%%) = %8.4f" % (self.e_err, self.e_err_pct*100, self.f_err*100), 
+                print "Errors: Energy = %8.4f kJ/mol (%.4f%%) Atomic Force (%%) = %8.4f" % (self.e_err, self.e_err_pct*100, self.f_err*100), 
+        if self.use_nft:
+            print "Net Force (%%) = %8.4f Torque (%%) = %8.4f" % (self.nf_err*100, self.tq_err*100),
         if self.resp:
-            print "ESP_err (%%) = %8.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
+            print "ESP (%%) = %8.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
         print "Objective = %.5e" % self.objective
+
+    def energy_force_transformer_all(self):
+        M = self.energy_force_driver_all()
+        if self.use_nft:
+            Nfts = []
+            for i in range(len(M)):
+                Fm  = M[i][1:]
+                Nft = self.compute_netforce_torque(self.traj.xyzs[i], Fm)
+                Nfts.append(Nft)
+            Nfts = array(Nfts)
+            return hstack((M, Nfts))
+        else:
+            return M
+
+    def energy_force_transformer(self,i):
+        M = self.energy_force_driver(i)
+        if self.use_nft:
+            Fm  = M[1:]
+            Nft = self.compute_netforce_torque(self.traj.xyzs[i], Fm)
+            return hstack((M, Nft))
+        else:
+            return M
 
     def get_energy_force_no_covariance_(self, mvals, AGrad=False, AHess=False):
         """
@@ -376,6 +482,8 @@ class AbInitio(FittingSimulation):
         #======================================#
         NC   = 3*self.fitatoms
         NCP1 = 3*self.fitatoms+1
+        if self.use_nft:
+            NCP1 += 3*(self.nnf + self.ntq)
         np   = self.FF.np
         ns   = self.ns
         #==============================================================#
@@ -398,7 +506,7 @@ class AbInitio(FittingSimulation):
         # QQ_Q  = The unnormalized expected value of <Q(X)Q>           #
         # Later on we divide these quantities by Z to normalize.       #
         #==============================================================#
-        if (self.w_energy == 0.0 and self.w_force == 0.0):
+        if (self.w_energy == 0.0 and self.w_force == 0.0 and self.w_netforce == 0.0 and self.w_torque == 0.0):
             AGrad = False
             AHess = False
         Z       = 0.0
@@ -443,12 +551,12 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         if self.all_at_once:
             print "\rExecuting\r",
-            M_all = self.energy_force_driver_all()
+            M_all = self.energy_force_transformer_all()
             if AGrad or AHess:
                 def callM(mvals_):
                     print "\r",
                     pvals = self.FF.make(mvals_, self.usepvals)
-                    return self.energy_force_driver_all()
+                    return self.energy_force_transformer_all()
                 for p in range(np):
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
             
@@ -456,7 +564,7 @@ class AbInitio(FittingSimulation):
             M_all_print = M_all.copy()
             M_all_print[:,0] -= mean(M_all_print[:,0])
             savetxt('M.txt',M_all_print)
-            Q_all_print = hstack((col(self.eqm),self.fqm))
+            Q_all_print = hstack((col(self.eqm),self.fref))
             Q_all_print[:,0] -= mean(Q_all_print[:,0])
             savetxt('Q.txt',Q_all_print)
         # My C helper code isn't fully functional yet.
@@ -477,14 +585,14 @@ class AbInitio(FittingSimulation):
             Y  += R
             # Recall reference (QM) data
             Q[0] = self.eqm[i]
-            Q[1:] = self.fqm[i,:].copy()
+            Q[1:] = self.fref[i,:].copy()
             QQ     = Q*Q
             # Call the simulation software to get the MM quantities.
             if self.all_at_once:
                 M = M_all[i]
             else:
                 print "Shot %i\r" % i,
-                M = self.energy_force_driver(i)
+                M = self.energy_force_transformer(i)
             X     = M-Q
             # Increment the average values.
             X0_M += P*X
@@ -508,7 +616,7 @@ class AbInitio(FittingSimulation):
                     def callM(mvals_):
                         print "\r",
                         pvals = self.FF.make(mvals_, self.usepvals)
-                        return self.energy_force_driver(i)
+                        return self.energy_force_transformer(i)
                     M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                 M0_M_p[p]  += P * M_p[p]
                 M0_Q_p[p]  += R * M_p[p]
@@ -533,23 +641,40 @@ class AbInitio(FittingSimulation):
         #      STEP 3: Build the variance vector and invert it.        #
         #==============================================================#
         print "Done with snapshots, building objective function now\r",
-        if (self.w_energy > 0.0 or self.w_force > 0.0):
-            EFW     = self.w_energy / (self.w_energy + self.w_force)
-            CEFW    = 1.0 - EFW
+        if (self.w_energy > 0.0 or self.w_force > 0.0 or self.w_netforce > 0.0 or self.w_torque > 0.0):
+            wtot    = self.w_energy + self.w_force + self.w_netforce + self.w_torque
+            EWt     = self.w_energy / wtot
+            FWt     = self.w_force / wtot
+            NWt     = self.w_netforce / wtot
+            TWt     = self.w_torque / wtot
         else:
-            EFW = 0.0
-            CEFW = 0.0
+            EWt = 0.0
+            FWt = 0.0
+            NWt = 0.0
+            TWt = 0.0
         # Build the weight vector, so the force contribution is suppressed by 1/3N
         WM      = zeros(NCP1,dtype=float)
-        WM[0] = sqrt(EFW)
-        for i in range(1,NCP1):
-            WM[i] = sqrt(CEFW/NC)
+        WM[0] = sqrt(EWt)
+        start   = 1
+        block   = 3*self.fitatoms
+        end     = start + block
+        WM[start:end] = sqrt(FWt / block)
+        if self.use_nft:
+            start   = end
+            block   = 3*self.nnf
+            end     = start + block
+            WM[start:end] = sqrt(NWt / block)
+            start   = end
+            block   = 3*self.ntq
+            end     = start + block
+            WM[start:end] = sqrt(TWt / block)
         # Here we're just using the variance.
         QBP  = self.qmboltz
         MBP  = 1 - self.qmboltz
         C    = MBP*(QQ_M-Q0_M*Q0_M/Z)/Z + QBP*(QQ_Q-Q0_Q*Q0_Q/Y)/Y
-        # Normalize all of the force components (should I do this?)
-        C[1:] = mean(C[1:])
+        # Normalize the force components
+        for i in range(1, len(C), 3):
+            C[i:i+3] = mean(C[i:i+3])
         Ci    = 1. / C
         WCiW = WM * Ci * WM
         #==============================================================#
@@ -592,12 +717,21 @@ class AbInitio(FittingSimulation):
         # Fractional energy error.
         Efrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
         # Fractional force error.
-        F     = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,NCP1)]))) + \
-                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,NCP1)])))
+        F = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,1+3*self.fitatoms)]))) + \
+            QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,1+3*self.fitatoms)])))
+        if self.use_nft:
+            N = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))]))) + \
+                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))])))
+            T = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))]))) + \
+                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))])))
+        # Save values to qualitative indicator if not inside finite difference code.
         if not in_fd():
             self.e_err = E
             self.e_err_pct = Efrac
             self.f_err = F
+            if self.use_nft:
+                self.nf_err = N
+                self.tq_err = T
         Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
 
@@ -671,6 +805,8 @@ class AbInitio(FittingSimulation):
         #======================================#
         NC   = 3*self.fitatoms
         NCP1 = 3*self.fitatoms+1
+        if self.use_nft:
+            NCP1 += 3*(self.nnf + self.ntq)
         #==============================================================#
         # Note: Because of hybrid ensembles, we form two separate      #
         # objective functions.  This means the code is (trivially)     #
@@ -693,7 +829,7 @@ class AbInitio(FittingSimulation):
         # Later on we divide these quantities by Z to normalize,       #
         # and Q0(X)Q0 is subtracted from QQ to get the covariance.     #
         #==============================================================#
-        if (self.w_energy == 0.0 and self.w_force == 0.0):
+        if (self.w_energy == 0.0 and self.w_force == 0.0 and self.w_netforce == 0.0 and self.w_torque == 0.0):
             AGrad = False
             AHess = False
         Z       = 0
@@ -718,7 +854,7 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         if self.all_at_once:
             print "Computing forces\r",
-            M_all = self.energy_force_driver_all()
+            M_all = self.energy_force_transformer_all()
         for i in range(ns):
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
@@ -727,7 +863,7 @@ class AbInitio(FittingSimulation):
             Y  += R
             # Recall reference (QM) data
             Q[0] = self.eqm[i]
-            Q[1:] = self.fqm[i,:].copy()
+            Q[1:] = self.fref[i,:].copy()
             # Increment the average quantities.
             QQ     = outer(Q,Q)
             # Call the simulation software to get the MM quantities.
@@ -735,7 +871,7 @@ class AbInitio(FittingSimulation):
                 M = M_all[i]
             else:
                 print "Shot %i\r" % i,
-                M = self.energy_force_driver(i)
+                M = self.energy_force_transformer(i)
             # Increment the average values.
             M0_M += P*M
             Q0_M += P*Q
@@ -750,17 +886,36 @@ class AbInitio(FittingSimulation):
         #==============================================================#
         #     STEP 3: Build the covariance matrix and invert it.       #
         #==============================================================#
-        if (self.w_energy > 0.0 and self.w_force > 0.0):
-            EFW     = self.w_energy / (self.w_energy + self.w_force)
-            CEFW    = 1.0 - EFW
+        if (self.w_energy > 0.0 or self.w_force > 0.0 or self.w_netforce > 0.0 or self.w_torque > 0.0):
+            wtot    = self.w_energy + self.w_force + self.w_netforce + self.w_torque
+            EWt     = self.w_energy / wtot
+            FWt     = self.w_force / wtot
+            NWt     = self.w_netforce / wtot
+            TWt     = self.w_torque / wtot
         else:
-            EFW = 0.0
-            CEFW = 0.0
+            EWt = 0.0
+            FWt = 0.0
+            NWt = 0.0
+            TWt = 0.0
         # Build the weight matrix, so the force contribution is suppressed by 1/3N
         WM      = zeros((NCP1,NCP1),dtype=float)
-        WM[0,0] = sqrt(EFW)
-        for i in range(1,NCP1):
-            WM[i,i] = sqrt(CEFW/NC)
+        WM[0,0] = sqrt(EWt)
+        start   = 1
+        block   = 3*self.fitatoms
+        end     = start + block
+        for i in range(start, end):
+            WM[i, i] = sqrt(FWt / block)
+        if self.use_nft:
+            start   = end
+            block   = 3*self.nnf
+            end     = start + block
+            for i in range(start, end):
+                WM[i, i] = sqrt(NWt / block)
+            start   = end
+            block   = 3*self.ntq
+            end     = start + block
+            for i in range(start, end):
+                WM[i, i] = sqrt(TWt / block)
         #==============================================================#
         #                      The covariance matrix                   #
         #                                                              #
@@ -775,7 +930,9 @@ class AbInitio(FittingSimulation):
         C    = MBP*(QQ_M-outer(Q0_M,Q0_M)/Z)/Z + QBP*(QQ_Q-outer(Q0_Q,Q0_Q)/Y)/Y
         if self.covariance == False:
             C = diag(C)
-            C[1:] = mean(C[1:])
+            for i in range(1, len(C), 3):
+                C[i:i+3] = mean(C[i:i+3])
+            #C[1:] = mean(C[1:])
             C = diag(C)
         Ci   = invert_svd(C)
         # Get rid of energy-force covariance
@@ -816,8 +973,13 @@ class AbInitio(FittingSimulation):
         # objective function values (divided by the diagonal           #
         # covariance values).                                          #
         #==============================================================#
-        F     = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1,NCP1)]))) + \
-                QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1,NCP1)])))
+        F = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1,1+3*self.fitatoms)]))) + \
+            QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1,1+3*self.fitatoms)])))
+        if self.use_nft:
+            N = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))]))) + \
+                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))])))
+            T = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))]))) + \
+                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))])))
         #======================================#
         #        End of the copied code        #
         #======================================#
@@ -825,6 +987,9 @@ class AbInitio(FittingSimulation):
             self.e_err = E
             self.e_err_pct = Efrac
             self.f_err = F
+            if self.use_nft:
+                self.nf_err = N
+                self.tq_err = T
         Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         return Answer
 
@@ -932,13 +1097,12 @@ class AbInitio(FittingSimulation):
             return self.get_energy_force_covariance_(mvals, AGrad, AHess)
         else:
             return self.get_energy_force_no_covariance_(mvals, AGrad, AHess)
-        
 
     def get(self, mvals, AGrad=False, AHess=False):
         Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
-        tw = self.w_energy + self.w_force + self.w_resp
+        tw = self.w_energy + self.w_force + self.w_netforce + self.w_torque + self.w_resp
         if tw > 0.0:
-            w_ef = (self.w_energy + self.w_force) / tw
+            w_ef = (self.w_energy + self.w_force + self.w_netforce + self.w_torque) / tw
             w_resp = self.w_resp / tw
         else:
             w_ef = 0.0

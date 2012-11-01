@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 
 #======================================================================#
 #|                                                                    |#
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated October 12, 2012                     |#
+#|                  Last updated October 29, 2012                     |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -140,6 +140,7 @@ import os, sys, re, copy
 import numpy as np
 import imp
 import itertools
+from chemistry import PeriodicTable as PT
 from collections import OrderedDict
 from ctypes import *
 from warnings import warn
@@ -402,6 +403,39 @@ def AlignToMoments(elem,xyz1,xyz2=None):
     else:
         return xyzr
 
+def get_rotate_translate(matrix1,matrix2):
+    assert np.shape(matrix1) == np.shape(matrix2), 'Matrices not of same dimensions'
+    
+    # Store number of rows
+    nrows = np.shape(matrix1)[0]
+    
+    # Getting centroid position for each selection
+    avg_pos1 = matrix1.sum(axis=0)/nrows
+    avg_pos2 = matrix2.sum(axis=0)/nrows
+
+    # Translation of matrices
+    avg_matrix1 = matrix1-avg_pos1
+    avg_matrix2 = matrix2-avg_pos2
+
+    # Covariance matrix
+    covar = np.dot(avg_matrix1.T,avg_matrix2)
+    
+    # Do the SVD in order to get rotation matrix
+    u,s,wt = np.linalg.svd(covar)
+    
+    # Rotation matrix
+    # Transposition of u,wt
+    rot_matrix = wt.T*u.T
+    
+    # Insure a right-handed coordinate system
+    # need to fix this!!
+    # if linalg.det(rot_matrix) > 0:
+    # wt[2] = -wt[2]
+    rot_matrix = np.transpose(np.dot(np.transpose(wt),np.transpose(u)))
+
+    trans_matrix = avg_pos2-np.dot(avg_pos1,rot_matrix)
+    return trans_matrix, rot_matrix
+
 class Molecule(object):
     """ Lee-Ping's general file format conversion class.
 
@@ -633,6 +667,7 @@ class Molecule(object):
                           'g96'     : 'gromacs',
                           'gmx'     : 'gromacs',
                           'in'      : 'qcin',
+                          'com'     : 'gaussian',
                           'out'     : 'qcout',
                           'esp'     : 'qcesp',
                           'txt'     : 'qdata',
@@ -695,7 +730,7 @@ class Molecule(object):
         ## I needed to add in this line because the DCD writer requires the file name,
         ## but the other methods don't.
         self.fout = fnm
-        if type(select) is int:
+        if type(select) in [int, np.int64, np.int32]:
             select = [select]
         if select == None:
             select = range(len(self))
@@ -806,6 +841,50 @@ class Molecule(object):
             xyz2 -= xyz2.mean(0)
             xyz2 = AlignToMoments(self.elem,xyz1,xyz2)
             self.xyzs[index2] = xyz2
+
+    def align(self, smooth = True, center = True):
+        """ Align molecules. 
+        
+        Has the option to create smooth trajectories 
+        (align each frame to the previous one)
+        or to align each frame to the first one.
+
+        Also has the option to remove the center of mass.
+
+        """
+        xyz1 = self.xyzs[0]
+        if center:
+            xyz1 -= xyz1.mean(0)
+        for index2, xyz2 in enumerate(self.xyzs):
+            if index2 == 0: continue
+            xyz2 -= xyz2.mean(0)
+            if smooth:
+                ref = index2-1
+            else:
+                ref = 0
+            tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
+            xyz2 = np.dot(xyz2, rt) + tr
+            self.xyzs[index2] = xyz2
+
+    def all_pairwise_rmsd(self):
+        """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
+        N = len(self)
+        Mat = np.zeros((N,N),dtype=float)
+        for i in range(N):
+            xyzi = self.xyzs[i].copy()
+            xyzi -= xyzi.mean(0)
+            for j in range(i):
+                xyzj = self.xyzs[j].copy()
+                xyzj -= xyzj.mean(0)
+                tr, rt = get_rotate_translate(xyzj, xyzi)
+                xyzj = np.dot(xyzj, rt) + tr
+                rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+                Mat[i,j] = rmsd
+                Mat[j,i] = rmsd
+        return Mat
+
+    def align_center(self):
+        self.align()
 
     def openmm_positions(self):
         """ Returns the Cartesian coordinates in the Molecule object in
@@ -1827,8 +1906,11 @@ class Molecule(object):
 
     def require_resid(self):
         if 'resid' not in self.Data:
-            na_res = int(raw_input("Enter how many atoms are in a residue -> "))
-            self.resid = [1 + i/na_res for i in range(self.na)]
+            na_res = int(raw_input("Enter how many atoms are in a residue, or zero as a single residue -> "))
+            if na_res == 0:
+                self.resid = [1 for i in range(self.na)]
+            else:
+                self.resid = [1 + i/na_res for i in range(self.na)]
             
     def require_resname(self):
         if 'resname' not in self.Data:

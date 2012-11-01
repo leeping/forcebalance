@@ -149,13 +149,17 @@ def LookupByMass(mass):
             Deviation = abs(mass - m)
     return EMatch
 
-def BondStrengthByLength(A, B, length): # Must be in Angstrom!!
+def BondStrengthByLength(A, B, length, artol = 0.33, bias=0.0): 
+    # Bond length Must be in Angstrom!!
+    # Set artol lower to get more aromatic bonds ; 0.5 means no aromatic bonds.
     Deviation = 1e10
     BOMatch = None
     if length < 0.5: # Assume using nanometers
         length *= 10
     if length > 50: # Assume using picometers
         length /= 100
+    # A positive bias means a lower bond order.
+    length += bias
     # Determine the bond order and the bond strength
     # We allow bond order 1.5 as well :)
     Devs = {}
@@ -171,7 +175,8 @@ def BondStrengthByLength(A, B, length): # Must be in Angstrom!!
         Spac = Devs[1] + Devs[2]
         Frac1 = Devs[1]/Spac
         Frac2 = Devs[2]/Spac
-        if Frac1 > 0.2 and Frac2 > 0.2:
+        if Frac1 > artol and Frac2 > artol:
+            #print A, B, L, Frac1, Frac2
             BOMatch = 1.5
             Strength = 0.5 * (BondEnergies[A][B][1][0] + BondEnergies[A][B][2][0])
     return Strength, BOMatch
