@@ -114,6 +114,8 @@ class Optimizer(ForceBalanceBaseClass):
         self.set_option(options,'print_parameters','print_vals')
         ## Error tolerance (if objective function rises by less than this, then the optimizer will forge ahead!)
         self.set_option(options,'error_tolerance','err_tol')
+        ## Search tolerance (The nonlinear search will stop if the change is below this threshold)
+        self.set_option(options,'search_tolerance','search_tol')
         self.set_option(options,'read_mvals')
         self.set_option(options,'read_pvals')
         
@@ -470,7 +472,7 @@ class Optimizer(ForceBalanceBaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            print "Searching! Hessian diagonal scaling = %.4e, length %.4e, result %.4e" % (1+L**2,norm(dx),Result)
+            print "Searching! Hessian diagonal scaling = %.4e, L = % .4e, length %.4e, result %.4e" % (1+L**2,L,norm(dx),Result)
             return Result
         
         if self.trust0 > 0: # This is the trust region code.
@@ -480,13 +482,13 @@ class Optimizer(ForceBalanceBaseClass):
             if dxnorm > trust:
                 bump = True
                 # Tried a few optimizers here, seems like Brent works well.
-                LOpt = optimize.brent(trust_fun,brack=(0.0,10.0),tol=trust*1e-4)
+                LOpt = optimize.brent(trust_fun,brack=(0.0,10.0),tol=self.search_tol)
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
                 print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)
         else: # This is the nonlinear search code.
             bump = False
-            Result = optimize.brent(search_fun,brack=(0.0,3.0),tol=1e-3,full_output=1)
+            Result = optimize.brent(search_fun,brack=(0.0,3.0),tol=self.search_tol,full_output=1)
             #optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
             dx, _ = solver(Result[0])
             expect = Result[1]

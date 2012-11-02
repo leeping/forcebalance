@@ -421,6 +421,7 @@ class AbInitio_GMX(AbInitio):
                         self.AtomLists['ChargeGroupNumber'].append(ChargeGroupCounter)
                         self.AtomLists['ParticleType'].append(j['ParticleType'])
                         self.AtomLists['Mass'].append(j['Mass'])
+        self.topology_flag = True
         return
 
     def prepare_temp_directory(self, options, sim_opts):

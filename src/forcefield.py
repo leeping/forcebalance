@@ -456,7 +456,11 @@ class FF(ForceBalanceBaseClass):
                     self.np += 1
             if "RPT" in sline:
                 parse = (array(sline)=='RPT').argmax()+1 # The position of the 'RPT' word
-                while parse < (array(sline)=='/RPT').argmax():
+                if max(array(sline)=='/RPT') > 0:
+                    stopparse = (array(sline)=='/RPT').argmax()
+                else:
+                    stopparse = len(sline)
+                while parse < stopparse:
                     # Between RPT and /RPT, the words occur in pairs.
                     # First is a number corresponding to the field that contains the dependent parameter.
                     # Second is a string corresponding to the 'pid' that this parameter depends on.
@@ -482,7 +486,11 @@ class FF(ForceBalanceBaseClass):
                     parse += 2
             if "EVAL" in sline:
                 parse = (array(sline)=='EVAL').argmax()+1 # The position of the 'EVAL' word
-                while parse < (array(sline)=='/EVAL').argmax():
+                if max(array(sline)=='/EVAL') > 0:
+                    stopparse = (array(sline)=='/EVAL').argmax()
+                else:
+                    stopparse = len(sline)
+                while parse < stopparse:
                     # Between EVAL and /EVAL, the words occur in pairs.
                     # First is a number corresponding to the field that contains the dependent parameter.
                     # Second is a Python command that determines how to calculate the parameter.
