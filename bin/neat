@@ -1,0 +1,62 @@
+#!/bin/bash
+
+# The purpose of this file is to run ForceBalance.py.
+# Run: "neat ForceBalance.py job.in [job.out]"
+# If the output filename is not specified, it will be automatically created.
+# Importantly, ForceBalance.py prints a lot of carriage returns as "progress reports".
+# These carriage returns are not saved to the output file if this command is used.
+
+minargs=2
+maxargs=3
+E_EXISTS=64
+force=0
+
+show_help() 
+{
+    echo "Usage: `basename $0` [options] ForceBalance.py job.in [job.out]"
+    echo "Values in brackets are optional."
+    echo "Options are:"
+    echo "  -f               Force overwrite of output file."
+    echo "  -h               Show this help message."
+    exit 1
+}
+
+while getopts f opt 
+do
+	case "$opt" in
+		f)  force=1;;
+		h)  show_help;;
+		\?) show_help;;
+	esac
+done
+
+shift $(expr $OPTIND - 1)
+
+if [ $# -lt $minargs ] || [ $# -gt $maxargs ]
+then
+    show_help
+fi
+
+program=$1
+input=$(basename "$2")
+
+if [ $# -eq $minargs ]
+then
+    filename=$(basename "$2")
+    extension="${filename##*.}"
+    filename="${filename%.*}"
+    output=$filename".out" 
+    echo "Output will be written to $output"
+else
+    output=$(basename "$3")
+fi
+
+if [ -e $output ] && [ $force -eq 0 ]
+then
+  echo "The output filename already exists; cowardly exiting"
+  exit $E_EXISTS
+fi
+
+# Standard error gets written to standard out
+# Text overwritten by carriage returns are not saved
+$program $input 2>&1 | tee >(awk -F '\r' '{print $NF}' > $output)

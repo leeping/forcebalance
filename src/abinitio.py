@@ -81,7 +81,7 @@ class AbInitio(FittingSimulation):
         ## Weights for the three components.
         self.set_option(sim_opts,'w_energy','w_energy')
         self.set_option(sim_opts,'w_force','w_force')
-        self.set_option(sim_opts,'forceblock','forceblock')
+        self.set_option(sim_opts,'force_map','force_map')
         self.set_option(sim_opts,'w_netforce','w_netforce')
         self.set_option(sim_opts,'w_torque','w_torque')
         self.set_option(sim_opts,'w_resp','w_resp')
@@ -148,7 +148,7 @@ class AbInitio(FittingSimulation):
         self.save_vmvals = {}
 
     def read_topology(self):
-        print "Topology reading is not available!"
+        self.topology_flag = False
 
     def build_invdist(self, mvals):
         for i in range(self.FF.np):
@@ -191,15 +191,17 @@ class AbInitio(FittingSimulation):
         # to an array of (3 * (n_forces + n_torques)) net forces and torques.
         # This code is rather slow.  It requires the system to have a list
         # of masses and blocking numbers.
-        self.block_force = 'residue'
-        if self.block_force == 'molecule':
+        if not self.topology_flag:
+            raise Exception('Cannot do net forces and torques for class %s because read_topology is not implemented' % __class__.__name__)
+
+        if self.force_map == 'molecule':
             Block = self.AtomLists['MoleculeNumber']
-        elif self.block_force == 'residue':
+        elif self.force_map == 'residue':
             Block = self.AtomLists['ResidueNumber']
-        elif self.block_force == 'chargegroup':
+        elif self.force_map == 'chargegroup':
             Block = self.AtomLists['ChargeGroupNumber']
         else:
-            raise Exception('Not supposed to be in this function')
+            raise Exception('Please choose a valid force_map keyword: molecule, residue, chargegroup')
 
         # Try to be intelligent here.  Before computing net forces and torques, first filter out all particles that are not atoms.
         if len(xyz) > self.natoms:
@@ -337,8 +339,9 @@ class AbInitio(FittingSimulation):
             #print "The quantum force matrix appears to contain more components (%i) than those being fit (%i)." % (fqmm.shape[1], 3*self.fitatoms)
             print "Pruning the quantum force matrix..."
             self.fqm  = self.fqm[:, :3*self.fitatoms].copy()
-        self.emd0 = array(self.emd0)
-        self.emd0 -= mean(self.emd0)
+        if len(self.emd0) > 0:
+            self.emd0 = array(self.emd0)
+            self.emd0 -= mean(self.emd0)
         if self.whamboltz == True:
             self.whamboltz_wts = array([float(i.strip()) for i in open(os.path.join(self.root,self.simdir,"wham-weights.txt")).readlines()])
             #   This is a constant pre-multiplier in front of every snapshot.

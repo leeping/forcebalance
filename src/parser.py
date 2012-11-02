@@ -99,7 +99,8 @@ gen_opts_types = {
                  "penalty_hyperbolic_b"   : (0.001, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b'),
                  "adaptive_factor"        : (0.25, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.'),
                  "adaptive_damping"       : (0.5, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.'),
-                 "error_tolerance"        : (0.0, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.')
+                 "error_tolerance"        : (0.0, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.'),
+                 "search_tolerance"       : (0.01,'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.')
                  },
     'sections': {"read_mvals" : (None, 'Paste mathematical parameters into the input file for them to be read in directly'),
                  "read_pvals" : (None, 'Paste physical parameters into the input file for them to be read in directly'),
@@ -119,7 +120,7 @@ for t in gen_opts_types:
 sim_opts_types = {
     'strings' : {"name"      : (None, 'The name of the simulation, which corresponds to the directory simulations/dir_name'),
                  "masterfile": ('interactions.txt', 'The name of the master file containing interacting systems'),
-                 "forceblock": ('residues', 'The resolution of condensing interactions down to net forces and torques; choose molecules > residues > charge-groups')
+                 "force_map" : ('residue', 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group')
                  },
     'allcaps' : {"simtype"   : (None,      'The type of fitting simulation, for instance AbInitio_GMXX2')
                  },

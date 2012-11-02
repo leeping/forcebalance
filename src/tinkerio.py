@@ -142,12 +142,11 @@ class AbInitio_TINKER(AbInitio):
         super(AbInitio_TINKER,self).__init__(options,sim_opts,forcefield)
         ## all_at_once is not implemented.
         self.all_at_once = False
-        self.set_option(options,'tinkerpath')
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(self.tinkerpath,"testgrad"),os.path.join(abstempdir,"testgrad"))
+        os.symlink(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
         # Link the run parameter file
         os.symlink(os.path.join(self.root,self.simdir,"settings","shot.key"),os.path.join(abstempdir,"shot.key"))
 
@@ -179,8 +178,8 @@ class Vibration_TINKER(Vibration):
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(self.tinkerpath,"vibrate"),os.path.join(abstempdir,"vibrate"))
-        os.symlink(os.path.join(self.tinkerpath,"optimize"),os.path.join(abstempdir,"optimize"))
+        os.symlink(os.path.join(options['tinkerpath'],"vibrate"),os.path.join(abstempdir,"vibrate"))
+        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
         os.symlink(os.path.join(self.root,self.simdir,"input.key"),os.path.join(abstempdir,"input.key"))
         os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
@@ -225,9 +224,9 @@ class Moments_TINKER(Moments):
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(self.tinkerpath,"analyze"),os.path.join(abstempdir,"analyze"))
-        os.symlink(os.path.join(self.tinkerpath,"polarize"),os.path.join(abstempdir,"polarize"))
-        os.symlink(os.path.join(self.tinkerpath,"optimize"),os.path.join(abstempdir,"optimize"))
+        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        os.symlink(os.path.join(options['tinkerpath'],"polarize"),os.path.join(abstempdir,"polarize"))
+        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
         os.symlink(os.path.join(self.root,self.simdir,"input.key"),os.path.join(abstempdir,"input.key"))
         os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
@@ -297,9 +296,9 @@ class Interactions_TINKER(Interactions):
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(self.tinkerpath,"analyze"),os.path.join(abstempdir,"analyze"))
-        os.symlink(os.path.join(self.tinkerpath,"optimize"),os.path.join(abstempdir,"optimize"))
-        os.symlink(os.path.join(self.tinkerpath,"superpose"),os.path.join(abstempdir,"superpose"))
+        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
+        os.symlink(os.path.join(options['tinkerpath'],"superpose"),os.path.join(abstempdir,"superpose"))
         # Link the run parameter file
         # The master file might be unneeded??
         # os.symlink(os.path.join(self.root,self.simdir,self.masterfile),os.path.join(abstempdir,self.masterfile))

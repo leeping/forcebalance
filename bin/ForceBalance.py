@@ -10,6 +10,8 @@ from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
 from forcebalance.nifty import printcool
+import numpy
+numpy.seterr(all='raise')
 
 def Run_ForceBalance(input_file):
     """ Create instances of ForceBalance components and run the optimizer.
@@ -46,7 +48,7 @@ def process(word, color):
     return Answer
 
 def main():
-    printcool("Welcome to ForceBalance version 0.14! =D\nAuthor: Lee-Ping Wang", color=7, bold=True, minwidth=64)
+    printcool("Welcome to ForceBalance version 1.0! =D\nSystematic Force Field Optimization\nAuthor: Lee-Ping Wang", color=7, bold=True, minwidth=64)
     logostr = """
                           ,'+++                                        
                        ,++++++.      .:,,.                              
