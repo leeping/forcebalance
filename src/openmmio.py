@@ -212,6 +212,7 @@ class AbInitio_OpenMM(AbInitio):
             self.platform.setPropertyDefaultValue("CudaDevice", device)
             self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
         except:
+            warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
             self.platform = None
 
     def prepare_temp_directory(self, options, sim_opts):

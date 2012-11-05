@@ -74,18 +74,15 @@ class Objective(ForceBalanceBaseClass):
             # List of functions that I can call.
             Funcs   = [Sim.get_X, Sim.get_G, Sim.get_H]
             # Call the appropriate function
-            print "Calling the get function for %s" % Sim.name
             Ans = Funcs[Order](mvals)
             # Print out the qualitative indicators
             if verbose:
                 Sim.indicate()
-            print "Done indicating"
             # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
             if not in_fd():
                 self.ObjDict[Sim.name] = {'w' : Sim.weight/self.WTot , 'x' : Ans['X']}
             for i in range(3):
                 Objective[Letters[i]] += Ans[Letters[i]]*Sim.weight/self.WTot
-            print "Done assigning objective function values"
         return Objective
 
     def Indicate(self):
