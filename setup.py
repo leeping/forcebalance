@@ -43,7 +43,7 @@ def buildKeywordDictionary():
     setupKeywords["license"]           = "GPL 3.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
-    setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/neat")
+    setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/ForceBalance")
     setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
     setupKeywords["package_dir"]       = {"forcebalance"        : "src",
                                           "forcebalance/pymbar" : "ext/pymbar"
