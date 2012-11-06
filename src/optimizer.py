@@ -125,7 +125,7 @@ class Optimizer(ForceBalanceBaseClass):
         ## The objective function (needs to pass in when I instantiate)
         self.Objective = Objective
         ## Whether the penalty function is hyperbolic
-        self.bhyp      = Objective.Penalty.ptyp == 1
+        self.bhyp      = Objective.Penalty.ptyp != 2
         ## The force field itself
         self.FF        = FF
         
@@ -142,7 +142,7 @@ class Optimizer(ForceBalanceBaseClass):
         elif options['read_pvals'] != None:
             self.mvals0    = FF.create_mvals(options['read_pvals'])
         else:
-            self.mvals0    = np.zeros(self.np)
+            self.mvals0    = np.zeros(self.FF.np)
 
         ## Print the optimizer options.
         printcool_dictionary(self.PrintOptionDict, title="Setup for optimizer")
@@ -383,6 +383,7 @@ class Optimizer(ForceBalanceBaseClass):
                     self.dx = 1e10 * np.ones(len(HL),dtype=float)
                     self.Val = 0
                     self.Grad = np.zeros(len(HL),dtype=float)
+                    self.Hess = np.zeros((len(HL),len(HL)),dtype=float)
                     self.Penalty = Penalty
                 def _compute(self, dx):
                     self.dx = dx.copy()
@@ -398,6 +399,10 @@ class Optimizer(ForceBalanceBaseClass):
                     if norm(dx - self.dx) > 1e-8:
                         self._compute(dx)
                     return self.Grad
+                def compute_hess(self, dx):
+                    if norm(dx - self.dx) > 1e-8:
+                        self._compute(dx)
+                    return self.Hess
             def hyper_solver(L):
                 dx0 = np.zeros(len(xkd),dtype=float)
                 #dx0 = np.delete(dx0, self.excision)
@@ -492,6 +497,11 @@ class Optimizer(ForceBalanceBaseClass):
             #optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
             dx, _ = solver(Result[0])
             expect = Result[1]
+
+        ## Decide which parameters to redirect.
+        if self.Objective.Penalty.ptyp == 3 or self.Objective.Penalty.ptyp == 4:
+            self.FF.make_redirect(dx+xk)
+
         return dx, expect, bump
 
     def NewtonRaphson(self):
@@ -594,7 +604,7 @@ class Optimizer(ForceBalanceBaseClass):
             return chrom
 
         def initial_generation():
-            return np.vstack((self.mvals0.copy(),np.random.randn(PopSize, self.np)*self.trust0)) / (self.np ** 0.5)
+            return np.vstack((self.mvals0.copy(),np.random.randn(PopSize, self.FF.np)*self.trust0)) / (self.FF.np ** 0.5)
             #return np.vstack((self.mvals0.copy(),generate_fresh(PopSize, self.np)))
 
         def calculate_fitness(pop):
@@ -771,10 +781,10 @@ class Optimizer(ForceBalanceBaseClass):
         """
 
         Adata        = self.Objective.Full(self.mvals0,Order=1)['G']
-        Fdata        = np.zeros(self.np,dtype=float)
+        Fdata        = np.zeros(self.FF.np,dtype=float)
         printcool("Checking first derivatives by finite difference!\n%-8s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
-        for i in range(self.np):
+        for i in range(self.FF.np):
             Fdata[i] = f1d7p(fdwrap(self.Objective.Full,self.mvals0,i,'X',Order=0),self.h)
             Denom = max(abs(Adata[i]),abs(Fdata[i]))
             Denom = Denom > 1e-8 and Denom or 1e-8
@@ -801,7 +811,7 @@ class Optimizer(ForceBalanceBaseClass):
 
         """
         Adata        = self.Objective.Full(self.mvals0,Order=2)['H']
-        Fdata        = np.zeros((self.np,self.np),dtype=float)
+        Fdata        = np.zeros((self.FF.np,self.FF.np),dtype=float)
         printcool("Checking second derivatives by finite difference!\n%-8s%-20s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter1 ID", "Parameter2 ID", "Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
 
@@ -813,8 +823,8 @@ class Optimizer(ForceBalanceBaseClass):
                 return f1d5p(fdwrap(self.Objective.Full,mvals,pidxi,'X',Order=0),self.h)
             return func1
         
-        for i in range(self.np):
-            for j in range(i,self.np):
+        for i in range(self.FF.np):
+            for j in range(i,self.FF.np):
                 Fdata[i,j] = f1d5p(wrap2(self.mvals0,i,j),self.h)
                 Denom = max(abs(Adata[i,j]),abs(Fdata[i,j]))
                 Denom = Denom > 1e-8 and Denom or 1e-8

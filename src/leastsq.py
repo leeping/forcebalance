@@ -67,7 +67,11 @@ class LeastSquares(FittingSimulation):
         dM = {}
         # Create the new force field!!
         np = len(mvals)
+        G = zeros(np,dtype=float)
+        H = zeros((np,np),dtype=float)
         pvals = self.FF.make(mvals,self.usepvals)
+        if float('Inf') in pvals:
+            return {'X' : 1e10, 'G' : G, 'H' : H}
         Ans = self.driver()
         W = Ans[:,2]
         M = Ans[:,1]
@@ -93,8 +97,6 @@ class LeastSquares(FittingSimulation):
                 else:
                     dM[p] = dM_arr.copy()
 	Objective = dot(W, D**2) * Fac
-        G = zeros(np,dtype=float)
-        H = zeros((np,np),dtype=float)
         if AGrad:
             for p in range(np):
                 if self.call_derivatives[p] == False: continue
