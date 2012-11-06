@@ -25,6 +25,10 @@ def Counter():
     global ITERATION_NUMBER
     return ITERATION_NUMBER
 
+def Best():
+    global BEST_STEP
+    return BEST_STEP
+
 class Optimizer(ForceBalanceBaseClass):
     """ Optimizer class.  Contains several methods for numerical optimization.
 
@@ -216,7 +220,9 @@ class Optimizer(ForceBalanceBaseClass):
         # First, set a bunch of starting values
         Ord         = 1 if b_BFGS else 2
         global ITERATION_NUMBER
+        global BEST_STEP
         ITERATION_NUMBER = 0
+        BEST_STEP = 0
         if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
             print "Reading initial objective, gradient, Hessian from checkpoint file"
             xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
@@ -311,6 +317,7 @@ class Optimizer(ForceBalanceBaseClass):
                 trust += a*trust*np.exp(-b*(trust/self.trust0 - 1))
             if X > (X_prev + self.err_tol):
                 color = "\x1b[91m"
+                BEST_STEP = 0
                 # Toggle switch for rejection (experimenting with no rejection)
                 Rejects = True
                 trust = max(ndx*(1./(1+a)), self.mintrust)
@@ -322,8 +329,10 @@ class Optimizer(ForceBalanceBaseClass):
                     continue
             else:
                 if X > X_best:
+                    BEST_STEP = 0
                     color = "\x1b[93m"
                 else:
+                    BEST_STEP = 1
                     color = "\x1b[92m"
                     X_best = X
                 ehist = np.append(ehist, X)
