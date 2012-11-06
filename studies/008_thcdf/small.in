@@ -39,7 +39,7 @@ finite_difference_h 0.001
 penalty_multiplicative 0.0
 penalty_additive 0.01
 
-trust0 1
+trust0 100.0
 
 backup no
 logarithmic_map 1
