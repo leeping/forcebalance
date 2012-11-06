@@ -12,7 +12,7 @@ ffdir forcefield
 penalty_type fusion
 
 # (allcap) The job type, defaults to a single-point evaluation of objective function
-jobtype single
+jobtype newton
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen|xml)
 forcefield cc-pvdz-overlap.gbs throwout.dat

@@ -671,18 +671,424 @@ normalize_weights         False
 ##########################################################
 ###[92m                Setup for optimizer                 [0m###
 ##########################################################
-jobtype                   SINGLE 
+jobtype                   NEWTON 
 trust0                    1.0 
 print_grad                False 
 ----------------------------------------------------------
-True
+
+##########################################################
+###[1;97m                   Main Optimizer                   [0m###
+###[1;97m       Newton-Raphson Mode (Adaptive Radius)        [0m###
+##########################################################
+
 DESTROYED lines: [[]]
 DESTROYED parameters: [[]]
 Sim: molc0           Molecules = ['B2H6']             Objective = 5.51685e-02
-False
 Sim: molc1           Molecules = ['BF3']              Objective = 1.04255e-01
-False
 Sim: molc2           Molecules = ['BH3']              Objective = 1.24553e-01
-False
 Sim: molc3           Molecules = ['BH3NH3']           Objective = 5.96709e-02
-False
+Sim: molc4           Molecules = ['B3N3H6']           Objective = 1.76834e-02
+Sim: molc5           Molecules = ['C2H2']             Objective = 1.07557e-01
+Sim: molc6           Molecules = ['C2H3N']            Objective = 8.51839e-02
+Sim: molc7           Molecules = ['C2H4']             Objective = 1.02044e-01
+Sim: molc8           Molecules = ['C6H6']             Objective = 2.75973e-02
+Sim: molc9           Molecules = ['CF4']              Objective = 7.38317e-02
+Sim: molc10          Molecules = ['CH2O']             Objective = 1.23305e-01
+Sim: molc11          Molecules = ['CH2O2']            Objective = 9.80506e-02
+Sim: molc12          Molecules = ['CH2NH']            Objective = 1.17157e-01
+Sim: molc13          Molecules = ['CH3OH']            Objective = 8.92487e-02
+Sim: molc14          Molecules = ['CH4', 'CO']        Objective = 2.55861e-01
+Sim: molc15          Molecules = ['CO2']              Objective = 1.22332e-01
+Sim: molc16          Molecules = ['F2']               Objective = 8.89073e-02
+Sim: molc17          Molecules = ['H2']               Objective = 2.82662e-02
+Sim: molc18          Molecules = ['H2CO3']            Objective = 7.57904e-02
+Sim: molc19          Molecules = ['water']            Objective = 4.26336e-01
+Sim: molc20          Molecules = ['H2O2']             Objective = 1.59792e-01
+Sim: molc21          Molecules = ['HCN']              Objective = 1.93035e-01
+Sim: molc22          Molecules = ['HF']               Objective = 5.33842e-01
+Sim: molc23          Molecules = ['HNC']              Objective = 1.47842e-01
+Sim: molc24          Molecules = ['HNO']              Objective = 1.77002e-01
+Sim: molc25          Molecules = ['HNO2']             Objective = 1.10966e-01
+Sim: molc26          Molecules = ['HNO3']             Objective = 9.06138e-02
+Sim: molc27          Molecules = ['N2']               Objective = 1.30372e-01
+Sim: molc28          Molecules = ['N2H2']             Objective = 1.72149e-01
+Sim: molc29          Molecules = ['N2H4']             Objective = 1.19976e-01
+Sim: molc30          Molecules = ['NF3']              Objective = 7.54729e-02
+Sim: molc31          Molecules = ['NH3']              Objective = 2.97133e-01
+Sim: molc32          Molecules = ['Ne2']              Objective = 8.70329e-03
+Sim: molc33          Molecules = ['OF2']              Objective = 6.81616e-02
+Sim: molc34          Molecules = ['He2']              Objective = 5.20722e-03
+Sim: molc35          Molecules = ['N4']               Objective = 7.41499e-02
+Sim: molc36          Molecules = ['B4H4']             Objective = 2.64244e-02
+Sim: molc37          Molecules = ['BH3CO']            Objective = 5.89706e-02
+Sim: molc38          Molecules = ['NH4F']             Objective = 1.36888e-01
+Sim: molc39          Molecules = ['C2H6']             Objective = 6.00871e-02
+Sim: molc40          Molecules = ['C4H4']             Objective = 5.24704e-02
+Sim: trans0          Molecules = ['s_tetrazine_to_2HCN_N2'] Objective = 4.33367e-02
+Sim: trans1          Molecules = ['HCCH_to_CCH2']     Objective = 1.66020e-01
+Sim: trans2          Molecules = ['CH3CH2F_to_CH2CH2_HF'] Objective = 5.59316e-02
+Sim: trans3          Molecules = ['HCN_to_HNC']       Objective = 1.46649e-01
+Sim: trans4          Molecules = ['H2CO_to_H2_CO']    Objective = 1.61525e-01
+Sim: trans5          Molecules = ['acrolein_rotation'] Objective = 5.01218e-02
+Sim: trans6          Molecules = ['diels_alder']      Objective = 1.94210e-02
+Sim: trans7          Molecules = ['CH3CH3_to_CH2CH2_H2'] Objective = 1.10722e-01
+Sim: trans8          Molecules = ['sigmatropic_shift'] Objective = 2.99656e-02
+Sim: trans9          Molecules = ['ring_closing']     Objective = 2.45771e-02
+
+######################################################################
+###[96m                  Objective Function Breakdown                  [0m###
+###[96m  Simulation Name          Residual  x  Weight  =  Contribution [0m###
+######################################################################
+molc0                          0.05517      1.000 [97m     5.51685e-02[0m 
+molc1                          0.10426      1.000 [97m     1.04255e-01[0m 
+molc2                          0.12455      1.000 [97m     1.24553e-01[0m 
+molc3                          0.05967      1.000 [97m     5.96709e-02[0m 
+molc4                          0.01768      1.000 [97m     1.76834e-02[0m 
+molc5                          0.10756      1.000 [97m     1.07557e-01[0m 
+molc6                          0.08518      1.000 [97m     8.51839e-02[0m 
+molc7                          0.10204      1.000 [97m     1.02044e-01[0m 
+molc8                          0.02760      1.000 [97m     2.75973e-02[0m 
+molc9                          0.07383      1.000 [97m     7.38317e-02[0m 
+molc10                         0.12330      1.000 [97m     1.23305e-01[0m 
+molc11                         0.09805      1.000 [97m     9.80506e-02[0m 
+molc12                         0.11716      1.000 [97m     1.17157e-01[0m 
+molc13                         0.08925      1.000 [97m     8.92487e-02[0m 
+molc14                         0.25586      1.000 [97m     2.55861e-01[0m 
+molc15                         0.12233      1.000 [97m     1.22332e-01[0m 
+molc16                         0.08891      1.000 [97m     8.89073e-02[0m 
+molc17                         0.02827      1.000 [97m     2.82662e-02[0m 
+molc18                         0.07579      1.000 [97m     7.57904e-02[0m 
+molc19                         0.42634      1.000 [97m     4.26336e-01[0m 
+molc20                         0.15979      1.000 [97m     1.59792e-01[0m 
+molc21                         0.19303      1.000 [97m     1.93035e-01[0m 
+molc22                         0.53384      1.000 [97m     5.33842e-01[0m 
+molc23                         0.14784      1.000 [97m     1.47842e-01[0m 
+molc24                         0.17700      1.000 [97m     1.77002e-01[0m 
+molc25                         0.11097      1.000 [97m     1.10966e-01[0m 
+molc26                         0.09061      1.000 [97m     9.06138e-02[0m 
+molc27                         0.13037      1.000 [97m     1.30372e-01[0m 
+molc28                         0.17215      1.000 [97m     1.72149e-01[0m 
+molc29                         0.11998      1.000 [97m     1.19976e-01[0m 
+molc30                         0.07547      1.000 [97m     7.54729e-02[0m 
+molc31                         0.29713      1.000 [97m     2.97133e-01[0m 
+molc32                         0.00870      1.000 [97m     8.70329e-03[0m 
+molc33                         0.06816      1.000 [97m     6.81616e-02[0m 
+molc34                         0.00521      1.000 [97m     5.20722e-03[0m 
+molc35                         0.07415      1.000 [97m     7.41499e-02[0m 
+molc36                         0.02642      1.000 [97m     2.64244e-02[0m 
+molc37                         0.05897      1.000 [97m     5.89706e-02[0m 
+molc38                         0.13689      1.000 [97m     1.36888e-01[0m 
+molc39                         0.06009      1.000 [97m     6.00871e-02[0m 
+molc40                         0.05247      1.000 [97m     5.24704e-02[0m 
+trans0                         0.04334      1.000 [97m     4.33367e-02[0m 
+trans1                         0.16602      1.000 [97m     1.66020e-01[0m 
+trans2                         0.05593      1.000 [97m     5.59316e-02[0m 
+trans3                         0.14665      1.000 [97m     1.46649e-01[0m 
+trans4                         0.16152      1.000 [97m     1.61525e-01[0m 
+trans5                         0.05012      1.000 [97m     5.01218e-02[0m 
+trans6                         0.01942      1.000 [97m     1.94210e-02[0m 
+trans7                         0.11072      1.000 [97m     1.10722e-01[0m 
+trans8                         0.02997      1.000 [97m     2.99656e-02[0m 
+trans9                         0.02458      1.000 [97m     2.45771e-02[0m 
+Regularization                 0.91953      1.000 [97m     9.19528e-01[0m 
+Total                                             [97m     6.60986e+00[0m 
+----------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     0   0.000e+00   0.000e+00   5.435e+00[97m   6.60986e+00[0m   0.000e+00      1.000
+
+Hessian has a small or negative eigenvalue (9.3e-09), mixing in some steepest descent (1.0e-04) to correct this.
+Eigenvalues are:
+ 1.8e+02  4.5e+01  3.9e+01  3.5e+01  2.6e+01  2.4e+01  2.3e+01  2.1e+01  2.0e+01  1.9e+01  1.8e+01  1.7e+01  1.6e+01  1.5e+01  1.4e+01  1.3e+01  1.0e+01  9.3e+00  1.1e+01  8.2e+00  7.7e+00  7.2e+00  6.7e+00  6.2e+00  5.6e+00  4.7e+00  4.9e+00  5.1e+00  5.1e+00  3.0e+00  2.9e+00  2.7e+00  2.6e+00  2.1e+00  2.0e+00  1.8e+00  1.9e+00  1.7e+00  1.1e+00  1.4e+00  1.4e+00  1.3e+00  1.3e+00  9.1e-01  6.7e-01  5.7e-01  5.2e-01  5.0e-01  4.5e-01  6.1e-01  3.5e-01  3.3e-01  3.3e-01  2.7e-01  2.4e-01  2.3e-01  2.3e-01  2.1e-01  1.7e-01  1.5e-01  1.4e-01  1.2e-01  1.0e-01  9.9e-02  8.1e-02  7.0e-02  7.2e-02  5.9e-02  5.1e-02  3.6e-02  3.7e-02  2.3e-02  2.2e-02  2.0e-02  1.9e-02  1.6e-02  1.5e-02  1.4e-02  6.8e-03  1.3e-02  1.4e-02  1.3e-02  4.6e-03  4.0e-03  3.5e-03  2.9e-03  2.0e-03  2.6e-03  1.5e-03  2.6e-03  6.9e-04  6.3e-04  4.3e-04  3.6e-04  2.0e-04  1.9e-05  9.6e-05  1.3e-04  2.6e-05  1.8e-03  6.6e-05  1.1e+01  7.5e+00  3.4e+00  1.6e+00  9.0e-01  6.6e-02  1.3e-02  3.9e-03  1.6e-03  1.1e-03  2.5e-05  2.4e-05  1.3e-05  9.3e-09  1.3e-06  1.0e-05  4.0e-06  5.8e-06
+Levenberg-Marquardt: hyperbolic-regularized step found (length 9.990e-01), Hessian diagonal is scaled by  14.903
+pvals:
+[  5.02568956e+00   1.13451075e+00   2.91711468e-01   1.87654698e+00
+   9.81038466e-01   1.16889319e+00   1.69748280e+01   3.58951287e+00
+   5.67501203e-01   5.16287812e+00   1.86312041e+00   2.32466487e+01
+   9.99122754e+00   3.87871971e+00   1.20659936e+00   5.62928240e-01
+   2.68804379e-01   1.17169303e-01   1.38060714e+01   4.61220029e+00
+   1.31866356e+00   5.35915729e-01   2.16079783e-01   2.44549556e+00
+   7.66451010e-01   3.72591253e-01   1.69376465e-01   2.27684737e+00
+   5.65309855e-01   5.96342275e+01   1.26884906e+01   4.59346214e+00
+   1.45582576e+00   7.73707551e-01   4.08461804e-01   2.08088043e-01
+   2.05770132e+01   5.49637409e+00   1.69456610e+00   7.47264576e-01
+   3.20650871e-01   9.84410872e+00   2.65210703e+00   9.19341908e-01
+   3.40607130e-01   2.68582204e+00   8.93606821e-01   8.85217403e+01
+   1.98295861e+01   7.49738824e+00   2.31525542e+00   1.12476953e+00
+   7.26722442e-01   3.28846811e-01   2.90631090e+01   7.96089146e+00
+   2.50120553e+00   1.08673081e+00   4.61260525e-01   1.20829733e+01
+   3.42915705e+00   1.28218269e+00   4.77431192e-01   3.31948256e+00
+   1.32968408e+00   1.10439616e+02   2.49545967e+01   9.46239889e+00
+   2.92027399e+00   1.38562108e+00   9.03121030e-01   4.22351832e-01
+   3.54973460e+01   9.81800660e+00   3.17822253e+00   1.39753421e+00
+   6.11013910e-01   1.50916075e+01   4.50953470e+00   1.80402058e+00
+   5.91776056e-01   4.13704684e+00   1.78834725e+00   1.29332955e+02
+   3.13711406e+01   1.09953402e+01   3.72648956e+00   1.71993057e+00
+   1.08273400e+00   5.40663585e-01   4.23868341e+01   1.16384080e+01
+   4.23163092e+00   1.90415418e+00   7.83401668e-01   1.98096656e+01
+   5.96519065e+00   2.44031937e+00   7.44890101e-01   5.70775649e+00
+   2.44145228e+00   1.11016776e+02   3.68537534e+01   1.09109299e+01
+   4.14378149e+00   1.49237651e+00   9.16027925e-01   6.96679551e-01
+   5.25393309e+01   1.56459145e+01   5.23246342e+00   2.55526869e+00
+   9.57272619e-01   2.22457493e+01   7.41558689e+00   3.24752674e+00
+   9.16341591e-01   7.86429878e+00   3.28705102e+00]
+
+##########################################################
+###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
+##########################################################
+   0 [  0.0000e+00 - 1.7789e-02 = -1.7789e-02 ] : Exponent:Elem=H,AMom=S,Bas=0,Con=0
+   1 [  0.0000e+00 - 7.4245e-03 = -7.4245e-03 ] : Exponent:Elem=H,AMom=S,Bas=1,Con=0
+   2 [  0.0000e+00 + 1.7120e-04 =  1.7120e-04 ] : Exponent:Elem=H,AMom=S,Bas=2,Con=0
+   3 [  0.0000e+00 - 2.0265e-02 = -2.0265e-02 ] : Exponent:Elem=H,AMom=P,Bas=0,Con=0
+   4 [  0.0000e+00 - 5.4515e-03 = -5.4515e-03 ] : Exponent:Elem=H,AMom=P,Bas=1,Con=0
+   5 [  0.0000e+00 - 2.7256e-03 = -2.7256e-03 ] : Exponent:Elem=H,AMom=D,Bas=0,Con=0
+   6 [  0.0000e+00 - 6.4089e-04 = -6.4089e-04 ] : Exponent:Elem=He,AMom=S,Bas=0,Con=0
+   7 [  0.0000e+00 - 1.9317e-05 = -1.9317e-05 ] : Exponent:Elem=He,AMom=S,Bas=1,Con=0
+   8 [  0.0000e+00 + 3.1871e-04 =  3.1871e-04 ] : Exponent:Elem=He,AMom=S,Bas=2,Con=0
+   9 [  0.0000e+00 - 7.1950e-05 = -7.1950e-05 ] : Exponent:Elem=He,AMom=P,Bas=0,Con=0
+  10 [  0.0000e+00 - 1.5339e-06 = -1.5339e-06 ] : Exponent:Elem=He,AMom=P,Bas=1,Con=0
+  11 [  0.0000e+00 - 8.3584e-01 = -8.3584e-01 ] : Exponent:Elem=B,AMom=S,Bas=0,Con=0
+  12 [  0.0000e+00 - 6.3635e-02 = -6.3635e-02 ] : Exponent:Elem=B,AMom=S,Bas=1,Con=0
+  13 [  0.0000e+00 - 3.6003e-02 = -3.6003e-02 ] : Exponent:Elem=B,AMom=S,Bas=2,Con=0
+  14 [  0.0000e+00 + 2.3913e-03 =  2.3913e-03 ] : Exponent:Elem=B,AMom=S,Bas=3,Con=0
+  15 [  0.0000e+00 + 9.8122e-03 =  9.8122e-03 ] : Exponent:Elem=B,AMom=S,Bas=4,Con=0
+  16 [  0.0000e+00 + 5.5215e-03 =  5.5215e-03 ] : Exponent:Elem=B,AMom=S,Bas=5,Con=0
+  17 [  0.0000e+00 - 2.1993e-03 = -2.1993e-03 ] : Exponent:Elem=B,AMom=S,Bas=6,Con=0
+  18 [  0.0000e+00 - 1.9160e-01 = -1.9160e-01 ] : Exponent:Elem=B,AMom=P,Bas=0,Con=0
+  19 [  0.0000e+00 - 1.0353e-01 = -1.0353e-01 ] : Exponent:Elem=B,AMom=P,Bas=1,Con=0
+  20 [  0.0000e+00 - 3.3712e-02 = -3.3712e-02 ] : Exponent:Elem=B,AMom=P,Bas=2,Con=0
+  21 [  0.0000e+00 - 1.1648e-02 = -1.1648e-02 ] : Exponent:Elem=B,AMom=P,Bas=3,Con=0
+  22 [  0.0000e+00 + 4.7820e-03 =  4.7820e-03 ] : Exponent:Elem=B,AMom=P,Bas=4,Con=0
+  23 [  0.0000e+00 - 1.3881e-02 = -1.3881e-02 ] : Exponent:Elem=B,AMom=D,Bas=0,Con=0
+  24 [  0.0000e+00 - 8.8438e-03 = -8.8438e-03 ] : Exponent:Elem=B,AMom=D,Bas=1,Con=0
+  25 [  0.0000e+00 - 2.0527e-03 = -2.0527e-03 ] : Exponent:Elem=B,AMom=D,Bas=2,Con=0
+  26 [  0.0000e+00 + 9.0445e-03 =  9.0445e-03 ] : Exponent:Elem=B,AMom=D,Bas=3,Con=0
+  27 [  0.0000e+00 - 1.0453e-01 = -1.0453e-01 ] : Exponent:Elem=B,AMom=F,Bas=0,Con=0
+  28 [  0.0000e+00 + 4.5438e-04 =  4.5438e-04 ] : Exponent:Elem=B,AMom=F,Bas=1,Con=0
+  29 [  0.0000e+00 - 5.0854e-02 = -5.0854e-02 ] : Exponent:Elem=C,AMom=S,Bas=0,Con=0
+  30 [  0.0000e+00 - 8.4299e-02 = -8.4299e-02 ] : Exponent:Elem=C,AMom=S,Bas=1,Con=0
+  31 [  0.0000e+00 - 3.8293e-02 = -3.8293e-02 ] : Exponent:Elem=C,AMom=S,Bas=2,Con=0
+  32 [  0.0000e+00 - 3.8739e-02 = -3.8739e-02 ] : Exponent:Elem=C,AMom=S,Bas=3,Con=0
+  33 [  0.0000e+00 - 1.1552e-02 = -1.1552e-02 ] : Exponent:Elem=C,AMom=S,Bas=4,Con=0
+  34 [  0.0000e+00 - 1.4928e-03 = -1.4928e-03 ] : Exponent:Elem=C,AMom=S,Bas=5,Con=0
+  35 [  0.0000e+00 + 6.2285e-03 =  6.2285e-03 ] : Exponent:Elem=C,AMom=S,Bas=6,Con=0
+  36 [  0.0000e+00 - 1.4861e-02 = -1.4861e-02 ] : Exponent:Elem=C,AMom=P,Bas=0,Con=0
+  37 [  0.0000e+00 - 8.8542e-02 = -8.8542e-02 ] : Exponent:Elem=C,AMom=P,Bas=1,Con=0
+  38 [  0.0000e+00 - 1.5246e-02 = -1.5246e-02 ] : Exponent:Elem=C,AMom=P,Bas=2,Con=0
+  39 [  0.0000e+00 - 9.5896e-03 = -9.5896e-03 ] : Exponent:Elem=C,AMom=P,Bas=3,Con=0
+  40 [  0.0000e+00 - 3.1639e-03 = -3.1639e-03 ] : Exponent:Elem=C,AMom=P,Bas=4,Con=0
+  41 [  0.0000e+00 - 3.2717e-02 = -3.2717e-02 ] : Exponent:Elem=C,AMom=D,Bas=0,Con=0
+  42 [  0.0000e+00 - 9.8801e-03 = -9.8801e-03 ] : Exponent:Elem=C,AMom=D,Bas=1,Con=0
+  43 [  0.0000e+00 - 3.4455e-03 = -3.4455e-03 ] : Exponent:Elem=C,AMom=D,Bas=2,Con=0
+  44 [  0.0000e+00 - 6.8933e-04 = -6.8933e-04 ] : Exponent:Elem=C,AMom=D,Bas=3,Con=0
+  45 [  0.0000e+00 - 2.1040e-02 = -2.1040e-02 ] : Exponent:Elem=C,AMom=F,Bas=0,Con=0
+  46 [  0.0000e+00 - 2.4022e-03 = -2.4022e-03 ] : Exponent:Elem=C,AMom=F,Bas=1,Con=0
+  47 [  0.0000e+00 + 9.4814e-03 =  9.4814e-03 ] : Exponent:Elem=N,AMom=S,Bas=0,Con=0
+  48 [  0.0000e+00 - 3.1683e-02 = -3.1683e-02 ] : Exponent:Elem=N,AMom=S,Bas=1,Con=0
+  49 [  0.0000e+00 - 1.6794e-02 = -1.6794e-02 ] : Exponent:Elem=N,AMom=S,Bas=2,Con=0
+  50 [  0.0000e+00 - 1.2450e-02 = -1.2450e-02 ] : Exponent:Elem=N,AMom=S,Bas=3,Con=0
+  51 [  0.0000e+00 + 1.3608e-03 =  1.3608e-03 ] : Exponent:Elem=N,AMom=S,Bas=4,Con=0
+  52 [  0.0000e+00 + 4.3902e-03 =  4.3902e-03 ] : Exponent:Elem=N,AMom=S,Bas=5,Con=0
+  53 [  0.0000e+00 + 4.8340e-03 =  4.8340e-03 ] : Exponent:Elem=N,AMom=S,Bas=6,Con=0
+  54 [  0.0000e+00 - 5.9757e-03 = -5.9757e-03 ] : Exponent:Elem=N,AMom=P,Bas=0,Con=0
+  55 [  0.0000e+00 - 7.1740e-02 = -7.1740e-02 ] : Exponent:Elem=N,AMom=P,Bas=1,Con=0
+  56 [  0.0000e+00 - 1.2884e-02 = -1.2884e-02 ] : Exponent:Elem=N,AMom=P,Bas=2,Con=0
+  57 [  0.0000e+00 - 7.2242e-03 = -7.2242e-03 ] : Exponent:Elem=N,AMom=P,Bas=3,Con=0
+  58 [  0.0000e+00 + 3.3940e-04 =  3.3940e-04 ] : Exponent:Elem=N,AMom=P,Bas=4,Con=0
+  59 [  0.0000e+00 - 2.0060e-02 = -2.0060e-02 ] : Exponent:Elem=N,AMom=D,Bas=0,Con=0
+  60 [  0.0000e+00 + 2.9080e-04 =  2.9080e-04 ] : Exponent:Elem=N,AMom=D,Bas=1,Con=0
+  61 [  0.0000e+00 - 2.4828e-03 = -2.4828e-03 ] : Exponent:Elem=N,AMom=D,Bas=2,Con=0
+  62 [  0.0000e+00 - 8.7683e-04 = -8.7683e-04 ] : Exponent:Elem=N,AMom=D,Bas=3,Con=0
+  63 [  0.0000e+00 - 2.4314e-02 = -2.4314e-02 ] : Exponent:Elem=N,AMom=F,Bas=0,Con=0
+  64 [  0.0000e+00 - 3.7876e-03 = -3.7876e-03 ] : Exponent:Elem=N,AMom=F,Bas=1,Con=0
+  65 [  0.0000e+00 + 8.9006e-03 =  8.9006e-03 ] : Exponent:Elem=O,AMom=S,Bas=0,Con=0
+  66 [  0.0000e+00 - 2.4675e-02 = -2.4675e-02 ] : Exponent:Elem=O,AMom=S,Bas=1,Con=0
+  67 [  0.0000e+00 - 9.3702e-03 = -9.3702e-03 ] : Exponent:Elem=O,AMom=S,Bas=2,Con=0
+  68 [  0.0000e+00 - 6.5961e-03 = -6.5961e-03 ] : Exponent:Elem=O,AMom=S,Bas=3,Con=0
+  69 [  0.0000e+00 - 7.7347e-03 = -7.7347e-03 ] : Exponent:Elem=O,AMom=S,Bas=4,Con=0
+  70 [  0.0000e+00 - 2.1458e-03 = -2.1458e-03 ] : Exponent:Elem=O,AMom=S,Bas=5,Con=0
+  71 [  0.0000e+00 + 2.3131e-03 =  2.3131e-03 ] : Exponent:Elem=O,AMom=S,Bas=6,Con=0
+  72 [  0.0000e+00 - 1.7643e-02 = -1.7643e-02 ] : Exponent:Elem=O,AMom=P,Bas=0,Con=0
+  73 [  0.0000e+00 - 1.0286e-01 = -1.0286e-01 ] : Exponent:Elem=O,AMom=P,Bas=1,Con=0
+  74 [  0.0000e+00 - 8.6833e-03 = -8.6833e-03 ] : Exponent:Elem=O,AMom=P,Bas=2,Con=0
+  75 [  0.0000e+00 - 4.5233e-03 = -4.5233e-03 ] : Exponent:Elem=O,AMom=P,Bas=3,Con=0
+  76 [  0.0000e+00 - 2.8585e-03 = -2.8585e-03 ] : Exponent:Elem=O,AMom=P,Bas=4,Con=0
+  77 [  0.0000e+00 - 1.0513e-02 = -1.0513e-02 ] : Exponent:Elem=O,AMom=D,Bas=0,Con=0
+  78 [  0.0000e+00 - 2.5105e-03 = -2.5105e-03 ] : Exponent:Elem=O,AMom=D,Bas=1,Con=0
+  79 [  0.0000e+00 - 4.5293e-03 = -4.5293e-03 ] : Exponent:Elem=O,AMom=D,Bas=2,Con=0
+  80 [  0.0000e+00 - 7.1783e-04 = -7.1783e-04 ] : Exponent:Elem=O,AMom=D,Bas=3,Con=0
+  81 [  0.0000e+00 - 2.0313e-02 = -2.0313e-02 ] : Exponent:Elem=O,AMom=F,Bas=0,Con=0
+  82 [  0.0000e+00 - 1.0411e-03 = -1.0411e-03 ] : Exponent:Elem=O,AMom=F,Bas=1,Con=0
+  83 [  0.0000e+00 - 7.7333e-03 = -7.7333e-03 ] : Exponent:Elem=F,AMom=S,Bas=0,Con=0
+  84 [  0.0000e+00 - 1.4813e-02 = -1.4813e-02 ] : Exponent:Elem=F,AMom=S,Bas=1,Con=0
+  85 [  0.0000e+00 - 2.0497e-03 = -2.0497e-03 ] : Exponent:Elem=F,AMom=S,Bas=2,Con=0
+  86 [  0.0000e+00 + 5.3058e-03 =  5.3058e-03 ] : Exponent:Elem=F,AMom=S,Bas=3,Con=0
+  87 [  0.0000e+00 - 9.6280e-03 = -9.6280e-03 ] : Exponent:Elem=F,AMom=S,Bas=4,Con=0
+  88 [  0.0000e+00 - 1.3900e-03 = -1.3900e-03 ] : Exponent:Elem=F,AMom=S,Bas=5,Con=0
+  89 [  0.0000e+00 + 7.5536e-03 =  7.5536e-03 ] : Exponent:Elem=F,AMom=S,Bas=6,Con=0
+  90 [  0.0000e+00 - 1.2666e-02 = -1.2666e-02 ] : Exponent:Elem=F,AMom=P,Bas=0,Con=0
+  91 [  0.0000e+00 - 8.1875e-02 = -8.1875e-02 ] : Exponent:Elem=F,AMom=P,Bas=1,Con=0
+  92 [  0.0000e+00 - 6.1910e-03 = -6.1910e-03 ] : Exponent:Elem=F,AMom=P,Bas=2,Con=0
+  93 [  0.0000e+00 - 4.2060e-03 = -4.2060e-03 ] : Exponent:Elem=F,AMom=P,Bas=3,Con=0
+  94 [  0.0000e+00 - 4.2396e-03 = -4.2396e-03 ] : Exponent:Elem=F,AMom=P,Bas=4,Con=0
+  95 [  0.0000e+00 - 5.8203e-03 = -5.8203e-03 ] : Exponent:Elem=F,AMom=D,Bas=0,Con=0
+  96 [  0.0000e+00 - 2.4294e-04 = -2.4294e-04 ] : Exponent:Elem=F,AMom=D,Bas=1,Con=0
+  97 [  0.0000e+00 - 2.6440e-03 = -2.6440e-03 ] : Exponent:Elem=F,AMom=D,Bas=2,Con=0
+  98 [  0.0000e+00 + 1.6057e-03 =  1.6057e-03 ] : Exponent:Elem=F,AMom=D,Bas=3,Con=0
+  99 [  0.0000e+00 - 8.0918e-03 = -8.0918e-03 ] : Exponent:Elem=F,AMom=F,Bas=0,Con=0
+ 100 [  0.0000e+00 - 1.7751e-03 = -1.7751e-03 ] : Exponent:Elem=F,AMom=F,Bas=1,Con=0
+ 101 [  0.0000e+00 - 3.9583e-01 = -3.9583e-01 ] : Exponent:Elem=Ne,AMom=S,Bas=0,Con=0
+ 102 [  0.0000e+00 - 3.3900e-02 = -3.3900e-02 ] : Exponent:Elem=Ne,AMom=S,Bas=1,Con=0
+ 103 [  0.0000e+00 - 1.3287e-02 = -1.3287e-02 ] : Exponent:Elem=Ne,AMom=S,Bas=2,Con=0
+ 104 [  0.0000e+00 - 5.7081e-03 = -5.7081e-03 ] : Exponent:Elem=Ne,AMom=S,Bas=3,Con=0
+ 105 [  0.0000e+00 + 7.8818e-03 =  7.8818e-03 ] : Exponent:Elem=Ne,AMom=S,Bas=4,Con=0
+ 106 [  0.0000e+00 + 1.5817e-02 =  1.5817e-02 ] : Exponent:Elem=Ne,AMom=S,Bas=5,Con=0
+ 107 [  0.0000e+00 + 1.5199e-01 =  1.5199e-01 ] : Exponent:Elem=Ne,AMom=S,Bas=6,Con=0
+ 108 [  0.0000e+00 - 2.4718e-02 = -2.4718e-02 ] : Exponent:Elem=Ne,AMom=P,Bas=0,Con=0
+ 109 [  0.0000e+00 - 3.1089e-03 = -3.1089e-03 ] : Exponent:Elem=Ne,AMom=P,Bas=1,Con=0
+ 110 [  0.0000e+00 + 4.5085e-03 =  4.5085e-03 ] : Exponent:Elem=Ne,AMom=P,Bas=2,Con=0
+ 111 [  0.0000e+00 + 8.7390e-04 =  8.7390e-04 ] : Exponent:Elem=Ne,AMom=P,Bas=3,Con=0
+ 112 [  0.0000e+00 - 1.8868e-03 = -1.8868e-03 ] : Exponent:Elem=Ne,AMom=P,Bas=4,Con=0
+ 113 [  0.0000e+00 - 5.6378e-03 = -5.6378e-03 ] : Exponent:Elem=Ne,AMom=D,Bas=0,Con=0
+ 114 [  0.0000e+00 - 5.2510e-04 = -5.2510e-04 ] : Exponent:Elem=Ne,AMom=D,Bas=1,Con=0
+ 115 [  0.0000e+00 - 4.2911e-03 = -4.2911e-03 ] : Exponent:Elem=Ne,AMom=D,Bas=2,Con=0
+ 116 [  0.0000e+00 + 1.2630e-03 =  1.2630e-03 ] : Exponent:Elem=Ne,AMom=D,Bas=3,Con=0
+ 117 [  0.0000e+00 - 3.1289e-03 = -3.1289e-03 ] : Exponent:Elem=Ne,AMom=F,Bas=0,Con=0
+ 118 [  0.0000e+00 + 5.9727e-04 =  5.9727e-04 ] : Exponent:Elem=Ne,AMom=F,Bas=1,Con=0
+----------------------------------------------------------
+
+##########################################################
+###[93m    Physical Parameters (Current + Step = Next)     [0m###
+##########################################################
+   0 [  5.1159e+00 - 9.0200e-02 =  5.0257e+00 ] : Exponent:Elem=H,AMom=S,Bas=0,Con=0
+   1 [  1.1430e+00 - 8.4545e-03 =  1.1345e+00 ] : Exponent:Elem=H,AMom=S,Bas=1,Con=0
+   2 [  2.9166e-01 + 4.9938e-05 =  2.9171e-01 ] : Exponent:Elem=H,AMom=S,Bas=2,Con=0
+   3 [  1.9150e+00 - 3.8417e-02 =  1.8765e+00 ] : Exponent:Elem=H,AMom=P,Bas=0,Con=0
+   4 [  9.8640e-01 - 5.3628e-03 =  9.8104e-01 ] : Exponent:Elem=H,AMom=P,Bas=1,Con=0
+   5 [  1.1721e+00 - 3.1903e-03 =  1.1689e+00 ] : Exponent:Elem=H,AMom=D,Bas=0,Con=0
+   6 [  1.6986e+01 - 1.0882e-02 =  1.6975e+01 ] : Exponent:Elem=He,AMom=S,Bas=0,Con=0
+   7 [  3.5896e+00 - 6.9341e-05 =  3.5895e+00 ] : Exponent:Elem=He,AMom=S,Bas=1,Con=0
+   8 [  5.6732e-01 + 1.8084e-04 =  5.6750e-01 ] : Exponent:Elem=He,AMom=S,Bas=2,Con=0
+   9 [  5.1632e+00 - 3.7148e-04 =  5.1629e+00 ] : Exponent:Elem=He,AMom=P,Bas=0,Con=0
+  10 [  1.8631e+00 - 2.8579e-06 =  1.8631e+00 ] : Exponent:Elem=He,AMom=P,Bas=1,Con=0
+  11 [  5.3624e+01 - 3.0378e+01 =  2.3247e+01 ] : Exponent:Elem=B,AMom=S,Bas=0,Con=0
+  12 [  1.0648e+01 - 6.5645e-01 =  9.9912e+00 ] : Exponent:Elem=B,AMom=S,Bas=1,Con=0
+  13 [  4.0209e+00 - 1.4219e-01 =  3.8787e+00 ] : Exponent:Elem=B,AMom=S,Bas=2,Con=0
+  14 [  1.2037e+00 + 2.8819e-03 =  1.2066e+00 ] : Exponent:Elem=B,AMom=S,Bas=3,Con=0
+  15 [  5.5743e-01 + 5.4966e-03 =  5.6293e-01 ] : Exponent:Elem=B,AMom=S,Bas=4,Con=0
+  16 [  2.6732e-01 + 1.4801e-03 =  2.6880e-01 ] : Exponent:Elem=B,AMom=S,Bas=5,Con=0
+  17 [  1.1743e-01 - 2.5798e-04 =  1.1717e-01 ] : Exponent:Elem=B,AMom=S,Bas=6,Con=0
+  18 [  1.6722e+01 - 2.9157e+00 =  1.3806e+01 ] : Exponent:Elem=B,AMom=P,Bas=0,Con=0
+  19 [  5.1153e+00 - 5.0311e-01 =  4.6122e+00 ] : Exponent:Elem=B,AMom=P,Bas=1,Con=0
+  20 [  1.3639e+00 - 4.5212e-02 =  1.3187e+00 ] : Exponent:Elem=B,AMom=P,Bas=2,Con=0
+  21 [  5.4219e-01 - 6.2791e-03 =  5.3592e-01 ] : Exponent:Elem=B,AMom=P,Bas=3,Con=0
+  22 [  2.1505e-01 + 1.0308e-03 =  2.1608e-01 ] : Exponent:Elem=B,AMom=P,Bas=4,Con=0
+  23 [  2.4797e+00 - 3.4184e-02 =  2.4455e+00 ] : Exponent:Elem=B,AMom=D,Bas=0,Con=0
+  24 [  7.7326e-01 - 6.8084e-03 =  7.6645e-01 ] : Exponent:Elem=B,AMom=D,Bas=1,Con=0
+  25 [  3.7336e-01 - 7.6562e-04 =  3.7259e-01 ] : Exponent:Elem=B,AMom=D,Bas=2,Con=0
+  26 [  1.6785e-01 + 1.5250e-03 =  1.6938e-01 ] : Exponent:Elem=B,AMom=D,Bas=3,Con=0
+  27 [  2.5277e+00 - 2.5088e-01 =  2.2768e+00 ] : Exponent:Elem=B,AMom=F,Bas=0,Con=0
+  28 [  5.6505e-01 + 2.5680e-04 =  5.6531e-01 ] : Exponent:Elem=B,AMom=F,Bas=1,Con=0
+  29 [  6.2745e+01 - 3.1111e+00 =  5.9634e+01 ] : Exponent:Elem=C,AMom=S,Bas=0,Con=0
+  30 [  1.3805e+01 - 1.1160e+00 =  1.2688e+01 ] : Exponent:Elem=C,AMom=S,Bas=1,Con=0
+  31 [  4.7728e+00 - 1.7931e-01 =  4.5935e+00 ] : Exponent:Elem=C,AMom=S,Bas=2,Con=0
+  32 [  1.5133e+00 - 5.7504e-02 =  1.4558e+00 ] : Exponent:Elem=C,AMom=S,Bas=3,Con=0
+  33 [  7.8270e-01 - 8.9894e-03 =  7.7371e-01 ] : Exponent:Elem=C,AMom=S,Bas=4,Con=0
+  34 [  4.0907e-01 - 6.1020e-04 =  4.0846e-01 ] : Exponent:Elem=C,AMom=S,Bas=5,Con=0
+  35 [  2.0680e-01 + 1.2920e-03 =  2.0809e-01 ] : Exponent:Elem=C,AMom=S,Bas=6,Con=0
+  36 [  2.0885e+01 - 3.0809e-01 =  2.0577e+01 ] : Exponent:Elem=C,AMom=P,Bas=0,Con=0
+  37 [  6.0052e+00 - 5.0886e-01 =  5.4964e+00 ] : Exponent:Elem=C,AMom=P,Bas=1,Con=0
+  38 [  1.7206e+00 - 2.6034e-02 =  1.6946e+00 ] : Exponent:Elem=C,AMom=P,Bas=2,Con=0
+  39 [  7.5447e-01 - 7.2004e-03 =  7.4726e-01 ] : Exponent:Elem=C,AMom=P,Bas=3,Con=0
+  40 [  3.2167e-01 - 1.0161e-03 =  3.2065e-01 ] : Exponent:Elem=C,AMom=P,Bas=4,Con=0
+  41 [  1.0171e+01 - 3.2739e-01 =  9.8441e+00 ] : Exponent:Elem=C,AMom=D,Bas=0,Con=0
+  42 [  2.6784e+00 - 2.6333e-02 =  2.6521e+00 ] : Exponent:Elem=C,AMom=D,Bas=1,Con=0
+  43 [  9.2251e-01 - 3.1731e-03 =  9.1934e-01 ] : Exponent:Elem=C,AMom=D,Bas=2,Con=0
+  44 [  3.4084e-01 - 2.3487e-04 =  3.4061e-01 ] : Exponent:Elem=C,AMom=D,Bas=3,Con=0
+  45 [  2.7429e+00 - 5.7108e-02 =  2.6858e+00 ] : Exponent:Elem=C,AMom=F,Bas=0,Con=0
+  46 [  8.9576e-01 - 2.1492e-03 =  8.9361e-01 ] : Exponent:Elem=C,AMom=F,Bas=1,Con=0
+  47 [  8.7686e+01 + 8.3534e-01 =  8.8522e+01 ] : Exponent:Elem=N,AMom=S,Bas=0,Con=0
+  48 [  2.0468e+01 - 6.3831e-01 =  1.9830e+01 ] : Exponent:Elem=N,AMom=S,Bas=1,Con=0
+  49 [  7.6244e+00 - 1.2697e-01 =  7.4974e+00 ] : Exponent:Elem=N,AMom=S,Bas=2,Con=0
+  50 [  2.3443e+00 - 2.9005e-02 =  2.3153e+00 ] : Exponent:Elem=N,AMom=S,Bas=3,Con=0
+  51 [  1.1232e+00 + 1.5295e-03 =  1.1248e+00 ] : Exponent:Elem=N,AMom=S,Bas=4,Con=0
+  52 [  7.2354e-01 + 3.1834e-03 =  7.2672e-01 ] : Exponent:Elem=N,AMom=S,Bas=5,Con=0
+  53 [  3.2726e-01 + 1.5858e-03 =  3.2885e-01 ] : Exponent:Elem=N,AMom=S,Bas=6,Con=0
+  54 [  2.9237e+01 - 1.7419e-01 =  2.9063e+01 ] : Exponent:Elem=N,AMom=P,Bas=0,Con=0
+  55 [  8.5530e+00 - 5.9210e-01 =  7.9609e+00 ] : Exponent:Elem=N,AMom=P,Bas=1,Con=0
+  56 [  2.5336e+00 - 3.2434e-02 =  2.5012e+00 ] : Exponent:Elem=N,AMom=P,Bas=2,Con=0
+  57 [  1.0946e+00 - 7.8792e-03 =  1.0867e+00 ] : Exponent:Elem=N,AMom=P,Bas=3,Con=0
+  58 [  4.6110e-01 + 1.5653e-04 =  4.6126e-01 ] : Exponent:Elem=N,AMom=P,Bas=4,Con=0
+  59 [  1.2328e+01 - 2.4483e-01 =  1.2083e+01 ] : Exponent:Elem=N,AMom=D,Bas=0,Con=0
+  60 [  3.4282e+00 + 9.9705e-04 =  3.4292e+00 ] : Exponent:Elem=N,AMom=D,Bas=1,Con=0
+  61 [  1.2854e+00 - 3.1873e-03 =  1.2822e+00 ] : Exponent:Elem=N,AMom=D,Bas=2,Con=0
+  62 [  4.7785e-01 - 4.1881e-04 =  4.7743e-01 ] : Exponent:Elem=N,AMom=D,Bas=3,Con=0
+  63 [  3.4012e+00 - 8.1697e-02 =  3.3195e+00 ] : Exponent:Elem=N,AMom=F,Bas=0,Con=0
+  64 [  1.3347e+00 - 5.0459e-03 =  1.3297e+00 ] : Exponent:Elem=N,AMom=F,Bas=1,Con=0
+  65 [  1.0946e+02 + 9.7862e-01 =  1.1044e+02 ] : Exponent:Elem=O,AMom=S,Bas=0,Con=0
+  66 [  2.5578e+01 - 6.2340e-01 =  2.4955e+01 ] : Exponent:Elem=O,AMom=S,Bas=1,Con=0
+  67 [  9.5515e+00 - 8.9081e-02 =  9.4624e+00 ] : Exponent:Elem=O,AMom=S,Bas=2,Con=0
+  68 [  2.9396e+00 - 1.9326e-02 =  2.9203e+00 ] : Exponent:Elem=O,AMom=S,Bas=3,Con=0
+  69 [  1.3964e+00 - 1.0759e-02 =  1.3856e+00 ] : Exponent:Elem=O,AMom=S,Bas=4,Con=0
+  70 [  9.0506e-01 - 1.9400e-03 =  9.0312e-01 ] : Exponent:Elem=O,AMom=S,Bas=5,Con=0
+  71 [  4.2138e-01 + 9.7583e-04 =  4.2235e-01 ] : Exponent:Elem=O,AMom=S,Bas=6,Con=0
+  72 [  3.6129e+01 - 6.3185e-01 =  3.5497e+01 ] : Exponent:Elem=O,AMom=P,Bas=0,Con=0
+  73 [  1.0882e+01 - 1.0637e+00 =  9.8180e+00 ] : Exponent:Elem=O,AMom=P,Bas=1,Con=0
+  74 [  3.2059e+00 - 2.7717e-02 =  3.1782e+00 ] : Exponent:Elem=O,AMom=P,Bas=2,Con=0
+  75 [  1.4039e+00 - 6.3358e-03 =  1.3975e+00 ] : Exponent:Elem=O,AMom=P,Bas=3,Con=0
+  76 [  6.1276e-01 - 1.7491e-03 =  6.1101e-01 ] : Exponent:Elem=O,AMom=P,Bas=4,Con=0
+  77 [  1.5251e+01 - 1.5949e-01 =  1.5092e+01 ] : Exponent:Elem=O,AMom=D,Bas=0,Con=0
+  78 [  4.5209e+00 - 1.1335e-02 =  4.5095e+00 ] : Exponent:Elem=O,AMom=D,Bas=1,Con=0
+  79 [  1.8122e+00 - 8.1894e-03 =  1.8040e+00 ] : Exponent:Elem=O,AMom=D,Bas=2,Con=0
+  80 [  5.9220e-01 - 4.2494e-04 =  5.9178e-01 ] : Exponent:Elem=O,AMom=D,Bas=3,Con=0
+  81 [  4.2219e+00 - 8.4893e-02 =  4.1370e+00 ] : Exponent:Elem=O,AMom=F,Bas=0,Con=0
+  82 [  1.7902e+00 - 1.8627e-03 =  1.7883e+00 ] : Exponent:Elem=O,AMom=F,Bas=1,Con=0
+  83 [  1.3034e+02 - 1.0040e+00 =  1.2933e+02 ] : Exponent:Elem=F,AMom=S,Bas=0,Con=0
+  84 [  3.1839e+01 - 4.6816e-01 =  3.1371e+01 ] : Exponent:Elem=F,AMom=S,Bas=1,Con=0
+  85 [  1.1018e+01 - 2.2560e-02 =  1.0995e+01 ] : Exponent:Elem=F,AMom=S,Bas=2,Con=0
+  86 [  3.7068e+00 + 1.9720e-02 =  3.7265e+00 ] : Exponent:Elem=F,AMom=S,Bas=3,Con=0
+  87 [  1.7366e+00 - 1.6639e-02 =  1.7199e+00 ] : Exponent:Elem=F,AMom=S,Bas=4,Con=0
+  88 [  1.0842e+00 - 1.5060e-03 =  1.0827e+00 ] : Exponent:Elem=F,AMom=S,Bas=5,Con=0
+  89 [  5.3660e-01 + 4.0686e-03 =  5.4066e-01 ] : Exponent:Elem=F,AMom=S,Bas=6,Con=0
+  90 [  4.2927e+01 - 5.4027e-01 =  4.2387e+01 ] : Exponent:Elem=F,AMom=P,Bas=0,Con=0
+  91 [  1.2631e+01 - 9.9299e-01 =  1.1638e+01 ] : Exponent:Elem=F,AMom=P,Bas=1,Con=0
+  92 [  4.2579e+00 - 2.6279e-02 =  4.2316e+00 ] : Exponent:Elem=F,AMom=P,Bas=2,Con=0
+  93 [  1.9122e+00 - 8.0258e-03 =  1.9042e+00 ] : Exponent:Elem=F,AMom=P,Bas=3,Con=0
+  94 [  7.8673e-01 - 3.3283e-03 =  7.8340e-01 ] : Exponent:Elem=F,AMom=P,Bas=4,Con=0
+  95 [  1.9925e+01 - 1.1563e-01 =  1.9810e+01 ] : Exponent:Elem=F,AMom=D,Bas=0,Con=0
+  96 [  5.9666e+00 - 1.4493e-03 =  5.9652e+00 ] : Exponent:Elem=F,AMom=D,Bas=1,Con=0
+  97 [  2.4468e+00 - 6.4606e-03 =  2.4403e+00 ] : Exponent:Elem=F,AMom=D,Bas=2,Con=0
+  98 [  7.4369e-01 + 1.1951e-03 =  7.4489e-01 ] : Exponent:Elem=F,AMom=D,Bas=3,Con=0
+  99 [  5.7541e+00 - 4.6374e-02 =  5.7078e+00 ] : Exponent:Elem=F,AMom=F,Bas=0,Con=0
+ 100 [  2.4458e+00 - 4.3377e-03 =  2.4415e+00 ] : Exponent:Elem=F,AMom=F,Bas=1,Con=0
+ 101 [  1.6493e+02 - 5.3912e+01 =  1.1102e+02 ] : Exponent:Elem=Ne,AMom=S,Bas=0,Con=0
+ 102 [  3.8125e+01 - 1.2708e+00 =  3.6854e+01 ] : Exponent:Elem=Ne,AMom=S,Bas=1,Con=0
+ 103 [  1.1057e+01 - 1.4594e-01 =  1.0911e+01 ] : Exponent:Elem=Ne,AMom=S,Bas=2,Con=0
+ 104 [  4.1675e+00 - 2.3721e-02 =  4.1438e+00 ] : Exponent:Elem=Ne,AMom=S,Bas=3,Con=0
+ 105 [  1.4807e+00 + 1.1716e-02 =  1.4924e+00 ] : Exponent:Elem=Ne,AMom=S,Bas=4,Con=0
+ 106 [  9.0165e-01 + 1.4375e-02 =  9.1603e-01 ] : Exponent:Elem=Ne,AMom=S,Bas=5,Con=0
+ 107 [  5.9845e-01 + 9.8234e-02 =  6.9668e-01 ] : Exponent:Elem=Ne,AMom=S,Bas=6,Con=0
+ 108 [  5.3854e+01 - 1.3149e+00 =  5.2539e+01 ] : Exponent:Elem=Ne,AMom=P,Bas=0,Con=0
+ 109 [  1.5695e+01 - 4.8717e-02 =  1.5646e+01 ] : Exponent:Elem=Ne,AMom=P,Bas=1,Con=0
+ 110 [  5.2089e+00 + 2.3537e-02 =  5.2325e+00 ] : Exponent:Elem=Ne,AMom=P,Bas=2,Con=0
+ 111 [  2.5530e+00 + 2.2321e-03 =  2.5553e+00 ] : Exponent:Elem=Ne,AMom=P,Bas=3,Con=0
+ 112 [  9.5908e-01 - 1.8079e-03 =  9.5727e-01 ] : Exponent:Elem=Ne,AMom=P,Bas=4,Con=0
+ 113 [  2.2372e+01 - 1.2577e-01 =  2.2246e+01 ] : Exponent:Elem=Ne,AMom=D,Bas=0,Con=0
+ 114 [  7.4195e+00 - 3.8949e-03 =  7.4156e+00 ] : Exponent:Elem=Ne,AMom=D,Bas=1,Con=0
+ 115 [  3.2615e+00 - 1.3965e-02 =  3.2475e+00 ] : Exponent:Elem=Ne,AMom=D,Bas=2,Con=0
+ 116 [  9.1519e-01 + 1.1566e-03 =  9.1634e-01 ] : Exponent:Elem=Ne,AMom=D,Bas=3,Con=0
+ 117 [  7.8889e+00 - 2.4645e-02 =  7.8643e+00 ] : Exponent:Elem=Ne,AMom=F,Bas=0,Con=0
+ 118 [  3.2851e+00 + 1.9627e-03 =  3.2871e+00 ] : Exponent:Elem=Ne,AMom=F,Bas=1,Con=0
+----------------------------------------------------------
+DESTROYED lines: [[], [321, 322]]
+DESTROYED parameters: [[], [106]]
+Sim: molc0           Molecules = ['B2H6']             Objective = 5.01132e-02
+Sim: molc1           Molecules = ['BF3']              Objective = 9.62413e-02
+Sim: molc2           Molecules = ['BH3']              Objective = 1.12201e-01
+Sim: molc3           Molecules = ['BH3NH3']           Objective = 5.68010e-02
+Sim: molc4           Molecules = ['B3N3H6']           Objective = 1.68171e-02
+Sim: molc5           Molecules = ['C2H2']             Objective = 1.02020e-01
+Sim: molc6           Molecules = ['C2H3N']            Objective = 8.01216e-02
+Sim: molc7           Molecules = ['C2H4']             Objective = 9.76724e-02
+Sim: molc8           Molecules = ['C6H6']             Objective = 2.65660e-02
+Sim: molc9           Molecules = ['CF4']              Objective = 7.14550e-02
+fdwrap: callM [79] =  1.0e-03                                                   
