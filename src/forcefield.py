@@ -715,10 +715,44 @@ class FF(ForceBalanceBaseClass):
                         pk = self.redirect[pi]
                     else:
                         pk = pi
-                    if pj not in self.redirect:
+                    #if pj not in self.redirect:
                         #print "Redirecting parameter %i to %i" % (pj, pk)
-                        self.redirect[pj] = pk
+                        #self.redirect[pj] = pk
         #print self.redirect
+
+    def find_spacings(self):
+        Groups = defaultdict(list)
+        for p, pid in enumerate(self.plist):
+            if 'Exponent' not in pid or len(pid.split()) != 1:
+                warn_press_key("Fusion penalty currently implemented only for basis set optimizations, where parameters are like this: Exponent:Elem=H,AMom=D,Bas=0,Con=0")
+            Data = dict([(i.split('=')[0],i.split('=')[1]) for i in pid.split(':')[1].split(',')])
+            if 'Con' not in Data or Data['Con'] != '0':
+                warn_press_key("More than one contraction coefficient found!  You should expect the unexpected")
+            key = Data['Elem']+'_'+Data['AMom']
+            Groups[key].append(p)
+
+        pvals = self.create_pvals(zeros(self.np,dtype=float))
+        print "pvals:"
+        print pvals
+
+        spacdict = {}
+        for gnm, pidx in Groups.items():
+            # The group of parameters for a particular element / angular momentum.
+            pvals_grp = pvals[pidx]
+            # The order that the parameters come in.
+            Order = argsort(pvals_grp)
+            spacs = []
+            for p in range(len(Order) - 1):
+                # The pointers to the parameter indices.
+                pi = pidx[Order[p]]
+                pj = pidx[Order[p+1]]
+                # pvals[pi] is the SMALLER parameter.
+                # pvals[pj] is the LARGER parameter.
+                dp = log(pvals[pj]) - log(pvals[pi])
+                spacs.append(dp)
+            if len(spacs) > 0:
+                spacdict[gnm] = mean(array(spacs))
+        return spacdict
         
     def create_pvals(self,mvals):
         """Converts mathematical to physical parameters.

@@ -37,9 +37,9 @@ finite_difference_h 0.001
 
 # (float) Factor for multiplicative penalty function in objective function
 penalty_multiplicative 0.0
-penalty_additive 0.01
+penalty_additive 0.003
 
-trust0 100.0
+trust0 0.1
 
 backup no
 logarithmic_map 1
