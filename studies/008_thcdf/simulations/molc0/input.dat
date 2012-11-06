@@ -1,0 +1,41 @@
+import os
+
+os.system("rm -f objective.dat")
+
+molecules = []
+
+molecule B2H6 {
+B       0.8812  0.0000  0.0000
+B       -0.8812 0.0000  0.0000
+H       0.0000  0.0000  0.9759
+H       0.0000  0.0000  -0.9759
+H       1.4551  1.0403  0.0000
+H       1.4551  -1.0403 0.0000
+H       -1.4551 1.0403  0.0000
+H       -1.4551 -1.0403 0.0000
+
+symmetry c1
+}
+
+molecules.append(B2H6)
+
+plugin_load("/home/egh4/lr_df/plugins/plugin_objective/plugin_objective.so")
+
+basis file cc-pvdz-overlap.gbs
+
+for mol in molecules:
+    activate(mol)
+
+    set {
+      basis cc-pvdz
+      freeze_core true
+    }
+    
+    set plugin_objective {
+      print 1
+      debug 1
+      ribasis cc-pvdz-overlap
+    }
+    
+    plugin("/home/egh4/lr_df/plugins/plugin_objective/plugin_objective.so")
+    clean()
