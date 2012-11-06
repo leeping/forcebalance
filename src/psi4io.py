@@ -130,20 +130,25 @@ class THCDF_Psi4(LeastSquares):
         return
 
     def write_nested_destroy(self, fnm):
+        ln0 = range(len(open(fnm).readlines()))
         for layer in self.FF.linedestroy:
             f = open(fnm).readlines()
             o = open('.tmp.gbs','w')
+            newln = []
             for ln, line in enumerate(f):
                 if ln not in layer:
                     print >> o, line,
+                    newln.append(ln0[ln])
+            ln0 = newln[:]
             _exec("mv .tmp.gbs %s" % fnm, print_command=False)
             o.close()
+        return ln0
 
     def driver(self):
         ## Actually run PSI4.
         if not in_fd() and CheckBasis():
             _exec("cp %s %s.bak" % (self.GBSfnm, self.GBSfnm), print_command=False)
-            self.write_nested_destroy(self.GBSfnm)
+            ln0 = self.write_nested_destroy(self.GBSfnm)
             _exec("psi4 throwout.dat", print_command=False)
             LI = GBS_Reader()
             LI_lines = {}
@@ -163,12 +168,18 @@ class THCDF_Psi4(LeastSquares):
             FK = GBS_Reader()
             FK_lines = []
             new_linedestroy = []
+            new_parmdestroy = []
             for ln, line in enumerate(open(self.GBSfnm).readlines()):
                 FK.feed(line)
                 key = '.'.join([str(i) for i in FK.element,FK.amom,FK.basis_number[FK.element],FK.contraction_number])
                 if FK.isdata and key in LI_lines:
                     if LI_lines[key][1]:
+                        print "Destroying line %i (originally %i):" % (ln, ln0[ln]), 
+                        print line,
                         new_linedestroy.append(ln)
+                        for p_destroy in [i for i, fld in enumerate(self.FF.pfields) if any([subfld[0] == self.GBSfnm and subfld[1] == ln0[ln] for subfld in fld])]:
+                            print "Destroying parameter %i located at line %i (originally %i) with fields given by:" % (p_destroy, ln, ln0[ln]), self.FF.pfields[p_destroy]
+                            new_parmdestroy.append(p_destroy)
                     FK_lines.append(LI_lines[key][0])
                 else:
                     FK_lines.append(line)
@@ -177,18 +188,9 @@ class THCDF_Psi4(LeastSquares):
                 print >> o, line,
             o.close()
             self.FF.linedestroy.append(new_linedestroy)
+            self.FF.parmdestroy.append(new_parmdestroy)
             _exec("cp %s.bak %s" % (self.GBSfnm, self.GBSfnm), print_command=False)
             print "DESTROYED lines:", self.FF.linedestroy
-            ## Now build a "Frankenstein" .gbs file composed of the original .gbs file but with data from the linindep.gbs file!
-            FK = GBS_Reader()
-            new_parmdestroy = []
-            for ln, line in enumerate(open(self.GBSfnm).readlines()):
-                FK.feed(line)
-                key = '.'.join([str(i) for i in FK.element,FK.amom,FK.basis_number[FK.element],FK.contraction_number])
-                if FK.isdata and key in LI_lines and LI_lines[key][1]:
-                    for p_destroy in [i for i, fld in enumerate(self.FF.pfields) if any([subfld[0] == self.GBSfnm and subfld[1] == ln for subfld in fld])]:
-                        new_parmdestroy.append(p_destroy)
-            self.FF.parmdestroy.append(new_parmdestroy)
             print "DESTROYED parameters:", self.FF.parmdestroy
 
         self.write_nested_destroy(self.GBSfnm)

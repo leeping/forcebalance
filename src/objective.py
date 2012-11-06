@@ -9,7 +9,6 @@ from collections import OrderedDict
 from finite_difference import in_fd
 from nifty import printcool_dictionary
 from baseclass import ForceBalanceBaseClass
-from optimizer import Best
 
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
 Letters = ['X','G','H']
@@ -124,9 +123,6 @@ class Objective(ForceBalanceBaseClass):
         else:
             Title = "Objective Function Breakdown\n %-20s %40s" % ("Simulation Name", "Residual  x  Weight  =  Contribution")
         printcool_dictionary(PrintDict,color=6,title=Title)
-        for key, val in self.ObjDict.items():
-            if Best():
-                self.ObjDict_Last[key] = val
         return
 
     def Full(self, mvals, Order=0, usepvals=False, verbose=False):
