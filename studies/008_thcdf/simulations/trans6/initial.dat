@@ -1,0 +1,43 @@
+import os
+
+os.system("rm -f objective.dat")
+
+molecules = []
+
+molecule diels_alder {
+C        1.4993102894    0.0000000000    0.7000000000
+C        1.4993102894    0.0000000000   -0.7000000000
+C       -1.2304980673    0.6230139132    0.7700000000
+C       -1.2304980673    0.6230139132   -0.7700000000
+C       -0.4764439908   -0.3104754813    1.4000000000
+C       -0.4764439908   -0.3104754813   -1.4000000000
+H       -1.8665039922    1.2806376885    1.3439576933
+H       -1.8665039922    1.2806376885   -1.3439576933
+H        1.7438503788   -0.9170788569    1.2153314611
+H        1.7438503788   -0.9170788569   -1.2153314611
+H        1.4340047232    0.9504595392    1.2065598162
+H        1.4340047232    0.9504595392   -1.2065598162
+H        0.1637490440   -0.9449801041    0.8032439678
+H        0.1637490440   -0.9449801041   -0.8032439678
+H       -0.5364765911   -0.3684189751    2.4767723243
+H       -0.5364765911   -0.3684189751   -2.4767723243
+
+symmetry c1
+}
+
+molecules.append(diels_alder)
+
+plugin_load("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+
+for mol in molecules:
+    activate(mol)
+
+    set {
+      basis cc-pvdz
+      freeze_core true
+    }
+    
+    energy('scf')
+    plugin("/home/egh4/lr_df/plugins/plugin_objective_data/plugin_objective_data.so")
+    clean()
+

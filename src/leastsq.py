@@ -16,6 +16,16 @@ from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from optimizer import Counter
 
+CHECK_BASIS = True
+def CheckBasis():
+    global CHECK_BASIS
+    return CHECK_BASIS
+
+LAST_MVALS = None
+def LastMvals():
+    global LAST_MVALS
+    return LAST_MVALS
+
 class LeastSquares(FittingSimulation):
 
     """ Subclass of FittingSimulation for general least squares fitting. """
@@ -61,6 +71,14 @@ class LeastSquares(FittingSimulation):
         @param[in] AHess Switch to turn on analytic Hessian
         @return Answer Contribution to the objective function
         """
+        global LAST_MVALS, CHECK_BASIS
+        # print mvals
+        # print LAST_MVALS
+        # print mvals == LAST_MVALS
+        if LAST_MVALS == None or not (mvals == LAST_MVALS).all():
+            CHECK_BASIS = True
+        else:
+            CHECK_BASIS = False
         Answer = {}
         Fac = 1000000
         ## Dictionary for derivative terms
@@ -113,5 +131,6 @@ class LeastSquares(FittingSimulation):
         Answer = {'X':Objective, 'G':G, 'H':H}
         if not in_fd():
             self.objective = Answer['X']
+            LAST_MVALS = mvals.copy()
         return Answer
 

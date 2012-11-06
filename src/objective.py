@@ -71,8 +71,6 @@ class Objective(ForceBalanceBaseClass):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
         Objective = {'X':0.0, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         # Loop through the simulations.
-        # XTot = 0.0
-        # WTot = 0.0
         for Sim in self.Simulations:
             # The first call is always done at the midpoint.
             Sim.bSave = True
@@ -86,12 +84,8 @@ class Objective(ForceBalanceBaseClass):
             # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
             if not in_fd():
                 self.ObjDict[Sim.name] = {'w' : Sim.weight/self.WTot , 'x' : Ans['X']}
-                # WTot += Sim.weight/self.WTot
-                # XTot += Ans['X']
             for i in range(3):
                 Objective[Letters[i]] += Ans[Letters[i]]*Sim.weight/self.WTot
-        # if not in_fd():
-        #     self.ObjDict['Total'] = {'w' : WTot, 'x' : XTot}
         return Objective
 
     def Indicate(self):
@@ -100,6 +94,7 @@ class Objective(ForceBalanceBaseClass):
         Total = 0.0
         Change = False
         for key, val in self.ObjDict.items():
+            if key == 'Total' : continue
             color = "\x1b[97m"
             if key in self.ObjDict_Last:
                 Change = True
@@ -113,10 +108,21 @@ class Objective(ForceBalanceBaseClass):
                 xold = self.ObjDict_Last[key]['x'] * self.ObjDict_Last[key]['w']
                 PrintDict[key] += " ( %+10.3e )" % (xnew - xold)
             Total += val['x']*val['w']
+        self.ObjDict['Total'] = Total
+        if 'Total' in self.ObjDict_Last:
+            Change = True
+            if self.ObjDict['Total'] <= self.ObjDict_Last['Total']:
+                color = "\x1b[92m"
+            elif self.ObjDict['Total'] > self.ObjDict_Last['Total']:
+                color = "\x1b[91m"
+        PrintDict['Total'] = "% 12s % 10s %s% 16.5e%s" % ("","",color,Total,"\x1b[0m")
         if Change:
-            Title = "Objective Function Breakdown, Total = % .5e\n %-20s %55s" % (Total, "Simulation Name", "Residual  x  Weight  =  Contribution (Current-Prev)")
+            xnew = self.ObjDict['Total']
+            xold = self.ObjDict_Last['Total']
+            PrintDict['Total'] += " ( %+10.3e )" % (xnew - xold)
+            Title = "Objective Function Breakdown\n %-20s %55s" % ("Simulation Name", "Residual  x  Weight  =  Contribution (Current-Prev)")
         else:
-            Title = "Objective Function Breakdown, Total = % .5e\n %-20s %40s" % (Total, "Simulation Name", "Residual  x  Weight  =  Contribution")
+            Title = "Objective Function Breakdown\n %-20s %40s" % ("Simulation Name", "Residual  x  Weight  =  Contribution")
         printcool_dictionary(PrintDict,color=6,title=Title)
         for key, val in self.ObjDict.items():
             if Best():

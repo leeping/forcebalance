@@ -99,7 +99,7 @@ from re import match, sub, split
 import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
 import basereader
 from finite_difference import in_fd
-from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros, sin, cos, pi, sqrt
+from numpy import argsort, arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros, sin, cos, pi, sqrt
 from numpy.linalg import norm
 from nifty import col, flat, invert_svd, isint, isfloat, kb, orthogonalize, pmat2d, printcool, row, warn_press_key, printcool_dictionary
 from string import count
@@ -301,6 +301,9 @@ class FF(ForceBalanceBaseClass):
         self.mktransmat()
         ## Redirection dictionary (experimental).
         self.redirect = {}
+        ## Destruction dictionary (experimental).
+        self.linedestroy = []
+        self.parmdestroy = []
         ## Print the optimizer options.
         printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
 
@@ -690,6 +693,7 @@ class FF(ForceBalanceBaseClass):
         #print "pvals: ", pvals
 
         pvals = self.create_pvals(mvals)
+        print "pvals:"
         print pvals
 
         Thresh = 1e-4
@@ -712,8 +716,8 @@ class FF(ForceBalanceBaseClass):
                     else:
                         pk = pi
                     if pj not in self.redirect:
-                        print "Redirecting parameter %i to %i" % (pj, pk)
-                        #self.redirect[pj] = pk
+                        #print "Redirecting parameter %i to %i" % (pj, pk)
+                        self.redirect[pj] = pk
         #print self.redirect
         
     def create_pvals(self,mvals):

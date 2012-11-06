@@ -222,7 +222,7 @@ class Optimizer(ForceBalanceBaseClass):
         global ITERATION_NUMBER
         global BEST_STEP
         ITERATION_NUMBER = 0
-        BEST_STEP = 0
+        BEST_STEP = 1
         if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
             print "Reading initial objective, gradient, Hessian from checkpoint file"
             xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
@@ -326,6 +326,9 @@ class Optimizer(ForceBalanceBaseClass):
                     xk = xk_prev.copy()
                     G = G_prev.copy()
                     H = H_stor.copy()
+                    if len(self.FF.parmdestroy) > 0:
+                        self.FF.parmdestroy = self.FF.parmdestroy[:-1]
+                        self.FF.linedestroy = self.FF.linedestroy[:-1]
                     continue
             else:
                 if X > X_best:
