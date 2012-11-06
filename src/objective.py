@@ -204,6 +204,11 @@ class Penalty:
         elif self.ptyp == 4:
             print "Using L0-L1 FUSION PENALTY (only relevant for basis set optimizations at the moment) with strength %.1e and switching distance %.1e" % (Factor_Add, Alpha)
 
+        ## Find exponential spacings.
+        if self.ptyp == 3 or self.ptyp == 4:
+            self.spacings = self.FF.find_spacings()
+            printcool_dictionary(self.spacings, title="Starting zeta spacings\n(Pay attention to these)")
+
     def compute(self, mvals, Objective):
         X = Objective['X']
         G = Objective['G']
@@ -290,6 +295,7 @@ class Penalty:
                 # pvals[pi] is the SMALLER parameter.
                 # pvals[pj] is the LARGER parameter.
                 dp = log(pvals[pj]) - log(pvals[pi])
+                # dp = (log(pvals[pj]) - log(pvals[pi])) / self.spacings[gnm]
                 DC0     += (dp**2 + self.b**2)**0.5 - self.b
                 DC1[pi] -= dp*(dp**2 + self.b**2)**-0.5
                 DC1[pj] += dp*(dp**2 + self.b**2)**-0.5
@@ -332,6 +338,7 @@ class Penalty:
                 # pvals[pi] is the SMALLER parameter.
                 # pvals[pj] is the LARGER parameter.
                 dp = log(pvals[pj]) - log(pvals[pi])
+                # dp = (log(pvals[pj]) - log(pvals[pi])) / self.spacings[gnm]
                 dp2b2 = dp**2 + self.b**2
                 h   = self.a*((dp2b2)**0.5 - self.b)
                 hp  = self.a*(dp*(dp2b2)**-0.5)
