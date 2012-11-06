@@ -98,6 +98,7 @@ import sys
 from re import match, sub, split
 import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
 import basereader
+from finite_difference import in_fd
 from numpy import arange, array, diag, exp, eye, log, mat, mean, ones, vstack, zeros, sin, cos, pi, sqrt
 from numpy.linalg import norm
 from nifty import col, flat, invert_svd, isint, isfloat, kb, orthogonalize, pmat2d, printcool, row, warn_press_key, printcool_dictionary
@@ -298,6 +299,8 @@ class FF(ForceBalanceBaseClass):
         self.rsmake(printfacs=verbose)            
         ## Make the transformation matrix.
         self.mktransmat()
+        ## Redirection dictionary (experimental).
+        self.redirect = {}
         ## Print the optimizer options.
         printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
 
@@ -673,6 +676,46 @@ class FF(ForceBalanceBaseClass):
                 with open(os.path.join(absprintdir,fnm),'w') as f: f.writelines(newffdata[fnm])
         return pvals
         
+    def make_redirect(self,mvals):
+        Groups = defaultdict(list)
+        for p, pid in enumerate(self.plist):
+            if 'Exponent' not in pid or len(pid.split()) != 1:
+                warn_press_key("Fusion penalty currently implemented only for basis set optimizations, where parameters are like this: Exponent:Elem=H,AMom=D,Bas=0,Con=0")
+            Data = dict([(i.split('=')[0],i.split('=')[1]) for i in pid.split(':')[1].split(',')])
+            if 'Con' not in Data or Data['Con'] != '0':
+                warn_press_key("More than one contraction coefficient found!  You should expect the unexpected")
+            key = Data['Elem']+'_'+Data['AMom']
+            Groups[key].append(p)
+        #pvals = self.FF.create_pvals(mvals)
+        #print "pvals: ", pvals
+
+        pvals = self.create_pvals(mvals)
+        print pvals
+
+        Thresh = 1e-4
+
+        for gnm, pidx in Groups.items():
+            # The group of parameters for a particular element / angular momentum.
+            pvals_grp = pvals[pidx]
+            # The order that the parameters come in.
+            Order = argsort(pvals_grp)
+            for p in range(len(Order) - 1):
+                # The pointers to the parameter indices.
+                pi = pidx[Order[p]]
+                pj = pidx[Order[p+1]]
+                # pvals[pi] is the SMALLER parameter.
+                # pvals[pj] is the LARGER parameter.
+                dp = log(pvals[pj]) - log(pvals[pi])
+                if dp < Thresh:
+                    if pi in self.redirect:
+                        pk = self.redirect[pi]
+                    else:
+                        pk = pi
+                    if pj not in self.redirect:
+                        print "Redirecting parameter %i to %i" % (pj, pk)
+                        #self.redirect[pj] = pk
+        #print self.redirect
+        
     def create_pvals(self,mvals):
         """Converts mathematical to physical parameters.
 
@@ -684,6 +727,9 @@ class FF(ForceBalanceBaseClass):
         @return pvals The physical parameters
         
         """
+        #print "mvals = ", mvals, 
+        for p in self.redirect:
+            mvals[p] = 0.0
         if self.logarithmic_map:
             pvals = exp(mvals) * self.pvals0
         else:
@@ -694,6 +740,12 @@ class FF(ForceBalanceBaseClass):
             if any([j in self.plist[i] for j in concern]) and pvals[i] * self.pvals0[i] < 0:
                 #print "Parameter %s has changed sign but it's not allowed to! Setting to zero." % self.plist[i]
                 pvals[i] = 0.0
+        # Redirect parameters (for the fusion penalty function.)
+        for p in self.redirect:
+            pvals[p] = pvals[self.redirect[p]]
+        # if not in_fd():
+        #     print pvals
+        #print "pvals = ", pvals
         return pvals
 
     def create_mvals(self,pvals):

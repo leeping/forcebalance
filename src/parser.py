@@ -96,6 +96,7 @@ gen_opts_types = {
                  "finite_difference_h"    : (1e-3, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
                  "penalty_additive"       : (0.0,   'Factor for additive penalty function in objective function'),
                  "penalty_multiplicative" : (0.0,   'Factor for multiplicative penalty function in objective function'),
+                 "penalty_alpha"          : (1.0,   'Switching distance from L1 to L0 (experimental)'),
                  "penalty_hyperbolic_b"   : (0.001, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b'),
                  "adaptive_factor"        : (0.25, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.'),
                  "adaptive_damping"       : (0.5, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.'),

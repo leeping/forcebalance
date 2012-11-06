@@ -3,7 +3,8 @@
 ForceBalance objective function."""
 
 from simtab import SimTab
-from numpy import array, diag, dot, eye, linalg, ones, reshape, sum, zeros
+from numpy import argsort, array, diag, dot, eye, linalg, ones, reshape, sum, zeros, exp, log
+from collections import defaultdict
 from collections import OrderedDict
 from finite_difference import in_fd
 from nifty import printcool_dictionary
@@ -52,7 +53,8 @@ class Objective(ForceBalanceBaseClass):
         self.FF = forcefield
         ## Initialize the penalty function.
         self.Penalty = Penalty(options['penalty_type'],forcefield,options['penalty_additive'],
-                               options['penalty_multiplicative'],options['penalty_hyperbolic_b'])
+                               options['penalty_multiplicative'],options['penalty_hyperbolic_b'],
+                               options['penalty_alpha'])
         ## Obtain the denominator.
         if self.normalize_weights:
             self.WTot = sum([i.weight for i in self.Simulations])
@@ -171,16 +173,17 @@ class Penalty:
     in the 'rsmake' method.
 
     """
-    def __init__(self, User_Option, ForceField, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1):
+    def __init__(self, User_Option, ForceField, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1, Alpha=1.0):
         self.fadd = Factor_Add
         self.fmul = Factor_Mult
+        self.a    = Alpha
         self.b    = Factor_B
         self.FF   = ForceField
         self.Pen_Names = {'HYP' : 1, 'HYPER' : 1, 'HYPERBOLIC' : 1, 'L1' : 1, 'HYPERBOLA' : 1,
                           'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2,
-                          'FUSE' : 3, 'FUSED' : 3, 'FUSION' : 3}
+                          'FUSE' : 3, 'FUSION' : 3, 'FUSE_L0' : 4, 'FUSION_L0' : 4}
         self.ptyp = self.Pen_Names[User_Option.upper()]
-        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.FUSE}
+        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.FUSE, 4:self.FUSE_L0}
         if User_Option.upper() == 'L1':
             print "L1 norm uses the hyperbolic penalty, make sure penalty_hyperbolic_b is set sufficiently small"
         elif self.ptyp == 1:
@@ -189,6 +192,8 @@ class Penalty:
             print "Using parabolic regularization (Gaussian prior) with strength %.1e (+), %.1e (x)" % (Factor_Add, Factor_Mult)
         elif self.ptyp == 3:
             print "Using FUSION PENALTY (only relevant for basis set optimizations at the moment) with strength %.1e" % Factor_Add
+        elif self.ptyp == 4:
+            print "Using L0-L1 FUSION PENALTY (only relevant for basis set optimizations at the moment) with strength %.1e and switching distance %.1e" % (Factor_Add, Alpha)
 
     def compute(self, mvals, Objective):
         X = Objective['X']
@@ -249,5 +254,105 @@ class Penalty:
         return DC0, DC1, DC2
 
     def FUSE(self, mvals):
-        print self.FF.plist
-        return HYP(self, mvals)
+        Groups = defaultdict(list)
+        for p, pid in enumerate(self.FF.plist):
+            if 'Exponent' not in pid or len(pid.split()) != 1:
+                warn_press_key("Fusion penalty currently implemented only for basis set optimizations, where parameters are like this: Exponent:Elem=H,AMom=D,Bas=0,Con=0")
+            Data = dict([(i.split('=')[0],i.split('=')[1]) for i in pid.split(':')[1].split(',')])
+            if 'Con' not in Data or Data['Con'] != '0':
+                warn_press_key("More than one contraction coefficient found!  You should expect the unexpected")
+            key = Data['Elem']+'_'+Data['AMom']
+            Groups[key].append(p)
+        pvals = self.FF.create_pvals(mvals)
+        DC0 = 0.0
+        DC1 = zeros(self.FF.np, dtype=float)
+        DC2 = zeros(self.FF.np, dtype=float)
+        for gnm, pidx in Groups.items():
+            # The group of parameters for a particular element / angular momentum.
+            pvals_grp = pvals[pidx]
+            # The order that the parameters come in.
+            Order = argsort(pvals_grp)
+            # The number of nearest neighbor pairs.
+            #print Order
+            for p in range(len(Order) - 1):
+                # The pointers to the parameter indices.
+                pi = pidx[Order[p]]
+                pj = pidx[Order[p+1]]
+                # pvals[pi] is the SMALLER parameter.
+                # pvals[pj] is the LARGER parameter.
+                dp = log(pvals[pj]) - log(pvals[pi])
+                DC0     += (dp**2 + self.b**2)**0.5 - self.b
+                DC1[pi] -= dp*(dp**2 + self.b**2)**-0.5
+                DC1[pj] += dp*(dp**2 + self.b**2)**-0.5
+                # The second derivatives have off-diagonal terms,
+                # but we're not using them right now anyway
+                DC2[pi] -= self.b**2*(dp**2 + self.b**2)**-1.5
+                DC2[pj] += self.b**2*(dp**2 + self.b**2)**-1.5
+                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
+                #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
+        return DC0, DC1, diag(DC2)
+
+    def FUSE_L0(self, mvals):
+        Groups = defaultdict(list)
+        for p, pid in enumerate(self.FF.plist):
+            if 'Exponent' not in pid or len(pid.split()) != 1:
+                warn_press_key("Fusion penalty currently implemented only for basis set optimizations, where parameters are like this: Exponent:Elem=H,AMom=D,Bas=0,Con=0")
+            Data = dict([(i.split('=')[0],i.split('=')[1]) for i in pid.split(':')[1].split(',')])
+            if 'Con' not in Data or Data['Con'] != '0':
+                warn_press_key("More than one contraction coefficient found!  You should expect the unexpected")
+            key = Data['Elem']+'_'+Data['AMom']
+            Groups[key].append(p)
+        pvals = self.FF.create_pvals(mvals)
+        #print "pvals: ", pvals
+        DC0 = 0.0
+        DC1 = zeros(self.FF.np, dtype=float)
+        DC2 = zeros((self.FF.np,self.FF.np), dtype=float)
+        for gnm, pidx in Groups.items():
+            # The group of parameters for a particular element / angular momentum.
+            pvals_grp = pvals[pidx]
+            # The order that the parameters come in.
+            Order = argsort(pvals_grp)
+            # The number of nearest neighbor pairs.
+            #print Order
+            Contribs = []
+            dps = []
+            for p in range(len(Order) - 1):
+                # The pointers to the parameter indices.
+                pi = pidx[Order[p]]
+                pj = pidx[Order[p+1]]
+                # pvals[pi] is the SMALLER parameter.
+                # pvals[pj] is the LARGER parameter.
+                dp = log(pvals[pj]) - log(pvals[pi])
+                dp2b2 = dp**2 + self.b**2
+                h   = self.a*((dp2b2)**0.5 - self.b)
+                hp  = self.a*(dp*(dp2b2)**-0.5)
+                hpp = self.a*(self.b**2*(dp2b2)**-1.5)
+                emh = exp(-1*h)
+                dps.append(dp)
+                Contribs.append((1.0 - emh))
+                DC0     += (1.0 - emh)
+                DC1[pi] -= hp*emh
+                DC1[pj] += hp*emh
+        # for i in self.FF.redirect:
+        #     p = mvals[i]
+        #     DC0 += 1e-6*p*p
+        #     DC1[i] = 2e-6*p
+            
+                # The second derivatives have off-diagonal terms,
+                # but we're not using them right now anyway
+                #DC2[pi,pi] += (hpp - hp**2)*emh
+                #DC2[pi,pj] -= (hpp - hp**2)*emh
+                #DC2[pj,pi] -= (hpp - hp**2)*emh
+                #DC2[pj,pj] += (hpp - hp**2)*emh
+                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
+                #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
+            
+            #print "grp:", gnm, "dp:", ' '.join(["% .1e" % i for i in dps]), "Contributions:", ' '.join(["% .1e" % i for i in Contribs])
+
+        #print DC0, DC1, DC2
+        #print pvals
+        #raw_input()
+
+        return DC0, DC1, DC2
+
+    #return self.HYP(mvals)
