@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-from forcebalance.molecule import Molecule
+#from forcebalance.molecule import Molecule
+import sys
+sys.path.append("/Users/vincentvoelz/scripts/forcebalance/src")
+from molecule import Molecule
 import numpy as np
 import os
 

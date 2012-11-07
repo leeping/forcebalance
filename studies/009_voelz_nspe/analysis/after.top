@@ -1,4 +1,4 @@
-#include "molecule.itp"
+#include "molecule_after.itp"
 
 [ system ]
  LIG
