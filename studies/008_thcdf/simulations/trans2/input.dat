@@ -35,6 +35,7 @@ for mol in molecules:
       print 1
       debug 1
       ribasis cc-pvdz-overlap
+      df_metric j
     }
     
     plugin("/home/egh4/lr_df/plugins/plugin_objective/plugin_objective.so")

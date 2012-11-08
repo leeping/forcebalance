@@ -273,6 +273,9 @@ class Optimizer(ForceBalanceBaseClass):
                 bar = printcool("Total Hessian",color=6)
                 pmat2d(H)
                 print bar
+            for key, val in self.Objective.ObjDict.items():
+                if Best_Step:
+                    self.Objective.ObjDict_Last[key] = val
             dx, dX_expect, bump = self.step(xk, data, trust)
             old_pk = self.FF.create_pvals(xk)
             old_xk = xk.copy()
@@ -287,9 +290,6 @@ class Optimizer(ForceBalanceBaseClass):
                 bar = printcool("Physical Parameters (Current + Step = Next)",color=3)
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
                 print bar
-            for key, val in self.Objective.ObjDict.items():
-                if Best_Step:
-                    self.Objective.ObjDict_Last[key] = val
             # Evaluate the objective function and its derivatives.
             data        = self.Objective.Full(xk,Ord,verbose=True)
             stepn += 1
@@ -323,9 +323,6 @@ class Optimizer(ForceBalanceBaseClass):
                     xk = xk_prev.copy()
                     G = G_prev.copy()
                     H = H_stor.copy()
-                    if len(self.FF.parmdestroy) > 0:
-                        self.FF.parmdestroy = self.FF.parmdestroy[:-1]
-                        self.FF.linedestroy = self.FF.linedestroy[:-1]
                     continue
             else:
                 if X > X_best:
@@ -350,6 +347,9 @@ class Optimizer(ForceBalanceBaseClass):
             H_stor  = H.copy()
             xk_prev = xk.copy()
             X_prev  = X
+            if len(self.FF.parmdestroy_this) > 0:
+                self.FF.parmdestroy_save.append(self.FF.parmdestroy_this)
+                self.FF.linedestroy_save.append(self.FF.linedestroy_this)
         
         bar = printcool("Final objective function value\nFull: % .6e  Un-penalized: % .6e" % (data['X'],data['X0']), '@', bold=True, color=2)
         return xk
@@ -415,11 +415,13 @@ class Optimizer(ForceBalanceBaseClass):
             def hyper_solver(L):
                 dx0 = np.zeros(len(xkd),dtype=float)
                 #dx0 = np.delete(dx0, self.excision)
-                HL = H + L**2*np.diag(np.diag(H))
+                HL = H + (L-1)**2*np.diag(np.diag(H))
                 HYP = Hyper(HL, self.Objective.Penalty)
-                Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
+                try:
+                    Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
+                except:
+                    Opt1 = optimize.fmin(HYP.compute_val,dx0,full_output=True,disp=0)
                 Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xkd,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
-                #Opt1 = optimize.fmin(HYP.compute_val,dx0,full_output=True,disp=0)
                 #Opt2 = optimize.fmin(HYP.compute_val,-xkd,full_output=True,disp=0)
                 dx1, sol1 = Opt1[0], Opt1[1]
                 dx2, sol2 = Opt2[0], Opt2[1]
@@ -451,11 +453,11 @@ class Optimizer(ForceBalanceBaseClass):
             for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                 dx = np.insert(dx, i, 0)
             def para_solver(L):
-                HT = H + L**2*np.diag(np.diag(H))
+                HT = H + (L-1)**2*np.diag(np.diag(H))
                 # print "Inverting Scaled Hessian:"                       ###
                 # print " G:"                                             ###
                 # pvec1d(G,precision=5)                                   ###
-                # print " HT: (Scal = %.4f)" % (1+L**2)                   ###
+                # print " HT: (Scal = %.4f)" % (1+(L-1)**2)               ###
                 # pmat2d(HT,precision=5)                                  ###
                 Hi = invert_svd(np.mat(HT))
                 dx = flat(-1 * Hi * col(G))
@@ -476,7 +478,7 @@ class Optimizer(ForceBalanceBaseClass):
     
         def trust_fun(L):
             N = norm(solver(L)[0])
-            #print "\rL = %.4e, Hessian diagonal scaling = %.4e: found length %.4e, objective is %.4e" % (L, 1+L**2, N, (N - trust)**2)
+            #print "\rL = %.4e, Hessian diagonal scaling = %.4e: found length %.4e, objective is %.4e" % (L, 1+(L-1)**2, N, (N - trust)**2)
             return (N - trust)**2
 
         def search_fun(L):
@@ -486,7 +488,7 @@ class Optimizer(ForceBalanceBaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            print "Searching! Hessian diagonal scaling = %.4e, L = % .4e, length %.4e, result %.4e" % (1+L**2,L,norm(dx),Result)
+            print "Searching! Hessian diagonal scaling = %.4e, L = % .4e, length %.4e, result %.4e" % (1+(L-1)**2,L,norm(dx),Result)
             return Result
         
         if self.trust0 > 0: # This is the trust region code.
@@ -496,19 +498,25 @@ class Optimizer(ForceBalanceBaseClass):
             if dxnorm > trust:
                 bump = True
                 # Tried a few optimizers here, seems like Brent works well.
-                LOpt = optimize.brent(trust_fun,brack=(0.0,10.0),tol=self.search_tol)
+                # Okay, the problem with Brent is that the tolerance is fractional.  
+                # If the optimized value is zero, then it takes a lot of meaningless steps.
+                LOpt = optimize.brent(trust_fun,brack=(1.0,4.0),tol=self.search_tol)
+                ### Result = optimize.fmin_powell(trust_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
+                ### LOpt = Result[0]
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
-                print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+LOpt**2)
+                print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+(LOpt-1)**2)
         else: # This is the nonlinear search code.
             bump = False
-            Result = optimize.brent(search_fun,brack=(0.0,3.0),tol=self.search_tol,full_output=1)
-            #optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
+            Result = optimize.brent(search_fun,brack=(1.0,4.0),tol=self.search_tol,full_output=1)
+            ### optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
+            ### Result = optimize.fmin_powell(search_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
             dx, _ = solver(Result[0])
             expect = Result[1]
 
         ## Decide which parameters to redirect.
-        if self.Objective.Penalty.ptyp == 3 or self.Objective.Penalty.ptyp == 4:
+        ## Currently not used.
+        if self.Objective.Penalty.ptyp in [3,4,5]:
             self.FF.make_redirect(dx+xk)
 
         return dx, expect, bump

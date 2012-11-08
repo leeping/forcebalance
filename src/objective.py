@@ -190,9 +190,10 @@ class Penalty:
         self.FF   = ForceField
         self.Pen_Names = {'HYP' : 1, 'HYPER' : 1, 'HYPERBOLIC' : 1, 'L1' : 1, 'HYPERBOLA' : 1,
                           'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2,
-                          'FUSE' : 3, 'FUSION' : 3, 'FUSE_L0' : 4, 'FUSION_L0' : 4}
+                          'FUSE' : 3, 'FUSION' : 3, 'FUSE_L0' : 4, 'FUSION_L0' : 4, 'FUSION-L0' : 4,
+                          'FUSE-BARRIER' : 5, 'FUSE-BARRIER' : 5, 'FUSE_BARRIER' : 5, 'FUSION_BARRIER' : 5}
         self.ptyp = self.Pen_Names[User_Option.upper()]
-        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.FUSE, 4:self.FUSE_L0}
+        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.FUSE, 4:self.FUSE_L0, 5: self.FUSE_BARRIER}
         if User_Option.upper() == 'L1':
             print "L1 norm uses the hyperbolic penalty, make sure penalty_hyperbolic_b is set sufficiently small"
         elif self.ptyp == 1:
@@ -200,12 +201,14 @@ class Penalty:
         elif self.ptyp == 2:
             print "Using parabolic regularization (Gaussian prior) with strength %.1e (+), %.1e (x)" % (Factor_Add, Factor_Mult)
         elif self.ptyp == 3:
-            print "Using FUSION PENALTY (only relevant for basis set optimizations at the moment) with strength %.1e" % Factor_Add
+            print "Using L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e" % Factor_Add
         elif self.ptyp == 4:
-            print "Using L0-L1 FUSION PENALTY (only relevant for basis set optimizations at the moment) with strength %.1e and switching distance %.1e" % (Factor_Add, Alpha)
+            print "Using L0-L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e and switching distance %.1e" % (Factor_Add, Alpha)
+        elif self.ptyp == 5:
+            print "Using L1 Fusion Penalty with Log Barrier (only relevant for basis set optimizations at the moment) with strength %.1e and barrier distance %.1e" % (Factor_Add, Alpha)
 
         ## Find exponential spacings.
-        if self.ptyp == 3 or self.ptyp == 4:
+        if self.ptyp in [3,4,5]:
             self.spacings = self.FF.find_spacings()
             printcool_dictionary(self.spacings, title="Starting zeta spacings\n(Pay attention to these)")
 
@@ -301,11 +304,54 @@ class Penalty:
                 DC1[pj] += dp*(dp**2 + self.b**2)**-0.5
                 # The second derivatives have off-diagonal terms,
                 # but we're not using them right now anyway
-                DC2[pi] -= self.b**2*(dp**2 + self.b**2)**-1.5
-                DC2[pj] += self.b**2*(dp**2 + self.b**2)**-1.5
+                # I will implement them if necessary.
+                # DC2[pi] -= self.b**2*(dp**2 + self.b**2)**-1.5
+                # DC2[pj] += self.b**2*(dp**2 + self.b**2)**-1.5
                 #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
                 #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
         return DC0, DC1, diag(DC2)
+
+    def FUSE_BARRIER(self, mvals):
+        Groups = defaultdict(list)
+        for p, pid in enumerate(self.FF.plist):
+            if 'Exponent' not in pid or len(pid.split()) != 1:
+                warn_press_key("Fusion penalty currently implemented only for basis set optimizations, where parameters are like this: Exponent:Elem=H,AMom=D,Bas=0,Con=0")
+            Data = dict([(i.split('=')[0],i.split('=')[1]) for i in pid.split(':')[1].split(',')])
+            if 'Con' not in Data or Data['Con'] != '0':
+                warn_press_key("More than one contraction coefficient found!  You should expect the unexpected")
+            key = Data['Elem']+'_'+Data['AMom']
+            Groups[key].append(p)
+        pvals = self.FF.create_pvals(mvals)
+        DC0 = 0.0
+        DC1 = zeros(self.FF.np, dtype=float)
+        DC2 = zeros(self.FF.np, dtype=float)
+        for gnm, pidx in Groups.items():
+            # The group of parameters for a particular element / angular momentum.
+            pvals_grp = pvals[pidx]
+            # The order that the parameters come in.
+            Order = argsort(pvals_grp)
+            # The number of nearest neighbor pairs.
+            #print Order
+            for p in range(len(Order) - 1):
+                # The pointers to the parameter indices.
+                pi = pidx[Order[p]]
+                pj = pidx[Order[p+1]]
+                # pvals[pi] is the SMALLER parameter.
+                # pvals[pj] is the LARGER parameter.
+                dp = log(pvals[pj]) - log(pvals[pi])
+                # dp = (log(pvals[pj]) - log(pvals[pi])) / self.spacings[gnm]
+                DC0     += (dp**2 + self.b**2)**0.5 - self.b - self.a*log(dp) + self.a*log(self.a)
+                DC1[pi] -= dp*(dp**2 + self.b**2)**-0.5 - self.a/dp
+                DC1[pj] += dp*(dp**2 + self.b**2)**-0.5 - self.a/dp
+                # The second derivatives have off-diagonal terms,
+                # but we're not using them right now anyway
+                # I will implement them later if necessary.
+                # DC2[pi] -= self.b**2*(dp**2 + self.b**2)**-1.5 - self.a/dp**2
+                # DC2[pj] += self.b**2*(dp**2 + self.b**2)**-1.5 - self.a/dp**2
+                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
+                #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
+        return DC0, DC1, diag(DC2)
+
 
     def FUSE_L0(self, mvals):
         Groups = defaultdict(list)

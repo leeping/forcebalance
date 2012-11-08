@@ -96,12 +96,12 @@ gen_opts_types = {
                  "finite_difference_h"    : (1e-3, 'Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)'),
                  "penalty_additive"       : (0.0,   'Factor for additive penalty function in objective function'),
                  "penalty_multiplicative" : (0.0,   'Factor for multiplicative penalty function in objective function'),
-                 "penalty_alpha"          : (1.0,   'Switching distance from L1 to L0 (experimental)'),
-                 "penalty_hyperbolic_b"   : (0.001, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b'),
+                 "penalty_alpha"          : (1e-3,  'Extra experimental parameter for fusion penalty function (relevant for basis set optimization).  Dictates position of log barrier (fusion_barrier) or L1-L0 switch distance (fusion_l0)'),
+                 "penalty_hyperbolic_b"   : (1e-6, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b'),
                  "adaptive_factor"        : (0.25, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.'),
                  "adaptive_damping"       : (0.5, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.'),
                  "error_tolerance"        : (0.0, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.'),
-                 "search_tolerance"       : (0.01,'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.')
+                 "search_tolerance"       : (1e-4,'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.')
                  },
     'sections': {"read_mvals" : (None, 'Paste mathematical parameters into the input file for them to be read in directly'),
                  "read_pvals" : (None, 'Paste physical parameters into the input file for them to be read in directly'),

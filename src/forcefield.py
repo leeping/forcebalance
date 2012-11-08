@@ -302,8 +302,10 @@ class FF(ForceBalanceBaseClass):
         ## Redirection dictionary (experimental).
         self.redirect = {}
         ## Destruction dictionary (experimental).
-        self.linedestroy = []
-        self.parmdestroy = []
+        self.linedestroy_save = []
+        self.parmdestroy_save = []
+        self.linedestroy_this = []
+        self.parmdestroy_this = []
         ## Print the optimizer options.
         printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
 
