@@ -46,9 +46,12 @@ then
     extension="${filename##*.}"
     filename="${filename%.*}"
     output=$filename".out" 
+    error=$filename".err" 
     echo "Output will be written to $output"
 else
     output=$(basename "$2")
+    filename="${output%.*}"
+    error=$filename".err"
 fi
 
 if [ -e $output ] && [ $force -eq 0 ]
@@ -59,4 +62,4 @@ fi
 
 # Standard error gets written to standard out
 # Text overwritten by carriage returns are not saved
-$program $input 2>&1 | tee >(awk -F '\r' '{print $NF}' > $output)
+$program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
