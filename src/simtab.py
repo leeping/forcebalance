@@ -10,6 +10,11 @@ except:
     print "Gromacs module import failed"
 
 try:
+    from gmxqpio import Monomer_QTPIE
+except:
+    print "QTPIE Monomer module import failed"
+
+try:
     from tinkerio import AbInitio_TINKER, Vibration_TINKER, Interactions_TINKER, Moments_TINKER
 except:
     print "Tinker module import failed; check SimTK package (required for units)"
@@ -59,4 +64,5 @@ SimTab = {
     'THCDF_PSI4':THCDF_Psi4,
     'INTERACTIONS_TINKER':Interactions_TINKER,
     'MOMENTS_TINKER':Moments_TINKER,
+    'MONOMER_QTPIE':Monomer_QTPIE,
     }

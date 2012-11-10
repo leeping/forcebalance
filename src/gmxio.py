@@ -426,6 +426,7 @@ class AbInitio_GMX(AbInitio):
 
     def prepare_temp_directory(self, options, sim_opts):
         os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
+        os.environ["GMX_NO_ALLVSALL"] = "TRUE"
         abstempdir = os.path.join(self.root,self.tempdir)
         if options['gmxpath'] == None or options['gmxsuffix'] == None:
             warn_press_key('Please set the options gmxpath and gmxsuffix in the input file!')
