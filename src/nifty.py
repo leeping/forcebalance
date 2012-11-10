@@ -490,16 +490,26 @@ def which(fnm):
     except:
         return ''
 
-def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_command = True):
-    """Runs command line using subprocess, optionally returning stdout"""
-    print_to_file = (logfnm != None)
-    if print_to_file:
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = None, print_command = True):
+    """Runs command line using subprocess, optionally returning stdout.
+    Options:
+    command (required) = Name of the command you want to execute
+    outfnm (optional) = Name of the output file name (overwritten if exists)
+    logfnm (optional) = Name of the log file name (appended if exists), exclusive with outfnm
+    stdin (optional) = A string to be passed to stdin, as if it were typed (use newline character to mimic Enter key)
+    print_command = Whether to print the command.
+    """
+    append_to_file = (logfnm != None)
+    write_to_file = (outfnm != None)
+    if append_to_file:
         f = open(logfnm,'a')
+    elif write_to_file:
+        f = open(outfnm,'w')
     if print_command:
         print "Executing process: \x1b[92m%-50s\x1b[0m%s%s" % (' '.join(command) if type(command) is list else command, 
-                                                               " Logfile: %s" % logfnm if logfnm != None else "", 
+                                                               " Output: %s" % logfnm if logfnm != None else "", 
                                                                " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
-        if print_to_file:
+        if append_to_file or write_to_file:
             print >> f, "Executing process: %s%s" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
     if stdin == None:
         p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = PIPE)
@@ -521,7 +531,7 @@ def _exec(command, print_to_screen = False, logfnm = None, stdin = None, print_c
     else:
         p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = PIPE, stderr = PIPE)
         Output, Error = p.communicate(stdin)
-    if logfnm != None:
+    if logfnm != None or outfnm != None:
         f.write(Output)
         f.close()
     if p.returncode != 0:

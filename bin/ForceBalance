@@ -1,8 +1,13 @@
 #!/bin/bash
 
 # This is a wrapper script around the main ForceBalance.py script.
-# Run: "ForceBalance job.in [job.out]"
+# Run: "ForceBalance [-f] job.in [job.out]"
+#
 # If the output filename is not specified, it will be automatically created.
+#
+# If the output file already exists, then this script will exit,
+# unless -f is given, and then files will be overwritten.
+# 
 # Importantly, ForceBalance.py prints a lot of carriage returns as "progress reports".
 # These carriage returns are not saved to the output file if this command is used.
 
@@ -60,6 +65,15 @@ then
   exit $E_EXISTS
 fi
 
-# Standard error gets written to standard out
+# Standard error gets written to its own .err file
 # Text overwritten by carriage returns are not saved
 $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
+nerr=`wc -l $error | awk '{print $1}'`
+if [ $nerr -ne 0 ] ; then
+    cat $error
+    echo
+    echo "$program may not have finished successfully, see error above."
+    echo "If error does not make sense, please contact me (Lee-Ping)."
+else
+    rm $error
+fi
