@@ -65,7 +65,8 @@ gen_opts_types = {
                  "readchk"      : (None, 'Name of the restart file we read from'),
                  "writechk"     : (None, 'Name of the restart file we write to (can be same as readchk)'),
                  "ffdir"        : ('forcefield', 'Directory containing force fields, relative to project directory'),
-                 "amoeba_polarization"        : ('direct', 'The AMOEBA polarization type, either direct or mutual.')
+                 "amoeba_polarization"        : ('direct', 'The AMOEBA polarization type, either direct or mutual.'),
+                 "rigid_water"        : (False, 'Perform calculations using rigid water molecules.  Currently used in AMOEBA parameterization.')
                  },
     'allcaps' : {"jobtype"      : ("single", 'The job type, defaults to a single-point evaluation of objective function'),
                  },

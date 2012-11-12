@@ -10,12 +10,13 @@ modules for other programs because it's so simple.
 import os
 from re import match, sub
 from nifty import isint, isfloat, warn_press_key
-from numpy import array
+import numpy as Np
 from basereader import BaseReader
 from subprocess import Popen, PIPE
 from abinitio import AbInitio
 from vibration import Vibration
 from moments import Moments
+from molecule import Molecule
 from interactions import Interactions
 from finite_difference import in_fd
 from collections import OrderedDict
@@ -153,7 +154,7 @@ class AbInitio_TINKER(AbInitio):
     def energy_force_driver(self, shot):
         self.traj.write("shot.arc",select=[shot])
         # This line actually runs TINKER
-        o, e = Popen(["./testgrad","shot.arc",self.FF.fnms[0],"y","n"],stdout=PIPE,stderr=PIPE).communicate()
+        o, e = Popen(["./testgrad","shot.arc",self.FF.tinkerprm,"y","n"],stdout=PIPE,stderr=PIPE).communicate()
         # Read data from stdout and stderr, and convert it to GROMACS
         # units for consistency with existing code.
         F = []
@@ -163,7 +164,7 @@ class AbInitio_TINKER(AbInitio):
                 E = [float(s[4]) * 4.184]
             elif len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
                 F += [-1 * float(i) * 4.184 * 10 for i in s[2:5]]
-        M = array(E + F)
+        M = Np.array(E + F)
         return M
 
 class Vibration_TINKER(Vibration):
@@ -174,6 +175,8 @@ class Vibration_TINKER(Vibration):
 
     def __init__(self,options,sim_opts,forcefield):
         super(Vibration_TINKER,self).__init__(options,sim_opts,forcefield)
+        if self.FF.rigid_water:
+            raise Exception('This class cannot be used with rigid water molecules.')
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
@@ -207,8 +210,8 @@ class Vibration_TINKER(Vibration):
                 readev = True
             elif moden > 0 and readev and len(s) == 4 and all([isint(s[0]), isfloat(s[1]), isfloat(s[2]), isfloat(s[3])]):
                 calc_eigvecs[-1].append([float(i) for i in s[1:]])
-        calc_eigvals = array(calc_eigvals)
-        calc_eigvecs = array(calc_eigvecs)
+        calc_eigvals = Np.array(calc_eigvals)
+        calc_eigvecs = Np.array(calc_eigvecs)
         os.system("rm -rf *_* *[0-9][0-9][0-9]*")
 
         return calc_eigvals, calc_eigvecs
@@ -233,8 +236,11 @@ class Moments_TINKER(Moments):
 
     def moments_driver(self):
         # This line actually runs TINKER
-        o, e = Popen(["./optimize","input.xyz","1.0e-6"],stdout=PIPE,stderr=PIPE).communicate()
-        o, e = Popen(["./analyze","input.xyz_2","M"],stdout=PIPE,stderr=PIPE).communicate()
+        if self.FF.rigid_water:
+            o, e = Popen(["./optimize","input.xyz","1.0e-6"],stdout=PIPE,stderr=PIPE).communicate()
+            o, e = Popen(["./analyze","input.xyz_2","M"],stdout=PIPE,stderr=PIPE).communicate()
+        else:
+            o, e = Popen(["./analyze","input.xyz","M"],stdout=PIPE,stderr=PIPE).communicate()
         # Read the TINKER output.
         qn = -1
         ln = 0
@@ -295,25 +301,63 @@ class Interactions_TINKER(Interactions):
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
+        if self.FF.rigid_water:
+            self.optprog = "optrigid"
+            os.symlink(os.path.join(self.root,self.simdir,"rigid.key"),os.path.join(abstempdir,"rigid.key"))
+        else:
+            self.optprog = "optimize"
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
-        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
+        os.symlink(os.path.join(options['tinkerpath'],self.optprog),os.path.join(abstempdir,self.optprog))
         os.symlink(os.path.join(options['tinkerpath'],"superpose"),os.path.join(abstempdir,"superpose"))
         # Link the run parameter file
         # The master file might be unneeded??
         # os.symlink(os.path.join(self.root,self.simdir,self.masterfile),os.path.join(abstempdir,self.masterfile))
         # os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
         for sysopt in self.sys_opts.values():
-            os.symlink(os.path.join(self.root, self.simdir, sysopt['geometry']), os.path.join(abstempdir,sysopt['geometry']))
+            if self.FF.rigid_water:
+                # Make every water molecule rigid
+                # WARNING: Hard coded values here!
+                M = Molecule(os.path.join(self.root, self.simdir, sysopt['geometry']),ftype="tinker")
+                for a in range(0, len(M.xyzs[0]), 3):
+                    flex = M.xyzs[0]
+                    wat = flex[a:a+3]
+                    com = wat.mean(0)
+                    wat -= com
+                    o  = wat[0]
+                    h1 = wat[1]
+                    h2 = wat[2]
+                    r1 = h1 - o
+                    r2 = h2 - o
+                    r1 /= Np.linalg.norm(r1)
+                    r2 /= Np.linalg.norm(r2)
+                    # Obtain unit vectors.
+                    ex = r1 + r2
+                    ey = r1 - r2
+                    ex /= Np.linalg.norm(ex)
+                    ey /= Np.linalg.norm(ey)
+                    Bond = 0.9572
+                    Ang = Np.pi * 104.52 / 2 / 180
+                    cosx = Np.cos(Ang)
+                    cosy = Np.sin(Ang)
+                    h1 = o + Bond*ex*cosx + Bond*ey*cosy
+                    h2 = o + Bond*ex*cosx - Bond*ey*cosy
+                    rig = Np.array([o, h1, h2]) + com
+                    M.xyzs[0][a:a+3] = rig
+                M.write(os.path.join(abstempdir,sysopt['geometry']),ftype="tinker")
+            else:
+                os.symlink(os.path.join(self.root, self.simdir, sysopt['geometry']), os.path.join(abstempdir,sysopt['geometry']))
 
     def system_driver(self,sysname):
         sysopt = self.sys_opts[sysname]
         rmsd = 0.0
         # This line actually runs TINKER
-        # Implement geometry optimization later
-        # o, e = Popen(["./optimize","input.xyz","1.0e-6"],stdout=PIPE,stderr=PIPE).communicate()
         if 'optimize' in sysopt and sysopt['optimize'] == True:
-            o, e = Popen(["./optimize",sysopt['geometry'],self.FF.tinkerprm,"1e-4"],stdout=PIPE,stderr=PIPE).communicate()
+            if self.FF.rigid_water:
+                os.system("cp rigid.key %s" % os.path.splitext(sysopt['geometry'])[0] + ".key")
+                o, e = Popen(["./%s" % self.optprog,sysopt['geometry'],"1e-4"],stdout=PIPE,stderr=PIPE).communicate()
+            else:
+                o, e = Popen(["./%s" % self.optprog,sysopt['geometry'],self.FF.tinkerprm,"1e-4"],stdout=PIPE,stderr=PIPE).communicate()
             cnvgd = 0
             for line in o.split('\n'):
                 if "Normal Termination" in line:
@@ -323,7 +367,10 @@ class Interactions_TINKER(Interactions):
                 print "The system %s did not converge in the geometry optimization - printout is above." % sysname
                 #warn_press_key("The system %s did not converge in the geometry optimization" % sysname)
             o, e = Popen(["./analyze",sysopt['geometry']+'_2',self.FF.tinkerprm,"E"],stdout=PIPE,stderr=PIPE).communicate()
-            oo, ee = Popen(['./superpose', sysopt['geometry'], self.FF.tinkerprm, sysopt['geometry']+'_2', self.FF.tinkerprm, '1', 'y', 'u', 'n', '0'], stdout=PIPE, stderr=PIPE).communicate()
+            if self.FF.rigid_water:
+                oo, ee = Popen(['./superpose', sysopt['geometry'], sysopt['geometry']+'_2', '1', 'y', 'u', 'n', '0'], stdout=PIPE, stderr=PIPE).communicate()
+            else:
+                oo, ee = Popen(['./superpose', sysopt['geometry'], self.FF.tinkerprm, sysopt['geometry']+'_2', self.FF.tinkerprm, '1', 'y', 'u', 'n', '0'], stdout=PIPE, stderr=PIPE).communicate()
             for line in oo.split('\n'):
                 if "Root Mean Square Distance" in line:
                     rmsd = float(line.split()[-1])

@@ -216,6 +216,8 @@ class FF(ForceBalanceBaseClass):
         self.set_option(options,'logarithmic_map','logarithmic_map')
         ## Switch for AMOEBA direct or mutual.
         self.set_option(None, None, 'amoeba_pol', options['amoeba_polarization'].lower(), 'direct')
+        ## Switch for rigid water molecules
+        self.set_option(options, 'rigid_water', 'rigid_water')
         
         #======================================#
         #     Variables which are set here     #

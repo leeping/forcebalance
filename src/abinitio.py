@@ -192,7 +192,7 @@ class AbInitio(FittingSimulation):
         # This code is rather slow.  It requires the system to have a list
         # of masses and blocking numbers.
         if not self.topology_flag:
-            raise Exception('Cannot do net forces and torques for class %s because read_topology is not implemented' % __class__.__name__)
+            raise Exception('Cannot do net forces and torques for class %s because read_topology is not implemented' % self.__class__.__name__)
 
         if self.force_map == 'molecule':
             Block = self.AtomLists['MoleculeNumber']
