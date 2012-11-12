@@ -13,6 +13,8 @@ import sys
 from finite_difference import *
 import pickle
 import shutil
+from molecule import *
+from chemistry import *
 from nifty import *
 try:
     from simtk.openmm.app import *
@@ -20,6 +22,7 @@ try:
     from simtk.unit import *
 except:
     pass
+from IPython import embed
 
 ## Dictionary for building parameter identifiers.  As usual they go like this:
 ## Bond/length/OW.HW
@@ -215,6 +218,15 @@ class AbInitio_OpenMM(AbInitio):
             warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
             self.platform = None
 
+    def read_topology(self):
+        pdb = PDBFile(os.path.join(self.root,self.simdir,"conf.pdb"))
+        mypdb = Molecule(os.path.join(self.root,self.simdir,"conf.pdb"))
+        self.AtomLists['Mass'] = [PeriodicTable[i] for i in mypdb.elem]
+        self.AtomLists['ParticleType'] = ['A' for i in mypdb.elem] # Assume that all particle types are atoms.
+        self.AtomLists['ResidueNumber'] = [a.residue.index for a in list(pdb.getTopology().atoms())]
+        self.topology_flag = True
+        return
+
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         ## Link the PDB file
@@ -236,9 +248,9 @@ class AbInitio_OpenMM(AbInitio):
         # Agrees with TINKER to within 0.0001 kcal! :) #
         #==============================================#
         if self.FF.amoeba_pol == 'mutual':
-            system = forcefield.createSystem(pdb.topology,rigidWater=False,mutualInducedTargetEpsilon=1e-6)
+            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
         elif self.FF.amoeba_pol == 'direct':
-            system = forcefield.createSystem(pdb.topology,rigidWater=False,polarization='Direct')
+            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         if self.platform != None:
@@ -253,6 +265,8 @@ class AbInitio_OpenMM(AbInitio):
             xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
             # Set the positions using the trajectory
             simulation.context.setPositions(xyz_omm)
+            if self.FF.rigid_water:
+                simulation.context.applyConstraints(1e-8)
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             # Compute the force and append to list
@@ -265,4 +279,5 @@ class AbInitio_OpenMM(AbInitio):
         if self.run_internal:
             return self.energy_force_driver_all_internal_()
         else:
+            warn_press_key('The energy_force_driver_all_external_ function is deprecated!')
             return self.energy_force_driver_all_external_()

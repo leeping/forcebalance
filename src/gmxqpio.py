@@ -29,11 +29,12 @@ def get_monomer_properties(print_stuff=0):
     os.system("rm -rf *.log \#*")
     _exec(["./grompp"], print_command=False)
     _exec(["./mdrun"], outfnm="mdrun.txt", print_command=False)
+    _exec("./trjconv -f traj.trr -o confout.gro -ndec 6".split(), stdin="0\n", print_command=False)
     x = []
     q = []
     for line in open("confout.gro").readlines():
         sline = line.split()
-        if len(sline) == 9 and isfloat(sline[3]) and isfloat(sline[4]) and isfloat(sline[5]):
+        if len(sline) >= 6 and isfloat(sline[3]) and isfloat(sline[4]) and isfloat(sline[5]):
             x.append([float(i) for i in sline[3:6]])
     for line in open("charges.log").readlines():
         sline = line.split()
@@ -153,20 +154,20 @@ class Monomer_QTPIE(FittingSimulation):
         self.ref_moments['AlphaXX'] = 10.32
         self.ref_moments['AlphaYY'] =  9.56
         self.ref_moments['AlphaZZ'] =  9.91
-        Quad0   = Np.sqrt((self.ref_moments['QuadXX']**2 + self.ref_moments['QuadYY']**2 + self.ref_moments['QuadZZ']**2)/3)
-        Oct0   = Np.sqrt((self.ref_moments['OctXXZ']**2 + self.ref_moments['OctYYZ']**2 + self.ref_moments['OctZZZ']**2)/3)
-        Alpha0   = Np.sqrt((self.ref_moments['AlphaXX']**2 + self.ref_moments['AlphaYY']**2 + self.ref_moments['AlphaZZ']**2)/3)
+        Quad0   = Np.sqrt((self.ref_moments['QuadXX']**2 + self.ref_moments['QuadYY']**2 + self.ref_moments['QuadZZ']**2))
+        Oct0   = Np.sqrt((self.ref_moments['OctXXZ']**2 + self.ref_moments['OctYYZ']**2 + self.ref_moments['OctZZZ']**2))
+        Alpha0   = Np.sqrt((self.ref_moments['AlphaXX']**2 + self.ref_moments['AlphaYY']**2 + self.ref_moments['AlphaZZ']**2))
         self.weights = OrderedDict()
         self.weights['DipZ'] = 1.0 / 1.855
-        self.weights['QuadXX'] = 1.0 / Quad0**2 / 3
-        self.weights['QuadYY'] = 1.0 / Quad0**2 / 3
-        self.weights['QuadZZ'] = 1.0 / Quad0**2 / 3
-        self.weights['OctXXZ'] = 1.0 / Oct0**2 / 3
-        self.weights['OctYYZ'] = 1.0 / Oct0**2 / 3
-        self.weights['OctZZZ'] = 1.0 / Oct0**2 / 3
-        self.weights['AlphaXX'] = 1.0 / Alpha0**2 / 3
-        self.weights['AlphaYY'] = 1.0 / Alpha0**2 / 3
-        self.weights['AlphaZZ'] = 1.0 / Alpha0**2 / 3
+        self.weights['QuadXX'] = 1.0 / Quad0
+        self.weights['QuadYY'] = 1.0 / Quad0
+        self.weights['QuadZZ'] = 1.0 / Quad0
+        self.weights['OctXXZ'] = 0.0
+        self.weights['OctYYZ'] = 0.0
+        self.weights['OctZZZ'] = 0.0
+        self.weights['AlphaXX'] = 1.0 / Alpha0
+        self.weights['AlphaYY'] = 1.0 / Alpha0
+        self.weights['AlphaZZ'] = 1.0 / Alpha0
         
     def indicate(self):
         """ Print qualitative indicator. """
@@ -201,6 +202,7 @@ class Monomer_QTPIE(FittingSimulation):
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
         os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
+        os.symlink(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
         # Link the run files
         os.symlink(os.path.join(self.root,self.simdir,"conf.gro"),os.path.join(abstempdir,"conf.gro"))
         os.symlink(os.path.join(self.root,self.simdir,"settings","grompp.mdp"),os.path.join(abstempdir,"grompp.mdp"))
