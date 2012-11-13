@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 from collections import defaultdict
 import re
 from numpy import abs

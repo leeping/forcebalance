@@ -211,7 +211,7 @@ class Optimizer(ForceBalanceBaseClass):
         # Parameters for the adaptive trust radius
         a = self.adapt_fac  # Default value is 0.5, decrease to make more conservative.  Zero to turn off all adaptive.
         b = self.adapt_damp # Default value is 0.5, increase to make more conservative
-        printcool( "Main Optimizer\n%s Mode%s" % ("BFGS" if b_BFGS else "Newton-Raphson", " (Static Radius)" if a == 0.0 else " (Adaptive Radius)"), color=7, bold=1)
+        printcool( "Main Optimizer\n%s Mode%s" % ("BFGS" if b_BFGS else "Newton-Raphson", " (Static Radius)" if a == 0.0 else " (Adaptive Radius)"), ansi=1, bold=1)
         # First, set a bunch of starting values
         Ord         = 1 if b_BFGS else 2
         global ITERATION_NUMBER
@@ -236,7 +236,7 @@ class Optimizer(ForceBalanceBaseClass):
         H_stor   = H.copy()
         stepn  = 0
         ndx    = 0.0
-        color  = "\x1b[97m"
+        color  = "\x1b[1m"
         nxk = norm(xk)
         ngr = norm(G)
 
@@ -581,16 +581,16 @@ class Optimizer(ForceBalanceBaseClass):
             my_gfunc.x_best = None
             return my_gfunc
         if Algorithm == "powell":
-            printcool("Minimizing Objective Function using Powell's Method" , color=7, bold=1)
+            printcool("Minimizing Objective Function using Powell's Method" , ansi=1, bold=1)
             return optimize.fmin_powell(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep)
         elif Algorithm == "simplex":
-            printcool("Minimizing Objective Function using Simplex Method" , color=7, bold=1)
+            printcool("Minimizing Objective Function using Simplex Method" , ansi=1, bold=1)
             return optimize.fmin(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep,maxfun=self.maxstep*10)
         elif Algorithm == "anneal":
-            printcool("Minimizing Objective Function using Simulated Annealing" , color=7, bold=1)
+            printcool("Minimizing Objective Function using Simulated Annealing" , ansi=1, bold=1)
             return optimize.anneal(xwrap(self.Objective.Full),self.mvals0,lower=-1*self.trust0*np.ones(self.np),upper=self.trust0*np.ones(self.np),schedule='boltzmann')
         elif Algorithm == "cg":
-            printcool("Minimizing Objective Function using Conjugate Gradient" , color=7, bold=1)
+            printcool("Minimizing Objective Function using Conjugate Gradient" , ansi=1, bold=1)
             return optimize.fmin_cg(xwrap(self.Objective.Full,verbose=False),self.mvals0,fprime=gwrap(self.Objective.Full),gtol=self.conv_grd)
 
     def GeneticAlgorithm(self):

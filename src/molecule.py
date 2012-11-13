@@ -1,5 +1,3 @@
- #!/usr/bin/env python
-
 #======================================================================#
 #|                                                                    |#
 #|              Chemical file format conversion module                |#

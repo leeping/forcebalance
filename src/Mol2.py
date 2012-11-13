@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 Author: P. Tuffery 2008
 Ressource Parisienne en Bioinformatique Structurale
