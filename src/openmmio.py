@@ -34,6 +34,8 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "NonbondedForce" : {"Atom": ["type"]},
                 "AmoebaHarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaHarmonicAngleForce" : {"Angle" : ["class1","class2","class3"]},
+                "AmoebaBondForce" : {"Bond" : ["class1","class2"]},
+                "AmoebaAngleForce" : {"Angle" : ["class1","class2","class3"]},
                 "AmoebaStretchBendForce" : {"StretchBend" : ["class1","class2","class3"]},
                 "AmoebaVdwForce" : {"Vdw" : ["class"]},
                 "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
@@ -160,10 +162,10 @@ class Liquid_OpenMM(Liquid):
         """ Submit a NPT simulation to the Work Queue. """
         link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
         queue_up(self.wq,
-                 command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.fnms[0], temperature),
+                 command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.openmmxml, temperature),
                  input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
-                 #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.fnms[0]])
-                 output_files = ['npt_result.p', 'npt.out', self.FF.fnms[0]])
+                 #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
+                 output_files = ['npt_result.p', 'npt.out', self.FF.openmmxml])
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
@@ -174,7 +176,7 @@ class Liquid_OpenMM(Liquid):
         infnm = os.path.join(rnd,'forcebalance.p')
         os.remove(infnm)
         with open(os.path.join(rnd,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h,True),f)
-        queue_up_src_dest(self.wq, command = './runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.fnms[0], "True" if bGradient else "False"),
+        queue_up_src_dest(self.wq, command = './runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.openmmxml, "True" if bGradient else "False"),
                           input_files = [(os.path.join(rnd,'runcuda.sh'),'runcuda.sh'), 
                                          (os.path.join(rnd,'evaltraj.py'),'evaltraj.py'),
                                          (os.path.join(rnd,'conf.pdb'),'conf.pdb'),
@@ -206,7 +208,11 @@ class AbInitio_OpenMM(AbInitio):
         super(AbInitio_OpenMM,self).__init__(options,sim_opts,forcefield)
         try:
             ## Copied over from npt.py (for now)
-            PlatName = 'Cuda'
+            if options['openmm_new_cuda']:
+                PlatName = 'CUDA'
+            else:
+                PlatName = 'Cuda'
+            ## Set the simulation platform
             print "Setting Platform to", PlatName
             self.platform = openmm.Platform.getPlatformByName(PlatName)
             ## Set the device to the environment variable or zero otherwise
@@ -217,6 +223,24 @@ class AbInitio_OpenMM(AbInitio):
         except:
             warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
             self.platform = None
+        ## If using the new CUDA platform, then create the simulation object within this class itself.
+        if PlatName == "NotImplementedYet":
+            # Set up the entire system here on the new CUDA Platform.
+            pdb = PDBFile(os.path.join(self.root,self.simdir,"conf.pdb"))
+            forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
+            if self.FF.amoeba_pol == 'mutual':
+                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+            elif self.FF.amoeba_pol == 'direct':
+                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+            # Create the simulation; we're not actually going to use the integrator
+            integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+            if self.platform != None:
+                self.simulation = Simulation(pdb.topology, system, integrator, self.platform)
+            else:
+                self.simulation = Simulation(pdb.topology, system, integrator)
+            for i in range(system.getNumForces()):
+                system.getForce(i).updateParametersInContext(self.simulation.context)
+
 
     def read_topology(self):
         pdb = PDBFile(os.path.join(self.root,self.simdir,"conf.pdb"))
@@ -234,7 +258,7 @@ class AbInitio_OpenMM(AbInitio):
 
     def energy_force_driver_all_external_(self):
         ## This line actually runs OpenMM,
-        o, e = Popen(["./openmm_energy_force.py","conf.pdb","all.gro",self.FF.fnms[0]],stdout=PIPE,stderr=PIPE).communicate()
+        o, e = Popen(["./openmm_energy_force.py","conf.pdb","all.gro",self.FF.openmmxml],stdout=PIPE,stderr=PIPE).communicate()
         Answer = pickle.load("Answer.dat")
         M = np.array(list(Answer['Energies']) + list(Answer['Forces']))
         return M
@@ -242,7 +266,7 @@ class AbInitio_OpenMM(AbInitio):
     def energy_force_driver_all_internal_(self):
         """ Loop through the snapshots and compute the energies and forces using OpenMM."""
         pdb = PDBFile("conf.pdb")
-        forcefield = ForceField(self.FF.fnms[0])
+        forcefield = ForceField(self.FF.openmmxml)
         #==============================================#
         #       Simulation settings (IMPORTANT)        #
         # Agrees with TINKER to within 0.0001 kcal! :) #
@@ -253,10 +277,14 @@ class AbInitio_OpenMM(AbInitio):
             system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-        if self.platform != None:
-            simulation = Simulation(pdb.topology, system, integrator, self.platform)
+        if hasattr(self,'simulation'):
+            for i in range(system.getNumForces()):
+                system.getForce(i).updateParametersInContext(self.simulation.context)
         else:
-            simulation = Simulation(pdb.topology, system, integrator)
+            if self.platform != None:
+                simulation = Simulation(pdb.topology, system, integrator, self.platform)
+            else:
+                simulation = Simulation(pdb.topology, system, integrator)
 
         M = []
         # Loop through the snapshots

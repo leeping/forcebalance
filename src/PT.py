@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # The periodic table
 
 PeriodicTable = {'H' : 1.0079, 'He' : 4.0026, 

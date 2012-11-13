@@ -66,7 +66,8 @@ gen_opts_types = {
                  "writechk"     : (None, 'Name of the restart file we write to (can be same as readchk)'),
                  "ffdir"        : ('forcefield', 'Directory containing force fields, relative to project directory'),
                  "amoeba_polarization"        : ('direct', 'The AMOEBA polarization type, either direct or mutual.'),
-                 "rigid_water"        : (False, 'Perform calculations using rigid water molecules.  Currently used in AMOEBA parameterization.')
+                 "rigid_water"        : (False, 'Perform calculations using rigid water molecules.  Currently used in AMOEBA parameterization.'),
+                 "openmm_new_cuda"        : (False, 'Use the new CUDA Platform instead of the old Cuda platform, which is the default.')
                  },
     'allcaps' : {"jobtype"      : ("single", 'The job type, defaults to a single-point evaluation of objective function'),
                  },

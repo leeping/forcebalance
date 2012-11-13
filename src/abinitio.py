@@ -735,6 +735,7 @@ class AbInitio(FittingSimulation):
             if self.use_nft:
                 self.nf_err = N
                 self.tq_err = T
+            pvals = self.FF.make(mvals,self.usepvals) # Write a force field that isn't perturbed by finite differences.
         Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
 
@@ -993,6 +994,7 @@ class AbInitio(FittingSimulation):
             if self.use_nft:
                 self.nf_err = N
                 self.tq_err = T
+            pvals = self.FF.make(mvals,self.usepvals) # Write a force field that isn't perturbed by finite differences.
         Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         return Answer
 

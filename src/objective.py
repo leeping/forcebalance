@@ -94,7 +94,7 @@ class Objective(ForceBalanceBaseClass):
         Change = False
         for key, val in self.ObjDict.items():
             if key == 'Total' : continue
-            color = "\x1b[97m"
+            color = "\x1b[94m"
             if key in self.ObjDict_Last:
                 Change = True
                 if self.ObjDict[key] <= self.ObjDict_Last[key]:
@@ -122,7 +122,7 @@ class Objective(ForceBalanceBaseClass):
             Title = "Objective Function Breakdown\n %-20s %55s" % ("Simulation Name", "Residual  x  Weight  =  Contribution (Current-Prev)")
         else:
             Title = "Objective Function Breakdown\n %-20s %40s" % ("Simulation Name", "Residual  x  Weight  =  Contribution")
-        printcool_dictionary(PrintDict,color=6,title=Title)
+        printcool_dictionary(PrintDict,color=4,title=Title)
         return
 
     def Full(self, mvals, Order=0, usepvals=False, verbose=False):

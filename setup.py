@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 setup.py: Install ForceBalance. 
 """
@@ -8,6 +9,7 @@ __version__ = VERSION
 from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
 import os
+import shutil
 import numpy
 import glob
 
@@ -43,7 +45,7 @@ def buildKeywordDictionary():
     setupKeywords["license"]           = "GPL 3.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
-    setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/ForceBalance")
+    setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
     setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
     setupKeywords["package_dir"]       = {"forcebalance"        : "src",
                                           "forcebalance/pymbar" : "ext/pymbar"
@@ -83,6 +85,8 @@ def buildKeywordDictionary():
     return setupKeywords
     
 def main():
+    # if len(os.path.split(__file__)[0]) > 0:
+    #     os.chdir(os.path.split(__file__)[0])
     setupKeywords=buildKeywordDictionary()
     setup(**setupKeywords)
 

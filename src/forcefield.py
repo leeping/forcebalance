@@ -393,6 +393,13 @@ class FF(ForceBalanceBaseClass):
             else:
                 self.tinkerprm = ffname
 
+        # Set the OpenMM XML file, which will help for running OpenMM.
+        if fftype == "openmm":
+            if hasattr(self, "openmmxml"):
+                warn_press_key("There should only be one OpenMM XML file - confused!!")
+            else:
+                self.openmmxml = ffname
+
         # Determine the appropriate parser from the FF_IOModules dictionary.
         # If we can't figure it out, then use the base reader, it ain't so bad. :)
         Reader = FF_IOModules.get(fftype,basereader.BaseReader)

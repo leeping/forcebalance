@@ -60,7 +60,7 @@ def pmat2d(mat2d, precision=1):
             print "%% .%ie" % precision % m2a[i][j],
         print
 
-def printcool(text,sym="#",bold=False,color=2,bottom='-',minwidth=50):
+def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50):
     """Cool-looking printout for slick formatting of output.
 
     @param[in] text The string that the printout is based upon.  This function
@@ -95,7 +95,13 @@ def printcool(text,sym="#",bold=False,color=2,bottom='-',minwidth=50):
     for line in text:
         padleft = ' ' * ((width - len(line)) / 2)
         padright = ' '* (width - len(line) - len(padleft))
-        print "%s\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
+        if ansi != None:
+            ansi = str(ansi)
+            print "%s\x1b[%sm%s" % (''.join([sym for i in range(3)]), ansi, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
+        elif color != None:
+            print "%s\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
+        else:
+            warn_press_key("Inappropriate use of printcool")
     print bar
     return sub(sym,bottom,bar)
 
