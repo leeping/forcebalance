@@ -22,7 +22,6 @@ try:
     from simtk.unit import *
 except:
     pass
-from IPython import embed
 
 ## Dictionary for building parameter identifiers.  As usual they go like this:
 ## Bond/length/OW.HW

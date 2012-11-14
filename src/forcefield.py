@@ -1007,14 +1007,15 @@ class FF(ForceBalanceBaseClass):
 
         ## Some customized constraints here.
         # Quadrupoles must be traceless
-        MultipoleAtoms = set([p.split('/')[-1] for p in self.plist if 'Multipole' in p])
-        QuadrupoleGrps = [[i for i, p in enumerate(self.plist) if 'Multipole' in p and p.split('/')[-1] == A and p.split('/')[1] in ['q11','q22','q33']] for A in MultipoleAtoms]
-        for Grp in QuadrupoleGrps:
-            qid = [array([i]) for i in range(3)]
-            tq = 3
-            qtrans2 = build_qtrans2(tq, qid, Grp)
-            print "Making sure that quadrupoles are traceless (for parameter IDs %s)" % str(Grp)
-            insert_mat(qtrans2, Grp)
+        if self.constrain_charge:
+            MultipoleAtoms = set([p.split('/')[-1] for p in self.plist if 'Multipole' in p])
+            QuadrupoleGrps = [[i for i, p in enumerate(self.plist) if 'Multipole' in p and p.split('/')[-1] == A and p.split('/')[1] in ['q11','q22','q33']] for A in MultipoleAtoms]
+            for Grp in QuadrupoleGrps:
+                qid = [array([i]) for i in range(3)]
+                tq = 3
+                qtrans2 = build_qtrans2(tq, qid, Grp)
+                print "Making sure that quadrupoles are traceless (for parameter IDs %s)" % str(Grp)
+                insert_mat(qtrans2, Grp)
 
         #ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Multipole')] for k in self.ffdata]))
 
