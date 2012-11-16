@@ -15,7 +15,11 @@ def main():
     options, sim_opts = parse_inputs(argv[1])
     MyFF = FF(options)
     Prec=int(argv[2])
-    MyFF.make(np.zeros(len(MyFF.pvals0)),False,'NewFF',precision=Prec)
+    if 'read_mvals' in options:
+        mvals = np.array(options['read_mvals'])
+    else:
+        mvals = np.zeros(len(MyFF.pvals0))
+    MyFF.make(mvals,False,'NewFF',precision=Prec)
 
 if __name__ == "__main__":
     main()

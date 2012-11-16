@@ -42,18 +42,14 @@ class LeastSquares(FittingSimulation):
         #======================================#
         #     Variables which are set here     #
         #======================================#
-        ## Prepare the temporary directory
-        self.prepare_temp_directory(options,sim_opts)
         ## Which parameters are differentiated?
         self.call_derivatives = [True for i in range(forcefield.np)]
 
-    def prepare_temp_directory(self, options, sim_opts):
-        """ Prepare the temporary directory, by default does nothing (gmxx2 needs it) """
-        return
-        
     def indicate(self):
+        #RMSD = sqrt(mean(self.D ** 2))
+        MAD = mean(abs(self.D))
         print "\rSim: %-15s" % self.name, 
-        print "Objective = %.5e" % self.objective
+        print "MeanAbsErr/MeanExact: %.5e Objective = %.5e" % (MAD / self.MAQ, self.objective)
         return
 
     def get(self, mvals, AGrad=False, AHess=False):
@@ -95,6 +91,9 @@ class LeastSquares(FittingSimulation):
         M = Ans[:,1]
         Q = Ans[:,0]
         D = M - Q
+
+        self.MAQ = mean(abs(Q))
+
         ns = len(M)
         # Wrapper to the driver, which returns just the part that changes.
         def callM(mvals_):
@@ -130,6 +129,7 @@ class LeastSquares(FittingSimulation):
         H *= Fac
         Answer = {'X':Objective, 'G':G, 'H':H}
         if not in_fd():
+            self.D = D
             self.objective = Answer['X']
             LAST_MVALS = mvals.copy()
         return Answer

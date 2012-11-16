@@ -91,6 +91,7 @@ class THCDF_Psi4(LeastSquares):
 
     def __init__(self,options,sim_opts,forcefield):
         super(THCDF_Psi4,self).__init__(options,sim_opts,forcefield)
+
         # Parse the input.dat file to figure out the elements and molecules
         MolSection = False
         ElemList = []
@@ -115,19 +116,36 @@ class THCDF_Psi4(LeastSquares):
             Pelem = set(Pelem)
             if len(self.Elements.intersection(Pelem)) == 0:
                 self.call_derivatives[p] = False
+        ## Psi4 basis set file
         gbslist = [i for i in self.FF.fnms if os.path.splitext(i)[1] == '.gbs']
         if len(gbslist) != 1:
             warn_press_key("In %s, you should only have exactly one .gbs file in the list of force field files!" % __file__)
         self.GBSfnm = gbslist[0]
+        ## Psi4 input file for calculation of linear dependencies
+        ## This is actually a file in 'forcefield' until we can figure out a better system
+        datlist = [i for i in self.FF.fnms if os.path.splitext(i)[1] == '.dat']
+        if len(datlist) != 1:
+            warn_press_key("In %s, you should only have exactly one .dat file in the list of force field files!" % __file__)
+        self.DATfnm = datlist[0]
+        ## Prepare the temporary directory
+        self.prepare_temp_directory(options,sim_opts)
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
-        os.symlink(os.path.join(self.root,self.simdir,"input.dat"),os.path.join(abstempdir,"input.dat"))
+        o = open(os.path.join(abstempdir,"input.dat"),'w')
+        for line in open(os.path.join(self.root,self.simdir,"input.dat")).readlines():
+            s = line.split("#")[0].split()
+            if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
+                print >> o, "basis file %s" % self.GBSfnm
+            else:
+                print >> o, line,
+        o.close()
 
     def indicate(self):
         print "\rSim: %-15s" % self.name, 
-        print "Molecules = %-20s" % str(self.Molecules),
-        print "Objective = %.5e" % self.objective
+        print "Molecules = %-30s" % str(self.Molecules),
+        MAD = np.mean(np.abs(self.D))
+        print "Mean (Max) Error: %8.4f%% (%8.4f%%) Energies: DF %+.3e MP2 %+.3e Delta % .3e Objective = %.5e" % (100*MAD / self.MAQ, 100*np.max(np.abs(self.D)) / self.MAQ, self.DF_Energy, self.MP2_Energy, self.DF_Energy - self.MP2_Energy, self.objective)
         return
 
     def write_nested_destroy(self, fnm, linedestroy):
@@ -150,7 +168,16 @@ class THCDF_Psi4(LeastSquares):
         if not in_fd() and CheckBasis():
             _exec("cp %s %s.bak" % (self.GBSfnm, self.GBSfnm), print_command=False)
             ln0 = self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save)
-            _exec("psi4 throwout.dat", print_command=False)
+            o = open(".lindep.dat",'w')
+            for line in open(self.DATfnm).readlines():
+                s = line.split("#")[0].split()
+                if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
+                    print >> o, "basis file %s" % self.GBSfnm
+                else:
+                    print >> o, line,
+            o.close()
+            _exec("mv .lindep.dat %s" % self.DATfnm, print_command=False)
+            _exec("psi4 %s" % self.DATfnm, print_command=False)
             LI = GBS_Reader()
             LI_lines = {}
             ## Read in the commented linindep.gbs file and ensure that these same lines are commented in the new .gbs file
@@ -195,7 +222,13 @@ class THCDF_Psi4(LeastSquares):
                 print "All parms removed:", self.FF.parmdestroy_save + [self.FF.parmdestroy_this]
 
         self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save + [self.FF.linedestroy_this])
-        _exec("psi4", print_command=False)
+        _exec("psi4", print_command=False, outfnm="psi4.stdout")
+        if not in_fd():
+            for line in open('psi4.stdout').readlines():
+                if "MP2 Energy:" in line:
+                    self.MP2_Energy = float(line.split()[-1])
+                elif "DF Energy:" in line:
+                    self.DF_Energy = float(line.split()[-1])
         Ans = np.array([[float(i) for i in line.split()] for line in open("objective.dat").readlines()])
         os.unlink("objective.dat")
         return Ans
