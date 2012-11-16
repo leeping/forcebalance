@@ -1,5 +1,6 @@
 $options
 jobtype newton
+jobtype fdcheckg
 forcefield molecule.itp                # Check out how the parameters are tagged
 trust0 -1                              # Negative number for "nonlinear search", positive number for "trust radius"
 penalty_type L1                        # L2 for Gaussian prior, L1 for Laplacian prior
@@ -31,7 +32,6 @@ simtype abinitio_gmx
 name 2dscan
 weight 1
 w_energy 1.0
-w_force 0.0
 shots -1
 $end
 

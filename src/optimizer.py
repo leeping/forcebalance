@@ -421,7 +421,10 @@ class Optimizer(ForceBalanceBaseClass):
                     Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
                 except:
                     Opt1 = optimize.fmin(HYP.compute_val,dx0,full_output=True,disp=0)
-                Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xkd,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
+                try:
+                    Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xkd,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
+                except:
+                    Opt2 = optimize.fmin(HYP.compute_val,-xkd,full_output=True,disp=0)
                 #Opt2 = optimize.fmin(HYP.compute_val,-xkd,full_output=True,disp=0)
                 dx1, sol1 = Opt1[0], Opt1[1]
                 dx2, sol2 = Opt2[0], Opt2[1]

@@ -9,7 +9,7 @@ modules for other programs because it's so simple.
 
 import os
 from re import match, sub
-from nifty import isint, isfloat, warn_press_key
+from nifty import isint, isfloat, warn_press_key, col
 import numpy as Np
 from basereader import BaseReader
 from subprocess import Popen, PIPE
@@ -142,12 +142,15 @@ class AbInitio_TINKER(AbInitio):
         self.trajfnm = "all.arc"
         super(AbInitio_TINKER,self).__init__(options,sim_opts,forcefield)
         ## all_at_once is not implemented.
-        self.all_at_once = False
+        if self.force and self.all_at_once:
+            warn_press_key("Currently, TINKER can only do trajectory loops for energy-only jobs.")
+            self.all_at_once = False
 
     def prepare_temp_directory(self, options, sim_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
+        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
         # Link the run parameter file
         os.symlink(os.path.join(self.root,self.simdir,"settings","shot.key"),os.path.join(abstempdir,"shot.key"))
 
@@ -166,6 +169,24 @@ class AbInitio_TINKER(AbInitio):
                 F += [-1 * float(i) * 4.184 * 10 for i in s[2:5]]
         M = Np.array(E + F)
         return M
+
+    def energy_driver_all(self):
+        self.traj.write("shot.arc")
+        # This line actually runs TINKER
+        o, e = Popen(["./analyze","shot.arc",self.FF.tinkerprm,"e"],stdout=PIPE,stderr=PIPE).communicate()
+        # Read data from stdout and stderr, and convert it to GROMACS units.
+        E = []
+        for line in o.split('\n'):
+            s = line.split()
+            if "Total Potential Energy" in line:
+                E.append([float(s[4]) * 4.184])
+        M = Np.array(E)
+        return M
+
+    def energy_force_driver_all(self):
+        if self.force:
+            raise Exception('Trying to call unimplemented functionality.')
+        return self.energy_driver_all()
 
 class Vibration_TINKER(Vibration):
 

@@ -492,7 +492,7 @@ def remove_if_exists(fnm):
 def which(fnm):
     # Get the location of a file.  Works only on UNIX-like file systems.
     try:
-        return os.path.split(os.popen('which %s' % fnm).readlines()[0].strip())[0]
+        return os.path.split(os.popen('which %s 2> /dev/null' % fnm).readlines()[0].strip())[0]
     except:
         return ''
 

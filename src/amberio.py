@@ -192,7 +192,7 @@ class AbInitio_AMBER(AbInitio):
             if ParseMode == 2:
                 if len(sline) == 3 and all(isfloat(sline[i]) for i in range(3)):
                     Force += [float(sline[i]) * 4.184 * 10 for i in range(3)]
-                if len(Force) == 3*self.natoms:
+                if len(Force) == 3*self.qmatoms:
                     Forces.append(np.array(Force))
                     Force = []
                     ParseMode = 0

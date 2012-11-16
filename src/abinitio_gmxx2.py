@@ -137,7 +137,7 @@ class AbInitio_GMXX2(AbInitio):
         if self.covariance == False:
             # Gromacs-X2 defaults to using the covariance, so we can turn it off here
             open(os.path.join(abstempdir,"NoCovariance"),'w').close()
-        if self.fitatoms != self.natoms:
+        if self.fitatoms != self.qatoms:
             # The number of fitting atoms (since the objective function is built internally)
             with open(os.path.join(abstempdir,"fitatoms"),'w') as f: f.write("%i\n" % self.fitatoms)
         # Print the QM energies and forces in such a way that Gromacs understands.
