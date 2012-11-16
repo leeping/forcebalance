@@ -790,7 +790,11 @@ class FF(ForceBalanceBaseClass):
         for p in self.redirect:
             mvals[p] = 0.0
         if self.logarithmic_map:
-            pvals = exp(mvals) * self.pvals0
+            try:
+                pvals = exp(mvals) * self.pvals0
+            except:
+                print mvals
+                raise Exception('What the hell did you do?')
         else:
             pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
