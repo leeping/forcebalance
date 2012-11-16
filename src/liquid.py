@@ -64,8 +64,6 @@ class Liquid(FittingSimulation):
         #     Variables which are set here     #
         #======================================#
         
-        ## The number of true atoms 
-        self.natoms      = 0
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,sim_opts)
         ## Saved force field mvals for all iterations

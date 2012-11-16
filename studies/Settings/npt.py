@@ -589,7 +589,7 @@ def main():
    global timestep, nsteps, niterations
    timestep = 0.1 * units.femtosecond # timestep for integrtion
    nsteps   = 1000                    # number of steps per data record
-   niterations = 5000
+   niterations = 2000
 
    mpdb = PDBFile('mono.pdb')
    mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_mutual_kwargs if FF.amoeba_pol == 'mutual' else mono_direct_kwargs, pbc=False, Trajectory=False)

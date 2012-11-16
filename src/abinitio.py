@@ -7,7 +7,7 @@
 import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
-from numpy import append, array, cross, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack, sum
+from numpy import append, array, cross, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack, sum, abs, vstack, max
 from fitsim import FittingSimulation
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -16,6 +16,7 @@ from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import defaultdict
 import itertools
+#from IPython import embed
 #from _increment import AbInitio_Build
 
 class AbInitio(FittingSimulation):
@@ -111,8 +112,8 @@ class AbInitio(FittingSimulation):
         self.espval        = []
         ## The qdata.txt file that contains the QM energies and forces
         self.qfnm = os.path.join(self.simdir,"qdata.txt")
-        ## The number of true atoms 
-        self.natoms      = 0
+        ## The number of atoms in the QM calculation (Irrelevant if not fitting forces)
+        self.qmatoms      = 0
         ## Qualitative Indicator: average energy error (in kJ/mol)
         self.e_err = 0.0
         self.e_err_pct = None
@@ -204,15 +205,15 @@ class AbInitio(FittingSimulation):
             raise Exception('Please choose a valid force_map keyword: molecule, residue, chargegroup')
 
         # Try to be intelligent here.  Before computing net forces and torques, first filter out all particles that are not atoms.
-        if len(xyz) > self.natoms:
+        if len(xyz) > self.fitatoms:
             xyz1 = array([xyz[i] for i in range(len(xyz)) if self.AtomLists['ParticleType'][i] == 'A'])
         else:
             xyz1 = xyz.copy()
 
-        if len(Block) > self.natoms:
+        if len(Block) > self.fitatoms:
             Block = [Block[i] for i in range(len(Block)) if self.AtomLists['ParticleType'][i] == 'A']
 
-        if len(self.AtomLists['Mass']) > self.natoms:
+        if len(self.AtomLists['Mass']) > self.fitatoms:
             Mass = array([self.AtomLists['Mass'][i] for i in range(len(xyz)) if self.AtomLists['ParticleType'][i] == 'A'])
         else:
             Mass = array(self.AtomLists['Mass'])
@@ -323,22 +324,29 @@ class AbInitio(FittingSimulation):
         self.eqm = array(self.eqm)
         self.eqm *= eqcgmx
         self.eqm -= mean(self.eqm)
-        self.fqm = array(self.fqm)
-        self.fqm *= fqcgmx
-        self.natoms = self.fqm.shape[1]/3
+        if len(self.fqm) > 0:
+            self.fqm = array(self.fqm)
+            self.fqm *= fqcgmx
+            self.qmatoms = self.fqm.shape[1]/3
+        else:
+            print "QM forces are not present, only fitting energies."
+            self.force = 0
         self.nesp = len(self.espval[0]) if len(self.espval) > 0 else 0
         # Here we may choose a subset of atoms to do the force matching.
-        if self.fitatoms == 0:
-            self.fitatoms = self.natoms
-        elif self.fitatoms > self.natoms:
-            print "What the heck, more fitting atoms than the total number of atoms?"
-            sys.exit(1)
+        if self.force:
+            if self.fitatoms == 0: 
+                self.fitatoms = self.qmatoms
+            elif self.fitatoms > self.qmatoms:
+                warn_press_key("There are more fitting atoms than the total number of atoms in the QM calculation (something is probably wrong)")
+            else:
+                # Indicate to Gromacs that we're only fitting the first however-many atoms.
+                print "We're only fitting the first %i atoms" % self.fitatoms
+                #print "The quantum force matrix appears to contain more components (%i) than those being fit (%i)." % (fqmm.shape[1], 3*self.fitatoms)
+                print "Pruning the quantum force matrix..."
+                self.fqm  = self.fqm[:, :3*self.fitatoms].copy()
         else:
-            # Indicate to Gromacs that we're only fitting the first however-many atoms.
-            print "We're only fitting the first %i atoms" % self.fitatoms
-            #print "The quantum force matrix appears to contain more components (%i) than those being fit (%i)." % (fqmm.shape[1], 3*self.fitatoms)
-            print "Pruning the quantum force matrix..."
-            self.fqm  = self.fqm[:, :3*self.fitatoms].copy()
+            self.fitatoms = 0
+            
         if len(self.emd0) > 0:
             self.emd0 = array(self.emd0)
             self.emd0 -= mean(self.emd0)
@@ -395,38 +403,46 @@ class AbInitio(FittingSimulation):
         
     def indicate(self):
         print "Sim: %-15s" % self.name, 
-        if self.energy or self.force:
+        if self.energy:
             if self.e_err_pct == None:
-                print "Errors: Energy (kJ/mol) = %8.4f Atomic Force (%%) = %8.4f" % (self.e_err, self.f_err*100), 
+                print "Errors: Energy (kJ/mol) = %8.4f" % (self.e_err, self.f_err*100), 
             else:
-                print "Errors: Energy = %8.4f kJ/mol (%.4f%%) Atomic Force (%%) = %8.4f" % (self.e_err, self.e_err_pct*100, self.f_err*100), 
-        if self.use_nft:
-            print "Net Force (%%) = %8.4f Torque (%%) = %8.4f" % (self.nf_err*100, self.tq_err*100),
+                print "Errors: Energy = %8.4f kJ/mol (%.4f%%)" % (self.e_err, self.e_err_pct*100), 
+        if self.force:
+            print "Atomic Force (%%) = %8.4f" % (self.f_err*100), 
+            if self.use_nft:
+                print "Net Force (%%) = %8.4f Torque (%%) = %8.4f" % (self.nf_err*100, self.tq_err*100),
         if self.resp:
             print "ESP (%%) = %8.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
         print "Objective = %.5e" % self.objective
 
     def energy_force_transformer_all(self):
         M = self.energy_force_driver_all()
-        if self.use_nft:
-            Nfts = []
-            for i in range(len(M)):
-                Fm  = M[i][1:]
-                Nft = self.compute_netforce_torque(self.traj.xyzs[i], Fm)
-                Nfts.append(Nft)
-            Nfts = array(Nfts)
-            return hstack((M, Nfts))
+        if self.force:
+            if self.use_nft:
+                Nfts = []
+                for i in range(len(M)):
+                    Fm  = M[i][1:]
+                    Nft = self.compute_netforce_torque(self.traj.xyzs[i], Fm)
+                    Nfts.append(Nft)
+                Nfts = array(Nfts)
+                return hstack((M, Nfts))
+            else:
+                return M
         else:
             return M
 
     def energy_force_transformer(self,i):
         M = self.energy_force_driver(i)
-        if self.use_nft:
-            Fm  = M[1:]
-            Nft = self.compute_netforce_torque(self.traj.xyzs[i], Fm)
-            return hstack((M, Nft))
+        if self.force:
+            if self.use_nft:
+                Fm  = M[1:]
+                Nft = self.compute_netforce_torque(self.traj.xyzs[i], Fm)
+                return hstack((M, Nft))
+            else:
+                return M
         else:
-            return M
+            return M[0]
 
     def get_energy_force_no_covariance_(self, mvals, AGrad=False, AHess=False):
         """
@@ -546,6 +562,7 @@ class AbInitio(FittingSimulation):
             X2_M_pq = zeros((np,np),dtype=float)
             X2_Q_pq = zeros((np,np),dtype=float)
         QBN = dot(self.qmboltz_wts[:ns],self.whamboltz_wts[:ns])
+        M_all = zeros((ns,NCP1),dtype=float)
         if AGrad and self.all_at_once:
             dM_all = zeros((ns,np,NCP1),dtype=float)
             ddM_all = zeros((ns,np,NCP1),dtype=float)
@@ -563,13 +580,6 @@ class AbInitio(FittingSimulation):
                 for p in range(np):
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
             
-            # Dump energies and forces to disk.
-            M_all_print = M_all.copy()
-            M_all_print[:,0] -= mean(M_all_print[:,0])
-            savetxt('M.txt',M_all_print)
-            Q_all_print = hstack((col(self.eqm),self.fref))
-            Q_all_print[:,0] -= mean(Q_all_print[:,0])
-            savetxt('Q.txt',Q_all_print)
         # My C helper code isn't fully functional yet.
         # try:
         #     AbInitio_Build(np, ns, NCP1, AGrad, AHess,
@@ -588,7 +598,8 @@ class AbInitio(FittingSimulation):
             Y  += R
             # Recall reference (QM) data
             Q[0] = self.eqm[i]
-            Q[1:] = self.fref[i,:].copy()
+            if self.force:
+                Q[1:] = self.fref[i,:].copy()
             QQ     = Q*Q
             # Call the simulation software to get the MM quantities.
             if self.all_at_once:
@@ -596,6 +607,7 @@ class AbInitio(FittingSimulation):
             else:
                 print "Shot %i\r" % i,
                 M = self.energy_force_transformer(i)
+                M_all[i,:] = M.copy()
             X     = M-Q
             # Increment the average values.
             X0_M += P*X
@@ -629,7 +641,8 @@ class AbInitio(FittingSimulation):
                 SPiXi_p[p] += P * Xi_p
                 SRiXi_p[p] += R * Xi_p
                 if not AHess: continue
-                M_pp[p] = ddM_all[i, p]
+                if self.all_at_once:
+                    M_pp[p] = ddM_all[i, p]
                 # This formula is more correct, but perhapsively convergence is slower.
                 #Xi_pq       = 2 * (M_p[p] * M_p[p] + X * M_pp[p])
                 # Gauss-Newton formula for approximate Hessian
@@ -640,6 +653,42 @@ class AbInitio(FittingSimulation):
                     Xi_pq          = 2 * M_p[p] * M_p[q]
                     SPiXi_pq[p,q] += P * Xi_pq
                     SRiXi_pq[p,q] += R * Xi_pq
+
+        # Dump energies and forces to disk.
+        M_all_print = M_all.copy()
+        M_all_print[:,0] -= mean(M_all_print[:,0])
+        if self.force:
+            Q_all_print = hstack((col(self.eqm),self.fref))
+        else:
+            Q_all_print = col(self.eqm)
+        Q_all_print[:,0] -= mean(Q_all_print[:,0])
+        savetxt('M.txt',M_all_print)
+        savetxt('Q.txt',Q_all_print)
+        EnergyComparison = hstack((col(Q_all_print[:,0]),col(M_all_print[:,0])))
+        savetxt('QM-vs-MM-energies.txt',EnergyComparison)
+        if self.force:
+            # Write .xyz files which can be viewed in vmd.
+            Mforce_obj = self.traj[:]
+            Qforce_obj = self.traj[:]
+            Mforce_print = array(M_all_print[:,1:3*self.fitatoms+1])
+            Qforce_print = array(Q_all_print[:,1:3*self.fitatoms+1])
+            MaxComp = max(abs(vstack((Mforce_print,Qforce_print)).flatten()))
+            Mforce_print /= MaxComp
+            Qforce_print /= MaxComp
+            for i in range(ns):
+                Mforce_obj.xyzs[i] = Mforce_print[i, :].reshape(-1,3)
+                Qforce_obj.xyzs[i] = Qforce_print[i, :].reshape(-1,3)
+            if self.fitatoms < self.qmatoms:
+                Fpad = zeros((self.qmatoms - self.fitatoms, 3),dtype=float)
+                Mforce_obj.xyzs[i] = vstack((Mforce_obj.xyzs[i], Fpad))
+                Qforce_obj.xyzs[i] = vstack((Qforce_obj.xyzs[i], Fpad))
+            #embed()
+            self.traj.write('coords.xyz')
+            Mforce_obj.elem = ['H' for i in range(Mforce_obj.na)]
+            Mforce_obj.write('MMforce.xyz')
+            Qforce_obj.elem = ['H' for i in range(Qforce_obj.na)]
+            Qforce_obj.write('QMforce.xyz')
+
         #==============================================================#
         #      STEP 3: Build the variance vector and invert it.        #
         #==============================================================#
@@ -658,19 +707,20 @@ class AbInitio(FittingSimulation):
         # Build the weight vector, so the force contribution is suppressed by 1/3N
         WM      = zeros(NCP1,dtype=float)
         WM[0] = sqrt(EWt)
-        start   = 1
-        block   = 3*self.fitatoms
-        end     = start + block
-        WM[start:end] = sqrt(FWt / block)
-        if self.use_nft:
-            start   = end
-            block   = 3*self.nnf
+        if self.force:
+            start   = 1
+            block   = 3*self.fitatoms
             end     = start + block
-            WM[start:end] = sqrt(NWt / block)
-            start   = end
-            block   = 3*self.ntq
-            end     = start + block
-            WM[start:end] = sqrt(TWt / block)
+            WM[start:end] = sqrt(FWt / block)
+            if self.use_nft:
+                start   = end
+                block   = 3*self.nnf
+                end     = start + block
+                WM[start:end] = sqrt(NWt / block)
+                start   = end
+                block   = 3*self.ntq
+                end     = start + block
+                WM[start:end] = sqrt(TWt / block)
         # Here we're just using the variance.
         QBP  = self.qmboltz
         MBP  = 1 - self.qmboltz
@@ -720,8 +770,11 @@ class AbInitio(FittingSimulation):
         # Fractional energy error.
         Efrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
         # Fractional force error.
-        F = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,1+3*self.fitatoms)]))) + \
-            QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,1+3*self.fitatoms)])))
+        if self.force:
+            F = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,1+3*self.fitatoms)]))) + \
+                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,1+3*self.fitatoms)])))
+        else:
+            F = None
         if self.use_nft:
             N = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))]))) + \
                 QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))])))
@@ -799,6 +852,7 @@ class AbInitio(FittingSimulation):
         @param[in] AHess Switch to turn on analytic Hessian
         @return Answer Contribution to the objective function
         """
+        warn_press_key("You have reached a piece of code that isn't well maintained!  If you believe you got here in error, try setting the covariance option to zero.")
         Answer = {}
         # Create the new force field!!
         pvals = self.FF.make(mvals,self.usepvals)
@@ -867,7 +921,8 @@ class AbInitio(FittingSimulation):
             Y  += R
             # Recall reference (QM) data
             Q[0] = self.eqm[i]
-            Q[1:] = self.fref[i,:].copy()
+            if self.force:
+                Q[1:] = self.fref[i,:].copy()
             # Increment the average quantities.
             QQ     = outer(Q,Q)
             # Call the simulation software to get the MM quantities.
@@ -977,8 +1032,11 @@ class AbInitio(FittingSimulation):
         # objective function values (divided by the diagonal           #
         # covariance values).                                          #
         #==============================================================#
-        F = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1,1+3*self.fitatoms)]))) + \
-            QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1,1+3*self.fitatoms)])))
+        if self.force:
+            F = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1,1+3*self.fitatoms)]))) + \
+                QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1,1+3*self.fitatoms)])))
+        else:
+            F = None
         if self.use_nft:
             N = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))]))) + \
                 QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))])))

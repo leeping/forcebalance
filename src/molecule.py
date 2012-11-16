@@ -1190,6 +1190,7 @@ class Molecule(object):
         nframes = 0
         thisresid   = 1
         ln = 0
+        thisatom = 0
         for line in open(fnm):
             sline = line.split()
             # The first line always contains the number of atoms
@@ -1208,7 +1209,9 @@ class Molecule(object):
                             suffix.append(''.join([whites[j]+sline[j] for j in range(5,len(sline))]))
                         else:
                             suffix.append('')
-                    thisatom = int(sline[0])
+                    # LPW Make sure ..
+                    thisatom += 1
+                    #thisatom = int(sline[0])
                     thisres.add(thisatom)
                     forwardres.add(thisatom)
                     if len(sline) >= 6:
@@ -1219,6 +1222,7 @@ class Molecule(object):
                         thisresid += 1
                     xyz.append([float(sline[2]),float(sline[3]),float(sline[4])])
                     if thisatom == na:
+                        thisatom = 0
                         nframes += 1
                         title = True
                         xyzs.append(np.array(xyz))
@@ -1551,7 +1555,7 @@ class Molecule(object):
                         'energy_opt'       : ("^Final energy is +[-+]?([0-9]*\.)?[0-9]+$", -1),
                         'charge'           : ("Sum of atomic charges", -1),
                         'mult'             : ("Sum of spin +charges", -1),
-                        'energy_mp2'       : ("^(ri-)*mp2 total energy += +[-+]?([0-9]*\.)?[0-9]+ +au$",-2),
+                        'energy_mp2'       : ("^(ri)*(-)*mp2 +total energy += +[-+]?([0-9]*\.)?[0-9]+ +au$",-2),
                         'energy_ccsd'      : ("^CCSD Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
                         'energy_ccsdt'     : ("^CCSD\(T\) Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1)
                         }
