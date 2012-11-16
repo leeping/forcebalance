@@ -464,6 +464,16 @@ class FF(ForceBalanceBaseClass):
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
                     # Add pid into the dictionary.
+                    # LPW: Here is a hack to 
+                    if pid in self.map and 'PDIHMULS' in pid:
+                        pid0 = pid
+                        extranum = 0
+                        while pid in self.map:
+                            pid = "%s%i" % (pid0, extranum)
+                            extranum += 1
+                        print "Encountered an expected duplicate: parameter name has been changed to %s" % pid
+                    elif pid in self.map:
+                        warn_press_key('Encounted an unexpected duplicate parameter ID : %s' % pid)
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
                     self.patoms.append([self.Readers[ffname].molatom])
@@ -839,7 +849,11 @@ class FF(ForceBalanceBaseClass):
             # The old, horrendously complicated rule
             # rsfactors[termtype] = exp(mean(log(abs(array(typevals[termtype]))+(abs(array(typevals[termtype]))==0))))
             # The newer, maximum rule (thanks Baba)
-            rsfactors[termtype] = max(abs(array(typevals[termtype])))
+            maxval = max(abs(array(typevals[termtype])))
+            # When all initial parameter values are zero, it could be a problem...
+            if maxval == 0:
+                maxval += 1
+            rsfactors[termtype] = maxval
             rsfac_list.append(termtype)
             # Physically motivated overrides
             rs_override(rsfactors,termtype)
@@ -1096,7 +1110,7 @@ def rs_override(rsfactors,termtype,Temperature=298.15):
     @param[in] Temperature The temperature for computing the kT energy scale
     
     """
-    if match('PDIHS[1-6]K|RBDIHSK[1-5]|MORSEC',termtype):
+    if match('PIMPDIHS[1-6]K|PDIHMULS[1-6]K|PDIHS[1-6]K|RBDIHSK[1-5]|MORSEC',termtype):
         # eV or eV rad^-2
         rsfactors[termtype] = 96.4853
     elif match('UREY_BRADLEYK1|ANGLESK',termtype):
