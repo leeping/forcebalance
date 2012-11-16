@@ -133,6 +133,7 @@ class Optimizer(ForceBalanceBaseClass):
         #======================================#
         ## The indices to be excluded from the Hessian update
         self.excision  = list(FF.excision)
+
         ## Number of parameters
         self.np        = FF.np
         ## The original parameter values
