@@ -34,6 +34,14 @@ PERMUTE = Extension('forcebalance/_assign',
                     include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')]
                     )
 
+# Copied from MSMBuilder 'contact' library for rapidly computing interatomic distances.
+CONTACT = Extension('forcebalance/_contact_wrap',
+                    sources = ["ext/contact/contact.c",
+                               "ext/contact/contact_wrap.c"],
+                    extra_compile_args=["-std=c99","-O3","-shared",
+                                        "-fopenmp", "-Wall"],
+                    extra_link_args=['-lgomp'],
+                    include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
 
 def buildKeywordDictionary():
     from distutils.core import Extension
@@ -47,14 +55,14 @@ def buildKeywordDictionary():
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
     setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
-    setupKeywords["package_dir"]       = {"forcebalance"        : "src",
-                                          "forcebalance/pymbar" : "ext/pymbar"
+    setupKeywords["package_dir"]       = {"forcebalance"         : "src",
+                                          "forcebalance/pymbar"  : "ext/pymbar"
                                           }
     setupKeywords["package_data"]      = {
         "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/uffparms.in","data/oplsaa.ff/*"]
                                          }
     setupKeywords["data_files"]        = []
-    setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE]
+    setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE, CONTACT]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
     setupKeywords["long_description"]  = """

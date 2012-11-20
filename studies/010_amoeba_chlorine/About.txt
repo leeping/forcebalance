@@ -1,0 +1,116 @@
+About this directory:
+
+Sample ForceBalance job for fitting VdW parameters of chlorine,
+using two simple data sets (dichloromethane and chloroform).
+
+Prerequisites:
+
+Have TINKER somewhere in your path (it needs to be able to find "analyze", "testgrad" etc.)
+
+My emailed instructions to Stephen Fried, who generated the
+conformations from condensed phase AMOEBA simulations:
+
+"""
+For each solvent, provide:
+
+1) A minimized monomer geometry using the current force field
+(i.e. VdW shouldn't matter for the monomer geometry.)
+
+2) A set of dimer geometries evenly spaced in separation and with
+randomly sampled orientations.  You can extract these from the liquid
+simulation; provide about 50 geometries per 0.1 Angstrom separation,
+starting from the closest sampled distance and ending at that distance
++ 2.0 Angstrom (so a total of 1000 geometries).  I don't think we need
+to worry about sampling the orientations evenly.
+
+I will superimpose the monomer geometry onto each molecule in the
+dimer geometry, so that there is no vibrational noise in the reference
+data.  (If you're feeling adventurous, feel free to do this yourself.)
+I'll run a QM calculation on each dimer geometry to obtain an energy
+curve.
+"""
+
+After superimposing the TINKER-minimized monomer onto each molecule in the dimer,
+I performed a RIMP2/aug-cc-pVTZ energy calculation on each dimer geometry.  Then
+I processed these to create "all.arc" and "qdata.txt" for each molecule, and they
+were placed into the "simulations" directory.
+
+Once this is all set up, I ran "ForceBalance -f optimize.in".
+
+#=============================================================#
+#|    Contents of this directory, generated using "find":    |#
+#=============================================================#
+
+./About.txt
+This file
+
+./forcefield
+Directory containing force field files to be tuned
+
+./forcefield/chlorine.prm
+Force field files to be tuned.  The parameters must be tagged with a
+comment line followed by PARM #, where # is the field number of the
+parameter, numbered from zero.
+
+./optimize.in
+ForceBalance input file.  More comments in there.
+
+./optimize.out
+ForceBalance output file.
+
+./optimize.pdf
+Annotated PDF file generated from output file.
+
+./simulations
+Directory containing all data sets.
+
+./simulations/chloroform
+Chloroform data set.
+
+./simulations/chloroform/all.arc
+TINKER trajectory file for all geometries.
+
+./simulations/chloroform/qdata.txt
+Text file containing geometries and energies (in a.u.)
+
+./simulations/chloroform/settings
+Settings for the MM calculation.
+
+./simulations/chloroform/settings/shot.key
+This contains all chloroform parameters except for VdW which we are
+tuning.  This may not be the best way to organize things - I am happy
+to hear input.
+
+./simulations/dichloromethane
+./simulations/dichloromethane/all.arc
+./simulations/dichloromethane/qdata.txt
+./simulations/dichloromethane/settings
+./simulations/dichloromethane/settings/shot.key
+Same directory structure for dichloromethane.
+
+./result
+Directory containing optimized parameter files.
+
+./result/chlorine.prm
+Optimized parameter file.
+
+./setup
+Directory containing stuff to set up the calculation.
+
+./setup/chcl3-confs.tar.bz2
+./setup/dcm-confs.tar.bz2
+Archives containing dimer conformations extracted from TINKER simulation.
+
+./setup/concatenator.py
+Script to process dimer conformation and distribute QM calculations.
+
+./setup/qtemp.in
+Q-Chem input template file with calculation settings.
+
+#==========================#
+#| Making Documentation:  |#
+#==========================#
+
+The "aha" tool was used to generate the HTML file from the .out file.
+Internet Explorer was used to convert HTML to .pdf.
+Acrobat Pro was used to annotate the .pdf file.

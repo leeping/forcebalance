@@ -1,0 +1,416 @@
+
+########################################################################
+###[1m             Welcome to ForceBalance version 1.0! =D              [0m###
+###[1m                 Force Field Optimization System                  [0m###
+###[1m                      Author: Lee-Ping Wang                       [0m###
+########################################################################
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: optimize.in
+
+##########################################################
+###[95m  Options at their default values are not printed   [0m###
+###[95m        Use 'verbose_options True' to Enable        [0m###
+##########################################################
+Reading force field from file: chlorine.prm
+
+###########################################################
+###[92m Starting parameter indices, physical values and IDs [0m###
+###########################################################
+   0 [  4.1300e+00 ] : VDWS3
+   1 [  3.4000e-01 ] : VDWT3
+-----------------------------------------------------------
+
+##########################################################
+###[91m    Rescaling Factors (Lower Takes Precedence):     [0m###
+##########################################################
+   VDWS                                 : 5.00000e+00
+   VDWT                                 : 5.00000e-01
+   VDWS                                 : 5.00000e+00
+   VDWT                                 : 5.00000e-01
+   VDWD                                 : 1.00000e+00
+----------------------------------------------------------
+
+##########################################################
+###[92m               Setup for force field                [0m###
+##########################################################
+priors                    OrderedDict([('VDWS', 5.0), ('VDWT', 0.5), ('VDWD', 1.0)]) 
+constrain_charge          False 
+----------------------------------------------------------
+There are 940 snapshots in this simulation
+QM forces are not present, only fitting energies.
+
+##########################################################
+###[92m     Setup for fitting simulation chloroform :      [0m###
+##########################################################
+name                      chloroform 
+simtype                   ABINITIO_TINKER 
+simdir                    simulations/chloroform 
+w_energy                  1.0 
+----------------------------------------------------------
+There are 1057 snapshots in this simulation
+QM forces are not present, only fitting energies.
+
+##########################################################
+###[92m   Setup for fitting simulation dichloromethane :   [0m###
+##########################################################
+name                      dichloromethane 
+simtype                   ABINITIO_TINKER 
+simdir                    simulations/dichloromethane 
+w_energy                  1.0 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
+
+##########################################################
+###[92m           Setup for objective function :           [0m###
+##########################################################
+penalty_additive          0.01 
+normalize_weights         False 
+----------------------------------------------------------
+
+##########################################################
+###[92m                Setup for optimizer                 [0m###
+##########################################################
+jobtype                   NEWTON 
+trust0                    -0.1 
+----------------------------------------------------------
+
+##########################################################
+###[1m                   Main Optimizer                   [0m###
+###[1m       Newton-Raphson Mode (Adaptive Radius)        [0m###
+##########################################################
+
+Sim: chloroform      Errors: Energy =   3.2035 kJ/mol (83.7509%) Objective = 7.01422e-01
+Sim: dichloromethane Errors: Energy =   2.4220 kJ/mol (64.6000%) Objective = 4.17316e-01
+
+######################################################################
+###[94m                  Objective Function Breakdown                  [0m###
+###[94m  Simulation Name          Residual  x  Weight  =  Contribution [0m###
+######################################################################
+chloroform                     0.70142      1.000 [94m     7.01422e-01[0m 
+dichloromethane                0.41732      1.000 [94m     4.17316e-01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     1.11874e+00[0m 
+----------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     0   0.000e+00   0.000e+00   3.959e+01[1m   1.11874e+00[0m   0.000e+00      1.000
+
+
+##########################################################
+###[96m                   Total Gradient                   [0m###
+##########################################################
+   0 [  3.9586e+01 ] : VDWS3
+   1 [  7.7870e-01 ] : VDWT3
+----------------------------------------------------------
+
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 2.5142e-01, result -9.0465e-01
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 2.9139e-02, result -1.7941e-01
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 1.3038e-02, result -7.9462e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 2.5142e-01, result -9.0465e-01
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 5.2243e-02, result -3.4582e-01
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 5.8236e-02, result -5.4259e-01
+Searching! Hessian diagonal scaling = 1.0379e+00, L =  8.0526e-01, length 2.0965e-01, result -8.9006e-01
+Searching! Hessian diagonal scaling = 1.0010e+00, L =  1.0311e+00, length 2.5025e-01, result -9.0431e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0010e+00, length 2.5142e-01, result -9.0465e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0001e+00, length 2.5142e-01, result -9.0465e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9990e-01, length 2.5142e-01, result -9.0465e-01
+
+##########################################################
+###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
+##########################################################
+   0 [  0.0000e+00 - 5.3045e-02 = -5.3045e-02 ] : VDWS3
+   1 [  0.0000e+00 + 2.4576e-01 =  2.4576e-01 ] : VDWT3
+----------------------------------------------------------
+
+##########################################################
+###[93m    Physical Parameters (Current + Step = Next)     [0m###
+##########################################################
+   0 [  4.1300e+00 - 2.6522e-01 =  3.8648e+00 ] : VDWS3
+   1 [  3.4000e-01 + 1.2288e-01 =  4.6288e-01 ] : VDWT3
+----------------------------------------------------------
+Sim: chloroform      Errors: Energy =   1.4200 kJ/mol (37.1241%) Objective = 1.37820e-01
+Sim: dichloromethane Errors: Energy =   1.0311 kJ/mol (27.5013%) Objective = 7.56322e-02
+
+#####################################################################################
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+#####################################################################################
+chloroform                     0.13782      1.000 [92m     1.37820e-01[0m ( -5.636e-01 ) 
+dichloromethane                0.07563      1.000 [92m     7.56322e-02[0m ( -3.417e-01 ) 
+Regularization                 0.00063      1.000 [91m     6.32127e-04[0m ( +6.321e-04 ) 
+Total                                             [92m     2.14084e-01[0m ( -9.047e-01 ) 
+-------------------------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     1   2.514e-01   2.514e-01   3.431e+00[92m   2.14084e-01[0m   4.523e-01      1.000
+
+
+##########################################################
+###[96m                   Total Gradient                   [0m###
+##########################################################
+   0 [  3.4310e+00 ] : VDWS3
+   1 [ -4.1164e-02 ] : VDWT3
+----------------------------------------------------------
+
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 6.2722e-02, result -2.4586e-02
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 5.3252e-03, result -4.6582e-03
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 2.1431e-03, result -1.9630e-03
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 6.2722e-02, result -2.4586e-02
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 1.2293e-02, result -9.7377e-03
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 2.4519e-02, result -1.6378e-02
+Searching! Hessian diagonal scaling = 1.0183e+00, L =  8.6475e-01, length 6.1406e-02, result -2.4531e-02
+Searching! Hessian diagonal scaling = 1.0011e+00, L =  9.6653e-01, length 6.2640e-02, result -2.4583e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9800e-01, length 6.2721e-02, result -2.4586e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9990e-01, length 6.2722e-02, result -2.4586e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9980e-01, length 6.2722e-02, result -2.4586e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9911e-01, length 6.2722e-02, result -2.4586e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9954e-01, length 6.2722e-02, result -2.4586e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9970e-01, length 6.2722e-02, result -2.4586e-02
+
+##########################################################
+###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
+##########################################################
+   0 [ -5.3045e-02 - 1.3935e-02 = -6.6980e-02 ] : VDWS3
+   1 [  2.4576e-01 + 6.1154e-02 =  3.0692e-01 ] : VDWT3
+----------------------------------------------------------
+
+##########################################################
+###[93m    Physical Parameters (Current + Step = Next)     [0m###
+##########################################################
+   0 [  3.8648e+00 - 6.9677e-02 =  3.7951e+00 ] : VDWS3
+   1 [  4.6288e-01 + 3.0577e-02 =  4.9346e-01 ] : VDWT3
+----------------------------------------------------------
+Sim: chloroform      Errors: Energy =   1.3557 kJ/mol (35.4432%) Objective = 1.25622e-01
+Sim: dichloromethane Errors: Energy =   0.9402 kJ/mol (25.0778%) Objective = 6.28896e-02
+
+#####################################################################################
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+#####################################################################################
+chloroform                     0.12562      1.000 [92m     1.25622e-01[0m ( -1.220e-02 ) 
+dichloromethane                0.06289      1.000 [92m     6.28896e-02[0m ( -1.274e-02 ) 
+Regularization                 0.00099      1.000 [91m     9.86839e-04[0m ( +3.547e-04 ) 
+Total                                             [92m     1.89498e-01[0m ( -2.459e-02 ) 
+-------------------------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     2   3.141e-01   6.272e-02   2.824e-01[92m   1.89498e-01[0m   4.324e-01      1.000
+
+
+##########################################################
+###[96m                   Total Gradient                   [0m###
+##########################################################
+   0 [  2.8185e-01 ] : VDWS3
+   1 [  1.7923e-02 ] : VDWT3
+----------------------------------------------------------
+
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 2.4017e-02, result -5.5108e-04
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 2.3749e-03, result -8.7020e-05
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 9.6618e-04, result -3.6289e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 2.4017e-02, result -5.5108e-04
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 5.3600e-03, result -1.8603e-04
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 1.0310e-02, result -3.2508e-04
+Searching! Hessian diagonal scaling = 1.0316e+00, L =  8.2231e-01, length 2.3273e-02, result -5.4468e-04
+Searching! Hessian diagonal scaling = 1.0002e+00, L =  1.0134e+00, length 2.4012e-02, result -5.5105e-04
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0001e+00, length 2.4017e-02, result -5.5108e-04
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0009e+00, length 2.4017e-02, result -5.5108e-04
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0004e+00, length 2.4017e-02, result -5.5108e-04
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0002e+00, length 2.4017e-02, result -5.5108e-04
+
+##########################################################
+###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
+##########################################################
+   0 [ -6.6980e-02 - 1.7283e-03 = -6.8708e-02 ] : VDWS3
+   1 [  3.0692e-01 - 2.3954e-02 =  2.8296e-01 ] : VDWT3
+----------------------------------------------------------
+
+##########################################################
+###[93m    Physical Parameters (Current + Step = Next)     [0m###
+##########################################################
+   0 [  3.7951e+00 - 8.6415e-03 =  3.7865e+00 ] : VDWS3
+   1 [  4.9346e-01 - 1.1977e-02 =  4.8148e-01 ] : VDWT3
+----------------------------------------------------------
+Sim: chloroform      Errors: Energy =   1.3537 kJ/mol (35.3921%) Objective = 1.25260e-01
+Sim: dichloromethane Errors: Energy =   0.9399 kJ/mol (25.0678%) Objective = 6.28395e-02
+
+#####################################################################################
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+#####################################################################################
+chloroform                     0.12526      1.000 [92m     1.25260e-01[0m ( -3.620e-04 ) 
+dichloromethane                0.06284      1.000 [92m     6.28395e-02[0m ( -5.012e-05 ) 
+Regularization                 0.00085      1.000 [92m     8.47883e-04[0m ( -1.390e-04 ) 
+Total                                             [92m     1.88947e-01[0m ( -5.511e-04 ) 
+-------------------------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     3   2.912e-01   2.402e-02   7.318e-02[92m   1.88947e-01[0m   1.172e-02      1.000
+
+
+##########################################################
+###[96m                   Total Gradient                   [0m###
+##########################################################
+   0 [  7.3117e-02 ] : VDWS3
+   1 [  2.9105e-03 ] : VDWT3
+----------------------------------------------------------
+
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 3.9977e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 3.8939e-04, result -4.5117e-06
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 1.5825e-04, result -1.8799e-06
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 3.9977e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 8.8068e-04, result -9.6608e-06
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 1.6999e-03, result -1.6922e-05
+Searching! Hessian diagonal scaling = 1.0318e+00, L =  8.2167e-01, length 3.8710e-03, result -2.8442e-05
+Searching! Hessian diagonal scaling = 1.0002e+00, L =  1.0129e+00, length 3.9970e-03, result -2.8776e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0006e+00, length 3.9977e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 1.0046e+00, L =  9.3188e-01, length 3.9787e-03, result -2.8730e-05
+Searching! Hessian diagonal scaling = 1.0007e+00, L =  9.7398e-01, length 3.9949e-03, result -2.8771e-05
+Searching! Hessian diagonal scaling = 1.0001e+00, L =  9.9006e-01, length 3.9973e-03, result -2.8777e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9728e-01, length 3.9976e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9774e-01, length 3.9977e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9452e-01, length 3.9976e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9623e-01, length 3.9976e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9688e-01, length 3.9976e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9746e-01, length 3.9977e-03, result -2.8778e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9713e-01, length 3.9976e-03, result -2.8778e-05
+
+##########################################################
+###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
+##########################################################
+   0 [ -6.8708e-02 - 4.9258e-04 = -6.9201e-02 ] : VDWS3
+   1 [  2.8296e-01 - 3.9672e-03 =  2.7899e-01 ] : VDWT3
+----------------------------------------------------------
+
+##########################################################
+###[93m    Physical Parameters (Current + Step = Next)     [0m###
+##########################################################
+   0 [  3.7865e+00 - 2.4629e-03 =  3.7840e+00 ] : VDWS3
+   1 [  4.8148e-01 - 1.9836e-03 =  4.7950e-01 ] : VDWT3
+----------------------------------------------------------
+Sim: chloroform      Errors: Energy =   1.3538 kJ/mol (35.3945%) Objective = 1.25277e-01
+Sim: dichloromethane Errors: Energy =   0.9397 kJ/mol (25.0629%) Objective = 6.28149e-02
+
+#####################################################################################
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+#####################################################################################
+chloroform                     0.12528      1.000 [91m     1.25277e-01[0m ( +1.744e-05 ) 
+dichloromethane                0.06281      1.000 [92m     6.28149e-02[0m ( -2.460e-05 ) 
+Regularization                 0.00083      1.000 [92m     8.26268e-04[0m ( -2.161e-05 ) 
+Total                                             [92m     1.88918e-01[0m ( -2.878e-05 ) 
+-------------------------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     4   2.874e-01   3.998e-03   1.370e-02[92m   1.88918e-01[0m   2.668e-04      1.000
+
+
+##########################################################
+###[96m                   Total Gradient                   [0m###
+##########################################################
+   0 [  1.3671e-02 ] : VDWS3
+   1 [  8.6149e-04 ] : VDWT3
+----------------------------------------------------------
+
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 1.1685e-03, result -1.4035e-06
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 1.1474e-04, result -2.1789e-07
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 4.6659e-05, result -9.0733e-08
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 1.1685e-03, result -1.4035e-06
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 2.5921e-04, result -4.6737e-07
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 4.9939e-04, result -8.2081e-07
+Searching! Hessian diagonal scaling = 1.0323e+00, L =  8.2028e-01, length 1.1312e-03, result -1.3866e-06
+Searching! Hessian diagonal scaling = 1.0002e+00, L =  1.0138e+00, length 1.1683e-03, result -1.4034e-06
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9874e-01, length 1.1685e-03, result -1.4035e-06
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0026e+00, length 1.1685e-03, result -1.4034e-06
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0010e+00, length 1.1685e-03, result -1.4036e-06
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0016e+00, length 1.1685e-03, result -1.4036e-06
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0011e+00, length 1.1685e-03, result -1.4035e-06
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0009e+00, length 1.1685e-03, result -1.4035e-06
+
+##########################################################
+###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
+##########################################################
+   0 [ -6.9201e-02 - 9.4859e-05 = -6.9296e-02 ] : VDWS3
+   1 [  2.7899e-01 - 1.1646e-03 =  2.7783e-01 ] : VDWT3
+----------------------------------------------------------
+
+##########################################################
+###[93m    Physical Parameters (Current + Step = Next)     [0m###
+##########################################################
+   0 [  3.7840e+00 - 4.7429e-04 =  3.7835e+00 ] : VDWS3
+   1 [  4.7950e-01 - 5.8231e-04 =  4.7892e-01 ] : VDWT3
+----------------------------------------------------------
+Sim: chloroform      Errors: Energy =   1.3538 kJ/mol (35.3945%) Objective = 1.25277e-01
+Sim: dichloromethane Errors: Energy =   0.9397 kJ/mol (25.0639%) Objective = 6.28199e-02
+
+#####################################################################################
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+#####################################################################################
+chloroform                     0.12528      1.000 [92m     1.25277e-01[0m ( -5.313e-08 ) 
+dichloromethane                0.06282      1.000 [91m     6.28199e-02[0m ( +5.003e-06 ) 
+Regularization                 0.00082      1.000 [92m     8.19915e-04[0m ( -6.354e-06 ) 
+Total                                             [92m     1.88917e-01[0m ( -1.404e-06 ) 
+-------------------------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     5   2.863e-01   1.168e-03   3.287e-03[92m   1.88917e-01[0m   1.391e-05      1.000
+
+Convergence criterion reached for objective function (1.00e-04)
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@[1;92m           Final objective function value           [0m@@@
+@@@[1;92m  Full:  1.889170e-01  Un-penalized:  1.880971e-01  [0m@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+##########################################################
+###[1;94m               Final parameter values               [0m###
+###[1;94m           Paste to input file to restart           [0m###
+###[1;94m                Choose pvals or mvals               [0m###
+##########################################################
+read_pvals
+   0 [  3.7835e+00 ] : VDWS3
+   1 [  4.7892e-01 ] : VDWT3
+/read_pvals
+read_mvals
+   0 [ -6.9296e-02 ] : VDWS3
+   1 [  2.7783e-01 ] : VDWT3
+/read_mvals
+----------------------------------------------------------
