@@ -150,7 +150,7 @@ class FittingSimulation(ForceBalanceBaseClass):
         # Create the work queue here.
         if self.wq_port != 0:
             work_queue.set_debug_flag('all')
-            self.wq = work_queue.WorkQueue(port=self.wq_port, exclusive=False, shutdown=False)
+            self.wq = work_queue.WorkQueue(port=self.wq_port, catalog=True, exclusive=False, shutdown=False)
             self.wq.specify_name('forcebalance')
             print('Work Queue for fitting simulation %s listening on %d' % (self.name, self.wq.port))
 

@@ -320,6 +320,7 @@ class AbInitio(FittingSimulation):
             if all(len(i) in [self.ns, 0] for i in [self.eqm, self.fqm, self.emd0, self.espxyz, self.espval]) and len(self.eqm) == self.ns:
                 break
         self.ns = len(self.eqm)
+        print "There are %i snapshots in this simulation" % self.ns
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
         self.eqm = array(self.eqm)
         self.eqm *= eqcgmx
