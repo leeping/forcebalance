@@ -79,6 +79,7 @@ def parse_interactions(input_file):
                 Globals[key] = s[1]
             elif key == 'optimize':
                 if len(s) == 1 or s[1].lower() in ['y','yes','true']:
+                    print "Optimizing ALL systems by default"
                     Globals[key] = True
                 else:
                     Globals[key] = False

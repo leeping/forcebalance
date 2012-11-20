@@ -70,9 +70,9 @@ fi
 $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
 nerr=`wc -l $error | awk '{print $1}'`
 if [ $nerr -ne 0 ] ; then
-    cat $error
+    tail -50 $error
     echo
-    echo "$program may not have finished successfully, see error above."
+    echo "$program may not have finished successfully, see error above or look in $error."
     echo "If error does not make sense, please contact me (Lee-Ping)."
 else
     rm $error

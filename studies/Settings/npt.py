@@ -77,7 +77,7 @@ from forcebalance.openmmio import liquid_energy_driver, liquid_energy_derivative
 timestep = 0.5 * units.femtosecond # timestep for integration
 nsteps = 200                       # number of steps per data record
 nequiliterations = 500             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 2000                # number of iterations to collect data for
+niterations = 10000                 # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -589,7 +589,7 @@ def main():
    global timestep, nsteps, niterations
    timestep = 0.1 * units.femtosecond # timestep for integrtion
    nsteps   = 1000                    # number of steps per data record
-   niterations = 2000
+   niterations = 5000
 
    mpdb = PDBFile('mono.pdb')
    mData, mXyzs, _trash, _crap, mEnergies = run_simulation(mpdb, mono_mutual_kwargs if FF.amoeba_pol == 'mutual' else mono_direct_kwargs, pbc=False, Trajectory=False)

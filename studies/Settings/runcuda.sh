@@ -29,10 +29,16 @@ elif [[ $HOSTNAME =~ "kid" ]] ; then
 elif [[ $HOSTNAME =~ "icme-gpu" || $HOSTNAME =~ "node0" ]] ; then
     module load gcc/4.4.6
     module load cuda41/toolkit/4.1.28
-elif [[ $HOSTNAME =~ "ls4" || $HOSTNAME =~ "longhorn" ]] ; then
+elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
     module load gcc
     module load cuda
+elif [[ $HOSTNAME =~ "not0rious" ]] ; then
+    module load cuda/4.2.9
+elif [[ $HOSTNAME =~ "ls4" ]] ; then
+    module unload intel
+    module load gcc
+    module load cuda/4.2
 fi
 
 echo "#=======================#"

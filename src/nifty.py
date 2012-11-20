@@ -415,16 +415,16 @@ def wq_wait(wq, verbose=False):
                 print "status = ", task.status, 
                 print "return_status = ", task.return_status, 
                 print "result = ", task.result, 
-                print "host = ", task.host
+                print "host = ", task.hostname
                 print "execution time = ", exectime, 
                 print "total_bytes_transferred = ", task.total_bytes_transferred
             if task.result != 0:
                 #ip.embed()
-                print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.host, exectime)
+                print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.hostname, exectime)
                 wq.submit(task)
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
-                    print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.host, exectime)
+                    print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.hostname, exectime)
                 del task
         else:
             printcount += 1
