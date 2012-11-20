@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated October 29, 2012                     |#
+#|                   Last updated November 20, 2012                   |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -48,6 +48,9 @@
 #|   complicated; they should be things like lists or dicts, and NOT  |#
 #|   contain references to themselves.                                |#
 #|                                                                    |#
+#|   To-do list: Handling of comments is still not very good.         |#
+#|   Comments from previous files should be 'passed on' better.       |#
+#|                                                                    |#
 #|              Contents of this file:                                |#
 #|              0) Names of data variables                            |#
 #|              1) Imports                                            |#
@@ -64,6 +67,7 @@
 #|                   Required: Python 2.7, Numpy 1.6                  |#
 #|                   Optional: Mol2, PDB, DCD readers                 |#
 #|                    (can be found in ForceBalance)                  |#
+#|                    NetworkX package (for topologies)               |#
 #|                                                                    |#
 #|             Thanks: Todd Dolinsky, Yong Huang,                     |#
 #|                     Kyle Beauchamp (PDB)                           |#
@@ -111,11 +115,11 @@ FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 
 # partial_charge = List of atomic partial charges 
 # atomname   = List of atom names (can come from MM coordinate file)
 # atomtype   = List of atom types (can come from MM force field)
-# bonds      = For each atom, the list of higher-numbered atoms it's bonded to
+# abonds      = For each atom, the list of higher-numbered atoms it's bonded to
 # suffix     = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
 # resid      = Residue IDs (can come from MM coordinate file)
 # resname    = Residue names
-AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'bonds', 'suffix', 'resid', 'resname', 'qcsuf', 'qm_ghost'])
+AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'abonds', 'suffix', 'resid', 'resname', 'qcsuf', 'qm_ghost'])
 #=========================================#
 #| This can be any data attribute we     |#
 #| want but it's usually some property   |#
@@ -142,6 +146,31 @@ from collections import OrderedDict
 from ctypes import *
 from warnings import warn
 
+# Covalent radii from Cordero et al. 'Covalent radii revisited' Dalton Transactions 2008, 2832-2838.
+Radii = [0.31, 0.28, # H and He
+         1.28, 0.96, 0.84, 0.76, 0.71, 0.66, 0.57, 0.58, # First row elements
+         1.66, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, # Second row elements
+         2.03, 1.76, 1.70, 1.60, 1.53, 1.39, 1.61, 1.52, 1.50, 
+         1.24, 1.32, 1.22, 1.22, 1.20, 1.19, 1.20, 1.20, 1.16, # Third row elements, K through Kr
+         2.20, 1.95, 1.90, 1.75, 1.64, 1.54, 1.47, 1.46, 1.42, 
+         1.39, 1.45, 1.44, 1.42, 1.39, 1.39, 1.38, 1.39, 1.40, # Fourth row elements, Rb through Xe
+         2.44, 2.15, 2.07, 2.04, 2.03, 2.01, 1.99, 1.98, 
+         1.98, 1.96, 1.94, 1.92, 1.92, 1.89, 1.90, 1.87, # Fifth row elements, s and f blocks
+         1.87, 1.75, 1.70, 1.62, 1.51, 1.44, 1.41, 1.36, 
+         1.36, 1.32, 1.45, 1.46, 1.48, 1.40, 1.50, 1.50, # Fifth row elements, d and p blocks
+         2.60, 2.21, 2.15, 2.06, 2.00, 1.96, 1.90, 1.87, 1.80, 1.69] # Sixth row elements
+
+# A list that gives you the element if you give it the atomic number, hence the 'none' at the front.
+Elements = ["None",'H','He',
+            'Li','Be','B','C','N','O','F','Ne',
+            'Na','Mg','Al','Si','P','S','Cl','Ar',
+            'K','Ca','Sc','Ti','V','Cr','Mn','Fe','Co','Ni','Cu','Zn','Ga','Ge','As','Se','Br','Kr',
+            'Rb','Sr','Y','Zr','Nb','Mo','Tc','Ru','Rh','Pd','Ag','Cd','In','Sn','Sb','Te','I','Xe',
+            'Cs','Ba','La','Ce','Pr','Nd','Pm','Sm','Eu','Gd','Tb','Dy','Ho','Er','Tm','Yb',
+            'Lu','Hf','Ta','W','Re','Os','Ir','Pt','Au','Hg','Tl','Pb','Bi','Po','At','Rn',
+            'Fr','Ra','Ac','Th','Pa','U','Np','Pu','Am','Cm','Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','Sg','Bh','Hs','Mt']
+
+# Dictionary of atomic masses ; also serves as the list of elements (periodic table)
 PeriodicTable = {'H' : 1.0079, 'He' : 4.0026, 
                  'Li' : 6.941, 'Be' : 9.0122, 'B' : 10.811, 'C' : 12.0107, 'N' : 14.0067, 'O' : 15.9994, 'F' : 18.9984, 'Ne' : 20.1797,
                  'Na' : 22.9897, 'Mg' : 24.305, 'Al' : 26.9815, 'Si' : 28.0855, 'P' : 30.9738, 'S' : 32.065, 'Cl' : 35.453, 'Ar' : 39.948, 
@@ -195,6 +224,10 @@ except: warn('The OpenMM modules cannot be imported (Cannot interface with OpenM
 ## One bohr equals this many angstroms
 bohrang = 0.529177249
 
+def nodematch(node1,node2):
+    # Matching two nodes of a graph.  Nodes are equivalent if the elements are the same
+    return node1['e'] == node2['e']
+
 def isint(word):
     """ONLY matches integers! If you have a decimal point? None shall pass!"""
     return re.match('^[-+]?[0-9]+$',word)
@@ -205,6 +238,53 @@ def isfloat(word):
 
 # Used to get the white spaces in a split line.
 splitter = re.compile(r'(\s+|\S+)')
+
+#===========================#
+#|   Connectivity graph    |#
+#|  Good for doing simple  |#
+#|     topology tricks     |#
+#===========================#
+try:
+    import networkx as nx
+    class MyG(nx.Graph):
+        def __init__(self):
+            super(MyG,self).__init__()
+            self.Alive = True
+        def __eq__(self, other):
+            # This defines whether two MyG objects are "equal" to one another.
+            if not self.Alive:
+                return False
+            if not other.Alive:
+                return False
+            return nx.is_isomorphic(self,other,node_match=nodematch)
+        def __hash__(self):
+            ''' The hash function is something we can use to discard two things that are obviously not equal.  Here we neglect the hash. '''
+            return 1
+        def L(self):
+            ''' Return a list of the sorted atom numbers in this graph. '''
+            return sorted(self.nodes())
+        def AStr(self):
+            ''' Return a string of atoms, which serves as a rudimentary 'fingerprint' : '99,100,103,151' . '''
+            return ','.join(['%i' % i for i in self.L()])
+        def e(self):
+            ''' Return an array of the elements.  For instance ['H' 'C' 'C' 'H']. '''
+            elems = nx.get_node_attributes(self,'e')
+            return [elems[i] for i in self.L()]
+        def ef(self):
+            ''' Create an Empirical Formula '''
+            Formula = list(self.e())
+            return ''.join([('%s%i' % (k, Formula.count(k)) if Formula.count(k) > 1 else '%s' % k) for k in sorted(set(Formula))])
+        def x(self):
+            ''' Get a list of the coordinates. '''
+            coors = nx.get_node_attributes(self,'x')
+            return np.array([coors[i] for i in self.L()])
+    try:
+        import contact
+    except:
+        warn("'contact' cannot be imported (topology tools will be slow.)")
+except:
+    warn("NetworkX cannot be imported (topology tools won't work).  Most functionality should still work though.")
+
 
 def format_xyz_coord(element,xyz,tinker=False):
     """ Print a line consisting of (element, x, y, z) in accordance with .xyz file format
@@ -640,7 +720,7 @@ class Molecule(object):
         self += other
 
     def __init__(self, fnm = None, ftype = None):
-        """ To instantiate the class we simply define the table of
+        """ To create the Molecule object, we simply define the table of
         file reading/writing functions and read in a file if it is
         provided."""
         #=========================================#
@@ -712,6 +792,10 @@ class Molecule(object):
             ## Make sure the comment line isn't too long
             # for i in range(len(self.comms)):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
+            if 'networkx' in sys.modules:
+                self.topology = self.build_topology()
+                if 'bonds' not in self.Data:
+                    self.Data['bonds'] = self.topology.edges()
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -877,6 +961,68 @@ class Molecule(object):
             tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
             xyz2 = np.dot(xyz2, rt) + tr
             self.xyzs[index2] = xyz2
+
+    def build_topology(self, sn=None):
+        ''' A bare-bones implementation of the bond graph capability in the nanoreactor code.  
+        Returns a NetworkX graph that depicts the molecular topology, which might be useful for stuff. 
+        Provide, optionally, the frame number used to compute the topology. '''
+        if sn == None:
+            sn = 0
+        mindist = 1.0 # Any two atoms that are closer than this distance are bonded.
+        Fac = 1.2     # Increase the threshold for determining whether atoms are bonded. 1.2 is conservative, 1.5 is crazy.
+        # Create an atom-wise list of covalent radii.
+        R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
+        # Create a list of 2-tuples corresponding to combinations of atomic indices.
+        AtomIterator = np.array(list(itertools.combinations(range(self.na),2)))
+        # Create a list of thresholds for determining whether a certain interatomic distance is considered to be a bond.
+        BondThresh = np.array([max(mindist,(R[i[0]] + R[i[1]]) * Fac) for i in AtomIterator])
+        try:
+            dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
+        except:
+            # Extremely inefficient implementation if importing contact doesn't work.
+            dxij = [np.array(list(itertools.chain(*[[np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i in range(j+1,self.na)] for j in range(self.na)])))]
+        G = MyG()
+        bonds = [[] for i in range(self.na)]
+        lengths = []
+        for i, a in enumerate(self.elem):
+            G.add_node(i)
+            nx.set_node_attributes(G,'e',{i:a})
+            nx.set_node_attributes(G,'x',{i:self.xyzs[sn][i]})
+        bond_bool = dxij[0] < BondThresh
+        for i, a in enumerate(bond_bool):
+            if not a: continue
+            (ii, jj) = AtomIterator[i]
+            bonds[ii].append(jj)
+            bonds[jj].append(ii)
+            G.add_edge(ii, jj)
+            lengths.append(dxij[0][i])
+        return G
+
+    def measure_dihedrals(self, i, j, k, l):
+        """ Return a series of dihedral angles, given four atom indices numbered from zero. """
+        phis = []
+        if 'bonds' in self.Data:
+            if any(p not in self.bonds for p in [(min(i,j),max(i,j)),(min(j,k),max(j,k)),(min(k,l),max(k,l))]):
+                print [(min(i,j),max(i,j)),(min(j,k),max(j,k)),(min(k,l),max(k,l))]
+                warn("Measuring dihedral angle for four atoms that aren't bonded.  Hope you know what you're doing!")
+        else:
+            warn("This molecule object doesn't have bonds defined, sanity-checking is off.")
+        for s in range(self.ns):
+            x4 = self.xyzs[s][l]
+            x3 = self.xyzs[s][k]
+            x2 = self.xyzs[s][j]
+            x1 = self.xyzs[s][i]
+            v1 = x2-x1
+            v2 = x3-x2
+            v3 = x4-x3
+            t1 = np.linalg.norm(v2)*np.dot(v1,np.cross(v2,v3))
+            t2 = np.dot(np.cross(v1,v2),np.cross(v2,v3))
+            phi = np.arctan2(t1,t2)
+            phis.append(phi * 180 / np.pi)
+            #phimod = phi*180/pi % 360
+            #phis.append(phimod)
+            #print phimod
+        return phis
 
     def all_pairwise_rmsd(self):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
@@ -1092,7 +1238,7 @@ class Molecule(object):
                   'atomname' : atomname,
                   'atomtype' : atomtype,
                   'elem'     : elem,
-                  'bonds'    : bonds
+                  'abonds'    : bonds
                   }
 
         return Answer

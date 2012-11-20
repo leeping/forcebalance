@@ -1,0 +1,24 @@
+$comments
+Water cluster
+DB-RIMP2/HATZ
+$end
+
+$molecule
+0 1
+$end
+
+$rem
+jobtype              sp
+basis                aug-cc-pVTZ
+aux_basis            rimp2-aug-cc-pVTZ
+basis2               racc-pVTZ
+CORRELATION          RIMP2
+DUAL_BASIS_ENERGY    TRUE
+EXCHANGE             HF
+N_FROZEN_CORE        FC
+incfock              off
+max_scf_cycles       300
+scf_convergence      8
+sym_ignore           true
+symmetry             off
+$end
