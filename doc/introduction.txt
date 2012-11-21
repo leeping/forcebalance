@@ -137,7 +137,7 @@ potential to any type of reference data.
 Conceptually, a set of reference data (usually a physical quantity of
 some kind), in combination with a method for computing the
 corresponding quantity with the force field, is called a
-<b>fitting simulation</b>.  For example:
+<b>target</b>.  For example:
 
 - A force field can predict the density of a liquid by running NPT
 molecular dynamics, and this computed value can be compared against
@@ -153,21 +153,21 @@ matching</b>.
 of a molecule isolated in vacuum, and these can be compared against
 experimental measurements.
 
-Within the context of a fitting simulation, the accuracy of the force
+Within a target, the accuracy of the force
 field can be optimized by tuning the parameters to minimize the
 difference between the computed and reference quantities.  One or more
-fitting simulations can be combined to produce an aggregate
+targets can be combined to produce an aggregate
 <b>objective function</b> whose domain is the <b>parameter space</b>.
 This objective function, which typically depends on the parameters in
 a complex way, is minimized using nonlinear optimization algorithms.
 The result is a force field with high accuracy in all of the fitting
 simulations.
 
-\image html flowchart_sm.png "The division of the potential optimization problem into three parts; the force field, fitting simulations and optimization algorithm."
-\image latex flowchart.png "The division of the potential optimization problem into three parts; the force field, fitting simulations and optimization algorithm." height=10cm
+\image html flowchart_sm.png "The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm."
+\image latex flowchart.png "The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm." height=10cm
 
 The problem is now split into three main components; the force field,
-the fitting simulations, and the optimization algorithm.  %ForceBalance
+the targets, and the optimization algorithm.  %ForceBalance
 uses this conceptual division to define three classes with minimal
 interdependence.  Thus, if a researcher wishes to explore a new
 functional form, incorporate a new type of reference data or try a new
