@@ -1,24 +1,24 @@
 #!/usr/bin/env python
 
-from forcebalance import parser, optimizer, simtab
+from forcebalance import parser, optimizer, implemented
 import re
 
 """ The OptionDoc dictionary is a key : dictionary dictionary.
 Each variable can have several parts of the documentation: 'pert' = 
 """
 
-GenOptionDoc = {"gmxpath" : {"scope" : "Fitting simulations that use GROMACS (GROMACS-X2 for ForceEnergyMatch_GMX)",
+GenOptionDoc = {"gmxpath" : {"scope" : "Targets that use GROMACS",
                              "required" : True,
                              "long" : """Specify the path where GROMACS executables are installed, most likely ending in 'bin'.
                              Note that executables are only installed 'bin' if the program is installed using 'make install';
                              this will NOT be the case if you simply ran 'make'.""",
                              "recommend" : "Depends on your local installation and environment."
                              },
-                "tinkerpath" : {"scope" : "Fitting simulations that use TINKER",
+                "tinkerpath" : {"scope" : "Targets that use TINKER",
                                 "required" : True,
                                 "recommend" : "Depends on your local installation and environment."
                                 },
-                "gmxsuffix" : {"scope" : "Fitting simulations that use GROMACS",
+                "gmxsuffix" : {"scope" : "Targets that use GROMACS",
                                "required" : False,
                                "long" : """Depending on how GROMACS is configured and installed, a suffix may be appended to executable
                                names.  If there is a suffix, it needs to be specified here (or else ForceBalance will not find the
@@ -184,43 +184,42 @@ GenOptionDoc = {"gmxpath" : {"scope" : "Fitting simulations that use GROMACS (GR
                                 },
                 }
 
-SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
+TgtOptionDoc = {"name" : {"scope" : "All targets",
                           "required" : True,
-                          "recommend" : """Choose a descriptive name and make sure all fitting simulations have different names."""
+                          "recommend" : """Choose a descriptive name and make sure all targets have different names."""
                           },
-                "simtype" : {"scope" : "All fitting simulations",
+                "type" : {"scope" : "All targets",
                              "required" : True,
-                             "long" : """This is the type of fitting simulation that you are running.  The current accepted values for the fitting simulation
-                             are given in the SimTab.py file: %s.""" % ', '.join([i for i in simtab.SimTab]),
-                             "recommend" : "Choose the appropriate type, and if the fitting simulation is missing, feel free to implement your own (or ask me for help)."
+                             "long" : """This is the type of target that you are running.  The current accepted values for the target type
+                             are given in the implemented.py file: %s.""" % ', '.join([i for i in implemented.Implemented_Targets]),
+                             "recommend" : "Choose the appropriate type, and if the target type is missing, feel free to implement your own (or ask me for help)."
                              },
-                "fd_ptypes" : {"scope" : "All fitting simulations",
+                "fd_ptypes" : {"scope" : "All target types",
                              "required" : False,
                                "long" : """To compute the objective function derivatives, some components may require numerical finite difference in the derivatives.
                              Here you may specify the parameter types that finite difference is applied to,
                              or write 'ALL' to take finite-difference derivatives in all parameter types.""",
                              "recommend" : """If you aren't sure, either use 'ALL' to do finite difference in each component (this is costly), or run a fdcheckG(H)
-                             job with this option set to 'NONE' to check which analytic derivatives are missing.
-                             Usually analytic derivatives will be missing in anything but FORCEENERGYMATCH_GMXX2 jobs."""
+                             job with this option set to 'NONE' to check which analytic derivatives are missing."""
                              },
-                "shots" : {"scope" : "Force and energy matching simulations",
+                "shots" : {"scope" : "Force and energy matching",
                            "required" : False,
-                           "long" : """This option allows you to choose a subset from the snapshots available in the force matching 'simulations' directory.
+                           "long" : """This option allows you to choose a subset from the snapshots available in the force matching 'targets' directory.
                            The subset is simply taken from the front of the trajectory.
                            In the future this option will be expanded to allow a random selection of snapshots, or a specific selection""",
                            "recommend" : """100-10,000 snapshots are recommended.  Note that you need at least 3x (number of atoms) if
                            the covariance matrix is turned on."""
                            },
-                "fitatoms" : {"scope" : "Force and energy matching simulations",
+                "fitatoms" : {"scope" : "Force and energy matching",
                               "required" : False,
-                              "long" : """Choose a subset of atoms from the force matching simulation to fit forces to.  This is useful in situations where
+                              "long" : """Choose a subset of atoms to fit forces to.  This is useful in situations where
                               it is undesirable to fit the forces on part of the system (e.g. the part that is described by another force field.)
                               Currently, you are only allowed to choose from the atoms in the front of the trajectory;
                               soon this will be expanded for random flexibility (see 'shots').  However, random coordinate selections are not allowed. ;)""",
-                              "recommend" : """Situation-dependent; this should be based on the part of the simulation that you're fitting, or leave blank
+                              "recommend" : """Situation-dependent; this should be based on the part of the system that you're fitting, or leave blank
                               if you're fitting the whole system."""
                               },
-                "whamboltz" : {"scope" : "Force and energy matching simulations",
+                "whamboltz" : {"scope" : "Force and energy matching",
                                "required" : False,
                                "long" : """In self-consistent energy/force matching projects, the data from previous cycles can be reused by applying the
                                Weighted Histogram Analysis Method (WHAM).  However, the WHAM data is currently generated by external scripts that
@@ -228,17 +227,7 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                                program automatically.""",
                                "recommend" : """Leave off unless you have an externally generated wham-master.txt and wham-weights.txt files."""
                                },
-                "sampcorr" : {"scope" : "Force and energy matching simulations that use GROMACS-X2",
-                              "required" : False,
-                              "long" : """Every time the force field parameters are updated, the ensemble is different.  In principle this applies
-                              to not only the self-consistent optimization cycles (which include re-running dynamics, QM calculations etc) but also
-                              the numerical optimization itself.  When this option is turned on, the Boltzmann weights of the snapshots are updated
-                              in every step of the optimization and the derivatives are modified accordingly.  My investigations reveal that this makes
-                              the force field more accurate in energy minima and less accurate for barriers, which was not very useful.  I haven't touched
-                              the 'sampling corrected' code in a long time; thus this option is vestigial and may be removed in the future.""",
-                              "recommend" : """Off."""
-                              },
-                "covariance" : {"scope" : "Force and energy matching simulations",
+                "covariance" : {"scope" : "Force and energy matching",
                                 "required" : False,
                                 "long" : """The components of the energy and force contribution to the objective function are rescaled to be on the 
                                 same footing when the objective function is optimized.  This can be done by dividing each component by its variance,
@@ -247,26 +236,26 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                                 "recommend" : """No recommendation; turn the covariance off if the number of snapshots is not much larger than
                                 the number of coordinates."""
                                 },
-                "batch_fd" : {"scope" : "All fitting simulations",
+                "batch_fd" : {"scope" : "All target types",
                               "required" : False,
                               "long" : """This is a stub for future functionality.  When the flag is switched on, the jobs corresponding to finite
                               difference derivatives are evaluated in parallel on a distributed computing platform."""
                               },
-                "fdgrad" : {"scope" : "All fitting simulations",
+                "fdgrad" : {"scope" : "All target types",
                             "required" : False,
                             "long" : """When this option is enabled, finite difference gradients will be enabled for selected parameter types 
                             (using the fd_ptypes option).  Gradients are computed using two-point finite difference of the objective function.""",
                             "recommend" : """If analytic derivatives are implemented (and correct), then they are much faster than finite difference
                             derivatives.  Run the 'fdcheckG' routine with this option set to Off to check which finite difference derivatives you need."""
                             },
-                "fdhess" : {"scope" : "All fitting simulations",
+                "fdhess" : {"scope" : "All target types",
                             "required" : False,
                             "long" : """When this option is enabled, finite difference Hessians will be enabled for selected parameter types 
                             (using the fd_ptypes option).  Hessians are computed using two-point finite difference of the gradient.""",
                             "recommend" : """Run the 'fdcheckH' routine with this option set to Off to check which finite difference Hessian elements you need.
                             Note that this requires a very large number of objective function evaluations, so use sparingly."""
                             },
-                "fdhessdiag" : {"scope" : "All fitting simulations",
+                "fdhessdiag" : {"scope" : "All target types",
                                 "required" : False,
                                 "long" : """When this option is enabled, finite difference gradients and Hessian diagonal elements will be enabled 
                                 for selected parameter types (using the fd_ptypes option).  This is done using a three-point finite difference of
@@ -274,7 +263,7 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                                 "recommend" : """Use this as a substitute for 'fdgrad'; it doubles the cost but provides more accurate derivatives
                                 plus the Hessian diagonal values (these are very nice for quasi-Newton optimizers like BFGS)."""
                                 },
-                "use_pvals" : {"scope" : "All fitting simulations",
+                "use_pvals" : {"scope" : "All target types",
                                "required" : False,
                                "long" : """When this option is enabled, the coordinate transformation in parameter space will be bypassed, and 
                                parameters passed into the 'get' subroutines will be plugged directly into the force field files.  This
@@ -283,25 +272,25 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                                should generally be avoided.""",
                                "recommend" : """This option should almost always be off unless the user really knows what he/she is doing."""
                                },
-                "weight" : {"scope" : "All fitting simulations",
+                "weight" : {"scope" : "All target types",
                             "required" : False,
-                            "long" : """This option specifies the weight that the fitting simulation will contribute to the objective function.
-                            A larger weight for a given fitting simulation means that the optimizer will prioritize it over the others.
-                            When several fitting simulations are used, the weight should be chosen carefully such that all fitting simulations
+                            "long" : """This option specifies the weight that the target will contribute to the objective function.
+                            A larger weight for a given target means that the optimizer will prioritize it over the others.
+                            When several targets are used, the weight should be chosen carefully such that all targets
                             contribute a finite amount to the objective function.  Note that the choice of weight determines the final outcome
                             of the force field, although we hope not by too much.""",
                             "recommend" : """It is important to specify something here (giving everything equal weight is unlikely to work.)  
                             Run a single-point objective function evaluation with all weights set to one to get a handle on
-                            the natural size of each fitting simulation's contribution, and then add weights accordingly."""
+                            the natural size of each target's contribution, and then add weights accordingly."""
                             },
-                "efweight" : {"scope" : "Force and energy matching simulations",
+                "efweight" : {"scope" : "Force and energy matching",
                               "required" : False,
-                              "long" : """Energies and forces are evaluated together in a force/energy matching simulation, and this option
+                              "long" : """Energies and forces are evaluated together in a force/energy matching target, and this option
                               specifies the relative weight of the energy and force contributions.""",
                               "recommend" : """Based on experience, it should be okay to leave this option at its default value, unless you wish
                               to emphasize only the force (then choose 0.0) or only the energy (then choose 1.0)."""
                               },
-                "qmboltz" : {"scope" : "Force and energy matching simulations",
+                "qmboltz" : {"scope" : "Force and energy matching",
                              "required" : False,
                              "long" : """When Boltzmann sampling is used to gather snapshots for force/energy matching, there is a potential
                              ambiguity regarding which ensemble one should sample from (either the force field's ensemble or the QM calculation's
@@ -309,9 +298,9 @@ SimOptionDoc = {"name" : {"scope" : "All fitting simulations",
                              the fraction of QM Boltzmann weight to include.  Note that when two ensembles are different, reweighting will decrease
                              the statistical significance of the number of snapshots (i.e. there is less InfoContent).""",
                              "recommend" : """If you want to reweight your snapshots entirely to the QM ensemble, choose 1.0; for hybrid weights,
-                             use 0.5.  Avoid if the fitting simulation has a very large RMS energy difference between QM and MM."""
+                             use 0.5.  Avoid if the there is a very large RMS energy difference between QM and MM."""
                              },
-                "qmboltztemp" : {"scope" : "Force and energy matching simulations",
+                "qmboltztemp" : {"scope" : "Force and energy matching",
                                  "required" : False,
                                  "long" : """The reweighting of an ensemble involves an exponential of (DE)/kT, so there is a massive degradation of sample
                                  quality if (DE) is large.  This option allows you to change the temperature in the denominator, which is unphysical (but
@@ -350,8 +339,8 @@ def main():
 
 This section contains a listing of the general options available when running
 a ForceBalance job, which go into the $options section.  The general options
-are global for the ForceBalance job, in contrast to 'Simulation options' which apply to one
-fitting simulation within a job (described in the next section).
+are global for the ForceBalance job, in contrast to 'Target options' which apply to one
+target within a job (described in the next section).
 The option index is generated by running make-option-index.py.
 """]
     GenIndex = create_index(GenOptionDoc,parser.gen_opts_types)
@@ -360,17 +349,17 @@ The option index is generated by running make-option-index.py.
         Answer += GenIndex[i]
         Answer.append("")
 
-    Answer.append("""\section sim_option_index Option index: Simulation options
+    Answer.append("""\section tgt_option_index Option index: Target options
 
-This section contains a listing of the simulation options available when running
-a ForceBalance job, which go into the $sim_opts section.  There can be multiple 
-$sim_opts sections in a ForceBalance input file, one for each fitting simulation.
+This section contains a listing of the target options available when running
+a ForceBalance job, which go into the $tgt_opts section.  There can be multiple 
+$tgt_opts sections in a ForceBalance input file, one for each target.
 """)
 
-    SimIndex = create_index(SimOptionDoc,parser.sim_opts_types)
+    TgtIndex = create_index(TgtOptionDoc,parser.tgt_opts_types)
 
-    for i in sorted([j for j in SimIndex]):
-        Answer += SimIndex[i]
+    for i in sorted([j for j in TgtIndex]):
+        Answer += TgtIndex[i]
         Answer.append("")
     
 

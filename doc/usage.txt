@@ -30,7 +30,7 @@ print_gradient no
 print_hessian no
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name water12_a
 weight 1
@@ -38,7 +38,7 @@ w_energy 1.0
 w_force 1.0
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name water12_b
 weight 1
@@ -48,16 +48,16 @@ $end
 @endverbatim
 
 Global options for a ForceBalance job are given in the \c $options
-section while the settings for each fitting simulation are given in
-the \c $simulation sections.  These are the only two section types.
+section while the settings for each Target are given in
+the \c $target sections.  These are the only two section types.
 
 The most important general options to note are: \c jobtype specifies
 the optimization algorithm to use and \c forcefield specifies the
 force field file name (there may be more than one of these).  The most
-important simulation options to note are: \c simtype specifies the
-type of fitting simulation and \c name specifies the simulation name
-(must correspond to a subdirectory in \c simulations/ ).  All options
-are explained in the Option Index.
+important target options to note are: \c name specifies the target
+name and \c type specifies the type of target (must correspond to a
+subdirectory in \c targets/ ).  All options are explained in the
+Option Index.
 
 @section directory_structure Directory structure
 
@@ -67,7 +67,7 @@ The directory structure for our example job would look like:
 <root>
   +- forcefield
   |   |- water.itp
-  +- simulations
+  +- targets
   |   +- water12_gen1
   |   |   +- settings
   |   |   |   |- shot.mdp
@@ -89,13 +89,13 @@ The directory structure for our example job would look like:
   |- input.in (ForceBalance input file)
 @endverbatim
 
-The top-level directory names \b forcefield and \b simulations are
-fixed and cannot be changed.  \b forcefield contains the force field
-files that you're optimizing, and \b simulations contains all of the
-fitting simulations and reference data.  Each subdirectory in \b
-simulations corresponds to a single fitting simulation, and its
-contents depend on the specific kind of simulation and its
-corresponding \c FittingSimulation subclass.
+The top-level directory names \b forcefield and \b targets are fixed
+and cannot be changed.  \b forcefield contains the force field files
+that you're optimizing, and \b targets contains all of the reference
+data as well as the settings for simulating that data using the force
+field.  Each subdirectory in \b targets corresponds to a single
+target, and its contents depend on the specific kind of target and its
+corresponding \c Target class.
 
 The \b temp directory is the temporary workspace of the program, and
 the \b result directory is where the optimized force field files are
@@ -103,16 +103,16 @@ deposited after the optimization job is done.  These two directories
 are created if not already there.
 
 Note the force field file, \c water.itp and the two fitting
-simulations \c water12_gen1 and \c water12_gen2 correspond to the
+targets \c water12_gen1 and \c water12_gen2 correspond to the
 entries in the input file.  There are two energy and force matching
-simulations here; each directory contains the relevant geometries (in
+targets here; each directory contains the relevant geometries (in
 \c all.gro ) and reference data (in \c qdata.txt ).
 
-@section fitting_simulations Setting up the fitting simulations
+@section targets Setting up the targets
 
-There are many fitting simulations one can choose from.
+There are many targets one can choose from.
 
-@li Energy and force matching - this is the oldest functionality.  Enabled in GROMACS, OpenMM, TINKER, AMBER.
+@li Energy and force matching - this is the oldest functionality and the most robust.  Enabled in GROMACS, OpenMM, TINKER, AMBER.
 @li Electrostatic potential fitting via the RESP method.  Enabled in GROMACS and AMBER.
 @li High-performance interaction energies - intended for the same two fragments in many conformations.  Enabled in GROMACS.
 @li General binding energies - intended for highly diverse collections of complexes and fragments.  Enabled in TINKER.
@@ -120,7 +120,7 @@ There are many fitting simulations one can choose from.
 @li Condensed-phase properties; currently enabled only for density and enthalpy of vaporization of water.  Enabled in OpenMM.
 @li Basis set coefficient fitting; enabled in psi4 (experimental)
 
-One salient quality of ForceBalance is that fitting simulations can be
+One feature of ForceBalance is that targets can be
 linearly combined to produce an aggregate objective function.  For
 example, our recently developed polarizable water model contains
 energy and force matching, binding energies, normal mode frequencies,
@@ -130,7 +130,7 @@ model that fitted all of these properties to very high accuracy.
 
 Due to the diverse (and somewhat esoteric) nature of these calculations,
 they need to be set up in a specific way that is recognized by ForceBalance.
-The setup is different for each type of simulation, and we encourage
+The setup is different for each type of simulation, and we invite
 you to learn by example through looking at the files in the \c studies
 directory.
 
@@ -144,7 +144,7 @@ The mathematics are implemented in \c abinitio.py while the interfaces
 to simulation software exist in derived classes in \c gmxio.py, \c
 tinkerio.py, \c amberio.py and \c openmmio.py.
 
-All energy and force matching simulations require a <em>coordinate
+All energy and force matching targets require a <em>coordinate
 trajectory file</em> (\c all.gro ) and a <em> quantum data file </em>
 (\c qdata.txt ).  The coordinate trajectory file contains the
 Cartesian coordinates of the snapshots, preferably in the file format
@@ -173,13 +173,13 @@ files are required.  These contain settings needed by the simulation
 software for the calculation to run.  For Gromacs calculations, a
 topology (.top) file and a run parameter file (.mdp) are required.
 These should be placed in the \c settings subdirectory within the
-directory belonging to the fitting simulation.
+directory belonging to the target.
 
 As a side note: If you wish to tune a number in the .mdp file, simply
 move it to the \c forcefield directory and specify it as a force field
 file.  ForceBalance will now be able to tune any highlighted
 parameters in the file, although it will also place copies of this
-file in all simulation directories within \c temp while the program is
+file in all target directories within \c temp while the program is
 running.
 
 @subsection Electrostatic potentials
