@@ -4,7 +4,7 @@ This is a tutorial page, but if you haven't installed ForceBalance yet
 please go to the Installation page first.  It is very much in process,
 and there are many more examples to come.
 
-\section tip4p Fitting a TIP4P potential using two fitting simulations
+\section tip4p Fitting a TIP4P potential using two Targets
 After everything is installed, go to the \c test directory in the distribution
 and run:
 
@@ -16,7 +16,7 @@ OptimizePotential.py 01_bfgs_from_start.in | tee my_job.out
 If the installation was successful, you will get an output file
 similar to \c 01_bfgs_from_start.out .  \c OptimizePotential.py begins
 by taking the force field files from the \c forcefield directory and
-the fitting simulations / reference data from the \c simulations
+the Targets / reference data from the \c targets
 directory.  Then it calls GROMACS-X2 to compute the objective function
 and its derivatives, uses the internal optimizer (based on BFGS) to
 take a step in the parameter space, and repeats the process until
@@ -38,9 +38,9 @@ objective function itself, and the standard deviation of the last ten
 convergence criteria - the step size, the gradient, and the objective
 function itself; all of them can be specified in the input file.
 
-The next two lines report on the two fitting simulations in this job,
+The next two lines report on the two Targets in this job,
 both of which use force/energy matching.  First, note that there are
-two fitting simulations named \c water12_sixpt and \c water12_fourpt;
+two Targets named \c water12_sixpt and \c water12_fourpt;
 the names are because one set of geometries was sampled using a
 six-site QTPIE force field, and the other was sampled using the TIP4P
 force field.  However, the TIP4P force field is what we are fitting
@@ -59,11 +59,11 @@ configurations that are sampled.  \c E_err and \c F_err are
 'indicators' of our progress - that is, they are not quantities to be
 optimized but they give us a mental picture of how we're doing.
 
-The other input files in the directory use the same fitting
-simulations, but they go through the various options of
+The other input files in the directory use the same targets, but 
+they go through the various options of
 reading/writing checkpoint files, testing gradients and Hessians by
 finite difference, and different optimizers in SciPy.  Feel free to
 explore some optimization jobs of your own - for example, vary the
-weights on the fitting simulations and see what happens.  You will
-notice that the optimizer will try very hard to fit one simulation but
+weights on the Targets and see what happens.  You will
+notice that the optimizer will try very hard to fit one target but
 not the other.
