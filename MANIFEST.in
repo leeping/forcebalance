@@ -11,6 +11,7 @@ recursive-include ext *
 recursive-include bin *
 recursive-include src *
 
+recursive-include studies/Settings *
 include studies/001_water_tutorial/*.in
 include studies/001_water_tutorial/*.out
 recursive-include studies/001_water_tutorial/forcefield *
