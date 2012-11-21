@@ -26,7 +26,7 @@ static PyObject *_Assign(PyObject *self, PyObject *args) {
   /**********************************/
   int inf=1e9;           // Infinity parameter (needs to be bigger than costs)
   int ans=0;             // The minimized cost
-  int i, j;              // Row and column indices
+  int i;                 // Row and column indices
   long unsigned int *Mat = (long unsigned int*) Mat_->data;
   // Dimensions of the matrix.
   int DIM = (int) Mat_->dimensions[0];
@@ -44,6 +44,7 @@ static PyObject *_Assign(PyObject *self, PyObject *args) {
     Mat_Int[i] = (int) Mat[i];
   }
   /*
+  int j;
   printf("Solving assignment problem for the following matrix:\n");
   for (i=0; i<DIM; i++) {
     for (j=0; j<DIM; j++) {

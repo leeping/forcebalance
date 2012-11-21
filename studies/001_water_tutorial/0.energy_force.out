@@ -93,8 +93,7 @@ Parameter 7 occurs 1 times in molecule SOL in locations [3] (COUL:SOL-4)
 ##########################################################
 
 ----------------------------------------------------------
-Backing up: temp/cluster-02 to: backups/cluster-02.14.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-02 to: backups/cluster-02.24.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-02 :            [0m###
@@ -104,9 +103,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-02 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-03 to: backups/cluster-03.3.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-03 to: backups/cluster-03.18.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-03 :            [0m###
@@ -116,9 +115,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-03 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-04 to: backups/cluster-04.3.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-04 to: backups/cluster-04.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-04 :            [0m###
@@ -128,9 +127,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-04 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-05 to: backups/cluster-05.2.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-05 to: backups/cluster-05.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-05 :            [0m###
@@ -140,9 +139,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-05 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-06 to: backups/cluster-06.2.tar.bz2
-There are 1208 snapshots
+Backing up: temp/cluster-06 to: backups/cluster-06.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-06 :            [0m###
@@ -152,9 +151,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-06 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1208 
 ----------------------------------------------------------
-Backing up: temp/cluster-07 to: backups/cluster-07.2.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-07 to: backups/cluster-07.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-07 :            [0m###
@@ -164,9 +163,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-07 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-08 to: backups/cluster-08.2.tar.bz2
-There are 1202 snapshots
+Backing up: temp/cluster-08 to: backups/cluster-08.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-08 :            [0m###
@@ -176,9 +175,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-08 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1202 
 ----------------------------------------------------------
-Backing up: temp/cluster-09 to: backups/cluster-09.2.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-09 to: backups/cluster-09.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-09 :            [0m###
@@ -188,9 +187,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-09 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-10 to: backups/cluster-10.2.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-10 to: backups/cluster-10.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-10 :            [0m###
@@ -200,9 +199,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-10 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-11 to: backups/cluster-11.2.tar.bz2
-There are 1205 snapshots
+Backing up: temp/cluster-11 to: backups/cluster-11.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-11 :            [0m###
@@ -212,9 +211,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-11 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1205 
 ----------------------------------------------------------
-Backing up: temp/cluster-12 to: backups/cluster-12.2.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-12 to: backups/cluster-12.17.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-12 :            [0m###
@@ -224,9 +223,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-12 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-13 to: backups/cluster-13.2.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-13 to: backups/cluster-13.13.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-13 :            [0m###
@@ -236,9 +235,9 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-13 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-14 to: backups/cluster-14.2.tar.bz2
-There are 1201 snapshots
+Backing up: temp/cluster-14 to: backups/cluster-14.12.tar.bz2
 
 ##########################################################
 ###[92m           Setup for target cluster-14 :            [0m###
@@ -248,6 +247,7 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-14 
 w_energy                  1.0 
 w_force                   1.0 
+shots                     1201 
 ----------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
 
@@ -518,4 +518,3 @@ read_mvals
    8 [  1.7711e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 /read_mvals
 ----------------------------------------------------------
-Creating the directory /home/leeping/src/forcebalance/studies/001_water_tutorial/result to print the force field
