@@ -8,7 +8,7 @@ import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
 from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, abs, max
-from fitsim import FittingSimulation
+from target import Target
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
@@ -26,19 +26,19 @@ def LastMvals():
     global LAST_MVALS
     return LAST_MVALS
 
-class LeastSquares(FittingSimulation):
+class LeastSquares(Target):
 
-    """ Subclass of FittingSimulation for general least squares fitting. """
+    """ Subclass of Target for general least squares fitting. """
     
-    def __init__(self,options,sim_opts,forcefield):
-        super(LeastSquares,self).__init__(options,sim_opts,forcefield)
+    def __init__(self,options,tgt_opts,forcefield):
+        super(LeastSquares,self).__init__(options,tgt_opts,forcefield)
         
         #======================================#
         # Options that are given by the parser #
         #======================================#
         
         ## Number of snapshots
-        self.set_option(sim_opts,'shots','ns')
+        self.set_option(tgt_opts,'shots','ns')
         #======================================#
         #     Variables which are set here     #
         #======================================#

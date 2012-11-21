@@ -372,8 +372,8 @@ class FF(ForceBalanceBaseClass):
         --- Endif ---
 
         @warning My program currently assumes that we are only using one MM program per job.
-        If we use CHARMM and GROMACS to perform fitting simulations in the same job, we will
-        get f-ed up.  Maybe this needs to be fixed in the future, with program prefixes to
+        If we use CHARMM and GROMACS to perform simulations as part of the same TARGET, we will
+        get messed up.  Maybe this needs to be fixed in the future, with program prefixes to
         parameters like C_ , G_ .. or simply unit conversions, you get the idea.
 
         @warning I don't think the multiplier actually works for analytic derivatives unless

@@ -89,15 +89,15 @@ class GBS_Reader(BaseReader):
 
 class THCDF_Psi4(LeastSquares):
 
-    def __init__(self,options,sim_opts,forcefield):
-        super(THCDF_Psi4,self).__init__(options,sim_opts,forcefield)
+    def __init__(self,options,tgt_opts,forcefield):
+        super(THCDF_Psi4,self).__init__(options,tgt_opts,forcefield)
 
         # Parse the input.dat file to figure out the elements and molecules
         MolSection = False
         ElemList = []
         self.Molecules = []
         self.throw_outs = []
-        for line in open(os.path.join(self.root,self.simdir,"input.dat")).readlines():
+        for line in open(os.path.join(self.root,self.tgtdir,"input.dat")).readlines():
             line = line.strip()
             s = line.split()
             if len(s) >= 3 and s[0].lower() == 'molecule' and s[2] == '{':
@@ -128,12 +128,12 @@ class THCDF_Psi4(LeastSquares):
             warn_press_key("In %s, you should only have exactly one .dat file in the list of force field files!" % __file__)
         self.DATfnm = datlist[0]
         ## Prepare the temporary directory
-        self.prepare_temp_directory(options,sim_opts)
+        self.prepare_temp_directory(options,tgt_opts)
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         o = open(os.path.join(abstempdir,"input.dat"),'w')
-        for line in open(os.path.join(self.root,self.simdir,"input.dat")).readlines():
+        for line in open(os.path.join(self.root,self.tgtdir,"input.dat")).readlines():
             s = line.split("#")[0].split()
             if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
                 print >> o, "basis file %s" % self.GBSfnm

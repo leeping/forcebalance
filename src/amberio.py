@@ -150,21 +150,21 @@ class FrcMod_Reader(BaseReader):
 
 class AbInitio_AMBER(AbInitio):
 
-    """Subclass of FittingSimulation for force and energy matching
+    """Subclass of Target for force and energy matching
     using AMBER.  Implements the prepare and energy_force_driver
     methods.  The get method is in the base class.  """
 
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
         self.trajfnm = "all.gro"
-        super(AbInitio_AMBER,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_AMBER,self).__init__(options,tgt_opts,forcefield)
         ## all_at_once is not implemented.
         self.all_at_once = True
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
-        os.symlink(os.path.join(self.root,self.simdir,"settings","force.mdin"),os.path.join(abstempdir,"force.mdin"))
-        os.symlink(os.path.join(self.root,self.simdir,"settings","stage.leap"),os.path.join(abstempdir,"stage.leap"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"settings","force.mdin"),os.path.join(abstempdir,"force.mdin"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"settings","stage.leap"),os.path.join(abstempdir,"stage.leap"))
         # I also need to write the trajectory
         if 'boxes' in self.traj.Data.keys():
             del self.traj.Data['boxes']

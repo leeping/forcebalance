@@ -13,7 +13,7 @@ the third option is the best although our early tests have
 indicated that none of the force fields perform particularly well
 for the water dimer.
 
-This subclass of FittingSimulation implements the 'get' method.
+This subclass of Target implements the 'get' method.
 
 @author Lee-Ping Wang
 @date 12/2011
@@ -22,30 +22,30 @@ This subclass of FittingSimulation implements the 'get' method.
 import os
 import sys
 from re import match
-from fitsim import FittingSimulation
+from target import Target
 from numpy import array, dot, exp, linalg, mean, ones, zeros
 
-class Counterpoise(FittingSimulation):
-    """ FittingSimulation subclass for matching the counterpoise correction."""
+class Counterpoise(Target):
+    """ Target subclass for matching the counterpoise correction."""
 
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         """ To instantiate Counterpoise, we read the coordinates and counterpoise data."""
         # Initialize the superclass. :)
-        super(Counterpoise,self).__init__(options,sim_opts,forcefield)
+        super(Counterpoise,self).__init__(options,tgt_opts,forcefield)
         
         #======================================#
         # Options that are given by the parser #
         #======================================#
         ## Number of snapshots
-        self.set_option(sim_opts,'shots','ns')
+        self.set_option(tgt_opts,'shots','ns')
         
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## XYZ elements and coordinates
-        self.elem, self.xyzs = self.loadxyz(os.path.join(self.root,self.simdir,'all.xyz'))
+        self.elem, self.xyzs = self.loadxyz(os.path.join(self.root,self.tgtdir,'all.xyz'))
         ## Counterpoise correction data
-        self.cpqm = self.load_cp(os.path.join(self.root,self.simdir,'cp.dat'))
+        self.cpqm = self.load_cp(os.path.join(self.root,self.tgtdir,'cp.dat'))
         
     def loadxyz(self,fnm):
         """ Parse an XYZ file which contains several xyz coordinates, and return their elements.

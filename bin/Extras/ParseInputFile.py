@@ -15,10 +15,10 @@ def main():
         print "Please call this script with one argument - that is the input file"
         sys.exit(1)
     else:
-        options, sim_opts = parse_inputs(sys.argv[1])
+        options, tgt_opts = parse_inputs(sys.argv[1])
         printcool_dictionary(options,"General options")
-        for this_sim_opt in sim_opts:
-            printcool_dictionary(this_sim_opt,"Simulation options for %s" % this_sim_opt['name'])
+        for this_tgt_opt in tgt_opts:
+            printcool_dictionary(this_tgt_opt,"Target options for %s" % this_tgt_opt['name'])
 
 if __name__ == "__main__":
     main()

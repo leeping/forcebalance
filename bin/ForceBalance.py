@@ -24,15 +24,15 @@ def Run_ForceBalance(input_file):
     Apoc: "TRINITY" *chunk*
 
     The force field is a class defined in forcefield.py.
-    The objective function is a combination of fitting simulation classes and a penalty function class.
+    The objective function is a combination of target classes and a penalty function class.
     The optimizer is a class defined in this file.
     """
-    ## The general options and simulation options that come from parsing the input file
-    options, sim_opts = parse_inputs(input_file)
+    ## The general options and target options that come from parsing the input file
+    options, tgt_opts = parse_inputs(input_file)
     ## The force field component of the project
     forcefield  = FF(options)
     ## The objective function
-    objective   = Objective(options, sim_opts, forcefield)
+    objective   = Objective(options, tgt_opts, forcefield)
     ## The optimizer component of the project
     optimizer   = Optimizer(options, objective, forcefield)
     ## Actually run the optimizer.

@@ -133,26 +133,26 @@ class Tinker_Reader(BaseReader):
 
 class AbInitio_TINKER(AbInitio):
 
-    """Subclass of FittingSimulation for force and energy matching
+    """Subclass of Target for force and energy matching
     using TINKER.  Implements the prepare and energy_force_driver
     methods.  """
 
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         ## Name of the trajectory
         self.trajfnm = "all.arc"
-        super(AbInitio_TINKER,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_TINKER,self).__init__(options,tgt_opts,forcefield)
         ## all_at_once is not implemented.
         if self.force and self.all_at_once:
             warn_press_key("Currently, TINKER can only do trajectory loops for energy-only jobs.")
             self.all_at_once = False
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
         os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
         # Link the run parameter file
-        os.symlink(os.path.join(self.root,self.simdir,"settings","shot.key"),os.path.join(abstempdir,"shot.key"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"settings","shot.key"),os.path.join(abstempdir,"shot.key"))
 
     def energy_force_driver(self, shot):
         self.traj.write("shot.arc",select=[shot])
@@ -190,23 +190,23 @@ class AbInitio_TINKER(AbInitio):
 
 class Vibration_TINKER(Vibration):
 
-    """Subclass of FittingSimulation for vibrational frequency matching
+    """Subclass of Target for vibrational frequency matching
     using TINKER.  Provides optimized geometry, vibrational frequencies (in cm-1),
     and eigenvectors."""
 
-    def __init__(self,options,sim_opts,forcefield):
-        super(Vibration_TINKER,self).__init__(options,sim_opts,forcefield)
+    def __init__(self,options,tgt_opts,forcefield):
+        super(Vibration_TINKER,self).__init__(options,tgt_opts,forcefield)
         if self.FF.rigid_water:
             raise Exception('This class cannot be used with rigid water molecules.')
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['tinkerpath'],"vibrate"),os.path.join(abstempdir,"vibrate"))
         os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
-        os.symlink(os.path.join(self.root,self.simdir,"input.key"),os.path.join(abstempdir,"input.key"))
-        os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
 
     def vibration_driver(self):
         # This line actually runs TINKER
@@ -239,21 +239,21 @@ class Vibration_TINKER(Vibration):
 
 class Moments_TINKER(Moments):
 
-    """Subclass of FittingSimulation for multipole moment matching
+    """Subclass of Target for multipole moment matching
     using TINKER."""
 
-    def __init__(self,options,sim_opts,forcefield):
-        super(Moments_TINKER,self).__init__(options,sim_opts,forcefield)
+    def __init__(self,options,tgt_opts,forcefield):
+        super(Moments_TINKER,self).__init__(options,tgt_opts,forcefield)
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
         os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
         os.symlink(os.path.join(options['tinkerpath'],"polarize"),os.path.join(abstempdir,"polarize"))
         os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
-        os.symlink(os.path.join(self.root,self.simdir,"input.key"),os.path.join(abstempdir,"input.key"))
-        os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
 
     def moments_driver(self):
         # This line actually runs TINKER
@@ -316,15 +316,15 @@ class Interactions_TINKER(Interactions):
     """Subclass of Interactions for interaction energy matching
     using TINKER.  """
 
-    def __init__(self,options,sim_opts,forcefield):
-        super(Interactions_TINKER,self).__init__(options,sim_opts,forcefield)
-        self.prepare_temp_directory(options, sim_opts)
+    def __init__(self,options,tgt_opts,forcefield):
+        super(Interactions_TINKER,self).__init__(options,tgt_opts,forcefield)
+        self.prepare_temp_directory(options, tgt_opts)
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         if self.FF.rigid_water:
             self.optprog = "optrigid"
-            os.symlink(os.path.join(self.root,self.simdir,"rigid.key"),os.path.join(abstempdir,"rigid.key"))
+            os.symlink(os.path.join(self.root,self.tgtdir,"rigid.key"),os.path.join(abstempdir,"rigid.key"))
         else:
             self.optprog = "optimize"
         # Link the necessary programs into the temporary directory
@@ -333,13 +333,13 @@ class Interactions_TINKER(Interactions):
         os.symlink(os.path.join(options['tinkerpath'],"superpose"),os.path.join(abstempdir,"superpose"))
         # Link the run parameter file
         # The master file might be unneeded??
-        # os.symlink(os.path.join(self.root,self.simdir,self.masterfile),os.path.join(abstempdir,self.masterfile))
-        # os.symlink(os.path.join(self.root,self.simdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
+        # os.symlink(os.path.join(self.root,self.tgtdir,self.masterfile),os.path.join(abstempdir,self.masterfile))
+        # os.symlink(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
         for sysopt in self.sys_opts.values():
             if self.FF.rigid_water:
                 # Make every water molecule rigid
                 # WARNING: Hard coded values here!
-                M = Molecule(os.path.join(self.root, self.simdir, sysopt['geometry']),ftype="tinker")
+                M = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']),ftype="tinker")
                 for a in range(0, len(M.xyzs[0]), 3):
                     flex = M.xyzs[0]
                     wat = flex[a:a+3]
@@ -367,7 +367,7 @@ class Interactions_TINKER(Interactions):
                     M.xyzs[0][a:a+3] = rig
                 M.write(os.path.join(abstempdir,sysopt['geometry']),ftype="tinker")
             else:
-                os.symlink(os.path.join(self.root, self.simdir, sysopt['geometry']), os.path.join(abstempdir,sysopt['geometry']))
+                os.symlink(os.path.join(self.root, self.tgtdir, sysopt['geometry']), os.path.join(abstempdir,sysopt['geometry']))
 
     def system_driver(self,sysname):
         sysopt = self.sys_opts[sysname]

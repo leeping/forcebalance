@@ -8,7 +8,7 @@ import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
 from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack
-from fitsim import FittingSimulation
+from target import Target
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
@@ -17,26 +17,26 @@ from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 
-class Moments(FittingSimulation):
+class Moments(Target):
 
-    """ Subclass of FittingSimulation for fitting force fields to multipole moments (from experiment or theory).
+    """ Subclass of Target for fitting force fields to multipole moments (from experiment or theory).
 
     Currently Tinker is supported.
 
     """
     
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         """Initialization."""
         
         # Initialize the SuperClass!
-        super(Moments,self).__init__(options,sim_opts,forcefield)
+        super(Moments,self).__init__(options,tgt_opts,forcefield)
         
         #======================================#
         # Options that are given by the parser #
         #======================================#
-        self.set_option(sim_opts, 'dipole_denom')
-        self.set_option(sim_opts, 'quadrupole_denom')
-        self.set_option(sim_opts, 'polarizability_denom')
+        self.set_option(tgt_opts, 'dipole_denom')
+        self.set_option(tgt_opts, 'quadrupole_denom')
+        self.set_option(tgt_opts, 'polarizability_denom')
 
 	self.denoms = {}
         self.denoms['dipole'] = self.dipole_denom
@@ -47,13 +47,13 @@ class Moments(FittingSimulation):
         #     Variables which are set here     #
         #======================================#
         ## The mdata.txt file that contains the moments.
-        self.mfnm = os.path.join(self.simdir,"mdata.txt")
+        self.mfnm = os.path.join(self.tgtdir,"mdata.txt")
         ##
         self.ref_moments = OrderedDict()
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
-        self.prepare_temp_directory(options,sim_opts)
+        self.prepare_temp_directory(options,tgt_opts)
 
     def read_reference_data(self):
         """ Read the reference data from a file. """
@@ -116,7 +116,7 @@ class Moments(FittingSimulation):
             ln += 1
         return
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         """ Prepare the temporary directory, by default does nothing (gmxx2 needs it) """
         return
         

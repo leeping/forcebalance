@@ -2,7 +2,7 @@
 
 ForceBalance objective function."""
 
-from simtab import SimTab
+from tgttab import TgtTab
 from numpy import argsort, array, diag, dot, eye, linalg, ones, reshape, sum, zeros, exp, log
 from collections import defaultdict
 from collections import OrderedDict
@@ -17,10 +17,10 @@ class Objective(ForceBalanceBaseClass):
     """ Objective function.
     
     The objective function is a combination of contributions from the different
-    fitting simulations.  Basically, it loops through the fitting simulations,
-    gets their contributions to the objective function and then sums all of them
+    fitting targets.  Basically, it loops through the targets, gets their 
+    contributions to the objective function and then sums all of them
     (although more elaborate schemes are conceivable).  The return value is the
-    same data type as calling the fitting simulation itself: a dictionary containing
+    same data type as calling the target itself: a dictionary containing
     the objective function, the gradient and the Hessian.
 
     The penalty function is also computed here; it keeps the parameters from straying
@@ -30,7 +30,7 @@ class Objective(ForceBalanceBaseClass):
     @param[in] Order The requested order of differentiation
     @param[in] usepvals Switch that determines whether to use physical parameter values
     """
-    def __init__(self, options, sim_opts, forcefield):
+    def __init__(self, options, tgt_opts, forcefield):
 
         super(Objective, self).__init__(options)
         self.set_option(options, 'penalty_type')
@@ -39,16 +39,12 @@ class Objective(ForceBalanceBaseClass):
         self.set_option(options, 'penalty_hyperbolic_b')
         self.set_option(options, 'normalize_weights')
 
-        ## The list of fitting simulations
-        #self.Simulations = [SimTab[opts['simtype']](options,opts,forcefield) for opts in sim_opts]
-        self.Simulations = []
-        for opts in sim_opts:
-            Sim = SimTab[opts['simtype']](options,opts,forcefield)
-            self.Simulations.append(Sim)
-            printcool_dictionary(Sim.PrintOptionDict,"Setup for fitting simulation %s :" % Sim.name)
-        # # Print the options for each simulation to the terminal.
-        # for Sim in self.Simulations:
-        #     printcool_dictionary(Sim.PrintOptionDict,"Setup for fitting simulation %s :" % Sim.name)
+        ## The list of fitting targets
+        self.Targets = []
+        for opts in tgt_opts:
+            Tgt = TgtTab[opts['type']](options,opts,forcefield)
+            self.Targets.append(Tgt)
+            printcool_dictionary(Tgt.PrintOptionDict,"Setup for target %s :" % Tgt.name)
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.
@@ -57,7 +53,7 @@ class Objective(ForceBalanceBaseClass):
                                options['penalty_alpha'])
         ## Obtain the denominator.
         if self.normalize_weights:
-            self.WTot = sum([i.weight for i in self.Simulations])
+            self.WTot = sum([i.weight for i in self.Targets])
         else:
             self.WTot = 1.0
         self.ObjDict = OrderedDict()
@@ -66,25 +62,25 @@ class Objective(ForceBalanceBaseClass):
         printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
 
         
-    def Simulation_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
+    def Target_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
         Objective = {'X':0.0, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
-        # Loop through the simulations.
-        for Sim in self.Simulations:
+        # Loop through the targets.
+        for Tgt in self.Targets:
             # The first call is always done at the midpoint.
-            Sim.bSave = True
+            Tgt.bSave = True
             # List of functions that I can call.
-            Funcs   = [Sim.get_X, Sim.get_G, Sim.get_H]
+            Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
             # Call the appropriate function
             Ans = Funcs[Order](mvals)
             # Print out the qualitative indicators
             if verbose:
-                Sim.indicate()
+                Tgt.indicate()
             # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
             if not in_fd():
-                self.ObjDict[Sim.name] = {'w' : Sim.weight/self.WTot , 'x' : Ans['X']}
+                self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
             for i in range(3):
-                Objective[Letters[i]] += Ans[Letters[i]]*Sim.weight/self.WTot
+                Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
         return Objective
 
     def Indicate(self):
@@ -119,14 +115,14 @@ class Objective(ForceBalanceBaseClass):
             xnew = self.ObjDict['Total']
             xold = self.ObjDict_Last['Total']
             PrintDict['Total'] += " ( %+10.3e )" % (xnew - xold)
-            Title = "Objective Function Breakdown\n %-20s %55s" % ("Simulation Name", "Residual  x  Weight  =  Contribution (Current-Prev)")
+            Title = "Objective Function Breakdown\n %-20s %55s" % ("Target Name", "Residual  x  Weight  =  Contribution (Current-Prev)")
         else:
-            Title = "Objective Function Breakdown\n %-20s %40s" % ("Simulation Name", "Residual  x  Weight  =  Contribution")
+            Title = "Objective Function Breakdown\n %-20s %40s" % ("Target Name", "Residual  x  Weight  =  Contribution")
         printcool_dictionary(PrintDict,color=4,title=Title)
         return
 
     def Full(self, mvals, Order=0, usepvals=False, verbose=False):
-        Objective = self.Simulation_Terms(mvals, Order, usepvals, verbose)
+        Objective = self.Target_Terms(mvals, Order, usepvals, verbose)
         ## Compute the penalty function.
         Extra = self.Penalty.compute(mvals,Objective)
         Objective['X0'] = Objective['X']

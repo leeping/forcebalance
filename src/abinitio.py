@@ -8,7 +8,7 @@ import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
 from numpy import append, array, cross, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack, sum, abs, vstack, max
-from fitsim import FittingSimulation
+from target import Target
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
@@ -19,9 +19,9 @@ import itertools
 #from IPython import embed
 #from _increment import AbInitio_Build
 
-class AbInitio(FittingSimulation):
+class AbInitio(Target):
 
-    """ Subclass of FittingSimulation for fitting force fields to ab initio data.
+    """ Subclass of Target for fitting force fields to ab initio data.
 
     Currently Gromacs-X2, Gromacs, Tinker, OpenMM and AMBER are supported.
 
@@ -42,7 +42,7 @@ class AbInitio(FittingSimulation):
     read output is still required).  The 'get' method can be overridden
     by subclasses like AbInitio_GMXX2."""
     
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         """
         Initialization; define a few core concepts.
 
@@ -51,46 +51,46 @@ class AbInitio(FittingSimulation):
         """
 
         ## Initialize the base class
-        super(AbInitio,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio,self).__init__(options,tgt_opts,forcefield)
         
         #======================================#
         # Options that are given by the parser #
         #======================================#
         
         ## Number of snapshots
-        self.set_option(sim_opts,'shots','ns')
+        self.set_option(tgt_opts,'shots','ns')
         ## Whether to use WHAM Boltzmann weights
-        self.set_option(sim_opts,'whamboltz','whamboltz')
+        self.set_option(tgt_opts,'whamboltz','whamboltz')
         ## Whether to use the Sampling Correction
-        self.set_option(sim_opts,'sampcorr','sampcorr')
+        self.set_option(tgt_opts,'sampcorr','sampcorr')
         ## Whether to use the Covariance Matrix
-        self.set_option(sim_opts,'covariance','covariance')
+        self.set_option(tgt_opts,'covariance','covariance')
         ## Whether to use QM Boltzmann weights
-        self.set_option(sim_opts,'qmboltz','qmboltz')
+        self.set_option(tgt_opts,'qmboltz','qmboltz')
         ## The temperature for QM Boltzmann weights
-        self.set_option(sim_opts,'qmboltztemp','qmboltztemp')
+        self.set_option(tgt_opts,'qmboltztemp','qmboltztemp')
         ## Number of atoms that we are fitting
-        self.set_option(sim_opts,'fitatoms','fitatoms')
+        self.set_option(tgt_opts,'fitatoms','fitatoms')
         ## Whether to fit Energies.
-        self.set_option(sim_opts,'energy','energy')
+        self.set_option(tgt_opts,'energy','energy')
         ## Whether to fit Forces.
-        self.set_option(sim_opts,'force','force')
+        self.set_option(tgt_opts,'force','force')
         ## Whether to fit Electrostatic Potential.
-        self.set_option(sim_opts,'resp','resp')
-        self.set_option(sim_opts,'resp_a','resp_a')
-        self.set_option(sim_opts,'resp_b','resp_b')
+        self.set_option(tgt_opts,'resp','resp')
+        self.set_option(tgt_opts,'resp_a','resp_a')
+        self.set_option(tgt_opts,'resp_b','resp_b')
         ## Weights for the three components.
-        self.set_option(sim_opts,'w_energy','w_energy')
-        self.set_option(sim_opts,'w_force','w_force')
-        self.set_option(sim_opts,'force_map','force_map')
-        self.set_option(sim_opts,'w_netforce','w_netforce')
-        self.set_option(sim_opts,'w_torque','w_torque')
-        self.set_option(sim_opts,'w_resp','w_resp')
+        self.set_option(tgt_opts,'w_energy','w_energy')
+        self.set_option(tgt_opts,'w_force','w_force')
+        self.set_option(tgt_opts,'force_map','force_map')
+        self.set_option(tgt_opts,'w_netforce','w_netforce')
+        self.set_option(tgt_opts,'w_torque','w_torque')
+        self.set_option(tgt_opts,'w_resp','w_resp')
         ## Whether to do energy and force calculations for the whole trajectory, or to do
         ## one calculation per snapshot.
-        self.set_option(sim_opts,'all_at_once','all_at_once')
+        self.set_option(tgt_opts,'all_at_once','all_at_once')
         ## OpenMM-only option - whether to run the energies and forces internally.
-        self.set_option(sim_opts,'run_internal','run_internal')
+        self.set_option(tgt_opts,'run_internal','run_internal')
         ## Whether we have virtual sites (set at the global option level)
         self.set_option(options,'have_vsite','have_vsite')
         #======================================#
@@ -111,7 +111,7 @@ class AbInitio(FittingSimulation):
         ## ESP values
         self.espval        = []
         ## The qdata.txt file that contains the QM energies and forces
-        self.qfnm = os.path.join(self.simdir,"qdata.txt")
+        self.qfnm = os.path.join(self.tgtdir,"qdata.txt")
         ## The number of atoms in the QM calculation (Irrelevant if not fitting forces)
         self.qmatoms      = 0
         ## Qualitative Indicator: average energy error (in kJ/mol)
@@ -127,10 +127,10 @@ class AbInitio(FittingSimulation):
         self.use_nft       = self.w_netforce > 0 or self.w_torque > 0
         ## Read in the trajectory file
         if self.ns == -1:
-            self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))
+            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))
             self.ns = len(self.traj)
         else:
-            self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))[:self.ns]
+            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))[:self.ns]
         ## The number of (atoms + drude particles + virtual sites)
         self.nparticles  = len(self.traj.elem)
         ## This is a default-dict containing a number of atom-wise lists, such as the
@@ -141,7 +141,7 @@ class AbInitio(FittingSimulation):
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
-        self.prepare_temp_directory(options,sim_opts)
+        self.prepare_temp_directory(options,tgt_opts)
         ## The below two options are related to whether we want to rebuild virtual site positions.
         ## Rebuild the distance matrix if virtual site positions have changed
         self.new_vsites = True
@@ -320,7 +320,7 @@ class AbInitio(FittingSimulation):
             if all(len(i) in [self.ns, 0] for i in [self.eqm, self.fqm, self.emd0, self.espxyz, self.espval]) and len(self.eqm) == self.ns:
                 break
         self.ns = len(self.eqm)
-        print "There are %i snapshots in this simulation" % self.ns
+        print "There are %i snapshots" % self.ns
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
         self.eqm = array(self.eqm)
         self.eqm *= eqcgmx
@@ -352,11 +352,11 @@ class AbInitio(FittingSimulation):
             self.emd0 = array(self.emd0)
             self.emd0 -= mean(self.emd0)
         if self.whamboltz == True:
-            self.whamboltz_wts = array([float(i.strip()) for i in open(os.path.join(self.root,self.simdir,"wham-weights.txt")).readlines()])
+            self.whamboltz_wts = array([float(i.strip()) for i in open(os.path.join(self.root,self.tgtdir,"wham-weights.txt")).readlines()])
             #   This is a constant pre-multiplier in front of every snapshot.
             bar = printcool("Using WHAM MM Boltzmann weights.", color=3)
-            if os.path.exists(os.path.join(self.root,self.simdir,"wham-master.txt")):
-                whaminfo = open(os.path.join(self.root,self.simdir,"wham-master.txt")).readlines()
+            if os.path.exists(os.path.join(self.root,self.tgtdir,"wham-master.txt")):
+                whaminfo = open(os.path.join(self.root,self.tgtdir,"wham-master.txt")).readlines()
                 print "From wham-master.txt, I can see that you're using %i generations" % len(whaminfo)
                 print "Relative weight of each generation:"
                 shotcounter = 0
@@ -398,7 +398,7 @@ class AbInitio(FittingSimulation):
         else:
             self.fref = self.fqm
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         """ Prepare the temporary directory, by default does nothing (gmxx2 needs it) """
         return
         
@@ -472,7 +472,7 @@ class AbInitio(FittingSimulation):
         This subroutine does the normalization automatically.
         
         2) Subtracting out the mean energy gap: The zero-point energy
-        difference between reference and fitting simulations is
+        difference between reference data and simulation is
         meaningless.  This subroutine subtracts it out.
         
         3) Hybrid ensembles: This program builds a combined objective
