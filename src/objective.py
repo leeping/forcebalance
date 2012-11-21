@@ -2,13 +2,17 @@
 
 ForceBalance objective function."""
 
-from tgttab import TgtTab
+import sys
+import inspect
+from implemented import Implemented_Targets
 from numpy import argsort, array, diag, dot, eye, linalg, ones, reshape, sum, zeros, exp, log
 from collections import defaultdict
 from collections import OrderedDict
 from finite_difference import in_fd
 from nifty import printcool_dictionary
 from baseclass import ForceBalanceBaseClass
+import datetime
+#from IPython import embed
 
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
 Letters = ['X','G','H']
@@ -42,7 +46,7 @@ class Objective(ForceBalanceBaseClass):
         ## The list of fitting targets
         self.Targets = []
         for opts in tgt_opts:
-            Tgt = TgtTab[opts['type']](options,opts,forcefield)
+            Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
             self.Targets.append(Tgt)
             printcool_dictionary(Tgt.PrintOptionDict,"Setup for target %s :" % Tgt.name)
         ## The force field (it seems to be everywhere)

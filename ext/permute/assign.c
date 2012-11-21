@@ -43,7 +43,6 @@ static PyObject *_Assign(PyObject *self, PyObject *args) {
   for (i=0; i<DIM*DIM; i++) {
     Mat_Int[i] = (int) Mat[i];
   }
-  /*
   printf("Solving assignment problem for the following matrix:\n");
   for (i=0; i<DIM; i++) {
     for (j=0; j<DIM; j++) {
@@ -51,10 +50,9 @@ static PyObject *_Assign(PyObject *self, PyObject *args) {
     }
     printf("\n");
   }
-  */
   // Solve the assignment problem.
   apc(DIM,Mat_Int,inf,&ans,idx);
-  //printf("The optimal assignment has cost %i\n",ans);
+  printf("The optimal assignment has cost %i\n",ans);
   free(Mat_Int);
   return PyArray_Return(idx_);
 }

@@ -80,26 +80,28 @@ Reading force field from file: chlorine.prm
 priors                    OrderedDict([('VDWS', 5.0), ('VDWT', 0.5), ('VDWD', 1.0)]) 
 constrain_charge          False 
 ----------------------------------------------------------
-There are 940 snapshots in this simulation
+Backing up: temp/chloroform to: backups/chloroform.1.tar.bz2
+There are 940 snapshots
 QM forces are not present, only fitting energies.
 
 ##########################################################
-###[92m     Setup for fitting simulation chloroform :      [0m###
+###[92m           Setup for target chloroform :            [0m###
 ##########################################################
 name                      chloroform 
-simtype                   ABINITIO_TINKER 
-simdir                    simulations/chloroform 
+type                      ABINITIO_TINKER 
+tgtdir                    targets/chloroform 
 w_energy                  1.0 
 ----------------------------------------------------------
-There are 1057 snapshots in this simulation
+Backing up: temp/dichloromethane to: backups/dichloromethane.1.tar.bz2
+There are 1057 snapshots
 QM forces are not present, only fitting energies.
 
 ##########################################################
-###[92m   Setup for fitting simulation dichloromethane :   [0m###
+###[92m         Setup for target dichloromethane :         [0m###
 ##########################################################
 name                      dichloromethane 
-simtype                   ABINITIO_TINKER 
-simdir                    simulations/dichloromethane 
+type                      ABINITIO_TINKER 
+tgtdir                    targets/dichloromethane 
 w_energy                  1.0 
 ----------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
@@ -128,7 +130,7 @@ Sim: dichloromethane Errors: Energy =   2.4220 kJ/mol (64.6000%) Objective = 4.1
 
 ######################################################################
 ###[94m                  Objective Function Breakdown                  [0m###
-###[94m  Simulation Name          Residual  x  Weight  =  Contribution [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution [0m###
 ######################################################################
 chloroform                     0.70142      1.000 [94m     7.01422e-01[0m 
 dichloromethane                0.41732      1.000 [94m     4.17316e-01[0m 
@@ -176,7 +178,7 @@ Sim: dichloromethane Errors: Energy =   1.0311 kJ/mol (27.5013%) Objective = 7.5
 
 #####################################################################################
 ###[94m                         Objective Function Breakdown                          [0m###
-###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
 chloroform                     0.13782      1.000 [92m     1.37820e-01[0m ( -5.636e-01 ) 
 dichloromethane                0.07563      1.000 [92m     7.56322e-02[0m ( -3.417e-01 ) 
@@ -227,7 +229,7 @@ Sim: dichloromethane Errors: Energy =   0.9402 kJ/mol (25.0778%) Objective = 6.2
 
 #####################################################################################
 ###[94m                         Objective Function Breakdown                          [0m###
-###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
 chloroform                     0.12562      1.000 [92m     1.25622e-01[0m ( -1.220e-02 ) 
 dichloromethane                0.06289      1.000 [92m     6.28896e-02[0m ( -1.274e-02 ) 
@@ -276,7 +278,7 @@ Sim: dichloromethane Errors: Energy =   0.9399 kJ/mol (25.0678%) Objective = 6.2
 
 #####################################################################################
 ###[94m                         Objective Function Breakdown                          [0m###
-###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
 chloroform                     0.12526      1.000 [92m     1.25260e-01[0m ( -3.620e-04 ) 
 dichloromethane                0.06284      1.000 [92m     6.28395e-02[0m ( -5.012e-05 ) 
@@ -332,7 +334,7 @@ Sim: dichloromethane Errors: Energy =   0.9397 kJ/mol (25.0629%) Objective = 6.2
 
 #####################################################################################
 ###[94m                         Objective Function Breakdown                          [0m###
-###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
 chloroform                     0.12528      1.000 [91m     1.25277e-01[0m ( +1.744e-05 ) 
 dichloromethane                0.06281      1.000 [92m     6.28149e-02[0m ( -2.460e-05 ) 
@@ -383,7 +385,7 @@ Sim: dichloromethane Errors: Energy =   0.9397 kJ/mol (25.0639%) Objective = 6.2
 
 #####################################################################################
 ###[94m                         Objective Function Breakdown                          [0m###
-###[94m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
 chloroform                     0.12528      1.000 [92m     1.25277e-01[0m ( -5.313e-08 ) 
 dichloromethane                0.06282      1.000 [91m     6.28199e-02[0m ( +5.003e-06 ) 
