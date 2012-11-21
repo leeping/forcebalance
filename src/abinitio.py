@@ -669,7 +669,11 @@ class AbInitio(Target):
         savetxt('QM-vs-MM-energies.txt',EnergyComparison)
         if self.force:
             # Write .xyz files which can be viewed in vmd.
-            TrueAtoms = array([i for i in range(self.traj.na) if self.AtomLists['ParticleType'][i] == 'A'])
+            try:
+                # Only print forces on true atoms, and ignore virtual sites.
+                TrueAtoms = array([i for i in range(self.traj.na) if self.AtomLists['ParticleType'][i] == 'A'])
+            except:
+                TrueAtoms = arange(self.traj.na)
             QMTraj = self.traj[:].atom_select(TrueAtoms)
             Mforce_obj = QMTraj[:]
             Qforce_obj = QMTraj[:]
@@ -685,11 +689,14 @@ class AbInitio(Target):
                 Fpad = zeros((self.qmatoms - self.fitatoms, 3),dtype=float)
                 Mforce_obj.xyzs[i] = vstack((Mforce_obj.xyzs[i], Fpad))
                 Qforce_obj.xyzs[i] = vstack((Qforce_obj.xyzs[i], Fpad))
-            self.traj.write('coords.xyz')
-            Mforce_obj.elem = ['H' for i in range(Mforce_obj.na)]
-            Mforce_obj.write('MMforce.xyz')
-            Qforce_obj.elem = ['H' for i in range(Qforce_obj.na)]
-            Qforce_obj.write('QMforce.xyz')
+            if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
+                warn_once('\x1b[91mThe printing of forces is not set up correctly.  Not printing forces.  Please report this issue.\x1b[0m')
+            else:
+                QMTraj.write('coords.xyz')
+                Mforce_obj.elem = ['H' for i in range(Mforce_obj.na)]
+                Mforce_obj.write('MMforce.xyz')
+                Qforce_obj.elem = ['H' for i in range(Qforce_obj.na)]
+                Qforce_obj.write('QMforce.xyz')
 
         #==============================================================#
         #      STEP 3: Build the variance vector and invert it.        #

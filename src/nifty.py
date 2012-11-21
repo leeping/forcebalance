@@ -557,6 +557,20 @@ def warn_press_key(warning):
     print "\x1b[1;91mPress Enter (I assume no responsibility for what happens after this!)\x1b[0m"
     raw_input()
 
+def warn_once(warning, warnhash = None):
+    """ Prints a warning but will only do so once in a given run. """
+    if warnhash == None:
+        warnhash = warning
+    if warnhash in warn_once.already:
+        return
+    warn_once.already.add(warnhash)
+    if type(warning) is str:
+        print warning
+    elif type(warning) is list:
+        for line in warning:
+            print line
+warn_once.already = set()
+
 #=========================================#
 #| Development stuff (not commonly used) |#
 #=========================================#

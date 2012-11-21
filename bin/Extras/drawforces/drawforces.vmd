@@ -61,12 +61,15 @@ material change ambient      Steel 0.0
 proc vmd_draw_vector {mol cnt vec {scale 1.0} {res 35} {radius 0.05}} {
     global cid
 
-    set camx [lindex [lindex [molinfo 0 get view_matrix] 0] 0]
+    set camz [lindex [lindex [molinfo 0 get view_matrix] 0] 2]
 
-    lappend arb [ lindex $camx 0 ]
-    lappend arb [ lindex $camx 1 ]
-    lappend arb [ lindex $camx 2 ]
-    set arb [ vecscale $arb [ expr 1 / [veclength $arb]]]
+    lappend x1 [ lindex $camz 0 ]
+    lappend x1 [ lindex $camz 1 ]
+    lappend x1 [ lindex $camz 2 ]
+    set x1 [ vecscale $x1 [ expr 1 / [veclength $x1]]]
+    set x2 [ vecscale $vec [ expr 1 / [ veclength $vec ]]]
+    set x3 [ veccross $x1 $x2 ]
+    set x3 [ vecscale $x3 [ expr 1 / [veclength $x3]]]
 
     set vechalf [vecscale [expr $scale *0.5] $vec]
     set veczero [vecscale [expr $scale *0.0] $vec]
@@ -74,11 +77,7 @@ proc vmd_draw_vector {mol cnt vec {scale 1.0} {res 35} {radius 0.05}} {
 
     # Offset the vectors by a little bit so they can both be seen.
     # Choose a direction that is normal to the present vector.
-    # set arb {0 0 1}
-    set vecproj [ vecscale $vecfull [ expr [vecdot $arb $vecfull] / [vecdot $vecfull $vecfull] ] ]
-    set vecperp [ vecsub $arb $vecproj ]
-    set perpunit [ vecscale $vecperp [ expr 1 / [ veclength $vecperp ]]]
-    set offset [ vecscale $perpunit [expr [expr $cid - 0.5] * 0.05] ]
+    set offset [ vecscale $x3 [expr [expr $cid - 0.5] * 0.05] ]
     set cnt [ vecadd $cnt $offset ]
     set radius [min [expr 0.1 * [veclength $vec]] $radius]
     return [list \
