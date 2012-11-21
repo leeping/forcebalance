@@ -872,7 +872,7 @@ class Molecule(object):
         for key in OtherMol.QuantumKeys:
             if key in AtomVariableNames and len(OtherMol.Data[key]) != self.na:
                 raise Exception('The quantum-key %s is AtomData, but it doesn\'t have the same number of atoms as the Molecule object we\'re adding it to.')
-            self.Data[key] = OtherMol.Data[key]
+            self.Data[key] = copy.deepcopy(OtherMol.Data[key])
 
     def add_virtual_site(self, idx, **kwargs):
         """ Add a virtual site to the system.  This does NOT set the position of the virtual site; it sits at the origin. """

@@ -10,6 +10,7 @@ contained inside.
 
 import os, pickle, re, sys
 import numpy as np
+from copy import deepcopy
 from numpy.linalg import eig, norm, solve
 from nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
 from finite_difference import f1d7p, f1d5p, fdwrap
@@ -324,6 +325,7 @@ class Optimizer(ForceBalanceBaseClass):
                     xk = xk_prev.copy()
                     G = G_prev.copy()
                     H = H_stor.copy()
+                    data = deepcopy(datastor)
                     continue
             else:
                 if X > X_best:
@@ -343,7 +345,8 @@ class Optimizer(ForceBalanceBaseClass):
                 Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
                 Hnew += Mat1-Mat2
                 H = Hnew.copy()
-                
+
+            datastor= deepcopy(data)
             G_prev  = G.copy()
             H_stor  = H.copy()
             xk_prev = xk.copy()
