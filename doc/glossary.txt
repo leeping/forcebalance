@@ -17,13 +17,13 @@ Note that in ForceBalance this is used very loosely; even a DFT
 functional may contain many empirical parameters, and ForceBalance has the
 ability to optimize these as well!
 
-@li <b> Fitting simulation </b> : A simulation protocol that allows
-a force field to predict a physical quantity, paired with some reference
-data.  The accuracy of the force field is given by its closeness 
+@li <b> Target </b> : A reference data set from high-level theoretical
+calculations or experimental measurements, paired with a procedure to
+simulate the same quantity using the force field.  The objective function
+is the sum of one or more targets.
 
 @li <b> Force field </b> : This term is used interchangeably with
-empirical potential; it is more prevalent in the biomolecular simulation
-community.
+empirical potential.
 
 @li <b> Functional form </b> : The mathematical functions in the force
 field.  For instance, a CHARMM-type functional form has harmonic interactions
