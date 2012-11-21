@@ -147,6 +147,7 @@ class AbInitio(Target):
         self.new_vsites = True
         ## Save the mvals from the last time we updated the vsites.
         self.save_vmvals = {}
+        self.set_option(None, 'shots', val=self.ns)
 
     def read_topology(self):
         self.topology_flag = False
@@ -320,7 +321,6 @@ class AbInitio(Target):
             if all(len(i) in [self.ns, 0] for i in [self.eqm, self.fqm, self.emd0, self.espxyz, self.espval]) and len(self.eqm) == self.ns:
                 break
         self.ns = len(self.eqm)
-        print "There are %i snapshots" % self.ns
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
         self.eqm = array(self.eqm)
         self.eqm *= eqcgmx
