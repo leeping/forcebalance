@@ -669,8 +669,10 @@ class AbInitio(Target):
         savetxt('QM-vs-MM-energies.txt',EnergyComparison)
         if self.force:
             # Write .xyz files which can be viewed in vmd.
-            Mforce_obj = self.traj[:]
-            Qforce_obj = self.traj[:]
+            TrueAtoms = array([i for i in range(self.traj.na) if self.AtomLists['ParticleType'][i] == 'A'])
+            QMTraj = self.traj[:].atom_select(TrueAtoms)
+            Mforce_obj = QMTraj[:]
+            Qforce_obj = QMTraj[:]
             Mforce_print = array(M_all_print[:,1:3*self.fitatoms+1])
             Qforce_print = array(Q_all_print[:,1:3*self.fitatoms+1])
             MaxComp = max(abs(vstack((Mforce_print,Qforce_print)).flatten()))
@@ -683,7 +685,6 @@ class AbInitio(Target):
                 Fpad = zeros((self.qmatoms - self.fitatoms, 3),dtype=float)
                 Mforce_obj.xyzs[i] = vstack((Mforce_obj.xyzs[i], Fpad))
                 Qforce_obj.xyzs[i] = vstack((Qforce_obj.xyzs[i], Fpad))
-            #embed()
             self.traj.write('coords.xyz')
             Mforce_obj.elem = ['H' for i in range(Mforce_obj.na)]
             Mforce_obj.write('MMforce.xyz')
