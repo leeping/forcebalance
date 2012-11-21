@@ -1,8 +1,8 @@
 
 ########################################################################
-###[1;97m             Welcome to ForceBalance version 1.0! =D              [0m###
-###[1;97m               Systematic Force Field Optimization                [0m###
-###[1;97m                      Author: Lee-Ping Wang                       [0m###
+###[1m             Welcome to ForceBalance version 1.0! =D              [0m###
+###[1m                 Force Field Optimization System                  [0m###
+###[1m                      Author: Lee-Ping Wang                       [0m###
 ########################################################################
 
                           [44m     [0m                                        
@@ -91,148 +91,161 @@ Parameter 7 occurs 1 times in molecule SOL in locations [3] (COUL:SOL-4)
 ##########################################################
 ###[92m               Setup for force field                [0m###
 ##########################################################
-amoeba_pol                direct 
+
 ----------------------------------------------------------
-Backing up: temp/cluster-02 to: backups/cluster-02.12.tar.bz2
-Backing up: temp/cluster-03 to: backups/cluster-03.9.tar.bz2
-Backing up: temp/cluster-04 to: backups/cluster-04.6.tar.bz2
-Backing up: temp/cluster-05 to: backups/cluster-05.6.tar.bz2
-Backing up: temp/cluster-06 to: backups/cluster-06.6.tar.bz2
-Backing up: temp/cluster-07 to: backups/cluster-07.6.tar.bz2
-Backing up: temp/cluster-08 to: backups/cluster-08.6.tar.bz2
-Backing up: temp/cluster-09 to: backups/cluster-09.6.tar.bz2
-Backing up: temp/cluster-10 to: backups/cluster-10.6.tar.bz2
-Backing up: temp/cluster-11 to: backups/cluster-11.6.tar.bz2
-Backing up: temp/cluster-12 to: backups/cluster-12.10.tar.bz2
-Backing up: temp/cluster-13 to: backups/cluster-13.6.tar.bz2
-Backing up: temp/cluster-14 to: backups/cluster-14.6.tar.bz2
+Backing up: temp/cluster-02 to: backups/cluster-02.14.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-02 :      [0m###
+###[92m           Setup for target cluster-02 :            [0m###
 ##########################################################
 name                      cluster-02 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-02 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-02 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-03 to: backups/cluster-03.3.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-03 :      [0m###
+###[92m           Setup for target cluster-03 :            [0m###
 ##########################################################
 name                      cluster-03 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-03 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-03 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-04 to: backups/cluster-04.3.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-04 :      [0m###
+###[92m           Setup for target cluster-04 :            [0m###
 ##########################################################
 name                      cluster-04 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-04 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-04 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-05 to: backups/cluster-05.2.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-05 :      [0m###
+###[92m           Setup for target cluster-05 :            [0m###
 ##########################################################
 name                      cluster-05 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-05 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-05 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-06 to: backups/cluster-06.2.tar.bz2
+There are 1208 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-06 :      [0m###
+###[92m           Setup for target cluster-06 :            [0m###
 ##########################################################
 name                      cluster-06 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-06 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-06 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-07 to: backups/cluster-07.2.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-07 :      [0m###
+###[92m           Setup for target cluster-07 :            [0m###
 ##########################################################
 name                      cluster-07 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-07 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-07 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-08 to: backups/cluster-08.2.tar.bz2
+There are 1202 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-08 :      [0m###
+###[92m           Setup for target cluster-08 :            [0m###
 ##########################################################
 name                      cluster-08 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-08 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-08 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-09 to: backups/cluster-09.2.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-09 :      [0m###
+###[92m           Setup for target cluster-09 :            [0m###
 ##########################################################
 name                      cluster-09 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-09 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-09 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-10 to: backups/cluster-10.2.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-10 :      [0m###
+###[92m           Setup for target cluster-10 :            [0m###
 ##########################################################
 name                      cluster-10 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-10 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-10 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-11 to: backups/cluster-11.2.tar.bz2
+There are 1205 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-11 :      [0m###
+###[92m           Setup for target cluster-11 :            [0m###
 ##########################################################
 name                      cluster-11 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-11 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-11 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-12 to: backups/cluster-12.2.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-12 :      [0m###
+###[92m           Setup for target cluster-12 :            [0m###
 ##########################################################
 name                      cluster-12 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-12 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-12 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-13 to: backups/cluster-13.2.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-13 :      [0m###
+###[92m           Setup for target cluster-13 :            [0m###
 ##########################################################
 name                      cluster-13 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-13 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-13 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
+Backing up: temp/cluster-14 to: backups/cluster-14.2.tar.bz2
+There are 1201 snapshots
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-14 :      [0m###
+###[92m           Setup for target cluster-14 :            [0m###
 ##########################################################
 name                      cluster-14 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-14 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-14 
 w_energy                  1.0 
 w_force                   1.0 
 ----------------------------------------------------------
@@ -253,8 +266,8 @@ search_tol                0.1
 ----------------------------------------------------------
 
 ##########################################################
-###[1;97m                   Main Optimizer                   [0m###
-###[1;97m       Newton-Raphson Mode (Adaptive Radius)        [0m###
+###[1m                   Main Optimizer                   [0m###
+###[1m       Newton-Raphson Mode (Adaptive Radius)        [0m###
 ##########################################################
 
 Sim: cluster-02      Errors: Energy =   4.1253 kJ/mol (45.8740%) Atomic Force (%) =  35.7140 Objective = 1.63857e-01
@@ -272,26 +285,27 @@ Sim: cluster-13      Errors: Energy =  16.3658 kJ/mol (32.3787%) Atomic Force (%
 Sim: cluster-14      Errors: Energy =  16.8982 kJ/mol (30.8387%) Atomic Force (%) =  32.1765 Objective = 9.93052e-02
 
 ######################################################################
-###[96m       Objective Function Breakdown, Total =  1.20552e-01       [0m###
-###[96m  Simulation Name          Residual  x  Weight  =  Contribution [0m###
+###[94m                  Objective Function Breakdown                  [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution [0m###
 ######################################################################
-cluster-02                     0.16386      0.077 [97m     1.26044e-02[0m 
-cluster-03                     0.14395      0.077 [97m     1.10733e-02[0m 
-cluster-04                     0.13919      0.077 [97m     1.07068e-02[0m 
-cluster-05                     0.12990      0.077 [97m     9.99200e-03[0m 
-cluster-06                     0.11206      0.077 [97m     8.62013e-03[0m 
-cluster-07                     0.12958      0.077 [97m     9.96745e-03[0m 
-cluster-08                     0.11269      0.077 [97m     8.66883e-03[0m 
-cluster-09                     0.11438      0.077 [97m     8.79823e-03[0m 
-cluster-10                     0.11162      0.077 [97m     8.58624e-03[0m 
-cluster-11                     0.10226      0.077 [97m     7.86629e-03[0m 
-cluster-12                     0.10409      0.077 [97m     8.00726e-03[0m 
-cluster-13                     0.10429      0.077 [97m     8.02249e-03[0m 
-cluster-14                     0.09931      0.077 [97m     7.63886e-03[0m 
-Regularization                 0.00000      1.000 [97m     0.00000e+00[0m 
+cluster-02                     0.16386      0.077 [94m     1.26044e-02[0m 
+cluster-03                     0.14395      0.077 [94m     1.10733e-02[0m 
+cluster-04                     0.13919      0.077 [94m     1.07068e-02[0m 
+cluster-05                     0.12990      0.077 [94m     9.99200e-03[0m 
+cluster-06                     0.11206      0.077 [94m     8.62013e-03[0m 
+cluster-07                     0.12958      0.077 [94m     9.96745e-03[0m 
+cluster-08                     0.11269      0.077 [94m     8.66883e-03[0m 
+cluster-09                     0.11438      0.077 [94m     8.79823e-03[0m 
+cluster-10                     0.11162      0.077 [94m     8.58624e-03[0m 
+cluster-11                     0.10226      0.077 [94m     7.86629e-03[0m 
+cluster-12                     0.10409      0.077 [94m     8.00726e-03[0m 
+cluster-13                     0.10429      0.077 [94m     8.02249e-03[0m 
+cluster-14                     0.09931      0.077 [94m     7.63886e-03[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     1.20552e-01[0m 
 ----------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
-     0   0.000e+00   0.000e+00   3.510e+00[97m   1.20552e-01[0m   0.000e+00      1.000
+     0   0.000e+00   0.000e+00   3.510e+00[1m   1.20552e-01[0m   0.000e+00      1.000
 
 
 ##########################################################
@@ -308,28 +322,14 @@ Regularization                 0.00000      1.000 [97m     0.00000e+00[0m
    8 [ -3.6452e-02 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+01, L =  3.0000e+00, length 5.5673e-02, result -1.5162e-02
-Searching! Hessian diagonal scaling = 2.4562e+01, L = -4.8541e+00, length 2.3865e-02, result -6.8455e-03
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 4.4377e+00, L = -1.8541e+00, length 1.1585e-01, result -2.8288e-02
-Searching! Hessian diagonal scaling = 2.3131e+00, L =  1.1459e+00, length 2.0510e-01, result -4.1898e-02
-Searching! Hessian diagonal scaling = 1.0065e+00, L = -8.0357e-02, length 4.3095e-01, result -5.4293e-02
-Searching! Hessian diagonal scaling = 1.0011e+00, L = -3.2538e-02, length 4.3301e-01, result -5.4303e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -1.3955e-03, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.2758e-05, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -9.6313e-05, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -3.6788e-05, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -2.1305e-06, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  2.5362e-06, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  4.4398e-07, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -8.1378e-07, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  3.6660e-07, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -3.1084e-07, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -1.5646e-07, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -5.0294e-07, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -3.8421e-07, length 4.3342e-01, result -5.4304e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -4.2956e-07, length 4.3342e-01, result -5.4304e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 4.3342e-01, result -5.4304e-02
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 5.5673e-02, result -1.5162e-02
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 2.3865e-02, result -6.8455e-03
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 4.3342e-01, result -5.4304e-02
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 1.1585e-01, result -2.8288e-02
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 2.0510e-01, result -4.1898e-02
+Searching! Hessian diagonal scaling = 1.0100e+00, L =  9.0000e-01, length 4.2959e-01, result -5.4287e-02
+Searching! Hessian diagonal scaling = 1.0100e+00, L =  1.1000e+00, length 4.2959e-01, result -5.4287e-02
 
 ##########################################################
 ###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
@@ -373,8 +373,8 @@ Sim: cluster-13      Errors: Energy =  14.2655 kJ/mol (28.2234%) Atomic Force (%
 Sim: cluster-14      Errors: Energy =  14.7700 kJ/mol (26.9549%) Atomic Force (%) =  21.0163 Objective = 5.84065e-02
 
 #####################################################################################
-###[96m              Objective Function Breakdown, Total =  6.62480e-02               [0m###
-###[96m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Last) [0m###
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
 cluster-02                     0.05310      0.077 [92m     4.08452e-03[0m ( -8.520e-03 ) 
 cluster-03                     0.06376      0.077 [92m     4.90445e-03[0m ( -6.169e-03 ) 
@@ -390,6 +390,7 @@ cluster-12                     0.06344      0.077 [92m     4.88019e-03[0m ( -3
 cluster-13                     0.06206      0.077 [92m     4.77392e-03[0m ( -3.249e-03 ) 
 cluster-14                     0.05841      0.077 [92m     4.49281e-03[0m ( -3.146e-03 ) 
 Regularization                 0.00188      1.000 [91m     1.87850e-03[0m ( +1.878e-03 ) 
+Total                                             [92m     6.62480e-02[0m ( -5.430e-02 ) 
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
      1   4.334e-01   4.334e-01   1.392e-01[92m   6.62480e-02[0m   2.715e-02      1.000
@@ -409,88 +410,84 @@ Regularization                 0.00188      1.000 [91m     1.87850e-03[0m ( +1
    8 [ -2.6680e-04 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 5.4709e-03, result -2.3645e-04
-Searching! Hessian diagonal scaling = 1.0000e+01, L =  3.0000e+00, length 8.5129e-04, result -3.8729e-05
-Searching! Hessian diagonal scaling = 2.4562e+01, L = -4.8541e+00, length 3.5478e-04, result -1.6129e-05
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 5.4709e-03, result -2.3645e-04
-Searching! Hessian diagonal scaling = 4.4377e+00, L = -1.8541e+00, length 1.8207e-03, result -8.3099e-05
-Searching! Hessian diagonal scaling = 2.3131e+00, L =  1.1459e+00, length 3.1836e-03, result -1.4612e-04
-Searching! Hessian diagonal scaling = 1.0253e+00, L = -1.5904e-01, length 5.2859e-03, result -2.3615e-04
-Searching! Hessian diagonal scaling = 1.0042e+00, L = -6.4611e-02, length 5.3811e-03, result -2.3644e-04
-Searching! Hessian diagonal scaling = 1.0008e+00, L = -2.8099e-02, length 5.4471e-03, result -2.3645e-04
-Searching! Hessian diagonal scaling = 1.0002e+00, L = -1.4099e-02, length 5.4645e-03, result -2.3645e-04
-Searching! Hessian diagonal scaling = 1.0002e+00, L = -1.5509e-02, length 5.4632e-03, result -2.3645e-04
-Searching! Hessian diagonal scaling = 1.0004e+00, L = -2.0472e-02, length 5.4577e-03, result -2.3645e-04
-Searching! Hessian diagonal scaling = 1.0003e+00, L = -1.7405e-02, length 5.4612e-03, result -2.3645e-04
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 5.4709e-03, result -2.3645e-04
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 8.5129e-04, result -3.8729e-05
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 3.5478e-04, result -1.6129e-05
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 5.4709e-03, result -2.3645e-04
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 1.8207e-03, result -8.3099e-05
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 3.1836e-03, result -1.4612e-04
+Searching! Hessian diagonal scaling = 1.0253e+00, L =  8.4096e-01, length 5.2859e-03, result -2.3615e-04
+Searching! Hessian diagonal scaling = 1.0100e+00, L =  1.1000e+00, length 5.3308e-03, result -2.3639e-04
 
 ##########################################################
 ###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
 ##########################################################
-   0 [  3.8774e-02 - 9.7417e-04 =  3.7800e-02 ] : VDWS:OW
-   1 [  3.7455e-02 - 3.0073e-03 =  3.4447e-02 ] : VDWT:OW
-   2 [  5.7209e-03 + 5.2338e-04 =  6.2443e-03 ] : BONDSB:HWOW
-   3 [ -4.5843e-02 - 6.0166e-06 = -4.5849e-02 ] : BONDSK:HWOW
-   4 [  7.1849e-03 + 4.3864e-03 =  1.1571e-02 ] : ANGLESB:HWOWHW
-   5 [ -3.8854e-01 + 7.0974e-06 = -3.8853e-01 ] : ANGLESK:HWOWHW
+   0 [  3.8774e-02 - 9.4538e-04 =  3.7829e-02 ] : VDWS:OW
+   1 [  3.7455e-02 - 3.0287e-03 =  3.4426e-02 ] : VDWT:OW
+   2 [  5.7209e-03 + 5.2364e-04 =  6.2446e-03 ] : BONDSB:HWOW
+   3 [ -4.5843e-02 - 5.1980e-06 = -4.5848e-02 ] : BONDSK:HWOW
+   4 [  7.1849e-03 + 4.3879e-03 =  1.1573e-02 ] : ANGLESB:HWOWHW
+   5 [ -3.8854e-01 + 5.1160e-06 = -3.8853e-01 ] : ANGLESK:HWOWHW
    6 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
-   7 [  2.3000e-02 + 5.0324e-04 =  2.3503e-02 ] : COUL:SOL-4
-   8 [  1.7682e-01 + 2.9230e-04 =  1.7711e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   7 [  2.3000e-02 + 5.0472e-04 =  2.3505e-02 ] : COUL:SOL-4
+   8 [  1.7682e-01 + 2.8433e-04 =  1.7711e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
 ##########################################################
 ###[93m    Physical Parameters (Current + Step = Next)     [0m###
 ##########################################################
-   0 [  3.1742e-01 - 5.1551e-05 =  3.1737e-01 ] : VDWS:OW
-   1 [  7.4137e-01 - 7.4548e-03 =  7.3391e-01 ] : VDWT:OW
-   2 [  9.6023e-02 + 2.7696e-05 =  9.6050e-02 ] : BONDSB:HWOW
-   3 [  4.5943e+05 - 5.6411e+00 =  4.5943e+05 ] : BONDSK:HWOW
-   4 [  1.0493e+02 + 2.5132e-01 =  1.0518e+02 ] : ANGLESB:HWOWHW
-   5 [  3.9259e+02 + 4.3005e-03 =  3.9260e+02 ] : ANGLESK:HWOWHW
-   6 [  5.1080e-01 - 2.0130e-04 =  5.1060e-01 ] : COUL:SOL-2 COUL:SOL-3
-   7 [ -1.0216e+00 + 4.0259e-04 = -1.0212e+00 ] : COUL:SOL-4
-   8 [  1.3736e-01 + 1.5468e-05 =  1.3737e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   0 [  3.1742e-01 - 5.0027e-05 =  3.1737e-01 ] : VDWS:OW
+   1 [  7.4137e-01 - 7.5081e-03 =  7.3386e-01 ] : VDWT:OW
+   2 [  9.6023e-02 + 2.7710e-05 =  9.6050e-02 ] : BONDSB:HWOW
+   3 [  4.5943e+05 - 4.8735e+00 =  4.5943e+05 ] : BONDSK:HWOW
+   4 [  1.0493e+02 + 2.5141e-01 =  1.0518e+02 ] : ANGLESB:HWOWHW
+   5 [  3.9259e+02 + 3.0999e-03 =  3.9260e+02 ] : ANGLESK:HWOWHW
+   6 [  5.1080e-01 - 2.0189e-04 =  5.1060e-01 ] : COUL:SOL-2 COUL:SOL-3
+   7 [ -1.0216e+00 + 4.0378e-04 = -1.0212e+00 ] : COUL:SOL-4
+   8 [  1.3736e-01 + 1.5046e-05 =  1.3737e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-Sim: cluster-02      Errors: Energy =   2.3709 kJ/mol (26.3655%) Atomic Force (%) =  20.1815 Objective = 5.43663e-02
-Sim: cluster-03      Errors: Energy =   3.9807 kJ/mol (29.7789%) Atomic Force (%) =  19.9179 Objective = 6.42386e-02
-Sim: cluster-04      Errors: Energy =   5.2279 kJ/mol (30.6370%) Atomic Force (%) =  20.0408 Objective = 6.69628e-02
-Sim: cluster-05      Errors: Energy =   6.4565 kJ/mol (30.8517%) Atomic Force (%) =  20.0361 Objective = 6.76935e-02
+Sim: cluster-02      Errors: Energy =   2.3710 kJ/mol (26.3656%) Atomic Force (%) =  20.1815 Objective = 5.43665e-02
+Sim: cluster-03      Errors: Energy =   3.9807 kJ/mol (29.7789%) Atomic Force (%) =  19.9179 Objective = 6.42387e-02
+Sim: cluster-04      Errors: Energy =   5.2280 kJ/mol (30.6371%) Atomic Force (%) =  20.0407 Objective = 6.69628e-02
+Sim: cluster-05      Errors: Energy =   6.4565 kJ/mol (30.8518%) Atomic Force (%) =  20.0361 Objective = 6.76937e-02
 Sim: cluster-06      Errors: Energy =   8.2233 kJ/mol (30.1071%) Atomic Force (%) =  20.2506 Objective = 6.57943e-02
-Sim: cluster-07      Errors: Energy =   9.1636 kJ/mol (32.1508%) Atomic Force (%) =  20.6493 Objective = 7.30029e-02
-Sim: cluster-08      Errors: Energy =  10.2979 kJ/mol (30.3075%) Atomic Force (%) =  20.8304 Objective = 6.76190e-02
-Sim: cluster-09      Errors: Energy =  11.0419 kJ/mol (29.8230%) Atomic Force (%) =  20.5834 Objective = 6.56449e-02
-Sim: cluster-10      Errors: Energy =  11.8017 kJ/mol (29.1809%) Atomic Force (%) =  20.8443 Objective = 6.42983e-02
-Sim: cluster-11      Errors: Energy =  13.3695 kJ/mol (28.4060%) Atomic Force (%) =  20.9805 Objective = 6.23370e-02
-Sim: cluster-12      Errors: Energy =  13.5736 kJ/mol (28.6693%) Atomic Force (%) =  20.7612 Objective = 6.26423e-02
-Sim: cluster-13      Errors: Energy =  14.2026 kJ/mol (28.0989%) Atomic Force (%) =  20.9467 Objective = 6.14345e-02
-Sim: cluster-14      Errors: Energy =  14.6889 kJ/mol (26.8069%) Atomic Force (%) =  20.8718 Objective = 5.77054e-02
+Sim: cluster-07      Errors: Energy =   9.1636 kJ/mol (32.1508%) Atomic Force (%) =  20.6492 Objective = 7.30028e-02
+Sim: cluster-08      Errors: Energy =  10.2979 kJ/mol (30.3076%) Atomic Force (%) =  20.8304 Objective = 6.76191e-02
+Sim: cluster-09      Errors: Energy =  11.0419 kJ/mol (29.8230%) Atomic Force (%) =  20.5833 Objective = 6.56448e-02
+Sim: cluster-10      Errors: Energy =  11.8017 kJ/mol (29.1810%) Atomic Force (%) =  20.8443 Objective = 6.42984e-02
+Sim: cluster-11      Errors: Energy =  13.3695 kJ/mol (28.4060%) Atomic Force (%) =  20.9804 Objective = 6.23369e-02
+Sim: cluster-12      Errors: Energy =  13.5736 kJ/mol (28.6692%) Atomic Force (%) =  20.7612 Objective = 6.26421e-02
+Sim: cluster-13      Errors: Energy =  14.2026 kJ/mol (28.0989%) Atomic Force (%) =  20.9466 Objective = 6.14344e-02
+Sim: cluster-14      Errors: Energy =  14.6889 kJ/mol (26.8069%) Atomic Force (%) =  20.8717 Objective = 5.77054e-02
 
 #####################################################################################
-###[96m              Objective Function Breakdown, Total =  6.60115e-02               [0m###
-###[96m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Last) [0m###
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
-cluster-02                     0.05437      0.077 [91m     4.18202e-03[0m ( +9.750e-05 ) 
-cluster-03                     0.06424      0.077 [91m     4.94143e-03[0m ( +3.698e-05 ) 
-cluster-04                     0.06696      0.077 [92m     5.15098e-03[0m ( -4.602e-06 ) 
-cluster-05                     0.06769      0.077 [91m     5.20720e-03[0m ( +6.917e-06 ) 
-cluster-06                     0.06579      0.077 [92m     5.06110e-03[0m ( -2.119e-05 ) 
-cluster-07                     0.07300      0.077 [92m     5.61561e-03[0m ( -3.548e-05 ) 
-cluster-08                     0.06762      0.077 [92m     5.20146e-03[0m ( -2.364e-05 ) 
-cluster-09                     0.06564      0.077 [92m     5.04961e-03[0m ( -3.331e-05 ) 
+cluster-02                     0.05437      0.077 [91m     4.18204e-03[0m ( +9.751e-05 ) 
+cluster-03                     0.06424      0.077 [91m     4.94144e-03[0m ( +3.699e-05 ) 
+cluster-04                     0.06696      0.077 [92m     5.15098e-03[0m ( -4.598e-06 ) 
+cluster-05                     0.06769      0.077 [91m     5.20720e-03[0m ( +6.926e-06 ) 
+cluster-06                     0.06579      0.077 [92m     5.06110e-03[0m ( -2.118e-05 ) 
+cluster-07                     0.07300      0.077 [92m     5.61560e-03[0m ( -3.550e-05 ) 
+cluster-08                     0.06762      0.077 [92m     5.20147e-03[0m ( -2.364e-05 ) 
+cluster-09                     0.06564      0.077 [92m     5.04960e-03[0m ( -3.331e-05 ) 
 cluster-10                     0.06430      0.077 [92m     4.94603e-03[0m ( -3.645e-05 ) 
 cluster-11                     0.06234      0.077 [92m     4.79515e-03[0m ( -5.871e-05 ) 
-cluster-12                     0.06264      0.077 [92m     4.81864e-03[0m ( -6.155e-05 ) 
-cluster-13                     0.06143      0.077 [92m     4.72573e-03[0m ( -4.819e-05 ) 
+cluster-12                     0.06264      0.077 [92m     4.81863e-03[0m ( -6.156e-05 ) 
+cluster-13                     0.06143      0.077 [92m     4.72572e-03[0m ( -4.819e-05 ) 
 cluster-14                     0.05771      0.077 [92m     4.43888e-03[0m ( -5.393e-05 ) 
-Regularization                 0.00188      1.000 [92m     1.87769e-03[0m ( -8.040e-07 ) 
+Regularization                 0.00188      1.000 [92m     1.87769e-03[0m ( -8.095e-07 ) 
+Total                                             [92m     6.60115e-02[0m ( -2.364e-04 ) 
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
-     2   4.333e-01   5.463e-03   8.305e-05[92m   6.60115e-02[0m   2.566e-02      1.000
+     2   4.333e-01   5.471e-03   4.600e-05[92m   6.60115e-02[0m   2.566e-02      1.000
 
 Convergence criterion reached for gradient norm (1.00e-04)
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@[1;92m           Final objective function value           [0m@@@
-@@@[1;92m  Full:  6.601152e-02  Un-penalized:  6.413383e-02  [0m@@@
+@@@[1;92m  Full:  6.601152e-02  Un-penalized:  6.413384e-02  [0m@@@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 ##########################################################
@@ -500,7 +497,7 @@ Convergence criterion reached for gradient norm (1.00e-04)
 ##########################################################
 read_pvals
    0 [  3.1737e-01 ] : VDWS:OW
-   1 [  7.3391e-01 ] : VDWT:OW
+   1 [  7.3386e-01 ] : VDWT:OW
    2 [  9.6050e-02 ] : BONDSB:HWOW
    3 [  4.5943e+05 ] : BONDSK:HWOW
    4 [  1.0518e+02 ] : ANGLESB:HWOWHW
@@ -510,14 +507,15 @@ read_pvals
    8 [  1.3737e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 /read_pvals
 read_mvals
-   0 [  3.7800e-02 ] : VDWS:OW
-   1 [  3.4447e-02 ] : VDWT:OW
-   2 [  6.2443e-03 ] : BONDSB:HWOW
-   3 [ -4.5849e-02 ] : BONDSK:HWOW
-   4 [  1.1571e-02 ] : ANGLESB:HWOWHW
+   0 [  3.7829e-02 ] : VDWS:OW
+   1 [  3.4426e-02 ] : VDWT:OW
+   2 [  6.2446e-03 ] : BONDSB:HWOW
+   3 [ -4.5848e-02 ] : BONDSK:HWOW
+   4 [  1.1573e-02 ] : ANGLESB:HWOWHW
    5 [ -3.8853e-01 ] : ANGLESK:HWOWHW
    6 [  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
-   7 [  2.3503e-02 ] : COUL:SOL-4
+   7 [  2.3505e-02 ] : COUL:SOL-4
    8 [  1.7711e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 /read_mvals
 ----------------------------------------------------------
+Creating the directory /home/leeping/src/forcebalance/studies/001_water_tutorial/result to print the force field
