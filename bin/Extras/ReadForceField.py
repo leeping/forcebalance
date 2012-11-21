@@ -12,7 +12,7 @@ import numpy as np
 def main():
     ## Set some basic options.  Note that 'forcefield' requires 'ffdir'
     ## which indicates the relative path of the force field.
-    options, sim_opts = parse_inputs(argv[1])
+    options, tgt_opts = parse_inputs(argv[1])
     MyFF = FF(options)
     Prec=int(argv[2])
     if 'read_mvals' in options:

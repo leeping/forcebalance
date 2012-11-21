@@ -8,16 +8,16 @@ import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
 from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt
-from fitsim import FittingSimulation
+from target import Target
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
 from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 
-class Interaction(FittingSimulation):
+class Interaction(Target):
 
-    """ Subclass of FittingSimulation for fitting force fields to interaction energies.
+    """ Subclass of Target for fitting force fields to interaction energies.
 
     Currently Gromacs is supported.
 
@@ -38,29 +38,29 @@ class Interaction(FittingSimulation):
     function from any simulation software (a driver to run the program and
     read output is still required)."""
     
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         # Initialize the SuperClass!
-        super(Interaction,self).__init__(options,sim_opts,forcefield)
+        super(Interaction,self).__init__(options,tgt_opts,forcefield)
         
         #======================================#
         # Options that are given by the parser #
         #======================================#
         
         ## Number of snapshots
-        self.set_option(sim_opts,'shots','ns')
+        self.set_option(tgt_opts,'shots','ns')
         ## Whether to use WHAM Boltzmann weights
-        self.set_option(sim_opts,'whamboltz','whamboltz')
+        self.set_option(tgt_opts,'whamboltz','whamboltz')
         ## Whether to use QM Boltzmann weights
-        self.set_option(sim_opts,'qmboltz','qmboltz')
+        self.set_option(tgt_opts,'qmboltz','qmboltz')
         ## The temperature for QM Boltzmann weights
-        self.set_option(sim_opts,'qmboltztemp','qmboltztemp')
+        self.set_option(tgt_opts,'qmboltztemp','qmboltztemp')
         ## Whether to do energy and force calculations for the whole trajectory, or to do
         ## one calculation per snapshot.
-        self.set_option(sim_opts,'all_at_once','all_at_once')
+        self.set_option(tgt_opts,'all_at_once','all_at_once')
         ## OpenMM-only option - whether to run the energies and forces internally.
-        self.set_option(sim_opts,'run_internal','run_internal')
+        self.set_option(tgt_opts,'run_internal','run_internal')
         ## Do we call Q-Chem for dielectric energies?
-        self.set_option(sim_opts,'do_cosmo','do_cosmo')
+        self.set_option(tgt_opts,'do_cosmo','do_cosmo')
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -73,20 +73,20 @@ class Interaction(FittingSimulation):
         ## Energies of the sampling simulation
         self.emd0          = []
         ## The qdata.txt file that contains the QM energies and forces
-        self.qfnm = os.path.join(self.simdir,"qdata.txt")
+        self.qfnm = os.path.join(self.tgtdir,"qdata.txt")
         ## Qualitative Indicator: average energy error (in kJ/mol)
         self.e_err = 0.0
         self.e_err_pct = None
         ## Read in the trajectory file
         if self.ns == -1:
-            self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))
+            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))
             self.ns = len(self.traj)
         else:
-            self.traj = Molecule(os.path.join(self.root,self.simdir,self.trajfnm))[:self.ns]
+            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))[:self.ns]
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
-        self.prepare_temp_directory(options,sim_opts)
+        self.prepare_temp_directory(options,tgt_opts)
 
     def read_reference_data(self):
         
@@ -156,11 +156,11 @@ class Interaction(FittingSimulation):
         self.emd0 = array(self.emd0)
         self.emd0 -= mean(self.emd0)
         if self.whamboltz == True:
-            self.whamboltz_wts = array([float(i.strip()) for i in open(os.path.join(self.root,self.simdir,"wham-weights.txt")).readlines()])
+            self.whamboltz_wts = array([float(i.strip()) for i in open(os.path.join(self.root,self.tgtdir,"wham-weights.txt")).readlines()])
             #   This is a constant pre-multiplier in front of every snapshot.
             bar = printcool("Using WHAM MM Boltzmann weights.", color=3)
-            if os.path.exists(os.path.join(self.root,self.simdir,"wham-master.txt")):
-                whaminfo = open(os.path.join(self.root,self.simdir,"wham-master.txt")).readlines()
+            if os.path.exists(os.path.join(self.root,self.tgtdir,"wham-master.txt")):
+                whaminfo = open(os.path.join(self.root,self.tgtdir,"wham-master.txt")).readlines()
                 print "From wham-master.txt, I can see that you're using %i generations" % len(whaminfo)
                 print "Relative weight of each generation:"
                 shotcounter = 0
@@ -190,7 +190,7 @@ class Interaction(FittingSimulation):
         else:
             self.qmboltz_wts = ones(self.ns)
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         """ Prepare the temporary directory, by default does nothing """
         return
         

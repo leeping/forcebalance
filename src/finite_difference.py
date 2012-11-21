@@ -146,25 +146,25 @@ def fdwrap(func,mvals0,pidx,key=None,**kwargs):
             return func(mvals,**kwargs)
     return func1
         
-def fdwrap_G(sim,mvals0,pidx):
+def fdwrap_G(tgt,mvals0,pidx):
     """
     A driver to fdwrap for gradients (see documentation for fdwrap)
     Inputs:
-    sim    = The fitting simulation containing the objective function that we want to differentiate
+    tgt    = The Target containing the objective function that we want to differentiate
     mvals0 = The 'central' values of the mathematical parameters - i.e. the wrapped function's origin is here.
     pidx   = The index of the parameter that we're differentiating
     """
-    return fdwrap(sim.get_X,mvals0,pidx,'X')
+    return fdwrap(tgt.get_X,mvals0,pidx,'X')
 
-def fdwrap_H(sim,mvals0,pidx):
+def fdwrap_H(tgt,mvals0,pidx):
     """
     A driver to fdwrap for Hessians (see documentation for fdwrap)
     Inputs:
-    sim    = The fitting simulation containing the objective function that we want to differentiate
+    tgt    = The Target containing the objective function that we want to differentiate
     mvals0 = The 'central' values of the mathematical parameters - i.e. the wrapped function's origin is here.
     pidx   = The index of the parameter that we're differentiating
     """
-    return fdwrap(sim.get_G,mvals0,pidx,'G')
+    return fdwrap(tgt.get_G,mvals0,pidx,'G')
 
 #method resolution order
 #type.mro(type(a))

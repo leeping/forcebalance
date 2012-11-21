@@ -16,7 +16,7 @@ import itertools
 
 class AbInitio_Internal(AbInitio):
 
-    """Subclass of FittingSimulation for force and energy matching
+    """Subclass of Target for force and energy matching
     using an internal implementation.  Implements the prepare and
     energy_force_driver methods.  The get method is in the superclass.
 
@@ -35,11 +35,11 @@ class AbInitio_Internal(AbInitio):
 
     """
 
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
         self.trajfnm = "all.gro"
         ## Initialize the SuperClass!
-        super(AbInitio_Internal,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_Internal,self).__init__(options,tgt_opts,forcefield)
 
     def energy_force_driver_all(self):
         """ Here we actually compute the interactions and return the

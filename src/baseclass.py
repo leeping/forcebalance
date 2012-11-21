@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from parser import sim_opts_defaults, gen_opts_defaults
+from parser import tgt_opts_defaults, gen_opts_defaults
 
 class ForceBalanceBaseClass(object):
     """ Provides some nifty functions that are common to all ForceBalance classes. """
@@ -16,8 +16,8 @@ class ForceBalanceBaseClass(object):
         if default == None:
             if src_key in gen_opts_defaults: 
                 default = gen_opts_defaults[src_key]
-            elif src_key in sim_opts_defaults:
-                default = sim_opts_defaults[src_key]
+            elif src_key in tgt_opts_defaults:
+                default = tgt_opts_defaults[src_key]
             else: default = None
         if (val != default or self.verbose_options) and dest_key != 'root':
             self.PrintOptionDict[dest_key] = val

@@ -3,11 +3,10 @@
 """ @package GenerateQMData
 
 Executable script for generating QM data for force, energy, electrostatic potential, and
-other ab initio-based fitting simulations. """
+other ab initio-based targets. """
 
 import os, sys, glob
 from forcebalance.forcefield import FF
-from forcebalance.simtab import SimTab
 from forcebalance.parser import parse_inputs
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
@@ -205,14 +204,14 @@ def gather_generations():
         All += shots
     return All
 
-def Generate(sim_opt):
-    print sim_opt['name']
-    Port = sim_opt['wq_port']
+def Generate(tgt_opt):
+    print tgt_opt['name']
+    Port = tgt_opt['wq_port']
     cwd = os.getcwd()
-    simdir = os.path.join('simulations',sim_opt['name'])
-    if not os.path.exists(simdir):
-        warn_press_key("%s doesn't exist!" % simdir)
-    os.chdir(simdir)
+    tgtdir = os.path.join('targets',tgt_opt['name'])
+    if not os.path.exists(tgtdir):
+        warn_press_key("%s doesn't exist!" % tgtdir)
+    os.chdir(tgtdir)
     GDirs = glob.glob("gen_[0-9][0-9][0-9]")
     if len(GDirs) == 0:
         print "No gens exist."
@@ -244,12 +243,7 @@ def Generate(sim_opt):
     os.chdir(cwd)
 
 def main():
-    options, sim_opts = parse_inputs(sys.argv[1])
-
-    # ## The list of fitting simulations
-    # self.Simulations = [SimTab[opts['simtype']](self.options,opts,self.FF) for opts in self.sim_opts]
-    # ## The optimizer component of the project
-    # self.Optimizer   = Optimizer(self.options,self.Objective,self.FF,self.Simulations)
+    options, tgt_opts = parse_inputs(sys.argv[1])
     
     """ Instantiate a ForceBalance project and call the optimizer. """
     print "\x1b[1;97m Welcome to ForceBalance version 0.12! =D\x1b[0m"
@@ -257,7 +251,7 @@ def main():
         print "Please call this program with only one argument - the name of the input file."
         sys.exit(1)
 
-    for S in sim_opts:
+    for S in tgt_opts:
         print os.getcwd()
         Generate(S)
     

@@ -353,7 +353,7 @@ def queue_up(wq, command, input_files, output_files, verbose=True):
     """ 
     Submit a job to the Work Queue.
 
-    @param[in] wq (Work Queue Object) A Work Queue (probably a member of a fitting simulation)
+    @param[in] wq (Work Queue Object)
     @param[in] command (string) The command to run on the remote worker.
     @param[in] input_files (list of files) A list of locations of the input files.
     @param[in] output_files (list of files) A list of locations of the output files.
@@ -378,7 +378,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, verbose=True):
     Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly
     specify where the input files come from, and where the output files go to.
 
-    @param[in] wq (Work Queue Object) A Work Queue (probably a member of a fitting simulation)
+    @param[in] wq (Work Queue Object)
     @param[in] command (string) The command to run on the remote worker.
     @param[in] input_files (list of 2-tuples) A list of local and
     remote locations of the input files.

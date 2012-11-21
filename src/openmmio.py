@@ -145,17 +145,17 @@ class OpenMM_Reader(BaseReader):
             return "/".join([InteractionType, parameter])
 
 class Liquid_OpenMM(Liquid):
-    def __init__(self,options,sim_opts,forcefield):
-        super(Liquid_OpenMM,self).__init__(options,sim_opts,forcefield)
+    def __init__(self,options,tgt_opts,forcefield):
+        super(Liquid_OpenMM,self).__init__(options,tgt_opts,forcefield)
 
-    def prepare_temp_directory(self,options,sim_opts):
+    def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        os.symlink(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
-        os.symlink(os.path.join(self.root,self.simdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
-        os.symlink(os.path.join(self.root,self.simdir,"settings","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
-        os.symlink(os.path.join(self.root,self.simdir,"settings","npt.py"),os.path.join(abstempdir,"npt.py"))
-        os.symlink(os.path.join(self.root,self.simdir,"settings","evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"settings","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"settings","npt.py"),os.path.join(abstempdir,"npt.py"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"settings","evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
 
     def npt_simulation(self, temperature):
         """ Submit a NPT simulation to the Work Queue. """
@@ -200,11 +200,11 @@ class AbInitio_OpenMM(AbInitio):
     using OpenMM.  Implements the prepare and energy_force_driver
     methods.  The get method is in the superclass.  """
 
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
         self.trajfnm = "all.gro"
         ## Initialize the SuperClass!
-        super(AbInitio_OpenMM,self).__init__(options,sim_opts,forcefield)
+        super(AbInitio_OpenMM,self).__init__(options,tgt_opts,forcefield)
         try:
             ## Copied over from npt.py (for now)
             if options['openmm_new_cuda']:
@@ -225,7 +225,7 @@ class AbInitio_OpenMM(AbInitio):
         ## If using the new CUDA platform, then create the simulation object within this class itself.
         if PlatName == "NotImplementedYet":
             # Set up the entire system here on the new CUDA Platform.
-            pdb = PDBFile(os.path.join(self.root,self.simdir,"conf.pdb"))
+            pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
             forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
             if self.FF.amoeba_pol == 'mutual':
                 system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
@@ -242,18 +242,18 @@ class AbInitio_OpenMM(AbInitio):
 
 
     def read_topology(self):
-        pdb = PDBFile(os.path.join(self.root,self.simdir,"conf.pdb"))
-        mypdb = Molecule(os.path.join(self.root,self.simdir,"conf.pdb"))
+        pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
+        mypdb = Molecule(os.path.join(self.root,self.tgtdir,"conf.pdb"))
         self.AtomLists['Mass'] = [PeriodicTable[i] for i in mypdb.elem]
         self.AtomLists['ParticleType'] = ['A' for i in mypdb.elem] # Assume that all particle types are atoms.
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in list(pdb.getTopology().atoms())]
         self.topology_flag = True
         return
 
-    def prepare_temp_directory(self, options, sim_opts):
+    def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         ## Link the PDB file
-        os.symlink(os.path.join(self.root,self.simdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
 
     def energy_force_driver_all_external_(self):
         ## This line actually runs OpenMM,

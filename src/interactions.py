@@ -8,7 +8,7 @@ import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
 from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, std
-from fitsim import FittingSimulation
+from target import Target
 from molecule import Molecule, format_xyz_coord
 import re
 import subprocess
@@ -113,13 +113,13 @@ def parse_interactions(input_file):
                 warn_press_key("Encountered unsupported key %s in section %s on line %i" % (key, section, ln))
     return Globals, Systems, Interactions
 
-class Interactions(FittingSimulation):
+class Interactions(Target):
 
-    """ Improved subclass of FittingSimulation for fitting force fields to interaction energies. """
+    """ Improved subclass of Target for fitting force fields to interaction energies. """
 
-    def __init__(self,options,sim_opts,forcefield):
-        super(Interactions,self).__init__(options,sim_opts,forcefield)
-        self.set_option(None, None, 'masterfile', os.path.join(self.simdir,sim_opts['masterfile']))
+    def __init__(self,options,tgt_opts,forcefield):
+        super(Interactions,self).__init__(options,tgt_opts,forcefield)
+        self.set_option(None, None, 'masterfile', os.path.join(self.tgtdir,tgt_opts['masterfile']))
         self.global_opts, self.sys_opts, self.inter_opts = parse_interactions(self.masterfile)
         # If the global option doesn't exist in the system / interaction, then it is copied over.
         for opt in self.global_opts:
@@ -132,12 +132,12 @@ class Interactions(FittingSimulation):
         for inter in self.inter_opts:
             self.inter_opts[inter]['reference_physical'] = self.inter_opts[inter]['energy'] * eval(self.inter_opts[inter]['energy_unit'])
 
-        if sim_opts['energy_denom'] == 0.0:
+        if tgt_opts['energy_denom'] == 0.0:
             self.set_option(None, None, 'energy_denom', val=std(array([val['reference_physical'].value_in_unit(kilocalories_per_mole) for val in self.inter_opts.values()])) * kilocalories_per_mole)
         else:
-            self.set_option(None, None, 'energy_denom', val=sim_opts['energy_denom'] * kilocalories_per_mole)
+            self.set_option(None, None, 'energy_denom', val=tgt_opts['energy_denom'] * kilocalories_per_mole)
 
-        self.set_option(None, None, 'rmsd_denom', val=sim_opts['rmsd_denom'] * angstrom)
+        self.set_option(None, None, 'rmsd_denom', val=tgt_opts['rmsd_denom'] * angstrom)
 
         print "The energy denominator is:", self.energy_denom 
         print "The RMSD denominator is:", self.rmsd_denom

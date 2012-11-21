@@ -29,19 +29,19 @@ class Optimizer(ForceBalanceBaseClass):
     """ Optimizer class.  Contains several methods for numerical optimization.
 
     For various reasons, the optimizer depends on the force field and fitting
-    simulations (i.e. we cannot treat it as a fully independent numerical optimizer).
+    targets (i.e. we cannot treat it as a fully independent numerical optimizer).
     The dependency is rather weak which suggests that I can remove it someday.
     """
     
     def __init__(self,options,Objective,FF):
         """ Instantiation of the optimizer.
 
-        The optimizer depends on both the FF and the fitting simulations so there
+        The optimizer depends on both the FF and the fitting targets so there
         is a chain of dependencies: FF --> FitSim --> Optimizer, and FF --> Optimizer
 
         Here's what we do:
         - Take options from the parser
-        - Pass in the objective function, force field, all fitting simulations
+        - Pass in the objective function, force field, all fitting targets
 
         """
         super(Optimizer, self).__init__(options)
@@ -760,7 +760,7 @@ class Optimizer(ForceBalanceBaseClass):
                 vals = self.mvals0.copy()
             else:
                 print "Scanning parameter %i (%s) in the physical space" % (pidx,self.FF.plist[pidx])
-                for Sim in self.Objective.Simulations:
+                for Sim in self.Objective.Targets:
                     Sim.usepvals = True
                 vals = self.FF.pvals0.copy()
             for i in scanvals:

@@ -7,7 +7,7 @@
 import os
 import shutil
 from nifty import *
-from fitsim import FittingSimulation
+from target import Target
 import numpy as np
 from molecule import Molecule
 from re import match
@@ -38,11 +38,11 @@ def weight_info(W, T, N_k, verbose=True):
 
 NPT_Trajectory = namedtuple('NPT_Trajectory', ['fnm', 'Rhos', 'pVs', 'Energies', 'Grads', 'mEnergies', 'mGrads', 'Rho_errs', 'Hvap_errs'])
 
-class Liquid(FittingSimulation):
+class Liquid(Target):
     
-    """ Subclass of FittingSimulation for liquid property matching."""
+    """ Subclass of Target for liquid property matching."""
     
-    def __init__(self,options,sim_opts,forcefield):
+    def __init__(self,options,tgt_opts,forcefield):
         """Instantiation of the subclass.
 
         We begin by instantiating the superclass here and also
@@ -54,18 +54,18 @@ class Liquid(FittingSimulation):
         """
         
         # Initialize the SuperClass!
-        super(Liquid,self).__init__(options,sim_opts,forcefield)
+        super(Liquid,self).__init__(options,tgt_opts,forcefield)
         # Fractional weight of the density
-        self.set_option(sim_opts,'w_rho','W_Rho')
+        self.set_option(tgt_opts,'w_rho','W_Rho')
         # Fractional weight of the enthalpy of vaporization
-        self.set_option(sim_opts,'w_hvap','W_Hvap')
+        self.set_option(tgt_opts,'w_hvap','W_Hvap')
         
         #======================================#
         #     Variables which are set here     #
         #======================================#
         
         ## Prepare the temporary directory
-        self.prepare_temp_directory(options,sim_opts)
+        self.prepare_temp_directory(options,tgt_opts)
         ## Saved force field mvals for all iterations
         self.SavedMVal = {}
         ## Saved trajectories for all iterations and all temperatures :)
