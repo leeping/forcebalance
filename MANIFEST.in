@@ -9,116 +9,25 @@ include doc/*.txt
 include doc/*.py
 recursive-include ext *
 recursive-include bin *
-recursive-include src/data *
-include studies/010_amoeba_chlorine/optimize.pdf
-include studies/010_amoeba_chlorine/result/chlorine.prm
-include studies/010_amoeba_chlorine/About.txt
-include studies/010_amoeba_chlorine/optimize.html
-include studies/010_amoeba_chlorine/optimize.out
-include studies/010_amoeba_chlorine/setup/qtemp.in
-include studies/010_amoeba_chlorine/setup/dcm-confs.tar.bz2
-include studies/010_amoeba_chlorine/setup/chcl3-confs.tar.bz2
-include studies/010_amoeba_chlorine/setup/concatenator.py
-include studies/010_amoeba_chlorine/forcefield/chlorine.prm
-include studies/010_amoeba_chlorine/simulations/dichloromethane/settings/shot.key
-include studies/010_amoeba_chlorine/simulations/dichloromethane/qdata.txt
-include studies/010_amoeba_chlorine/simulations/dichloromethane/all.arc
-include studies/010_amoeba_chlorine/simulations/chloroform/settings/shot.key
-include studies/010_amoeba_chlorine/simulations/chloroform/qdata.txt
-include studies/010_amoeba_chlorine/simulations/chloroform/all.arc
-include studies/010_amoeba_chlorine/optimize.in
+recursive-include src *
+
+include studies/001_water_tutorial/*.in
+include studies/001_water_tutorial/*.out
+recursive-include studies/001_water_tutorial/forcefield *
+recursive-include studies/001_water_tutorial/targets *
+recursive-include studies/009_voelz_nspe/forcefield *
+recursive-include studies/009_voelz_nspe/targets *
+recursive-include studies/009_voelz_nspe/Setup *
 include studies/009_voelz_nspe/result/molecule.itp
 include studies/009_voelz_nspe/About.txt
 include studies/009_voelz_nspe/options.in
 include studies/009_voelz_nspe/forcebalance.out
 include studies/009_voelz_nspe/options.out
-include studies/009_voelz_nspe/forcefield/molecule.itp
-include studies/009_voelz_nspe/forcefield/dih.itp
-include studies/009_voelz_nspe/forcefield/bondangdih.itp
-include studies/009_voelz_nspe/forcefield/dihang.itp
-include studies/009_voelz_nspe/simulations/2dscan/settings/shot.mdp
-include studies/009_voelz_nspe/simulations/2dscan/settings/topol.top
-include studies/009_voelz_nspe/simulations/2dscan/qdata.txt
-include studies/009_voelz_nspe/simulations/2dscan/all.gro
-include studies/009_voelz_nspe/Setup/shot.mdp
-include studies/009_voelz_nspe/Setup/convert.in
-include studies/009_voelz_nspe/Setup/convert.py
-include studies/009_voelz_nspe/Setup/collect.sh
-include studies/009_voelz_nspe/Setup/stage.leap
-include studies/009_voelz_nspe/Setup/structures.tar.bz2
-include studies/001_water_tutorial/1.netforce_torque.out
-include studies/001_water_tutorial/4.change_factor.out
-include studies/001_water_tutorial/3.no_penalty.in
-include studies/001_water_tutorial/result/water.itp
-include studies/001_water_tutorial/0.energy_force.out
-include studies/001_water_tutorial/3.no_penalty.out
-include studies/001_water_tutorial/2.L1_penalty.in
-include studies/001_water_tutorial/1.netforce_torque.in
-include studies/001_water_tutorial/nohup.out
-include studies/001_water_tutorial/2.L1_penalty.out
-include studies/001_water_tutorial/5.gradient.in
-include studies/001_water_tutorial/forcefield/water.itp
-include studies/001_water_tutorial/0.energy_force.in
-include studies/001_water_tutorial/simulations/About.txt
-include studies/001_water_tutorial/simulations/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-11/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-11/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-11/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-11/all.gro
-include studies/001_water_tutorial/simulations/cluster-10/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-10/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-10/file_format.tar.gz
-include studies/001_water_tutorial/simulations/cluster-10/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-10/all.gro
-include studies/001_water_tutorial/simulations/cluster-12/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-12/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-12/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-12/all.gro
-include studies/001_water_tutorial/simulations/make-settings.sh
-include studies/001_water_tutorial/simulations/cluster-07/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-07/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-07/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-07/all.gro
-include studies/001_water_tutorial/simulations/cluster-09/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-09/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-09/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-09/all.gro
-include studies/001_water_tutorial/simulations/modify-gro.py
-include studies/001_water_tutorial/simulations/cluster-05/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-05/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-05/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-05/all.gro
-include studies/001_water_tutorial/simulations/water12_fourpt/settings/shot.mdp
-include studies/001_water_tutorial/simulations/water12_fourpt/settings/topol.top
-include studies/001_water_tutorial/simulations/water12_fourpt/qdata.txt
-include studies/001_water_tutorial/simulations/water12_fourpt/all.gro
-include studies/001_water_tutorial/simulations/cluster-14/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-14/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-14/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-14/all.gro
-include studies/001_water_tutorial/simulations/cluster-04/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-04/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-04/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-04/all.gro
-include studies/001_water_tutorial/simulations/cluster-03/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-03/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-03/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-03/all.gro
-include studies/001_water_tutorial/simulations/cluster-02/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-02/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-02/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-02/all.gro
-include studies/001_water_tutorial/simulations/cluster-13/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-13/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-13/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-13/all.gro
-include studies/001_water_tutorial/simulations/cluster-08/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-08/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-08/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-08/all.gro
-include studies/001_water_tutorial/simulations/cluster-06/settings/shot.mdp
-include studies/001_water_tutorial/simulations/cluster-06/settings/topol.top
-include studies/001_water_tutorial/simulations/cluster-06/qdata.txt
-include studies/001_water_tutorial/simulations/cluster-06/all.gro
-include studies/001_water_tutorial/4.change_factor.in
-include studies/001_water_tutorial/5.gradient.out
+recursive-include studies/010_amoeba_chlorine/forcefield *
+recursive-include studies/010_amoeba_chlorine/targets *
+recursive-include studies/010_amoeba_chlorine/setup *
+include studies/010_amoeba_chlorine/optimize.pdf
+include studies/010_amoeba_chlorine/result/chlorine.prm
+include studies/010_amoeba_chlorine/About.txt
+include studies/010_amoeba_chlorine/optimize.html
+include studies/010_amoeba_chlorine/optimize.out
