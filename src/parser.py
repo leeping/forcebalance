@@ -171,7 +171,7 @@ tgt_opts_types = {
     }
 
 ## Option maps for maintaining backward compatibility.
-bkwd = {"sim_type" : "type"}
+bkwd = {"simtype" : "type"}
 
 ## Default target options - basically a collapsed version of tgt_opts_types.
 tgt_opts_defaults = {}

@@ -46,7 +46,7 @@ except:
     print "PSI4 module import failed"
 
 ## The table of implemented Targets
-Implemented = {
+Implemented_Targets = {
     'ABINITIO_GMX':AbInitio_GMX,
     'INTERACTION_GMX':Interaction_GMX,
     'ABINITIO_TINKER':AbInitio_TINKER,
