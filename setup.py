@@ -2,7 +2,7 @@
 """
 setup.py: Install ForceBalance. 
 """
-VERSION="0.13.0"
+VERSION="1.0"
 __author__ = "Lee-Ping Wang"
 __version__ = VERSION
 
