@@ -65,10 +65,7 @@ gen_opts_types = {
                  "readchk"      : (None, 'Name of the restart file we read from'),
                  "writechk"     : (None, 'Name of the restart file we write to (can be same as readchk)'),
                  "ffdir"        : ('forcefield', 'Directory containing force fields, relative to project directory'),
-                 "amoeba_polarization"        : ('direct', 'The AMOEBA polarization type, either direct or mutual.'),
-                 "rigid_water"        : (False, 'Perform calculations using rigid water molecules.  Currently used in AMOEBA parameterization.'),
-                 "openmm_new_cuda"        : (False, 'Use the new CUDA Platform instead of the old Cuda platform, which is the default.')
-                 },
+                 "amoeba_polarization"        : ('direct', 'The AMOEBA polarization type, either direct or mutual.')                 },
     'allcaps' : {"jobtype"      : ("single", 'The job type, defaults to a single-point evaluation of objective function'),
                  },
     'lists'   : {"forcefield"     : ([], 'The names of force fields, corresponding to directory forcefields/file_name.(itp,xml,prm,frcmod,mol2)'),
@@ -87,7 +84,9 @@ gen_opts_types = {
                  "print_hessian"    : (0, 'Print the objective function Hessian at every step'),
                  "print_parameters" : (1, 'Print the mathematical and physical parameters at every step'),
                  "normalize_weights": (1, 'Normalize the weights for the fitting targets'),
-                 "verbose_options"  : (0, 'Print options that are equal to their defaults')
+                 "verbose_options"  : (0, 'Print options that are equal to their defaults'),
+                 "rigid_water"        : (False, 'Perform calculations using rigid water molecules.  Currently used in AMOEBA parameterization.'),
+                 "openmm_new_cuda"        : (False, 'Use the new CUDA Platform instead of the old Cuda platform, which is the default.')
                  },
     'floats'  : {"trust0"                 : (1e-1, 'Trust radius for the MainOptimizer'),
                  "mintrust"               : (0.0, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)'),

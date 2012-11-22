@@ -16,7 +16,6 @@ import shutil
 from molecule import *
 from chemistry import *
 from nifty import *
-from IPython import embed
 try:
     from simtk.openmm.app import *
     from simtk.openmm import *

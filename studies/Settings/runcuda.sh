@@ -33,6 +33,7 @@ elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
     module load gcc
     module load cuda
+    export OPENMM_CUDA_COMPILER=/opt/apps/cuda/4.1/cuda/bin/nvcc
 elif [[ $HOSTNAME =~ "not0rious" ]] ; then
     module load cuda/4.2.9
 elif [[ $HOSTNAME =~ "ls4" ]] ; then
