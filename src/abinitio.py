@@ -40,7 +40,7 @@ class AbInitio(Target):
     This subclass contains the 'get' method for building the objective
     function from any simulation software (a driver to run the program and
     read output is still required).  The 'get' method can be overridden
-    by subclasses like AbInitio_GMXX2."""
+    by subclasses like AbInitio_GMX."""
     
     def __init__(self,options,tgt_opts,forcefield):
         """
@@ -399,7 +399,7 @@ class AbInitio(Target):
             self.fref = self.fqm
 
     def prepare_temp_directory(self, options, tgt_opts):
-        """ Prepare the temporary directory, by default does nothing (gmxx2 needs it) """
+        """ Prepare the temporary directory, by default does nothing """
         return
         
     def indicate(self):
