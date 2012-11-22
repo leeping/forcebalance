@@ -21,11 +21,6 @@ except:
     print "OpenMM module import failed; check OpenMM package"
 
 try:
-    from abinitio_gmxx2 import AbInitio_GMXX2
-except:
-    print "Gromacs-X2 module import failed"
-
-try:
     from abinitio_internal import AbInitio_Internal
 except:
     print "Internal energy fitting module import failed"
@@ -52,7 +47,6 @@ Implemented_Targets = {
     'ABINITIO_TINKER':AbInitio_TINKER,
     'ABINITIO_OPENMM':AbInitio_OpenMM,
     'ABINITIO_AMBER':AbInitio_AMBER,
-    'ABINITIO_GMXX2':AbInitio_GMXX2,
     'ABINITIO_INTERNAL':AbInitio_Internal,
     'VIBRATION_TINKER':Vibration_TINKER,
     'LIQUID_OPENMM':Liquid_OpenMM,

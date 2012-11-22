@@ -86,7 +86,7 @@ class Vibration(Target):
         return
 
     def prepare_temp_directory(self, options, tgt_opts):
-        """ Prepare the temporary directory, by default does nothing (gmxx2 needs it) """
+        """ Prepare the temporary directory, by default does nothing """
         return
         
     def indicate(self):

@@ -351,25 +351,6 @@ class ITP_Reader(BaseReader):
             self.suffix = ':' + '-'.join([self.mol,''.join(atom)])
         self.molatom = (self.mol, atom if type(atom) is list else [atom])
 
-def gmxx2_print(fnm, vec, type):
-    """ Prints a vector to a file to feed it to the modified GROMACS.
-    Ported over from the old version so it is a bit archaic for my current taste.
-
-    @param[in] fnm The file name that we're printing the data to
-    @param[in] vec 1-D array of data
-    @param[in] type Either 'int' or 'double', indicating the type of data.
-    """
-    fobj = open(fnm, 'w')
-    vec = array(vec)
-    print >> fobj, vec.shape[0],
-    if type == "int":
-        for i in vec:
-            print >> fobj, i,
-    elif type == "double":
-        for i in vec:
-            print >> fobj, "% .12e" % i,
-    fobj.close()
-
 def rm_gmx_baks(dir):
     # Delete the #-prepended files that GROMACS likes to make
     for root, dirs, files in os.walk(dir):

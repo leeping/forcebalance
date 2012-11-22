@@ -183,7 +183,7 @@ for {set k 1} {$k < [ llength $argv ]} {incr k} {
 }
 
 set molid 0
-# connect to vmd_frame
+# connect to vmd_frame or vmd_logfile
 # It redraws even when we rotate!
-trace variable vmd_logfile w do_frcdraw
+trace variable vmd_frame w do_frcdraw
 animate goto 0
