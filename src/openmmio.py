@@ -16,12 +16,86 @@ import shutil
 from molecule import *
 from chemistry import *
 from nifty import *
+from IPython import embed
 try:
     from simtk.openmm.app import *
     from simtk.openmm import *
     from simtk.unit import *
 except:
     pass
+
+def CopyAmoebaBondParameters(src,dest):
+    dest.setAmoebaGlobalBondCubic(src.getAmoebaGlobalBondCubic())
+    dest.setAmoebaGlobalBondQuartic(src.getAmoebaGlobalBondQuartic())
+    for i in range(src.getNumBonds()):
+        dest.setBondParameters(i,*src.getBondParameters(i))
+
+def CopyAmoebaOutOfPlaneBendParameters(src,dest):
+    dest.setAmoebaGlobalOutOfPlaneBendCubic(src.getAmoebaGlobalOutOfPlaneBendCubic())
+    dest.setAmoebaGlobalOutOfPlaneBendQuartic(src.getAmoebaGlobalOutOfPlaneBendQuartic())
+    dest.setAmoebaGlobalOutOfPlaneBendPentic(src.getAmoebaGlobalOutOfPlaneBendPentic())
+    dest.setAmoebaGlobalOutOfPlaneBendSextic(src.getAmoebaGlobalOutOfPlaneBendSextic())
+    for i in range(src.getNumOutOfPlaneBends()):
+        dest.setOutOfPlaneBendParameters(i,*src.getOutOfPlaneBendParameters(i))
+
+def CopyAmoebaAngleParameters(src, dest):
+    dest.setAmoebaGlobalAngleCubic(src.getAmoebaGlobalAngleCubic())
+    dest.setAmoebaGlobalAngleQuartic(src.getAmoebaGlobalAngleQuartic())
+    dest.setAmoebaGlobalAnglePentic(src.getAmoebaGlobalAnglePentic())
+    dest.setAmoebaGlobalAngleSextic(src.getAmoebaGlobalAngleSextic())
+    for i in range(src.getNumAngles()):
+        dest.setAngleParameters(i,*src.getAngleParameters(i))
+    return
+
+def CopyAmoebaInPlaneAngleParameters(src, dest):
+    dest.setAmoebaGlobalInPlaneAngleCubic(src.getAmoebaGlobalInPlaneAngleCubic())
+    dest.setAmoebaGlobalInPlaneAngleQuartic(src.getAmoebaGlobalInPlaneAngleQuartic())
+    dest.setAmoebaGlobalInPlaneAnglePentic(src.getAmoebaGlobalInPlaneAnglePentic())
+    dest.setAmoebaGlobalInPlaneAngleSextic(src.getAmoebaGlobalInPlaneAngleSextic())
+    for i in range(src.getNumAngles()):
+        dest.setAngleParameters(i,*src.getAngleParameters(i))
+    return
+
+def CopyAmoebaVdwParameters(src, dest):
+    for i in range(src.getNumParticles()):
+        dest.setParticleParameters(i,*src.getParticleParameters(i))
+
+def CopyAmoebaMultipoleParameters(src, dest):
+    for i in range(src.getNumMultipoles()):
+        dest.setMultipoleParameters(i,*src.getMultipoleParameters(i))
+    
+def CopyHarmonicBondParameters(src, dest):
+    for i in range(src.getNumBonds()):
+        dest.setBondParameters(i,*src.getBondParameters(i))
+
+def do_nothing(src, dest):
+    return
+
+def CopySystemParameters(src,dest):
+    # Copy parameters from one system (i.e. that which is created by a new force field)
+    # to another system (i.e. the one stored inside the Target object).
+    # DANGER: These need to be implemented manually!!!
+    Copiers = {'AmoebaBondForce':CopyAmoebaBondParameters,
+               'AmoebaOutOfPlaneBendForce':CopyAmoebaOutOfPlaneBendParameters,
+               'AmoebaAngleForce':CopyAmoebaAngleParameters,
+               'AmoebaInPlaneAngleForce':CopyAmoebaInPlaneAngleParameters,
+               'AmoebaVdwForce':CopyAmoebaVdwParameters,
+               'AmoebaMultipoleForce':CopyAmoebaMultipoleParameters,
+               'HarmonicBondForce':CopyHarmonicBondParameters,
+               'CMMotionRemover':do_nothing}
+    for i in range(src.getNumForces()):
+        nm = src.getForce(i).__class__.__name__
+        if nm in Copiers:
+            Copiers[nm](src.getForce(i),dest.getForce(i))
+        else:
+            warn_press_key('There is no Copier function implemented for the OpenMM force type %s!' % nm)
+
+def UpdateSimulationParameters(src_system, dest_simulation):
+    CopySystemParameters(src_system, dest_simulation.system)
+    for i in range(src_system.getNumForces()):
+        if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
+            dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
+
 
 ## Dictionary for building parameter identifiers.  As usual they go like this:
 ## Bond/length/OW.HW
@@ -147,6 +221,8 @@ class OpenMM_Reader(BaseReader):
 class Liquid_OpenMM(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_OpenMM,self).__init__(options,tgt_opts,forcefield)
+        if options['openmm_new_cuda']:
+            self.new_cuda = True
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
@@ -223,7 +299,7 @@ class AbInitio_OpenMM(AbInitio):
             warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
             self.platform = None
         ## If using the new CUDA platform, then create the simulation object within this class itself.
-        if PlatName == "NotImplementedYet":
+        if PlatName == "CUDA":
             # Set up the entire system here on the new CUDA Platform.
             pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
             forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
@@ -236,10 +312,7 @@ class AbInitio_OpenMM(AbInitio):
             if self.platform != None:
                 self.simulation = Simulation(pdb.topology, system, integrator, self.platform)
             else:
-                self.simulation = Simulation(pdb.topology, system, integrator)
-            for i in range(system.getNumForces()):
-                system.getForce(i).updateParametersInContext(self.simulation.context)
-
+                raise Exception('Unable to set the Platform to CUDA!')
 
     def read_topology(self):
         pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
@@ -277,8 +350,8 @@ class AbInitio_OpenMM(AbInitio):
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         if hasattr(self,'simulation'):
-            for i in range(system.getNumForces()):
-                system.getForce(i).updateParametersInContext(self.simulation.context)
+            UpdateSimulationParameters(system, self.simulation)
+            simulation = self.simulation
         else:
             if self.platform != None:
                 simulation = Simulation(pdb.topology, system, integrator, self.platform)
