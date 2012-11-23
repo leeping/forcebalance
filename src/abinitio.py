@@ -7,7 +7,7 @@
 import os
 import shutil
 from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
-from numpy import append, array, cross, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack, sum, abs, vstack, max
+from numpy import append, array, cross, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack, sum, abs, vstack, max, arange
 from target import Target
 from molecule import Molecule, format_xyz_coord
 from re import match, sub
