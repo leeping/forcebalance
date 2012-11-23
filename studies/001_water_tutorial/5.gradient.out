@@ -1,8 +1,8 @@
 
 ########################################################################
-###[1;97m             Welcome to ForceBalance version 1.0! =D              [0m###
-###[1;97m                 Force Field Optimization System                  [0m###
-###[1;97m                      Author: Lee-Ping Wang                       [0m###
+###[1m             Welcome to ForceBalance version 1.0! =D              [0m###
+###[1m                 Force Field Optimization System                  [0m###
+###[1m                      Author: Lee-Ping Wang                       [0m###
 ########################################################################
 
                           [44m     [0m                                        
@@ -91,163 +91,163 @@ Parameter 7 occurs 1 times in molecule SOL in locations [3] (COUL:SOL-4)
 ##########################################################
 ###[92m               Setup for force field                [0m###
 ##########################################################
-amoeba_pol                direct 
+
 ----------------------------------------------------------
-Backing up: temp/cluster-02 to: backups/cluster-02.23.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-02 :      [0m###
+###[92m           Setup for target cluster-02 :            [0m###
 ##########################################################
 name                      cluster-02 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-02 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-02 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-03 to: backups/cluster-03.17.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-03 :      [0m###
+###[92m           Setup for target cluster-03 :            [0m###
 ##########################################################
 name                      cluster-03 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-03 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-03 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-04 to: backups/cluster-04.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-04 :      [0m###
+###[92m           Setup for target cluster-04 :            [0m###
 ##########################################################
 name                      cluster-04 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-04 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-04 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-05 to: backups/cluster-05.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-05 :      [0m###
+###[92m           Setup for target cluster-05 :            [0m###
 ##########################################################
 name                      cluster-05 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-05 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-05 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-06 to: backups/cluster-06.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-06 :      [0m###
+###[92m           Setup for target cluster-06 :            [0m###
 ##########################################################
 name                      cluster-06 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-06 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-06 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1208 
 ----------------------------------------------------------
-Backing up: temp/cluster-07 to: backups/cluster-07.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-07 :      [0m###
+###[92m           Setup for target cluster-07 :            [0m###
 ##########################################################
 name                      cluster-07 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-07 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-07 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-08 to: backups/cluster-08.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-08 :      [0m###
+###[92m           Setup for target cluster-08 :            [0m###
 ##########################################################
 name                      cluster-08 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-08 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-08 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1202 
 ----------------------------------------------------------
-Backing up: temp/cluster-09 to: backups/cluster-09.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-09 :      [0m###
+###[92m           Setup for target cluster-09 :            [0m###
 ##########################################################
 name                      cluster-09 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-09 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-09 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-10 to: backups/cluster-10.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-10 :      [0m###
+###[92m           Setup for target cluster-10 :            [0m###
 ##########################################################
 name                      cluster-10 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-10 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-10 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-11 to: backups/cluster-11.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-11 :      [0m###
+###[92m           Setup for target cluster-11 :            [0m###
 ##########################################################
 name                      cluster-11 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-11 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-11 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1205 
 ----------------------------------------------------------
-Backing up: temp/cluster-12 to: backups/cluster-12.16.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-12 :      [0m###
+###[92m           Setup for target cluster-12 :            [0m###
 ##########################################################
 name                      cluster-12 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-12 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-12 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-13 to: backups/cluster-13.12.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-13 :      [0m###
+###[92m           Setup for target cluster-13 :            [0m###
 ##########################################################
 name                      cluster-13 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-13 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-13 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
-Backing up: temp/cluster-14 to: backups/cluster-14.11.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-14 :      [0m###
+###[92m           Setup for target cluster-14 :            [0m###
 ##########################################################
 name                      cluster-14 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-14 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-14 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
 
@@ -274,7 +274,7 @@ search_tol                0.1
     2       BONDSB:HWOW           -2.7378e-01  -2.7378e-01[92m  -5.4900e-09[92m  -2.0053e-08[0m
     3       BONDSK:HWOW            4.4851e-02   4.4851e-02[92m  -1.6083e-08[92m  -3.5858e-07[0m
     4       ANGLESB:HWOWHW        -4.6786e-01  -4.6786e-01[92m   1.5579e-08[92m   3.3299e-08[0m
-    5       ANGLESK:HWOWHW         2.4015e-02   2.4015e-02[92m   1.8680e-11[92m   7.7784e-10[0m
-    6       COUL:SOL-2 COUL:SOL-   0.0000e+00  -6.4763e-15[92m   6.4763e-15[92m   6.4763e-07[0m
-    7       COUL:SOL-4            -9.4966e-01  -9.4966e-01[92m   8.1770e-09[92m   8.6105e-09[0m
+    5       ANGLESK:HWOWHW         2.4015e-02   2.4015e-02[92m   1.8652e-11[92m   7.7667e-10[0m
+    6       COUL:SOL-2 COUL:SOL-   0.0000e+00  -3.7007e-15[92m   3.7007e-15[92m   3.7007e-07[0m
+    7       COUL:SOL-4            -9.4966e-01  -9.4966e-01[92m   8.1291e-09[92m   8.5600e-09[0m
     8       VSITE3B:SOL-4 VSITE3  -1.3049e-01  -1.3049e-01[92m  -4.2152e-08[92m  -3.2304e-07[0m

@@ -1,8 +1,7 @@
-
 ########################################################################
-###[1;97m             Welcome to ForceBalance version 1.0! =D              [0m###
-###[1;97m               Systematic Force Field Optimization                [0m###
-###[1;97m                      Author: Lee-Ping Wang                       [0m###
+###[1m             Welcome to ForceBalance version 1.0! =D              [0m###
+###[1m                 Force Field Optimization System                  [0m###
+###[1m                      Author: Lee-Ping Wang                       [0m###
 ########################################################################
 
                           [44m     [0m                                        
@@ -91,163 +90,163 @@ Parameter 7 occurs 1 times in molecule SOL in locations [3] (COUL:SOL-4)
 ##########################################################
 ###[92m               Setup for force field                [0m###
 ##########################################################
-amoeba_pol                direct 
+
 ----------------------------------------------------------
-Backing up: temp/cluster-02 to: backups/cluster-02.20.tar.bz2
-Backing up: temp/cluster-03 to: backups/cluster-03.14.tar.bz2
-Backing up: temp/cluster-04 to: backups/cluster-04.9.tar.bz2
-Backing up: temp/cluster-05 to: backups/cluster-05.9.tar.bz2
-Backing up: temp/cluster-06 to: backups/cluster-06.9.tar.bz2
-Backing up: temp/cluster-07 to: backups/cluster-07.9.tar.bz2
-Backing up: temp/cluster-08 to: backups/cluster-08.9.tar.bz2
-Backing up: temp/cluster-09 to: backups/cluster-09.9.tar.bz2
-Backing up: temp/cluster-10 to: backups/cluster-10.9.tar.bz2
-Backing up: temp/cluster-11 to: backups/cluster-11.9.tar.bz2
-Backing up: temp/cluster-12 to: backups/cluster-12.13.tar.bz2
-Backing up: temp/cluster-13 to: backups/cluster-13.9.tar.bz2
-Backing up: temp/cluster-14 to: backups/cluster-14.8.tar.bz2
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-02 :      [0m###
+###[92m           Setup for target cluster-02 :            [0m###
 ##########################################################
 name                      cluster-02 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-02 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-02 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-03 :      [0m###
+###[92m           Setup for target cluster-03 :            [0m###
 ##########################################################
 name                      cluster-03 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-03 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-03 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-04 :      [0m###
+###[92m           Setup for target cluster-04 :            [0m###
 ##########################################################
 name                      cluster-04 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-04 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-04 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-05 :      [0m###
+###[92m           Setup for target cluster-05 :            [0m###
 ##########################################################
 name                      cluster-05 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-05 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-05 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-06 :      [0m###
+###[92m           Setup for target cluster-06 :            [0m###
 ##########################################################
 name                      cluster-06 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-06 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-06 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1208 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-07 :      [0m###
+###[92m           Setup for target cluster-07 :            [0m###
 ##########################################################
 name                      cluster-07 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-07 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-07 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-08 :      [0m###
+###[92m           Setup for target cluster-08 :            [0m###
 ##########################################################
 name                      cluster-08 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-08 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-08 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1202 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-09 :      [0m###
+###[92m           Setup for target cluster-09 :            [0m###
 ##########################################################
 name                      cluster-09 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-09 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-09 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-10 :      [0m###
+###[92m           Setup for target cluster-10 :            [0m###
 ##########################################################
 name                      cluster-10 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-10 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-10 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-11 :      [0m###
+###[92m           Setup for target cluster-11 :            [0m###
 ##########################################################
 name                      cluster-11 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-11 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-11 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1205 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-12 :      [0m###
+###[92m           Setup for target cluster-12 :            [0m###
 ##########################################################
 name                      cluster-12 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-12 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-12 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-13 :      [0m###
+###[92m           Setup for target cluster-13 :            [0m###
 ##########################################################
 name                      cluster-13 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-13 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-13 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 
 ##########################################################
-###[92m     Setup for fitting simulation cluster-14 :      [0m###
+###[92m           Setup for target cluster-14 :            [0m###
 ##########################################################
 name                      cluster-14 
-simtype                   ABINITIO_GMX 
-simdir                    simulations/cluster-14 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-14 
 w_energy                  1.0 
 w_netforce                0.5 
 w_torque                  0.5 
+shots                     1201 
 ----------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
 
@@ -266,8 +265,8 @@ search_tol                0.1
 ----------------------------------------------------------
 
 ##########################################################
-###[1;97m                   Main Optimizer                   [0m###
-###[1;97m       Newton-Raphson Mode (Adaptive Radius)        [0m###
+###[1m                   Main Optimizer                   [0m###
+###[1m       Newton-Raphson Mode (Adaptive Radius)        [0m###
 ##########################################################
 
 Sim: cluster-02      Errors: Energy =   4.1253 kJ/mol (45.8740%) Atomic Force (%) =  35.7140 Net Force (%) =  63.8635 Torque (%) =  57.6599 Objective = 3.26827e-01
@@ -285,26 +284,27 @@ Sim: cluster-13      Errors: Energy =  16.3658 kJ/mol (32.3787%) Atomic Force (%
 Sim: cluster-14      Errors: Energy =  16.8982 kJ/mol (30.8387%) Atomic Force (%) =  32.1765 Net Force (%) =  62.9252 Torque (%) =  43.8883 Objective = 1.94613e-01
 
 ######################################################################
-###[96m       Objective Function Breakdown, Total =  2.40315e-01       [0m###
-###[96m  Simulation Name          Residual  x  Weight  =  Contribution [0m###
+###[94m                  Objective Function Breakdown                  [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution [0m###
 ######################################################################
-cluster-02                     0.32683      0.077 [97m     2.51406e-02[0m 
-cluster-03                     0.30631      0.077 [97m     2.35619e-02[0m 
-cluster-04                     0.27962      0.077 [97m     2.15089e-02[0m 
-cluster-05                     0.25747      0.077 [97m     1.98056e-02[0m 
-cluster-06                     0.23836      0.077 [97m     1.83356e-02[0m 
-cluster-07                     0.24966      0.077 [97m     1.92046e-02[0m 
-cluster-08                     0.22120      0.077 [97m     1.70158e-02[0m 
-cluster-09                     0.22359      0.077 [97m     1.71992e-02[0m 
-cluster-10                     0.21845      0.077 [97m     1.68040e-02[0m 
-cluster-11                     0.20267      0.077 [97m     1.55902e-02[0m 
-cluster-12                     0.20412      0.077 [97m     1.57018e-02[0m 
-cluster-13                     0.20119      0.077 [97m     1.54762e-02[0m 
-cluster-14                     0.19461      0.077 [97m     1.49703e-02[0m 
-Regularization                 0.00000      1.000 [97m     0.00000e+00[0m 
+cluster-02                     0.32683      0.077 [94m     2.51406e-02[0m 
+cluster-03                     0.30631      0.077 [94m     2.35619e-02[0m 
+cluster-04                     0.27962      0.077 [94m     2.15089e-02[0m 
+cluster-05                     0.25747      0.077 [94m     1.98056e-02[0m 
+cluster-06                     0.23836      0.077 [94m     1.83356e-02[0m 
+cluster-07                     0.24966      0.077 [94m     1.92046e-02[0m 
+cluster-08                     0.22120      0.077 [94m     1.70158e-02[0m 
+cluster-09                     0.22359      0.077 [94m     1.71992e-02[0m 
+cluster-10                     0.21845      0.077 [94m     1.68040e-02[0m 
+cluster-11                     0.20267      0.077 [94m     1.55902e-02[0m 
+cluster-12                     0.20412      0.077 [94m     1.57018e-02[0m 
+cluster-13                     0.20119      0.077 [94m     1.54762e-02[0m 
+cluster-14                     0.19461      0.077 [94m     1.49703e-02[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     2.40315e-01[0m 
 ----------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
-     0   0.000e+00   0.000e+00   2.133e+00[97m   2.40315e-01[0m   0.000e+00      1.000
+     0   0.000e+00   0.000e+00   2.133e+00[1m   2.40315e-01[0m   0.000e+00      1.000
 
 
 ##########################################################
@@ -321,281 +321,357 @@ Regularization                 0.00000      1.000 [97m     0.00000e+00[0m
    8 [ -1.3049e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 5.6579e-01, result -8.9786e-02
-Searching! Hessian diagonal scaling = 1.0000e+01, L =  3.0000e+00, length 7.9923e-02, result -3.8331e-02
-Searching! Hessian diagonal scaling = 2.4562e+01, L = -4.8541e+00, length 3.5595e-02, result -1.8631e-02
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 5.6579e-01, result -8.9786e-02
-Searching! Hessian diagonal scaling = 4.4377e+00, L = -1.8541e+00, length 1.5443e-01, result -6.2981e-02
-Searching! Hessian diagonal scaling = 2.3131e+00, L =  1.1459e+00, length 2.4792e-01, result -8.0626e-02
-Searching! Hessian diagonal scaling = 1.0015e+00, L =  3.8871e-02, length 5.4717e-01, result -9.0773e-02
-Searching! Hessian diagonal scaling = 1.1940e+00, L =  4.4047e-01, length 4.1141e-01, result -8.9512e-02
-Searching! Hessian diagonal scaling = 1.0370e+00, L =  1.9227e-01, length 4.9103e-01, result -9.0075e-02
-Searching! Hessian diagonal scaling = 1.0102e+00, L =  1.0097e-01, length 5.1904e-01, result -9.0280e-02
-Searching! Hessian diagonal scaling = 1.0039e+00, L =  6.2589e-02, length 5.3370e-01, result -9.0593e-02
-Searching! Hessian diagonal scaling = 1.0006e+00, L =  2.4024e-02, length 5.5691e-01, result -9.0517e-02
-Searching! Hessian diagonal scaling = 1.0020e+00, L =  4.4849e-02, length 5.4339e-01, result -9.0765e-02
-Searching! Hessian diagonal scaling = 1.0012e+00, L =  3.4984e-02, length 5.4972e-01, result -9.0749e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 5.6579e-01, result -8.9786e-02
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 7.9923e-02, result -3.8331e-02
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 3.5595e-02, result -1.8631e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 5.6579e-01, result -8.9786e-02
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 1.5443e-01, result -6.2981e-02
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 2.4792e-01, result -8.0626e-02
+Searching! Hessian diagonal scaling = 1.0100e+00, L =  1.1000e+00, length 5.1935e-01, result -9.0285e-02
+Searching! Hessian diagonal scaling = 1.0630e+00, L =  1.2511e+00, length 4.7201e-01, result -8.9996e-02
 
 ##########################################################
 ###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
 ##########################################################
-   0 [  0.0000e+00 + 1.6529e-01 =  1.6529e-01 ] : VDWS:OW
-   1 [  0.0000e+00 - 3.9924e-02 = -3.9924e-02 ] : VDWT:OW
-   2 [  0.0000e+00 + 6.6606e-03 =  6.6606e-03 ] : BONDSB:HWOW
-   3 [  0.0000e+00 - 3.7674e-02 = -3.7674e-02 ] : BONDSK:HWOW
-   4 [  0.0000e+00 + 6.4910e-03 =  6.4910e-03 ] : ANGLESB:HWOWHW
-   5 [  0.0000e+00 - 2.7679e-01 = -2.7679e-01 ] : ANGLESK:HWOWHW
+   0 [  0.0000e+00 + 9.4914e-02 =  9.4914e-02 ] : VDWS:OW
+   1 [  0.0000e+00 + 1.5705e-03 =  1.5705e-03 ] : VDWT:OW
+   2 [  0.0000e+00 + 6.7349e-03 =  6.7349e-03 ] : BONDSB:HWOW
+   3 [  0.0000e+00 - 3.7372e-02 = -3.7372e-02 ] : BONDSK:HWOW
+   4 [  0.0000e+00 + 6.1126e-03 =  6.1126e-03 ] : ANGLESB:HWOWHW
+   5 [  0.0000e+00 - 2.7385e-01 = -2.7385e-01 ] : ANGLESK:HWOWHW
    6 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
-   7 [  0.0000e+00 + 1.6320e-02 =  1.6320e-02 ] : COUL:SOL-4
-   8 [  0.0000e+00 + 4.3828e-01 =  4.3828e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   7 [  0.0000e+00 + 1.9168e-02 =  1.9168e-02 ] : COUL:SOL-4
+   8 [  0.0000e+00 + 4.2881e-01 =  4.2881e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
 ##########################################################
 ###[93m    Physical Parameters (Current + Step = Next)     [0m###
 ##########################################################
-   0 [  3.1537e-01 + 8.7467e-03 =  3.2411e-01 ] : VDWS:OW
-   1 [  6.4852e-01 - 9.8969e-02 =  5.4955e-01 ] : VDWT:OW
-   2 [  9.5720e-02 + 3.5246e-04 =  9.6072e-02 ] : BONDSB:HWOW
-   3 [  5.0242e+05 - 3.5322e+04 =  4.6709e+05 ] : BONDSK:HWOW
-   4 [  1.0452e+02 + 3.7191e-01 =  1.0489e+02 ] : ANGLESB:HWOWHW
-   5 [  6.2802e+02 - 1.6772e+02 =  4.6030e+02 ] : ANGLESK:HWOWHW
-   6 [  5.2000e-01 - 6.5280e-03 =  5.1347e-01 ] : COUL:SOL-2 COUL:SOL-3
-   7 [ -1.0400e+00 + 1.3056e-02 = -1.0269e+00 ] : COUL:SOL-4
-   8 [  1.2800e-01 + 2.3193e-02 =  1.5119e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   0 [  3.1537e-01 + 5.0227e-03 =  3.2039e-01 ] : VDWS:OW
+   1 [  6.4852e-01 + 3.8933e-03 =  6.5241e-01 ] : VDWT:OW
+   2 [  9.5720e-02 + 3.5640e-04 =  9.6076e-02 ] : BONDSB:HWOW
+   3 [  5.0242e+05 - 3.5039e+04 =  4.6738e+05 ] : BONDSK:HWOW
+   4 [  1.0452e+02 + 3.5023e-01 =  1.0487e+02 ] : ANGLESB:HWOWHW
+   5 [  6.2802e+02 - 1.6593e+02 =  4.6209e+02 ] : ANGLESK:HWOWHW
+   6 [  5.2000e-01 - 7.6673e-03 =  5.1233e-01 ] : COUL:SOL-2 COUL:SOL-3
+   7 [ -1.0400e+00 + 1.5335e-02 = -1.0247e+00 ] : COUL:SOL-4
+   8 [  1.2800e-01 + 2.2691e-02 =  1.5069e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-Sim: cluster-02      Errors: Energy =   2.0998 kJ/mol (23.3504%) Atomic Force (%) =  20.8492 Net Force (%) =  43.7482 Torque (%) =  49.5662 Objective = 1.37454e-01
-Sim: cluster-03      Errors: Energy =   3.7872 kJ/mol (28.3315%) Atomic Force (%) =  20.3131 Net Force (%) =  42.3027 Torque (%) =  49.4921 Objective = 1.47957e-01
-Sim: cluster-04      Errors: Energy =   5.1631 kJ/mol (30.2569%) Atomic Force (%) =  20.5311 Net Force (%) =  42.3336 Torque (%) =  47.2911 Objective = 1.47042e-01
-Sim: cluster-05      Errors: Energy =   6.5478 kJ/mol (31.2881%) Atomic Force (%) =  20.5305 Net Force (%) =  41.9588 Torque (%) =  47.0435 Objective = 1.48533e-01
-Sim: cluster-06      Errors: Energy =   8.4913 kJ/mol (31.0883%) Atomic Force (%) =  20.7447 Net Force (%) =  43.9149 Torque (%) =  46.1562 Objective = 1.49676e-01
-Sim: cluster-07      Errors: Energy =   9.3184 kJ/mol (32.6941%) Atomic Force (%) =  21.2319 Net Force (%) =  45.3948 Torque (%) =  45.8430 Objective = 1.57431e-01
-Sim: cluster-08      Errors: Energy =  10.7031 kJ/mol (31.5002%) Atomic Force (%) =  21.3674 Net Force (%) =  44.3867 Torque (%) =  44.3707 Objective = 1.47943e-01
-Sim: cluster-09      Errors: Energy =  11.5467 kJ/mol (31.1864%) Atomic Force (%) =  21.1500 Net Force (%) =  45.5475 Torque (%) =  43.8597 Objective = 1.48575e-01
-Sim: cluster-10      Errors: Energy =  12.3712 kJ/mol (30.5893%) Atomic Force (%) =  21.4060 Net Force (%) =  46.0084 Torque (%) =  44.1489 Objective = 1.48353e-01
-Sim: cluster-11      Errors: Energy =  14.1942 kJ/mol (30.1583%) Atomic Force (%) =  21.5721 Net Force (%) =  46.3417 Torque (%) =  43.0288 Objective = 1.45452e-01
-Sim: cluster-12      Errors: Energy =  14.2527 kJ/mol (30.1036%) Atomic Force (%) =  21.3382 Net Force (%) =  46.2919 Torque (%) =  42.9039 Objective = 1.44929e-01
-Sim: cluster-13      Errors: Energy =  14.8660 kJ/mol (29.4114%) Atomic Force (%) =  21.5315 Net Force (%) =  46.1095 Torque (%) =  42.9194 Objective = 1.42483e-01
-Sim: cluster-14      Errors: Energy =  15.6342 kJ/mol (28.5321%) Atomic Force (%) =  21.4573 Net Force (%) =  46.6644 Torque (%) =  42.0303 Objective = 1.39289e-01
+Sim: cluster-02      Errors: Energy =   2.0778 kJ/mol (23.1057%) Atomic Force (%) =  20.8695 Net Force (%) =  43.7872 Torque (%) =  49.7238 Objective = 1.35302e-01
+Sim: cluster-03      Errors: Energy =   3.7823 kJ/mol (28.2947%) Atomic Force (%) =  20.3642 Net Force (%) =  42.0659 Torque (%) =  49.6582 Objective = 1.46702e-01
+Sim: cluster-04      Errors: Energy =   5.1527 kJ/mol (30.1961%) Atomic Force (%) =  20.6003 Net Force (%) =  41.9773 Torque (%) =  47.4640 Objective = 1.46469e-01
+Sim: cluster-05      Errors: Energy =   6.5447 kJ/mol (31.2730%) Atomic Force (%) =  20.6140 Net Force (%) =  41.9002 Torque (%) =  47.2104 Objective = 1.48769e-01
+Sim: cluster-06      Errors: Energy =   8.5040 kJ/mol (31.1348%) Atomic Force (%) =  20.8387 Net Force (%) =  43.9806 Torque (%) =  46.3208 Objective = 1.50343e-01
+Sim: cluster-07      Errors: Energy =   9.3459 kJ/mol (32.7904%) Atomic Force (%) =  21.3388 Net Force (%) =  45.6801 Torque (%) =  46.0061 Objective = 1.58798e-01
+Sim: cluster-08      Errors: Energy =  10.7259 kJ/mol (31.5672%) Atomic Force (%) =  21.4792 Net Force (%) =  44.6859 Torque (%) =  44.5328 Objective = 1.49176e-01
+Sim: cluster-09      Errors: Energy =  11.5792 kJ/mol (31.2740%) Atomic Force (%) =  21.2590 Net Force (%) =  45.9327 Torque (%) =  44.0185 Objective = 1.50075e-01
+Sim: cluster-10      Errors: Energy =  12.3900 kJ/mol (30.6356%) Atomic Force (%) =  21.5257 Net Force (%) =  46.4645 Torque (%) =  44.3072 Objective = 1.49891e-01
+Sim: cluster-11      Errors: Energy =  14.2347 kJ/mol (30.2444%) Atomic Force (%) =  21.6960 Net Force (%) =  46.8734 Torque (%) =  43.1869 Objective = 1.47298e-01
+Sim: cluster-12      Errors: Energy =  14.3221 kJ/mol (30.2501%) Atomic Force (%) =  21.4624 Net Force (%) =  46.8071 Torque (%) =  43.0640 Objective = 1.46913e-01
+Sim: cluster-13      Errors: Energy =  14.9040 kJ/mol (29.4866%) Atomic Force (%) =  21.6594 Net Force (%) =  46.6871 Torque (%) =  43.0795 Objective = 1.44393e-01
+Sim: cluster-14      Errors: Energy =  15.6816 kJ/mol (28.6185%) Atomic Force (%) =  21.5854 Net Force (%) =  47.2251 Torque (%) =  42.1916 Objective = 1.41191e-01
 
 #####################################################################################
-###[96m              Objective Function Breakdown, Total =  1.49541e-01               [0m###
-###[96m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Last) [0m###
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
-cluster-02                     0.13745      0.077 [92m     1.05734e-02[0m ( -1.457e-02 ) 
-cluster-03                     0.14796      0.077 [92m     1.13813e-02[0m ( -1.218e-02 ) 
-cluster-04                     0.14704      0.077 [92m     1.13109e-02[0m ( -1.020e-02 ) 
-cluster-05                     0.14853      0.077 [92m     1.14256e-02[0m ( -8.380e-03 ) 
-cluster-06                     0.14968      0.077 [92m     1.15135e-02[0m ( -6.822e-03 ) 
-cluster-07                     0.15743      0.077 [92m     1.21100e-02[0m ( -7.095e-03 ) 
-cluster-08                     0.14794      0.077 [92m     1.13802e-02[0m ( -5.636e-03 ) 
-cluster-09                     0.14857      0.077 [92m     1.14288e-02[0m ( -5.770e-03 ) 
-cluster-10                     0.14835      0.077 [92m     1.14118e-02[0m ( -5.392e-03 ) 
-cluster-11                     0.14545      0.077 [92m     1.11886e-02[0m ( -4.402e-03 ) 
-cluster-12                     0.14493      0.077 [92m     1.11484e-02[0m ( -4.553e-03 ) 
-cluster-13                     0.14248      0.077 [92m     1.09603e-02[0m ( -4.516e-03 ) 
-cluster-14                     0.13929      0.077 [92m     1.07146e-02[0m ( -4.256e-03 ) 
-Regularization                 0.00299      1.000 [91m     2.99394e-03[0m ( +2.994e-03 ) 
+cluster-02                     0.13530      0.077 [92m     1.04078e-02[0m ( -1.473e-02 ) 
+cluster-03                     0.14670      0.077 [92m     1.12847e-02[0m ( -1.228e-02 ) 
+cluster-04                     0.14647      0.077 [92m     1.12668e-02[0m ( -1.024e-02 ) 
+cluster-05                     0.14877      0.077 [92m     1.14437e-02[0m ( -8.362e-03 ) 
+cluster-06                     0.15034      0.077 [92m     1.15649e-02[0m ( -6.771e-03 ) 
+cluster-07                     0.15880      0.077 [92m     1.22153e-02[0m ( -6.989e-03 ) 
+cluster-08                     0.14918      0.077 [92m     1.14751e-02[0m ( -5.541e-03 ) 
+cluster-09                     0.15007      0.077 [92m     1.15442e-02[0m ( -5.655e-03 ) 
+cluster-10                     0.14989      0.077 [92m     1.15301e-02[0m ( -5.274e-03 ) 
+cluster-11                     0.14730      0.077 [92m     1.13306e-02[0m ( -4.260e-03 ) 
+cluster-12                     0.14691      0.077 [92m     1.13010e-02[0m ( -4.401e-03 ) 
+cluster-13                     0.14439      0.077 [92m     1.11072e-02[0m ( -4.369e-03 ) 
+cluster-14                     0.14119      0.077 [92m     1.08609e-02[0m ( -4.109e-03 ) 
+Regularization                 0.00270      1.000 [91m     2.69724e-03[0m ( +2.697e-03 ) 
+Total                                             [92m     1.50030e-01[0m ( -9.029e-02 ) 
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
-     1   5.472e-01   5.472e-01   5.984e-02[92m   1.49541e-01[0m   4.539e-02      1.000
+     1   5.193e-01   5.193e-01   1.300e-01[92m   1.50030e-01[0m   4.514e-02      1.000
 
 
 ##########################################################
 ###[96m                   Total Gradient                   [0m###
 ##########################################################
-   0 [ -1.7520e-02 ] : VDWS:OW
-   1 [ -3.2517e-02 ] : VDWT:OW
-   2 [ -8.9815e-03 ] : BONDSB:HWOW
-   3 [  1.5038e-03 ] : BONDSK:HWOW
-   4 [ -4.3913e-02 ] : ANGLESB:HWOWHW
-   5 [ -3.7198e-04 ] : ANGLESK:HWOWHW
+   0 [  5.6405e-02 ] : VDWS:OW
+   1 [  1.0689e-01 ] : VDWT:OW
+   2 [ -2.1096e-02 ] : BONDSB:HWOW
+   3 [  1.5424e-03 ] : BONDSK:HWOW
+   4 [ -3.5109e-02 ] : ANGLESB:HWOWHW
+   5 [ -1.7454e-04 ] : ANGLESK:HWOWHW
    6 [  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
-   7 [ -1.3922e-02 ] : COUL:SOL-4
-   8 [ -3.4188e-03 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   7 [  2.4775e-02 ] : COUL:SOL-4
+   8 [  5.6382e-04 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 5.7571e-02, result -1.2734e-04
-Searching! Hessian diagonal scaling = 1.0000e+01, L =  3.0000e+00, length 2.4128e-03, result -2.4461e-05
-Searching! Hessian diagonal scaling = 2.4562e+01, L = -4.8541e+00, length 1.0421e-03, result -1.1247e-05
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 5.7571e-02, result -1.2734e-04
-Searching! Hessian diagonal scaling = 4.4377e+00, L = -1.8541e+00, length 4.9682e-03, result -4.4937e-05
-Searching! Hessian diagonal scaling = 2.3131e+00, L =  1.1459e+00, length 8.9226e-03, result -6.7806e-05
-Searching! Hessian diagonal scaling = 1.0555e+00, L = -2.3548e-01, length 3.1033e-02, result -1.1066e-04
-Searching! Hessian diagonal scaling = 1.0788e+00, L =  2.8071e-01, length 2.8717e-02, result -1.0825e-04
-Searching! Hessian diagonal scaling = 1.0002e+00, L =  1.3927e-02, length 5.5507e-02, result -1.3127e-04
-Searching! Hessian diagonal scaling = 1.0134e+00, L =  1.1583e-01, length 3.7305e-02, result -1.2061e-04
-Searching! Hessian diagonal scaling = 1.0024e+00, L =  4.9218e-02, length 4.4610e-02, result -1.3556e-04
-Searching! Hessian diagonal scaling = 1.0029e+00, L =  5.4140e-02, length 4.3549e-02, result -1.3440e-04
-Searching! Hessian diagonal scaling = 1.0015e+00, L =  3.8407e-02, length 4.7491e-02, result -1.3717e-04
-Searching! Hessian diagonal scaling = 1.0008e+00, L =  2.9057e-02, length 5.0540e-02, result -1.3666e-04
-Searching! Hessian diagonal scaling = 1.0018e+00, L =  4.2248e-02, length 4.6379e-02, result -1.3680e-04
-Searching! Hessian diagonal scaling = 1.0012e+00, L =  3.4566e-02, length 4.8693e-02, result -1.3722e-04
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 1.3906e-01, result 1.2369e-03
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 8.2467e-04, result -7.4275e-05
+Searching! Hessian diagonal scaling = 6.2687e+01, L =  8.8541e+00, length 1.5197e-04, result -1.4161e-05
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 8.2467e-04, result -7.4275e-05
+Searching! Hessian diagonal scaling = 2.4562e+01, L =  5.8541e+00, length 3.5932e-04, result -3.4139e-05
+Searching! Hessian diagonal scaling = 4.4377e+00, L =  2.8541e+00, length 2.2945e-03, result -1.3632e-04
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 6.7697e-03, result -2.0416e-04
+Searching! Hessian diagonal scaling = 1.5016e+00, L =  1.7082e+00, length 1.5250e-02, result -2.5606e-04
+Searching! Hessian diagonal scaling = 1.1916e+00, L =  1.4377e+00, length 2.5983e-02, result -2.8898e-04
+Searching! Hessian diagonal scaling = 1.0732e+00, L =  1.2705e+00, length 3.5860e-02, result -3.1745e-04
+Searching! Hessian diagonal scaling = 1.0206e+00, L =  1.1435e+00, length 4.5844e-02, result -3.8102e-04
 
 ##########################################################
 ###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
 ##########################################################
-   0 [  1.6529e-01 + 2.6979e-02 =  1.9227e-01 ] : VDWS:OW
-   1 [ -3.9924e-02 - 1.2185e-02 = -5.2109e-02 ] : VDWT:OW
-   2 [  6.6606e-03 + 3.4063e-04 =  7.0012e-03 ] : BONDSB:HWOW
-   3 [ -3.7674e-02 - 6.8103e-04 = -3.8355e-02 ] : BONDSK:HWOW
-   4 [  6.4910e-03 + 2.7214e-03 =  9.2124e-03 ] : ANGLESB:HWOWHW
-   5 [ -2.7679e-01 - 1.0077e-03 = -2.7780e-01 ] : ANGLESK:HWOWHW
+   0 [  9.4914e-02 + 1.1290e-02 =  1.0620e-01 ] : VDWS:OW
+   1 [  1.5705e-03 - 1.0312e-02 = -8.7414e-03 ] : VDWT:OW
+   2 [  6.7349e-03 + 4.4691e-04 =  7.1818e-03 ] : BONDSB:HWOW
+   3 [ -3.7372e-02 - 2.4889e-04 = -3.7621e-02 ] : BONDSK:HWOW
+   4 [  6.1126e-03 + 2.5217e-03 =  8.6343e-03 ] : ANGLESB:HWOWHW
+   5 [ -2.7385e-01 - 3.2358e-03 = -2.7708e-01 ] : ANGLESK:HWOWHW
    6 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
-   7 [  1.6320e-02 - 4.8423e-03 =  1.1478e-02 ] : COUL:SOL-4
-   8 [  4.3828e-01 + 3.8239e-02 =  4.7652e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   7 [  1.9168e-02 - 4.9165e-03 =  1.4252e-02 ] : COUL:SOL-4
+   8 [  4.2881e-01 + 4.2739e-02 =  4.7154e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
 ##########################################################
 ###[93m    Physical Parameters (Current + Step = Next)     [0m###
 ##########################################################
-   0 [  3.2411e-01 + 1.4276e-03 =  3.2554e-01 ] : VDWS:OW
-   1 [  5.4955e-01 - 3.0205e-02 =  5.1935e-01 ] : VDWT:OW
-   2 [  9.6072e-02 + 1.8025e-05 =  9.6090e-02 ] : BONDSB:HWOW
-   3 [  4.6709e+05 - 6.3852e+02 =  4.6646e+05 ] : BONDSK:HWOW
-   4 [  1.0489e+02 + 1.5593e-01 =  1.0505e+02 ] : ANGLESB:HWOWHW
-   5 [  4.6030e+02 - 6.1057e-01 =  4.5969e+02 ] : ANGLESK:HWOWHW
-   6 [  5.1347e-01 + 1.9369e-03 =  5.1541e-01 ] : COUL:SOL-2 COUL:SOL-3
-   7 [ -1.0269e+00 - 3.8739e-03 = -1.0308e+00 ] : COUL:SOL-4
-   8 [  1.5119e-01 + 2.0235e-03 =  1.5322e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   0 [  3.2039e-01 + 5.9746e-04 =  3.2099e-01 ] : VDWS:OW
+   1 [  6.5241e-01 - 2.5563e-02 =  6.2685e-01 ] : VDWT:OW
+   2 [  9.6076e-02 + 2.3649e-05 =  9.6100e-02 ] : BONDSB:HWOW
+   3 [  4.6738e+05 - 2.3335e+02 =  4.6714e+05 ] : BONDSK:HWOW
+   4 [  1.0487e+02 + 1.4448e-01 =  1.0501e+02 ] : ANGLESB:HWOWHW
+   5 [  4.6209e+02 - 1.9606e+00 =  4.6013e+02 ] : ANGLESK:HWOWHW
+   6 [  5.1233e-01 + 1.9666e-03 =  5.1430e-01 ] : COUL:SOL-2 COUL:SOL-3
+   7 [ -1.0247e+00 - 3.9332e-03 = -1.0286e+00 ] : COUL:SOL-4
+   8 [  1.5069e-01 + 2.2617e-03 =  1.5295e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-Sim: cluster-02      Errors: Energy =   2.1004 kJ/mol (23.3572%) Atomic Force (%) =  20.9761 Net Force (%) =  43.4446 Torque (%) =  49.2601 Objective = 1.36377e-01
-Sim: cluster-03      Errors: Energy =   3.7759 kJ/mol (28.2468%) Atomic Force (%) =  20.4138 Net Force (%) =  42.0931 Torque (%) =  49.2567 Objective = 1.46740e-01
-Sim: cluster-04      Errors: Energy =   5.1476 kJ/mol (30.1662%) Atomic Force (%) =  20.6072 Net Force (%) =  42.1745 Torque (%) =  47.0917 Objective = 1.45953e-01
-Sim: cluster-05      Errors: Energy =   6.5481 kJ/mol (31.2894%) Atomic Force (%) =  20.5959 Net Force (%) =  41.8316 Torque (%) =  46.8608 Objective = 1.47842e-01
-Sim: cluster-06      Errors: Energy =   8.4990 kJ/mol (31.1166%) Atomic Force (%) =  20.7977 Net Force (%) =  43.8089 Torque (%) =  45.9791 Objective = 1.49124e-01
-Sim: cluster-07      Errors: Energy =   9.3019 kJ/mol (32.6362%) Atomic Force (%) =  21.2641 Net Force (%) =  45.3027 Torque (%) =  45.6842 Objective = 1.56670e-01
-Sim: cluster-08      Errors: Energy =  10.7125 kJ/mol (31.5279%) Atomic Force (%) =  21.3908 Net Force (%) =  44.3188 Torque (%) =  44.2180 Objective = 1.47542e-01
-Sim: cluster-09      Errors: Energy =  11.5466 kJ/mol (31.1859%) Atomic Force (%) =  21.1586 Net Force (%) =  45.4908 Torque (%) =  43.7002 Objective = 1.48094e-01
-Sim: cluster-10      Errors: Energy =  12.3829 kJ/mol (30.6182%) Atomic Force (%) =  21.4081 Net Force (%) =  45.9602 Torque (%) =  43.9961 Objective = 1.47994e-01
-Sim: cluster-11      Errors: Energy =  14.2073 kJ/mol (30.1860%) Atomic Force (%) =  21.5598 Net Force (%) =  46.3123 Torque (%) =  42.8910 Objective = 1.45171e-01
-Sim: cluster-12      Errors: Energy =  14.2446 kJ/mol (30.0864%) Atomic Force (%) =  21.3230 Net Force (%) =  46.2671 Torque (%) =  42.7659 Objective = 1.44522e-01
-Sim: cluster-13      Errors: Energy =  14.8738 kJ/mol (29.4268%) Atomic Force (%) =  21.5033 Net Force (%) =  46.0919 Torque (%) =  42.7821 Objective = 1.42193e-01
-Sim: cluster-14      Errors: Energy =  15.6592 kJ/mol (28.5777%) Atomic Force (%) =  21.4222 Net Force (%) =  46.6453 Torque (%) =  41.8963 Objective = 1.39093e-01
+Sim: cluster-02      Errors: Energy =   2.1025 kJ/mol (23.3808%) Atomic Force (%) =  20.8468 Net Force (%) =  43.5508 Torque (%) =  49.2075 Objective = 1.36562e-01
+Sim: cluster-03      Errors: Energy =   3.7858 kJ/mol (28.3209%) Atomic Force (%) =  20.3392 Net Force (%) =  42.2898 Torque (%) =  49.2193 Objective = 1.47344e-01
+Sim: cluster-04      Errors: Energy =   5.1457 kJ/mol (30.1548%) Atomic Force (%) =  20.5532 Net Force (%) =  42.4473 Torque (%) =  47.0816 Objective = 1.46499e-01
+Sim: cluster-05      Errors: Energy =   6.5430 kJ/mol (31.2652%) Atomic Force (%) =  20.5579 Net Force (%) =  42.1354 Torque (%) =  46.8487 Objective = 1.48382e-01
+Sim: cluster-06      Errors: Energy =   8.4915 kJ/mol (31.0891%) Atomic Force (%) =  20.7725 Net Force (%) =  44.1148 Torque (%) =  45.9738 Objective = 1.49701e-01
+Sim: cluster-07      Errors: Energy =   9.3124 kJ/mol (32.6729%) Atomic Force (%) =  21.2542 Net Force (%) =  45.6508 Torque (%) =  45.6852 Objective = 1.57592e-01
+Sim: cluster-08      Errors: Energy =  10.6992 kJ/mol (31.4886%) Atomic Force (%) =  21.3903 Net Force (%) =  44.6209 Torque (%) =  44.2266 Objective = 1.48110e-01
+Sim: cluster-09      Errors: Energy =  11.5471 kJ/mol (31.1874%) Atomic Force (%) =  21.1584 Net Force (%) =  45.7977 Torque (%) =  43.7126 Objective = 1.48827e-01
+Sim: cluster-10      Errors: Energy =  12.3611 kJ/mol (30.5643%) Atomic Force (%) =  21.4162 Net Force (%) =  46.2729 Torque (%) =  44.0092 Objective = 1.48580e-01
+Sim: cluster-11      Errors: Energy =  14.1655 kJ/mol (30.0973%) Atomic Force (%) =  21.5750 Net Force (%) =  46.6226 Torque (%) =  42.9126 Objective = 1.45673e-01
+Sim: cluster-12      Errors: Energy =  14.2424 kJ/mol (30.0818%) Atomic Force (%) =  21.3382 Net Force (%) =  46.5541 Torque (%) =  42.7883 Objective = 1.45226e-01
+Sim: cluster-13      Errors: Energy =  14.8470 kJ/mol (29.3738%) Atomic Force (%) =  21.5262 Net Force (%) =  46.3816 Torque (%) =  42.8067 Objective = 1.42762e-01
+Sim: cluster-14      Errors: Energy =  15.6126 kJ/mol (28.4926%) Atomic Force (%) =  21.4467 Net Force (%) =  46.9303 Torque (%) =  41.9267 Objective = 1.39582e-01
 
 #####################################################################################
-###[96m              Objective Function Breakdown, Total =  1.49404e-01               [0m###
-###[96m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Last) [0m###
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
-cluster-02                     0.13638      0.077 [92m     1.04906e-02[0m ( -8.283e-05 ) 
-cluster-03                     0.14674      0.077 [92m     1.12877e-02[0m ( -9.366e-05 ) 
-cluster-04                     0.14595      0.077 [92m     1.12271e-02[0m ( -8.377e-05 ) 
-cluster-05                     0.14784      0.077 [92m     1.13725e-02[0m ( -5.311e-05 ) 
-cluster-06                     0.14912      0.077 [92m     1.14711e-02[0m ( -4.243e-05 ) 
-cluster-07                     0.15667      0.077 [92m     1.20515e-02[0m ( -5.850e-05 ) 
-cluster-08                     0.14754      0.077 [92m     1.13494e-02[0m ( -3.083e-05 ) 
-cluster-09                     0.14809      0.077 [92m     1.13919e-02[0m ( -3.696e-05 ) 
-cluster-10                     0.14799      0.077 [92m     1.13842e-02[0m ( -2.761e-05 ) 
-cluster-11                     0.14517      0.077 [92m     1.11670e-02[0m ( -2.157e-05 ) 
-cluster-12                     0.14452      0.077 [92m     1.11171e-02[0m ( -3.126e-05 ) 
-cluster-13                     0.14219      0.077 [92m     1.09379e-02[0m ( -2.232e-05 ) 
-cluster-14                     0.13909      0.077 [92m     1.06995e-02[0m ( -1.510e-05 ) 
-Regularization                 0.00346      1.000 [91m     3.45667e-03[0m ( +4.627e-04 ) 
+cluster-02                     0.13656      0.077 [91m     1.05047e-02[0m ( +9.691e-05 ) 
+cluster-03                     0.14734      0.077 [91m     1.13342e-02[0m ( +4.944e-05 ) 
+cluster-04                     0.14650      0.077 [91m     1.12692e-02[0m ( +2.348e-06 ) 
+cluster-05                     0.14838      0.077 [92m     1.14140e-02[0m ( -2.970e-05 ) 
+cluster-06                     0.14970      0.077 [92m     1.15155e-02[0m ( -4.941e-05 ) 
+cluster-07                     0.15759      0.077 [92m     1.21225e-02[0m ( -9.277e-05 ) 
+cluster-08                     0.14811      0.077 [92m     1.13930e-02[0m ( -8.200e-05 ) 
+cluster-09                     0.14883      0.077 [92m     1.14483e-02[0m ( -9.595e-05 ) 
+cluster-10                     0.14858      0.077 [92m     1.14292e-02[0m ( -1.008e-04 ) 
+cluster-11                     0.14567      0.077 [92m     1.12056e-02[0m ( -1.250e-04 ) 
+cluster-12                     0.14523      0.077 [92m     1.11712e-02[0m ( -1.298e-04 ) 
+cluster-13                     0.14276      0.077 [92m     1.09817e-02[0m ( -1.255e-04 ) 
+cluster-14                     0.13958      0.077 [92m     1.07371e-02[0m ( -1.238e-04 ) 
+Regularization                 0.00312      1.000 [91m     3.12230e-03[0m ( +4.251e-04 ) 
+Total                                             [92m     1.49649e-01[0m ( -3.810e-04 ) 
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
-     2   5.879e-01   4.869e-02   1.800e-02[92m   1.49404e-01[0m   4.282e-02      1.000
+     2   5.588e-01   4.584e-02   5.465e-03[92m   1.49649e-01[0m   4.265e-02      1.000
 
 
 ##########################################################
 ###[96m                   Total Gradient                   [0m###
 ##########################################################
-   0 [ -7.6529e-03 ] : VDWS:OW
-   1 [ -1.5939e-02 ] : VDWT:OW
-   2 [  5.4360e-04 ] : BONDSB:HWOW
-   3 [  1.2092e-05 ] : BONDSK:HWOW
-   4 [ -7.7277e-04 ] : ANGLESB:HWOWHW
-   5 [ -1.4352e-06 ] : ANGLESK:HWOWHW
+   0 [ -5.2606e-03 ] : VDWS:OW
+   1 [  4.2360e-04 ] : VDWT:OW
+   2 [ -3.8228e-04 ] : BONDSB:HWOW
+   3 [  7.1173e-06 ] : BONDSK:HWOW
+   4 [ -1.2919e-03 ] : ANGLESB:HWOWHW
+   5 [  2.4528e-07 ] : ANGLESK:HWOWHW
    6 [  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
-   7 [ -3.1861e-03 ] : COUL:SOL-4
-   8 [ -5.1581e-04 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   7 [ -2.4880e-04 ] : COUL:SOL-4
+   8 [ -3.6790e-04 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 1.0691e-02, result -5.1256e-06
-Searching! Hessian diagonal scaling = 1.0000e+01, L =  3.0000e+00, length 3.2309e-04, result -1.2003e-06
-Searching! Hessian diagonal scaling = 2.4562e+01, L = -4.8541e+00, length 1.4959e-04, result -5.7882e-07
-Searching! Hessian diagonal scaling = 1.0000e+00, L =  0.0000e+00, length 1.0691e-02, result -5.1256e-06
-Searching! Hessian diagonal scaling = 4.4377e+00, L = -1.8541e+00, length 5.7802e-04, result -2.0149e-06
-Searching! Hessian diagonal scaling = 2.3131e+00, L =  1.1459e+00, length 8.4870e-04, result -2.6972e-06
-Searching! Hessian diagonal scaling = 1.0698e+00, L = -2.6426e-01, length 2.7441e-03, result -3.6079e-06
-Searching! Hessian diagonal scaling = 1.1466e+00, L =  3.8291e-01, length 2.0920e-03, result -3.4541e-06
-Searching! Hessian diagonal scaling = 1.0027e+00, L =  5.1718e-02, length 6.3271e-03, result -4.8424e-06
-Searching! Hessian diagonal scaling = 1.0026e+00, L = -5.1243e-02, length 6.3636e-03, result -4.8499e-06
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -1.0673e-04, length 1.0691e-02, result -5.1256e-06
-Searching! Hessian diagonal scaling = 1.0000e+00, L = -1.3321e-04, length 1.0691e-02, result -5.1256e-06
-Searching! Hessian diagonal scaling = 1.0004e+00, L = -1.9656e-02, length 9.5312e-03, result -5.1587e-06
-Searching! Hessian diagonal scaling = 1.0010e+00, L = -3.1721e-02, length 8.2205e-03, result -5.1058e-06
-Searching! Hessian diagonal scaling = 1.0001e+00, L = -1.2199e-02, length 1.0203e-02, result -5.1485e-06
-Searching! Hessian diagonal scaling = 1.0006e+00, L = -2.4264e-02, length 9.0426e-03, result -5.1505e-06
-Searching! Hessian diagonal scaling = 1.0003e+00, L = -1.7690e-02, length 9.7265e-03, result -5.1583e-06
-Searching! Hessian diagonal scaling = 1.0005e+00, L = -2.1621e-02, length 9.3270e-03, result -5.1569e-06
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 1.1521e-01, result 6.9401e-04
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 2.6707e-04, result -3.7890e-07
+Searching! Hessian diagonal scaling = 6.2687e+01, L =  8.8541e+00, length 4.4961e-05, result -6.4202e-08
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 2.6707e-04, result -3.7890e-07
+Searching! Hessian diagonal scaling = 2.4562e+01, L =  5.8541e+00, length 1.1257e-04, result -1.6013e-07
+Searching! Hessian diagonal scaling = 4.4377e+00, L =  2.8541e+00, length 5.8459e-04, result -8.4615e-07
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 1.1939e-03, result -1.8658e-06
+Searching! Hessian diagonal scaling = 1.5016e+00, L =  1.7082e+00, length 2.3397e-03, result -4.2341e-06
+Searching! Hessian diagonal scaling = 1.1916e+00, L =  1.4377e+00, length 4.2723e-03, result -9.7975e-06
+Searching! Hessian diagonal scaling = 1.0732e+00, L =  1.2705e+00, length 7.2418e-03, result -2.2813e-05
+Searching! Hessian diagonal scaling = 1.0206e+00, L =  1.1435e+00, length 1.6208e-02, result -6.6377e-05
 
 ##########################################################
 ###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
 ##########################################################
-   0 [  1.9227e-01 + 8.1323e-03 =  2.0040e-01 ] : VDWS:OW
-   1 [ -5.2109e-02 - 3.2245e-03 = -5.5333e-02 ] : VDWT:OW
-   2 [  7.0012e-03 - 2.7969e-05 =  6.9733e-03 ] : BONDSB:HWOW
-   3 [ -3.8355e-02 - 1.2001e-04 = -3.8475e-02 ] : BONDSK:HWOW
-   4 [  9.2124e-03 + 5.7596e-05 =  9.2700e-03 ] : ANGLESB:HWOWHW
-   5 [ -2.7780e-01 - 1.1275e-04 = -2.7791e-01 ] : ANGLESK:HWOWHW
+   0 [  1.0620e-01 + 1.2816e-02 =  1.1902e-01 ] : VDWS:OW
+   1 [ -8.7414e-03 - 6.8934e-03 = -1.5635e-02 ] : VDWT:OW
+   2 [  7.1818e-03 - 2.5919e-05 =  7.1559e-03 ] : BONDSB:HWOW
+   3 [ -3.7621e-02 - 5.7998e-05 = -3.7679e-02 ] : BONDSK:HWOW
+   4 [  8.6343e-03 + 1.5938e-04 =  8.7937e-03 ] : ANGLESB:HWOWHW
+   5 [ -2.7708e-01 - 3.6978e-04 = -2.7745e-01 ] : ANGLESK:HWOWHW
    6 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
-   7 [  1.1478e-02 - 8.4739e-04 =  1.0630e-02 ] : COUL:SOL-4
-   8 [  4.7652e-01 + 3.6828e-03 =  4.8021e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   7 [  1.4252e-02 - 1.4533e-03 =  1.2799e-02 ] : COUL:SOL-4
+   8 [  4.7154e-01 + 6.9746e-03 =  4.7852e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
 ##########################################################
 ###[93m    Physical Parameters (Current + Step = Next)     [0m###
 ##########################################################
-   0 [  3.2554e-01 + 4.3035e-04 =  3.2597e-01 ] : VDWS:OW
-   1 [  5.1935e-01 - 7.9933e-03 =  5.1135e-01 ] : VDWT:OW
-   2 [  9.6090e-02 - 1.4801e-06 =  9.6089e-02 ] : BONDSB:HWOW
-   3 [  4.6646e+05 - 1.1251e+02 =  4.6634e+05 ] : BONDSK:HWOW
-   4 [  1.0505e+02 + 3.3000e-03 =  1.0505e+02 ] : ANGLESB:HWOWHW
-   5 [  4.5969e+02 - 6.8321e-02 =  4.5962e+02 ] : ANGLESK:HWOWHW
-   6 [  5.1541e-01 + 3.3896e-04 =  5.1575e-01 ] : COUL:SOL-2 COUL:SOL-3
-   7 [ -1.0308e+00 - 6.7791e-04 = -1.0315e+00 ] : COUL:SOL-4
-   8 [  1.5322e-01 + 1.9488e-04 =  1.5341e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   0 [  3.2099e-01 + 6.7817e-04 =  3.2166e-01 ] : VDWS:OW
+   1 [  6.2685e-01 - 1.7088e-02 =  6.0976e-01 ] : VDWT:OW
+   2 [  9.6100e-02 - 1.3716e-06 =  9.6099e-02 ] : BONDSB:HWOW
+   3 [  4.6714e+05 - 5.4378e+01 =  4.6709e+05 ] : BONDSK:HWOW
+   4 [  1.0501e+02 + 9.1319e-03 =  1.0502e+02 ] : ANGLESB:HWOWHW
+   5 [  4.6013e+02 - 2.2406e-01 =  4.5990e+02 ] : ANGLESK:HWOWHW
+   6 [  5.1430e-01 + 5.8134e-04 =  5.1488e-01 ] : COUL:SOL-2 COUL:SOL-3
+   7 [ -1.0286e+00 - 1.1627e-03 = -1.0298e+00 ] : COUL:SOL-4
+   8 [  1.5295e-01 + 3.6908e-04 =  1.5332e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-Sim: cluster-02      Errors: Energy =   2.0975 kJ/mol (23.3247%) Atomic Force (%) =  20.9986 Net Force (%) =  43.4106 Torque (%) =  49.2645 Objective = 1.36055e-01
-Sim: cluster-03      Errors: Energy =   3.7726 kJ/mol (28.2223%) Atomic Force (%) =  20.4312 Net Force (%) =  42.0242 Torque (%) =  49.2635 Objective = 1.46433e-01
-Sim: cluster-04      Errors: Energy =   5.1456 kJ/mol (30.1544%) Atomic Force (%) =  20.6229 Net Force (%) =  42.0861 Torque (%) =  47.0948 Objective = 1.45729e-01
-Sim: cluster-05      Errors: Energy =   6.5471 kJ/mol (31.2845%) Atomic Force (%) =  20.6102 Net Force (%) =  41.7706 Torque (%) =  46.8652 Objective = 1.47710e-01
-Sim: cluster-06      Errors: Energy =   8.5001 kJ/mol (31.1205%) Atomic Force (%) =  20.8109 Net Force (%) =  43.7612 Torque (%) =  45.9818 Objective = 1.49038e-01
-Sim: cluster-07      Errors: Energy =   9.3010 kJ/mol (32.6332%) Atomic Force (%) =  21.2757 Net Force (%) =  45.2718 Torque (%) =  45.6869 Objective = 1.56598e-01
-Sim: cluster-08      Errors: Energy =  10.7142 kJ/mol (31.5329%) Atomic Force (%) =  21.4013 Net Force (%) =  44.2970 Torque (%) =  44.2191 Objective = 1.47512e-01
-Sim: cluster-09      Errors: Energy =  11.5471 kJ/mol (31.1875%) Atomic Force (%) =  21.1685 Net Force (%) =  45.4780 Torque (%) =  43.6991 Objective = 1.48067e-01
-Sim: cluster-10      Errors: Energy =  12.3861 kJ/mol (30.6261%) Atomic Force (%) =  21.4178 Net Force (%) =  45.9542 Torque (%) =  43.9952 Objective = 1.48002e-01
-Sim: cluster-11      Errors: Energy =  14.2155 kJ/mol (30.2036%) Atomic Force (%) =  21.5684 Net Force (%) =  46.3150 Torque (%) =  42.8895 Objective = 1.45227e-01
-Sim: cluster-12      Errors: Energy =  14.2483 kJ/mol (30.0943%) Atomic Force (%) =  21.3316 Net Force (%) =  46.2717 Torque (%) =  42.7644 Objective = 1.44553e-01
-Sim: cluster-13      Errors: Energy =  14.8789 kJ/mol (29.4370%) Atomic Force (%) =  21.5108 Net Force (%) =  46.1027 Torque (%) =  42.7800 Objective = 1.42243e-01
-Sim: cluster-14      Errors: Energy =  15.6684 kJ/mol (28.5945%) Atomic Force (%) =  21.4294 Net Force (%) =  46.6555 Torque (%) =  41.8933 Objective = 1.39158e-01
+Sim: cluster-02      Errors: Energy =   2.1017 kJ/mol (23.3713%) Atomic Force (%) =  20.8757 Net Force (%) =  43.5068 Torque (%) =  49.1804 Objective = 1.36413e-01
+Sim: cluster-03      Errors: Energy =   3.7823 kJ/mol (28.2948%) Atomic Force (%) =  20.3574 Net Force (%) =  42.2457 Torque (%) =  49.1973 Objective = 1.47123e-01
+Sim: cluster-04      Errors: Energy =   5.1433 kJ/mol (30.1411%) Atomic Force (%) =  20.5681 Net Force (%) =  42.4013 Torque (%) =  47.0568 Objective = 1.46298e-01
+Sim: cluster-05      Errors: Energy =   6.5411 kJ/mol (31.2560%) Atomic Force (%) =  20.5696 Net Force (%) =  42.0915 Torque (%) =  46.8268 Objective = 1.48209e-01
+Sim: cluster-06      Errors: Energy =   8.4900 kJ/mol (31.0836%) Atomic Force (%) =  20.7818 Net Force (%) =  44.0730 Torque (%) =  45.9506 Objective = 1.49538e-01
+Sim: cluster-07      Errors: Energy =   9.3072 kJ/mol (32.6546%) Atomic Force (%) =  21.2605 Net Force (%) =  45.6074 Torque (%) =  45.6631 Objective = 1.57383e-01
+Sim: cluster-08      Errors: Energy =  10.6964 kJ/mol (31.4804%) Atomic Force (%) =  21.3946 Net Force (%) =  44.5847 Torque (%) =  44.2033 Objective = 1.47951e-01
+Sim: cluster-09      Errors: Energy =  11.5424 kJ/mol (31.1746%) Atomic Force (%) =  21.1620 Net Force (%) =  45.7624 Torque (%) =  43.6868 Objective = 1.48650e-01
+Sim: cluster-10      Errors: Energy =  12.3598 kJ/mol (30.5610%) Atomic Force (%) =  21.4180 Net Force (%) =  46.2383 Torque (%) =  43.9840 Objective = 1.48434e-01
+Sim: cluster-11      Errors: Energy =  14.1665 kJ/mol (30.0994%) Atomic Force (%) =  21.5753 Net Force (%) =  46.5904 Torque (%) =  42.8875 Objective = 1.45551e-01
+Sim: cluster-12      Errors: Energy =  14.2359 kJ/mol (30.0682%) Atomic Force (%) =  21.3383 Net Force (%) =  46.5248 Torque (%) =  42.7632 Objective = 1.45062e-01
+Sim: cluster-13      Errors: Energy =  14.8442 kJ/mol (29.3682%) Atomic Force (%) =  21.5244 Net Force (%) =  46.3532 Torque (%) =  42.7809 Objective = 1.42624e-01
+Sim: cluster-14      Errors: Energy =  15.6127 kJ/mol (28.4929%) Atomic Force (%) =  21.4447 Net Force (%) =  46.9025 Torque (%) =  41.9000 Objective = 1.39461e-01
 
 #####################################################################################
-###[96m              Objective Function Breakdown, Total =  1.49399e-01               [0m###
-###[96m  Simulation Name          Residual  x  Weight  =  Contribution (Current-Last) [0m###
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
 #####################################################################################
-cluster-02                     0.13606      0.077 [92m     1.04658e-02[0m ( -2.478e-05 ) 
-cluster-03                     0.14643      0.077 [92m     1.12641e-02[0m ( -2.362e-05 ) 
-cluster-04                     0.14573      0.077 [92m     1.12099e-02[0m ( -1.722e-05 ) 
-cluster-05                     0.14771      0.077 [92m     1.13623e-02[0m ( -1.018e-05 ) 
-cluster-06                     0.14904      0.077 [92m     1.14644e-02[0m ( -6.657e-06 ) 
-cluster-07                     0.15660      0.077 [92m     1.20460e-02[0m ( -5.547e-06 ) 
-cluster-08                     0.14751      0.077 [92m     1.13471e-02[0m ( -2.349e-06 ) 
-cluster-09                     0.14807      0.077 [92m     1.13898e-02[0m ( -2.079e-06 ) 
-cluster-10                     0.14800      0.077 [91m     1.13848e-02[0m ( +6.074e-07 ) 
-cluster-11                     0.14523      0.077 [91m     1.11713e-02[0m ( +4.309e-06 ) 
-cluster-12                     0.14455      0.077 [91m     1.11194e-02[0m ( +2.336e-06 ) 
-cluster-13                     0.14224      0.077 [91m     1.09418e-02[0m ( +3.847e-06 ) 
-cluster-14                     0.13916      0.077 [91m     1.07045e-02[0m ( +4.999e-06 ) 
-Regularization                 0.00353      1.000 [91m     3.52784e-03[0m ( +7.117e-05 ) 
+cluster-02                     0.13641      0.077 [92m     1.04933e-02[0m ( -1.143e-05 ) 
+cluster-03                     0.14712      0.077 [92m     1.13172e-02[0m ( -1.703e-05 ) 
+cluster-04                     0.14630      0.077 [92m     1.12537e-02[0m ( -1.551e-05 ) 
+cluster-05                     0.14821      0.077 [92m     1.14007e-02[0m ( -1.333e-05 ) 
+cluster-06                     0.14954      0.077 [92m     1.15029e-02[0m ( -1.255e-05 ) 
+cluster-07                     0.15738      0.077 [92m     1.21064e-02[0m ( -1.614e-05 ) 
+cluster-08                     0.14795      0.077 [92m     1.13809e-02[0m ( -1.217e-05 ) 
+cluster-09                     0.14865      0.077 [92m     1.14346e-02[0m ( -1.364e-05 ) 
+cluster-10                     0.14843      0.077 [92m     1.14180e-02[0m ( -1.119e-05 ) 
+cluster-11                     0.14555      0.077 [92m     1.11962e-02[0m ( -9.442e-06 ) 
+cluster-12                     0.14506      0.077 [92m     1.11586e-02[0m ( -1.260e-05 ) 
+cluster-13                     0.14262      0.077 [92m     1.09711e-02[0m ( -1.059e-05 ) 
+cluster-14                     0.13946      0.077 [92m     1.07278e-02[0m ( -9.290e-06 ) 
+Regularization                 0.00322      1.000 [91m     3.22083e-03[0m ( +9.853e-05 ) 
+Total                                             [92m     1.49582e-01[0m ( -6.638e-05 ) 
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
-     3   5.940e-01   9.531e-03   1.523e-03[92m   1.49399e-01[0m   6.594e-05      1.000
+     3   5.675e-01   1.621e-02   4.450e-03[92m   1.49582e-01[0m   1.971e-04      1.000
+
+
+##########################################################
+###[96m                   Total Gradient                   [0m###
+##########################################################
+   0 [ -4.3466e-03 ] : VDWS:OW
+   1 [  6.1870e-04 ] : VDWT:OW
+   2 [  1.8998e-04 ] : BONDSB:HWOW
+   3 [  2.9465e-06 ] : BONDSK:HWOW
+   4 [ -2.2627e-04 ] : ANGLESB:HWOWHW
+   5 [  6.5203e-07 ] : ANGLESK:HWOWHW
+   6 [  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
+   7 [ -6.4782e-04 ] : COUL:SOL-4
+   8 [ -1.4778e-04 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+----------------------------------------------------------
+
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 9.9588e-02, result 3.4218e-04
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 1.0418e-04, result -2.1341e-07
+Searching! Hessian diagonal scaling = 6.2687e+01, L =  8.8541e+00, length 1.8914e-05, result -3.5825e-08
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 1.0418e-04, result -2.1341e-07
+Searching! Hessian diagonal scaling = 2.4562e+01, L =  5.8541e+00, length 4.6270e-05, result -8.9556e-08
+Searching! Hessian diagonal scaling = 4.4377e+00, L =  2.8541e+00, length 2.0777e-04, result -4.8319e-07
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 3.8921e-04, result -1.0901e-06
+Searching! Hessian diagonal scaling = 1.5016e+00, L =  1.7082e+00, length 7.8847e-04, result -2.5714e-06
+Searching! Hessian diagonal scaling = 1.1916e+00, L =  1.4377e+00, length 1.7460e-03, result -6.3015e-06
+Searching! Hessian diagonal scaling = 1.0732e+00, L =  1.2705e+00, length 4.0416e-03, result -1.5517e-05
+Searching! Hessian diagonal scaling = 1.0206e+00, L =  1.1435e+00, length 1.2446e-02, result -4.7169e-05
+
+##########################################################
+###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
+##########################################################
+   0 [  1.1902e-01 + 1.0925e-02 =  1.2995e-01 ] : VDWS:OW
+   1 [ -1.5635e-02 - 5.7555e-03 = -2.1390e-02 ] : VDWT:OW
+   2 [  7.1559e-03 - 2.9712e-05 =  7.1262e-03 ] : BONDSB:HWOW
+   3 [ -3.7679e-02 - 1.2591e-04 = -3.7804e-02 ] : BONDSK:HWOW
+   4 [  8.7937e-03 + 7.1897e-05 =  8.8656e-03 ] : ANGLESB:HWOWHW
+   5 [ -2.7745e-01 - 9.8335e-05 = -2.7755e-01 ] : ANGLESK:HWOWHW
+   6 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
+   7 [  1.2799e-02 - 5.2799e-04 =  1.2271e-02 ] : COUL:SOL-4
+   8 [  4.7852e-01 + 1.4547e-03 =  4.7997e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+----------------------------------------------------------
+
+##########################################################
+###[93m    Physical Parameters (Current + Step = Next)     [0m###
+##########################################################
+   0 [  3.2166e-01 + 5.7814e-04 =  3.2224e-01 ] : VDWS:OW
+   1 [  6.0976e-01 - 1.4267e-02 =  5.9549e-01 ] : VDWT:OW
+   2 [  9.6099e-02 - 1.5723e-06 =  9.6097e-02 ] : BONDSB:HWOW
+   3 [  4.6709e+05 - 1.1805e+02 =  4.6697e+05 ] : BONDSK:HWOW
+   4 [  1.0502e+02 + 4.1194e-03 =  1.0503e+02 ] : ANGLESB:HWOWHW
+   5 [  4.5990e+02 - 5.9584e-02 =  4.5984e+02 ] : ANGLESK:HWOWHW
+   6 [  5.1488e-01 + 2.1120e-04 =  5.1509e-01 ] : COUL:SOL-2 COUL:SOL-3
+   7 [ -1.0298e+00 - 4.2239e-04 = -1.0302e+00 ] : COUL:SOL-4
+   8 [  1.5332e-01 + 7.6980e-05 =  1.5340e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+----------------------------------------------------------
+Sim: cluster-02      Errors: Energy =   2.1009 kJ/mol (23.3621%) Atomic Force (%) =  20.8950 Net Force (%) =  43.4884 Torque (%) =  49.1867 Objective = 1.36335e-01
+Sim: cluster-03      Errors: Energy =   3.7804 kJ/mol (28.2804%) Atomic Force (%) =  20.3692 Net Force (%) =  42.2110 Torque (%) =  49.2022 Objective = 1.46995e-01
+Sim: cluster-04      Errors: Energy =   5.1429 kJ/mol (30.1385%) Atomic Force (%) =  20.5771 Net Force (%) =  42.3545 Torque (%) =  47.0577 Objective = 1.46188e-01
+Sim: cluster-05      Errors: Energy =   6.5410 kJ/mol (31.2556%) Atomic Force (%) =  20.5764 Net Force (%) =  42.0457 Torque (%) =  46.8282 Objective = 1.48114e-01
+Sim: cluster-06      Errors: Energy =   8.4904 kJ/mol (31.0851%) Atomic Force (%) =  20.7868 Net Force (%) =  44.0290 Torque (%) =  45.9508 Objective = 1.49446e-01
+Sim: cluster-07      Errors: Energy =   9.3051 kJ/mol (32.6475%) Atomic Force (%) =  21.2633 Net Force (%) =  45.5614 Torque (%) =  45.6626 Objective = 1.57253e-01
+Sim: cluster-08      Errors: Energy =  10.6972 kJ/mol (31.4829%) Atomic Force (%) =  21.3961 Net Force (%) =  44.5454 Torque (%) =  44.2015 Objective = 1.47868e-01
+Sim: cluster-09      Errors: Energy =  11.5413 kJ/mol (31.1717%) Atomic Force (%) =  21.1633 Net Force (%) =  45.7240 Torque (%) =  43.6841 Objective = 1.48547e-01
+Sim: cluster-10      Errors: Energy =  12.3617 kJ/mol (30.5656%) Atomic Force (%) =  21.4183 Net Force (%) =  46.2004 Torque (%) =  43.9813 Objective = 1.48355e-01
+Sim: cluster-11      Errors: Energy =  14.1714 kJ/mol (30.1098%) Atomic Force (%) =  21.5746 Net Force (%) =  46.5542 Torque (%) =  42.8837 Objective = 1.45489e-01
+Sim: cluster-12      Errors: Energy =  14.2353 kJ/mol (30.0668%) Atomic Force (%) =  21.3376 Net Force (%) =  46.4915 Torque (%) =  42.7592 Objective = 1.44972e-01
+Sim: cluster-13      Errors: Energy =  14.8464 kJ/mol (29.3727%) Atomic Force (%) =  21.5225 Net Force (%) =  46.3206 Torque (%) =  42.7766 Objective = 1.42552e-01
+Sim: cluster-14      Errors: Energy =  15.6178 kJ/mol (28.5022%) Atomic Force (%) =  21.4426 Net Force (%) =  46.8704 Torque (%) =  41.8948 Objective = 1.39401e-01
+
+#####################################################################################
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+#####################################################################################
+cluster-02                     0.13634      0.077 [92m     1.04873e-02[0m ( -6.006e-06 ) 
+cluster-03                     0.14700      0.077 [92m     1.13073e-02[0m ( -9.825e-06 ) 
+cluster-04                     0.14619      0.077 [92m     1.12453e-02[0m ( -8.414e-06 ) 
+cluster-05                     0.14811      0.077 [92m     1.13934e-02[0m ( -7.310e-06 ) 
+cluster-06                     0.14945      0.077 [92m     1.14958e-02[0m ( -7.074e-06 ) 
+cluster-07                     0.15725      0.077 [92m     1.20964e-02[0m ( -9.995e-06 ) 
+cluster-08                     0.14787      0.077 [92m     1.13744e-02[0m ( -6.443e-06 ) 
+cluster-09                     0.14855      0.077 [92m     1.14267e-02[0m ( -7.904e-06 ) 
+cluster-10                     0.14835      0.077 [92m     1.14119e-02[0m ( -6.144e-06 ) 
+cluster-11                     0.14549      0.077 [92m     1.11915e-02[0m ( -4.736e-06 ) 
+cluster-12                     0.14497      0.077 [92m     1.11517e-02[0m ( -6.974e-06 ) 
+cluster-13                     0.14255      0.077 [92m     1.09656e-02[0m ( -5.528e-06 ) 
+cluster-14                     0.13940      0.077 [92m     1.07232e-02[0m ( -4.606e-06 ) 
+Regularization                 0.00326      1.000 [91m     3.26462e-03[0m ( +4.379e-05 ) 
+Total                                             [92m     1.49535e-01[0m ( -4.717e-05 ) 
+-------------------------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     4   5.714e-01   1.245e-02   3.667e-03[92m   1.49535e-01[0m   4.658e-05      1.000
 
 Convergence criterion reached for objective function (1.00e-04)
 
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 @@@[1;92m           Final objective function value           [0m@@@
-@@@[1;92m  Full:  1.493990e-01  Un-penalized:  1.458711e-01  [0m@@@
+@@@[1;92m  Full:  1.495350e-01  Un-penalized:  1.462704e-01  [0m@@@
 @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 ##########################################################
@@ -604,25 +680,25 @@ Convergence criterion reached for objective function (1.00e-04)
 ###[1;94m                Choose pvals or mvals               [0m###
 ##########################################################
 read_pvals
-   0 [  3.2597e-01 ] : VDWS:OW
-   1 [  5.1135e-01 ] : VDWT:OW
-   2 [  9.6089e-02 ] : BONDSB:HWOW
-   3 [  4.6634e+05 ] : BONDSK:HWOW
-   4 [  1.0505e+02 ] : ANGLESB:HWOWHW
-   5 [  4.5962e+02 ] : ANGLESK:HWOWHW
-   6 [  5.1575e-01 ] : COUL:SOL-2 COUL:SOL-3
-   7 [ -1.0315e+00 ] : COUL:SOL-4
-   8 [  1.5341e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   0 [  3.2224e-01 ] : VDWS:OW
+   1 [  5.9549e-01 ] : VDWT:OW
+   2 [  9.6097e-02 ] : BONDSB:HWOW
+   3 [  4.6697e+05 ] : BONDSK:HWOW
+   4 [  1.0503e+02 ] : ANGLESB:HWOWHW
+   5 [  4.5984e+02 ] : ANGLESK:HWOWHW
+   6 [  5.1509e-01 ] : COUL:SOL-2 COUL:SOL-3
+   7 [ -1.0302e+00 ] : COUL:SOL-4
+   8 [  1.5340e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 /read_pvals
 read_mvals
-   0 [  2.0040e-01 ] : VDWS:OW
-   1 [ -5.5333e-02 ] : VDWT:OW
-   2 [  6.9733e-03 ] : BONDSB:HWOW
-   3 [ -3.8475e-02 ] : BONDSK:HWOW
-   4 [  9.2700e-03 ] : ANGLESB:HWOWHW
-   5 [ -2.7791e-01 ] : ANGLESK:HWOWHW
+   0 [  1.2995e-01 ] : VDWS:OW
+   1 [ -2.1390e-02 ] : VDWT:OW
+   2 [  7.1262e-03 ] : BONDSB:HWOW
+   3 [ -3.7804e-02 ] : BONDSK:HWOW
+   4 [  8.8656e-03 ] : ANGLESB:HWOWHW
+   5 [ -2.7755e-01 ] : ANGLESK:HWOWHW
    6 [  0.0000e+00 ] : COUL:SOL-2 COUL:SOL-3
-   7 [  1.0630e-02 ] : COUL:SOL-4
-   8 [  4.8021e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+   7 [  1.2271e-02 ] : COUL:SOL-4
+   8 [  4.7997e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 /read_mvals
 ----------------------------------------------------------
