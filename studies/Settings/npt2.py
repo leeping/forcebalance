@@ -76,10 +76,10 @@ from forcebalance.openmmio import *
 #======================================================#
 
 # Select run parameters
-timestep = 0.5 * units.femtosecond # timestep for integration
-nsteps = 200                       # number of steps per data record
-nequiliterations = 100             # number of equilibration iterations (hope 50 ps is enough)
-niterations = 100                # number of iterations to collect data for
+timestep = 0.8 * units.femtosecond # timestep for integration
+nsteps = 250                       # number of steps per data record
+nequiliterations = 500             # number of equilibration iterations (hope 50 ps is enough)
+niterations = 10000                # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * units.kelvin
@@ -127,7 +127,7 @@ platform = openmm.Platform.getPlatformByName(PlatName)
 # Set the device to the environment variable or zero otherwise
 device = os.environ.get('CUDA_DEVICE',"0")
 print "Setting Device to", device
-platform.setPropertyDefaultValue("CudaDevice", device)
+platform.setPropertyDefaultValue("CudaDeviceIndex", device)
 platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
 
 def generateMaxwellBoltzmannVelocities(system, temperature):
@@ -592,7 +592,7 @@ def main():
    global timestep, nsteps, niterations
    timestep = 0.1 * units.femtosecond # timestep for integrtion
    nsteps   = 1000                    # number of steps per data record
-   niterations = 100
+   niterations = 5000
 
    mpdb = PDBFile('mono.pdb')
    mData, mXyzs, _trash, _crap, mEnergies, mSim = run_simulation(mpdb, mono_mutual_kwargs if FF.amoeba_pol == 'mutual' else mono_direct_kwargs, pbc=False, Trajectory=False)

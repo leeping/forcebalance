@@ -793,9 +793,12 @@ class Molecule(object):
             # for i in range(len(self.comms)):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             if 'networkx' in sys.modules:
-                self.topology = self.build_topology()
-                if 'bonds' not in self.Data:
-                    self.Data['bonds'] = self.topology.edges()
+                try:
+                    self.topology = self.build_topology()
+                    if 'bonds' not in self.Data:
+                        self.Data['bonds'] = self.topology.edges()
+                except:
+                    pass # Address this later ; topology builds may fail if certain things are missing
 
     #=====================================#
     #|     Core read/write functions     |#
