@@ -55,7 +55,7 @@ static PyObject *_Assign(PyObject *self, PyObject *args) {
   */
   // Solve the assignment problem.
   apc(DIM,Mat_Int,inf,&ans,idx);
-  printf("The optimal assignment has cost %i\n",ans);
+  //printf("The optimal assignment has cost %i\n",ans);
   free(Mat_Int);
   return PyArray_Return(idx_);
 }

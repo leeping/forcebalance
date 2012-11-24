@@ -88,14 +88,14 @@ def flat(vec):
 
 
 def build_graph(M):
-    M.require('bonds')
+    M.require('abonds')
     G = MolG()
     for i, a in enumerate(M.elem):
         G.add_node(i)
         nx.set_node_attributes(G,'n',{i:M.atomname[i]})
         nx.set_node_attributes(G,'e',{i:a})
         nx.set_node_attributes(G,'x',{i:M.xyzs[0][i]})
-    for i, a in enumerate(M.bonds):
+    for i, a in enumerate(M.abonds):
         for j in a:
             G.add_edge(i, j)
     return G
