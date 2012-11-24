@@ -282,7 +282,8 @@ class Interaction(Target):
             savetxt('M.txt',M_all)
             savetxt('Q.txt',self.eqm)
         for i in range(ns):
-            print "Incrementing quantities for snapshot %i\r" % i,
+            if i % 100 == 0:
+                print "Incrementing quantities for snapshot %i\r" % i,
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
             Z  += P

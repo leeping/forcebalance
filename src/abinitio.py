@@ -591,7 +591,8 @@ class AbInitio(Target):
         # except:
         #     warn_press_key("AbInitio_Build has phailed!")
         for i in range(ns):
-            print "\rIncrementing quantities for snapshot %i\r" % i,
+            if i % 100 == 0:
+                print "\rIncrementing quantities for snapshot %i\r" % i,
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
             Z  += P
@@ -606,7 +607,8 @@ class AbInitio(Target):
             if self.all_at_once:
                 M = M_all[i]
             else:
-                print "Shot %i\r" % i,
+                if i % 100 == 0:
+                    print "Shot %i\r" % i,
                 M = self.energy_force_transformer(i)
                 M_all[i,:] = M.copy()
             X     = M-Q
@@ -630,7 +632,8 @@ class AbInitio(Target):
                     M_pp[p] = ddM_all[i, p]
                 else:
                     def callM(mvals_):
-                        print "\r",
+                        if i % 100 == 0:
+                            print "\r",
                         pvals = self.FF.make(mvals_, self.usepvals)
                         return self.energy_force_transformer(i)
                     M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
@@ -938,7 +941,8 @@ class AbInitio(Target):
             if self.all_at_once:
                 M = M_all[i]
             else:
-                print "Shot %i\r" % i,
+                if i % 100 == 0:
+                    print "Shot %i\r" % i,
                 M = self.energy_force_transformer(i)
             # Increment the average values.
             M0_M += P*M
