@@ -168,13 +168,12 @@ class Optimizer(ForceBalanceBaseClass):
         ## Print out final answer
         final_print = True
         if final_print:
-            bar = printcool("Final parameter values\n Paste to input file to restart\n Choose pvals or mvals",bold=True,color=4)
-            print "read_pvals"
-            self.FF.print_map(self.FF.create_pvals(xk))
-            print "/read_pvals"
+            bar = printcool("Final optimization parameters:\n Paste to input file to restart",bold=True,color=4)
             print "read_mvals"
             self.FF.print_map(xk)
             print "/read_mvals"
+            bar = printcool("Final physical parameters:",bold=True,color=4)
+            self.FF.print_map(self.FF.create_pvals(xk))
             print bar
             self.FF.make(xk,False,'result')
 

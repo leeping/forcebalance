@@ -195,7 +195,7 @@ class Interaction(Target):
         return
         
     def indicate(self):
-        print "Sim: %-15s" % self.name, 
+        print "Target: %-15s" % self.name, 
         print "Interaction Energy error = %8.4f kJ/mol (%.4f%%), Objective = %.5e" % (self.e_err, self.e_err_pct*100, self.objective)
 
     def get(self, mvals, AGrad=False, AHess=False):

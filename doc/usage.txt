@@ -14,37 +14,25 @@ description for each option.
 
 @section input_file Input file
 
-A typical input file for ForceBalance might look something like this:
+A minimal input file for ForceBalance might look something like this:
 
 @verbatim
+
 $options
 jobtype newton
-gmxpath /home/leeping/opt/gromacs-4.5.5/bin
 forcefield water.itp
-penalty_additive       0.0
-penalty_multiplicative 0.01
-convergence_objective 1e-6
-convergence_step 1e-6
-print_parameters no
-print_gradient no
-print_hessian no
 $end
 
 $target
-name water12_a
+name cluster-02
 type abinitio_gmx
-weight 1
-w_energy 1.0
-w_force 1.0
 $end
 
 $target
-name water12_b
+name cluster-03
 type abinitio_gmx
-weight 1
-w_energy 1.0
-w_force 1.0
 $end
+
 @endverbatim
 
 Global options for a ForceBalance job are given in the \c $options
@@ -68,17 +56,19 @@ The directory structure for our example job would look like:
   +- forcefield
   |   |- water.itp
   +- targets
-  |   +- water12_gen1
+  |   +- cluster-02
+  |   |   +- settings (contains job settings)
+  |   |   |   |- shot.mdp
+  |   |   |   |- topol.top
+  |   |   |- all.gro (contains geometries)
+  |   |   |- qdata.txt (contains QM data)
+  |   +- cluster-03
   |   |   +- settings
   |   |   |   |- shot.mdp
   |   |   |   |- topol.top
-  |   |   |- all.gro (containing 300 geometries)
+  |   |   |- all.gro
   |   |   |- qdata.txt
-  |   +- water12_gen2
-  |   |   |   |- shot.mdp
-  |   |   |   |- topol.top
-  |   |   |- all.gro (containing 300 geometries)
-  |   |   |- qdata.txt
+  |   +- <more target directories>
   |- input.in
   +- temp
   |   |- iter_0001
@@ -92,7 +82,7 @@ The directory structure for our example job would look like:
 The top-level directory names \b forcefield and \b targets are fixed
 and cannot be changed.  \b forcefield contains the force field files
 that you're optimizing, and \b targets contains all of the reference
-data as well as the settings for simulating that data using the force
+data as well as the input files for simulating that data using the force
 field.  Each subdirectory in \b targets corresponds to a single
 target, and its contents depend on the specific kind of target and its
 corresponding \c Target class.
@@ -103,8 +93,8 @@ deposited after the optimization job is done.  These two directories
 are created if not already there.
 
 Note the force field file, \c water.itp and the two fitting
-targets \c water12_gen1 and \c water12_gen2 correspond to the
-entries in the input file.  There are two energy and force matching
+targets \c cluster-02 and \c cluster-03 match the
+\c target sections in the input file.  There are two energy and force matching
 targets here; each directory contains the relevant geometries (in
 \c all.gro ) and reference data (in \c qdata.txt ).
 
@@ -128,7 +118,7 @@ density, and enthalpy of vaporization.  With the AMOEBA functional
 form and 19 adjustable parameters, we developed a highly accurate
 model that fitted all of these properties to very high accuracy.
 
-Due to the diverse (and somewhat esoteric) nature of these calculations,
+Due to the diverse nature of these calculations,
 they need to be set up in a specific way that is recognized by ForceBalance.
 The setup is different for each type of simulation, and we invite
 you to learn by example through looking at the files in the \c studies
@@ -156,7 +146,7 @@ simple specification:
 JOB 0
 COORDS x1 y1 z1 x2 y2 z2 ... (floating point numbers in Angstrom)
 ENERGY (floating point number in Hartree)
-FORCES fx1 fy1 fz1 ... (floating point numbers in Hartree/bohr - this is a misnomer because they are actually gradients.)
+FORCES fx1 fy1 fz1 ... (floating point numbers in Hartree/bohr - this is a misnomer because they are actually gradients, which differ by a sign from the forces.)
 
 JOB 1
 ...
@@ -166,7 +156,7 @@ The coordinates in the quantum data file should be consistent with the
 coordinate trajectory file, although ForceBalance will use the latter
 most of the time.  It is easy to generate the quantum data file from
 parsing the output of quantum chemistry software.  ForceBalance
-contains example methods for parsing Q-Chem output files.
+contains methods for parsing Q-Chem output files in the \c molecule.py class.
 
 In addition to \c all.gro and \c qdata.txt , the simulation setup
 files are required.  These contain settings needed by the simulation

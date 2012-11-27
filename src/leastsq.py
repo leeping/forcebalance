@@ -48,7 +48,7 @@ class LeastSquares(Target):
     def indicate(self):
         #RMSD = sqrt(mean(self.D ** 2))
         MAD = mean(abs(self.D))
-        print "\rSim: %-15s" % self.name, 
+        print "\rTarget: %-15s" % self.name, 
         print "MeanAbsErr/MeanExact: %.5e Objective = %.5e" % (MAD / self.MAQ, self.objective)
         return
 

@@ -122,7 +122,7 @@ class Moments(Target):
         
     def indicate(self):
         """ Print qualitative indicator. """
-        print "\rSim: %-15s" % self.name
+        print "\rTarget: %-15s" % self.name
         #print "Multipole Moments and Po"
         #print "Reference :", self.ref_moments
         #print "Calculated:", self.calc_moments
