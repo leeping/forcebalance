@@ -31,16 +31,16 @@ print_hessian no
 $end
 
 $target
-simtype abinitio_gmx
 name water12_a
+type abinitio_gmx
 weight 1
 w_energy 1.0
 w_force 1.0
 $end
 
 $target
-simtype abinitio_gmx
 name water12_b
+type abinitio_gmx
 weight 1
 w_energy 1.0
 w_force 1.0
