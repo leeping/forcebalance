@@ -124,7 +124,7 @@ The setup is different for each type of simulation, and we invite
 you to learn by example through looking at the files in the \c studies
 directory.
 
-@subsection Energy and force matching
+@subsection energy_force_matching Energy and force matching
 
 In these relatively simple simulations, the objective function is
 computed from the squared difference in the potential energy and
