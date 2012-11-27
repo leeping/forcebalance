@@ -1,0 +1,273 @@
+
+########################################################################
+###[1m             Welcome to ForceBalance version 1.0! =D              [0m###
+###[1m                 Force Field Optimization System                  [0m###
+###[1m                      Author: Lee-Ping Wang                       [0m###
+########################################################################
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: validate.in
+
+##########################################################
+###[95m  Options at their default values are not printed   [0m###
+###[95m        Use 'verbose_options True' to Enable        [0m###
+##########################################################
+Reading force field from file: water.itp
+
+###########################################################
+###[92m Starting parameter indices, physical values and IDs [0m###
+###########################################################
+   0 [  3.1537e-01 ] : VDWS:OW
+   1 [  6.4852e-01 ] : VDWT:OW
+   2 [  9.5720e-02 ] : BONDSB:HWOW
+   3 [  5.0242e+05 ] : BONDSK:HWOW
+   4 [  1.0452e+02 ] : ANGLESB:HWOWHW
+   5 [  6.2802e+02 ] : ANGLESK:HWOWHW
+   6 [  5.2000e-01 ] : COUL:SOL-2 COUL:SOL-3
+   7 [ -1.0400e+00 ] : COUL:SOL-4
+   8 [  1.2800e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+-----------------------------------------------------------
+
+##########################################################
+###[91m    Rescaling Factors (Lower Takes Precedence):     [0m###
+##########################################################
+   BONDSB                               : 5.29177e-02
+   BONDSK                               : 9.37583e+05
+   VSITE3A                              : 5.29177e-02
+   VSITE3B                              : 5.29177e-02
+   ANGLESB                              : 5.72958e+01
+   VDWS                                 : 5.29177e-02
+   ANGLESK                              : 6.05928e+02
+   COUL                                 : 1.00000e+00
+   VDWT                                 : 2.47894e+00
+----------------------------------------------------------
+Building charge constraints...
+Parameter 6 occurs 2 times in molecule SOL in locations [1, 2] (COUL:SOL-2 COUL:SOL-3)
+Parameter 7 occurs 1 times in molecule SOL in locations [3] (COUL:SOL-4)
+
+##########################################################
+###[92m               Setup for force field                [0m###
+##########################################################
+
+----------------------------------------------------------
+Backing up: temp/cluster-02 to: backups/cluster-02.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-02 :            [0m###
+##########################################################
+name                      cluster-02 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-02 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-03 to: backups/cluster-03.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-03 :            [0m###
+##########################################################
+name                      cluster-03 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-03 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-04 to: backups/cluster-04.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-04 :            [0m###
+##########################################################
+name                      cluster-04 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-04 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-05 to: backups/cluster-05.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-05 :            [0m###
+##########################################################
+name                      cluster-05 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-05 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-06 to: backups/cluster-06.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-06 :            [0m###
+##########################################################
+name                      cluster-06 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-06 
+shots                     1208 
+----------------------------------------------------------
+Backing up: temp/cluster-07 to: backups/cluster-07.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-07 :            [0m###
+##########################################################
+name                      cluster-07 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-07 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-08 to: backups/cluster-08.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-08 :            [0m###
+##########################################################
+name                      cluster-08 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-08 
+shots                     1202 
+----------------------------------------------------------
+Backing up: temp/cluster-09 to: backups/cluster-09.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-09 :            [0m###
+##########################################################
+name                      cluster-09 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-09 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-10 to: backups/cluster-10.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-10 :            [0m###
+##########################################################
+name                      cluster-10 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-10 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-11 to: backups/cluster-11.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-11 :            [0m###
+##########################################################
+name                      cluster-11 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-11 
+shots                     1205 
+----------------------------------------------------------
+Backing up: temp/cluster-12 to: backups/cluster-12.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-12 :            [0m###
+##########################################################
+name                      cluster-12 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-12 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-13 to: backups/cluster-13.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-13 :            [0m###
+##########################################################
+name                      cluster-13 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-13 
+shots                     1201 
+----------------------------------------------------------
+Backing up: temp/cluster-14 to: backups/cluster-14.0.tar.bz2
+
+##########################################################
+###[92m           Setup for target cluster-14 :            [0m###
+##########################################################
+name                      cluster-14 
+type                      ABINITIO_GMX 
+tgtdir                    targets/cluster-14 
+shots                     1201 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
+
+##########################################################
+###[92m           Setup for objective function :           [0m###
+##########################################################
+penalty_additive          0.01 
+----------------------------------------------------------
+
+##########################################################
+###[92m                Setup for optimizer                 [0m###
+##########################################################
+jobtype                   SINGLE 
+----------------------------------------------------------
+Target: cluster-02      Errors: Energy =   4.1253 kJ/mol (45.8740%) Atomic Force (%) =  35.7140 Objective = 1.63857e-01
+Target: cluster-03      Errors: Energy =   5.6597 kJ/mol (42.3390%) Atomic Force (%) =  32.9942 Objective = 1.43953e-01
+Target: cluster-04      Errors: Energy =   7.0388 kJ/mol (41.2488%) Atomic Force (%) =  32.8812 Objective = 1.39188e-01
+Target: cluster-05      Errors: Energy =   8.2171 kJ/mol (39.2646%) Atomic Force (%) =  32.4988 Objective = 1.29896e-01
+Target: cluster-06      Errors: Energy =   9.4124 kJ/mol (34.4605%) Atomic Force (%) =  32.4778 Objective = 1.12062e-01
+Target: cluster-07      Errors: Energy =  11.0852 kJ/mol (38.8930%) Atomic Force (%) =  32.8584 Objective = 1.29577e-01
+Target: cluster-08      Errors: Energy =  11.7031 kJ/mol (34.4432%) Atomic Force (%) =  32.6745 Objective = 1.12695e-01
+Target: cluster-09      Errors: Energy =  13.0187 kJ/mol (35.1620%) Atomic Force (%) =  32.4220 Objective = 1.14377e-01
+Target: cluster-10      Errors: Energy =  13.9224 kJ/mol (34.4247%) Atomic Force (%) =  32.3609 Objective = 1.11621e-01
+Target: cluster-11      Errors: Energy =  14.8120 kJ/mol (31.4710%) Atomic Force (%) =  32.4811 Objective = 1.02262e-01
+Target: cluster-12      Errors: Energy =  15.2291 kJ/mol (32.1658%) Atomic Force (%) =  32.3608 Objective = 1.04094e-01
+Target: cluster-13      Errors: Energy =  16.3658 kJ/mol (32.3787%) Atomic Force (%) =  32.2080 Objective = 1.04292e-01
+Target: cluster-14      Errors: Energy =  16.8982 kJ/mol (30.8387%) Atomic Force (%) =  32.1765 Objective = 9.93052e-02
+
+######################################################################
+###[94m                  Objective Function Breakdown                  [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution [0m###
+######################################################################
+cluster-02                     0.16386      0.077 [94m     1.26044e-02[0m 
+cluster-03                     0.14395      0.077 [94m     1.10733e-02[0m 
+cluster-04                     0.13919      0.077 [94m     1.07068e-02[0m 
+cluster-05                     0.12990      0.077 [94m     9.99200e-03[0m 
+cluster-06                     0.11206      0.077 [94m     8.62013e-03[0m 
+cluster-07                     0.12958      0.077 [94m     9.96745e-03[0m 
+cluster-08                     0.11269      0.077 [94m     8.66883e-03[0m 
+cluster-09                     0.11438      0.077 [94m     8.79823e-03[0m 
+cluster-10                     0.11162      0.077 [94m     8.58624e-03[0m 
+cluster-11                     0.10226      0.077 [94m     7.86629e-03[0m 
+cluster-12                     0.10409      0.077 [94m     8.00726e-03[0m 
+cluster-13                     0.10429      0.077 [94m     8.02249e-03[0m 
+cluster-14                     0.09931      0.077 [94m     7.63886e-03[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     1.20552e-01[0m 
+----------------------------------------------------------------------
+The objective function is: 0.120552297674

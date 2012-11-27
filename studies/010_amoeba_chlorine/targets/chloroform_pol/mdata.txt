@@ -1,0 +1,63 @@
+#==========================================#
+#| File containing multipole moments from |#
+#|      experiment/QM for ForceBalance    |#
+#|                                        |#
+#| Octothorpes are comments               |#
+#| This file should be formatted like so: |#
+#| (Full XYZ file for the molecule)       |#
+#| Number of atoms                        |#
+#| Comment line                           |#
+#| a1 x1 y1 z1 (xyz for atom 1)           |#
+#| a2 x2 y2 z2 (xyz for atom 2)           |#
+#|                                        |#
+#| These coords will be actually used     |#
+#|                                        |#
+#| (Followed by multipole moments)        |#
+#| dipole, in Debye                       |#
+#| dx dy dz                               |#
+#| (Empty line is optional)               |#
+#| quadrupole, in Buckingham              |#
+#| qxx                                    |#
+#| qxy qyy                                |#
+#| qxz qyz qzz                            |#
+#| polarizability, in Angstrom^3          |#
+#| axx                                    |#
+#| axy ayy                                |#
+#| axz ayz azz                            |#
+#|                                        |#
+#| Polarizability was generated using     |#
+#| Q-Chem on the given coordinates,       |#
+#| PBE0, aug-cc-pVDZ basis set.           |#
+#| Values were scaled to experimental     |#
+#| isotropic value (from CRC Handbook)    |#
+#|                                        |#
+#| Moments are taken from a Q-Chem        |#
+#| calculation using RIMP2/aug-cc-pVTZ.   |#
+#| Since multipoles were obtained using   |#
+#| DMA, these moments are kept as a       |#
+#| sanity check. ForceBalance will        |#
+#| automatically subtract the quadrupole  |#
+#| trace.                                 |#
+#|                                        |#
+#==========================================#
+
+5
+Chloroform monomer from Stephen ; AMOEBA-minimized GaussView-symmetrized.
+C      0.000000     0.000000     0.475638
+H      0.000000     0.000000     1.562038
+Cl    -1.419738    -0.819686    -0.086586
+Cl     0.000000     1.639372    -0.086586
+Cl     1.419738    -0.819686    -0.086586
+
+dipole
+  0.000       0.000       1.203
+
+quadrupole
+-44.733       0.000       0.000
+  0.000     -44.733       0.000
+  0.000       0.000     -41.999
+
+polarizability
+  9.072       0.000       0.000
+  0.000       9.072       0.000
+  0.000       0.000       6.546
