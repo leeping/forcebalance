@@ -332,6 +332,7 @@ class AbInitio(Target):
         else:
             print "QM forces are not present, only fitting energies."
             self.force = 0
+            self.w_force = 0
         self.nesp = len(self.espval[0]) if len(self.espval) > 0 else 0
         # Here we may choose a subset of atoms to do the force matching.
         if self.force:
@@ -403,7 +404,7 @@ class AbInitio(Target):
         return
         
     def indicate(self):
-        print "Sim: %-15s" % self.name, 
+        print "Target: %-15s" % self.name, 
         if self.energy:
             if self.e_err_pct == None:
                 print "Errors: Energy (kJ/mol) = %8.4f" % (self.e_err, self.f_err*100), 

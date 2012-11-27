@@ -16,107 +16,68 @@ priors
 /priors
 $end
 
-$simulation
-simtype abinitio_gmx             # The simulation type; fitting ab initio data using GROMACS
-name cluster-02                  # Also the subdirectory containing data within "simulations"
-w_energy 1.0                     # Relative weight of energy differences
-w_force 1.0                      # Relative weight of force differences
-shots -1                         # Number of snapshots
+$target
+simtype abinitio_gmx             # The target type; fitting ab initio data using GROMACS
+name cluster-02                  # Also the subdirectory containing data within "targets"
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-03     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-04     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-05     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-06     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-07     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-08     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-09     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-10     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-11     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-12     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-13     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 
-$simulation
+$target
 simtype abinitio_gmx
 name cluster-14     
-w_energy 1.0        
-w_force 1.0         
-shots -1            
 $end
 

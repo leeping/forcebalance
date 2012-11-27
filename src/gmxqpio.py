@@ -171,7 +171,7 @@ class Monomer_QTPIE(Target):
         
     def indicate(self):
         """ Print qualitative indicator. """
-        print "\rSim: %-15s" % self.name
+        print "\rTarget: %-15s" % self.name
 
         ref_momvals = self.unpack_moments(self.ref_moments)
         calc_momvals = self.unpack_moments(self.calc_moments)

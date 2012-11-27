@@ -1,8 +1,8 @@
 $options
-jobtype newton                   # Indicates Newton-Raphson type optimization
+jobtype single                   # Indicates Newton-Raphson type optimization
 forcefield water.itp             # Specify names of force field files (files with tunable constants).  Try changing the PARM tags on the ITP file.
-trust0 -1                        # Negative trust radius indicates "nonlinear search" algorithm.  Try a positive trust radius.
-search_tolerance 1e-1            # Convergence threshold for nonlinear search
+penalty_additive 0.01            # Regularization prefactor.
+# <Make sure to paste the output from very_simple.in here.>
 $end
 
 $target

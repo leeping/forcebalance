@@ -142,7 +142,7 @@ class THCDF_Psi4(LeastSquares):
         o.close()
 
     def indicate(self):
-        print "\rSim: %-15s" % self.name, 
+        print "\rTarget: %-15s" % self.name, 
         print "Molecules = %-30s" % str(self.Molecules),
         MAD = np.mean(np.abs(self.D))
         print "Mean (Max) Error: %8.4f%% (%8.4f%%) Energies: DF %+.3e MP2 %+.3e Delta % .3e Objective = %.5e" % (100*MAD / self.MAQ, 100*np.max(np.abs(self.D)) / self.MAQ, self.DF_Energy, self.MP2_Energy, self.DF_Energy - self.MP2_Energy, self.objective)

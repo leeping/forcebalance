@@ -91,7 +91,7 @@ class Vibration(Target):
         
     def indicate(self):
         """ Print qualitative indicator. """
-        print "\rSim: %-15s" % self.name, 
+        print "\rTarget: %-15s" % self.name, 
         print "Frequencies (wavenumbers), Reference:", self.ref_eigvals,
         print "Calculated:", self.calc_eigvals,
         print "Objective = %.5e" % self.objective
