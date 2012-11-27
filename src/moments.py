@@ -37,6 +37,7 @@ class Moments(Target):
         self.set_option(tgt_opts, 'dipole_denom')
         self.set_option(tgt_opts, 'quadrupole_denom')
         self.set_option(tgt_opts, 'polarizability_denom')
+        self.set_option(tgt_opts, 'optimize_geometry')
 
 	self.denoms = {}
         self.denoms['dipole'] = self.dipole_denom
@@ -114,6 +115,13 @@ class Moments(Target):
                 print line
                 raise Exception("This line doesn't comply with our multipole file format!")
             ln += 1
+        # Subtract the trace of the quadrupole moment.
+        if 'quadrupole' in self.ref_moments:
+            trace3 = (self.ref_moments['quadrupole']['xx'] + self.ref_moments['quadrupole']['yy'] + self.ref_moments['quadrupole']['zz'])/3
+            self.ref_moments['quadrupole']['xx'] -= trace3
+            self.ref_moments['quadrupole']['yy'] -= trace3
+            self.ref_moments['quadrupole']['zz'] -= trace3
+
         return
 
     def prepare_temp_directory(self, options, tgt_opts):
@@ -148,7 +156,7 @@ class Moments(Target):
         return
 
     def unpack_moments(self, moment_dict):
-        answer = array(list(itertools.chain(*[[dct[i]/self.denoms[ord] for i in dct] for ord,dct in moment_dict.items()])))
+        answer = array(list(itertools.chain(*[[dct[i]/self.denoms[ord] if self.denoms[ord] != 0.0 else 0.0 for i in dct] for ord,dct in moment_dict.items()])))
         return answer
 
     def get(self, mvals, AGrad=False, AHess=False):

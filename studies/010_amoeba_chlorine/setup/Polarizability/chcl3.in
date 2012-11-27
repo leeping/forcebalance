@@ -1,0 +1,36 @@
+$molecule
+0 1
+ C                  0.00000000    0.00000000    0.47563839
+ H                  0.00000000    0.00000000    1.56203774
+ Cl                -1.41973774   -0.81968597   -0.08658571
+ Cl                -0.00000000    1.63937194   -0.08658571
+ Cl                 1.41973774   -0.81968597   -0.08658571
+$end
+
+$rem
+jobtype sp
+moprop 2
+scf_convergence 8
+basis aug-cc-pvdz
+exchange pbe0
+symmetry off
+sym_ignore true
+$end
+
+@@@@
+
+$molecule
+read
+$end
+
+$rem
+jobtype sp
+do_dma true
+scf_convergence 8
+exchange hf
+correlation rimp2
+basis aug-cc-pvtz
+aux_basis rimp2-aug-cc-pvtz
+symmetry off
+sym_ignore true
+$end

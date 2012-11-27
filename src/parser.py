@@ -146,6 +146,7 @@ tgt_opts_types = {
                  "force"            : (1, 'Enable the force objective function in ab initio'), 
                  "resp"             : (0, 'Enable the RESP objective function in ab initio (remember to set espweight)'),
                  "do_cosmo"         : (0, 'Call Q-Chem to do MM COSMO on MM snapshots.'),
+                 "optimize_geometry": (1, 'Perform a geometry optimization before computing properties (relevant for Moments function.)'),
                 },
     'floats'  : {"weight"      : (1.0, 'Weight of the target (determines its importance vs. other targets)'),
                  "w_rho"       : (1.0, 'Weight of experimental density within liquid properties'),
@@ -162,9 +163,9 @@ tgt_opts_types = {
                  "energy_denom"   : (0.0, 'Energy denominator for Interactions objective function (default is to use stdev)'),
                  "rmsd_denom"     : (0.1, 'RMSD denominator for Interactions objective function'),
                  "wavenumber_tol" : (10.0, 'Normalizes the objective function when fitting vibrational frequencies'),
-                 "dipole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (dipole, in Debye)'),
-                 "quadrupole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (quadrupole, in Buckingham)'),
-                 "polarizability_denom"   : (1.0, 'Normalizes the objective function when fitting molecular dipole polarizability tensor (dipole polarizability, in cubic Angstrom)')
+                 "dipole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (dipole, in Debye) ; set to 0 if a zero weight is desired'),
+                 "quadrupole_denom"   : (1.0, 'Normalizes the objective function when fitting multipole moments (quadrupole, in Buckingham) ; set to 0 if a zero weight is desired'),
+                 "polarizability_denom"   : (1.0, 'Normalizes the objective function when fitting molecular dipole polarizability tensor (dipole polarizability, in cubic Angstrom) ; set to 0 if a zero weight is desired')
                  },
     'sections': {}
     }

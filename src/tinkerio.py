@@ -244,6 +244,8 @@ class Moments_TINKER(Moments):
 
     def __init__(self,options,tgt_opts,forcefield):
         super(Moments_TINKER,self).__init__(options,tgt_opts,forcefield)
+        if self.FF.rigid_water:
+            raise Exception('This class cannot be used with rigid water molecules.')
 
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
@@ -257,7 +259,7 @@ class Moments_TINKER(Moments):
 
     def moments_driver(self):
         # This line actually runs TINKER
-        if self.FF.rigid_water:
+        if self.optimize_geometry:
             o, e = Popen(["./optimize","input.xyz","1.0e-6"],stdout=PIPE,stderr=PIPE).communicate()
             o, e = Popen(["./analyze","input.xyz_2","M"],stdout=PIPE,stderr=PIPE).communicate()
         else:
@@ -284,7 +286,10 @@ class Moments_TINKER(Moments):
         calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
 
         if 'polarizability' in self.ref_moments:
-            o, e = Popen(["./polarize","input.xyz_2"],stdout=PIPE,stderr=PIPE).communicate()
+            if self.optimize_geometry:
+                o, e = Popen(["./polarize","input.xyz_2"],stdout=PIPE,stderr=PIPE).communicate()
+            else:
+                o, e = Popen(["./polarize","input.xyz"],stdout=PIPE,stderr=PIPE).communicate()
             # Read the TINKER output.
             pn = -1
             ln = 0
