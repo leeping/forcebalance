@@ -10,11 +10,11 @@ After everything is installed, go to the \c studies directory in the distributio
 and run:
 
 @verbatim
-ForceBalance.py verysimple.in
+ForceBalance.py very_simple.in
 @endverbatim
 
 If the installation was successful, you will get an output file
-similar to \c verysimple.out .  What follows is a description
+similar to \c very_simple.out .  What follows is a description
 of the output file and what ForceBalance is actually doing.
 
 ForceBalance begins by reading the force field files from the \c
