@@ -489,6 +489,7 @@ class Interaction_GMX(Interaction):
         self.topfnm = "topol.top"
         super(Interaction_GMX,self).__init__(options,tgt_opts,forcefield)
         self.Dielectric = 0.0
+        raise Exception('This needs to be fixed')
     
     def prepare_temp_directory(self, options, tgt_opts):
         os.environ["GMX_NO_SOLV_OPT"] = "TRUE"

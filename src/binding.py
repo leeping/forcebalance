@@ -1,4 +1,4 @@
-""" @package interaction Interaction energy fitting module.
+""" @package binding Binding energy fitting module.
 
 @author Lee-Ping Wang
 @date 05/2012
@@ -115,12 +115,12 @@ def parse_interactions(input_file):
                 warn_press_key("Encountered unsupported key %s in section %s on line %i" % (key, section, ln))
     return Globals, Systems, Interactions
 
-class Interactions(Target):
+class BindingEnergy(Target):
 
-    """ Improved subclass of Target for fitting force fields to interaction energies. """
+    """ Improved subclass of Target for fitting force fields to binding energies. """
 
     def __init__(self,options,tgt_opts,forcefield):
-        super(Interactions,self).__init__(options,tgt_opts,forcefield)
+        super(BindingEnergy,self).__init__(options,tgt_opts,forcefield)
         self.set_option(None, None, 'masterfile', os.path.join(self.tgtdir,tgt_opts['masterfile']))
         self.global_opts, self.sys_opts, self.inter_opts = parse_interactions(self.masterfile)
         # If the global option doesn't exist in the system / interaction, then it is copied over.

@@ -1,7 +1,7 @@
 """ @package implemented Contains the dictionary of usable Target classes."""
 
 try:
-    from gmxio import AbInitio_GMX, Interaction_GMX
+    from gmxio import AbInitio_GMX
 except:
     print "Gromacs module import failed"
 
@@ -11,7 +11,7 @@ except:
     print "QTPIE Monomer module import failed"
 
 try:
-    from tinkerio import AbInitio_TINKER, Vibration_TINKER, Interactions_TINKER, Moments_TINKER
+    from tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER
 except:
     print "Tinker module import failed; check SimTK package (required for units)"
 
@@ -43,7 +43,6 @@ except:
 ## The table of implemented Targets
 Implemented_Targets = {
     'ABINITIO_GMX':AbInitio_GMX,
-    'INTERACTION_GMX':Interaction_GMX,
     'ABINITIO_TINKER':AbInitio_TINKER,
     'ABINITIO_OPENMM':AbInitio_OpenMM,
     'ABINITIO_AMBER':AbInitio_AMBER,
@@ -52,7 +51,8 @@ Implemented_Targets = {
     'LIQUID_OPENMM':Liquid_OpenMM,
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
-    'INTERACTIONS_TINKER':Interactions_TINKER,
+    'INTERACTION_TINKER':Interaction_TINKER,
+    'BINDINGENERGY_TINKER':BindingEnergy_TINKER,
     'MOMENTS_TINKER':Moments_TINKER,
     'MONOMER_QTPIE':Monomer_QTPIE,
     }
