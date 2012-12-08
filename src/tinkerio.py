@@ -9,7 +9,7 @@ modules for other programs because it's so simple.
 
 import os
 from re import match, sub
-from nifty import isint, isfloat, warn_press_key, col
+from nifty import isint, isfloat, warn_press_key, col, uncommadash
 import numpy as Np
 from basereader import BaseReader
 from subprocess import Popen, PIPE
@@ -17,7 +17,8 @@ from abinitio import AbInitio
 from vibration import Vibration
 from moments import Moments
 from molecule import Molecule
-from interactions import Interactions
+from binding import BindingEnergy
+from interaction import Interaction
 from finite_difference import in_fd
 from collections import OrderedDict
 try:
@@ -316,13 +317,13 @@ class Moments_TINKER(Moments):
         os.system("rm -rf *_* *[0-9][0-9][0-9]*")
         return calc_moments
 
-class Interactions_TINKER(Interactions):
+class BindingEnergy_TINKER(BindingEnergy):
 
-    """Subclass of Interactions for interaction energy matching
+    """Subclass of BindingEnergy for binding energy matching
     using TINKER.  """
 
     def __init__(self,options,tgt_opts,forcefield):
-        super(Interactions_TINKER,self).__init__(options,tgt_opts,forcefield)
+        super(BindingEnergy_TINKER,self).__init__(options,tgt_opts,forcefield)
         self.prepare_temp_directory(options, tgt_opts)
 
     def prepare_temp_directory(self, options, tgt_opts):
@@ -372,7 +373,8 @@ class Interactions_TINKER(Interactions):
             else:
                 M = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']),ftype="tinker")
                 if 'select' in sysopt:
-                    atomselect = eval("Np.arange(M.na)"+sysopt['select'])
+                    atomselect = Np.array(uncommadash(sysopt['select']))
+                    #atomselect = eval("Np.arange(M.na)"+sysopt['select'])
                     M = M.atom_select(atomselect)
                 M.write(os.path.join(abstempdir,sysname+".xyz"),ftype="tinker")
                 os.symlink(os.path.join(self.root,self.tgtdir,sysopt['keyfile']),os.path.join(abstempdir,sysname+".key"))
@@ -412,3 +414,44 @@ class Interactions_TINKER(Interactions):
             if "Total Potential Energy" in line:
                 return float(line.split()[-2]) * kilocalories_per_mole, rmsd * angstrom
         warn_press_key("Total potential energy wasn't encountered for system %s!" % sysname)
+    
+class Interaction_TINKER(Interaction):
+
+    """Subclass of Target for interaction matching using TINKER. """
+
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Name of the trajectory
+        self.trajfnm = "all.arc"
+        super(Interaction_TINKER,self).__init__(options,tgt_opts,forcefield)
+
+    def prepare_temp_directory(self, options, tgt_opts):
+        abstempdir = os.path.join(self.root,self.tempdir)
+        # Link the necessary programs into the temporary directory
+        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        # Link the run parameter file
+        os.symlink(os.path.join(self.root,self.tgtdir,"settings","shot.key"),os.path.join(abstempdir,"shot.key"))
+
+    def energy_driver_all(self,select=None):
+        if select == None:
+            self.traj.write("shot.arc")
+        else:
+            traj = self.traj.atom_select(select)
+            traj.write("shot.arc")
+        # This line actually runs TINKER
+        o, e = Popen(["./analyze","shot.arc","e"],stdout=PIPE,stderr=PIPE).communicate()
+        # Read data from stdout and stderr, and convert it to GROMACS units.
+        E = []
+        for line in o.split('\n'):
+            s = line.split()
+            if "Total Potential Energy" in line:
+                E.append(float(s[4]) * 4.184)
+        M = Np.array(E)
+        return M
+
+    def interaction_driver_all(self,dielectric=False):
+        # Compute the energies for the dimer
+        D = self.energy_driver_all()
+        A = self.energy_driver_all(select=self.select1)
+        B = self.energy_driver_all(select=self.select2)
+        return D - A - B
+

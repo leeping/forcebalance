@@ -17,6 +17,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 import os
 from re import match, sub
 import numpy as np
+import itertools
 from numpy import array, diag, dot, eye, mat, mean, transpose
 from numpy.linalg import norm, svd
 import threading
@@ -59,6 +60,60 @@ def pmat2d(mat2d, precision=1):
         for j in range(m2a.shape[1]):
             print "%% .%ie" % precision % m2a[i][j],
         print
+
+def encode(l): 	
+    return [[len(list(group)),name] for name, group in itertools.groupby(l)]
+
+def segments(e):
+    # Takes encoded input.
+    begins = np.array([sum([k[0] for k in e][:j]) for j,i in enumerate(e) if i[1] == 1])
+    lens = np.array([i[0] for i in e if i[1] == 1])
+    return [(i, i+j) for i, j in zip(begins, lens)]
+
+def commadash(l):
+    # Formats a list like [27, 28, 29, 30, 31, 88, 89, 90, 91, 100, 136, 137, 138, 139]
+    # into '27-31,88-91,100,136-139
+    L = sorted(l)
+    if len(L) == 0:
+        return "(empty)"
+    L.append(L[-1]+1)
+    LL = [i in L for i in range(L[-1])]
+    return ','.join('%i-%i' % (i[0]+1,i[1]) if (i[1]-1 > i[0]) else '%i' % (i[0]+1) for i in segments(encode(LL)))
+
+def uncommadash(s):
+    # Takes a string like '27-31,88-91,100,136-139'
+    # and turns it into a list like [27, 28, 29, 30, 31, 88, 89, 90, 91, 100, 136, 137, 138, 139]
+    L = []
+    try:
+        for w in s.split(','):
+            ws = w.split('-')
+            a = int(ws[0])-1
+            if len(ws) == 1:
+                b = int(ws[0])
+            elif len(ws) == 2:
+                b = int(ws[1])
+            else:
+                print "Dash-separated list cannot exceed length 2"
+                raise
+            if a < 0 or b <= 0 or b <= a:
+                if a < 0 or b <= 0:
+                    print "Items in list cannot be zero or negative:", a, b
+                else:
+                    print "Second number cannot be larger than first:", a, b
+                raise
+            newL = range(a,b)
+            if any([i in L for i in newL]):
+                print "Duplicate entries found in list"
+                raise
+            L += newL
+        if sorted(L) != L:
+            print "List is out of order"
+            raise
+    except:
+        raise Exception('Invalid string for converting to list of numbers: %s' % s)
+    return L
+            
+#list(itertools.chain(*[range(*(int(w.split('-')[0])-1, int(w.split('-')[1]) if len(w.split('-')) == 2 else int(w.split('-')[0])))  for w in Mao.split(',')]))
 
 def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50):
     """Cool-looking printout for slick formatting of output.
