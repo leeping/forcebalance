@@ -157,7 +157,7 @@ class AbInitio_TINKER(AbInitio):
     def energy_force_driver(self, shot):
         self.traj.write("shot.arc",select=[shot])
         # This line actually runs TINKER
-        o, e = Popen(["./testgrad","shot.arc",self.FF.tinkerprm,"y","n"],stdout=PIPE,stderr=PIPE).communicate()
+        o, e = Popen(["./testgrad","shot.arc","y","n"],stdout=PIPE,stderr=PIPE).communicate()
         # Read data from stdout and stderr, and convert it to GROMACS
         # units for consistency with existing code.
         F = []
@@ -173,7 +173,7 @@ class AbInitio_TINKER(AbInitio):
     def energy_driver_all(self):
         self.traj.write("shot.arc")
         # This line actually runs TINKER
-        o, e = Popen(["./analyze","shot.arc",self.FF.tinkerprm,"e"],stdout=PIPE,stderr=PIPE).communicate()
+        o, e = Popen(["./analyze","shot.arc","e"],stdout=PIPE,stderr=PIPE).communicate()
         # Read data from stdout and stderr, and convert it to GROMACS units.
         E = []
         for line in o.split('\n'):
@@ -329,7 +329,7 @@ class Interactions_TINKER(Interactions):
         abstempdir = os.path.join(self.root,self.tempdir)
         if self.FF.rigid_water:
             self.optprog = "optrigid"
-            os.symlink(os.path.join(self.root,self.tgtdir,"rigid.key"),os.path.join(abstempdir,"rigid.key"))
+            #os.symlink(os.path.join(self.root,self.tgtdir,"rigid.key"),os.path.join(abstempdir,"rigid.key"))
         else:
             self.optprog = "optimize"
         # Link the necessary programs into the temporary directory
@@ -338,9 +338,7 @@ class Interactions_TINKER(Interactions):
         os.symlink(os.path.join(options['tinkerpath'],"superpose"),os.path.join(abstempdir,"superpose"))
         # Link the run parameter file
         # The master file might be unneeded??
-        # os.symlink(os.path.join(self.root,self.tgtdir,self.masterfile),os.path.join(abstempdir,self.masterfile))
-        # os.symlink(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
-        for sysopt in self.sys_opts.values():
+        for sysname,sysopt in self.sys_opts.items():
             if self.FF.rigid_water:
                 # Make every water molecule rigid
                 # WARNING: Hard coded values here!
@@ -372,18 +370,24 @@ class Interactions_TINKER(Interactions):
                     M.xyzs[0][a:a+3] = rig
                 M.write(os.path.join(abstempdir,sysopt['geometry']),ftype="tinker")
             else:
-                os.symlink(os.path.join(self.root, self.tgtdir, sysopt['geometry']), os.path.join(abstempdir,sysopt['geometry']))
+                M = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']),ftype="tinker")
+                if 'select' in sysopt:
+                    atomselect = eval("Np.arange(M.na)"+sysopt['select'])
+                    M = M.atom_select(atomselect)
+                M.write(os.path.join(abstempdir,sysname+".xyz"),ftype="tinker")
+                os.symlink(os.path.join(self.root,self.tgtdir,sysopt['keyfile']),os.path.join(abstempdir,sysname+".key"))
 
     def system_driver(self,sysname):
         sysopt = self.sys_opts[sysname]
         rmsd = 0.0
         # This line actually runs TINKER
+        xyzfnm = sysname+".xyz"
         if 'optimize' in sysopt and sysopt['optimize'] == True:
             if self.FF.rigid_water:
-                os.system("cp rigid.key %s" % os.path.splitext(sysopt['geometry'])[0] + ".key")
-                o, e = Popen(["./%s" % self.optprog,sysopt['geometry'],"1e-4"],stdout=PIPE,stderr=PIPE).communicate()
+                #os.system("cp rigid.key %s" % os.path.splitext(xyzfnm)[0] + ".key")
+                o, e = Popen(["./%s" % self.optprog,xyzfnm,"1e-4"],stdout=PIPE,stderr=PIPE).communicate()
             else:
-                o, e = Popen(["./%s" % self.optprog,sysopt['geometry'],self.FF.tinkerprm,"1e-4"],stdout=PIPE,stderr=PIPE).communicate()
+                o, e = Popen(["./%s" % self.optprog,xyzfnm,"1e-4"],stdout=PIPE,stderr=PIPE).communicate()
             cnvgd = 0
             for line in o.split('\n'):
                 if "Normal Termination" in line:
@@ -392,17 +396,17 @@ class Interactions_TINKER(Interactions):
                 print o
                 print "The system %s did not converge in the geometry optimization - printout is above." % sysname
                 #warn_press_key("The system %s did not converge in the geometry optimization" % sysname)
-            o, e = Popen(["./analyze",sysopt['geometry']+'_2',self.FF.tinkerprm,"E"],stdout=PIPE,stderr=PIPE).communicate()
+            o, e = Popen(["./analyze",xyzfnm+'_2',"E"],stdout=PIPE,stderr=PIPE).communicate()
             if self.FF.rigid_water:
-                oo, ee = Popen(['./superpose', sysopt['geometry'], sysopt['geometry']+'_2', '1', 'y', 'u', 'n', '0'], stdout=PIPE, stderr=PIPE).communicate()
+                oo, ee = Popen(['./superpose', xyzfnm, xyzfnm+'_2', '1', 'y', 'u', 'n', '0'], stdout=PIPE, stderr=PIPE).communicate()
             else:
-                oo, ee = Popen(['./superpose', sysopt['geometry'], self.FF.tinkerprm, sysopt['geometry']+'_2', self.FF.tinkerprm, '1', 'y', 'u', 'n', '0'], stdout=PIPE, stderr=PIPE).communicate()
+                oo, ee = Popen(['./superpose', xyzfnm, xyzfnm+'_2', '1', 'y', 'u', 'n', '0'], stdout=PIPE, stderr=PIPE).communicate()
             for line in oo.split('\n'):
                 if "Root Mean Square Distance" in line:
                     rmsd = float(line.split()[-1])
-            os.system("rm %s" % sysopt['geometry']+'_2')
+            os.system("rm %s" % xyzfnm+'_2')
         else:
-            o, e = Popen(["./analyze",sysopt['geometry'],self.FF.tinkerprm,"E"],stdout=PIPE,stderr=PIPE).communicate()
+            o, e = Popen(["./analyze",xyzfnm,"E"],stdout=PIPE,stderr=PIPE).communicate()
         # Read the TINKER output. 
         for line in o.split('\n'):
             if "Total Potential Energy" in line:
