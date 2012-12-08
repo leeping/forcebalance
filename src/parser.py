@@ -147,6 +147,7 @@ tgt_opts_types = {
                  "resp"             : (0, 'Enable the RESP objective function in ab initio (remember to set espweight)'),
                  "do_cosmo"         : (0, 'Call Q-Chem to do MM COSMO on MM snapshots.'),
                  "optimize_geometry": (1, 'Perform a geometry optimization before computing properties (relevant for Moments function.)'),
+                 "absolute"         : (0, 'When matching energies in AbInitio, do not subtract the mean energy gap.'),
                 },
     'floats'  : {"weight"      : (1.0, 'Weight of the target (determines its importance vs. other targets)'),
                  "w_rho"       : (1.0, 'Weight of experimental density within liquid properties'),

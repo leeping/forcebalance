@@ -63,6 +63,8 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'whamboltz','whamboltz')
         ## Whether to use the Sampling Correction
         self.set_option(tgt_opts,'sampcorr','sampcorr')
+        ## Whether to match Absolute Energies (make sure you know what you're doing)
+        self.set_option(tgt_opts,'absolute','absolute')
         ## Whether to use the Covariance Matrix
         self.set_option(tgt_opts,'covariance','covariance')
         ## Whether to use QM Boltzmann weights
@@ -324,7 +326,10 @@ class AbInitio(Target):
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
         self.eqm = array(self.eqm)
         self.eqm *= eqcgmx
-        self.eqm -= mean(self.eqm)
+        if not self.absolute:
+            self.eqm -= mean(self.eqm)
+        else:
+            print "Fitting absolute energies.  Make sure you know what you are doing!"
         if len(self.fqm) > 0:
             self.fqm = array(self.fqm)
             self.fqm *= fqcgmx
@@ -661,12 +666,14 @@ class AbInitio(Target):
 
         # Dump energies and forces to disk.
         M_all_print = M_all.copy()
-        M_all_print[:,0] -= mean(M_all_print[:,0])
+        if not self.absolute:
+            M_all_print[:,0] -= mean(M_all_print[:,0])
         if self.force:
             Q_all_print = hstack((col(self.eqm),self.fref))
         else:
             Q_all_print = col(self.eqm)
-        Q_all_print[:,0] -= mean(Q_all_print[:,0])
+        if not self.absolute:
+            Q_all_print[:,0] -= mean(Q_all_print[:,0])
         savetxt('M.txt',M_all_print)
         savetxt('Q.txt',Q_all_print)
         EnergyComparison = hstack((col(Q_all_print[:,0]),col(M_all_print[:,0])))
@@ -746,18 +753,18 @@ class AbInitio(Target):
         #==============================================================#
         # STEP 4: Build the objective function and its derivatives.    #
         #==============================================================#
-        X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1)
-        X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1)
+        X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
+        X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute)
         for p in range(np):
             if not AGrad: continue
-            X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1)
-            X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1)
+            X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1,subtract_mean = not self.absolute)
+            X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1,subtract_mean = not self.absolute)
             if not AHess: continue
-            X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1)
-            X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1)
+            X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1,subtract_mean = not self.absolute)
+            X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1,subtract_mean = not self.absolute)
             for q in range(p):
-                X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1)
-                X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1)
+                X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1,subtract_mean = not self.absolute)
+                X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1,subtract_mean = not self.absolute)
                 # Get the other half of the Hessian matrix.
                 X2_M_pq[q,p] = X2_M_pq[p,q]
                 X2_Q_pq[q,p] = X2_Q_pq[p,q]
@@ -777,8 +784,12 @@ class AbInitio(Target):
             for q in range(np):
                 H[p,q] = MBP * X2_M_pq[p,q] + QBP * X2_Q_pq[p,q]
         # Energy error in kJ/mol
-        E0_M = (2*Q0_M[0]*M0_M[0] - Q0_M[0]*Q0_M[0] - M0_M[0]*M0_M[0])/Z/Z;
-        E0_Q = (2*Q0_Q[0]*M0_Q[0] - Q0_Q[0]*Q0_Q[0] - M0_Q[0]*M0_Q[0])/Y/Y;
+        if not self.absolute:
+            E0_M = (2*Q0_M[0]*M0_M[0] - Q0_M[0]*Q0_M[0] - M0_M[0]*M0_M[0])/Z/Z;
+            E0_Q = (2*Q0_Q[0]*M0_Q[0] - Q0_Q[0]*Q0_Q[0] - M0_Q[0]*M0_Q[0])/Y/Y;
+        else:
+            E0_M = 0.0
+            E0_Q = 0.0
         E     = MBP * sqrt(SPiXi[0]/Z + E0_M) + QBP * sqrt(SRiXi[0]/Y + E0_Q)
         # Fractional energy error.
         Efrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
@@ -1198,7 +1209,7 @@ class AbInitio(Target):
             self.objective = Answer['X']
         return Answer
 
-def weighted_variance(SPiXi,WCiW,Z,L,R,NCP1):
+def weighted_variance(SPiXi,WCiW,Z,L,R,NCP1,subtract_mean=True):
     """ A more generalized version of build_objective which is
     callable for derivatives, but the covariance is not there anymore. """
     # These are the functions that we are building.
@@ -1206,25 +1217,27 @@ def weighted_variance(SPiXi,WCiW,Z,L,R,NCP1):
     # Divide by Z to normalize
     XiZ       = SPiXi/Z
     # Subtract out the average energy.
-    XiZ[0] -= (L[0] * R[0])/Z/Z
+    if subtract_mean:
+        XiZ[0] -= (L[0] * R[0])/Z/Z
     # Return the answer.
     X2      = dot(XiZ.flatten(),WCiW.flatten())
     return X2
 
-def weighted_variance2(SPiXi,WCiW,Z,L,R,L2,R2,NCP1):
+def weighted_variance2(SPiXi,WCiW,Z,L,R,L2,R2,NCP1,subtract_mean=True):
     """ A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements. """
     # These are the functions that we are building.
     X2        = 0.0
     # Divide by Z to normalize
     XiZ       = SPiXi/Z
     # Subtract out the average energy.
-    XiZ[0] -= (L[0] * R[0])/Z/Z
-    XiZ[0] -= (L2[0] * R2[0])/Z/Z
+    if subtract_mean:
+        XiZ[0] -= (L[0] * R[0])/Z/Z
+        XiZ[0] -= (L2[0] * R2[0])/Z/Z
     # Return the answer.
     X2      = dot(XiZ.flatten(),WCiW.flatten())
     return X2
 
-def build_objective(SPiXi,WCiW,Z,Q0,M0,NCP1):
+def build_objective(SPiXi,WCiW,Z,Q0,M0,NCP1,subtract_mean=True):
 
     """ This function builds an objective function (number) from the
     complicated polytensor and covariance matrices. """
@@ -1233,11 +1246,12 @@ def build_objective(SPiXi,WCiW,Z,Q0,M0,NCP1):
     X2    = 0.0
     # Divide by Z to normalize
     XiZ       = SPiXi/Z
-    # Subtract out the zero-point energy gap
-    XiZ[0,0] -= (M0[0]*M0[0] + Q0[0]*Q0[0] - 2*Q0[0]*M0[0])/Z/Z
-    for i in range(1,NCP1):
-        XiZ[0,i] -= (M0[i]*M0[0] + Q0[i]*Q0[0] - 2*Q0[i]*M0[0])/Z/Z
-        XiZ[i,0] -= (M0[0]*M0[i] + Q0[0]*Q0[i] - 2*Q0[0]*M0[i])/Z/Z
+    if subtract_mean:
+        # Subtract out the zero-point energy gap
+        XiZ[0,0] -= (M0[0]*M0[0] + Q0[0]*Q0[0] - 2*Q0[0]*M0[0])/Z/Z
+        for i in range(1,NCP1):
+            XiZ[0,i] -= (M0[i]*M0[0] + Q0[i]*Q0[0] - 2*Q0[i]*M0[0])/Z/Z
+            XiZ[i,0] -= (M0[0]*M0[i] + Q0[0]*Q0[i] - 2*Q0[0]*M0[i])/Z/Z
     ### This is the objective function! LAAAAA ###
     X2      = dot(XiZ.flatten(),WCiW.flatten())
     return X2
