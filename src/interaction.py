@@ -57,7 +57,7 @@ class Interaction(Target):
             raise Exception('You need to define the second fragment using the fragment2 keyword')
         self.select2 = array(uncommadash(self.fragment2))
         ## Set upper cutoff energy
-        self.set_option(tgt_opts,'energy_cutoff','energy_cutoff')
+        self.set_option(tgt_opts,'energy_upper','energy_upper')
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -91,10 +91,10 @@ class Interaction(Target):
             self.divisor = ones(len(self.eqm)) * denom
         if self.cauchy:
             print "Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )"
-        if self.energy_cutoff > 0:
-            print "Interactions with an absolute strength greater than", self.energy_cutoff, "will not be fitted"
-            ecut = self.energy_cutoff * 4.184
-            self.prefactor = 1.0 * (abs(self.eqm) < ecut)
+        if self.energy_upper > 0:
+            print "Interactions more repulsive than", self.energy_upper, "will not be fitted"
+            ecut = self.energy_upper * 4.184
+            self.prefactor = 1.0 * (self.eqm < ecut)
         else:
             self.prefactor = ones(len(self.eqm))
 
