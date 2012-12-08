@@ -162,7 +162,7 @@ tgt_opts_types = {
                  "w_resp"       : (0.0, 'Weight of RESP within ab initio'),
                  "resp_a"       : (0.001, 'RESP "a" parameter for strength of penalty; 0.001 is strong, 0.0005 is weak'),
                  "resp_b"       : (0.1, 'RESP "b" parameter for hyperbolic behavior; 0.1 is recommended'),
-                 "energy_cutoff": (30.0, 'Upper energy cutoff (in kcal/mol) for interaction energies; stronger interactions are given zero weight'),
+                 "energy_upper" : (30.0, 'Upper energy cutoff (in kcal/mol) for interaction energies; super-repulsive interactions are given zero weight'),
                  "qmboltz"      : (0.0, 'Fraction of Quantum Boltzmann Weights (ab initio), 1.0 for full reweighting, 0.5 for hybrid'),
                  "qmboltztemp"  : (298.15, 'Temperature for Quantum Boltzmann Weights (ab initio), defaults to room temperature'),
                  "energy_denom"   : (0.0, 'Energy denominator for Interactions objective function (default is to use stdev)'),
