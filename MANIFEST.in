@@ -27,6 +27,7 @@ include studies/009_voelz_nspe/options.out
 recursive-include studies/010_amoeba_chlorine/forcefield *
 recursive-include studies/010_amoeba_chlorine/targets *
 recursive-include studies/010_amoeba_chlorine/setup *
+include studies/010_amoeba_chlorine/optimize.in
 include studies/010_amoeba_chlorine/optimize.pdf
 include studies/010_amoeba_chlorine/result/chlorine.prm
 include studies/010_amoeba_chlorine/About.txt
