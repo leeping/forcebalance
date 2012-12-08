@@ -92,6 +92,8 @@ def parse_interactions(input_file):
                 SystemDict[key] = s[1]
             elif key == 'rmsd_weight':
                 SystemDict[key] = float(s[1])
+            elif key == 'select':
+                SystemDict[key] = s[1]
             elif key == 'optimize':
                 if len(s) == 1 or s[1].lower() in ['y','yes','true']:
                     SystemDict[key] = True
@@ -139,8 +141,13 @@ class Interactions(Target):
 
         self.set_option(None, None, 'rmsd_denom', val=tgt_opts['rmsd_denom'] * angstrom)
 
+        self.set_option(tgt_opts,'cauchy','cauchy')
+
         print "The energy denominator is:", self.energy_denom 
         print "The RMSD denominator is:", self.rmsd_denom
+
+        if self.cauchy:
+            print "Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )"
 
     def indicate(self):
         printcool_dictionary(self.PrintDict,title="Interaction Energies (kcal/mol), Objective = % .5e\n %-20s %9s %9s %9s %11s" % 
@@ -172,7 +179,11 @@ class Interactions(Target):
                 Calculated_ = eval(self.inter_opts[inter_]['equation'])
                 Reference_ = self.inter_opts[inter_]['reference_physical']
                 Delta_ = Calculated_ - Reference_
-                DeltaNrm_ = Delta_ / self.energy_denom
+                if self.cauchy:
+                    Divisor_ = sqrt(self.energy_denom**2 + Reference_**2)
+                else:
+                    Divisor_ = self.energy_denom
+                DeltaNrm_ = Delta_ / Divisor_
                 w_ = self.inter_opts[inter_]['weight'] if 'weight' in self.inter_opts[inter_] else 1.0
                 VectorE_.append(sqrt(w_)*DeltaNrm_)
                 if not in_fd():

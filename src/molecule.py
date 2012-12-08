@@ -116,10 +116,10 @@ FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 
 # atomname   = List of atom names (can come from MM coordinate file)
 # atomtype   = List of atom types (can come from MM force field)
 # abonds      = For each atom, the list of higher-numbered atoms it's bonded to
-# suffix     = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
+# tinkersuf     = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
 # resid      = Residue IDs (can come from MM coordinate file)
 # resname    = Residue names
-AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'abonds', 'suffix', 'resid', 'resname', 'qcsuf', 'qm_ghost'])
+AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'abonds', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost'])
 #=========================================#
 #| This can be any data attribute we     |#
 #| want but it's usually some property   |#
@@ -914,17 +914,29 @@ class Molecule(object):
             raise Exception('Either the comparison or replacement key (%s, %s) doesn\'t exist.' % (key1, key2))
 
     def atom_select(self,atomslice):
-        """ Return a copy of the object with certain atoms selected. """
-        if isinstance(atomslice, int) or isinstance(atomslice, slice) or isinstance(atomslice,np.ndarray):
-            if isinstance(atomslice, int):
-                atomslice = [atomslice]
+        """ Reurn a copy of the object with certain atoms selected.  Takes an integer, list or array as argument. """
+        if isinstance(atomslice, int):
+            atomslice = [atomslice]
         if isinstance(atomslice, list):
             atomslice = np.array(atomslice)
         New = Molecule()
         for key in self.FrameKeys | self.MetaKeys:
             New.Data[key] = copy.deepcopy(self.Data[key])
         for key in self.AtomKeys:
-            New.Data[key] = list(np.array(self.Data[key])[atomslice])
+            if key == 'tinkersuf': # Tinker suffix is a bit tricky
+                Map = dict([(a+1, i+1) for i, a in enumerate(atomslice)])
+                CopySuf = list(np.array(self.Data[key])[atomslice])
+                NewSuf = []
+                for line in CopySuf:
+                    whites      = re.split('[^ ]+',line)
+                    s           = line.split()
+                    if len(s) > 1:
+                        for i in range(1,len(s)):
+                            s[i] = str(Map[int(s[i])])
+                    NewSuf.append(''.join([whites[j]+s[j] for j in range(len(s))]))
+                New.Data['tinkersuf'] = NewSuf[:]
+            else:
+                New.Data[key] = list(np.array(self.Data[key])[atomslice])
         if 'xyzs' in self.Data:
             for i in range(self.ns):
                 New.xyzs[i] = self.xyzs[i][atomslice]
@@ -1325,10 +1337,10 @@ class Molecule(object):
         @return resid   The residue ID numbers.  These are not easy to get!
         @return elem    A list of chemical elements in the XYZ file
         @return comms   A single-element list for the comment.
-        @return suffix  The suffix that comes after lines in the XYZ coordinates; this is usually topology info
+        @return tinkersuf  The suffix that comes after lines in the XYZ coordinates; this is usually topology info
 
         """
-        suffix   = []
+        tinkersuf   = []
         xyzs  = []
         xyz   = []
         resid = []
@@ -1343,6 +1355,7 @@ class Molecule(object):
         thisatom = 0
         for line in open(fnm):
             sline = line.split()
+            if len(sline) == 0: continue
             # The first line always contains the number of atoms
             # The words after the first line are comments
             if title:
@@ -1356,9 +1369,9 @@ class Molecule(object):
                         resid.append(thisresid)
                         whites      = re.split('[^ ]+',line)
                         if len(sline) > 5:
-                            suffix.append(''.join([whites[j]+sline[j] for j in range(5,len(sline))]))
+                            tinkersuf.append(''.join([whites[j]+sline[j] for j in range(5,len(sline))]))
                         else:
-                            suffix.append('')
+                            tinkersuf.append('')
                     # LPW Make sure ..
                     thisatom += 1
                     #thisatom = int(sline[0])
@@ -1382,7 +1395,7 @@ class Molecule(object):
                   'resid'  : resid,
                   'elem'   : elem,
                   'comms'  : comms,
-                  'suffix' : suffix}
+                  'tinkersuf' : tinkersuf}
         return Answer
 
     def read_gro(self, fnm):
@@ -1920,13 +1933,13 @@ class Molecule(object):
     def write_arc(self, select):
         self.require('elem','xyzs')
         out = []
-        if 'suffix' not in self.Data:
+        if 'tinkersuf' not in self.Data:
             sys.stderr.write("Beware, this .arc file contains no atom type or topology info\n")
         for I in select:
             xyz = self.xyzs[I]
             out.append("%6i  %s" % (self.na, self.comms[I]))
             for i in range(self.na):
-                out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.suffix[i] if 'suffix' in self.Data else ''))
+                out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.tinkersuf[i] if 'tinkersuf' in self.Data else ''))
         return out
 
     def write_gro(self, select):

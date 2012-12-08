@@ -387,11 +387,11 @@ class FF(ForceBalanceBaseClass):
         ffname = ffname.split(':')[0]
 
         # Set the Tinker PRM file, which will help for running programs like "analyze".
-        if fftype == "tinker":
-            if hasattr(self, "tinkerprm"):
-                warn_press_key("There should only be one TINKER parameter file")
-            else:
-                self.tinkerprm = ffname
+        # if fftype == "tinker":
+        #     if hasattr(self, "tinkerprm"):
+        #         warn_press_key("There should only be one TINKER parameter file")
+        #     else:
+        #         self.tinkerprm = ffname
 
         # Set the OpenMM XML file, which will help for running OpenMM.
         if fftype == "openmm":
