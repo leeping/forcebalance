@@ -1,0 +1,75 @@
+Here is how we set up the ForceBalance calculation.  I've already set it up for you,
+but here's a walkthrough of how I did it.
+
+0) Go into the Setup directory.
+
+cd Setup
+
+1) First concatenate all of the structure files into a single one for convenience.
+
+./collect.sh 
+
+2) Now create a force field using GAFF.
+
+2a) Create a PDB and run Antechamber on it to generate a mol2 file.
+
+head -30 all.xyz  > molecule.xyz
+babel -ixyz molecule.xyz -opdb molecule.pdb
+antechamber -i molecule.pdb -fi pdb -o molecule.mol2 -fo mol2 -c bcc -pf y
+
+2b) Run Leap to generate an inpcrd and prmtop file.
+
+tleap -f stage.leap 
+
+3) Run acpype to get a Gromacs itp file from the AMBER force field.
+
+# ~/src/acpype/acpype.py -p molecule.prmtop -x molecule.inpcrd -r
+~/scripts/acpype/acpype.py -p molecule.prmtop -x molecule.inpcrd -r
+
+### VAV: 
+
+4) Condense parameters into the top of the file, grouped by atom types rather than individual atoms.
+   (I verified that the physical interactions are not modified
+
+# ~/src/forcebalance/bin/Extras/Condense_Interactions.py LIG_GMX.top > LIG_GMX_bytype.top
+~/scripts/forcebalance/bin/Extras/Condense_Interactions.py LIG_GMX.top > LIG_GMX_bytype.top
+
+5) Split the file into .itp and .top parts.
+
+awk '/system/ {exit} {print}' LIG_GMX_bytype.top > molecule.itp
+awk '/system/,/neverever/' LIG_GMX_bytype.top > topol.top
+
+6) Tag the .itp file using the following syntax.
+
+   hc   c3    c    n    9      180.00     0.00000           2 ; PARM 6
+   hc   c3   c3    n    9        0.00     0.65270           3 ; PARM 6
+
+(Indicates that the sixth field - the dihedral Fourier coefficient - is to be parameterized)
+## VAV: Q: with numbering starting at zero?
+
+7) Convert the .xyz file into ForceBalance-compatible all.gro and qdata.txt files
+
+This uses my file format conversion library, feel free to look at the script.
+
+./convert.py < convert.in
+
+8) Copy the files to the appropriate directories.
+
+cd ..
+mkdir forcefield
+cp Setup/molecule.itp forcefield
+mkdir -p simulations/2dscan
+cp Setup/all.gro !$
+cp Setup/qdata.txt !$
+mkdir simulations/2dscan/settings
+cp Setup/shot.mdp !$
+cp Setup/topol.top !$
+
+9) Edit simulations/2dscan/settings/topol.top to have the first line be:
+ 
+#include "molecule.itp"
+
+10) Run ForceBalance.
+
+ForceBalance.py options.in
+
