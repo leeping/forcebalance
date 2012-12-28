@@ -464,16 +464,14 @@ class FF(ForceBalanceBaseClass):
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
                     # Add pid into the dictionary.
-                    # LPW: Here is a hack to 
-                    if pid in self.map and 'PDIHMULS' in pid:
+                    # LPW: Here is a hack to allow duplicate parameter IDs.
+                    if pid in self.map:
                         pid0 = pid
                         extranum = 0
                         while pid in self.map:
                             pid = "%s%i" % (pid0, extranum)
                             extranum += 1
-                        print "Encountered an expected duplicate: parameter name has been changed to %s" % pid
-                    elif pid in self.map:
-                        warn_press_key('Encounted an unexpected duplicate parameter ID : %s' % pid)
+                        print "Encountered an duplicate parameter ID: parameter name has been changed to %s" % pid
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
                     self.patoms.append([self.Readers[ffname].molatom])

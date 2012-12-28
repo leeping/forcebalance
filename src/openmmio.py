@@ -67,6 +67,17 @@ def CopyHarmonicBondParameters(src, dest):
     for i in range(src.getNumBonds()):
         dest.setBondParameters(i,*src.getBondParameters(i))
 
+def CopyHarmonicAngleParameters(src, dest):
+    for i in range(src.getNumAngles()):
+        dest.setAngleParameters(i,*src.getAngleParameters(i))
+
+def CopyNonbondedParameters(src, dest):
+    dest.setReactionFieldDielectric(src.getReactionFieldDielectric())
+    for i in range(src.getNumParticles()):
+        dest.setParticleParameters(i,*src.getParticleParameters(i))
+    for i in range(src.getNumExceptions()):
+        dest.setExceptionParameters(i,*src.getExceptionParameters(i))
+
 def do_nothing(src, dest):
     return
 
@@ -81,6 +92,8 @@ def CopySystemParameters(src,dest):
                'AmoebaVdwForce':CopyAmoebaVdwParameters,
                'AmoebaMultipoleForce':CopyAmoebaMultipoleParameters,
                'HarmonicBondForce':CopyHarmonicBondParameters,
+               'HarmonicAngleForce':CopyHarmonicAngleParameters,
+               'NonbondedForce':CopyNonbondedParameters,
                'CMMotionRemover':do_nothing}
     for i in range(src.getNumForces()):
         nm = src.getForce(i).__class__.__name__
@@ -102,10 +115,7 @@ def UpdateSimulationParameters(src_system, dest_simulation):
 ## could be under two different parent types (HarmonicBondForce, AmoebaHarmonicBondForce)
 suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "HarmonicAngleForce" : {"Angle" : ["class1","class2","class3"],},
-                "NonbondedForce" : [],
                 "NonbondedForce" : {"Atom": ["type"]},
-                "AmoebaHarmonicBondForce" : {"Bond" : ["class1","class2"]},
-                "AmoebaHarmonicAngleForce" : {"Angle" : ["class1","class2","class3"]},
                 "AmoebaBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaAngleForce" : {"Angle" : ["class1","class2","class3"]},
                 "AmoebaStretchBendForce" : {"StretchBend" : ["class1","class2","class3"]},
@@ -234,12 +244,13 @@ class Liquid_OpenMM(Liquid):
 
     def npt_simulation(self, temperature):
         """ Submit a NPT simulation to the Work Queue. """
-        link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-        queue_up(self.wq,
-                 command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.openmmxml, temperature),
-                 input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
-                 #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
-                 output_files = ['npt_result.p', 'npt.out', self.FF.openmmxml])
+        if not os.path.exists('npt_result.p'):
+            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            queue_up(self.wq,
+                     command = './runcuda.sh python npt.py conf.pdb %s %.1f 1.0 &> npt.out' % (self.FF.openmmxml, temperature),
+                     input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
+                     #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
+                     output_files = ['npt_result.p', 'npt.out', self.FF.openmmxml])
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """

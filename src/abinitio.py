@@ -690,6 +690,7 @@ class AbInitio(Target):
             Qforce_obj = QMTraj[:]
             Mforce_print = array(M_all_print[:,1:3*self.fitatoms+1])
             Qforce_print = array(Q_all_print[:,1:3*self.fitatoms+1])
+            Dforce_norm = array([linalg.norm(Mforce_print[i,:] - Qforce_print[i,:]) for i in range(ns)])
             MaxComp = max(abs(vstack((Mforce_print,Qforce_print)).flatten()))
             Mforce_print /= MaxComp
             Qforce_print /= MaxComp
@@ -708,6 +709,8 @@ class AbInitio(Target):
                 Mforce_obj.write('MMforce.xyz')
                 Qforce_obj.elem = ['H' for i in range(Qforce_obj.na)]
                 Qforce_obj.write('QMforce.xyz')
+                #savetxt('Dforce_norm.dat', Dforce_norm)
+                savetxt('Dforce_norm.dat', Dforce_norm)
 
         #==============================================================#
         #      STEP 3: Build the variance vector and invert it.        #
