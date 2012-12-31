@@ -303,12 +303,12 @@ class Optimizer(ForceBalanceBaseClass):
             dX_actual = X - X_prev
             Quality = dX_actual / dX_expect
 
-            #if Quality <= 0.25:
-            #    # If the step quality is bad, then we should decrease the trust radius.
-            #    trust = max(ndx*(1./(1+a)), self.mintrust)
-            #    print "Reducing the trust radius to % .4e" % trust
+            if Quality <= 0.25 and X < (X_prev + self.err_tol):
+                # If the step quality is bad, then we should decrease the trust radius.
+                trust = max(ndx*(1./(1+a)), self.mintrust)
+                print "Low quality step, reducing trust radius to % .4e" % trust
             if Quality >= 0.75 and bump:
-                # If the step quality is good, then we should increase the trust radius.  Capeesh?
+                # If the step quality is good, then we should increase the trust radius.
                 # The 'a' factor is how much we should grow or shrink the trust radius each step
                 # and the 'b' factor determines how closely we are tied down to the original value.
                 # Recommend values 0.5 and 0.5
@@ -499,14 +499,14 @@ class Optimizer(ForceBalanceBaseClass):
         
         if self.trust0 > 0: # This is the trust region code.
             bump = False
-            dx, expect = solver(0)
+            dx, expect = solver(1)
             dxnorm = norm(dx)
             if dxnorm > trust:
                 bump = True
                 # Tried a few optimizers here, seems like Brent works well.
                 # Okay, the problem with Brent is that the tolerance is fractional.  
                 # If the optimized value is zero, then it takes a lot of meaningless steps.
-                LOpt = optimize.brent(trust_fun,brack=(1.0,4.0),tol=self.search_tol)
+                LOpt = optimize.brent(trust_fun,brack=(1.0,4.0),tol=1e-6)
                 ### Result = optimize.fmin_powell(trust_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
                 ### LOpt = Result[0]
                 dx, expect = solver(LOpt)

@@ -89,28 +89,42 @@ class Liquid(Target):
     def indicate(self):
         return
 
-    def objective_term(self,temps, exp, calc, err, grad, fitorder, name="Quantity", verbose = True, FitFitted = False, Denom=None):
+    def objective_term(self,temps, exp, calc, err, grad, fitorder, name="Quantity", verbose = True, FitFitted = False, Denom=None, Weights=None):
         # Have the option to assume all uncertainties equal.
         Uncerts = {}
-        InverseErrorWeights = True
+        InverseErrorWeights = False
         for i in exp:
             if InverseErrorWeights:
                 Uncerts[i] = err[i]
             else:
                 Uncerts[i] = 1.0
-        # Build an array of weights.  (Cumbersome)
-        weight_array = np.array([Uncerts[i]**-2 for i in temps])
-        weight_array /= sum(weight_array)
-        weight_array = list(weight_array)
-        Weights = {}
-        for T, W in zip(temps,weight_array):
-            Weights[T] = W
+        if Weights == None:
+            # Build an array of weights.  (Cumbersome)
+            weight_array = np.array([Uncerts[i]**-2 for i in temps])
+            weight_array /= sum(weight_array)
+            weight_array = list(weight_array)
+            Weights = {}
+            for T, W in zip(temps,weight_array):
+                Weights[T] = W
+        else:
+            Sum = sum(Weights.values())
+            for i in Weights:
+                Weights[i] /= Sum
+            print "Weights have been renormalized to", sum(Weights.values())
+        # Use least-squares or hyperbolic (experimental) objective.
+        LeastSquares = True
         # The denominator
         if Denom == None:
             Denom = np.std(np.array([exp[i] for i in temps]))
             if len(temps) == 1:
                 Denom = 1.0
-            print "Physical quantity %s uses denominator = % .4f" % (name, Denom)
+        print "Physical quantity %s uses denominator = % .4f" % (name, Denom)
+        if not LeastSquares:
+            # If using a hyperbolic functional form
+            # we still want the contribution to the 
+            # objective function to be the same when
+            # Delta = Denom.
+            Denom /= 3 ** 0.5
         
         # Now we have an array of rescaled temperatures from zero to one.
         tarray = temps - min(temps)
@@ -128,6 +142,7 @@ class Liquid(Target):
         Gradient = np.zeros(self.FF.np, dtype=float)
         Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
         Objs = {}
+        GradMap = []
         for i, T in enumerate(temps):
             if FitFitted:
                 G = flat(GradZMat[i,:])
@@ -135,23 +150,47 @@ class Liquid(Target):
             else:
                 G = grad[T]
                 Delta = calc[T] - exp[T]
-            # print "T = ", T
-            # print "Weight = ", Weights[T]
-            # print "Delta = ", Delta
-            # print "G = ", G
-            ThisObj = Weights[T] * Delta ** 2 / Denom**2
-            Objs[T] = ThisObj
-            ThisGrad = 2.0 * Weights[T] * Delta * G / Denom**2
-            if verbose:
-                bar = printcool("%s at %.1f : Calculated = % .3f, Experimental = % .3f, Objective = % .3f, Gradient:" % (name, T, cfit[T] if FitFitted else calc[T], exp[T], ThisObj))
-                self.FF.print_map(vals=G)
-                print "Denominator = % .3f (squared) Stdev(expt) = %.3f" % (Denom, np.std(np.array([exp[i] for i in temps])))
-            # else:
-            #     print "%s at %.1f adds % .4f to objective (delta % .4f, weight % .4f)" % (name, T, ThisObj, Delta, Weights[T])
-            Objective += ThisObj
-            Gradient += ThisGrad
-            # Gauss-Newton approximation to the Hessian.
-            Hessian += 2.0 * Weights[T] * (np.outer(G, G)) / Denom**2
+            if LeastSquares:
+                # Least-squares objective function.
+                ThisObj = Weights[T] * Delta ** 2 / Denom**2
+                Objs[T] = ThisObj
+                ThisGrad = 2.0 * Weights[T] * Delta * G / Denom**2
+                GradMap.append(G)
+                Objective += ThisObj
+                Gradient += ThisGrad
+                # Gauss-Newton approximation to the Hessian.
+                Hessian += 2.0 * Weights[T] * (np.outer(G, G)) / Denom**2
+            else:
+                # L1-like objective function.
+                D = Denom
+                S = Delta**2 + D**2
+                # if np.abs(Delta) < D:
+                #     print "%s, temp % .1f : abs(calc-exp) = % .1e (< % .1e)" % (name,T,np.abs(Delta),D)
+                # else:
+                #     print "%s, temp % .1f : abs(calc-exp) = % .1e ;" % (name,T,np.abs(Delta)),
+                #     print "recommend trust <", Delta/np.abs(G)
+                ThisObj  = Weights[T] * (S**0.5-D) / Denom
+                ThisGrad = Weights[T] * (Delta/S**0.5) * G / Denom
+                ThisHess = Weights[T] * (1/S**0.5-Delta**2/S**1.5) * np.outer(G,G) / Denom
+                print "%s, T = % .1f" % (name, T)
+                print "Objective : "
+                print ThisObj
+                print "Gradient : "
+                print ThisGrad
+                print "Hessian : "
+                print ThisHess
+                Objs[T] = ThisObj
+                GradMap.append(G)
+                Objective += ThisObj
+                Gradient += ThisGrad
+                Hessian += ThisHess
+        GradMapPrint = [' '.join(["#Temperature"] + self.FF.plist)]
+        for T, g in zip(temps,GradMap):
+            GradMapPrint.append(["%9.3f" % T] + ["% 9.3e" % i for i in g])
+        o = open('gradient_%s.dat' % name,'w')
+        for line in GradMapPrint:
+            print >> o, ' '.join(line)
+        o.close()
             
         Delta = np.array([calc[T] - exp[T] for T in temps])
         Defit = np.array([cfit[T] - exp[T] for T in temps])
@@ -211,6 +250,13 @@ class Liquid(Target):
                    312.2 : 992.594323895, 318.6 : 990.045341555, 326.7 : 986.414237859, 
                    337.3 : 981.041345405, 351.8 : 972.665015969, 373.2 : 958.363657052}
 
+        Rho_wt = {243.2 : 0.005964, 247.2 : 0.007338, 250.8 : 0.008774, 253.9 : 0.010175, 256.8 : 0.011630, 
+                  259.5 : 0.013116, 262.0 : 0.014606, 264.3 : 0.016076, 266.6 : 0.017641, 268.7 : 0.019153, 
+                  270.9 : 0.020820, 273.2 : 0.022652, 275.1 : 0.024232, 277.2 : 0.026046, 279.4 : 0.028016, 
+                  281.6 : 0.030053, 283.9 : 0.032248, 286.4 : 0.034697, 289.0 : 0.037303, 291.8 : 0.040156, 
+                  294.9 : 0.043346, 298.2 : 0.046742, 302.3 : 0.050897, 306.8 : 0.055277, 312.2 : 0.060120, 
+                  318.6 : 0.065013, 326.7 : 0.069442, 337.3 : 0.071582, 351.8 : 0.067340, 373.2 : 0.049548}
+        
         Hvap_exp = {243.2 : 46.3954889576, 247.2 : 46.1962620917, 250.8 : 46.026660115, 
                     253.9 : 45.8854856909, 256.8 : 45.7562378857, 259.5 : 45.6376566716, 
                     262.0 : 45.5289631106, 264.3 : 45.4296676383, 266.6 : 45.3308849086, 
@@ -222,6 +268,13 @@ class Liquid(Target):
                     312.2 : 43.38721755,   318.6 : 43.11094613,   326.7 : 42.75881714, 
                     337.3 : 42.29274032,   351.8 : 41.64286045,   373.2 : 40.64987322}
 
+        Hvap_wt = {243.2 : 0.035362, 247.2 : 0.035538, 250.8 : 0.035653, 253.9 : 0.035718, 256.8 : 0.035752, 
+                   259.5 : 0.035759, 262.0 : 0.035744, 264.3 : 0.035713, 266.6 : 0.035664, 268.7 : 0.035605, 
+                   270.9 : 0.035528, 273.2 : 0.035431, 275.1 : 0.035339, 277.2 : 0.035224, 279.4 : 0.035088, 
+                   281.6 : 0.034938, 283.9 : 0.034765, 286.4 : 0.034560, 289.0 : 0.034327, 291.8 : 0.034055, 
+                   294.9 : 0.033728, 298.2 : 0.033351, 302.3 : 0.032844, 306.8 : 0.032240, 312.2 : 0.031454, 
+                   318.6 : 0.030443, 326.7 : 0.029055, 337.3 : 0.027090, 351.8 : 0.024214, 373.2 : 0.019818}
+
         # Thermal expansion coefficients in units of 1e-4 K-1
         Alpha_exp = {243.2 :-13.945, 247.2 :-10.261, 250.8 : -7.859, 253.9 : -6.246, 256.8 : -5.009, 
                      259.5 : -4.034, 262.0 : -3.252, 264.3 : -2.614, 266.6 : -2.041, 268.7 : -1.565, 
@@ -229,6 +282,13 @@ class Liquid(Target):
                      281.6 :  0.667, 283.9 :  0.979, 286.4 :  1.297, 289.0 :  1.608, 291.8 :  1.923, 
                      294.9 :  2.250, 298.2 :  2.577, 302.3 :  2.957, 306.8 :  3.346, 312.2 :  3.780, 
                      318.6 :  4.257, 326.7 :  4.815, 337.3 :  5.487, 351.8 :  6.335, 373.2 :  7.504}
+        
+        Alpha_wt = {243.2 : 0.007502, 247.2 : 0.008895, 250.8 : 0.010310, 253.9 : 0.011657, 256.8 : 0.013030, 
+                    259.5 : 0.014407, 262.0 : 0.015769, 264.3 : 0.017097, 266.6 : 0.018495, 268.7 : 0.019834, 
+                    270.9 : 0.021299, 273.2 : 0.022897, 275.1 : 0.024267, 277.2 : 0.025832, 279.4 : 0.027525, 
+                    281.6 : 0.029271, 283.9 : 0.031148, 286.4 : 0.033243, 289.0 : 0.035473, 291.8 : 0.037923, 
+                    294.9 : 0.040679, 298.2 : 0.043643, 302.3 : 0.047328, 306.8 : 0.051320, 312.2 : 0.055934, 
+                    318.6 : 0.060981, 326.7 : 0.066391, 337.3 : 0.071219, 351.8 : 0.072704, 373.2 : 0.063927}
 
         # Isothermal compressibilities in units of 1e-6 bar-1
         Kappa_exp = {243.2 : 76.292, 247.2 : 70.319, 250.8 : 66.225, 253.9 : 63.344, 256.8 : 61.040, 
@@ -238,6 +298,20 @@ class Liquid(Target):
                      294.9 : 45.645, 298.2 : 45.242, 302.3 : 44.841, 306.8 : 44.516, 312.2 : 44.268, 
                      318.6 : 44.151, 326.7 : 44.246, 337.3 : 44.733, 351.8 : 45.993, 373.2 : 49.027}
 
+        Kappa_wt = {243.2 : 0.004143, 247.2 : 0.005334, 250.8 : 0.006631, 253.9 : 0.007939, 256.8 : 0.009337, 
+                    259.5 : 0.010801, 262.0 : 0.012302, 264.3 : 0.013813, 266.6 : 0.015450, 268.7 : 0.017058, 
+                    270.9 : 0.018858, 273.2 : 0.020866, 275.1 : 0.022621, 277.2 : 0.024659, 279.4 : 0.026899, 
+                    281.6 : 0.029242, 283.9 : 0.031793, 286.4 : 0.034669, 289.0 : 0.037757, 291.8 : 0.041168, 
+                    294.9 : 0.045010, 298.2 : 0.049123, 302.3 : 0.054171, 306.8 : 0.059481, 312.2 : 0.065288, 
+                    318.6 : 0.070967, 326.7 : 0.075630, 337.3 : 0.076579, 351.8 : 0.068402, 373.2 : 0.044008}
+
+        Kappa_wt1 = {243.2 : 0.0, 247.2 : 1.0, 250.8 : 1.0, 253.9 : 1.0, 256.8 : 1.0, 
+                     259.5 : 1.0, 262.0 : 1.0, 264.3 : 1.0, 266.6 : 1.0, 268.7 : 1.0, 
+                     270.9 : 1.0, 273.2 : 1.0, 275.1 : 1.0, 277.2 : 1.0, 279.4 : 1.0, 
+                     281.6 : 1.0, 283.9 : 1.0, 286.4 : 1.0, 289.0 : 1.0, 291.8 : 1.0, 
+                     294.9 : 1.0, 298.2 : 1.0, 302.3 : 1.0, 306.8 : 1.0, 312.2 : 1.0, 
+                     318.6 : 1.0, 326.7 : 1.0, 337.3 : 1.0, 351.8 : 1.0, 373.2 : 1.0}
+
         # Isobaric heat capacities in units of cal mol-1 K-1
         Cp_exp = {243.2 : 20.292, 247.2 : 19.458, 250.8 : 18.988, 253.9 : 18.721, 256.8 : 18.549, 
                   259.5 : 18.435, 262.0 : 18.356, 264.3 : 18.299, 266.6 : 18.253, 268.7 : 18.218, 
@@ -245,6 +319,13 @@ class Liquid(Target):
                   281.6 : 18.077, 283.9 : 18.061, 286.4 : 18.045, 289.0 : 18.032, 291.8 : 18.020, 
                   294.9 : 18.010, 298.2 : 18.003, 302.3 : 17.997, 306.8 : 17.995, 312.2 : 17.996, 
                   318.6 : 18.000, 326.7 : 18.009, 337.3 : 18.027, 351.8 : 18.066, 373.2 : 18.152}
+        
+        Cp_wt = {243.2 : 0.009993, 247.2 : 0.011432, 250.8 : 0.012851, 253.9 : 0.014169, 256.8 : 0.015483, 
+                 259.5 : 0.016777, 262.0 : 0.018037, 264.3 : 0.019247, 266.6 : 0.020505, 268.7 : 0.021696, 
+                 270.9 : 0.022985, 273.2 : 0.024376, 275.1 : 0.025558, 277.2 : 0.026897, 279.4 : 0.028335, 
+                 281.6 : 0.029806, 283.9 : 0.031376, 286.4 : 0.033118, 289.0 : 0.034961, 291.8 : 0.036977, 
+                 294.9 : 0.039237, 298.2 : 0.041662, 302.3 : 0.044680, 306.8 : 0.047964, 312.2 : 0.051806, 
+                 318.6 : 0.056117, 326.7 : 0.061004, 337.3 : 0.066045, 351.8 : 0.069696, 373.2 : 0.067209}
 
         # Sorted list of temperatures.
         Temps = np.array(sorted([i for i in Rho_exp]))
@@ -317,11 +398,13 @@ class Liquid(Target):
                 mU_kln[k, m, :] *= beta
         print "Running MBAR analysis..."
         mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
-        mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8)
         W1 = mbar.getWeights()
-        mW1 = mmbar.getWeights()
-        print "Done"
-
+        if np.abs(np.std(mEnergies)) > 1e-6:
+            mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8)
+            mW1 = mmbar.getWeights()
+        else:
+            mW1 = np.ones((Sims*mShots,Sims),dtype=float)
+            mW1 /= Sims*mShots
         for i, T in enumerate(Temps):
             # The weights that we want are the last ones.
             W = flat(W1[:,i])
@@ -377,7 +460,7 @@ class Liquid(Target):
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density", verbose=False)
         X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap", verbose=False)
         X_Alpha, G_Alpha, H_Alpha, AlphaPrint = self.objective_term(Temps, Alpha_exp, Alpha_calc, Alpha_std, Alpha_grad, 2, name="Thermal Expansion", verbose=False, Denom=1.0)
-        X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Temps, Kappa_exp, Kappa_calc, Kappa_std, Kappa_grad, 2, name="Compressibility", verbose=False, Denom=5.0)
+        X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Temps, Kappa_exp, Kappa_calc, Kappa_std, Kappa_grad, 2, name="Compressibility", verbose=False, Denom=10.0, Weights=Kappa_wt1)
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Temps, Cp_exp, Cp_calc, Cp_std, Cp_grad, 2, name="Heat Capacity", verbose=False, Denom=1.0)
 
         Gradient = np.zeros(self.FF.np, dtype=float)
