@@ -458,7 +458,8 @@ class FF(ForceBalanceBaseClass):
                 self.Readers[ffname].feed(line)
             except:
                 print traceback.format_exc()
-                print line,
+                print "The force field reader crashed when trying to read the following line:"
+                print line
                 warn_press_key("The force field parser got confused!  The traceback and line in question are printed above.")
             sline = self.Readers[ffname].Split(line)
             if 'PARM' in sline:
