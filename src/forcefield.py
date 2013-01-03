@@ -454,7 +454,12 @@ class FF(ForceBalanceBaseClass):
         """
         
         for ln, line in enumerate(self.ffdata[ffname]):
-            self.Readers[ffname].feed(line)
+            try:
+                self.Readers[ffname].feed(line)
+            except:
+                print traceback.format_exc()
+                print line,
+                warn_press_key("The force field parser got confused!  The traceback and line in question are printed above.")
             sline = self.Readers[ffname].Split(line)
             if 'PARM' in sline:
                 pmark = (array(sline) == 'PARM').argmax() # The position of the 'PARM' word

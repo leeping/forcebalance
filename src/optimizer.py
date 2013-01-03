@@ -235,16 +235,15 @@ class Optimizer(ForceBalanceBaseClass):
         X_prev   = X
         G_prev   = G.copy()
         H_stor   = H.copy()
-        stepn  = 0
         ndx    = 0.0
         color  = "\x1b[1m"
         nxk = norm(xk)
         ngr = norm(G)
 
-        Quality  = 1.0
+        Quality  = 0.0
+        restep = False
 
         while 1: # Loop until convergence is reached.
-            ITERATION_NUMBER += 1
             ## Put data into the checkpoint file
             self.chk = {'xk': xk, 'X' : X, 'G' : G, 'H': H, 'ehist': ehist,
                         'x_best': X_best,'xk_prev': xk_prev, 'trust': trust}
@@ -252,18 +251,18 @@ class Optimizer(ForceBalanceBaseClass):
                 self.writechk()
             stdfront = len(ehist) > self.hist and np.std(np.sort(ehist)[:self.hist]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
             print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)", "StepQual")
-            print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (stepn, nxk, ndx, ngr, color, X, stdfront, Quality)
+            print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality)
             # Check the convergence criteria
             if ngr < self.conv_grd:
                 print "Convergence criterion reached for gradient norm (%.2e)" % self.conv_grd
                 break
-            if stepn == self.maxstep:
-                print "Maximum number of optimization steps reached (%i)" % stepn
+            if ITERATION_NUMBER == self.maxstep:
+                print "Maximum number of optimization steps reached (%i)" % ITERATION_NUMBER
                 break
-            if ndx < self.conv_stp and stepn > 0:
+            if ndx < self.conv_stp and ITERATION_NUMBER > 0 and not restep:
                 print "Convergence criterion reached in step size (%.2e)" % self.conv_stp
                 break
-            if stdfront < self.conv_obj and len(ehist) > self.hist:
+            if stdfront < self.conv_obj and len(ehist) > self.hist and not restep:
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             if self.print_grad:
@@ -277,9 +276,12 @@ class Optimizer(ForceBalanceBaseClass):
             for key, val in self.Objective.ObjDict.items():
                 if Best_Step:
                     self.Objective.ObjDict_Last[key] = val
+            restep = False
             dx, dX_expect, bump = self.step(xk, data, trust)
             old_pk = self.FF.create_pvals(xk)
             old_xk = xk.copy()
+            # Increment the iteration counter.
+            ITERATION_NUMBER += 1
             # Take a step in the parameter space.
             xk += dx
             if self.print_vals:
@@ -293,7 +295,6 @@ class Optimizer(ForceBalanceBaseClass):
                 print bar
             # Evaluate the objective function and its derivatives.
             data        = self.Objective.Full(xk,Ord,verbose=True)
-            stepn += 1
             X, G, H = data['X'], data['G'], data['H']
             ndx = norm(dx)
             nxk = norm(xk)
@@ -314,17 +315,32 @@ class Optimizer(ForceBalanceBaseClass):
                 # Recommend values 0.5 and 0.5
                 trust += a*trust*np.exp(-b*(trust/self.trust0 - 1))
             if X > (X_prev + self.err_tol):
-                color = "\x1b[91m"
                 Best_Step = 0
                 # Toggle switch for rejection (experimenting with no rejection)
                 Rejects = True
+                Reevaluate = True
                 trust = max(ndx*(1./(1+a)), self.mintrust)
                 print "Rejecting step and reducing trust radius to % .4e" % trust
                 if Rejects:
                     xk = xk_prev.copy()
-                    G = G_prev.copy()
-                    H = H_stor.copy()
-                    data = deepcopy(datastor)
+                    if Reevaluate:
+                        restep = True
+                        printcool("Objective function rises (Disappointed!)\nRe-evaluating at the previous point..",color=1)
+                        ITERATION_NUMBER += 1
+                        data        = self.Objective.Full(xk,Ord,verbose=True)
+                        X, G, H = data['X'], data['G'], data['H']
+                        X_prev = X
+                        dx *= 0
+                        ndx = norm(dx)
+                        nxk = norm(xk)
+                        ngr = norm(G)
+                        Quality = 0.0
+                        color = "\x1b[0m"
+                    else:
+                        color = "\x1b[91m"
+                        G = G_prev.copy()
+                        H = H_stor.copy()
+                        data = deepcopy(datastor)
                     continue
             else:
                 if X > X_best:

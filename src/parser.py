@@ -259,7 +259,7 @@ def printsection(heading,optdict,typedict):
     Answer.append("$end")
     return Answer
 
-def parse_inputs(input_file):
+def parse_inputs(input_file=None):
     """ Parse through the input file and read all user-supplied options.
 
     This is usually the first thing that happens when an executable script is called.
@@ -290,6 +290,9 @@ def parse_inputs(input_file):
     options.update(gen_opts_defaults)
     tgt_opts = []
     this_tgt_opt = deepcopy(tgt_opts_defaults)
+    # Give back a bunch of default options if input file isn't specified.
+    if input_file == None:
+        return options, tgt_opts
     fobj = open(input_file)
     for line in fobj:
         # Anything after "#" is a comment

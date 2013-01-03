@@ -70,7 +70,7 @@ fi
 $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
 exitstat=$?
 nerr=`wc -l $error | awk '{print $1}'`
-errlines=`grep error $error 2> /dev/null | wc -l | awk '{print $1}'`
+errlines=`grep -i error $error 2> /dev/null | wc -l | awk '{print $1}'`
 if [ $errlines -ne 0 ] || [ $exitstat -ne 0 ] ; then
     tail -50 $error
     echo
