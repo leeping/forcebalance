@@ -267,11 +267,11 @@ class Optimizer(ForceBalanceBaseClass):
                 break
             if self.print_grad:
                 bar = printcool("Total Gradient",color=6)
-                self.FF.print_map(vals=G)
+                self.FF.print_map(vals=G,precision=8)
                 print bar
             if self.print_hess:
                 bar = printcool("Total Hessian",color=6)
-                pmat2d(H)
+                pmat2d(H,precision=8)
                 print bar
             for key, val in self.Objective.ObjDict.items():
                 if Best_Step:

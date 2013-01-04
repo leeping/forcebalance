@@ -12,6 +12,7 @@ if [[ $HOSTNAME =~ "leeping" ]] ; then
     export INCLUDE=$CUDA_HOME/include:$INCLUDE
 elif [[ $HOSTNAME =~ "fire" ]] ; then
     module load cuda/4.1-experimental
+    export OPENMM_CUDA_COMPILER=/opt/CUDA/cuda4.1/bin/nvcc
     #export CUDA_HOME=/opt/CUDA/4.0
     #export PATH=$CUDA_HOME/bin:$PATH
     #export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/lib:$LD_LIBRARY_PATH
@@ -35,11 +36,12 @@ elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module load cuda
     export OPENMM_CUDA_COMPILER=/opt/apps/cuda/4.1/cuda/bin/nvcc
 elif [[ $HOSTNAME =~ "not0rious" ]] ; then
-    module load cuda/4.2.9
+    module load openmm
 elif [[ $HOSTNAME =~ "ls4" ]] ; then
     module unload intel
     module load gcc
-    module load cuda/4.2
+    module load cuda/5.0
+    export OPENMM_CUDA_COMPILER=/opt/apps/cuda/5.0/bin/nvcc
 fi
 
 echo "#=======================#"
@@ -68,7 +70,10 @@ echo "#=======================#"
 echo
 echo $@
 
+rm -rf npt_result.p
 time $@
+mkdir -p $HOME/temp/backups/$PWD
+cp * $HOME/temp/backups/$PWD
 
 # Avoid the stupid segfault-on-quit that happens on fire
 # Ahh, i don't know how to do this..
