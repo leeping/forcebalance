@@ -268,7 +268,7 @@ def orthogonalize(vec1, vec2):
     v2u = vec2/norm(vec2)
     return vec1 - v2u*dot(vec1, v2u)
 
-def invert_svd(X,thresh=1e-6):
+def invert_svd(X,thresh=1e-12):
     
     """ 
 
@@ -284,7 +284,7 @@ def invert_svd(X,thresh=1e-6):
     v      = mat(transpose(vh))
     si     = s.copy()
     for i in range(s.shape[0]):
-        if abs(s[i]) > 1e-8:
+        if abs(s[i]) > thresh:
             si[i] = 1./s[i]
         else:
             si[i] = 0.0
@@ -295,7 +295,7 @@ def invert_svd(X,thresh=1e-6):
 #==============================#
 #|    Linear least squares    |#
 #==============================#
-def get_least_squares(x, y, w = None):
+def get_least_squares(x, y, w = None, thresh=1e-12):
     """
     @code
      __                  __
@@ -322,20 +322,24 @@ def get_least_squares(x, y, w = None):
     Y = col(y)
     n_x = X.shape[0]
     n_fit = X.shape[1]
-    if n_fit >= n_x:
+    if n_fit > n_x:
         print "Argh? It seems like this problem is underdetermined!"
     # Build the weight matrix.
     if w != None:
         if len(w) != n_x:
             warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
         w /= mean(w)
-        W = mat(diag(w))
+        WH = mat(diag(w**0.5))
     else:
-        W = mat(eye(n_x))
+        WH = mat(eye(n_x))
     # Make the Moore-Penrose Pseudoinverse.
-    MPPI = invert_svd(X.T * W * X) * X.T * W
-    Beta = MPPI * Y
-    Hat = X * MPPI
+    # if n_fit == n_x:
+    #     MPPI = np.linalg.inv(WH*X)
+    # else:
+    # This resembles the formula (X'WX)^-1 X' W^1/2
+    MPPI = np.linalg.pinv(WH*X)
+    Beta = MPPI * WH * Y
+    Hat = WH * X * MPPI
     yfit = flat(Hat * Y)
     # Return three things: the least-squares coefficients, the hat matrix (turns y into yfit), and yfit
     # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
