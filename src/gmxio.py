@@ -373,7 +373,7 @@ class AbInitio_GMX(AbInitio):
         ResidueCounter = -1
         ChargeGroupCounter = -1
         MoleculeCounter = -1
-        for line in open(os.path.join(self.root, self.tgtdir, "settings", self.topfnm)).readlines():
+        for line in open(os.path.join(self.root, self.tgtdir,  self.topfnm)).readlines():
             s          = line.split()
             # No sense in doing anything for an empty line or a comment line.
             if len(s) == 0 or match('^;',line): continue
@@ -420,8 +420,8 @@ class AbInitio_GMX(AbInitio):
         os.symlink(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
         os.symlink(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
         # Link the run files
-        os.symlink(os.path.join(self.root,self.tgtdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"settings",self.topfnm),os.path.join(abstempdir,self.topfnm))
+        os.symlink(os.path.join(self.root,self.tgtdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        os.symlink(os.path.join(self.root,self.tgtdir,self.topfnm),os.path.join(abstempdir,self.topfnm))
         # Write the trajectory to the temp-directory
         self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro
@@ -503,9 +503,9 @@ class Interaction_GMX(Interaction):
         os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
         os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
         # Link the run files
-        os.symlink(os.path.join(self.root,self.tgtdir,"settings","index.ndx"),os.path.join(abstempdir,"index.ndx"))
-        #os.symlink(os.path.join(self.root,self.tgtdir,"settings","shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"settings",self.topfnm),os.path.join(abstempdir,self.topfnm))
+        os.symlink(os.path.join(self.root,self.tgtdir,"index.ndx"),os.path.join(abstempdir,"index.ndx"))
+        #os.symlink(os.path.join(self.root,self.tgtdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        os.symlink(os.path.join(self.root,self.tgtdir,self.topfnm),os.path.join(abstempdir,self.topfnm))
         # Write the trajectory to the temp-directory
         self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro
