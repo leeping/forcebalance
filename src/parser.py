@@ -152,6 +152,7 @@ tgt_opts_types = {
                  "absolute"         : (0, 'When matching energies in AbInitio, do not subtract the mean energy gap.'),
                  "cauchy"           : (0, 'When fitting interaction energies, normalize each using 1/(denom**2 + reference**2) which resembles a Cauchy distribution'),
                  "manual"           : (0, 'Give the user a chance to fill in condensed phase stuff on the zeroth step'),
+                 "hvap_subaverage"  : (0, 'Don\'t target the average enthalpy of vaporization and allow it to freely float (experimental)'),
                 },
     'floats'  : {"weight"       : (1.0, 'Weight of the target (determines its importance vs. other targets)'),
                  "w_rho"        : (1.0, 'Weight of experimental density within liquid properties'),

@@ -67,6 +67,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'w_cp','W_Cp')
         # Optionally pause on the zeroth step
         self.set_option(tgt_opts,'manual','manual')
+        # Don't target the average enthalpy of vaporization and allow it to freely float (experimental)
+        self.set_option(tgt_opts,'hvap_subaverage','hvap_subaverage')
         
         #======================================#
         #     Variables which are set here     #
@@ -89,7 +91,7 @@ class Liquid(Target):
     def indicate(self):
         return
 
-    def objective_term(self,temps, exp, calc, err, grad, fitorder, name="Quantity", verbose = True, FitFitted = False, Denom=None, Weights=None):
+    def objective_term(self,temps, exp, calc, err, grad, fitorder, name="Quantity", verbose = True, FitFitted = False, Denom=None, Weights=None, SubAverage=False):
         # Have the option to assume all uncertainties equal.
         Uncerts = {}
         InverseErrorWeights = False
@@ -143,10 +145,20 @@ class Liquid(Target):
         Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
         Objs = {}
         GradMap = []
+        avgCalc = 0.0
+        avgExp  = 0.0
+        avgGrad = np.zeros(self.FF.np, dtype=float)
+        for i, T in enumerate(temps):
+            avgCalc += Weights[T]*calc[T]
+            avgExp  += Weights[T]*exp[T]
+            avgGrad += Weights[T]*grad[T]
         for i, T in enumerate(temps):
             if FitFitted:
                 G = flat(GradZMat[i,:])
                 Delta = cfit[T] - exp[T]
+            elif SubAverage:
+                G = grad[T]-avgGrad
+                Delta = calc[T] - exp[T] - avgCalc + avgExp
             else:
                 G = grad[T]
                 Delta = calc[T] - exp[T]
@@ -535,7 +547,7 @@ class Liquid(Target):
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density", verbose=False, Denom=5.0, Weights=Weights)
-        X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap", verbose=False, Denom=2.0, Weights=Weights)
+        X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap", verbose=False, Denom=2.0, Weights=Weights, SubAverage=self.hvap_subaverage)
         X_Alpha, G_Alpha, H_Alpha, AlphaPrint = self.objective_term(Temps, Alpha_exp, Alpha_calc, Alpha_std, Alpha_grad, 2, name="Thermal Expansion", verbose=False, Denom=1.0, Weights=Weights)
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Temps, Kappa_exp, Kappa_calc, Kappa_std, Kappa_grad, 2, name="Compressibility", verbose=False, Denom=10.0, Weights=Weights)
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Temps, Cp_exp, Cp_calc, Cp_std, Cp_grad, 2, name="Heat Capacity", verbose=False, Denom=1.0, Weights=Weights)
