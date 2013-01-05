@@ -254,11 +254,11 @@ class ITP_Reader(BaseReader):
         self.itype = None
         self.ln   += 1
         # No sense in doing anything for an empty line or a comment line.
-        if len(s) == 0 or match('^;',line): return None, None
+        if len(s) == 0 or match('^ *;',line): return None, None
         # Now go through all the cases.
-        if match('^\[.*\]',line):
+        if match('^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
-            self.sec = sub('[\[\] \n]','',line)
+            self.sec = sub('[\[\] \n]','',line.strip())
         elif self.sec == 'defaults':
             self.itype = 'DEF'
             self.nbtype = int(s[0])
@@ -302,6 +302,7 @@ class ITP_Reader(BaseReader):
             atom = [s[0]]
             self.itype = 'QTPIE'
         elif self.sec == 'bonds':
+            # print self.adict
             atom = [self.adict[self.mol][int(i)-1] for i in s[:2]]
             self.itype = fdict[self.sec][int(s[2])]
         elif self.sec == 'bondtypes':
