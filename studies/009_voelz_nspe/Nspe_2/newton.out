@@ -1,0 +1,273 @@
+
+########################################################################
+###[1m             Welcome to ForceBalance version 1.0! =D              [0m###
+###[1m                 Force Field Optimization System                  [0m###
+###[1m                      Author: Lee-Ping Wang                       [0m###
+########################################################################
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: newton.in
+
+##########################################################
+###[95m  Options at their default values are not printed   [0m###
+###[95m        Use 'verbose_options True' to Enable        [0m###
+##########################################################
+Reading force field from file: molecule.itp
+
+###########################################################
+###[92m Starting parameter indices, physical values and IDs [0m###
+###########################################################
+   0 [  2.2175e+00 ] : PDIHMULS1K:cnc3c3
+   1 [  0.0000e+00 ] : PDIHMULS2K:cnc3c3
+   2 [  6.2760e-01 ] : PDIHMULS3K:cnc3c3
+   3 [  2.0920e+00 ] : PDIHMULS4K:cnc3c3
+   4 [  3.3472e+00 ] : PDIHMULS1K:cc3nc
+   5 [  3.5564e+00 ] : PDIHMULS2K:cc3nc
+   6 [  4.3932e+01 ] : PIMPDIHS2K:nc3co
+   7 [  4.6024e+00 ] : PIMPDIHS2K:cacacaha
+   8 [  4.6024e+00 ] : PIMPDIHS2K:c3cacaca
+   9 [  4.6024e+00 ] : PIMPDIHS2K:cc3nc3
+  10 [  4.3932e+01 ] : PIMPDIHS2K:c3nco
+-----------------------------------------------------------
+
+##########################################################
+###[91m    Rescaling Factors (Lower Takes Precedence):     [0m###
+##########################################################
+   PDIHMULS4K                           : 9.64853e+01
+   PDIHMULS2K                           : 9.64853e+01
+   PDIHMULS3K                           : 9.64853e+01
+   PIMPDIHS2K                           : 9.64853e+01
+   PDIHMULS1K                           : 9.64853e+01
+   PDIHS2K                              : 9.64853e+01
+   PDIHMULS1B                           : 1.80000e+02
+   PDIHMULS2B                           : 1.80000e+02
+   PDIHMULS3B                           : 1.80000e+02
+   PDIHMULS4B                           : 1.80000e+02
+   PIMPDIHS2B                           : 1.80000e+02
+   PDIHMULS1K                           : 9.64853e+01
+   PDIHMULS2K                           : 9.64853e+01
+   PDIHMULS3K                           : 9.64853e+01
+   PDIHMULS4K                           : 9.64853e+01
+   PIMPDIHS2K                           : 9.64853e+01
+----------------------------------------------------------
+Building charge constraints...
+
+##########################################################
+###[92m               Setup for force field                [0m###
+##########################################################
+priors                    OrderedDict([('PDIHMULS1B', 180.0), ('PDIHMULS2B', 180.0), ('PDIHMULS3B', 180.0), ('PDIHMULS4B', 180.0), ('PIMPDIHS2B', 180.0), ('PDIHMULS1K', 96.4853), ('PDIHMULS2K', 96.4853), ('PDIHMULS3K', 96.4853), ('PDIHMULS4K', 96.4853), ('PIMPDIHS2K', 96.4853)]) 
+----------------------------------------------------------
+Backing up: temp/nspe_2dscan to: backups/nspe_2dscan.21.tar.bz2
+QM forces are not present, only fitting energies.
+
+##########################################################
+###[92m           Setup for target nspe_2dscan :           [0m###
+##########################################################
+name                      nspe_2dscan 
+type                      ABINITIO_GMX 
+tgtdir                    targets/nspe_2dscan 
+shots                     351 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
+
+##########################################################
+###[92m           Setup for objective function :           [0m###
+##########################################################
+penalty_additive          0.01 
+----------------------------------------------------------
+
+##########################################################
+###[92m                Setup for optimizer                 [0m###
+##########################################################
+jobtype                   NEWTON 
+trust0                    -1.0 
+conv_obj                  0.001 
+----------------------------------------------------------
+
+##########################################################
+###[1m                   Main Optimizer                   [0m###
+###[1m       Newton-Raphson Mode (Adaptive Radius)        [0m###
+##########################################################
+
+Target: nspe_2dscan     Errors: Energy =  15.8023 kJ/mol (80.2478%) Objective = 6.43971e-01
+
+######################################################################
+###[94m                  Objective Function Breakdown                  [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution [0m###
+######################################################################
+nspe_2dscan                    0.64397      1.000 [94m     6.43971e-01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     6.43971e-01[0m 
+----------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     0   0.000e+00   0.000e+00   3.431e+00[1m   6.43971e-01[0m   0.000e+00      0.000
+
+
+##########################################################
+###[96m                   Total Gradient                   [0m###
+##########################################################
+   0 [  1.71034480e+00 ] : PDIHMULS1K:cnc3c3
+   1 [  7.52186643e-01 ] : PDIHMULS2K:cnc3c3
+   2 [  2.59321082e-01 ] : PDIHMULS3K:cnc3c3
+   3 [  9.18382958e-01 ] : PDIHMULS4K:cnc3c3
+   4 [  2.27175215e+00 ] : PDIHMULS1K:cc3nc
+   5 [ -2.47137567e-01 ] : PDIHMULS2K:cc3nc
+   6 [  3.60838882e-02 ] : PIMPDIHS2K:nc3co
+   7 [  2.86514587e-04 ] : PIMPDIHS2K:cacacaha
+   8 [ -6.25000298e-03 ] : PIMPDIHS2K:c3cacaca
+   9 [  1.45865056e+00 ] : PIMPDIHS2K:cc3nc3
+  10 [  1.39153960e-01 ] : PIMPDIHS2K:c3nco
+----------------------------------------------------------
+
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+01, L =  4.0000e+00, length 2.4864e-01, result -1.1740e-01
+Searching! Hessian diagonal scaling = 2.4562e+01, L = -3.8541e+00, length 1.0713e-01, result -5.2048e-02
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0000e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 4.4377e+00, L = -8.5410e-01, length 5.0100e-01, result -2.2471e-01
+Searching! Hessian diagonal scaling = 2.3131e+00, L =  2.1459e+00, length 8.1353e-01, result -3.4213e-01
+Searching! Hessian diagonal scaling = 1.0110e+00, L =  8.9491e-01, length 1.2590e+00, result -4.6419e-01
+Searching! Hessian diagonal scaling = 1.0025e+00, L =  9.5050e-01, length 1.2625e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0005e+00, L =  9.7858e-01, length 1.2633e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0001e+00, L =  9.9054e-01, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9596e-01, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  9.9970e-01, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.1916e+00, L =  1.4377e+00, length 1.1822e+00, result -4.5348e-01
+Searching! Hessian diagonal scaling = 1.0280e+00, L =  1.1672e+00, length 1.2521e+00, result -4.6391e-01
+Searching! Hessian diagonal scaling = 1.0041e+00, L =  1.0639e+00, length 1.2619e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0006e+00, L =  1.0244e+00, length 1.2633e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0001e+00, L =  1.0093e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0036e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0016e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0008e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0005e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0011e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0009e+00, length 1.2635e+00, result -4.6424e-01
+Searching! Hessian diagonal scaling = 1.0000e+00, L =  1.0007e+00, length 1.2635e+00, result -4.6424e-01
+
+##########################################################
+###[93m  Mathematical Parameters (Current + Step = Next)   [0m###
+##########################################################
+   0 [  0.0000e+00 - 1.9630e-02 = -1.9630e-02 ] : PDIHMULS1K:cnc3c3
+   1 [  0.0000e+00 - 1.3375e-02 = -1.3375e-02 ] : PDIHMULS2K:cnc3c3
+   2 [  0.0000e+00 + 7.4836e-03 =  7.4836e-03 ] : PDIHMULS3K:cnc3c3
+   3 [  0.0000e+00 - 2.7670e-02 = -2.7670e-02 ] : PDIHMULS4K:cnc3c3
+   4 [  0.0000e+00 - 7.6287e-02 = -7.6287e-02 ] : PDIHMULS1K:cc3nc
+   5 [  0.0000e+00 - 5.3552e-02 = -5.3552e-02 ] : PDIHMULS2K:cc3nc
+   6 [  0.0000e+00 - 5.8578e-01 = -5.8578e-01 ] : PIMPDIHS2K:nc3co
+   7 [  0.0000e+00 - 1.8726e-02 = -1.8726e-02 ] : PIMPDIHS2K:cacacaha
+   8 [  0.0000e+00 - 4.9188e-02 = -4.9188e-02 ] : PIMPDIHS2K:c3cacaca
+   9 [  0.0000e+00 - 3.6616e-01 = -3.6616e-01 ] : PIMPDIHS2K:cc3nc3
+  10 [  0.0000e+00 - 1.0519e+00 = -1.0519e+00 ] : PIMPDIHS2K:c3nco
+----------------------------------------------------------
+
+##########################################################
+###[93m    Physical Parameters (Current + Step = Next)     [0m###
+##########################################################
+   0 [  2.2175e+00 - 1.8940e+00 =  3.2349e-01 ] : PDIHMULS1K:cnc3c3
+   1 [  0.0000e+00 - 1.2905e+00 = -1.2905e+00 ] : PDIHMULS2K:cnc3c3
+   2 [  6.2760e-01 + 7.2206e-01 =  1.3497e+00 ] : PDIHMULS3K:cnc3c3
+   3 [  2.0920e+00 - 2.6698e+00 = -5.7775e-01 ] : PDIHMULS4K:cnc3c3
+   4 [  3.3472e+00 - 7.3605e+00 = -4.0133e+00 ] : PDIHMULS1K:cc3nc
+   5 [  3.5564e+00 - 5.1669e+00 = -1.6105e+00 ] : PDIHMULS2K:cc3nc
+   6 [  4.3932e+01 - 5.6519e+01 = -1.2587e+01 ] : PIMPDIHS2K:nc3co
+   7 [  4.6024e+00 - 1.8068e+00 =  2.7956e+00 ] : PIMPDIHS2K:cacacaha
+   8 [  4.6024e+00 - 4.7459e+00 = -1.4352e-01 ] : PIMPDIHS2K:c3cacaca
+   9 [  4.6024e+00 - 3.5329e+01 = -3.0727e+01 ] : PIMPDIHS2K:cc3nc3
+  10 [  4.3932e+01 - 1.0149e+02 = -5.7560e+01 ] : PIMPDIHS2K:c3nco
+----------------------------------------------------------
+Target: nspe_2dscan     Errors: Energy =   7.9688 kJ/mol (40.4675%) Objective = 1.63762e-01
+
+#####################################################################################
+###[94m                         Objective Function Breakdown                          [0m###
+###[94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m###
+#####################################################################################
+nspe_2dscan                    0.16376      1.000 [92m     1.63762e-01[0m ( -4.802e-01 ) 
+Regularization                 0.01597      1.000 [91m     1.59652e-02[0m ( +1.597e-02 ) 
+Total                                             [92m     1.79727e-01[0m ( -4.642e-01 ) 
+-------------------------------------------------------------------------------------
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)    StepQual
+     1   1.264e+00   1.264e+00   6.393e-06[92m   1.79727e-01[0m   2.321e-01      1.000
+
+Convergence criterion reached for gradient norm (1.00e-04)
+
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+@@@[1;92m           Final objective function value           [0m@@@
+@@@[1;92m  Full:  1.797270e-01  Un-penalized:  1.637618e-01  [0m@@@
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+##########################################################
+###[1;94m           Final optimization parameters:           [0m###
+###[1;94m           Paste to input file to restart           [0m###
+##########################################################
+read_mvals
+   0 [ -1.9630e-02 ] : PDIHMULS1K:cnc3c3
+   1 [ -1.3375e-02 ] : PDIHMULS2K:cnc3c3
+   2 [  7.4836e-03 ] : PDIHMULS3K:cnc3c3
+   3 [ -2.7670e-02 ] : PDIHMULS4K:cnc3c3
+   4 [ -7.6287e-02 ] : PDIHMULS1K:cc3nc
+   5 [ -5.3552e-02 ] : PDIHMULS2K:cc3nc
+   6 [ -5.8578e-01 ] : PIMPDIHS2K:nc3co
+   7 [ -1.8726e-02 ] : PIMPDIHS2K:cacacaha
+   8 [ -4.9188e-02 ] : PIMPDIHS2K:c3cacaca
+   9 [ -3.6616e-01 ] : PIMPDIHS2K:cc3nc3
+  10 [ -1.0519e+00 ] : PIMPDIHS2K:c3nco
+/read_mvals
+
+##########################################################
+###[1;94m             Final physical parameters:             [0m###
+##########################################################
+   0 [  3.2349e-01 ] : PDIHMULS1K:cnc3c3
+   1 [ -1.2905e+00 ] : PDIHMULS2K:cnc3c3
+   2 [  1.3497e+00 ] : PDIHMULS3K:cnc3c3
+   3 [ -5.7775e-01 ] : PDIHMULS4K:cnc3c3
+   4 [ -4.0133e+00 ] : PDIHMULS1K:cc3nc
+   5 [ -1.6105e+00 ] : PDIHMULS2K:cc3nc
+   6 [ -1.2587e+01 ] : PIMPDIHS2K:nc3co
+   7 [  2.7956e+00 ] : PIMPDIHS2K:cacacaha
+   8 [ -1.4352e-01 ] : PIMPDIHS2K:c3cacaca
+   9 [ -3.0727e+01 ] : PIMPDIHS2K:cc3nc3
+  10 [ -5.7560e+01 ] : PIMPDIHS2K:c3nco
+----------------------------------------------------------

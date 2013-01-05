@@ -205,8 +205,8 @@ class Monomer_QTPIE(Target):
         os.symlink(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
         # Link the run files
         os.symlink(os.path.join(self.root,self.tgtdir,"conf.gro"),os.path.join(abstempdir,"conf.gro"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"settings","grompp.mdp"),os.path.join(abstempdir,"grompp.mdp"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"settings","topol.top"),os.path.join(abstempdir,"topol.top"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"grompp.mdp"),os.path.join(abstempdir,"grompp.mdp"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
 
     def unpack_moments(self, moment_dict):
         answer = Np.array([moment_dict[i]*self.weights[i] for i in moment_dict])
