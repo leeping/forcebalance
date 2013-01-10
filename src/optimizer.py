@@ -302,7 +302,11 @@ class Optimizer(ForceBalanceBaseClass):
             drc = abs(flat(dx)).argmax()
 
             dX_actual = X - X_prev
-            Quality = dX_actual / dX_expect
+            try:
+                Quality = dX_actual / dX_expect
+            except:
+                print "Warning: Step size of zero detected (i.e. wrong direction).  Try reducing the finite_difference_h parameter"
+                Quality = 1.0 # This is a step length of zero.
 
             if Quality <= 0.25 and X < (X_prev + self.err_tol):
                 # If the step quality is bad, then we should decrease the trust radius.

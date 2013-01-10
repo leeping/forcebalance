@@ -446,10 +446,10 @@ def queue_up_src_dest(wq, command, input_files, output_files, verbose=True):
     """
     task = work_queue.Task(command)
     for f in input_files:
-        print f[0], f[1]
+        # print f[0], f[1]
         task.specify_input_file(f[0],f[1])
     for f in output_files:
-        print f[0], f[1]
+        # print f[0], f[1]
         task.specify_output_file(f[0],f[1])
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
