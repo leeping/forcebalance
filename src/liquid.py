@@ -65,6 +65,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'w_kappa','W_Kappa')
         # Fractional weight of the isobaric heat capacity
         self.set_option(tgt_opts,'w_cp','W_Cp')
+        # Fractional weight of the dielectric constant
+        self.set_option(tgt_opts,'w_eps0','W_Eps0')
         # Optionally pause on the zeroth step
         self.set_option(tgt_opts,'manual','manual')
         # Don't target the average enthalpy of vaporization and allow it to freely float (experimental)
@@ -278,6 +280,11 @@ class Liquid(Target):
                       298.2 : 18.003, 298.3 : 18.003, 298.4 : 18.002, 298.5 : 18.002, 298.6 : 18.002, 298.7 : 18.002,
                       298.8 : 18.002, 298.9 : 18.001, 299.0 : 18.001, 299.1 : 18.001, 299.2 : 18.001, 299.3 : 18.001,
                       299.4 : 18.001, 299.5 : 18.001, 299.6 : 18.000, 299.7 : 18.000, 299.8 : 18.000, 299.9 : 18.000, }
+            Eps0_exp = {297.00 : 78.823, 297.10 : 78.787, 297.20 : 78.751, 297.30 : 78.715, 297.40 : 78.679, 297.50 : 78.643, 
+                        297.60 : 78.607, 297.70 : 78.571, 297.80 : 78.535, 297.90 : 78.499, 298.00 : 78.463, 298.10 : 78.427, 
+                        298.20 : 78.391, 298.30 : 78.355, 298.40 : 78.319, 298.50 : 78.284, 298.60 : 78.248, 298.70 : 78.212, 
+                        298.80 : 78.176, 298.90 : 78.140, 299.00 : 78.105, 299.10 : 78.069, 299.20 : 78.033, 299.30 : 77.997, 
+                        299.40 : 77.962, 299.50 : 77.926, 299.60 : 77.890, 299.70 : 77.855, 299.80 : 77.819, 299.90 : 77.783, }
             Weights = None
         elif data == "new":
             Rho_exp = {249.15 : 990.497, 253.15 : 993.547, 257.15 : 995.816, 261.15 : 997.476, 265.15 : 998.647, 269.15 : 999.414, 273.15 : 999.840, 277.15 : 999.972, 
@@ -300,6 +307,10 @@ class Liquid(Target):
                       281.15 : 18.080, 285.15 : 18.052, 289.15 : 18.030, 293.15 : 18.015, 298.15 : 18.002, 301.15 : 17.998, 305.15 : 17.995, 309.15 : 17.995, 
                       313.15 : 17.996, 317.15 : 17.999, 321.15 : 18.002, 325.15 : 18.006, 329.15 : 18.011, 333.15 : 18.018, 337.15 : 18.026, 341.15 : 18.035, 
                       345.15 : 18.046, 349.15 : 18.058, 353.15 : 18.071, 357.15 : 18.086, 361.15 : 18.101, 365.15 : 18.117, 369.15 : 18.134, 373.15 : 18.151, }
+            Eps0_exp = {249.15 : 98.651, 253.15 : 96.581, 257.15 : 94.684, 261.15 : 92.898, 265.15 : 91.187, 269.15 : 89.526, 273.15 : 87.903, 277.15 : 86.312,
+                        281.15 : 84.749, 285.15 : 83.214, 289.15 : 81.706, 293.15 : 80.224, 298.15 : 78.409, 301.15 : 77.340, 305.15 : 75.936, 309.15 : 74.556,
+                        313.15 : 73.201, 317.15 : 71.869, 321.15 : 70.561, 325.15 : 69.275, 329.15 : 68.013, 333.15 : 66.773, 337.15 : 65.555, 341.15 : 64.359,
+                        345.15 : 63.185, 349.15 : 62.031, 353.15 : 60.898, 357.15 : 59.784, 361.15 : 58.691, 365.15 : 57.617, 369.15 : 56.562, 373.15 : 55.523, }
             # The lowest temperature point is too noisy so we cut it out.
             Weights = {249.15 : 0.0, 253.15 : 1.0, 257.15 : 1.0, 261.15 : 1.0, 265.15 : 1.0, 269.15 : 1.0, 273.15 : 1.0, 277.15 : 1.0, 
                        281.15 : 1.0, 285.15 : 1.0, 289.15 : 1.0, 293.15 : 1.0, 298.15 : 1.0, 301.15 : 1.0, 305.15 : 1.0, 309.15 : 1.0, 
@@ -441,14 +452,22 @@ class Liquid(Target):
         # Gather the calculation data
         Results = {t : lp_load(open('./%.2f/npt_result.p' % T)) for t, T in enumerate(Temps)}
 
-        Rhos, Vols, Hs, pVs, Energies, Grads, mEnergies, mGrads, Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs = ([Results[t][i] for t in range(len(Temps))] for i in range(13))
+        # Assign variable names to all the stuff in npt_result.p
+        Rhos, Vols, Hs, pVs, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs = ([Results[t][i] for t in range(len(Temps))] for i in range(16))
 
         R  = np.array(list(itertools.chain(*list(Rhos))))
         V  = np.array(list(itertools.chain(*list(Vols))))
         H  = np.array(list(itertools.chain(*list(Hs))))
         PV = np.array(list(itertools.chain(*list(pVs))))
         E  = np.array(list(itertools.chain(*list(Energies))))
+        Dx = np.array(list(itertools.chain(*list(d[:,0] for d in Dips))))
+        Dy = np.array(list(itertools.chain(*list(d[:,1] for d in Dips))))
+        Dz = np.array(list(itertools.chain(*list(d[:,2] for d in Dips))))
         G  = np.hstack(tuple(Grads))
+        GDx = np.hstack(tuple(gd[0] for gd in GDips))
+        GDy = np.hstack(tuple(gd[1] for gd in GDips))
+        GDz = np.hstack(tuple(gd[2] for gd in GDips))
         mE = np.array(list(itertools.chain(*list(mEnergies))))
         mG = np.hstack(tuple(mGrads))
         NMol = 216 # Number of molecules
@@ -468,6 +487,9 @@ class Liquid(Target):
         Cp_calc = {}
         Cp_grad = {}
         Cp_std  = {}
+        Eps0_calc = {}
+        Eps0_grad = {}
+        Eps0_std  = {}
 
         Sims = len(Temps)
         Shots = len(Energies[0])
@@ -538,35 +560,46 @@ class Liquid(Target):
             GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
             GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
             Cp_grad[T] = GCp1 + GCp2 + GCp3
+            ## Static dielectric constant.
+            prefactor = 30.348705333964077
+            D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
+            Eps0_calc[T] = prefactor*(D2/avg(V))/T
+            GD2  = 2*(flat(np.mat(GDx)*col(W*Dx)) - avg(Dx)*flat(np.mat(GDx)*col(W))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+            GD2 += 2*(flat(np.mat(GDy)*col(W*Dy)) - avg(Dy)*flat(np.mat(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+            GD2 += 2*(flat(np.mat(GDz)*col(W*Dz)) - avg(Dz)*flat(np.mat(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+            Eps0_grad[T] = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
             ## Estimation of errors.
             Rho_std[T]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             Hvap_std[T]   = np.sqrt(sum(C**2 * np.array(Hvap_errs)**2))
             Alpha_std[T]   = np.sqrt(sum(C**2 * np.array(Alpha_errs)**2)) * 1e4
             Kappa_std[T]   = np.sqrt(sum(C**2 * np.array(Kappa_errs)**2)) * 1e6
             Cp_std[T]   = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
+            Eps0_std[T]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density", verbose=False, Denom=5.0, Weights=Weights)
-        X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap", verbose=False, Denom=2.0, Weights=Weights, SubAverage=self.hvap_subaverage)
+        X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap", verbose=False, Denom=5.0, Weights=Weights, SubAverage=self.hvap_subaverage)
         X_Alpha, G_Alpha, H_Alpha, AlphaPrint = self.objective_term(Temps, Alpha_exp, Alpha_calc, Alpha_std, Alpha_grad, 2, name="Thermal Expansion", verbose=False, Denom=1.0, Weights=Weights)
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Temps, Kappa_exp, Kappa_calc, Kappa_std, Kappa_grad, 2, name="Compressibility", verbose=False, Denom=10.0, Weights=Weights)
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Temps, Cp_exp, Cp_calc, Cp_std, Cp_grad, 2, name="Heat Capacity", verbose=False, Denom=2.0, Weights=Weights)
+        X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Temps, Eps0_exp, Eps0_calc, Eps0_std, Eps0_grad, 2, name="Dielectric Constant", verbose=False, Denom=8.0, Weights=Weights)
 
         Gradient = np.zeros(self.FF.np, dtype=float)
         Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
 
-        w_tot = self.W_Rho + self.W_Hvap + self.W_Alpha + self.W_Kappa + self.W_Cp
+        w_tot = self.W_Rho + self.W_Hvap + self.W_Alpha + self.W_Kappa + self.W_Cp + self.W_Eps0
         w_1 = self.W_Rho / w_tot
         w_2 = self.W_Hvap / w_tot
         w_3 = self.W_Alpha / w_tot
         w_4 = self.W_Kappa / w_tot
         w_5 = self.W_Cp / w_tot
+        w_6 = self.W_Eps0 / w_tot
 
-        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp
+        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0
         if AGrad:
-            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp
+            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0
         if AHess:
-            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp
+            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0
 
         PrintDict = OrderedDict()
         Title = "Condensed Phase Properties:\n %-20s %40s" % ("Property Name", "Residual x Weight = Contribution")
@@ -599,6 +632,12 @@ class Liquid(Target):
         self.FF.print_map(vals=G_Cp)
         print bar
         PrintDict['Isobaric Heat Capacity'] = "% 10.5f % 8.3f % 14.5e" % (X_Cp, w_5, X_Cp*w_5)
+
+        printcool_dictionary(Eps0Print,   title='Dielectric Constant vs T\nTemperature  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=3,keywidth=15)
+        bar = printcool("Dielectric Constant objective function: % .3f, Derivative:" % X_Eps0)
+        self.FF.print_map(vals=G_Eps0)
+        print bar
+        PrintDict['Dielectric Constant'] = "% 10.5f % 8.3f % 14.5e" % (X_Eps0, w_6, X_Eps0*w_6)
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",Objective)
 
