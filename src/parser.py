@@ -160,6 +160,7 @@ tgt_opts_types = {
                  "w_alpha"      : (1.0, 'Weight of thermal expansion coefficient within liquid properties'),
                  "w_kappa"      : (1.0, 'Weight of isothermal compressibility within liquid properties'),
                  "w_cp"         : (1.0, 'Weight of isobaric heat capacity within liquid properties'),
+                 "w_eps0"       : (1.0, 'Weight of dielectric constant within liquid properties'),
                  "w_energy"     : (1.0, 'Weight of energy within ab initio'),
                  "w_force"      : (1.0, 'Weight of force within ab initio'),
                  "w_netforce"   : (0.0, 'Weight of net forces (condensed to molecules, residues, or charge groups) within ab initio'),
