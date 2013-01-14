@@ -433,24 +433,43 @@ class Liquid(Target):
             Weights = None
 
         # Sorted list of temperatures.
-        Temps = np.array(sorted([i for i in Rho_exp]))
+        Temp0 = np.array(sorted([i for i in Rho_exp]))
 
         if Counter() == 0 and self.manual:
             warn_press_key("Now's our chance to fill the temp directory up with data!")
 
         # Launch a series of simulations
-        for T in Temps:
+        for T in Temp0:
             if not os.path.exists('%.2f' % T):
                 os.makedirs('%.2f' % T)
-            os.chdir('%.2f' % T)
-            self.npt_simulation(T)
-            os.chdir('..')
+                os.chdir('%.2f' % T)
+                self.npt_simulation(T)
+                os.chdir('..')
 
         # Wait for simulations to finish
         wq_wait(self.wq)
 
-        # Gather the calculation data
-        Results = {t : lp_load(open('./%.2f/npt_result.p' % T)) for t, T in enumerate(Temps)}
+        # Gather the calculation data.
+        # This trickery is meant to load only the data that exists,
+        # in case the data is loaded manually (from a nearly-complete work queue job).
+        # Ad hoc? Very.
+        Results = {}
+        Temps = []
+        tt = 0
+        for t, T in enumerate(Temp0):
+            if os.path.exists('./%.2f/npt_result.p' % T):
+                Temps.append(T)
+                Results[tt] = lp_load(open('./%.2f/npt_result.p' % T))
+                tt += 1
+            else:
+                del Rho_exp[T]
+                del Hvap_exp[T]
+                del Alpha_exp[T]
+                del Kappa_exp[T]
+                del Cp_exp[T]
+                del Eps0_exp[T]
+                
+        Temps = np.array(Temps)
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Hs, pVs, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
@@ -577,12 +596,12 @@ class Liquid(Target):
             Eps0_std[T]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
 
         # Get contributions to the objective function
-        X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density", verbose=False, Denom=5.0, Weights=Weights)
+        X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Temps, Rho_exp, Rho_calc, Rho_std, Rho_grad, 3, name="Density", verbose=False, Denom=2.0, Weights=Weights)
         X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Temps, Hvap_exp, Hvap_calc, Hvap_std, Hvap_grad, 2, name="H_vap", verbose=False, Denom=5.0, Weights=Weights, SubAverage=self.hvap_subaverage)
         X_Alpha, G_Alpha, H_Alpha, AlphaPrint = self.objective_term(Temps, Alpha_exp, Alpha_calc, Alpha_std, Alpha_grad, 2, name="Thermal Expansion", verbose=False, Denom=1.0, Weights=Weights)
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Temps, Kappa_exp, Kappa_calc, Kappa_std, Kappa_grad, 2, name="Compressibility", verbose=False, Denom=10.0, Weights=Weights)
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Temps, Cp_exp, Cp_calc, Cp_std, Cp_grad, 2, name="Heat Capacity", verbose=False, Denom=2.0, Weights=Weights)
-        X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Temps, Eps0_exp, Eps0_calc, Eps0_std, Eps0_grad, 2, name="Dielectric Constant", verbose=False, Denom=8.0, Weights=Weights)
+        X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Temps, Eps0_exp, Eps0_calc, Eps0_std, Eps0_grad, 2, name="Dielectric Constant", verbose=False, Denom=10.0, Weights=Weights)
 
         Gradient = np.zeros(self.FF.np, dtype=float)
         Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
