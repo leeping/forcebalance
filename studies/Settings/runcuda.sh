@@ -78,8 +78,8 @@ echo $@
 rm -rf npt_result.p
 time $@
 # Delete backup files that are older than one week.
-find $BAK/$PWD -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD
+find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
 cp * $BAK/$PWD
 
 # Avoid the stupid segfault-on-quit that happens on fire
