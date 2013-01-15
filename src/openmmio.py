@@ -262,7 +262,7 @@ class Liquid_OpenMM(Liquid):
         infnm = os.path.join(rnd,'forcebalance.p')
         os.remove(infnm)
         with open(os.path.join(rnd,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h,True),f)
-        wq = WorkQueue()
+        wq = getWorkQueue()
         queue_up_src_dest(wq, command = './runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.openmmxml, "True" if bGradient else "False"),
                           input_files = [(os.path.join(rnd,'runcuda.sh'),'runcuda.sh'), 
                                          (os.path.join(rnd,'evaltraj.py'),'evaltraj.py'),
