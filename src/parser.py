@@ -74,6 +74,7 @@ gen_opts_types = {
                  },
     'ints'    : {"maxstep"      : (100, 'Maximum number of steps in an optimization'),
                  "objective_history"  : (3, 'Number of good optimization steps to average over when checking the objective convergence criterion'),
+                 "wq_port"   : (0, 'The port number to use for Work Queue'),
                  },
     'bools'   : {"backup"           : (1, 'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, 'Write the checkpoint file at every optimization step'),
@@ -132,7 +133,6 @@ tgt_opts_types = {
                  },
     'ints'    : {"shots"     : (-1, 'Number of snapshots (ab initio); defaults to all of the snapshots'),
                  "fitatoms"  : (0, 'Number of fitting atoms (ab initio); defaults to all of them'),
-                 "wq_port"   : (0, 'The port number to use for Work Queue')
                  },
     'bools'   : {"whamboltz"        : (0, 'Whether to use WHAM Boltzmann Weights (ab initio), defaults to False'),
                  "sampcorr"         : (0, 'Whether to use the (archaic) sampling correction (ab initio), defaults to False'),

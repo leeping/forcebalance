@@ -19,7 +19,7 @@ import random
 from baseclass import ForceBalanceBaseClass
 
 # Global variable corresponding to the iteration number.
-ITERATION_NUMBER = None
+ITERATION_NUMBER = 0
 
 def Counter():
     global ITERATION_NUMBER

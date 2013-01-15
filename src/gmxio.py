@@ -8,7 +8,7 @@
 
 import os
 from re import match, sub
-from nifty import isint, _exec, warn_press_key
+from nifty import isint, _exec, warn_press_key, WorkQueue
 from numpy import array
 from basereader import BaseReader
 from abinitio import AbInitio
@@ -547,11 +547,12 @@ class Interaction_GMX(Interaction):
             traj_monoB = deepcopy(self.traj)
             traj_monoB.add_quantum("qtemp_B.in")
             traj_monoB.write("qchem_monoB.in",ftype="qcin")
-            if self.wq_port == 0:
-                warn_press_key("To proceed past this point, a port for the Work Queue must be defined")
+            wq = WorkQueue()
+            if wq == None:
+                warn_press_key("To proceed past this point, a Work Queue must be present")
             print "Computing the dielectric energy"
-            Diel_D = QChem_Dielectric_Energy("qchem_dimer.in",self.wq)
-            Diel_A = QChem_Dielectric_Energy("qchem_monoA.in",self.wq)
+            Diel_D = QChem_Dielectric_Energy("qchem_dimer.in",wq)
+            Diel_A = QChem_Dielectric_Energy("qchem_monoA.in",wq)
             # The dielectric energy for a water molecule should never change.
             if hasattr(self,"Diel_B"):
                 Diel_B = self.Diel_B

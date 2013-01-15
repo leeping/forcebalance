@@ -23,6 +23,7 @@ elif [[ $HOSTNAME =~ "certainty" || $HOSTNAME =~ "compute-" || $HOSTNAME =~ "lar
     export PATH=$CUDA_HOME/bin:$PATH
     export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/lib:$LD_LIBRARY_PATH
     export INCLUDE=$CUDA_HOME/include:$INCLUDE
+    export BAK=/scratch/leeping/runcuda-backups
 elif [[ $HOSTNAME =~ "kid" ]] ; then
     export CUDA_HOME=/sw/keeneland/cuda/4.1/linux_binary
     export PATH=$CUDA_HOME/bin:$PATH
@@ -37,6 +38,7 @@ elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module load gcc
     module load cuda/4.1
     export OPENMM_CUDA_COMPILER=/opt/apps/cuda/4.1/cuda/bin/nvcc
+    export BAK=$SCRATCH/runcuda-backups
 elif [[ $HOSTNAME =~ "not0rious" ]] ; then
     module load openmm
 elif [[ $HOSTNAME =~ "ls4" ]] ; then
@@ -44,7 +46,7 @@ elif [[ $HOSTNAME =~ "ls4" ]] ; then
     module load gcc
     module load cuda/5.0
     export OPENMM_CUDA_COMPILER=/opt/apps/cuda/5.0/bin/nvcc
-    export BAK=$WORK/runcuda-backups
+    export BAK=$SCRATCH/runcuda-backups
 fi
 
 echo "#=======================#"
@@ -75,6 +77,8 @@ echo $@
 
 rm -rf npt_result.p
 time $@
+# Delete backup files that are older than one week.
+find $BAK/$PWD -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD
 cp * $BAK/$PWD
 
