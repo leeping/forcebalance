@@ -9,10 +9,9 @@ from numpy import argsort, array, diag, dot, eye, linalg, ones, reshape, sum, ze
 from collections import defaultdict
 from collections import OrderedDict
 from finite_difference import in_fd
-from nifty import printcool_dictionary
+from nifty import printcool_dictionary, createWorkQueue, getWorkQueue, wq_wait
 from baseclass import ForceBalanceBaseClass
 import datetime
-#from IPython import embed
 
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
 Letters = ['X','G','H']
@@ -42,6 +41,8 @@ class Objective(ForceBalanceBaseClass):
         self.set_option(options, 'penalty_multiplicative')
         self.set_option(options, 'penalty_hyperbolic_b')
         self.set_option(options, 'normalize_weights')
+        ## Work Queue Port (The specific target itself may or may not actually use this.)
+        self.set_option(options, 'wq_port')
 
         ## The list of fitting targets
         self.Targets = []
@@ -63,13 +64,23 @@ class Objective(ForceBalanceBaseClass):
         self.ObjDict = OrderedDict()
         self.ObjDict_Last = OrderedDict()
 
+        # Create the work queue here.
+        if self.wq_port != 0:
+            createWorkQueue(self.wq_port)
+            print('Work Queue is listening on %d' % self.wq_port)
+
         printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
 
         
     def Target_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
         Objective = {'X':0.0, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
-        # Loop through the targets.
+        # Loop through the targets, stage the directories and submit the Work Queue processes.
+        for Tgt in self.Targets:
+            Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2)
+        wq = getWorkQueue()
+        wq_wait(wq)
+        # Loop through the targets again and compute the objective function this time.
         for Tgt in self.Targets:
             # The first call is always done at the midpoint.
             Tgt.bSave = True

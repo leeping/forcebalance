@@ -11,9 +11,6 @@ from nifty import row,col,printcool_dictionary, link_dir_contents
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from optimizer import Counter
 from parser import tgt_opts_defaults
-try:
-    import work_queue
-except: pass
 
 class Target(ForceBalanceBaseClass):
     
@@ -111,8 +108,6 @@ class Target(ForceBalanceBaseClass):
         ## Parameter types that trigger FD Hessian elements
         ## Finite difference step size
         self.set_option(options, 'finite_difference_h', 'h')
-        ## Work Queue Port (The specific target itself may or may not actually use this.)
-        self.set_option(tgt_opts, 'wq_port')
         ## Manual override: bypass the parameter transformation and use
         ## physical parameters directly.  For power users only! :)
         self.set_option(tgt_opts, 'use_pvals', 'usepvals')
@@ -147,12 +142,6 @@ class Target(ForceBalanceBaseClass):
         #======================================#
         # Create a new temp directory.
         self.refresh_temp_directory()
-        # Create the work queue here.
-        if self.wq_port != 0:
-            work_queue.set_debug_flag('all')
-            self.wq = work_queue.WorkQueue(port=self.wq_port, catalog=True, exclusive=False, shutdown=False)
-            self.wq.specify_name('forcebalance')
-            print('Work Queue for target %s listening on %d' % (self.name, self.wq.port))
 
     def get_X(self,mvals=None):
         """Computes the objective function contribution without any parametric derivatives"""
@@ -285,3 +274,37 @@ class Target(ForceBalanceBaseClass):
         os.chdir(cwd)
         
         return Answer
+
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        return
+
+    def stage(self, mvals, AGrad=False, AHess=False, customdir=None):
+        """ 
+
+        Stages the directory for the target, and then launches Work Queue processes if any.
+        The 'get' method should not worry about the directory that it's running in.
+        
+        """
+        ## Directory of the current iteration; if not None, then the simulation runs under
+        ## temp/target_name/iteration_number
+        ## The 'customdir' is customizable and can go below anything
+        cwd = os.getcwd()
+        
+        absgetdir = os.path.join(self.root,self.tempdir)
+        if Counter() is not None:
+            # Not expecting more than ten thousand iterations
+            iterdir = "iter_%04i" % Counter()
+            absgetdir = os.path.join(absgetdir,iterdir)
+        if customdir is not None:
+            absgetdir = os.path.join(absgetdir,customdir)
+
+        if not os.path.exists(absgetdir):
+            os.makedirs(absgetdir)
+        os.chdir(absgetdir)
+        self.link_from_tempdir(absgetdir)
+        self.rundir = absgetdir.replace(self.root+'/','')
+        self.submit_jobs(mvals, AGrad, AHess)
+
+        os.chdir(cwd)
+        
+        return

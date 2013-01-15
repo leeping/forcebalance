@@ -168,6 +168,7 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
     @param[in] dict The dictionary to be printed
     @param[in] title The title of the printout
     """
+    if Dict == None: return
     bar = printcool(title,bold=bold,color=color,minwidth=topwidth)
     def magic_string(str):
         # This cryptic command returns a string with the number of characters specified as a variable. :P
@@ -175,9 +176,9 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
         #print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
         return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
     if isinstance(Dict, OrderedDict): 
-        print '\n'.join(["%s %s " % (magic_string(key),str(Dict[key])) for key in Dict if Dict[key] != None])
+        print '\n'.join(["%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None])
     else:
-        print '\n'.join(["%s %s " % (magic_string(key),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None])
+        print '\n'.join(["%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None])
     print bar
 
 #===============================#
@@ -407,6 +408,19 @@ try:
     import work_queue
 except:
     print "Work Queue library import fail (You can't queue up jobs using Work Queue)"
+
+# Global variable corresponding to the Work Queue object
+WORK_QUEUE = None
+
+def getWorkQueue():
+    global WORK_QUEUE
+    return WORK_QUEUE
+
+def createWorkQueue(wq_port):
+    global WORK_QUEUE
+    work_queue.set_debug_flag('all')
+    WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
+    WORK_QUEUE.specify_name('forcebalance')
 
 def queue_up(wq, command, input_files, output_files, verbose=True):
     """ 

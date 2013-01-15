@@ -242,12 +242,13 @@ class Liquid_OpenMM(Liquid):
         os.symlink(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
         os.symlink(os.path.join(self.root,self.tgtdir,"evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
 
-    def npt_simulation(self, temperature):
+    def npt_simulation(self, temperature, pressure):
         """ Submit a NPT simulation to the Work Queue. """
+        wq = getWorkQueue()
         if not os.path.exists('npt_result.p'):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            queue_up(self.wq,
-                     command = './runcuda.sh python npt.py conf.pdb %s %.2f 1.0 &> npt.out' % (self.FF.openmmxml, temperature),
+            queue_up(wq,
+                     command = './runcuda.sh python npt.py conf.pdb %s %.3f %.3f &> npt.out' % (self.FF.openmmxml, temperature, pressure),
                      input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                      #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
                      output_files = ['npt_result.p', 'npt.out', self.FF.openmmxml])
@@ -261,7 +262,8 @@ class Liquid_OpenMM(Liquid):
         infnm = os.path.join(rnd,'forcebalance.p')
         os.remove(infnm)
         with open(os.path.join(rnd,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h,True),f)
-        queue_up_src_dest(self.wq, command = './runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.openmmxml, "True" if bGradient else "False"),
+        wq = WorkQueue()
+        queue_up_src_dest(wq, command = './runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.openmmxml, "True" if bGradient else "False"),
                           input_files = [(os.path.join(rnd,'runcuda.sh'),'runcuda.sh'), 
                                          (os.path.join(rnd,'evaltraj.py'),'evaltraj.py'),
                                          (os.path.join(rnd,'conf.pdb'),'conf.pdb'),
@@ -269,7 +271,6 @@ class Liquid_OpenMM(Liquid):
                                          (os.path.join(trajpath,'dynamics.dcd'), 'dynamics.dcd')],
                           output_files = [(os.path.join(rnd,'evaltraj_result.p'),'evaltraj_result.p'), 
                                           (os.path.join(rnd,'evaltraj.log'),'evaltraj.log')])
-        #wq_wait(self.wq)
 
     def get_evaltraj_result(self, Dict, name, key, bGradient):
         cwd = os.getcwd()
