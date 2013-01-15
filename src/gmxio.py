@@ -8,7 +8,7 @@
 
 import os
 from re import match, sub
-from nifty import isint, _exec, warn_press_key, WorkQueue
+from nifty import isint, _exec, warn_press_key, getWorkQueue
 from numpy import array
 from basereader import BaseReader
 from abinitio import AbInitio
@@ -547,7 +547,7 @@ class Interaction_GMX(Interaction):
             traj_monoB = deepcopy(self.traj)
             traj_monoB.add_quantum("qtemp_B.in")
             traj_monoB.write("qchem_monoB.in",ftype="qcin")
-            wq = WorkQueue()
+            wq = getWorkQueue()
             if wq == None:
                 warn_press_key("To proceed past this point, a Work Queue must be present")
             print "Computing the dielectric energy"
