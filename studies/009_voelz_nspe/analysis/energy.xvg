@@ -1,10 +1,10 @@
-# This file was created Wed Nov  7 14:51:03 2012
+# This file was created Wed Jan 16 14:35:11 2013
 # by the following command:
 # g_energy -f ener.edr 
 #
 # g_energy is part of G R O M A C S:
 #
-# Great Red Owns Many ACres of Sand 
+# Gromacs Runs One Microsecond At Cannonball Speeds
 #
 @    title "Gromacs Energies"
 @    xaxis  label "Time (ps)"

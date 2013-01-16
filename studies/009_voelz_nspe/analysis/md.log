@@ -1,12 +1,12 @@
-Log file opened on Wed Nov  7 14:51:03 2012
-Host: vincent-voelzs-macbook-pro-2.local  pid: 22635  nodeid: 0  nnodes:  1
-The Gromacs distribution was built Mon Oct 17 21:28:48 EDT 2011 by
-root@vincent-voelzs-macbook-pro-2.local (Darwin 11.2.0 x86_64)
+Log file opened on Wed Jan 16 14:35:11 2013
+Host: vav1.local  pid: 87096  nodeid: 0  nnodes:  1
+The Gromacs distribution was built Tue Sep 20 15:45:11 EDT 2011 by
+vince@vav1.local (Darwin 11.0.1 x86_64)
 
 
                          :-)  G  R  O  M  A  C  S  (-:
 
-                       Great Red Owns Many ACres of Sand 
+               Gromacs Runs One Microsecond At Cannonball Speeds
 
                             :-)  VERSION 4.5.5  (-:
 
@@ -248,7 +248,7 @@ We have the following groups for center of mass motion removal:
 There are: 28 Atoms
 Initial temperature: 0 K
 
-Started mdrun on node 0 Wed Nov  7 14:51:03 2012
+Started mdrun on node 0 Wed Jan 16 14:35:11 2013
 
            Step           Time         Lambda
               0        0.00000        0.00000
@@ -2905,15 +2905,15 @@ Started mdrun on node 0 Wed Nov  7 14:51:03 2012
 
  Computing:         Nodes     Number     G-Cycles    Seconds     %
 -----------------------------------------------------------------------
- Force                  1        239        0.029        0.0    18.2
- Write traj.            1        239        0.009        0.0     5.5
- Rest                   1                   0.121        0.0    76.3
+ Force                  1        239        0.019        0.0    26.9
+ Write traj.            1        239        0.006        0.0     7.9
+ Rest                   1                   0.046        0.0    65.3
 -----------------------------------------------------------------------
- Total                  1                   0.159        0.1   100.0
+ Total                  1                   0.071        0.0   100.0
 -----------------------------------------------------------------------
 
                NODE (s)   Real (s)      (%)
-       Time:      0.041      0.061     67.0
+       Time:      0.035      0.035    100.0
                (Mnbf/s)   (MFlops)   (ns/day)  (hour/ns)
-Performance:      0.000    307.983    504.018      0.048
-Finished mdrun on node 0 Wed Nov  7 14:51:03 2012
+Performance:      0.000    356.704    583.751      0.041
+Finished mdrun on node 0 Wed Jan 16 14:35:11 2013
