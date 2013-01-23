@@ -5,7 +5,12 @@
 # Load my environment variables. :)
 . ~/.bashrc
 # Make sure the Cuda environment is turned on
+
+# module load cuda
+# module load cudatoolkit
+# export OPENMM_CUDA_COMPILER=`which nvcc`
 export BAK=$HOME/temp/runcuda-backups
+
 if [[ $HOSTNAME =~ "leeping" ]] ; then
     export CUDA_HOME=/opt/cuda
     export PATH=$CUDA_HOME/bin:$PATH
@@ -47,6 +52,13 @@ elif [[ $HOSTNAME =~ "ls4" ]] ; then
     module load cuda/5.0
     export OPENMM_CUDA_COMPILER=/opt/apps/cuda/5.0/bin/nvcc
     export BAK=$SCRATCH/runcuda-backups
+elif [[ $ARCHIVER == "ranch.tacc.utexas.edu" ]] ; then
+    # Currently this is the only way I can be sure I'm on Stampede...
+    # This is a wild shot. Kamelasa! It's difficult to tell the cluster name 
+    # from the environment variables on a Stampede compute node.
+    module load cuda/5.0
+    export OPENMM_CUDA_COMPILER=`which nvcc`
+    export BAK=$SCRATCH/runcuda-backups
 fi
 
 echo "#=======================#"
@@ -78,8 +90,8 @@ echo $@
 rm -rf npt_result.p
 time $@
 # Delete backup files that are older than one week.
+find $BAK/$PWD -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD
-find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
 cp * $BAK/$PWD
 
 # Avoid the stupid segfault-on-quit that happens on fire

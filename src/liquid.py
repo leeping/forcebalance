@@ -86,6 +86,7 @@ class Liquid(Target):
         #======================================#
         # Put stuff here that I'm not sure about. :)
         np.set_printoptions(precision=4, linewidth=100)
+        np.seterr(under='ignore')
         ## Saved force field mvals for all iterations
         self.SavedMVal = {}
         ## Saved trajectories for all iterations and all temperatures :)
@@ -97,17 +98,22 @@ class Liquid(Target):
         # Read the 'data.csv' file. The file should contain guidelines.
         with open(os.path.join(self.tgtdir,'data.csv'),'rU') as f: R0 = list(csv.reader(f))
         # All comments are erased.
-        R1 = [[sub('#.*$','',word) for word in line] for line in R0]
+        R1 = [[sub('#.*$','',word) for word in line] for line in R0 if len(line[0]) > 0 and line[0][0] != "#"]
         # All empty lines are deleted and words are converted to lowercase.
         R = [[wrd.lower() for wrd in line] for line in R1 if any([len(wrd) for wrd in line]) > 0]
         global_opts = OrderedDict()
         found_headings = False
-        known_vars = ['rho','hvap','alpha','kappa','cp','eps0']
+        known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra','cvib_inter','cni','devib_intra','devib_inter']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
                 # Global options are mainly denominators for the different observables.
-                global_opts[line[1]] = float(line[2])
+                if isfloat(line[2]):
+                    global_opts[line[1]] = float(line[2])
+                elif line[2].lower() == 'false':
+                    global_opts[line[1]] = False
+                elif line[2].lower() == 'true':
+                    global_opts[line[1]] = True
             elif not found_headings:
                 found_headings = True
                 headings = line
@@ -118,18 +124,27 @@ class Liquid(Target):
                 if 't' not in headings:
                     raise Exception('There must be a temperature column heading labeled by "t" in data.csv')
             elif found_headings:
-                # Temperatures are in kelvin.
-                t     = [float(val) for head, val in zip(headings,line) if head == 't'][0]
-                # For convenience, users may input the pressure in atmosphere or bar.
-                pval  = [float(val.split()[0]) for head, val in zip(headings,line) if head == 'p'][0]
-                punit = [val.split()[1] if len(val.split()) >= 1 else "atm" for head, val in zip(headings,line) if head == 'p'][0]
-                unrec = set([punit]).difference(['atm','bar']) 
-                if len(unrec) > 0:
-                    raise Exception('The pressure unit %s is not recognized, please use bar or atm' % unrec[0])
-                # This line actually reads the reference data and inserts it into the RefData dictionary of dictionaries.
-                for head, val in zip(headings,line):
-                    if head == 't' or head == 'p' : continue
-                    self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = float(val)
+                try:
+                    # Temperatures are in kelvin.
+                    t     = [float(val) for head, val in zip(headings,line) if head == 't'][0]
+                    # For convenience, users may input the pressure in atmosphere or bar.
+                    pval  = [float(val.split()[0]) for head, val in zip(headings,line) if head == 'p'][0]
+                    punit = [val.split()[1] if len(val.split()) >= 1 else "atm" for head, val in zip(headings,line) if head == 'p'][0]
+                    unrec = set([punit]).difference(['atm','bar']) 
+                    if len(unrec) > 0:
+                        raise Exception('The pressure unit %s is not recognized, please use bar or atm' % unrec[0])
+                    # This line actually reads the reference data and inserts it into the RefData dictionary of dictionaries.
+                    for head, val in zip(headings,line):
+                        if head == 't' or head == 'p' : continue
+                        if isfloat(val):
+                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = float(val)
+                        elif val.lower() == 'true':
+                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = True
+                        elif val.lower() == 'false':
+                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = False
+                except:
+                    print line
+                    raise Exception('Encountered an error reading this line!')
             else:
                 print line
                 raise Exception('I did not recognize this line!')
@@ -164,6 +179,8 @@ class Liquid(Target):
             if "_denom" in opt:
                 # Record entries from the global_opts dictionary so they can be retrieved from other methods.
                 self.set_option(global_opts,opt,default=default_denoms[opt])
+            else:
+                self.set_option(global_opts,opt)
 
     def indicate(self):
         # Somehow the "indicator" functionality made its way into "get".  No matter.
@@ -309,14 +326,17 @@ class Liquid(Target):
 
         Results = {}
         Points = []  # These are the phase points for which data exists.
+        BPoints = [] # These are the phase points for which we are doing MBAR for the condensed phase.
         mPoints = [] # These are the phase points to use for enthalpy of vaporization; if we're scanning pressure then set hvap_wt for higher pressures to zero.
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if os.path.exists('./%s/npt_result.p' % label):
                 Points.append(PT)
                 Results[tt] = lp_load(open('./%s/npt_result.p' % label))
-                if 'hvap' in self.RefData and self.RefData['hvap_wt'][PT] > 0:
+                if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mPoints]:
                     mPoints.append(PT)
+                if 'mbar' in self.RefData and self.RefData['mbar'][PT]:
+                    BPoints.append(PT)
                 tt += 1
             else:
                 for obs in self.RefData:
@@ -325,7 +345,7 @@ class Liquid(Target):
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Hs, pVs, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
             Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs = ([Results[t][i] for t in range(len(Points))] for i in range(16))
-
+        
         R  = np.array(list(itertools.chain(*list(Rhos))))
         V  = np.array(list(itertools.chain(*list(Vols))))
         #H  = np.array(list(itertools.chain(*list(Hs))))
@@ -364,25 +384,37 @@ class Liquid(Target):
         # The unit that converts atmospheres * nm**3 into kj/mol :)
         pvkj=0.061019351687175
 
-        Sims = len(Points)
+        BSims = len(BPoints)
         Shots = len(Energies[0])
-        N_k = np.ones(Sims)*Shots
+        N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
-        U_kln = np.zeros([Sims,Sims,Shots], dtype = np.float64)
-        ## This fills out a 'square' in the matrix with 30 trajectories and 30 temperatures
-        for m, PT in enumerate(Points):
+        U_kln = np.zeros([BSims,BSims,Shots], dtype = np.float64)
+        for m, PT in enumerate(BPoints):
             T = PT[0]
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
             beta = 1. / (kb * T)
-            for k in range(Sims):
+            for k in range(BSims):
                 # The correct Boltzmann factors include PV.
                 # Note that because the Boltzmann factors are computed from the conditions at simulation "m",
                 # the pV terms must be rescaled to the pressure at simulation "m".
-                U_kln[k, m, :]   = Energies[k] + P*Vols[k]*pvkj
+                kk = Points.index(BPoints[k])
+                U_kln[k, m, :]   = Energies[kk] + P*Vols[kk]*pvkj
                 U_kln[k, m, :]  *= beta
-        print "Running MBAR analysis..."
-        mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=1.0e-9)
+        print "Running MBAR analysis on %i states..." % len(BPoints)
+        mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
         W1 = mbar.getWeights()
+        
+        W2 = np.zeros([len(Points)*Shots,len(Points)],dtype=np.float64)
+        for m, PT in enumerate(Points):
+            if PT in BPoints:
+                mm = BPoints.index(PT)
+                for kk, PT1 in enumerate(BPoints):
+                    k = Points.index(PT1)
+                    # print "Will fill W2[%i:%i,%i] with W1[%i:%i,%i]" % (k*Shots,k*Shots+Shots,m,kk*Shots,kk*Shots+Shots,mm)
+                    W2[k*Shots:k*Shots+Shots,m] = W1[kk*Shots:kk*Shots+Shots,mm]
+            else:
+                # print "Will fill W2[%i:%i,%i] with equal weights" % (m*Shots,m*Shots+Shots,m)
+                W2[m*Shots:m*Shots+Shots,m] = 1.0/Shots
 
         # Run MBAR on the monomers.  This is barely necessary.
         mSims = len(mPoints)
@@ -396,7 +428,7 @@ class Liquid(Target):
                 mU_kln[k, m, :]  = mEnergies[k]
                 mU_kln[k, m, :] *= beta
         if np.abs(np.std(mEnergies)) > 1e-6:
-            mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8)
+            mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
             mW1 = mmbar.getWeights()
         else:
             mW1 = np.ones((mSims*mShots,mSims),dtype=float)
@@ -408,8 +440,8 @@ class Liquid(Target):
             PV = P*V*pvkj
             H = E + PV
             # The weights that we want are the last ones.
-            W = flat(W1[:,i])
-            C = weight_info(W, PT, N_k, verbose=False)
+            W = flat(W2[:,i])
+            C = weight_info(W, PT, np.ones(len(Points), dtype=np.float64)*Shots, verbose=False)
             Gbar = flat(np.mat(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
@@ -431,6 +463,15 @@ class Liquid(Target):
                 Hvap_grad[PT]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
                 Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.mat(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
                 Hvap_grad[PT] -= (mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                if hasattr(self,'use_cni') and self.use_cni:
+                    print "Adding % .3f to enthalpy of vaporization at" % self.RefData['cni'][PT], PT
+                    Hvap_calc[PT] += self.RefData['cni'][PT]
+                if hasattr(self,'use_cvib_intra') and self.use_cvib_intra:
+                    print "Adding % .3f to enthalpy of vaporization at" % self.RefData['cvib_intra'][PT], PT
+                    Hvap_calc[PT] += self.RefData['cvib_intra'][PT]
+                if hasattr(self,'use_cvib_inter') and self.use_cvib_inter:
+                    print "Adding % .3f to enthalpy of vaporization at" % self.RefData['cvib_inter'][PT], PT
+                    Hvap_calc[PT] += self.RefData['cvib_inter'][PT]
             else:
                 Hvap_calc[PT]  = 0.0
                 Hvap_grad[PT]  = np.zeros(self.FF.np,dtype=float)
@@ -450,6 +491,10 @@ class Liquid(Target):
             Kappa_grad[PT] = bar_unit*(GKappa1 + GKappa2 + GKappa3)
             ## Isobaric heat capacity.
             Cp_calc[PT] = 1000/(4.184*NMol*kT*T) * (avg(H**2) - avg(H)**2)
+            if hasattr(self,'use_cvib_intra') and self.use_cvib_intra:
+                Cp_calc[PT] += self.RefData['devib_intra'][PT]
+            if hasattr(self,'use_cvib_inter') and self.use_cvib_inter:
+                Cp_calc[PT] += self.RefData['devib_inter'][PT]
             GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
             GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
             GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
