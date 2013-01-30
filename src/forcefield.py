@@ -634,6 +634,7 @@ class FF(ForceBalanceBaseClass):
         newffdata = deepcopy(self.ffdata)
         # The dictionary that takes parameter names to physical values.
         PARM = {i:pvals[self.map[i]] for i in self.map}
+
         #======================================#
         #     Print the new force field.       #
         #   LPW Note: Is it really reasonable  #
@@ -670,20 +671,27 @@ class FF(ForceBalanceBaseClass):
                     sline       = self.Readers[fnm].Split(newffdata[fnm][ln])
                     whites      = self.Readers[fnm].Whites(newffdata[fnm][ln])
                     # Align whitespaces and fields (it should go white, field, white, field)
-                    if len(whites) == len(sline) - 1: 
+                    if newffdata[fnm][ln][0] != ' ':
                         whites = [''] + whites
                     # Subtract one whitespace, unless the line begins with a minus sign.
                     if not match('^-',sline[fld]) and len(whites[fld]) > 1:
                         whites[fld] = whites[fld][:-1]
-                    # Subtract whitespace equal to (length of the data field minus two).
-                    if len(whites[fld]) > len(sline[fld])+2:
-                        whites[fld] = whites[fld][:len(sline[fld])+2]
                     # Actually replace the field with the physical parameter value.
                     if precision == 12:
-                        sline[fld]  = "% 17.12e" % (wval)
+                        newrd  = "% 17.12e" % (wval)
                     else:
-                        #sline[fld]  = TXTFormat % (wval)
-                        sline[fld]  = TXTFormat(wval, precision)
+                        newrd  = TXTFormat(wval, precision)
+                    # The new word might be longer than the old word.
+                    # If this is the case, we can try to shave off some whitespace.
+                    Lold = len(sline[fld])
+                    if not match('^-',sline[fld]):
+                        Lold += 1
+                    Lnew = len(newrd)
+                    if Lnew > Lold:
+                        Shave = Lnew - Lold
+                        if Shave < (len(whites[fld+1])+2):
+                            whites[fld+1] = whites[fld+1][:-Shave]
+                    sline[fld] = newrd
                     # Replace the line in the new force field.
                     newffdata[fnm][ln] = ''.join([whites[j]+sline[j] for j in range(len(sline))])+'\n'
 
