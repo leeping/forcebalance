@@ -149,7 +149,7 @@ class Liquid(Target):
                 print line
                 raise Exception('I did not recognize this line!')
         # Check the reference data table for validity.
-        default_denoms = {}
+        default_denoms = defaultdict(int)
         PhasePoints = None
         for head in self.RefData:
             if head not in known_vars+[i+"_wt" for i in known_vars]:
@@ -175,6 +175,8 @@ class Liquid(Target):
             # printcool_dictionary(self.RefData[head],head)
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
+        print global_opts
+        print default_denoms
         for opt in global_opts:
             if "_denom" in opt:
                 # Record entries from the global_opts dictionary so they can be retrieved from other methods.
@@ -400,10 +402,14 @@ class Liquid(Target):
                 kk = Points.index(BPoints[k])
                 U_kln[k, m, :]   = Energies[kk] + P*Vols[kk]*pvkj
                 U_kln[k, m, :]  *= beta
-        print "Running MBAR analysis on %i states..." % len(BPoints)
-        mbar = pymbar.MBAR(U_kln, N_k, verbose=True, relative_tolerance=5.0e-8)
-        W1 = mbar.getWeights()
-        print "Done"
+        if len(BPoints) > 1:
+            print "Running MBAR analysis on %i states..." % len(BPoints)
+            mbar = pymbar.MBAR(U_kln, N_k, verbose=True, relative_tolerance=5.0e-8)
+            W1 = mbar.getWeights()
+            print "Done"
+        elif len(BPoints) == 1:
+            W1 = np.ones((BPoints*Shots,BPoints),dtype=float)
+            W1 /= BPoints*Shots
         
         W2 = np.zeros([len(Points)*Shots,len(Points)],dtype=np.float64)
         for m, PT in enumerate(Points):
@@ -428,7 +434,7 @@ class Liquid(Target):
             for k in range(mSims):
                 mU_kln[k, m, :]  = mEnergies[k]
                 mU_kln[k, m, :] *= beta
-        if np.abs(np.std(mEnergies)) > 1e-6:
+        if np.abs(np.std(mEnergies)) > 1e-6 and mSims > 1:
             mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
             mW1 = mmbar.getWeights()
         else:
