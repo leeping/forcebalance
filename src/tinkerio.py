@@ -9,7 +9,8 @@ modules for other programs because it's so simple.
 
 import os
 from re import match, sub
-from nifty import isint, isfloat, warn_press_key, col, uncommadash
+from nifty import *
+from nifty import _exec
 import numpy as Np
 from basereader import BaseReader
 from subprocess import Popen, PIPE
@@ -140,6 +141,10 @@ class Liquid_TINKER(Liquid):
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
+        # For now, go with statically linked executables.
+        os.symlink(os.path.join(self.root,self.tgtdir,"dynamic"),os.path.join(abstempdir,"dynamic"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"analyze"),os.path.join(abstempdir,"analyze"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"minimize"),os.path.join(abstempdir,"minimize"))
         os.symlink(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
         os.symlink(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
         os.symlink(os.path.join(self.root,self.tgtdir,"mono.xyz"),os.path.join(abstempdir,"mono.xyz"))
@@ -151,10 +156,17 @@ class Liquid_TINKER(Liquid):
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            queue_up(wq,
-                     command = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure),
-                     input_files = ['liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt_tinker.py'],
-                     output_files = ['npt_result.p.bz2', 'npt_tinker.py'] + self.FF.fnms)
+            if wq == None:
+                print "Running locally, it might be slow!"
+                print "You may tail -f %s/npt_tinker.out in another terminal window" % os.getcwd()
+                cmdstr = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure)
+                _exec(cmdstr)
+            else:
+                queue_up(wq,
+                         command = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure),
+                         input_files = ['dynamic','analyze','minimize','liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt_tinker.py'],
+                         output_files = ['npt_result.p.bz2', 'npt_tinker.py'] + self.FF.fnms)
+                
 
 class AbInitio_TINKER(AbInitio):
 

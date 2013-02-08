@@ -595,11 +595,13 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         # Since Python can't simultaneously redirect stdout to a pipe
         # and print stuff to screen in real time, we're going to use a 
         # workaround with tmporary files.
+        # NOTE: This doesn't catch the return code.
+        prestr = "set -o pipefail && "
         funstr = " 2> stderr.log | tee stdout.log"
         if type(command) is list:
-            command += funstr.split()
+            command = prestr.split() + command + funstr.split()
         else:
-            command += funstr
+            command = prestr + command + funstr
         print command
         if stdin == None:
             p = subprocess.Popen(command, shell=(type(command) is str))
