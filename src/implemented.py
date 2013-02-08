@@ -11,7 +11,7 @@ except:
     print "QTPIE Monomer module import failed"
 
 try:
-    from tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER
+    from tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER, Liquid_TINKER
 except:
     print "Tinker module import failed; check SimTK package (required for units)"
 
@@ -49,6 +49,7 @@ Implemented_Targets = {
     'ABINITIO_INTERNAL':AbInitio_Internal,
     'VIBRATION_TINKER':Vibration_TINKER,
     'LIQUID_OPENMM':Liquid_OpenMM,
+    'LIQUID_TINKER':Liquid_TINKER, 
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'INTERACTION_TINKER':Interaction_TINKER,

@@ -590,26 +590,33 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                                                                " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
         if append_to_file or write_to_file:
             print >> f, "Executing process: %s%s" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
-    if stdin == None:
-        p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = PIPE)
-        if print_to_screen:
-            Output = []
-            Error = []
-            while True:
-                line = p.stdout.readline()
-                try:
-                    Error.append(p.stderr.readline())
-                except: pass
-                if not line:
-                    break
-                print line,
-            Output.append(line)
-            print Error
+    
+    if print_to_screen:
+        # Since Python can't simultaneously redirect stdout to a pipe
+        # and print stuff to screen in real time, we're going to use a 
+        # workaround with tmporary files.
+        funstr = " 2> stderr.log | tee stdout.log"
+        if type(command) is list:
+            command += funstr.split()
         else:
-            Output, Error = p.communicate()
+            command += funstr
+        print command
+        if stdin == None:
+            p = subprocess.Popen(command, shell=(type(command) is str))
+            p.communicate()
+        else:
+            p = subprocess.Popen(command, shell=(type(command) is str),stdin=PIPE)
+            p.communicate(stdin)
+        Output = ''.join(open('stdout.log').readlines())
+        Error = ''.join(open('stderr.log').readlines())
     else:
-        p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = PIPE, stderr = PIPE)
-        Output, Error = p.communicate(stdin)
+        if stdin == None:
+            p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = PIPE)
+            Output, Error = p.communicate()
+        else:
+            p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = PIPE, stderr = PIPE)
+            Output, Error = p.communicate(stdin)
+
     if logfnm != None or outfnm != None:
         f.write(Output)
         f.close()

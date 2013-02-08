@@ -5,6 +5,7 @@ import os
 import subprocess
 import shutil
 import numpy as np
+import time
 from baseclass import ForceBalanceBaseClass
 from collections import OrderedDict
 from nifty import row,col,printcool_dictionary, link_dir_contents
@@ -102,6 +103,8 @@ class Target(ForceBalanceBaseClass):
         self.set_option(tgt_opts, 'fdhess')
         ## Switch for FD gradients + Hessian diagonals
         self.set_option(tgt_opts, 'fdhessdiag')
+        ## How many seconds to sleep (if any)
+        self.set_option(tgt_opts, 'sleepy')
         ## Parameter types that trigger FD gradient elements
         self.set_option(None, None, 'fd1_pids', [i.upper() for i in tgt_opts['fd_ptypes']], default = [])
         self.set_option(None, None, 'fd2_pids', [i.upper() for i in tgt_opts['fd_ptypes']], default = [])
@@ -285,6 +288,9 @@ class Target(ForceBalanceBaseClass):
         The 'get' method should not worry about the directory that it's running in.
         
         """
+        if self.sleepy > 0:
+            print "Sleeping for %i seconds as directed.." % self.sleepy
+            time.sleep(self.sleepy)
         ## Directory of the current iteration; if not None, then the simulation runs under
         ## temp/target_name/iteration_number
         ## The 'customdir' is customizable and can go below anything
