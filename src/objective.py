@@ -79,7 +79,8 @@ class Objective(ForceBalanceBaseClass):
         for Tgt in self.Targets:
             Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2)
         wq = getWorkQueue()
-        wq_wait(wq)
+        if wq != None:
+            wq_wait(wq)
         # Loop through the targets again and compute the objective function this time.
         for Tgt in self.Targets:
             # The first call is always done at the midpoint.
