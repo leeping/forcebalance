@@ -73,16 +73,17 @@ from forcebalance.openmmio import *
 #======================================================#
 
 # Select run parameters
-timestep = 0.5 * femtosecond       # timestep for integration
-nsteps = 200                       # number of steps per iteration
-nequiliterations = 5             # number of equilibration iterations
-niterations = 4                # number of iterations to collect data for
+timestep = 0.50 * femtosecond        # timestep for integration
+faststep = 0.25 * femtosecond        # timestep for "fast" forces in Multiple Timestep integrator
+nsteps = 100                         # number of steps per iteration
+nequiliterations = 500               # number of equilibration iterations
+niterations = 40000                  # number of iterations to collect data for
 
 # Set temperature, pressure, and collision rate for stochastic thermostats.
 temperature = float(sys.argv[3]) * kelvin
 pressure = float(sys.argv[4]) * atmospheres
 collision_frequency = 1.0 / picosecond
-barostat_frequency = 25            # number of steps between MC volume adjustments
+barostat_frequency = 10             # number of steps between MC volume adjustments
 nprint = 1
 
 # Flag to set verbose debug output
@@ -92,16 +93,16 @@ verbose = True
 PlatName = 'CUDA'
 
 amoeba_mutual_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
-                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.9,
+                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
                  'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
                  'mutualInducedTargetEpsilon' : 1e-6, 'useDispersionCorrection' : True}
 
 amoeba_direct_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
-                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.9,
+                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
                  'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
                  'polarization' : 'direct', 'useDispersionCorrection' : True}
 
-tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
+tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
                 'vdwCutoff' : 0.9, 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24], 'useDispersionCorrection' : True}
 
 mono_tip3p_kwargs = {'nonbondedMethod' : NoCutoff}
@@ -240,6 +241,128 @@ def compute_mass(system):
         mass += system.getParticleMass(i)
     return mass
 
+def get_dipole(simulation,q=None,positions=None):
+    # Return the current dipole moment in Debye.
+    # Note that this quantity is meaningless if the system carries a net charge.
+    dx = 0.0
+    dy = 0.0
+    dz = 0.0
+    enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
+    for i in simulation.system.getForces():
+        if i.__class__.__name__ == "AmoebaMultipoleForce":
+            mm = i.getSystemMultipoleMoments(simulation.context,0,1)
+            dx += mm[1]
+            dy += mm[2]
+            dz += mm[3]
+        if i.__class__.__name__ == "NonbondedForce":
+            # Get array of charges.
+            if q == None:
+                q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+            # Get array of positions in nanometers.
+            if positions == None:
+                positions = simulation.context.getState(getPositions=True).getPositions()
+            x = np.array([j._value for j in positions])
+            # Multiply charges by positions to get dipole moment.
+            dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
+            dx += dip[0]
+            dy += dip[1]
+            dz += dip[2]
+    return [dx,dy,dz]
+
+
+def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
+    """
+    Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
+    
+    ARGUMENTS
+
+    temperature (numpy.unit.Quantity compatible with kelvin) - the temperature
+    collision_rate (numpy.unit.Quantity compatible with 1/picoseconds) - the collision rate
+    timestep (numpy.unit.Quantity compatible with femtoseconds) - the integration timestep
+    system (simtk.openmm.System) - system whose forces will be partitioned
+    ninnersteps (int) - number of inner timesteps (default: 4)
+
+    RETURNS
+
+    integrator (openmm.CustomIntegrator) - a VVVR integrator
+
+    NOTES
+    
+    This integrator is equivalent to a Langevin integrator in the velocity Verlet discretization with a
+    timestep correction to ensure that the field-free diffusion constant is timestep invariant.  The inner
+    velocity Verlet discretization is transformed into a multiple timestep algorithm.
+
+    REFERENCES
+
+    VVVR Langevin integrator: 
+    * http://arxiv.org/abs/1301.3800
+    * http://arxiv.org/abs/1107.2967 (to appear in PRX 2013)    
+    
+    TODO
+
+    Move initialization of 'sigma' to setting the per-particle variables.
+    
+    """
+    # Multiple timestep Langevin integrator.
+    for i in system.getForces():
+        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
+            # Slow force.
+            print i.__class__.__name__, "is a Slow Force"
+            i.setForceGroup(1)
+        else:
+            print i.__class__.__name__, "is a Fast Force"
+            # Fast force.
+            i.setForceGroup(0)
+
+    kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
+    kT = kB * temperature
+    
+    integrator = openmm.CustomIntegrator(timestep)
+    
+    integrator.addGlobalVariable("dt_fast", timestep/float(ninnersteps)) # fast inner timestep
+    integrator.addGlobalVariable("kT", kT) # thermal energy
+    integrator.addGlobalVariable("a", numpy.exp(-collision_rate*timestep)) # velocity mixing parameter
+    integrator.addGlobalVariable("b", numpy.sqrt((2/(collision_rate*timestep)) * numpy.tanh(collision_rate*timestep/2))) # timestep correction parameter
+    integrator.addPerDofVariable("sigma", 0) 
+    integrator.addPerDofVariable("x1", 0) # position before application of constraints
+
+    #
+    # Pre-computation.
+    # This only needs to be done once, but it needs to be done for each degree of freedom.
+    # Could move this to initialization?
+    #
+    integrator.addComputePerDof("sigma", "sqrt(kT/m)")
+
+    # 
+    # Velocity perturbation.
+    #
+    integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
+    integrator.addConstrainVelocities();
+    
+    #
+    # Symplectic inner multiple timestep.
+    #
+    integrator.addUpdateContextState(); 
+    integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m")
+    for innerstep in range(ninnersteps):
+        # Fast inner symplectic timestep.
+        integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m")
+        integrator.addComputePerDof("x", "x + v*b*dt_fast")
+        integrator.addComputePerDof("x1", "x")
+        integrator.addConstrainPositions();        
+        integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m + (x-x1)/dt_fast")
+    integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m") # TODO: Additional velocity constraint correction?
+    integrator.addConstrainVelocities();
+
+    #
+    # Velocity randomization
+    #
+    integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
+    integrator.addConstrainVelocities();
+
+    return integrator
+
+
 def create_simulation_object(pdb, settings, pbc=True, precision="single"):
     #================================#
     # Create the simulation platform #
@@ -256,20 +379,26 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
     # Create the test system.
     forcefield = ForceField(sys.argv[2])
     system = forcefield.createSystem(pdb.topology, **settings)
-    ############
-    # LPW stuff for figuring out the ewald error tolerance.
-    print "There are %i forces" % system.getNumForces()
-    for i in range(system.getNumForces()):
-        if system.getForce(i).__class__.__name__ == 'AmoebaMultipoleForce':
-            Frc = system.getForce(i)
-            print "The Ewald error tolerance is:", Frc.getEwaldErrorTolerance()
-    ############
     if pbc:
         barostat = MonteCarloBarostat(pressure, temperature, barostat_frequency)
         # Add barostat.
         system.addForce(barostat)
     # Create integrator.
-    integrator = LangevinIntegrator(temperature, collision_frequency, timestep)
+    NewIntegrator = False
+    if not NewIntegrator:
+        integrator = LangevinIntegrator(temperature, collision_frequency, timestep)
+    else:
+        print "Using new multiple-timestep velocity-verlet with velocity randomization (MTS-VVVR) integrator."
+        integrator = MTSVVVRIntegrator(temperature, collision_frequency, timestep, system, ninnersteps=int(timestep/faststep))
+
+    # Stuff for figuring out the ewald error tolerance.
+    print "There are %i forces" % system.getNumForces()
+    for i in range(system.getNumForces()):
+        Frc = system.getForce(i)
+        print Frc.__class__.__name__
+        if Frc.__class__.__name__ == 'AmoebaMultipoleForce':
+            print "The Ewald error tolerance is:", Frc.getEwaldErrorTolerance()
+    
     # Create simulation object.
     simulation = Simulation(pdb.topology, system, integrator, platform)
     return simulation, system
@@ -279,6 +408,9 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     simulation, system = create_simulation_object(pdb, settings, pbc, "single")
     # Set initial positions.
     simulation.context.setPositions(pdb.positions)
+    print "Minimizing the energy... (starting energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole),
+    simulation.minimizeEnergy()
+    print "Done (final energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
     # Assign velocities.
     velocities = generateMaxwellBoltzmannVelocities(system, temperature)
     simulation.context.setVelocities(velocities)
@@ -320,6 +452,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     rhos = []
     energies = []
     volumes = []
+    dipoles = []
     #========================#
     # Now run the simulation #
     #========================#
@@ -347,7 +480,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     # Collect production data.
     if verbose: print "Production..."
     if Trajectory:
-        simulation.reporters.append(DCDReporter('dynamics.dcd', 100))
+        simulation.reporters.append(DCDReporter('dynamics.dcd', nsteps))
     for iteration in range(niterations):
         # Propagate dynamics.
         simulation.step(nsteps)
@@ -377,7 +510,9 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
         rhos.append(density.value_in_unit(kilogram / meter**3))
         energies.append(potential / kilojoules_per_mole)
         volumes.append(volume / nanometer**3)
-    return data, xyzs, boxes, np.array(rhos), np.array(energies), np.array(volumes), simulation
+        dipoles.append(get_dipole(simulation,positions=xyzs[-1]))
+        
+    return data, xyzs, boxes, np.array(rhos), np.array(energies), np.array(volumes), np.array(dipoles), simulation
 
 def analyze(data):
     """Analyze the data from the run_simulation function."""
@@ -447,7 +582,7 @@ def analyze(data):
 
     return statistics['density'] / unit_rho, statistics['ddensity'] / unit_rho, statistics['PE'] / unit_ene, statistics['dPE'] / unit_ene, pV_mean, pV_err
 
-def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False):
+def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False,dipole=False):
     """
     Compute a set of snapshot energies as a function of the force field parameters.
 
@@ -476,6 +611,11 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
     system = forcefield.createSystem(pdb.topology, **settings)
     UpdateSimulationParameters(system, simulation)
     E = []
+    D = []
+    q = None
+    for i in simulation.system.getForces():
+        if i.__class__.__name__ == "NonbondedForce":
+            q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
     # Loop through the snapshots
     if boxes == None:
         for xyz in xyzs:
@@ -484,6 +624,8 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             E.append(Energy)
+            if dipole:
+                D.append(get_dipole(simulation,q=q,positions=xyz))
     else:
         for xyz,box in zip(xyzs,boxes):
             # Set the positions and the box vectors
@@ -492,9 +634,15 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             E.append(Energy)
+            if dipole:
+                D.append(get_dipole(simulation,q=q,positions=xyz))
     print "\r",
     if verbose: print E
-    return np.array(E)
+    if dipole:
+        # Return a Nx4 array with energies in the first column and dipole in columns 2-4.
+        return np.hstack((np.array(E).reshape(-1,1), np.array(D).reshape(-1,3)))
+    else:
+        return np.array(E)
 
 def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=True):
 
@@ -531,36 +679,93 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=
             print "Parameter %3i 7-pt vs. central derivative : RMS, Max error (fractional) = % .4e % .4e (% .4e % .4e)" % (i, np.sqrt(np.mean(dG**2)), max(np.abs(dG)), np.sqrt(np.mean(dGfrac**2)), max(np.abs(dGfrac)))
     return G
 
+def energy_dipole_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=True):
+
+    """
+    Compute the first and second derivatives of a set of snapshot
+    energies with respect to the force field parameters.
+
+    This basically calls the finite difference subroutine on the
+    energy_driver subroutine also in this script.
+
+    @todo This is a sufficiently general function to be merged into openmmio.py?
+    @param[in] mvals Mathematical parameter values
+    @param[in] pdb OpenMM PDB object
+    @param[in] FF ForceBalance force field object
+    @param[in] xyzs List of OpenMM positions
+    @param[in] settings OpenMM settings for creating the System
+    @param[in] boxes Periodic box vectors
+    @return G First derivative of the energies in a N_param x N_coord array
+
+    """
+
+    G        = np.zeros((FF.np,len(xyzs)))
+    GDx      = np.zeros((FF.np,len(xyzs)))
+    GDy      = np.zeros((FF.np,len(xyzs)))
+    GDz      = np.zeros((FF.np,len(xyzs)))
+    if not AGrad:
+        return G, GDx, GDy, GDz
+    ED0      = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes, dipole=True)
+    CheckFDPts = False
+    for i in range(FF.np):
+        EDG, _   = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True),h,f0=ED0)
+        G[i,:]   = EDG[:,0]
+        GDx[i,:] = EDG[:,1]
+        GDy[i,:] = EDG[:,2]
+        GDz[i,:] = EDG[:,3]
+    return G, GDx, GDy, GDz
+
 def bzavg(obs,boltz):
-    return np.dot(obs,boltz)/sum(boltz)
+    if obs.ndim == 2:
+        if obs.shape[0] == len(boltz) and obs.shape[1] == len(boltz):
+            raise Exception('Error - both dimensions have length equal to number of snapshots, now confused!')
+        elif obs.shape[0] == len(boltz):
+            return np.sum(obs*boltz.reshape(-1,1),axis=0)/np.sum(boltz)
+        elif obs.shape[1] == len(boltz):
+            return np.sum(obs*boltz,axis=1)/np.sum(boltz)
+        else:
+            raise Exception('The dimensions are wrong!')
+    elif obs.ndim == 1:
+        return np.dot(obs,boltz)/sum(boltz)
+    else:
+        raise Exception('The number of dimensions can only be 1 or 2!')
 
 def property_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,kT,property_driver,property_kwargs,boxes=None,AGrad=True):
     G        = np.zeros(FF.np)
     if not AGrad:
         return G
-    E0       = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes)
+    ED0      = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes, dipole=True)
+    E0       = ED0[:,0]
+    D0       = ED0[:,1:]
     P0       = property_driver(None, **property_kwargs)
     if 'h_' in property_kwargs:
         H0 = property_kwargs['h_'].copy()
 
     for i in range(FF.np):
-        # Not doing the three-point finite difference anymore.
-        E1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes)(h)
+        ED1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True)(h)
+        E1       = ED1[:,0]
+        D1       = ED1[:,1:]
         b = np.exp(-(E1-E0)/kT)
         b /= np.sum(b)
         if 'h_' in property_kwargs:
             property_kwargs['h_'] = H0.copy() + (E1-E0)
+        if 'd_' in property_kwargs:
+            property_kwargs['d_'] = D1.copy()
         S = -1*np.dot(b,np.log(b))
         InfoContent = np.exp(S)
         if InfoContent / len(E0) < 0.1:
             print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
         P1 = property_driver(b=b,**property_kwargs)
 
-        EM1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes)(-h)
+        EDM1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True)(-h)
+        EM1       = EDM1[:,0]
+        DM1       = EDM1[:,1:]
         b = np.exp(-(EM1-E0)/kT)
         b /= np.sum(b)
         if 'h_' in property_kwargs:
             property_kwargs['h_'] = H0.copy() + (EM1-E0)
+        if 'd_' in property_kwargs:
+            property_kwargs['d_'] = DM1.copy()
         S = -1*np.dot(b,np.log(b))
         InfoContent = np.exp(S)
         if InfoContent / len(E0) < 0.1:
@@ -571,6 +776,8 @@ def property_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,kT,property_dri
 
     if 'h_' in property_kwargs:
         property_kwargs['h_'] = H0.copy()
+    if 'd_' in property_kwargs:
+        property_kwargs['d_'] = D0.copy()
 
     return G
 
@@ -631,7 +838,8 @@ def main():
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    Data, Xyzs, Boxes, Rhos, Energies, Volumes, Sim = run_simulation(pdb, Settings, Trajectory=True)
+    Data, Xyzs, Boxes, Rhos, Energies, Volumes, Dips, Sim = run_simulation(pdb, Settings, Trajectory=False)
+
     # Get statistics from our simulation.
     Rho_avg, Rho_err, Pot_avg, Pot_err, pV_avg, pV_err = analyze(Data)
     # Now that we have the coordinates, we can compute the energy derivatives.
@@ -640,7 +848,7 @@ def main():
     if DoublePrecisionDerivatives and AGrad:
         print "Creating Double Precision Simulation for parameter derivatives"
         Sim, _ = create_simulation_object(pdb, Settings, pbc=True, precision="double")
-    G = energy_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, Boxes, AGrad)
+    G, GDx, GDy, GDz = energy_dipole_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, Boxes, AGrad)
     # The density derivative can be computed using the energy derivative.
     N = len(Xyzs)
     kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
@@ -654,13 +862,13 @@ def main():
     # Now run the simulation for just the monomer. #
     #==============================================#
     global timestep, nsteps, niterations, nequiliterations
-    timestep = 0.1 * femtosecond       # timestep for integration
-    nsteps   = 1000                    # number of steps per data record
-    nequiliterations = 5             # number of equilibration iterations
-    niterations = 10                # number of iterations to collect data for
+    timestep = 0.5 * femtosecond       # timestep for integration
+    nsteps   = 100                     # number of steps per data record
+    nequiliterations = 500             # number of equilibration iterations
+    niterations = 10000                # number of iterations to collect data for
 
     mpdb = PDBFile('mono.pdb')
-    mData, mXyzs, _trash, _crap, mEnergies, _nah, mSim = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False)
+    mData, mXyzs, _trash, _crap, mEnergies, _nah, _dontneed, mSim = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False)
     # Get statistics from our simulation.
     _trash, _crap, mPot_avg, mPot_err, __trash, __crap = analyze(mData)
     # Now that we have the coordinates, we can compute the energy derivatives.
@@ -825,10 +1033,55 @@ def main():
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GCp,GCp_fd)]
         FF.print_map(vals=absfrac)
 
-    # Print the final force field.
+    ## Dielectric constant
+    eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
+    epsunit = 1.0*(debye**2) / nanometer**3 / BOLTZMANN_CONSTANT_kB / kelvin
+    prefactor = epsunit/eps0/3
+    def calc_eps0(b=None, **kwargs):
+        if b == None: b = np.ones(L,dtype=float)
+        if 'd_' in kwargs: # Dipole moment vector.
+            d_ = kwargs['d_']
+        if 'v_' in kwargs: # Volume.
+            v_ = kwargs['v_']
+        b0 = np.ones(L,dtype=float)
+        dx = d_[:,0]
+        dy = d_[:,1]
+        dz = d_[:,2]
+        D2  = bzavg(dx**2,b)-bzavg(dx,b)**2
+        D2 += bzavg(dy**2,b)-bzavg(dy,b)**2
+        D2 += bzavg(dz**2,b)-bzavg(dz,b)**2
+        return prefactor*D2/bzavg(v_,b)/T
+    Eps0 = calc_eps0(None,**{'d_':Dips, 'v_':V})
+    Eps0boot = []
+    for i in range(numboots):
+        boot = np.random.randint(L,size=L)
+        Eps0boot.append(calc_eps0(None,**{'d_':Dips[boot], 'v_':V[boot]}))
+    Eps0boot = np.array(Eps0boot)
+    Eps0_err = np.std(Eps0boot)*np.sqrt(np.mean([statisticalInefficiency(Dips[:,0]),statisticalInefficiency(Dips[:,1]),statisticalInefficiency(Dips[:,2])]))
+ 
+    ## Dielectric constant analytic derivative
+    Dx = Dips[:,0]
+    Dy = Dips[:,1]
+    Dz = Dips[:,2]
+    D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
+    GD2  = 2*(flat(np.mat(GDx)*col(Dx))/N - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+    GD2 += 2*(flat(np.mat(GDy)*col(Dy))/N - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+    GD2 += 2*(flat(np.mat(GDz)*col(Dz))/N - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+    GEps0 = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
+    Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
+    FF.print_map(vals=GEps0)
+    if FDCheck:
+        GEps0_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_eps0, {'d_':Dips,'v_':V}, Boxes)
+        Sep = printcool("Numerical Derivative:")
+        FF.print_map(vals=GEps0_fd)
+        Sep = printcool("Difference (Absolute, Fractional):")
+        absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GEps0,GEps0_fd)]
+        FF.print_map(vals=absfrac)
+
+    ## Print the final force field.
     pvals = FF.make(mvals)
 
-    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, H, pV, Energies, G, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err),f)
+    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err),f)
 
 if __name__ == "__main__":
     main()

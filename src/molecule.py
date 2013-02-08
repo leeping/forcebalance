@@ -796,6 +796,7 @@ class Molecule(object):
             if 'networkx' in sys.modules and self.na < 500:
                 try:
                     self.topology = self.build_topology()
+                    self.molecules = nx.connected_component_subgraphs(self.topology)
                     if 'bonds' not in self.Data:
                         self.Data['bonds'] = self.topology.edges()
                 except:
@@ -978,14 +979,14 @@ class Molecule(object):
             xyz2 = np.dot(xyz2, rt) + tr
             self.xyzs[index2] = xyz2
 
-    def build_topology(self, sn=None):
+    def build_topology(self, sn=None, Fac=1.2):
         ''' A bare-bones implementation of the bond graph capability in the nanoreactor code.  
         Returns a NetworkX graph that depicts the molecular topology, which might be useful for stuff. 
         Provide, optionally, the frame number used to compute the topology. '''
         if sn == None:
             sn = 0
         mindist = 1.0 # Any two atoms that are closer than this distance are bonded.
-        Fac = 1.2     # Increase the threshold for determining whether atoms are bonded. 1.2 is conservative, 1.5 is crazy.
+        #Fac = 1.2     # Increase the threshold for determining whether atoms are bonded. 1.2 is conservative, 1.5 is crazy.
         # Create an atom-wise list of covalent radii.
         R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
         # Create a list of 2-tuples corresponding to combinations of atomic indices.

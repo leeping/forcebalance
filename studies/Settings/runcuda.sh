@@ -36,8 +36,8 @@ elif [[ $HOSTNAME =~ "kid" ]] ; then
     export INCLUDE=$CUDA_HOME/include:$INCLUDE
     export BAK=/lustre/medusa/leeping/runcuda-backups
 elif [[ $HOSTNAME =~ "icme-gpu" || $HOSTNAME =~ "node0" ]] ; then
-    module load gcc/4.4.6
-    module load cuda41/toolkit/4.1.28
+    module load cuda50/toolkit/5.0.35
+    export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda50/toolkit/5.0.35/bin/nvcc
 elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
     module load gcc
@@ -52,6 +52,10 @@ elif [[ $HOSTNAME =~ "ls4" ]] ; then
     module load cuda/5.0
     export OPENMM_CUDA_COMPILER=/opt/apps/cuda/5.0/bin/nvcc
     export BAK=$SCRATCH/runcuda-backups
+elif [[ $HOSTNAME =~ "cn" ]] ; then
+    module load cuda
+    export OPENMM_CUDA_COMPILER=/opt/cuda5.0/bin/nvcc
+    export BAK=/hsgs/projects/pande/leeping/scratch/runcuda-backups
 elif [[ $ARCHIVER == "ranch.tacc.utexas.edu" ]] ; then
     # Currently this is the only way I can be sure I'm on Stampede...
     # This is a wild shot. Kamelasa! It's difficult to tell the cluster name 
@@ -87,12 +91,13 @@ echo "#=======================#"
 echo
 echo $@
 
-rm -rf npt_result.p
+rm -rf npt_result.p*
 time $@
 # Delete backup files that are older than one week.
 find $BAK/$PWD -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD
 cp * $BAK/$PWD
+bzip2 npt_result.p
 
 # Avoid the stupid segfault-on-quit that happens on fire
 # Ahh, i don't know how to do this..

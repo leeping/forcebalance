@@ -330,6 +330,8 @@ class Liquid(Target):
         mPoints = [] # These are the phase points to use for enthalpy of vaporization; if we're scanning pressure then set hvap_wt for higher pressures to zero.
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
+            if os.path.exists('./%s/npt_result.p.bz2' % label):
+                os.system('bunzip2 ./%s/npt_result.p.bz2' % label)
             if os.path.exists('./%s/npt_result.p' % label):
                 Points.append(PT)
                 Results[tt] = lp_load(open('./%s/npt_result.p' % label))
@@ -340,16 +342,14 @@ class Liquid(Target):
                 tt += 1
             else:
                 for obs in self.RefData:
-                    del self.RefData[obs][pt]
+                    del self.RefData[obs][PT]
 
         # Assign variable names to all the stuff in npt_result.p
-        Rhos, Vols, Hs, pVs, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs = ([Results[t][i] for t in range(len(Points))] for i in range(16))
+        Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs = ([Results[t][i] for t in range(len(Points))] for i in range(14))
         
         R  = np.array(list(itertools.chain(*list(Rhos))))
         V  = np.array(list(itertools.chain(*list(Vols))))
-        #H  = np.array(list(itertools.chain(*list(Hs))))
-        #PV = np.array(list(itertools.chain(*list(pVs))))
         E  = np.array(list(itertools.chain(*list(Energies))))
         Dx = np.array(list(itertools.chain(*list(d[:,0] for d in Dips))))
         Dy = np.array(list(itertools.chain(*list(d[:,1] for d in Dips))))
@@ -401,8 +401,9 @@ class Liquid(Target):
                 U_kln[k, m, :]   = Energies[kk] + P*Vols[kk]*pvkj
                 U_kln[k, m, :]  *= beta
         print "Running MBAR analysis on %i states..." % len(BPoints)
-        mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8)
+        mbar = pymbar.MBAR(U_kln, N_k, verbose=True, relative_tolerance=5.0e-8)
         W1 = mbar.getWeights()
+        print "Done"
         
         W2 = np.zeros([len(Points)*Shots,len(Points)],dtype=np.float64)
         for m, PT in enumerate(Points):
@@ -492,8 +493,10 @@ class Liquid(Target):
             ## Isobaric heat capacity.
             Cp_calc[PT] = 1000/(4.184*NMol*kT*T) * (avg(H**2) - avg(H)**2)
             if hasattr(self,'use_cvib_intra') and self.use_cvib_intra:
+                print "Adding", self.RefData['devib_intra'][PT], "to the heat capacity"
                 Cp_calc[PT] += self.RefData['devib_intra'][PT]
             if hasattr(self,'use_cvib_inter') and self.use_cvib_inter:
+                print "Adding", self.RefData['devib_inter'][PT], "to the heat capacity"
                 Cp_calc[PT] += self.RefData['devib_inter'][PT]
             GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
             GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)

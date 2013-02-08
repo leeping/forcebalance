@@ -240,18 +240,18 @@ class Liquid_OpenMM(Liquid):
         os.symlink(os.path.join(self.root,self.tgtdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
         os.symlink(os.path.join(self.root,self.tgtdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
         os.symlink(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
+        #os.symlink(os.path.join(self.root,self.tgtdir,"evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
 
     def npt_simulation(self, temperature, pressure):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
-        if not os.path.exists('npt_result.p'):
+        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             queue_up(wq,
                      command = './runcuda.sh python npt.py conf.pdb %s %.3f %.3f &> npt.out' % (self.FF.openmmxml, temperature, pressure),
                      input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                      #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
-                     output_files = ['npt_result.p', 'npt.out', self.FF.openmmxml])
+                     output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml])
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """

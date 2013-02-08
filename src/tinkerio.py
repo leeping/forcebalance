@@ -16,6 +16,7 @@ from subprocess import Popen, PIPE
 from abinitio import AbInitio
 from vibration import Vibration
 from moments import Moments
+from liquid import Liquid
 from molecule import Molecule
 from binding import BindingEnergy
 from interaction import Interaction
@@ -131,6 +132,29 @@ class Tinker_Reader(BaseReader):
             # The suffix of the parameter ID is built from the atom    #
             # types/classes involved in the interaction.
             self.suffix = '.'.join(self.atom)
+
+class Liquid_TINKER(Liquid):
+    def __init__(self,options,tgt_opts,forcefield):
+        super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
+
+    def prepare_temp_directory(self,options,tgt_opts):
+        """ Prepare the temporary directory by copying in important files. """
+        abstempdir = os.path.join(self.root,self.tempdir)
+        os.symlink(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"mono.xyz"),os.path.join(abstempdir,"mono.xyz"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"))
+        os.symlink(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
+
+    def npt_simulation(self, temperature, pressure):
+        """ Submit a NPT simulation to the Work Queue. """
+        wq = getWorkQueue()
+        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
+            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            queue_up(wq,
+                     command = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure),
+                     input_files = ['liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt_tinker.py'],
+                     output_files = ['npt_result.p.bz2', 'npt_tinker.py'] + self.FF.fnms)
 
 class AbInitio_TINKER(AbInitio):
 

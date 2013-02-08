@@ -133,6 +133,7 @@ tgt_opts_types = {
                  },
     'ints'    : {"shots"     : (-1, 'Number of snapshots (ab initio); defaults to all of the snapshots'),
                  "fitatoms"  : (0, 'Number of fitting atoms (ab initio); defaults to all of them'),
+                 "sleepy"           : (0, 'Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)'),
                  },
     'bools'   : {"whamboltz"        : (0, 'Whether to use WHAM Boltzmann Weights (ab initio), defaults to False'),
                  "sampcorr"         : (0, 'Whether to use the (archaic) sampling correction (ab initio), defaults to False'),
