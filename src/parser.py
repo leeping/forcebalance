@@ -73,7 +73,7 @@ gen_opts_types = {
                  "scanindex_name" : ([], 'Parameter name to scan over (should convert to a numerical index) in job type "scan[mp]vals"')
                  },
     'ints'    : {"maxstep"      : (100, 'Maximum number of steps in an optimization'),
-                 "objective_history"  : (3, 'Number of good optimization steps to average over when checking the objective convergence criterion'),
+                 "objective_history"  : (2, 'Number of good optimization steps to average over when checking the objective convergence criterion'),
                  "wq_port"   : (0, 'The port number to use for Work Queue'),
                  },
     'bools'   : {"backup"           : (1, 'Write temp directories to backup before wiping them'),
