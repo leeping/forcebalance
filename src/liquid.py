@@ -175,8 +175,8 @@ class Liquid(Target):
             # printcool_dictionary(self.RefData[head],head)
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
-        print global_opts
-        print default_denoms
+        # print global_opts
+        # print default_denoms
         for opt in global_opts:
             if "_denom" in opt:
                 # Record entries from the global_opts dictionary so they can be retrieved from other methods.

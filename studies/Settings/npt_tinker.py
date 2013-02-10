@@ -62,10 +62,10 @@ import argparse
 
 # Select run parameters
 # For consistency with the OpenMM module, the run length is set in this script.
-timestep = 0.50                      # timestep for integration in femtosecond
-nsteps = 200                         # one "iteration" = one interval for saving coordinates (in steps)
-nequiliterations = 500               # number of equilibration iterations
-niterations = 2000                   # number of production iterations
+timestep = 1.00                     # timestep for integration in femtosecond
+nsteps = 100                        # one "iteration" = one interval for saving coordinates (in steps)
+nequiliterations = 50               # number of equilibration iterations
+niterations = 1000                  # number of production iterations
 keyfile = None
 
 parser = argparse.ArgumentParser()
@@ -77,9 +77,6 @@ args = parser.parse_args()
 
 temperature = args.temperature
 pressure    = args.pressure
-
-# Flag to set verbose debug output
-verbose = True
 
 def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
 
@@ -176,7 +173,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
     # Return the computed statistical inefficiency.
     return g
 
-def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True):
+def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     """ Run a NPT simulation and gather statistics. """
 
     basename = xyz[:-4]
@@ -184,21 +181,23 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True):
     xain = "%s.arc" % basename + ("" if tky == None else " -k %s" % tky)
     
     cmdstr = "./minimize %s 1.0e-1" % xin
-    _exec(cmdstr,print_to_screen=True)
-    _exec("mv %s_2 %s" % (xyz,xyz),print_to_screen=True)
+    _exec(cmdstr)
+    _exec("mv %s_2 %s" % (xyz,xyz))
+    print "Running equilibration"
     # Run the equilibration.
     if pbc:
         cmdstr = "./dynamic %s %i %f %f 4 %f %f" % (xin, nstep*neq, tstep, nstep*tstep/1000, temperature, pressure)
     else:
         cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*neq, tstep, nstep*tstep/1000, temperature)
-    _exec(cmdstr,print_to_screen=True)
-    _exec("rm -f %s.arc %s.box" % (basename, basename), print_to_screen=True)
+    _exec(cmdstr,print_to_screen=verbose)
+    _exec("rm -f %s.arc %s.box" % (basename, basename))
     # Run the production.
+    print "Running production"
     if pbc:
         cmdstr = "./dynamic %s %i %f %f 4 %f %f" % (xin, nstep*npr, tstep, nstep*tstep/1000, temperature, pressure)
     else:
         cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*npr, tstep, nstep*tstep/1000, temperature)
-    odyn = _exec(cmdstr,print_to_screen=True)
+    odyn = _exec(cmdstr,print_to_screen=verbose)
 
     edyn = []
     for line in odyn.split('\n'):
@@ -240,35 +239,6 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True):
         rho = None
 
     return rho, edyn, vol, dip
-
-
-
-    # # Analyze.
-    # cmdstr = "./analyze %s" % xain
-    # oanl = _exec(cmdstr,print_to_screen=True,stdin="E,M")
-
-    # dyne = []
-    # for line in odyn.split('\n'):
-    #     if 'Current Potential' in line:
-    #         print line
-    #         dyne.append(float(line.split()[2]))
-    # anle = []
-    # for line in oanl.split('\n'):
-    #     if 'Total Potential Energy : ' in line:
-    #         print line
-    #         anle.append(float(line.split()[4]))
-
-    # anle = np.array(anle)
-    # # Convert to kJ/mol
-    # anle *= 4.184 
-
-    # sys.exit()
-    # # More data structures; stored coordinates, box sizes, densities, and potential energies
-    # rhos = []
-    # energies = []
-    # volumes = []
-    # dipoles = []
-    # return
 
 def energy_driver(mvals,FF,xyz,tky,verbose=False,dipole=False):
     """
@@ -480,7 +450,7 @@ def main():
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    Rhos, Energies, Volumes, Dips = run_simulation(args.xyzfile,args.keyfile,tstep=timestep,nstep=nsteps,neq=nequiliterations,npr=niterations)
+    Rhos, Energies, Volumes, Dips = run_simulation(args.xyzfile,args.keyfile,tstep=timestep,nstep=nsteps,neq=nequiliterations,npr=niterations,verbose=True)
     V  = Volumes
     pV = pressure * Volumes
     H = Energies + pV
@@ -493,7 +463,11 @@ def main():
     #==============================================#
     # Now run the simulation for just the monomer. #
     #==============================================#
-    _a, mEnergies, _b, _c = run_simulation("mono.xyz","mono.key",tstep=0.10,nstep=100,neq=50,npr=10000,pbc=False)
+    m_timestep = 0.10                     # timestep for integration in femtosecond
+    m_nsteps = 100                        # one "iteration" = one interval for saving coordinates (in steps)
+    m_nequiliterations = 50               # number of equilibration iterations
+    m_niterations = 1000                  # number of production iterations
+    _a, mEnergies, _b, _c = run_simulation("mono.xyz","mono.key",tstep=m_timestep,nstep=m_nsteps,neq=m_nequiliterations,npr=m_niterations,pbc=False)
     mN = len(mEnergies)
     print "Post-processing the gas simulation snapshots."
     mG = energy_derivatives(mvals,h,FF,"mono.xyz","mono.key",AGrad)
@@ -531,6 +505,10 @@ def main():
 
     FDCheck = False
 
+    Sep = printcool("Density: % .4f +- % .4f kg/m^3, Analytic Derivative" % (Rho_avg, Rho_err))
+    FF.print_map(vals=GRho)
+    print Sep
+
     if FDCheck:
         Sep = printcool("Numerical Derivative:")
         GRho1 = property_derivatives(mvals, h, FF, args.xyzfile, args.keyfile, kT, calc_arr, {'arr':Rhos})
@@ -561,6 +539,7 @@ def main():
 
     print "Box energy:", np.mean(Energies)
     print "Monomer energy:", np.mean(mEnergies)
+
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol, Derivatives below" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
     print Sep
