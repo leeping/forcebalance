@@ -262,7 +262,7 @@ class Optimizer(ForceBalanceBaseClass):
             if ndx < self.conv_stp and ITERATION_NUMBER > 0 and not restep:
                 print "Convergence criterion reached in step size (%.2e)" % self.conv_stp
                 break
-            if stdfront < self.conv_obj and len(ehist) > self.hist and not restep:
+            if 2*stdfront < self.conv_obj and len(ehist) > self.hist and not restep: # Factor of two is so [0,1] stdev is normalized to 1
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             if self.print_grad:
