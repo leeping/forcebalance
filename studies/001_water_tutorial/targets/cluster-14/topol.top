@@ -1,0 +1,7 @@
+#include "water.itp"
+
+[ system ]
+Clusters of 14 water molecules extracted from liquid, solid, and gas phase
+
+[ molecules ]
+SOL 14
