@@ -249,8 +249,9 @@ class Optimizer(ForceBalanceBaseClass):
                         'x_best': X_best,'xk_prev': xk_prev, 'trust': trust}
             if self.wchk_step:
                 self.writechk()
-            stdfront = 2*len(ehist) > self.hist and np.std(np.sort(ehist)[:self.hist]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
-            print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)", "StepQual")
+            stdfront = len(ehist) > self.hist and np.std(np.sort(ehist)[:self.hist]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
+            stdfront *= 2
+            print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual")
             print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality)
             # Check the convergence criteria
             if ngr < self.conv_grd:
@@ -262,7 +263,7 @@ class Optimizer(ForceBalanceBaseClass):
             if ndx < self.conv_stp and ITERATION_NUMBER > 0 and not restep:
                 print "Convergence criterion reached in step size (%.2e)" % self.conv_stp
                 break
-            if 2*stdfront < self.conv_obj and len(ehist) > self.hist and not restep: # Factor of two is so [0,1] stdev is normalized to 1
+            if stdfront < self.conv_obj and len(ehist) > self.hist and not restep: # Factor of two is so [0,1] stdev is normalized to 1
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             if self.print_grad:
@@ -330,7 +331,7 @@ class Optimizer(ForceBalanceBaseClass):
                     if Reevaluate:
                         restep = True
                         color = "\x1b[91m"
-                        print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Stdev(X2)", "StepQual")
+                        print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual")
                         print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality)
                         printcool("Objective function rises (Disappointed!)\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
