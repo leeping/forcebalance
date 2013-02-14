@@ -42,7 +42,7 @@ elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
     module load gcc
     module load cuda/4.1
-    export OPENMM_CUDA_COMPILER=/opt/apps/cuda/4.1/cuda/bin/nvcc
+    export OPENMM_CUDA_COMPILER=/share/apps/cuda/4.1/cuda/bin/nvcc
     export BAK=$SCRATCH/runcuda-backups
 elif [[ $HOSTNAME =~ "not0rious" ]] ; then
     module load openmm
@@ -91,12 +91,14 @@ echo "#=======================#"
 echo
 echo $@
 
-rm -rf npt_result.p*
+rm -f npt_result.p npt_result.p.bz2
 time $@
 # Delete backup files that are older than one week.
-find $BAK/$PWD -mtime +7 -exec rm {} \;
+find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD
 cp * $BAK/$PWD
+# For some reason I was still getting error messages about the bzip already existing..
+rm -f npt_result.p.bz2
 bzip2 npt_result.p
 
 # Avoid the stupid segfault-on-quit that happens on fire
