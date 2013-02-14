@@ -4,8 +4,8 @@ for i in `seq 2 14`; do
     j=`printf "%02i" $i`
     cd cluster-$j
     mkdir settings
-    cp ../shot.mdp settings/
-    cat <<EOF > settings/topol.top
+    cp ../shot.mdp .
+    cat <<EOF > topol.top
 #include "water.itp"
 
 [ system ]

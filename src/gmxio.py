@@ -443,7 +443,14 @@ class AbInitio_GMX(AbInitio):
         o, e = Popen(["./g_energy","-xvg","no"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('Potential')
         o, e = Popen(["./g_traj","-xvg","no","-f","shot.trr","-of","force.xvg","-fp"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('System')
         E = [float(open("energy.xvg").readlines()[0].split()[1])]
-        F = [float(i) for i in open("force.xvg").readlines()[0].split()[1:] if float(i) != 0.0]
+        # When we read in the force, virtual sites are distinguished by whether the force is zero.
+        # However, sometimes the force really is exactly zero on an atom, so we have to be a bit tricksier.
+        F0 = [float(i) for i in open("force.xvg").readlines()[0].split()[1:] if float(i) != 0.0]
+        F1 = [float(i) for i in open("force.xvg").readlines()[0].split()[1:]]
+        if len(F0) == len(F1) or len(F1) > 3*self.qmatoms:
+            F = F0[:]
+        elif len(F0) < 3*self.qmatoms:
+            F = F1[:]
         M = array(E + F)
         M = M[:3*self.fitatoms+1]
         return M
@@ -465,7 +472,12 @@ class AbInitio_GMX(AbInitio):
         for Eline, Fline in zip(Efile, Ffile):
             # Compute the potential energy and append to list
             Energy = [float(Eline.split()[1])]
-            Force = [float(i) for i in Fline.split()[1:] if float(i) != 0.0]
+            F0 = [float(i) for i in Fline.split()[1:] if float(i) != 0.0]
+            F1 = [float(i) for i in Fline.split()[1:]]
+            if len(F0) == len(F1) or len(F1) > 3*self.qmatoms:
+                Force = F0[:]
+            elif len(F0) < 3*self.qmatoms:
+                Force = F1[:]
             M.append(array(Energy + Force)[:3*self.fitatoms+1])
         return array(M)
 
