@@ -87,7 +87,6 @@ gen_opts_types = {
                  "normalize_weights": (1, 'Normalize the weights for the fitting targets'),
                  "verbose_options"  : (0, 'Print options that are equal to their defaults'),
                  "rigid_water"        : (False, 'Perform calculations using rigid water molecules.  Currently used in AMOEBA parameterization.'),
-                 "openmm_new_cuda"        : (True, 'Use the new CUDA Platform, which is the default starting with OpenMM 5.0.')
                  },
     'floats'  : {"trust0"                 : (1e-1, 'Trust radius for the MainOptimizer'),
                  "mintrust"               : (0.0, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)'),
@@ -126,6 +125,7 @@ tgt_opts_types = {
                  "force_map" : ('residue', 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group'),
                  "fragment1" : ('', 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)'),
                  "fragment2" : ('', 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.'),
+                 "openmm_cuda_precision" : ('', 'Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.'),
                  },
     'allcaps' : {"type"   : (None,      'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.')
                  },

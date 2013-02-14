@@ -230,8 +230,6 @@ class OpenMM_Reader(BaseReader):
 class Liquid_OpenMM(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_OpenMM,self).__init__(options,tgt_opts,forcefield)
-        if options['openmm_new_cuda']:
-            self.new_cuda = True
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
@@ -293,11 +291,7 @@ class AbInitio_OpenMM(AbInitio):
         ## Initialize the SuperClass!
         super(AbInitio_OpenMM,self).__init__(options,tgt_opts,forcefield)
         try:
-            ## Copied over from npt.py (for now)
-            if options['openmm_new_cuda']:
-                PlatName = 'CUDA'
-            else:
-                PlatName = 'Cuda'
+            PlatName = 'CUDA'
             ## Set the simulation platform
             print "Setting Platform to", PlatName
             self.platform = openmm.Platform.getPlatformByName(PlatName)
@@ -311,6 +305,12 @@ class AbInitio_OpenMM(AbInitio):
             self.platform = None
         ## If using the new CUDA platform, then create the simulation object within this class itself.
         if PlatName == "CUDA":
+            if tgt_opts['openmm_cuda_precision'] != '':
+                print "Setting Precision to %s" % tgt_opts['openmm_cuda_precision'].lower()
+                try:
+                    self.platform.setPropertyDefaultValue("CudaPrecision",tgt_opts['openmm_cuda_precision'].lower())
+                except:
+                    raise Exception('Unable to set the CUDA precision!')
             # Set up the entire system here on the new CUDA Platform.
             pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
             forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))

@@ -538,6 +538,13 @@ class Liquid(Target):
         Gradient = np.zeros(self.FF.np, dtype=float)
         Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
 
+        if X_Rho == 0: self.w_rho = 0.0
+        if X_Hvap == 0: self.w_hvap = 0.0
+        if X_Alpha == 0: self.w_alpha = 0.0
+        if X_Kappa == 0: self.w_kappa = 0.0
+        if X_Cp == 0: self.w_cp = 0.0
+        if X_Eps0 == 0: self.w_eps0 = 0.0
+
         w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0
         w_1 = self.w_rho / w_tot
         w_2 = self.w_hvap / w_tot
