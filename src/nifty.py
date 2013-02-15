@@ -14,7 +14,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 @date 12/2011
 """
 
-import os
+import os, sys
 from re import match, sub
 import numpy as np
 import itertools
@@ -636,8 +636,9 @@ def warn_press_key(warning):
             print line
     else:
         print "You're not supposed to pass me a variable of this type:", type(warning)
-    print "\x1b[1;91mPress Enter (I assume no responsibility for what happens after this!)\x1b[0m"
-    raw_input()
+    if sys.stdin.isatty():
+        print "\x1b[1;91mPress Enter (I assume no responsibility for what happens after this!)\x1b[0m"
+        raw_input()
 
 def warn_once(warning, warnhash = None):
     """ Prints a warning but will only do so once in a given run. """
