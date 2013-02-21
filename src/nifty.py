@@ -363,35 +363,47 @@ class Pickler_LP(pickle.Pickler):
         pickle.Pickler.__init__(self, file, protocol)
         ## The element tree is saved as a string.
         def save_etree(self, obj):
-            ## Convert the element tree to string.
-            String = etree.tostring(obj)
-            ## The rest is copied from the Pickler class
-            if self.bin:
-                print "self.bin is True, not sure what to do with myself"
-                raw_input()
-            else:
-                self.write(XMLFILE + repr(String) + '\n')
-            self.memoize(String)
-        self.dispatch[etree._ElementTree] = save_etree
+            try:
+                ## Convert the element tree to string.
+                String = etree.tostring(obj)
+                ## The rest is copied from the Pickler class
+                if self.bin:
+                    print "self.bin is True, not sure what to do with myself"
+                    raw_input()
+                else:
+                    self.write(XMLFILE + repr(String) + '\n')
+                self.memoize(String)
+            except:
+                warn_once("Cannot save XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
+        try:
+            self.dispatch[etree._ElementTree] = save_etree
+        except:
+            warn_once("Cannot save XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
 
 class Unpickler_LP(pickle.Unpickler):
     """ A subclass of the python Unpickler that implements unpickling of _ElementTree types. """
     def __init__(self, file):
         pickle.Unpickler.__init__(self, file)
         def load_etree(self):
-            ## This stuff is copied from the Unpickler class
-            rep = self.readline()[:-1]
-            for q in "\"'": # double or single quote
-                if rep.startswith(q):
-                    if not rep.endswith(q):
-                        raise ValueError, "insecure string pickle"
-                    rep = rep[len(q):-len(q)]
-                    break
-            else:
-                raise ValueError, "insecure string pickle"
-            ## The string is converted to an _ElementTree type before it is finally loaded.
-            self.append(etree.ElementTree(etree.fromstring(rep.decode("string-escape"))))
-        self.dispatch[XMLFILE] = load_etree
+            try:
+                ## This stuff is copied from the Unpickler class
+                rep = self.readline()[:-1]
+                for q in "\"'": # double or single quote
+                    if rep.startswith(q):
+                        if not rep.endswith(q):
+                            raise ValueError, "insecure string pickle"
+                        rep = rep[len(q):-len(q)]
+                        break
+                else:
+                    raise ValueError, "insecure string pickle"
+                ## The string is converted to an _ElementTree type before it is finally loaded.
+                self.append(etree.ElementTree(etree.fromstring(rep.decode("string-escape"))))
+            except:
+                warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
+        try:
+            self.dispatch[XMLFILE] = load_etree
+        except:
+            warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
 
 def lp_dump(obj, file, protocol=None):
     """ Use this instead of pickle.dump for pickling anything that contains _ElementTree types. """
