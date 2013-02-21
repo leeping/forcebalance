@@ -448,7 +448,7 @@ class BindingEnergy_TINKER(BindingEnergy):
         # Read the TINKER output. 
         for line in o.split('\n'):
             if "Total Potential Energy" in line:
-                return float(line.split()[-2]) * kilocalories_per_mole, rmsd * angstrom
+                return float(line.split()[-2].replace('D','e')) * kilocalories_per_mole, rmsd * angstrom
         warn_press_key("Total potential energy wasn't encountered for system %s!" % sysname)
     
 class Interaction_TINKER(Interaction):
