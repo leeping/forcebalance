@@ -24,6 +24,7 @@ elif [[ $HOSTNAME =~ "fire" ]] ; then
     #export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/lib:$LD_LIBRARY_PATH
     #export INCLUDE=$CUDA_HOME/include:$INCLUDE
 elif [[ $HOSTNAME =~ "certainty" || $HOSTNAME =~ "compute-" || $HOSTNAME =~ "largemem-" ]] ; then
+    # Keeneland, currently don't have access
     export CUDA_HOME=/usr/local/cuda
     export PATH=$CUDA_HOME/bin:$PATH
     export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/lib:$LD_LIBRARY_PATH
@@ -42,6 +43,7 @@ elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
     module load gcc
     module load cuda/4.1
+    export CUDA_CACHE_PATH=$SCRATCH/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=/share/apps/cuda/4.1/cuda/bin/nvcc
     export BAK=$SCRATCH/runcuda-backups
 elif [[ $HOSTNAME =~ "not0rious" ]] ; then
@@ -50,10 +52,13 @@ elif [[ $HOSTNAME =~ "ls4" ]] ; then
     module unload intel
     module load gcc
     module load cuda/5.0
+    export CUDA_CACHE_PATH=$SCRATCH/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=/opt/apps/cuda/5.0/bin/nvcc
     export BAK=$SCRATCH/runcuda-backups
 elif [[ $HOSTNAME =~ "cn" ]] ; then
+    # HS GPU Cluster
     module load cuda
+    export CUDA_CACHE_PATH=/hsgs/projects/pande/leeping/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=/opt/cuda5.0/bin/nvcc
     export BAK=/hsgs/projects/pande/leeping/scratch/runcuda-backups
 elif [[ $ARCHIVER == "ranch.tacc.utexas.edu" ]] ; then
@@ -61,6 +66,7 @@ elif [[ $ARCHIVER == "ranch.tacc.utexas.edu" ]] ; then
     # This is a wild shot. Kamelasa! It's difficult to tell the cluster name 
     # from the environment variables on a Stampede compute node.
     module load cuda/5.0
+    export CUDA_CACHE_PATH=$SCRATCH/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=`which nvcc`
     export BAK=$SCRATCH/runcuda-backups
 fi

@@ -478,10 +478,11 @@ def wq_wait(wq, verbose=False):
         if verbose: print '---'
         task = wq.wait(10)
         if task:
-            try:
-                exectime = task.cmd_execution_time/1000000 # Work Queue 3.6.0
-            except:
-                exectime = task.computation_time/1000000   # Work Queue <= 3.5.2
+            exectime = task.cmd_execution_time/1000000 # Work Queue 3.6.0
+            # try:
+            #     exectime = task.cmd_execution_time/1000000 # Work Queue 3.6.0
+            # except:
+            #     exectime = task.computation_time/1000000   # Work Queue <= 3.5.2
             if verbose:
                 print 'A job has finished!'
                 print 'Job name = ', task.tag, 'command = ', task.command
