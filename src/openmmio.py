@@ -234,11 +234,11 @@ class Liquid_OpenMM(Liquid):
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        os.symlink(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
-        #os.symlink(os.path.join(self.root,self.tgtdir,"evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
+        #LinkFile(os.path.join(self.root,self.tgtdir,"evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
 
     def npt_simulation(self, temperature, pressure):
         """ Submit a NPT simulation to the Work Queue. """
@@ -337,7 +337,7 @@ class AbInitio_OpenMM(AbInitio):
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         ## Link the PDB file
-        os.symlink(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
 
     def energy_force_driver_all_external_(self):
         ## This line actually runs OpenMM,

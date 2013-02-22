@@ -557,9 +557,9 @@ def LinkFile(src, dest):
             if os.path.islink(dest): pass
             else: raise Exception("Tried to create symbolic link %s to %s, destination exists but isn't a symbolic link" % (src, dest))
         else:
-            os.path.symlink(src, dest)
+            os.symlink(src, dest)
     else:
-        raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist" % src)
+        raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist" % (src,dest))
 
 def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
@@ -582,7 +582,7 @@ def which(fnm):
     except:
         return ''
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = None, print_command = True):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
