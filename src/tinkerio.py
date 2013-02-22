@@ -141,10 +141,9 @@ class Liquid_TINKER(Liquid):
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        # For now, go with statically linked executables.
-        LinkFile(os.path.join(self.root,self.tgtdir,"dynamic"),os.path.join(abstempdir,"dynamic"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"analyze"),os.path.join(abstempdir,"analyze"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"minimize"),os.path.join(abstempdir,"minimize"))
+        LinkFile(os.path.join(options['tinkerpath'],"dynamic"),os.path.join(abstempdir,"dynamic"))
+        LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        LinkFile(os.path.join(options['tinkerpath'],"minimize"),os.path.join(abstempdir,"minimize"))
         LinkFile(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
         LinkFile(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
         LinkFile(os.path.join(self.root,self.tgtdir,"mono.xyz"),os.path.join(abstempdir,"mono.xyz"))
@@ -162,9 +161,11 @@ class Liquid_TINKER(Liquid):
                 cmdstr = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure)
                 _exec(cmdstr)
             else:
+                # This part of the code has never been used before
+                # Still need to figure out where to specify TINKER location on each cluster
                 queue_up(wq,
                          command = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure),
-                         input_files = ['dynamic','analyze','minimize','liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt_tinker.py'],
+                         input_files = ['liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt_tinker.py'],
                          output_files = ['npt_result.p.bz2', 'npt_tinker.py'] + self.FF.fnms)
                 
 
