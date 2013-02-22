@@ -51,7 +51,7 @@ import os
 import sys
 import numpy as np
 from forcebalance.forcefield import FF
-from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, _exec
+from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, _exec, warn_press_key
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p
 from forcebalance.molecule import Molecule
 import argparse
@@ -173,7 +173,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
     # Return the computed statistical inefficiency.
     return g
 
-def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=True):
+def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     """ Run a NPT simulation and gather statistics. """
 
     basename = xyz[:-4]
@@ -181,23 +181,23 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=True):
     xain = "%s.arc" % basename + ("" if tky == None else " -k %s" % tky)
     
     cmdstr = "./minimize %s 1.0e-1" % xin
-    _exec(cmdstr,print_to_screen=verbose)
-    _exec("mv %s_2 %s" % (xyz,xyz),print_to_screen=verbose)
+    _exec(cmdstr,print_command=verbose,print_to_screen=verbose)
+    _exec("mv %s_2 %s" % (xyz,xyz),print_command=verbose,print_to_screen=verbose)
     print "Running equilibration"
     # Run the equilibration.
     if pbc:
         cmdstr = "./dynamic %s %i %f %f 4 %f %f" % (xin, nstep*neq, tstep, nstep*tstep/1000, temperature, pressure)
     else:
         cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*neq, tstep, nstep*tstep/1000, temperature)
-    _exec(cmdstr,print_to_screen=verbose)
-    _exec("rm -f %s.arc %s.box" % (basename, basename),print_to_screen=verbose)
+    _exec(cmdstr,print_command=verbose,print_to_screen=verbose)
+    _exec("rm -f %s.arc %s.box" % (basename, basename),print_command=verbose,print_to_screen=verbose)
     # Run the production.
     print "Running production"
     if pbc:
         cmdstr = "./dynamic %s %i %f %f 4 %f %f" % (xin, nstep*npr, tstep, nstep*tstep/1000, temperature, pressure)
     else:
         cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*npr, tstep, nstep*tstep/1000, temperature)
-    odyn = _exec(cmdstr,print_to_screen=verbose)
+    odyn = _exec(cmdstr,print_command=verbose,print_to_screen=verbose)
 
     edyn = []
     for line in odyn.split('\n'):
@@ -207,7 +207,7 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=True):
     edyn = np.array(edyn) * 4.184
 
     cmdstr = "./analyze %s" % xain
-    oanl = _exec(cmdstr,stdin="G,E",print_to_screen=verbose)
+    oanl = _exec(cmdstr,stdin="G,E",print_command=verbose,print_to_screen=verbose)
 
     # Read potential energy and dipole from file.
     eanl = []
@@ -240,7 +240,7 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=True):
 
     return rho, edyn, vol, dip
 
-def energy_driver(mvals,FF,xyz,tky,verbose=True,dipole=False):
+def energy_driver(mvals,FF,xyz,tky,verbose=False,dipole=False):
     """
     Compute a set of snapshot energies (and optionally, dipoles) as a function of the force field parameters.
 
@@ -262,7 +262,7 @@ def energy_driver(mvals,FF,xyz,tky,verbose=True,dipole=False):
     
     # Execute TINKER.
     cmdstr = "./analyze %s" % xain
-    oanl = _exec(cmdstr,stdin="E",print_command=False,print_to_screen=verbose)
+    oanl = _exec(cmdstr,stdin="E",print_command=verbose,print_to_screen=verbose)
 
     # Read potential energy from file.
     E = []
@@ -425,7 +425,10 @@ def main():
     """
     Usage: (runcuda.sh) npt.py input.xyz [-k input.key] <temperature> <pressure>
     """
-    
+
+    if not os.path.exists(args.xyzfile):
+        warn_press_key("Warning: %s does not exist, script cannot continue" % args.xyzfile)
+
     # Set up some conversion factors
     # All units are in kJ/mol
     N = niterations
