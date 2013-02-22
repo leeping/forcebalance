@@ -9,7 +9,7 @@ modules for other programs because it's so simple.
 
 import os
 from re import match, sub, split, findall
-from nifty import isint, isfloat, _exec
+from nifty import isint, isfloat, _exec, LinkFile
 import numpy as np
 from basereader import BaseReader
 from abinitio import AbInitio
@@ -163,8 +163,8 @@ class AbInitio_AMBER(AbInitio):
 
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
-        os.symlink(os.path.join(self.root,self.tgtdir,"force.mdin"),os.path.join(abstempdir,"force.mdin"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"stage.leap"),os.path.join(abstempdir,"stage.leap"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"force.mdin"),os.path.join(abstempdir,"force.mdin"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"stage.leap"),os.path.join(abstempdir,"stage.leap"))
         # I also need to write the trajectory
         if 'boxes' in self.traj.Data.keys():
             del self.traj.Data['boxes']

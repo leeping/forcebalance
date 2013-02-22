@@ -173,7 +173,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
     # Return the computed statistical inefficiency.
     return g
 
-def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
+def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=True):
     """ Run a NPT simulation and gather statistics. """
 
     basename = xyz[:-4]
@@ -181,8 +181,8 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     xain = "%s.arc" % basename + ("" if tky == None else " -k %s" % tky)
     
     cmdstr = "./minimize %s 1.0e-1" % xin
-    _exec(cmdstr)
-    _exec("mv %s_2 %s" % (xyz,xyz))
+    _exec(cmdstr,print_to_screen=verbose)
+    _exec("mv %s_2 %s" % (xyz,xyz),print_to_screen=verbose)
     print "Running equilibration"
     # Run the equilibration.
     if pbc:
@@ -190,7 +190,7 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     else:
         cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*neq, tstep, nstep*tstep/1000, temperature)
     _exec(cmdstr,print_to_screen=verbose)
-    _exec("rm -f %s.arc %s.box" % (basename, basename))
+    _exec("rm -f %s.arc %s.box" % (basename, basename),print_to_screen=verbose)
     # Run the production.
     print "Running production"
     if pbc:
@@ -207,7 +207,7 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     edyn = np.array(edyn) * 4.184
 
     cmdstr = "./analyze %s" % xain
-    oanl = _exec(cmdstr,stdin="G,E")
+    oanl = _exec(cmdstr,stdin="G,E",print_to_screen=verbose)
 
     # Read potential energy and dipole from file.
     eanl = []
@@ -240,7 +240,7 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
 
     return rho, edyn, vol, dip
 
-def energy_driver(mvals,FF,xyz,tky,verbose=False,dipole=False):
+def energy_driver(mvals,FF,xyz,tky,verbose=True,dipole=False):
     """
     Compute a set of snapshot energies (and optionally, dipoles) as a function of the force field parameters.
 
@@ -262,7 +262,7 @@ def energy_driver(mvals,FF,xyz,tky,verbose=False,dipole=False):
     
     # Execute TINKER.
     cmdstr = "./analyze %s" % xain
-    oanl = _exec(cmdstr,stdin="E",print_command=False)
+    oanl = _exec(cmdstr,stdin="E",print_command=False,print_to_screen=verbose)
 
     # Read potential energy from file.
     E = []

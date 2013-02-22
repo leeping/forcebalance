@@ -8,7 +8,7 @@
 
 import os
 from re import match, sub
-from nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
+from nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary, LinkFile
 import numpy as Np
 from molecule import Molecule
 from copy import deepcopy
@@ -200,13 +200,13 @@ class Monomer_QTPIE(Target):
         if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
             warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
-        os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
-        os.symlink(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
+        LinkFile(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
+        LinkFile(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
+        LinkFile(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
         # Link the run files
-        os.symlink(os.path.join(self.root,self.tgtdir,"conf.gro"),os.path.join(abstempdir,"conf.gro"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"grompp.mdp"),os.path.join(abstempdir,"grompp.mdp"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"conf.gro"),os.path.join(abstempdir,"conf.gro"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"grompp.mdp"),os.path.join(abstempdir,"grompp.mdp"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
 
     def unpack_moments(self, moment_dict):
         answer = Np.array([moment_dict[i]*self.weights[i] for i in moment_dict])

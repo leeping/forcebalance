@@ -8,7 +8,7 @@
 
 import os
 from re import match, sub
-from nifty import isint, _exec, warn_press_key, getWorkQueue
+from nifty import isint, _exec, warn_press_key, getWorkQueue, LinkFile
 from numpy import array
 from basereader import BaseReader
 from abinitio import AbInitio
@@ -415,14 +415,14 @@ class AbInitio_GMX(AbInitio):
         if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
             warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
-        os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
-        os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
-        os.symlink(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
-        os.symlink(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
+        LinkFile(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
+        LinkFile(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
+        LinkFile(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
+        LinkFile(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
+        LinkFile(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
         # Link the run files
-        os.symlink(os.path.join(self.root,self.tgtdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        os.symlink(os.path.join(self.root,self.tgtdir,self.topfnm),os.path.join(abstempdir,self.topfnm))
+        LinkFile(os.path.join(self.root,self.tgtdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        LinkFile(os.path.join(self.root,self.tgtdir,self.topfnm),os.path.join(abstempdir,self.topfnm))
         # Write the trajectory to the temp-directory
         self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro
@@ -512,13 +512,13 @@ class Interaction_GMX(Interaction):
         if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
             warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
-        os.symlink(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
-        os.symlink(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
+        LinkFile(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
+        LinkFile(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
+        LinkFile(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
         # Link the run files
-        os.symlink(os.path.join(self.root,self.tgtdir,"index.ndx"),os.path.join(abstempdir,"index.ndx"))
-        #os.symlink(os.path.join(self.root,self.tgtdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
-        os.symlink(os.path.join(self.root,self.tgtdir,self.topfnm),os.path.join(abstempdir,self.topfnm))
+        LinkFile(os.path.join(self.root,self.tgtdir,"index.ndx"),os.path.join(abstempdir,"index.ndx"))
+        #LinkFile(os.path.join(self.root,self.tgtdir,"shot.mdp"),os.path.join(abstempdir,"shot.mdp"))
+        LinkFile(os.path.join(self.root,self.tgtdir,self.topfnm),os.path.join(abstempdir,self.topfnm))
         # Write the trajectory to the temp-directory
         self.traj.write(os.path.join(abstempdir,"all.gro"),select=range(self.ns))
         # Print out the first conformation in all.gro to use as conf.gro

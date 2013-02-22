@@ -142,14 +142,14 @@ class Liquid_TINKER(Liquid):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
         # For now, go with statically linked executables.
-        os.symlink(os.path.join(self.root,self.tgtdir,"dynamic"),os.path.join(abstempdir,"dynamic"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"analyze"),os.path.join(abstempdir,"analyze"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"minimize"),os.path.join(abstempdir,"minimize"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"mono.xyz"),os.path.join(abstempdir,"mono.xyz"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"dynamic"),os.path.join(abstempdir,"dynamic"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"analyze"),os.path.join(abstempdir,"analyze"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"minimize"),os.path.join(abstempdir,"minimize"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"mono.xyz"),os.path.join(abstempdir,"mono.xyz"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
 
     def npt_simulation(self, temperature, pressure):
         """ Submit a NPT simulation to the Work Queue. """
@@ -186,10 +186,10 @@ class AbInitio_TINKER(AbInitio):
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
-        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        LinkFile(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
+        LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
         # Link the run parameter file
-        os.symlink(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
 
     def energy_force_driver(self, shot):
         self.traj.write("shot.arc",select=[shot])
@@ -239,11 +239,11 @@ class Vibration_TINKER(Vibration):
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['tinkerpath'],"vibrate"),os.path.join(abstempdir,"vibrate"))
-        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
+        LinkFile(os.path.join(options['tinkerpath'],"vibrate"),os.path.join(abstempdir,"vibrate"))
+        LinkFile(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
-        os.symlink(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
 
     def vibration_driver(self):
         # This line actually runs TINKER
@@ -287,12 +287,12 @@ class Moments_TINKER(Moments):
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
-        os.symlink(os.path.join(options['tinkerpath'],"polarize"),os.path.join(abstempdir,"polarize"))
-        os.symlink(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
+        LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        LinkFile(os.path.join(options['tinkerpath'],"polarize"),os.path.join(abstempdir,"polarize"))
+        LinkFile(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
-        os.symlink(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
-        os.symlink(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
 
     def moments_driver(self):
         # This line actually runs TINKER
@@ -366,13 +366,13 @@ class BindingEnergy_TINKER(BindingEnergy):
         abstempdir = os.path.join(self.root,self.tempdir)
         if self.FF.rigid_water:
             self.optprog = "optrigid"
-            #os.symlink(os.path.join(self.root,self.tgtdir,"rigid.key"),os.path.join(abstempdir,"rigid.key"))
+            #LinkFile(os.path.join(self.root,self.tgtdir,"rigid.key"),os.path.join(abstempdir,"rigid.key"))
         else:
             self.optprog = "optimize"
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
-        os.symlink(os.path.join(options['tinkerpath'],self.optprog),os.path.join(abstempdir,self.optprog))
-        os.symlink(os.path.join(options['tinkerpath'],"superpose"),os.path.join(abstempdir,"superpose"))
+        LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        LinkFile(os.path.join(options['tinkerpath'],self.optprog),os.path.join(abstempdir,self.optprog))
+        LinkFile(os.path.join(options['tinkerpath'],"superpose"),os.path.join(abstempdir,"superpose"))
         # Link the run parameter file
         # The master file might be unneeded??
         for sysname,sysopt in self.sys_opts.items():
@@ -413,7 +413,7 @@ class BindingEnergy_TINKER(BindingEnergy):
                     #atomselect = eval("Np.arange(M.na)"+sysopt['select'])
                     M = M.atom_select(atomselect)
                 M.write(os.path.join(abstempdir,sysname+".xyz"),ftype="tinker")
-                os.symlink(os.path.join(self.root,self.tgtdir,sysopt['keyfile']),os.path.join(abstempdir,sysname+".key"))
+                LinkFile(os.path.join(self.root,self.tgtdir,sysopt['keyfile']),os.path.join(abstempdir,sysname+".key"))
 
     def system_driver(self,sysname):
         sysopt = self.sys_opts[sysname]
@@ -463,9 +463,9 @@ class Interaction_TINKER(Interaction):
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
         # Link the necessary programs into the temporary directory
-        os.symlink(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
+        LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
         # Link the run parameter file
-        os.symlink(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
 
     def energy_driver_all(self,select=None):
         if select == None:
