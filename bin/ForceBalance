@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This is a wrapper script around the main ForceBalance.py script.
-# Run: "ForceBalance [-f] job.in [job.out]"
+# Run: "ForceBalance [-b] [-f] job.in [job.out]"
 #
 # If the output filename is not specified, it will be automatically created.
 #
@@ -15,24 +15,27 @@ minargs=1
 maxargs=2
 E_EXISTS=64
 force=0
+blkwht=0
 
 show_help() 
 {
     echo "Usage: `basename $0` [options] ForceBalance.py job.in [job.out]"
     echo "Values in brackets are optional."
     echo "Options are:"
+    echo "  -b               Black and white output file (no ANSI colors in output file)."
     echo "  -f               Force overwrite of output file."
     echo "  -h               Show this help message."
     exit 1
 }
 
-while getopts f opt 
+while getopts "bfh" opt 
 do
-	case "$opt" in
-		f)  force=1;;
-		h)  show_help;;
-		\?) show_help;;
-	esac
+    case "$opt" in
+	b)  blkwht=1;;
+	f)  force=1;;
+	h)  show_help;;
+	\?) show_help;;
+    esac
 done
 
 shift $(expr $OPTIND - 1)
@@ -62,12 +65,17 @@ fi
 if [ -e $output ] && [ $force -eq 0 ]
 then
   echo "The output filename already exists; cowardly exiting"
+  echo "Use -f option to force overwrite"
   exit $E_EXISTS
 fi
 
 # Standard error gets written to its own .err file
 # Text overwritten by carriage returns are not saved
-$program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
+if [ $blkwht -eq 1 ] ; then
+    $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" > $output)
+else
+    $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
+fi
 exitstat=$?
 nerr=`wc -l $error | awk '{print $1}'`
 errlines=`grep -i "error\|exception\|fatal" $error 2> /dev/null | wc -l | awk '{print $1}'`
