@@ -339,17 +339,30 @@ class Liquid(Target):
                 Results[tt] = lp_load(open('./%s/npt_result.p' % label))
                 if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mPoints]:
                     mPoints.append(PT)
-                if 'mbar' in self.RefData and self.RefData['mbar'][PT]:
+                if 'mbar' in self.RefData and PT in self.RefData['mbar'] and self.RefData['mbar'][PT]:
                     BPoints.append(PT)
                 tt += 1
             else:
                 for obs in self.RefData:
                     del self.RefData[obs][PT]
 
-        # Assign variable names to all the stuff in npt_result.p
-        Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs = ([Results[t][i] for t in range(len(Points))] for i in range(14))
-        
+        try:
+            # Assign variable names to all the stuff in npt_result.p
+            Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
+                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(15))
+            # Determine the number of molecules
+            if len(set(NMols)) != 1:
+                print NMols
+                raise Exception('The above list should only contain one number - the number of molecules')
+            else:
+                NMol = list(set(NMols))[0]
+        except:
+            # Stop-gap measure
+            print "Falling back to 216 molecules"
+            Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
+                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs = ([Results[t][i] for t in range(len(Points))] for i in range(14))
+            NMol = 216
+    
         R  = np.array(list(itertools.chain(*list(Rhos))))
         V  = np.array(list(itertools.chain(*list(Vols))))
         E  = np.array(list(itertools.chain(*list(Energies))))
@@ -362,7 +375,6 @@ class Liquid(Target):
         GDz = np.hstack(tuple(gd[2] for gd in GDips))
         mE = np.array(list(itertools.chain(*list([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))))
         mG = np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
-        NMol = 216 # Number of molecules
 
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
@@ -511,7 +523,7 @@ class Liquid(Target):
             ## Static dielectric constant.
             prefactor = 30.348705333964077
             D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
-            Eps0_calc[PT] = prefactor*(D2/avg(V))/T
+            Eps0_calc[PT] = 1.0 + prefactor*(D2/avg(V))/T
             GD2  = 2*(flat(np.mat(GDx)*col(W*Dx)) - avg(Dx)*flat(np.mat(GDx)*col(W))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
             GD2 += 2*(flat(np.mat(GDy)*col(W*Dy)) - avg(Dy)*flat(np.mat(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
             GD2 += 2*(flat(np.mat(GDz)*col(W*Dz)) - avg(Dz)*flat(np.mat(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))

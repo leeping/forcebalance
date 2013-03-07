@@ -7,7 +7,7 @@ modules for other programs because it's so simple.
 @date 01/2012
 """
 
-import os
+import os, shutil
 from re import match, sub
 from nifty import *
 from nifty import _exec
@@ -134,9 +134,109 @@ class Tinker_Reader(BaseReader):
             # types/classes involved in the interaction.
             self.suffix = '.'.join(self.atom)
 
+def write_key_with_prm(src, dest, prmfnm=None, ffobj=None):
+    """ Copies a TINKER .key file but changes the parameter keyword as
+    necessary to reflect the ForceBalance settings. """
+
+    if src == dest:
+        raise Exception("This function shouldn't be used to modify a file in-place.")
+
+    if prmfnm == None and ffobj == None:
+        raise Exception('write_key_with_prm should be called with either a ForceField object or a parameter file name')
+    elif prmfnm == None:
+        if hasattr(ffobj, 'tinkerprm'):
+            prmfnm = ffobj.tinkerprm
+        else:
+            raise AttributeError('The TINKER parameter file name must be specified in the ForceBalance input file')
+    elif prmfnm != None and ffobj != None:
+        raise Exception('write_key_with_prm should be called with either a ForceField object or a parameter file name, but not both')
+        
+    # Account for both cases where the file name may end with .prm
+    prms = [prmfnm]
+    if prms[0].endswith('.prm'):
+        prms.append(prmfnm[:-4])
+
+    # This is a flag which tells us whether the "parameters" line has appeared
+    prmflag = False
+    outlines = []
+    for line in open(src):
+        if len(line.split()) > 1 and line.split()[0].lower() == 'parameters':
+            prmflag = True
+            # This is the case where "parameters" correctly corresponds to optimize.in
+            if line.split()[1] in prms: pass
+            else:
+                print line
+                warn_press_key("The above line was found in %s, but we expected something like %s" % (src,prmfnm))
+        outlines.append(line)
+    if not prmflag:
+        print "Adding parameter file %s to key file" % prmfnm
+        outlines.insert(0,"parameters %s\n" % prmfnm)
+    with open(dest,'w') as f: f.writelines(outlines)
+
+def modify_key(src, in_dict):
+    """ Performs in-place modification of a TINKER .key file. 
+
+    The input dictionary contains key:value pairs such as
+    "polarization direct".  If the key exists in the TINKER file, then
+    that line is modified such that it contains the value in the
+    dictionary.  Note that this "key" is not to be confused with the
+    .key extension in the TINKER file that we're modifying.
+
+    Sometimes keys like 'archive' do not have a value, in which case
+    the dictionary should contain a None value or a blank space.
+
+    If the key doesn't exist in the TINKER file, then the key:value pair
+    will be printed at the end.
+
+    @param[in] src Name of the TINKER file to be modified.
+    @param[in] in_dict Dictionary containing key-value pairs used to modify the TINKER file.
+
+    """
+
+    if os.path.isfile(src) and not os.path.islink(src):
+        fin = open(src).readlines()
+    else:
+        raise Exception("This function shouldn't be used to follow symbolic links, because I don't want to modify files in the target directory")
+    odict = OrderedDict([(key.lower(), val) for key, val in in_dict.items()])
+    flags = OrderedDict([(key, False) for key in odict.keys()])
+    outlines = []
+    for line in open(src).readlines():
+        s = line.split()
+        if len(s) == 0:
+            outlines.append(line)
+            continue
+        key = s[0].lower()
+        # Modify the line in-place if the key already exists.
+        if key in odict:
+            val = odict[key]
+            if val != None:
+                outlines.append("%s %s\n" % (key, val))
+            else:
+                outlines.append("%s\n" % (key))
+            flags[key] = True
+        else:
+            outlines.append(line)
+    for key, val in odict.items():
+        if not flags[key]:
+            if val != None:
+                outlines.append("%s %s\n" % (key, val))
+            else:
+                outlines.append("%s\n" % (key))
+    with open(src,'w') as f: f.writelines(outlines)
+
 class Liquid_TINKER(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
+        # Number of time steps in the liquid "equilibration" run
+        self.set_option(tgt_opts,'liquid_equ_steps',forceprint=True)
+        # Number of time steps in the liquid "production" run
+        self.set_option(tgt_opts,'liquid_prod_steps',forceprint=True)
+        # Time step length (in fs) for the liquid production run
+        self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
+        # Time interval (in ps) for writing coordinates
+        self.set_option(tgt_opts,'liquid_interval',forceprint=True)
+        # Dictionary of .dyn file locations for restarting simulations
+        self.DynDict = OrderedDict()
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
@@ -145,9 +245,13 @@ class Liquid_TINKER(Liquid):
         LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
         LinkFile(os.path.join(options['tinkerpath'],"minimize"),os.path.join(abstempdir,"minimize"))
         LinkFile(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
+        write_key_with_prm(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"),ffobj=self.FF)
+        modify_key(os.path.join(abstempdir,"liquid.key"),{'archive':None,'save-box':None})
+        # LinkFile(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
         LinkFile(os.path.join(self.root,self.tgtdir,"mono.xyz"),os.path.join(abstempdir,"mono.xyz"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"))
+        write_key_with_prm(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"),ffobj=self.FF)
+        modify_key(os.path.join(abstempdir,"mono.key"),{'archive':None})
+        # LinkFile(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"))
         LinkFile(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
 
     def npt_simulation(self, temperature, pressure):
@@ -158,8 +262,14 @@ class Liquid_TINKER(Liquid):
             if wq == None:
                 print "Running locally, it might be slow!"
                 print "You may tail -f %s/npt_tinker.out in another terminal window" % os.getcwd()
-                cmdstr = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure)
+                if (temperature, pressure) in self.DynDict:
+                    dynsrc = self.DynDict[(temperature, pressure)]
+                    dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
+                    print "Copying .dyn file: %s to %s" % (dynsrc, dyndest)
+                    shutil.copy2(dynsrc,dyndest)
+                cmdstr = 'python npt_tinker.py liquid.xyz %i %.3f %.3f %.3f %.3f --liquid_equ_steps %i &> npt_tinker.out' % (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps)
                 _exec(cmdstr)
+                self.DynDict[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
             else:
                 # This part of the code has never been used before
                 # Still need to figure out where to specify TINKER location on each cluster
@@ -189,8 +299,8 @@ class AbInitio_TINKER(AbInitio):
         # Link the necessary programs into the temporary directory
         LinkFile(os.path.join(options['tinkerpath'],"testgrad"),os.path.join(abstempdir,"testgrad"))
         LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
-        # Link the run parameter file
-        LinkFile(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
+        write_key_with_prm(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"),ffobj=self.FF)
+        # LinkFile(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
 
     def energy_force_driver(self, shot):
         self.traj.write("shot.arc",select=[shot])
@@ -243,7 +353,8 @@ class Vibration_TINKER(Vibration):
         LinkFile(os.path.join(options['tinkerpath'],"vibrate"),os.path.join(abstempdir,"vibrate"))
         LinkFile(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
-        LinkFile(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
+        write_key_with_prm(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"),ffobj=self.FF)
+        # LinkFile(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
         LinkFile(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
 
     def vibration_driver(self):
@@ -292,7 +403,8 @@ class Moments_TINKER(Moments):
         LinkFile(os.path.join(options['tinkerpath'],"polarize"),os.path.join(abstempdir,"polarize"))
         LinkFile(os.path.join(options['tinkerpath'],"optimize"),os.path.join(abstempdir,"optimize"))
         # Link the run parameter file
-        LinkFile(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
+        write_key_with_prm(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"),ffobj=self.FF)
+        # LinkFile(os.path.join(self.root,self.tgtdir,"input.key"),os.path.join(abstempdir,"input.key"))
         LinkFile(os.path.join(self.root,self.tgtdir,"input.xyz"),os.path.join(abstempdir,"input.xyz"))
 
     def moments_driver(self):
@@ -414,7 +526,8 @@ class BindingEnergy_TINKER(BindingEnergy):
                     #atomselect = eval("Np.arange(M.na)"+sysopt['select'])
                     M = M.atom_select(atomselect)
                 M.write(os.path.join(abstempdir,sysname+".xyz"),ftype="tinker")
-                LinkFile(os.path.join(self.root,self.tgtdir,sysopt['keyfile']),os.path.join(abstempdir,sysname+".key"))
+                write_key_with_prm(os.path.join(self.root,self.tgtdir,sysopt['keyfile']),os.path.join(abstempdir,sysname+".key"),ffobj=self.FF)
+                # LinkFile(os.path.join(self.root,self.tgtdir,sysopt['keyfile']),os.path.join(abstempdir,sysname+".key"))
 
     def system_driver(self,sysname):
         sysopt = self.sys_opts[sysname]
@@ -466,7 +579,8 @@ class Interaction_TINKER(Interaction):
         # Link the necessary programs into the temporary directory
         LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
         # Link the run parameter file
-        LinkFile(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
+        write_key_with_prm(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"),ffobj=self.FF)
+        # LinkFile(os.path.join(self.root,self.tgtdir,"shot.key"),os.path.join(abstempdir,"shot.key"))
 
     def energy_driver_all(self,select=None):
         if select == None:

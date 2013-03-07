@@ -163,7 +163,7 @@ class AbInitio(Target):
         if not self.new_vsites: return self.invdists
         if any(['VSITE' in i for i in self.FF.map.keys()]) or self.have_vsite:
             print "\rGenerating virtual site positions.%s" % (" "*30),
-            pvals = self.FF.make(mvals,self.usepvals)
+            pvals = self.FF.make(mvals)
             self.generate_vsite_positions()
         # prepare the distance matrix for esp computations
         if len(self.espxyz) > 0:
@@ -501,7 +501,7 @@ class AbInitio(Target):
         """
         Answer = {}
         # Create the new force field!!
-        pvals = self.FF.make(mvals,self.usepvals)
+        pvals = self.FF.make(mvals)
 
         #======================================#
         #   Copied from the old ForTune code   #
@@ -582,7 +582,7 @@ class AbInitio(Target):
             if AGrad or AHess:
                 def callM(mvals_):
                     print "\r",
-                    pvals = self.FF.make(mvals_, self.usepvals)
+                    pvals = self.FF.make(mvals_)
                     return self.energy_force_transformer_all()
                 for p in range(np):
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
@@ -640,7 +640,7 @@ class AbInitio(Target):
                     def callM(mvals_):
                         if i % 100 == 0:
                             print "\r",
-                        pvals = self.FF.make(mvals_, self.usepvals)
+                        pvals = self.FF.make(mvals_)
                         return self.energy_force_transformer(i)
                     M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                 M0_M_p[p]  += P * M_p[p]
@@ -815,7 +815,7 @@ class AbInitio(Target):
             if self.use_nft:
                 self.nf_err = N
                 self.tq_err = T
-            pvals = self.FF.make(mvals,self.usepvals) # Write a force field that isn't perturbed by finite differences.
+            pvals = self.FF.make(mvals) # Write a force field that isn't perturbed by finite differences.
         Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
 
@@ -882,7 +882,7 @@ class AbInitio(Target):
         warn_press_key("You have reached a piece of code that isn't well maintained!  If you believe you got here in error, try setting the covariance option to zero.")
         Answer = {}
         # Create the new force field!!
-        pvals = self.FF.make(mvals,self.usepvals)
+        pvals = self.FF.make(mvals)
         ns = self.ns
 
         #======================================#
@@ -1080,7 +1080,7 @@ class AbInitio(Target):
             if self.use_nft:
                 self.nf_err = N
                 self.tq_err = T
-            pvals = self.FF.make(mvals,self.usepvals) # Write a force field that isn't perturbed by finite differences.
+            pvals = self.FF.make(mvals) # Write a force field that isn't perturbed by finite differences.
         Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         return Answer
 
@@ -1090,7 +1090,7 @@ class AbInitio(Target):
             AGrad = False
             AHess = False
         Answer = {}
-        pvals = self.FF.make(mvals,self.usepvals)
+        pvals = self.FF.make(mvals)
 
         # Build the distance matrix for ESP fitting.
         self.invdists = self.build_invdist(mvals)

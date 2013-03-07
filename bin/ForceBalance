@@ -69,10 +69,24 @@ then
   exit $E_EXISTS
 fi
 
+if [ $blkwht -eq 1 ] ; then
+    echo "#=====================================#"
+    echo -e "#|    Black and White Mode \xE0\xB2\xA0_\xE0\xB2\xA0       |#"
+    echo "#|       Try color on a black        |#"
+    echo "#|       terminal background!        |#"
+    echo "#=====================================#"
+else
+    echo "#=====================================#"
+    echo "#|     For black and white mode,     |#"
+    echo "#|      Run this script with -b      |#"
+    echo "#=====================================#"
+fi
+
 # Standard error gets written to its own .err file
 # Text overwritten by carriage returns are not saved
 if [ $blkwht -eq 1 ] ; then
-    $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' | sed -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" > $output)
+    # Option for black and white output
+    $program $input 2>$error | sed -u -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | tee >(awk -F '\r' '{print $NF}' > $output)
 else
     $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
 fi

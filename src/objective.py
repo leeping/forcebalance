@@ -31,7 +31,6 @@ class Objective(ForceBalanceBaseClass):
 
     @param[in] mvals The mathematical parameters that enter into computing the objective function
     @param[in] Order The requested order of differentiation
-    @param[in] usepvals Switch that determines whether to use physical parameter values
     """
     def __init__(self, options, tgt_opts, forcefield):
 
@@ -72,7 +71,7 @@ class Objective(ForceBalanceBaseClass):
         printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
 
         
-    def Target_Terms(self, mvals, Order=0, usepvals=False, verbose=False):
+    def Target_Terms(self, mvals, Order=0, verbose=False):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
         Objective = {'X':0.0, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         # Loop through the targets, stage the directories and submit the Work Queue processes.
@@ -137,8 +136,8 @@ class Objective(ForceBalanceBaseClass):
         printcool_dictionary(PrintDict,color=4,title=Title)
         return
 
-    def Full(self, mvals, Order=0, usepvals=False, verbose=False):
-        Objective = self.Target_Terms(mvals, Order, usepvals, verbose)
+    def Full(self, mvals, Order=0, verbose=False):
+        Objective = self.Target_Terms(mvals, Order, verbose)
         ## Compute the penalty function.
         Extra = self.Penalty.compute(mvals,Objective)
         Objective['X0'] = Objective['X']

@@ -11,7 +11,6 @@ from collections import OrderedDict
 from nifty import row,col,printcool_dictionary, link_dir_contents
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from optimizer import Counter
-from parser import tgt_opts_defaults
 
 class Target(ForceBalanceBaseClass):
     
@@ -111,9 +110,6 @@ class Target(ForceBalanceBaseClass):
         ## Parameter types that trigger FD Hessian elements
         ## Finite difference step size
         self.set_option(options, 'finite_difference_h', 'h')
-        ## Manual override: bypass the parameter transformation and use
-        ## physical parameters directly.  For power users only! :)
-        self.set_option(tgt_opts, 'use_pvals', 'usepvals')
         ## Whether to make backup files
         self.set_option(options, 'backup')
                                                                  

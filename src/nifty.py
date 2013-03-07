@@ -155,6 +155,10 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50):
             print "%s\x1b[%sm%s" % (''.join([sym for i in range(3)]), ansi, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
         elif color != None:
             print "%s\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
+            # if color == 3 or color == 7:
+            #     print "%s\x1b[40m\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
+            # else:
+            #     print "%s\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
         else:
             warn_press_key("Inappropriate use of printcool")
     print bar
@@ -639,7 +643,9 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         print "Received an error message:"
         print Error
         warn_press_key("%s gave a return code of %i (it may have crashed)" % (command, p.returncode))
-    return Output
+    # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
+    # return [l + '\n' for l in Output.split('\n')]
+    return Output.split('\n')
 
 def warn_press_key(warning):
     if type(warning) is str:

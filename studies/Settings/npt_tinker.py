@@ -61,19 +61,43 @@ import argparse
 #======================================================#
 
 # Select run parameters
-# For consistency with the OpenMM module, the run length is set in this script.
-timestep = 1.00                     # timestep for integration in femtosecond
-nsteps = 100                        # one "iteration" = one interval for saving coordinates (in steps)
-nequiliterations = 50               # number of equilibration iterations
-niterations = 1000                  # number of production iterations
-keyfile = None
+#timestep = 1.00                     # timestep for integration in femtosecond
+#nsteps = 100                        # one "iteration" = one interval for saving coordinates (in steps)
+#nequiliterations = 50               # number of equilibration iterations
+#niterations = 1000                  # number of production iterations
+#keyfile = None
 
 parser = argparse.ArgumentParser()
-parser.add_argument('xyzfile')
-parser.add_argument('-k', '--keyfile')
-parser.add_argument('temperature',type=float)
-parser.add_argument('pressure',type=float)
+parser.add_argument('liquid_xyzfile', help='TINKER .xyz file for the liquid')
+parser.add_argument('-k', '--liquid_keyfile', help='TINKER .key file for the liquid')
+parser.add_argument('liquid_prod_steps', type=int, help='Number of time steps for the liquid production simulation')
+parser.add_argument('liquid_timestep', type=float, help='Length of the time step for the liquid simulation, in femtoseconds')
+parser.add_argument('liquid_interval', type=float, help='Time interval for writing the liquid coordinates to disk, in picoseconds')
+parser.add_argument('temperature',type=float, help='Temperature (K)')
+parser.add_argument('pressure',type=float, help='Pressure (Atm)')
+
+# Other optional arguments
+parser.add_argument('--liquid_equ_steps', type=int, help='Number of time steps used for equilibration', default=5000)
+parser.add_argument('--gas_xyzfile', help='TINKER .xyz file for the gas', type=str, default="mono.xyz")
+parser.add_argument('--gas_keyfile', help='TINKER .key file for the gas', type=str, default="mono.key")
+parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=50000)
+parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=1000000)
+parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=0.1)
+parser.add_argument('--gas_interval', type=float, help='Time interval for writing the gas-phase coordinates to disk, in picoseconds', default=0.1)
+
 args = parser.parse_args()
+
+# The convention of using the "iteration" as a fundamental unit comes from the OpenMM script.
+timestep         = args.liquid_timestep                            # timestep for integration in femtosecond
+nsteps           = int(1000 * args.liquid_interval / timestep)     # Number of time steps per interval (or "iteration") for saving coordinates (in steps)
+nequiliterations = args.liquid_equ_steps / nsteps                  # Number of iterations set aside for equilibration
+niterations      = args.liquid_prod_steps / nsteps                 # Number of production iterations
+
+# Simulation settings for the monomer.
+m_timestep         = args.gas_timestep
+m_nsteps           = int(1000 * args.gas_interval / m_timestep)
+m_nequiliterations = args.gas_equ_steps / m_nsteps
+m_niterations      = args.gas_prod_steps / m_nsteps
 
 temperature = args.temperature
 pressure    = args.pressure
@@ -186,26 +210,27 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     print "Running equilibration"
     # Run the equilibration.
     if pbc:
-        cmdstr = "./dynamic %s %i %f %f 4 %f %f" % (xin, nstep*neq, tstep, nstep*tstep/1000, temperature, pressure)
+        cmdstr = "./dynamic %s %i %f %f 4 %f %f" % (xin, nstep*neq, tstep, float(nstep*tstep)/1000, temperature, pressure)
     else:
-        cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*neq, tstep, nstep*tstep/1000, temperature)
+        cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*neq, tstep, float(nstep*tstep)/1000, temperature)
     _exec(cmdstr,print_command=verbose,print_to_screen=verbose)
     _exec("rm -f %s.arc %s.box" % (basename, basename),print_command=verbose,print_to_screen=verbose)
     # Run the production.
     print "Running production"
     if pbc:
-        cmdstr = "./dynamic %s %i %f %f 4 %f %f" % (xin, nstep*npr, tstep, nstep*tstep/1000, temperature, pressure)
+        cmdstr = "./dynamic %s %i %f %f 4 %f %f" % (xin, nstep*npr, tstep, float(nstep*tstep/1000), temperature, pressure)
     else:
-        cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*npr, tstep, nstep*tstep/1000, temperature)
+        cmdstr = "./dynamic %s %i %f %f 2 %f" % (xin, nstep*npr, tstep, float(nstep*tstep/1000), temperature)
     odyn = _exec(cmdstr,print_command=verbose,print_to_screen=verbose)
 
     edyn = []
-    for line in odyn.split('\n'):
+    for line in odyn:
         if 'Current Potential' in line:
             edyn.append(float(line.split()[2]))
 
     edyn = np.array(edyn) * 4.184
 
+    print "Post-processing to get the dipole moments"
     cmdstr = "./analyze %s" % xain
     oanl = _exec(cmdstr,stdin="G,E",print_command=verbose,print_to_screen=verbose)
 
@@ -213,7 +238,7 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     eanl = []
     dip = []
     mass = 0.0
-    for line in oanl.split('\n'):
+    for line in oanl:
         if 'Total System Mass' in line:
             mass = float(line.split()[-1])
         if 'Total Potential Energy : ' in line:
@@ -266,14 +291,14 @@ def energy_driver(mvals,FF,xyz,tky,verbose=False,dipole=False):
 
     # Read potential energy from file.
     E = []
-    for line in oanl.split('\n'):
+    for line in oanl:
         if 'Total Potential Energy : ' in line:
             E.append(float(line.split()[4]))
     E = np.array(E) * 4.184
     if dipole:
         # If desired, read dipole from file.
         D = []
-        for line in oanl.split('\n'):
+        for line in oanl:
             if 'Dipole X,Y,Z-Components :' in line:
                 D.append([float(line.split()[i]) for i in range(-3,0)])
         D = np.array(D)
@@ -423,11 +448,12 @@ def property_derivatives(mvals,h,FF,xyz,tky,kT,property_driver,property_kwargs,A
 def main():
 
     """
-    Usage: (runcuda.sh) npt.py input.xyz [-k input.key] <temperature> <pressure>
+    Run the script with -h for help
+    Usage: python npt_tinker.py input.xyz [-k input.key] liquid_production_steps liquid_timestep liquid_interval temperature(K) pressure(atm)
     """
 
-    if not os.path.exists(args.xyzfile):
-        warn_press_key("Warning: %s does not exist, script cannot continue" % args.xyzfile)
+    if not os.path.exists(args.liquid_xyzfile):
+        warn_press_key("Warning: %s does not exist, script cannot continue" % args.liquid_xyzfile)
 
     # Set up some conversion factors
     # All units are in kJ/mol
@@ -451,29 +477,45 @@ def main():
     FF.make(mvals)
 
     #=================================================================#
+    #     Get the number of molecules from the liquid xyz file.       #
+    #=================================================================#
+
+    xin = "%s" % args.liquid_xyzfile + ("" if args.liquid_keyfile == None else " -k %s" % args.liquid_keyfile)
+    cmdstr = "./analyze %s" % xin
+    oanl = _exec(cmdstr,stdin="G",print_command=True,print_to_screen=True)
+    molflag = False
+    for line in oanl:
+        if 'Number of Molecules' in line:
+            if not molflag:
+                NMol = int(line.split()[-1])
+                molflag = True
+            else:
+                raise Exception("TINKER output contained more than one line with the words 'Number of Molecules'")
+    if molflag:
+        print "Detected %i Molecules" % NMol
+    if not molflag:
+        raise Exception("Failed to detect the number of molecules")
+
+    #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    Rhos, Energies, Volumes, Dips = run_simulation(args.xyzfile,args.keyfile,tstep=timestep,nstep=nsteps,neq=nequiliterations,npr=niterations,verbose=True)
+    Rhos, Energies, Volumes, Dips = run_simulation(args.liquid_xyzfile,args.liquid_keyfile,tstep=timestep,nstep=nsteps,neq=nequiliterations,npr=niterations,verbose=True)
     V  = Volumes
     pV = pressure * Volumes
     H = Energies + pV
 
     # Get the energy and dipole gradients.
     print "Post-processing the liquid simulation snapshots."
-    G, GDx, GDy, GDz = energy_dipole_derivatives(mvals,h,FF,args.xyzfile,args.keyfile,AGrad)
+    G, GDx, GDy, GDz = energy_dipole_derivatives(mvals,h,FF,args.liquid_xyzfile,args.liquid_keyfile,AGrad)
     print
 
     #==============================================#
     # Now run the simulation for just the monomer. #
     #==============================================#
-    m_timestep = 0.10                     # timestep for integration in femtosecond
-    m_nsteps = 100                        # one "iteration" = one interval for saving coordinates (in steps)
-    m_nequiliterations = 50               # number of equilibration iterations
-    m_niterations = 1000                  # number of production iterations
-    _a, mEnergies, _b, _c = run_simulation("mono.xyz","mono.key",tstep=m_timestep,nstep=m_nsteps,neq=m_nequiliterations,npr=m_niterations,pbc=False)
+    _a, mEnergies, _b, _c = run_simulation(args.gas_xyzfile,args.gas_keyfile,tstep=m_timestep,nstep=m_nsteps,neq=m_nequiliterations,npr=m_niterations,pbc=False)
     mN = len(mEnergies)
     print "Post-processing the gas simulation snapshots."
-    mG = energy_derivatives(mvals,h,FF,"mono.xyz","mono.key",AGrad)
+    mG = energy_derivatives(mvals,h,FF,args.gas_xyzfile,args.gas_keyfile,AGrad)
     print
 
     numboots = 1000    
@@ -514,7 +556,7 @@ def main():
 
     if FDCheck:
         Sep = printcool("Numerical Derivative:")
-        GRho1 = property_derivatives(mvals, h, FF, args.xyzfile, args.keyfile, kT, calc_arr, {'arr':Rhos})
+        GRho1 = property_derivatives(mvals, h, FF, args.liquid_xyzfile, args.liquid_keyfile, kT, calc_arr, {'arr':Rhos})
         FF.print_map(vals=GRho1)
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GRho, GRho1)]
@@ -528,17 +570,17 @@ def main():
     mPot_err *= np.sqrt(statisticalInefficiency(mEnergies))
     pV_err   *= np.sqrt(statisticalInefficiency(pV))
 
-    Hvap_avg = mPot_avg - Pot_avg / 216 + kT - np.mean(pV) / 216
-    Hvap_err = np.sqrt(Pot_err**2 / 216**2 + mPot_err**2 + pV_err**2/216**2)
+    Hvap_avg = mPot_avg - Pot_avg / NMol + kT - np.mean(pV) / NMol
+    Hvap_err = np.sqrt(Pot_err**2 / NMol**2 + mPot_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
     GHvap = np.mean(G,axis=1)
     GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Pot_avg * np.mean(G, axis=1))
-    GHvap /= 216
+    GHvap /= NMol
     GHvap -= np.mean(mG,axis=1)
     GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mPot_avg * np.mean(mG, axis=1))
     GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)) / 216
+    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
     print "Box energy:", np.mean(Energies)
     print "Monomer energy:", np.mean(mEnergies)
@@ -575,7 +617,7 @@ def main():
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
-        GAlpha_fd = property_derivatives(mvals, h, FF, args.xyzfile, args.keyfile, kT, calc_alpha, {'h_':H,'v_':V})
+        GAlpha_fd = property_derivatives(mvals, h, FF, args.liquid_xyzfile, args.liquid_keyfile, kT, calc_alpha, {'h_':H,'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GAlpha_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -604,7 +646,7 @@ def main():
     GKappa  = bar_unit*(GKappa1 + GKappa2 + GKappa3)
     FF.print_map(vals=GKappa)
     if FDCheck:
-        GKappa_fd = property_derivatives(mvals, h, FF, args.xyzfile, args.keyfile, kT, calc_kappa, {'v_':V})
+        GKappa_fd = property_derivatives(mvals, h, FF, args.liquid_xyzfile, args.liquid_keyfile, kT, calc_kappa, {'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GKappa_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -616,7 +658,7 @@ def main():
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         if b == None: b = np.ones(len(h_),dtype=float)
-        Cp_  = 1/(216*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
+        Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
         Cp_ *= 1000 / 4.184
         return Cp_
 
@@ -624,14 +666,14 @@ def main():
     Cp_err *= np.sqrt(statisticalInefficiency(H))
 
     ## Isobaric heat capacity analytic derivative
-    GCp1 = 2*covde(H) * 1000 / 4.184 / (216*kT*T)
-    GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (216*kT*T)
-    GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (216*kT*T)
+    GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+    GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
+    GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
     GCp  = GCp1 + GCp2 + GCp3
     Sep = printcool("Isobaric heat capacity:        % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:
-        GCp_fd = property_derivatives(mvals, h, FF, args.xyzfile, args.keyfile, kT, calc_cp, {'h_':H})
+        GCp_fd = property_derivatives(mvals, h, FF, args.liquid_xyzfile, args.liquid_keyfile, kT, calc_cp, {'h_':H})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GCp_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -658,6 +700,7 @@ def main():
         return prefactor*D2/bzavg(v_,b)/T
 
     Eps0, Eps0_err = bootstats(calc_eps0,{'d_':Dips, 'v_':V})
+    Eps0 += 1.0
     Eps0_err *= np.sqrt(np.mean([statisticalInefficiency(Dips[:,0]),statisticalInefficiency(Dips[:,1]),statisticalInefficiency(Dips[:,2])]))
 
     ## Dielectric constant analytic derivative
@@ -672,7 +715,7 @@ def main():
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)
     if FDCheck:
-        GEps0_fd = property_derivatives(mvals, h, FF, args.xyzfile, args.keyfile, kT, calc_eps0, {'d_':Dips,'v_':V})
+        GEps0_fd = property_derivatives(mvals, h, FF, args.liquid_xyzfile, args.liquid_keyfile, kT, calc_eps0, {'d_':Dips,'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GEps0_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -682,7 +725,7 @@ def main():
     ## Print the final force field.
     pvals = FF.make(mvals)
 
-    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err),f)
+    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
 
 if __name__ == "__main__":
     main()
