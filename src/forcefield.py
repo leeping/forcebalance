@@ -207,17 +207,19 @@ class FF(ForceBalanceBaseClass):
         ## File names of force fields
         self.set_option(options,'forcefield','fnms')
         ## Directory containing force fields, relative to project directory
-        self.set_option(options,'ffdir','ffdir')
+        self.set_option(options,'ffdir')
         ## Priors given by the user :)
-        self.set_option(options,'priors','priors')
+        self.set_option(options,'priors')
         ## Whether to constrain the charges.
-        self.set_option(options,'constrain_charge','constrain_charge')
+        self.set_option(options,'constrain_charge')
         ## Whether to constrain the charges.
-        self.set_option(options,'logarithmic_map','logarithmic_map')
+        self.set_option(options,'logarithmic_map')
         ## Switch for AMOEBA direct or mutual.
         self.set_option(None, None, 'amoeba_pol', options['amoeba_polarization'].lower(), 'direct')
         ## Switch for rigid water molecules
-        self.set_option(options, 'rigid_water', 'rigid_water')
+        self.set_option(options, 'rigid_water')
+        ## Bypass the transformation and use physical parameters directly
+        self.set_option(options, 'use_pvals')
         
         #======================================#
         #     Variables which are set here     #
@@ -387,11 +389,11 @@ class FF(ForceBalanceBaseClass):
         ffname = ffname.split(':')[0]
 
         # Set the Tinker PRM file, which will help for running programs like "analyze".
-        # if fftype == "tinker":
-        #     if hasattr(self, "tinkerprm"):
-        #         warn_press_key("There should only be one TINKER parameter file")
-        #     else:
-        #         self.tinkerprm = ffname
+        if fftype == "tinker":
+            if hasattr(self, "tinkerprm"):
+                warn_press_key("There should only be one TINKER parameter file")
+            else:
+                self.tinkerprm = ffname
 
         # Set the OpenMM XML file, which will help for running OpenMM.
         if fftype == "openmm":
@@ -587,7 +589,7 @@ class FF(ForceBalanceBaseClass):
                 evalcmd  = field.strip().split('=')[1]
                 self.assign_field(None,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
             
-    def make(self,vals,usepvals=False,printdir=None,precision=12):
+    def make(self,vals,use_pvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.
         
         This big kahuna does a number of things:
@@ -602,11 +604,12 @@ class FF(ForceBalanceBaseClass):
         this is relative to the project root directory.
         @param[in] vals Input parameters.  I previously had an option where it uses
         stored values in the class state, but I don't think that's a good idea anymore.
-        @param[in] usepvals Switch for whether to bypass the coordinate transformation
+        @param[in] use_pvals Switch for whether to bypass the coordinate transformation
         and use physical parameters directly.
         
         """
-        if usepvals:
+        if use_pvals or self.use_pvals:
+            print "Using physical parameters directly!\r",
             pvals = vals.copy()
         else:
             pvals = self.create_pvals(vals)

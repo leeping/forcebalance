@@ -83,7 +83,7 @@ class LeastSquares(Target):
         np = len(mvals)
         G = zeros(np,dtype=float)
         H = zeros((np,np),dtype=float)
-        pvals = self.FF.make(mvals,self.usepvals)
+        pvals = self.FF.make(mvals)
         if float('Inf') in pvals:
             return {'X' : 1e10, 'G' : G, 'H' : H}
         Ans = self.driver()

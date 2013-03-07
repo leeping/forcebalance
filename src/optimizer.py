@@ -32,20 +32,20 @@ class Optimizer(ForceBalanceBaseClass):
     targets (i.e. we cannot treat it as a fully independent numerical optimizer).
     The dependency is rather weak which suggests that I can remove it someday.
     """
-    
+        
     def __init__(self,options,Objective,FF):
-        """ Instantiation of the optimizer.
-
+        """ Create an Optimizer object.
+        
         The optimizer depends on both the FF and the fitting targets so there
         is a chain of dependencies: FF --> FitSim --> Optimizer, and FF --> Optimizer
-
+        
         Here's what we do:
         - Take options from the parser
         - Pass in the objective function, force field, all fitting targets
 
         """
         super(Optimizer, self).__init__(options)
-        
+
         ## A list of all the things we can ask the optimizer to do.
         self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
                           'NEWTON'            : self.NewtonRaphson, 
@@ -353,7 +353,7 @@ class Optimizer(ForceBalanceBaseClass):
             else:
                 if X > X_best:
                     Best_Step = 0
-                    color = "\x1b[93m"
+                    color = "\x1b[40m\x1b[93m"
                 else:
                     Best_Step = 1
                     color = "\x1b[92m"
@@ -783,8 +783,7 @@ class Optimizer(ForceBalanceBaseClass):
                 vals = self.mvals0.copy()
             else:
                 print "Scanning parameter %i (%s) in the physical space" % (pidx,self.FF.plist[pidx])
-                for Sim in self.Objective.Targets:
-                    Sim.usepvals = True
+                self.FF.use_pvals = True
                 vals = self.FF.pvals0.copy()
             for i in scanvals:
                 vals[pidx] = i
@@ -837,8 +836,8 @@ class Optimizer(ForceBalanceBaseClass):
             Denom = Denom > 1e-8 and Denom or 1e-8
             D = Adata[i] - Fdata[i]
             Q = (Adata[i] - Fdata[i])/Denom
-            cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
-            cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
+            cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[40m\x1b[93m" or "\x1b[92m"))
+            cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[40m\x1b[93m" or "\x1b[92m"))
             print "\r    %-8i%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
                   % (i, self.FF.plist[i][:20], Adata[i], Fdata[i], cD, D, cQ, Q)
 
@@ -877,8 +876,8 @@ class Optimizer(ForceBalanceBaseClass):
                 Denom = Denom > 1e-8 and Denom or 1e-8
                 D = Adata[i,j] - Fdata[i,j]
                 Q = (Adata[i,j] - Fdata[i,j])/Denom
-                cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
-                cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
+                cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[40m\x1b[93m" or "\x1b[92m"))
+                cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[40m\x1b[93m" or "\x1b[92m"))
                 print "\r    %-8i%-20s%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
                       % (i, self.FF.plist[i][:20], self.FF.plist[j][:20], Adata[i,j], Fdata[i,j], cD, D, cQ, Q)
 
@@ -890,7 +889,7 @@ class Optimizer(ForceBalanceBaseClass):
             if os.path.exists(absfnm):
                 self.chk = pickle.load(open(absfnm))
             else:
-                print "\x1b[1;93mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)"
+                print "\x1b[40m\x1b[1;93mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)"
         return self.chk
 
     def writechk(self):

@@ -67,24 +67,50 @@ from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p
 from forcebalance.molecule import Molecule
 from forcebalance.openmmio import *
+import argparse
 
 #======================================================#
 # Global, user-tunable variables (simulation settings) #
 #======================================================#
 
-# Select run parameters
-timestep = 0.50 * femtosecond        # timestep for integration
-faststep = 0.25 * femtosecond        # timestep for "fast" forces in Multiple Timestep integrator
-nsteps = 100                         # number of steps per iteration
-nequiliterations = 500               # number of equilibration iterations
-niterations = 40000                  # number of iterations to collect data for
+parser = argparse.ArgumentParser()
+parser.add_argument('liquid_pdbfile', help='PDB File for the liquid')
+parser.add_argument('openmm_xmlfile', help='OpenMM Parameter XML File for the liquid, contained within forcebalance.p')
+parser.add_argument('liquid_prod_steps', type=int, help='Number of time steps for the liquid production simulation')
+parser.add_argument('liquid_timestep', type=float, help='Length of the time step for the liquid simulation, in femtoseconds')
+parser.add_argument('liquid_interval', type=float, help='Time interval for saving the liquid coordinates, in picoseconds')
+parser.add_argument('temperature',type=float, help='Temperature (K)')
+parser.add_argument('pressure',type=float, help='Pressure (Atm)')
 
-# Set temperature, pressure, and collision rate for stochastic thermostats.
-temperature = float(sys.argv[3]) * kelvin
-pressure = float(sys.argv[4]) * atmospheres
-collision_frequency = 1.0 / picosecond
-barostat_frequency = 10             # number of steps between MC volume adjustments
-nprint = 1
+# Other optional arguments
+parser.add_argument('--liquid_equ_steps', type=int, help='Number of time steps used for equilibration', default=100000)
+parser.add_argument('--gas_pdbfile', help='TINKER .xyz file for the gas', type=str, default="mono.pdb")
+parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=100000)
+parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=1000000)
+parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=0.5)
+parser.add_argument('--gas_interval', type=float, help='Time interval for saving the gas-phase coordinates, in picoseconds', default=0.1)
+
+args = parser.parse_args()
+
+# The convention of using the "iteration" as a fundamental unit comes from the OpenMM script.
+timestep         = args.liquid_timestep * femtosecond                          # timestep for integration in femtosecond
+faststep         = 0.25 * femtosecond                                          # "fast" timestep (for MTS integrator, if used)
+nsteps           = int(1000 * args.liquid_interval / args.liquid_timestep)     # Number of time steps per interval (or "iteration") for saving coordinates (in steps)
+nequiliterations = args.liquid_equ_steps / nsteps                              # Number of iterations set aside for equilibration
+niterations      = args.liquid_prod_steps / nsteps                             # Number of production iterations
+
+print "I will perform %i iterations of %i x %.3f fs time steps each" % (niterations, nsteps, args.liquid_timestep)
+
+# Simulation settings for the monomer.
+m_timestep         = args.gas_timestep * femtosecond
+m_nsteps           = int(1000 * args.gas_interval / args.gas_timestep)
+m_nequiliterations = args.gas_equ_steps / m_nsteps
+m_niterations      = args.gas_prod_steps / m_nsteps
+
+temperature = args.temperature * kelvin                            # temperature in kelvin
+pressure    = args.pressure * atmospheres                          # pressure in atmospheres
+collision_frequency = 1.0 / picosecond                             # Langevin barostat friction / random force parameter
+barostat_frequency = 10                                            # number of steps between MC volume adjustments
 
 # Flag to set verbose debug output
 verbose = True
@@ -473,7 +499,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
             volume = 0.0 * nanometers ** 3
             density = 0.0 * kilogram / meter ** 3
         kinetic_temperature = 2.0 * kinetic / kB / ndof # (1/2) ndof * kB * T = KE
-        if verbose and (iteration%nprint==0):
+        if verbose:
             print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds,
                                                              kinetic_temperature / kelvin, potential / kilojoules_per_mole,
                                                              volume / nanometers**3, density / (kilogram / meter**3))
@@ -496,7 +522,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
             volume = 0.0 * nanometers ** 3
             density = 0.0 * kilogram / meter ** 3
         kinetic_temperature = 2.0 * kinetic / kB / ndof
-        if verbose and (iteration%nprint==0):
+        if verbose:
             print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds, kinetic_temperature / kelvin, potential / kilojoules_per_mole, volume / nanometers**3, density / (kilogram / meter**3))
         # Store properties.
         data['time'][iteration] = state.getTime()
@@ -807,6 +833,8 @@ def main():
 
     # Create an OpenMM PDB object so we may make the Simulation class.
     pdb = PDBFile(sys.argv[1])
+    # The number of molecules can be determined here.
+    NMol = len(list(pdb.topology.residues()))
     # Load the force field in from the ForceBalance pickle.
     FF,mvals,h,AGrad = lp_load(open('forcebalance.p'))
     # Create the force field XML files.
@@ -862,10 +890,10 @@ def main():
     # Now run the simulation for just the monomer. #
     #==============================================#
     global timestep, nsteps, niterations, nequiliterations
-    timestep = 0.5 * femtosecond       # timestep for integration
-    nsteps   = 100                     # number of steps per data record
-    nequiliterations = 500             # number of equilibration iterations
-    niterations = 10000                # number of iterations to collect data for
+    timestep = m_timestep
+    nsteps   = m_nteps
+    nequiliterations = m_nequiliterations
+    niterations = m_niterations
 
     mpdb = PDBFile('mono.pdb')
     mData, mXyzs, _trash, _crap, mEnergies, _nah, _dontneed, mSim = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False)
@@ -882,18 +910,18 @@ def main():
     kT = (kB * temperature).value_in_unit(kilojoule_per_mole)
 
     # The enthalpy of vaporization in kJ/mol.
-    Hvap_avg = mPot_avg - Pot_avg / 216 + kT - np.mean(pV) / 216
-    Hvap_err = np.sqrt(Pot_err**2 / 216**2 + mPot_err**2 + pV_err**2/216**2)
+    Hvap_avg = mPot_avg - Pot_avg / NMol + kT - np.mean(pV) / NMol
+    Hvap_err = np.sqrt(Pot_err**2 / NMol**2 + mPot_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
     # We don't pass it back, but nice for printing.
     GHvap = np.mean(G,axis=1)
     GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Pot_avg * np.mean(G, axis=1))
-    GHvap /= 216
+    GHvap /= NMol
     GHvap -= np.mean(mG,axis=1)
     GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mPot_avg * np.mean(mG, axis=1))
     GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)) / 216
+    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
     print "The finite difference step size is:",h
 
@@ -1007,7 +1035,7 @@ def main():
         if b == None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
-        Cp_  = 1/(216*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
+        Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
         Cp_ *= 1000 / 4.184
         return Cp_
     Cp = calc_cp(None,**{'h_':H})
@@ -1019,9 +1047,9 @@ def main():
     Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(H))
 
     ## Isobaric heat capacity analytic derivative
-    GCp1 = 2*covde(H) * 1000 / 4.184 / (216*kT*T)
-    GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (216*kT*T)
-    GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (216*kT*T)
+    GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+    GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
+    GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
     GCp  = GCp1 + GCp2 + GCp3
     Sep = printcool("Isobaric heat capacity:        % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
@@ -1081,7 +1109,7 @@ def main():
     ## Print the final force field.
     pvals = FF.make(mvals)
 
-    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err),f)
+    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
 
 if __name__ == "__main__":
     main()

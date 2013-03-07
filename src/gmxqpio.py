@@ -227,7 +227,7 @@ class Monomer_QTPIE(Target):
         np = len(mvals)
         G = Np.zeros(np,dtype=float)
         H = Np.zeros((np,np),dtype=float)
-        pvals = self.FF.make(mvals,self.usepvals)
+        pvals = self.FF.make(mvals)
 
         calc_moments = get_monomer_properties()
         

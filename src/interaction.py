@@ -150,7 +150,7 @@ class Interaction(Target):
 
         def callM(mvals_, dielectric=False):
             print "\r",
-            pvals = self.FF.make(mvals_, self.usepvals)
+            pvals = self.FF.make(mvals_)
             return self.interaction_driver_all(dielectric)
 
         print "Executing\r",
@@ -168,7 +168,7 @@ class Interaction(Target):
             for p in range(self.FF.np):
                 dV[p,:], _ = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = emm)
             # Create the force field one last time.
-            pvals  = self.FF.make(mvals,self.usepvals)
+            pvals  = self.FF.make(mvals)
                 
         Answer['X'] = dot(self.prefactor*D/self.divisor,D/self.divisor)
         for p in range(self.FF.np):

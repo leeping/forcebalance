@@ -246,7 +246,7 @@ class Liquid_OpenMM(Liquid):
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             queue_up(wq,
-                     command = './runcuda.sh python npt.py conf.pdb %s %.3f %.3f &> npt.out' % (self.FF.openmmxml, temperature, pressure),
+                     command = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps),
                      input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                      #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
                      output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml])
