@@ -1076,11 +1076,12 @@ class FF(ForceBalanceBaseClass):
         """ Create the plist, which is like a reversed version of the parameter map.  More convenient for printing. """
         if len(self.map) == 0:
             warn_press_key('The parameter map has no elements (Did you remember to specify a "forcefield" setting and tag the parameter files?)')
-        self.plist = [[] for j in range(max([self.map[i] for i in self.map])+1)]
-        for i in self.map:
-            self.plist[self.map[i]].append(i)
-        for i in range(self.np):
-            self.plist[i] = ' '.join(self.plist[i])
+        else:
+            self.plist = [[] for j in range(max([self.map[i] for i in self.map])+1)]
+            for i in self.map:
+                self.plist[self.map[i]].append(i)
+            for i in range(self.np):
+                self.plist[i] = ' '.join(self.plist[i])
             
     def print_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
