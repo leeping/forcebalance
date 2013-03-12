@@ -891,7 +891,7 @@ def main():
     #==============================================#
     global timestep, nsteps, niterations, nequiliterations
     timestep = m_timestep
-    nsteps   = m_nteps
+    nsteps   = m_nsteps
     nequiliterations = m_nequiliterations
     niterations = m_niterations
 

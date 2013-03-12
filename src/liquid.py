@@ -72,6 +72,15 @@ class Liquid(Target):
         self.set_option(tgt_opts,'manual')
         # Don't target the average enthalpy of vaporization and allow it to freely float (experimental)
         self.set_option(tgt_opts,'hvap_subaverage')
+        # Number of time steps in the liquid "equilibration" run
+        self.set_option(tgt_opts,'liquid_equ_steps',forceprint=True)
+        # Number of time steps in the liquid "production" run
+        self.set_option(tgt_opts,'liquid_prod_steps',forceprint=True)
+        # Time step length (in fs) for the liquid production run
+        self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
+        # Time interval (in ps) for writing coordinates
+        self.set_option(tgt_opts,'liquid_interval',forceprint=True)
+        # Dictionary of .dyn file locations for restarting simulations
         
         #======================================#
         #     Variables which are set here     #
@@ -346,22 +355,15 @@ class Liquid(Target):
                 for obs in self.RefData:
                     del self.RefData[obs][PT]
 
-        try:
-            # Assign variable names to all the stuff in npt_result.p
-            Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
-                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(15))
-            # Determine the number of molecules
-            if len(set(NMols)) != 1:
-                print NMols
-                raise Exception('The above list should only contain one number - the number of molecules')
-            else:
-                NMol = list(set(NMols))[0]
-        except:
-            # Stop-gap measure
-            print "Falling back to 216 molecules"
-            Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
-                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs = ([Results[t][i] for t in range(len(Points))] for i in range(14))
-            NMol = 216
+        # Assign variable names to all the stuff in npt_result.p
+        Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(15))
+        # Determine the number of molecules
+        if len(set(NMols)) != 1:
+            print NMols
+            raise Exception('The above list should only contain one number - the number of molecules')
+        else:
+            NMol = list(set(NMols))[0]
     
         R  = np.array(list(itertools.chain(*list(Rhos))))
         V  = np.array(list(itertools.chain(*list(Vols))))

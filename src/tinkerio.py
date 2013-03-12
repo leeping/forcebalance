@@ -31,7 +31,7 @@ pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals dista
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
          'ANGLE'        : {'Atom':[1,2,3], 4:'K',5:'B'},   # Angle force constant and equilibrium angle
          'UREYBRAD'     : {'Atom':[1,2,3], 4:'K',5:'B'},   # Urey-Bradley force constant and equilibrium distance (Angstrom)
-         'CHARGE'       : {'Atom':[1,2,3], 4:''},          # Atomic charge
+         'MCHARGE'       : {'Atom':[1,2,3], 4:''},          # Atomic charge
          'DIPOLE'       : {0:'X',1:'Y',2:'Z'},             # Dipole moment in local frame
          'QUADX'        : {0:'X'},                         # Quadrupole moment, X component
          'QUADY'        : {0:'X',1:'Y'},                   # Quadrupole moment, Y component
@@ -114,8 +114,8 @@ class Tinker_Reader(BaseReader):
         # This is kind of a silly hack that allows us to take care of the 'multipole' keyword,
         # because of the syntax that the TINKER .prm file uses.
         elif s[0].upper() == 'MULTIPOLE':
-            self.itype = 'CHARGE'
-        elif self.itype == 'CHARGE':
+            self.itype = 'MCHARGE'
+        elif self.itype == 'MCHARGE':
             self.itype = 'DIPOLE'
         elif self.itype == 'DIPOLE':
             self.itype = 'QUADX'
@@ -128,6 +128,7 @@ class Tinker_Reader(BaseReader):
 
         if self.itype in pdict:
             if 'Atom' in pdict[self.itype]:
+                print self.itype
                 # List the atoms in the interaction.
                 self.atom = [s[i] for i in pdict[self.itype]['Atom']]
             # The suffix of the parameter ID is built from the atom    #
@@ -227,15 +228,6 @@ def modify_key(src, in_dict):
 class Liquid_TINKER(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
-        # Number of time steps in the liquid "equilibration" run
-        self.set_option(tgt_opts,'liquid_equ_steps',forceprint=True)
-        # Number of time steps in the liquid "production" run
-        self.set_option(tgt_opts,'liquid_prod_steps',forceprint=True)
-        # Time step length (in fs) for the liquid production run
-        self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
-        # Time interval (in ps) for writing coordinates
-        self.set_option(tgt_opts,'liquid_interval',forceprint=True)
-        # Dictionary of .dyn file locations for restarting simulations
         self.DynDict = OrderedDict()
 
     def prepare_temp_directory(self,options,tgt_opts):

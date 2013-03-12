@@ -611,7 +611,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     if print_to_screen:
         # Since Python can't simultaneously redirect stdout to a pipe
         # and print stuff to screen in real time, we're going to use a 
-        # workaround with tmporary files.
+        # workaround with temporary files.
         # NOTE: This doesn't catch the return code.
         prestr = "set -o pipefail && "
         funstr = " 2> stderr.log | tee stdout.log"
@@ -628,6 +628,15 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             p.communicate(stdin)
         Output = ''.join(open('stdout.log').readlines())
         Error = ''.join(open('stderr.log').readlines())
+    elif append_to_file or write_to_file:
+        if stdin == None:
+            p = subprocess.Popen(command, shell=(type(command) is str), stdout = f, stderr = PIPE)
+            _, Error = p.communicate()
+        else:
+            p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = f, stderr = PIPE)
+            _, Error = p.communicate(stdin)
+        f.close()
+        Output = open(f.name).read()
     else:
         if stdin == None:
             p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = PIPE)
@@ -635,10 +644,9 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         else:
             p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = PIPE, stderr = PIPE)
             Output, Error = p.communicate(stdin)
-
-    if logfnm != None or outfnm != None:
-        f.write(Output)
-        f.close()
+    # if logfnm != None or outfnm != None:
+    #     f.write(Output)
+    #     f.close()
     if p.returncode != 0:
         print "Received an error message:"
         print Error
