@@ -85,9 +85,9 @@ parser.add_argument('pressure',type=float, help='Pressure (Atm)')
 # Other optional arguments
 parser.add_argument('--liquid_equ_steps', type=int, help='Number of time steps used for equilibration', default=100000)
 parser.add_argument('--gas_pdbfile', help='TINKER .xyz file for the gas', type=str, default="mono.pdb")
-parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=100000)
-parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=1000000)
-parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=0.5)
+parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=10000)
+parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=100000)
+parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=1.0)
 parser.add_argument('--gas_interval', type=float, help='Time interval for saving the gas-phase coordinates, in picoseconds', default=0.1)
 
 args = parser.parse_args()
@@ -98,12 +98,6 @@ faststep         = 0.25 * femtosecond                                          #
 nsteps           = int(1000 * args.liquid_interval / args.liquid_timestep)     # Number of time steps per interval (or "iteration") for saving coordinates (in steps)
 nequiliterations = args.liquid_equ_steps / nsteps                              # Number of iterations set aside for equilibration
 niterations      = args.liquid_prod_steps / nsteps                             # Number of production iterations
-
-print timestep
-print faststep
-print nsteps
-print nequiliterations
-print niterations
 
 print "I will perform %i iterations of %i x %.3f fs time steps each" % (niterations, nsteps, args.liquid_timestep)
 
