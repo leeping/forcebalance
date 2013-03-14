@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                   Last updated November 20, 2012                   |#
+#|                  Last updated March 12, 2013                       |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -105,7 +105,8 @@
 # qm_forces  = List of numpy arrays of atomistic forces from QM calculations
 # qm_espxyzs = List of numpy arrays of xyz coordinates for ESP evaluation
 # qm_espvals = List of numpy arrays of ESP values
-FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_interaction', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs'])
+FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_interaction', 
+                          'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
 #| must be a list along the atom axis,   |#
@@ -115,23 +116,23 @@ FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 
 # partial_charge = List of atomic partial charges 
 # atomname   = List of atom names (can come from MM coordinate file)
 # atomtype   = List of atom types (can come from MM force field)
-# abonds      = For each atom, the list of higher-numbered atoms it's bonded to
-# tinkersuf     = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
+# tinkersuf  = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
 # resid      = Residue IDs (can come from MM coordinate file)
 # resname    = Residue names
-AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'abonds', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost'])
+AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost'])
 #=========================================#
 #| This can be any data attribute we     |#
 #| want but it's usually some property   |#
 #| of the molecule not along the frame   |#
 #| atom axis.                            |#
 #=========================================#
+# bonds      = A list of 2-tuples representing bonds.  Carefully pruned when atom subselection is done.
 # fnm        = The file name that the class was built from
 # qcrems     = The Q-Chem 'rem' variables stored as a list of OrderedDicts
 # qctemplate = The Q-Chem template file, not including the coordinates or rem variables
 # charge     = The net charge of the molecule
 # mult       = The spin multiplicity of the molecule
-MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult'])
+MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult', 'bonds'])
 # Variable names relevant to quantum calculations explicitly
 QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost'])
 # Superset of all variable names.
@@ -171,20 +172,23 @@ Elements = ["None",'H','He',
             'Fr','Ra','Ac','Th','Pa','U','Np','Pu','Am','Cm','Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','Sg','Bh','Hs','Mt']
 
 # Dictionary of atomic masses ; also serves as the list of elements (periodic table)
-PeriodicTable = {'H' : 1.0079, 'He' : 4.0026, 
-                 'Li' : 6.941, 'Be' : 9.0122, 'B' : 10.811, 'C' : 12.0107, 'N' : 14.0067, 'O' : 15.9994, 'F' : 18.9984, 'Ne' : 20.1797,
-                 'Na' : 22.9897, 'Mg' : 24.305, 'Al' : 26.9815, 'Si' : 28.0855, 'P' : 30.9738, 'S' : 32.065, 'Cl' : 35.453, 'Ar' : 39.948, 
-                 'K' : 39.0983, 'Ca' : 40.078, 'Sc' : 44.9559, 'Ti' : 47.867, 'V' : 50.9415, 'Cr' : 51.9961, 'Mn' : 54.938, 'Fe' : 55.845, 'Co' : 58.9332, 
-                 'Ni' : 58.6934, 'Cu' : 63.546, 'Zn' : 65.39, 'Ga' : 69.723, 'Ge' : 72.64, 'As' : 74.9216, 'Se' : 78.96, 'Br' : 79.904, 'Kr' : 83.8, 
-                 'Rb' : 85.4678, 'Sr' : 87.62, 'Y' : 88.9059, 'Zr' : 91.224, 'Nb' : 92.9064, 'Mo' : 95.94, 'Tc' : 98, 'Ru' : 101.07, 'Rh' : 102.9055, 
-                 'Pd' : 106.42, 'Ag' : 107.8682, 'Cd' : 112.411, 'In' : 114.818, 'Sn' : 118.71, 'Sb' : 121.76, 'Te' : 127.6, 'I' : 126.9045, 'Xe' : 131.293, 
-                 'Cs' : 132.9055, 'Ba' : 137.327, 'La' : 138.9055, 'Ce' : 140.116, 'Pr' : 140.9077, 'Nd' : 144.24, 'Pm' : 145, 'Sm' : 150.36, 
-                 'Eu' : 151.964, 'Gd' : 157.25, 'Tb' : 158.9253, 'Dy' : 162.5, 'Ho' : 164.9303, 'Er' : 167.259, 'Tm' : 168.9342, 'Yb' : 173.04, 
-                 'Lu' : 174.967, 'Hf' : 178.49, 'Ta' : 180.9479, 'W' : 183.84, 'Re' : 186.207, 'Os' : 190.23, 'Ir' : 192.217, 'Pt' : 195.078, 
-                 'Au' : 196.9665, 'Hg' : 200.59, 'Tl' : 204.3833, 'Pb' : 207.2, 'Bi' : 208.9804, 'Po' : 209, 'At' : 210, 'Rn' : 222, 
-                 'Fr' : 223, 'Ra' : 226, 'Ac' : 227, 'Th' : 232.0381, 'Pa' : 231.0359, 'U' : 238.0289, 'Np' : 237, 'Pu' : 244, 
-                 'Am' : 243, 'Cm' : 247, 'Bk' : 247, 'Cf' : 251, 'Es' : 252, 'Fm' : 257, 'Md' : 258, 'No' : 259, 
-                 'Lr' : 262, 'Rf' : 261, 'Db' : 262, 'Sg' : 266, 'Bh' : 264, 'Hs' : 277, 'Mt' : 268}
+PeriodicTable = OrderedDict([('H' , 1.0079), ('He' , 4.0026), 
+                             ('Li' , 6.941), ('Be' , 9.0122), ('B' , 10.811), ('C' , 12.0107), ('N' , 14.0067), ('O' , 15.9994), ('F' , 18.9984), ('Ne' , 20.1797),
+                             ('Na' , 22.9897), ('Mg' , 24.305), ('Al' , 26.9815), ('Si' , 28.0855), ('P' , 30.9738), ('S' , 32.065), ('Cl' , 35.453), ('Ar' , 39.948), 
+                             ('K' , 39.0983), ('Ca' , 40.078), ('Sc' , 44.9559), ('Ti' , 47.867), ('V' , 50.9415), ('Cr' , 51.9961), ('Mn' , 54.938), ('Fe' , 55.845), ('Co' , 58.9332), 
+                             ('Ni' , 58.6934), ('Cu' , 63.546), ('Zn' , 65.39), ('Ga' , 69.723), ('Ge' , 72.64), ('As' , 74.9216), ('Se' , 78.96), ('Br' , 79.904), ('Kr' , 83.8), 
+                             ('Rb' , 85.4678), ('Sr' , 87.62), ('Y' , 88.9059), ('Zr' , 91.224), ('Nb' , 92.9064), ('Mo' , 95.94), ('Tc' , 98), ('Ru' , 101.07), ('Rh' , 102.9055), 
+                             ('Pd' , 106.42), ('Ag' , 107.8682), ('Cd' , 112.411), ('In' , 114.818), ('Sn' , 118.71), ('Sb' , 121.76), ('Te' , 127.6), ('I' , 126.9045), ('Xe' , 131.293), 
+                             ('Cs' , 132.9055), ('Ba' , 137.327), ('La' , 138.9055), ('Ce' , 140.116), ('Pr' , 140.9077), ('Nd' , 144.24), ('Pm' , 145), ('Sm' , 150.36), 
+                             ('Eu' , 151.964), ('Gd' , 157.25), ('Tb' , 158.9253), ('Dy' , 162.5), ('Ho' , 164.9303), ('Er' , 167.259), ('Tm' , 168.9342), ('Yb' , 173.04), 
+                             ('Lu' , 174.967), ('Hf' , 178.49), ('Ta' , 180.9479), ('W' , 183.84), ('Re' , 186.207), ('Os' , 190.23), ('Ir' , 192.217), ('Pt' , 195.078), 
+                             ('Au' , 196.9665), ('Hg' , 200.59), ('Tl' , 204.3833), ('Pb' , 207.2), ('Bi' , 208.9804), ('Po' , 209), ('At' , 210), ('Rn' , 222), 
+                             ('Fr' , 223), ('Ra' , 226), ('Ac' , 227), ('Th' , 232.0381), ('Pa' , 231.0359), ('U' , 238.0289), ('Np' , 237), ('Pu' , 244), 
+                             ('Am' , 243), ('Cm' , 247), ('Bk' , 247), ('Cf' , 251), ('Es' , 252), ('Fm' , 257), ('Md' , 258), ('No' , 259), 
+                             ('Lr' , 262), ('Rf' , 261), ('Db' , 262), ('Sg' , 266), ('Bh' , 264), ('Hs' , 277), ('Mt' , 268)])
+
+def getElement(mass):
+    return PeriodicTable.keys()[np.argmin([np.abs(m-mass) for m in PeriodicTable.values()])]
 
 #============================#
 #| DCD read/write functions |#
@@ -593,7 +597,7 @@ class Molecule(object):
             for key in self.AtomKeys:
                 Defined = True
                 if L != -1 and len(self.Data[key]) != L:
-                    raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two AtomKeys member variables.' % (key, klast))
+                    raise Exception('The keys %s and %s have different lengths (%i %i) - this isn\'t supposed to happen for two AtomKeys member variables.' % (key, klast, len(self.Data[key]), len(self.Data[klast])))
                 L = len(self.Data[key])
                 klast = key
             if Defined:
@@ -601,7 +605,8 @@ class Molecule(object):
             elif 'xyzs' in self.Data:
                 return len(self.xyzs[0])
             else:
-                raise Exception('na is ill-defined if the molecule has no AtomKeys member variables.')
+                return 0
+            #raise Exception('na is ill-defined if the molecule has no AtomKeys member variables.')
         ## These attributes return a list of attribute names defined in this class that belong in the chosen category.
         ## For example: self.FrameKeys should return set(['xyzs','boxes']) if xyzs and boxes exist in self.Data
         elif key == 'FrameKeys':
@@ -778,6 +783,8 @@ class Molecule(object):
             if ftype == None:
                 ## Try to determine from the file name using the extension.
                 ftype = os.path.splitext(fnm)[1][1:]
+            if not os.path.exists(fnm):
+                raise Exception('Tried to create Molecule object from a file that does not exist')
             self.Data['ftype'] = ftype
             ## Actually read the file.
             Parsed = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)
@@ -793,14 +800,14 @@ class Molecule(object):
             # for i in range(len(self.comms)):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
-            if 'networkx' in sys.modules and self.na < 500:
-                try:
+            try:
+                if 'networkx' in sys.modules and self.na:
                     self.topology = self.build_topology()
                     self.molecules = nx.connected_component_subgraphs(self.topology)
                     if 'bonds' not in self.Data:
                         self.Data['bonds'] = self.topology.edges()
-                except:
-                    pass # Address this later ; topology builds may fail if certain things are missing
+            except:
+                pass # Address this later ; topology builds may fail if certain things are missing
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -828,6 +835,10 @@ class Molecule(object):
             raise Exception("Output file name and file type are not specified.")
         elif ftype == None:
             ftype = os.path.splitext(fnm)[1][1:]
+        ## Fill in comments.
+        if len(self.comms) < len(self.xyzs):
+            for i in range(len(self.comms), len(self.xyzs)):
+                self.comms.append("Frame %i: generated by ForceBalance" % i)
         ## I needed to add in this line because the DCD writer requires the file name,
         ## but the other methods don't.
         self.fout = fnm
@@ -852,6 +863,10 @@ class Molecule(object):
     #|         Useful functions          |#
     #|     For doing useful things       |#
     #=====================================#
+
+    def center_of_mass(self):
+        M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
+        return [np.sum([xyz[i,:] * PeriodicTable[self.elem[i]] / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs]
 
     def load_frames(self, fnm):
         NewMol = Molecule(fnm)
@@ -941,6 +956,11 @@ class Molecule(object):
         if 'xyzs' in self.Data:
             for i in range(self.ns):
                 New.xyzs[i] = self.xyzs[i][atomslice]
+        if 'bonds' in self.Data:
+            # print self.bonds
+            # print atomslice
+            # print [(b[0] in atomslice and b[1] in atomslice) for b in self.bonds]
+            New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
         return New
 
     def align_by_moments(self):
@@ -1243,6 +1263,9 @@ class Molecule(object):
                 thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
             elem.append(thiselem)
 
+        resname = [data.compounds.items()[0][0] for i in range(len(elem))]
+        resid = [1 for i in range(len(elem))]
+        
         bonds    = [[] for i in range(len(elem))]
         for bond in data.compounds.items()[0][1].bonds:
             a1 = bond.origin_atom_id - 1
@@ -1250,12 +1273,21 @@ class Molecule(object):
             aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
             bonds[aL].append(aH)
 
+        # bonds = []
+        # for bond in data.compounds.items()[0][1].bonds:
+        #     a1 = bond.origin_atom_id - 1
+        #     a2 = bond.target_atom_id - 1
+        #     aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
+        #     bonds.append((aL,aH))
+
         Answer = {'xyzs' : [np.array(xyz)],
                   'partial_charge' : charge,
                   'atomname' : atomname,
                   'atomtype' : atomtype,
                   'elem'     : elem,
-                  'abonds'    : bonds
+                  'resname'  : resname,
+                  'resid'    : resid,
+                  'abonds'   : bonds
                   }
 
         return Answer
@@ -1709,8 +1741,12 @@ class Molecule(object):
         xyz      = []
         elem     = []
         elemThis = []
+        mkchg    = []
+        mkspn    = []
+        mkchgThis= []
+        mkspnThis= []
         XMode    = 0
-        ffd      = 0
+        MMode    = 0
         conv     = []
         convThis = 0
         readChargeMult = 0
@@ -1758,9 +1794,23 @@ class Molecule(object):
                     xyzs.append(np.array(xyz))
                     xyz  = []
                     XMode = 0
-                    ffd  = 1
+            if MMode >= 1:
+                # Perfectionist here; matches integer, element, and two floating points
+                if re.match("^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){2}$", line):
+                    MMode = 2
+                    sline = line.split()
+                    mkchgThis.append(float(sline[2]))
+                    mkspnThis.append(float(sline[3]))
+                elif MMode == 2: # Break out of the loop if we encounter anything other than Mulliken charges
+                    mkchg.append(mkchgThis[:])
+                    mkspn.append(mkspnThis[:])
+                    mkchgThis = []
+                    mkspnThis = []
+                    MMode = 0
             elif re.match("Standard Nuclear Orientation".lower(), line.lower()):
                 XMode = 1
+            elif re.match("Ground-State Mulliken Net Atomic Charges".lower(), line.lower()):
+                MMode = 1
             for key, val in float_match.items():
                 if re.match(val[0].lower(), line.lower()):
                     Floats[key].append(float(line.split()[val[1]]))
@@ -1846,6 +1896,11 @@ class Molecule(object):
         if 'qm_forces' in Answer:
             for i, frc in enumerate(Answer['qm_forces']):
                 Answer['qm_forces'][i] = frc.T
+        # A strange peculiarity; Q-Chem sometimes prints out the final Mulliken charges a second time, after the geometry optimization.
+        if mkchg != []:
+            Answer['qm_mulliken_charges'] = np.array(mkchg[:len(Answer['qm_energies'])])
+        if mkspn != []:
+            Answer['qm_mulliken_spins'] = np.array(mkspn[:len(Answer['qm_energies'])])
 
         return Answer
     
@@ -2019,6 +2074,8 @@ class Molecule(object):
         RESNUMS = self.resid
 
         out = []
+        if min(RESNUMS) == 0:
+            RESNUMS = [i+1 for i in RESNUMS]
 
         for I in select:
             XYZ = self.xyzs[I]
@@ -2060,6 +2117,9 @@ class Molecule(object):
                 if ATOMNUM!=-1:
                     out.append(line.tostring())
             out.append('ENDMDL')
+        if 'bonds' in self.Data:
+            connects = ["CONECT%5i" % (b0+1) + "".join(["%5i" % (b[1]+1) for b in self.bonds if b[0] == b0]) for b0 in sorted(list(set(b[0] for b in self.bonds)))]
+            out += connects
         return out
         
     def write_qdata(self, select):
