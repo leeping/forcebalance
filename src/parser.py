@@ -82,7 +82,7 @@ gen_opts_types = {
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
                  "have_vsite"       : (0, -150, 'Specify whether there are virtual sites in the simulation (being fitted or not).  Enforces calculation of vsite positions.', 'Experimental feature in ESP fitting', ['ABINITIO']),
-                 "constrain_charge" : (1,  10,  'Specify whether to constrain the charges on the molecules.', 'Printing the force field (all calculations)'),
+                 "constrain_charge" : (0,  10,  'Specify whether to constrain the charges on the molecules.', 'Printing the force field (all calculations)'),
                  "print_gradient"   : (1,  20,  'Print the objective function gradient at every step', 'Main Optimizer'),
                  "logarithmic_map"  : (0, -150, 'Optimize in the space of log-variables', 'Creating the force field (all calculations, advanced usage)'),
                  "print_hessian"    : (0,  20, 'Print the objective function Hessian at every step', 'Main Optimizer'),

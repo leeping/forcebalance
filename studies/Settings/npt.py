@@ -854,14 +854,16 @@ def main():
             Settings = amoeba_direct_kwargs
             mSettings = mono_direct_kwargs
     else:
-        if 'tip3p' in sys.argv[2]:
-            print "Using TIP3P settings."
-            Settings = tip3p_kwargs
-            mSettings = mono_tip3p_kwargs
-            timestep = 1.0 * femtosecond
-            nsteps   = 100
-        else:
-            raise Exception('Encountered a force field that I did not expect!')
+        Settings = {'nonbondedMethod':PME}
+        mSettings = {}
+        # if 'tip3p' in sys.argv[2]:
+        #     print "Using TIP3P settings."
+        #     Settings = tip3p_kwargs
+        #     mSettings = mono_tip3p_kwargs
+        #     timestep = 1.0 * femtosecond
+        #     nsteps   = 100
+        # else:
+        #     raise Exception('Encountered a force field that I did not expect!')
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #

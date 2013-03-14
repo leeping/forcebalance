@@ -58,6 +58,12 @@ class Mol2_Reader(BaseReader):
         if line.strip().lower() == '@<tripos>atom':
             self.itype = 'COUL'
             self.section = 'Atom'
+        elif line.strip().lower() == '@<tripos>bond':
+            self.itype = 'None'
+            self.section = 'Bond'
+        elif line.strip().lower() == '@<tripos>substructure':
+            self.itype = 'None'
+            self.section = 'Substructure'
         elif line.strip().lower() == '@<tripos>molecule':
             self.itype = 'None'
             self.section = 'Molecule'
@@ -99,7 +105,7 @@ class FrcMod_Reader(BaseReader):
         self.adict = {None:None}
         
     def Split(self, line):
-        return split(' +(?!-(?![0-9.]))', line.replace('\n',''))
+        return split(' +(?!-(?![0-9.]))', line.strip().replace('\n',''))
 
     def Whites(self, line):
         return findall(' +(?!-(?![0-9.]))', line.replace('\n',''))
@@ -112,6 +118,10 @@ class FrcMod_Reader(BaseReader):
             return
         if match('^dihe', line.strip().lower()):
             self.dihe = True
+            return
+        elif match('^mass$', line.strip().lower()):
+            self.dihe  = False
+            self.itype = 'MASS'
             return
         elif match('^bond$', line.strip().lower()):
             self.dihe  = False

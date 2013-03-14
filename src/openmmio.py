@@ -8,6 +8,7 @@ import os
 from basereader import BaseReader
 from abinitio import AbInitio
 from liquid import Liquid
+from interaction import Interaction
 import numpy as np
 import sys
 from finite_difference import *
@@ -16,6 +17,8 @@ import shutil
 from molecule import *
 from chemistry import *
 from nifty import *
+from nifty import _exec
+from collections import OrderedDict
 try:
     from simtk.openmm.app import *
     from simtk.openmm import *
@@ -71,6 +74,10 @@ def CopyHarmonicAngleParameters(src, dest):
     for i in range(src.getNumAngles()):
         dest.setAngleParameters(i,*src.getAngleParameters(i))
 
+def CopyPeriodicTorsionParameters(src, dest):
+    for i in range(src.getNumTorsions()):
+        dest.setTorsionParameters(i,*src.getTorsionParameters(i))
+
 def CopyNonbondedParameters(src, dest):
     dest.setReactionFieldDielectric(src.getReactionFieldDielectric())
     for i in range(src.getNumParticles()):
@@ -93,6 +100,7 @@ def CopySystemParameters(src,dest):
                'AmoebaMultipoleForce':CopyAmoebaMultipoleParameters,
                'HarmonicBondForce':CopyHarmonicBondParameters,
                'HarmonicAngleForce':CopyHarmonicAngleParameters,
+               'PeriodicTorsionForce':CopyPeriodicTorsionParameters,
                'NonbondedForce':CopyNonbondedParameters,
                'CMMotionRemover':do_nothing}
     for i in range(src.getNumForces()):
@@ -115,6 +123,7 @@ def UpdateSimulationParameters(src_system, dest_simulation):
 ## could be under two different parent types (HarmonicBondForce, AmoebaHarmonicBondForce)
 suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "HarmonicAngleForce" : {"Angle" : ["class1","class2","class3"],},
+                "PeriodicTorsionForce" : {"Proper" : ["class1","class2","class3","class4"],},
                 "NonbondedForce" : {"Atom": ["type"]},
                 "AmoebaBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaAngleForce" : {"Angle" : ["class1","class2","class3"]},
@@ -245,11 +254,17 @@ class Liquid_OpenMM(Liquid):
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            queue_up(wq,
-                     command = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps),
-                     input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
-                     #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
-                     output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml])
+            if wq == None:
+                print "Running condensed phase simulation locally."
+                print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
+                cmdstr = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps)
+                _exec(cmdstr)
+            else:
+                queue_up(wq,
+                         command = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps),
+                         input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
+                         #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
+                         output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml])
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
         """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
@@ -392,3 +407,118 @@ class AbInitio_OpenMM(AbInitio):
         else:
             warn_press_key('The energy_force_driver_all_external_ function is deprecated!')
             return self.energy_force_driver_all_external_()
+
+class Interaction_OpenMM(Interaction):
+
+    """Subclass of Target for interaction matching using OpenMM. """
+
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Name of the trajectory file containing snapshots.
+        self.trajfnm = "all.pdb"
+        ## Dictionary of simulation objects (dimer, fraga, fragb)
+        self.simulations = OrderedDict()
+        ## Initialize base class.
+        super(Interaction_OpenMM,self).__init__(options,tgt_opts,forcefield)
+
+    def prepare_temp_directory(self, options, tgt_opts):
+        abstempdir = os.path.join(self.root,self.tempdir)
+        cwd = os.getcwd()
+        os.chdir(abstempdir)
+        ## Set up three OpenMM System objects.
+        self.traj[0].write("dimer.pdb")
+        self.traj[0].atom_select(self.select1).write("fraga.pdb")
+        self.traj[0].atom_select(self.select2).write("fragb.pdb")
+        # ## Write a single frame PDB if it doesn't exist already. Breaking my self-imposed rule of not editing the Target directory...
+        # if not os.path.exists(os.path.join(self.root,self.tgtdir,"conf.pdb")):
+        #     self.traj[0].write(os.path.join(self.root,self.tgtdir,"conf.pdb"))
+        ## TODO: The following code should not be repeated everywhere.
+        for pdbfnm in ["dimer.pdb", "fraga.pdb", "fragb.pdb"]:
+            print "Setting up Simulation object for %s" % pdbfnm
+            try:
+                PlatName = 'CUDA'
+                ## Set the simulation platform
+                print "Setting Platform to", PlatName
+                self.platform = openmm.Platform.getPlatformByName(PlatName)
+                ## Set the device to the environment variable or zero otherwise
+                device = os.environ.get('CUDA_DEVICE',"0")
+                print "Setting Device to", device
+                self.platform.setPropertyDefaultValue("CudaDevice", device)
+                self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+            except:
+                warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
+                self.platform = None
+            ## If using the new CUDA platform, then create the simulation object within this class itself.
+            if PlatName == "CUDA":
+                if tgt_opts['openmm_cuda_precision'] != '':
+                    print "Setting Precision to %s" % tgt_opts['openmm_cuda_precision'].lower()
+                    try:
+                        self.platform.setPropertyDefaultValue("CudaPrecision",tgt_opts['openmm_cuda_precision'].lower())
+                    except:
+                        raise Exception('Unable to set the CUDA precision!')
+                # Set up the entire system here on the new CUDA Platform.
+                pdb = PDBFile(pdbfnm)
+                forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
+                if self.FF.amoeba_pol == 'mutual':
+                    system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+                elif self.FF.amoeba_pol == 'direct':
+                    system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+                # Create the simulation; we're not actually going to use the integrator
+                integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+                if self.platform != None:
+                    self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(pdb.topology, system, integrator, self.platform)
+                else:
+                    raise Exception('Unable to set the Platform to CUDA!')
+        os.chdir(cwd)
+        
+    def energy_driver_all(self, mode):
+        if mode not in ['dimer','fraga','fragb']:
+            raise Exception('This function may only be called with three modes - dimer, fraga, fragb')
+        if mode == 'dimer':
+            self.traj.write("shot.pdb")
+        elif mode == 'fraga':
+            self.traj.atom_select(self.select1).write("shot.pdb")
+        elif mode == 'fragb':
+            self.traj.atom_select(self.select2).write("shot.pdb")
+        thistraj = Molecule("shot.pdb")
+        
+        # Run OPenMM.
+        pdb = PDBFile(mode+".pdb")
+        forcefield = ForceField(self.FF.openmmxml)
+        #==============================================#
+        #       Simulation settings (IMPORTANT)        #
+        # Agrees with TINKER to within 0.0001 kcal! :) #
+        #==============================================#
+        if self.FF.amoeba_pol == 'mutual':
+            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+        elif self.FF.amoeba_pol == 'direct':
+            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+        # Create the simulation; we're not actually going to use the integrator
+        integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+        if hasattr(self,'simulations'):
+            UpdateSimulationParameters(system, self.simulations[mode])
+            simulation = self.simulations[mode]
+        else:
+            raise Exception('This module only works if it contains a dictionary of Simulation objects.')
+
+        M = []
+        # Loop through the snapshots
+        for I in range(self.ns):
+            xyz = thistraj.xyzs[I]
+            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            # Set the positions using the trajectory
+            simulation.context.setPositions(xyz_omm)
+            if self.FF.rigid_water:
+                simulation.context.applyConstraints(1e-8)
+            # Compute the potential energy and append to list
+            Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+            M.append(Energy)
+        M = np.array(M)
+        return M
+    
+    def interaction_driver_all(self,dielectric=False):
+        # Compute the energies for the dimer
+        D = self.energy_driver_all('dimer')
+        A = self.energy_driver_all('fraga')
+        B = self.energy_driver_all('fragb')
+        return D - A - B
+

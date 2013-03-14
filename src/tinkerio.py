@@ -252,7 +252,7 @@ class Liquid_TINKER(Liquid):
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             if wq == None:
-                print "Running locally, it might be slow!"
+                print "Running condensed phase simulation locally."
                 print "You may tail -f %s/npt_tinker.out in another terminal window" % os.getcwd()
                 if (temperature, pressure) in self.DynDict:
                     dynsrc = self.DynDict[(temperature, pressure)]

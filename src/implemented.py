@@ -21,7 +21,7 @@ except:
     print "Tinker module import failed"
 
 try:
-    from openmmio import AbInitio_OpenMM, Liquid_OpenMM
+    from openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM
 except:
     print traceback.format_exc()
     print "OpenMM module import failed; check OpenMM package"
@@ -63,6 +63,7 @@ Implemented_Targets = {
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'INTERACTION_TINKER':Interaction_TINKER,
+    'INTERACTION_OPENMM':Interaction_OpenMM,
     'BINDINGENERGY_TINKER':BindingEnergy_TINKER,
     'MOMENTS_TINKER':Moments_TINKER,
     'MONOMER_QTPIE':Monomer_QTPIE,
