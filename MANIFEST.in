@@ -16,21 +16,4 @@ include studies/001_water_tutorial/*.in
 include studies/001_water_tutorial/*.out
 recursive-include studies/001_water_tutorial/forcefield *
 recursive-include studies/001_water_tutorial/targets *
-recursive-include studies/009_voelz_nspe/forcefield *
-recursive-include studies/009_voelz_nspe/targets *
-recursive-include studies/009_voelz_nspe/Setup *
-include studies/009_voelz_nspe/result/molecule.itp
-include studies/009_voelz_nspe/About.txt
-include studies/009_voelz_nspe/options.in
-include studies/009_voelz_nspe/forcebalance.out
-include studies/009_voelz_nspe/options.out
-recursive-include studies/010_amoeba_chlorine/forcefield *
-recursive-include studies/010_amoeba_chlorine/targets *
-recursive-include studies/010_amoeba_chlorine/setup *
-include studies/010_amoeba_chlorine/optimize.in
-include studies/010_amoeba_chlorine/optimize.pdf
-include studies/010_amoeba_chlorine/result/chlorine.prm
-include studies/010_amoeba_chlorine/About.txt
-include studies/010_amoeba_chlorine/optimize.html
-include studies/010_amoeba_chlorine/optimize.out
-recursive-include studies/2013_Mar_OpenMM_Workshop
+recursive-include studies/2013_Mar_OpenMM_Workshop *
