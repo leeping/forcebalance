@@ -48,7 +48,7 @@ def process(word, color):
     return Answer
 
 def main():
-    printcool("Welcome to ForceBalance version 1.0! =D\nForce Field Optimization System\nAuthor: Lee-Ping Wang", ansi="1", bold=True, minwidth=64)
+    printcool("Welcome to ForceBalance version 1.1! =D\nForce Field Optimization System\nAuthor: Lee-Ping Wang", ansi="1", bold=True, minwidth=64)
     logostr = """
                           ,'+++                                        
                        ,++++++.      .:,,.                              

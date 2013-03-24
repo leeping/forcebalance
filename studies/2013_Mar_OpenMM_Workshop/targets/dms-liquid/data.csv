@@ -36,5 +36,5 @@ Global,use_cni,FALSE,,,,
 # dEvib : To be ADDED to the calculated heat capacity.  Note that these values are slightly different from the TIP4P-Ew paper for some reason.,,,,,,
 # Data for dimethyl sulfide taken from http://virtualchemistry.org/molecules/75-18-3/,,,,,,
 ,,,,,,
-T,P,MBAR,Rho,Rho_wt,Hvap,Hvap_wt
-298.15,1.0 atm,FALSE,841.9,1,27.65,1
+T,P,Rho,Hvap
+298.15,1.0 atm,841.9,27.65

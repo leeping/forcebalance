@@ -176,6 +176,10 @@ class Optimizer(ForceBalanceBaseClass):
             self.FF.print_map(self.FF.create_pvals(xk))
             print bar
             self.FF.make(xk,False,'result')
+            print
+            print "The final force field has been printed to the 'result' directory."
+            #bar = printcool("\x1b[1;45;93mCongratulations, ForceBalance has finished\x1b[0m\n\x1b[1;45;93mGive yourself a pat on the back!\x1b[0m")
+            bar = printcool("Congratulations, ForceBalance has finished\nGive yourself a pat on the back!",ansi="1;44;93")
 
         ## Write out stuff to checkpoint file
         self.writechk()
@@ -267,11 +271,11 @@ class Optimizer(ForceBalanceBaseClass):
                 print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
                 break
             if self.print_grad:
-                bar = printcool("Total Gradient",color=6)
+                bar = printcool("Total Gradient",color=4)
                 self.FF.print_map(vals=G,precision=8)
                 print bar
             if self.print_hess:
-                bar = printcool("Total Hessian",color=6)
+                bar = printcool("Total Hessian",color=4)
                 pmat2d(H,precision=8)
                 print bar
             for key, val in self.Objective.ObjDict.items():
@@ -288,10 +292,10 @@ class Optimizer(ForceBalanceBaseClass):
             if self.print_vals:
                 pk = self.FF.create_pvals(xk)
                 dp = pk - old_pk
-                bar = printcool("Mathematical Parameters (Current + Step = Next)",color=3)
+                bar = printcool("Mathematical Parameters (Current + Step = Next)",color=5)
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_xk[i], '+' if dx[i] >= 0 else '-', abs(dx[i]), xk[i]) for i in range(len(xk))])
                 print bar
-                bar = printcool("Physical Parameters (Current + Step = Next)",color=3)
+                bar = printcool("Physical Parameters (Current + Step = Next)",color=5)
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
                 print bar
             # Evaluate the objective function and its derivatives.
@@ -353,7 +357,7 @@ class Optimizer(ForceBalanceBaseClass):
             else:
                 if X > X_best:
                     Best_Step = 0
-                    color = "\x1b[93m"
+                    color = "\x1b[95m"
                 else:
                     Best_Step = 1
                     color = "\x1b[92m"
@@ -889,7 +893,7 @@ class Optimizer(ForceBalanceBaseClass):
             if os.path.exists(absfnm):
                 self.chk = pickle.load(open(absfnm))
             else:
-                print "\x1b[40m\x1b[1;93mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)"
+                print "\x1b[40m\x1b[1;92mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)"
         return self.chk
 
     def writechk(self):

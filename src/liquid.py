@@ -472,6 +472,8 @@ class Liquid(Target):
                 return np.dot(W,vec)
             def covde(vec):
                 return flat(np.mat(G)*col(W*vec)) - avg(vec)*Gbar
+            def deprod(vec):
+                return flat(np.mat(G)*col(W*vec))
             ## Density.
             Rho_calc[PT]   = np.dot(W,R)
             Rho_grad[PT]   = mBeta*(flat(np.mat(G)*col(W*R)) - np.dot(W,R)*Gbar)
@@ -498,16 +500,16 @@ class Liquid(Target):
                 Hvap_grad[PT]  = np.zeros(self.FF.np,dtype=float)
             ## Thermal expansion coefficient.
             Alpha_calc[PT] = 1e4 * (avg(H*V)-avg(H)*avg(V))/avg(V)/(kT*T)
-            GAlpha1 = mBeta * covde(H*V) / avg(V)
-            GAlpha2 = Beta * avg(H*V) * covde(V) / avg(V)**2
-            GAlpha3 = flat(np.mat(G)*col(W*V))/avg(V) - Gbar
+            GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
+            GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
+            GAlpha3 = deprod(V)/avg(V) - Gbar
             GAlpha4 = Beta * covde(H)
             Alpha_grad[PT] = 1e4 * (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
             ## Isothermal compressibility.
             bar_unit = 0.06022141793 * 1e6
             Kappa_calc[PT] = bar_unit / kT * (avg(V**2)-avg(V)**2)/avg(V)
-            GKappa1 = -1 * Beta**2 * avg(V) * covde(V**2) / avg(V)**2
-            GKappa2 = +1 * Beta**2 * avg(V**2) * covde(V) / avg(V)**2
+            GKappa1 = +1 * Beta**2 * avg(V**2) * deprod(V) / avg(V)**2
+            GKappa2 = -1 * Beta**2 * avg(V) * deprod(V**2) / avg(V)**2
             GKappa3 = +1 * Beta**2 * covde(V)
             Kappa_grad[PT] = bar_unit*(GKappa1 + GKappa2 + GKappa3)
             ## Isobaric heat capacity.
@@ -576,45 +578,51 @@ class Liquid(Target):
         PrintDict = OrderedDict()
         if X_Rho > 0:
             Title = "Condensed Phase Properties:\n %-20s %40s" % ("Property Name", "Residual x Weight = Contribution")
-            printcool_dictionary(RhoPrint, title='Density (kg m^-3) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=3,keywidth=15)
-            bar = printcool("Density objective function: % .3f, Derivative:" % X_Rho)
-            self.FF.print_map(vals=G_Rho)
-            print bar
+            printcool_dictionary(RhoPrint, title='Density (kg m^-3) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            bar = printcool("Density objective function: % .3f%s" % (X_Rho, ", Derivative:" if AGrad else ""))
+            if AGrad:
+                self.FF.print_map(vals=G_Rho)
+                print bar
             PrintDict['Density'] = "% 10.5f % 8.3f % 14.5e" % (X_Rho, w_1, X_Rho*w_1)
 
         if X_Hvap > 0:
-            printcool_dictionary(HvapPrint, title='Enthalpy of Vaporization (kJ mol^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=3,keywidth=15)
-            bar = printcool("H_vap objective function: % .3f, Derivative:" % X_Hvap)
-            self.FF.print_map(vals=G_Hvap)
-            print bar
+            printcool_dictionary(HvapPrint, title='Enthalpy of Vaporization (kJ mol^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            bar = printcool("H_vap objective function: % .3f%s" % (X_Hvap, ", Derivative:" if AGrad else ""))
+            if AGrad:
+                self.FF.print_map(vals=G_Hvap)
+                print bar
             PrintDict['Enthalpy of Vaporization'] = "% 10.5f % 8.3f % 14.5e" % (X_Hvap, w_2, X_Hvap*w_2)
 
         if X_Alpha > 0:
-            printcool_dictionary(AlphaPrint,title='Thermal Expansion Coefficient (10^-4 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=3,keywidth=15)
-            bar = printcool("Thermal Expansion objective function: % .3f, Derivative:" % X_Alpha)
-            self.FF.print_map(vals=G_Alpha)
-            print bar
+            printcool_dictionary(AlphaPrint,title='Thermal Expansion Coefficient (10^-4 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            bar = printcool("Thermal Expansion objective function: % .3f%s" % (X_Alpha, ", Derivative:" if AGrad else ""))
+            if AGrad:
+                self.FF.print_map(vals=G_Alpha)
+                print bar
             PrintDict['Thermal Expansion Coefficient'] = "% 10.5f % 8.3f % 14.5e" % (X_Alpha, w_3, X_Alpha*w_3)
 
         if X_Kappa > 0:
-            printcool_dictionary(KappaPrint,title='Isothermal Compressibility (10^-6 bar^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=3,keywidth=15)
-            bar = printcool("Compressibility objective function: % .3f, Derivative:" % X_Kappa)
-            self.FF.print_map(vals=G_Kappa)
-            print bar
+            printcool_dictionary(KappaPrint,title='Isothermal Compressibility (10^-6 bar^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            bar = printcool("Compressibility objective function: % .3f%s" % (X_Kappa, ", Derivative:" if AGrad else ""))
+            if AGrad:
+                self.FF.print_map(vals=G_Kappa)
+                print bar
             PrintDict['Isothermal Compressibility'] = "% 10.5f % 8.3f % 14.5e" % (X_Kappa, w_4, X_Kappa*w_4)
 
         if X_Cp > 0:
-            printcool_dictionary(CpPrint,   title='Isobaric Heat Capacity (cal mol^-1 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=3,keywidth=15)
-            bar = printcool("Heat Capacity objective function: % .3f, Derivative:" % X_Cp)
-            self.FF.print_map(vals=G_Cp)
-            print bar
+            printcool_dictionary(CpPrint,   title='Isobaric Heat Capacity (cal mol^-1 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            bar = printcool("Heat Capacity objective function: % .3f%s" % (X_Cp, ", Derivative:" if AGrad else ""))
+            if AGrad:
+                self.FF.print_map(vals=G_Cp)
+                print bar
             PrintDict['Isobaric Heat Capacity'] = "% 10.5f % 8.3f % 14.5e" % (X_Cp, w_5, X_Cp*w_5)
 
         if X_Eps0 > 0:
-            printcool_dictionary(Eps0Print,   title='Dielectric Constant\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=3,keywidth=15)
-            bar = printcool("Dielectric Constant objective function: % .3f, Derivative:" % X_Eps0)
-            self.FF.print_map(vals=G_Eps0)
-            print bar
+            printcool_dictionary(Eps0Print,   title='Dielectric Constant\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            bar = printcool("Dielectric Constant objective function: % .3f%s" % (X_Eps0, ", Derivative:" if AGrad else ""))
+            if AGrad:
+                self.FF.print_map(vals=G_Eps0)
+                print bar
             PrintDict['Dielectric Constant'] = "% 10.5f % 8.3f % 14.5e" % (X_Eps0, w_6, X_Eps0*w_6)
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",Objective)
