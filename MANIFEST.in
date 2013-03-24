@@ -33,3 +33,4 @@ include studies/010_amoeba_chlorine/result/chlorine.prm
 include studies/010_amoeba_chlorine/About.txt
 include studies/010_amoeba_chlorine/optimize.html
 include studies/010_amoeba_chlorine/optimize.out
+recursive-include studies/2013_Mar_OpenMM_Workshop
