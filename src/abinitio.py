@@ -360,7 +360,7 @@ class AbInitio(Target):
         if self.whamboltz == True:
             self.whamboltz_wts = array([float(i.strip()) for i in open(os.path.join(self.root,self.tgtdir,"wham-weights.txt")).readlines()])
             #   This is a constant pre-multiplier in front of every snapshot.
-            bar = printcool("Using WHAM MM Boltzmann weights.", color=3)
+            bar = printcool("Using WHAM MM Boltzmann weights.", color=4)
             if os.path.exists(os.path.join(self.root,self.tgtdir,"wham-master.txt")):
                 whaminfo = open(os.path.join(self.root,self.tgtdir,"wham-master.txt")).readlines()
                 print "From wham-master.txt, I can see that you're using %i generations" % len(whaminfo)

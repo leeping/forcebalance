@@ -282,7 +282,7 @@ def get_dipole(simulation,q=None,positions=None):
     enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
     for i in simulation.system.getForces():
         if i.__class__.__name__ == "AmoebaMultipoleForce":
-            mm = i.getSystemMultipoleMoments(simulation.context,0,1)
+            mm = i.getSystemMultipoleMoments(simulation.context)
             dx += mm[1]
             dy += mm[2]
             dz += mm[3]
@@ -971,6 +971,8 @@ def main():
 
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
+    def deprod(vec):
+        return flat(np.mat(G)*col(vec))/N
     def covde(vec):
         return flat(np.mat(G)*col(vec))/N - Gbar*np.mean(vec)
     def avg(vec):
@@ -993,9 +995,9 @@ def main():
     Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(H))])
 
     ## Thermal expansion coefficient analytic derivative
-    GAlpha1 = mBeta * covde(H*V) / avg(V)
-    GAlpha2 = Beta * avg(H*V) * covde(V) / avg(V)**2
-    GAlpha3 = flat(np.mat(G)*col(V))/N/avg(V) - Gbar
+    GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
+    GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
+    GAlpha3 = deprod(V)/avg(V) - Gbar
     GAlpha4 = Beta * covde(H)
     GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
@@ -1025,8 +1027,8 @@ def main():
 
     ## Isothermal compressibility analytic derivative
     Sep = printcool("Isothermal compressibility:    % .4e +- %.4e bar^-1\nAnalytic Derivative:" % (Kappa, Kappa_err))
-    GKappa1 = -1 * Beta**2 * avg(V) * covde(V**2) / avg(V)**2
-    GKappa2 = +1 * Beta**2 * avg(V**2) * covde(V) / avg(V)**2
+    GKappa1 = +1 * Beta**2 * avg(V**2) * deprod(V) / avg(V)**2
+    GKappa2 = -1 * Beta**2 * avg(V) * deprod(V**2) / avg(V)**2
     GKappa3 = +1 * Beta**2 * covde(V)
     GKappa  = bar_unit*(GKappa1 + GKappa2 + GKappa3)
     FF.print_map(vals=GKappa)

@@ -44,6 +44,8 @@ class Interaction(Target):
         self.set_option(tgt_opts,'do_cosmo','do_cosmo')
         ## Do we put the reference energy into the denominator?
         self.set_option(tgt_opts,'cauchy','cauchy')
+        ## Do we put the reference energy into the denominator?
+        self.set_option(tgt_opts,'attenuate','attenuate')
         ## What is the energy denominator?
         self.set_option(tgt_opts,'energy_denom','energy_denom')
         ## Set fragment 1
@@ -87,6 +89,16 @@ class Interaction(Target):
         # Create the denominator.
         if self.cauchy:
             self.divisor = sqrt(self.eqm**2 + denom**2)
+            if self.attenuate:
+                raise Exception('attenuate and cauchy are mutually exclusive')
+        elif self.attenuate:
+            # Attenuate only large repulsions.
+            self.divisor = zeros(len(self.eqm))
+            for i in range(len(self.eqm)):
+                if self.eqm[i] < denom:
+                    self.divisor[i] = denom
+                else:
+                    self.divisor[i] = sqrt(denom**2 + (self.eqm[i]-denom)**2)
         else:
             self.divisor = ones(len(self.eqm)) * denom
         if self.cauchy:

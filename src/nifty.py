@@ -143,18 +143,20 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50):
 
     @return bar The bottom bar is returned for the user to print later, e.g. to mark off a 'section'    
     """
+    def newlen(l):
+        return len(sub("\x1b\[[0-9;]*m","",line))
     text = text.split('\n')
-    width = max(minwidth,max([len(line) for line in text]))
+    width = max(minwidth,max([newlen(line) for line in text]))
     bar = ''.join([sym for i in range(width + 8)])
     print '\n'+bar
     for line in text:
-        padleft = ' ' * ((width - len(line)) / 2)
-        padright = ' '* (width - len(line) - len(padleft))
+        padleft = ' ' * ((width - newlen(line)) / 2)
+        padright = ' '* (width - newlen(line) - len(padleft))
         if ansi != None:
             ansi = str(ansi)
-            print "%s\x1b[%sm%s" % (''.join([sym for i in range(3)]), ansi, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
+            print "%s| \x1b[%sm%s" % (sym, ansi, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
         elif color != None:
-            print "%s\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
+            print "%s| \x1b[%s9%im%s" % (sym, bold and "1;" or "", color, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
             # if color == 3 or color == 7:
             #     print "%s\x1b[40m\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
             # else:
