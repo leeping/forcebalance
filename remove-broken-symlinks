@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Run this command prior to creating the distribution using 'python setup.py sdist'
+for i in `find .`; do if (test -h $i); then file $i | grep broken; fi; done | awk -F ':' '{print $1}' | xargs rm
