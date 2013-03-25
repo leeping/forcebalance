@@ -1,0 +1,18 @@
+# Simplest possible ForceBalance input file with two targets.
+
+$options
+forcefield dms.xml
+jobtype newton
+$end
+
+$target
+type Interaction_OpenMM
+name S2EPose
+fragment1 1-9
+fragment2 10-18
+$end
+
+$target
+type Liquid_OpenMM
+name dms-liquid
+$end
