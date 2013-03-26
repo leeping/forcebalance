@@ -399,15 +399,20 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
     #================================#
     # Create the simulation platform #
     #================================#
-    print "Setting Platform to", PlatName
-    platform = Platform.getPlatformByName(PlatName)
-    # Set the device to the environment variable or zero otherwise
-    device = os.environ.get('CUDA_DEVICE',"0")
-    print "Setting Device to", device
-    platform.setPropertyDefaultValue("CudaDeviceIndex", device)
-    # Setting CUDA precision to double appears to improve performance of derivatives.
-    platform.setPropertyDefaultValue("CudaPrecision", precision)
-    platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+    try:
+        print "Setting Platform to", PlatName
+        platform = Platform.getPlatformByName(PlatName)
+        # Set the device to the environment variable or zero otherwise
+        device = os.environ.get('CUDA_DEVICE',"0")
+        print "Setting Device to", device
+        platform.setPropertyDefaultValue("CudaDeviceIndex", device)
+        # Setting CUDA precision to double appears to improve performance of derivatives.
+        platform.setPropertyDefaultValue("CudaPrecision", precision)
+        platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+    except:
+        PlatName = "Reference"
+        print "Setting Platform to", PlatName
+        platform = Platform.getPlatformByName(PlatName)
     # Create the test system.
     forcefield = ForceField(sys.argv[2])
     system = forcefield.createSystem(pdb.topology, **settings)
