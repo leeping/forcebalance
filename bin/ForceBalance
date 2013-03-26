@@ -82,6 +82,7 @@ else
     echo "#=====================================#"
 fi
 
+export PYTHONUNBUFFERED="y"
 # Standard error gets written to its own .err file
 # Text overwritten by carriage returns are not saved
 if [ $blkwht -eq 1 ] ; then
