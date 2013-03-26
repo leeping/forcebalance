@@ -468,7 +468,7 @@ class Interaction_OpenMM(Interaction):
                         raise Exception('Unable to set the CUDA precision!')
             else:
                 # Set up the entire system here on the new CUDA Platform.
-                pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
+                pdb = PDBFile(pdbfnm)
                 forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
                 if self.FF.amoeba_pol == 'mutual':
                     system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
