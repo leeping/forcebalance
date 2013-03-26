@@ -321,7 +321,6 @@ class AbInitio_OpenMM(AbInitio):
             self.platform = openmm.Platform.getPlatformByName(PlatName)
             # warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
             # self.platform = None
-        ## Create the simulation object within this class itself.
         if PlatName == "CUDA":
             if tgt_opts['openmm_cuda_precision'] != '':
                 print "Setting Precision to %s" % tgt_opts['openmm_cuda_precision'].lower()
@@ -329,22 +328,18 @@ class AbInitio_OpenMM(AbInitio):
                     self.platform.setPropertyDefaultValue("CudaPrecision",tgt_opts['openmm_cuda_precision'].lower())
                 except:
                     raise Exception('Unable to set the CUDA precision!')
-        else:
-            # Set up the entire system here on the new CUDA Platform.
-            pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
-            forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
-            if self.FF.amoeba_pol == 'mutual':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
-            elif self.FF.amoeba_pol == 'direct':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
-            elif self.FF.amoeba_pol == 'nonpolarizable':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
-            # Create the simulation; we're not actually going to use the integrator
-            integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-            if self.platform != None:
-                self.simulation = Simulation(pdb.topology, system, integrator, self.platform)
-            else:
-                raise Exception('Unable to set the Platform!')
+        ## Create the simulation object within this class itself.
+        pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
+        forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
+        if self.FF.amoeba_pol == 'mutual':
+            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+        elif self.FF.amoeba_pol == 'direct':
+            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+        elif self.FF.amoeba_pol == 'nonpolarizable':
+            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
+        # Create the simulation; we're not actually going to use the integrator
+        integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+        self.simulation = Simulation(pdb.topology, system, integrator, self.platform)
 
     def read_topology(self):
         pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
@@ -458,7 +453,6 @@ class Interaction_OpenMM(Interaction):
                 self.platform = openmm.Platform.getPlatformByName(PlatName)
                 # warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
                 # self.platform = None
-            ## Create the simulation object within this class itself.
             if PlatName == "CUDA":
                 if tgt_opts['openmm_cuda_precision'] != '':
                     print "Setting Precision to %s" % tgt_opts['openmm_cuda_precision'].lower()
@@ -466,58 +460,18 @@ class Interaction_OpenMM(Interaction):
                         self.platform.setPropertyDefaultValue("CudaPrecision",tgt_opts['openmm_cuda_precision'].lower())
                     except:
                         raise Exception('Unable to set the CUDA precision!')
-            else:
-                # Set up the entire system here on the new CUDA Platform.
-                pdb = PDBFile(pdbfnm)
-                forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
-                if self.FF.amoeba_pol == 'mutual':
-                    system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
-                elif self.FF.amoeba_pol == 'direct':
-                    system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
-                elif self.FF.amoeba_pol == 'nonpolarizable':
-                    system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
-                # Create the simulation; we're not actually going to use the integrator
-                integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-                if self.platform != None:
-                    self.simulation = Simulation(pdb.topology, system, integrator, self.platform)
-                else:
-                    raise Exception('Unable to set the Platform!')
-            # try:
-            #     PlatName = 'CUDA'
-            #     ## Set the simulation platform
-            #     print "Setting Platform to", PlatName
-            #     self.platform = openmm.Platform.getPlatformByName(PlatName)
-            #     ## Set the device to the environment variable or zero otherwise
-            #     device = os.environ.get('CUDA_DEVICE',"0")
-            #     print "Setting Device to", device
-            #     self.platform.setPropertyDefaultValue("CudaDevice", device)
-            #     self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
-            # except:
-            #     warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
-            #     self.platform = None
-            # ## If using the new CUDA platform, then create the simulation object within this class itself.
-            # if PlatName == "CUDA":
-            #     if tgt_opts['openmm_cuda_precision'] != '':
-            #         print "Setting Precision to %s" % tgt_opts['openmm_cuda_precision'].lower()
-            #         try:
-            #             self.platform.setPropertyDefaultValue("CudaPrecision",tgt_opts['openmm_cuda_precision'].lower())
-            #         except:
-            #             raise Exception('Unable to set the CUDA precision!')
-            #     # Set up the entire system here on the new CUDA Platform.
-            #     pdb = PDBFile(pdbfnm)
-            #     forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
-            #     if self.FF.amoeba_pol == 'mutual':
-            #         system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
-            #     elif self.FF.amoeba_pol == 'direct':
-            #         system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
-            #     elif self.FF.amoeba_pol == 'nonpolarizable':
-            #         system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
-            #     # Create the simulation; we're not actually going to use the integrator
-            #     integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-            #     if self.platform != None:
-            #         self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(pdb.topology, system, integrator, self.platform)
-            #     else:
-            #         raise Exception('Unable to set the Platform to CUDA!')
+            ## Create the simulation object within this class itself.
+            pdb = PDBFile(pdbfnm)
+            forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
+            if self.FF.amoeba_pol == 'mutual':
+                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+            elif self.FF.amoeba_pol == 'direct':
+                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+            elif self.FF.amoeba_pol == 'nonpolarizable':
+                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
+            # Create the simulation; we're not actually going to use the integrator
+            integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+            self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(pdb.topology, system, integrator, self.platform)
         os.chdir(cwd)
         
     def energy_driver_all(self, mode):
