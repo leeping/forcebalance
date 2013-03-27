@@ -80,7 +80,6 @@ class Liquid(Target):
         self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'liquid_interval',forceprint=True)
-        # Dictionary of .dyn file locations for restarting simulations
         
         #======================================#
         #     Variables which are set here     #

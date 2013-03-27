@@ -96,6 +96,7 @@ echo
 echo $@
 
 rm -f npt_result.p npt_result.p.bz2
+export PYTHONUNBUFFERED="y"
 time $@
 # Delete backup files that are older than one week.
 find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
