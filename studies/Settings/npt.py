@@ -89,6 +89,7 @@ parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for 
 parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=1000000)
 parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=0.5)
 parser.add_argument('--gas_interval', type=float, help='Time interval for saving the gas-phase coordinates, in picoseconds', default=0.1)
+parser.add_argument('--force_cuda', action='store_true', help='Crash immediately if CUDA platform is not available')
 
 args = parser.parse_args()
 
@@ -121,18 +122,20 @@ barostat_frequency = 10                                            # number of s
 # Flag to set verbose debug output
 verbose = True
 
-# Name of the simulation platform (Reference, Cuda, OpenCL)
-PlatName = 'CUDA'
-
 amoeba_mutual_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
-                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
-                 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
-                 'mutualInducedTargetEpsilon' : 1e-6, 'useDispersionCorrection' : True}
+                        'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
+                        'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
+                        'mutualInducedTargetEpsilon' : 1e-6, 'useDispersionCorrection' : True}
 
 amoeba_direct_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
-                 'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
-                 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
-                 'polarization' : 'direct', 'useDispersionCorrection' : True}
+                        'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
+                        'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
+                        'polarization' : 'direct', 'useDispersionCorrection' : True}
+
+amoeba_nonpol_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
+                        'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
+                        'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
+                        'useDispersionCorrection' : True}
 
 tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
                 'vdwCutoff' : 0.9, 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24], 'useDispersionCorrection' : True}
@@ -144,6 +147,9 @@ mono_direct_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
 
 mono_mutual_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
                'rigidWater' : False, 'mutualInducedTargetEpsilon' : 1e-6}
+
+mono_nonpol_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
+                      'rigidWater' : False}
 
 def generateMaxwellBoltzmannVelocities(system, temperature):
     """ Generate velocities from a Maxwell-Boltzmann distribution. """
@@ -399,7 +405,9 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
     #================================#
     # Create the simulation platform #
     #================================#
+    # Name of the simulation platform (Reference, Cuda, OpenCL)
     try:
+        PlatName = 'CUDA'
         print "Setting Platform to", PlatName
         platform = Platform.getPlatformByName(PlatName)
         # Set the device to the environment variable or zero otherwise
@@ -410,6 +418,8 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
         platform.setPropertyDefaultValue("CudaPrecision", precision)
         platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
     except:
+        if args.force_cuda:
+            raise Exception('Force CUDA option is enabled but CUDA platform not available')
         PlatName = "Reference"
         print "Setting Platform to", PlatName
         platform = Platform.getPlatformByName(PlatName)
@@ -855,15 +865,18 @@ def main():
     # Try to detect if we're using an AMOEBA system.
     if any(['Amoeba' in i.__class__.__name__ for i in forcefield._forces]):
         print "Detected AMOEBA system!"
-        PolMutual = FF.amoeba_pol == 'mutual'
-        if PolMutual:
+        if FF.amoeba_pol == "mutual":
             print "Setting mutual polarization"
             Settings = amoeba_mutual_kwargs
             mSettings = mono_mutual_kwargs
-        else:
+        elif FF.amoeba_pol == "direct":
             print "Setting direct polarization"
             Settings = amoeba_direct_kwargs
             mSettings = mono_direct_kwargs
+        else:
+            print "No polarization"
+            Settings = amoeba_nonpol_kwargs
+            mSettings = mono_nonpol_kwargs
     else:
         Settings = {'nonbondedMethod':PME}
         mSettings = {}

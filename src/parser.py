@@ -153,6 +153,7 @@ tgt_opts_types = {
                  "attenuate"        : (0, 0, 'Normalize interaction energies using 1/(denom**2 + reference**2) only for repulsive interactions greater than denom.', 'Interaction energy targets', 'interaction'),
                  "manual"           : (0, -150, 'Give the user a chance to fill in condensed phase stuff on the zeroth step', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "hvap_subaverage"  : (0, -150, 'Don\'t target the average enthalpy of vaporization and allow it to freely float (experimental)', 'Condensed phase property targets (advanced usage)', 'liquid'),
+                 "force_cuda"       : (0, -150, 'Force the external npt.py script to crash if CUDA Platform not available', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                 },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid'),
