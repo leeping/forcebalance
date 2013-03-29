@@ -23,6 +23,7 @@ from binding import BindingEnergy
 from interaction import Interaction
 from finite_difference import in_fd
 from collections import OrderedDict
+from optimizer import GoodStep
 try:
     from simtk.unit import *
 except: pass
@@ -128,7 +129,6 @@ class Tinker_Reader(BaseReader):
 
         if self.itype in pdict:
             if 'Atom' in pdict[self.itype]:
-                print self.itype
                 # List the atoms in the interaction.
                 self.atom = [s[i] for i in pdict[self.itype]['Atom']]
             # The suffix of the parameter ID is built from the atom    #
@@ -229,6 +229,7 @@ class Liquid_TINKER(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
         self.DynDict = OrderedDict()
+        self.DynDict_New = OrderedDict()
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
@@ -254,6 +255,8 @@ class Liquid_TINKER(Liquid):
             if wq == None:
                 print "Running condensed phase simulation locally."
                 print "You may tail -f %s/npt_tinker.out in another terminal window" % os.getcwd()
+                if GoodStep() and (temperature, pressure) in self.DynDict_New:
+                    self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
                 if (temperature, pressure) in self.DynDict:
                     dynsrc = self.DynDict[(temperature, pressure)]
                     dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
@@ -261,7 +264,7 @@ class Liquid_TINKER(Liquid):
                     shutil.copy2(dynsrc,dyndest)
                 cmdstr = 'python npt_tinker.py liquid.xyz %i %.3f %.3f %.3f %.3f --liquid_equ_steps %i &> npt_tinker.out' % (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps)
                 _exec(cmdstr)
-                self.DynDict[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
+                self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
             else:
                 # This part of the code has never been used before
                 # Still need to figure out where to specify TINKER location on each cluster

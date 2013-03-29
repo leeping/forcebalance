@@ -20,10 +20,16 @@ from baseclass import ForceBalanceBaseClass
 
 # Global variable corresponding to the iteration number.
 ITERATION_NUMBER = 0
+# Global variable corresponding to whether the optimization took a good step.
+GOODSTEP = 0
 
 def Counter():
     global ITERATION_NUMBER
     return ITERATION_NUMBER
+
+def GoodStep():
+    global GOODSTEP
+    return GOODSTEP
 
 class Optimizer(ForceBalanceBaseClass):
     """ Optimizer class.  Contains several methods for numerical optimization.
@@ -221,6 +227,7 @@ class Optimizer(ForceBalanceBaseClass):
         Ord         = 1 if b_BFGS else 2
         global ITERATION_NUMBER
         ITERATION_NUMBER = 0
+        global GOODSTEP
         Best_Step = 1
         if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
             print "Reading initial objective, gradient, Hessian from checkpoint file"
@@ -246,6 +253,7 @@ class Optimizer(ForceBalanceBaseClass):
 
         Quality  = 0.0
         restep = False
+        GOODSTEP = 1
 
         while 1: # Loop until convergence is reached.
             ## Put data into the checkpoint file
@@ -327,6 +335,7 @@ class Optimizer(ForceBalanceBaseClass):
                 Best_Step = 0
                 # Toggle switch for rejection (experimenting with no rejection)
                 Rejects = True
+                GOODSTEP = 0
                 Reevaluate = True
                 trust = max(ndx*(1./(1+a)), self.mintrust)
                 print "Rejecting step and reducing trust radius to % .4e" % trust
@@ -337,9 +346,10 @@ class Optimizer(ForceBalanceBaseClass):
                         color = "\x1b[91m"
                         print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual")
                         print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality)
-                        printcool("Objective function rises (Disappointed!)\nRe-evaluating at the previous point..",color=1)
+                        printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
                         data        = self.Objective.Full(xk,Ord,verbose=True)
+                        GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
                         X_prev = X
                         dx *= 0
@@ -355,6 +365,7 @@ class Optimizer(ForceBalanceBaseClass):
                         data = deepcopy(datastor)
                     continue
             else:
+                GOODSTEP = 1
                 if X > X_best:
                     Best_Step = 0
                     color = "\x1b[95m"
