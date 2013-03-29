@@ -217,6 +217,8 @@ class Optimizer(ForceBalanceBaseClass):
         @param[in] b_BFGS Switch to use BFGS (True) or Newton-Raphson (False)
 
         """
+        if any(['liquid' in tgt.name.lower() for tgt in self.Objective.Targets]) and self.conv_obj < 1e-3:
+            warn_press_key("Condensed phase targets detected - may not converge with current choice of convergence_objective (%.e)\nRecommended range is 1e-2 - 1e-1 for this option." % self.conv_obj)
         if b_BFGS:
             warn_press_key("Using the BFGS optimization method is not recommended at this time!")
         # Parameters for the adaptive trust radius
