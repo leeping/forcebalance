@@ -8,7 +8,7 @@ import numpy as np
 import time
 from baseclass import ForceBalanceBaseClass
 from collections import OrderedDict
-from nifty import row,col,printcool_dictionary, link_dir_contents
+from nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from optimizer import Counter
 
@@ -135,6 +135,8 @@ class Target(ForceBalanceBaseClass):
         self.gct         = 0
         ## Counts how often the Hessian was computed
         self.hct         = 0
+        ## A list of Work Queue tags
+        self.wqids       = []
         
         #======================================#
         #          UNDER DEVELOPMENT           #
@@ -310,3 +312,18 @@ class Target(ForceBalanceBaseClass):
         os.chdir(cwd)
         
         return
+
+    def finished(self):
+        wq = getWorkQueue()
+        if wq == None:
+            return True
+        elif wq.empty():
+            return True
+        elif len(self.wqids) == 0:
+            return True
+        else:
+            wq_wait1(wq, tgt=self)
+            if len(self.wqids) == 0:
+                return True
+            else:
+                return False
