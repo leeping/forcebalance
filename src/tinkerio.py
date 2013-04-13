@@ -271,7 +271,8 @@ class Liquid_TINKER(Liquid):
                 queue_up(wq,
                          command = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure),
                          input_files = ['liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt_tinker.py'],
-                         output_files = ['npt_result.p.bz2', 'npt_tinker.py'] + self.FF.fnms)
+                         output_files = ['npt_result.p.bz2', 'npt_tinker.py'] + self.FF.fnms,
+                         tgt=self)
                 
 
 class AbInitio_TINKER(AbInitio):

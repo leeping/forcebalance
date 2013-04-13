@@ -77,25 +77,37 @@ class Objective(ForceBalanceBaseClass):
         # Loop through the targets, stage the directories and submit the Work Queue processes.
         for Tgt in self.Targets:
             Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2)
-        wq = getWorkQueue()
-        if wq != None:
-            wq_wait(wq)
-        # Loop through the targets again and compute the objective function this time.
+        # wq = getWorkQueue()
+        # if wq != None:
+        #     wq_wait(wq)
+
+        # Create a list of the targets, and remove them from the list as they are finished.
+        Need2Evaluate = self.Targets[:]
+
+        # This ensures that the OrderedDict doesn't get out of order.
         for Tgt in self.Targets:
-            # The first call is always done at the midpoint.
-            Tgt.bSave = True
-            # List of functions that I can call.
-            Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
-            # Call the appropriate function
-            Ans = Funcs[Order](mvals)
-            # Print out the qualitative indicators
-            if verbose:
-                Tgt.indicate()
-            # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
-            if not in_fd():
-                self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
-            for i in range(3):
-                Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
+            self.ObjDict[Tgt.name] = None
+
+        while len(Need2Evaluate) > 0:
+            # Loop through the targets and compute the objective function for ones that are finished.
+            for Tgt in self.Targets:
+                if Tgt.finished():
+                    # List of functions that I can call.
+                    Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
+                    # Call the appropriate function
+                    Ans = Funcs[Order](mvals)
+                    # Print out the qualitative indicators
+                    if verbose:
+                        Tgt.indicate()
+                    # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
+                    if not in_fd():
+                        self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
+                    for i in range(3):
+                        Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
+                    Need2Evaluate.remove(Tgt)
+                else:
+                    pass
+
         return Objective
 
     def Indicate(self):

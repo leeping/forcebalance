@@ -266,10 +266,12 @@ class Liquid_OpenMM(Liquid):
                          command = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", self.liquid_equ_steps),
                          input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                          #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
-                         output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml])
+                         output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
+                         tgt=self)
 
     def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
-        """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. """
+        """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. 
+        Currently not being used. """
         cwd = os.getcwd()
         rnd = os.path.join(cwd,name)
         os.makedirs(name)
@@ -285,7 +287,8 @@ class Liquid_OpenMM(Liquid):
                                          (os.path.join(rnd,'forcebalance.p'),'forcebalance.p'),
                                          (os.path.join(trajpath,'dynamics.dcd'), 'dynamics.dcd')],
                           output_files = [(os.path.join(rnd,'evaltraj_result.p'),'evaltraj_result.p'), 
-                                          (os.path.join(rnd,'evaltraj.log'),'evaltraj.log')])
+                                          (os.path.join(rnd,'evaltraj.log'),'evaltraj.log')],
+                          tgt=self)
 
     def get_evaltraj_result(self, Dict, name, key, bGradient):
         cwd = os.getcwd()

@@ -55,6 +55,11 @@ elif [[ $HOSTNAME =~ "ls4" ]] ; then
     export CUDA_CACHE_PATH=$SCRATCH/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=/opt/apps/cuda/5.0/bin/nvcc
     export BAK=$SCRATCH/runcuda-backups
+elif [[ $HOSTNAME =~ "biox3" ]] ; then
+    # biox3 cluster
+    export PATH=/usr/local/cuda-5.0/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/cuda-5.0/lib64:/usr/local/cuda-5.0/lib:$LD_LIBRARY_PATH
+    export OPENMM_CUDA_COMPILER=/usr/local/cuda-5.0/bin/nvcc
 elif [[ $HOSTNAME =~ "cn" ]] ; then
     # HS GPU Cluster
     module load cuda
