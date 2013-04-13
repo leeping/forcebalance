@@ -91,6 +91,7 @@ gen_opts_types = {
                  "verbose_options"  : (0, 150, 'Set to false to suppress printing options that are equal to their defaults', 'Printing output'),
                  "rigid_water"      : (0, -150, 'Perform calculations using rigid water molecules.', 'Currently used in AMOEBA parameterization (advanced usage)', ['OPENMM','TINKER']),
                  "use_pvals"        : (0, -150, 'Bypass the transformation matrix and use the physical parameters directly', 'Creating the force field; advanced usage, be careful.'),
+                 "asynchronous"     : (0, 0, 'Execute Work Queue tasks and local calculations asynchronously for improved speed', 'Targets that use Work Queue (advanced usage)'),
                  },
     'floats'  : {"trust0"                 : (1e-1, 100, 'Levenberg-Marquardt trust radius; set to negative for nonlinear search', 'Main Optimizer'),
                  "mintrust"               : (0.0,   10, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)', 'Main Optimizer'),

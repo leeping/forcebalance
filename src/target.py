@@ -313,16 +313,18 @@ class Target(ForceBalanceBaseClass):
         
         return
 
-    def finished(self):
+    def wq_complete(self):
+        """ This method determines whether the Work Queue tasks for the current target have completed. """
         wq = getWorkQueue()
         if wq == None:
             return True
         elif wq.empty():
+            self.wqids = []
             return True
         elif len(self.wqids) == 0:
             return True
         else:
-            wq_wait1(wq, tgt=self)
+            wq_wait1(wq, wait_time=30, tgt=self)
             if len(self.wqids) == 0:
                 return True
             else:
