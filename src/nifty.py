@@ -494,48 +494,49 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
         tgt.wqids.append(taskid)
     wq.submit(task)
 
-def wq_wait1(wq, tgt=None, verbose=False):
+def wq_wait1(wq, wait_time=10, tgt=None, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
     if verbose: print '---'
-    task = wq.wait(10)
-    if task:
-        exectime = task.cmd_execution_time/1000000
+    for sec in range(wait_time):
+        task = wq.wait(1)
+        if task:
+            exectime = task.cmd_execution_time/1000000
+            if verbose:
+                print 'A job has finished!'
+                print 'Job name = ', task.tag, 'command = ', task.command
+                print "status = ", task.status, 
+                print "return_status = ", task.return_status, 
+                print "result = ", task.result, 
+                print "host = ", task.hostname
+                print "execution time = ", exectime, 
+                print "total_bytes_transferred = ", task.total_bytes_transferred
+            if task.result != 0:
+                print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.hostname, exectime)
+                if tgt != None:
+                    tgt.wqids.remove(task.id)
+                taskid = wq.submit(task)
+                if tgt != None:
+                    tgt.wqids.append(taskid)
+            else:
+                if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
+                    print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.hostname, exectime)
+                if tgt != None:
+                    tgt.wqids.remove(task.id)
+                del task
         if verbose:
-            print 'A job has finished!'
-            print 'Job name = ', task.tag, 'command = ', task.command
-            print "status = ", task.status, 
-            print "return_status = ", task.return_status, 
-            print "result = ", task.result, 
-            print "host = ", task.hostname
-            print "execution time = ", exectime, 
-            print "total_bytes_transferred = ", task.total_bytes_transferred
-        if task.result != 0:
-            print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.hostname, exectime)
-            if tgt != None:
-                tgt.wqids.remove(task.taskid)
-            taskid = wq.submit(task)
-            if tgt != None:
-                tgt.wqids.append(taskid)
+            print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
+                % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed)
+            print "Tasks: %i running, %i waiting, %i total dispatched, %i total complete" \
+                % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete)
+            print "Data: %i / %i kb sent/received" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024)
         else:
-            if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
-                print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.hostname, exectime)
-            if tgt != None:
-                tgt.wqids.remove(task.taskid)
-            del task
-    if verbose:
-        print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
-            % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed)
-        print "Tasks: %i running, %i waiting, %i total dispatched, %i total complete" \
-            % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete)
-        print "Data: %i / %i kb sent/received" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024)
-    else:
-        print "%s : %i/%i workers busy; %i/%i jobs complete\r" % (datetime.datetime.fromtimestamp(time.mktime(datetime.datetime.now().timetuple())).ctime(),
-                                                                  wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
-                                                                  wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched), 
-        if time.time() - wq_wait.t0 > 900:
-            wq_wait.t0 = time.time()
-            print
-wq_wait.t0 = time.time()
+            print "%s : %i/%i workers busy; %i/%i jobs complete\r" % (datetime.datetime.fromtimestamp(time.mktime(datetime.datetime.now().timetuple())).ctime(),
+                                                                      wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
+                                                                      wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched), 
+            if time.time() - wq_wait1.t0 > 900:
+                wq_wait1.t0 = time.time()
+                print
+wq_wait1.t0 = time.time()
 
 def wq_wait(wq, verbose=False):
     """ This function waits until the work queue is completely empty. """
