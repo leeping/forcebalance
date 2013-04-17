@@ -39,6 +39,7 @@ class Objective(ForceBalanceBaseClass):
         self.set_option(options, 'penalty_additive')
         self.set_option(options, 'penalty_multiplicative')
         self.set_option(options, 'penalty_hyperbolic_b')
+        self.set_option(options, 'penalty_alpha')
         self.set_option(options, 'normalize_weights')
         ## Work Queue Port (The specific target itself may or may not actually use this.)
         self.set_option(options, 'wq_port')
@@ -110,21 +111,21 @@ class Objective(ForceBalanceBaseClass):
             wq = getWorkQueue()
             if wq != None:
                 wq_wait(wq)
-                for Tgt in self.Targets:
-                    # The first call is always done at the midpoint.
-                    Tgt.bSave = True
-                    # List of functions that I can call.
-                    Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
-                    # Call the appropriate function
-                    Ans = Funcs[Order](mvals)
-                    # Print out the qualitative indicators
-                    if verbose:
-                        Tgt.indicate()
-                    # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
-                    if not in_fd():
-                        self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
-                    for i in range(3):
-                        Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
+            for Tgt in self.Targets:
+                # The first call is always done at the midpoint.
+                Tgt.bSave = True
+                # List of functions that I can call.
+                Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
+                # Call the appropriate function
+                Ans = Funcs[Order](mvals)
+                # Print out the qualitative indicators
+                if verbose:
+                    Tgt.indicate()
+                # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
+                if not in_fd():
+                    self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
+                for i in range(3):
+                    Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
         return Objective
 
     def Indicate(self):

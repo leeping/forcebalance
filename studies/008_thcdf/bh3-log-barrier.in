@@ -9,13 +9,13 @@ $options
 ffdir forcefield
 
 # (string) Type of the penalty, L2 or L1 in the optimizer
-penalty_type fusion_barrier
+penalty_type L1 # fusion_barrier
 
 # (allcap) The job type, defaults to a single-point evaluation of objective function
 jobtype newton
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen|xml)
-forcefield cc-pvdz-overlap.gbs throwout.dat
+forcefield cc-pvdz-overlap.gbs # throwout.dat
 
 # (int) Maximum number of steps in an optimization
 maxstep 100
@@ -51,7 +51,7 @@ normalize_weights no
 
 $end
 
-$simulation
+$target
 name molc2
 simtype THCDF_Psi4
 weight 1.0

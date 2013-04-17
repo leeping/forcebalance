@@ -15,7 +15,7 @@ penalty_type fusion
 jobtype newton
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen|xml)
-forcefield cc-pvdz-overlap.gbs throwout.dat
+forcefield cc-pvdz-overlap.gbs # throwout.dat
 
 # (int) Maximum number of steps in an optimization
 maxstep 100

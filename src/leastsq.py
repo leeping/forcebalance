@@ -16,7 +16,7 @@ from subprocess import PIPE
 from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from optimizer import Counter
 
-CHECK_BASIS = True
+CHECK_BASIS = False
 def CheckBasis():
     global CHECK_BASIS
     return CHECK_BASIS
@@ -72,7 +72,7 @@ class LeastSquares(Target):
         # print LAST_MVALS
         # print mvals == LAST_MVALS
         if LAST_MVALS == None or not (mvals == LAST_MVALS).all():
-            CHECK_BASIS = True
+            CHECK_BASIS = False
         else:
             CHECK_BASIS = False
         Answer = {}
