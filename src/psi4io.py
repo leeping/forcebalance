@@ -123,10 +123,11 @@ class THCDF_Psi4(LeastSquares):
         self.GBSfnm = gbslist[0]
         ## Psi4 input file for calculation of linear dependencies
         ## This is actually a file in 'forcefield' until we can figure out a better system
-        datlist = [i for i in self.FF.fnms if os.path.splitext(i)[1] == '.dat']
-        if len(datlist) != 1:
-            warn_press_key("In %s, you should only have exactly one .dat file in the list of force field files!" % __file__)
-        self.DATfnm = datlist[0]
+        if CheckBasis():
+            datlist = [i for i in self.FF.fnms if os.path.splitext(i)[1] == '.dat']
+            if len(datlist) != 1:
+                warn_press_key("In %s, you should only have exactly one .dat file in the list of force field files!" % __file__)
+            self.DATfnm = datlist[0]
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,tgt_opts)
 
@@ -166,6 +167,7 @@ class THCDF_Psi4(LeastSquares):
     def driver(self):
         ## Actually run PSI4.
         if not in_fd() and CheckBasis():
+            print "Now checking for linear dependencies."
             _exec("cp %s %s.bak" % (self.GBSfnm, self.GBSfnm), print_command=False)
             ln0 = self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save)
             o = open(".lindep.dat",'w')

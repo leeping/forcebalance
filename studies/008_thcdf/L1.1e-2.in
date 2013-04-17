@@ -9,7 +9,7 @@ $options
 ffdir forcefield
 
 # (string) Type of the penalty, L2 or L1 in the optimizer
-penalty_type fusion
+penalty_type L1 # fusion
 
 # (allcap) The job type, defaults to a single-point evaluation of objective function
 jobtype newton

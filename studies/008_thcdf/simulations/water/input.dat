@@ -20,7 +20,7 @@ set plugin_objective {
   print 1
   debug 1
   ribasis cc-pvdz-overlap
-      df_metric j
+  df_metric j
 }
 
 energy('scf')
