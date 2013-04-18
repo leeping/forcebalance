@@ -459,7 +459,10 @@ class Optimizer(ForceBalanceBaseClass):
             def hyper_solver(L):
                 dx0 = np.zeros(len(xkd),dtype=float)
                 #dx0 = np.delete(dx0, self.excision)
-                HL = H + (L-1)**2*np.diag(np.diag(H))
+                # HL = H + (L-1)**2*np.diag(np.diag(H))
+                # Attempt to use plain Levenberg
+                HL = H + (L-1)**2*np.eye(len(H))
+
                 HYP = Hyper(HL, self.Objective.Penalty)
                 try:
                     Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
@@ -500,7 +503,10 @@ class Optimizer(ForceBalanceBaseClass):
             for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                 dx = np.insert(dx, i, 0)
             def para_solver(L):
-                HT = H + (L-1)**2*np.diag(np.diag(H))
+                # Levenberg-Marquardt
+                # HT = H + (L-1)**2*np.diag(np.diag(H))
+                # Attempt to use plain Levenberg
+                HT = H + (L-1)**2*np.eye(len(H))
                 # print "Inverting Scaled Hessian:"                       ###
                 # print " G:"                                             ###
                 # pvec1d(G,precision=5)                                   ###
@@ -552,7 +558,8 @@ class Optimizer(ForceBalanceBaseClass):
                 ### LOpt = Result[0]
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
-                print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .3f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+(LOpt-1)**2)
+                # print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .8f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+(LOpt-1)**2)
+                print "\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2)
         else: # This is the nonlinear search code.
             bump = False
             Result = optimize.brent(search_fun,brack=(1.0,4.0),tol=self.search_tol,full_output=1)
