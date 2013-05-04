@@ -351,8 +351,9 @@ class Liquid(Target):
                     BPoints.append(PT)
                 tt += 1
             else:
-                for obs in self.RefData:
-                    del self.RefData[obs][PT]
+                pass
+                # for obs in self.RefData:
+                #     del self.RefData[obs][PT]
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
