@@ -7,16 +7,17 @@ modules for other programs because it's so simple.
 @date 01/2012
 """
 
-import os
+import os, shutil
 from re import match, sub, split, findall
-from nifty import isint, isfloat, _exec, warn_press_key
+from nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
 import numpy as np
 from leastsq import LeastSquares, CheckBasis
 from basereader import BaseReader
 from string import capitalize
-from finite_difference import in_fd
-from collections import defaultdict
+from finite_difference import in_fd, f1d2p, f12d3p, fdwrap
+from collections import defaultdict, OrderedDict
 import itertools
+from target import Target
 
 ##Interaction type -> Parameter Dictionary.
 #pdict = {'Exponent':{0:'A', 1:'C'},
@@ -234,3 +235,222 @@ class THCDF_Psi4(LeastSquares):
         Ans = np.array([[float(i) for i in line.split()] for line in open("objective.dat").readlines()])
         os.unlink("objective.dat")
         return Ans
+
+class Grid_Reader(BaseReader):
+    """Finite state machine for parsing DVR grid files.
+    
+    """
+    
+    def __init__(self,fnm=None):
+        super(Grid_Reader,self).__init__(fnm)
+        self.element = ''
+        self.point = 0
+        self.radii = OrderedDict()
+    
+    def build_pid(self, pfld):
+        if pfld == 1:
+            ptype = 'Position'
+        elif pfld == 2:
+            ptype = 'Weight'
+        else:
+            ptype = 'None'
+        return ptype+":"+"Elem=%s,Point=%i" % (self.element, self.point)
+        
+    def feed(self, line, linindep=False):
+        """ Feed in a line.
+
+        @param[in] line     The line of data
+
+        """
+        line       = line.split('!')[0].strip()
+        s          = line.split()
+        self.ln   += 1
+        # No sense in doing anything for an empty line or a comment line.
+        if len(s) == 0 or match('^ *!',line): return None, None
+        # Now go through all the cases.
+        if match('^[A-Za-z][A-Za-z]? +[0-9]$',line):
+            # This is supposed to match the element line. For example 'Li 0'
+            self.element = capitalize(s[0])
+            self.radii[self.element] = float(s[1])
+            self.isdata = False
+            self.point = 0
+        elif len(s) >= 2 and isint(s[0]) and isfloat(s[1]):
+            self.point += 1
+            self.isdata = True
+        else:
+            self.isdata = False
+
+class RDVR3_Psi4(Target):
+
+    """ Subclass of Target for R-DVR3 grid fitting.
+    Main features:
+    - Multiple molecules are treated as a single target.
+    - R-DVR3 can only print out the objective function, it cannot print out the residual vector.
+    - We should be smart enough to mask derivatives.
+    """
+    
+    def __init__(self,options,tgt_opts,forcefield):
+        super(RDVR3_Psi4,self).__init__(options,tgt_opts,forcefield)
+        #======================================#
+        #     Variables which are set here     #
+        #======================================#
+        ## Which parameters are differentiated?
+        self.objfiles = OrderedDict()
+        self.objvals = OrderedDict()
+        self.elements = OrderedDict()
+        self.molecules = OrderedDict()
+        self.callderivs = OrderedDict()
+        self.factor = 1e6
+        for d in sorted(os.listdir(self.tgtdir)):
+            if os.path.isdir(os.path.join(self.tgtdir,d)) and os.path.exists(os.path.join(self.tgtdir,d,'objective.dat')):
+                self.callderivs[d] = [True for i in range(forcefield.np)]
+                self.objfiles[d] = open(os.path.join(self.tgtdir,d,'objective.dat')).readlines()
+                ElemList = []
+                Molecules = []
+                for line in self.objfiles[d]:
+                    line = line.strip()
+                    s = line.split()
+                    if len(s) >= 3 and s[0].lower() == 'molecule' and s[2] == '{':
+                        MolSection = True
+                        Molecules.append(s[1])
+                    elif len(s) >= 1 and s[0] == '}':
+                        MolSection = False
+                    elif MolSection and len(s) >= 4 and match("^[A-Za-z]+$",s[0]) and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
+                        ElemList.append(capitalize(s[0]))
+                self.elements[d] = set(ElemList)
+                self.molecules[d] = Molecules
+                for p in range(self.FF.np):
+                    Pelem = []
+                    for pid in self.FF.plist[p].split():
+                        # Extract the chemical element.
+                        Pelem.append(pid.split(':')[1].split(',')[0].split('=')[1])
+                    Pelem = set(Pelem)
+                    if len(self.elements[d].intersection(Pelem)) == 0:
+                        self.callderivs[d][p] = False
+        
+    def indicate(self):
+        PrintDict = OrderedDict()
+        for d in self.objvals:
+            PrintDict[d] = "%15.9f" % self.objvals[d]
+        printcool_dictionary(PrintDict,title="Target: %s\nR-DVR Objective Function, Total = %15.9f\n %-10s %15s" % 
+                             (self.name, self.objective, "Molecule", "Objective"),keywidth=15)
+
+        return
+
+    def driver(self, mvals, d):
+        ## Create the force field file.
+        pvals = self.FF.make(mvals)
+        ## Actually run PSI4.
+        odir = os.path.join(os.getcwd(),d)
+        if os.path.exists(odir):
+            shutil.rmtree(odir)
+        os.makedirs(odir)
+        os.chdir(odir)
+        o = open('objective.dat','w')
+        for line in self.objfiles[d]:
+            s = line.split()
+            if len(s) > 2 and s[0] == 'path' and s[1] == '=':
+                print >> o, "path = '%s'" % self.tdir
+            elif len(s) > 2 and s[0] == 'set' and s[1] == 'objective_path':
+                print >> o, "opath = '%s'" % os.getcwd()
+                print >> o, "set objective_path $opath"
+            else:
+                print >> o, line,
+        o.close()
+        _exec("psi4 objective.dat", print_command=False)
+        answer = float(open('objective.out').readlines()[0].split()[1])*self.factor
+        os.chdir('..')
+        return answer
+
+    def get(self, mvals, AGrad=False, AHess=False):
+	"""
+        LPW 04-17-2013
+        
+        This subroutine builds the objective function from Psi4.
+
+        @param[in] mvals Mathematical parameter values
+        @param[in] AGrad Switch to turn on analytic gradient
+        @param[in] AHess Switch to turn on analytic Hessian
+        @return Answer Contribution to the objective function
+        """
+        Answer = {}
+        Fac = 1000000
+        n = len(mvals)
+        X = 0.0
+        G = np.zeros(n,dtype=float)
+        H = np.zeros((n,n),dtype=float)
+        pvals = self.FF.make(mvals)
+        self.tdir = os.getcwd()
+        self.objd = OrderedDict()
+        self.gradd = OrderedDict()
+        self.hdiagd = OrderedDict()
+        bidirect = False
+
+        def fdwrap2(func,mvals0,pidx,qidx,key=None,**kwargs):
+            def func2(arg1,arg2):
+                mvals = list(mvals0)
+                mvals[pidx] += arg1
+                mvals[qidx] += arg2
+                print "\rfdwrap2:", func.__name__, "[%i] = % .1e , [%i] = % .1e" % (pidx, arg1, qidx, arg2), ' '*50,
+                if key != None:
+                    return func(mvals,**kwargs)[key]
+                else:
+                    return func(mvals,**kwargs)
+            return func2
+
+        def f2d5p(f, h):
+            fpp, fpm, fmp, fmm = [f(i*h,j*h) for i,j in [(1,1),(1,-1),(-1,1),(-1,-1)]]
+            fpp = (fpp-fpm-fmp+fmm)/(4*h*h)
+            return fpp
+
+        def f2d4p(f, h, f0 = None):
+            if f0 == None:
+                fpp, fp0, f0p, f0 = [f(i*h,j*h) for i,j in [(1,1),(1,0),(0,1),(0,0)]]
+            else:
+                fpp, fp0, f0p = [f(i*h,j*h) for i,j in [(1,1),(1,0),(0,1)]]
+            fpp = (fpp-fp0-f0p+f0)/(h*h)
+            return fpp
+
+        for d in self.objfiles:
+            print "\rNow working on", d, 50*' ','\r',
+            x = self.driver(mvals, d)
+            grad  = np.zeros(n,dtype=float)
+            hdiag = np.zeros(n,dtype=float)
+            hess  = np.zeros((n,n),dtype=float)
+            for p in range(self.FF.np):
+                if self.callderivs[d][p]:
+                    if AHess:
+                        grad[p], hdiag[p] = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                        hess[p,p] = hdiag[p]
+                        # for q in range(p):
+                        #     if self.callderivs[d][q]:
+                        #         if bidirect:
+                        #             hessentry = f2d5p(fdwrap2(self.driver, mvals, p, q, d=d), h = self.h)
+                        #         else:
+                        #             hessentry = f2d4p(fdwrap2(self.driver, mvals, p, q, d=d), h = self.h, f0 = x)
+                        #         hess[p,q] = hessentry
+                        #         hess[q,p] = hessentry
+                    elif AGrad:
+                        if bidirect:
+                            grad[p], _ = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                        else:
+                            grad[p] = f1d2p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                            
+            self.objd[d] = x
+            self.gradd[d] = grad
+            self.hdiagd[d] = hdiag
+            X += x
+            G += grad
+            #H += np.diag(hdiag)
+            H += hess
+        if not in_fd():
+            self.objective = X
+            self.objvals = self.objd
+        # print self.objd
+        # print self.gradd
+        # print self.hdiagd
+                    
+        if float('Inf') in pvals:
+            return {'X' : 1e10, 'G' : G, 'H' : H}
+        return {'X' : X, 'G' : G, 'H' : H}
+        

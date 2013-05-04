@@ -119,7 +119,8 @@ FF_Extensions = {"itp" : "gmx",
                  "xml" : "openmm",
                  "frcmod" : "frcmod",
                  "mol2" : "mol2",
-                 "gbs" : "gbs"
+                 "gbs"  : "gbs",
+                 "grid" : "grid"
                  }
 
 """ Recognized force field formats. """
@@ -130,7 +131,8 @@ FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "openmm" : openmmio.OpenMM_Reader,
                 "frcmod" : amberio.FrcMod_Reader,
                 "mol2" : amberio.Mol2_Reader,
-                "gbs" : psi4io.GBS_Reader
+                "gbs" : psi4io.GBS_Reader,
+                "grid" : psi4io.Grid_Reader
                 }
 
 def determine_fftype(ffname,verbose=False):
@@ -809,6 +811,8 @@ class FF(ForceBalanceBaseClass):
                 pvals = exp(mvals) * self.pvals0
             except:
                 print mvals
+                import traceback
+                traceback.print_exc()
                 raise Exception('What the hell did you do?')
         else:
             pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0

@@ -50,6 +50,7 @@ import os
 import re
 import sys
 import itertools
+import traceback
 from nifty import printcool, printcool_dictionary, which
 from copy import deepcopy
 from collections import OrderedDict
@@ -99,6 +100,7 @@ gen_opts_types = {
                  "convergence_gradient"   : (1e-4, 100, 'Convergence criterion of gradient norm', 'Main Optimizer'),
                  "convergence_step"       : (1e-4, 100, 'Convergence criterion of step size (just needs to fall below this threshold)', 'Main Optimizer'),
                  "eig_lowerbound"         : (1e-4,  10, 'Minimum eigenvalue for applying steepest descent correction', 'Main Optimizer'),
+                 "lm_guess"               : (1.0,    9, 'Guess value for bracketing line search in trust radius algorithm', 'Main Optimizer'),
                  "finite_difference_h"    : (1e-3,  50, 'Step size for finite difference derivatives in many functions', 'pretty much everywhere'),
                  "penalty_additive"       : (0.0,   55, 'Factor for additive penalty function in objective function', 'Objective function, all penalty types'),
                  "penalty_multiplicative" : (0.0,   55, 'Factor for multiplicative penalty function in objective function', 'Objective function, all penalty types'),
@@ -367,57 +369,63 @@ def parse_inputs(input_file=None):
         return options, tgt_opts
     fobj = open(input_file)
     for line in fobj:
-        # Anything after "#" is a comment
-        line = line.split("#")[0].strip()
-        s = line.split()
-        # Skip over blank lines
-        if len(s) == 0:
-            continue
-        key = s[0].lower()
-        if key in bkwd: # Do option replacement for backward compatibility.
-            key = bkwd[key]
-        # If line starts with a $, this signifies that we're in a new section.
-        if re.match('^\$',line):
-            newsection = re.sub('^\$','',line).upper()
-            if section in ["SIMULATION","TARGET"] and newsection in mainsections:
-                tgt_opts.append(this_tgt_opt)
-                this_tgt_opt = deepcopy(tgt_opts_defaults)
-            section = newsection
-        elif section in ["OPTIONS","SIMULATION","TARGET"]:
-            ## Depending on which section we are in, we choose the correct type dictionary
-            ## and add stuff to 'options' and 'this_tgt_opt'
-            (this_opt, opts_types) = (options, gen_opts_types) if section == "OPTIONS" else (this_tgt_opt, tgt_opts_types)
-            ## Note that "None" is a special keyword!  The variable will ACTUALLY be set to None.
-            if len(s) > 1 and s[1].upper() == "NONE":
-                this_opt[key] = None
-            elif key in opts_types['strings']:
-                this_opt[key] = s[1]
-            elif key in opts_types['allcaps']:
-                this_opt[key] = s[1].upper()
-            elif key in opts_types['lists']:
-                for word in s[1:]:
-                    this_opt.setdefault(key,[]).append(word)
-            elif key in opts_types['ints']:
-                this_opt[key] = int(s[1])
-            elif key in opts_types['bools']:
-                if len(s) == 1:
-                    this_opt[key] = True
-                elif s[1].upper() in ["0", "NO", "FALSE"]:
-                    this_opt[key] = False
+        try:
+            # Anything after "#" is a comment
+            line = line.split("#")[0].strip()
+            s = line.split()
+            # Skip over blank lines
+            if len(s) == 0:
+                continue
+            key = s[0].lower()
+            if key in bkwd: # Do option replacement for backward compatibility.
+                key = bkwd[key]
+            # If line starts with a $, this signifies that we're in a new section.
+            if re.match('^\$',line):
+                newsection = re.sub('^\$','',line).upper()
+                if section in ["SIMULATION","TARGET"] and newsection in mainsections:
+                    tgt_opts.append(this_tgt_opt)
+                    this_tgt_opt = deepcopy(tgt_opts_defaults)
+                section = newsection
+            elif section in ["OPTIONS","SIMULATION","TARGET"]:
+                ## Depending on which section we are in, we choose the correct type dictionary
+                ## and add stuff to 'options' and 'this_tgt_opt'
+                (this_opt, opts_types) = (options, gen_opts_types) if section == "OPTIONS" else (this_tgt_opt, tgt_opts_types)
+                ## Note that "None" is a special keyword!  The variable will ACTUALLY be set to None.
+                if len(s) > 1 and s[1].upper() == "NONE":
+                    this_opt[key] = None
+                elif key in opts_types['strings']:
+                    this_opt[key] = s[1]
+                elif key in opts_types['allcaps']:
+                    this_opt[key] = s[1].upper()
+                elif key in opts_types['lists']:
+                    for word in s[1:]:
+                        this_opt.setdefault(key,[]).append(word)
+                elif key in opts_types['ints']:
+                    this_opt[key] = int(s[1])
+                elif key in opts_types['bools']:
+                    if len(s) == 1:
+                        this_opt[key] = True
+                    elif s[1].upper() in ["0", "NO", "FALSE"]:
+                        this_opt[key] = False
+                    else:
+                        this_opt[key] = True
+                elif key in opts_types['floats']:
+                    this_opt[key] = float(s[1])
+                elif key in opts_types['sections']:
+                    this_opt[key] = ParsTab[key](fobj)
                 else:
-                    this_opt[key] = True
-            elif key in opts_types['floats']:
-                this_opt[key] = float(s[1])
-            elif key in opts_types['sections']:
-                this_opt[key] = ParsTab[key](fobj)
-            else:
-                print "Unrecognized keyword: --- \x1b[1;91m%s\x1b[0m --- in %s section" \
-                      % (key, section)
-                print "Perhaps this option actually belongs in %s section?" \
-                      % (section == "OPTIONS" and "a TARGET" or "the OPTIONS")
+                    print "Unrecognized keyword: --- \x1b[1;91m%s\x1b[0m --- in %s section" \
+                          % (key, section)
+                    print "Perhaps this option actually belongs in %s section?" \
+                          % (section == "OPTIONS" and "a TARGET" or "the OPTIONS")
+                    sys.exit(1)
+            elif section not in mainsections:
+                print "Unrecognized section: %s" % section
                 sys.exit(1)
-        elif section not in mainsections:
-            print "Unrecognized section: %s" % section
+        except:
+            print "Failed to read in this line! Check your input file."
+            print line,
+            traceback.print_exc()
             sys.exit(1)
     if section == "SIMULATION" or section == "TARGET":
         tgt_opts.append(this_tgt_opt)

@@ -84,6 +84,8 @@ class Optimizer(ForceBalanceBaseClass):
         self.set_option(options,'mintrust','mintrust')
         ## Lower bound on Hessian eigenvalue (below this, we add in steepest descent)
         self.set_option(options,'eig_lowerbound','eps')
+        ## Guess value for Brent
+        self.set_option(options,'lm_guess','lmg')
         ## Step size for numerical finite difference
         self.set_option(options,'finite_difference_h','h')
         ## Number of steps to average over
@@ -219,14 +221,12 @@ class Optimizer(ForceBalanceBaseClass):
         """
         if any(['liquid' in tgt.name.lower() for tgt in self.Objective.Targets]) and self.conv_obj < 1e-3:
             warn_press_key("Condensed phase targets detected - may not converge with current choice of convergence_objective (%.e)\nRecommended range is 1e-2 - 1e-1 for this option." % self.conv_obj)
-        if b_BFGS:
-            warn_press_key("Using the BFGS optimization method is not recommended at this time!")
         # Parameters for the adaptive trust radius
         a = self.adapt_fac  # Default value is 0.5, decrease to make more conservative.  Zero to turn off all adaptive.
         b = self.adapt_damp # Default value is 0.5, increase to make more conservative
         printcool( "Main Optimizer\n%s Mode%s" % ("BFGS" if b_BFGS else "Newton-Raphson", " (Static Radius)" if a == 0.0 else " (Adaptive Radius)"), ansi=1, bold=1)
         # First, set a bunch of starting values
-        Ord         = 1 if b_BFGS else 2
+        Ord         = 2
         global ITERATION_NUMBER
         ITERATION_NUMBER = 0
         global GOODSTEP
@@ -256,6 +256,7 @@ class Optimizer(ForceBalanceBaseClass):
         Quality  = 0.0
         restep = False
         GOODSTEP = 1
+        Ord         = 1 if b_BFGS else 2
 
         while 1: # Loop until convergence is reached.
             ## Put data into the checkpoint file
@@ -385,6 +386,7 @@ class Optimizer(ForceBalanceBaseClass):
                 Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
                 Hnew += Mat1-Mat2
                 H = Hnew.copy()
+                data['H'] = H.copy()
 
             datastor= deepcopy(data)
             G_prev  = G.copy()
@@ -416,10 +418,12 @@ class Optimizer(ForceBalanceBaseClass):
         Eig = eig(H1)[0]            # Diagonalize Hessian
         Emin = min(Eig)
         if Emin < self.eps:         # Mix in SD step if Hessian minimum eigenvalue is negative
-            print "Hessian has a small or negative eigenvalue (%.1e), mixing in some steepest descent (%.1e) to correct this." % (Emin, self.eps - Emin)
+            # Experiment.
+            Adj = max(self.eps, 0.01*abs(Emin)) - Emin
+            print "Hessian has a small or negative eigenvalue (%.1e), mixing in some steepest descent (%.1e) to correct this." % (Emin, Adj)
             print "Eigenvalues are:"   ###
             pvec1d(Eig)                ###
-            H += (self.eps - Emin)*np.eye(H.shape[0])
+            H += Adj*np.eye(H.shape[0])
 
         if self.bhyp:
             G = np.delete(G, self.excision)
@@ -541,7 +545,7 @@ class Optimizer(ForceBalanceBaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            print "Searching! Hessian diagonal scaling = %.4e, L = % .4e, length %.4e, result %.4e" % (1+(L-1)**2,L,norm(dx),Result)
+            print "Searching! Hessian diagonal term = %.4e, L = % .4e, length %.4e, result %.4e" % (1+(L-1)**2,L,norm(dx),Result)
             return Result
         
         if self.trust0 > 0: # This is the trust region code.
@@ -553,7 +557,7 @@ class Optimizer(ForceBalanceBaseClass):
                 # Tried a few optimizers here, seems like Brent works well.
                 # Okay, the problem with Brent is that the tolerance is fractional.  
                 # If the optimized value is zero, then it takes a lot of meaningless steps.
-                LOpt = optimize.brent(trust_fun,brack=(1.0,4.0),tol=1e-6)
+                LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
                 ### Result = optimize.fmin_powell(trust_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
                 ### LOpt = Result[0]
                 dx, expect = solver(LOpt)
@@ -562,7 +566,7 @@ class Optimizer(ForceBalanceBaseClass):
                 print "\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2)
         else: # This is the nonlinear search code.
             bump = False
-            Result = optimize.brent(search_fun,brack=(1.0,4.0),tol=self.search_tol,full_output=1)
+            Result = optimize.brent(search_fun,brack=(self.lmg,self.lmg*4),tol=self.search_tol,full_output=1)
             ### optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
             ### Result = optimize.fmin_powell(search_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
             dx, _ = solver(Result[0])

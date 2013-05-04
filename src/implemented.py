@@ -45,7 +45,7 @@ except:
     print "Amber module import failed"
 
 try:
-    from psi4io import THCDF_Psi4
+    from psi4io import THCDF_Psi4, RDVR3_Psi4
 except:
     print traceback.format_exc()
     print "PSI4 module import failed"
@@ -62,6 +62,7 @@ Implemented_Targets = {
     'LIQUID_TINKER':Liquid_TINKER, 
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
+    'RDVR3_PSI4':RDVR3_Psi4,
     'INTERACTION_TINKER':Interaction_TINKER,
     'INTERACTION_OPENMM':Interaction_OpenMM,
     'BINDINGENERGY_TINKER':BindingEnergy_TINKER,
