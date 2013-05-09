@@ -242,7 +242,7 @@ class Optimizer(ForceBalanceBaseClass):
             X, G, H  = data['X'], data['G'], data['H']
             ehist    = np.array([X])
             xk_prev  = xk.copy()
-            trust    = self.trust0
+            trust    = abs(self.trust0)
             X_best   = X
 
         X_prev   = X
@@ -324,11 +324,11 @@ class Optimizer(ForceBalanceBaseClass):
                 print "Warning: Step size of zero detected (i.e. wrong direction).  Try reducing the finite_difference_h parameter"
                 Quality = 1.0 # This is a step length of zero.
 
-            if Quality <= 0.25 and X < (X_prev + self.err_tol):
+            if Quality <= 0.25 and X < (X_prev + self.err_tol) and self.trust0 > 0:
                 # If the step quality is bad, then we should decrease the trust radius.
                 trust = max(ndx*(1./(1+a)), self.mintrust)
                 print "Low quality step, reducing trust radius to % .4e" % trust
-            if Quality >= 0.75 and bump:
+            if Quality >= 0.75 and bump and self.trust0 > 0:
                 # If the step quality is good, then we should increase the trust radius.
                 # The 'a' factor is how much we should grow or shrink the trust radius each step
                 # and the 'b' factor determines how closely we are tied down to the original value.
@@ -351,7 +351,7 @@ class Optimizer(ForceBalanceBaseClass):
                         print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality)
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
-                        data        = self.Objective.Full(xk,Ord,verbose=True)
+                        data        = self.Objective.Full(xk,2,verbose=True)
                         GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
                         X_prev = X
@@ -565,8 +565,10 @@ class Optimizer(ForceBalanceBaseClass):
                 # print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .8f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+(LOpt-1)**2)
                 print "\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2)
         else: # This is the nonlinear search code.
+            # First obtain a step that is the same length as the provided trust radius.
+            LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
             bump = False
-            Result = optimize.brent(search_fun,brack=(self.lmg,self.lmg*4),tol=self.search_tol,full_output=1)
+            Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             ### optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
             ### Result = optimize.fmin_powell(search_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
             dx, _ = solver(Result[0])
