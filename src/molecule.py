@@ -868,6 +868,29 @@ class Molecule(object):
         M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
         return np.array([np.sum([xyz[i,:] * PeriodicTable[self.elem[i]] / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
 
+    def radius_of_gyration(self):
+        M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
+        coms = self.center_of_mass()
+        rgs = []
+        for i, xyz in enumerate(self.xyzs):
+            xyz1 = xyz.copy()
+            xyz1 -= coms[i]
+            rgs.append(np.sum([PeriodicTable[self.elem[i]]*np.dot(x,x) for i, x in enumerate(xyz1)])/M)
+        return np.array(rgs)
+            
+#        if center:
+#            xyz1 -= xyz1.mean(0)
+#        for index2, xyz2 in enumerate(self.xyzs):
+#            if index2 == 0: continue
+#            xyz2 -= xyz2.mean(0)
+#            if smooth:
+#                ref = index2-1
+#            else:
+#                ref = 0
+#            tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
+#            xyz2 = np.dot(xyz2, rt) + tr
+#            self.xyzs[index2] = xyz2
+
     def load_frames(self, fnm):
         NewMol = Molecule(fnm)
         if NewMol.na != self.na:
