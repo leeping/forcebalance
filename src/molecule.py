@@ -801,7 +801,7 @@ class Molecule(object):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
             try:
-                if 'networkx' in sys.modules and self.na:
+                if 'networkx' in sys.modules and self.na < 300:
                     self.topology = self.build_topology()
                     self.molecules = nx.connected_component_subgraphs(self.topology)
                     if 'bonds' not in self.Data:
@@ -866,7 +866,7 @@ class Molecule(object):
 
     def center_of_mass(self):
         M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
-        return [np.sum([xyz[i,:] * PeriodicTable[self.elem[i]] / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs]
+        return np.array([np.sum([xyz[i,:] * PeriodicTable[self.elem[i]] / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
 
     def load_frames(self, fnm):
         NewMol = Molecule(fnm)
