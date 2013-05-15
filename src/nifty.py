@@ -492,7 +492,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     taskid = wq.submit(task)
     if tgt != None:
         tgt.wqids.append(taskid)
-    wq.submit(task)
+    #wq.submit(task)
 
 def wq_wait1(wq, wait_time=10, tgt=None, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
