@@ -65,6 +65,16 @@ class END:
         """
         pass
 
+def toInt(strin):
+    try:
+        return int(strin)
+    except:
+        return int(strin,16)
+
+# def toStr(intin):
+#     if intin >= 100000:
+#         return 
+
 class MASTER:
     """ MASTER class
 
@@ -95,17 +105,17 @@ class MASTER:
         """
         record = string.strip(line[0:6])
         if record == "MASTER":
-            self.numRemark = int(string.strip(line[10:15]))
-            self.numHet = int(string.strip(line[20:25]))
-            self.numHelix = int(string.strip(line[25:30]))
-            self.numSheet = int(string.strip(line[30:35]))
-            self.numTurn = int(string.strip(line[35:40]))
-            self.numSite = int(string.strip(line[40:45]))
-            self.numXform = int(string.strip(line[45:50]))
-            self.numCoord = int(string.strip(line[50:55]))
-            self.numTer = int(string.strip(line[55:60]))
-            self.numConect = int(string.strip(line[60:65]))
-            self.numSeq = int(string.strip(line[65:70]))
+            self.numRemark = toInt(string.strip(line[10:15]))
+            self.numHet = toInt(string.strip(line[20:25]))
+            self.numHelix = toInt(string.strip(line[25:30]))
+            self.numSheet = toInt(string.strip(line[30:35]))
+            self.numTurn = toInt(string.strip(line[35:40]))
+            self.numSite = toInt(string.strip(line[40:45]))
+            self.numXform = toInt(string.strip(line[45:50]))
+            self.numCoord = toInt(string.strip(line[50:55]))
+            self.numTer = toInt(string.strip(line[55:60]))
+            self.numConect = toInt(string.strip(line[60:65]))
+            self.numSeq = toInt(string.strip(line[65:70]))
         else:  raise ValueError, record
 
 
@@ -141,26 +151,26 @@ class CONECT:
         """
         record = string.strip(line[0:6])
         if record == "CONECT":
-            self.serial = int(string.strip(line[6:11]))
-            try:  self.serial1 = int(string.strip(line[11:16]))
+            self.serial = toInt(string.strip(line[6:11]))
+            try:  self.serial1 = toInt(string.strip(line[11:16]))
             except ValueError:  self.serial1 = None
-            try:  self.serial2 = int(string.strip(line[16:21]))
+            try:  self.serial2 = toInt(string.strip(line[16:21]))
             except ValueError:  self.serial2 = None
-            try:  self.serial3 = int(string.strip(line[21:26]))
+            try:  self.serial3 = toInt(string.strip(line[21:26]))
             except ValueError:  self.serial3 = None
-            try:  self.serial4 = int(string.strip(line[26:31]))
+            try:  self.serial4 = toInt(string.strip(line[26:31]))
             except ValueError:  self.serial4 = None
-            try:  self.serial5 = int(string.strip(line[31:36]))
+            try:  self.serial5 = toInt(string.strip(line[31:36]))
             except ValueError:  self.serial5 = None
-            try:  self.serial6 = int(string.strip(line[36:41]))
+            try:  self.serial6 = toInt(string.strip(line[36:41]))
             except ValueError:  self.serial6 = None
-            try:  self.serial7 = int(string.strip(line[41:46]))
+            try:  self.serial7 = toInt(string.strip(line[41:46]))
             except ValueError:  self.serial7 = None
-            try:  self.serial8 = int(string.strip(line[46:51]))
+            try:  self.serial8 = toInt(string.strip(line[46:51]))
             except ValueError:  self.serial8 = None
-            try:  self.serial9 = int(string.strip(line[51:56]))
+            try:  self.serial9 = toInt(string.strip(line[51:56]))
             except ValueError:  self.serial9 = None
-            try:  self.serial10 = int(string.strip(line[56:61]))
+            try:  self.serial10 = toInt(string.strip(line[56:61]))
             except ValueError:  self.serial10 = None
         else:  raise ValueError, record
 
@@ -198,10 +208,10 @@ class TER:
         record = string.strip(line[0:6])
         if record == "TER":
             try: # Not really needed
-                self.serial = int(string.strip(line[6:11]))
+                self.serial = toInt(string.strip(line[6:11]))
                 self.resName = string.strip(line[17:20])
                 self.chainID = string.strip(line[21])
-                self.resSeq = int(string.strip(line[22:26]))
+                self.resSeq = toInt(string.strip(line[22:26]))
                 self.iCode = string.strip(line[26])
             except (IndexError, ValueError):
                 self.serial = None
@@ -242,19 +252,19 @@ class SIGUIJ:
         """
         record = string.strip(line[0:6])
         if record == "SIGUIJ":
-            self.serial = int(string.strip(line[6:11]))
+            self.serial = toInt(string.strip(line[6:11]))
             self.name = string.strip(line[12:16])
             self.altLoc = string.strip(line[16])
             self.resName = string.strip(line[17:20])
             self.chainID = string.strip(line[21])
-            self.resSeq = int(string.strip(line[22:26]))
+            self.resSeq = toInt(string.strip(line[22:26]))
             self.iCode = string.strip(line[26])
-            self.sig11 = int(string.strip(line[28:35]))
-            self.sig22 = int(string.strip(line[35:42]))
-            self.sig33 = int(string.strip(line[42:49]))
-            self.sig12 = int(string.strip(line[49:56]))
-            self.sig13 = int(string.strip(line[56:63]))
-            self.sig23 = int(string.strip(line[63:70]))
+            self.sig11 = toInt(string.strip(line[28:35]))
+            self.sig22 = toInt(string.strip(line[35:42]))
+            self.sig33 = toInt(string.strip(line[42:49]))
+            self.sig12 = toInt(string.strip(line[49:56]))
+            self.sig13 = toInt(string.strip(line[56:63]))
+            self.sig23 = toInt(string.strip(line[63:70]))
             self.segID = string.strip(line[72:76])
             self.element = string.strip(line[76:78])
             self.charge = string.strip(line[78:80])
@@ -292,19 +302,19 @@ class ANISOU:
         """
         record = string.strip(line[0:6])
         if record == "ANISOU":
-            self.serial = int(string.strip(line[6:11]))
+            self.serial = toInt(string.strip(line[6:11]))
             self.name = string.strip(line[12:16])
             self.altLoc = string.strip(line[16])
             self.resName = string.strip(line[17:20])
             self.chainID = string.strip(line[21])
-            self.resSeq = int(string.strip(line[22:26]))
+            self.resSeq = toInt(string.strip(line[22:26]))
             self.iCode = string.strip(line[26])
-            self.u00 = int(string.strip(line[28:35]))
-            self.u11 = int(string.strip(line[35:42]))
-            self.u22 = int(string.strip(line[42:49]))
-            self.u01 = int(string.strip(line[49:56]))
-            self.u02 = int(string.strip(line[56:63]))
-            self.u12 = int(string.strip(line[63:70]))
+            self.u00 = toInt(string.strip(line[28:35]))
+            self.u11 = toInt(string.strip(line[35:42]))
+            self.u22 = toInt(string.strip(line[42:49]))
+            self.u01 = toInt(string.strip(line[49:56]))
+            self.u02 = toInt(string.strip(line[56:63]))
+            self.u12 = toInt(string.strip(line[63:70]))
             self.segID = string.strip(line[72:76])
             self.element = string.strip(line[76:78])
             self.charge = string.strip(line[78:80])
@@ -344,12 +354,12 @@ class SIGATM:
         """
         record = string.strip(line[0:6])
         if record == "HETATM":
-            self.serial = int(string.strip(line[6:11]))
+            self.serial = toInt(string.strip(line[6:11]))
             self.name = string.strip(line[12:16])
             self.altLoc = string.strip(line[16])
             self.resName = string.strip(line[17:20])
             self.chainID = string.strip(line[21])
-            self.resSeq = int(string.strip(line[22:26]))
+            self.resSeq = toInt(string.strip(line[22:26]))
             self.iCode = string.strip(line[26])
             self.sigX = float(string.strip(line[30:38]))
             self.sigY = float(string.strip(line[38:46]))
@@ -396,13 +406,13 @@ class HETATM:
         """
         record = string.strip(line[0:6])
         if record == "HETATM":
-            self.serial = int(string.strip(line[6:11]))
+            self.serial = toInt(string.strip(line[6:11]))
             self.name = string.strip(line[12:16])
             self.altLoc = string.strip(line[16])
             try:
                 self.resName = string.strip(line[17:20])
                 self.chainID = string.strip(line[21])
-                self.resSeq = int(string.strip(line[22:26]))
+                self.resSeq = toInt(string.strip(line[22:26]))
                 self.iCode = string.strip(line[26])
             except: 
                 raise ValueError, 'Residue name must be less than 4 characters!'
@@ -458,7 +468,10 @@ class HETATM:
         str = ""
         tstr = "HETATM"
         str = str + string.ljust(tstr, 6)[:6]
-        tstr = "%d" % self.serial
+        if self.serial < 100000:
+            tstr = "%d" % self.serial
+        else:
+            tstr = hex(self.serial)[2:]
         str = str + string.rjust(tstr, 5)[:5]
         str = str + " "
         tstr = self.name
@@ -473,7 +486,10 @@ class HETATM:
         str = str + " "
         tstr = self.chainID
         str = str + string.ljust(tstr, 1)[:1]
-        tstr = "%d" % self.resSeq
+        if self.resSeq < 100000:
+            tstr = "%d" % self.resSeq
+        else:
+            tstr = hex(self.resSeq)[2:]
         str = str + string.rjust(tstr, 4)[:4]
         tstr = self.iCode
         str = str + string.ljust(tstr, 1)[:1]
@@ -576,9 +592,9 @@ class MOL2MOLECULE:
             fakeChain = " L"
             try:
                 mol2pdb = '%s%5i%5s%4s%2s%4i    %8.3f%8.3f%8.3f' %\
-                   (fakeRecord,int(SeparatedAtomLine[0]),
+                   (fakeRecord,toInt(SeparatedAtomLine[0]),
                     SeparatedAtomLine[1],SeparatedAtomLine[7],
-                    fakeChain,int(SeparatedAtomLine[6]),
+                    fakeChain,toInt(SeparatedAtomLine[6]),
                     float(SeparatedAtomLine[2]),float(SeparatedAtomLine[3]),
                     float(SeparatedAtomLine[4]))
             except ValueError:
@@ -598,10 +614,10 @@ class MOL2MOLECULE:
                 raise Exception, "Bad bond entry in MOL2 file: %s" % BondLine
             try:
                 thisBond = MOL2BOND(
-                    int(SeparatedBondLine[1]), # bond frm
-                    int(SeparatedBondLine[2]), # bond to
+                    toInt(SeparatedBondLine[1]), # bond frm
+                    toInt(SeparatedBondLine[2]), # bond to
                     SeparatedBondLine[3],      # bond type
-                    int(SeparatedBondLine[0])  # bond id
+                    toInt(SeparatedBondLine[0])  # bond id
                     )
             except ValueError:
                 raise Exception, "Bad bond entry in MOL2 file: %s" % BondLine
@@ -675,12 +691,12 @@ class ATOM:
         """
         record = string.strip(line[0:6])
         if record == "ATOM":
-            self.serial = int(string.strip(line[6:11]))
+            self.serial = toInt(string.strip(line[6:11]))
             self.name = string.strip(line[12:16])
             self.altLoc = string.strip(line[16])
             self.resName = string.strip(line[17:20])
             self.chainID = string.strip(line[21])
-            self.resSeq = int(string.strip(line[22:26]))
+            self.resSeq = toInt(string.strip(line[22:26]))
             self.iCode = string.strip(line[26])
             self.x = float(string.strip(line[30:38]))
             self.y = float(string.strip(line[38:46]))
@@ -728,7 +744,10 @@ class ATOM:
         str = ""
         tstr = "ATOM"
         str = str + string.ljust(tstr, 6)[:6]
-        tstr = "%d" % self.serial
+        if self.serial < 100000:
+            tstr = "%d" % self.serial
+        else:
+            tstr = hex(self.serial)[2:]
         str = str + string.rjust(tstr, 5)[:5]
         str = str + " "
         tstr = self.name
@@ -743,7 +762,10 @@ class ATOM:
         str = str + " "
         tstr = self.chainID
         str = str + string.ljust(tstr, 1)[:1]
-        tstr = "%d" % self.resSeq
+        if self.resSeq < 100000:
+            tstr = "%d" % self.resSeq
+        else:
+            tstr = hex(self.resSeq)[2:]
         str = str + string.rjust(tstr, 4)[:4]
         tstr = self.iCode
         str = str + string.ljust(tstr, 1)[:1]
@@ -784,7 +806,7 @@ class MODEL:
         """
         record = string.strip(line[0:6])
         if record == "MODEL":
-            self.serial = int(string.strip(line[10:14]))
+            self.serial = toInt(string.strip(line[10:14]))
         else:  raise ValueError, record
 
 class TVECT:
@@ -808,7 +830,7 @@ class TVECT:
         """
         record = string.strip(line[0:6])
         if record == "TVECT":
-            self.serial = int(string.strip(line[7:10]))
+            self.serial = toInt(string.strip(line[7:10]))
             self.t1 = float(string.strip(line[10:20]))
             self.t2 = float(string.strip(line[20:30]))
             self.t3 = float(string.strip(line[30:40]))
@@ -840,12 +862,12 @@ class MTRIX3:
         """
         record = string.strip(line[0:6])
         if record == "MTRIX3":
-            self.serial = int(string.strip(line[7:10]))
+            self.serial = toInt(string.strip(line[7:10]))
             self.mn1 = float(string.strip(line[10:20]))
             self.mn2 = float(string.strip(line[20:30]))
             self.mn3 = float(string.strip(line[30:40]))
             self.vn = float(string.strip(line[45:55]))
-            self.iGiven = int(string.strip(line[59]))
+            self.iGiven = toInt(string.strip(line[59]))
         else:  raise ValueError, record
 
 class MTRIX2:
@@ -873,12 +895,12 @@ class MTRIX2:
         """
         record = string.strip(line[0:6])
         if record == "MTRIX2":
-            self.serial = int(string.strip(line[7:10]))
+            self.serial = toInt(string.strip(line[7:10]))
             self.mn1 = float(string.strip(line[10:20]))
             self.mn2 = float(string.strip(line[20:30]))
             self.mn3 = float(string.strip(line[30:40]))
             self.vn = float(string.strip(line[45:55]))
-            self.iGiven = int(string.strip(line[59]))
+            self.iGiven = toInt(string.strip(line[59]))
         else:  raise ValueError, record
 
 class MTRIX1:
@@ -906,12 +928,12 @@ class MTRIX1:
         """
         record = string.strip(line[0:6])
         if record == "MTRIX1":
-            self.serial = int(string.strip(line[7:10]))
+            self.serial = toInt(string.strip(line[7:10]))
             self.mn1 = float(string.strip(line[10:20]))
             self.mn2 = float(string.strip(line[20:30]))
             self.mn3 = float(string.strip(line[30:40]))
             self.vn = float(string.strip(line[45:55]))
-            try:  self.iGiven = int(string.strip(line[45:55]))
+            try:  self.iGiven = toInt(string.strip(line[45:55]))
             except ValueError:  self.iGiven = None
             except IndexError:  self.iGiven = None
         else:  raise ValueError, record
@@ -1113,7 +1135,7 @@ class CRYST1:
             self.beta = float(string.strip(line[40:47]))
             self.gamma = float(string.strip(line[47:54]))
             self.sGroup = string.strip(line[55:65])
-            self.z = int(string.strip(line[66:70]))
+            self.z = toInt(string.strip(line[66:70]))
         else:  raise ValueError, record
 
 
@@ -1168,24 +1190,24 @@ class SITE:
         """
         record = string.strip(line[0:6])
         if record == "SITE":
-            self.seqNum = int(string.strip(line[7:10]))
+            self.seqNum = toInt(string.strip(line[7:10]))
             self.siteID = string.strip(line[11:14])
-            self.numRes = int(string.strip(line[15:17]))
+            self.numRes = toInt(string.strip(line[15:17]))
             self.resName1 = string.strip(line[18:21])
             self.chainID1 = string.strip(line[22])
-            self.seq1 = int(string.strip(line[23:27]))
+            self.seq1 = toInt(string.strip(line[23:27]))
             self.iCode1 = string.strip(line[27])
             self.resName2 = string.strip(line[29:32])
             self.chainID2 = string.strip(line[33])
-            self.seq2 = int(string.strip(line[34:38]))
+            self.seq2 = toInt(string.strip(line[34:38]))
             self.iCode2 = string.strip(line[38])
             self.resName3 = string.strip(line[40:43])
             self.chainID3 = string.strip(line[44])
-            self.seq3 = int(string.strip(line[45:49]))
+            self.seq3 = toInt(string.strip(line[45:49]))
             self.iCode3 = string.strip(line[49])
             self.resName4 = string.strip(line[51:54])
             self.chainID4 = string.strip(line[55])
-            self.seq4 = int(string.strip(line[56:60]))
+            self.seq4 = toInt(string.strip(line[56:60]))
             try:  self.iCode4 = string.strip(line[60])
             except IndexError:  self.iCode4 = None
         else:  raise ValueError, record
@@ -1218,16 +1240,16 @@ class CISPEP:
         """
         record = string.strip(line[0:6])
         if record == "CISPEP":
-            self.serNum = int(string.strip(line[7:10]))
+            self.serNum = toInt(string.strip(line[7:10]))
             self.pep1 = string.strip(line[11:14])
             self.chainID1 = string.strip(line[15])
-            self.seqNum1 = int(string.strip(line[17:21]))
+            self.seqNum1 = toInt(string.strip(line[17:21]))
             self.icode1 = string.strip(line[21])
             self.pep2 = string.strip(line[25:28])
             self.chainID2 = string.strip(line[29])
-            self.seqNum2 = int(string.strip(line[31:35]))
+            self.seqNum2 = toInt(string.strip(line[31:35]))
             self.icode2 = string.strip(line[35])
-            self.modNum = int(string.strip(line[43:46]))
+            self.modNum = toInt(string.strip(line[43:46]))
             self.measure = float(string.strip(line[53:59]))
         else:  raise ValueError, record
 
@@ -1265,13 +1287,13 @@ class SLTBRG:
             self.altLoc1 = string.strip(line[16])
             self.resName1 = string.strip(line[17:20])
             self.chainID1 = string.strip(line[21])
-            self.resSeq1 = int(string.strip(line[22:26]))
+            self.resSeq1 = toInt(string.strip(line[22:26]))
             self.iCode1 = string.strip(line[26])
             self.name2 = string.strip(line[42:46])
             self.altLoc2 = string.strip(line[46])
             self.resName2 = string.strip(line[47:50])
             self.chainID2 = string.strip(line[51])
-            self.resSeq2 = int(string.strip(line[52:56]))
+            self.resSeq2 = toInt(string.strip(line[52:56]))
             self.iCode2 = string.strip(line[56])
             self.sym1 = string.strip(line[59:65])
             self.sym2 = string.strip(line[66:72])
@@ -1370,13 +1392,13 @@ class LINK:
             self.altLoc1 = string.strip(line[16])
             self.resName1 = string.strip(line[17:20])
             self.chainID1 = string.strip(line[21])
-            self.resSeq1 = int(string.strip(line[22:26]))
+            self.resSeq1 = toInt(string.strip(line[22:26]))
             self.iCode1 = string.strip(line[26])
             self.name2 = string.strip(line[42:46])
             self.altLoc2 = string.strip(line[46])
             self.resName2 = string.strip(line[47:50])
             self.chainID2 = string.strip(line[51])
-            self.resSeq2 = int(string.strip(line[52:56]))
+            self.resSeq2 = toInt(string.strip(line[52:56]))
             self.iCode2 = string.strip(line[56])
             self.sym1 = string.strip(line[59:65])
             self.sym2 = string.strip(line[66:72])
@@ -1409,12 +1431,12 @@ class SSBOND:
         """
         record = string.strip(line[0:6])
         if record == "SSBOND":
-            self.serNum = int(string.strip(line[7:10]))
+            self.serNum = toInt(string.strip(line[7:10]))
             self.chainID1 = string.strip(line[15])
-            self.seqNum1 = int(string.strip(line[17:21]))
+            self.seqNum1 = toInt(string.strip(line[17:21]))
             self.icode1 = string.strip(line[21])
             self.chainID2 = string.strip(line[29])
-            self.seqNum2 = int(string.strip(line[31:35]))
+            self.seqNum2 = toInt(string.strip(line[31:35]))
             self.icode2 = string.strip(line[35])
             self.sym1 = string.strip(line[59:65])
             self.sym2 = string.strip(line[66:72])
@@ -1456,15 +1478,15 @@ class TURN:
         """
         record = string.strip(line[0:6])
         if record == "TURN":
-            self.seq = int(string.strip(line[7:10]))
+            self.seq = toInt(string.strip(line[7:10]))
             self.turnId = string.strip(line[11:14])
             self.initResName = string.strip(line[15:18])
             self.initChainId = string.strip(line[19])
-            self.initSeqNum = int(string.strip(line[20:24]))
+            self.initSeqNum = toInt(string.strip(line[20:24]))
             self.initICode = string.strip(line[24])
             self.endResName = string.strip(line[26:29])
             self.endChainId = string.strip(line[30])
-            self.endSeqNum = int(string.strip(line[31:35]))
+            self.endSeqNum = toInt(string.strip(line[31:35]))
             self.endICode = string.strip(line[35])
             self.comment = string.strip(line[40:70])
         else:  raise ValueError, record
@@ -1526,29 +1548,29 @@ class SHEET:
         """
         record = string.strip(line[0:6])
         if record == "SHEET":
-            self.strand = int(string.strip(line[7:10]))
+            self.strand = toInt(string.strip(line[7:10]))
             self.sheetID = string.strip(line[11:14])
-            self.numStrands = int(string.strip(line[14:16]))
+            self.numStrands = toInt(string.strip(line[14:16]))
             self.initResName = string.strip(line[17:20])
             self.initChainID = string.strip(line[21])
-            self.initSeqNum = int(string.strip(line[22:26]))
+            self.initSeqNum = toInt(string.strip(line[22:26]))
             self.initICode = string.strip(line[26])
             self.endResName = string.strip(line[28:31])
             self.endChainID = string.strip(line[32])
-            self.endSeqNum = int(string.strip(line[33:37]))
+            self.endSeqNum = toInt(string.strip(line[33:37]))
             self.endICode = string.strip(line[37])
-            self.sense = int(string.strip(line[38:40]))
+            self.sense = toInt(string.strip(line[38:40]))
             try:
                 self.curAtom = string.strip(line[41:45])
                 self.curResName = string.strip(line[45:48])
                 self.curChainID = string.strip(line[49])
-                try:  self.curResSeq = int(string.strip(line[50:54]))
+                try:  self.curResSeq = toInt(string.strip(line[50:54]))
                 except ValueError:  self.curResSeq = None
                 self.curICode = string.strip(line[54])
                 self.prevAtom = string.strip(line[56:60])
                 self.prevResName = string.strip(line[60:63])
                 self.prevChainID = string.strip(line[64])
-                try:  self.prevResSeq = int(string.strip(line[65:69]))
+                try:  self.prevResSeq = toInt(string.strip(line[65:69]))
                 except ValueError:  self.prevResSeq = None
                 self.prevICode = string.strip(line[69])
             except IndexError:  
@@ -1601,20 +1623,20 @@ class HELIX:
         """
         record = string.strip(line[0:6])
         if record == "HELIX":
-            self.serNum = int(string.strip(line[7:10]))
+            self.serNum = toInt(string.strip(line[7:10]))
             self.helixID = string.strip(line[11:14])
             self.initResName = string.strip(line[15:18])
             self.initChainID = string.strip(line[19])
-            self.initSeqNum = int(string.strip(line[21:25]))
+            self.initSeqNum = toInt(string.strip(line[21:25]))
             self.initICode = string.strip(line[25])
             self.endResName = string.strip(line[27:30])
             self.endChainID = string.strip(line[31])
-            self.endSeqNum = int(string.strip(line[33:37]))
+            self.endSeqNum = toInt(string.strip(line[33:37]))
             self.endICode = string.strip(line[37])
-            try:  self.helixClass = int(string.strip(line[38:40]))
+            try:  self.helixClass = toInt(string.strip(line[38:40]))
             except ValueError:  self.helixClass = None
             self.comment = string.strip(line[40:70])
-            try:  self.length = int(string.strip(line[71:76]))
+            try:  self.length = toInt(string.strip(line[71:76]))
             except ValueError:  self.length = None
         else:  raise ValueError, record
 
@@ -1638,7 +1660,7 @@ class FORMUL:
         """
         record = string.strip(line[0:6])
         if record == "FORMUL":
-            self.compNum = int(string.strip(line[8:10]))
+            self.compNum = toInt(string.strip(line[8:10]))
             self.hetID = string.strip(line[12:15])
             self.asterisk = string.strip(line[19])
             self.text = string.strip(line[19:70])
@@ -1722,10 +1744,10 @@ class HET:
         if record == "HET":
             self.hetID = string.strip(line[7:10])
             self.chainID = string.strip(line[12])
-            try:  self.seqNum = int(string.strip(line[13]))
+            try:  self.seqNum = toInt(string.strip(line[13]))
             except ValueError:  self.seqNum = None
             self.iCode = string.strip(line[17])
-            self.numHetAtoms = int(string.strip(line[20:25]))
+            self.numHetAtoms = toInt(string.strip(line[20:25]))
             self.text = string.strip(line[30:70])
         else:  raise ValueError, record
 
@@ -1757,7 +1779,7 @@ class MODRES:
             string.idCode = string.strip(line[7:11])
             string.resName = string.strip(line[12:15])
             string.chainID = string.strip(line[16])
-            string.seqNum = int(string.strip(line[18:22]))
+            string.seqNum = toInt(string.strip(line[18:22]))
             string.iCode = string.strip(line[22])
             string.stdRes = string.strip(line[24:27])
             string.comment = string.strip(line[29:70])
@@ -1801,9 +1823,9 @@ class SEQRES:
         """
         record = string.strip(line[0:6])
         if record == "SEQRES":
-            self.serNum = int(string.strip(line[8:10]))
+            self.serNum = toInt(string.strip(line[8:10]))
             self.chainID = string.strip(line[11])
-            self.numRes = int(string.strip(line[13:17]))
+            self.numRes = toInt(string.strip(line[13:17]))
             self.resName = []
             self.resName.append(string.strip(line[19:22]))
             self.resName.append(string.strip(line[23:26]))
@@ -1855,13 +1877,13 @@ class SEQADV:
             self.idCode = string.strip(line[7:11])
             self.resName = string.strip(line[12:15])
             self.chainID = string.strip(line[16])
-            try:  self.seqNum = int(string.strip(line[19:22]))
+            try:  self.seqNum = toInt(string.strip(line[19:22]))
             except ValueError:  self.seqNum = None
             self.iCode = string.strip(line[22])
             self.database = string.strip(line[24:28])
             self.dbIdCode = string.strip(line[29:38])
             self.dbRes = string.strip(line[39:42])
-            self.dbSeq = int(string.strip(line[43:48]))
+            self.dbSeq = toInt(string.strip(line[43:48]))
             self.conflict = string.strip(line[49:70])
         else:  raise ValueError, record
 
@@ -1916,16 +1938,16 @@ class DBREF:
         if record == "DBREF":
             self.idCode = string.strip(line[7:11]) 
             self.chainID = string.strip(line[12]) 
-            self.seqBegin = int(string.strip(line[14:18]))
+            self.seqBegin = toInt(string.strip(line[14:18]))
             self.insertBegin = string.strip(line[18])
-            self.seqEnd = int(string.strip(line[20:24]))
+            self.seqEnd = toInt(string.strip(line[20:24]))
             self.insertEnd = string.strip(line[24])
             self.database = string.strip(line[26:32])
             self.dbAccession = string.strip(line[33:41])
             self.dbIdCode = string.strip(line[42:54])
-            self.dbseqBegin = int(string.strip(line[55:60]))
+            self.dbseqBegin = toInt(string.strip(line[55:60]))
             self.dbinsBeg = string.strip(line[60])
-            self.dbseqEnd = int(string.strip(line[62:67]))
+            self.dbseqEnd = toInt(string.strip(line[62:67]))
             try:  self.dbinsEnd = string.strip(line[67])
             except IndexError:  self.dbinsEnd = None
         else:  raise ValueError, record
@@ -1948,7 +1970,7 @@ class REMARK:
         record = string.strip(line[0:6])
         if record == "REMARK":
             try:
-                self.remarkNum = int(string.strip(line[7:10]))
+                self.remarkNum = toInt(string.strip(line[7:10]))
             except ValueError:
                 self.remarkNum = None
             self.remarkDict = {}
@@ -1956,7 +1978,7 @@ class REMARK:
             if self.remarkNum == 1:
                 subfield = string.strip(line[11:20])
                 if subfield == "REFERENCE":
-                    self.remarkDict["refNum"] = int(string.strip(line[21:70]))
+                    self.remarkDict["refNum"] = toInt(string.strip(line[21:70]))
                 elif subfield == "AUTH":
                     self.remarkDict["authorList"] = string.strip(line[19:70])
                 elif subfield == "TITL":
@@ -2074,10 +2096,10 @@ class REVDAT:
         """
         record = string.strip(line[0:6])
         if record == "REVDAT":
-            self.modNum = int(string.strip(line[7:10]))
+            self.modNum = toInt(string.strip(line[7:10]))
             self.modDate = string.strip(line[13:22])
             self.modId = string.strip(line[23:28])
-            self.modType = int(string.strip(line[31]))
+            self.modType = toInt(string.strip(line[31]))
             self.records = []
             self.records.append(string.strip(line[39:45]))
             self.records.append(string.strip(line[46:52]))
@@ -2347,12 +2369,12 @@ def readAtom(line):
         Parameters
             line:  The line to parse(string)
        if record == ATOM:
-            self.serial = int(string.strip(line[6:11]))
+            self.serial = toInt(string.strip(line[6:11]))
             self.name = string.strip(line[12:16])
             self.altLoc = string.strip(line[16])
             self.resName = string.strip(line[17:20])
             self.chainID = string.strip(line[21])
-            self.resSeq = int(string.strip(line[22:26]))
+            self.resSeq = toInt(string.strip(line[22:26]))
             self.iCode = string.strip(line[26])
             self.x = float(string.strip(line[30:38]))
             self.y = float(string.strip(line[38:46]))

@@ -2111,6 +2111,10 @@ class Molecule(object):
                 line[0:4]=np.array(list("ATOM"))
                 line=np.array(line,'str')
                 line[6:11]=np.array(list(str(ATOMNUM%100000).rjust(5)))
+                # if ATOMNUM < 100000:
+                #     line[6:11]=np.array(list(str(ATOMNUM%100000).rjust(5)))
+                # else:
+                #     line[6:11]=np.array(list(hex(ATOMNUM)[2:].rjust(5)))
                 #Molprobity is picky about atom name centering
                 if len(str(ATOMS[i]))==3:
                     line[12:16]=np.array(list(str(ATOMS[i]).rjust(4)))
@@ -2126,7 +2130,11 @@ class Molecule(object):
                     line[17:21]=np.array(list(str(RESNAMES[i]).ljust(4)))
 
                 line[21]=str(CHAIN[i]).rjust(1)
-                line[22:26]=np.array(list(str(RESNUMS[i]).rjust(4)))
+                line[22:26]=np.array(list(str(RESNUMS[i]%10000).rjust(4)))
+                # if RESNUMS[i] < 100000:
+                #     line[22:26]=np.array(list(str(RESNUMS[i]).rjust(4)))
+                # else:
+                #     line[22:26]=np.array(list(hex(RESNUMS[i])[2:].rjust(4)))
 
                 x=XYZ[i][0]
                 y=XYZ[i][1]
