@@ -5,7 +5,7 @@
 #
 # If the output filename is not specified, it will be automatically created.
 #
-# If the output file already exists, then this script will exit,
+# If the output file already exists, then the output file will be backed up -
 # unless -f is given, and then files will be overwritten.
 # 
 # Importantly, ForceBalance.py prints a lot of carriage returns as "progress reports".
@@ -54,19 +54,27 @@ then
     extension="${filename##*.}"
     filename="${filename%.*}"
     output=$filename".out" 
+    outext="out"
     error=$filename".err" 
     echo "Output will be written to $output"
 else
     output=$(basename "$2")
     filename="${output%.*}"
+    outext="${output##*.}"
     error=$filename".err"
 fi
 
 if [ -e $output ] && [ $force -eq 0 ]
 then
-  echo "The output filename already exists; cowardly exiting"
+  echo "Backing up the output file.."
   echo "Use -f option to force overwrite"
-  exit $E_EXISTS
+  mkdir -p backups
+  bnum=0
+  while [[ -e backups/${filename}_$bnum.$outext || -e backups/${filename}_$bnum.err ]] ; do
+      bnum=$(( bnum + 1 ))
+  done
+  cp $output backups/${filename}_$bnum.$outext
+  cp $error backups/${filename}_$bnum.err
 fi
 
 if [ $blkwht -eq 1 ] ; then

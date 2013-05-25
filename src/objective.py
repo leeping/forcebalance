@@ -126,6 +126,10 @@ class Objective(ForceBalanceBaseClass):
                     self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
                 for i in range(3):
                     Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
+        # Safeguard to make sure we don't have exact zeros on Hessian diagonal
+        for i in range(self.FF.np):
+            if Objective['H'][i,i] == 0.0:
+                Objective['H'][i,i] = 1.0
         return Objective
 
     def Indicate(self):

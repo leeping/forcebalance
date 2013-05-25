@@ -216,12 +216,12 @@ class Target(ForceBalanceBaseClass):
                 os.chdir(os.path.join(self.root,"temp"))
                 FileCount = 0
                 while True:
-                    CandFile = os.path.join(self.root,'backups',"%s.%i.tar.bz2" % (self.name,FileCount))
+                    CandFile = os.path.join(self.root,'backups',"%s_%i.tar.bz2" % (self.name,FileCount))
                     if os.path.exists(CandFile):
                         FileCount += 1
                     else:
                         # I could use the tarfile module here
-                        print "Backing up:", self.tempdir, 'to:', "backups/%s.%i.tar.bz2" % (self.name,FileCount)
+                        print "Backing up:", self.tempdir, 'to:', "backups/%s_%i.tar.bz2" % (self.name,FileCount)
                         subprocess.call(["tar","cjf",CandFile,self.name])
                         shutil.rmtree(self.name)
                         break
