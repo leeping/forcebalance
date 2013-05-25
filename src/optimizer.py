@@ -226,7 +226,8 @@ class Optimizer(ForceBalanceBaseClass):
         b = self.adapt_damp # Default value is 0.5, increase to make more conservative
         printcool( "Main Optimizer\n%s Mode%s" % ("BFGS" if b_BFGS else "Newton-Raphson", " (Static Radius)" if a == 0.0 else " (Adaptive Radius)"), ansi=1, bold=1)
         # First, set a bunch of starting values
-        Ord         = 2
+        Ord         = 1 if b_BFGS else 2
+        #Ord         = 2
         global ITERATION_NUMBER
         ITERATION_NUMBER = 0
         global GOODSTEP
@@ -351,7 +352,7 @@ class Optimizer(ForceBalanceBaseClass):
                         print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality)
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
-                        data        = self.Objective.Full(xk,2,verbose=True)
+                        data        = self.Objective.Full(xk,Ord,verbose=True)
                         GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
                         X_prev = X
