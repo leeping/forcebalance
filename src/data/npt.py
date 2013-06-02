@@ -89,6 +89,7 @@ parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for 
 parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=1000000)
 parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=0.5)
 parser.add_argument('--gas_interval', type=float, help='Time interval for saving the gas-phase coordinates, in picoseconds', default=0.1)
+parser.add_argument('--anisotropic', action='store_true', help='Enable anisotropic scaling of periodic box (useful for crystals)')
 parser.add_argument('--force_cuda', action='store_true', help='Crash immediately if CUDA platform is not available')
 
 args = parser.parse_args()
@@ -116,7 +117,7 @@ m_niterations      = args.gas_prod_steps / m_nsteps
 
 temperature = args.temperature * kelvin                            # temperature in kelvin
 pressure    = args.pressure * atmospheres                          # pressure in atmospheres
-collision_frequency = 1.0 / picosecond                             # Langevin barostat friction / random force parameter
+collision_frequency = 1.0 / picosecond                             # Langevin integrator friction / random force parameter
 barostat_frequency = 10                                            # number of steps between MC volume adjustments
 
 # Flag to set verbose debug output
@@ -427,7 +428,10 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
     forcefield = ForceField(sys.argv[2])
     system = forcefield.createSystem(pdb.topology, **settings)
     if pbc:
-        barostat = MonteCarloBarostat(pressure, temperature, barostat_frequency)
+        if args.anisotropic:
+            barostat = MonteCarloAnisotropicBarostat(pressure, pressure, pressure, temperature, barostat_frequency)
+        else:
+            barostat = MonteCarloBarostat(pressure, temperature, barostat_frequency)
         # Add barostat.
         system.addForce(barostat)
     # Create integrator.

@@ -241,6 +241,8 @@ class Liquid_OpenMM(Liquid):
         super(Liquid_OpenMM,self).__init__(options,tgt_opts,forcefield)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'force_cuda',forceprint=True)
+        # Enable anisotropic periodic box
+        self.set_option(tgt_opts,'anisotropic_box',forceprint=True)
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
@@ -259,11 +261,11 @@ class Liquid_OpenMM(Liquid):
             if wq == None:
                 print "Running condensed phase simulation locally."
                 print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
-                cmdstr = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", self.liquid_equ_steps)
+                cmdstr = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", " --anisotropic" if self.anisotropic_box else "", self.liquid_equ_steps)
                 _exec(cmdstr)
             else:
                 queue_up(wq,
-                         command = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", self.liquid_equ_steps),
+                         command = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", " --anisotropic" if self.anisotropic_box else "", self.liquid_equ_steps),
                          input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                          #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
                          output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
