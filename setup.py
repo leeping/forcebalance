@@ -59,7 +59,7 @@ def buildKeywordDictionary():
                                           "forcebalance/pymbar"  : "ext/pymbar"
                                           }
     setupKeywords["package_data"]      = {
-        "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/uffparms.in","data/oplsaa.ff/*"]
+        "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/*.py","data/*.sh","data/uffparms.in","data/oplsaa.ff/*"]
                                          }
     setupKeywords["data_files"]        = []
     setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE, CONTACT]

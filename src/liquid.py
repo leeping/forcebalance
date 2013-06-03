@@ -375,8 +375,9 @@ class Liquid(Target):
         GDx = np.hstack(tuple(gd[0] for gd in GDips))
         GDy = np.hstack(tuple(gd[1] for gd in GDips))
         GDz = np.hstack(tuple(gd[2] for gd in GDips))
-        mE = np.array(list(itertools.chain(*list([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))))
-        mG = np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+        if len(mPoints) > 0:
+            mE = np.array(list(itertools.chain(*list([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))))
+            mG = np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
 
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
@@ -438,22 +439,23 @@ class Liquid(Target):
                 W2[m*Shots:m*Shots+Shots,m] = 1.0/Shots
 
         # Run MBAR on the monomers.  This is barely necessary.
-        mSims = len(mPoints)
-        mShots = len(mEnergies[0])
-        mN_k = np.ones(mSims)*mShots
-        mU_kln = np.zeros([mSims,mSims,mShots], dtype = np.float64)
-        for m, PT in enumerate(mPoints):
-            T = PT[0]
-            beta = 1. / (kb * T)
-            for k in range(mSims):
-                mU_kln[k, m, :]  = mEnergies[k]
-                mU_kln[k, m, :] *= beta
-        if np.abs(np.std(mEnergies)) > 1e-6 and mSims > 1:
-            mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
-            mW1 = mmbar.getWeights()
-        else:
-            mW1 = np.ones((mSims*mShots,mSims),dtype=float)
-            mW1 /= mSims*mShots
+        if len(mPoints) > 0:
+            mSims = len(mPoints)
+            mShots = len(mEnergies[0])
+            mN_k = np.ones(mSims)*mShots
+            mU_kln = np.zeros([mSims,mSims,mShots], dtype = np.float64)
+            for m, PT in enumerate(mPoints):
+                T = PT[0]
+                beta = 1. / (kb * T)
+                for k in range(mSims):
+                    mU_kln[k, m, :]  = mEnergies[k]
+                    mU_kln[k, m, :] *= beta
+            if np.abs(np.std(mEnergies)) > 1e-6 and mSims > 1:
+                mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
+                mW1 = mmbar.getWeights()
+            else:
+                mW1 = np.ones((mSims*mShots,mSims),dtype=float)
+                mW1 /= mSims*mShots
 
         for i, PT in enumerate(Points):
             T = PT[0]
@@ -577,8 +579,7 @@ class Liquid(Target):
 
         PrintDict = OrderedDict()
         if X_Rho > 0:
-            Title = "Condensed Phase Properties:\n %-20s %40s" % ("Property Name", "Residual x Weight = Contribution")
-            printcool_dictionary(RhoPrint, title='Density (kg m^-3) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            printcool_dictionary(RhoPrint, title='%s Density (kg m^-3) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
             bar = printcool("Density objective function: % .3f%s" % (X_Rho, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Rho)
@@ -586,7 +587,7 @@ class Liquid(Target):
             PrintDict['Density'] = "% 10.5f % 8.3f % 14.5e" % (X_Rho, w_1, X_Rho*w_1)
 
         if X_Hvap > 0:
-            printcool_dictionary(HvapPrint, title='Enthalpy of Vaporization (kJ mol^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            printcool_dictionary(HvapPrint, title='%s Enthalpy of Vaporization (kJ mol^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
             bar = printcool("H_vap objective function: % .3f%s" % (X_Hvap, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Hvap)
@@ -594,7 +595,7 @@ class Liquid(Target):
             PrintDict['Enthalpy of Vaporization'] = "% 10.5f % 8.3f % 14.5e" % (X_Hvap, w_2, X_Hvap*w_2)
 
         if X_Alpha > 0:
-            printcool_dictionary(AlphaPrint,title='Thermal Expansion Coefficient (10^-4 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            printcool_dictionary(AlphaPrint,title='%s Thermal Expansion Coefficient (10^-4 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
             bar = printcool("Thermal Expansion objective function: % .3f%s" % (X_Alpha, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Alpha)
@@ -602,7 +603,7 @@ class Liquid(Target):
             PrintDict['Thermal Expansion Coefficient'] = "% 10.5f % 8.3f % 14.5e" % (X_Alpha, w_3, X_Alpha*w_3)
 
         if X_Kappa > 0:
-            printcool_dictionary(KappaPrint,title='Isothermal Compressibility (10^-6 bar^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            printcool_dictionary(KappaPrint,title='%s Isothermal Compressibility (10^-6 bar^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
             bar = printcool("Compressibility objective function: % .3f%s" % (X_Kappa, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Kappa)
@@ -610,7 +611,7 @@ class Liquid(Target):
             PrintDict['Isothermal Compressibility'] = "% 10.5f % 8.3f % 14.5e" % (X_Kappa, w_4, X_Kappa*w_4)
 
         if X_Cp > 0:
-            printcool_dictionary(CpPrint,   title='Isobaric Heat Capacity (cal mol^-1 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            printcool_dictionary(CpPrint,   title='%s Isobaric Heat Capacity (cal mol^-1 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
             bar = printcool("Heat Capacity objective function: % .3f%s" % (X_Cp, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Cp)
@@ -618,7 +619,7 @@ class Liquid(Target):
             PrintDict['Isobaric Heat Capacity'] = "% 10.5f % 8.3f % 14.5e" % (X_Cp, w_5, X_Cp*w_5)
 
         if X_Eps0 > 0:
-            printcool_dictionary(Eps0Print,   title='Dielectric Constant\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ',bold=True,color=4,keywidth=15)
+            printcool_dictionary(Eps0Print,   title='%s Dielectric Constant\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
             bar = printcool("Dielectric Constant objective function: % .3f%s" % (X_Eps0, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Eps0)
@@ -627,6 +628,7 @@ class Liquid(Target):
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",Objective)
 
+        Title = "%s Condensed Phase Properties:\n %-20s %40s" % (self.name, "Property Name", "Residual x Weight = Contribution")
         printcool_dictionary(PrintDict,color=4,title=Title,keywidth=31)
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
