@@ -52,6 +52,8 @@ class Objective(ForceBalanceBaseClass):
             Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
             self.Targets.append(Tgt)
             printcool_dictionary(Tgt.PrintOptionDict,"Setup for target %s :" % Tgt.name)
+        if len(set([Tgt.name for Tgt in self.Targets])) != len([Tgt.name for Tgt in self.Targets]):
+            raise Exception("The list of target names is not unique!")
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.

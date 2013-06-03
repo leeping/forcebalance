@@ -8,7 +8,7 @@ import numpy as np
 import time
 from baseclass import ForceBalanceBaseClass
 from collections import OrderedDict
-from nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1
+from nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
 from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from optimizer import Counter
 
@@ -135,8 +135,6 @@ class Target(ForceBalanceBaseClass):
         self.gct         = 0
         ## Counts how often the Hessian was computed
         self.hct         = 0
-        ## A list of Work Queue tags
-        self.wqids       = []
         
         #======================================#
         #          UNDER DEVELOPMENT           #
@@ -316,16 +314,17 @@ class Target(ForceBalanceBaseClass):
     def wq_complete(self):
         """ This method determines whether the Work Queue tasks for the current target have completed. """
         wq = getWorkQueue()
+        WQIds = getWQIds()
         if wq == None:
             return True
         elif wq.empty():
-            self.wqids = []
+            WQIds[self.name] = []
             return True
-        elif len(self.wqids) == 0:
+        elif len(WQIds[self.name]) == 0:
             return True
         else:
             wq_wait1(wq, wait_time=30, tgt=self)
-            if len(self.wqids) == 0:
+            if len(WQIds[self.name]) == 0:
                 return True
             else:
                 return False

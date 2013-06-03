@@ -249,9 +249,9 @@ class Liquid_OpenMM(Liquid):
         abstempdir = os.path.join(self.root,self.tempdir)
         LinkFile(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
         LinkFile(os.path.join(self.root,self.tgtdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
-        #LinkFile(os.path.join(self.root,self.tgtdir,"evaltraj.py"),os.path.join(abstempdir,"evaltraj.py"))
+        LinkFile(os.path.join(os.path.split(__file__)[0],"data","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
+        LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
+        #LinkFile(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
 
     def npt_simulation(self, temperature, pressure):
         """ Submit a NPT simulation to the Work Queue. """
@@ -261,11 +261,11 @@ class Liquid_OpenMM(Liquid):
             if wq == None:
                 print "Running condensed phase simulation locally."
                 print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
-                cmdstr = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", " --anisotropic" if self.anisotropic_box else "", self.liquid_equ_steps)
+                cmdstr = 'bash runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", " --anisotropic" if self.anisotropic_box else "", self.liquid_equ_steps)
                 _exec(cmdstr)
             else:
                 queue_up(wq,
-                         command = './runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", " --anisotropic" if self.anisotropic_box else "", self.liquid_equ_steps),
+                         command = 'bash runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", " --anisotropic" if self.anisotropic_box else "", self.liquid_equ_steps),
                          input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                          #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
                          output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
@@ -282,7 +282,7 @@ class Liquid_OpenMM(Liquid):
         os.remove(infnm)
         with open(os.path.join(rnd,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h,True),f)
         wq = getWorkQueue()
-        queue_up_src_dest(wq, command = './runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.openmmxml, "True" if bGradient else "False"),
+        queue_up_src_dest(wq, command = 'bash runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.openmmxml, "True" if bGradient else "False"),
                           input_files = [(os.path.join(rnd,'runcuda.sh'),'runcuda.sh'), 
                                          (os.path.join(rnd,'evaltraj.py'),'evaltraj.py'),
                                          (os.path.join(rnd,'conf.pdb'),'conf.pdb'),

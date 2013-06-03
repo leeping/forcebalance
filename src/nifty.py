@@ -14,7 +14,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 @date 12/2011
 """
 
-import os, sys
+import os, sys, shutil
 from re import match, sub
 import numpy as np
 import itertools
@@ -25,7 +25,7 @@ import pickle
 import time, datetime
 import subprocess
 from subprocess import PIPE, STDOUT
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 # import IPython as ip # For debugging
 
 ## Boltzmann constant
@@ -430,9 +430,16 @@ except:
 # Global variable corresponding to the Work Queue object
 WORK_QUEUE = None
 
+# Global variable containing a mapping from target names to Work Queue task IDs
+WQIDS = defaultdict(list)
+
 def getWorkQueue():
     global WORK_QUEUE
     return WORK_QUEUE
+
+def getWQIds():
+    global WQIDS
+    return WQIDS
 
 def createWorkQueue(wq_port):
     global WORK_QUEUE
@@ -449,7 +456,7 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     @param[in] input_files (list of files) A list of locations of the input files.
     @param[in] output_files (list of files) A list of locations of the output files.
     """
-
+    global WQIDS
     task = work_queue.Task(command)
     cwd = os.getcwd()
     for f in input_files:
@@ -460,11 +467,13 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
         task.specify_output_file(lf,f)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
-    if verbose:
-        print "Submitting command '%s' to the Work Queue" % command
     taskid = wq.submit(task)
+    if verbose:
+        print "Submitting command '%s' to the Work Queue, taskid %i" % (command, taskid)
     if tgt != None:
-        tgt.wqids.append(taskid)
+        WQIDS[tgt.name].append(taskid)
+    else:
+        WQIDS["None"].append(taskid)
     
 def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
@@ -478,6 +487,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     @param[in] output_files (list of 2-tuples) A list of local and
     remote locations of the output files.
     """
+    global WQIDS
     task = work_queue.Task(command)
     for f in input_files:
         # print f[0], f[1]
@@ -487,15 +497,17 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
         task.specify_output_file(f[0],f[1])
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
-    if verbose:
-        print "Submitting command '%s' to the Work Queue" % command
     taskid = wq.submit(task)
+    if verbose:
+        print "Submitting command '%s' to the Work Queue, taskid %i" % (command, taskid)
     if tgt != None:
-        tgt.wqids.append(taskid)
-    #wq.submit(task)
+        WQIDS[tgt.name].append(taskid)
+    else:
+        WQIDS["None"].append(taskid)
 
 def wq_wait1(wq, wait_time=10, tgt=None, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
+    global WQIDS
     if verbose: print '---'
     for sec in range(wait_time):
         task = wq.wait(1)
@@ -511,17 +523,24 @@ def wq_wait1(wq, wait_time=10, tgt=None, verbose=False):
                 print "execution time = ", exectime, 
                 print "total_bytes_transferred = ", task.total_bytes_transferred
             if task.result != 0:
-                print "Command '%s' failed on host %s (%i seconds), resubmitting" % (task.command, task.hostname, exectime)
-                if tgt != None:
-                    tgt.wqids.remove(task.id)
+                oldid = task.id
+                print "taskids:", WQIDS
+                print "removing taskid:", task.id
+                for tnm in WQIDS:
+                    if task.id in WQIDS[tnm]:
+                        WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
+                print "Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i" % (task.command, oldid, task.hostname, exectime, taskid)
                 if tgt != None:
-                    tgt.wqids.append(taskid)
+                    WQIDS[tgt.name].append(taskid)
+                else:
+                    WQIDS["None"].append(taskid)
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
-                    print "Command '%s' finished succesfully on host %s (%i seconds)" % (task.command, task.hostname, exectime)
-                if tgt != None:
-                    tgt.wqids.remove(task.id)
+                    print "Command '%s' (task %i) finished succesfully on host %s (%i seconds)" % (task.command, task.id, task.hostname, exectime)
+                for tnm in WQIDS:
+                    if task.id in WQIDS[tnm]:
+                        WQIDS[tnm].remove(task.id)
                 del task
         if verbose:
             print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
@@ -575,6 +594,16 @@ def LinkFile(src, dest):
             os.symlink(src, dest)
     else:
         raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist" % (src,dest))
+
+def CopyFile(src, dest):
+    if os.path.exists(src):
+        if os.path.exists(dest):
+            if os.path.islink(dest): 
+                raise Exception("Tried to copy %s to %s, destination exists but it's a symbolic link" % (src, dest))
+        else:
+            shutil.copy2(src, dest)
+    else:
+        raise Exception("Tried to copy %s to %s, but source file doesn't exist" % (src,dest))
 
 def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
