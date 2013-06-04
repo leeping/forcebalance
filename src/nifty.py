@@ -505,7 +505,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     else:
         WQIDS["None"].append(taskid)
 
-def wq_wait1(wq, wait_time=10, tgt=None, verbose=False):
+def wq_wait1(wq, wait_time=10, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
     global WQIDS
     if verbose: print '---'
@@ -524,17 +524,14 @@ def wq_wait1(wq, wait_time=10, tgt=None, verbose=False):
                 print "total_bytes_transferred = ", task.total_bytes_transferred
             if task.result != 0:
                 oldid = task.id
-                print "taskids:", WQIDS
-                print "removing taskid:", task.id
+                tgtname = "None"
                 for tnm in WQIDS:
                     if task.id in WQIDS[tnm]:
+                        tgtname = tnm
                         WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
                 print "Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i" % (task.command, oldid, task.hostname, exectime, taskid)
-                if tgt != None:
-                    WQIDS[tgt.name].append(taskid)
-                else:
-                    WQIDS["None"].append(taskid)
+                WQIDS[tgtname].append(taskid)
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
                     print "Command '%s' (task %i) finished succesfully on host %s (%i seconds)" % (task.command, task.id, task.hostname, exectime)

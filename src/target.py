@@ -323,7 +323,7 @@ class Target(ForceBalanceBaseClass):
         elif len(WQIds[self.name]) == 0:
             return True
         else:
-            wq_wait1(wq, wait_time=30, tgt=self)
+            wq_wait1(wq, wait_time=30)
             if len(WQIds[self.name]) == 0:
                 return True
             else:
