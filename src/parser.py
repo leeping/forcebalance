@@ -158,7 +158,7 @@ tgt_opts_types = {
                  "hvap_subaverage"  : (0, -150, 'Don\'t target the average enthalpy of vaporization and allow it to freely float (experimental)', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "force_cuda"       : (0, -150, 'Force the external npt.py script to crash if CUDA Platform not available', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "anisotropic_box"  : (0, -150, 'Enable anisotropic box scaling (e.g. for crystals or two-phase simulations) in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
-                 "mts_integrator"   : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
+                 "mts_vvvr"         : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                 },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid'),
