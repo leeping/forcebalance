@@ -90,6 +90,7 @@ parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for
 parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=0.5)
 parser.add_argument('--gas_interval', type=float, help='Time interval for saving the gas-phase coordinates, in picoseconds', default=0.1)
 parser.add_argument('--anisotropic', action='store_true', help='Enable anisotropic scaling of periodic box (useful for crystals)')
+parser.add_argument('--mts_vvvr', action='store_true', help='Enable multiple timestep integrator')
 parser.add_argument('--force_cuda', action='store_true', help='Crash immediately if CUDA platform is not available')
 
 args = parser.parse_args()
@@ -435,7 +436,7 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
         # Add barostat.
         system.addForce(barostat)
     # Create integrator.
-    NewIntegrator = False
+    NewIntegrator = args.mts_vvvr
     if not NewIntegrator:
         integrator = LangevinIntegrator(temperature, collision_frequency, timestep)
     else:
