@@ -130,90 +130,12 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaStretchBendForce" : {"StretchBend" : ["class1","class2","class3"]},
                 "AmoebaVdwForce" : {"Vdw" : ["class"]},
                 "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
-                "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]}
+                "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]},
+                "Residues.Residue" : {"VirtualSite" : ["index"]}
                 }
 
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
-
-def liquid_energy_driver(mvals,pdb,FF,xyzs,settings,platform,boxes=None,verbose=False):
-
-   """
-   Compute a set of snapshot energies as a function of the force field parameters.
-
-   This is a combined OpenMM and ForceBalance function.  Note (importantly) that this
-   function creates a new force field XML file in the run directory.
-
-   ForceBalance creates the force field, OpenMM reads it in, and we loop through the snapshots
-   to compute the energies.
-   
-   @todo I should be able to generate the OpenMM force field object without writing an external file.
-   @todo This is a sufficiently general function to be merged into openmmio.py?
-   @param[in] mvals Mathematical parameter values
-   @param[in] pdb OpenMM PDB object
-   @param[in] FF ForceBalance force field object
-   @param[in] xyzs List of OpenMM positions
-   @param[in] settings OpenMM settings for creating the System
-   @param[in] boxes Periodic box vectors
-   @return E A numpy array of energies in kilojoules per mole
-
-   """
-   # Print the force field XML from the ForceBalance object, with modified parameters.
-   FF.make(mvals)
-   # Load the force field XML file to make the OpenMM object.
-   forcefield = ForceField(sys.argv[2])
-   # Create the system, setup the simulation.
-   system = forcefield.createSystem(pdb.topology, **settings)
-   integrator = openmm.LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-   simulation = Simulation(pdb.topology, system, integrator, platform)
-   E = []
-   # Loop through the snapshots
-   if boxes == None:
-       for xyz in xyzs:
-          # Set the positions and the box vectors
-          simulation.context.setPositions(xyz)
-          # Compute the potential energy and append to list
-          Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-          E.append(Energy)
-   else:
-       for xyz,box in zip(xyzs,boxes):
-          # Set the positions and the box vectors
-          simulation.context.setPositions(xyz)
-          simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
-          # Compute the potential energy and append to list
-          Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-          E.append(Energy)
-   print "\r",
-   if verbose: print E
-   return np.array(E)
-
-def liquid_energy_derivatives(mvals,h,pdb,FF,xyzs,settings,platform,boxes=None):
-
-   """
-   Compute the first and second derivatives of a set of snapshot
-   energies with respect to the force field parameters.
-
-   This basically calls the finite difference subroutine on the
-   energy_driver subroutine also in this script.
-
-   @todo This is a sufficiently general function to be merged into openmmio.py?
-   @param[in] mvals Mathematical parameter values
-   @param[in] pdb OpenMM PDB object
-   @param[in] FF ForceBalance force field object
-   @param[in] xyzs List of OpenMM positions
-   @param[in] settings OpenMM settings for creating the System
-   @param[in] boxes Periodic box vectors
-   @return G First derivative of the energies in a N_param x N_coord array
-   @return Hd Second derivative of the energies (i.e. diagonal Hessian elements) in a N_param x N_coord array
-
-   """
-
-   G        = np.zeros((FF.np,len(xyzs)))
-   Hd       = np.zeros((FF.np,len(xyzs)))
-   E0       = liquid_energy_driver(mvals, pdb, FF, xyzs, settings, platform, boxes)
-   for i in range(FF.np):
-      G[i,:], Hd[i,:] = f12d3p(fdwrap(liquid_energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,platform=platform,boxes=boxes),h,f0=E0)
-   return G, Hd
 
 class OpenMM_Reader(BaseReader):
     """ Class for parsing OpenMM force field files. """
@@ -230,7 +152,11 @@ class OpenMM_Reader(BaseReader):
         ParentType = ".".join([i.tag for i in list(element.iterancestors())][::-1][1:])
         InteractionType = element.tag
         try:
-            Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
+            if ParentType == "Residues.Residue":
+                pfx = list(element.iterancestors())[0].attrib["name"]
+                Involved = '.'.join([pfx+"-"+element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
+            else:
+                Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
             return "/".join([InteractionType, parameter, Involved])
         except:
             print "Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible" % ("/".join([InteractionType, parameter]))
@@ -273,36 +199,6 @@ class Liquid_OpenMM(Liquid):
                          output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
                          tgt=self)
 
-    def evaluate_trajectory(self, name, trajpath, mvals, bGradient):
-        """ Submit an energy / gradient evaluation (looping over a trajectory) to the Work Queue. 
-        Currently not being used. """
-        cwd = os.getcwd()
-        rnd = os.path.join(cwd,name)
-        os.makedirs(name)
-        link_dir_contents(os.path.join(self.root,self.rundir),rnd)
-        infnm = os.path.join(rnd,'forcebalance.p')
-        os.remove(infnm)
-        with open(os.path.join(rnd,'forcebalance.p'),'w') as f: lp_dump((self.FF,mvals,self.h,True),f)
-        wq = getWorkQueue()
-        queue_up_src_dest(wq, command = 'bash runcuda.sh python evaltraj.py conf.pdb %s dynamics.dcd %s &> evaltraj.log' % (self.FF.openmmxml, "True" if bGradient else "False"),
-                          input_files = [(os.path.join(rnd,'runcuda.sh'),'runcuda.sh'), 
-                                         (os.path.join(rnd,'evaltraj.py'),'evaltraj.py'),
-                                         (os.path.join(rnd,'conf.pdb'),'conf.pdb'),
-                                         (os.path.join(rnd,'forcebalance.p'),'forcebalance.p'),
-                                         (os.path.join(trajpath,'dynamics.dcd'), 'dynamics.dcd')],
-                          output_files = [(os.path.join(rnd,'evaltraj_result.p'),'evaltraj_result.p'), 
-                                          (os.path.join(rnd,'evaltraj.log'),'evaltraj.log')],
-                          tgt=self)
-
-    def get_evaltraj_result(self, Dict, name, key, bGradient):
-        cwd = os.getcwd()
-        rnd = os.path.join(cwd,name)
-        if bGradient:
-            Answer = lp_load(open(os.path.join(rnd,'evaltraj_result.p')))[1]
-        else:
-            Answer = lp_load(open(os.path.join(rnd,'evaltraj_result.p')))[0]
-        Dict[key] = Answer
-        
 class AbInitio_OpenMM(AbInitio):
 
     """Subclass of AbInitio for force and energy matching
@@ -340,15 +236,17 @@ class AbInitio_OpenMM(AbInitio):
         ## Create the simulation object within this class itself.
         pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
         forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
+        mod = Modeller(pdb.topology, pdb.positions)
+        mod.addExtraParticles(forcefield)
         if self.FF.amoeba_pol == 'mutual':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
         elif self.FF.amoeba_pol == 'direct':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
         elif self.FF.amoeba_pol == 'nonpolarizable':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-        self.simulation = Simulation(pdb.topology, system, integrator, self.platform)
+        self.simulation = Simulation(mod.topology, system, integrator, self.platform)
 
     def read_topology(self):
         pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
@@ -375,16 +273,20 @@ class AbInitio_OpenMM(AbInitio):
         """ Loop through the snapshots and compute the energies and forces using OpenMM."""
         pdb = PDBFile("conf.pdb")
         forcefield = ForceField(self.FF.openmmxml)
+        mod = Modeller(pdb.topology, pdb.positions)
+        mod.addExtraParticles(forcefield)
+        # List to determine which atoms are real. :)
+        isAtom = [i.element != None for i in list(mod.topology.atoms())]
         #==============================================#
         #       Simulation settings (IMPORTANT)        #
         # Agrees with TINKER to within 0.0001 kcal! :) #
         #==============================================#
         if self.FF.amoeba_pol == 'mutual':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
         elif self.FF.amoeba_pol == 'direct':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
         elif self.FF.amoeba_pol == 'nonpolarizable':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         if hasattr(self,'simulation'):
@@ -392,24 +294,28 @@ class AbInitio_OpenMM(AbInitio):
             simulation = self.simulation
         else:
             if self.platform != None:
-                simulation = Simulation(pdb.topology, system, integrator, self.platform)
+                simulation = Simulation(mod.topology, system, integrator, self.platform)
             else:
-                simulation = Simulation(pdb.topology, system, integrator)
-
+                simulation = Simulation(mod.topology, system, integrator)
         M = []
         # Loop through the snapshots
         for I in range(self.ns):
             xyz = self.traj.xyzs[I]
             xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            # An extra step with adding virtual particles
+            mod = Modeller(pdb.topology, xyz_omm)
+            mod.addExtraParticles(forcefield)
             # Set the positions using the trajectory
-            simulation.context.setPositions(xyz_omm)
+            simulation.context.setPositions(mod.getPositions())
             if self.FF.rigid_water:
                 simulation.context.applyConstraints(1e-8)
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             # Compute the force and append to list
             Force = list(np.array(simulation.context.getState(getForces=True).getForces() / kilojoules_per_mole * nanometer).flatten())
-            M.append(np.array([Energy] + Force))
+            # Extract forces belonging to real atoms only
+            Force1 = list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if isAtom[i]]))
+            M.append(np.array([Energy] + Force1))
         M = np.array(M)
         return M
 
@@ -472,15 +378,17 @@ class Interaction_OpenMM(Interaction):
             ## Create the simulation object within this class itself.
             pdb = PDBFile(pdbfnm)
             forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
+            mod = Modeller(pdb.topology, pdb.positions)
+            mod.addExtraParticles(forcefield)
             if self.FF.amoeba_pol == 'mutual':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+                system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
             elif self.FF.amoeba_pol == 'direct':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+                system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
             elif self.FF.amoeba_pol == 'nonpolarizable':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
+                system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
             # Create the simulation; we're not actually going to use the integrator
             integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-            self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(pdb.topology, system, integrator, self.platform)
+            self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(mod.topology, system, integrator, self.platform)
         os.chdir(cwd)
         
     def energy_driver_all(self, mode):
@@ -494,19 +402,21 @@ class Interaction_OpenMM(Interaction):
             self.traj.atom_select(self.select2).write("shot.pdb")
         thistraj = Molecule("shot.pdb")
         
-        # Run OPenMM.
+        # Run OpenMM.
         pdb = PDBFile(mode+".pdb")
         forcefield = ForceField(self.FF.openmmxml)
+        mod = Modeller(pdb.topology, pdb.positions)
+        mod.addExtraParticles(forcefield)
         #==============================================#
         #       Simulation settings (IMPORTANT)        #
         # Agrees with TINKER to within 0.0001 kcal! :) #
         #==============================================#
         if self.FF.amoeba_pol == 'mutual':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
         elif self.FF.amoeba_pol == 'direct':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
         elif self.FF.amoeba_pol == 'nonpolarizable':
-            system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         if hasattr(self,'simulations'):
@@ -520,8 +430,11 @@ class Interaction_OpenMM(Interaction):
         for I in range(self.ns):
             xyz = thistraj.xyzs[I]
             xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            # An extra step with adding virtual particles
+            mod = Modeller(pdb.topology, xyz_omm)
+            mod.addExtraParticles(forcefield)
             # Set the positions using the trajectory
-            simulation.context.setPositions(xyz_omm)
+            simulation.context.setPositions(mod.getPositions())
             if self.FF.rigid_water:
                 simulation.context.applyConstraints(1e-8)
             # Compute the potential energy and append to list
