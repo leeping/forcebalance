@@ -427,7 +427,9 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
         platform = Platform.getPlatformByName(PlatName)
     # Create the test system.
     forcefield = ForceField(sys.argv[2])
-    system = forcefield.createSystem(pdb.topology, **settings)
+    mod = Modeller(pdb.topology, pdb.positions)
+    mod.addExtraParticles(forcefield)
+    system = forcefield.createSystem(mod.topology, **settings)
     if pbc:
         if args.anisotropic:
             barostat = MonteCarloAnisotropicBarostat(pressure, pressure, pressure, temperature, barostat_frequency)
@@ -452,7 +454,7 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
             print "The Ewald error tolerance is:", Frc.getEwaldErrorTolerance()
     
     # Create simulation object.
-    simulation = Simulation(pdb.topology, system, integrator, platform)
+    simulation = Simulation(mod.topology, system, integrator, platform)
     return simulation, system
 
 def run_simulation(pdb,settings,pbc=True,Trajectory=True):
@@ -660,7 +662,9 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
     # Load the force field XML file to make the OpenMM object.
     forcefield = ForceField(sys.argv[2])
     # Create the system, setup the simulation.
-    system = forcefield.createSystem(pdb.topology, **settings)
+    mod = Modeller(pdb.topology, pdb.positions)
+    mod.addExtraParticles(forcefield)
+    system = forcefield.createSystem(mod.topology, **settings)
     UpdateSimulationParameters(system, simulation)
     E = []
     D = []
