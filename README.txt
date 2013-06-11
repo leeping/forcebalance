@@ -33,3 +33,4 @@ To turn the package into a distributable .tar.bz2 file:
 
 python setup.py sdist
 
+Arthur was here
