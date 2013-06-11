@@ -247,6 +247,16 @@ class AbInitio_OpenMM(AbInitio):
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         self.simulation = Simulation(mod.topology, system, integrator, self.platform)
+        # Generate OpenMM-compatible positions
+        self.xyz_omms = []
+        for I in range(self.ns):
+            xyz = self.traj.xyzs[I]
+            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            # An extra step with adding virtual particles
+            mod = Modeller(pdb.topology, xyz_omm)
+            mod.addExtraParticles(forcefield)
+            # Set the positions using the trajectory
+            self.xyz_omms.append(mod.getPositions())
 
     def read_topology(self):
         pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
@@ -307,8 +317,12 @@ class AbInitio_OpenMM(AbInitio):
             mod.addExtraParticles(forcefield)
             # Set the positions using the trajectory
             simulation.context.setPositions(mod.getPositions())
-            if self.FF.rigid_water:
-                simulation.context.applyConstraints(1e-8)
+            # simulation.context.setPositions(self.xyz_omms[I])
+            # Right now OpenMM is a bit bugged because I can't copy vsite parameters.
+            # if self.FF.rigid_water:
+            #     simulation.context.applyConstraints(1e-8)
+            # else:
+            #     simulation.context.computeVirtualSites()
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             # Compute the force and append to list
@@ -435,8 +449,9 @@ class Interaction_OpenMM(Interaction):
             mod.addExtraParticles(forcefield)
             # Set the positions using the trajectory
             simulation.context.setPositions(mod.getPositions())
-            if self.FF.rigid_water:
-                simulation.context.applyConstraints(1e-8)
+            # Right now OpenMM is a bit bugged because I can't copy vsite parameters.
+            # if self.FF.rigid_water:
+            #     simulation.context.applyConstraints(1e-8)
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             M.append(Energy)

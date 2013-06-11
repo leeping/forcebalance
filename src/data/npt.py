@@ -139,10 +139,9 @@ amoeba_nonpol_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanomet
                         'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
                         'useDispersionCorrection' : True}
 
-tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
-                'vdwCutoff' : 0.9, 'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24], 'useDispersionCorrection' : True}
+tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer, 'useDispersionCorrection' : True, 'rigidwater' : True}
 
-mono_tip3p_kwargs = {'nonbondedMethod' : NoCutoff}
+mono_tip3p_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : True}
 
 mono_direct_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
                'rigidWater' : False, 'polarization' : 'direct'}
@@ -153,23 +152,23 @@ mono_mutual_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
 mono_nonpol_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
                       'rigidWater' : False}
 
-def generateMaxwellBoltzmannVelocities(system, temperature):
-    """ Generate velocities from a Maxwell-Boltzmann distribution. """
-    # Get number of atoms
-    natoms = system.getNumParticles()
-    # Create storage for velocities.
-    velocities = Quantity(np.zeros([natoms, 3], np.float32), nanometer / picosecond) # velocities[i,k] is the kth component of the velocity of atom i
-    # Compute thermal energy and inverse temperature from specified temperature.
-    kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
-    kT = kB * temperature # thermal energy
-    beta = 1.0 / kT # inverse temperature
-    # Assign velocities from the Maxwell-Boltzmann distribution.
-    for atom_index in range(natoms):
-        mass = system.getParticleMass(atom_index) # atomic mass
-        sigma = sqrt(kT / mass) # standard deviation of velocity distribution for each coordinate for this atom
-        for k in range(3):
-            velocities[atom_index,k] = sigma * np.random.normal()
-    return velocities
+# def generateMaxwellBoltzmannVelocities(system, temperature):
+#     """ Generate velocities from a Maxwell-Boltzmann distribution. """
+#     # Get number of atoms
+#     natoms = system.getNumParticles()
+#     # Create storage for velocities.
+#     velocities = Quantity(np.zeros([natoms, 3], np.float32), nanometer / picosecond) # velocities[i,k] is the kth component of the velocity of atom i
+#     # Compute thermal energy and inverse temperature from specified temperature.
+#     kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
+#     kT = kB * temperature # thermal energy
+#     beta = 1.0 / kT # inverse temperature
+#     # Assign velocities from the Maxwell-Boltzmann distribution.
+#     for atom_index in range(natoms):
+#         mass = system.getParticleMass(atom_index) # atomic mass
+#         sigma = sqrt(kT / mass) # standard deviation of velocity distribution for each coordinate for this atom
+#         for k in range(3):
+#             velocities[atom_index,k] = sigma * np.random.normal()
+#     return velocities
 
 def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
 
@@ -461,13 +460,18 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     """ Run a NPT simulation and gather statistics. """
     simulation, system = create_simulation_object(pdb, settings, pbc, "single")
     # Set initial positions.
-    simulation.context.setPositions(pdb.positions)
+    # Create the test system.
+    forcefield = ForceField(sys.argv[2])
+    mod = Modeller(pdb.topology, pdb.positions)
+    mod.addExtraParticles(forcefield)
+    simulation.context.setPositions(mod.positions)
     print "Minimizing the energy... (starting energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole),
     simulation.minimizeEnergy()
     print "Done (final energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
     # Assign velocities.
-    velocities = generateMaxwellBoltzmannVelocities(system, temperature)
-    simulation.context.setVelocities(velocities)
+    # velocities = generateMaxwellBoltzmannVelocities(system, temperature)
+    # simulation.context.setVelocities(velocities)
+    simulation.context.setVelocitiesToTemperature(temperature)
     if verbose:
         # Print out the platform used by the context
         print "I'm using the platform", simulation.context.getPlatform().getName()
@@ -664,6 +668,8 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
     # Create the system, setup the simulation.
     mod = Modeller(pdb.topology, pdb.positions)
     mod.addExtraParticles(forcefield)
+    # List to determine which atoms are real. :)
+    isAtom = [i.element != None for i in list(mod.topology.atoms())]
     system = forcefield.createSystem(mod.topology, **settings)
     UpdateSimulationParameters(system, simulation)
     E = []
@@ -675,8 +681,14 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
     # Loop through the snapshots
     if boxes == None:
         for xyz in xyzs:
-            # Set the positions and the box vectors
-            simulation.context.setPositions(xyz)
+            # A cumbersome way to update virtual site positions.
+            xyzatom = [xyz[i]._value for i in range(len(xyz)) if isAtom[i]]*nanometer
+            mod = Modeller(pdb.topology, xyzatom)
+            mod.addExtraParticles(forcefield)
+            simulation.context.setPositions(mod.positions)
+            # Enable this code later.
+            # simulation.context.setPositions(xyz)
+            # simulation.context.computeVirtualSitePositions()
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             E.append(Energy)
@@ -685,7 +697,14 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
     else:
         for xyz,box in zip(xyzs,boxes):
             # Set the positions and the box vectors
-            simulation.context.setPositions(xyz)
+            # A cumbersome way to update virtual site positions.
+            xyzatom = [xyz[i]._value for i in range(len(xyz)) if isAtom[i]]*nanometer
+            mod = Modeller(pdb.topology, xyzatom)
+            mod.addExtraParticles(forcefield)
+            simulation.context.setPositions(mod.positions)
+            # Enable this code later.
+            # simulation.context.setPositions(xyz)
+            # simulation.context.computeVirtualSitePositions()
             simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
@@ -887,16 +906,12 @@ def main():
             Settings = amoeba_nonpol_kwargs
             mSettings = mono_nonpol_kwargs
     else:
-        Settings = {'nonbondedMethod':PME}
-        mSettings = {}
-        # if 'tip3p' in sys.argv[2]:
-        #     print "Using TIP3P settings."
-        #     Settings = tip3p_kwargs
-        #     mSettings = mono_tip3p_kwargs
-        #     timestep = 1.0 * femtosecond
-        #     nsteps   = 100
-        # else:
-        #     raise Exception('Encountered a force field that I did not expect!')
+        if 'tip' in sys.argv[2]:
+            print "Using rigid water."
+            Settings = tip3p_kwargs
+            mSettings = mono_tip3p_kwargs
+        else:
+            raise Exception('Encountered a force field that I did not expect!')
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
