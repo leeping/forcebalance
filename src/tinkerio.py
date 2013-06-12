@@ -245,7 +245,8 @@ class Liquid_TINKER(Liquid):
         write_key_with_prm(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"),ffobj=self.FF)
         modify_key(os.path.join(abstempdir,"mono.key"),{'archive':None})
         # LinkFile(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
+        LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
+        # LinkFile(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
 
     def npt_simulation(self, temperature, pressure):
         """ Submit a NPT simulation to the Work Queue. """

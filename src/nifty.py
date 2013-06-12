@@ -583,6 +583,31 @@ def Leave(Dir):
     for i in range(len(allsplit(Dir))):
         os.chdir('..')
 
+# Dictionary containing specific error messages for specific missing files or file patterns
+specific_lst = [(['mdrun','grompp','trjconv','g_energy','g_traj'], "Make sure to install GROMACS and add it to your path (or set the gmxpath option)"),
+                (['force.mdin', 'stage.leap'], "This file is needed for setting up AMBER force matching targets"),
+                (['conf.pdb', 'mono.pdb'], "This file is needed for setting up OpenMM condensed phase property targets"),
+                (['liquid.xyz', 'liquid.key', 'mono.xyz', 'mono.key'], "This file is needed for setting up OpenMM condensed phase property targets"),
+                (['dynamic', 'analyze', 'minimize', 'testgrad', 'vibrate', 'optimize', 'polarize', 'superpose'], "Make sure to install TINKER and add it to your path (or set the tinkerpath option)"),
+                (['runcuda.sh', 'npt.py', 'npt_tinker.py'], "This file belongs in the ForceBalance source directory, not sure why it is missing"),
+                (['input.xyz'], "This file is needed for TINKER molecular property targets"),
+                (['.*key$', '.*xyz$'], "I am guessing this file is probably needed by TINKER"),
+                (['.*gro$', '.*top$', '.*itp$', '.*mdp$', '.*ndx$'], "I am guessing this file is probably needed by GROMACS")
+                ]
+
+# Build a dictionary mapping all of the keys in the above lists to their error messages
+specific_dct = dict(list(itertools.chain(*[[(j,i[1]) for j in i[0]] for i in specific_lst])))
+
+def MissingFileInspection(fnm):
+    fnm = os.path.split(fnm)[1]
+    answer = ""
+    for key in specific_dct:
+        if answer == "":
+            answer += "\n"
+        if match(key, fnm):
+            answer += "%s\n" % specific_dct[key]
+    return answer
+
 def LinkFile(src, dest):
     if os.path.exists(src):
         if os.path.exists(dest):
@@ -591,7 +616,8 @@ def LinkFile(src, dest):
         else:
             os.symlink(src, dest)
     else:
-        raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist" % (src,dest))
+        raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist%s" % (src,dest,MissingFileInspection(src)))
+    
 
 def CopyFile(src, dest):
     if os.path.exists(src):
@@ -601,7 +627,7 @@ def CopyFile(src, dest):
         else:
             shutil.copy2(src, dest)
     else:
-        raise Exception("Tried to copy %s to %s, but source file doesn't exist" % (src,dest))
+        raise Exception("Tried to copy %s to %s, but source file doesn't exist%s" % (src,dest,MissingFileInspection(src)))
 
 def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
