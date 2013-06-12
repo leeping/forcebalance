@@ -112,6 +112,7 @@ def CopySystemParameters(src,dest):
 
 def UpdateSimulationParameters(src_system, dest_simulation):
     CopySystemParameters(src_system, dest_simulation.system)
+    dest_simulation.context.updateVirtualSiteWeights(src_system)
     for i in range(src_system.getNumForces()):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
@@ -310,19 +311,19 @@ class AbInitio_OpenMM(AbInitio):
         M = []
         # Loop through the snapshots
         for I in range(self.ns):
-            xyz = self.traj.xyzs[I]
-            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
-            # An extra step with adding virtual particles
-            mod = Modeller(pdb.topology, xyz_omm)
-            mod.addExtraParticles(forcefield)
-            # Set the positions using the trajectory
-            simulation.context.setPositions(mod.getPositions())
-            # simulation.context.setPositions(self.xyz_omms[I])
+            # xyz = self.traj.xyzs[I]
+            # xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            # # An extra step with adding virtual particles
+            # mod = Modeller(pdb.topology, xyz_omm)
+            # mod.addExtraParticles(forcefield)
+            # # Set the positions using the trajectory
+            # simulation.context.setPositions(mod.getPositions())
+            simulation.context.setPositions(self.xyz_omms[I])
             # Right now OpenMM is a bit bugged because I can't copy vsite parameters.
-            # if self.FF.rigid_water:
-            #     simulation.context.applyConstraints(1e-8)
-            # else:
-            #     simulation.context.computeVirtualSites()
+            if self.FF.rigid_water:
+                simulation.context.applyConstraints(1e-8)
+            else:
+                simulation.context.computeVirtualSites()
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             # Compute the force and append to list
