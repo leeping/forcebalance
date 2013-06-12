@@ -682,13 +682,13 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
     if boxes == None:
         for xyz in xyzs:
             # A cumbersome way to update virtual site positions.
-            xyzatom = [xyz[i]._value for i in range(len(xyz)) if isAtom[i]]*nanometer
-            mod = Modeller(pdb.topology, xyzatom)
-            mod.addExtraParticles(forcefield)
-            simulation.context.setPositions(mod.positions)
+            # xyzatom = [xyz[i]._value for i in range(len(xyz)) if isAtom[i]]*nanometer
+            # mod = Modeller(pdb.topology, xyzatom)
+            # mod.addExtraParticles(forcefield)
+            # simulation.context.setPositions(mod.positions)
             # Enable this code later.
-            # simulation.context.setPositions(xyz)
-            # simulation.context.computeVirtualSitePositions()
+            simulation.context.setPositions(xyz)
+            simulation.context.computeVirtualSites()
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             E.append(Energy)
@@ -698,13 +698,13 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
         for xyz,box in zip(xyzs,boxes):
             # Set the positions and the box vectors
             # A cumbersome way to update virtual site positions.
-            xyzatom = [xyz[i]._value for i in range(len(xyz)) if isAtom[i]]*nanometer
-            mod = Modeller(pdb.topology, xyzatom)
-            mod.addExtraParticles(forcefield)
-            simulation.context.setPositions(mod.positions)
+            # xyzatom = [xyz[i]._value for i in range(len(xyz)) if isAtom[i]]*nanometer
+            # mod = Modeller(pdb.topology, xyzatom)
+            # mod.addExtraParticles(forcefield)
+            # simulation.context.setPositions(mod.positions)
             # Enable this code later.
-            # simulation.context.setPositions(xyz)
-            # simulation.context.computeVirtualSitePositions()
+            simulation.context.setPositions(xyz)
+            simulation.context.computeVirtualSites()
             simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
@@ -925,8 +925,10 @@ def main():
     DoublePrecisionDerivatives = True
     if DoublePrecisionDerivatives and AGrad:
         print "Creating Double Precision Simulation for parameter derivatives"
-        Sim, _ = create_simulation_object(pdb, Settings, pbc=True, precision="double")
-    G, GDx, GDy, GDz = energy_dipole_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, Boxes, AGrad)
+        SimD, _ = create_simulation_object(pdb, Settings, pbc=True, precision="double")
+    elif AGrad:
+        SimD = Sim
+    G, GDx, GDy, GDz = energy_dipole_derivatives(mvals, h, pdb, FF, Xyzs, Settings, SimD, Boxes, AGrad)
     # The density derivative can be computed using the energy derivative.
     N = len(Xyzs)
     kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
@@ -952,8 +954,10 @@ def main():
     # Now that we have the coordinates, we can compute the energy derivatives.
     if DoublePrecisionDerivatives and AGrad:
         print "Creating Double Precision Simulation for parameter derivatives"
-        mSim, _ = create_simulation_object(mpdb, mSettings, pbc=False, precision="double")
-    mG = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mSettings, mSim, None, AGrad)
+        mSimD, _ = create_simulation_object(mpdb, mSettings, pbc=False, precision="double")
+    elif AGrad:
+        mSimD = mSim
+    mG = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mSettings, mSimD, None, AGrad)
 
     # pV_avg and mean(pV) are exactly the same.
     pV = (pressure * Data['volume'] * AVOGADRO_CONSTANT_NA).value_in_unit(kilojoule_per_mole)
@@ -999,7 +1003,7 @@ def main():
     # Rho_err = np.std(Rhoboot)
     if FDCheck:
         Sep = printcool("Numerical Derivative:")
-        GRho1 = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_rho, {'r_':Rhos}, Boxes)
+        GRho1 = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, SimD, kT, calc_rho, {'r_':Rhos}, Boxes)
         FF.print_map(vals=GRho1)
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GRho, GRho1)]
@@ -1045,7 +1049,7 @@ def main():
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
-        GAlpha_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_alpha, {'h_':H,'v_':V}, Boxes)
+        GAlpha_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, SimD, kT, calc_alpha, {'h_':H,'v_':V}, Boxes)
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GAlpha_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -1075,7 +1079,7 @@ def main():
     GKappa  = bar_unit*(GKappa1 + GKappa2 + GKappa3)
     FF.print_map(vals=GKappa)
     if FDCheck:
-        GKappa_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_kappa, {'v_':V}, Boxes)
+        GKappa_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, SimD, kT, calc_kappa, {'v_':V}, Boxes)
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GKappa_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -1106,7 +1110,7 @@ def main():
     Sep = printcool("Isobaric heat capacity:        % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:
-        GCp_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_cp, {'h_':H}, Boxes)
+        GCp_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, SimD, kT, calc_cp, {'h_':H}, Boxes)
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GCp_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -1151,7 +1155,7 @@ def main():
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)
     if FDCheck:
-        GEps0_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_eps0, {'d_':Dips,'v_':V}, Boxes)
+        GEps0_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, SimD, kT, calc_eps0, {'d_':Dips,'v_':V}, Boxes)
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GEps0_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
