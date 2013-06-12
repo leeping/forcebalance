@@ -121,6 +121,8 @@ class Target(ForceBalanceBaseClass):
             tgtdir = 'targets'
         elif os.path.exists('simulations'):
             tgtdir = 'simulations'
+        else:
+            raise Exception('\x1b[91mThe targets directory is missing!\x1b[0m\nDid you finish setting up the target data?\nPlace the data in a directory called "targets" or "simulations"')
         self.set_option(None, None, 'tgtdir', os.path.join(tgtdir,self.name))
         ## Temporary (working) directory; it is temp/(target_name)
         ## Used for storing temporary variables that don't change through the course of the optimization
