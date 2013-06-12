@@ -6,8 +6,8 @@ and there are many more examples to come.
 
 \section tip4p Fitting a TIP4P potential to QM cluster calculations
 
-After everything is installed, go to the \c studies directory in the distribution
-and run:
+After everything is installed, go to the \c studies/001_water_tutorial directory in the distribution.
+Extract the \c targets.tar.bz2 archive file.  Now execute:
 
 @verbatim
 ForceBalance.py very_simple.in
