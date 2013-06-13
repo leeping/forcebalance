@@ -1,4 +1,4 @@
-"""@package nifty Nifty functions, intended to be imported by any module within ForceBalance.
+"""@package forcebalance.nifty Nifty functions, intended to be imported by any module within ForceBalance.
 
 Table of Contents:
 - I/O formatting

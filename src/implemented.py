@@ -1,4 +1,4 @@
-""" @package implemented Contains the dictionary of usable Target classes."""
+""" @package forcebalance.implemented Contains the dictionary of usable Target classes."""
 
 import traceback
 

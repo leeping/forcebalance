@@ -1,4 +1,4 @@
-""" @package interaction Interaction energy fitting module.
+""" @package forcebalance.interaction Interaction energy fitting module.
 
 @author Lee-Ping Wang
 @date 05/2012

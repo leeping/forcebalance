@@ -1,4 +1,4 @@
-"""@package counterpoise
+"""@package forcebalance.counterpoise
 
 Match an empirical potential to the counterpoise correction for basis set superposition error (BSSE).
 

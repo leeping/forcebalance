@@ -1,4 +1,4 @@
-""" @package moments Multipole moment fitting module
+""" @package forcebalance.moments Multipole moment fitting module
 
 @author Lee-Ping Wang
 @date 09/2012

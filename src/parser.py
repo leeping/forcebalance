@@ -1,4 +1,4 @@
-""" @package parser Input file parser for ForceBalance jobs.  Additionally, the location for all default options.
+""" @package forcebalance.parser Input file parser for ForceBalance jobs.  Additionally, the location for all default options.
 
 Although I will do my best to write good documentation,
 for many programs the input parser becomes the most up-to-date

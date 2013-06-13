@@ -1,4 +1,4 @@
-""" @package gmxio GROMACS input/output.
+""" @package forcebalance.gmxio GROMACS input/output.
 
 @todo Even more stuff from forcefield.py needs to go into here.
 

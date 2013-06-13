@@ -1,4 +1,4 @@
-""" @package liquid Matching of liquid bulk properties.  Under development.
+""" @package forcebalance.liquid Matching of liquid bulk properties.  Under development.
 
 @author Lee-Ping Wang
 @date 04/2012

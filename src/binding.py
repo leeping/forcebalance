@@ -1,4 +1,4 @@
-""" @package binding Binding energy fitting module.
+""" @package forcebalance.binding Binding energy fitting module.
 
 @author Lee-Ping Wang
 @date 05/2012

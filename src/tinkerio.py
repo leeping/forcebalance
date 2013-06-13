@@ -1,4 +1,4 @@
-""" @package tinkerio TINKER input/output.
+""" @package forcebalance.tinkerio TINKER input/output.
 
 This serves as a good template for writing future force matching I/O
 modules for other programs because it's so simple.

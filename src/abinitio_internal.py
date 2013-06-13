@@ -1,4 +1,4 @@
-""" @package abinitio_internal Internal implementation of energy matching (for TIP3P water only)
+""" @package forcebalance.abinitio_internal Internal implementation of energy matching (for TIP3P water only)
 
 @author Lee-Ping Wang
 @date 04/2012

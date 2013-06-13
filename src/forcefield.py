@@ -1,4 +1,4 @@
-""" @package forcefield
+""" @package forcebalance.forcefield
 
 Force field module.
 
