@@ -152,6 +152,7 @@ class AbInitio(Target):
         self.set_option(None, 'shots', val=self.ns)
 
     def read_topology(self):
+        # Arthur: Document this.
         self.topology_flag = False
 
     def build_invdist(self, mvals):

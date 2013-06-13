@@ -370,6 +370,7 @@ class AbInitio_GMX(AbInitio):
         super(AbInitio_GMX,self).__init__(options,tgt_opts,forcefield)
         
     def read_topology(self):
+        # Arthur: Document this.
         section = None
         ResidueCounter = -1
         ChargeGroupCounter = -1

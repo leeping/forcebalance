@@ -26,6 +26,29 @@ try:
 except:
     pass
 
+def ResetVirtualSites(positions, system):
+    # Given a set of OpenMM-compatible positions and a System object,
+    # compute the correct virtual site positions according to the System.
+    if any([system.isVirtualSite(i) for i in range(system.getNumParticles())]):
+        pos = np.array(positions/nanometer)
+        for i in range(system.getNumParticles()):
+            if system.isVirtualSite(i):
+                vs = system.getVirtualSite(i)
+                vstype = vs.__class__.__name__
+                if vstype == 'TwoParticleAverageSite':
+                    vspos = vs.getWeight(0)*pos[vs.getParticle(0)] + vs.getWeight(1)*pos[vs.getParticle(1)]
+                elif vstype == 'ThreeParticleAverageSite':
+                    vspos = vs.getWeight(0)*pos[vs.getParticle(0)] + vs.getWeight(1)*pos[vs.getParticle(1)] + vs.getWeight(2)*pos[vs.getParticle(2)]
+                elif vstype == 'OutOfPlaneSite':
+                    v1 = pos[vs.getParticle(1)] - pos[vs.getParticle(0)]
+                    v2 = pos[vs.getParticle(2)] - pos[vs.getParticle(0)]
+                    cross = Vec3(v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0])
+                    vspos = pos[vs.getParticle(0)] + vs.getWeight12()*v1 + vs.getWeight13()*v2 + vs.getWeightCross()*cross
+                pos[i] = vspos
+        newpos = [tuple(i) for i in pos]*nanometer
+        return newpos
+    else: return positions
+
 def CopyAmoebaBondParameters(src,dest):
     dest.setAmoebaGlobalBondCubic(src.getAmoebaGlobalBondCubic())
     dest.setAmoebaGlobalBondQuartic(src.getAmoebaGlobalBondQuartic())
@@ -112,7 +135,6 @@ def CopySystemParameters(src,dest):
 
 def UpdateSimulationParameters(src_system, dest_simulation):
     CopySystemParameters(src_system, dest_simulation.system)
-    dest_simulation.context.updateVirtualSiteWeights(src_system)
     for i in range(src_system.getNumForces()):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
@@ -260,6 +282,7 @@ class AbInitio_OpenMM(AbInitio):
             self.xyz_omms.append(mod.getPositions())
 
     def read_topology(self):
+        # Arthur: Document this.
         pdb = PDBFile(os.path.join(self.root,self.tgtdir,"conf.pdb"))
         mypdb = Molecule(os.path.join(self.root,self.tgtdir,"conf.pdb"))
         self.AtomLists['Mass'] = [PeriodicTable[i] for i in mypdb.elem]
@@ -318,13 +341,16 @@ class AbInitio_OpenMM(AbInitio):
             # mod.addExtraParticles(forcefield)
             # # Set the positions using the trajectory
             # simulation.context.setPositions(mod.getPositions())
-            simulation.context.setPositions(self.xyz_omms[I])
+            # simulation.context.setPositions(self.xyz_omms[I])
             # Right now OpenMM is a bit bugged because I can't copy vsite parameters.
-            if self.FF.rigid_water:
-                simulation.context.applyConstraints(1e-8)
-            else:
-                simulation.context.computeVirtualSites()
+            # if self.FF.rigid_water:
+            #     simulation.context.applyConstraints(1e-8)
+            # else:
+            #     simulation.context.computeVirtualSites()
             # Compute the potential energy and append to list
+            xyz_omm = self.xyz_omms[I]
+            # ResetVirtualSites(xyz_omm, system)
+            simulation.context.setPositions(ResetVirtualSites(xyz_omm, system))
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             # Compute the force and append to list
             Force = list(np.array(simulation.context.getState(getForces=True).getForces() / kilojoules_per_mole * nanometer).flatten())
