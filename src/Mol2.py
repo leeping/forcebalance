@@ -248,7 +248,7 @@ class mol2_bond:
 
 class mol2:
     """
-    This is to manage one mol2 series of lines on the form:
+    This is to manage one mol2 series of lines on the form: @verbatim
 @<TRIPOS>MOLECULE
 CDK2.xray.inh1.1E9H
  34 37 0 0 0
@@ -263,7 +263,7 @@ Energy = 0
      1     1     2   ar
      2     1     6   ar
 
-    """
+    @endverbatim"""
     def __init__(self, data):
         self.mol_name  = None
         self.num_atoms = 0
