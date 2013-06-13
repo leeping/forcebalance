@@ -1,4 +1,4 @@
-""" @package qchemio Q-Chem input file parser. """
+""" @package forcebalance.qchemio Q-Chem input file parser. """
 
 import os
 from re import match, sub

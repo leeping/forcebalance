@@ -1,4 +1,4 @@
-""" @package openmmio OpenMM input/output.
+""" @package forcebalance.openmmio OpenMM input/output.
 
 @author Lee-Ping Wang
 @date 04/2012

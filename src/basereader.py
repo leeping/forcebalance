@@ -1,4 +1,4 @@
-"""@package BaseReader Base class for force field line reader.
+"""@package forcebalance.basereader Base class for force field line reader.
 
 @author Lee-Ping Wang
 @date 12/2011

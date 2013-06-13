@@ -1,4 +1,4 @@
-""" @package optimizer Optimization algorithms.
+""" @package forcebalance.optimizer Optimization algorithms.
 
 My current implementation is to have a single optimizer class with several methods
 contained inside.

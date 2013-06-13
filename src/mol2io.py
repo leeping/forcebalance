@@ -1,4 +1,4 @@
-""" @package mol2io Mol2 I/O.
+""" @package forcebalance.mol2io Mol2 I/O.
 
 This serves as a good template for writing future force matching I/O
 modules for other programs because it's so simple.

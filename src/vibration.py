@@ -1,4 +1,4 @@
-""" @package vibration Vibrational mode fitting module
+""" @package forcebalance.vibration Vibrational mode fitting module
 
 @author Lee-Ping Wang
 @date 08/2012

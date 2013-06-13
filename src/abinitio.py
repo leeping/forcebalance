@@ -1,4 +1,4 @@
-""" @package abinitio Ab-initio fitting module (energies, forces, resp).
+""" @package forcebalance.abinitio Ab-initio fitting module (energies, forces, resp).
 
 @author Lee-Ping Wang
 @date 05/2012

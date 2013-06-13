@@ -1,4 +1,4 @@
-"""@package objective
+"""@package forcebalance.objective
 
 ForceBalance objective function."""
 

@@ -1,4 +1,4 @@
-""" @package custom_io Custom force field parser.
+""" @package forcebalance.custom_io Custom force field parser.
 
 We take advantage of the sections in GROMACS and the 'interaction
 type' concept, but these interactions are not supported in GROMACS;

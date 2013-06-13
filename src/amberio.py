@@ -1,4 +1,4 @@
-""" @package amberio AMBER force field input/output.
+""" @package forcebalance.amberio AMBER force field input/output.
 
 This serves as a good template for writing future force matching I/O
 modules for other programs because it's so simple.
