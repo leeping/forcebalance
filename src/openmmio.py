@@ -23,6 +23,7 @@ try:
     from simtk.openmm.app import *
     from simtk.openmm import *
     from simtk.unit import *
+    import simtk.openmm._openmm as _openmm
 except:
     pass
 
@@ -35,15 +36,25 @@ def ResetVirtualSites(positions, system):
             if system.isVirtualSite(i):
                 vs = system.getVirtualSite(i)
                 vstype = vs.__class__.__name__
+                # if vstype == 'TwoParticleAverageSite':
+                #     vspos = vs.getWeight(0)*pos[vs.getParticle(0)] + vs.getWeight(1)*pos[vs.getParticle(1)]
+                # elif vstype == 'ThreeParticleAverageSite':
+                #     vspos = vs.getWeight(0)*pos[vs.getParticle(0)] + vs.getWeight(1)*pos[vs.getParticle(1)] + vs.getWeight(2)*pos[vs.getParticle(2)]
+                # elif vstype == 'OutOfPlaneSite':
+                #     v1 = pos[vs.getParticle(1)] - pos[vs.getParticle(0)]
+                #     v2 = pos[vs.getParticle(2)] - pos[vs.getParticle(0)]
+                #     cross = Vec3(v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0])
+                #     vspos = pos[vs.getParticle(0)] + vs.getWeight12()*v1 + vs.getWeight13()*v2 + vs.getWeightCross()*cross
+                # Faster code to work around Python API slowness.
                 if vstype == 'TwoParticleAverageSite':
-                    vspos = vs.getWeight(0)*pos[vs.getParticle(0)] + vs.getWeight(1)*pos[vs.getParticle(1)]
+                    vspos = _openmm.TwoParticleAverageSite_getWeight(vs, 0)*pos[_openmm.VirtualSite_getParticle(vs, 0)] + _openmm.TwoParticleAverageSite_getWeight(vs, 1)*pos[_openmm.VirtualSite_getParticle(vs, 1)]
                 elif vstype == 'ThreeParticleAverageSite':
-                    vspos = vs.getWeight(0)*pos[vs.getParticle(0)] + vs.getWeight(1)*pos[vs.getParticle(1)] + vs.getWeight(2)*pos[vs.getParticle(2)]
+                    vspos = _openmm.ThreeParticleAverageSite_getWeight(vs, 0)*pos[_openmm.VirtualSite_getParticle(vs, 0)] + _openmm.ThreeParticleAverageSite_getWeight(vs, 1)*pos[_openmm.VirtualSite_getParticle(vs, 1)] + _openmm.ThreeParticleAverageSite_getWeight(vs, 2)*pos[_openmm.VirtualSite_getParticle(vs, 2)]
                 elif vstype == 'OutOfPlaneSite':
-                    v1 = pos[vs.getParticle(1)] - pos[vs.getParticle(0)]
-                    v2 = pos[vs.getParticle(2)] - pos[vs.getParticle(0)]
+                    v1 = pos[_openmm.VirtualSite_getParticle(vs, 1)] - pos[_openmm.VirtualSite_getParticle(vs, 0)]
+                    v2 = pos[_openmm.VirtualSite_getParticle(vs, 2)] - pos[_openmm.VirtualSite_getParticle(vs, 0)]
                     cross = Vec3(v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0])
-                    vspos = pos[vs.getParticle(0)] + vs.getWeight12()*v1 + vs.getWeight13()*v2 + vs.getWeightCross()*cross
+                    vspos = pos[_openmm.VirtualSite_getParticle(vs, 0)] + _openmm.OutOfPlaneSite_getWeight12(vs)*v1 + _openmm.OutOfPlaneSite_getWeight13(vs)*v2 + _openmm.OutOfPlaneSite_getWeightCross(vs)*cross
                 pos[i] = vspos
         newpos = [tuple(i) for i in pos]*nanometer
         return newpos
