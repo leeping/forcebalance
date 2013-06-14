@@ -300,7 +300,8 @@ def get_dipole(simulation,q=None,positions=None):
             # Get array of positions in nanometers.
             if positions == None:
                 positions = simulation.context.getState(getPositions=True).getPositions()
-            x = np.array([j._value for j in positions])
+            #x = np.array([j._value for j in positions])
+            x = np.array(positions.value_in_unit(nanometer))
             # Multiply charges by positions to get dipole moment.
             dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
             dx += dip[0]
@@ -493,7 +494,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     # Determine number of degrees of freedom.
     kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
     # The center of mass motion remover is also a constraint.
-    ndof = 3*system.getNumParticles() - system.getNumConstraints() - 3
+    ndof = 3*(system.getNumParticles() - sum([system.isVirtualSite(i) for i in range(system.getNumParticles())])) - system.getNumConstraints() - 3
     # Compute total mass.
     mass = compute_mass(system).in_units_of(gram / mole) /  AVOGADRO_CONSTANT_NA # total system mass in g
     # Initialize statistics.
@@ -640,7 +641,7 @@ def analyze(data):
 
     return statistics['density'] / unit_rho, statistics['ddensity'] / unit_rho, statistics['PE'] / unit_ene, statistics['dPE'] / unit_ene, pV_mean, pV_err
 
-def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False,dipole=False):
+def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False,dipole=False,resetvs=False):
     """
     Compute a set of snapshot energies as a function of the force field parameters.
 
@@ -678,40 +679,34 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
     for i in simulation.system.getForces():
         if i.__class__.__name__ == "NonbondedForce":
             q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+    
     # Loop through the snapshots
     if boxes == None:
         for xyz in xyzs:
-            # A cumbersome way to update virtual site positions.
-            # xyzatom = [xyz[i]._value for i in range(len(xyz)) if isAtom[i]]*nanometer
-            # mod = Modeller(pdb.topology, xyzatom)
-            # mod.addExtraParticles(forcefield)
-            # simulation.context.setPositions(mod.positions)
-            # Enable this code later.
-            simulation.context.setPositions(ResetVirtualSites(xyz, system))
-            # simulation.context.computeVirtualSites()
+            if resetvs:
+                xyz1 = ResetVirtualSites(xyz, system)
+            else:
+                xyz1 = xyz
+            simulation.context.setPositions(xyz1)
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             E.append(Energy)
             if dipole:
-                D.append(get_dipole(simulation,q=q,positions=xyz))
+                D.append(get_dipole(simulation,q=q,positions=xyz1))
     else:
         for xyz,box in zip(xyzs,boxes):
             # Set the positions and the box vectors
-            # A cumbersome way to update virtual site positions.
-            # xyzatom = [xyz[i]._value for i in range(len(xyz)) if isAtom[i]]*nanometer
-            # mod = Modeller(pdb.topology, xyzatom)
-            # mod.addExtraParticles(forcefield)
-            simulation.context.setPositions(ResetVirtualSites(xyz, system))
-            # simulation.context.setPositions(mod.positions)
-            # Enable this code later.
-            # simulation.context.setPositions(xyz)
-            # simulation.context.computeVirtualSites()
+            if resetvs:
+                xyz1 = ResetVirtualSites(xyz, system)
+            else:
+                xyz1 = xyz
+            simulation.context.setPositions(xyz1)
             simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
             # Compute the potential energy and append to list
             Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             E.append(Energy)
             if dipole:
-                D.append(get_dipole(simulation,q=q,positions=xyz))
+                D.append(get_dipole(simulation,q=q,positions=xyz1))
     print "\r",
     if verbose: print E
     if dipole:
@@ -746,10 +741,11 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=
     E0       = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes)
     CheckFDPts = False
     for i in range(FF.np):
-        G[i,:], _ = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes),h,f0=E0)
+        print FF.plist[i]
+        G[i,:], _ = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,resetvs='VirtualSite' in FF.plist[i]),h,f0=E0)
         if CheckFDPts:
             # Check whether the number of finite difference points is sufficient.  Forward difference still gives residual error of a few percent.
-            G1 = f1d7p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes),h)
+            G1 = f1d7p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,resetvs='VirtualSite' in FF.plist[i]),h)
             dG = G1 - G[i,:]
             dGfrac = (G1 - G[i,:]) / G[i,:]
             print "Parameter %3i 7-pt vs. central derivative : RMS, Max error (fractional) = % .4e % .4e (% .4e % .4e)" % (i, np.sqrt(np.mean(dG**2)), max(np.abs(dG)), np.sqrt(np.mean(dGfrac**2)), max(np.abs(dGfrac)))
@@ -784,7 +780,8 @@ def energy_dipole_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None
     ED0      = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes, dipole=True)
     CheckFDPts = False
     for i in range(FF.np):
-        EDG, _   = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True),h,f0=ED0)
+        print FF.plist[i]
+        EDG, _   = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True,resetvs='VirtualSite' in FF.plist[i]),h,f0=ED0)
         G[i,:]   = EDG[:,0]
         GDx[i,:] = EDG[:,1]
         GDy[i,:] = EDG[:,2]
@@ -818,7 +815,8 @@ def property_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,kT,property_dri
         H0 = property_kwargs['h_'].copy()
 
     for i in range(FF.np):
-        ED1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True)(h)
+        print FF.plist[i]
+        ED1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True,resetvs='VirtualSite' in FF.plist[i])(h)
         E1       = ED1[:,0]
         D1       = ED1[:,1:]
         b = np.exp(-(E1-E0)/kT)
@@ -833,7 +831,7 @@ def property_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,kT,property_dri
             print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
         P1 = property_driver(b=b,**property_kwargs)
 
-        EDM1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True)(-h)
+        EDM1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True,resetvs='VirtualSite' in FF.plist[i])(-h)
         EM1       = EDM1[:,0]
         DM1       = EDM1[:,1:]
         b = np.exp(-(EM1-E0)/kT)
