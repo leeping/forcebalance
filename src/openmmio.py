@@ -31,7 +31,7 @@ def ResetVirtualSites(positions, system):
     # Given a set of OpenMM-compatible positions and a System object,
     # compute the correct virtual site positions according to the System.
     if any([system.isVirtualSite(i) for i in range(system.getNumParticles())]):
-        pos = np.array(positions/nanometer)
+        pos = positions.value_in_unit(nanometer)
         for i in range(system.getNumParticles()):
             if system.isVirtualSite(i):
                 vs = system.getVirtualSite(i)
@@ -56,7 +56,7 @@ def ResetVirtualSites(positions, system):
                     cross = Vec3(v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0])
                     vspos = pos[_openmm.VirtualSite_getParticle(vs, 0)] + _openmm.OutOfPlaneSite_getWeight12(vs)*v1 + _openmm.OutOfPlaneSite_getWeight13(vs)*v2 + _openmm.OutOfPlaneSite_getWeightCross(vs)*cross
                 pos[i] = vspos
-        newpos = [tuple(i) for i in pos]*nanometer
+        newpos = pos*nanometer
         return newpos
     else: return positions
 
