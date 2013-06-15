@@ -266,12 +266,12 @@ class Liquid_OpenMM(Liquid):
         UpdateSimulationParameters(sys, self.msim)
         self.msim.context.setPositions(mod.getPositions())
         self.msim.minimizeEnergy()
-        pos = self.msim.context.getPositions()
+        pos = self.msim.context.getState(getPositions=True).getPositions()
         pos = ResetVirtualSites(pos, sys)
         d = get_dipole(self.msim, positions=pos)
         dd2 = ((np.linalg.norm(d)-self.self_pol_mu0)*debye)**2
         eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
-        epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
+        epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*np.pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
         return epol
 
     def npt_simulation(self, temperature, pressure):
@@ -282,11 +282,25 @@ class Liquid_OpenMM(Liquid):
             if wq == None:
                 print "Running condensed phase simulation locally."
                 print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
-                cmdstr = 'bash runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", " --anisotropic" if self.anisotropic_box else "", " --mts_vvvr" if self.mts_vvvr else "", self.liquid_equ_steps)
+                cmdstr = 'bash runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s%s%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, 
+                                                                                                                                          self.liquid_interval, temperature, pressure, 
+                                                                                                                                          " --force_cuda" if self.force_cuda else "", 
+                                                                                                                                          " --anisotropic" if self.anisotropic_box else "", 
+                                                                                                                                          " --mts_vvvr" if self.mts_vvvr else "", 
+                                                                                                                                          " --gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else "", 
+                                                                                                                                          " --gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else "", 
+                                                                                                                                          self.liquid_equ_steps)
                 _exec(cmdstr)
             else:
                 queue_up(wq,
-                         command = 'bash runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --force_cuda" if self.force_cuda else "", " --anisotropic" if self.anisotropic_box else "", " --mts_vvvr" if self.mts_vvvr else "", self.liquid_equ_steps),
+                         command = 'bash runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s%s%s%s --liquid_equ_steps %i &> npt.out' % (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, 
+                                                                                                                                                    self.liquid_interval, temperature, pressure, 
+                                                                                                                                                    " --force_cuda" if self.force_cuda else "", 
+                                                                                                                                                    " --anisotropic" if self.anisotropic_box else "", 
+                                                                                                                                                    " --mts_vvvr" if self.mts_vvvr else "", 
+                                                                                                                                                    " --gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else "", 
+                                                                                                                                                    " --gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else "", 
+                                                                                                                                                    self.liquid_equ_steps),
                          input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
                          #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
                          output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
