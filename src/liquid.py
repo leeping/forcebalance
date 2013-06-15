@@ -4,6 +4,7 @@
 @date 04/2012
 """
 
+import abc
 import os
 import shutil
 from nifty import *
@@ -80,6 +81,12 @@ class Liquid(Target):
         self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'liquid_interval',forceprint=True)
+        # Isolated dipole (debye) for analytic self-polarization correction.
+        self.set_option(tgt_opts,'self_pol_mu0',forceprint=True)
+        # Molecular polarizability (ang**3) for analytic self-polarization correction.
+        self.set_option(tgt_opts,'self_pol_alpha',forceprint=True)
+        # Set up the simulation object for self-polarization correction.
+        self.do_self_pol = (self.self_pol_mu0 > 0.0 and self.self_pol_alpha > 0.0)
         
         #======================================#
         #     Variables which are set here     #
@@ -457,6 +464,14 @@ class Liquid(Target):
                 mW1 = np.ones((mSims*mShots,mSims),dtype=float)
                 mW1 /= mSims*mShots
 
+        if self.do_self_pol:
+            EPol = self.polarization_correction(mvals)
+            GEPol = np.array([f12d3p(fdwrap(self.polarization_correction, mvals, p), h = self.h, f0 = EPol)[0] for p in range(self.FF.np)])
+            bar = printcool("Self-polarization correction to enthalpy of vaporization is % .3f kJ/mol%s" % (EPol, ", Derivative:" if AGrad else ""))
+            if AGrad:
+                self.FF.print_map(vals=GEPol)
+                print bar
+            
         for i, PT in enumerate(Points):
             T = PT[0]
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
@@ -488,6 +503,9 @@ class Liquid(Target):
                 Hvap_grad[PT]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
                 Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.mat(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
                 Hvap_grad[PT] -= (mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                if self.do_self_pol:
+                    Hvap_calc[PT] -= EPol
+                    Hvap_grad[PT] -= GEPol
                 if hasattr(self,'use_cni') and self.use_cni:
                     print "Adding % .3f to enthalpy of vaporization at" % self.RefData['cni'][PT], PT
                     Hvap_calc[PT] += self.RefData['cni'][PT]
@@ -634,3 +652,13 @@ class Liquid(Target):
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         return Answer
 
+    @abc.abstractmethod
+    def polarization_correction(self,mvals):
+
+        """ 
+        
+        Return the self-polarization correction as described in Berendsen et al., JPC 1987.
+
+        """
+        
+        raise NotImplementedError('This method is not implemented in the base class')

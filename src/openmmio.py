@@ -27,6 +27,35 @@ try:
 except:
     pass
 
+def get_dipole(simulation,q=None,positions=None):
+    # Return the current dipole moment in Debye.
+    # Note that this quantity is meaningless if the system carries a net charge.
+    dx = 0.0
+    dy = 0.0
+    dz = 0.0
+    enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
+    for i in simulation.system.getForces():
+        if i.__class__.__name__ == "AmoebaMultipoleForce":
+            mm = i.getSystemMultipoleMoments(simulation.context)
+            dx += mm[1]
+            dy += mm[2]
+            dz += mm[3]
+        if i.__class__.__name__ == "NonbondedForce":
+            # Get array of charges.
+            if q == None:
+                q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+            # Get array of positions in nanometers.
+            if positions == None:
+                positions = simulation.context.getState(getPositions=True).getPositions()
+            #x = np.array([j._value for j in positions])
+            x = np.array(positions.value_in_unit(nanometer))
+            # Multiply charges by positions to get dipole moment.
+            dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
+            dx += dip[0]
+            dy += dip[1]
+            dz += dip[2]
+    return [dx,dy,dz]
+
 def ResetVirtualSites(positions, system):
     # Given a set of OpenMM-compatible positions and a System object,
     # compute the correct virtual site positions according to the System.
@@ -205,6 +234,19 @@ class Liquid_OpenMM(Liquid):
         self.set_option(tgt_opts,'anisotropic_box',forceprint=True)
         # Enable multiple timestep integrator
         self.set_option(tgt_opts,'mts_vvvr',forceprint=True)
+        # Set up for polarization correction
+        if self.do_self_pol:
+            self.mpdb = PDBFile(os.path.join(self.root,self.tgtdir,"mono.pdb"))
+            forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
+            mod = Modeller(self.mpdb.topology, self.mpdb.positions)
+            mod.addExtraParticles(forcefield)
+            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
+            # Create the simulation; we're not actually going to use the integrator
+            integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+            # Create a Reference platform (this will be faster than CUDA since it's small)
+            self.platform = openmm.Platform.getPlatformByName('Reference')
+            # Create the simulation object
+            self.msim = Simulation(mod.topology, system, integrator, self.platform)
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
@@ -214,6 +256,23 @@ class Liquid_OpenMM(Liquid):
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
         #LinkFile(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
+
+    def polarization_correction(self,mvals):
+        self.FF.make(mvals)
+        ff = ForceField(self.FF.openmmxml)
+        mod = Modeller(self.mpdb.topology, self.mpdb.positions)
+        mod.addExtraParticles(ff)
+        sys = ff.createSystem(mod.topology, rigidWater=self.FF.rigid_water)
+        UpdateSimulationParameters(sys, self.msim)
+        self.msim.context.setPositions(mod.getPositions())
+        self.msim.minimizeEnergy()
+        pos = self.msim.context.getPositions()
+        pos = ResetVirtualSites(pos, sys)
+        d = get_dipole(self.msim, positions=pos)
+        dd2 = ((np.linalg.norm(d)-self.self_pol_mu0)*debye)**2
+        eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
+        epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
+        return epol
 
     def npt_simulation(self, temperature, pressure):
         """ Submit a NPT simulation to the Work Queue. """
