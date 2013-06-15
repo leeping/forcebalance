@@ -185,6 +185,8 @@ tgt_opts_types = {
                  "polarizability_denom"   : (1.0, 0, 'Dipole polarizability tensor normalization (cubic Angstrom) ; set to 0 if a zero weight is desired', 'Monomer property targets with polarizability', 'monomer'),
                  "liquid_timestep"  : (0.5, 0, 'Time step size for the liquid simulation.', 'Condensed phase property targets', 'liquid'),
                  "liquid_interval"  : (0.05, 0, 'Time interval for saving coordinates for the liquid production run.', 'Condensed phase property targets', 'liquid'),
+                 "self_pol_mu0"  : (0.0, -150, 'Gas-phase dipole parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
+                 "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  },
     'sections': {}
     }

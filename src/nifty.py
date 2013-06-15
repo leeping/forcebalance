@@ -536,7 +536,7 @@ def wq_wait1(wq, wait_time=10, verbose=False):
                 WQIDS[tgtname].append(taskid)
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
-                    print "Command '%s' (task %i) finished succesfully on host %s (%i seconds)" % (task.command, task.id, task.hostname, exectime)
+                    print "Command '%s' (task %i) finished successfully on host %s (%i seconds)" % (task.command, task.id, task.hostname, exectime)
                 for tnm in WQIDS:
                     if task.id in WQIDS[tnm]:
                         WQIDS[tnm].remove(task.id)

@@ -280,36 +280,6 @@ def compute_mass(system):
         mass += system.getParticleMass(i)
     return mass
 
-def get_dipole(simulation,q=None,positions=None):
-    # Return the current dipole moment in Debye.
-    # Note that this quantity is meaningless if the system carries a net charge.
-    dx = 0.0
-    dy = 0.0
-    dz = 0.0
-    enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
-    for i in simulation.system.getForces():
-        if i.__class__.__name__ == "AmoebaMultipoleForce":
-            mm = i.getSystemMultipoleMoments(simulation.context)
-            dx += mm[1]
-            dy += mm[2]
-            dz += mm[3]
-        if i.__class__.__name__ == "NonbondedForce":
-            # Get array of charges.
-            if q == None:
-                q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-            # Get array of positions in nanometers.
-            if positions == None:
-                positions = simulation.context.getState(getPositions=True).getPositions()
-            #x = np.array([j._value for j in positions])
-            x = np.array(positions.value_in_unit(nanometer))
-            # Multiply charges by positions to get dipole moment.
-            dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
-            dx += dip[0]
-            dy += dip[1]
-            dz += dip[2]
-    return [dx,dy,dz]
-
-
 def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
     """
     Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.

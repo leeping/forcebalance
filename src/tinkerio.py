@@ -230,6 +230,8 @@ class Liquid_TINKER(Liquid):
         super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
         self.DynDict = OrderedDict()
         self.DynDict_New = OrderedDict()
+        if self.do_self_pol:
+            warn_press_key("Self-polarization correction not implemented yet when using TINKER")
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
