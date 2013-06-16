@@ -53,7 +53,7 @@ def find_forcebalance():
     forcebalance_dir=""
     try:
         import forcebalance
-        forcebalance_dir = os.path.dirname(forcebalance.__file__)
+        forcebalance_dir = forcebalance.__path__[0]
     except:
         print "Unable to find forcebalance directory in PYTHON PATH (Is it installed?)"
         print "Try running forcebalance/setup.py or you can always set the INPUT directory"
@@ -67,7 +67,7 @@ def find_doxypy():
     doxypy_path=""
     try:
         # first check to see if doxypy is in system path
-        if os.system("doxypy"): raise OSError()
+        if subprocess.call(["doxypy", "makedocumentation.py"],stdout=open(os.devnull)): raise OSError()
         doxypy_path="doxypy"
     except OSError: 
         doxypy_path=raw_input("Enter location of doxypy.py: ")
