@@ -368,8 +368,8 @@ class Liquid(Target):
                 #     del self.RefData[obs][PT]
 
         # Assign variable names to all the stuff in npt_result.p
-        Rhos, Vols, Energies, Dips, Grads, GDips, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(15))
+        Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             print NMols
@@ -413,6 +413,7 @@ class Liquid(Target):
         # The unit that converts atmospheres * nm**3 into kj/mol :)
         pvkj=0.061019351687175
 
+        # Run MBAR using the total energies. Required for estimates that use the kinetic energy.
         BSims = len(BPoints)
         Shots = len(Energies[0])
         N_k = np.ones(BSims)*Shots
@@ -484,7 +485,7 @@ class Liquid(Target):
             H = E + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
-            C = weight_info(W, PT, np.ones(len(Points), dtype=np.float64)*Shots, verbose=False)
+            C = weight_info(W, PT, np.ones(len(Points), dtype=np.float64)*Shots, verbose=True)
             Gbar = flat(np.mat(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
