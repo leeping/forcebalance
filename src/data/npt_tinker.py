@@ -224,11 +224,15 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     odyn = _exec(cmdstr,print_command=verbose,print_to_screen=verbose)
 
     edyn = []
+    kdyn = []
     for line in odyn:
         if 'Current Potential' in line:
             edyn.append(float(line.split()[2]))
+        if 'Current Kinetic' in line:
+            kdyn.append(float(line.split()[2]))
 
     edyn = np.array(edyn) * 4.184
+    kdyn = np.array(kdyn) * 4.184
 
     print "Post-processing to get the dipole moments"
     cmdstr = "./analyze %s" % xain
@@ -263,7 +267,7 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
         vol = None
         rho = None
 
-    return rho, edyn, vol, dip
+    return rho, edyn, kdyn, vol, dip
 
 def energy_driver(mvals,FF,xyz,tky,verbose=False,dipole=False):
     """
@@ -499,7 +503,8 @@ def main():
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    Rhos, Energies, Volumes, Dips = run_simulation(args.liquid_xyzfile,args.liquid_keyfile,tstep=timestep,nstep=nsteps,neq=nequiliterations,npr=niterations,verbose=True)
+    Rhos, Potentials, Kinetics, Volumes, Dips = run_simulation(args.liquid_xyzfile,args.liquid_keyfile,tstep=timestep,nstep=nsteps,neq=nequiliterations,npr=niterations,verbose=True)
+    Energies = Potentials + Kinetics
     V  = Volumes
     pV = pressure * Volumes
     H = Energies + pV
@@ -512,7 +517,8 @@ def main():
     #==============================================#
     # Now run the simulation for just the monomer. #
     #==============================================#
-    _a, mEnergies, _b, _c = run_simulation(args.gas_xyzfile,args.gas_keyfile,tstep=m_timestep,nstep=m_nsteps,neq=m_nequiliterations,npr=m_niterations,pbc=False)
+    _a, mPotentials, mKinetics, _b, _c = run_simulation(args.gas_xyzfile,args.gas_keyfile,tstep=m_timestep,nstep=m_nsteps,neq=m_nequiliterations,npr=m_niterations,pbc=False)
+    mEnergies = mPotentials + mKinetics
     mN = len(mEnergies)
     print "Post-processing the gas simulation snapshots."
     mG = energy_derivatives(mvals,h,FF,args.gas_xyzfile,args.gas_keyfile,AGrad)
@@ -563,27 +569,27 @@ def main():
         FF.print_map(vals=absfrac)
 
     # The enthalpy of vaporization in kJ/mol.
-    Pot_avg,  Pot_err  = bootstats(calc_arr,{'arr':Energies})
-    mPot_avg, mPot_err = bootstats(calc_arr,{'arr':mEnergies})
+    Ene_avg,  Ene_err  = bootstats(calc_arr,{'arr':Energies})
+    mEne_avg, mEne_err = bootstats(calc_arr,{'arr':mEnergies})
     pV_avg,   pV_err   = bootstats(calc_arr,{'arr':pV})
-    Pot_err  *= np.sqrt(statisticalInefficiency(Energies))
-    mPot_err *= np.sqrt(statisticalInefficiency(mEnergies))
+    Ene_err  *= np.sqrt(statisticalInefficiency(Energies))
+    mEne_err *= np.sqrt(statisticalInefficiency(mEnergies))
     pV_err   *= np.sqrt(statisticalInefficiency(pV))
 
-    Hvap_avg = mPot_avg - Pot_avg / NMol + kT - np.mean(pV) / NMol
-    Hvap_err = np.sqrt(Pot_err**2 / NMol**2 + mPot_err**2 + pV_err**2/NMol**2)
+    Hvap_avg = mEne_avg - Ene_avg / NMol + kT - np.mean(pV) / NMol
+    Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
     GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Pot_avg * np.mean(G, axis=1))
+    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Ene_avg * np.mean(G, axis=1))
     GHvap /= NMol
     GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mPot_avg * np.mean(mG, axis=1))
+    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mEne_avg * np.mean(mG, axis=1))
     GHvap *= -1
     GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
-    print "Box energy:", np.mean(Energies)
-    print "Monomer energy:", np.mean(mEnergies)
+    print "Box total energy:", np.mean(Energies)
+    print "Monomer total energy:", np.mean(mEnergies)
 
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol, Derivatives below" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
@@ -725,7 +731,7 @@ def main():
     ## Print the final force field.
     pvals = FF.make(mvals)
 
-    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
+    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
 
 if __name__ == "__main__":
     main()

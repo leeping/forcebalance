@@ -119,7 +119,7 @@ m_niterations      = args.gas_prod_steps / m_nsteps
 temperature = args.temperature * kelvin                            # temperature in kelvin
 pressure    = args.pressure * atmospheres                          # pressure in atmospheres
 collision_frequency = 1.0 / picosecond                             # Langevin integrator friction / random force parameter
-barostat_frequency = 10                                            # number of steps between MC volume adjustments
+barostat_frequency = 25                                            # number of steps between MC volume adjustments
 
 # Flag to set verbose debug output
 verbose = True
@@ -139,18 +139,20 @@ amoeba_nonpol_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanomet
                         'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
                         'useDispersionCorrection' : True}
 
-tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer, 'useDispersionCorrection' : True, 'rigidwater' : True}
+tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
+                'useSwitchingFunction' : True, 'switchingDistance' : 0.75*nanometer,
+                'constraints' : HBonds, 'rigidwater' : True, 'useDispersionCorrection' : True}
 
-mono_tip3p_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : True}
+mono_tip3p_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : True, 'removeCMMotion' : False}
 
 mono_direct_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
-               'rigidWater' : False, 'polarization' : 'direct'}
+               'rigidWater' : False, 'polarization' : 'direct', 'removeCMMotion' : False}
 
 mono_mutual_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
-               'rigidWater' : False, 'mutualInducedTargetEpsilon' : 1e-6}
+               'rigidWater' : False, 'mutualInducedTargetEpsilon' : 1e-6, 'removeCMMotion' : False}
 
 mono_nonpol_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
-                      'rigidWater' : False}
+                      'rigidWater' : False, 'removeCMMotion' : False}
 
 # def generateMaxwellBoltzmannVelocities(system, temperature):
 #     """ Generate velocities from a Maxwell-Boltzmann distribution. """
@@ -373,7 +375,7 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     return integrator
 
 
-def create_simulation_object(pdb, settings, pbc=True, precision="single"):
+def create_simulation_object(pdb, settings, pbc=True, precision="mixed"):
     #================================#
     # Create the simulation platform #
     #================================#
@@ -420,7 +422,7 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
     for i in range(system.getNumForces()):
         Frc = system.getForce(i)
         print Frc.__class__.__name__
-        if Frc.__class__.__name__ == 'AmoebaMultipoleForce':
+        if Frc.__class__.__name__ == 'AmoebaMultipoleForce' or Frc.__class__.__name__ == 'NonbondedForce':
             print "The Ewald error tolerance is:", Frc.getEwaldErrorTolerance()
     
     # Create simulation object.
@@ -429,7 +431,7 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
 
 def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     """ Run a NPT simulation and gather statistics. """
-    simulation, system = create_simulation_object(pdb, settings, pbc, "single")
+    simulation, system = create_simulation_object(pdb, settings, pbc, "mixed")
     # Set initial positions.
     # Create the test system.
     forcefield = ForceField(sys.argv[2])
@@ -464,7 +466,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     # Determine number of degrees of freedom.
     kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
     # The center of mass motion remover is also a constraint.
-    ndof = 3*(system.getNumParticles() - sum([system.isVirtualSite(i) for i in range(system.getNumParticles())])) - system.getNumConstraints() - 3
+    ndof = 3*(system.getNumParticles() - sum([system.isVirtualSite(i) for i in range(system.getNumParticles())])) - system.getNumConstraints() - 3*pbc
     # Compute total mass.
     mass = compute_mass(system).in_units_of(gram / mole) /  AVOGADRO_CONSTANT_NA # total system mass in g
     # Initialize statistics.
@@ -472,6 +474,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     data['time'] = Quantity(np.zeros([niterations], np.float64), picoseconds)
     data['potential'] = Quantity(np.zeros([niterations], np.float64), kilojoules_per_mole)
     data['kinetic'] = Quantity(np.zeros([niterations], np.float64), kilojoules_per_mole)
+    data['energy'] = Quantity(np.zeros([niterations], np.float64), kilojoules_per_mole)
     data['volume'] = Quantity(np.zeros([niterations], np.float64), angstroms**3)
     data['density'] = Quantity(np.zeros([niterations], np.float64), kilogram / meters**3)
     data['kinetic_temperature'] = Quantity(np.zeros([niterations], np.float64), kelvin)
@@ -479,7 +482,8 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     xyzs = []
     boxes = []
     rhos = []
-    energies = []
+    potentials = []
+    kinetics = []
     volumes = []
     dipoles = []
     #========================#
@@ -531,17 +535,19 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
         data['time'][iteration] = state.getTime()
         data['potential'][iteration] = potential
         data['kinetic'][iteration] = kinetic
+        data['energy'][iteration] = kinetic+potential
         data['volume'][iteration] = volume
         data['density'][iteration] = density
         data['kinetic_temperature'][iteration] = kinetic_temperature
         xyzs.append(state.getPositions())
         boxes.append(state.getPeriodicBoxVectors())
         rhos.append(density.value_in_unit(kilogram / meter**3))
-        energies.append(potential / kilojoules_per_mole)
+        potentials.append(potential / kilojoules_per_mole)
+        kinetics.append(kinetic / kilojoules_per_mole)
         volumes.append(volume / nanometer**3)
         dipoles.append(get_dipole(simulation,positions=xyzs[-1]))
         
-    return data, xyzs, boxes, np.array(rhos), np.array(energies), np.array(volumes), np.array(dipoles), simulation
+    return data, xyzs, boxes, np.array(rhos), np.array(potentials), np.array(kinetics), np.array(volumes), np.array(dipoles), simulation
 
 def analyze(data):
     """Analyze the data from the run_simulation function."""
@@ -551,6 +557,7 @@ def analyze(data):
     #===========================================================================================#
     data['g_potential'] = statisticalInefficiency(data['potential'] / kilojoules_per_mole)
     data['g_kinetic'] = statisticalInefficiency(data['kinetic'] / kilojoules_per_mole, fast=True)
+    data['g_energy'] = statisticalInefficiency(data['energy'] / kilojoules_per_mole, fast=True)
     data['g_volume'] = statisticalInefficiency(data['volume'] / angstroms**3, fast=True)
     data['g_density'] = statisticalInefficiency(data['density'] / (kilogram / meter**3), fast=True)
     data['g_kinetic_temperature'] = statisticalInefficiency(data['kinetic_temperature'] / kelvin, fast=True)
@@ -567,6 +574,10 @@ def analyze(data):
     statistics['PE']  = (data['potential'] / kilojoules_per_mole).mean() * kilojoules_per_mole
     statistics['dPE'] = (data['potential'] / kilojoules_per_mole).std() / np.sqrt(niterations / data['g_potential']) * kilojoules_per_mole
     statistics['g_PE'] = data['g_potential'] * nsteps * timestep
+    # Total energy.
+    statistics['E']  = (data['energy'] / kilojoules_per_mole).mean() * kilojoules_per_mole
+    statistics['dE'] = (data['energy'] / kilojoules_per_mole).std() / np.sqrt(niterations / data['g_energy']) * kilojoules_per_mole
+    statistics['g_E'] = data['g_energy'] * nsteps * timestep
     # Density
     unit = (kilogram / meter**3)
     statistics['density']  = (data['density'] / unit).mean() * unit
@@ -594,6 +605,8 @@ def analyze(data):
     print "Average kinetic energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['KE'] / kilojoules_per_mole, statistics['dKE'] / kilojoules_per_mole, statistics['g_KE'] / picoseconds)
     # Potential energies
     print "Average potential energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['PE'] / kilojoules_per_mole, statistics['dPE'] / kilojoules_per_mole, statistics['g_PE'] / picoseconds)
+    # Total energies
+    print "Average total energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['E'] / kilojoules_per_mole, statistics['dE'] / kilojoules_per_mole, statistics['g_E'] / picoseconds)
     # Kinetic temperature
     unit = kelvin
     print "Average kinetic temperature: %11.6f +- %11.6f  K         (g = %11.6f ps)" % (statistics['kinetic_temperature'] / unit, statistics['dkinetic_temperature'] / unit, statistics['g_kinetic_temperature'] / picoseconds)
@@ -609,7 +622,7 @@ def analyze(data):
     pV_mean = (statistics['volume'] * pressure * AVOGADRO_CONSTANT_NA).value_in_unit(kilojoule_per_mole)
     pV_err = (statistics['dvolume'] * pressure * AVOGADRO_CONSTANT_NA).value_in_unit(kilojoule_per_mole)
 
-    return statistics['density'] / unit_rho, statistics['ddensity'] / unit_rho, statistics['PE'] / unit_ene, statistics['dPE'] / unit_ene, pV_mean, pV_err
+    return statistics['density'] / unit_rho, statistics['ddensity'] / unit_rho, statistics['PE'] / unit_ene, statistics['dPE'] / unit_ene, statistics['KE'] / unit_ene, statistics['dKE'] / unit_ene, statistics['E'] / unit_ene, statistics['dE'] / unit_ene, pV_mean, pV_err
 
 def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False,dipole=False,resetvs=False):
     """
@@ -711,7 +724,7 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=
     E0       = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes)
     CheckFDPts = False
     for i in range(FF.np):
-        print FF.plist[i]
+        print FF.plist[i] + " "*30
         G[i,:], _ = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,resetvs='VirtualSite' in FF.plist[i]),h,f0=E0)
         if CheckFDPts:
             # Check whether the number of finite difference points is sufficient.  Forward difference still gives residual error of a few percent.
@@ -750,7 +763,7 @@ def energy_dipole_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None
     ED0      = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes, dipole=True)
     CheckFDPts = False
     for i in range(FF.np):
-        print FF.plist[i]
+        print FF.plist[i] + " "*30
         EDG, _   = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True,resetvs='VirtualSite' in FF.plist[i]),h,f0=ED0)
         G[i,:]   = EDG[:,0]
         GDx[i,:] = EDG[:,1]
@@ -785,7 +798,7 @@ def property_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,kT,property_dri
         H0 = property_kwargs['h_'].copy()
 
     for i in range(FF.np):
-        print FF.plist[i]
+        print FF.plist[i] + " "*30
         ED1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True,resetvs='VirtualSite' in FF.plist[i])(h)
         E1       = ED1[:,0]
         D1       = ED1[:,1:]
@@ -885,13 +898,14 @@ def main():
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    Data, Xyzs, Boxes, Rhos, Energies, Volumes, Dips, Sim = run_simulation(pdb, Settings, Trajectory=False)
+    Data, Xyzs, Boxes, Rhos, Potentials, Kinetics, Volumes, Dips, Sim = run_simulation(pdb, Settings, Trajectory=False)
+    Energies = Potentials + Kinetics
 
     # Get statistics from our simulation.
-    Rho_avg, Rho_err, Pot_avg, Pot_err, pV_avg, pV_err = analyze(Data)
+    Rho_avg, Rho_err, Pot_avg, Pot_err, Kin_avg, Kin_err, Ene_avg, Ene_err, pV_avg, pV_err = analyze(Data)
     # Now that we have the coordinates, we can compute the energy derivatives.
     # First create a double-precision simulation object.
-    DoublePrecisionDerivatives = True
+    DoublePrecisionDerivatives = False
     if DoublePrecisionDerivatives and AGrad:
         print "Creating Double Precision Simulation for parameter derivatives"
         Sim, _ = create_simulation_object(pdb, Settings, pbc=True, precision="double")
@@ -915,9 +929,10 @@ def main():
     niterations = m_niterations
 
     mpdb = PDBFile('mono.pdb')
-    mData, mXyzs, _trash, _crap, mEnergies, _nah, _dontneed, mSim = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False)
+    mData, mXyzs, _trash, _crap, mPotentials, mKinetics, _nah, _dontneed, mSim = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False)
+    mEnergies = mPotentials + mKinetics
     # Get statistics from our simulation.
-    _trash, _crap, mPot_avg, mPot_err, __trash, __crap = analyze(mData)
+    _trash, _crap, mPot_avg, mPot_err, mKin_avg, mKin_err, mEne_avg, mEne_err, __trash, __crap = analyze(mData)
     # Now that we have the coordinates, we can compute the energy derivatives.
     if DoublePrecisionDerivatives and AGrad:
         print "Creating Double Precision Simulation for parameter derivatives"
@@ -929,16 +944,16 @@ def main():
     kT = (kB * temperature).value_in_unit(kilojoule_per_mole)
 
     # The enthalpy of vaporization in kJ/mol.
-    Hvap_avg = mPot_avg - Pot_avg / NMol + kT - np.mean(pV) / NMol
-    Hvap_err = np.sqrt(Pot_err**2 / NMol**2 + mPot_err**2 + pV_err**2/NMol**2)
+    Hvap_avg = mEne_avg - Ene_avg / NMol + kT - np.mean(pV) / NMol
+    Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
     # We don't pass it back, but nice for printing.
     GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Pot_avg * np.mean(G, axis=1))
+    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Ene_avg * np.mean(G, axis=1))
     GHvap /= NMol
     GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mPot_avg * np.mean(mG, axis=1))
+    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mEne_avg * np.mean(mG, axis=1))
     GHvap *= -1
     GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
@@ -949,6 +964,7 @@ def main():
     print Sep
 
     H = Energies + pV
+    print "Liquid enthalpy: % .4f kJ/mol, stdev % .4f ; (% .4f from energy, % .4f from pV)" % (np.mean(H), np.std(H), np.mean(Energies), np.mean(pV))
     V = np.array(Volumes)
     numboots = 1000
     L = len(H)
@@ -974,8 +990,8 @@ def main():
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GRho, GRho1)]
         FF.print_map(vals=absfrac)
 
-    print "Box energy:", np.mean(Energies)
-    print "Monomer energy:", np.mean(mEnergies)
+    print "Box total energy:", np.mean(Energies)
+    print "Monomer total energy:", np.mean(mEnergies)
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol, Derivatives below" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
     print Sep
@@ -1130,7 +1146,7 @@ def main():
     ## Print the final force field.
     pvals = FF.make(mvals)
 
-    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
+    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
 
 if __name__ == "__main__":
     main()

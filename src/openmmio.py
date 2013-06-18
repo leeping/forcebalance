@@ -269,6 +269,8 @@ class Liquid_OpenMM(Liquid):
         pos = self.msim.context.getState(getPositions=True).getPositions()
         pos = ResetVirtualSites(pos, sys)
         d = get_dipole(self.msim, positions=pos)
+        if not in_fd():
+            print "The molecular dipole moment is % .3f debye" % np.linalg.norm(d)
         dd2 = ((np.linalg.norm(d)-self.self_pol_mu0)*debye)**2
         eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
         epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*np.pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
