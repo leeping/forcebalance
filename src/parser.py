@@ -366,8 +366,8 @@ def parse_inputs(input_file=None):
     print "Reading options from file: %s" % input_file
     section = "NONE"
     # First load in all of the default options.
-    options = {'root':os.getcwd()}
-    options.update(deepcopy(gen_opts_defaults)) # deepcopy to make sure options doesn't make changes to gen_opts_defaults
+    options = deepcopy(gen_opts_defaults) # deepcopy to make sure options doesn't make changes to gen_opts_defaults
+    options['root'] = os.getcwd()
     tgt_opts = []
     this_tgt_opt = deepcopy(tgt_opts_defaults)
     # Give back a bunch of default options if input file isn't specified.
