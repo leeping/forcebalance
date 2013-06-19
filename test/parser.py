@@ -1,19 +1,12 @@
-import unittest
 import sys, os
 import forcebalance.parser
+import unittest
+from . import ForceBalanceTestCase
 
-class TestParser(unittest.TestCase):
-    def setUp(self):
-        self.console = sys.stdout
-        sys.stdout = open(os.devnull,'w')
-    
-    def tearDown(self):
-        sys.stdout.close()        
-        sys.stdout = self.console
-
+class TestParser(ForceBalanceTestCase):
     def test_parse_inputs_returns_tuple(self):
         """parse_inputs() returns a tuple"""
-        output = forcebalance.parser.parse_inputs('../studies/001_water_tutorial/very_simple.in')
+        output = forcebalance.parser.parse_inputs('studies/001_water_tutorial/very_simple.in')
         self.assertEqual(type(output), tuple)
 
     def test_parse_inputs_generates_default_options(self):
@@ -23,5 +16,5 @@ class TestParser(unittest.TestCase):
         defaults.update({'root':os.getcwd()})
         self.assertEqual(output, defaults)
 
-if __name__ == '__main__':        
+if __name__ == '__main__':           
     unittest.main()
