@@ -1,7 +1,7 @@
 import sys, os
 import forcebalance.parser
 import unittest
-from . import ForceBalanceTestCase
+from __init__ import ForceBalanceTestCase
 
 class TestParser(ForceBalanceTestCase):
     def test_parse_inputs_returns_tuple(self):
