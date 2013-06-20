@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
-from forcebalance import parser, optimizer, implemented
+from forcebalance import parser, optimizer
+from forcebalance.objective import Implemented_Targets
 import re
 
 """ The OptionDoc dictionary is a key : dictionary dictionary.
@@ -191,7 +192,7 @@ TgtOptionDoc = {"name" : {"scope" : "All targets",
                 "type" : {"scope" : "All targets",
                              "required" : True,
                              "long" : """This is the type of target that you are running.  The current accepted values for the target type
-                             are given in the implemented.py file: %s.""" % ', '.join([i for i in implemented.Implemented_Targets]),
+                             are given in the beginning of the objective.py file: %s.""" % ', '.join([i for i in Implemented_Targets]),
                              "recommend" : "Choose the appropriate type, and if the target type is missing, feel free to implement your own (or ask me for help)."
                              },
                 "fd_ptypes" : {"scope" : "All target types",
