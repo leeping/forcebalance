@@ -24,7 +24,7 @@ class TestTutorial(ForceBalanceTestCase):
         os.chdir(self.cwd)
 
     def runTest(self):
-        """Checks whether tutorial runs and output has not changed from known baseline"""
+        """Check whether tutorial runs and output has not changed from known baseline"""
         input_file='very_simple.in'
 
         ## The general options and target options that come from parsing the input file
