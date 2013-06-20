@@ -12,7 +12,7 @@ class TestImplemented(ForceBalanceTestCase):
             self.assertTrue(issubclass(forcebalance.objective.Implemented_Targets[key],forcebalance.target.Target))
     
     def test_no_unlisted_classes_derived_from_Target(self):
-        """Checks for classes derived from Target that are not listed in Implemented_Targets"""
+        """Check for classes derived from Target that are not listed in Implemented_Targets"""
         forcebalance_modules=[module[:-3] for module in os.listdir(forcebalance.__path__[0])
                      if re.compile(".*\.py$").match(module)
                      and module not in ["__init__.py"]]
