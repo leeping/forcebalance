@@ -88,16 +88,15 @@ def flat(vec):
 
 
 def build_graph(M):
-    M.require('abonds')
+    M.require('bonds')
     G = MolG()
     for i, a in enumerate(M.elem):
         G.add_node(i)
         nx.set_node_attributes(G,'n',{i:M.atomname[i]})
         nx.set_node_attributes(G,'e',{i:a})
         nx.set_node_attributes(G,'x',{i:M.xyzs[0][i]})
-    for i, a in enumerate(M.abonds):
-        for j in a:
-            G.add_edge(i, j)
+    for i in enumerate(M.bonds):
+        G.add_edge(i[0], i[1])
     return G
 
 def get_equivalent_atoms(MyG):
