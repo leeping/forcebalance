@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated March 12, 2013                       |#
+#|                   Last updated June 21, 2013                       |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -724,7 +724,7 @@ class Molecule(object):
     def append(self,other):
         self += other
 
-    def __init__(self, fnm = None, ftype = None):
+    def __init__(self, fnm = None, ftype = None, build_topology = False):
         """ To create the Molecule object, we simply define the table of
         file reading/writing functions and read in a file if it is
         provided."""
@@ -800,14 +800,14 @@ class Molecule(object):
             # for i in range(len(self.comms)):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
-            try:
-                if 'networkx' in sys.modules and self.na < 300:
+            if 'networkx' in sys.modules and build_topology:
+                try:
                     self.topology = self.build_topology()
                     self.molecules = nx.connected_component_subgraphs(self.topology)
                     if 'bonds' not in self.Data:
                         self.Data['bonds'] = self.topology.edges()
-            except:
-                pass # Address this later ; topology builds may fail if certain things are missing
+                except:
+                    pass # Address this later ; topology builds may fail if certain things are missing
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -1289,19 +1289,20 @@ class Molecule(object):
         resname = [data.compounds.items()[0][0] for i in range(len(elem))]
         resid = [1 for i in range(len(elem))]
         
-        bonds    = [[] for i in range(len(elem))]
-        for bond in data.compounds.items()[0][1].bonds:
-            a1 = bond.origin_atom_id - 1
-            a2 = bond.target_atom_id - 1
-            aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
-            bonds[aL].append(aH)
-
-        # bonds = []
+        # Deprecated 'abonds' format.
+        # bonds    = [[] for i in range(len(elem))]
         # for bond in data.compounds.items()[0][1].bonds:
         #     a1 = bond.origin_atom_id - 1
         #     a2 = bond.target_atom_id - 1
         #     aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
-        #     bonds.append((aL,aH))
+        #     bonds[aL].append(aH)
+
+        bonds = []
+        for bond in data.compounds.items()[0][1].bonds:
+            a1 = bond.origin_atom_id - 1
+            a2 = bond.target_atom_id - 1
+            aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
+            bonds.append((aL,aH))
 
         Answer = {'xyzs' : [np.array(xyz)],
                   'partial_charge' : charge,
@@ -1310,7 +1311,7 @@ class Molecule(object):
                   'elem'     : elem,
                   'resname'  : resname,
                   'resid'    : resid,
-                  'abonds'   : bonds
+                  'bonds'    : bonds
                   }
 
         return Answer
