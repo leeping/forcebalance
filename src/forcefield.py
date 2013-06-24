@@ -1120,6 +1120,19 @@ class FF(ForceBalanceBaseClass):
             self.pfields.append([[fnm,ln,pfld,mult,cmd]])
         else:
             self.pfields[idx].append([fnm,ln,pfld,mult,cmd])
+    
+    def __eq__(self, other):
+        # check equality of forcefields using comparison of pfields and map
+        if isinstance(other, FF):
+            # list comprehension removes filename element of pfields since we don't care about filename uniqueness
+            self_pfields = [[p[1:] for p in pfield] for pfield in self.pfields]
+            other_pfields= [[p[1:] for p in pfield] for pfield in other.pfields]
+
+            return  self_pfields == other_pfields and\
+                        self.map == other.map
+
+        # we only compare two forcefield objects
+        else: return NotImplemented
 
 def rs_override(rsfactors,termtype,Temperature=298.15):
     """ This function takes in a dictionary (rsfactors) and a string (termtype).
