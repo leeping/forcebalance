@@ -1,6 +1,6 @@
 import unittest, os, sys, re
 import forcebalance
-import __init__
+from __init__ import ForceBalanceTestRunner
 import getopt
 
 def getOptions():
@@ -27,7 +27,7 @@ def getOptions():
         sys.exit()
     
     if not options.has_key('test_modules'):
-        options['test_modules'] = [module[:-3] for module in os.listdir('test')
+        options['test_modules'] = [module[:-3] for module in sorted(os.listdir('test'))
                                   if re.match("^test_.*\.py$",module)
                                   and module[5:-3] not in exclude]
     
@@ -48,11 +48,8 @@ Valid options are:
 def runTests(options):
 
     #print "\x1b[2J\x1b[80A"
-    runner=__init__.ForceBalanceTestRunner()
+    runner=ForceBalanceTestRunner()
     results=runner.run(**options)
-    print "\n<run=%d errors=%d fail=%d>" % (results.testsRun,len(results.errors),len(results.failures))
-    if results.wasSuccessful(): print "All tests passed successfully"
-    else: print "Some tests failed or had errors!"
     return results
 
 #### main block ####
