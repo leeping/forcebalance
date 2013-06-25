@@ -25,7 +25,7 @@ def add_tab(fnm):
             newfile.append('      <li%s><a href="usage.html"><span>Usage</span></a></li>\n' % usagetag)
             newfile.append('      <li%s><a href="tutorial.html"><span>Tutorial</span></a></li>\n' % tutorialtag)
             newfile.append('      <li%s><a href="glossary.html"><span>Glossary</span></a></li>\n' % glossarytag)
-            newfile.append('      <li><a href="api/namespaces.html"><span>API</span></a></li>\n')
+            newfile.append('      <li><a href="api/roadmap.html"><span>API</span></a></li>\n')
     with open(fnm,'w') as f: f.writelines(newfile)
 
 def redirect_main_tab(fnm):
@@ -34,6 +34,7 @@ def redirect_main_tab(fnm):
     for line in open(fnm):
         if re.match('.*a href="index\.html"',line):
             newfile.append('      <li><a href="../index.html"><span>Main Page</span></a></li>\n')
+            newfile.append('      <li><a href="roadmap.html"><span>Project Roadmap</span></a></li>\n')
         else: newfile.append(line)
     with open(fnm,'w') as f: f.writelines(newfile)
 
@@ -86,17 +87,13 @@ def doxyconf():
 
     shutil.copy('doxygen.cfg', 'doxygen.cfg.tmp')
 
-    # make sure INPUT_FILTER is set to use doxypy
+    # make sure FILTER_PATTERNS is set to use doxypy
     with open('doxygen.cfg.tmp', 'w') as fout:
         for line in lines:
-            if line.startswith('INPUT_FILTER           ='):
-                doxypy_path=line.partition('=')[2].strip()
-                if os.path.exists(doxypy_path):
-                    fout.write(line)
-                else:
-                    doxypy_path = find_doxypy()
-                    option = 'INPUT_FILTER           = ' + doxypy_path + '\n'
-                    fout.write(option)
+            if line.startswith('FILTER_PATTERNS        =') and not re.match(".*doxypy.*", line):
+                doxypy_path = find_doxypy()
+                option = 'FILTER_PATTERNS        = "*.py=' + doxypy_path + '"\n'
+                fout.write(option)
             else:
                 fout.write(line)
 
@@ -111,14 +108,11 @@ def doxyconf():
 
     with open('api.cfg.tmp', 'w') as fout:
         for line in lines:
-            if line.startswith('INPUT                  ='):
-                if os.path.exists(line.partition('=')[2].strip()):
-                    fout.write(line)
-                else:
-                    option = 'INPUT                  = ' + find_forcebalance() + '\n'
-                    fout.write(option)
-            elif line.startswith('INPUT_FILTER           ='):
-                option = 'INPUT_FILTER           = ' + doxypy_path + '\n'
+            if line.startswith('INPUT                  =') and not re.match(".*forcebalance.*|.*src.*", line):
+                option = 'INPUT                  = api.dox ' + find_forcebalance() + '\n'
+                fout.write(option)
+            elif line.startswith('FILTER_PATTERNS        =') and not re.match(".*doxypy.*", line):
+                option = 'FILTER_PATTERNS        = "*.py=' + doxypy_path + '"\n'
                 fout.write(option)
             else:
                 fout.write(line)
@@ -126,15 +120,24 @@ def doxyconf():
     shutil.move('api.cfg.tmp', 'api.cfg')
 
 def generate_content():
-    """Parse text files and concatenate into mainpage.py"""
-    mainpage=open('mainpage.py','w')
-
-    mainpage.write("\"\"\"\n\n@mainpage\n\n")
+    """Parse text files and concatenate into mainpage.py and api.py"""
+    # generate pages to be included in general documentation
+    mainpage=open('mainpage.dox','w')
+    mainpage.write("/**\n\n\\mainpage\n\n")
     for fnm in ["introduction.txt", "installation.txt", "usage.txt", "tutorial.txt", "glossary.txt", "option_index.txt"]:
-        if re.match('.*\.txt$',fnm):
-            page=open(fnm,'r')
-            mainpage.write(page.read())
-    mainpage.write("\n\\image latex ForceBalance.pdf \"Logo.\" height=10cm\n\n\"\"\"\n\n\"\"\"")
+        page=open(fnm,'r')
+        mainpage.write(page.read())
+    mainpage.write("\n\\image latex ForceBalance.pdf \"Logo.\" height=10cm\n\n*/")
+    mainpage.close()
+
+    # generate pages to be included in API documentation
+    api=open('api.dox','w')
+    api.write("/**\n\n")
+    for fnm in ["roadmap.txt"]:
+        page=open(fnm,'r')
+        api.write(page.read())
+    api.write("\n\n*/")
+    api.close()
 
 def generate_doc(logfile=os.devnull):
     """Run doxygen and compile generated latex into pdf, optionally writing output to a file
@@ -169,5 +172,5 @@ if __name__ == '__main__':
     generate_doc()
     print "Integrating HTML docs..."
     parse_html()
-    os.system("rm -rf latex mainpage.py")   # cleanup
+    os.system("rm -rf latex mainpage.dox api.dox")   # cleanup
     print "Documentation successfully generated"
