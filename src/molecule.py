@@ -525,8 +525,8 @@ def get_rotate_translate(matrix1,matrix2):
     
     # Insure a right-handed coordinate system
     # need to fix this!!
-    # if linalg.det(rot_matrix) > 0:
-    # wt[2] = -wt[2]
+    #if np.linalg.det(rot_matrix) > 0:
+    #    wt[2] = -wt[2]
     rot_matrix = np.transpose(np.dot(np.transpose(wt),np.transpose(u)))
 
     trans_matrix = avg_pos2-np.dot(avg_pos1,rot_matrix)
@@ -1583,6 +1583,8 @@ class Molecule(object):
         xyzs                 = []
         elem                 = []
         section              = None
+        # The Z-matrix printing in new versions throws me off.
+        zmatrix              = False
         template             = []
         fff = False
         inside_section       = False
@@ -1600,9 +1602,12 @@ class Molecule(object):
             line = line.strip().expandtabs()
             sline = line.split()
             dline = line.split('!')[0].split()
+            if "Z-matrix Print" in line:
+                zmatrix = True
             if re.match('^\$',line):
                 wrd = re.sub('\$','',line)
                 if wrd == 'end':
+                    zmatrix = False
                     inside_section = False
                     if section == 'molecule':
                         if len(xyz) > 0:
@@ -1623,7 +1628,7 @@ class Molecule(object):
                     section = wrd
                     inside_section = True
             elif inside_section:
-                if section == 'molecule':
+                if section == 'molecule' and not zmatrix:
                     if len(dline) >= 4 and all([isfloat(dline[i]) for i in range(1,4)]):
                         if fff:
                             reading_template = False
@@ -1644,7 +1649,7 @@ class Molecule(object):
                             mult = int(sline[1])
                     else:
                         SectionData.append(line)
-                elif reading_template:
+                elif reading_template and not zmatrix:
                     if section == 'basis':
                         SectionData.append(line.split('!')[0])
                     elif section == 'rem':
