@@ -10,8 +10,14 @@ from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
 import os
 import shutil
-import numpy
 import glob
+
+try:
+    import numpy
+except ImportError:
+    print "Couldn't import numpy but this is required to install ForceBalance"
+    print "Please install the numpy package and try again"
+    exit()
 
 # DCD file reading module
 DCD = Extension('forcebalance/_dcdlib',
