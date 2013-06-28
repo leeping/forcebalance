@@ -729,8 +729,11 @@ def warn_press_key(warning):
     else:
         print "You're not supposed to pass me a variable of this type:", type(warning)
     if sys.stdin.isatty():
-        print "\x1b[1;91mPress Enter (I assume no responsibility for what happens after this!)\x1b[0m"
-        raw_input()
+        # Timeout after 10 seconds.
+        timeout = 10
+        print "\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m" % timeout
+        try: rlist, wlist, xlist = select([sys.stdin], [], [], timeout)
+        except: pass
 
 def warn_once(warning, warnhash = None):
     """ Prints a warning but will only do so once in a given run. """

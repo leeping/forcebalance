@@ -610,9 +610,13 @@ class FF(ForceBalanceBaseClass):
         and use physical parameters directly.
         
         """
+        if vals.ndim != 1:
+            raise Exception('Please only pass 1-D arrays')
+        if len(vals) != self.np:
+            raise Exception('Input parameter array (%i) not the required size (%i)' % (len(vals), self.np))
         if use_pvals or self.use_pvals:
             print "Using physical parameters directly!\r",
-            pvals = vals.copy()
+            pvals = vals.copy().flatten()
         else:
             pvals = self.create_pvals(vals)
 
@@ -804,11 +808,12 @@ class FF(ForceBalanceBaseClass):
         
         """
         #print "mvals = ", mvals, 
+        
         for p in self.redirect:
             mvals[p] = 0.0
         if self.logarithmic_map:
             try:
-                pvals = exp(mvals) * self.pvals0
+                pvals = exp(mvals.flatten()) * self.pvals0
             except:
                 print mvals
                 import traceback
