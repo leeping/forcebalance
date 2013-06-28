@@ -86,6 +86,12 @@ class Liquid(Target):
         self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'liquid_interval',forceprint=True)
+        # Time step length (in fs) for the gas production run
+        self.set_option(tgt_opts,'gas_timestep',forceprint=True)
+        # Time interval (in ps) for writing coordinates
+        self.set_option(tgt_opts,'gas_interval',forceprint=True)
+        # Minimize the energy prior to running any dynamics
+        self.set_option(tgt_opts,'minimize_energy',forceprint=True)
         # Isolated dipole (debye) for analytic self-polarization correction.
         self.set_option(tgt_opts,'self_pol_mu0',forceprint=True)
         # Molecular polarizability (ang**3) for analytic self-polarization correction.

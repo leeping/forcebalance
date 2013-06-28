@@ -264,7 +264,10 @@ class Liquid_TINKER(Liquid):
                     dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
                     print "Copying .dyn file: %s to %s" % (dynsrc, dyndest)
                     shutil.copy2(dynsrc,dyndest)
-                cmdstr = 'python npt_tinker.py liquid.xyz %i %.3f %.3f %.3f %.3f --liquid_equ_steps %i &> npt_tinker.out' % (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps)
+                cmdstr = 'python npt_tinker.py liquid.xyz %i %.3f %.3f %.3f %.3f %s --liquid_equ_steps %i &> npt_tinker.out' % \
+                    (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps,
+                     " --minimize_energy" if self.minimize_energy else "", 
+                     )
                 _exec(cmdstr)
                 self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
             else:
