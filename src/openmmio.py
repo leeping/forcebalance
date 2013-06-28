@@ -17,6 +17,7 @@ import shutil
 from forcebalance.molecule import *
 from forcebalance.chemistry import *
 from forcebalance.nifty import *
+from forcebalance.nifty import _exec
 from collections import OrderedDict
 try:
     from simtk.openmm.app import *
@@ -504,26 +505,26 @@ class Interaction_OpenMM(Interaction):
             ## Create the simulation object within this class itself.
             pdb = PDBFile(pdbfnm)
             forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
-            if self.FF.amoeba_pol == 'mutual':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
-            elif self.FF.amoeba_pol == 'direct':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
-            elif self.FF.amoeba_pol == 'nonpolarizable':
-                system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
-            # Create the simulation; we're not actually going to use the integrator
-            integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-            self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(pdb.topology, system, integrator, self.platform)
-            # mod = Modeller(pdb.topology, pdb.positions)
-            # mod.addExtraParticles(forcefield)
             # if self.FF.amoeba_pol == 'mutual':
-            #     system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+            #     system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
             # elif self.FF.amoeba_pol == 'direct':
-            #     system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+            #     system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
             # elif self.FF.amoeba_pol == 'nonpolarizable':
-            #     system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
+            #     system = forcefield.createSystem(pdb.topology,rigidWater=self.FF.rigid_water)
             # # Create the simulation; we're not actually going to use the integrator
             # integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-            # self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(mod.topology, system, integrator, self.platform)
+            # self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(pdb.topology, system, integrator, self.platform)
+            mod = Modeller(pdb.topology, pdb.positions)
+            mod.addExtraParticles(forcefield)
+            if self.FF.amoeba_pol == 'mutual':
+                system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,mutualInducedTargetEpsilon=1e-6)
+            elif self.FF.amoeba_pol == 'direct':
+                system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water,polarization='Direct')
+            elif self.FF.amoeba_pol == 'nonpolarizable':
+                system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
+            # Create the simulation; we're not actually going to use the integrator
+            integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+            self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(mod.topology, system, integrator, self.platform)
         os.chdir(cwd)
         
     def energy_driver_all(self, mode):

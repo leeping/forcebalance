@@ -1730,9 +1730,20 @@ class Molecule(object):
 
         XYZList=list(np.array(XYZList).reshape((-1,len(ChainID),3)))
 
+        bonds = []
+        # Read in CONECT records.
+        F2=open(fnm,'r')
+        for line in F2:
+            s = line.split()
+            if s[0].upper() == "CONECT":
+                if len(s) > 2:
+                    for i in range(2, len(s)):
+                        bonds.append((int(s[1])-1, int(s[i])-1))
+
         Answer={"xyzs":XYZList, "chain":ChainID, "atomname":AtomNames,
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
-                "comms":['' for i in range(len(XYZList))], "boxes":[Box for i in range(len(XYZList))]}
+                "comms":['' for i in range(len(XYZList))], "boxes":[Box for i in range(len(XYZList))],
+                "bonds":bonds}
 
         return Answer
 

@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 """
-@package npt2
-
-*** This code is for the new CUDA platform! ***
+@package npt
 
 NPT simulation in OpenMM.  Runs a simulation to compute bulk properties
 (for example, the density or the enthalpy of vaporization) and compute the
@@ -19,10 +17,6 @@ accessible.  We compute the potential energy derivative using
 finite-difference of snapshot energies and apply a simple formula to
 compute the density derivative.
 
-The enthalpy of vaporization should come just as easily.
-
-This script borrows from John Chodera's ideal gas simulation in PyOpenMM.
-
 References
 
 [1] Shirts MR, Mobley DL, Chodera JD, and Pande VS. Accurate and efficient corrections for
@@ -34,7 +28,7 @@ Technical Report, EECS Department, The University of Michigan, 2003.
 Copyright And License
 
 @author Lee-Ping Wang <leeping@stanford.edu>
-@author John D. Chodera <jchodera@gmail.com>
+@author John D. Chodera <jchodera@gmail.com> (Wrote statisticalInefficiency and MTS-VVVR)
 
 All code in this repository is released under the GNU General Public License.
 
@@ -67,6 +61,7 @@ from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p
 from forcebalance.molecule import Molecule
 from forcebalance.openmmio import *
+from copy import deepcopy
 import argparse
 
 #======================================================#
@@ -94,6 +89,12 @@ parser.add_argument('--mts_vvvr', action='store_true', help='Enable multiple tim
 parser.add_argument('--force_cuda', action='store_true', help='Crash immediately if CUDA platform is not available')
 
 args = parser.parse_args()
+
+DoEDA = True
+if args.mts_vvvr:
+    # EDA relies on Force Groups, as does MTS integrator, 
+	# and they are incompatible.
+    DoEDA = False
 
 # The convention of using the "iteration" as a fundamental unit comes from the OpenMM script.
 timestep         = args.liquid_timestep * femtosecond                          # timestep for integration in femtosecond
@@ -143,6 +144,12 @@ tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
                 'useSwitchingFunction' : True, 'switchingDistance' : 0.75*nanometer,
                 'constraints' : HBonds, 'rigidwater' : True, 'useDispersionCorrection' : True}
 
+gen_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
+              'useSwitchingFunction' : True, 'switchingDistance' : 0.75*nanometer,
+              'constraints' : None, 'rigidwater' : False, 'useDispersionCorrection' : True}
+
+mono_gen_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : False, 'removeCMMotion' : False}
+
 mono_tip3p_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : True, 'removeCMMotion' : False}
 
 mono_direct_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
@@ -172,7 +179,7 @@ mono_nonpol_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
 #             velocities[atom_index,k] = sigma * np.random.normal()
 #     return velocities
 
-def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
+def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
 
     """
     Compute the (cross) statistical inefficiency of (two) timeseries.
@@ -241,7 +248,8 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
     sigma2_AB = (dA_n * dB_n).mean() # standard estimator to ensure C(0) = 1
     # Trap the case where this covariance is zero, and we cannot proceed.
     if(sigma2_AB == 0):
-        print 'Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency'
+        if warn:
+            print 'Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency'
         return 1.0
     # Accumulate the integrated correlation time by computing the normalized correlation time at
     # increasing values of t.  Stop accumulating if the correlation function goes negative, since
@@ -412,22 +420,38 @@ def create_simulation_object(pdb, settings, pbc=True, precision="mixed"):
     # Create integrator.
     NewIntegrator = args.mts_vvvr
     if not NewIntegrator:
-        integrator = LangevinIntegrator(temperature, collision_frequency, timestep)
+        integrator = LangevinIntegrator(temperature, collision_frequency, timestep) 
+        for n, i in enumerate(system.getForces()):
+            print "Setting Force %s to group %i" % (i.__class__.__name__, n)
+            i.setForceGroup(n)
     else:
         print "Using new multiple-timestep velocity-verlet with velocity randomization (MTS-VVVR) integrator."
+        print "Warning: not proven to work in most situations"
         integrator = MTSVVVRIntegrator(temperature, collision_frequency, timestep, system, ninnersteps=int(timestep/faststep))
 
     # Stuff for figuring out the ewald error tolerance.
     print "There are %i forces" % system.getNumForces()
     for i in range(system.getNumForces()):
         Frc = system.getForce(i)
-        print Frc.__class__.__name__
+        # print Frc.__class__.__name__
         if Frc.__class__.__name__ == 'AmoebaMultipoleForce' or Frc.__class__.__name__ == 'NonbondedForce':
             print "The Ewald error tolerance is:", Frc.getEwaldErrorTolerance()
     
     # Create simulation object.
     simulation = Simulation(mod.topology, system, integrator, platform)
     return simulation, system
+
+def EnergyDecomposition(Sim):
+    # Before using EnergyDecomposition, make sure each Force is set to a different group.
+    EnergyTerms = OrderedDict()
+    Potential = Sim.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+    Kinetic = Sim.context.getState(getEnergy=True).getKineticEnergy() / kilojoules_per_mole
+    for i in range(Sim.system.getNumForces()):
+        EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
+    EnergyTerms['Potential'] = Potential
+    EnergyTerms['Kinetic'] = Kinetic
+    EnergyTerms['Total'] = Potential+Kinetic
+    return EnergyTerms
 
 def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     """ Run a NPT simulation and gather statistics. """
@@ -478,6 +502,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     data['volume'] = Quantity(np.zeros([niterations], np.float64), angstroms**3)
     data['density'] = Quantity(np.zeros([niterations], np.float64), kilogram / meters**3)
     data['kinetic_temperature'] = Quantity(np.zeros([niterations], np.float64), kelvin)
+    edecomp = OrderedDict()
     # More data structures; stored coordinates, box sizes, densities, and potential energies
     xyzs = []
     boxes = []
@@ -521,6 +546,13 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
         state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
         kinetic = state.getKineticEnergy()
         potential = state.getPotentialEnergy()
+        # Perform energy decomposition.
+        if DoEDA:
+            for comp, val in EnergyDecomposition(simulation).items():
+                if comp in edecomp:
+                    edecomp[comp].append(val)
+                else:
+                    edecomp[comp] = [val]
         if pbc:
             box_vectors = state.getPeriodicBoxVectors()
             volume = compute_volume(box_vectors)
@@ -547,7 +579,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
         volumes.append(volume / nanometer**3)
         dipoles.append(get_dipole(simulation,positions=xyzs[-1]))
         
-    return data, xyzs, boxes, np.array(rhos), np.array(potentials), np.array(kinetics), np.array(volumes), np.array(dipoles), simulation
+    return data, xyzs, boxes, np.array(rhos), np.array(potentials), np.array(kinetics), np.array(volumes), np.array(dipoles), simulation, OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
 
 def analyze(data):
     """Analyze the data from the run_simulation function."""
@@ -893,16 +925,24 @@ def main():
             Settings = tip3p_kwargs
             mSettings = mono_tip3p_kwargs
         else:
-            raise Exception('Encountered a force field that I did not expect!')
+            print "Using general settings for nonpolarizable force fields."
+            Settings = gen_kwargs
+            mSettings = mono_gen_kwargs
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    Data, Xyzs, Boxes, Rhos, Potentials, Kinetics, Volumes, Dips, Sim = run_simulation(pdb, Settings, Trajectory=False)
+    Data, Xyzs, Boxes, Rhos, Potentials, Kinetics, Volumes, Dips, Sim, EDA = run_simulation(pdb, Settings, Trajectory=False)
     Energies = Potentials + Kinetics
 
     # Get statistics from our simulation.
     Rho_avg, Rho_err, Pot_avg, Pot_err, Kin_avg, Kin_err, Ene_avg, Ene_err, pV_avg, pV_err = analyze(Data)
+    # Get energy decomposition statistics.
+    if DoEDA:
+        PrintDict = OrderedDict([(key, "% 12.4f +- %10.4f [ % 9.4f +- %7.4f ]" % (np.mean(val), np.std(val)*sqrt(statisticalInefficiency(val, warn=False)/len(val)),
+                                                                                  np.mean(val)/NMol, np.std(val)*sqrt(statisticalInefficiency(val, warn=False)/len(val))/NMol)) 
+                                 for key, val in EDA.items() if (np.mean(val) != 0.0 or np.std(val) != 0.0)])
+        printcool_dictionary(PrintDict, "Energy Decomposition Analysis, Mean +- Stderr [Per Molecule] (kJ/mol)")
     # Now that we have the coordinates, we can compute the energy derivatives.
     # First create a double-precision simulation object.
     DoublePrecisionDerivatives = False
@@ -929,10 +969,14 @@ def main():
     niterations = m_niterations
 
     mpdb = PDBFile('mono.pdb')
-    mData, mXyzs, _trash, _crap, mPotentials, mKinetics, _nah, _dontneed, mSim = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False)
+    mData, mXyzs, _trash, _crap, mPotentials, mKinetics, _nah, _dontneed, mSim, mEDA = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False)
     mEnergies = mPotentials + mKinetics
     # Get statistics from our simulation.
     _trash, _crap, mPot_avg, mPot_err, mKin_avg, mKin_err, mEne_avg, mEne_err, __trash, __crap = analyze(mData)
+    # Get energy decomposition statistics.
+    if DoEDA:
+        PrintDict = OrderedDict([(key, "% 9.4f +- %7.4f" % (np.mean(val), np.std(val)*sqrt(statisticalInefficiency(val, warn=False)/len(val)))) for key, val in mEDA.items() if (np.mean(val) != 0.0 or np.std(val) != 0.0)])
+        printcool_dictionary(PrintDict, "Monomer Energy Decomposition Analysis, Mean +- Stderr (kJ/mol)")
     # Now that we have the coordinates, we can compute the energy derivatives.
     if DoublePrecisionDerivatives and AGrad:
         print "Creating Double Precision Simulation for parameter derivatives"
