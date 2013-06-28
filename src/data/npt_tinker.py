@@ -84,6 +84,7 @@ parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for 
 parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=1000000)
 parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=0.1)
 parser.add_argument('--gas_interval', type=float, help='Time interval for writing the gas-phase coordinates to disk, in picoseconds', default=0.1)
+parser.add_argument('--minimize_energy', action='store_true', help='Minimize the energy of the system prior to running dynamics')
 
 args = parser.parse_args()
 
@@ -204,7 +205,8 @@ def run_simulation(xyz, tky, tstep, nstep, neq, npr, pbc=True, verbose=False):
     xin = "%s" % xyz + ("" if tky == None else " -k %s" % tky)
     xain = "%s.arc" % basename + ("" if tky == None else " -k %s" % tky)
     
-    cmdstr = "./minimize %s 1.0e-1" % xin
+    if args.minimize_energy:
+        cmdstr = "./minimize %s 1.0e-1" % xin
     _exec(cmdstr,print_command=verbose,print_to_screen=verbose)
     _exec("mv %s_2 %s" % (xyz,xyz),print_command=verbose,print_to_screen=verbose)
     print "Running equilibration"

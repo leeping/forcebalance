@@ -87,6 +87,7 @@ parser.add_argument('--gas_interval', type=float, help='Time interval for saving
 parser.add_argument('--anisotropic', action='store_true', help='Enable anisotropic scaling of periodic box (useful for crystals)')
 parser.add_argument('--mts_vvvr', action='store_true', help='Enable multiple timestep integrator')
 parser.add_argument('--force_cuda', action='store_true', help='Crash immediately if CUDA platform is not available')
+parser.add_argument('--minimize_energy', action='store_true', help='Minimize the energy of the system prior to running dynamics')
 
 args = parser.parse_args()
 
@@ -463,7 +464,8 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     mod.addExtraParticles(forcefield)
     simulation.context.setPositions(mod.positions)
     print "Minimizing the energy... (starting energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole),
-    simulation.minimizeEnergy()
+    if args.minimize_energy:
+        simulation.minimizeEnergy()
     print "Done (final energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
     # Assign velocities.
     # velocities = generateMaxwellBoltzmannVelocities(system, temperature)
