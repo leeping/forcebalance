@@ -14,6 +14,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 @date 12/2011
 """
 
+from select import select
 import os, sys, shutil
 from re import match, sub
 import numpy as np
