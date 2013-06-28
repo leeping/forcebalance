@@ -8,56 +8,56 @@ import inspect
 from numpy import argsort, array, diag, dot, eye, linalg, ones, reshape, sum, zeros, exp, log
 from collections import defaultdict
 from collections import OrderedDict
-from finite_difference import in_fd
-from nifty import printcool_dictionary, createWorkQueue, getWorkQueue, wq_wait
-from baseclass import ForceBalanceBaseClass
+from forcebalance.finite_difference import in_fd
+from forcebalance.nifty import printcool_dictionary, createWorkQueue, getWorkQueue, wq_wait
+from forcebalance.baseclass import ForceBalanceBaseClass
 import datetime
 import traceback
 
 try:
-    from gmxio import AbInitio_GMX
+    from forcebalance.gmxio import AbInitio_GMX
 except:
     print traceback.format_exc()
     print "Gromacs module import failed"
 
 try:
-    from gmxqpio import Monomer_QTPIE
+    from forcebalance.gmxqpio import Monomer_QTPIE
 except:
     print traceback.format_exc()
     print "QTPIE Monomer module import failed"
 
 try:
-    from tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER, Liquid_TINKER
+    from forcebalance.tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER, Liquid_TINKER
 except:
     print traceback.format_exc()
     print "Tinker module import failed"
 
 try:
-    from openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM
+    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM
 except:
     print traceback.format_exc()
     print "OpenMM module import failed; check OpenMM package"
 
 try:
-    from abinitio_internal import AbInitio_Internal
+    from forcebalance.abinitio_internal import AbInitio_Internal
 except:
     print traceback.format_exc()
     print "Internal energy fitting module import failed"
 
 try:
-    from counterpoise import Counterpoise
+    from forcebalance.counterpoise import Counterpoise
 except:
     print traceback.format_exc()
     print "Counterpoise module import failed"
 
 try:
-    from amberio import AbInitio_AMBER
+    from forcebalance.amberio import AbInitio_AMBER
 except:
     print traceback.format_exc()
     print "Amber module import failed"
 
 try:
-    from psi4io import THCDF_Psi4, RDVR3_Psi4
+    from forcebalance.psi4io import THCDF_Psi4, RDVR3_Psi4
 except:
     print traceback.format_exc()
     print "PSI4 module import failed"

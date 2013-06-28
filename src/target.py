@@ -6,11 +6,11 @@ import subprocess
 import shutil
 import numpy as np
 import time
-from baseclass import ForceBalanceBaseClass
+from forcebalance.baseclass import ForceBalanceBaseClass
 from collections import OrderedDict
-from nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
-from finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
-from optimizer import Counter
+from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
+from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
+from forcebalance.optimizer import Counter
 
 class Target(ForceBalanceBaseClass):
     

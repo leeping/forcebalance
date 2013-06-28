@@ -22,7 +22,7 @@ This subclass of Target implements the 'get' method.
 import os
 import sys
 from re import match
-from target import Target
+from forcebalance.target import Target
 from numpy import array, dot, exp, linalg, mean, ones, zeros
 
 class Counterpoise(Target):

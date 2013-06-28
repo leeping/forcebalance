@@ -6,15 +6,15 @@
 
 import os
 import shutil
-from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
 from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, abs, max
-from target import Target
-from molecule import Molecule, format_xyz_coord
+from forcebalance.target import Target
+from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
 import subprocess
 from subprocess import PIPE
-from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
-from optimizer import Counter
+from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
+from forcebalance.optimizer import Counter
 
 CHECK_BASIS = False
 def CheckBasis():

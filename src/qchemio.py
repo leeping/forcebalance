@@ -2,9 +2,9 @@
 
 import os
 from re import match, sub
-from basereader import BaseReader
-from nifty import *
-from molecule import Molecule
+from forcebalance.basereader import BaseReader
+from forcebalance.nifty import *
+from forcebalance.molecule import Molecule
 
 ## Types of counterpoise correction
 #cptypes = [None, 'BASS', 'BASSP']
