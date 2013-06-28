@@ -22,14 +22,14 @@ class TestWaterFF(ForceBalanceTestCase):
         """Check that make() function performs as expected"""
         pvals = self.ff.pvals0
 
-        new_pvals = self.ff.make(np.zeros((3,3)))
+        new_pvals = self.ff.make(np.zeros(9))
         # given zero matrix, make should return unchanged pvals
         self.assertTrue((pvals == new_pvals).all())
 
-        new_pvals = self.ff.make(np.random.rand(3,3))
+        new_pvals = self.ff.make(np.random.rand(9))
         # given arbitrary nonzero input, make should return new pvals
         self.assertFalse((pvals == new_pvals).all(), msg="\nmake() returned unchanged pvals even when given nonzero matrix")
 
-        random_array = np.random.rand(3,3).flatten()
+        random_array = np.random.rand(9)
         new_pvals = self.ff.make(random_array,use_pvals=True)
         self.assertTrue((random_array == new_pvals).all(), msg="\nmake() did not return input pvals with use_pvals=True")
