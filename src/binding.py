@@ -6,14 +6,14 @@
 
 import os
 import shutil
-from nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
 from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, std
-from target import Target
-from molecule import Molecule, format_xyz_coord
+from forcebalance.target import Target
+from forcebalance.molecule import Molecule, format_xyz_coord
 import re
 import subprocess
 from subprocess import PIPE
-from finite_difference import fdwrap, f1d2p, f12d3p, in_fd
+from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 from multiprocessing import Pool
 try:

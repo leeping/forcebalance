@@ -8,14 +8,14 @@
 
 import os
 from re import match, sub
-from nifty import isint, _exec, warn_press_key, getWorkQueue, LinkFile
+from forcebalance.nifty import isint, _exec, warn_press_key, getWorkQueue, LinkFile
 from numpy import array
-from basereader import BaseReader
-from abinitio import AbInitio
-from interaction import Interaction
-from molecule import Molecule
+from forcebalance.basereader import BaseReader
+from forcebalance.abinitio import AbInitio
+from forcebalance.interaction import Interaction
+from forcebalance.molecule import Molecule
 from copy import deepcopy
-from qchemio import QChem_Dielectric_Energy
+from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
 #import IPython
 

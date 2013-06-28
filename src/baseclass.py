@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from parser import tgt_opts_defaults, gen_opts_defaults
+from forcebalance.parser import tgt_opts_defaults, gen_opts_defaults
 
 class ForceBalanceBaseClass(object):
     """ Provides some nifty functions that are common to all ForceBalance classes. """

@@ -7,11 +7,11 @@
 import abc
 import os
 import shutil
-from finite_difference import *
-from nifty import *
-from target import Target
+from forcebalance.finite_difference import *
+from forcebalance.nifty import *
+from forcebalance.target import Target
 import numpy as np
-from molecule import Molecule
+from forcebalance.molecule import Molecule
 from re import match, sub
 import subprocess
 from subprocess import PIPE
@@ -21,7 +21,7 @@ except: pass
 from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple
-from optimizer import Counter
+from forcebalance.optimizer import Counter
 import csv
 
 def weight_info(W, PT, N_k, verbose=True):

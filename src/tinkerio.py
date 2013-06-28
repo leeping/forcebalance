@@ -9,21 +9,20 @@ modules for other programs because it's so simple.
 
 import os, shutil
 from re import match, sub
-from nifty import *
-from nifty import _exec
+from forcebalance.nifty import *
 import numpy as Np
-from basereader import BaseReader
+from forcebalance.basereader import BaseReader
 from subprocess import Popen, PIPE
-from abinitio import AbInitio
+from forcebalance.abinitio import AbInitio
 from vibration import Vibration
-from moments import Moments
-from liquid import Liquid
-from molecule import Molecule
-from binding import BindingEnergy
-from interaction import Interaction
-from finite_difference import in_fd
+from forcebalance.moments import Moments
+from forcebalance.liquid import Liquid
+from forcebalance.molecule import Molecule
+from forcebalance.binding import BindingEnergy
+from forcebalance.interaction import Interaction
+from forcebalance.finite_difference import in_fd
 from collections import OrderedDict
-from optimizer import GoodStep
+from forcebalance.optimizer import GoodStep
 try:
     from simtk.unit import *
 except: pass

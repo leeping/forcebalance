@@ -784,7 +784,7 @@ class Molecule(object):
                 ## Try to determine from the file name using the extension.
                 ftype = os.path.splitext(fnm)[1][1:]
             if not os.path.exists(fnm):
-                raise Exception('Tried to create Molecule object from a file that does not exist')
+                raise IOError('Tried to create Molecule object from a file that does not exist')
             self.Data['ftype'] = ftype
             ## Actually read the file.
             Parsed = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)

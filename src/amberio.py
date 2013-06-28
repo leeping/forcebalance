@@ -9,10 +9,10 @@ modules for other programs because it's so simple.
 
 import os
 from re import match, sub, split, findall
-from nifty import isint, isfloat, _exec, LinkFile
+from forcebalance.nifty import isint, isfloat, _exec, LinkFile
 import numpy as np
-from basereader import BaseReader
-from abinitio import AbInitio
+from forcebalance.basereader import BaseReader
+from forcebalance.abinitio import AbInitio
 
 mol2_pdict = {'COUL':{'Atom':[1], 8:''}}
 

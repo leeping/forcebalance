@@ -5,9 +5,9 @@
 """
 
 import os
-from basereader import BaseReader
-from abinitio import AbInitio
-from forcefield import FF
+from forcebalance.basereader import BaseReader
+from forcebalance.abinitio import AbInitio
+from forcebalance.forcefield import FF
 import numpy as np
 import sys
 import pickle

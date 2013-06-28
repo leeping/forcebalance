@@ -9,15 +9,15 @@ modules for other programs because it's so simple.
 
 import os, shutil
 from re import match, sub, split, findall
-from nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
+from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
 import numpy as np
-from leastsq import LeastSquares, CheckBasis
-from basereader import BaseReader
+from forcebalance.leastsq import LeastSquares, CheckBasis
+from forcebalance.basereader import BaseReader
 from string import capitalize
-from finite_difference import in_fd, f1d2p, f12d3p, fdwrap
+from forcebalance.finite_difference import in_fd, f1d2p, f12d3p, fdwrap
 from collections import defaultdict, OrderedDict
 import itertools
-from target import Target
+from forcebalance.target import Target
 
 ##Interaction type -> Parameter Dictionary.
 #pdict = {'Exponent':{0:'A', 1:'C'},

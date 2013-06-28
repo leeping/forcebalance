@@ -8,14 +8,14 @@
 
 import os
 from re import match, sub
-from nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary, LinkFile
+from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary, LinkFile
 import numpy as Np
-from molecule import Molecule
+from forcebalance.molecule import Molecule
 from copy import deepcopy
 import itertools
-from target import Target
+from forcebalance.target import Target
 from collections import OrderedDict
-from finite_difference import *
+from forcebalance.finite_difference import *
 
 # Prerequisite: Water monomer geometry with:
 # - Oxygen atom at the origin

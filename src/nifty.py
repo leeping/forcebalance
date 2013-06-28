@@ -715,7 +715,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     if p.returncode != 0:
         print "Received an error message:"
         print Error
-        warn_press_key("%s gave a return code of %i (it may have crashed)" % (command, p.returncode))
+        raise Exception("%s gave a return code of %i (it may have crashed)" % (command, p.returncode))
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
     # return [l + '\n' for l in Output.split('\n')]
     return Output.split('\n')
