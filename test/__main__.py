@@ -4,6 +4,8 @@ from __init__ import ForceBalanceTestRunner
 import getopt
 
 def getOptions():
+    """Parse options passed to forcebalance testing framework"""
+
     exclude = []
     options = {
         'pretend':False
@@ -34,6 +36,8 @@ def getOptions():
     return options
 
 def usage():
+    """Print information on running tests using this script"""
+
     print """ForceBalance Test Suite
 Usage: python test [OPTIONS] [MODULES]
 If no modules are specified, all test modules in test/ are run
@@ -46,6 +50,7 @@ Valid options are:
 """
 
 def runTests(options):
+    """Run tests with options given from command line"""
 
     #print "\x1b[2J\x1b[80A"
     runner=ForceBalanceTestRunner()

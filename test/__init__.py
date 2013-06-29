@@ -5,13 +5,16 @@ from collections import OrderedDict
 
 class ForceBalanceTestCase(unittest.TestCase):
     def __init__(self,methodName='runTest'):
+        """Override default test case constructor to set longMessage=True
+        @override unittest.TestCase.__init(methodName='runTest')"""
+
         super(ForceBalanceTestCase,self).__init__(methodName)
         self.longMessage=True
 
     def shortDescription(self):
         """Default shortDescription function returns None value if no description
-        is present, but this causes errors when trying to print. Return empty
-        string instead"""
+        is present, but this causes errors when trying to print. Return empty string instead
+        @override unittest.TestCase.shortDescription()"""
 
         message = super(ForceBalanceTestCase,self).shortDescription()
         if message: return message
@@ -23,11 +26,17 @@ class ForceBalanceTestResult(unittest.TestResult):
        by unittest.TestResult"""
 
     def startTest(self, test):
+        """Notify of test start by writing message to stderr, and also printing to stdout
+        @override unittest.TestResult.startTest(test)"""
+
         super(ForceBalanceTestResult, self).startTest(test)
         sys.stderr.write("---     " + test.shortDescription())
         print "<<<<<<<< Starting %s >>>>>>>>\n" % test.id()
 
     def addFailure(self, test, err):
+        """Run whenever a test comes back as failed
+        @override unittest.TestResult.addFailure(test,err)"""
+
         super(ForceBalanceTestResult, self).addFailure(test,err)
         sys.stderr.write("\r\x1b[31;1m" + "FAIL" + "\x1b[0m    " + test.shortDescription() + "\n")
         
@@ -37,6 +46,9 @@ class ForceBalanceTestResult(unittest.TestResult):
             sys.stderr.write("\t >\t" + line + "\n")
 
     def addError(self, test, err):
+        """Run whenever a test comes back with an unexpected exception
+        @override unittest.TestResult.addError(test,err)"""
+
         super(ForceBalanceTestResult, self).addError(test,err)
         sys.stderr.write("\r\x1b[33;1mERROR\x1b[0m   " + test.shortDescription() + "\n")
 
@@ -47,6 +59,7 @@ class ForceBalanceTestResult(unittest.TestResult):
     
     def buildErrorMessage(self, test, err):
         """Compile error data from test exceptions into a helpful message"""
+
         errorMessage = ""
         errorMessage += test.id()
         errorMessage += "\n\n"
@@ -55,31 +68,45 @@ class ForceBalanceTestResult(unittest.TestResult):
         return errorMessage
 
     def addSuccess(self, test):
+        """Run whenever a test comes back as passed
+        @override unittest.TestResult.addSuccess(test)"""
+
         sys.stderr.write("\r\x1b[32mOK\x1b[0m      " + test.shortDescription() + "\n")
 
     def addSkip(self, test, err=""):
+        """Run whenever a test is skipped
+        @override unittest.TestResult.addSkip(test,err)"""
+
         sys.stderr.write("\r\x1b[33;1mSKIP\x1b[0m    " + test.shortDescription() + "\n")
         if err: sys.stderr.write("\t\t%s\n" % err)
 
     def stopTest(self, test):
+        """Run whenever a test is finished, regardless of the result
+        @override unittest.TestResult.stopTest(test)"""
+
         print "\n<<<<<<<< Finished %s >>>>>>>>\n\n" % test.id()
+        os.chdir(self.cwd)
 
     def startTestRun(self, test):
+        """Run before any tests are started"""
+        self.cwd = os.getcwd()
         self.runTime= time.time()
 
     def stopTestRun(self, test):
+        """Run after all tests have finished"""
+
         self.runTime = time.time()-self.runTime
         sys.stderr.write("\n<run=%d errors=%d fail=%d in %.2fs>\n" % (self.testsRun,len(self.errors),len(self.failures), self.runTime))
-        if self.wasSuccessful(): sys.stderr.write("All tests passed successfully")
-        else: sys.stderr.write("Some tests failed or had errors!")
+        if self.wasSuccessful(): sys.stderr.write("All tests passed successfully\n")
+        else: sys.stderr.write("Some tests failed or had errors!\n")
 
 class ForceBalanceTestRunner(object):
     """This test runner class manages the running and logging of tests.
        It controls WHERE test results go but not what is recorded.
        Once the tests have finished running, it will return the test result
-       for further analysis"""
+       in the standard unittest.TestResult format"""
 
-    def run(self,test_modules=[],exclude=[],pretend=False,program_output='test/test.log',quick=False):   
+    def run(self,test_modules=[],exclude=[],pretend=False,program_output='test/test.log',quick=False):
         unittest.installHandler()
 
         tests = unittest.TestSuite()
@@ -92,7 +119,7 @@ class ForceBalanceTestRunner(object):
 
         result = ForceBalanceTestResult()
 
-        ### TEST IS RUNNING ###
+        ### START TESTING ###
         result.startTestRun(tests)
         if pretend:
             for module in tests:
@@ -106,18 +133,18 @@ class ForceBalanceTestRunner(object):
 
             unittest.registerResult(result)
             tests.run(result)
-            
 
             sys.stdout.close()
             sys.stdout = self.console
 
         result.stopTestRun(tests)
-        ### TEST IS STOPPED ###
+        ### STOP TESTING ###
 
         return result
         
 class TestValues(object):
-    cwd = os.getcwd()
+    """Contains values used as inputs, defaults, etc during testing"""
+    # options used in 001_water_tutorial
     water_options={
             'penalty_type': 'L2',
             'print_gradient': 1, 
@@ -165,10 +192,11 @@ class TestValues(object):
             'priors': OrderedDict(),
             'asynchronous': 0,
             'read_pvals': None,
-            'root': cwd + '/studies/001_water_tutorial',
+            'root': os.getcwd() + '/studies/001_water_tutorial',
             'jobtype': 'NEWTON',
             'penalty_alpha': 0.001}
-    tgt_opts = [
+    # target options in 001_water_tutorial
+    water_tgt_opts = [
         {   'fdgrad': 0, 
             'qmboltz': 0.0, 
             'gas_prod_steps': 0, 

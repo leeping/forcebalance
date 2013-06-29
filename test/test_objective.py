@@ -8,11 +8,12 @@ from __init__ import ForceBalanceTestCase
 
 class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
+        """Check classes listed in Implemented_Targets are derived from Target"""
         for key in forcebalance.objective.Implemented_Targets.iterkeys():
             self.assertTrue(issubclass(forcebalance.objective.Implemented_Targets[key],forcebalance.target.Target))
     
     def test_no_unlisted_classes_derived_from_Target(self):
-        """Check for classes derived from Target that are not listed in Implemented_Targets"""
+        """Check for unknown omissions from Implemented_Targets"""
         forcebalance_modules=[module[:-3] for module in os.listdir(forcebalance.__path__[0])
                      if re.compile(".*\.py$").match(module)
                      and module not in ["__init__.py"]]
@@ -34,7 +35,7 @@ class TestImplemented(ForceBalanceTestCase):
                                'Vibration',
                                'Moments']
                     if object not in implemented and object.__name__ not in exclude:
-                        self.fail("Found unlisted class '%s'" % object.__name__)
+                        self.fail("Unknown class '%s' not listed in Implemented_Targets" % object.__name__)
 
 if __name__ == '__main__':           
     unittest.main()
