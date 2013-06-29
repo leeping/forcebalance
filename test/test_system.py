@@ -8,10 +8,9 @@ from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
 from collections import OrderedDict
 
-class TestTutorial(ForceBalanceTestCase):
+class TestWaterTutorial(ForceBalanceTestCase):
     def setUp(self):
         super(ForceBalanceTestCase,self).setUp()
-        self.cwd = os.getcwd()
         os.chdir('studies/001_water_tutorial')
         if not os.path.isdir('targets'):
             targets = tarfile.open('targets.tar.bz2','r')
@@ -19,9 +18,8 @@ class TestTutorial(ForceBalanceTestCase):
             targets.close()
 
     def tearDown(self):
-        super(ForceBalanceTestCase,self).tearDown()
         os.system('rm -rf results targets backups temp')
-        os.chdir(self.cwd)
+        super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):
         """Check whether tutorial runs and output has not changed from known baseline"""
