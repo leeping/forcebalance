@@ -330,3 +330,62 @@ class Target(ForceBalanceBaseClass):
                 return True
             else:
                 return False
+
+    def printcool_table(self, data=OrderedDict([]), headings=[], banner=None, footnote=None):
+        """ Print target information in an organized table format.  Implemented 6/30 because
+        multiple targets are already printing out tabulated information in very similar ways.
+        This method is a simple wrapper around printcool_dictionary.  
+
+        The input should be something like:
+
+        @param data Column contents in the form of an OrderedDict, with string keys and list vals.
+        The key is printed in the leftmost column and the vals are printed in the other columns.
+        If non-strings are passed, they will be converted to strings (not recommended).
+        
+        @param headings Column headings in the form of a list.  It must be equal to the number to the list length
+        for each of the "vals" in OrderedDict, plus one.  Use "\n" characters to specify long
+        column names that may take up more than one line.
+
+        @param banner Optional heading line, which will be printed at the top in the title.
+        @param footnote Optional footnote line, which will be printed at the bottom.
+        
+        """
+        tline="Target: %s Type: %s Objective = %.5e" % (self.name, self.__class__.__name__, self.objective)
+        nc = len(headings)
+        if banner != None:
+            tlines = [banner, tline]
+        else:
+            tlines = [tline]
+        # Sanity check.
+        for val in data.values():
+            if (len(val)+1) != nc:
+                raise RuntimeError('There are %i column headings, so the values in the data dictionary must be lists of length %i (currently %i)' % (nc, nc-1, len(val)))
+        cwidths = [0 for i in range(nc)]
+        # Figure out maximum column width.
+        # First look at all of the column headings...
+        crows = []
+        for cnum, cname in enumerate(headings):
+            crows.append(len(cname.split('\n')))
+            for l in cname.split('\n'):
+                cwidths[cnum] = max(cwidths[cnum], len(l))
+        # Then look at the row names to stretch out the first column width...
+        for k in data.keys():
+            cwidths[0] = max(cwidths[0], len(k))
+        # Then look at the data values to stretch out the other column widths.
+        for v in data.values():
+            for n, f in enumerate(v):
+                cwidths[n+1] = max(cwidths[n+1], len(str(f)))
+        for i in range(1, len(cwidths)):
+            cwidths[i] += 2
+        if cwidths[0] < 25:
+            cwidths[0] = 25
+        cblocks = [['' for i in range(max(crows) - len(cname.split('\n')))] + cname.split('\n') for cnum, cname in enumerate(headings)]
+        # The formatting line consisting of variable column widths
+        fline = ' '.join("%%%s%is" % (("-" if i==0 else ""), j) for i, j in enumerate(cwidths))
+        vline = ' '.join(["%%%is" % j for i, j in enumerate(cwidths) if i > 0])
+        clines = [fline % (tuple(cblocks[j][i] for j in range(nc))) for i in range(max(crows))]
+        tlines += clines
+        PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
+        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=False, leftpad=4)
+
+

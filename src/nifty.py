@@ -116,7 +116,7 @@ def uncommadash(s):
             
 #list(itertools.chain(*[range(*(int(w.split('-')[0])-1, int(w.split('-')[1]) if len(w.split('-')) == 2 else int(w.split('-')[0])))  for w in Mao.split(',')]))
 
-def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50):
+def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,center=True):
     """Cool-looking printout for slick formatting of output.
 
     @param[in] text The string that the printout is based upon.  This function
@@ -148,10 +148,15 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50):
         return len(sub("\x1b\[[0-9;]*m","",line))
     text = text.split('\n')
     width = max(minwidth,max([newlen(line) for line in text]))
-    bar = ''.join([sym for i in range(width + 8)])
+    bar = ''.join(["=" for i in range(width + 6)])
+    bar = sym + bar + sym
+    #bar = ''.join([sym for i in range(width + 8)])
     print '\n'+bar
     for line in text:
-        padleft = ' ' * ((width - newlen(line)) / 2)
+        if center:
+            padleft = ' ' * ((width - newlen(line)) / 2)
+        else:
+            padleft = ''
         padright = ' '* (width - newlen(line) - len(padleft))
         if ansi != None:
             ansi = str(ansi)
@@ -165,9 +170,10 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50):
         else:
             warn_press_key("Inappropriate use of printcool")
     print bar
-    return sub(sym,bottom,bar)
+    botbar = ''.join([bottom for i in range(width + 8)])
+    return botbar
 
-def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidth=25,topwidth=50):
+def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidth=25,topwidth=50,center=True,leftpad=0):
     """See documentation for printcool; this is a nice way to print out keys/values in a dictionary.
 
     The keys in the dictionary are sorted before printing out.
@@ -176,16 +182,16 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
     @param[in] title The title of the printout
     """
     if Dict == None: return
-    bar = printcool(title,bold=bold,color=color,minwidth=topwidth)
+    bar = printcool(title,bold=bold,color=color,minwidth=topwidth,center=center)
     def magic_string(str):
         # This cryptic command returns a string with the number of characters specified as a variable. :P
         # Useful for printing nice-looking dictionaries, i guess.
         #print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
         return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
     if isinstance(Dict, OrderedDict): 
-        print '\n'.join(["%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None])
+        print '\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None])
     else:
-        print '\n'.join(["%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None])
+        print '\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None])
     print bar
 
 #===============================#

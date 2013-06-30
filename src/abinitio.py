@@ -14,7 +14,7 @@ from re import match, sub
 import subprocess
 from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 import itertools
 #from IPython import embed
 #from _increment import AbInitio_Build
@@ -88,6 +88,8 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'w_netforce','w_netforce')
         self.set_option(tgt_opts,'w_torque','w_torque')
         self.set_option(tgt_opts,'w_resp','w_resp')
+        ## Option for how much data to write to disk.
+        self.set_option(tgt_opts,'writelevel','writelevel')
         ## Whether to do energy and force calculations for the whole trajectory, or to do
         ## one calculation per snapshot.
         self.set_option(tgt_opts,'all_at_once','all_at_once')
@@ -237,10 +239,8 @@ class AbInitio(Target):
             for a in range(len(xyzb)):
                 R = xyzb[a] - com
                 F = frc[a]
-                # I think the unit of torque is in Angstrom * kJ / nm.
-                # While not really nice, it does give a number roughly the same
-                # size as the net force.  Doesn't matter because we'll be normalizing.
-                Torque += cross(R, F)
+                # I think the unit of torque is in nm x kJ / nm.
+                Torque += cross(R, F) / 10
             NetForces += [i for i in NetForce]
             # Increment the torques only if we have more than one atom in our block.
             if len(xyzb) > 1:
@@ -412,19 +412,24 @@ class AbInitio(Target):
         return
         
     def indicate(self):
-        print "Target: %-15s" % self.name, 
+        Headings = ["Physical Variable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference"]
+        Data = OrderedDict([])
         if self.energy:
-            if self.e_err_pct == None:
-                print "Errors: Energy (kJ/mol) = %8.4f" % (self.e_err), 
-            else:
-                print "Errors: Energy = %8.4f kJ/mol (%.4f%%)" % (self.e_err, self.e_err_pct*100), 
+            Data['Energy (kJ/mol)'] = ["%8.4f" % self.e_err,
+                                       "%8.4f" % self.e_ref,
+                                       "%.4f%%" % (self.e_err_pct*100)]
         if self.force:
-            print "Gradient = %8.2f kJ/mol/nm (%.4f%%)" % (self.f_err, self.f_err_pct*100), 
+            Data['Gradient (kJ/mol/nm)'] = ["%8.4f" % self.f_err,
+                                            "%8.4f" % self.f_ref,
+                                            "%.4f%%" % (self.f_err_pct*100)]
             if self.use_nft:
-                print "Net Force = %8.2f kJ/mol/nm (%.4f%%) Torque = %8.4f%%" % (self.nf_err, self.nf_err_pct*100, self.tq_err_pct*100),
-        if self.resp:
-            print "ESP (%%) = %8.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
-        print "Objective = %.5e" % self.objective
+                Data['Net Force (kJ/mol/nm)'] = ["%8.4f" % self.nf_err,
+                                                 "%8.4f" % self.nf_ref,
+                                                 "%.4f%%" % (self.nf_err_pct*100)]
+                Data['Torque (nm x kJ/mol/nm)'] = ["%8.4f" % self.tq_err,
+                                                   "%8.4f" % self.tq_ref,
+                                                   "%.4f%%" % (self.tq_err_pct*100)]
+        self.printcool_table(data=Data, headings=Headings)
 
     def energy_force_transformer_all(self):
         M = self.energy_force_driver_all()
@@ -454,9 +459,9 @@ class AbInitio(Target):
         else:
             return M[0]
 
-    def get_energy_force_no_covariance_(self, mvals, AGrad=False, AHess=False):
+    def get_energy_force_(self, mvals, AGrad=False, AHess=False):
         """
-        LPW 05-30-2012
+        LPW 06-30-2013
         
         This subroutine builds the objective function (and optionally
         its derivatives) from a general simulation software.  This is
@@ -472,9 +477,15 @@ class AbInitio(Target):
         there are a number of nontrivial considerations.  I will list
         them here.
         
-        0) Polytensor formulation: Removed because it adds a factor of
-        NCP1 to the memory requirement.  Instead we're trying
-        Gauss-Newton approximation to the Hessian.
+        0) Polytensor formulation: Because there may exist covariance
+        between different components of the force (or covariance
+        between the energy and the force), we build the objective
+        function by taking outer products of vectors that have the
+        form [E F_1x F_1y F_1z F_2x F_2y ... ], and then we trace it
+        with the inverse of the covariance matrix to get the objective
+        function.
+
+        This version implements both the polytensor formulation and the standard formulation.
 
         1) Boltzmann weights and normalization: Each snapshot has its
         own Boltzmann weight, which may or may not be normalized.
@@ -495,6 +506,14 @@ class AbInitio(Target):
         2) 'Sampling correction' (deprecated, since it doesn't seem to work)
         3) Analytic derivatives
         
+        In the previous code (ForTune) this subroutine used analytic
+        first derivatives of the energy and force to build the
+        derivatives of the objective function.  Here I will take a
+        simplified approach, because building the derivatives are
+        cumbersome.  For now we will return the objective function
+        ONLY.  A two-point central difference should give us the first
+        and diagonal second derivative anyhow.
+
         @todo Parallelization over snapshots is not implemented yet
 
         @param[in] mvals Mathematical parameter values
@@ -502,6 +521,9 @@ class AbInitio(Target):
         @param[in] AHess Switch to turn on analytic Hessian
         @return Answer Contribution to the objective function
         """
+        cv = self.covariance # Whether covariance matrix is turned on
+        if cv and (AGrad or AHess):
+            warn_press_key("Covariance is turned on, gradients requested but not implemented (will skip over grad.)")
         Answer = {}
         # Create the new force field!!
         pvals = self.FF.make(mvals)
@@ -533,77 +555,90 @@ class AbInitio(Target):
         # Z(Y)  = The partition function in the MM (QM) ensemble       #
         # M0_M  = The mean of the MM values in the MM ensemble         #
         # QQ_Q  = The unnormalized expected value of <Q(X)Q>           #
-        # Later on we divide these quantities by Z to normalize.       #
+        # Later on we divide these quantities by Z to normalize,       #
+        # and optionally Q0(X)Q0 is subtracted from QQ to get the      #
+        # covariance.                                                  #
         #==============================================================#
         if (self.w_energy == 0.0 and self.w_force == 0.0 and self.w_netforce == 0.0 and self.w_torque == 0.0):
             AGrad = False
             AHess = False
         Z       = 0.0
         Y       = 0.0
-        # The average force / net force error per atom in kJ/mol/nm. (Added LPW 6/30)
-        F_M     = 0
-        NF_M    = 0
-        F_Q     = 0
-        NF_Q    = 0
+        # The average force / net force per atom in kJ/mol/nm. (Added LPW 6/30)
+        # Torques are in kj/mol/nm x nm.
+        qF_M     = 0
+        qN_M     = 0
+        qT_M     = 0
+        qF_Q     = 0
+        qN_Q     = 0
+        qT_Q     = 0
+        dF_M     = 0
+        dN_M     = 0
+        dT_M     = 0
+        dF_Q     = 0
+        dN_Q     = 0
+        dT_Q     = 0
         Q = zeros(NCP1,dtype=float)
-        # Derivatives
-        M_p     = zeros((np,NCP1),dtype=float)
-        M_pp    = zeros((np,NCP1),dtype=float)
         # Mean quantities
         M0_M    = zeros(NCP1,dtype=float)
-        X0_M    = zeros(NCP1,dtype=float)
         Q0_M    = zeros(NCP1,dtype=float)
-        QQ_M    = zeros(NCP1,dtype=float)
         M0_Q    = zeros(NCP1,dtype=float)
-        X0_Q    = zeros(NCP1,dtype=float)
         Q0_Q    = zeros(NCP1,dtype=float)
-        QQ_Q    = zeros(NCP1,dtype=float)
-        # Means of gradients
-        M0_M_p  = zeros((np,NCP1),dtype=float)
-        M0_Q_p  = zeros((np,NCP1),dtype=float)
-        M0_M_pp = zeros((np,NCP1),dtype=float)
-        M0_Q_pp = zeros((np,NCP1),dtype=float)
-        # Objective functions
-        SPiXi = zeros(NCP1,dtype=float)
-        SRiXi = zeros(NCP1,dtype=float)
-        if AGrad:
-            SPiXi_p = zeros((np,NCP1),dtype=float)
-            SRiXi_p = zeros((np,NCP1),dtype=float)
-            X2_M_p = zeros(np,dtype=float)
-            X2_Q_p = zeros(np,dtype=float)
-        if AHess:
-            SPiXi_pq = zeros((np,np,NCP1),dtype=float)
-            SRiXi_pq = zeros((np,np,NCP1),dtype=float)
-            X2_M_pq = zeros((np,np),dtype=float)
-            X2_Q_pq = zeros((np,np),dtype=float)
+        if cv:
+            QQ_M    = zeros((NCP1,NCP1),dtype=float)
+            QQ_Q    = zeros((NCP1,NCP1),dtype=float)
+            #==============================================================#
+            # Objective function polytensors: This is formed in a loop     #
+            # over snapshots by taking the outer product (Q-M)(X)(Q-M),    #
+            # multiplying by the Boltzmann weight, and then summing.       #
+            #==============================================================#
+            SPiXi = zeros((NCP1,NCP1),dtype=float)
+            SRiXi = zeros((NCP1,NCP1),dtype=float)
+        else:
+            # Derivatives
+            M_p     = zeros((np,NCP1),dtype=float)
+            M_pp    = zeros((np,NCP1),dtype=float)
+            X0_M    = zeros(NCP1,dtype=float)
+            QQ_M    = zeros(NCP1,dtype=float)
+            X0_Q    = zeros(NCP1,dtype=float)
+            Q0_Q    = zeros(NCP1,dtype=float)
+            QQ_Q    = zeros(NCP1,dtype=float)
+            # Means of gradients
+            M0_M_p  = zeros((np,NCP1),dtype=float)
+            M0_Q_p  = zeros((np,NCP1),dtype=float)
+            M0_M_pp = zeros((np,NCP1),dtype=float)
+            M0_Q_pp = zeros((np,NCP1),dtype=float)
+            # Objective functions
+            SPiXi = zeros(NCP1,dtype=float)
+            SRiXi = zeros(NCP1,dtype=float)
+            if AGrad:
+                SPiXi_p = zeros((np,NCP1),dtype=float)
+                SRiXi_p = zeros((np,NCP1),dtype=float)
+                X2_M_p = zeros(np,dtype=float)
+                X2_Q_p = zeros(np,dtype=float)
+            if AHess:
+                SPiXi_pq = zeros((np,np,NCP1),dtype=float)
+                SRiXi_pq = zeros((np,np,NCP1),dtype=float)
+                X2_M_pq = zeros((np,np),dtype=float)
+                X2_Q_pq = zeros((np,np),dtype=float)
+            M_all = zeros((ns,NCP1),dtype=float)
+            if AGrad and self.all_at_once:
+                dM_all = zeros((ns,np,NCP1),dtype=float)
+                ddM_all = zeros((ns,np,NCP1),dtype=float)
         QBN = dot(self.qmboltz_wts[:ns],self.whamboltz_wts[:ns])
-        M_all = zeros((ns,NCP1),dtype=float)
-        if AGrad and self.all_at_once:
-            dM_all = zeros((ns,np,NCP1),dtype=float)
-            ddM_all = zeros((ns,np,NCP1),dtype=float)
         #==============================================================#
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
         if self.all_at_once:
             print "\rExecuting\r",
             M_all = self.energy_force_transformer_all()
-            if AGrad or AHess:
+            if not cv and (AGrad or AHess):
                 def callM(mvals_):
                     print "\r",
                     pvals = self.FF.make(mvals_)
                     return self.energy_force_transformer_all()
                 for p in range(np):
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
-            
-        # My C helper code isn't fully functional yet.
-        # try:
-        #     AbInitio_Build(np, ns, NCP1, AGrad, AHess,
-        #                    self.whamboltz_wts, self.qmboltz_wts, QBN, Z, Y, self.eqm, self.fqm, M_all, 
-        #                    X0_M, M0_M, Q0_M, QQ_M, X0_Q, M0_Q, Q0_Q, QQ_Q, 
-        #                    SPiXi, SRiXi, dM_all, ddM_all, M0_M_p, M0_Q_p, 
-        #                    M0_M_pp, M0_Q_pp, SPiXi_p, SRiXi_p, SPiXi_pq, SRiXi_pq)
-        # except:
-        #     warn_press_key("AbInitio_Build has phailed!")
         for i in range(ns):
             if i % 100 == 0:
                 print "\rIncrementing quantities for snapshot %i\r" % i,
@@ -616,7 +651,11 @@ class AbInitio(Target):
             Q[0] = self.eqm[i]
             if self.force:
                 Q[1:] = self.fref[i,:].copy()
-            QQ     = Q*Q
+            # Increment the average quantities.
+            if cv:
+                QQ     = outer(Q,Q)
+            else:
+                QQ     = Q*Q
             # Call the simulation software to get the MM quantities.
             if self.all_at_once:
                 M = M_all[i]
@@ -625,61 +664,86 @@ class AbInitio(Target):
                     print "Shot %i\r" % i,
                 M = self.energy_force_transformer(i)
                 M_all[i,:] = M.copy()
-            X     = M-Q
-            # Increment the average values.
+            if not cv:
+                X     = M-Q
             # Increment the average values.
             if self.force:
-                frcarray = mean(array([linalg.norm(M[1+3*j:1+3*j+3] - Q[1+3*j:1+3*j+3]) for j in range(self.fitatoms)]))
-                F_M    += P*frcarray
-                F_Q    += R*frcarray
+                dfrcarray = mean(array([linalg.norm(M[1+3*j:1+3*j+3] - Q[1+3*j:1+3*j+3]) for j in range(self.fitatoms)]))
+                qfrcarray = mean(array([linalg.norm(Q[1+3*j:1+3*j+3]) for j in range(self.fitatoms)]))
+                dF_M    += P*dfrcarray
+                dF_Q    += R*dfrcarray
+                qF_M    += P*qfrcarray
+                qF_Q    += R*qfrcarray
                 if self.use_nft:
-                    nfrcarray = mean(array([linalg.norm(M[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3] - Q[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3]) for j in range(self.nnf)]))
-                    NF_M    += P*nfrcarray
-                    NF_Q    += R*nfrcarray
-            X0_M += P*X
-            X0_Q += R*X
-            M0_M += P*M
-            M0_Q += R*M
-            Q0_M += P*Q
-            Q0_Q += R*Q
+                    dnfrcarray = mean(array([linalg.norm(M[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3] - Q[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3]) for j in range(self.nnf)]))
+                    qnfrcarray = mean(array([linalg.norm(Q[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3]) for j in range(self.nnf)]))
+                    dN_M    += P*dnfrcarray
+                    dN_Q    += R*dnfrcarray
+                    qN_M    += P*qnfrcarray
+                    qN_Q    += R*qnfrcarray
+                    dtrqarray = mean(array([linalg.norm(M[1+3*self.fitatoms+3*self.nnf+3*j:1+3*self.fitatoms+3*self.nnf+3*j+3] - Q[1+3*self.fitatoms+3*self.nnf+3*j:1+3*self.fitatoms+3*self.nnf+3*j+3]) for j in range(self.ntq)]))
+                    qtrqarray = mean(array([linalg.norm(Q[1+3*self.fitatoms+3*self.nnf+3*j:1+3*self.fitatoms+3*self.nnf+3*j+3]) for j in range(self.ntq)]))
+                    dT_M    += P*dtrqarray
+                    dT_Q    += R*dtrqarray
+                    qT_M    += P*qtrqarray
+                    qT_Q    += R*qtrqarray
+            # The [0] indicates that we are fitting the RMS force and not the RMSD
+            # (without the covariance, subtracting a mean force doesn't make sense.)
+            M0_M[0] += P*M[0]
+            M0_Q[0] += R*M[0]
+            Q0_M[0] += P*Q[0]
+            Q0_Q[0] += R*Q[0]
             QQ_M += P*QQ
             QQ_Q += R*QQ
+            if not cv:
+                X0_M[0] += P*X[0]
+                X0_Q[0] += R*X[0]
             # Increment the objective function.
-            Xi     = X**2
+            if cv:
+                Xi  = outer(M,M) - 2*outer(Q,M) + outer(Q,Q)
+            else:
+                Xi     = X**2                   
             SPiXi += P * Xi
             SRiXi += R * Xi
-            for p in range(np):
-                if not AGrad: continue
-                if self.all_at_once:
-                    M_p[p] = dM_all[i, p]
-                    M_pp[p] = ddM_all[i, p]
-                else:
-                    def callM(mvals_):
-                        if i % 100 == 0:
-                            print "\r",
-                        pvals = self.FF.make(mvals_)
-                        return self.energy_force_transformer(i)
-                    M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
-                M0_M_p[p]  += P * M_p[p]
-                M0_Q_p[p]  += R * M_p[p]
-                #M0_M_pp[p] += P * M_pp[p]
-                #M0_Q_pp[p] += R * M_pp[p]
-                Xi_p        = 2 * X * M_p[p]
-                SPiXi_p[p] += P * Xi_p
-                SRiXi_p[p] += R * Xi_p
-                if not AHess: continue
-                if self.all_at_once:
-                    M_pp[p] = ddM_all[i, p]
-                # This formula is more correct, but perhapsively convergence is slower.
-                #Xi_pq       = 2 * (M_p[p] * M_p[p] + X * M_pp[p])
-                # Gauss-Newton formula for approximate Hessian
-                Xi_pq       = 2 * (M_p[p] * M_p[p])
-                SPiXi_pq[p,p] += P * Xi_pq
-                SRiXi_pq[p,p] += R * Xi_pq
-                for q in range(p):
-                    Xi_pq          = 2 * M_p[p] * M_p[q]
-                    SPiXi_pq[p,q] += P * Xi_pq
-                    SRiXi_pq[p,q] += R * Xi_pq
+            #==============================================================#
+            #      STEP 2a: Increment gradients and mean quantities.       #
+            #   This is only implemented for the case without covariance.  #
+            #==============================================================#
+            if not cv:
+                for p in range(np):
+                    if not AGrad: continue
+                    if self.all_at_once:
+                        M_p[p] = dM_all[i, p]
+                        M_pp[p] = ddM_all[i, p]
+                    else:
+                        def callM(mvals_):
+                            if i % 100 == 0:
+                                print "\r",
+                            pvals = self.FF.make(mvals_)
+                            return self.energy_force_transformer(i)
+                        M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
+                    # The [0] indicates that we are fitting the RMS force and not the RMSD
+                    # (without the covariance, subtracting a mean force doesn't make sense.)
+                    M0_M_p[p][0]  += P * M_p[p][0]
+                    M0_Q_p[p][0]  += R * M_p[p][0]
+                    #M0_M_pp[p][0] += P * M_pp[p][0]
+                    #M0_Q_pp[p][0] += R * M_pp[p][0]
+                    Xi_p        = 2 * X * M_p[p]
+                    SPiXi_p[p] += P * Xi_p
+                    SRiXi_p[p] += R * Xi_p
+                    if not AHess: continue
+                    if self.all_at_once:
+                        M_pp[p] = ddM_all[i, p]
+                    # This formula is more correct, but perhapsively convergence is slower.
+                    #Xi_pq       = 2 * (M_p[p] * M_p[p] + X * M_pp[p])
+                    # Gauss-Newton formula for approximate Hessian
+                    Xi_pq       = 2 * (M_p[p] * M_p[p])
+                    SPiXi_pq[p,p] += P * Xi_pq
+                    SRiXi_pq[p,p] += R * Xi_pq
+                    for q in range(p):
+                        Xi_pq          = 2 * M_p[p] * M_p[q]
+                        SPiXi_pq[p,q] += P * Xi_pq
+                        SRiXi_pq[p,q] += R * Xi_pq
 
         # Dump energies and forces to disk.
         M_all_print = M_all.copy()
@@ -691,10 +755,12 @@ class AbInitio(Target):
             Q_all_print = col(self.eqm)
         if not self.absolute:
             Q_all_print[:,0] -= mean(Q_all_print[:,0])
-        savetxt('M.txt',M_all_print)
-        savetxt('Q.txt',Q_all_print)
+        if self.writelevel > 1:
+            savetxt('M.txt',M_all_print)
+            savetxt('Q.txt',Q_all_print)
         EnergyComparison = hstack((col(Q_all_print[:,0]),col(M_all_print[:,0])))
-        savetxt('QM-vs-MM-energies.txt',EnergyComparison)
+        if self.writelevel > 0:
+            savetxt('QM-vs-MM-energies.txt',EnergyComparison)
         if self.force:
             # Write .xyz files which can be viewed in vmd.
             try:
@@ -721,16 +787,21 @@ class AbInitio(Target):
             if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
                 warn_once('\x1b[91mThe printing of forces is not set up correctly.  Not printing forces.  Please report this issue.\x1b[0m')
             else:
-                QMTraj.write('coords.xyz')
-                Mforce_obj.elem = ['H' for i in range(Mforce_obj.na)]
-                Mforce_obj.write('MMforce.xyz')
-                Qforce_obj.elem = ['H' for i in range(Qforce_obj.na)]
-                Qforce_obj.write('QMforce.xyz')
+                if self.writelevel > 1:
+                    QMTraj.write('coords.xyz')
+                    Mforce_obj.elem = ['H' for i in range(Mforce_obj.na)]
+                    Mforce_obj.write('MMforce.xyz')
+                    Qforce_obj.elem = ['H' for i in range(Qforce_obj.na)]
+                    Qforce_obj.write('QMforce.xyz')
                 #savetxt('Dforce_norm.dat', Dforce_norm)
-                savetxt('Dforce_norm.dat', Dforce_norm)
+                if self.writelevel > 0:
+                    savetxt('Dforce_norm.dat', Dforce_norm)
+
 
         #==============================================================#
-        #      STEP 3: Build the variance vector and invert it.        #
+        #    STEP 3: Build the (co)variance matrix and invert it.      #
+        # In the case of no covariance, this is just a diagonal matrix #
+        # with the RMSD energy in [0,0] and the RMS gradient in [n, n] #
         #==============================================================#
         print "Done with snapshots, building objective function now\r",
         if (self.w_energy > 0.0 or self.w_force > 0.0 or self.w_netforce > 0.0 or self.w_torque > 0.0):
@@ -744,65 +815,111 @@ class AbInitio(Target):
             FWt = 0.0
             NWt = 0.0
             TWt = 0.0
-        # Build the weight vector, so the force contribution is suppressed by 1/3N
-        WM      = zeros(NCP1,dtype=float)
-        WM[0] = sqrt(EWt)
-        if self.force:
+        # Build the weight vector/matrix, so the force contribution is suppressed by 1/3N
+        if cv:
+            WM      = zeros((NCP1,NCP1),dtype=float)
+            WM[0,0] = sqrt(EWt)
             start   = 1
             block   = 3*self.fitatoms
             end     = start + block
-            WM[start:end] = sqrt(FWt / block)
+            for i in range(start, end):
+                WM[i, i] = sqrt(FWt / block)
             if self.use_nft:
                 start   = end
                 block   = 3*self.nnf
                 end     = start + block
-                WM[start:end] = sqrt(NWt / block)
+                for i in range(start, end):
+                    WM[i, i] = sqrt(NWt / block)
                 start   = end
                 block   = 3*self.ntq
                 end     = start + block
-                WM[start:end] = sqrt(TWt / block)
-        # Here we're just using the variance.
-        QBP  = self.qmboltz
-        MBP  = 1 - self.qmboltz
-        C    = MBP*(QQ_M-Q0_M*Q0_M/Z)/Z + QBP*(QQ_Q-Q0_Q*Q0_Q/Y)/Y
-        # Normalize the force components
-        for i in range(1, len(C), 3):
-            C[i:i+3] = mean(C[i:i+3])
-        Ci    = 1. / C
-        WCiW = WM * Ci * WM
+                for i in range(start, end):
+                    WM[i, i] = sqrt(TWt / block)
+        else:
+            WM      = zeros(NCP1,dtype=float)
+            WM[0] = sqrt(EWt)
+            if self.force:
+                start   = 1
+                block   = 3*self.fitatoms
+                end     = start + block
+                WM[start:end] = sqrt(FWt / block)
+                if self.use_nft:
+                    start   = end
+                    block   = 3*self.nnf
+                    end     = start + block
+                    WM[start:end] = sqrt(NWt / block)
+                    start   = end
+                    block   = 3*self.ntq
+                    end     = start + block
+                    WM[start:end] = sqrt(TWt / block)
+        if cv:
+            #==============================================================#
+            #                      The covariance matrix                   #
+            #                                                              #
+            # Note: There is a detail here that might appear peculiar :    #
+            # I'm building only one covariance matrix from both ensembles. #
+            # This is the proper thing to do, believe me.                  #
+            # The functional form looks like (X2_M + X2_Q)(C)^-1           #
+            # I will build X2_M C^-1 and X2_Q C^-1 separately.             #
+            #==============================================================#
+            QBP  = self.qmboltz
+            MBP  = 1 - self.qmboltz
+            C    = MBP*(QQ_M-outer(Q0_M,Q0_M)/Z)/Z + QBP*(QQ_Q-outer(Q0_Q,Q0_Q)/Y)/Y
+            Ci   = invert_svd(C)
+            # Get rid of energy-force covariance
+            for i in range(1,NCP1):
+                Ci[0,i] = 0.0;
+                Ci[i,0] = 0.0;
+            WCiW = array(mat(WM) * mat(Ci) * mat(WM)) # Weighted covariance matrix.
+        else:
+            # Here we're just using the variance.
+            QBP  = self.qmboltz
+            MBP  = 1 - self.qmboltz
+            C    = MBP*(QQ_M-Q0_M*Q0_M/Z)/Z + QBP*(QQ_Q-Q0_Q*Q0_Q/Y)/Y
+            # Normalize the force components
+            for i in range(1, len(C), 3):
+                C[i:i+3] = mean(C[i:i+3])
+            Ci    = 1. / C
+            WCiW = WM * Ci * WM
         #==============================================================#
         # STEP 4: Build the objective function and its derivatives.    #
+        # Note that building derivatives with covariance is not yet    #
+        # implemented, but can use external warpper to differentiate   #
         #==============================================================#
-        X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
-        X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute)
-        for p in range(np):
-            if not AGrad: continue
-            X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1,subtract_mean = not self.absolute)
-            X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1,subtract_mean = not self.absolute)
-            if not AHess: continue
-            X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1,subtract_mean = not self.absolute)
-            X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1,subtract_mean = not self.absolute)
-            for q in range(p):
-                X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1,subtract_mean = not self.absolute)
-                X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1,subtract_mean = not self.absolute)
-                # Get the other half of the Hessian matrix.
-                X2_M_pq[q,p] = X2_M_pq[p,q]
-                X2_Q_pq[q,p] = X2_Q_pq[p,q]
-                
+        if cv:
+            X2_M  = build_objective(SPiXi,WCiW,Z,Q0_M,M0_M,NCP1)
+            X2_Q  = build_objective(SRiXi,WCiW,Y,Q0_Q,M0_Q,NCP1)
+        else:
+            X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
+            X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute)
+            for p in range(np):
+                if not AGrad: continue
+                X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1,subtract_mean = not self.absolute)
+                X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1,subtract_mean = not self.absolute)
+                if not AHess: continue
+                X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1,subtract_mean = not self.absolute)
+                X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1,subtract_mean = not self.absolute)
+                for q in range(p):
+                    X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1,subtract_mean = not self.absolute)
+                    X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1,subtract_mean = not self.absolute)
+                    # Get the other half of the Hessian matrix.
+                    X2_M_pq[q,p] = X2_M_pq[p,q]
+                    X2_Q_pq[q,p] = X2_Q_pq[p,q]
         #==============================================================#
         #            STEP 5: Build the return quantities.              #
         #==============================================================#
         # The objective function
         X2   = MBP * X2_M    + QBP * X2_Q
-        # Derivatives of the objective function
-        G = zeros(np,dtype=float)
-        H = zeros((np,np),dtype=float)
-        for p in range(np):
-            if not AGrad: continue
-            G[p] = MBP * X2_M_p[p] + QBP * X2_Q_p[p]
-            if not AHess: continue
-            for q in range(np):
-                H[p,q] = MBP * X2_M_pq[p,q] + QBP * X2_Q_pq[p,q]
+        if not cv:
+            # Derivatives of the objective function
+            G = zeros(np,dtype=float)
+            H = zeros((np,np),dtype=float)
+            for p in range(np):
+                if not AGrad: continue
+                G[p] = MBP * X2_M_p[p] + QBP * X2_Q_p[p]
+                if not AHess: continue
+                for q in range(np):
+                    H[p,q] = MBP * X2_M_pq[p,q] + QBP * X2_Q_pq[p,q]
         # Energy error in kJ/mol
         if not self.absolute:
             E0_M = (2*Q0_M[0]*M0_M[0] - Q0_M[0]*Q0_M[0] - M0_M[0]*M0_M[0])/Z/Z;
@@ -810,318 +927,61 @@ class AbInitio(Target):
         else:
             E0_M = 0.0
             E0_Q = 0.0
-        E     = MBP * sqrt(SPiXi[0]/Z + E0_M) + QBP * sqrt(SRiXi[0]/Y + E0_Q)
+        if cv:
+            dE     = MBP * sqrt(SPiXi[0,0]/Z + E0_M) + QBP * sqrt(SRiXi[0,0]/Y + E0_Q)
+        else:
+            dE     = MBP * sqrt(SPiXi[0]/Z + E0_M) + QBP * sqrt(SRiXi[0]/Y + E0_Q)
         # Fractional energy error.
-        Efrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
+        dEfrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
         # Absolute and Fractional force error.
         if self.force:
-            F = MBP * F_M / Z + QBP * F_Q / Y
-            Ffrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,1+3*self.fitatoms) if abs(QQ_M[i]) > 1e-3]))) + \
-                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,1+3*self.fitatoms) if abs(QQ_Q[i]) > 1e-3])))
-        else:
-            F = None
-            Ffrac = None
+            dF = MBP * dF_M / Z + QBP * dF_Q / Y
+            qF = MBP * qF_M / Z + QBP * qF_Q / Y
+            dFfrac = MBP * (dF_M/qF_M) + QBP * (dF_Q/qF_Q)
+            # Old code for generating percentage force errors is less intuitive.
+            # if cv:
+            #     dFfrac = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1,1+3*self.fitatoms) if abs(QQ_M[i,i]) > 1e-3 ]))) + \
+            #         QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1,1+3*self.fitatoms) if abs(QQ_Q[i,i]) > 1e-3])))
+            # else:
+            #     dFfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,1+3*self.fitatoms) if abs(QQ_M[i]) > 1e-3]))) + \
+            #         QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,1+3*self.fitatoms) if abs(QQ_Q[i]) > 1e-3])))
         if self.use_nft:
-            NF = MBP * NF_M / Z + QBP * NF_Q / Y
-            NFfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf)) if abs(QQ_M[i]) > 1e-3]))) + \
-                     QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf)) if abs(QQ_Q[i]) > 1e-3])))
-            Tfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq)) if abs(QQ_M[i]) > 1e-3]))) + \
-                    QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq)) if abs(QQ_Q[i]) > 1e-3])))
+            dN = MBP * dN_M / Z + QBP * dN_Q / Y
+            qN = MBP * qN_M / Z + QBP * qN_Q / Y
+            dNfrac = MBP * dN_M / qN_M + QBP * dN_Q / qN_Q
+            dT = MBP * dT_M / Z + QBP * dT_Q / Y
+            qT = MBP * qT_M / Z + QBP * qT_Q / Y
+            dTfrac = MBP * dT_M / qT_M + QBP * dT_Q / qT_Q
+            # if cv:
+            #     dNfrac = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))]))) + \
+            #         QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))])))
+            #     dTfrac = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))]))) + \
+            #         QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))])))
+            # else:
+            #     dNfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf)) if abs(QQ_M[i]) > 1e-3]))) + \
+            #         QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf)) if abs(QQ_Q[i]) > 1e-3])))
+            #     dTfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq)) if abs(QQ_M[i]) > 1e-3]))) + \
+            #         QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq)) if abs(QQ_Q[i]) > 1e-3])))
         # Save values to qualitative indicator if not inside finite difference code.
         if not in_fd():
-            self.e_err = E
-            self.e_err_pct = Efrac
-            self.f_err = F
-            self.f_err_pct = Ffrac
+            self.e_ref = MBP * sqrt(QQ_M[0]/Z - Q0_M[0]**2/Z/Z) + QBP * sqrt((QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
+            self.e_err = dE
+            self.e_err_pct = dEfrac
+            self.f_ref = qF
+            self.f_err = dF
+            self.f_err_pct = dFfrac
             if self.use_nft:
-                self.nf_err = NF
-                self.nf_err_pct = NFfrac
-                self.tq_err_pct = Tfrac
+                self.nf_ref = qN
+                self.nf_err = dN
+                self.nf_err_pct = dNfrac
+                self.tq_ref = qT
+                self.tq_err = dT
+                self.tq_err_pct = dTfrac
             pvals = self.FF.make(mvals) # Write a force field that isn't perturbed by finite differences.
-        Answer = {'X':X2, 'G':G, 'H':H}
-        return Answer
-
-    def get_energy_force_covariance_(self, mvals, AGrad=False, AHess=False):
-        """
-        LPW 01-11-2012
-        
-        This subroutine builds the objective function (and optionally
-        its derivatives) from a general simulation software.  This is
-        in contrast to using GROMACS-X2, which computes the objective
-        function and prints it out; then 'get' only needs to call
-        GROMACS and read it in.
-
-        This subroutine interfaces with simulation software 'drivers'.
-        The driver is only expected to give the energy and forces.
-
-        Now this subroutine may sound trivial since the objective
-        function is simply a least-squares quantity (M-Q)^2 - but
-        there are a number of nontrivial considerations.  I will list
-        them here.
-        
-        0) Polytensor formulation: Because there may exist covariance
-        between different components of the force (or covariance
-        between the energy and the force), we build the objective
-        function by taking outer products of vectors that have the
-        form [E F_1x F_1y F_1z F_2x F_2y ... ], and then we trace it
-        with the inverse of the covariance matrix to get the objective
-        function.
-
-        1) Boltzmann weights and normalization: Each snapshot has its
-        own Boltzmann weight, which may or may not be normalized.
-        This subroutine does the normalization automatically.
-        
-        2) Subtracting out the mean energy gap: The zero-point energy
-        difference between reference and fitting simulations is
-        meaningless.  This subroutine subtracts it out.
-        
-        3) Hybrid ensembles: This program builds a combined objective
-        function from both MM and QM ensembles, which is rigorously
-        better than using a single ensemble.
-
-        Note that this subroutine does not do EVERYTHING that
-        GROMACS-X2 can do, which includes:
-        
-        1) Internal coordinate systems
-        2) 'Sampling correction' (deprecated, since it doesn't seem to work)
-        3) Analytic derivatives
-        
-        In the previous code (ForTune) this subroutine used analytic
-        first derivatives of the energy and force to build the
-        derivatives of the objective function.  Here I will take a
-        simplified approach, because building the derivatives are
-        cumbersome.  For now we will return the objective function
-        ONLY.  A two-point central difference should give us the first
-        and diagonal second derivative anyhow.
-
-        @todo Parallelization over snapshots is not implemented yet
-
-        @param[in] mvals Mathematical parameter values
-        @param[in] AGrad Switch to turn on analytic gradient
-        @param[in] AHess Switch to turn on analytic Hessian
-        @return Answer Contribution to the objective function
-        """
-        warn_press_key("You have reached a piece of code that isn't well maintained!  If you believe you got here in error, try setting the covariance option to zero.")
-        Answer = {}
-        # Create the new force field!!
-        pvals = self.FF.make(mvals)
-        ns = self.ns
-
-        #======================================#
-        #   Copied from the old ForTune code   #
-        #======================================#
-        NC   = 3*self.fitatoms
-        NCP1 = 3*self.fitatoms+1
-        if self.use_nft:
-            NCP1 += 3*(self.nnf + self.ntq)
-        #==============================================================#
-        # Note: Because of hybrid ensembles, we form two separate      #
-        # objective functions.  This means the code is (trivially)     #
-        # doubled in length because there are two sets of Boltzmann    #
-        # weights.  In principle I could write a general subroutine    #
-        # for a single set of Boltzmann weights and call it twice, but #
-        # that would require me to loop over the snapshots twice.      #
-        # However, after the loop over snapshots, the subroutine that  #
-        # builds the objective function (build_objective, above) is    #
-        # called twice using the MM-ensemble and QM-ensemble           #
-        # variables.                                                   #
-        #                                                              #
-        #            STEP 1: Form all of the arrays.                   #
-        #                                                              #
-        # Quantities pertaining to the covariance matrix.              #
-        # An explanation of variable names follows.                    #
-        # Z(Y)  = The partition function in the MM (QM) ensemble       #
-        # M0_M  = The mean of the MM values in the MM ensemble         #
-        # QQ_Q  = The unnormalized expected value of <Q(X)Q>           #
-        # Later on we divide these quantities by Z to normalize,       #
-        # and Q0(X)Q0 is subtracted from QQ to get the covariance.     #
-        #==============================================================#
-        if (self.w_energy == 0.0 and self.w_force == 0.0 and self.w_netforce == 0.0 and self.w_torque == 0.0):
-            AGrad = False
-            AHess = False
-        Z       = 0
-        Y       = 0
-        # The average force / net force error per atom in kJ/mol/nm. (Added LPW 6/30)
-        F_M     = 0
-        NF_M    = 0
-        F_Q     = 0
-        NF_Q    = 0
-        Q = zeros(NCP1,dtype=float)
-        M0_M    = zeros(NCP1,dtype=float)
-        Q0_M    = zeros(NCP1,dtype=float)
-        QQ_M    = zeros((NCP1,NCP1),dtype=float)
-        M0_Q    = zeros(NCP1,dtype=float)
-        Q0_Q    = zeros(NCP1,dtype=float)
-        QQ_Q    = zeros((NCP1,NCP1),dtype=float)
-        #==============================================================#
-        # Objective function polytensors: This is formed in a loop     #
-        # over snapshots by taking the outer product (Q-M)(X)(Q-M),    #
-        # multiplying by the Boltzmann weight, and then summing.       #
-        #==============================================================#
-        SPiXi = zeros((NCP1,NCP1),dtype=float)
-        SRiXi = zeros((NCP1,NCP1),dtype=float)
-        QBN = dot(self.qmboltz_wts[:ns],self.whamboltz_wts[:ns])
-        #==============================================================#
-        #             STEP 2: Loop through the snapshots.              #
-        #==============================================================#
-        if self.all_at_once:
-            print "Computing forces\r",
-            M_all = self.energy_force_transformer_all()
-        for i in range(ns):
-            # Build Boltzmann weights and increment partition function.
-            P   = self.whamboltz_wts[i]
-            Z  += P
-            R   = self.qmboltz_wts[i]*self.whamboltz_wts[i] / QBN
-            Y  += R
-            # Recall reference (QM) data
-            Q[0] = self.eqm[i]
-            if self.force:
-                Q[1:] = self.fref[i,:].copy()
-            # Increment the average quantities.
-            QQ     = outer(Q,Q)
-            # Call the simulation software to get the MM quantities.
-            if self.all_at_once:
-                M = M_all[i]
-            else:
-                if i % 100 == 0:
-                    print "Shot %i\r" % i,
-                M = self.energy_force_transformer(i)
-            # Increment the average values.
-            if self.force:
-                frcarray = mean(array([linalg.norm(M[1+3*j:1+3*j+3] - Q[1+3*j:1+3*j+3]) for j in range(self.fitatoms)]))
-                F_M    += P*frcarray
-                F_Q    += R*frcarray
-                if self.use_nft:
-                    nfrcarray = mean(array([linalg.norm(M[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3] - Q[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3]) for j in range(self.nnf)]))
-                    NF_M    += P*nfrcarray
-                    NF_Q    += R*nfrcarray
-            M0_M += P*M
-            Q0_M += P*Q
-            QQ_M += P*QQ
-            M0_Q += R*M
-            Q0_Q += R*Q
-            QQ_Q += R*QQ
-            # Increment the objective function.
-            Xi  = outer(M,M) - 2*outer(Q,M) + outer(Q,Q)
-            SPiXi += P * Xi
-            SRiXi += R * Xi
-        #==============================================================#
-        #     STEP 3: Build the covariance matrix and invert it.       #
-        #==============================================================#
-        if (self.w_energy > 0.0 or self.w_force > 0.0 or self.w_netforce > 0.0 or self.w_torque > 0.0):
-            wtot    = self.w_energy + self.w_force + self.w_netforce + self.w_torque
-            EWt     = self.w_energy / wtot
-            FWt     = self.w_force / wtot
-            NWt     = self.w_netforce / wtot
-            TWt     = self.w_torque / wtot
+        if cv:
+            Answer = {'X':X2, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         else:
-            EWt = 0.0
-            FWt = 0.0
-            NWt = 0.0
-            TWt = 0.0
-        # Build the weight matrix, so the force contribution is suppressed by 1/3N
-        WM      = zeros((NCP1,NCP1),dtype=float)
-        WM[0,0] = sqrt(EWt)
-        start   = 1
-        block   = 3*self.fitatoms
-        end     = start + block
-        for i in range(start, end):
-            WM[i, i] = sqrt(FWt / block)
-        if self.use_nft:
-            start   = end
-            block   = 3*self.nnf
-            end     = start + block
-            for i in range(start, end):
-                WM[i, i] = sqrt(NWt / block)
-            start   = end
-            block   = 3*self.ntq
-            end     = start + block
-            for i in range(start, end):
-                WM[i, i] = sqrt(TWt / block)
-        #==============================================================#
-        #                      The covariance matrix                   #
-        #                                                              #
-        # Note: There is a detail here that might appear peculiar :    #
-        # I'm building only one covariance matrix from both ensembles. #
-        # This is the proper thing to do, believe me.                  #
-        # The functional form looks like (X2_M + X2_Q)(C)^-1           #
-        # I will build X2_M C^-1 and X2_Q C^-1 separately.             #
-        #==============================================================#
-        QBP  = self.qmboltz
-        MBP  = 1 - self.qmboltz
-        C    = MBP*(QQ_M-outer(Q0_M,Q0_M)/Z)/Z + QBP*(QQ_Q-outer(Q0_Q,Q0_Q)/Y)/Y
-        if self.covariance == False:
-            C = diag(C)
-            for i in range(1, len(C), 3):
-                C[i:i+3] = mean(C[i:i+3])
-            #C[1:] = mean(C[1:])
-            C = diag(C)
-        Ci   = invert_svd(C)
-        # Get rid of energy-force covariance
-        for i in range(1,NCP1):
-            Ci[0,i] = 0.0;
-            Ci[i,0] = 0.0;
-        WCiW = array(mat(WM) * mat(Ci) * mat(WM)) # Weighted covariance matrix.
-        #==============================================================#
-        # STEP 4: Build the objective function and its derivatives by  #
-        # tracing with the covariance matrix.  (Note that without      #
-        # Sampling Correction, covariance matrix has no derivatives.   #
-        # I am thankful for this.)  I will build X2_M C^-1 and X2_Q    #
-        # C^-1 separately because it's cleaner that way.               #
-        #==============================================================#
-        X2_M  = build_objective(SPiXi,WCiW,Z,Q0_M,M0_M,NCP1)
-        X2_Q  = build_objective(SRiXi,WCiW,Y,Q0_Q,M0_Q,NCP1)
-        #==============================================================#
-        #            STEP 5: Build the return quantities.              #
-        #==============================================================#
-        # The un-penalized objective function
-        BC   = MBP * X2_M    + QBP * X2_Q
-        # Energy error in kJ/mol
-        E0_M = (2*Q0_M[0]*M0_M[0] - Q0_M[0]*Q0_M[0] - M0_M[0]*M0_M[0])/Z/Z;
-        E0_Q = (2*Q0_Q[0]*M0_Q[0] - Q0_Q[0]*Q0_Q[0] - M0_Q[0]*M0_Q[0])/Y/Y;
-        E     = MBP * sqrt(SPiXi[0,0]/Z + E0_M) + QBP * sqrt(SRiXi[0,0]/Y + E0_Q)
-        #==============================================================#
-        # Fractional energy error.  This is not used right now but I   #
-        # thought it might help to have the formula.  Note: SPiXi and  #
-        # QQ both need to be divided by Z to be truly "averaged", but  #
-        # since we're dividing them, the Z cancels out.                #
-        #==============================================================#
-        Efrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
-        #==============================================================#
-        # Fractional force error; this is the internal force error,    #
-        # and for us this only means it is Boltzmann-averaged, because #
-        # we are not doing the sampling correction or the internal     #
-        # coordinates.  This is given by the root-mean-square diagonal #
-        # objective function values (divided by the diagonal           #
-        # covariance values).                                          #
-        #==============================================================#
-        if self.force:
-            F = MBP * F_M / Z + QBP * F_Q / Y
-            Ffrac = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1,1+3*self.fitatoms)]))) + \
-                    QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1,1+3*self.fitatoms)])))
-        else:
-            F = None
-            Ffrac = None
-        if self.use_nft:
-            NF = MBP * NF_M / Z + QBP * NF_Q / Y
-            NFfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))]))) + \
-                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))])))
-            Tfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))]))) + \
-                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))])))
-        #======================================#
-        #        End of the copied code        #
-        #======================================#
-        if not in_fd():
-            self.e_err = E
-            self.e_err_pct = Efrac
-            self.f_err = F
-            self.f_err_pct = Ffrac
-            if self.use_nft:
-                self.nf_err = NF
-                self.nf_err_pct = NFfrac
-                self.tq_err_pct = Tfrac
-            pvals = self.FF.make(mvals) # Write a force field that isn't perturbed by finite differences.
-        Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
+            Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
 
     def get_resp_(self, mvals, AGrad=False, AHess=False):
@@ -1222,12 +1082,6 @@ class AbInitio(Target):
             
         Answer = {'X':X,'G':G,'H':H}
         return Answer
-
-    def get_energy_force_(self, mvals, AGrad=False, AHess=False):
-        if self.covariance:
-            return self.get_energy_force_covariance_(mvals, AGrad, AHess)
-        else:
-            return self.get_energy_force_no_covariance_(mvals, AGrad, AHess)
 
     def get(self, mvals, AGrad=False, AHess=False):
         Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
