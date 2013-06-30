@@ -121,10 +121,12 @@ class AbInitio(Target):
         self.e_err_pct = None
         ## Qualitative Indicator: average force error (fractional)
         self.f_err = 0.0
+        self.f_err_pct = 0.0
         ## Qualitative Indicator: "relative RMS" for electrostatic potential
         self.esp_err = 0.0
         self.nf_err = 0.0
-        self.tq_err = 0.0
+        self.nf_err_pct = 0.0
+        self.tq_err_pct = 0.0
         ## Whether to compute net forces and torques, or not.
         self.use_nft       = self.w_netforce > 0 or self.w_torque > 0
         ## Read in the trajectory file
@@ -413,13 +415,13 @@ class AbInitio(Target):
         print "Target: %-15s" % self.name, 
         if self.energy:
             if self.e_err_pct == None:
-                print "Errors: Energy (kJ/mol) = %8.4f" % (self.e_err, self.f_err*100), 
+                print "Errors: Energy (kJ/mol) = %8.4f" % (self.e_err), 
             else:
                 print "Errors: Energy = %8.4f kJ/mol (%.4f%%)" % (self.e_err, self.e_err_pct*100), 
         if self.force:
-            print "Atomic Force (%%) = %8.4f" % (self.f_err*100), 
+            print "Gradient = %8.2f kJ/mol/nm (%.4f%%)" % (self.f_err, self.f_err_pct*100), 
             if self.use_nft:
-                print "Net Force (%%) = %8.4f Torque (%%) = %8.4f" % (self.nf_err*100, self.tq_err*100),
+                print "Net Force = %8.2f kJ/mol/nm (%.4f%%) Torque = %8.4f%%" % (self.nf_err, self.nf_err_pct*100, self.tq_err_pct*100),
         if self.resp:
             print "ESP (%%) = %8.4f, RESP penalty = %.3e" % (self.esp_err*100, self.respterm),
         print "Objective = %.5e" % self.objective
@@ -538,6 +540,11 @@ class AbInitio(Target):
             AHess = False
         Z       = 0.0
         Y       = 0.0
+        # The average force / net force error per atom in kJ/mol/nm. (Added LPW 6/30)
+        F_M     = 0
+        NF_M    = 0
+        F_Q     = 0
+        NF_Q    = 0
         Q = zeros(NCP1,dtype=float)
         # Derivatives
         M_p     = zeros((np,NCP1),dtype=float)
@@ -620,6 +627,15 @@ class AbInitio(Target):
                 M_all[i,:] = M.copy()
             X     = M-Q
             # Increment the average values.
+            # Increment the average values.
+            if self.force:
+                frcarray = mean(array([linalg.norm(M[1+3*j:1+3*j+3] - Q[1+3*j:1+3*j+3]) for j in range(self.fitatoms)]))
+                F_M    += P*frcarray
+                F_Q    += R*frcarray
+                if self.use_nft:
+                    nfrcarray = mean(array([linalg.norm(M[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3] - Q[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3]) for j in range(self.nnf)]))
+                    NF_M    += P*nfrcarray
+                    NF_Q    += R*nfrcarray
             X0_M += P*X
             X0_Q += R*X
             M0_M += P*M
@@ -797,25 +813,30 @@ class AbInitio(Target):
         E     = MBP * sqrt(SPiXi[0]/Z + E0_M) + QBP * sqrt(SRiXi[0]/Y + E0_Q)
         # Fractional energy error.
         Efrac = MBP * sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
-        # Fractional force error.
+        # Absolute and Fractional force error.
         if self.force:
-            F = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,1+3*self.fitatoms) if abs(QQ_M[i]) > 1e-3]))) + \
+            F = MBP * F_M / Z + QBP * F_Q / Y
+            Ffrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1,1+3*self.fitatoms) if abs(QQ_M[i]) > 1e-3]))) + \
                 QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1,1+3*self.fitatoms) if abs(QQ_Q[i]) > 1e-3])))
         else:
             F = None
+            Ffrac = None
         if self.use_nft:
-            N = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf)) if abs(QQ_M[i]) > 1e-3]))) + \
-                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf)) if abs(QQ_Q[i]) > 1e-3])))
-            T = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq)) if abs(QQ_M[i]) > 1e-3]))) + \
-                QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq)) if abs(QQ_Q[i]) > 1e-3])))
+            NF = MBP * NF_M / Z + QBP * NF_Q / Y
+            NFfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf)) if abs(QQ_M[i]) > 1e-3]))) + \
+                     QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf)) if abs(QQ_Q[i]) > 1e-3])))
+            Tfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq)) if abs(QQ_M[i]) > 1e-3]))) + \
+                    QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq)) if abs(QQ_Q[i]) > 1e-3])))
         # Save values to qualitative indicator if not inside finite difference code.
         if not in_fd():
             self.e_err = E
             self.e_err_pct = Efrac
             self.f_err = F
+            self.f_err_pct = Ffrac
             if self.use_nft:
-                self.nf_err = N
-                self.tq_err = T
+                self.nf_err = NF
+                self.nf_err_pct = NFfrac
+                self.tq_err_pct = Tfrac
             pvals = self.FF.make(mvals) # Write a force field that isn't perturbed by finite differences.
         Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
@@ -920,6 +941,11 @@ class AbInitio(Target):
             AHess = False
         Z       = 0
         Y       = 0
+        # The average force / net force error per atom in kJ/mol/nm. (Added LPW 6/30)
+        F_M     = 0
+        NF_M    = 0
+        F_Q     = 0
+        NF_Q    = 0
         Q = zeros(NCP1,dtype=float)
         M0_M    = zeros(NCP1,dtype=float)
         Q0_M    = zeros(NCP1,dtype=float)
@@ -961,6 +987,14 @@ class AbInitio(Target):
                     print "Shot %i\r" % i,
                 M = self.energy_force_transformer(i)
             # Increment the average values.
+            if self.force:
+                frcarray = mean(array([linalg.norm(M[1+3*j:1+3*j+3] - Q[1+3*j:1+3*j+3]) for j in range(self.fitatoms)]))
+                F_M    += P*frcarray
+                F_Q    += R*frcarray
+                if self.use_nft:
+                    nfrcarray = mean(array([linalg.norm(M[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3] - Q[1+3*self.fitatoms+3*j:1+3*self.fitatoms+3*j+3]) for j in range(self.nnf)]))
+                    NF_M    += P*nfrcarray
+                    NF_Q    += R*nfrcarray
             M0_M += P*M
             Q0_M += P*Q
             QQ_M += P*QQ
@@ -1062,14 +1096,17 @@ class AbInitio(Target):
         # covariance values).                                          #
         #==============================================================#
         if self.force:
-            F = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1,1+3*self.fitatoms)]))) + \
-                QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1,1+3*self.fitatoms)])))
+            F = MBP * F_M / Z + QBP * F_Q / Y
+            Ffrac = MBP * sqrt(mean(array([SPiXi[i,i]/QQ_M[i,i] for i in range(1,1+3*self.fitatoms)]))) + \
+                    QBP * sqrt(mean(array([SRiXi[i,i]/QQ_Q[i,i] for i in range(1,1+3*self.fitatoms)])))
         else:
             F = None
+            Ffrac = None
         if self.use_nft:
-            N = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))]))) + \
+            NF = MBP * NF_M / Z + QBP * NF_Q / Y
+            NFfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))]))) + \
                 QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*self.fitatoms, 1+3*(self.fitatoms+self.nnf))])))
-            T = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))]))) + \
+            Tfrac = MBP * sqrt(mean(array([SPiXi[i]/QQ_M[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))]))) + \
                 QBP * sqrt(mean(array([SRiXi[i]/QQ_Q[i] for i in range(1+3*(self.fitatoms+self.nnf), 1+3*(self.fitatoms+self.nnf+self.ntq))])))
         #======================================#
         #        End of the copied code        #
@@ -1078,9 +1115,11 @@ class AbInitio(Target):
             self.e_err = E
             self.e_err_pct = Efrac
             self.f_err = F
+            self.f_err_pct = Ffrac
             if self.use_nft:
-                self.nf_err = N
-                self.tq_err = T
+                self.nf_err = NF
+                self.nf_err_pct = NFfrac
+                self.tq_err_pct = Tfrac
             pvals = self.FF.make(mvals) # Write a force field that isn't perturbed by finite differences.
         Answer = {'X':BC, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
         return Answer

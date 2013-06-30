@@ -724,7 +724,7 @@ class Molecule(object):
     def append(self,other):
         self += other
 
-    def __init__(self, fnm = None, ftype = None, build_topology = False):
+    def __init__(self, fnm = None, ftype = None, build_topology = True):
         """ To create the Molecule object, we simply define the table of
         file reading/writing functions and read in a file if it is
         provided."""
@@ -801,6 +801,8 @@ class Molecule(object):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
             if 'networkx' in sys.modules and build_topology:
+                if self.na > 300:
+                    print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
                 try:
                     self.topology = self.build_topology()
                     self.molecules = nx.connected_component_subgraphs(self.topology)
@@ -1864,17 +1866,21 @@ class Molecule(object):
             for key, val in matrix_match.items():
                 if Mats[key]["Mode"] >= 1:
                     if re.match("^[0-9]+( +[0-9]+)+$",line):
+                        # print "A", line
                         Mats[key]["This"] = add_strip_to_mat(Mats[key]["This"],Mats[key]["Strip"])
                         Mats[key]["Strip"] = []
                     elif re.match("^[0-9]+( +[-+]?([0-9]*\.)?[0-9]+)+$",line):
+                        # print "B", line
                         Mats[key]["Strip"].append([float(i) for i in line.split()[1:]])
                     else:
+                        # print "C", line
                         Mats[key]["This"] = add_strip_to_mat(Mats[key]["This"],Mats[key]["Strip"])
                         Mats[key]["Strip"] = []
                         Mats[key]["All"].append(np.array(Mats[key]["This"]))
                         Mats[key]["This"] = []
                         Mats[key]["Mode"] = 0
                 elif re.match(val.lower(), line.lower()):
+                    # print "D", line
                     Mats[key]["Mode"] = 1
 
         if len(Floats['mult']) == 0:
@@ -1896,7 +1902,7 @@ class Molecule(object):
         # We start with the most reliable heading and work our way down.
         if len(Mats['analytical_grad']['All']) > 0:
             Answer['qm_forces'] = Mats['analytical_grad']['All']
-        elif len(Mats['gradient_mp2']['All']) > 0:
+        if len(Mats['gradient_mp2']['All']) > 0:
             Answer['qm_forces'] = Mats['gradient_mp2']['All']
         elif len(Mats['gradient_dualbas']['All']) > 0:
             Answer['qm_forces'] = Mats['gradient_dualbas']['All']
