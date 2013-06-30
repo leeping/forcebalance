@@ -12,7 +12,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
     def setUp(self):
         super(TestPDBMolecule,self).setUp()
         os.chdir('test/files')
-        try: self.molecule = forcebalance.molecule.Molecule(self.source)
+        try: self.molecule = forcebalance.molecule.Molecule(self.source, build_topology=False)
         except IOError:
             self.skipTest("Input pdb file test/files/%s doesn't exist" % self.source)
         except:
@@ -26,7 +26,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
         """Check molecule conversion from pdb to xyz format"""
         self.molecule.write(self.source[:-3] + '.xyz')
         try:
-            molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + '.xyz')
+            molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + '.xyz', build_topology=False)
         except:
             self.fail("\nConversion to xyz format creates unreadable file")
 
@@ -37,7 +37,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
         """Check molecule conversion from pdb to gro format"""
         self.molecule.write(self.source[:-3] + '.gro')
         try:
-            molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + '.gro')
+            molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + '.gro', build_topology=False)
         except:
             self.fail("\nConversion to gro format creates unreadable file")
 

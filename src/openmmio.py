@@ -335,7 +335,7 @@ class AbInitio_OpenMM(AbInitio):
             ## Set the device to the environment variable or zero otherwise
             device = os.environ.get('CUDA_DEVICE',"0")
             print "Setting Device to", device
-            self.platform.setPropertyDefaultValue("CudaDevice", device)
+            self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
             self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
         except:
             PlatName = 'Reference'
@@ -486,7 +486,7 @@ class Interaction_OpenMM(Interaction):
                 ## Set the device to the environment variable or zero otherwise
                 device = os.environ.get('CUDA_DEVICE',"0")
                 print "Setting Device to", device
-                self.platform.setPropertyDefaultValue("CudaDevice", device)
+                self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
                 self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
             except:
                 PlatName = 'Reference'
