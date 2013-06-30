@@ -62,10 +62,12 @@ elif [[ $HOSTNAME =~ "biox3" ]] ; then
     export OPENMM_CUDA_COMPILER=/usr/local/cuda-5.0/bin/nvcc
 elif [[ $HOSTNAME =~ "cn" ]] ; then
     # HS GPU Cluster
-    module load cuda
-    export CUDA_CACHE_PATH=/hsgs/projects/pande/leeping/.nv/ComputeCache
+    # 6-29-2013 Seems environment modules don't work for noninteractive shells, strange.
+    export PATH=/opt/cuda5.0/bin:$PATH
+    export LD_LIBRARY_PATH=/opt/cuda5.0/lib64:$LD_LIBRARY_PATH
+    export CUDA_CACHE_PATH=/tmp/leeping/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=/opt/cuda5.0/bin/nvcc
-    export BAK=/hsgs/projects/pande/leeping/scratch/runcuda-backups
+    export BAK=/hsgs/nobackup/leeping/scratch/runcuda-backups
 elif [[ `env | grep -i tacc | wc -l` -gt 0 ]] ; then
     # Currently this is the only way I can be sure I'm on Stampede...
     module load cuda/5.0

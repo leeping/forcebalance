@@ -63,6 +63,7 @@ from forcebalance.molecule import Molecule
 from forcebalance.openmmio import *
 from copy import deepcopy
 import argparse
+import traceback
 
 #======================================================#
 # Global, user-tunable variables (simulation settings) #
@@ -401,6 +402,7 @@ def create_simulation_object(pdb, settings, pbc=True, precision="mixed"):
         platform.setPropertyDefaultValue("CudaPrecision", precision)
         platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
     except:
+        traceback.print_exc()
         if args.force_cuda:
             raise Exception('Force CUDA option is enabled but CUDA platform not available')
         PlatName = "Reference"

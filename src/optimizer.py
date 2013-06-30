@@ -536,7 +536,7 @@ class Optimizer(ForceBalanceBaseClass):
     
         def trust_fun(L):
             N = norm(solver(L)[0])
-            #print "\rL = %.4e, Hessian diagonal scaling = %.4e: found length %.4e, objective is %.4e" % (L, 1+(L-1)**2, N, (N - trust)**2)
+            #print "\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e" % (L, (L-1)**2, N, (N - trust)**2)
             return (N - trust)**2
 
         def search_fun(L):
@@ -546,7 +546,7 @@ class Optimizer(ForceBalanceBaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            print "Searching! Hessian diagonal term = %.4e, L = % .4e, length %.4e, result %.4e" % (1+(L-1)**2,L,norm(dx),Result)
+            print "Searching! Hessian diagonal addition = %.4e, L = % .4e, length %.4e, result %.4e" % ((L-1)**2,L,norm(dx),Result)
             return Result
         
         if self.trust0 > 0: # This is the trust region code.
@@ -563,7 +563,7 @@ class Optimizer(ForceBalanceBaseClass):
                 ### LOpt = Result[0]
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
-                # print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .8f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, 1+(LOpt-1)**2)
+                # print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .8f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2)
                 print "\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2)
         else: # This is the nonlinear search code.
             # First obtain a step that is the same length as the provided trust radius.
