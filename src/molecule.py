@@ -1421,7 +1421,7 @@ class Molecule(object):
                 na = int(sline[0])
                 comms.append(' '.join(sline[1:]))
                 title = False
-            elif len(sline) >= 6:
+            elif len(sline) == 5:
                 if isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]): # A line of data better look like this
                     if nframes == 0:
                         elem.append(sline[1])
