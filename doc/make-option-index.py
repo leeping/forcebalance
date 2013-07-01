@@ -376,15 +376,15 @@ def create_index(optiondoc,opt_types):
             val =  opt_types[i][j][0]
             #print j
             Glossary[j] = ["@li <b> %s </b> (%s)" % (j.upper(), vartype.capitalize())]
+            Glossary[j].append("\\n<b> One-line description </b>: %s" % opt_types[i][j][2])
+            Glossary[j].append("\\n<b> Default Value </b>: %s" % val)
             if j not in optiondoc:
-                Glossary[j].append("\\n<b> Need to document </b>")
+                Glossary[j].append("\\n(Needs full documentation)")
                 continue
             if "scope" in optiondoc[j] and "required" in optiondoc[j]:
                 Glossary[j].append("\\n<b> Scope </b>: %s (%s)" % (optiondoc[j]["scope"],"<b><em>Required</em></b>" if optiondoc[j]["required"] else "Optional"))
-            Glossary[j].append("\\n<b> One-line description </b>: %s" % opt_types[i][j][1])
             if "long" in optiondoc[j]:
                 Glossary[j].append("\\n<b> Full description </b>: %s" % optiondoc[j]["long"])
-            Glossary[j].append("\\n<b> Default Value </b>: %s" % val)
             if "recommend" in optiondoc[j]:
                 Glossary[j].append("\\n<b> Recommendation </b>: %s" % optiondoc[j]["recommend"])
     return Glossary
