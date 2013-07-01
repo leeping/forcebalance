@@ -158,6 +158,63 @@ GenOptionDoc = {"gmxpath" : {"scope" : "Targets that use GROMACS",
                                             "recommend" : """A value of 0.01 tends to keep the length of the parameter vector from exceeding 1."""
                                             },
                 
+                "amoeba_polarization" : {"scope" : "Optimizations of the AMOEBA polarizable force field",
+                                         "required" : False,
+                                         "long" : """When optimizing a force field with the AMOEBA functional form, 
+                                         set this variable to 'direct', 'mutual', or 'nonpolarizable'.  At present 
+                                         this variable affects OpenMM API calls, but not TINKER input files.""",
+                                         "recommend" : """No recommendation, depends on the application."""
+                                         },
+
+                "adaptive_factor" : {"scope" : "Main optimizer",
+                                      "required" : False,
+                                      "long" : """Adaptive adjustment of the step size in trust-radius Newton Raphson.
+                                      If the optimizer takes a good step, the step is increased as follows:
+@verbatim
+trust += adaptive_factor*trust*np.exp(-adaptive_damping*(trust/self.trust0 - 1))
+@endverbatim
+                                      Note that the adaptive_damping option makes sure that the trust radius increases by a smaller factor
+                                      the further it deviates from the original trust radius (trust0).
+                                      On the other hand, if the optimizer takes a bad step, the step is reduced as follows:
+@verbatim
+trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
+@endverbatim
+""",
+                                      "recommend" : """0.2 is a conservative value, 0.5 for big step size adjustments."""
+                                      },
+
+                "adaptive_damping" : {"scope" : "Main optimizer",
+                                      "required" : False,
+                                      "long" : """See documentation for adaptive_factor.""",
+                                      "recommend" : """A larger value will ensure that the trust radius never exceeds the original value by more
+                                      than a small percentage.  0.5 is a reasonable value to start from."""
+                                      },
+
+                "asynchronous" : {"scope" : "Targets that use Work Queue",
+                                  "required" : False,
+                                  "long" : """When using Work Queue to distribute computationally intensive tasks (e.g. condensed phase simulations), 
+                                  it is computationally efficient to run the local jobs concurrently rather than wait for the tasks to finish.  Setting
+                                  this flag allows local evaluation of targets to proceed while the Work Queue runs in the background, which speeds up
+                                  the calculation compared to waiting idly for the Work Queue tasks to complete.""",
+                                  "recommend" : """If using Work Queue to distribute tasks for some targets, set to True."""
+                                  },
+
+                "constrain_charge" : {"scope" : "Force fields with point charges",
+                                      "required" : False,
+                                      "long" : """It is important for force fields with point charges to not change the overall charge on the molecule or ion.  Setting this option
+                                      will activate a linear transformation which projects out the direction in parameter space that changes the net charge.""",
+                                      "recommend" : """Either set to true and check your output carefully, or use "eval" statements in the force field file for finer control."""
+                                  },
+
+                "error_tolerance" : {"scope" : "Main optimizer",
+                                     "required" : False,
+                                     "long" : """In some targets (e.g. condensed phase properties), the contribution to the objective function may contain statistical noise
+                                     and cause the optimization step to be rejected.  Introducing an error tolerance allows the optimization to continue despite some apparent
+                                     roughness in the objective function surface.""",
+                                     "recommend" : """Set to zero for targets that don't have statistical noise.  
+                                     Otherwise, choose a value based on the rough size of the objective function and the weight of the statistically noisy targets."""
+                                  },
+                
                 "read_mvals" : {"scope" : "All force field optimizations",
                                 "required" : False,
                                 "long" : """Read in mathematical parameters before starting the optimization.  There is a standardized syntax, given by:
