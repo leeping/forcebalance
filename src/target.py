@@ -331,7 +331,7 @@ class Target(ForceBalanceBaseClass):
             else:
                 return False
 
-    def printcool_table(self, data=OrderedDict([]), headings=[], banner=None, footnote=None):
+    def printcool_table(self, data=OrderedDict([]), headings=[], banner=None, footnote=None, color=0):
         """ Print target information in an organized table format.  Implemented 6/30 because
         multiple targets are already printing out tabulated information in very similar ways.
         This method is a simple wrapper around printcool_dictionary.  
@@ -386,6 +386,6 @@ class Target(ForceBalanceBaseClass):
         clines = [fline % (tuple(cblocks[j][i] for j in range(nc))) for i in range(max(crows))]
         tlines += clines
         PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
-        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=False, leftpad=4)
+        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=False, leftpad=4, color=color)
 
 

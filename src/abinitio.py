@@ -429,7 +429,7 @@ class AbInitio(Target):
                 Data['Torque (nm x kJ/mol/nm)'] = ["%8.4f" % self.tq_err,
                                                    "%8.4f" % self.tq_ref,
                                                    "%.4f%%" % (self.tq_err_pct*100)]
-        self.printcool_table(data=Data, headings=Headings)
+        self.printcool_table(data=Data, headings=Headings, color=0)
 
     def energy_force_transformer_all(self):
         M = self.energy_force_driver_all()
