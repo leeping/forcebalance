@@ -151,7 +151,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     bar = ''.join(["=" for i in range(width + 6)])
     bar = sym + bar + sym
     #bar = ''.join([sym for i in range(width + 8)])
-    print '\n'+bar
+    print '\r'+bar
     for line in text:
         if center:
             padleft = ' ' * ((width - newlen(line)) / 2)
@@ -162,7 +162,12 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
             ansi = str(ansi)
             print "%s| \x1b[%sm%s" % (sym, ansi, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
         elif color != None:
-            print "%s| \x1b[%s9%im%s" % (sym, bold and "1;" or "", color, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
+            if color == 0 and bold:
+                print "%s| \x1b[1m%s" % (sym, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
+            elif color == 0:
+                print "%s| %s" % (sym, padleft),line,"%s |%s" % (padright, sym)
+            else:
+                print "%s| \x1b[%s9%im%s" % (sym, bold and "1;" or "", color, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
             # if color == 3 or color == 7:
             #     print "%s\x1b[40m\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
             # else:
