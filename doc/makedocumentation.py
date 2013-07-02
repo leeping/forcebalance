@@ -34,7 +34,9 @@ def redirect_main_tab(fnm):
     for line in open(fnm):
         if re.match('.*a href="index\.html"',line):
             newfile.append('      <li><a href="../index.html"><span>Main Page</span></a></li>\n')
-            newfile.append('      <li><a href="roadmap.html"><span>Project Roadmap</span></a></li>\n')
+            newfile.append('      <li ')
+            if re.match('.*roadmap\.html$', fnm): newfile.append('class="current"')
+            newfile.append('><a href="roadmap.html"><span>Project Roadmap</span></a></li>\n')
         else: newfile.append(line)
     with open(fnm,'w') as f: f.writelines(newfile)
 
