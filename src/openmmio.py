@@ -28,8 +28,8 @@ except:
     pass
 
 def get_dipole(simulation,q=None,positions=None):
-    # Return the current dipole moment in Debye.
-    # Note that this quantity is meaningless if the system carries a net charge.
+    """Return the current dipole moment in Debye.
+    Note that this quantity is meaningless if the system carries a net charge."""
     dx = 0.0
     dy = 0.0
     dz = 0.0
@@ -57,8 +57,8 @@ def get_dipole(simulation,q=None,positions=None):
     return [dx,dy,dz]
 
 def ResetVirtualSites(positions, system):
-    # Given a set of OpenMM-compatible positions and a System object,
-    # compute the correct virtual site positions according to the System.
+    """Given a set of OpenMM-compatible positions and a System object,
+    compute the correct virtual site positions according to the System."""
     if any([system.isVirtualSite(i) for i in range(system.getNumParticles())]):
         pos = positions.value_in_unit(nanometer)
         for i in range(system.getNumParticles()):
@@ -152,9 +152,9 @@ def do_nothing(src, dest):
     return
 
 def CopySystemParameters(src,dest):
-    # Copy parameters from one system (i.e. that which is created by a new force field)
-    # to another system (i.e. the one stored inside the Target object).
-    # DANGER: These need to be implemented manually!!!
+    """Copy parameters from one system (i.e. that which is created by a new force field)
+    sto another system (i.e. the one stored inside the Target object).
+    DANGER: These need to be implemented manually!!!"""
     Copiers = {'AmoebaBondForce':CopyAmoebaBondParameters,
                'AmoebaOutOfPlaneBendForce':CopyAmoebaOutOfPlaneBendParameters,
                'AmoebaAngleForce':CopyAmoebaAngleParameters,
@@ -180,10 +180,10 @@ def UpdateSimulationParameters(src_system, dest_simulation):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
 
 
-## Dictionary for building parameter identifiers.  As usual they go like this:
-## Bond/length/OW.HW
-## The dictionary is two-layered because the same interaction type (Bond)
-## could be under two different parent types (HarmonicBondForce, AmoebaHarmonicBondForce)
+"""Dictionary for building parameter identifiers.  As usual they go like this:
+Bond/length/OW.HW
+The dictionary is two-layered because the same interaction type (Bond)
+could be under two different parent types (HarmonicBondForce, AmoebaHarmonicBondForce)"""
 suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "HarmonicAngleForce" : {"Angle" : ["class1","class2","class3"],},
                 "PeriodicTorsionForce" : {"Proper" : ["class1","class2","class3","class4"],},
