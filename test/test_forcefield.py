@@ -58,6 +58,11 @@ class TestWaterFF(ForceBalanceTestCase):
                         msg = "make([1]) produced an unchanged output forcefield")
         os.remove(self.options['ffdir']+'/test_ones.' + self.filetype)
 
+    def shortDescription(self):
+        """Add XML to test descriptions
+        @override __init__.ForceBalanceTestCase.shortDescription()"""
+        return "ITP Forcefield: " + super(TestWaterFF,self).shortDescription()
+
 class TestXmlFF(TestWaterFF):
     """Test FF class using water options and forcefield (text forcefield input)"""
     def setUp(self):
@@ -76,7 +81,7 @@ class TestXmlFF(TestWaterFF):
     def shortDescription(self):
         """Add XML to test descriptions
         @override __init__.ForceBalanceTestCase.shortDescription()"""
-        return super(TestWaterFF,self).shortDescription() + " (XML)"
+        return "XML Forcefield: " + super(TestWaterFF,self).shortDescription()
 
 class TestGbsFF(TestWaterFF):
     """Test FF class using water options and forcefield (text forcefield input)"""
@@ -95,7 +100,6 @@ class TestGbsFF(TestWaterFF):
     def shortDescription(self):
         """Add XML to test descriptions
         @override __init__.ForceBalanceTestCase.shortDescription()"""
-        return super(TestWaterFF,self).shortDescription() + " (GBS)"
-
+        return "GBS Forcefield: " + super(TestWaterFF,self).shortDescription()
 if __name__ == '__main__':           
     unittest.main()
