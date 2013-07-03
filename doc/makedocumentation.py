@@ -174,5 +174,5 @@ if __name__ == '__main__':
     generate_doc()
     print "Integrating HTML docs..."
     parse_html()
-    os.system("rm -rf latex mainpage.dox api.dox")   # cleanup
+    os.system("rm -rf latex mainpage.dox api.dox option_index.txt")   # cleanup
     print "Documentation successfully generated"
