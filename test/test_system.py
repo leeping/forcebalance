@@ -12,24 +12,20 @@ class TestWaterTutorial(ForceBalanceTestCase):
     def setUp(self):
         super(ForceBalanceTestCase,self).setUp()
         os.chdir('studies/001_water_tutorial')
-        if not os.path.isdir('targets'):
-            targets = tarfile.open('targets.tar.bz2','r')
-            targets.extractall()
-            targets.close()
+        targets = tarfile.open('targets.tar.bz2','r')
+        targets.extractall()
+        targets.close()
 
     def tearDown(self):
         os.system('rm -rf results targets backups temp')
         super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):
-        """Check whether tutorial runs and output has not changed from known baseline"""
+        """Check tutorial runs without errors"""
         input_file='very_simple.in'
 
         ## The general options and target options that come from parsing the input file
         options, tgt_opts = parse_inputs(input_file)
-
-        # for key in TestValues.water_options.iterkeys():
-        #     self.assertEqual(options[key],TestValues.water_options[key], msg="\nunexpected value for options['%s']" % key)
 
         ## The force field component of the project
         forcefield  = FF(options)

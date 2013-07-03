@@ -6,9 +6,15 @@ import numpy as np
 from copy import deepcopy
 
 class TestWaterFF(ForceBalanceTestCase):
-    """Test FF class using water options and forcefield"""
+    """Test FF class using water options and forcefield (text forcefield input)"""
     def setUp(self):
-        self.options = TestValues.water_options.copy()
+        # options used in 001_water_tutorial
+        self.options=TestValues.opts.copy()
+        self.options.update({
+                'root': os.getcwd() + '/test/files',
+                'penalty_additive': 0.01,
+                'jobtype': 'NEWTON',
+                'forcefield': ['water.itp']})
         os.chdir(self.options['root'])
         self.ff = forcefield.FF(self.options)
         self.ffname = self.options['forcefield'][0][:-3]
@@ -16,7 +22,7 @@ class TestWaterFF(ForceBalanceTestCase):
 
     def test_FF_yields_consistent_results(self):
         """Check whether multiple calls to FF yield the same result"""
-        self.assertTrue(forcefield.FF(TestValues.water_options)==forcefield.FF(TestValues.water_options))
+        self.assertTrue(forcefield.FF(self.options)==forcefield.FF(self.options))
 
     def test_make_function_return_value(self):
         """Check that make() return value meets expectation"""
@@ -51,6 +57,45 @@ class TestWaterFF(ForceBalanceTestCase):
         self.assertNotEqual(self.ff, ff_ones,
                         msg = "make([1]) produced an unchanged output forcefield")
         os.remove(self.options['ffdir']+'/test_ones.' + self.filetype)
+
+class TestXmlFF(TestWaterFF):
+    """Test FF class using water options and forcefield (text forcefield input)"""
+    def setUp(self):
+        # options from 2013 tutorial
+        self.options=TestValues.opts.copy()
+        self.options.update({
+                'root': os.getcwd() + '/test/files',
+                'penalty_additive': 0.01,
+                'jobtype': 'NEWTON',
+                'forcefield': ['dms.xml']})
+        os.chdir(self.options['root'])
+        self.ff = forcefield.FF(self.options)
+        self.ffname = self.options['forcefield'][0][:-3]
+        self.filetype = self.options['forcefield'][0][-3:]
+
+    def shortDescription(self):
+        """Add XML to test descriptions
+        @override __init__.ForceBalanceTestCase.shortDescription()"""
+        return super(TestWaterFF,self).shortDescription() + " (XML)"
+
+class TestGbsFF(TestWaterFF):
+    """Test FF class using water options and forcefield (text forcefield input)"""
+    def setUp(self):
+        # options from 2013 tutorial
+        self.options=TestValues.opts.copy()
+        self.options.update({
+                'root': os.getcwd() + '/test/files',
+                'penalty_additive': 0.01,
+                'jobtype': 'NEWTON',
+                'forcefield': ['cc-pvdz-overlap-original.gbs']})
+        os.chdir(self.options['root'])
+        self.ff = forcefield.FF(self.options)
+        self.ffname = self.options['forcefield'][0][:-3]
+        self.filetype = self.options['forcefield'][0][-3:]
+    def shortDescription(self):
+        """Add XML to test descriptions
+        @override __init__.ForceBalanceTestCase.shortDescription()"""
+        return super(TestWaterFF,self).shortDescription() + " (GBS)"
 
 if __name__ == '__main__':           
     unittest.main()
