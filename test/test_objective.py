@@ -4,7 +4,8 @@ import forcebalance.objective
 import forcebalance.target
 import forcebalance
 import abc
-from __init__ import ForceBalanceTestCase
+import numpy
+from __init__ import ForceBalanceTestCase, TestValues
 
 class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
