@@ -419,16 +419,16 @@ class AbInitio(Target):
                                        "%8.4f" % self.e_ref,
                                        "%.4f%%" % (self.e_err_pct*100)]
         if self.force:
-            Data['Gradient (kJ/mol/nm)'] = ["%8.4f" % self.f_err,
-                                            "%8.4f" % self.f_ref,
-                                            "%.4f%%" % (self.f_err_pct*100)]
+            Data['Gradient (kJ/mol/A)'] = ["%8.4f" % (self.f_err/10),
+                                           "%8.4f" % (self.f_ref/10),
+                                           "%.4f%%" % (self.f_err_pct*100)]
             if self.use_nft:
-                Data['Net Force (kJ/mol/nm)'] = ["%8.4f" % self.nf_err,
-                                                 "%8.4f" % self.nf_ref,
-                                                 "%.4f%%" % (self.nf_err_pct*100)]
-                Data['Torque (nm x kJ/mol/nm)'] = ["%8.4f" % self.tq_err,
-                                                   "%8.4f" % self.tq_ref,
-                                                   "%.4f%%" % (self.tq_err_pct*100)]
+                Data['Net Force (kJ/mol/A)'] = ["%8.4f" % (self.nf_err/10),
+                                                "%8.4f" % (self.nf_ref/10),
+                                                "%.4f%%" % (self.nf_err_pct*100)]
+                Data['Torque (kJ/mol/rad)'] = ["%8.4f" % self.tq_err,
+                                               "%8.4f" % self.tq_ref,
+                                               "%.4f%%" % (self.tq_err_pct*100)]
         self.printcool_table(data=Data, headings=Headings, color=0)
 
     def energy_force_transformer_all(self):
