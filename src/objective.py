@@ -298,16 +298,17 @@ class Penalty:
     in the 'rsmake' method.
 
     """
+    Pen_Names = {'HYP' : 1, 'HYPER' : 1, 'HYPERBOLIC' : 1, 'L1' : 1, 'HYPERBOLA' : 1,
+                      'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2,
+                      'FUSE' : 3, 'FUSION' : 3, 'FUSE_L0' : 4, 'FUSION_L0' : 4, 'FUSION-L0' : 4,
+                      'FUSE-BARRIER' : 5, 'FUSE-BARRIER' : 5, 'FUSE_BARRIER' : 5, 'FUSION_BARRIER' : 5}
+
     def __init__(self, User_Option, ForceField, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1, Alpha=1.0):
         self.fadd = Factor_Add
         self.fmul = Factor_Mult
         self.a    = Alpha
         self.b    = Factor_B
         self.FF   = ForceField
-        self.Pen_Names = {'HYP' : 1, 'HYPER' : 1, 'HYPERBOLIC' : 1, 'L1' : 1, 'HYPERBOLA' : 1,
-                          'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2,
-                          'FUSE' : 3, 'FUSION' : 3, 'FUSE_L0' : 4, 'FUSION_L0' : 4, 'FUSION-L0' : 4,
-                          'FUSE-BARRIER' : 5, 'FUSE-BARRIER' : 5, 'FUSE_BARRIER' : 5, 'FUSION_BARRIER' : 5}
         self.ptyp = self.Pen_Names[User_Option.upper()]
         self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.FUSE, 4:self.FUSE_L0, 5: self.FUSE_BARRIER}
         if User_Option.upper() == 'L1':
