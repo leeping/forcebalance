@@ -191,6 +191,8 @@ class Optimizer(ForceBalanceBaseClass):
 
         ## Write out stuff to checkpoint file
         self.writechk()
+
+        return xk
             
     def MainOptimizer(self,b_BFGS=0):
         """ The main ForceBalance adaptive trust-radius pseudo-Newton optimizer.  Tried and true in many situations. :)
