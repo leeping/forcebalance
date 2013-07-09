@@ -12,6 +12,8 @@ class ForceBalanceTestCase(unittest.TestCase):
         super(ForceBalanceTestCase,self).__init__(methodName)
         self.longMessage=True
         self.addCleanup(os.chdir, os.getcwd())  # directory changes shouldn't persist between tests
+        self.addTypeEqualityFunc(numpy.ndarray, self.assertNdArrayEqual)
+        
 
     def shortDescription(self):
         """Default shortDescription function returns None value if no description
@@ -21,6 +23,37 @@ class ForceBalanceTestCase(unittest.TestCase):
         message = super(ForceBalanceTestCase,self).shortDescription()
         if message: return message
         else: return self.id()
+    
+    def assertNdArrayEqual(self, A, B, msg=None, delta=.000001):
+        """Provide equality checking for numpy arrays, with informative error messages
+        when applicable. A and B are equal if they have the same dimensions and
+        for all elements a in A and corresponding elements b in B,
+        a == b +/- delta"""
+
+        
+        if A.shape != B.shape:
+            reason = "Tried to compare ndarray of size %s to ndarray of size %s\n" % (str(A.shape),str(B.shape))
+            if self.longMessage and msg:
+                reason += msg
+            raise self.failureException(reason)
+
+        unequal = (abs(A-B)>delta)
+        if unequal.any():
+            index = numpy.argwhere(unequal)[0]
+            reason = "ndarrays not equal\nA%s\t" % str(index)
+            # if dimensionality is small, try printing first unequal value
+            if index.size == 1:
+                reason += str(A[index[0]]) + " != " + str(B[index[0]])
+            elif index.size == 2:
+                reason += str(A[index[0]][index[1]]) + " != " + str(B[index[0]][index[1]])
+            elif index.size == 3:
+                reason += str(A[index[0]][index[1]][index[2]]) + " != " + str(B[index[0]][index[1]][index[2]])
+            else: reason += " != "
+            reason += "\tB%s\n" % str(index)
+            
+            if self.longMessage and msg:
+                reason += msg
+            raise self.failureException(reason)
 
 class ForceBalanceTestResult(unittest.TestResult):
     """This manages the reporting of test results as they are run,

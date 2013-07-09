@@ -30,8 +30,9 @@ class TestPDBMolecule(ForceBalanceTestCase):
         except:
             self.fail("\nConversion to xyz format creates unreadable file")
 
-        self.assertTrue((self.molecule.Data['xyzs'][0]==molecule1.Data['xyzs'][0]).all(),
-                        msg = "\nConversion from pdb to xyz yields different xyz coordinates")
+        self.assertEqual(self.molecule.Data['xyzs'][0],molecule1.Data['xyzs'][0],
+        msg = "\nConversion from pdb to xyz yields different xyz coordinates\npdb:\n%s\n\ngro:\n%s\n" %\
+        (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
 
     def test_gro_conversion(self):
         """Check molecule conversion from pdb to gro format"""
@@ -44,7 +45,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
         self.assertEqual(len(self.molecule.Data['resid']), len(molecule1.Data['resid']),
                         msg = "\nConversion from pdb to gro yields different number of residues")
 
-        self.assertTrue((abs(self.molecule.Data['xyzs'][0]-molecule1.Data['xyzs'][0])<.0000001).all(),
+        self.assertEqual(self.molecule.Data['xyzs'][0],molecule1.Data['xyzs'][0],
         msg = "\nConversion from pdb to gro yields different xyz coordinates\npdb:\n%s\n\ngro:\n%s\n" %\
         (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
 
@@ -60,7 +61,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
         self.assertEqual(len(self.molecule.Data['resid']), len(molecule1.Data['resid']),
                         msg = "\nConversion from pdb to arc (TINKER) yields different number of residues")
 
-        self.assertTrue((abs(self.molecule.Data['xyzs'][0]-molecule1.Data['xyzs'][0])<.0000001).all(),
+        self.assertEqual(self.molecule.Data['xyzs'][0],molecule1.Data['xyzs'][0],
         msg = "\nConversion from pdb to arc yields different xyz coordinates\npdb:\n%s\n\narc:\n%s\n" %\
         (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
 
