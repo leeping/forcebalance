@@ -1,4 +1,3 @@
-
 #======================================================================#
 #| [1m             Welcome to ForceBalance version 1.1! =D              [0m |#
 #| [1m                 Force Field Optimization System                  [0m |#
@@ -50,13 +49,11 @@
                              [44m  [0m                                         
 
 Reading options from file: very_simple.in
-
 #========================================================#
 #| [95m  Options at their default values are not printed   [0m |#
 #| [95m        Use 'verbose_options True' to Enable        [0m |#
 #========================================================#
 Reading force field from file: water.itp
-
 #=========================================================#
 #| [92m Starting parameter indices, physical values and IDs [0m |#
 #=========================================================#
@@ -70,7 +67,6 @@ Reading force field from file: water.itp
    7 [ -1.0400e+00 ] : COUL:SOL-4
    8 [  1.2800e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 -----------------------------------------------------------
-
 #========================================================#
 #| [91m    Rescaling Factors (Lower Takes Precedence):     [0m |#
 #========================================================#
@@ -87,14 +83,11 @@ Reading force field from file: water.itp
 Building charge constraints...
 Parameter 6 occurs 2 times in molecule SOL in locations [1, 2] (COUL:SOL-2 COUL:SOL-3)
 Parameter 7 occurs 1 times in molecule SOL in locations [3] (COUL:SOL-4)
-
 #========================================================#
 #| [92m               Setup for force field                [0m |#
 #========================================================#
 fnms                      ['water.itp'] 
 ----------------------------------------------------------
-Backing up: temp/cluster-06 to: backups/cluster-06_3.tar.bz2
-
 #========================================================#
 #| [92m           Setup for target cluster-06 :            [0m |#
 #========================================================#
@@ -103,8 +96,6 @@ type                      ABINITIO_GMX
 tgtdir                    targets/cluster-06 
 shots                     1208 
 ----------------------------------------------------------
-Backing up: temp/cluster-12 to: backups/cluster-12_2.tar.bz2
-
 #========================================================#
 #| [92m           Setup for target cluster-12 :            [0m |#
 #========================================================#
@@ -114,43 +105,37 @@ tgtdir                    targets/cluster-12
 shots                     1201 
 ----------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
-
 #========================================================#
 #| [92m           Setup for objective function :           [0m |#
 #========================================================#
 penalty_additive          0.01 
 ----------------------------------------------------------
-
 #========================================================#
 #| [92m                Setup for optimizer                 [0m |#
 #========================================================#
 jobtype                   NEWTON 
 ----------------------------------------------------------
-
 #========================================================#
 #| [1m                   Main Optimizer                   [0m |#
 #| [1m       Newton-Raphson Mode (Adaptive Radius)        [0m |#
 #========================================================#
 
-
 #=======================================================================#
-#| [92m Target: cluster-06 Type: AbInitio_GMX Objective = 1.12035e-01     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-06 Type: AbInitio_GMX Objective = 1.12035e-01      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                 9.4124       27.3135     34.4605% 
-    Gradient (kJ/mol/nm)          391.9632     1190.8405     32.9148% 
+    Gradient (kJ/mol/A)            39.1963      119.0841     32.9148% 
 -------------------------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-12 Type: AbInitio_GMX Objective = 1.04039e-01     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-12 Type: AbInitio_GMX Objective = 1.04039e-01      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                15.2291       47.3455     32.1658% 
-    Gradient (kJ/mol/nm)          385.4013     1180.2403     32.6545% 
+    Gradient (kJ/mol/A)            38.5401      118.0240     32.6545% 
 -------------------------------------------------------------------------
-
 #====================================================================#
 #| [94m                  Objective Function Breakdown                  [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
@@ -162,7 +147,6 @@ Total                                             [94m     1.08037e-01[0m
 ----------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
      0   0.000e+00   0.000e+00   3.206e+00[1m   1.08037e-01[0m   0.000e+00      0.000
-
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
@@ -179,7 +163,6 @@ Total                                             [94m     1.08037e-01[0m
 ----------------------------------------------------------
 
 Levenberg-Marquardt: Newton-Raphson step found (length 1.000e-01),  0.92958359 added to Hessian diagonal
-
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
@@ -193,7 +176,6 @@ Levenberg-Marquardt: Newton-Raphson step found (length 1.000e-01),  0.92958359 a
    7 [  0.0000e+00 + 2.9107e-02 =  2.9107e-02 ] : COUL:SOL-4
    8 [  0.0000e+00 + 6.3479e-03 =  6.3479e-03 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
@@ -207,25 +189,22 @@ Levenberg-Marquardt: Newton-Raphson step found (length 1.000e-01),  0.92958359 a
    7 [ -1.0400e+00 + 2.9107e-02 = -1.0109e+00 ] : COUL:SOL-4
    8 [  1.2800e-01 + 3.3591e-04 =  1.2834e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-06 Type: AbInitio_GMX Objective = 7.55909e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-06 Type: AbInitio_GMX Objective = 7.55909e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                 8.0920       27.3135     29.6263% 
-    Gradient (kJ/mol/nm)          301.3784     1190.8405     25.3080% 
+    Gradient (kJ/mol/A)            30.1378      119.0841     25.3080% 
 -------------------------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-12 Type: AbInitio_GMX Objective = 7.17029e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-12 Type: AbInitio_GMX Objective = 7.17029e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                13.2306       47.3455     27.9447% 
-    Gradient (kJ/mol/nm)          301.3300     1180.2403     25.5312% 
+    Gradient (kJ/mol/A)            30.1330      118.0240     25.5312% 
 -------------------------------------------------------------------------
-
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
@@ -237,7 +216,6 @@ Total                                             [92m     7.37469e-02[0m ( -3
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
      1   1.000e-01   1.000e-01   1.941e-01[92m   7.37469e-02[0m   3.429e-02      1.001
-
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
@@ -254,7 +232,6 @@ Total                                             [92m     7.37469e-02[0m ( -3
 ----------------------------------------------------------
 
 Levenberg-Marquardt: Newton-Raphson step found (length 1.250e-01),  0.32636774 added to Hessian diagonal
-
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
@@ -268,7 +245,6 @@ Levenberg-Marquardt: Newton-Raphson step found (length 1.250e-01),  0.32636774 a
    7 [  2.9107e-02 - 1.2468e-03 =  2.7861e-02 ] : COUL:SOL-4
    8 [  6.3479e-03 + 9.3418e-03 =  1.5690e-02 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
@@ -282,25 +258,22 @@ Levenberg-Marquardt: Newton-Raphson step found (length 1.250e-01),  0.32636774 a
    7 [ -1.0109e+00 - 1.2468e-03 = -1.0121e+00 ] : COUL:SOL-4
    8 [  1.2834e-01 + 4.9435e-04 =  1.2883e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-06 Type: AbInitio_GMX Objective = 6.78955e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-06 Type: AbInitio_GMX Objective = 6.78955e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                 7.9578       27.3135     29.1352% 
-    Gradient (kJ/mol/nm)          268.9384     1190.8405     22.5839% 
+    Gradient (kJ/mol/A)            26.8938      119.0841     22.5839% 
 -------------------------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-12 Type: AbInitio_GMX Objective = 6.42870e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-12 Type: AbInitio_GMX Objective = 6.42870e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                13.0444       47.3455     27.5514% 
-    Gradient (kJ/mol/nm)          269.7731     1180.2403     22.8575% 
+    Gradient (kJ/mol/A)            26.9773      118.0240     22.8575% 
 -------------------------------------------------------------------------
-
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
@@ -312,7 +285,6 @@ Total                                             [92m     6.65466e-02[0m ( -7
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
      2   2.134e-01   1.250e-01   4.452e-02[92m   6.65466e-02[0m   7.200e-03      1.000
-
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
@@ -329,7 +301,6 @@ Total                                             [92m     6.65466e-02[0m ( -7
 ----------------------------------------------------------
 
 Levenberg-Marquardt: Newton-Raphson step found (length 1.526e-01),  0.04929377 added to Hessian diagonal
-
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
@@ -343,7 +314,6 @@ Levenberg-Marquardt: Newton-Raphson step found (length 1.526e-01),  0.04929377 a
    7 [  2.7861e-02 - 6.7449e-03 =  2.1116e-02 ] : COUL:SOL-4
    8 [  1.5690e-02 + 4.4164e-02 =  5.9854e-02 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
@@ -357,25 +327,22 @@ Levenberg-Marquardt: Newton-Raphson step found (length 1.526e-01),  0.04929377 a
    7 [ -1.0121e+00 - 6.7449e-03 = -1.0189e+00 ] : COUL:SOL-4
    8 [  1.2883e-01 + 2.3371e-03 =  1.3117e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-06 Type: AbInitio_GMX Objective = 6.36391e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-06 Type: AbInitio_GMX Objective = 6.36391e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                 7.9259       27.3135     29.0181% 
-    Gradient (kJ/mol/nm)          244.6806     1190.8405     20.5469% 
+    Gradient (kJ/mol/A)            24.4681      119.0841     20.5469% 
 -------------------------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-12 Type: AbInitio_GMX Objective = 5.97033e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-12 Type: AbInitio_GMX Objective = 5.97033e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                12.9487       47.3455     27.3493% 
-    Gradient (kJ/mol/nm)          246.1119     1180.2403     20.8527% 
+    Gradient (kJ/mol/A)            24.6112      118.0240     20.8527% 
 -------------------------------------------------------------------------
-
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
@@ -387,7 +354,6 @@ Total                                             [92m     6.29504e-02[0m ( -3
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
      3   3.577e-01   1.526e-01   2.768e-02[92m   6.29504e-02[0m   3.596e-03      0.999
-
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
@@ -403,7 +369,6 @@ Total                                             [92m     6.29504e-02[0m ( -3
    8 [ -2.49056852e-03 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
-
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
@@ -417,7 +382,6 @@ Total                                             [92m     6.29504e-02[0m ( -3
    7 [  2.1116e-02 - 8.7667e-03 =  1.2349e-02 ] : COUL:SOL-4
    8 [  5.9854e-02 + 8.8794e-02 =  1.4865e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
@@ -431,25 +395,22 @@ Total                                             [92m     6.29504e-02[0m ( -3
    7 [ -1.0189e+00 - 8.7667e-03 = -1.0277e+00 ] : COUL:SOL-4
    8 [  1.3117e-01 + 4.6988e-03 =  1.3587e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-06 Type: AbInitio_GMX Objective = 6.30685e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-06 Type: AbInitio_GMX Objective = 6.30685e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                 7.9103       27.3135     28.9610% 
-    Gradient (kJ/mol/nm)          241.8614     1190.8405     20.3101% 
+    Gradient (kJ/mol/A)            24.1861      119.0841     20.3101% 
 -------------------------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-12 Type: AbInitio_GMX Objective = 5.89955e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-12 Type: AbInitio_GMX Objective = 5.89955e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                12.9102       47.3455     27.2681% 
-    Gradient (kJ/mol/nm)          242.9378     1180.2403     20.5838% 
+    Gradient (kJ/mol/A)            24.2938      118.0240     20.5838% 
 -------------------------------------------------------------------------
-
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
@@ -461,7 +422,6 @@ Total                                             [92m     6.27254e-02[0m ( -2
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
      4   4.115e-01   9.496e-02   1.815e-03[92m   6.27254e-02[0m   2.250e-04      1.014
-
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
@@ -477,7 +437,6 @@ Total                                             [92m     6.27254e-02[0m ( -2
    8 [  1.63152883e-06 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
 
-
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
@@ -491,7 +450,6 @@ Total                                             [92m     6.27254e-02[0m ( -2
    7 [  1.2349e-02 - 4.7457e-04 =  1.1874e-02 ] : COUL:SOL-4
    8 [  1.4865e-01 + 2.4321e-03 =  1.5108e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
@@ -505,25 +463,22 @@ Total                                             [92m     6.27254e-02[0m ( -2
    7 [ -1.0277e+00 - 4.7457e-04 = -1.0281e+00 ] : COUL:SOL-4
    8 [  1.3587e-01 + 1.2870e-04 =  1.3599e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 ----------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-06 Type: AbInitio_GMX Objective = 6.30676e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-06 Type: AbInitio_GMX Objective = 6.30676e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                 7.9083       27.3135     28.9539% 
-    Gradient (kJ/mol/nm)          241.9906     1190.8405     20.3210% 
+    Gradient (kJ/mol/A)            24.1991      119.0841     20.3210% 
 -------------------------------------------------------------------------
-
 #=======================================================================#
-#| [92m Target: cluster-12 Type: AbInitio_GMX Objective = 5.89806e-02     [0m |#
-#| [92m                             Difference   Denominator     Percent  [0m |#
-#| [92m Physical Variable           (Calc-Ref)     RMS (Ref)   Difference [0m |#
+#|  Target: cluster-12 Type: AbInitio_GMX Objective = 5.89806e-02      |#
+#|                              Difference   Denominator     Percent   |#
+#|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
 #=======================================================================#
     Energy (kJ/mol)                12.9053       47.3455     27.2578% 
-    Gradient (kJ/mol/nm)          243.0212     1180.2403     20.5908% 
+    Gradient (kJ/mol/A)            24.3021      118.0240     20.5908% 
 -------------------------------------------------------------------------
-
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
@@ -537,12 +492,10 @@ Total                                             [92m     6.27252e-02[0m ( -2
      5   4.124e-01   2.498e-03   2.130e-05[92m   6.27252e-02[0m   2.045e-07      1.029
 
 Convergence criterion reached for gradient norm (1.00e-04)
-
 @========================================================@
 @| [1;92m           Final objective function value           [0m |@
 @| [1;92m  Full:  6.272524e-02  Un-penalized:  6.102410e-02  [0m |@
 @========================================================@
-
 #========================================================#
 #| [1;94m           Final optimization parameters:           [0m |#
 #| [1;94m           Paste to input file to restart           [0m |#
@@ -558,7 +511,6 @@ read_mvals
    7 [  1.1874e-02 ] : COUL:SOL-4
    8 [  1.5108e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
 /read_mvals
-
 #========================================================#
 #| [1;94m             Final physical parameters:             [0m |#
 #========================================================#
@@ -574,7 +526,6 @@ read_mvals
 ----------------------------------------------------------
 
 The final force field has been printed to the 'result' directory.
-
 #========================================================#
 #| [1;44;93m     Congratulations, ForceBalance has finished     [0m |#
 #| [1;44;93m          Give yourself a pat on the back!          [0m |#

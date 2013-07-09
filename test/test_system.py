@@ -48,7 +48,8 @@ class TestWaterTutorial(ForceBalanceTestCase):
         ## Actually run the optimizer.
         result = optimizer.Run()
         # expected results taken from previous runs. Update this if it changes and seems reasonable
-        expected = array((0.03311403,0.043358,0.00550615,-0.0459336,0.01548854,-0.37656029,0.0025888,0.01169443,0.15300846))
+
+        expected = array((0.03316133, 0.04331116, 0.00550698, -0.04593296, 0.01549711, -0.37654517, 0.00249289, 0.01187446, 0.1510803))
         self.assertEqual(expected,result,msg="\nCalculation result differs from previous value")
 
         # Tutorial calculation converges in 5 iterations
