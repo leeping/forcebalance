@@ -385,29 +385,29 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     return integrator
 
 
-def create_simulation_object(pdb, settings, pbc=True, precision="mixed"):
+def create_simulation_object(pdb, settings, pbc=True, precision="mixed", platname="CUDA"):
     #================================#
     # Create the simulation platform #
     #================================#
     # Name of the simulation platform (Reference, Cuda, OpenCL)
-    try:
-        PlatName = 'CUDA'
-        print "Setting Platform to", PlatName
-        platform = Platform.getPlatformByName(PlatName)
-        # Set the device to the environment variable or zero otherwise
-        device = os.environ.get('CUDA_DEVICE',"0")
-        print "Setting Device to", device
-        platform.setPropertyDefaultValue("CudaDeviceIndex", device)
-        # Setting CUDA precision to double appears to improve performance of derivatives.
-        platform.setPropertyDefaultValue("CudaPrecision", precision)
-        platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
-    except:
-        traceback.print_exc()
-        if args.force_cuda:
-            raise Exception('Force CUDA option is enabled but CUDA platform not available')
-        PlatName = "Reference"
-        print "Setting Platform to", PlatName
-        platform = Platform.getPlatformByName(PlatName)
+    if platname == "CUDA":
+        try:
+            print "Setting Platform to", platname
+            platform = Platform.getPlatformByName(platname)
+            # Set the device to the environment variable or zero otherwise
+            device = os.environ.get('CUDA_DEVICE',"0")
+            print "Setting Device to", device
+            platform.setPropertyDefaultValue("CudaDeviceIndex", device)
+            platform.setPropertyDefaultValue("CudaPrecision", precision)
+            platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+        except:
+            traceback.print_exc()
+            if args.force_cuda:
+                raise Exception('Force CUDA option is enabled but CUDA platform not available')
+            platname = "Reference"
+    if platname == "Reference":
+        print "Setting Platform to", platname
+        platform = Platform.getPlatformByName(platname)
     # Create the test system.
     forcefield = ForceField(sys.argv[2])
     mod = Modeller(pdb.topology, pdb.positions)
@@ -456,9 +456,9 @@ def EnergyDecomposition(Sim):
     EnergyTerms['Total'] = Potential+Kinetic
     return EnergyTerms
 
-def run_simulation(pdb,settings,pbc=True,Trajectory=True):
+def run_simulation(pdb,settings,pbc=True,Trajectory=True,platname="CUDA"):
     """ Run a NPT simulation and gather statistics. """
-    simulation, system = create_simulation_object(pdb, settings, pbc, "mixed")
+    simulation, system = create_simulation_object(pdb, settings, pbc, "mixed", platname=platname)
     # Set initial positions.
     # Create the test system.
     forcefield = ForceField(sys.argv[2])
@@ -936,7 +936,7 @@ def main():
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    Data, Xyzs, Boxes, Rhos, Potentials, Kinetics, Volumes, Dips, Sim, EDA = run_simulation(pdb, Settings, Trajectory=False)
+    Data, Xyzs, Boxes, Rhos, Potentials, Kinetics, Volumes, Dips, Sim, EDA = run_simulation(pdb, Settings, Trajectory=False, platname="CUDA")
     Energies = Potentials + Kinetics
 
     # Get statistics from our simulation.
@@ -973,7 +973,7 @@ def main():
     niterations = m_niterations
 
     mpdb = PDBFile('mono.pdb')
-    mData, mXyzs, _trash, _crap, mPotentials, mKinetics, _nah, _dontneed, mSim, mEDA = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False)
+    mData, mXyzs, _trash, _crap, mPotentials, mKinetics, _nah, _dontneed, mSim, mEDA = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False, platname="Reference")
     mEnergies = mPotentials + mKinetics
     # Get statistics from our simulation.
     _trash, _crap, mPot_avg, mPot_err, mKin_avg, mKin_err, mEne_avg, mEne_err, __trash, __crap = analyze(mData)

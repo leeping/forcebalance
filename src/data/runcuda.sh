@@ -68,6 +68,18 @@ elif [[ $HOSTNAME =~ "cn" ]] ; then
     export CUDA_CACHE_PATH=/tmp/leeping/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=/opt/cuda5.0/bin/nvcc
     export BAK=/hsgs/nobackup/leeping/scratch/runcuda-backups
+elif [[ $HOSTNAME =~ "nid" ]] ; then
+    # Blue Waters XK Compute Node
+    . /etc/bash.bashrc.local
+    module add gcc/4.7.2
+    module add cudatoolkit
+    export CUDA_HOME=$CRAY_CUDATOOLKIT_DIR
+    export OPENMM_PLUGIN_DIR=$HOME/opt/openmm/lib/plugins
+    export OPENMM_CUDA_COMPILER=$CUDA_HOME/bin/nvcc
+    export LD_LIBRARY_PATH=$HOME/opt/openmm/lib:$OPENMM_PLUGIN_DIR:$LD_LIBRARY_PATH
+    export CRAY_CUDA_PROXY=1 
+    export BAK=/scratch/sciteam/leeping/runcuda-backups
+    numactl --hardware
 elif [[ `env | grep -i tacc | wc -l` -gt 0 ]] ; then
     # Currently this is the only way I can be sure I'm on Stampede...
     module load cuda/5.0
