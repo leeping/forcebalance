@@ -5,20 +5,10 @@ from __init__ import ForceBalanceTestCase, TestValues
 import numpy as np
 from copy import deepcopy
 
-class TestWaterFF(ForceBalanceTestCase):
-    """Test FF class using water options and forcefield (text forcefield input)"""
-    def setUp(self):
-        # options used in 001_water_tutorial
-        self.options=TestValues.opts.copy()
-        self.options.update({
-                'root': os.getcwd() + '/test/files',
-                'penalty_additive': 0.01,
-                'jobtype': 'NEWTON',
-                'forcefield': ['water.itp']})
-        os.chdir(self.options['root'])
-        self.ff = forcefield.FF(self.options)
-        self.ffname = self.options['forcefield'][0][:-3]
-        self.filetype = self.options['forcefield'][0][-3:]
+class FFTests(object):
+    """Tests common to all forcefields. Note that to prevent this class from being run on its own
+    by the Test Runner, we do not subclass ForceBalanceTestCase. The actual forcefield instance
+    being tested needs to be provided by subclasses"""
 
     def test_FF_yields_consistent_results(self):
         """Check whether multiple calls to FF yield the same result"""
@@ -39,6 +29,8 @@ class TestWaterFF(ForceBalanceTestCase):
         new_pvals = self.ff.make(np.ones(self.ff.np),use_pvals=True)
         self.assertTrue((np.ones(self.ff.np) == new_pvals).all(), msg="\nmake() did not return input pvals with use_pvals=True")
 
+        os.remove(self.options['root'] + '/' + self.ff.fnms[0])
+
     def test_make_function_output(self):
         """Check make() function creates expected forcefield file"""
 
@@ -57,14 +49,32 @@ class TestWaterFF(ForceBalanceTestCase):
         self.assertNotEqual(self.ff, ff_ones,
                         msg = "make([1]) produced an unchanged output forcefield")
         os.remove(self.options['ffdir']+'/test_ones.' + self.filetype)
+    
+
+class TestWaterFF(ForceBalanceTestCase, FFTests):
+    """Test FF class using water options and forcefield (text forcefield input)
+    This test case also acts as a base class for other forcefield test cases.
+    Override the setUp() to run tests on a different forcefield"""
+    def setUp(self):
+        # options used in 001_water_tutorial
+        self.options=TestValues.opts.copy()
+        self.options.update({
+                'root': os.getcwd() + '/test/files',
+                'penalty_additive': 0.01,
+                'jobtype': 'NEWTON',
+                'forcefield': ['water.itp']})
+        os.chdir(self.options['root'])
+        self.ff = forcefield.FF(self.options)
+        self.ffname = self.options['forcefield'][0][:-3]
+        self.filetype = self.options['forcefield'][0][-3:]
 
     def shortDescription(self):
         """Add XML to test descriptions
         @override __init__.ForceBalanceTestCase.shortDescription()"""
-        return "ITP Forcefield: " + super(TestWaterFF,self).shortDescription()
+        return super(TestWaterFF,self).shortDescription() + " (itp)"
 
-class TestXmlFF(TestWaterFF):
-    """Test FF class using water options and forcefield (text forcefield input)"""
+class TestXmlFF(ForceBalanceTestCase, FFTests):
+    """Test FF class using dms.xml forcefield input"""
     def setUp(self):
         # options from 2013 tutorial
         self.options=TestValues.opts.copy()
@@ -81,10 +91,10 @@ class TestXmlFF(TestWaterFF):
     def shortDescription(self):
         """Add XML to test descriptions
         @override __init__.ForceBalanceTestCase.shortDescription()"""
-        return "XML Forcefield: " + super(TestWaterFF,self).shortDescription()
+        return super(TestXmlFF,self).shortDescription() + " (xml)"
 
-class TestGbsFF(TestWaterFF):
-    """Test FF class using water options and forcefield (text forcefield input)"""
+class TestGbsFF(ForceBalanceTestCase, FFTests):
+    """Test FF class using gbs forcefield input"""
     def setUp(self):
         # options from 2013 tutorial
         self.options=TestValues.opts.copy()
@@ -97,9 +107,18 @@ class TestGbsFF(TestWaterFF):
         self.ff = forcefield.FF(self.options)
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
+
+    def test_find_spacings(self):
+        """Check find_spacings function"""
+        spacings = self.ff.find_spacings()
+
+        self.assertGreaterEqual((self.ff.np)*(self.ff.np-1)/2,len(spacings.keys()))
+        self.assertEqual(dict, type(spacings))
+
     def shortDescription(self):
-        """Add XML to test descriptions
+        """Add gbs to test descriptions
         @override __init__.ForceBalanceTestCase.shortDescription()"""
-        return "GBS Forcefield: " + super(TestWaterFF,self).shortDescription()
+        return super(TestGbsFF,self).shortDescription() + " (gbs)"
+
 if __name__ == '__main__':           
     unittest.main()
