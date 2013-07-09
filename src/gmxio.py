@@ -370,7 +370,14 @@ class AbInitio_GMX(AbInitio):
         super(AbInitio_GMX,self).__init__(options,tgt_opts,forcefield)
         
     def read_topology(self):
-        # Arthur: Document this.
+        """ This function parses the GROMACS topology file (.top) which contains a listing of 
+        the molecules in the simulation.  For each molecule, it loads up a "FFMolecule" dictionary
+        which contains information about each atom in the molecule - which residue (i.e. molecular fragment)
+        the atom belongs in, the charge group, the particle type etc.
+        
+        This allows us to do things like condense the gradients into net forces and torques,
+        determine which particles are real atoms and which are virtual sites, and so on.
+        """
         section = None
         ResidueCounter = -1
         ChargeGroupCounter = -1
@@ -404,6 +411,7 @@ class AbInitio_GMX(AbInitio):
                         self.AtomLists['ChargeGroupNumber'].append(ChargeGroupCounter)
                         self.AtomLists['ParticleType'].append(j['ParticleType'])
                         self.AtomLists['Mass'].append(j['Mass'])
+        self.AtomMask = array([i=='A' for i in self.AtomLists['ParticleType']])
         self.topology_flag = True
         return
 
@@ -444,14 +452,8 @@ class AbInitio_GMX(AbInitio):
         o, e = Popen(["./g_energy","-xvg","no"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('Potential')
         o, e = Popen(["./g_traj","-xvg","no","-f","shot.trr","-of","force.xvg","-fp"],stdin=PIPE,stdout=PIPE,stderr=PIPE).communicate('System')
         E = [float(open("energy.xvg").readlines()[0].split()[1])]
-        # When we read in the force, virtual sites are distinguished by whether the force is zero.
-        # However, sometimes the force really is exactly zero on an atom, so we have to be a bit tricksier.
-        F0 = [float(i) for i in open("force.xvg").readlines()[0].split()[1:] if float(i) != 0.0]
-        F1 = [float(i) for i in open("force.xvg").readlines()[0].split()[1:]]
-        if len(F0) == len(F1) or len(F1) > 3*self.qmatoms:
-            F = F0[:]
-        elif len(F0) < 3*self.qmatoms:
-            F = F1[:]
+        # When we read in the force, make sure that we only read in the forces on real atoms.
+        F = [float(j) for i, j in enumerate(open("force.xvg").readlines()[0].split()[1:]) if self.AtomMask[i/3]]
         M = array(E + F)
         M = M[:3*self.fitatoms+1]
         return M
@@ -473,12 +475,8 @@ class AbInitio_GMX(AbInitio):
         for Eline, Fline in zip(Efile, Ffile):
             # Compute the potential energy and append to list
             Energy = [float(Eline.split()[1])]
-            F0 = [float(i) for i in Fline.split()[1:] if float(i) != 0.0]
-            F1 = [float(i) for i in Fline.split()[1:]]
-            if len(F0) == len(F1) or len(F1) > 3*self.qmatoms:
-                Force = F0[:]
-            elif len(F0) < 3*self.qmatoms:
-                Force = F1[:]
+            # When we read in the force, make sure that we only read in the forces on real atoms.
+            Force = [float(j) for i, j in enumerate(Fline.split()[1:]) if self.AtomMask[i/3]]
             M.append(array(Energy + Force)[:3*self.fitatoms+1])
         return array(M)
 
