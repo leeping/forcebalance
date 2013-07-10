@@ -1,0 +1,41 @@
+\page glossary Glossary
+
+This is a glossary page containing scientific concepts for the discussion of
+potential optimization, as well as the (automatically generated) documentation
+of ForceBalance keywords.
+
+\section concepts Scientific concepts
+
+@li <b> Empirical parameter </b> : Any adjustable parameter in the
+empirical potential that affects the potential energy, such as the
+partial charge on an atom, the equilibrium length of a chemical
+bond, or the fraction of Hartree-Fock exchange in a density functional.
+
+@li <b> Empirical Potential </b> : A formula that contains empirical
+parameters and computes the potential energy of a collection of atoms.
+Note that in ForceBalance this is used very loosely; even a DFT
+functional may contain many empirical parameters, and ForceBalance has the
+ability to optimize these as well!
+
+@li <b> Target </b> : A reference data set from high-level theoretical
+calculations or experimental measurements, paired with a procedure to
+simulate the same quantity using the force field.  The objective function
+is the sum of one or more targets.
+
+@li <b> Force field </b> : This term is used interchangeably with
+empirical potential.
+
+@li <b> Functional form </b> : The mathematical functions in the force
+field.  For instance, a CHARMM-type functional form has harmonic interactions
+for bonds and angles, a cosine expansion for the dihedrals, Coulomb interactions
+between point charges and Lennard-Jones terms for van der Waals interactions.
+
+@li <b> Reference data </b> : In general, any accurately known
+quantity that the force field is optimized to reproduce.  Reference
+data can come from either theory or experiment.  For instance,
+energies and forces from a high-level QM method can be used as
+reference data (for instance, a CHARMM-type force field can be fitted
+to reproduce forces from a DFT or MP2 calculation), or a force field
+can be optimized to reproduce the experimental density of a liquid,
+its enthalpy of vaporization or the solvation free energy of a solute.
+

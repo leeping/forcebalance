@@ -1,0 +1,212 @@
+\page usage Usage
+
+This page describes how to use the ForceBalance software.
+
+A good starting point for using this software package is to run the
+scripts contained in the \c bin directory on the example jobs in the
+\c studies directory.
+
+\c ForceBalance.py is the main executable script for force field
+optimization.  It requires an input file and a \ref
+directory_structure.  \c MakeInputFile.py will create an example input
+file containing all options, their default values, and a short
+description for each option.  
+
+@section input_file Input file
+
+A minimal input file for ForceBalance might look something like this:
+
+@verbatim
+
+$options
+jobtype newton
+forcefield water.itp
+$end
+
+$target
+name cluster-02
+type abinitio_gmx
+$end
+
+$target
+name cluster-03
+type abinitio_gmx
+$end
+
+@endverbatim
+
+Global options for a ForceBalance job are given in the \c $options
+section while the settings for each Target are given in
+the \c $target sections.  These are the only two section types.
+
+The most important general options to note are: \c jobtype specifies
+the optimization algorithm to use and \c forcefield specifies the
+force field file name (there may be more than one of these).  The most
+important target options to note are: \c name specifies the target
+name and \c type specifies the type of target (must correspond to a
+subdirectory in \c targets/ ).  All options are explained in the
+Option Index.
+
+@section directory_structure Directory structure
+
+The directory structure for our example job would look like:
+
+@verbatim
+<root>
+  +- forcefield
+  |   |- water.itp
+  +- targets
+  |   +- cluster-02
+  |   |   +- settings (contains job settings)
+  |   |   |   |- shot.mdp
+  |   |   |   |- topol.top
+  |   |   |- all.gro (contains geometries)
+  |   |   |- qdata.txt (contains QM data)
+  |   +- cluster-03
+  |   |   +- settings
+  |   |   |   |- shot.mdp
+  |   |   |   |- topol.top
+  |   |   |- all.gro
+  |   |   |- qdata.txt
+  |   +- <more target directories>
+  |- input.in
+  +- temp
+  |   |- iter_0001
+  |   |- iter_0002
+  |   |   |- <files generated during runtime>
+  +- result
+  |   |- water.itp (Optimized force field, generated on completion)
+  |- input.in (ForceBalance input file)
+@endverbatim
+
+The top-level directory names \b forcefield and \b targets are fixed
+and cannot be changed.  \b forcefield contains the force field files
+that you're optimizing, and \b targets contains all of the reference
+data as well as the input files for simulating that data using the force
+field.  Each subdirectory in \b targets corresponds to a single
+target, and its contents depend on the specific kind of target and its
+corresponding \c Target class.
+
+The \b temp directory is the temporary workspace of the program, and
+the \b result directory is where the optimized force field files are
+deposited after the optimization job is done.  These two directories
+are created if not already there.
+
+Note the force field file, \c water.itp and the two fitting
+targets \c cluster-02 and \c cluster-03 match the
+\c target sections in the input file.  There are two energy and force matching
+targets here; each directory contains the relevant geometries (in
+\c all.gro ) and reference data (in \c qdata.txt ).
+
+@section targets Setting up the targets
+
+There are many targets one can choose from.
+
+@li Energy and force matching - this is the oldest functionality and the most robust.  Enabled in GROMACS, OpenMM, TINKER, AMBER.
+@li Electrostatic potential fitting via the RESP method.  Enabled in GROMACS and AMBER.
+@li High-performance interaction energies - intended for the same two fragments in many conformations.  Enabled in GROMACS.
+@li General binding energies - intended for highly diverse collections of complexes and fragments.  Enabled in TINKER.
+@li Normal mode frequencies.  Enabled in TINKER.
+@li Condensed-phase properties; currently enabled only for density and enthalpy of vaporization of water.  Enabled in OpenMM.
+@li Basis set coefficient fitting; enabled in psi4 (experimental)
+
+One feature of ForceBalance is that targets can be
+linearly combined to produce an aggregate objective function.  For
+example, our recently developed polarizable water model contains
+energy and force matching, binding energies, normal mode frequencies,
+density, and enthalpy of vaporization.  With the AMOEBA functional
+form and 19 adjustable parameters, we developed a highly accurate
+model that fitted all of these properties to very high accuracy.
+
+Due to the diverse nature of these calculations,
+they need to be set up in a specific way that is recognized by ForceBalance.
+The setup is different for each type of simulation, and we invite
+you to learn by example through looking at the files in the \c studies
+directory.
+
+@subsection energy_force_matching Energy and force matching
+
+In these relatively simple simulations, the objective function is
+computed from the squared difference in the potential energy and
+forces (gradients) between the force field and reference (QM) method,
+evaluated at a number of stored geometries called <em>snapshots</em>.
+The mathematics are implemented in \c abinitio.py while the interfaces
+to simulation software exist in derived classes in \c gmxio.py, \c
+tinkerio.py, \c amberio.py and \c openmmio.py.
+
+All energy and force matching targets require a <em>coordinate
+trajectory file</em> (\c all.gro ) and a <em> quantum data file </em>
+(\c qdata.txt ).  The coordinate trajectory file contains the
+Cartesian coordinates of the snapshots, preferably in the file format
+of the simulation software used (\c all.gro is the most extensively
+tested.)  The quantum data file is formatted according to a very
+simple specification:
+
+@verbatim
+JOB 0
+COORDS x1 y1 z1 x2 y2 z2 ... (floating point numbers in Angstrom)
+ENERGY (floating point number in Hartree)
+FORCES fx1 fy1 fz1 ... (floating point numbers in Hartree/bohr - this is a misnomer because they are actually gradients, which differ by a sign from the forces.)
+
+JOB 1
+...
+@endverbatim
+
+The coordinates in the quantum data file should be consistent with the
+coordinate trajectory file, although ForceBalance will use the latter
+most of the time.  It is easy to generate the quantum data file from
+parsing the output of quantum chemistry software.  ForceBalance
+contains methods for parsing Q-Chem output files in the \c molecule.py class.
+
+In addition to \c all.gro and \c qdata.txt , the simulation setup
+files are required.  These contain settings needed by the simulation
+software for the calculation to run.  For Gromacs calculations, a
+topology (.top) file and a run parameter file (.mdp) are required.
+These should be placed in the \c settings subdirectory within the
+directory belonging to the target.
+
+As a side note: If you wish to tune a number in the .mdp file, simply
+move it to the \c forcefield directory and specify it as a force field
+file.  ForceBalance will now be able to tune any highlighted
+parameters in the file, although it will also place copies of this
+file in all target directories within \c temp while the program is
+running.
+
+@subsection Electrostatic potentials
+
+ForceBalance contains methods for evaluating electrostatic potentials
+given a collection of point charges.  At this time, this functionality
+is very experimental and risky to use for systems containing more than
+one molecule.  This is because ForceBalance evaluates the
+electrostatic potentials internally, and we don't have an
+infrastructure for building a full topology consisting of many
+molecules.  Currently, we assume that the electrostatic potential
+fitting contains only one molecule.
+
+Once again, the coordinate trajectory file and quantum data files are
+used to specify the calculation.  However, now the coordinates for
+evaluating the potential, and the reference potential values, are
+included:
+
+@verbatim
+JOB 0
+COORDS x1 y1 z1 x2 y2 z2 ...
+ENERGY e
+FORCES fx1 fy1 fz1 ...
+ESPXYZ ex1 ey1 ez1 ex2 ey2 ez2 ... 
+ESPVAL ev1 ev2 ev3 ..
+@endverbatim
+
+@section running_software Running the optimization
+
+To run ForceBalance, make sure the calculation is set up properly
+(refer to the above sections), and then type in:
+
+<b> ForceBalance.py input.in </b>
+
+In general it's impossible to set up a calculation perfectly the first
+time, in which case the calculation will crash.  ForceBalance will try
+to print helpful error messages to guide you toward setting up your
+calculation properly.
+
+Further example inputs and outputs are given in the Tutorial section.
