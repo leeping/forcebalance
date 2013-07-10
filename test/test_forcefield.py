@@ -12,22 +12,22 @@ class FFTests(object):
 
     def test_FF_yields_consistent_results(self):
         """Check whether multiple calls to FF yield the same result"""
-        self.assertTrue(forcefield.FF(self.options)==forcefield.FF(self.options))
+        self.assertEqual(forcefield.FF(self.options),forcefield.FF(self.options))
 
     def test_make_function_return_value(self):
         """Check that make() return value meets expectation"""
         pvals = self.ff.pvals0
 
-        new_pvals = self.ff.make(np.zeros(self.ff.np))
+        new_pvals = np.array(self.ff.make(np.zeros(self.ff.np)))
         # given zero matrix, make should return unchanged pvals
-        self.assertTrue((pvals == new_pvals).all())
+        self.assertEqual(pvals,new_pvals)
 
-        new_pvals = self.ff.make(np.ones(self.ff.np))
+        new_pvals = np.array(self.ff.make(np.ones(self.ff.np)))
         # given arbitrary nonzero input, make should return new pvals
-        self.assertFalse((pvals == new_pvals).all(), msg="\nmake() returned unchanged pvals even when given nonzero matrix")
+        self.assertFalse((pvals==new_pvals).all(), msg="\nmake() returned unchanged pvals even when given nonzero matrix")
 
-        new_pvals = self.ff.make(np.ones(self.ff.np),use_pvals=True)
-        self.assertTrue((np.ones(self.ff.np) == new_pvals).all(), msg="\nmake() did not return input pvals with use_pvals=True")
+        new_pvals = np.array(self.ff.make(np.ones(self.ff.np),use_pvals=True))
+        self.assertEqual(np.ones(self.ff.np),new_pvals, msg="\nmake() did not return input pvals with use_pvals=True")
 
         os.remove(self.options['root'] + '/' + self.ff.fnms[0])
 
