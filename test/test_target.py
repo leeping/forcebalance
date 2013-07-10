@@ -41,6 +41,7 @@ class TargetTests(object):
         objective = self.target.get(self.mvals, AGrad=True)
         X=objective['X']
         G=objective['G']
+        self.assertTrue(G.any())    # with AGrad=True, G should not be [0]
         g=numpy.zeros(self.ff.np)
 
         for p in range(self.ff.np):
