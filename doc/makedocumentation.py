@@ -172,6 +172,7 @@ if __name__ == '__main__':
     mainpage, api = generate_content()
 
     print "Switching to doc repository..."
+    os.system("git stash")
     os.system("git checkout gh-pages")
     print "Checking Doxygen config files..."
     doxyconf()
@@ -182,12 +183,14 @@ if __name__ == '__main__':
     with open('api.dox','w') as f:
         f.write(api)
     generate_doc()
-    os.system('git push -am %s' % datetime.now().strftime("%m-%d-%Y %H:%M"))
-
     print "Integrating HTML docs..."
     parse_html()
 
+    os.system('git add ./html *.pdf')
+    os.system('git commit -m "Automatic documentation generation on %s"' % datetime.now().strftime("%m-%d-%Y %H:%M"))
 
     print "Cleaning up..."
-    #os.system("rm -rf latex mainpage.dox api.dox option_index.txt")   # cleanup
+    #os.system("rm -rf latex option_index.txt")   # cleanup
+    os.system('git checkout master')
+    os.system('git stash apply')
     print "Documentation successfully generated"
