@@ -8,6 +8,7 @@ import os
 import re
 import shutil
 import subprocess
+from datetime import datetime
 
 def add_tab(fnm):
     """Add tabs to html version of general documentation"""
@@ -122,24 +123,24 @@ def doxyconf():
     shutil.move('api.cfg.tmp', 'api.cfg')
 
 def generate_content():
-    """Parse text files and concatenate into mainpage.py and api.py"""
+    """Parse text files and concatenate into mainpage and api"""
     # generate pages to be included in general documentation
-    mainpage=open('mainpage.dox','w')
-    mainpage.write("/**\n\n\\mainpage\n\n")
+    mainpage=""
+    mainpage+="/**\n\n\\mainpage\n\n"
     for fnm in ["introduction.txt", "installation.txt", "usage.txt", "tutorial.txt", "glossary.txt", "option_index.txt"]:
         page=open(fnm,'r')
-        mainpage.write(page.read())
-    mainpage.write("\n\\image latex ForceBalance.pdf \"Logo.\" height=10cm\n\n*/")
-    mainpage.close()
+        mainpage+=page.read()
+    mainpage+="\n\\image latex ForceBalance.pdf \"Logo.\" height=10cm\n\n*/"
 
     # generate pages to be included in API documentation
-    api=open('api.dox','w')
-    api.write("/**\n\n")
+    api=""
+    api+="/**\n\n"
     for fnm in ["roadmap.txt"]:
         page=open(fnm,'r')
-        api.write(page.read())
-    api.write("\n\n*/")
-    api.close()
+        api+=page.read()
+    api+="\n\n*/"
+
+    return (mainpage, api)
 
 def generate_doc(logfile=os.devnull):
     """Run doxygen and compile generated latex into pdf, optionally writing output to a file
@@ -166,13 +167,39 @@ def generate_doc(logfile=os.devnull):
         shutil.copy('latex/refman.pdf', 'ForceBalance-API.pdf')
 
 if __name__ == '__main__':
-    print "Collecting documents..."    
+    print "Collecting documents..."
     os.system("python make-option-index.py > option_index.txt")
-    generate_content()
+    mainpage, api = generate_content()
+
+    print "Stashing uncommitted changes..."
+    os.system("git stash")
+    print "Switching to doc repository..."
+    os.system("git checkout gh-pages")
     print "Checking Doxygen config files..."
     doxyconf()
+
+    print "Generating docs with Doxygen..."
+    with open('mainpage.dox','w') as f:
+        f.write(mainpage)
+    with open('api.dox','w') as f:
+        f.write(api)
     generate_doc()
     print "Integrating HTML docs..."
     parse_html()
-    os.system("rm -rf latex mainpage.dox api.dox option_index.txt")   # cleanup
+
+    print "Applying changes to local repository..."
+    os.system('git add ./html *.pdf')
+    os.system('git commit -m "Automatic documentation generation on %s"' % datetime.now().strftime("%m-%d-%Y %H:%M"))
+
+    print "\n----Enter username/password to push changes to remote repository or Ctrl-C to abort\n"
+    os.system('git push origin gh-pages')
+    print
+
+    print "Cleaning up..."
+    os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
+    print "Returning to master branch..."
+    os.system('git checkout master')
+
+    print "Loading master branch stash if necessary..."
+    os.system('git stash apply')
     print "Documentation successfully generated"
