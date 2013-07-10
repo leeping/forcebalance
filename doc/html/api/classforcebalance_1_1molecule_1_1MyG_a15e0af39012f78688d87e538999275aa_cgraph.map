@@ -1,0 +1,25 @@
+<map id="forcebalance.molecule.MyG.__init__" name="forcebalance.molecule.MyG.__init__">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1MyG.html#a0d5915cec6b8fe13a23b50f5c1edc10a" title="forcebalance.molecule.My\lG.__eq__" alt="" coords="244,190,431,237"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1MyG.html#a5ae5e64f229f7833216a82969fa39b15" title="The hash function is something we can use to discard two things that are obviously not equal..." alt="" coords="481,219,668,266"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1MyG.html#a2a5ae00cf603aa8d887d4dcca8412834" title="Return a list of the sorted atom numbers in this graph." alt="" coords="957,172,1165,201"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1MyG.html#a56413ce7a4c8db075299f724bd9ad71f" title="Return a string of atoms, which serves as a rudimentary &#39;fingerprint&#39; : &#39;99,100,103,151&#39; ." alt="" coords="719,219,905,266"/>
+<area shape="rect" id="node12" href="$classforcebalance_1_1molecule_1_1MyG.html#a2913983e3a4725dff2df4a39f30bfaad" title="Return an array of the elements." alt="" coords="1217,172,1425,201"/>
+<area shape="rect" id="node55" href="$classforcebalance_1_1molecule_1_1MyG.html#ab6c0598bb829c52b68aaa9c189211419" title="Create an Empirical Formula." alt="" coords="955,276,1168,305"/>
+<area shape="rect" id="node14" href="$classforcebalance_1_1molecule_1_1MyG.html#a2fff1521f1d651835fe56f64340a7ddf" title="Get a list of the coordinates." alt="" coords="1476,172,1684,201"/>
+<area shape="rect" id="node16" href="$namespaceforcebalance_1_1molecule.html#a2eba3cad44138b3b10ea883240888412" title="Print a line consisting of (element, x, y, z) in accordance with .xyz file format." alt="" coords="1735,198,1945,245"/>
+<area shape="rect" id="node35" href="$namespaceforcebalance_1_1molecule.html#a41c13064e4285973aa6c49369d3d3390" title="Print a line in accordance with .gro file format, with six decimal points of precision." alt="" coords="1735,109,1945,155"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1molecule.html#a4948e4662b8d2c8d515427d1bbb3d01e" title="Print a line consisting of (element, p, q, r, s, t, ...) where (p, q, r) are arbitrary atom&#45;wise data..." alt="" coords="1996,209,2207,255"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1molecule.html#a12b7bb398c2fa49a223f258ec7737483" title="Determines whether a line contains GROMACS data or not." alt="" coords="2273,271,2452,318"/>
+<area shape="rect" id="node22" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="2519,221,2713,251"/>
+<area shape="rect" id="node24" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="2769,169,2977,199"/>
+<area shape="rect" id="node27" href="$namespaceforcebalance_1_1molecule.html#aafc8c924eed4480fed8ddc9c474d3bc1" title="Determines whether a line contains a GROMACS box vector or not." alt="" coords="2527,325,2705,371"/>
+<area shape="rect" id="node29" href="$namespaceforcebalance_1_1molecule.html#a58c3f09152db4d1c6e1db9df29c60c43" title="forcebalance.molecule.pvec" alt="" coords="2773,307,2973,336"/>
+<area shape="rect" id="node31" href="$namespaceforcebalance_1_1molecule.html#a7fe52c2928c7b0329882541bef2e34cd" title="Groups a big long iterable into groups of ten or what have you." alt="" coords="2764,360,2983,389"/>
+<area shape="rect" id="node37" href="$namespaceforcebalance_1_1molecule.html#ae25aa5331b3a2dd0e9d1e184380357db" title="Print a line corresponding to the box vector in accordance with .gro file format." alt="" coords="2257,101,2468,147"/>
+<area shape="rect" id="node41" href="$namespaceforcebalance_1_1molecule.html#a838d85848bd817e801d0f5f6502217ef" title="Determines whether a line contains CHARMM data or not." alt="" coords="2527,50,2705,97"/>
+<area shape="rect" id="node44" href="$namespaceforcebalance_1_1molecule.html#a4cdb2086978b281ed84cd66179c3f5b2" title="forcebalance.molecule.add\l_strip_to_mat" alt="" coords="2777,50,2969,97"/>
+<area shape="rect" id="node46" href="$namespaceforcebalance_1_1molecule.html#a5f529179461765fadbd0a742cdc2c677" title="Creates a list of number sequences divided as evenly as possible." alt="" coords="3033,59,3257,88"/>
+<area shape="rect" id="node48" href="$namespaceforcebalance_1_1molecule.html#a5b50df23cc4d0e617fdc56538f0bea63" title="forcebalance.molecule.both" alt="" coords="3312,5,3509,35"/>
+<area shape="rect" id="node50" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="3316,59,3505,88"/>
+<area shape="rect" id="node52" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="3308,112,3513,141"/>
+</map>

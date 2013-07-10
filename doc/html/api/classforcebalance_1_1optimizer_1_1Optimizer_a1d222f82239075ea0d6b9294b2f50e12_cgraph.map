@@ -1,0 +1,17 @@
+<map id="forcebalance.optimizer.Optimizer.MainOptimizer" name="forcebalance.optimizer.Optimizer.MainOptimizer">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a11babd62dc7bca389162c6318f9672ca" title="Cool&#45;looking printout for slick formatting of output." alt="" coords="336,47,528,76"/>
+<area shape="rect" id="node36" href="$classforcebalance_1_1optimizer_1_1Optimizer.html#aa7ac7cda43b70ac58ccbd6c8445e88ef" title="Write the checkpoint file for the main optimizer." alt="" coords="289,100,575,129"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="2075,5,2240,51"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary..." alt="" coords="624,79,816,126"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="2319,13,2559,43"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="864,88,1027,117"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="1321,137,1495,167"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" title="Matches things with a decimal only; see isint and isfloat." alt="" coords="1076,59,1271,88"/>
+<area shape="rect" id="node24" href="$namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" title="Given any list, array, or matrix, return a 1&#45;column matrix." alt="" coords="1331,59,1485,88"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1nifty.html#a8d63c8ae9a67c66673a6cf81357f827d" title="Returns a big number if we encounter NaN." alt="" coords="1545,163,1745,192"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1nifty.html#a6c9727360cdff8f3011a12cc54d0e86e" title="Given any list, array, or matrix, return a 1&#45;row matrix." alt="" coords="1817,163,1975,192"/>
+<area shape="rect" id="node22" href="$namespaceforcebalance_1_1nifty.html#a7676236002c6a65ea7d2e69a09923889" title="Given two vectors vec1 and vec2, project out the component of vec1 that is along the vec2&#45;direction..." alt="" coords="2045,163,2269,192"/>
+<area shape="rect" id="node26" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="1568,109,1723,139"/>
+<area shape="rect" id="node28" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="1796,59,1996,88"/>
+<area shape="rect" id="node30" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get\l_least_squares" alt="" coords="2079,81,2236,127"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="forcebalance.binding.BindingEnergy.indicate" name="forcebalance.binding.BindingEnergy.indicate">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary..." alt="" coords="265,150,457,197"/>
+<area shape="rect" id="node33" href="$classforcebalance_1_1binding_1_1BindingEnergy.html#a263fadef13141ef341a01d1f538f85af" title="forcebalance.binding.Binding\lEnergy.get" alt="" coords="259,219,464,266"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="512,133,675,163"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="969,136,1143,165"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" title="Matches things with a decimal only; see isint and isfloat." alt="" coords="724,83,919,112"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" title="Given any list, array, or matrix, return a 1&#45;column matrix." alt="" coords="979,81,1133,111"/>
+<area shape="rect" id="node12" href="$namespaceforcebalance_1_1nifty.html#a8d63c8ae9a67c66673a6cf81357f827d" title="Returns a big number if we encounter NaN." alt="" coords="1193,140,1393,169"/>
+<area shape="rect" id="node14" href="$namespaceforcebalance_1_1nifty.html#a6c9727360cdff8f3011a12cc54d0e86e" title="Given any list, array, or matrix, return a 1&#45;row matrix." alt="" coords="1465,141,1623,171"/>
+<area shape="rect" id="node16" href="$namespaceforcebalance_1_1nifty.html#a7676236002c6a65ea7d2e69a09923889" title="Given two vectors vec1 and vec2, project out the component of vec1 that is along the vec2&#45;direction..." alt="" coords="1693,144,1917,173"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="1216,29,1371,59"/>
+<area shape="rect" id="node22" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="1444,79,1644,108"/>
+<area shape="rect" id="node24" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get\l_least_squares" alt="" coords="1727,5,1884,51"/>
+<area shape="rect" id="node28" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="1723,74,1888,121"/>
+<area shape="rect" id="node30" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="1967,83,2207,112"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="forcebalance.gmxio.AbInitio_GMX.generate_vsite_positions" name="forcebalance.gmxio.AbInitio_GMX.generate_vsite_positions">
+<area shape="rect" id="node3" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" title="forcebalance.gmxio.AbInitio\l_GMX.__init__" alt="" coords="275,131,472,178"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th..." alt="" coords="520,100,717,147"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ab2eac76585bdb8401812f0c8e465a44e" title="forcebalance.gmxio.AbInitio\l_GMX.prepare_temp_directory" alt="" coords="767,86,980,132"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="1045,24,1211,71"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="1037,94,1219,124"/>
+<area shape="rect" id="node17" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd" title="Computes the energy and force using GROMACS for a single snapshot." alt="" coords="1029,147,1227,194"/>
+<area shape="rect" id="node22" href="$namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" title="forcebalance.gmxio.rm\l_gmx_baks" alt="" coords="1565,147,1733,194"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="1276,33,1516,62"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="1304,86,1488,132"/>
+<area shape="rect" id="node19" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a6e43c323b2286c546ff8afd3377f8808" title="Computes the energy and force using GROMACS for a trajectory." alt="" coords="1292,207,1500,254"/>
+</map>

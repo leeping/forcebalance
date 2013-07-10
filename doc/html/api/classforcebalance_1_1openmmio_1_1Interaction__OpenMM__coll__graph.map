@@ -1,0 +1,5 @@
+<map id="forcebalance.openmmio.Interaction_OpenMM" name="forcebalance.openmmio.Interaction_OpenMM">
+<area shape="rect" id="node2" href="$classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies." alt="" coords="40,257,219,303"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="35,179,224,208"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="25,83,233,130"/>
+</map>

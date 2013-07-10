@@ -1,0 +1,8 @@
+<map id="forcebalance.Mol2.mol2.set_mol_name" name="forcebalance.Mol2.mol2.set_mol_name">
+<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2.html#ab5de4b8eef6e851d9be12ecb92cf8f86" title="number of features (integer)" alt="" coords="251,49,448,95"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2.html#a8d49f0024dfe625e1b43a244ec76f3b3" title="Parse a series of text lines, and setup compound information." alt="" coords="496,57,709,87"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1Mol2_1_1mol2.html#af5a261aefed1c65fd5f56b5b30e69995" title="return the atom instance given its atom identifier" alt="" coords="757,5,997,35"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1Mol2_1_1mol2.html#a2d2b34613f2b72ad3a7fcdc94a3de994" title="return a dictionnary of atom instances bonded to the atom, and their types" alt="" coords="1047,18,1244,65"/>
+<area shape="rect" id="node12" href="$classforcebalance_1_1Mol2_1_1mol2.html#aa5a8b41dee69923e1854b0385ba588a4" title="modify atom types to specify donnor, acceptor, or both" alt="" coords="779,109,976,155"/>
+<area shape="rect" id="node14" href="$classforcebalance_1_1Mol2_1_1mol2.html#ad2182f9984dda90dfbd036d70921d5d8" title="forcebalance.Mol2.mol2.\l__init__" alt="" coords="1057,109,1233,155"/>
+</map>

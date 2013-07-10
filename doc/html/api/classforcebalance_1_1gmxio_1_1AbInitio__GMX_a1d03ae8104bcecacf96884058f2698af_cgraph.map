@@ -1,0 +1,12 @@
+<map id="forcebalance.gmxio.AbInitio_GMX.__init__" name="forcebalance.gmxio.AbInitio_GMX.__init__">
+<area shape="rect" id="node3" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th..." alt="" coords="251,145,448,192"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ab2eac76585bdb8401812f0c8e465a44e" title="forcebalance.gmxio.AbInitio\l_GMX.prepare_temp_directory" alt="" coords="497,86,711,133"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="776,25,941,72"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="768,95,949,124"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd" title="Computes the energy and force using GROMACS for a single snapshot." alt="" coords="760,148,957,194"/>
+<area shape="rect" id="node22" href="$namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" title="forcebalance.gmxio.rm\l_gmx_baks" alt="" coords="1323,142,1491,189"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="1007,30,1247,59"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="1035,82,1219,129"/>
+<area shape="rect" id="node17" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a6e43c323b2286c546ff8afd3377f8808" title="Computes the energy and force using GROMACS for a trajectory." alt="" coords="1023,202,1231,249"/>
+<area shape="rect" id="node19" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ae17e3c379d82935d725dd31f01df23e5" title="Call mdrun in order to update the virtual site positions." alt="" coords="1296,237,1517,284"/>
+</map>

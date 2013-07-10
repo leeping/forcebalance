@@ -1,0 +1,12 @@
+<map id="forcebalance.Mol2.mol2_atom.set_atom_name" name="forcebalance.Mol2.mol2_atom.set_atom_name">
+<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a233ebfedcde7e5d75b0ec54f194d2b4f" title="The mol2 type of the atom." alt="" coords="227,93,400,139"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#af149e1d049adee0318eef510a8d32f9c" title="substructure name" alt="" coords="448,93,621,139"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a2b8855f5349976b26917fee353618354" title="Never to use (in theory)" alt="" coords="669,118,843,165"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a1d745e4db9ba351cb8e4e53bf544132c" title="if data is passed, it will be installed" alt="" coords="891,178,1064,225"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a29aaa00b8fa91f4d18cef387622d339d" title="split the text line into a series of properties" alt="" coords="891,58,1064,105"/>
+<area shape="rect" id="node24" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a2e0ecf1c6da8fde8ab146d4341ac1341" title="assemble the properties as a text line, and return it" alt="" coords="1112,143,1285,190"/>
+<area shape="rect" id="node13" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a3a6c9728119ace119108183920689a9d" title="the coordinates of the atom" alt="" coords="1555,93,1728,139"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#ae879ba27197a573b6e3e1e97f0b76aff" title="substructure identifier" alt="" coords="1776,42,1949,89"/>
+<area shape="rect" id="node17" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#abfe80eac2952ad867d87e8b6e64f3c09" title="atomic charge" alt="" coords="1997,13,2171,59"/>
+<area shape="rect" id="node26" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a1af054109bd2d27c29e89b5da0f70920" title="atom identifier (integer, starting from 1)" alt="" coords="1333,143,1507,190"/>
+</map>
