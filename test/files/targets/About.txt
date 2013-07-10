@@ -1,0 +1,14 @@
+The targets in this directory are:
+
+clusters-## : QM Energy and Force calculations on water clusters of various size containing three different types
+of geometries:
+
+1) Clusters extracted from simulation of a water-ice interface using the "Direct AMOEBA Revision 3" 
+model at +/- 10 degrees around the melting point (255 K).
+
+2) Clusters extracted from simulation of liquid water using the original AMOEBA model at 243 - 373 K.
+
+3) Minimum energy clusters, minimized using MP2/aTZ.
+
+All QM force calculations performed with DB-RIMP2/haTZ.
+
