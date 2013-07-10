@@ -663,7 +663,7 @@ def which(fnm):
     except:
         return ''
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, persist = False):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -671,6 +671,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     logfnm (optional) = Name of the log file name (appended if exists), exclusive with outfnm
     stdin (optional) = A string to be passed to stdin, as if it were typed (use newline character to mimic Enter key)
     print_command = Whether to print the command.
+    persist = Continue execution even if the command gives a nonzero return code.
     """
     append_to_file = (logfnm != None)
     write_to_file = (outfnm != None)
@@ -727,7 +728,10 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     if p.returncode != 0:
         print "Received an error message:"
         print Error
-        raise Exception("%s gave a return code of %i (it may have crashed)" % (command, p.returncode))
+        if persist:
+            print "%s gave a return code of %i (it may have crashed) -- carrying on" % (command, p.returncode)
+        else:
+            raise Exception("%s gave a return code of %i (it may have crashed)" % (command, p.returncode))
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
     # return [l + '\n' for l in Output.split('\n')]
     return Output.split('\n')

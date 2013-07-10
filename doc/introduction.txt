@@ -163,8 +163,8 @@ a complex way, is minimized using nonlinear optimization algorithms.
 The result is a force field with high accuracy in all of the fitting
 simulations.
 
-\image html flowchart_sm.png "The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm."
-\image latex flowchart.png "The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm." height=10cm
+\image html cycle_sm.png "The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm."
+\image latex cycle.png "The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm." height=10cm
 
 The problem is now split into three main components; the force field,
 the targets, and the optimization algorithm.  %ForceBalance
@@ -190,6 +190,10 @@ the central ideas as well as financial support.
 fluctuating-charge force field (which Lee-Ping implemented into
 GROMACS), the interface to the MOPAC semiempirical code, and many
 helpful discussions.
+
+- Arthur Vigil contributed the unit testing framework and many unit tests,
+significant improvements to the automatic documentation generation, 
+and various code improvements.
 
 - Matt Welborn contributed the parallelization-over-snapshots
 functionality in the general force matching module.
