@@ -174,6 +174,7 @@ if __name__ == '__main__':
     branch = subprocess.check_output(['git','status']).splitlines()[0][12:]
     
     print "Stashing uncommitted changes on '%s'..." % branch
+
     os.system("git stash")
     print "Switching to doc repository..."
     os.system("git checkout gh-pages")
@@ -199,8 +200,10 @@ if __name__ == '__main__':
 
     print "Cleaning up..."
     os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
+
     print "Returning to branch '%s'..." % branch
     os.system('git checkout %s' % branch)
+
 
     print "Loading master branch stash if necessary..."
     os.system('git stash apply')
