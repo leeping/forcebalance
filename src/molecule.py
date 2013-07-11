@@ -1803,8 +1803,10 @@ class Molecule(object):
 
         Answer={"xyzs":XYZList, "chain":ChainID, "atomname":AtomNames,
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
-                "comms":['' for i in range(len(XYZList))], "bonds":bonds}
+                "comms":['' for i in range(len(XYZList))]}
 
+        if len(bonds) > 0:
+            Answer["bonds"] = bonds
         if Box != None:
             Answer["boxes"] = [Box for i in range(len(XYZList))]
 
