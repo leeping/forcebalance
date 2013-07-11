@@ -9,6 +9,12 @@ from forcebalance.optimizer import Optimizer, Counter
 from collections import OrderedDict
 from numpy import array
 
+# expected results taken from previous runs. Update this if it changes and seems reasonable (updated 7/4/13)
+EXPECTED_WATER_RESULTS = array([0.03311403,0.043358,0.00550615,-0.0459336,0.01548854,-0.37656029,0.0025888,0.01169443,0.15300846])
+
+# fail test if we take more than this many iterations to converge. Update this as necessary
+ITERATIONS_TO_CONVERGE = 5
+
 class TestWaterTutorial(ForceBalanceTestCase):
     def setUp(self):
         super(ForceBalanceTestCase,self).setUp()
@@ -47,13 +53,14 @@ class TestWaterTutorial(ForceBalanceTestCase):
 
         ## Actually run the optimizer.
         result = optimizer.Run()
-        # expected results taken from previous runs. Update this if it changes and seems reasonable
 
-        expected = array((0.03316133, 0.04331116, 0.00550698, -0.04593296, 0.01549711, -0.37654517, 0.00249289, 0.01187446, 0.1510803))
-        self.assertEqual(expected,result,msg="\nCalculation result differs from previous value")
+        self.assertEqual(EXPECTED_WATER_RESULTS,result,
+        msg="\nCalculation results have changed from previously calculated values.\nIf this seems reasonable, update EXPECTED_WATER_RESULTS in test_system.py with these values:\n%s"\
+        % repr(result))
 
-        # Tutorial calculation converges in 5 iterations
-        self.assertGreaterEqual(5, Counter(), msg="\nCalculation took longer than expected to converge")
+        # Fail if calculation takes longer than previously to converge
+        self.assertGreaterEqual(ITERATIONS_TO_CONVERGE, Counter(), msg="\nCalculation took longer than expected to converge (%d iterations vs previous of %d)" %\
+        (ITERATIONS_TO_CONVERGE, Counter()))
         
 
 if __name__ == '__main__':
