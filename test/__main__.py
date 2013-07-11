@@ -19,15 +19,14 @@ def getOptions():
             if o in ("-m", "--metatest"):
                 options['test_modules']=['__test__']
             elif o in ("-e", "--exclude"):
-                exclude=a.split(',')
-            if o in ("-i", "--include"):
-                options['test_modules']=['test_' + module for module in a.split(',')]
+                exclude=a.split(',')    # used below when generating module list
             if o in ("-p", "--pretend"):
                 options['pretend']=True
     except getopt.GetoptError as err:
         usage()
         sys.exit()
     
+    # if modules to be run were not already provided in args, generate them automatically
     if not options.has_key('test_modules'):
         options['test_modules'] = [module[:-3] for module in sorted(os.listdir('test'))
                                   if re.match("^test_.*\.py$",module)
