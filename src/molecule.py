@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                   Last updated June 21, 2013                       |#
+#|                   Last updated July 10, 2013                       |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -141,9 +141,10 @@ AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames 
 # OrderedDict requires Python 2.7 or higher
 import os, sys, re, copy
 import numpy as np
+from numpy import sin, cos, arcsin, arccos
 import imp
 import itertools
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 from ctypes import *
 from warnings import warn
 
@@ -243,6 +244,43 @@ def isfloat(word):
 # Used to get the white spaces in a split line.
 splitter = re.compile(r'(\s+|\S+)')
 
+# Container for Bravais lattice vector.  Three cell lengths, three angles, three vectors, volume, and TINKER trig functions.
+Box = namedtuple('Box',['a','b','c','alpha','beta','gamma','A','B','C','V'])
+radian = 180. / np.pi
+def BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma):
+    """ This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification. """
+    alph = alpha*np.pi/180
+    bet  = beta*np.pi/180
+    gamm = gamma*np.pi/180
+    v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
+    Mat = np.mat([[a, b*cos(gamm), c*cos(bet)],
+                  [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
+                  [0, 0, c*v/sin(gamm)]])
+    L1 = Mat*np.mat([[1],[0],[0]])
+    L2 = Mat*np.mat([[0],[1],[0]])
+    L3 = Mat*np.mat([[0],[0],[1]])
+    return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
+
+def BuildLatticeFromVectors(v1, v2, v3):
+    """ This function takes in three lattice vectors and tries to return a complete box specification. """
+    a = np.linalg.norm(v1)
+    b = np.linalg.norm(v2)
+    c = np.linalg.norm(v3)
+    alpha = arccos(np.linalg.dot(v2, v3) / np.linalg.norm(v2) / np.linalg.norm(v3)) * radian
+    beta  = arccos(np.linalg.dot(v1, v3) / np.linalg.norm(v1) / np.linalg.norm(v3)) * radian
+    gamma = arccos(np.linalg.dot(v1, v2) / np.linalg.norm(v1) / np.linalg.norm(v2)) * radian
+    alph = alpha*np.pi/180
+    bet  = beta*np.pi/180
+    gamm = gamma*np.pi/180
+    v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
+    Mat = np.mat([[a, b*cos(gamm), c*cos(bet)],
+                  [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
+                  [0, 0, c*v/sin(gamm)]])
+    L1 = Mat*np.mat([[1],[0],[0]])
+    L2 = Mat*np.mat([[0],[1],[0]])
+    L3 = Mat*np.mat([[0],[0],[1]])
+    return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
+
 #===========================#
 #|   Connectivity graph    |#
 #|  Good for doing simple  |#
@@ -325,13 +363,16 @@ def format_xyzgen_coord(element,xyzgen):
     """
     return "%-5s" + ' '.join(["% 15.10f" % i] for i in xyzgen)
 
-def format_gro_box(xyz):
+def format_gro_box(box):
     """ Print a line corresponding to the box vector in accordance with .gro file format
 
-    @param[in] xyz A 3-element or 9-element array containing the box vectors
+    @param[in] box Box NamedTuple
     
     """
-    return ' '.join(["% 10.6f" % (i/10) for i in xyz])
+    if box.alpha == 90.0 and box.beta == 90.0 and box.gamma == 90.0:
+        return ' '.join(["% 10.6f" % (i/10) for i in [box.a, box.b, box.c]])
+    else:
+        return ' '.join(["% 10.6f" % (i/10) for i in [box.A[0], box.B[1], box.C[2], box.A[1], box.A[2], box.B[0], box.B[2], box.C[0], box.C[1]]])
 
 def is_gro_coord(line):
     """ Determines whether a line contains GROMACS data or not
@@ -639,7 +680,10 @@ class Molecule(object):
                 key = [key]
             New = Molecule()
             for k in self.FrameKeys:
-                New.Data[k] = list(np.array(self.Data[k])[key])
+                if k == 'boxes':
+                    New.Data[k] = [j for i, j in enumerate(self.Data[k]) if i in np.arange(len(self))[key]]
+                else:
+                    New.Data[k] = list(np.array(self.Data[k])[key])
             for k in self.AtomKeys | self.MetaKeys:
                 New.Data[k] = copy.deepcopy(self.Data[k])
             return New
@@ -801,15 +845,12 @@ class Molecule(object):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
             if 'networkx' in sys.modules and build_topology:
-                if self.na > 300:
+                if self.na > 3000:
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
-                try:
-                    self.topology = self.build_topology()
-                    self.molecules = nx.connected_component_subgraphs(self.topology)
-                    if 'bonds' not in self.Data:
-                        self.Data['bonds'] = self.topology.edges()
-                except:
-                    pass # Address this later ; topology builds may fail if certain things are missing
+                self.topology = self.build_topology()
+                self.molecules = nx.connected_component_subgraphs(self.topology)
+                if 'bonds' not in self.Data:
+                    self.Data['bonds'] = self.topology.edges()
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -1031,13 +1072,17 @@ class Molecule(object):
         if sn == None:
             sn = 0
         mindist = 1.0 # Any two atoms that are closer than this distance are bonded.
-        #Fac = 1.2     # Increase the threshold for determining whether atoms are bonded. 1.2 is conservative, 1.5 is crazy.
         # Create an atom-wise list of covalent radii.
         R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
         # Create a list of 2-tuples corresponding to combinations of atomic indices.
-        AtomIterator = np.array(list(itertools.combinations(range(self.na),2)))
+        # This is optimized and much faster than using itertools.combinations.
+        AtomIterator = np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=int), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=int))).T
         # Create a list of thresholds for determining whether a certain interatomic distance is considered to be a bond.
-        BondThresh = np.array([max(mindist,(R[i[0]] + R[i[1]]) * Fac) for i in AtomIterator])
+        # BondThresh = np.fromiter([max(mindist,(R[i[0]] + R[i[1]])*Fac) for i in AtomIterator], dtype=float)
+        BT0 = R[AtomIterator[:,0]]
+        BT1 = R[AtomIterator[:,1]]
+        BondThresh = (BT0+BT1) * Fac
+        BondThresh = (BondThresh > mindist) * BondThresh + (BondThresh < mindist) * mindist
         try:
             dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
         except:
@@ -1130,7 +1175,7 @@ class Molecule(object):
         """
         
         self.require('boxes')
-        return [(Vec3(box[0]/10,0.0,0.0), Vec3(0.0,box[1]/10,0.0), Vec3(0.0,0.0,box[2]/10)) * nanometer for box in self.boxes]
+        return [(Vec3(box.A)/10.0, Vec3(box.B)/10.0, Vec3(box.C)/10.0) * nanometer for box in self.boxes]
 
     def split(self, fnm=None, ftype=None, method="chunks", num=None):
 
@@ -1222,7 +1267,8 @@ class Molecule(object):
                 pass
             else:
                 if xyz == [] and len(sline) == 3:
-                    boxes.append([float(i) for i in line.split()])
+                    a, b, c = (float(i) for i in line.split())
+                    boxes.append(BuildLatticeFromLengthsAngles(a, b, c, 90.0, 90.0, 90.0))
                 else:
                     xyz += [float(i) for i in line.split()]
                     if len(xyz) == self.na * 3:
@@ -1339,7 +1385,7 @@ class Molecule(object):
             npa    = np.array(xyzvec)
             xyz    = np.asfarray(npa)
             xyzs.append(xyz.reshape(-1, 3))
-            boxes.append([ts.A, ts.B, ts.C])
+            boxes.append(BuildLatticeFromLengthsAngles(ts.A, ts.B, ts.C, 90.0, 90.0, 90.0))
         _dcdlib.close_file_read(dcd)
         dcd = None
         Answer = {'xyzs' : xyzs,
@@ -1491,7 +1537,20 @@ class Molecule(object):
                     elem.append(thiselem)
                 xyz.append([float(i) for i in sline[-3:]])
             elif is_gro_box(line) and ln == na + 2:
-                boxes.append([float(i)*10 for i in sline])
+                box = [float(i)*10 for i in sline]
+                if len(box) == 3:
+                    a = box[0]
+                    b = box[1]
+                    c = box[2]
+                    alpha = 90.0
+                    beta = 90.0
+                    gamma = 90.0
+                    boxes.append(BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma))
+                elif len(box) == 9:
+                    v1 = np.array([box[0], box[3], box[4]])
+                    v2 = np.array([box[5], box[1], box[6]])
+                    v3 = np.array([box[7], box[8], box[2]])
+                    boxes.append(BuildLatticeFromVectors(v1, v2, v3))
                 xyzs.append(np.array(xyz)*10)
                 xyz = []
                 ln = -1
@@ -1693,16 +1752,16 @@ class Molecule(object):
         F1=file(fnm,'r')
         ParsedPDB=readPDB(F1)
 
-        Box = np.array([10.0, 10.0, 10.0])
+        Box = None
         #Separate into distinct lists for each model.
         PDBLines=[[]]
         for x in ParsedPDB[0]:
             if x.__class__ in [END, ENDMDL]:
                 PDBLines.append([])
-            if x.__class__==ATOM:
+            if x.__class__ in [ATOM, HETATM]:
                 PDBLines[-1].append(x)
             if x.__class__==CRYST1:
-                Box = np.array([x.a, x.b, x.c])
+                Box = BuildLatticeFromLengthsAngles(x.a, x.b, x.c, x.alpha, x.beta, x.gamma)
 
         X=PDBLines[0]
 
@@ -1744,8 +1803,10 @@ class Molecule(object):
 
         Answer={"xyzs":XYZList, "chain":ChainID, "atomname":AtomNames,
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
-                "comms":['' for i in range(len(XYZList))], "boxes":[Box for i in range(len(XYZList))],
-                "bonds":bonds}
+                "comms":['' for i in range(len(XYZList))], "bonds":bonds}
+
+        if Box != None:
+            Answer["boxes"] = [Box for i in range(len(XYZList))]
 
         return Answer
 
@@ -2031,7 +2092,7 @@ class Molecule(object):
             xyz = self.xyzs[I]
             out += [''.join(["%8.3f" % i for i in g]) for g in grouper(10, list(xyz.flatten()))]
             if 'boxes' in self.Data:
-                out.append(''.join(["%8.3f" % i for i in self.boxes[I][:3]]))
+                out.append(''.join(["%8.3f" % i for i in [self.boxes[I].a, self.boxes[I].b, self.boxes[I].c]]))
         return out
 
     def write_arc(self, select):
@@ -2067,7 +2128,7 @@ class Molecule(object):
             out.append("%5i" % self.na)
             for an, line in enumerate(xyzwrite):
                 out.append(format_gro_coord(self.resid[an],self.resname[an],atomname[an],an+1,xyzwrite[an]))
-            out.append(format_gro_box(xyz = self.boxes[I]))
+            out.append(format_gro_box(self.boxes[I]))
         return out
 
     def write_dcd(self, select):
@@ -2080,9 +2141,9 @@ class Molecule(object):
         for I in select:
             xyz = self.xyzs[I]
             ts.coords = _xyz(*list(xyz.flatten()))
-            ts.A      = self.boxes[I][0] if 'boxes' in self.Data else 1.0
-            ts.B      = self.boxes[I][1] if 'boxes' in self.Data else 1.0
-            ts.C      = self.boxes[I][2] if 'boxes' in self.Data else 1.0
+            ts.A      = self.boxes[I].a if 'boxes' in self.Data else 1.0
+            ts.B      = self.boxes[I].b if 'boxes' in self.Data else 1.0
+            ts.C      = self.boxes[I].c if 'boxes' in self.Data else 1.0
             result    = _dcdlib.write_timestep(dcd, byref(ts))
             if result != 0:
                 raise IOError("Error encountered when writing DCD")
@@ -2112,6 +2173,19 @@ class Molecule(object):
         73-76     string segID         Segment identifier, left-justified.
         77-78     string element       Element symbol, right-justified.
         79-80     string charge        Charge on the atom.
+
+        CRYST1 line, added by Lee-Ping
+        COLUMNS  TYPE   FIELD  DEFINITION
+        ---------------------------------------
+         7-15    float  a      a (Angstroms).
+        16-24    float  b      b (Angstroms).
+        25-33    float  c      c (Angstroms).
+        34-40    float  alpha  alpha (degrees).
+        41-47    float  beta   beta (degrees).
+        48-54    float  gamma  gamma (degrees).
+        56-66    string sGroup Space group.
+        67-70    int    z      Z value.
+
         """
         self.require('xyzs')
         self.require_resname()
@@ -2125,6 +2199,28 @@ class Molecule(object):
         if min(RESNUMS) == 0:
             RESNUMS = [i+1 for i in RESNUMS]
 
+        if 'boxes' in self.Data:
+            a = self.boxes[0].a
+            b = self.boxes[0].b
+            c = self.boxes[0].c
+            alpha = self.boxes[0].alpha
+            beta = self.boxes[0].beta
+            gamma = self.boxes[0].gamma
+            line=np.chararray(80)
+            line[:] = ' '
+            line[0:6]=np.array(list("CRYST1"))
+            line=np.array(line,'str')
+            line[6:15] =np.array(list(("%9.3f"%(a))))
+            line[15:24]=np.array(list(("%9.3f"%(b))))
+            line[24:33]=np.array(list(("%9.3f"%(c))))
+            line[33:40]=np.array(list(("%7.2f"%(alpha))))
+            line[40:47]=np.array(list(("%7.2f"%(beta))))
+            line[47:54]=np.array(list(("%7.2f"%(gamma))))
+            # LPW: Put in a dummy space group, we never use it.
+            line[55:66]=np.array(list(str("P 21 21 21").rjust(11)))
+            line[66:70]=np.array(list(str(4).rjust(4)))
+            out.append(line.tostring())
+            
         for I in select:
             XYZ = self.xyzs[I]
             for i in range(self.na):
@@ -2215,18 +2311,44 @@ class Molecule(object):
             
     def require_boxes(self):
         if 'boxes' not in self.Data or len(self.boxes) != self.ns:
-            sys.stderr.write("We're writing a file with boxes, but the file either contains no boxes or too few\n")
-            boxstr = raw_input("Enter 1 / 3 / 9 numbers for box in Angstrom or name of timeseries file -> ")
-            if os.path.exists(boxstr):
-                self.boxes = [[float(i.strip()),float(i.strip()),float(i.strip())] for i in open(boxstr).readlines()]
+            sys.stderr.write("Please specify the periodic box using:\n")
+            sys.stderr.write("1 float (cubic lattice length in Angstrom)\n")
+            sys.stderr.write("3 floats (orthogonal lattice lengths in Angstrom)\n")
+            sys.stderr.write("6 floats (triclinic lattice lengths and angles in degrees)\n")
+            sys.stderr.write("9 floats (triclinic lattice vectors v1(x) v2(y) v3(z) v1(y) v1(z) v2(x) v2(z) v3(x) v3(y) in Angstrom)\n")
+            boxstr = raw_input("Box Vector Input: -> ")
+            box    = [float(i) for i in boxstr.split()]
+            if len(box) == 1:
+                a = box[0]
+                b = box[0]
+                c = box[0]
+                alpha = 90.0
+                beta = 90.0
+                gamma = 90.0
+                self.boxes = [BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma) for i in range(self.ns)]
+            elif len(box) == 3:
+                a = box[0]
+                b = box[1]
+                c = box[2]
+                alpha = 90.0
+                beta = 90.0
+                gamma = 90.0
+                self.boxes = [BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma) for i in range(self.ns)]
+            elif len(box) == 6:
+                a = box[0]
+                b = box[1]
+                c = box[2]
+                alpha = box[3]
+                beta = box[4]
+                gamma = box[5]
+                self.boxes = [BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma) for i in range(self.ns)]
+            elif len(box) == 9:
+                v1 = np.array([box[0], box[3], box[4]])
+                v2 = np.array([box[5], box[1], box[6]])
+                v3 = np.array([box[7], box[8], box[2]])
+                self.boxes = [BuildLatticeFromVectors(v1, v2, v3) for i in range(self.ns)]
             else:
-                box    = [float(i) for i in boxstr.split()]
-                if len(box) == 3 or len(box) == 9:
-                    self.boxes = [box for i in range(self.ns)]
-                elif len(box) == 1:
-                    self.boxes = [[box[0],box[0],box[0]] for i in range(self.ns)]
-                else:
-                    raise Exception("Not sure what to do since you gave me %i numbers" % len(box))
+                raise Exception("Not sure what to do since you gave me %i numbers" % len(box))
 
 def main():
     print "Basic usage as an executable: molecule.py input.format1 output.format2"
