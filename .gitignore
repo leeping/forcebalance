@@ -1,2 +1,3 @@
 *.pyc
-doc/callgraph/*.py
+doc/*
+test/test.log

@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, shutil
 import forcebalance.parser
 import unittest
 from __init__ import ForceBalanceTestCase
@@ -17,8 +17,9 @@ class TestParser(ForceBalanceTestCase):
         msg = "\nExpected parse_inputs()[1][0] to be a target dictionary, got a %s instead" % type(output[1]).__name__)
 
     def test_parse_inputs_generates_default_options(self):
-        """Check parse_inputs() without arguments generates default options"""
+        """Check parse_inputs() without arguments generates dictionary of default options"""
         output = forcebalance.parser.parse_inputs()[0]
+        self.assertEqual(dict, type(output))
         defaults = forcebalance.parser.gen_opts_defaults
         defaults.update({'root':os.getcwd()})
         self.assertEqual(output, defaults)
@@ -37,6 +38,14 @@ class TestParser(ForceBalanceTestCase):
 
         # directory change should lead to different result in output['root']
         self.assertNotEqual(output1,output3)
+
+        # different parameters from the same file should yield different results
+        shutil.copyfile('0.energy_force.in', 'test.in')
+        output5 = forcebalance.parser.parse_inputs('test.in')
+        shutil.copyfile('1.netforce_torque.in','test.in')
+        output6 = forcebalance.parser.parse_inputs('test.in')
+        self.assertNotEqual(output5,output6)
+        os.remove('test.in')
 
 if __name__ == '__main__':           
     unittest.main()
