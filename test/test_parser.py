@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, shutil
 import forcebalance.parser
 import unittest
 from __init__ import ForceBalanceTestCase
@@ -40,9 +40,9 @@ class TestParser(ForceBalanceTestCase):
         self.assertNotEqual(output1,output3)
 
         # different parameters from the same file should yield different results
-        os.copy('0.energy_force.in', 'test.in')
+        shutil.copyfile('0.energy_force.in', 'test.in')
         output5 = forcebalance.parser.parse_inputs('test.in')
-        os.copy('1.netforce_torque.in','test.in')
+        shutil.copyfile('1.netforce_torque.in','test.in')
         output6 = forcebalance.parser.parse_inputs('test.in')
         self.assertNotEqual(output5,output6)
         os.remove('test.in')
