@@ -3,6 +3,7 @@ import os, sys, time
 import traceback
 from collections import OrderedDict
 import numpy
+import logging
 
 class ForceBalanceTestCase(unittest.TestCase):
     def __init__(self,methodName='runTest'):
@@ -54,6 +55,11 @@ class ForceBalanceTestResult(unittest.TestResult):
     """This manages the reporting of test results as they are run,
        and also records results in the internal data structures provided
        by unittest.TestResult"""
+
+    def __init__(self):
+        """Add logging capabilities to the standard TestResult implementation"""
+        super(ForceBalanceTestResult,self).__init__()
+        self.log = logging.getLogger('TestResult')
 
     def startTest(self, test):
         """Notify of test start by writing message to stderr, and also printing to stdout
@@ -117,7 +123,6 @@ class ForceBalanceTestResult(unittest.TestResult):
 
     def startTestRun(self, test):
         """Run before any tests are started"""
-        self.cwd = os.getcwd()
         self.runTime= time.time()
 
     def stopTestRun(self, test):
@@ -134,9 +139,11 @@ class ForceBalanceTestRunner(object):
        Once the tests have finished running, it will return the test result
        in the standard unittest.TestResult format"""
 
-    def run(self,test_modules=[],exclude=[],pretend=False,program_output='test/test.log',quick=False):
+    def run(self,test_modules=[],pretend=False,program_output='test/test.log',quick=False):
+        # first install unittest interrupt handler which gracefully finishes current test on Ctrl+C
         unittest.installHandler()
 
+        # create blank test suite and fill it with test suites loaded from each test module
         tests = unittest.TestSuite()
         for module in test_modules:
             try:
@@ -150,13 +157,19 @@ class ForceBalanceTestRunner(object):
         result = ForceBalanceTestResult()
 
         ### START TESTING ###
+        # run any pretest tasks before first test
         result.startTestRun(tests)
+
+        # if pretend option is enabled, skip all tests instead of running them
         if pretend:
             for module in tests:
                 for test in module:
                     try:
                         result.addSkip(test)
+                    # addSkip will fail if run on TestSuite objects
                     except AttributeError: continue
+
+        # otherwise do a normal test run
         else:
             self.console = sys.stdout
             sys.stdout = open(program_output, 'w')
