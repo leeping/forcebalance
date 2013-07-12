@@ -996,7 +996,7 @@ class Molecule(object):
             raise Exception('Either the comparison or replacement key (%s, %s) doesn\'t exist.' % (key1, key2))
 
     def atom_select(self,atomslice):
-        """ Reurn a copy of the object with certain atoms selected.  Takes an integer, list or array as argument. """
+        """ Return a copy of the object with certain atoms selected.  Takes an integer, list or array as argument. """
         if isinstance(atomslice, int):
             atomslice = [atomslice]
         if isinstance(atomslice, list):
@@ -1027,6 +1027,47 @@ class Molecule(object):
             # print atomslice
             # print [(b[0] in atomslice and b[1] in atomslice) for b in self.bonds]
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
+        return New
+
+    def atom_stack(self, other):
+        """ Return a copy of the object with another molecule object appended.  WARNING: This function may invalidate stuff like QM energies. """
+        if len(other) != len(self):
+            raise Exception('The number of frames of the Molecule objects being stacked are not equal.')
+
+        New = Molecule()
+        for key in self.FrameKeys | self.MetaKeys:
+            New.Data[key] = copy.deepcopy(self.Data[key])
+            
+        # This is how we're going to stack things like Cartesian coordinates and QM forces.
+        def FrameStack(k):
+            if k in self.Data and k in other.Data:
+                New.Data[k] = [np.vstack((s, o)) for s, o in zip(self.Data[k], other.Data[k])]
+        for i in ['xyzs', 'qm_forces', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+            FrameStack(i)
+
+        # Now build the new atom keys.
+        for key in self.AtomKeys:
+            if key not in other.Data:
+                raise Exception('Trying to stack two Molecule objects - the first object contains %s and the other does not' % (key))
+            if key == 'tinkersuf': # Tinker suffix is a bit tricky
+                NewSuf = []
+                for line in other.Data[key]:
+                    whites      = re.split('[^ ]+',line)
+                    s           = line.split()
+                    if len(s) > 1:
+                        for i in range(1,len(s)):
+                            s[i] = str(int(s[i]) + self.na)
+                    NewSuf.append(''.join([whites[j]+s[j] for j in range(len(s))]))
+                New.Data[key] = deepcopy(self.Data[key]) + NewSuf
+            else:
+                if type(self.Data[key]) is np.ndarray:
+                    New.Data[key] = np.concatenate((self.Data[key], other.Data[key]))
+                elif type(self.Data[key]) is list:
+                    New.Data[key] = self.Data[key] + other.Data[key]
+                else:
+                    raise Exception('Cannot stack %s because it is of type %s' % (key, str(type(New.Data[key]))))
+        if 'bonds' in self.Data and 'bonds' in other.Data:
+            New.Data['bonds'] = self.bonds + [(b[0]+self.na, b[1]+self.na) for b in other.bonds]
         return New
 
     def align_by_moments(self):
@@ -1770,7 +1811,6 @@ class Molecule(object):
         AtomNames=np.array([x.name for x in X],'str')
         ResidueNames=np.array([x.resName for x in X],'str')
         ResidueID=np.array([x.resSeq for x in X],'int')
-        ResidueID=ResidueID-ResidueID[0]+1
 
         XYZList=[]
         for Model in PDBLines:
