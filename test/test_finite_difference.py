@@ -2,33 +2,59 @@ from __init__ import ForceBalanceTestCase
 import unittest
 import numpy
 import forcebalance
-from math import cos, pi
+import re, sys
+from math import cos, sin, pi
 
 class TestFiniteDifference(ForceBalanceTestCase):
+    def setUp(self):
+        # functions is a list of tuples containing (function, d/dp, d^2/dp^2)
+        self.functions = []
+
+        # f(x) = 2x
+        self.functions.append((lambda x: 2,
+                               lambda x,p: 0,
+                               lambda x,p: 0))
+        # f(x) = cos(x)
+        self.functions.append((lambda x: cos(x[0]),
+                               lambda x,p: -sin(x[0])*(p==0),
+                               lambda x,p: -cos(x[0])*(p==0)))
+        # f(x) = x^2
+        self.functions.append((lambda x: x[0]**2,
+                               lambda x,p: 2*x[0]*(p==0),
+                               lambda x,p: 2*(p==0)))
+
     def test_fdwrap(self):
         """Check fdwrap properly wraps function"""
 
-        msg = "\nfdwrap alters function behavior"
-        # wrap simple linear function f(x) == 2x
-        func = lambda x: 2*x[0]
-        f=forcebalance.finite_difference.fdwrap(func, [0], 0)
-        self.assertEqual(type(f), type(lambda : ''), "\nfdwrap did not return a function")
-        # some test values
-        self.assertEqual(2,f(1),msg)
-        self.assertEqual(7,f(3.5),msg)
-        self.assertEqual(-3.4,f(-1.7), msg)
+        for func in self.functions:
+            msg = "\nfdwrap alters function behavior"
+            f=forcebalance.finite_difference.fdwrap(func[0], [0]*3, 0)
+            self.assertEqual(type(f), type(lambda : ''), "\nfdwrap did not return a function")
+            # some test values
+            for x in range(-10, 11):
+                self.assertAlmostEqual(f(x), func[0]([x,0,0]))
 
-        self.assertEqual(2, f(.5)-f(-.5),msg)
+    def test_fd_stencils(self):
+        """Check finite difference stencils return approximately correct results"""
+        func = lambda x: x[0]**2
+        fd_stencils = [function for function in dir(forcebalance.finite_difference) if re.match('^f..?d.p$',function)]
 
-        # wrap simple trig function f(x) == cos(x)
-        func = lambda x: cos(x[0])
-        f=forcebalance.finite_difference.fdwrap(func, [pi/2], 0)
-        self.assertEqual(type(f), type(lambda : ''), "\nfdwrap did not return a function")
-        # some test values (need to use assertAlmostEqual for floats)
-        self.assertAlmostEqual(0, f(0), msg=msg)
-        self.assertAlmostEqual(-1, f(pi/2), msg=msg)
-
-        self.assertAlmostEqual(-1, (f(.0005)-f(-.0005))/.001, msg=msg)
+        for func in self.functions:
+            for p in range(1):
+                for x in range(10):
+                    input = [0,0,0]
+                    input[p]=x
+                    f=forcebalance.finite_difference.fdwrap(func[0], input, p)
+                    for stencil in fd_stencils:
+                        fd = eval("forcebalance.finite_difference.%s" % stencil)
+                        result = fd(f,.0001)
+                        if re.match('^f..d.p$', stencil):
+                            self.assertAlmostEqual(result[0], func[1](input,p), places=3)
+                            self.assertAlmostEqual(result[1], func[2](input,p), places=3)
+                        else:
+                            self.assertAlmostEqual(result, func[1](input,p), places=3)
+            
+            
 
 if __name__ == '__main__':           
     unittest.main()
