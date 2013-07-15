@@ -247,11 +247,17 @@ class Liquid_OpenMM(Liquid):
             self.platform = openmm.Platform.getPlatformByName('Reference')
             # Create the simulation object
             self.msim = Simulation(mod.topology, system, integrator, self.platform)
+        # I shall enable starting simulations for many different initial conditions.
+        self.conf_pdb = Molecule(os.path.join(self.root, self.tgtdir,"conf.pdb"))
+        self.traj = None
+        if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
+            self.traj = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
+            print "Found collection of starting conformations, length %i!" % len(self.traj)
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        LinkFile(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
+        # LinkFile(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
         LinkFile(os.path.join(self.root,self.tgtdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
@@ -276,11 +282,15 @@ class Liquid_OpenMM(Liquid):
         epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*np.pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
         return epol
 
-    def npt_simulation(self, temperature, pressure):
+    def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            if self.traj != None:
+                self.conf_pdb.xyzs[0] = self.traj.xyzs[simnum%len(self.traj)]
+                self.conf_pdb.boxes[0] = self.traj.boxes[simnum%len(self.traj)]
+            self.conf_pdb.write('conf.pdb')
             if wq == None:
                 print "Running condensed phase simulation locally."
                 print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()

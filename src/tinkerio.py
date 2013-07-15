@@ -249,7 +249,7 @@ class Liquid_TINKER(Liquid):
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
         # LinkFile(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
 
-    def npt_simulation(self, temperature, pressure):
+    def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
