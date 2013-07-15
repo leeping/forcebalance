@@ -1883,7 +1883,8 @@ class SEQADV:
             self.database = string.strip(line[24:28])
             self.dbIdCode = string.strip(line[29:38])
             self.dbRes = string.strip(line[39:42])
-            self.dbSeq = toInt(string.strip(line[43:48]))
+            try:  self.dbSeq = toInt(string.strip(line[43:48]))
+            except ValueError:  self.dbSeq = None
             self.conflict = string.strip(line[49:70])
         else:  raise ValueError, record
 
