@@ -119,7 +119,7 @@ FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 
 # tinkersuf  = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
 # resid      = Residue IDs (can come from MM coordinate file)
 # resname    = Residue names
-AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost'])
+AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode'])
 #=========================================#
 #| This can be any data attribute we     |#
 #| want but it's usually some property   |#
@@ -453,7 +453,12 @@ def both(A, B, key):
     return key in A.Data and key in B.Data
 
 def diff(A, B, key):
-    return key in A.Data and key in B.Data and A.Data[key] != B.Data[key]
+    if not (key in A.Data and key in B.Data) : return False
+    else:
+        if type(A.Data[key]) is np.ndarray:
+            return (A.Data[key] != B.Data[key]).any()
+        else:
+            return A.Data[key] != B.Data[key]
 
 def either(A, B, key):
     return key in A.Data or key in B.Data
@@ -1807,10 +1812,13 @@ class Molecule(object):
         X=PDBLines[0]
 
         XYZ=np.array([[x.x,x.y,x.z] for x in X])/10.0#Convert to nanometers
+        AltLoc=np.array([x.altLoc for x in X],'str') # Alternate location
+        ICode=np.array([x.iCode for x in X],'str') # Insertion code
         ChainID=np.array([x.chainID for x in X],'str')
         AtomNames=np.array([x.name for x in X],'str')
         ResidueNames=np.array([x.resName for x in X],'str')
         ResidueID=np.array([x.resSeq for x in X],'int')
+        ResidueID=ResidueID-ResidueID[0]+1
 
         XYZList=[]
         for Model in PDBLines:
@@ -1841,7 +1849,7 @@ class Molecule(object):
                     for i in range(2, len(s)):
                         bonds.append((int(s[1])-1, int(s[i])-1))
 
-        Answer={"xyzs":XYZList, "chain":ChainID, "atomname":AtomNames,
+        Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":AtomNames,
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
                 "comms":['' for i in range(len(XYZList))]}
 
