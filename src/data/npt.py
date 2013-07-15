@@ -415,7 +415,7 @@ def create_simulation_object(pdb, settings, pbc=True, precision="mixed", platnam
     system = forcefield.createSystem(mod.topology, **settings)
     if pbc:
         if args.anisotropic:
-            barostat = MonteCarloAnisotropicBarostat(pressure, pressure, pressure, temperature, barostat_frequency)
+            barostat = MonteCarloAnisotropicBarostat([pressure, pressure, pressure], temperature, barostat_frequency)
         else:
             barostat = MonteCarloBarostat(pressure, temperature, barostat_frequency)
         # Add barostat.

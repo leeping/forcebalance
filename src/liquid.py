@@ -304,6 +304,7 @@ class Liquid(Target):
             warn_press_key("Now's our chance to fill the temp directory up with data!")
 
         # Set up and run the NPT simulations.
+        snum = 0
         for label, pt in zip(self.Labels, self.PhasePoints):
             T = pt[0]
             P = pt[1]
@@ -313,8 +314,9 @@ class Liquid(Target):
             if not os.path.exists(label):
                 os.makedirs(label)
                 os.chdir(label)
-                self.npt_simulation(T,P)
+                self.npt_simulation(T,P,snum)
                 os.chdir('..')
+                snum += 1
 
     def get(self, mvals, AGrad=True, AHess=True):
         
