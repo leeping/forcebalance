@@ -15,6 +15,8 @@ class ForceBalanceTestCase(unittest.TestCase):
         self.addCleanup(os.chdir, os.getcwd())  # directory changes shouldn't persist between tests
         self.addTypeEqualityFunc(numpy.ndarray, self.assertNdArrayEqual)
 
+        self.logger = logging.getLogger('test.' + __name__[5:])
+
     def shortDescription(self):
         """Default shortDescription function returns None value if no description
         is present, but this causes errors when trying to print. Return empty string instead
@@ -138,10 +140,15 @@ class ForceBalanceTestRunner(object):
        It controls WHERE test results go but not what is recorded.
        Once the tests have finished running, it will return the test result
        in the standard unittest.TestResult format"""
-    def __init__(self, logger=logging.getLogger("test")):
+    def __init__(self, logger=logging.getLogger("test"), verbose = False):
         self.logger = logger
 
-    def run(self,test_modules=[],pretend=False,program_output='test/test.log',quick=False):
+    def run(self,test_modules=[],pretend=False,program_output='test/test.log',quick=False, verbose=False):
+        if verbose:
+            self.logger.setLevel(logging.DEBUG)
+        else:
+            self.logger.setLevel(logging.INFO)
+
         # first install unittest interrupt handler which gracefully finishes current test on Ctrl+C
         unittest.installHandler()
 

@@ -22,6 +22,8 @@ def getOptions():
                 exclude=a.split(',')    # used below when generating module list
             if o in ("-p", "--pretend"):
                 options['pretend']=True
+            if o in ("-v", "--verbose"):
+                options['verbose']=True
     except getopt.GetoptError as err:
         usage()
         sys.exit()
