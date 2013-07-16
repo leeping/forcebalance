@@ -376,7 +376,7 @@ def parse_inputs(input_file=None):
     this_tgt_opt = deepcopy(tgt_opts_defaults)
     # Give back a bunch of default options if input file isn't specified.
     if input_file == None:
-        return options, tgt_opts
+        return (options, [this_tgt_opt])
     fobj = open(input_file)
     for line in fobj:
         try:
