@@ -773,7 +773,7 @@ class Molecule(object):
     def append(self,other):
         self += other
 
-    def __init__(self, fnm = None, ftype = None, build_topology = True):
+    def __init__(self, fnm = None, ftype = None, positive_resid=True, build_topology = True):
         """ To create the Molecule object, we simply define the table of
         file reading/writing functions and read in a file if it is
         provided."""
@@ -822,6 +822,7 @@ class Molecule(object):
                           'arc'     : 'tinker'}
         ## Creates entries like 'gromacs' : 'gromacs' and 'xyz' : 'xyz'
         ## in the Funnel
+        self.positive_resid = positive_resid
         for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
             self.Funnel[i] = i
         # Data container.  All of the data is stored in here.
@@ -1819,7 +1820,8 @@ class Molecule(object):
         ResidueNames=np.array([x.resName for x in X],'str')
         ResidueID=np.array([x.resSeq for x in X],'int')
         # Try not to number Residue IDs starting from 1...
-        # ResidueID=ResidueID-ResidueID[0]+1
+        if self.positive_resid:
+            ResidueID=ResidueID-ResidueID[0]+1
 
         XYZList=[]
         for Model in PDBLines:
