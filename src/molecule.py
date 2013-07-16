@@ -1818,7 +1818,8 @@ class Molecule(object):
         AtomNames=np.array([x.name for x in X],'str')
         ResidueNames=np.array([x.resName for x in X],'str')
         ResidueID=np.array([x.resSeq for x in X],'int')
-        ResidueID=ResidueID-ResidueID[0]+1
+        # Try not to number Residue IDs starting from 1...
+        # ResidueID=ResidueID-ResidueID[0]+1
 
         XYZList=[]
         for Model in PDBLines:
