@@ -3,7 +3,7 @@ import os, sys, time
 import traceback
 from collections import OrderedDict
 import numpy
-import logging
+import forcebalance
 
 class ForceBalanceTestCase(unittest.TestCase):
     def __init__(self,methodName='runTest'):
@@ -15,7 +15,7 @@ class ForceBalanceTestCase(unittest.TestCase):
         self.addCleanup(os.chdir, os.getcwd())  # directory changes shouldn't persist between tests
         self.addTypeEqualityFunc(numpy.ndarray, self.assertNdArrayEqual)
 
-        self.logger = logging.getLogger('test.' + __name__[5:])
+        self.logger = forcebalance.logging.getLogger('test.' + __name__[5:])
 
     def shortDescription(self):
         """Default shortDescription function returns None value if no description
@@ -61,7 +61,7 @@ class ForceBalanceTestResult(unittest.TestResult):
     def __init__(self):
         """Add logging capabilities to the standard TestResult implementation"""
         super(ForceBalanceTestResult,self).__init__()
-        self.logger = logging.getLogger('test.results')
+        self.logger = forcebalance.logging.getLogger('test.results')
 
     def startTest(self, test):
         """Notify of test start by writing message to stderr, and also printing to stdout
@@ -140,14 +140,14 @@ class ForceBalanceTestRunner(object):
        It controls WHERE test results go but not what is recorded.
        Once the tests have finished running, it will return the test result
        in the standard unittest.TestResult format"""
-    def __init__(self, logger=logging.getLogger("test"), verbose = False):
+    def __init__(self, logger=forcebalance.logging.getLogger("test"), verbose = False):
         self.logger = logger
 
     def run(self,test_modules=[],pretend=False,program_output='test/test.log',quick=False, verbose=False):
         if verbose:
-            self.logger.setLevel(logging.DEBUG)
+            self.logger.setLevel(forcebalance.logging.DEBUG)
         else:
-            self.logger.setLevel(logging.INFO)
+            self.logger.setLevel(forcebalance.logging.INFO)
 
         # first install unittest interrupt handler which gracefully finishes current test on Ctrl+C
         unittest.installHandler()
@@ -183,8 +183,8 @@ class ForceBalanceTestRunner(object):
             self.console = sys.stdout
             sys.stdout = open(program_output, 'w')
 
-            self.logger.addHandler(RawStreamHandler(sys.stderr))
-            self.logger.setLevel(logging.DEBUG)
+            self.logger.addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
+            self.logger.setLevel(forcebalance.logging.DEBUG)
 
             unittest.registerResult(result)
             tests.run(result)
@@ -320,31 +320,4 @@ class TestValues(object):
     water_tgt_opts = [tgt_opt.copy(), tgt_opt.copy()]
     water_tgt_opts[0].update({'type': 'ABINITIO_GMX', 'name': 'cluster-06'})
     water_tgt_opts[1].update({'type': 'ABINITIO_GMX', 'name': 'cluster-12'})
-    
-#=========================================#
-#| Logging Handlers (move to nifty       |#
-#| after logging branch merge?)          |#
-#=========================================#
-
-class RawStreamHandler(logging.StreamHandler):
-    """Exactly like logging.StreamHandler except it does no extra formatting
-    before sending logging messages to the stream. This is more compatible with
-    how output has been displayed in ForceBalance. Default stream has also been
-    changed from stderr to stdout"""
-    def __init__(self, stream = sys.stdout):
-        super(RawStreamHandler, self).__init__(stream)
-    
-    def emit(self, record):
-        message = record.getMessage()
-        self.stream.write(message)
-        self.flush()
-
-class RawFileHandler(logging.FileHandler):
-    """Exactly like logging.FileHandler except it does no extra formatting
-    before sending logging messages to the file. This is more compatible with
-    how output has been displayed in ForceBalance."""
-    def emit(self, record):
-        message = record.getMessage()
-        self.stream.write(message)
-        self.flush()
 

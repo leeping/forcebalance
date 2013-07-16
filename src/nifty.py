@@ -28,6 +28,7 @@ import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
 # import IPython as ip # For debugging
+from forcebalance import logging
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -764,6 +765,33 @@ def warn_once(warning, warnhash = None):
         for line in warning:
             print line
 warn_once.already = set()
+
+#=========================================#
+#| Logging Handlers (move to nifty       |#
+#| after logging branch merge?)          |#
+#=========================================#
+
+class RawStreamHandler(logging.StreamHandler):
+    """Exactly like logging.StreamHandler except it does no extra formatting
+    before sending logging messages to the stream. This is more compatible with
+    how output has been displayed in ForceBalance. Default stream has also been
+    changed from stderr to stdout"""
+    def __init__(self, stream = sys.stdout):
+        super(RawStreamHandler, self).__init__(stream)
+    
+    def emit(self, record):
+        message = record.getMessage()
+        self.stream.write(message)
+        self.flush()
+
+class RawFileHandler(logging.FileHandler):
+    """Exactly like logging.FileHandler except it does no extra formatting
+    before sending logging messages to the file. This is more compatible with
+    how output has been displayed in ForceBalance."""
+    def emit(self, record):
+        message = record.getMessage()
+        self.stream.write(message)
+        self.flush()
 
 #=========================================#
 #| Development stuff (not commonly used) |#
