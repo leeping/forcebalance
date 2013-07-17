@@ -1,8 +1,7 @@
 import Tkinter as tk
 import tkFileDialog as tkfile
 import sys, os
-from interfaces import *
-from objects import *
+import elements
 
 class MainWindow(tk.Tk):
     def __init__(self):
@@ -12,9 +11,9 @@ class MainWindow(tk.Tk):
         self._initialize_menu()
 
         ## Window Components
-        self.objectsPane = ObjectViewer(self)
-        self.detailsPane = DetailViewer(self)
-        #self.consolePane = ConsoleViewer(self)
+        self.objectsPane = elements.ObjectViewer(self)
+        self.detailsPane = elements.DetailViewer(self)
+        #self.consolePane = elements.ConsoleViewer(self)
         self.objectsPane.pack(side=tk.LEFT, fill=tk.Y)
         self.detailsPane.pack(side=tk.LEFT, fill=tk.Y)
         #self.consolePane.pack(side=tk.LEFT, fill=tk.Y)
@@ -27,10 +26,16 @@ class MainWindow(tk.Tk):
     def _initialize_menu(self):
         self.menubar = tk.Menu(self)
         filemenu = tk.Menu(self.menubar, tearoff=0)
-        filemenu.add_command(label="New")
-        filemenu.add_command(label="Open", command=self.open)
-        filemenu.add_command(label="Save")
-        filemenu.add_command(label="Close")
+        filemenu.add_command(label="New", state="disabled")
+
+        def open():
+            filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
+            inputfile = tkfile.askopenfilename(title="Open ForceBalance input file...", filetypes=filters)
+            self.objectsPane.open(inputfile)
+        filemenu.add_command(label="Open", command=open)
+
+        filemenu.add_command(label="Save", state="disabled")
+        filemenu.add_command(label="Close", state="disabled")
         filemenu.add_command(label="Exit", command=sys.exit)
         self.menubar.add_cascade(label="File", menu=filemenu)
 
@@ -38,26 +43,13 @@ class MainWindow(tk.Tk):
 
         calculationmenu = tk.Menu(self.menubar, tearoff=0)
         calculationmenu.add_command(label="Check", state="disabled")
-        calculationmenu.add_command(label="Run")
-        self.menubar.add_cascade(label="Calculation", menu=calculationmenu)
+        calculationmenu.add_command(label="Run", state="disabled")
+        self.menubar.add_cascade(label="Calculation", menu=calculationmenu, state="disabled")
 
     def open(self):
         filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
         inputfile = tkfile.askopenfilename(title="Open ForceBalance input file...", filetypes=filters)
 
-        if inputfile=='': return
-
-        cwd=os.getcwd()
-        os.chdir(os.path.dirname(inputfile))
-        opts, tgt_opts = forcebalance.parser.parse_inputs(inputfile)
-
-        self.objectsPane.add(OptionObject(opts, os.path.split(inputfile)[1]))
-        for target in tgt_opts:
-            self.objectsPane.add(TargetObject(target))
-        self.objectsPane.add(ForcefieldObject(opts))
-        self.objectsPane.update()
-        
-        os.chdir(cwd)
 
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
