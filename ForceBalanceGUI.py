@@ -95,16 +95,16 @@ class ObjectViewer(tk.LabelFrame):
         self.selectionchanged=tk.BooleanVar()
         self.selectionchanged.set(True)
 
-        self.canvas = tk.Text(self, cursor="arrow", state="disabled", width="30")
+        self.content = tk.Text(self, cursor="arrow", state="disabled", width="30")
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
 
         # bind scrollbar actions
-        self.scrollbar.config(command = self.canvas.yview)
-        self.canvas['yscrollcommand']=self.scrollbar.set
+        self.scrollbar.config(command = self.content.yview)
+        self.content['yscrollcommand']=self.scrollbar.set
 
         # arrange and display list elements
-        self.canvas.pack(side=tk.LEFT, fill=tk.Y)
-        self.canvas.update()
+        self.content.pack(side=tk.LEFT, fill=tk.Y)
+        self.content.update()
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y)
 
     def _bindSelection(self, widget):
@@ -127,36 +127,36 @@ class ObjectViewer(tk.LabelFrame):
         else: raise TypeError("ObjectViewer can only handle option, target, and forcefield objects")
 
     def update(self):
-        self.canvas["state"]= "normal"
-        self.canvas.delete("1.0","end")
+        self.content["state"]= "normal"
+        self.content.delete("1.0","end")
         for calculation in self.calculations:
-            self.canvas.window_create("end",window = tk.Label(self.canvas,text=calculation['options']['name'], bg="#FFFFFF"))
-            self.canvas.insert("end",'\n')
+            self.content.window_create("end",window = tk.Label(self.content,text=calculation['options']['name'], bg="#FFFFFF"))
+            self.content.insert("end",'\n')
             
-            l = tk.Label(self.canvas,text="General Options", bg="#DEE4FA")
-            self.canvas.window_create("end",window = l)
+            l = tk.Label(self.content,text="General Options", bg="#DEE4FA")
+            self.content.window_create("end",window = l)
             l.bind('<Button-1>', self._bindSelection(calculation['options']))
-            self.canvas.insert("end",'\n')
+            self.content.insert("end",'\n')
 
-            self.canvas.window_create("end", window = tk.Label(self.canvas,text="Targets", bg="#FFFFFF"))
-            self.canvas.insert("end",'\n')
+            self.content.window_create("end", window = tk.Label(self.content,text="Targets", bg="#FFFFFF"))
+            self.content.insert("end",'\n')
             for target in calculation['targets']:
-                l=tk.Label(self.canvas, text=target['name'], bg="#DEE4FA")
-                self.canvas.window_create("end", window = l)
-                self.canvas.insert("end",'\n')
+                l=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
+                self.content.window_create("end", window = l)
+                self.content.insert("end",'\n')
                 l.bind('<Button-1>', self._bindSelection(target))
 
-            self.canvas.window_create("end", window = tk.Label(self.canvas,text="Forcefields", bg="#FFFFFF"))
-            self.canvas.insert("end",'\n')
+            self.content.window_create("end", window = tk.Label(self.content,text="Forcefields", bg="#FFFFFF"))
+            self.content.insert("end",'\n')
             for forcefield in calculation['forcefields']:
-                l=tk.Label(self.canvas, text=forcefield['name'], bg="#DEE4FA")
-                self.canvas.window_create("end", window = l)
+                l=tk.Label(self.content, text=forcefield['name'], bg="#DEE4FA")
+                self.content.window_create("end", window = l)
                 l.bind('<Button-1>', self._bindSelection(forcefield))
-            self.canvas.insert("end",'\n\n')
-        self.canvas["state"]="disabled"
+            self.content.insert("end",'\n\n')
+        self.content["state"]="disabled"
 
     def select(self, e, o):
-        for widget in self.canvas.winfo_children():
+        for widget in self.content.winfo_children():
             if not widget['bg']=="#FFFFFF":
                 widget['bg']='#DEE4FA'
         e.widget['bg']='#4986D6'
@@ -164,10 +164,10 @@ class ObjectViewer(tk.LabelFrame):
         self.selectionchanged.get() # reading this variable triggers a refresh
 
     def scrollUp(self, e):
-        self.canvas.yview('scroll', -1, 'units')
+        self.content.yview('scroll', -1, 'units')
 
     def scrollDown(self, e):
-        self.canvas.yview('scroll', 1, 'units')
+        self.content.yview('scroll', 1, 'units')
 
 class DetailViewer(tk.LabelFrame):
     def __init__(self, root, opts=''):
