@@ -29,9 +29,9 @@ class ObjectViewer(tk.LabelFrame):
         self.content.update()
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y)
 
-    def _bindEventHandler(self, handler, object):
+    def _bindEventHandler(self, handler, **kwargs):
         def f(e):
-            return handler(e, object)
+            return handler(e, **kwargs)
         return f
 
     def open(self, filename):
@@ -45,45 +45,44 @@ class ObjectViewer(tk.LabelFrame):
         self.content["state"]= "normal"
         self.content.delete("1.0","end")
         for calculation in self.calculations:
-            self.content.window_create("end",window = tk.Label(self.content,text=calculation['options']['name'], bg="#FFFFFF"))
+            l = tk.Label(self.content,text=calculation['options']['name'], bg="#DEE4FA")
+            self.content.window_create("end",window = l)
+            l.bind('<Button-1>', self._bindEventHandler(self.select, object = calculation))
             self.content.insert("end",'\n')
             
+            self.content.insert("end",' ')
             l = tk.Label(self.content,text="General Options", bg="#DEE4FA")
             self.content.window_create("end",window = l)
-            l.bind('<Button-1>', self._bindEventHandler(self.select, calculation['options']))
+            l.bind('<Button-1>', self._bindEventHandler(self.select, object = calculation['options']))
             self.content.insert("end",'\n')
-
-            def toggle_targets(e):
-                if calculation['_expand_targets']:
-                    calculation['_expand_targets']=False
-                else: calculation['_expand_targets']=True
-                self.needUpdate.get()
             
+            self.content.insert("end",' ')
             targetLabel = tk.Label(self.content,text="Targets", bg="#FFFFFF")
             self.content.window_create("end", window = targetLabel)
-            targetLabel.bind("<Button-1>", self._bindEventHandler(self.toggle, calculation))
+            targetLabel.bind("<Button-1>", self._bindEventHandler(self.toggle, calculation = calculation))
             self.content.insert("end",'\n')
 
             if calculation['_expand_targets']:
                 for target in calculation['targets']:
-                    self.content.insert("end",'  ')
+                    self.content.insert("end",'   ')
                     l=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
                     self.content.window_create("end", window = l)
                     self.content.insert("end",'\n')
-                    l.bind('<Button-1>', self._bindEventHandler(self.select, target))
+                    l.bind('<Button-1>', self._bindEventHandler(self.select, object=target))
 
+            self.content.insert("end",' ')
             l=tk.Label(self.content, text="Forcefield", bg="#DEE4FA")
             self.content.window_create("end", window = l)
-            l.bind('<Button-1>', self._bindEventHandler(self.select, calculation['forcefield']))
+            l.bind('<Button-1>', self._bindEventHandler(self.select, object=calculation['forcefield']))
             self.content.insert("end",'\n\n')
         self.content["state"]="disabled"
 
-    def select(self, e, o):
+    def select(self, e, object):
         for widget in self.content.winfo_children():
             if not widget['bg']=="#FFFFFF":
                 widget['bg']='#DEE4FA'
         e.widget['bg']='#4986D6'
-        self.activeselection=o
+        self.activeselection=object
         self.selectionchanged.get() # reading this variable triggers a refresh
 
     def toggle(self, e, calculation):
@@ -122,35 +121,31 @@ class DetailViewer(tk.LabelFrame):
 
         # right click context menu
         self.contextmenu = tk.Menu(self, tearoff=0)
+        self.contextmenu.add_command(label="Add option", state="disabled")
         self.contextmenu.add_checkbutton(label="show all", variable=self.printAll)
         self.content.bind("<Button-3>", lambda e : self.contextmenu.post(e.x_root, e.y_root))
         self.content.bind("<Button-1>", lambda e : self.contextmenu.unpost())
         self.printAll.trace('w', lambda *x : self.load())
 
     def load(self,newObject=None):
-        self.content["state"]="normal"
-        self.content.delete("1.0","end")
+
         if newObject:
             self.currentObject = newObject
             self.printAll.set(0)
-        else:
+        if self.currentObject:   # if there is an object to display
+            self.content["state"]="normal"
+            self.content.delete("1.0","end")
+
+            self['text']="Details - %s" % self.currentObject['name']
+
+            try:
+                self.content.insert("end", self.currentObject.display(self.printAll.get()))
+            except:
+                self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject['type'], self.currentObject['name']), "error")
+                from traceback import format_exc
+                self.content.insert("end", format_exc(), "error")
+
             self.content["state"]="disabled"
-            return   # no object being viewed, nothing else to do!
-
-        self['text']="Details - %s" % self.currentObject['name']
-
-        self.content["state"]="normal"
-        self.content.delete("1.0","end")
-
-        try:
-            self.content.insert("end", self.currentObject.display(self.printAll.get()))
-        except:
-            #self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject['type'], self.currentObject['name']), "error")
-            self.content.insert("end", "%s\n" % self.currentObject)
-            from traceback import format_exc
-            self.content.insert("end", format_exc(), "error")
-
-        self.content["state"]="disabled"
 
     def scrollUp(self, e):
         self.content.yview('scroll', -1, 'units')
