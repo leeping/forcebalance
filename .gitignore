@@ -1,3 +1,7 @@
 *.pyc
 doc/*
-test/test.log
+
+test.log
+temp
+backups
+result
