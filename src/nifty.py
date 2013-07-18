@@ -767,8 +767,7 @@ def warn_once(warning, warnhash = None):
 warn_once.already = set()
 
 #=========================================#
-#| Logging Handlers (move to nifty       |#
-#| after logging branch merge?)          |#
+#| Logging Handlers                      |#
 #=========================================#
 
 class RawStreamHandler(logging.StreamHandler):
