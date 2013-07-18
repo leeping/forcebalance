@@ -46,11 +46,6 @@ class MainWindow(tk.Tk):
         calculationmenu.add_command(label="Run", state="disabled")
         self.menubar.add_cascade(label="Calculation", menu=calculationmenu, state="disabled")
 
-    def open(self):
-        filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
-        inputfile = tkfile.askopenfilename(title="Open ForceBalance input file...", filetypes=filters)
-
-
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
 
