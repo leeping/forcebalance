@@ -48,6 +48,7 @@ class ObjectViewer(tk.LabelFrame):
             l = tk.Label(self.content,text=calculation['options']['name'], bg="#DEE4FA")
             self.content.window_create("end",window = l)
             l.bind('<Button-1>', self._bindEventHandler(self.select, object = calculation))
+            l.bind('<Double-Button-1>', self._bindEventHandler(self.toggleCalculation, calculation = calculation))
             self.content.insert("end",'\n')
             
             self.content.insert("end",' ')
@@ -55,20 +56,27 @@ class ObjectViewer(tk.LabelFrame):
             self.content.window_create("end",window = l)
             l.bind('<Button-1>', self._bindEventHandler(self.select, object = calculation['options']))
             self.content.insert("end",'\n')
-            
-            self.content.insert("end",' ')
-            targetLabel = tk.Label(self.content,text="Targets", bg="#FFFFFF")
-            self.content.window_create("end", window = targetLabel)
-            targetLabel.bind("<Button-1>", self._bindEventHandler(self.toggle, calculation = calculation))
-            self.content.insert("end",'\n')
+
+            targetLabel = tk.Label(self.content, text="Targets", bg="#FFFFFF")
+            targetLabel.bind("<Double-Button-1>", self._bindEventHandler(self.toggleTargets, calculation = calculation))
 
             if calculation['_expand_targets']:
+                self.content.insert("end",' ')
+                self.content.window_create("end", window = targetLabel)
+                self.content.insert("end",'\n')
+
                 for target in calculation['targets']:
-                    self.content.insert("end",'   ')
-                    l=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
-                    self.content.window_create("end", window = l)
+                    target.label=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
+
+                    self.content.insert("end",'  ')
+                    self.content.window_create("end", window = target.label)
                     self.content.insert("end",'\n')
-                    l.bind('<Button-1>', self._bindEventHandler(self.select, object=target))
+
+                    target.label.bind('<Button-1>', self._bindEventHandler(self.select, object=target))
+            else:
+                self.content.insert("end",'+')
+                self.content.window_create("end", window = targetLabel)
+                self.content.insert("end",'\n')
 
             self.content.insert("end",' ')
             l=tk.Label(self.content, text="Forcefield", bg="#DEE4FA")
@@ -85,9 +93,14 @@ class ObjectViewer(tk.LabelFrame):
         self.activeselection=object
         self.selectionchanged.get() # reading this variable triggers a refresh
 
-    def toggle(self, e, calculation):
+    def toggleTargets(self, e, calculation):
         if calculation['_expand_targets']: calculation['_expand_targets'] = False
         else: calculation['_expand_targets'] = True
+        self.needUpdate.get()
+
+    def toggleCalculation(self, e, calculation):
+        if calculation['_expand']: calculation['_expand'] = False
+        else: calculation['_expand'] = True
         self.needUpdate.get()
 
     def scrollUp(self, e):
