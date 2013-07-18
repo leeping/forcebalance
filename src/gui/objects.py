@@ -2,7 +2,13 @@ import forcebalance
 from uuid import uuid1 as uuid
 import os
 
+"""
+This file contains classes that interface with forcebalance and act as an intermediary
+between the GUI frontend and lower level calculation elements.
+"""
+
 class ForceBalanceObject(object):
+    """Generic forcebalance object with some identifying information"""
     def __init__(self, name='', type='object'):
         self.properties = dict()
         self.properties['active'] = False
@@ -23,8 +29,9 @@ class ForceBalanceObject(object):
         return s
 
 class CalculationObject(ForceBalanceObject):
+    """Represents a set of forcebalance objects that together make up a calculation"""
     def __init__(self, filename=None):
-        super(CalculationObject,self).__init__()
+        super(CalculationObject,self).__init__(type='calculation')
         self.properties['options']=[]
         self.properties['targets']=[]
         self.properties['forcefield']=None
@@ -38,6 +45,8 @@ class CalculationObject(ForceBalanceObject):
         opts, tgt_opts = forcebalance.parser.parse_inputs(filename)
         self.properties['options'] = OptionObject(opts, os.path.basename(filename))
 
+        self.properties['name'] = self.properties['options']['name']
+
         for target in tgt_opts:
             self.properties['targets'].append(TargetObject(target))
 
@@ -46,57 +55,29 @@ class CalculationObject(ForceBalanceObject):
 
         os.chdir(cwd)
 
+    def addTarget(self, opts = forcebalance.parser.tgt_opts_defaults.copy()):
+        self.properties['targets'].append(TargetObject(opts))
+
+    def writeOptions(self, filename):
+        with open('~' + filename,'w') as f:
+            f.write("$options\n")
+            for option in self.properties['options'].opts.iterkeys():
+                f.write("%s %s\n" % (option, self.properties['options'].opts[option]))
+            f.write("$end\n")
+            
+            for target in self.properties['targets']:
+                f.write("\n$target\n")
+                for option in target.opts:
+                    f.write("%s %s\n" % (option, target.opts[option]))
+                f.write("$end\n")
         
 
-#        objtype = type(obj)
-
-#        if objtype==objects.OptionObject:
-#            newcalc = {'options':obj,'targets':[],'forcefields':[]}
-#            self.calculations.append(newcalc)
-
-#        elif objtype==objects.TargetObject: 
-#            self.calculations[-1]['targets'].append(obj)
-#        elif objtype==objects.ForcefieldObject:
-#            self.calculations[-1]['forcefields'].append(obj)
-#        else: raise TypeError("ObjectViewer can only handle option, target, and forcefield objects")
-########################################3
-#        if filename=='': return
-#
-#        cwd=os.getcwd()
-#        os.chdir(os.path.dirname(filename))
-#
-#        self.add(objects.OptionObject(opts, os.path.split(filename)[1]))
-#        for target in tgt_opts:
-#            self.add(objects.TargetObject(target))
-#        self.add(objects.ForcefieldObject(opts))
-#        self.update()
-#        
-#        os.chdir(cwd)
-
-class TargetObject(ForceBalanceObject):
-    def __init__(self, tgt_opt):
-        super(TargetObject,self).__init__()
-        self.opts = tgt_opt
-        self.properties.update(self.opts)
-
-    def display(self, verbose=0):
-        s=''
-        default_keys=[]
-        for key in self.opts.iterkeys():
-            if key not in forcebalance.parser.tgt_opts_defaults.keys() or self.opts[key] != forcebalance.parser.tgt_opts_defaults[key]:
-                s+= "%s : %s\n" % (key, str(self.opts[key]))
-            else: default_keys.append(key)
-        if verbose:
-            s+= "\n--- default options ---\n"
-            for default_key in default_keys:
-                s+= "%s : %s\n" % (default_key, str(self.opts[default_key]))
-        
-        return s
-        
-
+# maybe the current implementation of TargetObject should be merged here
+# to keep all options in the same place?
 class OptionObject(ForceBalanceObject):
+    """Represents general options parsed from an input file"""
     def __init__(self, opts=None, name="unknown options file"):
-        super(OptionObject,self).__init__()
+        super(OptionObject,self).__init__(type = 'options')
 
         if not opts: self.opts = forcebalance.parser.gen_opts_defaults
         else: self.opts = opts
@@ -107,7 +88,7 @@ class OptionObject(ForceBalanceObject):
         s=''
         default_keys=[]
         for key in self.opts.iterkeys():
-            if key not in forcebalance.parser.gen_opts_defaults.keys() or self.opts[key] != forcebalance.parser.gen_opts_defaults[key]:
+            if not self.isDefault(key):
                 s+= "%s : %s\n" % (key, str(self.opts[key]))
             else: default_keys.append(key)
         if verbose:
@@ -115,11 +96,78 @@ class OptionObject(ForceBalanceObject):
             for default_key in default_keys:
                 s+= "%s : %s\n" % (default_key, str(self.opts[default_key]))
         return s
+
+    def resetOption(self, option):
+        try:
+            self.opts[option] = forcebalance.parser.gen_opts_defaults[option]
+        except:
+            self.opts[option] = None        
+
+    def setOption(self, option, value):
+        self.opts[option] = value
+
+    def getOptionHelp(self, option):
+        message = "No help available for option '%s'" % option
+
+        for opt_type in forcebalance.parser.gen_opts_types:
+            if option in forcebalance.parser.gen_opts_types[opt_type].keys():
+                message = option + ": "
+                message += forcebalance.parser.gen_opts_types[opt_type][option][2]
+                message +="\nApplicable to: "
+                message += forcebalance.parser.gen_opts_types[opt_type][option][3]
+        return message
+
+    def isDefault(self, option):
+        return option in forcebalance.parser.gen_opts_defaults.keys() and self.opts[option] == forcebalance.parser.gen_opts_defaults[option]
+
+class TargetObject(ForceBalanceObject):
+    """Currently holds target option information. In the future, might also hold actual target objects"""
+    def __init__(self, tgt_opt):
+        super(TargetObject,self).__init__(type='target')
+        self.opts = tgt_opt
+        self.properties.update(self.opts)
+
+    def display(self, verbose=0):
+        s=''
+        default_keys=[]
+        for key in self.opts.iterkeys():
+            if not self.isDefault(key):
+                s+= "%s : %s\n" % (key, str(self.opts[key]))
+            else: default_keys.append(key)
+        if verbose:
+            s+= "\n--- default options ---\n"
+            for default_key in default_keys:
+                s+= "%s : %s\n" % (default_key, str(self.opts[default_key]))
         
+        return s
+
+    def resetOption(self, option):
+        try:
+            self.opts[option] = forcebalance.parser.tgt_opts_defaults[option]
+        except:
+            self.opts[option] = None
+
+    def setOption(self, option, value):
+        self.opts[option] = value
+
+    def getTargetOptionHelp(self, option):
+        message = "No help available for option '%s'" % option
+
+        for opt_type in forcebalance.parser.tgt_opts_types:
+            if option in forcebalance.parser.tgt_opts_types[opt_type].keys():
+                message = option + ": "
+                message += forcebalance.parser.tgt_opts_types[opt_type][option][2]
+                message +="\nApplicable to: "
+                message += forcebalance.parser.tgt_opts_types[opt_type][option][3]
+        return message
+
+    def isDefault(self, option):
+        return option in forcebalance.parser.tgt_opts_defaults.keys() and self.opts[option] == forcebalance.parser.tgt_opts_defaults[option]
 
 class ForcefieldObject(ForceBalanceObject):
+    """Represents a forcebalance forcefield object"""
     def __init__(self, opts):
-        super(ForcefieldObject, self).__init__()
+        super(ForcefieldObject, self).__init__(type = 'forcefield')
         self.opts = opts
         self.forcefield = forcebalance.forcefield.FF(self.opts)
         self.properties["name"] = self.forcefield.fnms[0]
