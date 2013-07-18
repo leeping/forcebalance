@@ -8,7 +8,7 @@ __version__ = VERSION
 
 from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
-import os
+import os,sys
 import shutil
 import glob
 
@@ -97,12 +97,32 @@ def buildKeywordDictionary():
     print "%s" % outputString
 
     return setupKeywords
+
+def doClean():
+    """Remove existing forcebalance module folder before installing"""
+    try:
+        dir=os.path.dirname(__import__('forcebalance').__file__)
+    except ImportError:
+        print "Couldn't find existing forcebalance installation. Nothing to clean..\n"
+        return
+
+    raw_input("All files in %s will be deleted for clean install\nPress <Enter> to continue, <Ctrl+C> to abort\n" % dir)
+    shutil.rmtree(dir)
     
 def main():
     # if len(os.path.split(__file__)[0]) > 0:
     #     os.chdir(os.path.split(__file__)[0])
+
+    for i, option in enumerate(sys.argv):
+        if option == "-c" or option== "--clean":
+            doClean()
+            del sys.argv[i]
+            break
+    
     setupKeywords=buildKeywordDictionary()
     setup(**setupKeywords)
+
+    shutil.rmtree('build')
 
 if __name__ == '__main__':
     main()
