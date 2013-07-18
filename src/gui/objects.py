@@ -85,17 +85,13 @@ class OptionObject(ForceBalanceObject):
         self.properties['name'] = name
 
     def display(self, verbose = False):
-        s=''
-        default_keys=[]
+        options = dict()
+        default_options = dict()
         for key in self.opts.iterkeys():
             if not self.isDefault(key):
-                s+= "%s : %s\n" % (key, str(self.opts[key]))
-            else: default_keys.append(key)
-        if verbose:
-            s+= "\n--- default options ---\n"
-            for default_key in default_keys:
-                s+= "%s : %s\n" % (default_key, str(self.opts[default_key]))
-        return s
+                options[key]=self.opts[key]
+            else: default_options[key]=self.opts[key]
+        return (options, default_options)
 
     def resetOption(self, option):
         try:
@@ -150,7 +146,7 @@ class TargetObject(ForceBalanceObject):
     def setOption(self, option, value):
         self.opts[option] = value
 
-    def getTargetOptionHelp(self, option):
+    def getOptionHelp(self, option):
         message = "No help available for option '%s'" % option
 
         for opt_type in forcebalance.parser.tgt_opts_types:

@@ -3,7 +3,7 @@ import tkFileDialog as tkfile
 import sys, os
 
 import objects
-import forcebalance
+from eventhandlers import _bindEventHandler
 
 class ObjectViewer(tk.LabelFrame):
     def __init__(self,root):
@@ -29,11 +29,6 @@ class ObjectViewer(tk.LabelFrame):
         self.content.update()
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y)
 
-    def _bindEventHandler(self, handler, **kwargs):
-        def f(e):
-            return handler(e, **kwargs)
-        return f
-
     def open(self, filename):
         """Parse forcebalance input file and add referenced objects"""
         if filename=='': return
@@ -47,41 +42,43 @@ class ObjectViewer(tk.LabelFrame):
         for calculation in self.calculations:
             l = tk.Label(self.content,text=calculation['options']['name'], bg="#DEE4FA")
             self.content.window_create("end",window = l)
-            l.bind('<Button-1>', self._bindEventHandler(self.select, object = calculation))
-            l.bind('<Double-Button-1>', self._bindEventHandler(self.toggleCalculation, calculation = calculation))
+            l.bind('<Button-1>', _bindEventHandler(self.select, object = calculation))
             self.content.insert("end",'\n')
             
             self.content.insert("end",' ')
             l = tk.Label(self.content,text="General Options", bg="#DEE4FA")
             self.content.window_create("end",window = l)
-            l.bind('<Button-1>', self._bindEventHandler(self.select, object = calculation['options']))
+            l.bind('<Button-1>', _bindEventHandler(self.select, object = calculation['options']))
             self.content.insert("end",'\n')
+            
 
-            targetLabel = tk.Label(self.content, text="Targets", bg="#FFFFFF")
-            targetLabel.bind("<Double-Button-1>", self._bindEventHandler(self.toggleTargets, calculation = calculation))
+            def toggle(e):
+                calculation['_expand_targets'] = not calculation['_expand_targets']
+                self.needUpdate.get()
+
+            targetLabel = tk.Label(self.content,text="Targets", bg="#FFFFFF")
+            
+            targetLabel.bind("<Double-Button-1>", toggle)
 
             if calculation['_expand_targets']:
                 self.content.insert("end",' ')
                 self.content.window_create("end", window = targetLabel)
                 self.content.insert("end",'\n')
-
                 for target in calculation['targets']:
-                    target.label=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
-
-                    self.content.insert("end",'  ')
-                    self.content.window_create("end", window = target.label)
+                    self.content.insert("end",'   ')
+                    l=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
+                    self.content.window_create("end", window = l)
                     self.content.insert("end",'\n')
-
-                    target.label.bind('<Button-1>', self._bindEventHandler(self.select, object=target))
+                    l.bind('<Button-1>', _bindEventHandler(self.select, object=target))
             else:
                 self.content.insert("end",'+')
                 self.content.window_create("end", window = targetLabel)
-                self.content.insert("end",'\n')
+            self.content.insert("end",'\n')
 
             self.content.insert("end",' ')
             l=tk.Label(self.content, text="Forcefield", bg="#DEE4FA")
             self.content.window_create("end", window = l)
-            l.bind('<Button-1>', self._bindEventHandler(self.select, object=calculation['forcefield']))
+            l.bind('<Button-1>', _bindEventHandler(self.select, object=calculation['forcefield']))
             self.content.insert("end",'\n\n')
         self.content["state"]="disabled"
 
@@ -92,16 +89,6 @@ class ObjectViewer(tk.LabelFrame):
         e.widget['bg']='#4986D6'
         self.activeselection=object
         self.selectionchanged.get() # reading this variable triggers a refresh
-
-    def toggleTargets(self, e, calculation):
-        if calculation['_expand_targets']: calculation['_expand_targets'] = False
-        else: calculation['_expand_targets'] = True
-        self.needUpdate.get()
-
-    def toggleCalculation(self, e, calculation):
-        if calculation['_expand']: calculation['_expand'] = False
-        else: calculation['_expand'] = True
-        self.needUpdate.get()
 
     def scrollUp(self, e):
         self.content.yview('scroll', -1, 'units')
@@ -116,12 +103,14 @@ class DetailViewer(tk.LabelFrame):
         self.printAll = tk.IntVar()
         self.printAll.set(False)
         self.currentObject = None # keep current object in case view needs refreshing
+        self.currentElement= None # currently selected element within current object
 
         # Viewer GUI elements
         tk.LabelFrame.__init__(self, root, text="Details")
         self.content = tk.Text(self,cursor="arrow",state="disabled")
         self.content.tag_config("error", foreground="red")
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
+        self.helptext = tk.Text(self, width=50, height=3, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
 
         # bind scrollbar actions
         self.scrollbar.config(command = self.content.yview)
@@ -141,7 +130,6 @@ class DetailViewer(tk.LabelFrame):
         self.printAll.trace('w', lambda *x : self.load())
 
     def load(self,newObject=None):
-
         if newObject:
             self.currentObject = newObject
             self.printAll.set(0)
@@ -152,7 +140,29 @@ class DetailViewer(tk.LabelFrame):
             self['text']="Details - %s" % self.currentObject['name']
 
             try:
-                self.content.insert("end", self.currentObject.display(self.printAll.get()))
+                printValues = self.currentObject.display(self.printAll.get())
+                if type(printValues)==str:
+                    self.content.insert("end", printValues)
+                if type(printValues)==tuple:
+                    for key in printValues[0].keys():
+                        frame = tk.Frame(self.content)
+                        frame.bindtags(key)
+                        keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
+                        keylabel.bindtags(key)
+                        separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
+                        separator.bindtags(key)
+                        valuelabel = tk.Label(frame, text=printValues[0][key], bg="#FFFFFF", padx=0, pady=0)
+                        valuelabel.bindtags(key)
+
+                        keylabel.pack(side=tk.LEFT)
+                        separator.pack(side=tk.LEFT)
+                        valuelabel.pack(side=tk.LEFT)
+
+                        self.content.window_create("end", window = frame)
+                        self.content.insert("end", '\n')
+
+                        self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
+                    
             except:
                 self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject['type'], self.currentObject['name']), "error")
                 from traceback import format_exc
@@ -165,6 +175,13 @@ class DetailViewer(tk.LabelFrame):
 
     def scrollDown(self, e):
         self.content.yview('scroll', 1, 'units')
+
+    def showHelp(self, e, object, option):
+        self.helptext["state"]="normal"
+        self.helptext.delete("1.0","end")
+        self.helptext.insert("end", object.getOptionHelp(option))
+        self.helptext.place(x=e.x, y=e.y_root-self.root.winfo_y())
+        self.root.bind("<Motion>", lambda e : self.helptext.place_forget())
 
 class ConsoleViewer(tk.LabelFrame):
     def __init__(self, root):
