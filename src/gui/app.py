@@ -28,13 +28,9 @@ class MainWindow(tk.Tk):
         filemenu = tk.Menu(self.menubar, tearoff=0)
         filemenu.add_command(label="New", state="disabled")
 
-        def open():
-            filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
-            inputfile = tkfile.askopenfilename(title="Open ForceBalance input file...", filetypes=filters)
-            self.objectsPane.open(inputfile)
-        filemenu.add_command(label="Open", command=open)
+        filemenu.add_command(label="Open", command=self.open)
         filemenu.add_command(label="Save", state="disabled")
-        filemenu.add_command(label="Close", state="disabled")
+        filemenu.add_command(label="Close", command=self.close)
         filemenu.add_command(label="Exit", command=sys.exit)
         self.menubar.add_cascade(label="File", menu=filemenu)
 
@@ -44,6 +40,15 @@ class MainWindow(tk.Tk):
         calculationmenu.add_command(label="Check", state="disabled")
         calculationmenu.add_command(label="Run", state="disabled")
         self.menubar.add_cascade(label="Calculation", menu=calculationmenu, state="disabled")
+
+    def open(self):
+        filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
+        inputfile = tkfile.askopenfilename(title="Open ForceBalance input file...", filetypes=filters)
+        self.objectsPane.open(inputfile)
+
+    def close(self):
+        self.objectsPane.clear()
+        self.detailsPane.clear()
 
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
