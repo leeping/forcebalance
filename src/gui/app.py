@@ -19,8 +19,6 @@ class MainWindow(tk.Tk):
         #self.consolePane.pack(side=tk.LEFT, fill=tk.Y)
 
         # Application-wide event bindings
-        self.bind('<Button-4>', self.scrollWidgetUp)
-        self.bind('<Button-5>', self.scrollWidgetDown)
         self.objectsPane.selectionchanged.trace('r', self.updateDetailView)
 
     def _initialize_menu(self):

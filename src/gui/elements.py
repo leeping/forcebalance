@@ -98,10 +98,10 @@ class ObjectViewer(tk.LabelFrame):
         self.selectionchanged.get() # reading this variable triggers a refresh
 
     def scrollUp(self, e):
-        self.content.yview('scroll', -1, 'units')
+        self.content.yview('scroll', -2, 'units')
 
     def scrollDown(self, e):
-        self.content.yview('scroll', 1, 'units')
+        self.content.yview('scroll', 2, 'units')
 
 class DetailViewer(tk.LabelFrame):
     def __init__(self, root, opts=''):
@@ -123,6 +123,8 @@ class DetailViewer(tk.LabelFrame):
         self.scrollbar.config(command = self.content.yview)
         self.content['yscrollcommand']=self.scrollbar.set
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y)
+        self.root.bind_class("scrollable", "<Button-4>", self.scrollUp)
+        self.root.bind_class("scrollable", "<Button-5>", self.scrollDown)
 
         # arrange and display list elements
         self.content.pack(side=tk.LEFT, fill=tk.Y)
@@ -146,7 +148,6 @@ class DetailViewer(tk.LabelFrame):
         self.content["state"]="normal"
         self.content.delete("1.0","end")
         if self.currentObject:   # if there is an object to display
-
             self['text']+=" - %s" % self.currentObject['name']
 
             try:
@@ -156,13 +157,13 @@ class DetailViewer(tk.LabelFrame):
                 if type(printValues)==tuple:
                     for key in printValues[0].keys():
                         frame = tk.Frame(self.content)
-                        frame.bindtags((key, "details"))
+                        frame.bindtags((key, "scrollable"))
                         keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
-                        keylabel.bindtags((key, "details"))
+                        keylabel.bindtags((key, "scrollable"))
                         separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
-                        separator.bindtags((key, "details"))
+                        separator.bindtags((key, "scrollable"))
                         valuelabel = tk.Label(frame, text=printValues[0][key], bg="#FFFFFF", padx=0, pady=0)
-                        valuelabel.bindtags((key, "details"))
+                        valuelabel.bindtags((key, "scrollable"))
 
                         keylabel.pack(side=tk.LEFT)
                         separator.pack(side=tk.LEFT)
@@ -176,13 +177,13 @@ class DetailViewer(tk.LabelFrame):
                         self.content.insert("end", "\n--- Default Values ---\n")
                         for key in printValues[1].keys():
                             frame = tk.Frame(self.content)
-                            frame.bindtags(key)
+                            frame.bindtags((key, "scrollable"))
                             keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
-                            keylabel.bindtags((key, "details"))
+                            keylabel.bindtags((key, "scrollable"))
                             separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
-                            separator.bindtags((key, "details"))
+                            separator.bindtags((key, "scrollable"))
                             valuelabel = tk.Label(frame, text=str(printValues[1][key]), bg="#FFFFFF", padx=0, pady=0)
-                            valuelabel.bindtags((key, "details"))
+                            valuelabel.bindtags((key, "scrollable"))
 
                             keylabel.pack(side=tk.LEFT)
                             separator.pack(side=tk.LEFT)
@@ -191,8 +192,7 @@ class DetailViewer(tk.LabelFrame):
                             self.content.window_create("end", window = frame)
                             self.content.insert("end", '\n')
 
-                            self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
-                
+                            self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))                
                     
             except:
                 self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject['type'], self.currentObject['name']), "error")
@@ -206,10 +206,10 @@ class DetailViewer(tk.LabelFrame):
         self.load()
 
     def scrollUp(self, e):
-        self.content.yview('scroll', -1, 'units')
+        self.content.yview('scroll', -2, 'units')
 
     def scrollDown(self, e):
-        self.content.yview('scroll', 1, 'units')
+        self.content.yview('scroll', 2, 'units')
 
     def showHelp(self, e, object, option):
         self.helptext["state"]="normal"
