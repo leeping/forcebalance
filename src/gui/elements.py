@@ -10,7 +10,7 @@ class ObjectViewer(tk.LabelFrame):
         tk.LabelFrame.__init__(self, root, text="Loaded Objects")
         self.root = root
 
-        self.calculations=[] # list of loaded option input files
+        self.calculation=None
         self.activeselection=None
         self.selectionchanged=tk.BooleanVar()
         self.selectionchanged.set(True)
@@ -33,38 +33,42 @@ class ObjectViewer(tk.LabelFrame):
         """Parse forcebalance input file and add referenced objects"""
         if filename=='': return
 
-        self.calculations.append(objects.CalculationObject(filename))
+        self.calculation = objects.CalculationObject(filename)
+        self.update()
+
+    def clear(self):
+        self.calculation = None
         self.update()
 
     def update(self, *args):
         self.content["state"]= "normal"
         self.content.delete("1.0","end")
-        for calculation in self.calculations:
-            l = tk.Label(self.content,text=calculation['options']['name'], bg="#DEE4FA")
-            self.content.window_create("end",window = l)
-            l.bind('<Button-1>', _bindEventHandler(self.select, object = calculation))
-            self.content.insert("end",'\n')
+        self['text']="Objects"
+
+        if self.calculation:
+            self['text'] += " - " + self.calculation['options']['name']
+            self.content.bind('<Button-1>', _bindEventHandler(self.select, object = self.calculation))
             
             self.content.insert("end",' ')
             l = tk.Label(self.content,text="General Options", bg="#DEE4FA")
             self.content.window_create("end",window = l)
-            l.bind('<Button-1>', _bindEventHandler(self.select, object = calculation['options']))
+            l.bind('<Button-1>', _bindEventHandler(self.select, object = self.calculation['options']))
             self.content.insert("end",'\n')
-            
+                
 
             def toggle(e):
-                calculation['_expand_targets'] = not calculation['_expand_targets']
+                self.calculation['_expand_targets'] = not self.calculation['_expand_targets']
                 self.needUpdate.get()
 
             targetLabel = tk.Label(self.content,text="Targets", bg="#FFFFFF")
             
             targetLabel.bind("<Double-Button-1>", toggle)
 
-            if calculation['_expand_targets']:
+            if self.calculation['_expand_targets']:
                 self.content.insert("end",' ')
                 self.content.window_create("end", window = targetLabel)
                 self.content.insert("end",'\n')
-                for target in calculation['targets']:
+                for target in self.calculation['targets']:
                     self.content.insert("end",'   ')
                     l=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
                     self.content.window_create("end", window = l)
@@ -73,20 +77,23 @@ class ObjectViewer(tk.LabelFrame):
             else:
                 self.content.insert("end",'+')
                 self.content.window_create("end", window = targetLabel)
-            self.content.insert("end",'\n')
+                self.content.insert("end",'\n')
 
             self.content.insert("end",' ')
             l=tk.Label(self.content, text="Forcefield", bg="#DEE4FA")
             self.content.window_create("end", window = l)
-            l.bind('<Button-1>', _bindEventHandler(self.select, object=calculation['forcefield']))
+            l.bind('<Button-1>', _bindEventHandler(self.select, object=self.calculation['forcefield']))
             self.content.insert("end",'\n\n')
+
         self.content["state"]="disabled"
 
     def select(self, e, object):
         for widget in self.content.winfo_children():
             if not widget['bg']=="#FFFFFF":
-                widget['bg']='#DEE4FA'
-        e.widget['bg']='#4986D6'
+                widget["relief"]=tk.FLAT
+                #widget['bg']='#DEE4FA'
+        #e.widget['bg']='#4986D6'
+        e.widget["relief"]="solid"
         self.activeselection=object
         self.selectionchanged.get() # reading this variable triggers a refresh
 
@@ -110,7 +117,7 @@ class DetailViewer(tk.LabelFrame):
         self.content = tk.Text(self,cursor="arrow",state="disabled")
         self.content.tag_config("error", foreground="red")
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
-        self.helptext = tk.Text(self, width=50, height=3, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
+        self.helptext = tk.Text(self, width=70, height=3, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
 
         # bind scrollbar actions
         self.scrollbar.config(command = self.content.yview)
@@ -133,11 +140,14 @@ class DetailViewer(tk.LabelFrame):
         if newObject:
             self.currentObject = newObject
             self.printAll.set(0)
-        if self.currentObject:   # if there is an object to display
-            self.content["state"]="normal"
-            self.content.delete("1.0","end")
 
-            self['text']="Details - %s" % self.currentObject['name']
+        self['text']="Details"
+
+        self.content["state"]="normal"
+        self.content.delete("1.0","end")
+        if self.currentObject:   # if there is an object to display
+
+            self['text']+=" - %s" % self.currentObject['name']
 
             try:
                 printValues = self.currentObject.display(self.printAll.get())
@@ -146,13 +156,13 @@ class DetailViewer(tk.LabelFrame):
                 if type(printValues)==tuple:
                     for key in printValues[0].keys():
                         frame = tk.Frame(self.content)
-                        frame.bindtags(key)
+                        frame.bindtags((key, "details"))
                         keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
-                        keylabel.bindtags(key)
+                        keylabel.bindtags((key, "details"))
                         separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
-                        separator.bindtags(key)
+                        separator.bindtags((key, "details"))
                         valuelabel = tk.Label(frame, text=printValues[0][key], bg="#FFFFFF", padx=0, pady=0)
-                        valuelabel.bindtags(key)
+                        valuelabel.bindtags((key, "details"))
 
                         keylabel.pack(side=tk.LEFT)
                         separator.pack(side=tk.LEFT)
@@ -162,13 +172,38 @@ class DetailViewer(tk.LabelFrame):
                         self.content.insert("end", '\n')
 
                         self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
+                    if self.printAll.get():
+                        self.content.insert("end", "\n--- Default Values ---\n")
+                        for key in printValues[1].keys():
+                            frame = tk.Frame(self.content)
+                            frame.bindtags(key)
+                            keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
+                            keylabel.bindtags((key, "details"))
+                            separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
+                            separator.bindtags((key, "details"))
+                            valuelabel = tk.Label(frame, text=str(printValues[1][key]), bg="#FFFFFF", padx=0, pady=0)
+                            valuelabel.bindtags((key, "details"))
+
+                            keylabel.pack(side=tk.LEFT)
+                            separator.pack(side=tk.LEFT)
+                            valuelabel.pack(side=tk.LEFT)
+
+                            self.content.window_create("end", window = frame)
+                            self.content.insert("end", '\n')
+
+                            self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
+                
                     
             except:
                 self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject['type'], self.currentObject['name']), "error")
                 from traceback import format_exc
                 self.content.insert("end", format_exc(), "error")
+        
+        self.content["state"]="disabled"
 
-            self.content["state"]="disabled"
+    def clear(self):
+        self.currentObject=None
+        self.load()
 
     def scrollUp(self, e):
         self.content.yview('scroll', -1, 'units')
