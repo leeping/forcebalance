@@ -1,7 +1,10 @@
 var searchData=
 [
+  ['radian',['radian',['../namespaceforcebalance_1_1molecule.html#a1ee5389ce8a9042e053c7972dbbfb005',1,'forcebalance::molecule']]],
   ['radii',['radii',['../classforcebalance_1_1psi4io_1_1Grid__Reader.html#a82c8a907130461776b26605ee022f951',1,'forcebalance.psi4io.Grid_Reader.radii()'],['../namespaceforcebalance_1_1chemistry.html#a5b56f8045a8e79c5b088a58695fa460f',1,'forcebalance.chemistry.Radii()'],['../namespaceforcebalance_1_1molecule.html#a74f55a89a14ca676b5a06441d1fdab19',1,'forcebalance.molecule.Radii()']]],
   ['radius_5fof_5fgyration',['radius_of_gyration',['../classforcebalance_1_1molecule_1_1Molecule.html#a02ff6f6642ed47c3b1fa3bb00191c32a',1,'forcebalance::molecule::Molecule']]],
+  ['rawfilehandler',['RawFileHandler',['../classforcebalance_1_1nifty_1_1RawFileHandler.html',1,'forcebalance::nifty']]],
+  ['rawstreamhandler',['RawStreamHandler',['../classforcebalance_1_1nifty_1_1RawStreamHandler.html',1,'forcebalance::nifty']]],
   ['rdvr3_5fpsi4',['RDVR3_Psi4',['../classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html',1,'forcebalance::psi4io']]],
   ['read_5farc',['read_arc',['../classforcebalance_1_1molecule_1_1Molecule.html#aeb5983ae61079198f077f55e448e2c32',1,'forcebalance::molecule::Molecule']]],
   ['read_5fcharmm',['read_charmm',['../classforcebalance_1_1molecule_1_1Molecule.html#a8b8d3444945cab760288f28996787855',1,'forcebalance::molecule::Molecule']]],

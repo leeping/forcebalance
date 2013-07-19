@@ -4,7 +4,6 @@
 <area shape="rect" id="node8" href="$namespaceforcebalance_1_1molecule.html#a838d85848bd817e801d0f5f6502217ef" title="Determines whether a line contains CHARMM data or not." alt="" coords="276,109,455,155"/>
 <area shape="rect" id="node11" href="$namespaceforcebalance_1_1molecule.html#a4cdb2086978b281ed84cd66179c3f5b2" title="forcebalance.molecule.add\l_strip_to_mat" alt="" coords="520,109,712,155"/>
 <area shape="rect" id="node13" href="$namespaceforcebalance_1_1molecule.html#a5f529179461765fadbd0a742cdc2c677" title="Creates a list of number sequences divided as evenly as possible." alt="" coords="769,117,993,147"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1molecule.html#a5b50df23cc4d0e617fdc56538f0bea63" title="forcebalance.molecule.both" alt="" coords="1048,64,1245,93"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="1052,117,1241,147"/>
-<area shape="rect" id="node19" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="1044,171,1249,200"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="1052,91,1241,120"/>
+<area shape="rect" id="node17" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="1044,144,1249,173"/>
 </map>

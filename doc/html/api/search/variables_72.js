@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['radian',['radian',['../namespaceforcebalance_1_1molecule.html#a1ee5389ce8a9042e053c7972dbbfb005',1,'forcebalance::molecule']]],
   ['radii',['radii',['../classforcebalance_1_1psi4io_1_1Grid__Reader.html#a82c8a907130461776b26605ee022f951',1,'forcebalance.psi4io.Grid_Reader.radii()'],['../namespaceforcebalance_1_1chemistry.html#a5b56f8045a8e79c5b088a58695fa460f',1,'forcebalance.chemistry.Radii()'],['../namespaceforcebalance_1_1molecule.html#a74f55a89a14ca676b5a06441d1fdab19',1,'forcebalance.molecule.Radii()']]],
   ['read_5ftab',['Read_Tab',['../classforcebalance_1_1molecule_1_1Molecule.html#a35600d98f150597c9d9ac5129e01bd8d',1,'forcebalance::molecule::Molecule']]],
   ['readers',['Readers',['../classforcebalance_1_1forcefield_1_1FF.html#a9db381836dba8b531ff7d45dce877f4f',1,'forcebalance::forcefield::FF']]],

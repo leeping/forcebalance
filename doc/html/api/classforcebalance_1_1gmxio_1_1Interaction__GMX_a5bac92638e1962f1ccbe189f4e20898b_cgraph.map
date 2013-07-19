@@ -1,15 +1,14 @@
 <map id="forcebalance.gmxio.Interaction_GMX.interaction_driver_all" name="forcebalance.gmxio.Interaction_GMX.interaction_driver_all">
 <area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="287,5,473,51"/>
 <area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="297,74,463,121"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1qchemio.html#a067c1b4f6695fc5dc20b5de66114bb7f" title="forcebalance.qchemio.QChem\l_Dielectric_Energy" alt="" coords="273,159,487,206"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="537,65,777,95"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="1055,120,1233,149"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue." alt="" coords="557,228,757,257"/>
-<area shape="rect" id="node19" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="1052,176,1236,205"/>
-<area shape="rect" id="node29" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="1057,319,1231,348"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue." alt="" coords="827,289,1003,335"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished." alt="" coords="839,219,991,266"/>
-<area shape="rect" id="node21" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="1285,203,1461,232"/>
-<area shape="rect" id="node23" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="1509,194,1693,241"/>
-<area shape="rect" id="node25" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="1741,194,1899,241"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1qchemio.html#a067c1b4f6695fc5dc20b5de66114bb7f" title="forcebalance.qchemio.QChem\l_Dielectric_Energy" alt="" coords="273,143,487,190"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="1012,31,1191,60"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue." alt="" coords="536,121,736,151"/>
+<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="1009,173,1193,203"/>
+<area shape="rect" id="node27" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="1015,229,1188,259"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue." alt="" coords="784,43,960,90"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished." alt="" coords="796,113,948,159"/>
+<area shape="rect" id="node19" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="1243,148,1419,177"/>
+<area shape="rect" id="node21" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="1467,139,1651,186"/>
+<area shape="rect" id="node23" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="1699,139,1856,186"/>
 </map>

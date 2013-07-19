@@ -27,41 +27,29 @@
 <path fill="none" stroke="midnightblue" d="M129.514,-42.336C142.754,-44.0469 156.779,-45.859 170.285,-47.6042"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="170.125,-51.1125 180.491,-48.923 171.022,-44.1703 170.125,-51.1125"/>
 </g>
-<!-- Node4 -->
-<g id="node7" class="node"><title>Node4</title>
+<!-- Node3 -->
+<g id="node5" class="node"><title>Node3</title>
 <a xlink:href="namespaceforcebalance_1_1nifty.html#a26e563ec71ed229c30f3d61d3448c8f1" target="_top" xlink:title="Prints a warning but will only do so once in a given run.">
 <polygon fill="white" stroke="black" points="166.5,-0.5 166.5,-21.5 319.5,-21.5 319.5,-0.5 166.5,-0.5"/>
 <text text-anchor="middle" x="243" y="-8.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.warn_once</text>
 </a>
 </g>
-<!-- Node1&#45;&gt;Node4 -->
-<g id="edge6" class="edge"><title>Node1&#45;&gt;Node4</title>
+<!-- Node1&#45;&gt;Node3 -->
+<g id="edge4" class="edge"><title>Node1&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M129.514,-25.664C138.188,-24.5431 147.199,-23.3787 156.181,-22.2182"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="156.82,-25.6648 166.289,-20.9121 155.923,-18.7225 156.82,-25.6648"/>
 </g>
-<!-- Node3 -->
-<g id="node5" class="node"><title>Node3</title>
+<!-- Node4 -->
+<g id="node7" class="node"><title>Node4</title>
 <a xlink:href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" target="_top" xlink:title="Similar to the bultin function map().">
-<polygon fill="white" stroke="black" points="356.5,-46.5 356.5,-67.5 537.5,-67.5 537.5,-46.5 356.5,-46.5"/>
-<text text-anchor="middle" x="447" y="-54.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.concurrent_map</text>
+<polygon fill="white" stroke="black" points="356.5,-0.5 356.5,-21.5 537.5,-21.5 537.5,-0.5 356.5,-0.5"/>
+<text text-anchor="middle" x="447" y="-8.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.concurrent_map</text>
 </a>
 </g>
-<!-- Node2&#45;&gt;Node3 -->
-<g id="edge4" class="edge"><title>Node2&#45;&gt;Node3</title>
-<path fill="none" stroke="midnightblue" d="M305.593,-57C318.505,-57 332.412,-57 346.288,-57"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="346.371,-60.5001 356.371,-57 346.371,-53.5001 346.371,-60.5001"/>
-</g>
-<!-- Node5 -->
-<g id="node9" class="node"><title>Node5</title>
-<a xlink:href="namespaceforcebalance_1_1nifty.html#a64b7c6ca7afa1c11681f5c2897c55cc3" target="_top" xlink:title="This function be given any of several variable types (single file name, file object, or list of lines, or a list of the above) and give a list of files:">
-<polygon fill="white" stroke="black" points="372,-0.5 372,-21.5 522,-21.5 522,-0.5 372,-0.5"/>
-<text text-anchor="middle" x="447" y="-8.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.multiopen</text>
-</a>
-</g>
-<!-- Node4&#45;&gt;Node5 -->
-<g id="edge8" class="edge"><title>Node4&#45;&gt;Node5</title>
-<path fill="none" stroke="midnightblue" d="M319.542,-11C333.28,-11 347.676,-11 361.643,-11"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="361.723,-14.5001 371.723,-11 361.723,-7.5001 361.723,-14.5001"/>
+<!-- Node3&#45;&gt;Node4 -->
+<g id="edge6" class="edge"><title>Node3&#45;&gt;Node4</title>
+<path fill="none" stroke="midnightblue" d="M319.542,-11C328.25,-11 337.221,-11 346.181,-11"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="346.277,-14.5001 356.277,-11 346.277,-7.5001 346.277,-14.5001"/>
 </g>
 </g>
 </svg>

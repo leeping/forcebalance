@@ -101,8 +101,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1molecule_1_1MyG.html">forcebalance.molecule.MyG</a></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1molecule_1_1MolfileTimestep.html">forcebalance.molecule.MolfileTimestep</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper for the timestep C structure used in molfile plugins.  <a href="classforcebalance_1_1molecule_1_1MolfileTimestep.html#details">More...</a><br/></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,6 +125,12 @@ Functions</h2></td></tr>
 <tr class="memitem:afe989ffd119568047fc8265b1d329a70"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70">forcebalance.molecule.isfloat</a></td></tr>
 <tr class="memdesc:afe989ffd119568047fc8265b1d329a70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Matches ANY number; it can be a decimal, scientific notation, integer, or what have you.  <a href="#afe989ffd119568047fc8265b1d329a70">More...</a><br/></td></tr>
 <tr class="separator:afe989ffd119568047fc8265b1d329a70"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a6e3e79b04534bf2e83d09def189444"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444">forcebalance.molecule.BuildLatticeFromLengthsAngles</a></td></tr>
+<tr class="memdesc:a0a6e3e79b04534bf2e83d09def189444"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification.  <a href="#a0a6e3e79b04534bf2e83d09def189444">More...</a><br/></td></tr>
+<tr class="separator:a0a6e3e79b04534bf2e83d09def189444"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29fb1ac9324f4280f07c65baea339989"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989">forcebalance.molecule.BuildLatticeFromVectors</a></td></tr>
+<tr class="memdesc:a29fb1ac9324f4280f07c65baea339989"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function takes in three lattice vectors and tries to return a complete box specification.  <a href="#a29fb1ac9324f4280f07c65baea339989">More...</a><br/></td></tr>
+<tr class="separator:a29fb1ac9324f4280f07c65baea339989"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2eba3cad44138b3b10ea883240888412"><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a2eba3cad44138b3b10ea883240888412">forcebalance.molecule.format_xyz_coord</a></td></tr>
 <tr class="memdesc:a2eba3cad44138b3b10ea883240888412"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a line consisting of (element, x, y, z) in accordance with .xyz file format.  <a href="#a2eba3cad44138b3b10ea883240888412">More...</a><br/></td></tr>
 <tr class="separator:a2eba3cad44138b3b10ea883240888412"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -185,7 +189,7 @@ Functions</h2></td></tr>
 Variables</h2></td></tr>
 <tr class="memitem:a0044fa397e0923635a8b3e9625aa70f7"><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a0044fa397e0923635a8b3e9625aa70f7">forcebalance.molecule.FrameVariableNames</a></td></tr>
 <tr class="separator:a0044fa397e0923635a8b3e9625aa70f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5daa68e835dcb9877d6c3f2fb559b54b"><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a5daa68e835dcb9877d6c3f2fb559b54b">forcebalance.molecule.AtomVariableNames</a> = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost'])</td></tr>
+<tr class="memitem:a5daa68e835dcb9877d6c3f2fb559b54b"><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a5daa68e835dcb9877d6c3f2fb559b54b">forcebalance.molecule.AtomVariableNames</a> = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode'])</td></tr>
 <tr class="separator:a5daa68e835dcb9877d6c3f2fb559b54b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38e1c99e9567fe42b792af43db9b7488"><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a38e1c99e9567fe42b792af43db9b7488">forcebalance.molecule.MetaVariableNames</a> = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult', 'bonds'])</td></tr>
 <tr class="separator:a38e1c99e9567fe42b792af43db9b7488"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,11 +208,17 @@ Variables</h2></td></tr>
 <tr class="separator:a76af9edfbaaa8999680e32aafe1b1b61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09d04113accea9c88b084051c5de29d1"><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a09d04113accea9c88b084051c5de29d1">forcebalance.molecule.splitter</a> = re.compile(r'(\s+|\S+)')</td></tr>
 <tr class="separator:a09d04113accea9c88b084051c5de29d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa761cf1cf260e15d0b03a6f61569c840"><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#aa761cf1cf260e15d0b03a6f61569c840">forcebalance.molecule.Box</a> = namedtuple('Box',['a','b','c','alpha','beta','gamma','A','B','C','V'])</td></tr>
+<tr class="separator:aa761cf1cf260e15d0b03a6f61569c840"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ee5389ce8a9042e053c7972dbbfb005"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a1ee5389ce8a9042e053c7972dbbfb005">forcebalance.molecule.radian</a> = 180</td></tr>
+<tr class="separator:a1ee5389ce8a9042e053c7972dbbfb005"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2986996d4f957928047df06fbec3717d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a2986996d4f957928047df06fbec3717d">forcebalance.molecule.Alive</a></td></tr>
+<tr class="separator:a2986996d4f957928047df06fbec3717d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 11 2013 10:59:37 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 19 2013 16:28:03 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

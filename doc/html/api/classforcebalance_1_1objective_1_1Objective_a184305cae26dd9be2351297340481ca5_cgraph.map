@@ -1,7 +1,7 @@
 <map id="forcebalance.objective.Objective.Indicate" name="forcebalance.objective.Objective.Indicate">
 <area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary..." alt="" coords="316,179,508,226"/>
-<area shape="rect" id="node33" href="$classforcebalance_1_1objective_1_1Objective.html#a3996f95feb58197088775fe439ec697b" title="forcebalance.objective.Objective.Full" alt="" coords="287,249,537,279"/>
-<area shape="rect" id="node38" href="$classforcebalance_1_1objective_1_1Objective.html#aa14af29457c3784b9b97b46186c230ce" title="forcebalance.objective.Objective.\lTarget_Terms" alt="" coords="296,302,528,349"/>
+<area shape="rect" id="node31" href="$classforcebalance_1_1objective_1_1Objective.html#a3996f95feb58197088775fe439ec697b" title="forcebalance.objective.Objective.Full" alt="" coords="287,249,537,279"/>
+<area shape="rect" id="node36" href="$classforcebalance_1_1objective_1_1Objective.html#aa14af29457c3784b9b97b46186c230ce" title="forcebalance.objective.Objective.\lTarget_Terms" alt="" coords="296,302,528,349"/>
 <area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="600,137,763,167"/>
 <area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="1075,141,1248,171"/>
 <area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" title="Matches things with a decimal only; see isint and isfloat." alt="" coords="825,87,1020,116"/>
@@ -13,11 +13,10 @@
 <area shape="rect" id="node22" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="1553,32,1753,61"/>
 <area shape="rect" id="node24" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get\l_least_squares" alt="" coords="1836,74,1993,121"/>
 <area shape="rect" id="node28" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="1832,5,1997,51"/>
-<area shape="rect" id="node30" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="2076,13,2316,43"/>
-<area shape="rect" id="node35" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="612,241,751,287"/>
-<area shape="rect" id="node41" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="588,363,775,410"/>
-<area shape="rect" id="node43" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="589,311,773,340"/>
-<area shape="rect" id="node45" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="835,311,1011,340"/>
-<area shape="rect" id="node47" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="1069,302,1253,349"/>
-<area shape="rect" id="node49" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="1324,302,1481,349"/>
+<area shape="rect" id="node33" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="612,241,751,287"/>
+<area shape="rect" id="node39" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="588,363,775,410"/>
+<area shape="rect" id="node41" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="589,311,773,340"/>
+<area shape="rect" id="node43" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="835,311,1011,340"/>
+<area shape="rect" id="node45" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="1069,302,1253,349"/>
+<area shape="rect" id="node47" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="1324,302,1481,349"/>
 </map>

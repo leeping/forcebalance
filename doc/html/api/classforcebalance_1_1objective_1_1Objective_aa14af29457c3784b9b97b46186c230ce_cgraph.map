@@ -7,7 +7,7 @@
 <area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="867,225,1051,272"/>
 <area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="1119,236,1276,282"/>
 <area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary..." alt="" coords="596,132,788,178"/>
-<area shape="rect" id="node47" href="$classforcebalance_1_1objective_1_1Objective.html#a3996f95feb58197088775fe439ec697b" title="forcebalance.objective.Objective.Full" alt="" coords="567,79,817,108"/>
+<area shape="rect" id="node45" href="$classforcebalance_1_1objective_1_1Objective.html#a3996f95feb58197088775fe439ec697b" title="forcebalance.objective.Objective.Full" alt="" coords="567,79,817,108"/>
 <area shape="rect" id="node19" href="$namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="877,140,1040,170"/>
 <area shape="rect" id="node23" href="$namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="1345,131,1519,160"/>
 <area shape="rect" id="node21" href="$namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" title="Matches things with a decimal only; see isint and isfloat." alt="" coords="1100,183,1295,212"/>
@@ -19,5 +19,4 @@
 <area shape="rect" id="node36" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="1820,236,2020,266"/>
 <area shape="rect" id="node38" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get\l_least_squares" alt="" coords="2103,177,2260,224"/>
 <area shape="rect" id="node42" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="2099,246,2264,293"/>
-<area shape="rect" id="node44" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="2343,255,2583,284"/>
 </map>

@@ -17,7 +17,7 @@ var searchData=
   ['append',['append',['../classforcebalance_1_1molecule_1_1Molecule.html#a77417ff99b19f6d0b7c6f527e83fa7f1',1,'forcebalance::molecule::Molecule']]],
   ['assign_5ffield',['assign_field',['../classforcebalance_1_1forcefield_1_1FF.html#a2c9cda9adb5a6446fbccfa7b35f8dff5',1,'forcebalance::forcefield::FF']]],
   ['assign_5fp0',['assign_p0',['../classforcebalance_1_1forcefield_1_1FF.html#a3af07734a2378364ed533e2853ee6b82',1,'forcebalance::forcefield::FF']]],
-  ['astr',['AStr',['../classforcebalance_1_1molecule_1_1MyG.html#a56413ce7a4c8db075299f724bd9ad71f',1,'forcebalance::molecule::MyG']]],
   ['atom_5fdistances',['atom_distances',['../namespaceforcebalance_1_1contact.html#a3592dbbf524c6115f34d9a70b50e2e0f',1,'forcebalance::contact']]],
-  ['atom_5fselect',['atom_select',['../classforcebalance_1_1molecule_1_1Molecule.html#a432affdec68562b5b19fd249124480c3',1,'forcebalance::molecule::Molecule']]]
+  ['atom_5fselect',['atom_select',['../classforcebalance_1_1molecule_1_1Molecule.html#a432affdec68562b5b19fd249124480c3',1,'forcebalance::molecule::Molecule']]],
+  ['atom_5fstack',['atom_stack',['../classforcebalance_1_1molecule_1_1Molecule.html#a63dd7bc0347cc3dec5e8fa0ebfd567ec',1,'forcebalance::molecule::Molecule']]]
 ];

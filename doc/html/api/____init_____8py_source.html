@@ -103,11 +103,18 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00010"></a><span class="lineno">   10</span>&#160;    <span class="keywordflow">print</span> <span class="stringliteral">&quot;Could not load scipy module, exiting...&quot;</span></div>
 <div class="line"><a name="l00011"></a><span class="lineno">   11</span>&#160;    exit()</div>
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;</div>
-<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">import</span> parser, forcefield, optimizer, objective</div>
+<div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">import</span> logging</div>
+<div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">import</span> parser, forcefield, optimizer, objective</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;</div>
+<div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="comment"># set up package level logger that by default does nothing</span></div>
+<div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;logging.logger=logging.getLogger(<span class="stringliteral">&#39;forcebalance&#39;</span>)</div>
+<div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;logging.logger.addHandler(logging.NullHandler())</div>
+<div class="line"><a name="l00019"></a><span class="lineno">   19</span>&#160;logging.logger.setLevel(logging.INFO)</div>
+<div class="line"><a name="l00020"></a><span class="lineno">   20</span>&#160;</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 11 2013 10:59:37 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jul 19 2013 16:28:02 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

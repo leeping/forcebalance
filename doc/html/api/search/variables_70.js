@@ -15,6 +15,7 @@ var searchData=
   ['platform',['platform',['../classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#ab9cc3ba5e2cb545e714733efe99c00e1',1,'forcebalance.openmmio.Liquid_OpenMM.platform()'],['../classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html#ae6977017b553e5d6dd47258f67fcdf1c',1,'forcebalance.openmmio.AbInitio_OpenMM.platform()'],['../classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a2cb5810aea0daabf203c7f343954c161',1,'forcebalance.openmmio.Interaction_OpenMM.platform()']]],
   ['plist',['plist',['../classforcebalance_1_1forcefield_1_1FF.html#a72d2a63abbeae0b783a1e3e4077b3ab1',1,'forcebalance::forcefield::FF']]],
   ['point',['point',['../classforcebalance_1_1psi4io_1_1Grid__Reader.html#a556a1786a7db1a738a680a784696bf2e',1,'forcebalance::psi4io::Grid_Reader']]],
+  ['positive_5fresid',['positive_resid',['../classforcebalance_1_1molecule_1_1Molecule.html#af9d8dc89fee54b2b89558633f2c9b70a',1,'forcebalance::molecule::Molecule']]],
   ['prefactor',['prefactor',['../classforcebalance_1_1interaction_1_1Interaction.html#ad4e78437713a0b9b809e4ba52cbbf9d2',1,'forcebalance::interaction::Interaction']]],
   ['printdict',['PrintDict',['../classforcebalance_1_1binding_1_1BindingEnergy.html#ae88e256776152d847fd3c5d8609a5c6d',1,'forcebalance::binding::BindingEnergy']]],
   ['printoptiondict',['PrintOptionDict',['../classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#a5c55e661e746d1a4443f4e0bc34ebe05',1,'forcebalance::baseclass::ForceBalanceBaseClass']]],

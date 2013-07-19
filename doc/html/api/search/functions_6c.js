@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['l',['L',['../classforcebalance_1_1molecule_1_1MyG.html#a2a5ae00cf603aa8d887d4dcca8412834',1,'forcebalance::molecule::MyG']]],
   ['l2_5fnorm',['L2_norm',['../classforcebalance_1_1objective_1_1Penalty.html#ab59d5beafbab0918b7c3e0c61ece41a3',1,'forcebalance::objective::Penalty']]],
   ['lastmvals',['LastMvals',['../namespaceforcebalance_1_1leastsq.html#ad9d0036b0003e0245608ffb192c7c60c',1,'forcebalance::leastsq']]],
   ['leave',['Leave',['../namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120',1,'forcebalance::nifty']]],

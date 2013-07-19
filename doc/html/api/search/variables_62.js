@@ -14,5 +14,6 @@ var searchData=
   ['bondchars',['BondChars',['../namespaceforcebalance_1_1chemistry.html#ac5fcb01c4de1456a654dd920150069f3',1,'forcebalance::chemistry']]],
   ['bondenergies',['BondEnergies',['../namespaceforcebalance_1_1chemistry.html#aa5baf093f9cb069966eae63492327221',1,'forcebalance::chemistry']]],
   ['bonds',['bonds',['../classforcebalance_1_1Mol2_1_1mol2.html#af5d55171d13ee99d083adeffb359b19f',1,'forcebalance::Mol2::mol2']]],
+  ['box',['Box',['../namespaceforcebalance_1_1molecule.html#aa761cf1cf260e15d0b03a6f61569c840',1,'forcebalance::molecule']]],
   ['boxes',['boxes',['../classforcebalance_1_1molecule_1_1Molecule.html#a9b3fb36e61a914b9f0e2c1613357736a',1,'forcebalance::molecule::Molecule']]]
 ];

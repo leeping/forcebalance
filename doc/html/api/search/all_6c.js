@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['l',['L',['../classforcebalance_1_1molecule_1_1MyG.html#a2a5ae00cf603aa8d887d4dcca8412834',1,'forcebalance.molecule.MyG.L()'],['../namespaceforcebalance_1_1chemistry.html#ad5838ecc45d68a3a29f0c2518ceaaca2',1,'forcebalance.chemistry.L()']]],
+  ['l',['L',['../namespaceforcebalance_1_1chemistry.html#ad5838ecc45d68a3a29f0c2518ceaaca2',1,'forcebalance::chemistry']]],
   ['l2_5fnorm',['L2_norm',['../classforcebalance_1_1objective_1_1Penalty.html#ab59d5beafbab0918b7c3e0c61ece41a3',1,'forcebalance::objective::Penalty']]],
   ['label',['label',['../classforcebalance_1_1interaction_1_1Interaction.html#a35a5c40d99a474bbf6032888f1f75e46',1,'forcebalance::interaction::Interaction']]],
   ['labels',['Labels',['../classforcebalance_1_1liquid_1_1Liquid.html#a50f976d2d3d6a1c261756035a26390e2',1,'forcebalance::liquid::Liquid']]],

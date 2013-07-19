@@ -1,12 +1,11 @@
 <map id="forcebalance.gmxio.AbInitio_GMX.energy_force_driver_all" name="forcebalance.gmxio.AbInitio_GMX.energy_force_driver_all">
 <area shape="rect" id="node3" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ae17e3c379d82935d725dd31f01df23e5" title="Call mdrun in order to update the virtual site positions." alt="" coords="261,126,483,173"/>
-<area shape="rect" id="node22" href="$namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" title="forcebalance.gmxio.rm\l_gmx_baks" alt="" coords="1568,186,1736,233"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" title="forcebalance.gmxio.rm\l_gmx_baks" alt="" coords="1540,186,1708,233"/>
 <area shape="rect" id="node5" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" title="forcebalance.gmxio.AbInitio\l_GMX.__init__" alt="" coords="531,126,728,173"/>
 <area shape="rect" id="node7" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th..." alt="" coords="776,126,973,173"/>
 <area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ab2eac76585bdb8401812f0c8e465a44e" title="forcebalance.gmxio.AbInitio\l_GMX.prepare_temp_directory" alt="" coords="1023,126,1236,173"/>
 <area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="1301,66,1467,113"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="1293,13,1475,43"/>
-<area shape="rect" id="node19" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd" title="Computes the energy and force using GROMACS for a single snapshot." alt="" coords="1285,186,1483,233"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="1532,75,1772,104"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="1560,5,1744,51"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="1293,13,1475,43"/>
+<area shape="rect" id="node17" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd" title="Computes the energy and force using GROMACS for a single snapshot." alt="" coords="1285,186,1483,233"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="1532,5,1716,51"/>
 </map>

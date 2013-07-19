@@ -1,10 +1,9 @@
 <map id="forcebalance.leastsq.LeastSquares.get" name="forcebalance.leastsq.LeastSquares.get">
 <area shape="rect" id="node3" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#a14993bd872840bd869fefced495e7ba2" title="forcebalance.psi4io.THCDF\l_Psi4.driver" alt="" coords="245,65,437,111"/>
-<area shape="rect" id="node17" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a8c4cf7a59ef8714519631145669a5df9" title="forcebalance.psi4io.RDVR3\l_Psi4.driver" alt="" coords="247,169,436,215"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a8c4cf7a59ef8714519631145669a5df9" title="forcebalance.psi4io.RDVR3\l_Psi4.driver" alt="" coords="247,169,436,215"/>
 <area shape="rect" id="node5" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#ae4389941b46ce11689f45115fdb61b39" title="forcebalance.psi4io.THCDF\l_Psi4.write_nested_destroy" alt="" coords="485,65,680,111"/>
-<area shape="rect" id="node8" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="780,5,919,51"/>
+<area shape="rect" id="node8" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="757,5,896,51"/>
 <area shape="rect" id="node12" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="500,134,665,181"/>
-<area shape="rect" id="node10" href="$namespaceforcebalance_1_1leastsq.html#a8e7ef329e27aff738bc91dd79bd2dd1c" title="forcebalance.leastsq.Check\lBasis" alt="" coords="751,74,948,121"/>
-<area shape="rect" id="node14" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="729,144,969,173"/>
-<area shape="rect" id="node19" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a70936cb704ab5df307013cc6aa5b85c8" title="LPW 04&#45;17&#45;2013." alt="" coords="488,203,677,250"/>
+<area shape="rect" id="node10" href="$namespaceforcebalance_1_1leastsq.html#a8e7ef329e27aff738bc91dd79bd2dd1c" title="forcebalance.leastsq.Check\lBasis" alt="" coords="728,74,925,121"/>
+<area shape="rect" id="node17" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a70936cb704ab5df307013cc6aa5b85c8" title="LPW 04&#45;17&#45;2013." alt="" coords="488,203,677,250"/>
 </map>

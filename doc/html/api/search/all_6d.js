@@ -20,8 +20,8 @@ var searchData=
   ['mol2_5fatom',['mol2_atom',['../classforcebalance_1_1Mol2_1_1mol2__atom.html',1,'forcebalance::Mol2']]],
   ['mol2_5fbond',['mol2_bond',['../classforcebalance_1_1Mol2_1_1mol2__bond.html',1,'forcebalance::Mol2']]],
   ['mol2_5fpdict',['mol2_pdict',['../namespaceforcebalance_1_1amberio.html#a84f51a0ccf50d3442cefb90f948653b0',1,'forcebalance.amberio.mol2_pdict()'],['../namespaceforcebalance_1_1mol2io.html#a9a28a68a67a02946036ee03f9685f3ba',1,'forcebalance.mol2io.mol2_pdict()']]],
-  ['mol2_5freader',['Mol2_Reader',['../classforcebalance_1_1amberio_1_1Mol2__Reader.html',1,'forcebalance::amberio']]],
   ['mol2_5freader',['Mol2_Reader',['../classforcebalance_1_1mol2io_1_1Mol2__Reader.html',1,'forcebalance::mol2io']]],
+  ['mol2_5freader',['Mol2_Reader',['../classforcebalance_1_1amberio_1_1Mol2__Reader.html',1,'forcebalance::amberio']]],
   ['mol2_5fset',['mol2_set',['../classforcebalance_1_1Mol2_1_1mol2__set.html',1,'forcebalance::Mol2']]],
   ['mol2io_2epy',['mol2io.py',['../mol2io_8py.html',1,'']]],
   ['mol_5fname',['mol_name',['../classforcebalance_1_1Mol2_1_1mol2.html#a5aedb128d92f2ce5a046b02a491fd57c',1,'forcebalance::Mol2::mol2']]],
@@ -40,6 +40,5 @@ var searchData=
   ['mpdb',['mpdb',['../classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#aaaa8d66c5bb45d847e1fbcd3953fe0d3',1,'forcebalance::openmmio::Liquid_OpenMM']]],
   ['msim',['msim',['../classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#acf60da4350bb882795a8143b1b85ca57',1,'forcebalance::openmmio::Liquid_OpenMM']]],
   ['multiopen',['multiopen',['../namespaceforcebalance_1_1nifty.html#a64b7c6ca7afa1c11681f5c2897c55cc3',1,'forcebalance::nifty']]],
-  ['mvals0',['mvals0',['../classforcebalance_1_1optimizer_1_1Optimizer.html#aa1d7f33ea1c9341fb1c867ef01752a16',1,'forcebalance::optimizer::Optimizer']]],
-  ['myg',['MyG',['../classforcebalance_1_1molecule_1_1MyG.html',1,'forcebalance::molecule']]]
+  ['mvals0',['mvals0',['../classforcebalance_1_1optimizer_1_1Optimizer.html#aa1d7f33ea1c9341fb1c867ef01752a16',1,'forcebalance::optimizer::Optimizer']]]
 ];

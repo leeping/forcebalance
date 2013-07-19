@@ -3,7 +3,7 @@ var searchData=
   ['a',['a',['../classforcebalance_1_1objective_1_1Penalty.html#abab984da8a8f62adbd1decbaf56ac2fa',1,'forcebalance.objective.Penalty.a()'],['../namespaceforcebalance_1_1chemistry.html#a352fe220850f433a698a751ed1210881',1,'forcebalance.chemistry.A()']]],
   ['adict',['adict',['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#afee8f33a13244afd3f595acad27e04f4',1,'forcebalance.amberio.FrcMod_Reader.adict()'],['../classforcebalance_1_1basereader_1_1BaseReader.html#a84a513e0e43145b2fdaf38e73c32f83a',1,'forcebalance.basereader.BaseReader.adict()'],['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#ac42c3b29532e11a0d8d78b48347739ff',1,'forcebalance.psi4io.GBS_Reader.adict()']]],
   ['aftypes',['aftypes',['../namespaceforcebalance_1_1gmxio.html#aef89ff391902f81feb14e28ec301296c',1,'forcebalance::gmxio']]],
-  ['alive',['Alive',['../classforcebalance_1_1molecule_1_1MyG.html#ad6a5334dbe95ecab760c2d76ec8610ea',1,'forcebalance::molecule::MyG']]],
+  ['alive',['Alive',['../namespaceforcebalance_1_1molecule.html#a2986996d4f957928047df06fbec3717d',1,'forcebalance::molecule']]],
   ['all_5fat_5fonce',['all_at_once',['../classforcebalance_1_1amberio_1_1AbInitio__AMBER.html#a39462b1942be0f7fb6202862ad1afa9c',1,'forcebalance.amberio.AbInitio_AMBER.all_at_once()'],['../classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#a1825352ec4711fd59eb2872eef46c1a6',1,'forcebalance.tinkerio.AbInitio_TINKER.all_at_once()']]],
   ['allvariablenames',['AllVariableNames',['../namespaceforcebalance_1_1molecule.html#a8fcfb88fe12a9256b61980f3d4fe3b63',1,'forcebalance::molecule']]],
   ['amom',['amom',['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#a322f36949ce67389f107cac80e8f5b40',1,'forcebalance::psi4io::GBS_Reader']]],
