@@ -7,8 +7,8 @@ from __init__ import ForceBalanceTestCase
 
 class TargetTests(object):
     def setUp(self):
-        self.options=forcebalance.parser.gen_opts_defaults
-        self.tgt_opt=forcebalance.parser.tgt_opts_defaults
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
         self.options.update({'root': os.getcwd() + '/test/files'})
 
