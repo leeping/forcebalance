@@ -240,7 +240,7 @@ class Liquid(Target):
             else:
                 queue_up(wq, command = cmdstr+' &> npt.out',
                          input_files = ['runcuda.sh', 'npt.py', self.liquid_fnm, self.gas_fnm, 'forcebalance.p'],
-                         output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
+                         output_files = ['npt_result.p.bz2', 'npt.out'],
                          tgt=self)
 
     def indicate(self):
