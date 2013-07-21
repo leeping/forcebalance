@@ -321,7 +321,7 @@ class Gromacs_MD(MDEngine):
         md_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_prod_steps}, **self.opts["liquid"]),
                    "gas" : dict({"integrator" : "md", "nsteps" : args.gas_prod_steps}, **self.opts["gas"])}
         # Arguments for running minimization.
-        min_opts = {"liquid" : dict({"integrator" : "l-bfgs", "emtol" : 10.0, "nsteps" : 10000}, **self.opts["liquid"]),
+        min_opts = {"liquid" : dict({"integrator" : "steep", "emtol" : 10.0, "nsteps" : 10000}, **self.opts["liquid"]),
                     "gas" : dict({"integrator" : "steep", "emtol" : 10.0, "nsteps" : 10000}, **self.opts["gas"])}
         # Arguments for not saving coordinates.
         nosave_opts = {"nstxout" : 0, "nstenergy" : 0}

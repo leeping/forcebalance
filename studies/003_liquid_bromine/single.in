@@ -14,9 +14,6 @@ penalty_type L2
 # (allcap) The job type, defaults to a single-point evaluation of objective function
 jobtype single
 
-# Path to TINKER
-gmxpath /home/leeping/opt/gromacs-4.5.5/bin
-
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
 forcefield bro.itp
 
