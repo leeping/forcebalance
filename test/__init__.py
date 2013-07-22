@@ -4,6 +4,7 @@ import traceback
 from collections import OrderedDict
 import numpy
 import forcebalance
+from forcebalance import logging
 
 class ForceBalanceTestCase(unittest.TestCase):
     def __init__(self,methodName='runTest'):
@@ -76,24 +77,24 @@ class ForceBalanceTestResult(unittest.TestResult):
         @override unittest.TestResult.addFailure(test,err)"""
 
         super(ForceBalanceTestResult, self).addFailure(test,err)
-        self.logger.info("\r\x1b[31;1m" + "FAIL" + "\x1b[0m    " + test.shortDescription() + "\n")
+        self.logger.warning("\r\x1b[31;1m" + "FAIL" + "\x1b[0m    " + test.shortDescription() + "\n")
         
         errorMessage = self.buildErrorMessage(test, err)
 
         for line in errorMessage.splitlines():
-            self.logger.info("\t >\t" + line + "\n")
+            self.logger.warning("\t >\t" + line + "\n")
 
     def addError(self, test, err):
         """Run whenever a test comes back with an unexpected exception
         @override unittest.TestResult.addError(test,err)"""
 
         super(ForceBalanceTestResult, self).addError(test,err)
-        self.logger.info("\r\x1b[33;1mERROR\x1b[0m   " + test.shortDescription() + "\n")
+        self.logger.warning("\r\x1b[33;1mERROR\x1b[0m   " + test.shortDescription() + "\n")
 
         errorMessage = self.buildErrorMessage(test,err)
 
         for line in errorMessage.splitlines():
-            self.logger.info("\t >\t" + line + "\n")
+            self.logger.warning("\t >\t" + line + "\n")
     
     def buildErrorMessage(self, test, err):
         """Compile error data from test exceptions into a helpful message"""
@@ -121,7 +122,6 @@ class ForceBalanceTestResult(unittest.TestResult):
     def stopTest(self, test):
         """Run whenever a test is finished, regardless of the result
         @override unittest.TestResult.stopTest(test)"""
-        print "\n<<<<<<<< Finished %s >>>>>>>>\n\n" % test.id()
 
     def startTestRun(self, test):
         """Run before any tests are started"""
@@ -143,11 +143,8 @@ class ForceBalanceTestRunner(object):
     def __init__(self, logger=forcebalance.logging.getLogger("test"), verbose = False):
         self.logger = logger
 
-    def run(self,test_modules=[],pretend=False,program_output='test/test.log',quick=False, verbose=False):
-        if verbose:
-            self.logger.setLevel(forcebalance.logging.DEBUG)
-        else:
-            self.logger.setLevel(forcebalance.logging.INFO)
+    def run(self,test_modules=[],pretend=False,logfile='test/test.log',quick=False, loglevel=logging.INFO):
+        self.logger.setLevel(loglevel)
 
         # first install unittest interrupt handler which gracefully finishes current test on Ctrl+C
         unittest.installHandler()
@@ -181,10 +178,9 @@ class ForceBalanceTestRunner(object):
         # otherwise do a normal test run
         else:
             self.console = sys.stdout
-            sys.stdout = open(program_output, 'w')
+            sys.stdout = open(logfile, 'w')
 
             self.logger.addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
-            self.logger.setLevel(forcebalance.logging.DEBUG)
 
             unittest.registerResult(result)
             tests.run(result)
