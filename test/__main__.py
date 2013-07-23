@@ -33,12 +33,6 @@ def getOptions():
         usage()
         sys.exit()
     
-    # if modules to be run were not already provided in args, generate them automatically
-    if not options.has_key('test_modules'):
-        options['test_modules'] = [module[:-3] for module in sorted(os.listdir('test'))
-                                  if re.match("^test_.*\.py$",module)
-                                  and module[5:-3] not in exclude]
-    
     return options
 
 def usage():
@@ -57,15 +51,10 @@ Valid options are:
 -q, --quiet\t\tSet log level to WARNING, printing only on failure or error
 """
 
-def runTests(options):
-    """Run tests with options given from command line"""
-
-    #print "\x1b[2J\x1b[80A"
-    runner=ForceBalanceTestRunner()
-    results=runner.run(**options)
-    return results
 
 #### main block ####
 
 options=getOptions()
-runTests(options)
+logging.getLogger("test").addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
+runner=ForceBalanceTestRunner()
+results=runner.run(**options)
