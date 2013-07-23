@@ -1,10 +1,13 @@
 import unittest
-import os, sys, time
+import os, sys, time, re
 import traceback
 from collections import OrderedDict
 import numpy
 import forcebalance
 from forcebalance import logging
+
+__all__ = [module[:-3] for module in sorted(os.listdir('test'))
+           if re.match("^test_.*\.py$",module)]
 
 class ForceBalanceTestCase(unittest.TestCase):
     def __init__(self,methodName='runTest'):
@@ -146,7 +149,7 @@ class ForceBalanceTestRunner(object):
     def __init__(self, logger=forcebalance.logging.getLogger("test"), verbose = False):
         self.logger = logger
 
-    def run(self,test_modules=[],pretend=False,logfile='test/test.log',quick=False, loglevel=logging.INFO):
+    def run(self,test_modules=__all__,pretend=False,logfile='test/test.log',quick=False, loglevel=logging.INFO):
         self.logger.setLevel(loglevel)
 
         # first install unittest interrupt handler which gracefully finishes current test on Ctrl+C
@@ -159,6 +162,8 @@ class ForceBalanceTestRunner(object):
                 m=__import__(module)
                 module_tests=unittest.defaultTestLoader.loadTestsFromModule(m)
                 tests.addTest(module_tests)
+            except ImportError:
+                self.logger.error("No such test module: %s\n" % module)
             except:
                 self.logger.critical("Error loading '%s'\n" % module)
                 print traceback.print_exc()
@@ -182,8 +187,6 @@ class ForceBalanceTestRunner(object):
         else:
             self.console = sys.stdout
             sys.stdout = open(logfile, 'w')
-
-            self.logger.addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
 
             unittest.registerResult(result)
             tests.run(result)
