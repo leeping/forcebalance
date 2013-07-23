@@ -3,7 +3,7 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy
-from __init__ import ForceBalanceTestCase, TestValues
+from __init__ import ForceBalanceTestCase
 from test_target import TargetTests # general targets tests defined in test_target.py
 import logging
 
