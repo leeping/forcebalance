@@ -1,7 +1,7 @@
 import unittest
 import os, sys
 import tarfile
-from __init__ import ForceBalanceTestCase, TestValues
+from __init__ import ForceBalanceTestCase
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective

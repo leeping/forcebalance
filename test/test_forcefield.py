@@ -1,7 +1,8 @@
 import sys, os
+import forcebalance
 import forcebalance.forcefield as forcefield
 import unittest
-from __init__ import ForceBalanceTestCase, TestValues
+from __init__ import ForceBalanceTestCase
 import numpy as np
 from copy import deepcopy
 
@@ -64,7 +65,7 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
     Override the setUp() to run tests on a different forcefield"""
     def setUp(self):
         # options used in 001_water_tutorial
-        self.options=TestValues.opts.copy()
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
                 'penalty_additive': 0.01,
@@ -84,7 +85,7 @@ class TestXmlFF(ForceBalanceTestCase, FFTests):
     """Test FF class using dms.xml forcefield input"""
     def setUp(self):
         # options from 2013 tutorial
-        self.options=TestValues.opts.copy()
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
                 'penalty_additive': 0.01,
@@ -104,7 +105,7 @@ class TestGbsFF(ForceBalanceTestCase, FFTests):
     """Test FF class using gbs forcefield input"""
     def setUp(self):
         # options from 2013 tutorial
-        self.options=TestValues.opts.copy()
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
                 'penalty_additive': 0.01,
