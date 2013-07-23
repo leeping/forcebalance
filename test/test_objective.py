@@ -73,7 +73,7 @@ class TestPenalty(ForceBalanceTestCase):
             # more tests go here
 
 class TestObjective(ForceBalanceTestCase):
-    def setUp():
+    def setUp(self):
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
@@ -81,6 +81,11 @@ class TestObjective(ForceBalanceTestCase):
                 'jobtype': 'NEWTON',
                 'forcefield': ['cc-pvdz-overlap-original.gbs']})
         os.chdir(self.options['root'])
+
+        self.tgt_opts = forcebalance.parser.tgt_opts_defaults.copy()
+
+    def runTest(self):
+        pass
 
 if __name__ == '__main__':           
     unittest.main()
