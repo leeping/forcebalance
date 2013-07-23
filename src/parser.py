@@ -270,7 +270,7 @@ def printsection(heading,optdict,typedict):
     @return Answer List of strings for the section that we are printing out.
     
     """
-    from forcebalance.implemented import Implemented_Targets
+    from forcebalance.objective import Implemented_Targets
     from forcebalance.optimizer import Optimizer
 
     def FilterTargets(search):

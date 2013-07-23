@@ -11,8 +11,8 @@ the main page.
 
 <b>Developers and contributors</b> should read the
 Introduction chapter, including the <em>Program Layout</em> and
-<em>Creating Documentation</em> sections.  The <em>API
-documentation</em>, which describes all of the modules, classes and
+<em>Creating Documentation</em> sections.  The <em><a href=http://leeping.github.io/forcebalance/doc/html/api/roadmap.html>
+API documentation</a></em>, which describes all of the modules, classes and
 functions in the program, is intended as a reference
 for contributors who are writing code.
 

@@ -1,5 +1,6 @@
 import unittest, os, sys, re
 import forcebalance
+from forcebalance import logging
 from __init__ import ForceBalanceTestRunner
 import getopt
 
@@ -12,7 +13,8 @@ def getOptions():
         }
     # handle options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "e:mpi:", ["metatest","exclude=","pretend"])
+        opts, args = getopt.getopt(sys.argv[1:], "me:pvq", ["metatest","exclude=","pretend", "verbose", "quiet"])
+        options['loglevel']=logging.INFO
         if args:
             options['test_modules']=['test_' + module for module in args]
         for o, a in opts:
@@ -23,16 +25,13 @@ def getOptions():
             if o in ("-p", "--pretend"):
                 options['pretend']=True
             if o in ("-v", "--verbose"):
-                options['verbose']=True
+                options['loglevel']=logging.DEBUG
+            elif o in ("-q", "--quiet"):
+                options['loglevel']=logging.WARNING
+                
     except getopt.GetoptError as err:
         usage()
         sys.exit()
-    
-    # if modules to be run were not already provided in args, generate them automatically
-    if not options.has_key('test_modules'):
-        options['test_modules'] = [module[:-3] for module in sorted(os.listdir('test'))
-                                  if re.match("^test_.*\.py$",module)
-                                  and module[5:-3] not in exclude]
     
     return options
 
@@ -48,18 +47,14 @@ Valid options are:
 --exclude=MODULE[,MODULE2[,...]]
 -m, --metatest\t\tRun tests on testing framework
 -p, --pretend\t\tLoad tests but don't actually run them
+-v, --verbose\t\tSet log level to DEBUG, printing additional test information
+-q, --quiet\t\tSet log level to WARNING, printing only on failure or error
 """
 
-def runTests(options):
-    """Run tests with options given from command line"""
-
-    #print "\x1b[2J\x1b[80A"
-    runner=ForceBalanceTestRunner()
-    results=runner.run(**options)
-    return results
 
 #### main block ####
 
 options=getOptions()
-runTests(options)
-    
+logging.getLogger("test").addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
+runner=ForceBalanceTestRunner()
+results=runner.run(**options)

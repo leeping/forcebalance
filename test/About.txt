@@ -1,0 +1,27 @@
+This folder contains testing routines for ForceBalance
+
+=====================
+=   Basic usage     =
+=====================
+To run through all tests and print results to standard out, run
+python test
+from a shell at the root 'forcebalance' directly
+
+To see options for more advanced usage, run
+python test -h
+
+=====================
+=   Contents        =
+=====================
+Contents of this directory are as follows:
+
+    files/      : This directory holds files used to provide sample input for various test cases
+
+    test_*.py   : Test modules named after the corresponding files in ../src/ being tested
+
+    __init__.py : Classes that modify the python unittest framework and provide general unit testing functionality
+
+    __main__.py : Functions providing an interface from which tests can be run from the command line
+
+    __test__.py : some basic test cases that test result presentation
+                  This is also a good template to use when creating a new test module file
