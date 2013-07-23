@@ -4,9 +4,14 @@ ForceBalance
 
 If you're reading this, you are probably looking for help. :)
 
-There is documentation available online at:
+The main ForceBalance project website can be found at
+https://simtk.org/home/forcebalance
 
-http://www.simtk.org/home/forcebalance
+There is documentation available online in html at:
+http://leeping.github.io/forcebalance/doc/html/index.html
+
+You can also download the documentation in pdf format here:
+http://leeping.github.io/forcebalance/doc/ForceBalance-Manual.pdf
 
 =========
 Quick help

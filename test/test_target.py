@@ -3,13 +3,22 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy
-from __init__ import ForceBalanceTestCase, TestValues
+from __init__ import ForceBalanceTestCase
 
 class TargetTests(object):
+    def setUp(self):
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
+        self.ff = None  # Forcefield this target is fitting
+        self.options.update({'root': os.getcwd() + '/test/files'})
+
+        os.chdir(self.options['root'])
+
+
     def test_get_function(self):
         """Check target get() function output"""
         os.chdir('temp/%s' % self.tgt_opt['name'])
-        objective = self.target.get([1]*9)
+        objective = self.target.get([1]*self.ff.np)
         
         # check objective dictionary keys
         self.assertEqual(dict,type(objective))
@@ -54,7 +63,7 @@ class TargetTests(object):
             Xhi = self.target.get(mvals_hi)['X']
             g[p] = (Xhi-Xlo)/(self.mvals[p]/100.)
             #sys.stderr.write("\n%f\t%f" % (G[p],g[p]))
-            self.assertAlmostEqual(g[p], G[p], delta=X*.001)
+            self.assertAlmostEqual(g[p], G[p], delta=X*.01)
 
         os.chdir('../..')
         
