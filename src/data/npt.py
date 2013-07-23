@@ -400,6 +400,9 @@ def create_simulation_object(pdb, settings, pbc=True, precision="mixed", platnam
             platform.setPropertyDefaultValue("CudaDeviceIndex", device)
             platform.setPropertyDefaultValue("CudaPrecision", precision)
             platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+            cpupme = os.environ.get('CPU_PME',"n")
+            if cpupme.lower() == "y":
+                platform.setPropertyDefaultValue("CudaUseCpuPme", "true")
         except:
             traceback.print_exc()
             if args.force_cuda:
