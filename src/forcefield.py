@@ -701,7 +701,7 @@ class FF(ForceBalanceBaseClass):
                             whites[fld+1] = whites[fld+1][:-Shave]
                     sline[fld] = newrd
                     # Replace the line in the new force field.
-                    newffdata[fnm][ln] = ''.join([whites[j]+sline[j] for j in range(len(sline))])+'\n'
+                    newffdata[fnm][ln] = ''.join([(whites[j] if len(whites[j]) > 0 else ' ')+sline[j] for j in range(len(sline))])+'\n'
 
         if printdir != None:
             absprintdir = os.path.join(self.root,printdir)
