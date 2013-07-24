@@ -11,6 +11,31 @@ To see options for more advanced usage, run
 python test -h
 
 =====================
+=   Headless Config =
+=====================
+In headless mode, tests results are not printed to the screen. Tests will be run in this
+mode when a headless config file is provided as a command line argument:
+python test --headless-config=config_file.conf
+
+the config file is a line separated list of options in the form
+option=value
+which determine where test results are sent
+
+Available options are:
+log_location (string)       : path to put test log. If not specified, log is not saved
+enable_smtp (string)        : valid values are
+                              'true'- send test results via email after every test
+                              'error'- only send if any tests fail or have errors
+smtp_server (string)        : the url of the smtp server used for sending log information
+smtp_port (integer)         : the port number to use when connecting to the smtp server
+smtp_user (string)          : the user to use when connecting to the smtp server
+smtp_password (string)      : the password to use when connecting to the smtp server
+smtp_tls (boolean)          : whether the smtp server requires TLS when authenticating
+smtp_destination (string)   : the destination address where the error log will be sent
+smtp_source (string)        : specifies the "from:" header in the outgoing email
+smtp_subject (string)       : specifies the subject of the outgoing email
+
+=====================
 =   Contents        =
 =====================
 Contents of this directory are as follows:
