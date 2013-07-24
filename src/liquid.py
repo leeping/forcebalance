@@ -374,6 +374,8 @@ class Liquid(Target):
                 pass
                 # for obs in self.RefData:
                 #     del self.RefData[obs][PT]
+        if len(Points) == 0:
+            raise Exception('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!')
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \

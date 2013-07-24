@@ -558,8 +558,8 @@ def createWorkQueue(wq_port):
     work_queue.set_debug_flag('all')
     WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
     WORK_QUEUE.specify_name('forcebalance')
-    #WORK_QUEUE.specify_keepalive_timeout(3600)
-    WORK_QUEUE.specify_keepalive_interval(86400)
+    WORK_QUEUE.specify_keepalive_timeout(8640000)
+    WORK_QUEUE.specify_keepalive_interval(8640000)
 
 def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
@@ -865,8 +865,7 @@ def warn_once(warning, warnhash = None):
 warn_once.already = set()
 
 #=========================================#
-#| Logging Handlers (move to nifty       |#
-#| after logging branch merge?)          |#
+#| Logging Handlers                      |#
 #=========================================#
 
 class RawStreamHandler(logging.StreamHandler):

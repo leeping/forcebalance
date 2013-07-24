@@ -206,5 +206,5 @@ if __name__ == '__main__':
 
 
     print "Loading master branch stash if necessary..."
-    os.system('git stash apply')
+    os.system('git stash pop')
     print "Documentation successfully generated"

@@ -535,6 +535,9 @@ class OpenMM_MD(MDEngine):
                 platform.setPropertyDefaultValue("CudaDeviceIndex", device)
                 platform.setPropertyDefaultValue("CudaPrecision", precision)
                 platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+                cpupme = os.environ.get('CPU_PME',"n")
+                if cpupme.lower() == "y":
+                    platform.setPropertyDefaultValue("CudaUseCpuPme", "true")
             except:
                 traceback.print_exc()
                 if args.force_cuda:
@@ -542,7 +545,6 @@ class OpenMM_MD(MDEngine):
                 platname = "Reference"
         if platname == "Reference":
             platform = Platform.getPlatformByName(platname)
-
         # Create the system.
         try:
             pdb = self.PDBs[phase]
