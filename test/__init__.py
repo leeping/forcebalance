@@ -130,7 +130,7 @@ class ForceBalanceTestResult(unittest.TestResult):
     def startTestRun(self, test):
         """Run before any tests are started"""
         self.runTime= time.time()
-        self.logger.debug("\nBeginning test suite\n")
+        self.logger.debug("\nBeginning ForceBalance test suite at %s\n" % time.strftime('%x %X %Z'))
 
     def stopTestRun(self, test):
         """Run after all tests have finished"""
