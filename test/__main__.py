@@ -1,4 +1,4 @@
-import unittest, os, sys, re
+import unittest, os, sys, re, shutil, time
 import forcebalance
 from forcebalance import logging
 from __init__ import ForceBalanceTestRunner
@@ -63,8 +63,10 @@ def runHeadless(options):
     with open(options["headless_config"], 'r') as f:
         config = f.read().splitlines()
         for line in config:
-            line = line.split('=')
-            headless_options[line[0]]=line[1]
+            line = line.strip()
+            if line:
+                line = line.split('=')
+                headless_options[line[0]]=line[1]
 
     os.chdir(os.path.dirname(__file__) + "/..")
 
@@ -77,9 +79,11 @@ def runHeadless(options):
             self.stream.write(message)
             self.flush()
 
-    warningHandler = CleanFileHandler('test.err','w')
+    os.mkdir('/tmp/forcebalance')
+    warningHandler = CleanFileHandler('/tmp/forcebalance/test.err','w')
     warningHandler.setLevel(logging.WARNING)
-    debugHandler = CleanFileHandler('test.log','w')
+    logfile = "/tmp/forcebalance/%s.log" % time.strftime('%m%d%y_%H%M%S')
+    debugHandler = CleanFileHandler(logfile,'w')
     debugHandler.setLevel(logging.DEBUG)
     
     logging.getLogger("test").addHandler(warningHandler)
@@ -90,48 +94,57 @@ def runHeadless(options):
     runner=ForceBalanceTestRunner()
     results=runner.run(**options)
 
-    if not results.wasSuccessful():
-        import smtplib
-        from email.mime.text import MIMEText
-        from email.mime.multipart import MIMEMultipart
+    if headless_options.has_key('enable_smtp')\
+    and headless_options['enable_smtp'].lower() in ['true','error']:
+        if headless_options['enable_smtp'].lower()=='true' or not results.wasSuccessful():
+            import smtplib
+            from email.mime.text import MIMEText
+            from email.mime.multipart import MIMEMultipart
 
-        # establish connection with smtp server
-        server = smtplib.SMTP(host = headless_options["smtp_server"],
-                              port = headless_options["smtp_port"])
-        if headless_options.has_key("smtp_tls") and headless_options["smtp_tls"].lower()=="true":
-            server.starttls()
-        server.login(user = headless_options["smtp_username"],
-                     password = headless_options["smtp_password"])
+            # establish connection with smtp server
+            server = smtplib.SMTP(host = headless_options["smtp_server"],
+                                  port = headless_options["smtp_port"])
+            if headless_options.has_key("smtp_tls") and headless_options["smtp_tls"].lower()=="true":
+                server.starttls()
+            server.login(user = headless_options["smtp_user"],
+                         password = headless_options["smtp_password"])
 
-        # prepare message text
-        text = "ForceBalance unit test failure. See attached debug log for more details\n"
-        text += "Error Output:\n"
-        with open('test.err','r') as warnings:
-            text += warnings.read()
+            # prepare message text
+            
+            text = "ForceBalance unit test suite ran at %s with %d failures, %d errors. " %\
+            (time.strftime('%x %X %Z'),len(results.failures), len(results.errors)) 
+            text += "See attached debug log for more details\n"
+            if not results.wasSuccessful():
+                text += "Error Output:\n"
+                with open('/tmp/forcebalance/test.err','r') as warnings:
+                    text += warnings.read()
 
-        log = ''
-        with open('test.log','r') as debug:
-            log += debug.read()
+            log = ''
+            with open(logfile,'r') as debug:
+                log += debug.read()
 
-        # format message headers
-        msg = MIMEMultipart()
-        msg['From']= headless_options["source"]
-        msg['To']= headless_options["destination"]
-        msg['Subject']=headless_options["subject"]
+            # format message headers
+            msg = MIMEMultipart()
+            msg['From']= headless_options["smtp_source"]
+            msg['To']= headless_options["smtp_destination"]
+            msg['Subject']=headless_options["smtp_subject"]
 
-        content = MIMEText(text)
-        attachment = MIMEText(log)
-        attachment.add_header('Content-Disposition', 'attachment', filename="debug.log")
-        msg.attach(content)
-        msg.attach(attachment)
+            content = MIMEText(text)
+            attachment = MIMEText(log)
+            attachment.add_header('Content-Disposition', 'attachment', filename="debug.log")
+            msg.attach(content)
+            msg.attach(attachment)
 
-        # send message
-        server.sendmail(headless_options["source"],
-                        [ headless_options["destination"] ],
-                        msg.as_string())
+            # send message
+            server.sendmail(headless_options["smtp_source"],
+                            [ headless_options["smtp_destination"] ],
+                            msg.as_string())
 
-        # close connection
-        server.quit()
+            # close connection
+            server.quit()
+    if headless_options.has_key('log_location'):
+        shutil.copy(logfile, headless_options['log_location'])
+    shutil.rmtree('/tmp/forcebalance')
 
 def run(options):
     logging.getLogger("test").addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
