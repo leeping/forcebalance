@@ -72,8 +72,8 @@ class ForceBalanceTestResult(unittest.TestResult):
         @override unittest.TestResult.startTest(test)"""
 
         super(ForceBalanceTestResult, self).startTest(test)
-        self.logger.info("---     " + test.shortDescription())
-        self.logger.debug("Started %s\n" % test.id())
+        self.logger.debug("\n>>>     Starting %s\n" % test.id())
+        self.logger.info(">>>     " + test.shortDescription())
 
     def addFailure(self, test, err):
         """Run whenever a test comes back as failed
@@ -125,7 +125,7 @@ class ForceBalanceTestResult(unittest.TestResult):
     def stopTest(self, test):
         """Run whenever a test is finished, regardless of the result
         @override unittest.TestResult.stopTest(test)"""
-        self.logger.debug("Finished %s\n" % test.id())
+        self.logger.debug(">>>     Finished %s\n\n" % test.id())
 
     def startTestRun(self, test):
         """Run before any tests are started"""
@@ -149,7 +149,13 @@ class ForceBalanceTestRunner(object):
     def __init__(self, logger=forcebalance.logging.getLogger("test"), verbose = False):
         self.logger = logger
 
-    def run(self,test_modules=__all__,pretend=False,logfile='test/test.log',quick=False, loglevel=logging.INFO):
+    def run(self,
+            test_modules=__all__,
+            pretend=False,
+            logfile='test/test.log',
+            loglevel=logging.INFO,
+            **kwargs):
+
         self.logger.setLevel(loglevel)
 
         # first install unittest interrupt handler which gracefully finishes current test on Ctrl+C
