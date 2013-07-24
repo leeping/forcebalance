@@ -195,7 +195,10 @@ class ForceBalanceTestRunner(object):
             sys.stdout = open(logfile, 'w')
 
             unittest.registerResult(result)
-            tests.run(result)
+            try:
+                tests.run(result)
+            except:
+                self.logger.exception(msg="An unexpected exception occurred while running tests")
 
             sys.stdout.close()
             sys.stdout = self.console
