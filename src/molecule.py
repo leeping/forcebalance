@@ -850,7 +850,7 @@ class Molecule(object):
             # for i in range(len(self.comms)):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
-            if 'networkx' in sys.modules and build_topology:
+            if 'networkx' in sys.modules and build_topology and self.na > 0:
                 if self.na > 10000:
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
                 self.topology = self.build_topology()
@@ -1140,6 +1140,7 @@ class Molecule(object):
         lengths = []
         for i, a in enumerate(self.elem):
             G.add_node(i)
+            nx.set_node_attributes(G,'n',{i:self.atomname[i]})
             nx.set_node_attributes(G,'e',{i:a})
             nx.set_node_attributes(G,'x',{i:self.xyzs[sn][i]})
         bond_bool = dxij[0] < BondThresh
@@ -1825,9 +1826,14 @@ class Molecule(object):
 
         XYZList=[]
         for Model in PDBLines:
-            XYZList.append([])
+            # Skip over subsequent models with the wrong number of atoms.
+            NewXYZ = []
             for x in Model:
-                XYZList[-1].append([x.x,x.y,x.z])
+                NewXYZ.append([x.x,x.y,x.z])
+            if len(XYZList) == 0:
+                XYZList.append(NewXYZ)
+            elif len(XYZList) >= 1 and (np.array(NewXYZ).shape == np.array(XYZList[-1]).shape):
+                XYZList.append(NewXYZ)
 
         if len(XYZList[-1])==0:#If PDB contains trailing END / ENDMDL, remove empty list
             XYZList.pop()
@@ -1837,6 +1843,7 @@ class Molecule(object):
         for i in AtomNames:
             thiselem = i
             if len(thiselem) > 1:
+                thiselem = re.sub('^[0-9]','',thiselem)
                 thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
             elem.append(thiselem)
 

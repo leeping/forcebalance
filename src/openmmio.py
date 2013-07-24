@@ -179,6 +179,98 @@ def UpdateSimulationParameters(src_system, dest_simulation):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
 
+def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
+    """
+    Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
+    
+    ARGUMENTS
+
+    temperature (numpy.unit.Quantity compatible with kelvin) - the temperature
+    collision_rate (numpy.unit.Quantity compatible with 1/picoseconds) - the collision rate
+    timestep (numpy.unit.Quantity compatible with femtoseconds) - the integration timestep
+    system (simtk.openmm.System) - system whose forces will be partitioned
+    ninnersteps (int) - number of inner timesteps (default: 4)
+
+    RETURNS
+
+    integrator (openmm.CustomIntegrator) - a VVVR integrator
+
+    NOTES
+    
+    This integrator is equivalent to a Langevin integrator in the velocity Verlet discretization with a
+    timestep correction to ensure that the field-free diffusion constant is timestep invariant.  The inner
+    velocity Verlet discretization is transformed into a multiple timestep algorithm.
+
+    REFERENCES
+
+    VVVR Langevin integrator: 
+    * http://arxiv.org/abs/1301.3800
+    * http://arxiv.org/abs/1107.2967 (to appear in PRX 2013)    
+    
+    TODO
+
+    Move initialization of 'sigma' to setting the per-particle variables.
+    
+    """
+    # Multiple timestep Langevin integrator.
+    for i in system.getForces():
+        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
+            # Slow force.
+            print i.__class__.__name__, "is a Slow Force"
+            i.setForceGroup(1)
+        else:
+            print i.__class__.__name__, "is a Fast Force"
+            # Fast force.
+            i.setForceGroup(0)
+
+    kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
+    kT = kB * temperature
+    
+    integrator = openmm.CustomIntegrator(timestep)
+    
+    integrator.addGlobalVariable("dt_fast", timestep/float(ninnersteps)) # fast inner timestep
+    integrator.addGlobalVariable("kT", kT) # thermal energy
+    integrator.addGlobalVariable("a", numpy.exp(-collision_rate*timestep)) # velocity mixing parameter
+    integrator.addGlobalVariable("b", numpy.sqrt((2/(collision_rate*timestep)) * numpy.tanh(collision_rate*timestep/2))) # timestep correction parameter
+    integrator.addPerDofVariable("sigma", 0) 
+    integrator.addPerDofVariable("x1", 0) # position before application of constraints
+
+    #
+    # Pre-computation.
+    # This only needs to be done once, but it needs to be done for each degree of freedom.
+    # Could move this to initialization?
+    #
+    integrator.addComputePerDof("sigma", "sqrt(kT/m)")
+
+    # 
+    # Velocity perturbation.
+    #
+    integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
+    integrator.addConstrainVelocities();
+    
+    #
+    # Symplectic inner multiple timestep.
+    #
+    integrator.addUpdateContextState(); 
+    integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m")
+    for innerstep in range(ninnersteps):
+        # Fast inner symplectic timestep.
+        integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m")
+        integrator.addComputePerDof("x", "x + v*b*dt_fast")
+        integrator.addComputePerDof("x1", "x")
+        integrator.addConstrainPositions();        
+        integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m + (x-x1)/dt_fast")
+    integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m") # TODO: Additional velocity constraint correction?
+    integrator.addConstrainVelocities();
+
+    #
+    # Velocity randomization
+    #
+    integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
+    integrator.addConstrainVelocities();
+
+    return integrator
+
 
 """Dictionary for building parameter identifiers.  As usual they go like this:
 Bond/length/OW.HW

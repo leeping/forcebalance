@@ -1,0 +1,25 @@
+In this directory I set up the liquid bromine simulations.
+
+I probably started by writing the .itp file by hand.
+
+Then I wrote the .gro file for the monomer by hand.
+
+Gas-phase Bromine
+    2
+    1Br     Br1    1   0.128321   1.799782   0.521545
+    1Br     Br2    2  -0.073624   1.930111   0.484734
+   2.055630   2.055630   2.055630
+
+Next I wrote the .top files by hand (these are easy too)
+
+#include "bro.itp"
+
+[ system ]
+Liquid Bromine
+
+[ molecules ]
+BRO 100
+
+I created the liquid .gro file with genbox, knowing the experimental density of bromine, don't remember if I had to make the box bigger.
+I minimized the energy, ran some MD, and saved a box after ~50 ps for liquid.gro
+

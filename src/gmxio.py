@@ -7,17 +7,74 @@
 """
 
 import os
-from re import match, sub
-from forcebalance.nifty import isint, _exec, warn_press_key, getWorkQueue, LinkFile
+import re
+from forcebalance.nifty import isint, _exec, warn_press_key, getWorkQueue, LinkFile, link_dir_contents, printcool_dictionary
 from numpy import array
 from forcebalance.basereader import BaseReader
 from forcebalance.abinitio import AbInitio
+from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
 from forcebalance.molecule import Molecule
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
+from collections import OrderedDict
 #import IPython
+
+def edit_mdp(fin, fout, options, verbose=False):
+    """
+    Create or edit a Gromacs MDP file.
+    @param[in] fin Input file name.
+    @param[in] fout Output file name, can be the same as input file name.
+    @param[in] options Dictionary containing mdp options. Existing options are replaced, new options are added at the end.
+    """
+    # Make sure that the keys are lowercase, and the values are all strings.
+    options = OrderedDict([(key.lower(), str(val)) for key, val in options.items()])
+    # List of lines in the output file.
+    out = []
+    # List of options in the output file.
+    haveopts = []
+    if os.path.isfile(fin):
+        for line in open(fin).readlines():
+            line    = line.strip().expandtabs()
+            # The line structure should look something like this:
+            # key   = value  ; comments
+            # First split off the comments.
+            if len(line) == 0:
+                out.append('')
+            s = line.split(';',1)
+            data = s[0]
+            comms = s[1] if len(s) > 1 else None
+            # Pure comment lines or empty lines get appended to the output.
+            if set(data).issubset([' ']):
+                out.append(line)
+                continue
+            # Now split off the key and value fields at the equals sign.
+            keyf, valf = data.split('=',1)
+            key = keyf.strip().lower()
+            valen = len(valf)
+            if key in options:
+                val = options[key]
+                if len(val) < len(valf):
+                    valf = ' ' + val + ' '*(len(valf) - len(val)-1)
+                else:
+                    valf = ' ' + val + ' '
+                lout = [keyf, '=', valf]
+                if comms != None:
+                    lout += [';',comms]
+                out.append(''.join(lout))
+                haveopts.append(key)
+            else:
+                out.append(line)
+    for key, val in options.items():
+        if key not in haveopts:
+            out.append("%-20s = %s" % (key, val))
+    file_out = open(fout,'w')
+    for line in out:
+        print >> file_out, line
+    if verbose:
+        printcool_dictionary(options, title="%s -> %s with options:" % (fin, fout))
+    file_out.close()
 
 ## VdW interaction function types
 nftypes = [None, 'VDW', 'VDW_BHAM']
@@ -130,7 +187,7 @@ def parse_atomtype_line(line):
     wrd += 1
     # The bonded atom type, a pecularity of OPLS-AA
     # Test if it begins with a letter.  Seems to work. :)
-    if match('[A-Za-z]',sline[wrd]):
+    if re.match('[A-Za-z]',sline[wrd]):
         batomtype = sline[wrd]
         wrd += 1
         bonus += 1
@@ -254,11 +311,11 @@ class ITP_Reader(BaseReader):
         self.itype = None
         self.ln   += 1
         # No sense in doing anything for an empty line or a comment line.
-        if len(s) == 0 or match('^ *;',line): return None, None
+        if len(s) == 0 or re.match('^ *;',line): return None, None
         # Now go through all the cases.
-        if match('^ *\[.*\]',line):
+        if re.match('^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
-            self.sec = sub('[\[\] \n]','',line.strip())
+            self.sec = re.sub('[\[\] \n]','',line.strip())
         elif self.sec == 'defaults':
             self.itype = 'DEF'
             self.nbtype = int(s[0])
@@ -356,7 +413,7 @@ def rm_gmx_baks(dir):
     # Delete the #-prepended files that GROMACS likes to make
     for root, dirs, files in os.walk(dir):
         for file in files:
-            if match('^#',file):
+            if re.match('^#',file):
                 os.remove(file)
 
 class AbInitio_GMX(AbInitio):
@@ -385,11 +442,11 @@ class AbInitio_GMX(AbInitio):
         for line in open(os.path.join(self.root, self.tgtdir,  self.topfnm)).readlines():
             s          = line.split()
             # No sense in doing anything for an empty line or a comment line.
-            if len(s) == 0 or match('^;',line): continue
+            if len(s) == 0 or re.match('^;',line): continue
             # Now go through all the cases.
-            if match('^\[.*\]',line):
+            if re.match('^\[.*\]',line):
                 # Makes a word like "atoms", "bonds" etc.
-                section = sub('[\[\] \n]','',line)
+                section = re.sub('[\[\] \n]','',line)
             elif section == 'molecules':
                 molname    = s[0]
                 nummol     = int(s[1])
@@ -491,6 +548,69 @@ class AbInitio_GMX(AbInitio):
         _exec(["./trjconv","-f","shot.trr","-o","trajout.gro","-ndec","6","-novel","-noforce"], stdin='System', print_command=False)
         NewMol = Molecule("trajout.gro")
         self.traj.xyzs = NewMol.xyzs
+
+class Liquid_GMX(Liquid):
+    def __init__(self,options,tgt_opts,forcefield):
+        super(Liquid_GMX,self).__init__(options,tgt_opts,forcefield)
+        # self.DynDict = OrderedDict()
+        # self.DynDict_New = OrderedDict()
+        if self.do_self_pol:
+            warn_press_key("Self-polarization correction not implemented yet when using GMX")
+
+    def prepare_temp_directory(self,options,tgt_opts):
+        """ Prepare the temporary directory by copying in important files. """
+        os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
+        os.environ["GMX_NO_ALLVSALL"] = "TRUE"
+        abstempdir = os.path.join(self.root,self.tempdir)
+        if options['gmxpath'] == None or options['gmxsuffix'] == None:
+            warn_press_key('Please set the options gmxpath and gmxsuffix in the input file!')
+        if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
+            warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
+        # Link the necessary programs into the temporary directory
+        # LinkFile(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
+        # LinkFile(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
+        # LinkFile(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
+        # LinkFile(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
+        # LinkFile(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
+        LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
+        # Link the run files
+        for phase in ["liquid","gas"]:
+            LinkFile(os.path.join(self.root,self.tgtdir,"%s.mdp" % phase),os.path.join(abstempdir,"%s.mdp" % phase))
+            LinkFile(os.path.join(self.root,self.tgtdir,"%s.top" % phase),os.path.join(abstempdir,"%s.top" % phase))
+            LinkFile(os.path.join(self.root,self.tgtdir,"%s.gro" % phase),os.path.join(abstempdir,"%s.gro" % phase))
+
+    def npt_simulation(self, temperature, pressure, simnum):
+        """ Submit a NPT simulation to the Work Queue. """
+        wq = getWorkQueue()
+        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
+            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            if wq == None:
+                print "Running condensed phase simulation locally."
+                print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
+                # if GoodStep() and (temperature, pressure) in self.DynDict_New:
+                #     self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
+                # if (temperature, pressure) in self.DynDict:
+                #     dynsrc = self.DynDict[(temperature, pressure)]
+                #     dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
+                #     print "Copying .dyn file: %s to %s" % (dynsrc, dyndest)
+                #     shutil.copy2(dynsrc,dyndest)
+                cmdstr = 'python npt.py gromacs %i %.3f %.3f %.3f %.3f %s --liquid_equ_steps %i &> npt.out' % \
+                    (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --minimize_energy" if self.minimize_energy else "", self.liquid_equ_steps)
+                _exec(cmdstr)
+                # self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
+            else:
+                # This part of the code has never been used before
+                # Still need to figure out where to specify GROMACS location on each cluster
+                # queue_up(wq,
+                #          command = 'python npt.py liquid.xyz %.3f %.3f &> npt.out' % (temperature, pressure),
+                #          input_files = ['liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt.py'],
+                #          output_files = ['npt_result.p.bz2', 'npt.py'] + self.FF.fnms,
+                #          tgt=self)
+                raise RuntimeError('Remote GROMACS execution is not yet enabled')
+
+    def polarization_correction(self,mvals):
+        # This needs to be implemented
+        return 0
 
 class Interaction_GMX(Interaction):
     """ Subclass of Interaction for interaction energy matching using GROMACS. """

@@ -15,7 +15,7 @@ import datetime
 import traceback
 
 try:
-    from forcebalance.gmxio import AbInitio_GMX
+    from forcebalance.gmxio import AbInitio_GMX, Liquid_GMX
 except:
     print traceback.format_exc()
     print "Gromacs module import failed"
@@ -72,6 +72,7 @@ Implemented_Targets = {
     'VIBRATION_TINKER':Vibration_TINKER,
     'LIQUID_OPENMM':Liquid_OpenMM,
     'LIQUID_TINKER':Liquid_TINKER, 
+    'LIQUID_GMX':Liquid_GMX, 
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'RDVR3_PSI4':RDVR3_Psi4,
@@ -118,6 +119,8 @@ class Objective(ForceBalanceBaseClass):
         ## The list of fitting targets
         self.Targets = []
         for opts in tgt_opts:
+            if opts['type'] not in Implemented_Targets:
+                raise RuntimeError('The target type \x1b[1;91m%s\x1b[0m is not implemented!' % opts['type'])
             Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
             self.Targets.append(Tgt)
             printcool_dictionary(Tgt.PrintOptionDict,"Setup for target %s :" % Tgt.name)
