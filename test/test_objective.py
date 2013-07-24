@@ -3,7 +3,7 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy
-from __init__ import ForceBalanceTestCase, TestValues
+from __init__ import ForceBalanceTestCase
 
 class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
@@ -38,8 +38,7 @@ class TestImplemented(ForceBalanceTestCase):
 
 class TestPenalty(ForceBalanceTestCase):
     def setUp(self):
-        # options from 2013 tutorial
-        self.options=TestValues.opts.copy()
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
                 'penalty_additive': 0.01,
@@ -72,6 +71,21 @@ class TestPenalty(ForceBalanceTestCase):
             result=penalty.compute([1]*self.np, objective)
             self.assertEqual(tuple, type(result))
             # more tests go here
+
+class TestObjective(ForceBalanceTestCase):
+    def setUp(self):
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options.update({
+                'root': os.getcwd() + '/test/files',
+                'penalty_additive': 0.01,
+                'jobtype': 'NEWTON',
+                'forcefield': ['cc-pvdz-overlap-original.gbs']})
+        os.chdir(self.options['root'])
+
+        self.tgt_opts = forcebalance.parser.tgt_opts_defaults.copy()
+
+    def runTest(self):
+        pass
 
 if __name__ == '__main__':           
     unittest.main()
