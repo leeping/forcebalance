@@ -20,9 +20,13 @@ class TestOptimizer(ForceBalanceTestCase):
         self.options, self.tgt_opts = forcebalance.parser.parse_inputs(self.input_file)
 
         self.options.update({'writechk':'checkfile.tmp'})
-        self.forcefield  = forcebalance.forcefield.FF(self.options)
-        self.objective   = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
-        self.optimizer   = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
+
+        try: self.forcefield  = forcebalance.forcefield.FF(self.options)
+        except: self.skipTest("\nCouldn't create forcefield")
+        try: self.objective   = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
+        except: self.skipTest("\nCouldn't create objective function")
+        try: self.optimizer   = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
+        except: self.fail("\nCouldn't create optimizer")
 
     def tearDown(self):
         os.system('rm -rf results targets backups temp checkfile.tmp')
