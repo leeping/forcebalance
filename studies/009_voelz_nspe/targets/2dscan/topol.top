@@ -1,0 +1,8 @@
+#include "molecule.itp"
+
+[ system ]
+Peptoid 2D dihedral scan
+
+[ molecules ]
+LIG 1
+

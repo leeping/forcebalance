@@ -967,9 +967,10 @@ class AbInitio(Target):
             self.e_ref = MBP * sqrt(QQ_M[0]/Z - Q0_M[0]**2/Z/Z) + QBP * sqrt((QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
             self.e_err = dE
             self.e_err_pct = dEfrac
-            self.f_ref = qF
-            self.f_err = dF
-            self.f_err_pct = dFfrac
+            if self.force:
+                self.f_ref = qF
+                self.f_err = dF
+                self.f_err_pct = dFfrac
             if self.use_nft:
                 self.nf_ref = qN
                 self.nf_err = dN
