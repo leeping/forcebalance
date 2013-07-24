@@ -521,12 +521,18 @@ class Liquid(Target):
                     Hvap_calc[PT] -= EPol
                     Hvap_grad[PT] -= GEPol
                 if hasattr(self,'use_cni') and self.use_cni:
+                    if not ('cni' in self.RefData and self.RefData['cni'][PT]):
+                        raise RuntimeError('Asked for a nonideality correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
                     print "Adding % .3f to enthalpy of vaporization at" % self.RefData['cni'][PT], PT
                     Hvap_calc[PT] += self.RefData['cni'][PT]
                 if hasattr(self,'use_cvib_intra') and self.use_cvib_intra:
+                    if not ('cvib_intra' in self.RefData and self.RefData['cvib_intra'][PT]):
+                        raise RuntimeError('Asked for a quantum intramolecular vibrational correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
                     print "Adding % .3f to enthalpy of vaporization at" % self.RefData['cvib_intra'][PT], PT
                     Hvap_calc[PT] += self.RefData['cvib_intra'][PT]
                 if hasattr(self,'use_cvib_inter') and self.use_cvib_inter:
+                    if not ('cvib_inter' in self.RefData and self.RefData['cvib_inter'][PT]):
+                        raise RuntimeError('Asked for a quantum intermolecular vibrational correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
                     print "Adding % .3f to enthalpy of vaporization at" % self.RefData['cvib_inter'][PT], PT
                     Hvap_calc[PT] += self.RefData['cvib_inter'][PT]
             else:

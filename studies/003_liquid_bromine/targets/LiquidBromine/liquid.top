@@ -1,0 +1,7 @@
+#include "bro.itp"
+
+[ system ]
+Liquid Bromine
+
+[ molecules ]
+BRO 100

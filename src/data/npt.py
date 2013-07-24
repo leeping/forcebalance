@@ -3,9 +3,9 @@
 """
 @package npt
 
-NPT simulation in OpenMM.  Runs a simulation to compute bulk properties
-(for example, the density or the enthalpy of vaporization) and compute the
-derivative with respect to changing the force field parameters.
+Runs a simulation to compute condensed phase properties (for example, the density 
+or the enthalpy of vaporization) and compute the derivative with respect 
+to changing the force field parameters.  This script is a part of ForceBalance.
 
 The basic idea is this: First we run a density simulation to determine
 the average density.  This quantity of course has some uncertainty,
@@ -46,32 +46,32 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 
-#================#
-# Global Imports #
-#================#
+#==================#
+#| Global Imports |#
+#==================#
 
 import os
 import sys
-import numpy as np
-from simtk.unit import *
-from simtk.openmm import *
-from simtk.openmm.app import *
-from forcebalance.forcefield import FF
-from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary
-from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p
-from forcebalance.molecule import Molecule
-from forcebalance.openmmio import *
-from copy import deepcopy
+import glob
 import argparse
 import traceback
+import numpy as np
+from copy import deepcopy
+from collections import namedtuple
+from forcebalance.forcefield import FF
+from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, statisticalInefficiency, which, _exec, isint
+from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p, in_fd
+from forcebalance.molecule import Molecule
 
-#======================================================#
-# Global, user-tunable variables (simulation settings) #
-#======================================================#
+#========================================================#
+#| Global, user-tunable variables (simulation settings) |#
+#========================================================#
+
+# TODO: Strip out PDB and XML file arguments.
+# TODO: Strip out all units.
 
 parser = argparse.ArgumentParser()
-parser.add_argument('liquid_pdbfile', help='PDB File for the liquid')
-parser.add_argument('openmm_xmlfile', help='OpenMM Parameter XML File for the liquid, contained within forcebalance.p')
+parser.add_argument('engine', help='MD program that we are using; choose "openmm" or "gromacs"')
 parser.add_argument('liquid_prod_steps', type=int, help='Number of time steps for the liquid production simulation')
 parser.add_argument('liquid_timestep', type=float, help='Length of the time step for the liquid simulation, in femtoseconds')
 parser.add_argument('liquid_interval', type=float, help='Time interval for saving the liquid coordinates, in picoseconds')
@@ -80,734 +80,70 @@ parser.add_argument('pressure',type=float, help='Pressure (Atm)')
 
 # Other optional arguments
 parser.add_argument('--liquid_equ_steps', type=int, help='Number of time steps used for equilibration', default=100000)
-parser.add_argument('--gas_pdbfile', help='TINKER .xyz file for the gas', type=str, default="mono.pdb")
-parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=100000)
+parser.add_argument('--gas_equ_steps', type=int, help='Number of time steps for the gas-phase equilibration simulation', default=100000)
 parser.add_argument('--gas_prod_steps', type=int, help='Number of time steps for the gas-phase production simulation', default=1000000)
-parser.add_argument('--gas_timestep', type=float, help='Length of the time step for the gas-phase simulation, in femtoseconds', default=0.5)
+parser.add_argument('--gas_timestep', type=float, help='Time step for the gas-phase simulation, in femtoseconds', default=0.5)
 parser.add_argument('--gas_interval', type=float, help='Time interval for saving the gas-phase coordinates, in picoseconds', default=0.1)
 parser.add_argument('--anisotropic', action='store_true', help='Enable anisotropic scaling of periodic box (useful for crystals)')
-parser.add_argument('--mts_vvvr', action='store_true', help='Enable multiple timestep integrator')
-parser.add_argument('--force_cuda', action='store_true', help='Crash immediately if CUDA platform is not available')
+parser.add_argument('--mts_vvvr', action='store_true', help='Enable multiple timestep integrator (OpenMM)')
+parser.add_argument('--force_cuda', action='store_true', help='Exit if CUDA platform is not available (OpenMM)')
+parser.add_argument('--gmxpath', type=str, help='Specify the location of GROMACS executables', default="")
 parser.add_argument('--minimize_energy', action='store_true', help='Minimize the energy of the system prior to running dynamics')
 
 args = parser.parse_args()
 
-DoEDA = True
-if args.mts_vvvr:
-    # EDA relies on Force Groups, as does MTS integrator, 
-	# and they are incompatible.
-    DoEDA = False
-
-# The convention of using the "iteration" as a fundamental unit comes from the OpenMM script.
-timestep         = args.liquid_timestep * femtosecond                          # timestep for integration in femtosecond
-faststep         = 0.25 * femtosecond                                          # "fast" timestep (for MTS integrator, if used)
-nsteps           = int(1000 * args.liquid_interval / args.liquid_timestep)     # Number of time steps per interval (or "iteration") for saving coordinates (in steps)
-nequiliterations = args.liquid_equ_steps / nsteps                              # Number of iterations set aside for equilibration
-niterations      = args.liquid_prod_steps / nsteps                             # Number of production iterations
-
-print timestep
-print faststep
-print nsteps
-print nequiliterations
-print niterations
-
-print "I will perform %i iterations of %i x %.3f fs time steps each" % (niterations, nsteps, args.liquid_timestep)
+# Simulation settings for the condensed phase system.
+timestep         = float(args.liquid_timestep)                                 # timestep for integration in femtosecond
+faststep         = 0.25                                                        # "fast" timestep (for MTS integrator, if used)
+nsteps           = int(1000 * args.liquid_interval / args.liquid_timestep)     # Interval for saving snapshots (in steps)
+nequil           = args.liquid_equ_steps / nsteps                              # Number of snapshots set aside for equilibration
+nprod            = args.liquid_prod_steps / nsteps                             # Number of snapshots in production run
+temperature      = args.temperature                                            # temperature in kelvin
+pressure         = args.pressure                                               # pressure in atmospheres
 
 # Simulation settings for the monomer.
-m_timestep         = args.gas_timestep * femtosecond
-m_nsteps           = int(1000 * args.gas_interval / args.gas_timestep)
-m_nequiliterations = args.gas_equ_steps / m_nsteps
-m_niterations      = args.gas_prod_steps / m_nsteps
-
-temperature = args.temperature * kelvin                            # temperature in kelvin
-pressure    = args.pressure * atmospheres                          # pressure in atmospheres
-collision_frequency = 1.0 / picosecond                             # Langevin integrator friction / random force parameter
-barostat_frequency = 25                                            # number of steps between MC volume adjustments
-
-# Flag to set verbose debug output
-verbose = True
-
-amoeba_mutual_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
-                        'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
-                        'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
-                        'mutualInducedTargetEpsilon' : 1e-6, 'useDispersionCorrection' : True}
-
-amoeba_direct_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
-                        'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
-                        'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
-                        'polarization' : 'direct', 'useDispersionCorrection' : True}
-
-amoeba_nonpol_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
-                        'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
-                        'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
-                        'useDispersionCorrection' : True}
-
-tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
-                'useSwitchingFunction' : True, 'switchingDistance' : 0.75*nanometer,
-                'constraints' : HBonds, 'rigidwater' : True, 'useDispersionCorrection' : True}
-
-gen_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
-              'useSwitchingFunction' : True, 'switchingDistance' : 0.75*nanometer,
-              'constraints' : None, 'rigidwater' : False, 'useDispersionCorrection' : True}
-
-mono_gen_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : False, 'removeCMMotion' : False}
-
-mono_tip3p_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : True, 'removeCMMotion' : False}
-
-mono_direct_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
-               'rigidWater' : False, 'polarization' : 'direct', 'removeCMMotion' : False}
-
-mono_mutual_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
-               'rigidWater' : False, 'mutualInducedTargetEpsilon' : 1e-6, 'removeCMMotion' : False}
-
-mono_nonpol_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
-                      'rigidWater' : False, 'removeCMMotion' : False}
-
-# def generateMaxwellBoltzmannVelocities(system, temperature):
-#     """ Generate velocities from a Maxwell-Boltzmann distribution. """
-#     # Get number of atoms
-#     natoms = system.getNumParticles()
-#     # Create storage for velocities.
-#     velocities = Quantity(np.zeros([natoms, 3], np.float32), nanometer / picosecond) # velocities[i,k] is the kth component of the velocity of atom i
-#     # Compute thermal energy and inverse temperature from specified temperature.
-#     kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
-#     kT = kB * temperature # thermal energy
-#     beta = 1.0 / kT # inverse temperature
-#     # Assign velocities from the Maxwell-Boltzmann distribution.
-#     for atom_index in range(natoms):
-#         mass = system.getParticleMass(atom_index) # atomic mass
-#         sigma = sqrt(kT / mass) # standard deviation of velocity distribution for each coordinate for this atom
-#         for k in range(3):
-#             velocities[atom_index,k] = sigma * np.random.normal()
-#     return velocities
-
-def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
-
-    """
-    Compute the (cross) statistical inefficiency of (two) timeseries.
-
-    Notes
-      The same timeseries can be used for both A_n and B_n to get the autocorrelation statistical inefficiency.
-      The fast method described in Ref [1] is used to compute g.
-
-    References
-      [1] J. D. Chodera, W. C. Swope, J. W. Pitera, C. Seok, and K. A. Dill. Use of the weighted
-      histogram analysis method for the analysis of simulated and parallel tempering simulations.
-      JCTC 3(1):26-41, 2007.
-
-    Examples
-
-    Compute statistical inefficiency of timeseries data with known correlation time.
-
-    >>> import timeseries
-    >>> A_n = timeseries.generateCorrelatedTimeseries(N=100000, tau=5.0)
-    >>> g = statisticalInefficiency(A_n, fast=True)
-
-    @param[in] A_n (required, numpy array) - A_n[n] is nth value of
-    timeseries A.  Length is deduced from vector.
-
-    @param[in] B_n (optional, numpy array) - B_n[n] is nth value of
-    timeseries B.  Length is deduced from vector.  If supplied, the
-    cross-correlation of timeseries A and B will be estimated instead of
-    the autocorrelation of timeseries A.
-
-    @param[in] fast (optional, boolean) - if True, will use faster (but
-    less accurate) method to estimate correlation time, described in
-    Ref. [1] (default: False)
-
-    @param[in] mintime (optional, int) - minimum amount of correlation
-    function to compute (default: 3) The algorithm terminates after
-    computing the correlation time out to mintime when the correlation
-    function furst goes negative.  Note that this time may need to be
-    increased if there is a strong initial negative peak in the
-    correlation function.
-
-    @return g The estimated statistical inefficiency (equal to 1 + 2
-    tau, where tau is the correlation time).  We enforce g >= 1.0.
-
-    """
-
-    # Create numpy copies of input arguments.
-    A_n = np.array(A_n)
-    if B_n is not None:
-        B_n = np.array(B_n)
-    else:
-        B_n = np.array(A_n)
-    # Get the length of the timeseries.
-    N = A_n.size
-    # Be sure A_n and B_n have the same dimensions.
-    if(A_n.shape != B_n.shape):
-        raise ParameterError('A_n and B_n must have same dimensions.')
-    # Initialize statistical inefficiency estimate with uncorrelated value.
-    g = 1.0
-    # Compute mean of each timeseries.
-    mu_A = A_n.mean()
-    mu_B = B_n.mean()
-    # Make temporary copies of fluctuation from mean.
-    dA_n = A_n.astype(np.float64) - mu_A
-    dB_n = B_n.astype(np.float64) - mu_B
-    # Compute estimator of covariance of (A,B) using estimator that will ensure C(0) = 1.
-    sigma2_AB = (dA_n * dB_n).mean() # standard estimator to ensure C(0) = 1
-    # Trap the case where this covariance is zero, and we cannot proceed.
-    if(sigma2_AB == 0):
-        if warn:
-            print 'Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency'
-        return 1.0
-    # Accumulate the integrated correlation time by computing the normalized correlation time at
-    # increasing values of t.  Stop accumulating if the correlation function goes negative, since
-    # this is unlikely to occur unless the correlation function has decayed to the point where it
-    # is dominated by noise and indistinguishable from zero.
-    t = 1
-    increment = 1
-    while (t < N-1):
-        # compute normalized fluctuation correlation function at time t
-        C = sum( dA_n[0:(N-t)]*dB_n[t:N] + dB_n[0:(N-t)]*dA_n[t:N] ) / (2.0 * float(N-t) * sigma2_AB)
-        # Terminate if the correlation function has crossed zero and we've computed the correlation
-        # function at least out to 'mintime'.
-        if (C <= 0.0) and (t > mintime):
-            break
-        # Accumulate contribution to the statistical inefficiency.
-        g += 2.0 * C * (1.0 - float(t)/float(N)) * float(increment)
-        # Increment t and the amount by which we increment t.
-        t += increment
-        # Increase the interval if "fast mode" is on.
-        if fast: increment += 1
-    # g must be at least unity
-    if (g < 1.0): g = 1.0
-    # Return the computed statistical inefficiency.
-    return g
-
-def compute_volume(box_vectors):
-    """ Compute the total volume of an OpenMM system. """
-    [a,b,c] = box_vectors
-    A = np.array([a/a.unit, b/a.unit, c/a.unit])
-    # Compute volume of parallelepiped.
-    volume = np.linalg.det(A) * a.unit**3
-    return volume
-
-def compute_mass(system):
-    """ Compute the total mass of an OpenMM system. """
-    mass = 0.0 * amu
-    for i in range(system.getNumParticles()):
-        mass += system.getParticleMass(i)
-    return mass
-
-def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
-    """
-    Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
-    
-    ARGUMENTS
-
-    temperature (numpy.unit.Quantity compatible with kelvin) - the temperature
-    collision_rate (numpy.unit.Quantity compatible with 1/picoseconds) - the collision rate
-    timestep (numpy.unit.Quantity compatible with femtoseconds) - the integration timestep
-    system (simtk.openmm.System) - system whose forces will be partitioned
-    ninnersteps (int) - number of inner timesteps (default: 4)
-
-    RETURNS
-
-    integrator (openmm.CustomIntegrator) - a VVVR integrator
-
-    NOTES
-    
-    This integrator is equivalent to a Langevin integrator in the velocity Verlet discretization with a
-    timestep correction to ensure that the field-free diffusion constant is timestep invariant.  The inner
-    velocity Verlet discretization is transformed into a multiple timestep algorithm.
-
-    REFERENCES
-
-    VVVR Langevin integrator: 
-    * http://arxiv.org/abs/1301.3800
-    * http://arxiv.org/abs/1107.2967 (to appear in PRX 2013)    
-    
-    TODO
-
-    Move initialization of 'sigma' to setting the per-particle variables.
-    
-    """
-    # Multiple timestep Langevin integrator.
-    for i in system.getForces():
-        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
-            # Slow force.
-            print i.__class__.__name__, "is a Slow Force"
-            i.setForceGroup(1)
-        else:
-            print i.__class__.__name__, "is a Fast Force"
-            # Fast force.
-            i.setForceGroup(0)
-
-    kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
-    kT = kB * temperature
-    
-    integrator = openmm.CustomIntegrator(timestep)
-    
-    integrator.addGlobalVariable("dt_fast", timestep/float(ninnersteps)) # fast inner timestep
-    integrator.addGlobalVariable("kT", kT) # thermal energy
-    integrator.addGlobalVariable("a", numpy.exp(-collision_rate*timestep)) # velocity mixing parameter
-    integrator.addGlobalVariable("b", numpy.sqrt((2/(collision_rate*timestep)) * numpy.tanh(collision_rate*timestep/2))) # timestep correction parameter
-    integrator.addPerDofVariable("sigma", 0) 
-    integrator.addPerDofVariable("x1", 0) # position before application of constraints
-
-    #
-    # Pre-computation.
-    # This only needs to be done once, but it needs to be done for each degree of freedom.
-    # Could move this to initialization?
-    #
-    integrator.addComputePerDof("sigma", "sqrt(kT/m)")
-
-    # 
-    # Velocity perturbation.
-    #
-    integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
-    integrator.addConstrainVelocities();
-    
-    #
-    # Symplectic inner multiple timestep.
-    #
-    integrator.addUpdateContextState(); 
-    integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m")
-    for innerstep in range(ninnersteps):
-        # Fast inner symplectic timestep.
-        integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m")
-        integrator.addComputePerDof("x", "x + v*b*dt_fast")
-        integrator.addComputePerDof("x1", "x")
-        integrator.addConstrainPositions();        
-        integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m + (x-x1)/dt_fast")
-    integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m") # TODO: Additional velocity constraint correction?
-    integrator.addConstrainVelocities();
-
-    #
-    # Velocity randomization
-    #
-    integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
-    integrator.addConstrainVelocities();
-
-    return integrator
-
-
-def create_simulation_object(pdb, settings, pbc=True, precision="mixed", platname="CUDA"):
-    #================================#
-    # Create the simulation platform #
-    #================================#
-    # Name of the simulation platform (Reference, Cuda, OpenCL)
-    if platname == "CUDA":
-        try:
-            print "Setting Platform to", platname
-            platform = Platform.getPlatformByName(platname)
-            # Set the device to the environment variable or zero otherwise
-            device = os.environ.get('CUDA_DEVICE',"0")
-            print "Setting Device to", device
-            platform.setPropertyDefaultValue("CudaDeviceIndex", device)
-            platform.setPropertyDefaultValue("CudaPrecision", precision)
-            platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
-        except:
-            traceback.print_exc()
-            if args.force_cuda:
-                raise Exception('Force CUDA option is enabled but CUDA platform not available')
-            platname = "Reference"
-    if platname == "Reference":
-        print "Setting Platform to", platname
-        platform = Platform.getPlatformByName(platname)
-    # Create the test system.
-    forcefield = ForceField(sys.argv[2])
-    mod = Modeller(pdb.topology, pdb.positions)
-    mod.addExtraParticles(forcefield)
-    system = forcefield.createSystem(mod.topology, **settings)
-    if pbc:
-        if args.anisotropic:
-            barostat = MonteCarloAnisotropicBarostat([pressure, pressure, pressure], temperature, barostat_frequency)
-        else:
-            barostat = MonteCarloBarostat(pressure, temperature, barostat_frequency)
-        # Add barostat.
-        system.addForce(barostat)
-    # Create integrator.
-    NewIntegrator = args.mts_vvvr
-    if not NewIntegrator:
-        integrator = LangevinIntegrator(temperature, collision_frequency, timestep) 
-        for n, i in enumerate(system.getForces()):
-            print "Setting Force %s to group %i" % (i.__class__.__name__, n)
-            i.setForceGroup(n)
-    else:
-        print "Using new multiple-timestep velocity-verlet with velocity randomization (MTS-VVVR) integrator."
-        print "Warning: not proven to work in most situations"
-        integrator = MTSVVVRIntegrator(temperature, collision_frequency, timestep, system, ninnersteps=int(timestep/faststep))
-
-    # Stuff for figuring out the ewald error tolerance.
-    print "There are %i forces" % system.getNumForces()
-    for i in range(system.getNumForces()):
-        Frc = system.getForce(i)
-        # print Frc.__class__.__name__
-        if Frc.__class__.__name__ == 'AmoebaMultipoleForce' or Frc.__class__.__name__ == 'NonbondedForce':
-            print "The Ewald error tolerance is:", Frc.getEwaldErrorTolerance()
-    
-    # Create simulation object.
-    simulation = Simulation(mod.topology, system, integrator, platform)
-    return simulation, system
-
-def EnergyDecomposition(Sim):
-    # Before using EnergyDecomposition, make sure each Force is set to a different group.
-    EnergyTerms = OrderedDict()
-    Potential = Sim.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-    Kinetic = Sim.context.getState(getEnergy=True).getKineticEnergy() / kilojoules_per_mole
-    for i in range(Sim.system.getNumForces()):
-        EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
-    EnergyTerms['Potential'] = Potential
-    EnergyTerms['Kinetic'] = Kinetic
-    EnergyTerms['Total'] = Potential+Kinetic
-    return EnergyTerms
-
-def run_simulation(pdb,settings,pbc=True,Trajectory=True,platname="CUDA"):
-    """ Run a NPT simulation and gather statistics. """
-    simulation, system = create_simulation_object(pdb, settings, pbc, "mixed", platname=platname)
-    # Set initial positions.
-    # Create the test system.
-    forcefield = ForceField(sys.argv[2])
-    mod = Modeller(pdb.topology, pdb.positions)
-    mod.addExtraParticles(forcefield)
-    simulation.context.setPositions(mod.positions)
-    print "Minimizing the energy... (starting energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole),
-    if args.minimize_energy:
-        simulation.minimizeEnergy()
-    print "Done (final energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
-    # Assign velocities.
-    # velocities = generateMaxwellBoltzmannVelocities(system, temperature)
-    # simulation.context.setVelocities(velocities)
-    simulation.context.setVelocitiesToTemperature(temperature)
-    if verbose:
-        # Print out the platform used by the context
-        print "I'm using the platform", simulation.context.getPlatform().getName()
-        # Print out the properties of the platform
-        printcool_dictionary({i:simulation.context.getPlatform().getPropertyValue(simulation.context,i) for i in simulation.context.getPlatform().getPropertyNames()},title="Platform %s has properties:" % simulation.context.getPlatform().getName())
-    # Serialize the system if we want.
-    Serialize = 0
-    if Serialize:
-        serial = XmlSerializer.serializeSystem(system)
-        with open('system.xml','w') as f: f.write(serial)
-    #==========================================#
-    # Computing a bunch of initial values here #
-    #==========================================#
-    if pbc:
-        # Show initial system volume.
-        box_vectors = system.getDefaultPeriodicBoxVectors()
-        volume = compute_volume(box_vectors)
-        if verbose: print "initial system volume = %.1f nm^3" % (volume / nanometers**3)
-    # Determine number of degrees of freedom.
-    kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
-    # The center of mass motion remover is also a constraint.
-    ndof = 3*(system.getNumParticles() - sum([system.isVirtualSite(i) for i in range(system.getNumParticles())])) - system.getNumConstraints() - 3*pbc
-    # Compute total mass.
-    mass = compute_mass(system).in_units_of(gram / mole) /  AVOGADRO_CONSTANT_NA # total system mass in g
-    # Initialize statistics.
-    data = dict()
-    data['time'] = Quantity(np.zeros([niterations], np.float64), picoseconds)
-    data['potential'] = Quantity(np.zeros([niterations], np.float64), kilojoules_per_mole)
-    data['kinetic'] = Quantity(np.zeros([niterations], np.float64), kilojoules_per_mole)
-    data['energy'] = Quantity(np.zeros([niterations], np.float64), kilojoules_per_mole)
-    data['volume'] = Quantity(np.zeros([niterations], np.float64), angstroms**3)
-    data['density'] = Quantity(np.zeros([niterations], np.float64), kilogram / meters**3)
-    data['kinetic_temperature'] = Quantity(np.zeros([niterations], np.float64), kelvin)
-    edecomp = OrderedDict()
-    # More data structures; stored coordinates, box sizes, densities, and potential energies
-    xyzs = []
-    boxes = []
-    rhos = []
-    potentials = []
-    kinetics = []
-    volumes = []
-    dipoles = []
-    #========================#
-    # Now run the simulation #
-    #========================#
-    # Equilibrate.
-    if verbose: print "Using timestep", timestep, "and %i steps per data record" % nsteps
-    if verbose: print "Special note: getVelocities and getForces has been turned off."
-    if verbose: print "Equilibrating..."
-    for iteration in range(nequiliterations):
-        simulation.step(nsteps)
-        state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-        kinetic = state.getKineticEnergy()
-        potential = state.getPotentialEnergy()
-        if pbc:
-            box_vectors = state.getPeriodicBoxVectors()
-            volume = compute_volume(box_vectors)
-            density = (mass / volume).in_units_of(kilogram / meter**3)
-        else:
-            volume = 0.0 * nanometers ** 3
-            density = 0.0 * kilogram / meter ** 3
-        kinetic_temperature = 2.0 * kinetic / kB / ndof # (1/2) ndof * kB * T = KE
-        if verbose:
-            print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds,
-                                                             kinetic_temperature / kelvin, potential / kilojoules_per_mole,
-                                                             volume / nanometers**3, density / (kilogram / meter**3))
-    # Collect production data.
-    if verbose: print "Production..."
-    if Trajectory:
-        simulation.reporters.append(DCDReporter('dynamics.dcd', nsteps))
-    for iteration in range(niterations):
-        # Propagate dynamics.
-        simulation.step(nsteps)
-        # Compute properties.
-        state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-        kinetic = state.getKineticEnergy()
-        potential = state.getPotentialEnergy()
-        # Perform energy decomposition.
-        if DoEDA:
-            for comp, val in EnergyDecomposition(simulation).items():
-                if comp in edecomp:
-                    edecomp[comp].append(val)
-                else:
-                    edecomp[comp] = [val]
-        if pbc:
-            box_vectors = state.getPeriodicBoxVectors()
-            volume = compute_volume(box_vectors)
-            density = (mass / volume).in_units_of(kilogram / meter**3)
-        else:
-            volume = 0.0 * nanometers ** 3
-            density = 0.0 * kilogram / meter ** 3
-        kinetic_temperature = 2.0 * kinetic / kB / ndof
-        if verbose:
-            print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds, kinetic_temperature / kelvin, potential / kilojoules_per_mole, volume / nanometers**3, density / (kilogram / meter**3))
-        # Store properties.
-        data['time'][iteration] = state.getTime()
-        data['potential'][iteration] = potential
-        data['kinetic'][iteration] = kinetic
-        data['energy'][iteration] = kinetic+potential
-        data['volume'][iteration] = volume
-        data['density'][iteration] = density
-        data['kinetic_temperature'][iteration] = kinetic_temperature
-        xyzs.append(state.getPositions())
-        boxes.append(state.getPeriodicBoxVectors())
-        rhos.append(density.value_in_unit(kilogram / meter**3))
-        potentials.append(potential / kilojoules_per_mole)
-        kinetics.append(kinetic / kilojoules_per_mole)
-        volumes.append(volume / nanometer**3)
-        dipoles.append(get_dipole(simulation,positions=xyzs[-1]))
-        
-    return data, xyzs, boxes, np.array(rhos), np.array(potentials), np.array(kinetics), np.array(volumes), np.array(dipoles), simulation, OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
-
-def analyze(data):
-    """Analyze the data from the run_simulation function."""
-
-    #===========================================================================================#
-    # Compute statistical inefficiencies to determine effective number of uncorrelated samples. #
-    #===========================================================================================#
-    data['g_potential'] = statisticalInefficiency(data['potential'] / kilojoules_per_mole)
-    data['g_kinetic'] = statisticalInefficiency(data['kinetic'] / kilojoules_per_mole, fast=True)
-    data['g_energy'] = statisticalInefficiency(data['energy'] / kilojoules_per_mole, fast=True)
-    data['g_volume'] = statisticalInefficiency(data['volume'] / angstroms**3, fast=True)
-    data['g_density'] = statisticalInefficiency(data['density'] / (kilogram / meter**3), fast=True)
-    data['g_kinetic_temperature'] = statisticalInefficiency(data['kinetic_temperature'] / kelvin, fast=True)
-
-    #=========================================#
-    # Compute expectations and uncertainties. #
-    #=========================================#
-    statistics = dict()
-    # Kinetic energy.
-    statistics['KE']  = (data['kinetic'] / kilojoules_per_mole).mean() * kilojoules_per_mole
-    statistics['dKE'] = (data['kinetic'] / kilojoules_per_mole).std() / np.sqrt(niterations / data['g_kinetic']) * kilojoules_per_mole
-    statistics['g_KE'] = data['g_kinetic'] * nsteps * timestep
-    # Potential energy.
-    statistics['PE']  = (data['potential'] / kilojoules_per_mole).mean() * kilojoules_per_mole
-    statistics['dPE'] = (data['potential'] / kilojoules_per_mole).std() / np.sqrt(niterations / data['g_potential']) * kilojoules_per_mole
-    statistics['g_PE'] = data['g_potential'] * nsteps * timestep
-    # Total energy.
-    statistics['E']  = (data['energy'] / kilojoules_per_mole).mean() * kilojoules_per_mole
-    statistics['dE'] = (data['energy'] / kilojoules_per_mole).std() / np.sqrt(niterations / data['g_energy']) * kilojoules_per_mole
-    statistics['g_E'] = data['g_energy'] * nsteps * timestep
-    # Density
-    unit = (kilogram / meter**3)
-    statistics['density']  = (data['density'] / unit).mean() * unit
-    statistics['ddensity'] = (data['density'] / unit).std() / np.sqrt(niterations / data['g_density']) * unit
-    statistics['g_density'] = data['g_density'] * nsteps * timestep
-    # Volume
-    unit = nanometer**3
-    statistics['volume']  = (data['volume'] / unit).mean() * unit
-    statistics['dvolume'] = (data['volume'] / unit).std() / np.sqrt(niterations / data['g_volume']) * unit
-    statistics['g_volume'] = data['g_volume'] * nsteps * timestep
-    statistics['std_volume']  = (data['volume'] / unit).std() * unit
-    statistics['dstd_volume'] = (data['volume'] / unit).std() / np.sqrt((niterations / data['g_volume'] - 1) * 2.0) * unit # uncertainty expression from Ref [1].
-    # Kinetic temperature
-    unit = kelvin
-    statistics['kinetic_temperature']  = (data['kinetic_temperature'] / unit).mean() * unit
-    statistics['dkinetic_temperature'] = (data['kinetic_temperature'] / unit).std() / np.sqrt(niterations / data['g_kinetic_temperature']) * unit
-    statistics['g_kinetic_temperature'] = data['g_kinetic_temperature'] * nsteps * timestep
-
-    #==========================#
-    # Print summary statistics #
-    #==========================#
-    print "Summary statistics (%.3f ns equil, %.3f ns production)" % (nequiliterations * nsteps * timestep / nanoseconds, niterations * nsteps * timestep / nanoseconds)
-    print
-    # Kinetic energies
-    print "Average kinetic energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['KE'] / kilojoules_per_mole, statistics['dKE'] / kilojoules_per_mole, statistics['g_KE'] / picoseconds)
-    # Potential energies
-    print "Average potential energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['PE'] / kilojoules_per_mole, statistics['dPE'] / kilojoules_per_mole, statistics['g_PE'] / picoseconds)
-    # Total energies
-    print "Average total energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['E'] / kilojoules_per_mole, statistics['dE'] / kilojoules_per_mole, statistics['g_E'] / picoseconds)
-    # Kinetic temperature
-    unit = kelvin
-    print "Average kinetic temperature: %11.6f +- %11.6f  K         (g = %11.6f ps)" % (statistics['kinetic_temperature'] / unit, statistics['dkinetic_temperature'] / unit, statistics['g_kinetic_temperature'] / picoseconds)
-    unit = (nanometer**3)
-    print "Volume: mean %11.6f +- %11.6f  nm^3" % (statistics['volume'] / unit, statistics['dvolume'] / unit),
-    print "g = %11.6f ps" % (statistics['g_volume'] / picoseconds)
-    unit = (kilogram / meter**3)
-    print "Density: mean %11.6f +- %11.6f  nm^3" % (statistics['density'] / unit, statistics['ddensity'] / unit),
-    print "g = %11.6f ps" % (statistics['g_density'] / picoseconds)
-    unit_rho = (kilogram / meter**3)
-    unit_ene = kilojoules_per_mole
-
-    pV_mean = (statistics['volume'] * pressure * AVOGADRO_CONSTANT_NA).value_in_unit(kilojoule_per_mole)
-    pV_err = (statistics['dvolume'] * pressure * AVOGADRO_CONSTANT_NA).value_in_unit(kilojoule_per_mole)
-
-    return statistics['density'] / unit_rho, statistics['ddensity'] / unit_rho, statistics['PE'] / unit_ene, statistics['dPE'] / unit_ene, statistics['KE'] / unit_ene, statistics['dKE'] / unit_ene, statistics['E'] / unit_ene, statistics['dE'] / unit_ene, pV_mean, pV_err
-
-def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False,dipole=False,resetvs=False):
-    """
-    Compute a set of snapshot energies as a function of the force field parameters.
-
-    This is a combined OpenMM and ForceBalance function.  Note (importantly) that this
-    function creates a new force field XML file in the run directory.
-
-    ForceBalance creates the force field, OpenMM reads it in, and we loop through the snapshots
-    to compute the energies.
-
-    @todo I should be able to generate the OpenMM force field object without writing an external file.
-    @todo This is a sufficiently general function to be merged into openmmio.py?
-    @param[in] mvals Mathematical parameter values
-    @param[in] pdb OpenMM PDB object
-    @param[in] FF ForceBalance force field object
-    @param[in] xyzs List of OpenMM positions
-    @param[in] settings OpenMM settings for creating the System
-    @param[in] boxes Periodic box vectors
-    @return E A numpy array of energies in kilojoules per mole
-
-    """
-    # Print the force field XML from the ForceBalance object, with modified parameters.
-    FF.make(mvals)
-    # Load the force field XML file to make the OpenMM object.
-    forcefield = ForceField(sys.argv[2])
-    # Create the system, setup the simulation.
-    mod = Modeller(pdb.topology, pdb.positions)
-    mod.addExtraParticles(forcefield)
-    # List to determine which atoms are real. :)
-    isAtom = [i.element != None for i in list(mod.topology.atoms())]
-    system = forcefield.createSystem(mod.topology, **settings)
-    UpdateSimulationParameters(system, simulation)
-    E = []
-    D = []
-    q = None
-    for i in simulation.system.getForces():
-        if i.__class__.__name__ == "NonbondedForce":
-            q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-    
-    # Loop through the snapshots
-    if boxes == None:
-        for xyz in xyzs:
-            if resetvs:
-                xyz1 = ResetVirtualSites(xyz, system)
-            else:
-                xyz1 = xyz
-            simulation.context.setPositions(xyz1)
-            # Compute the potential energy and append to list
-            Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-            E.append(Energy)
-            if dipole:
-                D.append(get_dipole(simulation,q=q,positions=xyz1))
-    else:
-        for xyz,box in zip(xyzs,boxes):
-            # Set the positions and the box vectors
-            if resetvs:
-                xyz1 = ResetVirtualSites(xyz, system)
-            else:
-                xyz1 = xyz
-            simulation.context.setPositions(xyz1)
-            simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
-            # Compute the potential energy and append to list
-            Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-            E.append(Energy)
-            if dipole:
-                D.append(get_dipole(simulation,q=q,positions=xyz1))
-    print "\r",
-    if verbose: print E
-    if dipole:
-        # Return a Nx4 array with energies in the first column and dipole in columns 2-4.
-        return np.hstack((np.array(E).reshape(-1,1), np.array(D).reshape(-1,3)))
-    else:
-        return np.array(E)
-
-def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=True):
-
-    """
-    Compute the first and second derivatives of a set of snapshot
-    energies with respect to the force field parameters.
-
-    This basically calls the finite difference subroutine on the
-    energy_driver subroutine also in this script.
-
-    @todo This is a sufficiently general function to be merged into openmmio.py?
-    @param[in] mvals Mathematical parameter values
-    @param[in] pdb OpenMM PDB object
-    @param[in] FF ForceBalance force field object
-    @param[in] xyzs List of OpenMM positions
-    @param[in] settings OpenMM settings for creating the System
-    @param[in] boxes Periodic box vectors
-    @return G First derivative of the energies in a N_param x N_coord array
-
-    """
-
-    G        = np.zeros((FF.np,len(xyzs)))
-    if not AGrad:
-        return G
-    E0       = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes)
-    CheckFDPts = False
-    for i in range(FF.np):
-        print FF.plist[i] + " "*30
-        G[i,:], _ = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,resetvs='VirtualSite' in FF.plist[i]),h,f0=E0)
-        if CheckFDPts:
-            # Check whether the number of finite difference points is sufficient.  Forward difference still gives residual error of a few percent.
-            G1 = f1d7p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,resetvs='VirtualSite' in FF.plist[i]),h)
-            dG = G1 - G[i,:]
-            dGfrac = (G1 - G[i,:]) / G[i,:]
-            print "Parameter %3i 7-pt vs. central derivative : RMS, Max error (fractional) = % .4e % .4e (% .4e % .4e)" % (i, np.sqrt(np.mean(dG**2)), max(np.abs(dG)), np.sqrt(np.mean(dGfrac**2)), max(np.abs(dGfrac)))
-    return G
-
-def energy_dipole_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=True):
-
-    """
-    Compute the first and second derivatives of a set of snapshot
-    energies with respect to the force field parameters.
-
-    This basically calls the finite difference subroutine on the
-    energy_driver subroutine also in this script.
-
-    @todo This is a sufficiently general function to be merged into openmmio.py?
-    @param[in] mvals Mathematical parameter values
-    @param[in] pdb OpenMM PDB object
-    @param[in] FF ForceBalance force field object
-    @param[in] xyzs List of OpenMM positions
-    @param[in] settings OpenMM settings for creating the System
-    @param[in] boxes Periodic box vectors
-    @return G First derivative of the energies in a N_param x N_coord array
-
-    """
-
-    G        = np.zeros((FF.np,len(xyzs)))
-    GDx      = np.zeros((FF.np,len(xyzs)))
-    GDy      = np.zeros((FF.np,len(xyzs)))
-    GDz      = np.zeros((FF.np,len(xyzs)))
-    if not AGrad:
-        return G, GDx, GDy, GDz
-    ED0      = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes, dipole=True)
-    CheckFDPts = False
-    for i in range(FF.np):
-        print FF.plist[i] + " "*30
-        EDG, _   = f12d3p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True,resetvs='VirtualSite' in FF.plist[i]),h,f0=ED0)
-        G[i,:]   = EDG[:,0]
-        GDx[i,:] = EDG[:,1]
-        GDy[i,:] = EDG[:,2]
-        GDz[i,:] = EDG[:,3]
-    return G, GDx, GDy, GDz
+m_timestep          = float(args.gas_timestep)
+m_nsteps            = int(1000 * args.gas_interval / args.gas_timestep)
+m_nequil            = args.gas_equ_steps / m_nsteps
+m_nprod             = args.gas_prod_steps / m_nsteps
+
+if args.engine == "openmm":
+    try:
+        from simtk.unit import *
+        from simtk.openmm import *
+        from simtk.openmm.app import *
+        from forcebalance.openmmio import *
+    except:
+        traceback.print_exc()
+        raise Exception("Cannot import OpenMM modules")
+elif args.engine == "gromacs" or args.engine == "gmx":
+    from forcebalance.gmxio import *
+    if args.mts_vvvr:
+        raise Exception("Selected multiple timestep integrator with GROMACS interface, but it is only usable with OpenMM interface")
+    if args.force_cuda:
+        raise Exception("Selected CUDA platform with GROMACS interface, but it is only usable with OpenMM interface")
+else:
+    raise Exception('Only OpenMM and GROMACS support implemented at this time.')
+
+printcool("ForceBalance condensed phase simulation using engine: %s" % args.engine)
+print "For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" % (nprod, nsteps, args.liquid_timestep)
+print "For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" % (nprod, nsteps, args.liquid_timestep)
+
+DoEDA = True
+if args.mts_vvvr:
+    # EDA relies on Force Groups, as does MTS integrator, so they are incompatible.
+    DoEDA = False
+
+#==================#
+#|   Subroutines  |#
+#==================#
+
+def mean_stderr(ts):
+    """ Get mean and standard deviation of a time series. """
+    return np.mean(ts), np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
 
 def bzavg(obs,boltz):
+    """ Get the Boltzmann average of an observable. """
     if obs.ndim == 2:
         if obs.shape[0] == len(boltz) and obs.shape[1] == len(boltz):
             raise Exception('Error - both dimensions have length equal to number of snapshots, now confused!')
@@ -822,62 +158,617 @@ def bzavg(obs,boltz):
     else:
         raise Exception('The number of dimensions can only be 1 or 2!')
 
-def property_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,kT,property_driver,property_kwargs,boxes=None,AGrad=True):
-    G        = np.zeros(FF.np)
-    if not AGrad:
+def PrintEDA(EDA, N):
+    # Get energy decomposition statistics.
+    PrintDict = OrderedDict()
+    for key, val in EDA.items():
+        val_avg, val_err = mean_stderr(val)
+        if val_avg == 0.0: continue
+        if val_err == 0.0: continue
+        PrintDict[key] = "% 12.4f +- %10.4f [ % 9.4f +- %7.4f ]" % (val_avg, val_err, val_avg/N, val_err/N)
+    printcool_dictionary(PrintDict, "Energy Decomposition Analysis, Mean +- Stderr [Per Molecule] (kJ/mol)")
+
+#=============================================#
+#|   Driver classes for simulation software  |#
+#=============================================#
+
+class MDEngine(object):
+    """
+    This class represents the molecular dynamics engine, which controls the execution of a MD code
+    (e.g. GROMACS, OpenMM, TINKER) in order to obtain simulation trajectories and potential energy
+    derivatives.  This information is used to calculate the condensed phase properties and their
+    derivatives in parameter space.
+    """
+
+    def __init__(self, FF):
+        self.FF = FF
+
+    def energy_derivatives(self,mvals,h,phase,length,AGrad=True,dipole=False):
+
+        """
+        Compute the first and second derivatives of a set of snapshot
+        energies with respect to the force field parameters.
+    
+        This basically calls the finite difference subroutine on the
+        energy_driver subroutine also in this script.
+    
+        @param[in] mvals Mathematical parameter values
+        @param[in] h Finite difference step size
+        @param[in] phase The phase (liquid, gas) to perform the calculation on
+        @param[in] AGrad Switch to turn derivatives on or off; if off, return all zeros
+        @param[in] dipole Switch for dipole derivatives.
+        @return G First derivative of the energies in a N_param x N_coord array
+        @return GDx First derivative of the box dipole moment x-component in a N_param x N_coord array
+        @return GDy First derivative of the box dipole moment y-component in a N_param x N_coord array
+        @return GDz First derivative of the box dipole moment z-component in a N_param x N_coord array
+    
+        """
+        G        = np.zeros((self.FF.np,length))
+        GDx      = np.zeros((self.FF.np,length))
+        GDy      = np.zeros((self.FF.np,length))
+        GDz      = np.zeros((self.FF.np,length))
+        if not AGrad:
+            return G, GDx, GDy, GDz
+        ED0      = self.energy_driver(mvals, phase, dipole=dipole)
+        for i in range(self.FF.np):
+            print self.FF.plist[i] + " "*30
+            EDG, _   = f12d3p(fdwrap(self.energy_driver,mvals,i,key=None,phase=phase,dipole=dipole,resetvs='VirtualSite' in self.FF.plist[i]),h,f0=ED0)
+            if dipole:
+                G[i,:]   = EDG[:,0]
+                GDx[i,:] = EDG[:,1]
+                GDy[i,:] = EDG[:,2]
+                GDz[i,:] = EDG[:,3]
+            else:
+                G[i,:]   = EDG[:]
+        return G, GDx, GDy, GDz
+
+    def property_derivatives(self,mvals,h,phase,kT,property_driver,property_kwargs,AGrad=True):
+
+        """ 
+        Function for double-checking property derivatives.  This function is called to perform
+        a more explicit numerical derivative of the property, rather than going through the 
+        fluctuation formula.  It takes longer and is potentially less precise, which means
+        it's here mainly as a sanity check.
+
+        @param[in] mvals Mathematical parameter values
+        @param[in] h Finite difference step size
+        @param[in] phase The phase (liquid, gas) to perform the calculation on
+        @param[in] property_driver The function that calculates the property
+        @param[in] property_driver A dictionary of arguments that goes into calculating the property
+        @param[in] AGrad Switch to turn derivatives on or off; if off, return all zeros
+        @return G First derivative of the property
+
+        """
+        G        = np.zeros(self.FF.np)
+        if not AGrad:
+            return G
+        ED0      = self.energy_driver(mvals, phase, dipole=True)
+        E0       = ED0[:,0]
+        D0       = ED0[:,1:]
+        P0       = property_driver(None, **property_kwargs)
+        if 'h_' in property_kwargs:
+            H0 = property_kwargs['h_'].copy()
+        for i in range(self.FF.np):
+            print self.FF.plist[i] + " "*30
+            ED1 = fdwrap(self.energy_driver,mvals,i,key=None,phase=phase,dipole=True,resetvs='VirtualSite' in self.FF.plist[i])(h)
+            E1       = ED1[:,0]
+            D1       = ED1[:,1:]
+            b = np.exp(-(E1-E0)/kT)
+            b /= np.sum(b)
+            if 'h_' in property_kwargs:
+                property_kwargs['h_'] = H0.copy() + (E1-E0)
+            if 'd_' in property_kwargs:
+                property_kwargs['d_'] = D1.copy()
+            S = -1*np.dot(b,np.log(b))
+            InfoContent = np.exp(S)
+            if InfoContent / len(E0) < 0.1:
+                print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
+            P1 = property_driver(b=b,**property_kwargs)
+            EDM1 = fdwrap(self.energy_driver,mvals,i,key=None,phase=phase,dipole=True,resetvs='VirtualSite' in self.FF.plist[i])(-h)
+            EM1       = EDM1[:,0]
+            DM1       = EDM1[:,1:]
+            b = np.exp(-(EM1-E0)/kT)
+            b /= np.sum(b)
+            if 'h_' in property_kwargs:
+                property_kwargs['h_'] = H0.copy() + (EM1-E0)
+            if 'd_' in property_kwargs:
+                property_kwargs['d_'] = DM1.copy()
+            S = -1*np.dot(b,np.log(b))
+            InfoContent = np.exp(S)
+            if InfoContent / len(E0) < 0.1:
+                print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
+            PM1 = property_driver(b=b,**property_kwargs)
+            G[i] = (P1-PM1)/(2*h)
+        if 'h_' in property_kwargs:
+            property_kwargs['h_'] = H0.copy()
+        if 'd_' in property_kwargs:
+            property_kwargs['d_'] = D0.copy()
         return G
-    ED0      = energy_driver(mvals, pdb, FF, xyzs, settings, simulation, boxes, dipole=True)
-    E0       = ED0[:,0]
-    D0       = ED0[:,1:]
-    P0       = property_driver(None, **property_kwargs)
-    if 'h_' in property_kwargs:
-        H0 = property_kwargs['h_'].copy()
 
-    for i in range(FF.np):
-        print FF.plist[i] + " "*30
-        ED1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True,resetvs='VirtualSite' in FF.plist[i])(h)
-        E1       = ED1[:,0]
-        D1       = ED1[:,1:]
-        b = np.exp(-(E1-E0)/kT)
-        b /= np.sum(b)
-        if 'h_' in property_kwargs:
-            property_kwargs['h_'] = H0.copy() + (E1-E0)
-        if 'd_' in property_kwargs:
-            property_kwargs['d_'] = D1.copy()
-        S = -1*np.dot(b,np.log(b))
-        InfoContent = np.exp(S)
-        if InfoContent / len(E0) < 0.1:
-            print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
-        P1 = property_driver(b=b,**property_kwargs)
+class Gromacs_MD(MDEngine):
+    def __init__(self, FF):
+        super(Gromacs_MD,self).__init__(FF)
+        if args.gmxpath != '' and os.path.exists(os.path.join(args.gmxpath,'grompp')):
+            self.gmxpath = args.gmxpath
+        else:
+            if which('grompp') != '':
+                self.gmxpath = which('grompp')
+            else:
+                raise RuntimeError("Failed to discern location of Gromacs executables, make sure it's in your PATH")
+        # Execute "grompp -h" to ensure that GROMACS can run properly.
+        _exec(os.path.join(self.gmxpath,'grompp -h'))
+        # Global options for liquid and gas
+        self.opts = {"liquid" : {"comm_mode" : "linear"},
+                     "gas" : {"comm_mode" : "None", "nstcomm" : 0}}
 
-        EDM1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True,resetvs='VirtualSite' in FF.plist[i])(-h)
-        EM1       = EDM1[:,0]
-        DM1       = EDM1[:,1:]
-        b = np.exp(-(EM1-E0)/kT)
-        b /= np.sum(b)
-        if 'h_' in property_kwargs:
-            property_kwargs['h_'] = H0.copy() + (EM1-E0)
-        if 'd_' in property_kwargs:
-            property_kwargs['d_'] = DM1.copy()
-        S = -1*np.dot(b,np.log(b))
-        InfoContent = np.exp(S)
-        if InfoContent / len(E0) < 0.1:
-            print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
-        PM1 = property_driver(b=b,**property_kwargs)
+    def callgmx(self, command, stdin=None, print_to_screen=False, print_command=True):
+        # Call a GROMACS program as you would from the command line.
+        csplit = command.split()
+        prog = os.path.join(self.gmxpath, csplit[0])
+        csplit[0] = prog
+        return _exec(' '.join(csplit), print_to_screen=print_to_screen, print_command=print_command, stdin=stdin)
+   
+    def run_simulation(self, phase, minimize=True, savexyz=True):
+        # Edit the mdp file (trajectory save frequency, number of time steps).
+        # Minimize the energy if necessary.
+        # Remember to save the trajectory.
+        # Extract the quantities.
+        # If running remotely, make sure GROMACS is in your PATH!
+        # Arguments for running equilibration.
+        eq_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_equ_steps}, **self.opts["liquid"]),
+                   "gas" : dict({"integrator" : "md", "nsteps" : args.gas_equ_steps}, **self.opts["gas"])}
+        # Arguments for running production.
+        md_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_prod_steps}, **self.opts["liquid"]),
+                   "gas" : dict({"integrator" : "md", "nsteps" : args.gas_prod_steps}, **self.opts["gas"])}
+        # Arguments for running minimization.
+        min_opts = {"liquid" : dict({"integrator" : "l-bfgs", "emtol" : 10.0, "nsteps" : 10000}, **self.opts["liquid"]),
+                    "gas" : dict({"integrator" : "steep", "emtol" : 10.0, "nsteps" : 10000}, **self.opts["gas"])}
+        # Arguments for not saving coordinates.
+        nosave_opts = {"nstxout" : 0, "nstenergy" : 0}
+        # Arguments for saving coordinates.
+        save_opts = {"nstxout" : nsteps, "nstenergy" : nsteps, "nstcalcenergy" : nsteps}
+        # Minimize the energy.
+        if minimize:
+            edit_mdp("%s.mdp" % phase, "%s-min.mdp" % phase, dict(min_opts[phase], **nosave_opts), verbose=True)
+            self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (phase, phase, phase, phase))
+            self.callgmx("mdrun -v -deffnm %s-min" % phase)
+        # Run equilibration.
+        edit_mdp("%s.mdp" % phase, "%s-eq.mdp" % phase, dict(eq_opts[phase], **nosave_opts), verbose=True)
+        self.callgmx("grompp -maxwarn 1 -c %s-min.gro -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (phase, phase, phase, phase))
+        self.callgmx("mdrun -v -deffnm %s-eq" % phase)
+        # Run production.
+        edit_mdp("%s.mdp" % phase, "%s-md.mdp" % phase, dict(md_opts[phase], **save_opts), verbose=True)
+        self.callgmx("grompp -maxwarn 1 -c %s-eq.gro -p %s.top -f %s-md.mdp -o %s-md.tpr" % (phase, phase, phase, phase))
+        self.callgmx("mdrun -v -deffnm %s-md" % phase)
+        # After production, run analysis.
+        self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (phase, phase, phase), stdin="System\n")
+        # Figure out which energy terms need to be printed.
+        o = self.callgmx("g_energy -f %s-md.edr -xvg no 2>&1" % (phase), stdin="Total-Energy\n")
+        parsemode = 0
+        energyterms = OrderedDict()
+        for line in o:
+            s = line.split()
+            if "Select the terms you want from the following list" in line:
+                parsemode = 1
+            if parsemode == 1:
+                if len(s) > 0 and all([isint(i) for i in s[::2]]):
+                    parsemode = 2
+            if parsemode == 2:
+                if len(s) > 0 and all([isint(i) for i in s[::2]]):
+                    for j in range(len(s))[::2]:
+                        num = int(s[j])
+                        name = s[j+1]
+                        energyterms[name] = num
+                else:
+                    parsemode = 0
+        ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
+        ekeep += ['Volume', 'Density']
+        o = self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (phase, phase), stdin="\n".join(ekeep))
+        # for line in o:
+        #     print line
+        edecomp = OrderedDict()
+        Rhos = []
+        Volumes = []
+        Kinetics = []
+        Potentials = []
+        for line in open("%s-md-energy.xvg" % phase):
+            s = [float(i) for i in line.split()]
+            for i in range(len(ekeep) - 2):
+                val = s[i+1]
+                if ekeep[i] in edecomp:
+                    edecomp[ekeep[i]].append(val)
+                else:
+                    edecomp[ekeep[i]] = [val]
+            Rhos.append(s[-1])
+            Volumes.append(s[-2])
+        Rhos = np.array(Rhos)
+        Volumes = np.array(Volumes)
+        Potentials = np.array(edecomp['Potential'])
+        Kinetics = np.array(edecomp['Kinetic-En.'])
+        Dips = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-md-dip.xvg" % phase)])
+        for i in glob.glob("#*"):
+            os.remove(i)
+        return Rhos, Potentials, Kinetics, Volumes, Dips, OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
+    
+    def energy_driver(self,mvals,phase,verbose=False,dipole=False,resetvs=False):
+        # Print the force field XML from the ForceBalance object, with modified parameters.
+        self.FF.make(mvals)
+        # Arguments for running over snapshots.
+        shot_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : 0, "nstenergy" : 1}, **self.opts["liquid"]),
+                     "gas" : dict({"integrator" : "md", "nsteps" : 0, "nstenergy" : 1}, **self.opts["gas"])}
+        # Run over the snapshots.
+        if in_fd(): verbose=False
+        edit_mdp("%s.mdp" % phase, "%s-shot.mdp" % phase, shot_opts[phase], verbose=verbose)
+        self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-shot.mdp -o %s-shot.tpr" % (phase, phase, phase, phase), print_command=verbose)
+        self.callgmx("mdrun -v -deffnm %s-shot -rerun %s-md.trr -rerunvsite" % (phase, phase), print_command=verbose)
+        # Get potential energies.
+        self.callgmx("g_energy -f %s-shot.edr -o %s-shot-energy.xvg -xvg no" % (phase, phase), stdin="Potential\n", print_command=verbose)
+        E = [float(line.split()[1]) for line in open("%s-shot-energy.xvg" % phase)]
+        print "\r",
+        if verbose: print E
+        if dipole:
+            # Return a Nx4 array with energies in the first column and dipole in columns 2-4.
+            self.callgmx("g_dipoles -s %s-shot.tpr -f %s-md.trr -o %s-shot-dip.xvg -xvg no" % (phase, phase, phase), stdin="System\n", print_command=verbose)
+            D = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-shot-dip.xvg" % phase)])
+            for i in glob.glob("#*"): os.remove(i)
+            return np.hstack((np.array(E).reshape(-1,1), np.array(D).reshape(-1,3)))
+        else:
+            # Return just the energies.
+            for i in glob.glob("#*"): os.remove(i)
+            return np.array(E)
+    
+class OpenMM_MD(MDEngine):
+    def __init__(self, FF):
+        super(OpenMM_MD,self).__init__(FF)
+        # Langevin integrator friction / random force parameter in OpenMM, in inverse picoseconds
+        self.collision_parameter  = 1.0
+        # number of steps between MC volume adjustments
+        self.barostat_interval   = 25
+        # Keyword arguments (settings) for setting up the system.
+        # AMOEBA mutual
+        mutual_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
+                         'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
+                         'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
+                         'mutualInducedTargetEpsilon' : 1e-6, 'useDispersionCorrection' : True}
+        # AMOEBA direct
+        direct_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
+                         'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
+                         'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
+                         'polarization' : 'direct', 'useDispersionCorrection' : True}
+        # AMOEBA nonpolarizable
+        nonpol_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.7*nanometer,
+                         'constraints' : None, 'rigidWater' : False, 'vdwCutoff' : 0.85,
+                         'aEwald' : 5.4459052, 'pmeGridDimensions' : [24,24,24],
+                         'useDispersionCorrection' : True}
+        # TIP3P and other rigid water models
+        tip3p_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
+                        'useSwitchingFunction' : True, 'switchingDistance' : 0.75*nanometer,
+                        'constraints' : HBonds, 'rigidwater' : True, 'useDispersionCorrection' : True}
+        # General periodic systems (no constraints)
+        gen_kwargs = {'nonbondedMethod' : PME, 'nonbondedCutoff' : 0.85*nanometer,
+                      'useSwitchingFunction' : True, 'switchingDistance' : 0.75*nanometer,
+                      'constraints' : None, 'rigidwater' : False, 'useDispersionCorrection' : True}
+        # Same settings for the monomer.
+        m_mutual_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
+                           'rigidWater' : False, 'mutualInducedTargetEpsilon' : 1e-6, 'removeCMMotion' : False}
+        m_direct_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
+                           'rigidWater' : False, 'polarization' : 'direct', 'removeCMMotion' : False}
+        m_nonpol_kwargs = {'nonbondedMethod' : NoCutoff, 'constraints' : None,
+                           'rigidWater' : False, 'removeCMMotion' : False}
+        m_tip3p_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : True, 'removeCMMotion' : False}
+        m_gen_kwargs = {'nonbondedMethod' : NoCutoff, 'rigidwater' : False, 'removeCMMotion' : False}
+        # Dictionary of simulation, system, and trajectory objects.
+        self.Simulations = OrderedDict()
+        self.Systems = OrderedDict()
+        self.Xyzs = OrderedDict()
+        self.Boxes = OrderedDict()
+        self.PlatNames = {"gas":"Reference",
+                          "liquid":"CUDA"}
+        # Dictionary of PDB and simulation settings
+        self.PDBs = OrderedDict()
+        self.Settings = OrderedDict()
+        # ForceBalance force field object.
+        self.FF = FF
+        # This creates a system from a force field XML file.
+        forcefield = ForceField(FF.openmmxml)
+        self.ffxml = FF.openmmxml
+        # Read in the PDB files here.
+        if os.path.exists("gas.pdb"):
+            self.PDBs["gas"] = PDBFile("gas.pdb")
+        elif os.path.exists("mono.pdb"):
+            self.PDBs["gas"] = PDBFile("mono.pdb")
+        if os.path.exists("liquid.pdb"):
+            self.PDBs["liquid"] = PDBFile("liquid.pdb")
+        elif os.path.exists("conf.pdb"):
+            self.PDBs["liquid"] = PDBFile("conf.pdb")
+        # Try to detect if we're using an AMOEBA system.
+        if any(['Amoeba' in i.__class__.__name__ for i in forcefield._forces]):
+            print "Detected AMOEBA system!"
+            if FF.amoeba_pol == "mutual":
+                print "Setting mutual polarization"
+                self.Settings["liquid"] = mutual_kwargs
+                self.Settings["gas"] = m_mutual_kwargs
+            elif FF.amoeba_pol == "direct":
+                print "Setting direct polarization"
+                self.Settings["liquid"] = direct_kwargs
+                self.Settings["gas"] = m_direct_kwargs
+            else:
+                print "No polarization"
+                self.Settings["liquid"] = nonpol_kwargs
+                self.Settings["gas"] = m_nonpol_kwargs
+        else:
+            if 'tip' in self.ffxml:
+                print "Using rigid water."
+                self.Settings["liquid"] = tip3p_kwargs
+                self.Settings["gas"] = m_tip3p_kwargs
+            else:
+                print "Using general settings for nonpolarizable force fields."
+                self.Settings["liquid"] = gen_kwargs
+                self.Settings["gas"] = m_gen_kwargs
+    
+    def compute_volume(self, box_vectors):
+        """ Compute the total volume of an OpenMM system. """
+        [a,b,c] = box_vectors
+        A = np.array([a/a.unit, b/a.unit, c/a.unit])
+        # Compute volume of parallelepiped.
+        volume = np.linalg.det(A) * a.unit**3
+        return volume
+    
+    def compute_mass(self, system):
+        """ Compute the total mass of an OpenMM system. """
+        mass = 0.0 * amu
+        for i in range(system.getNumParticles()):
+            mass += system.getParticleMass(i)
+        return mass
+    
+    def create_simulation_object(self, phase, precision="mixed"):
+        """ Create an OpenMM simulation object. """
+        pbc = phase == "liquid"
+        platname = self.PlatNames[phase]
+        # Create the platform.
+        if platname == "CUDA":
+            try:
+                platform = Platform.getPlatformByName(platname)
+                # Set the device to the environment variable or zero otherwise
+                device = os.environ.get('CUDA_DEVICE',"0")
+                print "Setting Device to", device
+                platform.setPropertyDefaultValue("CudaDeviceIndex", device)
+                platform.setPropertyDefaultValue("CudaPrecision", precision)
+                platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
+            except:
+                traceback.print_exc()
+                if args.force_cuda:
+                    raise Exception('Force CUDA option is enabled but CUDA platform not available')
+                platname = "Reference"
+        if platname == "Reference":
+            platform = Platform.getPlatformByName(platname)
 
-        G[i] = (P1-PM1)/(2*h)
+        # Create the system.
+        try:
+            pdb = self.PDBs[phase]
+            settings = self.Settings[phase]
+        except:
+            traceback.print_exc()
+            raise RuntimeError("Tried to load pdb and settings for %s phase but failed" % phase)
+        forcefield = ForceField(self.ffxml)
+        mod = Modeller(pdb.topology, pdb.positions)
+        mod.addExtraParticles(forcefield)
+        system = forcefield.createSystem(mod.topology, **settings)
+        if pbc:
+            if args.anisotropic:
+                barostat = MonteCarloAnisotropicBarostat([pressure, pressure, pressure]*atmospheres, temperature*kelvin, self.barostat_interval)
+            else:
+                barostat = MonteCarloBarostat(pressure*atmospheres, temperature*kelvin, self.barostat_interval)
+            system.addForce(barostat)
 
-    if 'h_' in property_kwargs:
-        property_kwargs['h_'] = H0.copy()
-    if 'd_' in property_kwargs:
-        property_kwargs['d_'] = D0.copy()
+        # Create integrator.
+        if args.mts_vvvr:
+            print "Using new multiple-timestep velocity-verlet with velocity randomization (MTS-VVVR) integrator."
+            print "Warning: not proven to work in most situations"
+            integrator = MTSVVVRIntegrator(temperature*kelvin, self.collision_parameter/picosecond, timestep*femtosecond, system, ninnersteps=int(timestep/faststep))
+        else:
+            integrator = LangevinIntegrator(temperature*kelvin, self.collision_parameter/picosecond, timestep*femtosecond) 
+            for n, i in enumerate(system.getForces()):
+                print "Setting Force %s to group %i" % (i.__class__.__name__, n)
+                i.setForceGroup(n)
 
-    return G
+        # Delete any pre-existing simulation and system objects.
+        if phase in self.Simulations:
+            del self.Simulations[phase]
+            del self.Systems[phase]
+
+        # Create simulation object; assign positions and velocities.
+        simulation = Simulation(mod.topology, system, integrator, platform)
+        # Print out the platform properties.
+        print "I'm using the platform", simulation.context.getPlatform().getName()
+        printcool_dictionary({i:simulation.context.getPlatform().getPropertyValue(simulation.context,i) for i in simulation.context.getPlatform().getPropertyNames()},title="Platform %s has properties:" % simulation.context.getPlatform().getName())
+        simulation.context.setPositions(mod.positions)
+        simulation.context.setVelocitiesToTemperature(temperature*kelvin)
+        self.Simulations[phase] = simulation
+        self.Systems[phase] = system
+    
+    def EnergyDecomposition(self, Sim):
+        # Before using EnergyDecomposition, make sure each Force is set to a different group.
+        EnergyTerms = OrderedDict()
+        Potential = Sim.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+        Kinetic = Sim.context.getState(getEnergy=True).getKineticEnergy() / kilojoules_per_mole
+        for i in range(Sim.system.getNumForces()):
+            EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
+        EnergyTerms['Potential'] = Potential
+        EnergyTerms['Kinetic'] = Kinetic
+        EnergyTerms['Total'] = Potential+Kinetic
+        return EnergyTerms
+    
+    def run_simulation(self, phase, minimize=True, savexyz=True):
+        """ Run a NPT simulation for a given phase and gather statistics. """
+        # Set periodic boundary conditions.
+        pbc = phase == "liquid"
+
+        # Create simulation and system objects.
+        if phase not in self.Simulations:
+            self.create_simulation_object(phase, precision="mixed")
+        simulation = self.Simulations[phase]
+        system = self.Systems[phase]
+
+        # Minimize the energy.
+        if minimize:
+            print "Minimizing the energy... (starting energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole),
+            simulation.minimizeEnergy()
+            print "Done (final energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
+
+        # Serialize the system if we want.
+        Serialize = 0
+        if Serialize:
+            serial = XmlSerializer.serializeSystem(system)
+            with open('%s_system.xml' % phase,'w') as f: f.write(serial)
+
+        kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
+        # Determine number of degrees of freedom; the center of mass motion remover is also a constraint.
+        ndof = 3*(system.getNumParticles() - sum([system.isVirtualSite(i) for i in range(system.getNumParticles())])) - system.getNumConstraints() - 3*pbc
+        # Compute total mass.
+        mass = self.compute_mass(system).in_units_of(gram / mole) /  AVOGADRO_CONSTANT_NA # total system mass in g
+        # Initialize statistics.
+        edecomp = OrderedDict()
+        # More data structures; stored coordinates, box sizes, densities, and potential energies
+        self.Xyzs[phase] = []
+        self.Boxes[phase] = []
+        rhos = []
+        potentials = []
+        kinetics = []
+        volumes = []
+        dipoles = []
+        #========================#
+        # Now run the simulation #
+        #========================#
+        # Equilibrate.
+        print "Equilibrating..."
+        for iteration in range(nequil):
+            simulation.step(nsteps)
+            state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
+            kinetic = state.getKineticEnergy()
+            potential = state.getPotentialEnergy()
+            if pbc:
+                box_vectors = state.getPeriodicBoxVectors()
+                volume = self.compute_volume(box_vectors)
+                density = (mass / volume).in_units_of(kilogram / meter**3)
+            else:
+                volume = 0.0 * nanometers ** 3
+                density = 0.0 * kilogram / meter ** 3
+            kinetic_temperature = 2.0 * kinetic / kB / ndof # (1/2) ndof * kB * T = KE
+            print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds,
+                                                             kinetic_temperature / kelvin, potential / kilojoules_per_mole,
+                                                             volume / nanometers**3, density / (kilogram / meter**3))
+        # Collect production data.
+        print "Production..."
+        if savexyz:
+            simulation.reporters.append(DCDReporter('dynamics.dcd', nsteps))
+        for iteration in range(nprod):
+            # Propagate dynamics.
+            simulation.step(nsteps)
+            # Compute properties.
+            state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
+            self.Xyzs[phase].append(state.getPositions())
+            kinetic = state.getKineticEnergy()
+            potential = state.getPotentialEnergy()
+            kinetic_temperature = 2.0 * kinetic / kB / ndof
+            if pbc:
+                box_vectors = state.getPeriodicBoxVectors()
+                volume = self.compute_volume(box_vectors)
+                density = (mass / volume).in_units_of(kilogram / meter**3)
+            else:
+                box_vectors = None
+                volume = 0.0 * nanometers ** 3
+                density = 0.0 * kilogram / meter ** 3
+            self.Boxes[phase].append(box_vectors)
+            # Perform energy decomposition.
+            if DoEDA:
+                for comp, val in self.EnergyDecomposition(simulation).items():
+                    if comp in edecomp:
+                        edecomp[comp].append(val)
+                    else:
+                        edecomp[comp] = [val]
+            print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds, kinetic_temperature / kelvin, potential / kilojoules_per_mole, volume / nanometers**3, density / (kilogram / meter**3))
+            rhos.append(density.value_in_unit(kilogram / meter**3))
+            potentials.append(potential / kilojoules_per_mole)
+            kinetics.append(kinetic / kilojoules_per_mole)
+            volumes.append(volume / nanometer**3)
+            dipoles.append(get_dipole(simulation,positions=self.Xyzs[phase][-1]))
+            
+        return np.array(rhos), np.array(potentials), np.array(kinetics), np.array(volumes), np.array(dipoles), OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
+    
+    def energy_driver(self,mvals,phase,verbose=False,dipole=False,resetvs=False):
+        """
+        Compute a set of snapshot energies as a function of the force field parameters.
+    
+        This is a combined OpenMM and ForceBalance function.  Note (importantly) that this
+        function creates a new force field XML file in the run directory.
+    
+        ForceBalance creates the force field, OpenMM reads it in, and we loop through the snapshots
+        to compute the energies.
+    
+        @todo I should be able to generate the OpenMM force field object without writing an external file.
+        @todo This is a sufficiently general function to be merged into openmmio.py?
+        @param[in] mvals Mathematical parameter values
+        @param[in] pdb OpenMM PDB object
+        @param[in] FF ForceBalance force field object
+        @param[in] xyzs List of OpenMM positions
+        @param[in] settings OpenMM settings for creating the System
+        @param[in] boxes Periodic box vectors
+        @return E A numpy array of energies in kilojoules per mole
+    
+        """
+        # Set periodic boundary conditions.
+        pbc = phase == "liquid"
+
+        # Load in the information for the appropriate phase.
+        pdb = self.PDBs[phase]
+        xyzs = self.Xyzs[phase]
+        simulation = self.Simulations[phase]
+        settings = self.Settings[phase]
+        boxes = self.Boxes[phase]
+        
+        # Print the force field XML from the ForceBalance object, with modified parameters.
+        self.FF.make(mvals)
+        forcefield = ForceField(self.ffxml)
+
+        # Create the system and update the simulation parameters.
+        mod = Modeller(pdb.topology, pdb.positions)
+        mod.addExtraParticles(forcefield)
+        system = forcefield.createSystem(mod.topology, **settings)
+        UpdateSimulationParameters(system, simulation)
+        E = []
+        D = []
+        q = None
+        for i in simulation.system.getForces():
+            if i.__class__.__name__ == "NonbondedForce":
+                q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+        
+        # Loop through the snapshots
+        for xyz,box in zip(self.Xyzs[phase],self.Boxes[phase]):
+            xyz1 = ResetVirtualSites(xyz, system) if resetvs else xyz
+            simulation.context.setPositions(xyz1)
+            if box != None:
+                simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
+            # Compute the potential energy and append to list
+            Energy = simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+            E.append(Energy)
+            if dipole:
+                D.append(get_dipole(simulation,q=q,positions=xyz1))
+
+        print "\r",
+        if verbose: print E
+        if dipole:
+            # Return a Nx4 array with energies in the first column and dipole in columns 2-4.
+            return np.hstack((np.array(E).reshape(-1,1), np.array(D).reshape(-1,3)))
+        else:
+            return np.array(E)
+
+Tinker_MD = None
 
 def main():
 
     """
-    Usage: (runcuda.sh) npt.py protein.pdb forcefield.xml <temperature> <pressure>
+    Usage: (runcuda.sh) npt.py <openmm|gromacs|tinker> <liquid_prod_steps> <liquid_timestep (fs)> <liquid_interval (ps> <temperature> <pressure>
 
     This program is meant to be called automatically by ForceBalance on
     a GPU cluster (specifically, subroutines in openmmio.py).  It is
@@ -889,7 +780,7 @@ def main():
     calculations need to be distributed to the queue.  The main instance
     of ForceBalance (running on my workstation) queues up a bunch of these
     jobs (using Work Queue).  Then, I submit a bunch of workers to GPU
-    clusters (e.g. Certainty, Keeneland).  The worker scripts connect to
+    clusters (e.g. Certainty, Keeneland).  The worker scripts connect to.
     the main instance and receives one of these jobs.
 
     This script can also be executed locally, if you want to (e.g. for
@@ -897,142 +788,148 @@ def main():
     file.
 
     """
-
-    # Create an OpenMM PDB object so we may make the Simulation class.
-    pdb = PDBFile(sys.argv[1])
+    if args.engine == "openmm":
+        if os.path.exists("liquid.pdb"):
+            fnm = "liquid.pdb"
+        elif os.path.exists("conf.pdb"):
+            fnm = "conf.pdb"
+    elif args.engine in ["gmx", "gromacs"]:
+        fnm = "liquid.gro"
+    elif args.engine == "tinker":
+        fnm = "liquid.xyz"
+    
+    # Load in the molecule object so that we may count the number of molecules.
+    try:
+        M = Molecule(fnm)
+    except:
+        raise RuntimeError('Tried to load structure from %s but file does not exist' % fnm)
+    
     # The number of molecules can be determined here.
-    NMol = len(list(pdb.topology.residues()))
+    NMol = len(M.molecules)
+
     # Load the force field in from the ForceBalance pickle.
     FF,mvals,h,AGrad = lp_load(open('forcebalance.p'))
-    # Create the force field XML files.
+    AGrad = True
     FF.make(mvals)
-    # This creates a system from a force field XML file.
-    forcefield = ForceField(sys.argv[2])
-    # Try to detect if we're using an AMOEBA system.
-    if any(['Amoeba' in i.__class__.__name__ for i in forcefield._forces]):
-        print "Detected AMOEBA system!"
-        if FF.amoeba_pol == "mutual":
-            print "Setting mutual polarization"
-            Settings = amoeba_mutual_kwargs
-            mSettings = mono_mutual_kwargs
-        elif FF.amoeba_pol == "direct":
-            print "Setting direct polarization"
-            Settings = amoeba_direct_kwargs
-            mSettings = mono_direct_kwargs
-        else:
-            print "No polarization"
-            Settings = amoeba_nonpol_kwargs
-            mSettings = mono_nonpol_kwargs
-    else:
-        if 'tip' in sys.argv[2]:
-            print "Using rigid water."
-            Settings = tip3p_kwargs
-            mSettings = mono_tip3p_kwargs
-        else:
-            print "Using general settings for nonpolarizable force fields."
-            Settings = gen_kwargs
-            mSettings = mono_gen_kwargs
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    Data, Xyzs, Boxes, Rhos, Potentials, Kinetics, Volumes, Dips, Sim, EDA = run_simulation(pdb, Settings, Trajectory=False, platname="CUDA")
-    Energies = Potentials + Kinetics
+    EngineDict = {"openmm" : OpenMM_MD, "gmx" : Gromacs_MD,
+                  "gromacs" : Gromacs_MD, "tinker" : Tinker_MD}
 
-    # Get statistics from our simulation.
-    Rho_avg, Rho_err, Pot_avg, Pot_err, Kin_avg, Kin_err, Ene_avg, Ene_err, pV_avg, pV_err = analyze(Data)
-    # Get energy decomposition statistics.
-    if DoEDA:
-        PrintDict = OrderedDict([(key, "% 12.4f +- %10.4f [ % 9.4f +- %7.4f ]" % (np.mean(val), np.std(val)*sqrt(statisticalInefficiency(val, warn=False)/len(val)),
-                                                                                  np.mean(val)/NMol, np.std(val)*sqrt(statisticalInefficiency(val, warn=False)/len(val))/NMol)) 
-                                 for key, val in EDA.items() if (np.mean(val) != 0.0 or np.std(val) != 0.0)])
-        printcool_dictionary(PrintDict, "Energy Decomposition Analysis, Mean +- Stderr [Per Molecule] (kJ/mol)")
-    # Now that we have the coordinates, we can compute the energy derivatives.
-    # First create a double-precision simulation object.
-    DoublePrecisionDerivatives = False
-    if DoublePrecisionDerivatives and AGrad:
-        print "Creating Double Precision Simulation for parameter derivatives"
-        Sim, _ = create_simulation_object(pdb, Settings, pbc=True, precision="double")
-    G, GDx, GDy, GDz = energy_dipole_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, Boxes, AGrad)
-    # The density derivative can be computed using the energy derivative.
-    N = len(Xyzs)
-    kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
-    T = temperature / kelvin
-    mBeta = (-1 / (temperature * kB)).value_in_unit(mole / kilojoule)
-    Beta = (1 / (temperature * kB)).value_in_unit(mole / kilojoule)
-    # Build the first density derivative .
-    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / N - np.mean(Rhos) * np.mean(G, axis=1))
+    # Create an instance of the MD Engine object.
+    Engine = EngineDict[args.engine](FF)
+
+    # This line runs the condensed phase simulation.
+    Rhos, Potentials, Kinetics, Volumes, Dips, EDA = Engine.run_simulation("liquid", minimize=True, savexyz=False)
+
+    # Create a bunch of physical constants.
+    # Energies are in kJ/mol
+    # Lengths are in nanometers.
+    L = len(Rhos)
+    kB = 0.008314472471220214
+    T = temperature
+    kT = kB * T
+    mBeta = -1.0 / kT
+    Beta = 1.0 / kT
+    atm_unit = 0.061019351687175
+    bar_unit = 0.060221417930000
+    # This is how I calculated the prefactor for the dielectric constant.
+    # eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
+    # epsunit = 1.0*(debye**2) / nanometer**3 / BOLTZMANN_CONSTANT_kB / kelvin
+    # prefactor = epsunit/eps0/3
+    prefactor = 30.348705333964077
+
+    # Gather some physical variables.
+    Energies = Potentials + Kinetics
+    Ene_avg, Ene_err = mean_stderr(Energies)
+    pV = atm_unit * pressure * Volumes
+    pV_avg, pV_err = mean_stderr(pV)
+    Rho_avg, Rho_err = mean_stderr(Rhos)
+    if DoEDA: PrintEDA(EDA, NMol)
 
     #==============================================#
     # Now run the simulation for just the monomer. #
     #==============================================#
-    global timestep, nsteps, niterations, nequiliterations
+    # Reset the timestep and such.
+    global timestep, nsteps, nprod, nequil
     timestep = m_timestep
     nsteps   = m_nsteps
-    nequiliterations = m_nequiliterations
-    niterations = m_niterations
+    nequil = m_nequil
+    nprod = m_nprod
 
-    mpdb = PDBFile('mono.pdb')
-    mData, mXyzs, _trash, _crap, mPotentials, mKinetics, _nah, _dontneed, mSim, mEDA = run_simulation(mpdb, mSettings, pbc=False, Trajectory=False, platname="Reference")
+    # Run the OpenMM simulation, gather information.
+    _, mPotentials, mKinetics, __, ___, mEDA = Engine.run_simulation("gas", minimize=True, savexyz=False)
     mEnergies = mPotentials + mKinetics
-    # Get statistics from our simulation.
-    _trash, _crap, mPot_avg, mPot_err, mKin_avg, mKin_err, mEne_avg, mEne_err, __trash, __crap = analyze(mData)
-    # Get energy decomposition statistics.
-    if DoEDA:
-        PrintDict = OrderedDict([(key, "% 9.4f +- %7.4f" % (np.mean(val), np.std(val)*sqrt(statisticalInefficiency(val, warn=False)/len(val)))) for key, val in mEDA.items() if (np.mean(val) != 0.0 or np.std(val) != 0.0)])
-        printcool_dictionary(PrintDict, "Monomer Energy Decomposition Analysis, Mean +- Stderr (kJ/mol)")
-    # Now that we have the coordinates, we can compute the energy derivatives.
-    if DoublePrecisionDerivatives and AGrad:
-        print "Creating Double Precision Simulation for parameter derivatives"
-        mSim, _ = create_simulation_object(mpdb, mSettings, pbc=False, precision="double")
-    mG = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mSettings, mSim, None, AGrad)
+    mEne_avg, mEne_err = mean_stderr(mEnergies)
+    if DoEDA: PrintEDA(mEDA, 1)
 
-    # pV_avg and mean(pV) are exactly the same.
-    pV = (pressure * Data['volume'] * AVOGADRO_CONSTANT_NA).value_in_unit(kilojoule_per_mole)
-    kT = (kB * temperature).value_in_unit(kilojoule_per_mole)
+    #============================================#
+    #  Compute the potential energy derivatives. #
+    #============================================#
+    print "Calculating potential energy derivatives with finite difference step size:", h
+    # Switch for whether to compute the derivatives two different ways for consistency.
+    FDCheck = False
+
+    # Create a double-precision simulation object if desired (seems unnecessary).
+    DoublePrecisionDerivatives = False
+    if args.engine == "openmm" and DoublePrecisionDerivatives and AGrad:
+        print "Creating Double Precision Simulation for parameter derivatives"
+        Engine.create_simulation_object("liquid", precision="double")
+        Engine.create_simulation_object("gas", precision="double")
+
+    # Compute the energy and dipole derivatives.
+    print "Condensed phase potential and dipole derivatives."
+    print "Initializing array to length %i" % len(Energies)
+    G, GDx, GDy, GDz = Engine.energy_derivatives(mvals, h, "liquid", len(Energies), AGrad, dipole=True)
+    print "Gas phase potential derivatives."
+    mG, _, __, ___ = Engine.energy_derivatives(mvals, h, "gas", len(mEnergies), AGrad, dipole=False)
+
+    # Build the first density derivative.
+    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / L - np.mean(Rhos) * np.mean(G, axis=1))
 
     # The enthalpy of vaporization in kJ/mol.
     Hvap_avg = mEne_avg - Ene_avg / NMol + kT - np.mean(pV) / NMol
     Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
-    # We don't pass it back, but nice for printing.
     GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / N - Ene_avg * np.mean(G, axis=1))
+    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
     GHvap /= NMol
     GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / N - mEne_avg * np.mean(mG, axis=1))
+    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
     GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)) / NMol
+    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
-    print "The finite difference step size is:",h
-
+    # Print out the density and its derivative.
     Sep = printcool("Density: % .4f +- % .4f kg/m^3, Analytic Derivative" % (Rho_avg, Rho_err))
     FF.print_map(vals=GRho)
     print Sep
 
     H = Energies + pV
+    # Print out the liquid enthalpy.
     print "Liquid enthalpy: % .4f kJ/mol, stdev % .4f ; (% .4f from energy, % .4f from pV)" % (np.mean(H), np.std(H), np.mean(Energies), np.mean(pV))
     V = np.array(Volumes)
     numboots = 1000
-    L = len(H)
-    FDCheck = False
 
     def calc_rho(b = None, **kwargs):
         if b == None: b = np.ones(L,dtype=float)
         if 'r_' in kwargs:
             r_ = kwargs['r_']
         return bzavg(r_,b)
+
     # No need to calculate error using bootstrap, but here it is anyway
     # Rhoboot = []
     # for i in range(numboots):
-    #    boot = np.random.randint(L,size=L)
+    #    boot = np.random.randint(N,size=N)
     #    Rhoboot.append(calc_rho(None,**{'r_':Rhos[boot]}))
     # Rhoboot = np.array(Rhoboot)
     # Rho_err = np.std(Rhoboot)
+
     if FDCheck:
         Sep = printcool("Numerical Derivative:")
-        GRho1 = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_rho, {'r_':Rhos}, Boxes)
+        GRho1 = property_derivatives(mvals, h, "liquid", kT, calc_rho, {'r_':Rhos}, Boxes)
         FF.print_map(vals=GRho1)
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GRho, GRho1)]
@@ -1047,9 +944,9 @@ def main():
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
     def deprod(vec):
-        return flat(np.mat(G)*col(vec))/N
+        return flat(np.mat(G)*col(vec))/L
     def covde(vec):
-        return flat(np.mat(G)*col(vec))/N - Gbar*np.mean(vec)
+        return flat(np.mat(G)*col(vec))/L - Gbar*np.mean(vec)
     def avg(vec):
         return np.mean(vec)
 
@@ -1078,7 +975,7 @@ def main():
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
-        GAlpha_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_alpha, {'h_':H,'v_':V}, Boxes)
+        GAlpha_fd = property_derivatives(mvals, h, "liquid", kT, calc_alpha, {'h_':H,'v_':V}, Boxes)
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GAlpha_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -1086,7 +983,6 @@ def main():
         FF.print_map(vals=absfrac)
 
     ## Isothermal compressibility
-    bar_unit = 1.0*bar*nanometer**3/kilojoules_per_mole/item
     def calc_kappa(b=None, **kwargs):
         if b == None: b = np.ones(L,dtype=float)
         if 'v_' in kwargs:
@@ -1108,7 +1004,7 @@ def main():
     GKappa  = bar_unit*(GKappa1 + GKappa2 + GKappa3)
     FF.print_map(vals=GKappa)
     if FDCheck:
-        GKappa_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_kappa, {'v_':V}, Boxes)
+        GKappa_fd = property_derivatives(mvals, h, "liquid", kT, calc_kappa, {'v_':V}, Boxes)
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GKappa_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -1139,7 +1035,7 @@ def main():
     Sep = printcool("Isobaric heat capacity:        % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:
-        GCp_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_cp, {'h_':H}, Boxes)
+        GCp_fd = property_derivatives(mvals, h, "liquid", kT, calc_cp, {'h_':H}, Boxes)
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GCp_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -1147,9 +1043,6 @@ def main():
         FF.print_map(vals=absfrac)
 
     ## Dielectric constant
-    eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
-    epsunit = 1.0*(debye**2) / nanometer**3 / BOLTZMANN_CONSTANT_kB / kelvin
-    prefactor = epsunit/eps0/3
     def calc_eps0(b=None, **kwargs):
         if b == None: b = np.ones(L,dtype=float)
         if 'd_' in kwargs: # Dipole moment vector.
@@ -1177,14 +1070,14 @@ def main():
     Dy = Dips[:,1]
     Dz = Dips[:,2]
     D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
-    GD2  = 2*(flat(np.mat(GDx)*col(Dx))/N - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-    GD2 += 2*(flat(np.mat(GDy)*col(Dy))/N - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-    GD2 += 2*(flat(np.mat(GDz)*col(Dz))/N - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+    GD2  = 2*(flat(np.mat(GDx)*col(Dx))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+    GD2 += 2*(flat(np.mat(GDy)*col(Dy))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+    GD2 += 2*(flat(np.mat(GDz)*col(Dz))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
     GEps0 = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)
     if FDCheck:
-        GEps0_fd = property_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, kT, calc_eps0, {'d_':Dips,'v_':V}, Boxes)
+        GEps0_fd = property_derivatives(mvals, h, "liquid", kT, calc_eps0, {'d_':Dips,'v_':V}, Boxes)
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GEps0_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
