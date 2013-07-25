@@ -561,6 +561,8 @@ class Liquid_GMX(Liquid):
             print "Found collection of starting conformations, length %i!" % len(self.liquid_traj)
         if self.do_self_pol:
             warn_press_key("Self-polarization correction not implemented yet when using GMX")
+        # MD engine argument supplied to command string for launching NPT simulations.
+        self.engine = "gromacs"
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """

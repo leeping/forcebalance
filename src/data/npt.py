@@ -53,6 +53,7 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 import sys
 import glob
+import shutil
 import argparse
 import traceback
 import numpy as np
@@ -336,6 +337,8 @@ class Gromacs_MD(MDEngine):
         edit_mdp("%s.mdp" % phase, "%s-eq.mdp" % phase, dict(eq_opts[phase], **nosave_opts), verbose=True)
         self.callgmx("grompp -maxwarn 1 -c %s-min.gro -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (phase, phase, phase, phase))
         self.callgmx("mdrun -v -deffnm %s-eq" % phase)
+        if int(eq_opts[phase]["nsteps"]) == 0:
+            shutil.copy2("%s-min.gro" % phase, "%s-eq.gro" % phase)
         # Run production.
         edit_mdp("%s.mdp" % phase, "%s-md.mdp" % phase, dict(md_opts[phase], **save_opts), verbose=True)
         self.callgmx("grompp -maxwarn 1 -c %s-eq.gro -p %s.top -f %s-md.mdp -o %s-md.tpr" % (phase, phase, phase, phase))
