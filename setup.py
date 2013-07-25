@@ -103,7 +103,10 @@ def doClean():
     try:
         dir=os.path.dirname(__import__('forcebalance').__file__)
     except ImportError:
-        print "Couldn't find existing forcebalance installation. Nothing to clean..\n"
+        print "Couldn't find existing forcebalance installation. Nothing to clean...\n"
+        return
+    except:
+        print "Couldn't read forcebalance location... Continuing with regular install"
         return
 
     raw_input("All files in %s will be deleted for clean install\nPress <Enter> to continue, <Ctrl+C> to abort\n" % dir)
