@@ -1140,7 +1140,8 @@ class Molecule(object):
         lengths = []
         for i, a in enumerate(self.elem):
             G.add_node(i)
-            nx.set_node_attributes(G,'n',{i:self.atomname[i]})
+            if 'atomname' in self.Data:
+                nx.set_node_attributes(G,'n',{i:self.atomname[i]})
             nx.set_node_attributes(G,'e',{i:a})
             nx.set_node_attributes(G,'x',{i:self.xyzs[sn][i]})
         bond_bool = dxij[0] < BondThresh
