@@ -328,7 +328,7 @@ class Liquid_OpenMM(Liquid):
         self.set_option(tgt_opts,'mts_vvvr',forceprint=True)
         # Set up for polarization correction
         if self.do_self_pol:
-            self.mpdb = PDBFile(os.path.join(self.root,self.tgtdir,"mono.pdb"))
+            self.mpdb = PDBFile(os.path.join(self.root,self.tgtdir,"gas.pdb"))
             forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
             mod = Modeller(self.mpdb.topology, self.mpdb.positions)
             mod.addExtraParticles(forcefield)
@@ -340,7 +340,7 @@ class Liquid_OpenMM(Liquid):
             # Create the simulation object
             self.msim = Simulation(mod.topology, system, integrator, self.platform)
         # I shall enable starting simulations for many different initial conditions.
-        self.conf_pdb = Molecule(os.path.join(self.root, self.tgtdir,"conf.pdb"))
+        self.conf_pdb = Molecule(os.path.join(self.root, self.tgtdir,"liquid.pdb"))
         self.traj = None
         if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
             self.traj = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
@@ -349,8 +349,8 @@ class Liquid_OpenMM(Liquid):
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        # LinkFile(os.path.join(self.root,self.tgtdir,"conf.pdb"),os.path.join(abstempdir,"conf.pdb"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"mono.pdb"),os.path.join(abstempdir,"mono.pdb"))
+        # LinkFile(os.path.join(self.root,self.tgtdir,"liquid.pdb"),os.path.join(abstempdir,"liquid.pdb"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"gas.pdb"),os.path.join(abstempdir,"gas.pdb"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
         #LinkFile(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
@@ -382,12 +382,12 @@ class Liquid_OpenMM(Liquid):
             if self.traj != None:
                 self.conf_pdb.xyzs[0] = self.traj.xyzs[simnum%len(self.traj)]
                 self.conf_pdb.boxes[0] = self.traj.boxes[simnum%len(self.traj)]
-            self.conf_pdb.write('conf.pdb')
+            self.conf_pdb.write('liquid.pdb')
             if wq == None:
                 print "Running condensed phase simulation locally."
                 print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
-                cmdstr = 'bash runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s%s%s%s%s%s%s --liquid_equ_steps %i &> npt.out' % \
-                    (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, 
+                cmdstr = 'bash runcuda.sh python npt.py openmm %i %.3f %.3f %.3f %.3f%s%s%s%s%s%s%s%s --liquid_equ_steps %i' % \
+                    (self.liquid_prod_steps, self.liquid_timestep, 
                      self.liquid_interval, temperature, pressure, 
                      " --force_cuda" if self.force_cuda else "", 
                      " --anisotropic" if self.anisotropic_box else "", 
@@ -398,11 +398,11 @@ class Liquid_OpenMM(Liquid):
                      " --gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else "", 
                      " --gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else "", 
                      self.liquid_equ_steps)
-                _exec(cmdstr)
+                _exec(cmdstr, outfnm='npt.out')
             else:
                 queue_up(wq,
-                         command = 'bash runcuda.sh python npt.py conf.pdb %s %i %.3f %.3f %.3f %.3f%s%s%s%s%s%s%s%s --liquid_equ_steps %i &> npt.out' % \
-                             (self.FF.openmmxml, self.liquid_prod_steps, self.liquid_timestep, 
+                         command = 'bash runcuda.sh python npt.py openmm %i %.3f %.3f %.3f %.3f%s%s%s%s%s%s%s%s --liquid_equ_steps %i &> npt.out' % \
+                             (self.liquid_prod_steps, self.liquid_timestep, 
                               self.liquid_interval, temperature, pressure, 
                               " --force_cuda" if self.force_cuda else "", 
                               " --anisotropic" if self.anisotropic_box else "", 
@@ -413,8 +413,7 @@ class Liquid_OpenMM(Liquid):
                               " --gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else "", 
                               " --gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else "", 
                               self.liquid_equ_steps),
-                         input_files = ['runcuda.sh', 'npt.py', 'conf.pdb', 'mono.pdb', 'forcebalance.p'],
-                         #output_files = ['dynamics.dcd', 'npt_result.p', 'npt.out', self.FF.openmmxml])
+                         input_files = ['runcuda.sh', 'npt.py', 'liquid.pdb', 'gas.pdb', 'forcebalance.p'],
                          output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
                          tgt=self)
 
