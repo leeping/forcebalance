@@ -139,6 +139,7 @@ tgt_opts_types = {
                  "gas_prod_steps"     : (0, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "gas_equ_steps"      : (0, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "writelevel"         : (1, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
+                 "mdrun_threads"      : (1, 0, 'Set the number of threads used by remote Gromacs processes', 'Condensed phase properties in GROMACS', 'Liquid_GMX'),
                  },
     'bools'   : {"whamboltz"        : (0, -100, 'Whether to use WHAM Boltzmann Weights', 'Ab initio targets with Boltzmann weights (advanced usage)', 'AbInitio'),
                  "sampcorr"         : (0, -150, 'Whether to use the archaic sampling correction', 'Energy + Force Matching, very old option, do not use', 'AbInitio'),

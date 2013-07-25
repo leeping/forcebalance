@@ -552,6 +552,8 @@ class AbInitio_GMX(AbInitio):
 class Liquid_GMX(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_GMX,self).__init__(options,tgt_opts,forcefield)
+        # Number of threads in mdrun
+        self.set_option(tgt_opts,'mdrun_threads')
         self.liquid_fnm = "liquid.gro"
         self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.gro"))
         self.liquid_traj = None
@@ -563,7 +565,9 @@ class Liquid_GMX(Liquid):
             warn_press_key("Self-polarization correction not implemented yet when using GMX")
         # Command prefix.
         self.nptpfx = 'sh rungmx.sh'
-        # List of extra files to upload to Work Queue.
+         # Suffix to command string for launching NPT simulations.
+        self.nptsfx += ["--nt %i" % self.mdrun_threads]
+       # List of extra files to upload to Work Queue.
         self.nptfiles += ['rungmx.sh', 'liquid.top', 'liquid.mdp', 'gas.top', 'gas.mdp']
         # MD engine argument supplied to command string for launching NPT simulations.
         self.engine = "gromacs"

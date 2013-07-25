@@ -87,6 +87,7 @@ parser.add_argument('--gas_timestep', type=float, help='Time step for the gas-ph
 parser.add_argument('--gas_interval', type=float, help='Time interval for saving the gas-phase coordinates, in picoseconds', default=0.1)
 parser.add_argument('--anisotropic', action='store_true', help='Enable anisotropic scaling of periodic box (useful for crystals)')
 parser.add_argument('--mts_vvvr', action='store_true', help='Enable multiple timestep integrator (OpenMM)')
+parser.add_argument('--nt', type=int, help='Number of threads when executing GROMACS', default=1)
 parser.add_argument('--force_cuda', action='store_true', help='Exit if CUDA platform is not available (OpenMM)')
 parser.add_argument('--gmxpath', type=str, help='Specify the location of GROMACS executables', default="")
 parser.add_argument('--minimize_energy', action='store_true', help='Minimize the energy of the system prior to running dynamics')
@@ -336,13 +337,13 @@ class Gromacs_MD(MDEngine):
         # Run equilibration.
         edit_mdp("%s.mdp" % phase, "%s-eq.mdp" % phase, dict(eq_opts[phase], **nosave_opts), verbose=True)
         self.callgmx("grompp -maxwarn 1 -c %s-min.gro -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (phase, phase, phase, phase))
-        self.callgmx("mdrun -v -deffnm %s-eq" % phase)
+        self.callgmx("mdrun -v -deffnm %s-eq -nt %i" % (phase, args.nt))
         if int(eq_opts[phase]["nsteps"]) == 0:
             shutil.copy2("%s-min.gro" % phase, "%s-eq.gro" % phase)
         # Run production.
         edit_mdp("%s.mdp" % phase, "%s-md.mdp" % phase, dict(md_opts[phase], **save_opts), verbose=True)
         self.callgmx("grompp -maxwarn 1 -c %s-eq.gro -p %s.top -f %s-md.mdp -o %s-md.tpr" % (phase, phase, phase, phase))
-        self.callgmx("mdrun -v -deffnm %s-md" % phase)
+        self.callgmx("mdrun -v -deffnm %s-md -nt %i" % (phase, args.nt))
         # After production, run analysis.
         self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (phase, phase, phase), stdin="System\n")
         # Figure out which energy terms need to be printed.
@@ -403,7 +404,7 @@ class Gromacs_MD(MDEngine):
         if in_fd(): verbose=False
         edit_mdp("%s.mdp" % phase, "%s-shot.mdp" % phase, shot_opts[phase], verbose=verbose)
         self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-shot.mdp -o %s-shot.tpr" % (phase, phase, phase, phase), print_command=verbose)
-        self.callgmx("mdrun -v -deffnm %s-shot -rerun %s-md.trr -rerunvsite" % (phase, phase), print_command=verbose)
+        self.callgmx("mdrun -v -deffnm %s-shot -rerun %s-md.trr -rerunvsite -nt %i" % (phase, phase, args.nt), print_command=verbose)
         # Get potential energies.
         self.callgmx("g_energy -f %s-shot.edr -o %s-shot-energy.xvg -xvg no" % (phase, phase), stdin="Potential\n", print_command=verbose)
         E = [float(line.split()[1]) for line in open("%s-shot-energy.xvg" % phase)]
