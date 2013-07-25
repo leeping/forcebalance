@@ -345,6 +345,8 @@ class Liquid_OpenMM(Liquid):
         if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
             self.traj = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
             print "Found collection of starting conformations, length %i!" % len(self.traj)
+        # Prefix to command string for launching NPT simulations.
+        self.nptpfx = "bash runcuda.sh"
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """

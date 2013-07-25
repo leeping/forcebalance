@@ -119,6 +119,8 @@ class Liquid(Target):
         self.SavedTraj = defaultdict(dict)
         ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
+        ## Prefix for command to run condensed phase simulations.
+        self.nptpfx = ""
 
     def read_data(self):
         # Read the 'data.csv' file. The file should contain guidelines.
