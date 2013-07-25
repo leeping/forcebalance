@@ -9,6 +9,7 @@ import os
 import shutil
 from forcebalance.finite_difference import *
 from forcebalance.nifty import *
+from forcebalance.nifty import _exec
 from forcebalance.target import Target
 import numpy as np
 from forcebalance.molecule import Molecule
@@ -122,14 +123,14 @@ class Liquid(Target):
         ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
         # Prefix to command string for launching NPT simulations.
-        self.nptpfx == ""
+        self.nptpfx = ""
         # Suffix to command string for launching NPT simulations.
-        self.nptsfx == [("--minimize_energy" if self.minimize_energy else None), 
-                        ("--liquid_equ_steps %i" if self.liquid_equ_steps >= 0 else None)
-                        ("--gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps >= 0 else None), 
-                        ("--gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else None), 
-                        ("--gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else None), 
-                        ("--gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
+        self.nptsfx = [("--minimize_energy" if self.minimize_energy else None), 
+                       ("--liquid_equ_steps %i" % self.liquid_equ_steps if self.liquid_equ_steps > 0 else None),
+                       ("--gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else None), 
+                       ("--gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else None), 
+                       ("--gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else None), 
+                       ("--gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
 
     def read_data(self):
         # Read the 'data.csv' file. The file should contain guidelines.
@@ -226,13 +227,12 @@ class Liquid(Target):
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            if self.traj != None:
-                self.liquid_conf.xyzs[0] = self.traj.xyzs[simnum%len(self.traj)]
-                self.liquid_conf.boxes[0] = self.traj.boxes[simnum%len(self.traj)]
+            if self.liquid_traj != None:
+                self.liquid_conf.xyzs[0] = self.liquid_traj.xyzs[simnum%len(self.liquid_traj)]
+                self.liquid_conf.boxes[0] = self.liquid_traj.boxes[simnum%len(self.liquid_traj)]
             self.liquid_conf.write(self.liquid_fnm)
-            cmdstr = '%s python npt.py %s %i %.3f %.3f %.3f %.3f %s' % (self.nptpfx, self.liquid_prod_steps, self.liquid_timestep,
-                                                                        self.liquid_interval, temperature, pressure, 
-                                                                        ' '.join([i for i in self.nptsfx if i != None]))
+            cmdstr = '%s python npt.py %s %i %.3f %.3f %.3f %.3f %s' % (self.nptpfx, self.engine, self.liquid_prod_steps, self.liquid_timestep,
+                                                                        self.liquid_interval, temperature, pressure, ' '.join([i for i in self.nptsfx if i != None]))
             if wq == None:
                 print "Running condensed phase simulation locally."
                 print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()

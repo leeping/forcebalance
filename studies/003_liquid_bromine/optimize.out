@@ -72,7 +72,7 @@ Building charge constraints...
 #========================================================#
 fnms                      ['bro.itp'] 
 ----------------------------------------------------------
-Backing up: temp/LiquidBromine to: backups/LiquidBromine_13.tar.bz2
+Backing up: temp/LiquidBromine to: backups/LiquidBromine_16.tar.bz2
 #========================================================#
 #| [92m          Setup for target LiquidBromine :          [0m |#
 #========================================================#
@@ -95,6 +95,7 @@ gas_interval              0.1
 minimize_energy           1 
 self_pol_mu0              0.0 
 self_pol_alpha            0.0 
+anisotropic_box           0 
 rho_denom                 30.0 
 hvap_denom                0.3 
 alpha_denom               1.0 
@@ -133,8 +134,8 @@ err_tol                   1.0
 #========================================================#
 
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/temp/bromine-setup/forcebalance/temp/LiquidBromine/iter_0000/298.15K-1.0atm/npt.out in another terminal window
-Executing process: [92mpython npt.py gromacs 50000 2.000 0.100 298.150 1.000  --minimize_energy --liquid_equ_steps 10000 &> npt.out[0m Stdin: 
+You may tail -f /home/leeping/src/forcebalance/studies/003_liquid_bromine/temp/LiquidBromine/iter_0000/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92m python npt.py gromacs 50000 2.000 0.100 298.150 1.000 --minimize_energy --liquid_equ_steps 10000 --gas_prod_steps 200000 --gas_timestep 0.500000 --gas_interval 0.100000[0m Stdin: 
 MBAR Results for Phase Point (298.15, 1.0, 'atm'), Box, Contributions:
 [ 1.]
 InfoContent:  1001.00 snapshots (100.00 %)
@@ -146,73 +147,74 @@ Physical quantity H_vap uses denominator =  0.3000
 #| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm  3102.800     2880.417 +- 2.949   -222.383   1.00000  54.94888 
+      298.15      1.0 atm  3102.800     2882.952 +- 3.096   -219.848   1.00000  53.70333 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  54.949, Derivative:  [0m |#
+#| [92m  Density objective function:  53.703, Derivative:  [0m |#
 #========================================================#
-   0 [  5.4001e+02 ] : VDWS:opls_730
-   1 [ -3.5003e+02 ] : VDWT:opls_730
+   0 [  4.9283e+02 ] : VDWS:opls_730
+   1 [ -3.7573e+02 ] : VDWT:opls_730
 ----------------------------------------------------------
 #==========================================================================================#
 #| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    29.960       32.165 +- 0.207     2.205   1.00000  54.04157 
+      298.15      1.0 atm    29.960       32.081 +- 0.267     2.121   1.00000  49.96198 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m   H_vap objective function:  54.042, Derivative:   [0m |#
+#| [92m   H_vap objective function:  49.962, Derivative:   [0m |#
 #========================================================#
-   0 [  8.5631e+01 ] : VDWS:opls_730
-   1 [  1.8471e+03 ] : VDWT:opls_730
+   0 [  5.9607e+01 ] : VDWS:opls_730
+   1 [  1.7911e+03 ] : VDWT:opls_730
 ----------------------------------------------------------
 #====================================================================#
 #| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                           54.94888    0.500    2.74744e+01 
-Enthalpy of Vaporization          54.04157    0.500    2.70208e+01 
-Total                                                  5.44952e+01 
+Density                           53.70333    0.500    2.68517e+01 
+Enthalpy of Vaporization          49.96198    0.500    2.49810e+01 
+Total                                                  5.18327e+01 
 ----------------------------------------------------------------------
 #====================================================================#
 #| [94m                  Objective Function Breakdown                  [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
 #====================================================================#
-LiquidBromine                 54.49522      1.000 [94m     5.44952e+01[0m 
+LiquidBromine                 51.83266      1.000 [94m     5.18327e+01[0m 
 Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
-Total                                             [94m     5.44952e+01[0m 
+Total                                             [94m     5.18327e+01[0m 
 ----------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     0   0.000e+00   0.000e+00   8.113e+02[1m   5.44952e+01[0m   0.000e+00      0.000
+     0   0.000e+00   0.000e+00   7.597e+02[1m   5.18327e+01[0m   0.000e+00      0.000
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [  3.12819655e+02 ] : VDWS:opls_730
-   1 [  7.48528171e+02 ] : VDWT:opls_730
+   0 [  2.76218453e+02 ] : VDWS:opls_730
+   1 [  7.07676950e+02 ] : VDWT:opls_730
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 1.36265082e+03 -1.28279607e+02
--1.28279607e+02  1.63422780e+04
+ 1.15044240e+03 -3.27799863e+02
+-3.27799863e+02  1.67112870e+04
 ----------------------------------------------------------
 
+Levenberg-Marquardt: Newton-Raphson step found (length 2.500e-01),  37.36691998 added to Hessian diagonal
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
-   0 [  0.0000e+00 - 2.3405e-01 = -2.3405e-01 ] : VDWS:opls_730
-   1 [  0.0000e+00 - 4.7640e-02 = -4.7640e-02 ] : VDWT:opls_730
+   0 [  0.0000e+00 - 2.4553e-01 = -2.4553e-01 ] : VDWS:opls_730
+   1 [  0.0000e+00 - 4.7058e-02 = -4.7058e-02 ] : VDWT:opls_730
 ----------------------------------------------------------
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
-   0 [  3.6700e-01 - 1.2385e-02 =  3.5461e-01 ] : VDWS:opls_730
-   1 [  2.4665e+00 - 1.1810e-01 =  2.3484e+00 ] : VDWT:opls_730
+   0 [  3.6700e-01 - 1.2993e-02 =  3.5401e-01 ] : VDWS:opls_730
+   1 [  2.4665e+00 - 1.1665e-01 =  2.3498e+00 ] : VDWT:opls_730
 ----------------------------------------------------------
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/temp/bromine-setup/forcebalance/temp/LiquidBromine/iter_0001/298.15K-1.0atm/npt.out in another terminal window
-Executing process: [92mpython npt.py gromacs 50000 2.000 0.100 298.150 1.000  --minimize_energy --liquid_equ_steps 10000 &> npt.out[0m Stdin: 
+You may tail -f /home/leeping/src/forcebalance/studies/003_liquid_bromine/temp/LiquidBromine/iter_0001/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92m python npt.py gromacs 50000 2.000 0.100 298.150 1.000 --minimize_energy --liquid_equ_steps 10000 --gas_prod_steps 200000 --gas_timestep 0.500000 --gas_interval 0.100000[0m Stdin: 
 MBAR Results for Phase Point (298.15, 1.0, 'atm'), Box, Contributions:
 [ 1.]
 InfoContent:  1001.00 snapshots (100.00 %)
@@ -224,73 +226,73 @@ Physical quantity H_vap uses denominator =  0.3000
 #| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm  3102.800     3085.490 +- 3.542   -17.310   1.00000   0.33293 
+      298.15      1.0 atm  3102.800     3101.603 +- 12.948   -1.197   1.00000   0.00159 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  0.333, Derivative:   [0m |#
+#| [92m  Density objective function:  0.002, Derivative:   [0m |#
 #========================================================#
-   0 [  4.1406e+01 ] : VDWS:opls_730
-   1 [ -3.4367e+01 ] : VDWT:opls_730
+   0 [  2.5498e+00 ] : VDWS:opls_730
+   1 [ -2.6640e+00 ] : VDWT:opls_730
 ----------------------------------------------------------
 #==========================================================================================#
 #| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    29.960       29.710 +- 0.216    -0.250   1.00000   0.69647 
+      298.15      1.0 atm    29.960       29.598 +- 0.301    -0.362   1.00000   1.45711 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m   H_vap objective function:  0.696, Derivative:    [0m |#
+#| [92m   H_vap objective function:  1.457, Derivative:    [0m |#
 #========================================================#
-   0 [ -1.1924e+01 ] : VDWS:opls_730
-   1 [ -2.0740e+02 ] : VDWT:opls_730
+   0 [ -1.5367e+01 ] : VDWS:opls_730
+   1 [ -3.1807e+02 ] : VDWT:opls_730
 ----------------------------------------------------------
 #====================================================================#
 #| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                            0.33293    0.500    1.66464e-01 
-Enthalpy of Vaporization           0.69647    0.500    3.48236e-01 
-Total                                                  5.14699e-01 
+Density                            0.00159    0.500    7.95374e-04 
+Enthalpy of Vaporization           1.45711    0.500    7.28553e-01 
+Total                                                  7.29348e-01 
 ----------------------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-LiquidBromine                  0.51470      1.000 [92m     5.14699e-01[0m ( -5.398e+01 ) 
-Regularization                 0.05705      1.000 [91m     5.70499e-02[0m ( +5.705e-02 ) 
-Total                                             [92m     5.71749e-01[0m ( -5.392e+01 ) 
+LiquidBromine                  0.72935      1.000 [92m     7.29348e-01[0m ( -5.110e+01 ) 
+Regularization                 0.06250      1.000 [91m     6.25000e-02[0m ( +6.250e-02 ) 
+Total                                             [92m     7.91848e-01[0m ( -5.104e+01 ) 
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     1   2.389e-01   2.389e-01   1.218e+02[92m   5.71749e-01[0m   5.392e+01      0.991
+     1   2.500e-01   2.500e-01   1.606e+02[92m   7.91848e-01[0m   5.104e+01      0.987
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [  1.42731120e+01 ] : VDWS:opls_730
-   1 [ -1.20976782e+02 ] : VDWT:opls_730
+   0 [ -6.89990067e+00 ] : VDWS:opls_730
+   1 [ -1.60460524e+02 ] : VDWT:opls_730
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 1.34045455e+03 -1.80886034e+02
--1.80886034e+02  1.63285680e+04
+ 1.06430157e+03 -2.28885598e+02
+-2.28885598e+02  1.84749773e+04
 ----------------------------------------------------------
 
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
-   0 [ -2.3405e-01 - 9.6626e-03 = -2.4371e-01 ] : VDWS:opls_730
-   1 [ -4.7640e-02 + 7.3019e-03 = -4.0339e-02 ] : VDWT:opls_730
+   0 [ -2.4553e-01 + 8.3732e-03 = -2.3716e-01 ] : VDWS:opls_730
+   1 [ -4.7058e-02 + 8.7890e-03 = -3.8269e-02 ] : VDWT:opls_730
 ----------------------------------------------------------
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
-   0 [  3.5461e-01 - 5.1132e-04 =  3.5410e-01 ] : VDWS:opls_730
-   1 [  2.3484e+00 + 1.8101e-02 =  2.3665e+00 ] : VDWT:opls_730
+   0 [  3.5401e-01 + 4.4309e-04 =  3.5445e-01 ] : VDWS:opls_730
+   1 [  2.3498e+00 + 2.1787e-02 =  2.3716e+00 ] : VDWT:opls_730
 ----------------------------------------------------------
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/temp/bromine-setup/forcebalance/temp/LiquidBromine/iter_0002/298.15K-1.0atm/npt.out in another terminal window
-Executing process: [92mpython npt.py gromacs 50000 2.000 0.100 298.150 1.000  --minimize_energy --liquid_equ_steps 10000 &> npt.out[0m Stdin: 
+You may tail -f /home/leeping/src/forcebalance/studies/003_liquid_bromine/temp/LiquidBromine/iter_0002/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92m python npt.py gromacs 50000 2.000 0.100 298.150 1.000 --minimize_energy --liquid_equ_steps 10000 --gas_prod_steps 200000 --gas_timestep 0.500000 --gas_interval 0.100000[0m Stdin: 
 MBAR Results for Phase Point (298.15, 1.0, 'atm'), Box, Contributions:
 [ 1.]
 InfoContent:  1001.00 snapshots (100.00 %)
@@ -302,64 +304,65 @@ Physical quantity H_vap uses denominator =  0.3000
 #| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm  3102.800     3113.988 +- 3.268    11.188   1.00000   0.13909 
+      298.15      1.0 atm  3102.800     3103.184 +- 12.701    0.384   1.00000   0.00016 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  0.139, Derivative:   [0m |#
+#| [92m  Density objective function:  0.000, Derivative:   [0m |#
 #========================================================#
-   0 [ -2.9485e+01 ] : VDWS:opls_730
-   1 [  1.9427e+01 ] : VDWT:opls_730
+   0 [ -7.7860e-01 ] : VDWS:opls_730
+   1 [  7.3130e-01 ] : VDWT:opls_730
 ----------------------------------------------------------
 #==========================================================================================#
 #| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    29.960       30.069 +- 0.190     0.109   1.00000   0.13182 
+      298.15      1.0 atm    29.960       30.009 +- 0.298     0.049   1.00000   0.02638 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m   H_vap objective function:  0.132, Derivative:    [0m |#
+#| [92m   H_vap objective function:  0.026, Derivative:    [0m |#
 #========================================================#
-   0 [  4.6727e+00 ] : VDWS:opls_730
-   1 [  8.6069e+01 ] : VDWT:opls_730
+   0 [  2.5134e+00 ] : VDWS:opls_730
+   1 [  4.1028e+01 ] : VDWT:opls_730
 ----------------------------------------------------------
 #====================================================================#
 #| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                            0.13909    0.500    6.95446e-02 
-Enthalpy of Vaporization           0.13182    0.500    6.59081e-02 
-Total                                                  1.35453e-01 
+Density                            0.00016    0.500    8.17292e-05 
+Enthalpy of Vaporization           0.02638    0.500    1.31906e-02 
+Total                                                  1.32724e-02 
 ----------------------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-LiquidBromine                  0.13545      1.000 [92m     1.35453e-01[0m ( -3.792e-01 ) 
-Regularization                 0.06102      1.000 [91m     6.10239e-02[0m ( +3.974e-03 ) 
-Total                                             [92m     1.96477e-01[0m ( -3.753e-01 ) 
+LiquidBromine                  0.01327      1.000 [92m     1.32724e-02[0m ( -7.161e-01 ) 
+Regularization                 0.05771      1.000 [92m     5.77084e-02[0m ( -4.792e-03 ) 
+Total                                             [92m     7.09808e-02[0m ( -7.209e-01 ) 
 -------------------------------------------------------------------------------------
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     2   2.470e-01   1.211e-02   5.422e+01[92m   1.96477e-01[0m   3.753e-01      0.735
+     2   2.402e-01   1.214e-02   2.081e+01[92m   7.09808e-02[0m   7.209e-01      0.982
 
 Convergence criterion reached in step size (5.00e-02)
 @========================================================@
 @| [1;92m           Final objective function value           [0m |@
-@| [1;92m  Full:  1.964767e-01  Un-penalized:  1.354528e-01  [0m |@
+@| [1;92m  Full:  7.098078e-02  Un-penalized:  1.327236e-02  [0m |@
 @========================================================@
 #========================================================#
 #| [1;94m           Final optimization parameters:           [0m |#
 #| [1;94m           Paste to input file to restart           [0m |#
 #========================================================#
 read_mvals
-   0 [ -2.4371e-01 ] : VDWS:opls_730
-   1 [ -4.0339e-02 ] : VDWT:opls_730
+   0 [ -2.3716e-01 ] : VDWS:opls_730
+   1 [ -3.8269e-02 ] : VDWT:opls_730
 /read_mvals
 #========================================================#
 #| [1;94m             Final physical parameters:             [0m |#
 #========================================================#
-   0 [  3.5410e-01 ] : VDWS:opls_730
-   1 [  2.3665e+00 ] : VDWT:opls_730
+   0 [  3.5445e-01 ] : VDWS:opls_730
+   1 [  2.3716e+00 ] : VDWT:opls_730
 ----------------------------------------------------------
+Creating the directory /home/leeping/src/forcebalance/studies/003_liquid_bromine/result to print the force field
 
 The final force field has been printed to the 'result' directory.
 #========================================================#
