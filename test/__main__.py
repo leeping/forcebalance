@@ -86,8 +86,8 @@ def runHeadless(options):
     debugHandler = CleanFileHandler(logfile,'w')
     debugHandler.setLevel(logging.DEBUG)
     
-    logging.getLogger("test").addHandler(warningHandler)
-    logging.getLogger("test").addHandler(debugHandler)
+    logging.getLogger("forcebalance.test").addHandler(warningHandler)
+    logging.getLogger("forcebalance.test").addHandler(debugHandler)
 
     options['loglevel']=logging.DEBUG
     
@@ -147,7 +147,7 @@ def runHeadless(options):
     shutil.rmtree('/tmp/forcebalance')
 
 def run(options):
-    logging.getLogger("test").addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
+    logging.getLogger("forcebalance.test").addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
     runner=ForceBalanceTestRunner()
     runner.run(**options)
 
