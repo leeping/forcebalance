@@ -594,9 +594,9 @@ class Liquid_GMX(Liquid):
                 #     dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
                 #     print "Copying .dyn file: %s to %s" % (dynsrc, dyndest)
                 #     shutil.copy2(dynsrc,dyndest)
-                cmdstr = 'python npt.py gromacs %i %.3f %.3f %.3f %.3f %s --liquid_equ_steps %i &> npt.out' % \
+                cmdstr = 'python npt.py gromacs %i %.3f %.3f %.3f %.3f %s --liquid_equ_steps' % \
                     (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --minimize_energy" if self.minimize_energy else "", self.liquid_equ_steps)
-                _exec(cmdstr)
+                _exec(cmdstr, outfnm='npt.out')
                 # self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
             else:
                 # This part of the code has never been used before
