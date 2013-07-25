@@ -98,6 +98,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'self_pol_alpha',forceprint=True)
         # Set up the simulation object for self-polarization correction.
         self.do_self_pol = (self.self_pol_mu0 > 0.0 and self.self_pol_alpha > 0.0)
+        # Enable anisotropic periodic box
+        self.set_option(tgt_opts,'anisotropic_box',forceprint=True)
         
         #======================================#
         #     Variables which are set here     #
@@ -119,8 +121,15 @@ class Liquid(Target):
         self.SavedTraj = defaultdict(dict)
         ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
-        ## Prefix for command to run condensed phase simulations.
-        self.nptpfx = ""
+        # Prefix to command string for launching NPT simulations.
+        self.nptpfx == ""
+        # Suffix to command string for launching NPT simulations.
+        self.nptsfx == [("--minimize_energy" if self.minimize_energy else None), 
+                        ("--liquid_equ_steps %i" if self.liquid_equ_steps >= 0 else None)
+                        ("--gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps >= 0 else None), 
+                        ("--gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else None), 
+                        ("--gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else None), 
+                        ("--gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
 
     def read_data(self):
         # Read the 'data.csv' file. The file should contain guidelines.
@@ -211,6 +220,28 @@ class Liquid(Target):
                 self.set_option(global_opts,opt,default=default_denoms[opt])
             else:
                 self.set_option(global_opts,opt)
+
+    def npt_simulation(self, temperature, pressure, simnum):
+        """ Submit a NPT simulation to the Work Queue. """
+        wq = getWorkQueue()
+        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
+            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            if self.traj != None:
+                self.liquid_conf.xyzs[0] = self.traj.xyzs[simnum%len(self.traj)]
+                self.liquid_conf.boxes[0] = self.traj.boxes[simnum%len(self.traj)]
+            self.liquid_conf.write(self.liquid_fnm)
+            cmdstr = '%s python npt.py %s %i %.3f %.3f %.3f %.3f %s' % (self.nptpfx, self.liquid_prod_steps, self.liquid_timestep,
+                                                                        self.liquid_interval, temperature, pressure, 
+                                                                        ' '.join([i for i in self.nptsfx if i != None]))
+            if wq == None:
+                print "Running condensed phase simulation locally."
+                print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
+                _exec(cmdstr, outfnm='npt.out')
+            else:
+                queue_up(wq, command = cmdstr+' &> npt.out',
+                         input_files = ['runcuda.sh', 'npt.py', self.liquid_fnm, self.gas_fnm, 'forcebalance.p'],
+                         output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
+                         tgt=self)
 
     def indicate(self):
         # Somehow the "indicator" functionality made its way into "get".  No matter.

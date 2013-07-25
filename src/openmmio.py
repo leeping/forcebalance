@@ -322,8 +322,6 @@ class Liquid_OpenMM(Liquid):
         super(Liquid_OpenMM,self).__init__(options,tgt_opts,forcefield)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'force_cuda',forceprint=True)
-        # Enable anisotropic periodic box
-        self.set_option(tgt_opts,'anisotropic_box',forceprint=True)
         # Enable multiple timestep integrator
         self.set_option(tgt_opts,'mts_vvvr',forceprint=True)
         # Set up for polarization correction
@@ -340,22 +338,29 @@ class Liquid_OpenMM(Liquid):
             # Create the simulation object
             self.msim = Simulation(mod.topology, system, integrator, self.platform)
         # I shall enable starting simulations for many different initial conditions.
-        self.conf_pdb = Molecule(os.path.join(self.root, self.tgtdir,"liquid.pdb"))
-        self.traj = None
+        self.liquid_fnm = "liquid.pdb"
+        self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.pdb"))
+        self.liquid_traj = None
+        self.gas_fnm = "gas.pdb"
         if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
-            self.traj = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
-            print "Found collection of starting conformations, length %i!" % len(self.traj)
+            self.liquid_traj = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
+            print "Found collection of starting conformations, length %i!" % len(self.liquid_traj)
         # Prefix to command string for launching NPT simulations.
-        self.nptpfx = "bash runcuda.sh"
+        self.nptpfx += "bash runcuda.sh"
+        # Suffix to command string for launching NPT simulations.
+        self.nptsfx += [("--force_cuda" if self.force_cuda else None),
+                        ("--anisotropic" if self.anisotropic_box else None),
+                        ("--mts_vvvr" if self.mts_vvvr else None)]
+        # MD engine argument supplied to command string for launching NPT simulations.
+        self.engine = "openmm"
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        # LinkFile(os.path.join(self.root,self.tgtdir,"liquid.pdb"),os.path.join(abstempdir,"liquid.pdb"))
+        # The liquid.pdb file is not written here.
         LinkFile(os.path.join(self.root,self.tgtdir,"gas.pdb"),os.path.join(abstempdir,"gas.pdb"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
-        #LinkFile(os.path.join(self.root,self.tgtdir,"npt.py"),os.path.join(abstempdir,"npt.py"))
 
     def polarization_correction(self,mvals):
         self.FF.make(mvals)
@@ -375,49 +380,6 @@ class Liquid_OpenMM(Liquid):
         eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
         epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*np.pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
         return epol
-
-    def npt_simulation(self, temperature, pressure, simnum):
-        """ Submit a NPT simulation to the Work Queue. """
-        wq = getWorkQueue()
-        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
-            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            if self.traj != None:
-                self.conf_pdb.xyzs[0] = self.traj.xyzs[simnum%len(self.traj)]
-                self.conf_pdb.boxes[0] = self.traj.boxes[simnum%len(self.traj)]
-            self.conf_pdb.write('liquid.pdb')
-            if wq == None:
-                print "Running condensed phase simulation locally."
-                print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
-                cmdstr = 'bash runcuda.sh python npt.py openmm %i %.3f %.3f %.3f %.3f%s%s%s%s%s%s%s%s --liquid_equ_steps %i' % \
-                    (self.liquid_prod_steps, self.liquid_timestep, 
-                     self.liquid_interval, temperature, pressure, 
-                     " --force_cuda" if self.force_cuda else "", 
-                     " --anisotropic" if self.anisotropic_box else "", 
-                     " --mts_vvvr" if self.mts_vvvr else "", 
-                     " --minimize_energy" if self.minimize_energy else "", 
-                     " --gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else "", 
-                     " --gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else "", 
-                     " --gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else "", 
-                     " --gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else "", 
-                     self.liquid_equ_steps)
-                _exec(cmdstr, outfnm='npt.out')
-            else:
-                queue_up(wq,
-                         command = 'bash runcuda.sh python npt.py openmm %i %.3f %.3f %.3f %.3f%s%s%s%s%s%s%s%s --liquid_equ_steps %i &> npt.out' % \
-                             (self.liquid_prod_steps, self.liquid_timestep, 
-                              self.liquid_interval, temperature, pressure, 
-                              " --force_cuda" if self.force_cuda else "", 
-                              " --anisotropic" if self.anisotropic_box else "", 
-                              " --mts_vvvr" if self.mts_vvvr else "", 
-                              " --minimize_energy" if self.minimize_energy else "", 
-                              " --gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else "", 
-                              " --gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else "", 
-                              " --gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else "", 
-                              " --gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else "", 
-                              self.liquid_equ_steps),
-                         input_files = ['runcuda.sh', 'npt.py', 'liquid.pdb', 'gas.pdb', 'forcebalance.p'],
-                         output_files = ['npt_result.p.bz2', 'npt.out', self.FF.openmmxml],
-                         tgt=self)
 
 class AbInitio_OpenMM(AbInitio):
 

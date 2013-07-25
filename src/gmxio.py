@@ -552,8 +552,13 @@ class AbInitio_GMX(AbInitio):
 class Liquid_GMX(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_GMX,self).__init__(options,tgt_opts,forcefield)
-        # self.DynDict = OrderedDict()
-        # self.DynDict_New = OrderedDict()
+        self.liquid_fnm = "liquid.gro"
+        self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.gro"))
+        self.liquid_traj = None
+        self.gas_fnm = "gas.gro"
+        if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
+            self.liquid_traj = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
+            print "Found collection of starting conformations, length %i!" % len(self.liquid_traj)
         if self.do_self_pol:
             warn_press_key("Self-polarization correction not implemented yet when using GMX")
 
@@ -567,46 +572,12 @@ class Liquid_GMX(Liquid):
         if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
             warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
         # Link the necessary programs into the temporary directory
-        # LinkFile(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']),os.path.join(abstempdir,"mdrun"))
-        # LinkFile(os.path.join(options['gmxpath'],"grompp"+options['gmxsuffix']),os.path.join(abstempdir,"grompp"))
-        # LinkFile(os.path.join(options['gmxpath'],"g_energy"+options['gmxsuffix']),os.path.join(abstempdir,"g_energy"))
-        # LinkFile(os.path.join(options['gmxpath'],"g_traj"+options['gmxsuffix']),os.path.join(abstempdir,"g_traj"))
-        # LinkFile(os.path.join(options['gmxpath'],"trjconv"+options['gmxsuffix']),os.path.join(abstempdir,"trjconv"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
         # Link the run files
         for phase in ["liquid","gas"]:
             LinkFile(os.path.join(self.root,self.tgtdir,"%s.mdp" % phase),os.path.join(abstempdir,"%s.mdp" % phase))
             LinkFile(os.path.join(self.root,self.tgtdir,"%s.top" % phase),os.path.join(abstempdir,"%s.top" % phase))
             LinkFile(os.path.join(self.root,self.tgtdir,"%s.gro" % phase),os.path.join(abstempdir,"%s.gro" % phase))
-
-    def npt_simulation(self, temperature, pressure, simnum):
-        """ Submit a NPT simulation to the Work Queue. """
-        wq = getWorkQueue()
-        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
-            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            if wq == None:
-                print "Running condensed phase simulation locally."
-                print "You may tail -f %s/npt.out in another terminal window" % os.getcwd()
-                # if GoodStep() and (temperature, pressure) in self.DynDict_New:
-                #     self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
-                # if (temperature, pressure) in self.DynDict:
-                #     dynsrc = self.DynDict[(temperature, pressure)]
-                #     dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
-                #     print "Copying .dyn file: %s to %s" % (dynsrc, dyndest)
-                #     shutil.copy2(dynsrc,dyndest)
-                cmdstr = 'python npt.py gromacs %i %.3f %.3f %.3f %.3f %s --liquid_equ_steps' % \
-                    (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, " --minimize_energy" if self.minimize_energy else "", self.liquid_equ_steps)
-                _exec(cmdstr, outfnm='npt.out')
-                # self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
-            else:
-                # This part of the code has never been used before
-                # Still need to figure out where to specify GROMACS location on each cluster
-                # queue_up(wq,
-                #          command = 'python npt.py liquid.xyz %.3f %.3f &> npt.out' % (temperature, pressure),
-                #          input_files = ['liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt.py'],
-                #          output_files = ['npt_result.p.bz2', 'npt.py'] + self.FF.fnms,
-                #          tgt=self)
-                raise RuntimeError('Remote GROMACS execution is not yet enabled')
 
     def polarization_correction(self,mvals):
         # This needs to be implemented
