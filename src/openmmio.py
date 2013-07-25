@@ -347,6 +347,8 @@ class Liquid_OpenMM(Liquid):
             print "Found collection of starting conformations, length %i!" % len(self.liquid_traj)
         # Prefix to command string for launching NPT simulations.
         self.nptpfx += "bash runcuda.sh"
+        # List of extra files to upload to Work Queue.
+        self.nptfiles += ['runcuda.sh']
         # Suffix to command string for launching NPT simulations.
         self.nptsfx += [("--force_cuda" if self.force_cuda else None),
                         ("--anisotropic" if self.anisotropic_box else None),

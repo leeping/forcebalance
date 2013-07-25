@@ -124,6 +124,8 @@ class Liquid(Target):
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
         # Prefix to command string for launching NPT simulations.
         self.nptpfx = ""
+        # List of extra files to upload to Work Queue.
+        self.nptfiles = []
         # Suffix to command string for launching NPT simulations.
         self.nptsfx = [("--minimize_energy" if self.minimize_energy else None), 
                        ("--liquid_equ_steps %i" % self.liquid_equ_steps if self.liquid_equ_steps > 0 else None),
@@ -239,7 +241,7 @@ class Liquid(Target):
                 _exec(cmdstr, outfnm='npt.out')
             else:
                 queue_up(wq, command = cmdstr+' &> npt.out',
-                         input_files = ['runcuda.sh', 'npt.py', self.liquid_fnm, self.gas_fnm, 'forcebalance.p'],
+                         input_files = self.nptfiles + ['npt.py', self.liquid_fnm, self.gas_fnm, 'forcebalance.p'],
                          output_files = ['npt_result.p.bz2', 'npt.out'],
                          tgt=self)
 
