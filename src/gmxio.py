@@ -561,6 +561,10 @@ class Liquid_GMX(Liquid):
             print "Found collection of starting conformations, length %i!" % len(self.liquid_traj)
         if self.do_self_pol:
             warn_press_key("Self-polarization correction not implemented yet when using GMX")
+        # Command prefix.
+        self.nptpfx = 'sh rungmx.sh'
+        # List of extra files to upload to Work Queue.
+        self.nptfiles += ['rungmx.sh', 'liquid.top', 'liquid.mdp', 'gas.top', 'gas.mdp']
         # MD engine argument supplied to command string for launching NPT simulations.
         self.engine = "gromacs"
 
@@ -575,6 +579,7 @@ class Liquid_GMX(Liquid):
             warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
         # Link the necessary programs into the temporary directory
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
+        LinkFile(os.path.join(os.path.split(__file__)[0],"data","rungmx.sh"),os.path.join(abstempdir,"rungmx.sh"))
         # Link the run files
         for phase in ["liquid","gas"]:
             LinkFile(os.path.join(self.root,self.tgtdir,"%s.mdp" % phase),os.path.join(abstempdir,"%s.mdp" % phase))
