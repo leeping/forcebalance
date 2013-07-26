@@ -774,8 +774,12 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     persist = Continue execution even if the command gives a nonzero return code.
     """
     cmd_options={'shell':(type(command) is str), 'stdout':PIPE,'stdin':None, 'stderr':PIPE}
-    if logfnm: cmd_options['stdout'] = open(logfnm,'a+')
-    elif outfnm: cmd_options['stdout'] = open(outfnm,'w+')
+    if logfnm:
+        cmd_options['stdout'] = open(logfnm,'a+')
+        offset = os.path.getsize(logfnm)
+    elif outfnm:
+        cmd_options['stdout'] = open(outfnm,'w+')
+        offset = 0
     if stdin: cmd_options['stdin'] = PIPE
 
     if print_command:
@@ -809,7 +813,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         p = subprocess.Popen(command, **cmd_options)
         Output, Error = p.communicate(stdin)
         if type(cmd_options['stdout']) is file:
-            cmd_options['stdout'].seek(0)
+            cmd_options['stdout'].seek(offset)
             Output = cmd_options['stdout'].read()
 
     # if logfnm != None or outfnm != None:
