@@ -317,11 +317,17 @@ class Gromacs_MD(MDEngine):
         # Extract the quantities.
         # If running remotely, make sure GROMACS is in your PATH!
         # Arguments for running equilibration.
-        eq_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_equ_steps}, **self.opts["liquid"]),
-                   "gas" : dict({"integrator" : "md", "nsteps" : args.gas_equ_steps}, **self.opts["gas"])}
+        eq_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_equ_steps,
+                                    "ref_t" : args.temperature, "gen_temp" : args.temperature,
+                                    "ref_p" : args.pressure}, **self.opts["liquid"]),
+                   "gas" : dict({"integrator" : "md", "nsteps" : args.gas_equ_steps,
+                                 "ref_t" : args.temperature, "gen_temp" : args.temperature}, **self.opts["gas"])}
         # Arguments for running production.
-        md_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_prod_steps}, **self.opts["liquid"]),
-                   "gas" : dict({"integrator" : "md", "nsteps" : args.gas_prod_steps}, **self.opts["gas"])}
+        md_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_prod_steps,
+                                    "ref_t" : args.temperature, "gen_temp" : args.temperature,
+                                    "ref_p" : args.pressure}, **self.opts["liquid"]),
+                   "gas" : dict({"integrator" : "md", "nsteps" : args.gas_prod_steps,
+                                 "ref_t" : args.temperature, "gen_temp" : args.temperature}, **self.opts["gas"])}
         # Arguments for running minimization.
         min_opts = {"liquid" : dict({"integrator" : "steep", "emtol" : 10.0, "nsteps" : 10000}, **self.opts["liquid"]),
                     "gas" : dict({"integrator" : "steep", "emtol" : 10.0, "nsteps" : 10000}, **self.opts["gas"])}
