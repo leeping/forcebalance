@@ -13,18 +13,21 @@ class FFTests(object):
 
     def test_FF_yields_consistent_results(self):
         """Check whether multiple calls to FF yield the same result"""
+        self.logger.debug("\nChecking consistency of ForceField constructor\n")
         self.assertEqual(forcefield.FF(self.options),forcefield.FF(self.options),
-        msg = "\nGot two different forcefields despite using the same options")
+        msg = "\nGot two different forcefields despite using the same options as input")
 
     def test_make_function_return_value(self):
         """Check that make() return value meets expectation"""
         pvals = self.ff.pvals0
 
+        self.logger.debug("Running forcefield.make() with zero vector should not change pvals... ")
         new_pvals = np.array(self.ff.make(np.zeros(self.ff.np)))
         self.assertEqual(pvals.size,new_pvals.size)
         # given zero matrix, make should return unchanged pvals
         self.assertEqual(pvals,new_pvals,
         msg="\nmake() should produce unchanged pvals when given zero vector")
+        self.logger.debug("ok\n")
 
         new_pvals = np.array(self.ff.make(np.ones(self.ff.np)))
         self.assertEqual(pvals.size,new_pvals.size)
@@ -65,16 +68,20 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
     Override the setUp() to run tests on a different forcefield"""
     def setUp(self):
         # options used in 001_water_tutorial
+        self.logger.debug("Setting up options...\n")
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['water.itp']})
+        self.logger.debug(str(self.options) + '\n')
         os.chdir(self.options['root'])
+        self.logger.debug("Creating forcefield using above options... ")
         self.ff = forcefield.FF(self.options)
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
+        self.logger.debug("ok\n")
 
     def shortDescription(self):
         """Add XML to test descriptions
@@ -85,16 +92,21 @@ class TestXmlFF(ForceBalanceTestCase, FFTests):
     """Test FF class using dms.xml forcefield input"""
     def setUp(self):
         # options from 2013 tutorial
+        self.logger.debug("Setting up options...\n")
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['dms.xml']})
+        self.logger.debug(str(self.options) + '\n')
         os.chdir(self.options['root'])
+
+        self.logger.debug("Creating forcefield using above options... ")
         self.ff = forcefield.FF(self.options)
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
+        self.logger.debug("ok\n")
 
     def shortDescription(self):
         """Add XML to test descriptions
@@ -104,20 +116,25 @@ class TestXmlFF(ForceBalanceTestCase, FFTests):
 class TestGbsFF(ForceBalanceTestCase, FFTests):
     """Test FF class using gbs forcefield input"""
     def setUp(self):
-        # options from 2013 tutorial
+        self.logger.debug("Setting up options...\n")
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['cc-pvdz-overlap-original.gbs']})
+        self.logger.debug(str(self.options) + '\n')
         os.chdir(self.options['root'])
+
+        self.logger.debug("Creating forcefield using above options... ")
         self.ff = forcefield.FF(self.options)
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
+        self.logger.debug("ok\n")
 
     def test_find_spacings(self):
         """Check find_spacings function"""
+        self.logger.debug("Running forcefield.find_spacings()...\n")
         spacings = self.ff.find_spacings()
 
         self.assertGreaterEqual((self.ff.np)*(self.ff.np-1)/2,len(spacings.keys()))

@@ -24,42 +24,56 @@ class TestPDBMolecule(ForceBalanceTestCase):
 
     def test_xyz_conversion(self):
         """Check molecule conversion from pdb to xyz format"""
+        self.logger.debug("Creating xyz file from pdb... ")
         self.molecule.write(self.source[:-3] + 'xyz')
+        self.logger.debug("done\nTrying to read generated xyz file... ")
         try:
             molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + 'xyz', build_topology=False)
+            self.logger.debug("ok\n")
         except:
             self.fail("\nConversion to xyz format creates unreadable file")
 
+        self.logger.debug("Checking that conversion has not changed molecule spatial coordinates\n")
         self.assertEqual(self.molecule.Data['xyzs'][0],molecule1.Data['xyzs'][0],
         msg = "\nConversion from pdb to xyz yields different xyz coordinates\npdb:\n%s\n\ngro:\n%s\n" %\
         (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
 
     def test_gro_conversion(self):
         """Check molecule conversion from pdb to gro format"""
+        self.logger.debug("Creating gro file from pdb... ")
         self.molecule.write(self.source[:-3] + 'gro')
+        self.logger.debug("done\nTrying to read generated gro file... ")
         try:
             molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + 'gro', build_topology=False)
+            self.logger.debug("ok\n")
         except:
             self.fail("\nConversion to gro format creates unreadable file")
 
+        self.logger.debug("Checking that conversion has not changed number of residues\n")
         self.assertEqual(len(self.molecule.Data['resid']), len(molecule1.Data['resid']),
                         msg = "\nConversion from pdb to gro yields different number of residues")
 
+        self.logger.debug("Checking that conversion has not changed molecule spatial coordinates\n")
         self.assertEqual(self.molecule.Data['xyzs'][0],molecule1.Data['xyzs'][0],
         msg = "\nConversion from pdb to gro yields different xyz coordinates\npdb:\n%s\n\ngro:\n%s\n" %\
         (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
 
     def test_arc_conversion(self):
         """Check molecule conversion from pdb to arc format"""
+        self.logger.debug("Creating arc file from pdb... ")
         self.molecule.Data['tinkersuf']=['']*len(self.molecule.Data['resname'])  # suppress topology warning
         self.molecule.write(self.source[:-3] + 'arc')
+        self.logger.debug("done\nTrying to read generated gro file... ")
         try:
             molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + 'arc',build_topology=False)
+            self.logger.debug("ok\n")
         except:
             self.fail("\nConversion to arc (TINKER) format creates unreadable file")
 
+        self.logger.debug("Checking that conversion has not changed molecule spatial coordinates\n")
         self.assertEqual(len(self.molecule.Data['resid']), len(molecule1.Data['resid']),
                         msg = "\nConversion from pdb to arc (TINKER) yields different number of residues")
+
 
         self.assertEqual(self.molecule.Data['xyzs'][0],molecule1.Data['xyzs'][0],
         msg = "\nConversion from pdb to arc yields different xyz coordinates\npdb:\n%s\n\narc:\n%s\n" %\
@@ -67,8 +81,10 @@ class TestPDBMolecule(ForceBalanceTestCase):
 
     def test_pdb_topology_build(self):
         """Check reading pdb with build_topology=True"""
+        self.logger.debug("Trying to read molecule with topology... ")
         try:
             molecule = forcebalance.molecule.Molecule(self.source, build_topology=True)
+            self.logger.debug("done\nChecking molecule has correct number of residues\n")
         except:
             self.fail("\nFailed to load pdb with build_topology=True")
 

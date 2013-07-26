@@ -10,21 +10,25 @@ class TestNifty(ForceBalanceTestCase):
         """Check utility functions in forcebalance.nifty"""
 
         ##variable manipulation functions
+        self.logger.debug("Checking nifty.isint()\n")
         self.assertTrue(isint("1"))
         self.assertFalse(isint("1."))
         self.assertTrue(isint("-4"))
         self.assertFalse(isint("-3.14"))
 
+        self.logger.debug("Checking nifty.isfloat()\n")
         self.assertTrue(isfloat("1.5"))
         self.assertTrue(isfloat("1"))
         self.assertFalse(isfloat("a"))
 
+        self.logger.debug("Checking nifty.isdecimal()\n")
         self.assertTrue(isdecimal("1.0"))
         self.assertFalse(isdecimal("1"))
 
         for result in get_least_squares(([0]),[0]):
             self.assertFalse(result.any())
 
+        self.logger.debug("Verifying nifty.get_least_squares() results for some trivial cases\n")
         ##least squares function tests
         #   trivial fully determined
         X=((1,3,-2),(3,5,6),(2,4,3))
@@ -47,6 +51,7 @@ class TestNifty(ForceBalanceTestCase):
         self.assertAlmostEqual(result[0], 1./3.)
         self.assertAlmostEqual(result[1], -1./3.)
 
+        self.logger.debug("Verify nifty matrix manipulations perform as expected\n")
         ##matrix manipulations
         X=flat(X)
         self.assertEqual(X.shape, (6,))
@@ -55,6 +60,7 @@ class TestNifty(ForceBalanceTestCase):
         X=col(X)
         self.assertEqual(X.shape, (6,1))
 
+        self.logger.debug("Running some test processes using nifty._exec()\n")
         ##_exec
         self.assertEqual(type(_exec("")),list)
         self.assertEqual(_exec("echo test")[0],"test")
