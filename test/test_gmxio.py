@@ -17,9 +17,14 @@ class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests):
         self.tgt_opt.update({'type':'ABINITIO_GMX',
             'name':'cluster-02'})
 
-        self.ff = forcebalance.forcefield.FF(self.options)
+        try:
+            self.ff = forcebalance.forcefield.FF(self.options)
+        except:
+            self.skipTest("Unable to create forcefield from water.itp\n")
+
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
+        self.mvals = [.5]*self.ff.np
 
         self.target = forcebalance.gmxio.AbInitio_GMX(self.options, self.tgt_opt, self.ff)
         self.addCleanup(os.system, 'rm -rf temp')

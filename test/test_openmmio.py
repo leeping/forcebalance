@@ -9,7 +9,7 @@ import logging
 
 class TestLiquid_OpenMM(ForceBalanceTestCase, TargetTests):
     def setUp(self):
-        self.skipTest("Not Implemented")
+        self.skipTest("Needs optimizing to reduce runtime")
         TargetTests.setUp(self)
         # settings specific to this target
         self.options.update({
@@ -26,8 +26,10 @@ class TestLiquid_OpenMM(ForceBalanceTestCase, TargetTests):
 
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
+        self.mvals = [.5]*self.ff.np
 
         self.target = forcebalance.openmmio.Liquid_OpenMM(self.options, self.tgt_opt, self.ff)
+        self.target.stage(self.mvals)
         self.addCleanup(os.system, 'rm -rf temp')
 
     def shortDescription(self):
@@ -54,6 +56,7 @@ class TestInteraction_OpenMM(ForceBalanceTestCase, TargetTests):
 
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
+        self.mvals = [.5]*self.ff.np
 
         self.target = forcebalance.openmmio.Interaction_OpenMM(self.options, self.tgt_opt, self.ff)
         self.addCleanup(os.system, 'rm -rf temp')

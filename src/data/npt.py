@@ -834,7 +834,7 @@ def main():
     Engine = EngineDict[args.engine](FF)
 
     # This line runs the condensed phase simulation.
-    Rhos, Potentials, Kinetics, Volumes, Dips, EDA = Engine.run_simulation("liquid", minimize=True, savexyz=False)
+    Rhos, Potentials, Kinetics, Volumes, Dips, EDA = Engine.run_simulation("liquid", minimize=args.minimize_energy, savexyz=False)
 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -872,7 +872,7 @@ def main():
     nprod = m_nprod
 
     # Run the OpenMM simulation, gather information.
-    _, mPotentials, mKinetics, __, ___, mEDA = Engine.run_simulation("gas", minimize=True, savexyz=False)
+    _, mPotentials, mKinetics, __, ___, mEDA = Engine.run_simulation("gas", minimize=args.minimize_energe, savexyz=False)
     mEnergies = mPotentials + mKinetics
     mEne_avg, mEne_err = mean_stderr(mEnergies)
     if DoEDA: PrintEDA(mEDA, 1)
