@@ -378,6 +378,14 @@ class ITP_Reader(BaseReader):
                 # Add the multiplicity of the dihedrals to the interaction type.
                 self.itype += s[7]
         elif self.sec == 'dihedraltypes':
+            # LPW: This needs to be fixed, because some dihedraltypes lines only have 2 atom types.
+            # for i in range(len(s)):
+            #     if isint(s[i]):
+            #         nat = i
+            # atom = [s[i] for i in range(nat)]
+            # self.itype = fdict[self.sec][int(s[nat+1])]
+            # if self.itype in ['PDIHS', 'PIMPDIHS', 'FOURDIHS', 'PDIHMULS'] and len(s) > (nat+3):
+            #     self.itype += s[nat+3]
             atom = [s[0], s[1], s[2], s[3]]
             self.itype = fdict[self.sec][int(s[4])]
             if self.itype in ['PDIHS', 'PIMPDIHS', 'FOURDIHS', 'PDIHMULS'] and len(s) >= 7:
