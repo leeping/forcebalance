@@ -776,7 +776,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     cmd_options={'shell':(type(command) is str), 'stdout':PIPE,'stdin':None, 'stderr':PIPE}
     if logfnm: cmd_options['stdout'] = open(logfnm,'a+')
     elif outfnm: cmd_options['stdout'] = open(outfnm,'w+')
-    if stdin: cmd_options['stdout'] = PIPE
+    if stdin: cmd_options['stdin'] = PIPE
 
     if print_command:
         print "Executing process: \x1b[92m%-50s\x1b[0m%s%s" % (' '.join(command) if type(command) is list else command, 
