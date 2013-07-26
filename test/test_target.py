@@ -7,7 +7,7 @@ from __init__ import ForceBalanceTestCase
 
 class TargetTests(object):
     def setUp(self):
-        self.logger.debug("Building options for target...\n")
+        self.logger.debug("\nBuilding options for target...\n")
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
@@ -24,7 +24,7 @@ class TargetTests(object):
         self.logger.debug("objective =\n%s" % str(objective))
         
         # check objective dictionary keys
-        self.logger.debug(">ASSERT objective dictionary has X, G, H keys\n")
+        self.logger.debug("\n>ASSERT objective dictionary has X, G, H keys\n")
         self.assertEqual(dict,type(objective))
         self.assertTrue(objective.has_key('X'))
         self.assertTrue(objective.has_key('G'))
@@ -47,9 +47,9 @@ class TargetTests(object):
         self.assertEqual(objective['G'].ndim, 1)
         self.logger.debug(">ASSERT objective['H'] is two dimensional\n")
         self.assertEqual(objective['H'].ndim, 2)
-        self.logger.debug(">ASSERT objective['G'] is p x 1 array")
+        self.logger.debug(">ASSERT objective['G'] is p x 1 array\n")
         self.assertEqual(objective['G'].shape, (self.ff.np,))
-        self.logger.debug(">ASSERT objective['G'] is p x p array")
+        self.logger.debug(">ASSERT objective['G'] is p x p array\n")
         self.assertEqual(objective['H'].shape, (self.ff.np, self.ff.np))
 
         os.chdir('../..')
@@ -64,11 +64,11 @@ class TargetTests(object):
         objective = self.target.get(self.mvals, AGrad=True)
         X=objective['X']
         G=objective['G']
-        self.logger.debug(">ASSERT objective['G'] is not a zero vector")
+        self.logger.debug(">ASSERT objective['G'] is not a zero vector\n")
         self.assertTrue(G.any())    # with AGrad=True, G should not be [0]
         g=numpy.zeros(self.ff.np)
 
-        self.logger.debug(">ASSERT objective['G'] approximately matches finite difference calculations")
+        self.logger.debug(">ASSERT objective['G'] approximately matches finite difference calculations\n")
         for p in range(self.ff.np):
             mvals_lo = self.mvals[:]
             mvals_hi = self.mvals[:]
