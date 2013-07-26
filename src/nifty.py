@@ -799,28 +799,25 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             command = prestr + command + funstr
         if stdin == None:
             p = subprocess.Popen(command, shell=(type(command) is str))
-            p.communicate()
         else:
             p = subprocess.Popen(command, shell=(type(command) is str), stdin=PIPE)
-            p.communicate(stdin)
+        p.communicate(stdin)
         Output = ''.join(open('stdout.log').readlines())
         Error = ''.join(open('stderr.log').readlines())
     elif append_to_file or write_to_file:
         if stdin == None:
             p = subprocess.Popen(command, shell=(type(command) is str), stdout = f, stderr = PIPE)
-            _, Error = p.communicate()
         else:
             p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = f, stderr = PIPE)
-            _, Error = p.communicate(stdin)
+        _, Error = p.communicate(stdin)
         f.close()
         Output = open(f.name).read()
     else:
         if stdin == None:
             p = subprocess.Popen(command, shell=(type(command) is str), stdout = PIPE, stderr = PIPE)
-            Output, Error = p.communicate()
         else:
             p = subprocess.Popen(command, shell=(type(command) is str), stdin = PIPE, stdout = PIPE, stderr = PIPE)
-            Output, Error = p.communicate(stdin)
+        Output, Error = p.communicate(stdin)
     # if logfnm != None or outfnm != None:
     #     f.write(Output)
     #     f.close()
