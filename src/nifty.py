@@ -783,7 +783,8 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                                                                " Output: %s" % logfnm if logfnm != None else "", 
                                                                " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
         if type(cmd_options['stdout']) is file:
-            print >> cmd_options['stdout'], "Executing process: %s%s" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
+            cmd_options['stdout'].write("Executing process: %s%s\n" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else ""))
+            cmd_options['stdout'].flush()
     
     if print_to_screen:
         # Since Python can't simultaneously redirect stdout to a pipe
