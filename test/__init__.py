@@ -165,16 +165,16 @@ class ForceBalanceTestRunner(object):
 
         # create blank test suite and fill it with test suites loaded from each test module
         tests = unittest.TestSuite()
-        for module in test_modules:
-            try:
-                m=__import__(module)
-                module_tests=unittest.defaultTestLoader.loadTestsFromModule(m)
-                tests.addTest(module_tests)
-            except ImportError:
-                self.logger.error("No such test module: %s\n" % module)
-            except:
-                self.logger.critical("Error loading '%s'\n" % module)
-                print traceback.print_exc()
+        systemTests = unittest.TestSuite()
+        for suite in unittest.defaultTestLoader.discover('test'):
+            for module in suite:
+                for test in module:
+                    modName,caseName,testName = test.id().split('.')
+                    if modName in test_modules:
+                        if modName=="test_system": systemTests.addTest(test)
+                        else: tests.addTest(test)
+
+        tests.addTests(systemTests) # integration tests should be run after other tests
 
         result = ForceBalanceTestResult()
 
@@ -184,12 +184,8 @@ class ForceBalanceTestRunner(object):
 
         # if pretend option is enabled, skip all tests instead of running them
         if pretend:
-            for module in tests:
-                for test in module:
-                    try:
-                        result.addSkip(test)
-                    # addSkip will fail if run on TestSuite objects
-                    except AttributeError: continue
+            for test in tests:
+                result.addSkip(test)
 
         # otherwise do a normal test run
         else:
@@ -200,7 +196,7 @@ class ForceBalanceTestRunner(object):
             try:
                 tests.run(result)
             except:
-                self.logger.exception(msg="An unexpected exception occurred while running tests")
+                self.logger.exception(msg="An unexpected exception occurred while running tests\n")
 
             sys.stdout.close()
             sys.stdout = self.console

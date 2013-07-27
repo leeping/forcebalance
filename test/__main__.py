@@ -10,23 +10,31 @@ def getOptions():
     exclude = []
     options = {
         'loglevel' : logging.INFO,
-        'pretend':False
+        'pretend':False,
         }
     # handle options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "me:pvq", ["metatest","exclude=","pretend", "verbose", "quiet", "headless-config="])
+        opts, args = getopt.getopt(sys.argv[1:], "mepvq", ["metatest","exclude","pretend", "verbose", "quiet", "headless-config="])
 
+        # first parse module arguments which determine what modules to test
+        exclude = False
         if args:
-            options['test_modules']=['test_' + module for module in args]
+            for o, a in opts:
+                if o in ("-e","--exclude"): exclude = True
+            module_args=[]
+            for module in args:
+                module = module.split('.')
+                module_args.append('test_' + module[0])
+            if exclude:
+                options['test_modules']=[module[:-3] for module in sorted(os.listdir('test'))
+                                        if re.match("^test_.*\.py$",module)
+                                        and module[:-3] not in module_args]
+            else:
+                options['test_modules']=module_args
+
         for o, a in opts:
             if o in ("-m", "--metatest"):
                 options['test_modules']=['__test__']
-            elif o in ("-e", "--exclude"):
-                exclude=a.split(',')
-
-                options['test_modules']=[module[:-3] for module in sorted(os.listdir('test'))
-                                        if re.match("^test_.*\.py$",module)
-                                        and module[5:-3] not in exclude]
             if o in ("-p", "--pretend"):
                 options['pretend']=True
             if o in ("-v", "--verbose"):
@@ -39,18 +47,17 @@ def getOptions():
     except getopt.GetoptError as err:
         usage()
         sys.exit()
-    
     return options
 
 def usage():
     """Print information on running tests using this script"""
     print """ForceBalance Test Suite
 Usage: python test [OPTIONS] [MODULES]
+Test suite will load all tests for forcebalance modules provided as arguments.
 If no modules are specified, all test modules in test/ are run
 
 Valid options are:
--e, \t\t\tRun all tests except those for listed modules
---exclude=MODULE[,MODULE2[,...]]
+-e, --exclude\t\tRun all tests EXCEPT those listed
 -m, --metatest\t\tRun tests on testing framework
 -p, --pretend\t\tLoad tests but don't actually run them
 -v, --verbose\t\tSet log level to DEBUG, printing additional test information
