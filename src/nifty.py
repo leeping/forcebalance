@@ -816,18 +816,20 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             cmd_options['stdout'].seek(offset)
             Output = cmd_options['stdout'].read()
 
-    # if logfnm != None or outfnm != None:
-    #     f.write(Output)
-    #     f.close()
     if p.returncode != 0:
         print "Received an error message:"
-        print Error
+        sys.stderr.write("\n==== Error Message ====\n")
+        sys.stderr.write(Error)
+        sys.stderr.write("== End Error Message ==\n")
         if persist:
             print "%s gave a return code of %i (it may have crashed) -- carrying on" % (command, p.returncode)
         else:
-            raise Exception("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)" % (command, p.returncode))
+            # This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.
+            # sys.stderr.write("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
+            # sys.exit(p.returncode)
+            raise Exception("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
+        
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
-    # return [l + '\n' for l in Output.split('\n')]
     return Output.split('\n')
 
 def warn_press_key(warning):
