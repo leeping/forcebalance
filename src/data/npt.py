@@ -872,7 +872,7 @@ def main():
     nprod = m_nprod
 
     # Run the OpenMM simulation, gather information.
-    _, mPotentials, mKinetics, __, ___, mEDA = Engine.run_simulation("gas", minimize=args.minimize_energe, savexyz=False)
+    _, mPotentials, mKinetics, __, ___, mEDA = Engine.run_simulation("gas", minimize=args.minimize_energy, savexyz=False)
     mEnergies = mPotentials + mKinetics
     mEne_avg, mEne_err = mean_stderr(mEnergies)
     if DoEDA: PrintEDA(mEDA, 1)

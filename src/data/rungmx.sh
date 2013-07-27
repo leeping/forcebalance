@@ -8,6 +8,9 @@
 # Backup folder
 export BAK=$HOME/temp/rungmx-backups
 
+# Disable GROMACS backup files
+export GMX_MAXBACKUP=-1
+
 if [[ $HOSTNAME =~ "leeping" ]] ; then
     . /opt/intel/Compiler/11.1/072/bin/iccvars.sh intel64
     export PATH=/home/leeping/opt/gromacs-4.5.5/bin:$PATH
