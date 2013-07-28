@@ -298,17 +298,17 @@ class Gromacs_MD(MDEngine):
             else:
                 raise RuntimeError("Failed to discern location of Gromacs executables, make sure it's in your PATH")
         # Execute "grompp -h" to ensure that GROMACS can run properly.
-        _exec(os.path.join(self.gmxpath,'grompp -h'))
+        _exec(os.path.join(self.gmxpath,'grompp -h'), print_to_screen=True)
         # Global options for liquid and gas
         self.opts = {"liquid" : {"comm_mode" : "linear"},
                      "gas" : {"comm_mode" : "None", "nstcomm" : 0}}
 
-    def callgmx(self, command, stdin=None, print_to_screen=False, print_command=True):
+    def callgmx(self, command, stdin=None, print_to_screen=True, print_command=True, **kwargs):
         # Call a GROMACS program as you would from the command line.
         csplit = command.split()
         prog = os.path.join(self.gmxpath, csplit[0])
         csplit[0] = prog
-        return _exec(' '.join(csplit), print_to_screen=print_to_screen, print_command=print_command, stdin=stdin)
+        return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
    
     def run_simulation(self, phase, minimize=True, savexyz=True):
         # Edit the mdp file (trajectory save frequency, number of time steps).
@@ -318,15 +318,19 @@ class Gromacs_MD(MDEngine):
         # If running remotely, make sure GROMACS is in your PATH!
         # Arguments for running equilibration.
         eq_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_equ_steps,
+                                    "dt" : args.liquid_timestep / 1000,
                                     "ref_t" : args.temperature, "gen_temp" : args.temperature,
-                                    "ref_p" : args.pressure}, **self.opts["liquid"]),
+                                    "pcoupl" : "berendsen", "ref_p" : args.pressure}, **self.opts["liquid"]),
                    "gas" : dict({"integrator" : "md", "nsteps" : args.gas_equ_steps,
+                                 "dt" : args.gas_timestep / 1000,
                                  "ref_t" : args.temperature, "gen_temp" : args.temperature}, **self.opts["gas"])}
         # Arguments for running production.
         md_opts = {"liquid" : dict({"integrator" : "md", "nsteps" : args.liquid_prod_steps,
+                                    "dt" : args.liquid_timestep / 1000,
                                     "ref_t" : args.temperature, "gen_temp" : args.temperature,
-                                    "ref_p" : args.pressure}, **self.opts["liquid"]),
+                                    "pcoupl" : "parrinello-rahman", "ref_p" : args.pressure}, **self.opts["liquid"]),
                    "gas" : dict({"integrator" : "md", "nsteps" : args.gas_prod_steps,
+                                 "dt" : args.gas_timestep / 1000,
                                  "ref_t" : args.temperature, "gen_temp" : args.temperature}, **self.opts["gas"])}
         # Arguments for running minimization.
         min_opts = {"liquid" : dict({"integrator" : "steep", "emtol" : 10.0, "nsteps" : 10000}, **self.opts["liquid"]),
@@ -337,23 +341,23 @@ class Gromacs_MD(MDEngine):
         save_opts = {"nstxout" : nsteps, "nstenergy" : nsteps, "nstcalcenergy" : nsteps}
         # Minimize the energy.
         if minimize:
-            edit_mdp("%s.mdp" % phase, "%s-min.mdp" % phase, dict(min_opts[phase], **nosave_opts), verbose=True)
+            edit_mdp("%s.mdp" % phase, "%s-min.mdp" % phase, dict(min_opts[phase], **save_opts), verbose=True)
             self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (phase, phase, phase, phase))
             self.callgmx("mdrun -v -deffnm %s-min" % phase)
         # Run equilibration.
-        edit_mdp("%s.mdp" % phase, "%s-eq.mdp" % phase, dict(eq_opts[phase], **nosave_opts), verbose=True)
+        edit_mdp("%s.mdp" % phase, "%s-eq.mdp" % phase, dict(eq_opts[phase], **save_opts), verbose=True)
         self.callgmx("grompp -maxwarn 1 -c %s-min.gro -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (phase, phase, phase, phase))
-        self.callgmx("mdrun -v -deffnm %s-eq -nt %i" % (phase, args.nt))
+        self.callgmx("mdrun -v -deffnm %s-eq -nt %i -stepout %i" % (phase, args.nt, nsteps), expand_cr=True)
         if int(eq_opts[phase]["nsteps"]) == 0:
             shutil.copy2("%s-min.gro" % phase, "%s-eq.gro" % phase)
         # Run production.
         edit_mdp("%s.mdp" % phase, "%s-md.mdp" % phase, dict(md_opts[phase], **save_opts), verbose=True)
         self.callgmx("grompp -maxwarn 1 -c %s-eq.gro -p %s.top -f %s-md.mdp -o %s-md.tpr" % (phase, phase, phase, phase))
-        self.callgmx("mdrun -v -deffnm %s-md -nt %i" % (phase, args.nt))
+        self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (phase, args.nt, nsteps), outfnm="%s-md.out" % phase, copy_stderr=True, expand_cr=True)
         # After production, run analysis.
         self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (phase, phase, phase), stdin="System\n")
         # Figure out which energy terms need to be printed.
-        o = self.callgmx("g_energy -f %s-md.edr -xvg no 2>&1" % (phase), stdin="Total-Energy\n")
+        o = self.callgmx("g_energy -f %s-md.edr -xvg no" % (phase), stdin="Total-Energy\n", copy_stderr=True)
         parsemode = 0
         energyterms = OrderedDict()
         for line in o:
@@ -409,16 +413,16 @@ class Gromacs_MD(MDEngine):
         # Run over the snapshots.
         if in_fd(): verbose=False
         edit_mdp("%s.mdp" % phase, "%s-shot.mdp" % phase, shot_opts[phase], verbose=verbose)
-        self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-shot.mdp -o %s-shot.tpr" % (phase, phase, phase, phase), print_command=verbose)
-        self.callgmx("mdrun -v -deffnm %s-shot -rerun %s-md.trr -rerunvsite -nt %i" % (phase, phase, args.nt), print_command=verbose)
+        self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-shot.mdp -o %s-shot.tpr" % (phase, phase, phase, phase), print_command=verbose, print_to_screen=verbose)
+        self.callgmx("mdrun -v -deffnm %s-shot -rerun %s-md.trr -rerunvsite -nt %i" % (phase, phase, args.nt), print_command=verbose, print_to_screen=verbose)
         # Get potential energies.
-        self.callgmx("g_energy -f %s-shot.edr -o %s-shot-energy.xvg -xvg no" % (phase, phase), stdin="Potential\n", print_command=verbose)
+        self.callgmx("g_energy -f %s-shot.edr -o %s-shot-energy.xvg -xvg no" % (phase, phase), stdin="Potential\n", print_command=verbose, print_to_screen=verbose)
         E = [float(line.split()[1]) for line in open("%s-shot-energy.xvg" % phase)]
         print "\r",
         if verbose: print E
         if dipole:
             # Return a Nx4 array with energies in the first column and dipole in columns 2-4.
-            self.callgmx("g_dipoles -s %s-shot.tpr -f %s-md.trr -o %s-shot-dip.xvg -xvg no" % (phase, phase, phase), stdin="System\n", print_command=verbose)
+            self.callgmx("g_dipoles -s %s-shot.tpr -f %s-md.trr -o %s-shot-dip.xvg -xvg no" % (phase, phase, phase), stdin="System\n", print_command=verbose, print_to_screen=verbose)
             D = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-shot-dip.xvg" % phase)])
             for i in glob.glob("#*"): os.remove(i)
             return np.hstack((np.array(E).reshape(-1,1), np.array(D).reshape(-1,3)))
