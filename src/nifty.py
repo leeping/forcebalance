@@ -15,7 +15,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 """
 
 from select import select
-import os, sys, shutil
+import os, sys, shutil, select
 from re import match, sub
 import numpy as np
 import itertools
@@ -763,63 +763,77 @@ def which(fnm):
     except:
         return ''
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, persist = False):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stderr = False, persist = False, expand_cr=False):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
     outfnm (optional) = Name of the output file name (overwritten if exists)
-    logfnm (optional) = Name of the log file name (appended if exists), exclusive with outfnm
+    logfnm (optional) = Name of the log file name (appended if exists)
     stdin (optional) = A string to be passed to stdin, as if it were typed (use newline character to mimic Enter key)
     print_command = Whether to print the command.
+    copy_stderr = Whether to copy the stderr stream to the stdout stream; useful for GROMACS which prints out everything to stderr (argh.)
+    expand_cr = Whether to expand carriage returns into newlines (useful for GROMACS mdrun).
     persist = Continue execution even if the command gives a nonzero return code.
     """
-    cmd_options={'shell':(type(command) is str), 'stdout':PIPE,'stdin':None, 'stderr':PIPE}
-    if logfnm:
-        cmd_options['stdout'] = open(logfnm,'a+')
-        offset = os.path.getsize(logfnm)
-    elif outfnm:
-        cmd_options['stdout'] = open(outfnm,'w+')
-        offset = 0
+    # Dictionary of options to be passed to the Popen object.
+    cmd_options={'shell':(type(command) is str), 'stdin':None, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
+
+    # "write to file" : Function for writing some characters to the log and/or output files.
+    def wtf(out):
+        if logfnm != None: 
+            with open(logfnm,'a+') as f: 
+                f.write(out)
+                f.flush()
+        if outfnm != None: 
+            with open(outfnm,'w+' if wtf.first else 'a+') as f: 
+                f.write(out)
+                f.flush()
+        wtf.first = False
+    wtf.first = True
+
     if stdin: cmd_options['stdin'] = PIPE
 
     if print_command:
-        print "Executing process: \x1b[92m%-50s\x1b[0m%s%s" % (' '.join(command) if type(command) is list else command, 
-                                                               " Output: %s" % logfnm if logfnm != None else "", 
+        print "Executing process: \x1b[92m%-50s\x1b[0m%s%s%s" % (' '.join(command) if type(command) is list else command, 
+                                                               " Output: %s" % outfnm if outfnm != None else "", 
+                                                               " Append: %s" % logfnm if logfnm != None else "", 
                                                                " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
-        if type(cmd_options['stdout']) is file:
-            cmd_options['stdout'].write("Executing process: %s%s\n" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else ""))
-            cmd_options['stdout'].flush()
-    
-    if print_to_screen:
-        # Since Python can't simultaneously redirect stdout to a pipe
-        # and print stuff to screen in real time, we're going to use a 
-        # workaround with temporary files.
-        # NOTE: This doesn't catch the return code.
-        prestr = "set -o pipefail && "
-        funstr = " 2> stderr.log | tee stdout.log"
-        if type(command) is list:
-            command = prestr.split() + command + funstr.split()
-        else:
-            command = prestr + command + funstr
-        if stdin == None:
-            p = subprocess.Popen(command, shell=(type(command) is str))
-        else:
-            p = subprocess.Popen(command, shell=(type(command) is str), stdin=PIPE)
-        p.communicate(stdin)
-        Output = ''.join(open('stdout.log').readlines())
-        Error = ''.join(open('stderr.log').readlines())
+        wtf("Executing process: %s%s\n" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else ""))
 
-    else:
-        p = subprocess.Popen(command, **cmd_options)
-        Output, Error = p.communicate(stdin)
-        if type(cmd_options['stdout']) is file:
-            cmd_options['stdout'].seek(offset)
-            Output = cmd_options['stdout'].read()
+    p = subprocess.Popen(command, **cmd_options)
+    
+    stdout = ""
+    stderr = ""
+
+    if p.stdin:
+        p.stdin.write(stdin)
+        p.stdin.close()
+
+    while True:
+        reads = [p.stdout.fileno(), p.stderr.fileno()]
+        ret = select.select(reads, [], [])
+        for fd in ret[0]:
+            if fd == p.stdout.fileno():
+                read = p.stdout.readline()
+                if print_to_screen: sys.stdout.write(read)
+                stdout += read
+                wtf(read)
+            if fd == p.stderr.fileno():
+                read = p.stderr.readline()
+                if print_to_screen: sys.stderr.write(read)
+                stderr += read
+                if copy_stderr: 
+                    stdout += read
+                    wtf(read)
+        if not read:
+            break
+
+    p.wait()
 
     if p.returncode != 0:
         print "Received an error message:"
         sys.stderr.write("\n==== Error Message ====\n")
-        sys.stderr.write(Error)
+        sys.stderr.write(stderr)
         sys.stderr.write("== End Error Message ==\n")
         if persist:
             print "%s gave a return code of %i (it may have crashed) -- carrying on" % (command, p.returncode)
@@ -830,7 +844,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             raise Exception("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
         
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
-    return Output.split('\n')
+    return stdout.split('\n')
 
 def warn_press_key(warning):
     if type(warning) is str:
