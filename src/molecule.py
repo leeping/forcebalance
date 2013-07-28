@@ -1944,7 +1944,7 @@ class Molecule(object):
                 raise Exception('Calculation encountered a fatal error!')
             if XMode >= 1:
                 # Perfectionist here; matches integer, element, and three floating points
-                if re.match("^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+                if re.match("^[0-9]+ +[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
                     XMode = 2
                     sline = line.split()
                     elemThis.append(sline[1])
@@ -1982,6 +1982,9 @@ class Molecule(object):
                 conv.append(1)
                 energy_scf.append(Floats['energy_scfThis'][-1])
                 Floats['energy_scfThis'] = []
+            elif re.match(".*Including correction$".lower(), line.lower()):
+                energy_scf[-1] = Floats['energy_scfThis'][-1]
+                Floats['energy_scfThis'] = []
             elif re.match(".*Convergence failure$".lower(), line.lower()):
                 conv.append(0)
                 Floats['energy_scfThis'] = []
@@ -2008,12 +2011,13 @@ class Molecule(object):
         if len(Floats['mult']) == 0:
             Floats['mult'] = [0]
 
-        # Copy out the element and coordinate lists
-        Answer = {'elem':elem, 'xyzs':xyzs}
+        # Copy out the coordinate lists; Q-Chem output cannot be trusted to get the chemical elements
+        Answer = {'xyzs':xyzs}
         # Read the output file as an input file to get a Q-Chem template.
         Aux = self.read_qcin(fnm)
         Answer['qctemplate'] = Aux['qctemplate']
         Answer['qcrems'] = Aux['qcrems']
+        Answer['elem'] = Aux['elem']
         if 'qm_ghost' in Aux:
             Answer['qm_ghost'] = Aux['qm_ghost']
         # Copy out the charge and multiplicity
