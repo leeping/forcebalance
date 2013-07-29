@@ -155,8 +155,7 @@ class DetailViewer(tk.LabelFrame):
             self['text']+=" - %d Configured Targets" % len(self.currentObject)
         try:
             for object in self.currentObject:
-                printValues = object.display(self.printAll.get())
-                self.populate(printValues)
+                self.populate(object)
         except:
             self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject[0]['type'], self.currentObject[0]['name']), "error")
             from traceback import format_exc
@@ -164,8 +163,10 @@ class DetailViewer(tk.LabelFrame):
         
         self.content["state"]="disabled"
 
-    def populate(self, displayText):
+    def populate(self, object):
         """Populate the view with information in displayText argument"""
+        displayText = object.display(self.printAll.get())
+
         if type(displayText)==str:
             self.content.insert("end", displayText)
         if type(displayText)==tuple:
@@ -187,7 +188,7 @@ class DetailViewer(tk.LabelFrame):
                 self.content.insert("end", '\n')
 
                 # right click help popup
-                self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
+                self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = object, option=key))
 
             if self.printAll.get():
                 self.content.insert("end", "\n--- Default Values ---\n")
