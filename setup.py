@@ -60,7 +60,7 @@ def buildKeywordDictionary():
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
-    setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
+    setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar", "forcebalance.gui"]
     setupKeywords["package_dir"]       = {"forcebalance"         : "src",
                                           "forcebalance/pymbar"  : "ext/pymbar"
                                           }
