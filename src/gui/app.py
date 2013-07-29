@@ -28,6 +28,7 @@ class MainWindow(tk.Tk):
 
         filemenu.add_command(label="Open", command=self.open)
         filemenu.add_command(label="Save", state="disabled")
+        filemenu.add_command(label="Save As...",state="disabled")
         filemenu.add_command(label="Close", command=self.close)
         filemenu.add_command(label="Exit", command=sys.exit)
         self.menubar.add_cascade(label="File", menu=filemenu)
