@@ -117,7 +117,7 @@ class DetailViewer(tk.LabelFrame):
         self.content = tk.Text(self,cursor="arrow",state="disabled")
         self.content.tag_config("error", foreground="red")
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
-        self.helptext = tk.Text(self, width=70, height=3, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
+        self.helptext = tk.Text(self, width=70, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
 
         # bind scrollbar actions
         self.scrollbar.config(command = self.content.yview)
@@ -172,7 +172,9 @@ class DetailViewer(tk.LabelFrame):
                         self.content.window_create("end", window = frame)
                         self.content.insert("end", '\n')
 
+                        # right click help popup
                         self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
+
                     if self.printAll.get():
                         self.content.insert("end", "\n--- Default Values ---\n")
                         for key in printValues[1].keys():
@@ -214,9 +216,18 @@ class DetailViewer(tk.LabelFrame):
     def showHelp(self, e, object, option):
         self.helptext["state"]="normal"
         self.helptext.delete("1.0","end")
-        self.helptext.insert("end", object.getOptionHelp(option))
+
+        # get message and calculate how high window should be
+        helpmessage = object.getOptionHelp(option)
+        height=0
+        for line in object.getOptionHelp(option).splitlines():
+            height += 1 + len(line)/70
+
+        self.helptext.insert("end", helpmessage)
+        self.helptext['height']=height
         self.helptext.place(x=e.x, y=e.y_root-self.root.winfo_y())
         self.root.bind("<Motion>", lambda e : self.helptext.place_forget())
+        self.root.bind("<Button>", lambda e : self.helptext.place_forget())
 
 class ConsoleViewer(tk.LabelFrame):
     def __init__(self, root):
