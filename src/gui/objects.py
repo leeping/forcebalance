@@ -124,18 +124,13 @@ class TargetObject(ForceBalanceObject):
         self.properties.update(self.opts)
 
     def display(self, verbose=0):
-        s=''
-        default_keys=[]
+        options = dict()
+        default_options = dict()
         for key in self.opts.iterkeys():
             if not self.isDefault(key):
-                s+= "%s : %s\n" % (key, str(self.opts[key]))
-            else: default_keys.append(key)
-        if verbose:
-            s+= "\n--- default options ---\n"
-            for default_key in default_keys:
-                s+= "%s : %s\n" % (default_key, str(self.opts[default_key]))
-        
-        return s
+                options[key]=self.opts[key]
+            else: default_options[key]=self.opts[key]
+        return (options, default_options)
 
     def resetOption(self, option):
         try:
