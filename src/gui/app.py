@@ -37,8 +37,8 @@ class MainWindow(tk.Tk):
 
         calculationmenu = tk.Menu(self.menubar, tearoff=0)
         calculationmenu.add_command(label="Check", state="disabled")
-        calculationmenu.add_command(label="Run", state="disabled")
-        self.menubar.add_cascade(label="Calculation", menu=calculationmenu, state="disabled")
+        calculationmenu.add_command(label="Run", command=self.run)
+        self.menubar.add_cascade(label="Calculation", menu=calculationmenu)
 
     def open(self):
         filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
@@ -48,6 +48,11 @@ class MainWindow(tk.Tk):
     def close(self):
         self.objectsPane.clear()
         self.detailsPane.clear()
+
+    def run(self):
+        self.withdraw()
+        self.objectsPane.run()
+        self.deiconify()
 
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
