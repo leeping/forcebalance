@@ -1,0 +1,8 @@
+This folder contains files related to the ForceBalance GUI
+
+Contents:
+    app.py  -   Main GUI window
+    elements.py -   GUI elements that exist within the main window
+    objects.py  -   Lower level objects representing things in the forcebalance calculation
+                    These don't actually appear on screen but are read by things in elements.py
+    __main__.py -   Script to initiate GUI main loops
