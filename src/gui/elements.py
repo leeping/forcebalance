@@ -52,15 +52,17 @@ class ObjectViewer(tk.LabelFrame):
             self.content.insert("end",' ')
             l = tk.Label(self.content,text="General Options", bg="#DEE4FA")
             self.content.window_create("end",window = l)
-            l.bind('<Button-1>', _bindEventHandler(self.select, object = self.calculation['options']))
+            l.bind('<Button-1>', _bindEventHandler(self.select, object = [ self.calculation['options'] ]))
             self.content.insert("end",'\n')
                 
 
+            # Event handler to toggle whether targets list should be expanded
             def toggle(e):
                 self.calculation['_expand_targets'] = not self.calculation['_expand_targets']
                 self.needUpdate.get()
 
             targetLabel = tk.Label(self.content,text="Targets", bg="#FFFFFF")
+            targetLabel.bind('<Button-1>', _bindEventHandler(self.select, object = self.calculation['targets']))
             
             targetLabel.bind("<Double-Button-1>", toggle)
 
@@ -73,7 +75,7 @@ class ObjectViewer(tk.LabelFrame):
                     l=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
                     self.content.window_create("end", window = l)
                     self.content.insert("end",'\n')
-                    l.bind('<Button-1>', _bindEventHandler(self.select, object=target))
+                    l.bind('<Button-1>', _bindEventHandler(self.select, object=[ target ]))
             else:
                 self.content.insert("end",'+')
                 self.content.window_create("end", window = targetLabel)
@@ -82,7 +84,7 @@ class ObjectViewer(tk.LabelFrame):
             self.content.insert("end",' ')
             l=tk.Label(self.content, text="Forcefield", bg="#DEE4FA")
             self.content.window_create("end", window = l)
-            l.bind('<Button-1>', _bindEventHandler(self.select, object=self.calculation['forcefield']))
+            l.bind('<Button-1>', _bindEventHandler(self.select, object=[ self.calculation['forcefield'] ]))
             self.content.insert("end",'\n\n')
 
         self.content["state"]="disabled"
@@ -141,67 +143,74 @@ class DetailViewer(tk.LabelFrame):
     def load(self,newObject=None):
         if newObject:
             self.currentObject = newObject
-            self.printAll.set(0)
+            self.printAll.set(0)    # reset view to only show values changed from default
 
         self['text']="Details"
 
         self.content["state"]="normal"
         self.content.delete("1.0","end")
-        if self.currentObject:   # if there is an object to display
-            self['text']+=" - %s" % self.currentObject['name']
-
-            try:
-                printValues = self.currentObject.display(self.printAll.get())
-                if type(printValues)==str:
-                    self.content.insert("end", printValues)
-                if type(printValues)==tuple:
-                    for key in printValues[0].keys():
-                        frame = tk.Frame(self.content)
-                        frame.bindtags((key, "scrollable"))
-                        keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
-                        keylabel.bindtags((key, "scrollable"))
-                        separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
-                        separator.bindtags((key, "scrollable"))
-                        valuelabel = tk.Label(frame, text=printValues[0][key], bg="#FFFFFF", padx=0, pady=0)
-                        valuelabel.bindtags((key, "scrollable"))
-
-                        keylabel.pack(side=tk.LEFT)
-                        separator.pack(side=tk.LEFT)
-                        valuelabel.pack(side=tk.LEFT)
-
-                        self.content.window_create("end", window = frame)
-                        self.content.insert("end", '\n')
-
-                        # right click help popup
-                        self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
-
-                    if self.printAll.get():
-                        self.content.insert("end", "\n--- Default Values ---\n")
-                        for key in printValues[1].keys():
-                            frame = tk.Frame(self.content)
-                            frame.bindtags((key, "scrollable"))
-                            keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
-                            keylabel.bindtags((key, "scrollable"))
-                            separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
-                            separator.bindtags((key, "scrollable"))
-                            valuelabel = tk.Label(frame, text=str(printValues[1][key]), bg="#FFFFFF", padx=0, pady=0)
-                            valuelabel.bindtags((key, "scrollable"))
-
-                            keylabel.pack(side=tk.LEFT)
-                            separator.pack(side=tk.LEFT)
-                            valuelabel.pack(side=tk.LEFT)
-
-                            self.content.window_create("end", window = frame)
-                            self.content.insert("end", '\n')
-
-                            self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))                
-                    
-            except:
-                self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject['type'], self.currentObject['name']), "error")
-                from traceback import format_exc
-                self.content.insert("end", format_exc(), "error")
+        if self.currentObject and len(self.currentObject) ==1:   # if there is an object to display and it is not a collection
+            self['text']+=" - %s" % self.currentObject[0]['name']
+        else:
+            self['text']+=" - %d Configured Targets" % len(self.currentObject)
+        try:
+            for object in self.currentObject:
+                printValues = object.display(self.printAll.get())
+                self.populate(printValues)
+        except:
+            self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject[0]['type'], self.currentObject[0]['name']), "error")
+            from traceback import format_exc
+            self.content.insert("end", format_exc(), "error")
         
         self.content["state"]="disabled"
+
+    def populate(self, displayText):
+        """Populate the view with information in displayText argument"""
+        if type(displayText)==str:
+            self.content.insert("end", displayText)
+        if type(displayText)==tuple:
+            for key in displayText[0].keys():
+                frame = tk.Frame(self.content)
+                frame.bindtags((key, "scrollable"))
+                keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
+                keylabel.bindtags((key, "scrollable"))
+                separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
+                separator.bindtags((key, "scrollable"))
+                valuelabel = tk.Label(frame, text=displayText[0][key], bg="#FFFFFF", padx=0, pady=0)
+                valuelabel.bindtags((key, "scrollable"))
+
+                keylabel.pack(side=tk.LEFT)
+                separator.pack(side=tk.LEFT)
+                valuelabel.pack(side=tk.LEFT)
+
+                self.content.window_create("end", window = frame)
+                self.content.insert("end", '\n')
+
+                # right click help popup
+                self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
+
+            if self.printAll.get():
+                self.content.insert("end", "\n--- Default Values ---\n")
+                for key in displayText[1].keys():
+                    frame = tk.Frame(self.content)
+                    frame.bindtags((key, "scrollable"))
+                    keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
+                    keylabel.bindtags((key, "scrollable"))
+                    separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
+                    separator.bindtags((key, "scrollable"))
+                    valuelabel = tk.Label(frame, text=str(displayText[1][key]), bg="#FFFFFF", padx=0, pady=0)
+                    valuelabel.bindtags((key, "scrollable"))
+
+                    keylabel.pack(side=tk.LEFT)
+                    separator.pack(side=tk.LEFT)
+                    valuelabel.pack(side=tk.LEFT)
+
+                    self.content.window_create("end", window = frame)
+                    self.content.insert("end", '\n')
+
+                    self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
+
+        self.content.insert("end",'\n')
 
     def clear(self):
         self.currentObject=None
