@@ -42,16 +42,16 @@ class CalculationObject(ForceBalanceObject):
         cwd=os.getcwd()
         os.chdir(os.path.dirname(filename))
 
-        opts, tgt_opts = forcebalance.parser.parse_inputs(filename)
-        self.properties['options'] = OptionObject(opts, os.path.basename(filename))
+        self.opts, self.tgt_opts = forcebalance.parser.parse_inputs(filename)
+        self.properties['options'] = OptionObject(self.opts, os.path.basename(filename))
 
         self.properties['name'] = self.properties['options']['name']
 
-        for target in tgt_opts:
+        for target in self.tgt_opts:
             self.properties['targets'].append(TargetObject(target))
 
         if filename:
-            self.properties['forcefield'] = ForcefieldObject(opts)
+            self.properties['forcefield'] = ForcefieldObject(self.opts)
 
         os.chdir(cwd)
 
@@ -70,6 +70,27 @@ class CalculationObject(ForceBalanceObject):
                 for option in target.opts:
                     f.write("%s %s\n" % (option, target.opts[option]))
                 f.write("$end\n")
+
+    def display(self, verbose = False):
+        properties = {
+            'forcefield' : self.properties['forcefield'],
+            'input file' : self.properties['options']['name']}
+
+        for n, target in enumerate(self.properties['targets']):
+            properties.update({"target%d" % n : target['name']})
+
+        return properties
+
+    def run(self):
+        #options, tgt_opts = parse_inputs(input_file)
+        ## The force field component of the project
+        #forcefield  = FF(options)
+        ## The objective function
+        objective   = forcebalance.objective.Objective(self.opts, self.tgt_opts, self.properties['forcefield'].forcefield)
+        ## The optimizer component of the project
+        optimizer   = forcebalance.optimizer.Optimizer(self.opts, objective, self.properties['forcefield'].forcefield)
+        ## Actually run the optimizer.
+        optimizer.Run()
         
 
 # maybe the current implementation of TargetObject should be merged here

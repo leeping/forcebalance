@@ -40,6 +40,12 @@ class ObjectViewer(tk.LabelFrame):
         self.calculation = None
         self.update()
 
+    def run(self):
+        cwd = os.getcwd()
+        os.chdir(self.calculation['options'].opts['root'])
+        self.calculation.run()
+        os.chdir(cwd)
+
     def update(self, *args):
         self.content["state"]= "normal"
         self.content.delete("1.0","end")
@@ -47,7 +53,7 @@ class ObjectViewer(tk.LabelFrame):
 
         if self.calculation:
             self['text'] += " - " + self.calculation['options']['name']
-            self.content.bind('<Button-1>', _bindEventHandler(self.select, object = self.calculation))
+            self.content.bind('<Button-1>', _bindEventHandler(self.select, object = [ self.calculation ]))
             
             self.content.insert("end",' ')
             l = tk.Label(self.content,text="General Options", bg="#DEE4FA")
@@ -96,7 +102,11 @@ class ObjectViewer(tk.LabelFrame):
                 #widget['bg']='#DEE4FA'
         #e.widget['bg']='#4986D6'
         e.widget["relief"]="solid"
-        self.activeselection=object
+
+
+        if type(object) is not list: self.activeselection=[ object ]
+        else: self.activeselection=object
+
         self.selectionchanged.get() # reading this variable triggers a refresh
 
     def scrollUp(self, e):
@@ -169,6 +179,25 @@ class DetailViewer(tk.LabelFrame):
 
         if type(displayText)==str:
             self.content.insert("end", displayText)
+
+        if type(displayText)==dict:
+            for key in displayText.keys():
+                frame = tk.Frame(self.content)
+                frame.bindtags((key, "scrollable"))
+                keylabel = tk.Label(frame, text=key, bg="#FFFFFF", padx=0, pady=0)
+                keylabel.bindtags((key, "scrollable"))
+                separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
+                separator.bindtags((key, "scrollable"))
+                valuelabel = tk.Label(frame, text= str(displayText[key]), bg="#FFFFFF", padx=0, pady=0)
+                valuelabel.bindtags((key, "scrollable"))
+
+                keylabel.pack(side=tk.LEFT)
+                separator.pack(side=tk.LEFT)
+                valuelabel.pack(side=tk.LEFT)
+
+                self.content.window_create("end", window = frame)
+                self.content.insert("end", '\n')
+
         if type(displayText)==tuple:
             for key in displayText[0].keys():
                 frame = tk.Frame(self.content)
@@ -177,7 +206,7 @@ class DetailViewer(tk.LabelFrame):
                 keylabel.bindtags((key, "scrollable"))
                 separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
                 separator.bindtags((key, "scrollable"))
-                valuelabel = tk.Label(frame, text=displayText[0][key], bg="#FFFFFF", padx=0, pady=0)
+                valuelabel = tk.Label(frame, text= str(displayText[0][key]), bg="#FFFFFF", padx=0, pady=0)
                 valuelabel.bindtags((key, "scrollable"))
 
                 keylabel.pack(side=tk.LEFT)
@@ -199,7 +228,7 @@ class DetailViewer(tk.LabelFrame):
                     keylabel.bindtags((key, "scrollable"))
                     separator = tk.Label(frame, text=" : ", bg="#FFFFFF", padx=0, pady=0)
                     separator.bindtags((key, "scrollable"))
-                    valuelabel = tk.Label(frame, text=str(displayText[1][key]), bg="#FFFFFF", padx=0, pady=0)
+                    valuelabel = tk.Label(frame, text= str(displayText[1][key]), bg="#FFFFFF", padx=0, pady=0)
                     valuelabel.bindtags((key, "scrollable"))
 
                     keylabel.pack(side=tk.LEFT)
@@ -209,7 +238,7 @@ class DetailViewer(tk.LabelFrame):
                     self.content.window_create("end", window = frame)
                     self.content.insert("end", '\n')
 
-                    self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = self.currentObject, option=key))
+                    self.root.bind_class(key, "<Button-3>", _bindEventHandler(self.showHelp, object = object, option=key))
 
         self.content.insert("end",'\n')
 
@@ -227,7 +256,7 @@ class DetailViewer(tk.LabelFrame):
         self.helptext["state"]="normal"
         self.helptext.delete("1.0","end")
 
-        # get message and calculate how high window should be
+        # get message and calculate how high window should be 
         helpmessage = object.getOptionHelp(option)
         height=0
         for line in object.getOptionHelp(option).splitlines():
