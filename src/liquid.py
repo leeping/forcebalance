@@ -336,7 +336,7 @@ class Liquid(Target):
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == 0 and self.manual:
-            warn_press_key("Now's our chance to fill the temp directory up with data!")
+            warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=120)
 
         # Set up and run the NPT simulations.
         snum = 0

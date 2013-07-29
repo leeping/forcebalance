@@ -15,7 +15,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 """
 
 from select import select
-import os, sys, shutil, select
+import os, sys, shutil
 from re import match, sub
 import numpy as np
 import itertools
@@ -811,7 +811,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
 
     while True:
         reads = [p.stdout.fileno(), p.stderr.fileno()]
-        ret = select.select(reads, [], [])
+        ret = select(reads, [], [])
         for fd in ret[0]:
             if fd == p.stdout.fileno():
                 read = p.stdout.readline()
@@ -846,7 +846,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
     return stdout.split('\n')
 
-def warn_press_key(warning):
+def warn_press_key(warning, timeout=10):
     if type(warning) is str:
         print warning
     elif type(warning) is list:
@@ -855,8 +855,6 @@ def warn_press_key(warning):
     else:
         print "You're not supposed to pass me a variable of this type:", type(warning)
     if sys.stdin.isatty():
-        # Timeout after 10 seconds.
-        timeout = 10
         print "\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m" % timeout
         try: rlist, wlist, xlist = select([sys.stdin], [], [], timeout)
         except: pass
