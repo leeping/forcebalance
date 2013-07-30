@@ -5,4 +5,14 @@ Contents:
     elements.py -   GUI elements that exist within the main window
     objects.py  -   Lower level objects representing things in the forcebalance calculation
                     These don't actually appear on screen but are read by things in elements.py
-    __main__.py -   Script to initiate GUI main loops
+    __main__.py -   Script to initiate GUI main event loop
+                    (currently also opens a study automatically to streamline testing)
+
+Basic usage:
+You can call the GUI implementation directly from the command line using
+python -m forcebalance.gui
+
+TODO:
+Allow editing of calculation options, targets, etc
+Document code to make it more understandable
+Add interactive console to allow running python commands in the forcebalance environment.
