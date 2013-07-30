@@ -27,8 +27,8 @@ import time, datetime
 import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
+import forcebalance
 # import IPython as ip # For debugging
-from forcebalance import logging
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -539,27 +539,19 @@ try:
 except:
     print "Work Queue library import fail (You can't queue up jobs using Work Queue)"
 
-# Global variable corresponding to the Work Queue object
-WORK_QUEUE = None
-
-# Global variable containing a mapping from target names to Work Queue task IDs
-WQIDS = defaultdict(list)
 
 def getWorkQueue():
-    global WORK_QUEUE
-    return WORK_QUEUE
+    return forcebalance.WORK_QUEUE
 
 def getWQIds():
-    global WQIDS
-    return WQIDS
+    return forcebalance.WQIDS
 
 def createWorkQueue(wq_port):
-    global WORK_QUEUE
     work_queue.set_debug_flag('all')
-    WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
-    WORK_QUEUE.specify_name('forcebalance')
-    WORK_QUEUE.specify_keepalive_timeout(8640000)
-    WORK_QUEUE.specify_keepalive_interval(8640000)
+    forcebalance.WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
+    forcebalance.WORK_QUEUE.specify_name('forcebalance')
+    forcebalance.WORK_QUEUE.specify_keepalive_timeout(8640000)
+    forcebalance.WORK_QUEUE.specify_keepalive_interval(8640000)
 
 def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
@@ -570,7 +562,6 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     @param[in] input_files (list of files) A list of locations of the input files.
     @param[in] output_files (list of files) A list of locations of the output files.
     """
-    global WQIDS
     task = work_queue.Task(command)
     cwd = os.getcwd()
     for f in input_files:
@@ -585,9 +576,9 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     if verbose:
         print "Submitting command '%s' to the Work Queue, taskid %i" % (command, taskid)
     if tgt != None:
-        WQIDS[tgt.name].append(taskid)
+        forcebalance.WQIDS[tgt.name].append(taskid)
     else:
-        WQIDS["None"].append(taskid)
+        forcebalance.WQIDS["None"].append(taskid)
     
 def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
@@ -601,7 +592,6 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     @param[in] output_files (list of 2-tuples) A list of local and
     remote locations of the output files.
     """
-    global WQIDS
     task = work_queue.Task(command)
     for f in input_files:
         # print f[0], f[1]
@@ -615,13 +605,12 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     if verbose:
         print "Submitting command '%s' to the Work Queue, taskid %i" % (command, taskid)
     if tgt != None:
-        WQIDS[tgt.name].append(taskid)
+        forcebalance.WQIDS[tgt.name].append(taskid)
     else:
-        WQIDS["None"].append(taskid)
+        forcebalance.WQIDS["None"].append(taskid)
 
 def wq_wait1(wq, wait_time=10, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
-    global WQIDS
     if verbose: print '---'
     for sec in range(wait_time):
         task = wq.wait(1)
@@ -639,13 +628,13 @@ def wq_wait1(wq, wait_time=10, verbose=False):
             if task.result != 0:
                 oldid = task.id
                 tgtname = "None"
-                for tnm in WQIDS:
-                    if task.id in WQIDS[tnm]:
+                for tnm in forcebalance.WQIDS:
+                    if task.id in forcebalance.WQIDS[tnm]:
                         tgtname = tnm
-                        WQIDS[tnm].remove(task.id)
+                        forcebalance.WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
                 print "Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i" % (task.command, oldid, task.hostname, exectime, taskid)
-                WQIDS[tgtname].append(taskid)
+                forcebalance.WQIDS[tgtname].append(taskid)
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
                     print "Command '%s' (task %i) finished successfully on host %s (%i seconds)" % (task.command, task.id, task.hostname, exectime)
@@ -872,32 +861,6 @@ def warn_once(warning, warnhash = None):
         for line in warning:
             print line
 warn_once.already = set()
-
-#=========================================#
-#| Logging Handlers                      |#
-#=========================================#
-
-class RawStreamHandler(logging.StreamHandler):
-    """Exactly like logging.StreamHandler except it does no extra formatting
-    before sending logging messages to the stream. This is more compatible with
-    how output has been displayed in ForceBalance. Default stream has also been
-    changed from stderr to stdout"""
-    def __init__(self, stream = sys.stdout):
-        super(RawStreamHandler, self).__init__(stream)
-    
-    def emit(self, record):
-        message = record.getMessage()
-        self.stream.write(message)
-        self.flush()
-
-class RawFileHandler(logging.FileHandler):
-    """Exactly like logging.FileHandler except it does no extra formatting
-    before sending logging messages to the file. This is more compatible with
-    how output has been displayed in ForceBalance."""
-    def emit(self, record):
-        message = record.getMessage()
-        self.stream.write(message)
-        self.flush()
 
 #=========================================#
 #| Development stuff (not commonly used) |#
