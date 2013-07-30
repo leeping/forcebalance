@@ -4,9 +4,8 @@ import traceback
 from collections import OrderedDict
 import numpy
 import forcebalance
-from forcebalance import logging
 
-logging.getLogger("forcebalance.test").propagate=False
+forcebalance.output.getLogger("forcebalance.test").propagate=False
 
 __all__ = [module[:-3] for module in sorted(os.listdir('test'))
            if re.match("^test_.*\.py$",module)]
@@ -21,7 +20,7 @@ class ForceBalanceTestCase(unittest.TestCase):
         self.addCleanup(os.chdir, os.getcwd())  # directory changes shouldn't persist between tests
         self.addTypeEqualityFunc(numpy.ndarray, self.assertNdArrayEqual)
 
-        self.logger = forcebalance.logging.getLogger('forcebalance.test.' + __name__[5:])
+        self.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
 
     def shortDescription(self):
         """Default shortDescription function returns None value if no description
@@ -67,7 +66,7 @@ class ForceBalanceTestResult(unittest.TestResult):
     def __init__(self):
         """Add logging capabilities to the standard TestResult implementation"""
         super(ForceBalanceTestResult,self).__init__()
-        self.logger = forcebalance.logging.getLogger('forcebalance.test.results')
+        self.logger = forcebalance.output.getLogger('forcebalance.test.results')
 
     def startTest(self, test):
         """Notify of test start by writing message to stderr, and also printing to stdout
@@ -148,7 +147,7 @@ class ForceBalanceTestRunner(object):
        It controls WHERE test results go but not what is recorded.
        Once the tests have finished running, it will return the test result
        in the standard unittest.TestResult format"""
-    def __init__(self, logger=forcebalance.logging.getLogger("forcebalance.test"), verbose = False):
+    def __init__(self, logger=forcebalance.output.getLogger("forcebalance.test"), verbose = False):
         self.logger = logger
         
     def check(self, test_modules=__all__):
@@ -170,7 +169,7 @@ class ForceBalanceTestRunner(object):
             test_modules=__all__,
             pretend=False,
             logfile='test/test.log',
-            loglevel=logging.INFO,
+            loglevel=forcebalance.output.INFO,
             **kwargs):
             
         self.check()

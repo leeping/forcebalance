@@ -1,6 +1,5 @@
 import unittest, os, sys, re, shutil, time
 import forcebalance
-from forcebalance import logging
 from __init__ import ForceBalanceTestRunner
 import getopt
 
@@ -9,7 +8,7 @@ def getOptions():
     # set some defaults
     exclude = []
     options = {
-        'loglevel' : logging.INFO,
+        'loglevel' : forcebalance.output.INFO,
         'pretend':False,
         }
     # handle options
@@ -38,9 +37,9 @@ def getOptions():
             if o in ("-p", "--pretend"):
                 options['pretend']=True
             if o in ("-v", "--verbose"):
-                options['loglevel']=logging.DEBUG
+                options['loglevel']=forcebalance.output.DEBUG
             elif o in ("-q", "--quiet"):
-                options['loglevel']=logging.WARNING
+                options['loglevel']=forcebalance.output.WARNING
             if o in ("--headless-config",):
                 options['headless_config'] = a
                 
@@ -77,7 +76,7 @@ def runHeadless(options):
 
     os.chdir(os.path.dirname(__file__) + "/..")
 
-    class CleanFileHandler(logging.FileHandler):
+    class CleanFileHandler(forcebalance.output.FileHandler):
         """File handler that does not write terminal escape codes to files, which
         makes it easier to do things like send a log via email"""
         def emit(self, record):
@@ -88,15 +87,15 @@ def runHeadless(options):
 
     os.mkdir('/tmp/forcebalance')
     warningHandler = CleanFileHandler('/tmp/forcebalance/test.err','w')
-    warningHandler.setLevel(logging.WARNING)
+    warningHandler.setLevel(forcebalance.output.WARNING)
     logfile = "/tmp/forcebalance/%s.log" % time.strftime('%m%d%y_%H%M%S')
     debugHandler = CleanFileHandler(logfile,'w')
-    debugHandler.setLevel(logging.DEBUG)
+    debugHandler.setLevel(forcebalance.output.DEBUG)
     
-    logging.getLogger("forcebalance.test").addHandler(warningHandler)
-    logging.getLogger("forcebalance.test").addHandler(debugHandler)
+    forcebalance.output.getLogger("forcebalance.test").addHandler(warningHandler)
+    forcebalance.output.getLogger("forcebalance.test").addHandler(debugHandler)
 
-    options['loglevel']=logging.DEBUG
+    options['loglevel']=forcebalance.output.DEBUG
     
     runner=ForceBalanceTestRunner()
     results=runner.run(**options)
@@ -154,7 +153,7 @@ def runHeadless(options):
     shutil.rmtree('/tmp/forcebalance')
 
 def run(options):
-    logging.getLogger("forcebalance.test").addHandler(forcebalance.nifty.RawStreamHandler(sys.stderr))
+    forcebalance.output.getLogger("forcebalance.test").addHandler(forcebalance.output.RawStreamHandler(sys.stderr))
     runner=ForceBalanceTestRunner()
     runner.run(**options)
 
