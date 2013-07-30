@@ -2,9 +2,11 @@ from __init__ import ForceBalanceTestCase
 import unittest
 import numpy
 import os
+import work_queue
 import forcebalance
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
+from collections import defaultdict
 
 class TestNifty(ForceBalanceTestCase):
     def test_nifty_functions(self):
@@ -86,6 +88,9 @@ class TestNifty(ForceBalanceTestCase):
         
         queue_up(wq, "echo work queue test > test.job", [], ["test.job"], tgt=None, verbose=False)
         self.assertEqual(wq.stats.tasks_waiting, 1, msg = "\nExpected queue to have a task waiting")
+        
+        forcebalance.WORK_QUEUE = None
+        forcebalance.WQIDS = defaultdict(list)
         
 if __name__ == '__main__':           
     unittest.main()
