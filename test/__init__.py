@@ -156,7 +156,12 @@ class ForceBalanceTestRunner(object):
         since the unittest loader is not very good at identifying syntax errors
         when discovering tests. Checking that test_modules are all importable
         produced better, more informative exceptions and lets you know when your
-        test modules have syntax errors"""        
+        test modules have syntax errors"""
+        
+        # if test suite is being running from within forcebalance module, append the forcebalance prefix
+        if __name__=="forcebalance.test.__init__":
+            test_modules = ["forcebalance.test." + test_module for test_module in test_modules]
+            
         for test_module in test_modules:
                 __import__(test_module)
 
