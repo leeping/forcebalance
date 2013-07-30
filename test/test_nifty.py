@@ -2,11 +2,12 @@ from __init__ import ForceBalanceTestCase
 import unittest
 import numpy
 import os
+import forcebalance
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 
 class TestNifty(ForceBalanceTestCase):
-    def runTest(self):
+    def test_nifty_functions(self):
         """Check utility functions in forcebalance.nifty"""
 
         ##variable manipulation functions
@@ -69,6 +70,22 @@ class TestNifty(ForceBalanceTestCase):
         _exec("rm .test")
         self.assertFalse(os.path.isfile(".test"))
         self.assertRaises(Exception, _exec, "exit 255")
-
+    
+    def test_work_queue_functions(self):
+        """Check work_queue functions behave as expected"""
+        self.logger.debug("Checking Work Queue is initialized to None...\n")
+        self.assertEqual(forcebalance.WORK_QUEUE, None,
+            msg="\nUnexpected initialization of WORK_QUEUE to %s" % str(forcebalance.WORK_QUEUE))
+        createWorkQueue(30000)
+        self.assertEqual(type(forcebalance.WORK_QUEUE), work_queue.WorkQueue,
+            msg="\nExpected WORK_QUEUE to be a WorkQueue object, but got a %s instead" % str(type(forcebalance.WORK_QUEUE)))
+            
+        wq = getWorkQueue()
+        self.assertEqual(type(wq), work_queue.WorkQueue,
+            msg="\nExpected getWorkQueue() to return a WorkQueue object, but got %s instead" % str(type(forcebalance.WORK_QUEUE)))
+        
+        queue_up(wq, "echo work queue test > test.job", [], ["test.job"], tgt=None, verbose=False)
+        self.assertEqual(wq.stats.tasks_waiting, 1, msg = "\nExpected queue to have a task waiting")
+        
 if __name__ == '__main__':           
     unittest.main()
