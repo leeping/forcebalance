@@ -79,13 +79,22 @@ class TestObjective(ForceBalanceTestCase):
                 'root': os.getcwd() + '/test/files',
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
-                'forcefield': ['cc-pvdz-overlap-original.gbs']})
+                'forcefield': ['water.itp']})
         os.chdir(self.options['root'])
+        
+        self.logger.debug(str(self.options))
 
-        self.tgt_opts = forcebalance.parser.tgt_opts_defaults.copy()
+        self.tgt_opts = [ forcebalance.parser.tgt_opts_defaults.copy() ]
+        self.tgt_opts[0].update({"type" : "ABINITIO_GMX", "name" : "cluster-06"})
+        self.ff = forcebalance.forcefield.FF(self.options)
+        
+        self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
 
-    def runTest(self):
-        pass
+    def test_target_terms(self):
+        self.objective.Target_Terms(numpy.array([.5]*self.ff.np))
+        
+    def test_indicate(self):
+        self.objective.Indicate()
 
 if __name__ == '__main__':           
     unittest.main()
