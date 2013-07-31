@@ -35,6 +35,7 @@ class CalculationObject(ForceBalanceObject):
         self.properties['options']=[]
         self.properties['targets']=[]
         self.properties['forcefield']=None
+        self.properties['result']=None
 
         self.properties['_expand']=True
         self.properties['_expand_targets']=True
@@ -92,6 +93,9 @@ class CalculationObject(ForceBalanceObject):
         ## Actually run the optimizer.
         optimizer.Run()
         
+        resultopts = self.opts.copy()
+        resultopts.update({"ffdir" : "result"})
+        self.properties['result'] = ForcefieldObject(resultopts)
 
 # maybe the current implementation of TargetObject should be merged here
 # to keep all options in the same place?
