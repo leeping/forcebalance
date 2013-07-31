@@ -1,6 +1,7 @@
 import Tkinter as tk
 import tkFileDialog as tkfile
 import sys, os
+import threading
 
 import objects
 from eventhandlers import _bindEventHandler
@@ -43,8 +44,19 @@ class ObjectViewer(tk.LabelFrame):
     def run(self):
         cwd = os.getcwd()
         os.chdir(self.calculation['options'].opts['root'])
-        self.calculation.run()
+        
+        def debugrun():
+            try: self.calculation.run()
+            except:
+                import pdb
+                pdb.post_mortem()
+        
+        calculation_thread = threading.Thread(target=debugrun)
+        calculation_thread.start()
+        calculation_thread.join()
         os.chdir(cwd)
+        
+        self.update()
 
     def update(self, *args):
         self.content["state"]= "normal"
@@ -56,7 +68,7 @@ class ObjectViewer(tk.LabelFrame):
             self.content.bind('<Button-1>', _bindEventHandler(self.select, object = [ self.calculation ]))
             
             self.content.insert("end",' ')
-            l = tk.Label(self.content,text="General Options", bg="#DEE4FA")
+            l = tk.Label(self.content,text="General Options", bg="#FFFFFF")
             self.content.window_create("end",window = l)
             l.bind('<Button-1>', _bindEventHandler(self.select, object = [ self.calculation['options'] ]))
             self.content.insert("end",'\n')
@@ -78,7 +90,7 @@ class ObjectViewer(tk.LabelFrame):
                 self.content.insert("end",'\n')
                 for target in self.calculation['targets']:
                     self.content.insert("end",'   ')
-                    l=tk.Label(self.content, text=target['name'], bg="#DEE4FA")
+                    l=tk.Label(self.content, text=target['name'], bg="#FFFFFF")
                     self.content.window_create("end", window = l)
                     self.content.insert("end",'\n')
                     l.bind('<Button-1>', _bindEventHandler(self.select, object=[ target ]))
@@ -88,19 +100,23 @@ class ObjectViewer(tk.LabelFrame):
                 self.content.insert("end",'\n')
 
             self.content.insert("end",' ')
-            l=tk.Label(self.content, text="Forcefield", bg="#DEE4FA")
+            l=tk.Label(self.content, text="Forcefield", bg="#FFFFFF")
             self.content.window_create("end", window = l)
             l.bind('<Button-1>', _bindEventHandler(self.select, object=[ self.calculation['forcefield'] ]))
-            self.content.insert("end",'\n\n')
+            self.content.insert("end",'\n')
+            
+            if self.calculation["result"]:
+                self.content.insert("end",' ')
+                l=tk.Label(self.content, text="Result", bg="#FFFFFF")
+                self.content.window_create("end", window = l)
+                l.bind('<Button-1>', _bindEventHandler(self.select, object=[ self.calculation["result"] ]))
+                self.content.insert("end",'\n\n')
 
         self.content["state"]="disabled"
 
     def select(self, e, object):
         for widget in self.content.winfo_children():
-            if not widget['bg']=="#FFFFFF":
-                widget["relief"]=tk.FLAT
-                #widget['bg']='#DEE4FA'
-        #e.widget['bg']='#4986D6'
+            widget["relief"]=tk.FLAT
         e.widget["relief"]="solid"
 
 
@@ -159,10 +175,11 @@ class DetailViewer(tk.LabelFrame):
 
         self.content["state"]="normal"
         self.content.delete("1.0","end")
-        if self.currentObject and len(self.currentObject) ==1:   # if there is an object to display and it is not a collection
-            self['text']+=" - %s" % self.currentObject[0]['name']
-        else:
-            self['text']+=" - %d Configured Targets" % len(self.currentObject)
+        if self.currentObject:
+            if len(self.currentObject) ==1:   # if there is an object to display and it is not a collection
+                self['text']+=" - %s" % self.currentObject[0]['name']
+            else:
+                self['text']+=" - %d Configured Targets" % len(self.currentObject)
         try:
             for object in self.currentObject:
                 self.populate(object)
