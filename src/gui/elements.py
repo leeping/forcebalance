@@ -312,7 +312,7 @@ class ConsoleViewer(tk.LabelFrame):
         
         # processing of input
         input = re.sub("\r","\n", input)
-        input = re.sub("\x1b\[[0-9]{1,2};?[0-9]{,2}m", "", input)
+        input = re.sub("\x1b\[.?;?[0-9]{1,2};?[0-9]{,2}m", "", input)
         #input = re.split("(\x1b\[[0-9]{1,2};?[0-9]{,2}m)", input)
         
         self.console.insert(tk.END, input, color)
