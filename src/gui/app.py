@@ -8,15 +8,17 @@ class MainWindow(tk.Tk):
         tk.Tk.__init__(self)
 
         self.title("ForceBalance 1.1")
-        self._initialize_menu()
 
         ## Window Components
         self.objectsPane = elements.ObjectViewer(self)
         self.detailsPane = elements.DetailViewer(self)
-        #self.consolePane = elements.ConsoleViewer(self)
-        self.objectsPane.pack(side=tk.LEFT, fill=tk.Y)
-        self.detailsPane.pack(side=tk.LEFT, fill=tk.Y)
-        #self.consolePane.pack(side=tk.LEFT, fill=tk.Y)
+        self.consolePane = elements.ConsoleViewer(self)
+        sys.stdout = self.consolePane
+        self.objectsPane.grid(row=0, column=0)
+        self.detailsPane.grid(row=0, column=1)
+        self.consolePane.grid(row=1, columnspan=2, sticky=tk.W+tk.E+tk.N+tk.S)
+        
+        self._initialize_menu()
 
         # Application-wide event bindings
         self.objectsPane.selectionchanged.trace('r', self.updateDetailView)
@@ -37,22 +39,19 @@ class MainWindow(tk.Tk):
 
         calculationmenu = tk.Menu(self.menubar, tearoff=0)
         calculationmenu.add_command(label="Check", state="disabled")
-        calculationmenu.add_command(label="Run", command=self.run)
+        calculationmenu.add_command(label="Run", command=self.objectsPane.run)
         self.menubar.add_cascade(label="Calculation", menu=calculationmenu)
 
     def open(self):
         filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
         inputfile = tkfile.askopenfilename(title="Open ForceBalance input file...", filetypes=filters)
-        self.objectsPane.open(inputfile)
+        if inputfile:
+            self.consolePane.clear()
+            self.objectsPane.open(inputfile)
 
     def close(self):
         self.objectsPane.clear()
         self.detailsPane.clear()
-
-    def run(self):
-        self.withdraw()
-        self.objectsPane.run()
-        self.deiconify()
 
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
