@@ -1,12 +1,13 @@
 import Tkinter as tk
 import tkFileDialog as tkfile
-import sys, os
+import sys, os, re
 import threading
 
 import objects
 from eventhandlers import _bindEventHandler
 
 class ObjectViewer(tk.LabelFrame):
+    """Provides a general overview of the loaded calculation objects"""
     def __init__(self,root):
         tk.LabelFrame.__init__(self, root, text="Loaded Objects")
         self.root = root
@@ -18,7 +19,7 @@ class ObjectViewer(tk.LabelFrame):
         self.needUpdate=tk.BooleanVar()
         self.needUpdate.trace('r',self.update)
 
-        self.content = tk.Text(self, cursor="arrow", state="disabled", width="30")
+        self.content = tk.Text(self, cursor="arrow", state="disabled", width=30, height=20)
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
 
         # bind scrollbar actions
@@ -42,21 +43,19 @@ class ObjectViewer(tk.LabelFrame):
         self.update()
 
     def run(self):
-        cwd = os.getcwd()
-        os.chdir(self.calculation['options'].opts['root'])
-        
-        def debugrun():
+        def runthread():
+            cwd = os.getcwd()
+            os.chdir(self.calculation['options'].opts['root'])
             try: self.calculation.run()
             except:
-                import pdb
-                pdb.post_mortem()
+                print "An Error occurred"
+            self.update()
         
-        calculation_thread = threading.Thread(target=debugrun)
-        calculation_thread.start()
-        calculation_thread.join()
-        os.chdir(cwd)
-        
-        self.update()
+        if threading.active_count() < 2:
+            calculation_thread = threading.Thread(target=runthread)
+            calculation_thread.start()
+        else:
+            print "Calculation already running"
 
     def update(self, *args):
         self.content["state"]= "normal"
@@ -78,11 +77,11 @@ class ObjectViewer(tk.LabelFrame):
             def toggle(e):
                 self.calculation['_expand_targets'] = not self.calculation['_expand_targets']
                 self.needUpdate.get()
+                print "toggle!"
 
             targetLabel = tk.Label(self.content,text="Targets", bg="#FFFFFF")
+            targetLabel.bind("<Button-3>", toggle)
             targetLabel.bind('<Button-1>', _bindEventHandler(self.select, object = self.calculation['targets']))
-            
-            targetLabel.bind("<Double-Button-1>", toggle)
 
             if self.calculation['_expand_targets']:
                 self.content.insert("end",' ')
@@ -132,6 +131,8 @@ class ObjectViewer(tk.LabelFrame):
         self.content.yview('scroll', 2, 'units')
 
 class DetailViewer(tk.LabelFrame):
+    """Shows detailed properties of the currently selected object (as defined in
+    and ObjectViewer)"""
     def __init__(self, root, opts=''):
         # initialize variables
         self.root = root
@@ -142,7 +143,7 @@ class DetailViewer(tk.LabelFrame):
 
         # Viewer GUI elements
         tk.LabelFrame.__init__(self, root, text="Details")
-        self.content = tk.Text(self,cursor="arrow",state="disabled")
+        self.content = tk.Text(self,cursor="arrow",state="disabled", height=20)
         self.content.tag_config("error", foreground="red")
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.helptext = tk.Text(self, width=70, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
@@ -180,13 +181,14 @@ class DetailViewer(tk.LabelFrame):
                 self['text']+=" - %s" % self.currentObject[0]['name']
             else:
                 self['text']+=" - %d Configured Targets" % len(self.currentObject)
-        try:
-            for object in self.currentObject:
-                self.populate(object)
-        except:
-            self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject[0]['type'], self.currentObject[0]['name']), "error")
-            from traceback import format_exc
-            self.content.insert("end", format_exc(), "error")
+                
+            try:
+                for object in self.currentObject:
+                    self.populate(object)
+            except:
+                self.content.insert("end", "Error trying to display <%s %s>\n" % (self.currentObject[0]['type'], self.currentObject[0]['name']), "error")
+                from traceback import format_exc
+                self.content.insert("end", format_exc(), "error")
         
         self.content["state"]="disabled"
 
@@ -286,26 +288,41 @@ class DetailViewer(tk.LabelFrame):
         self.root.bind("<Button>", lambda e : self.helptext.place_forget())
 
 class ConsoleViewer(tk.LabelFrame):
+    """Tries to emulate a terminal by displaying standard output"""
     def __init__(self, root):
         tk.LabelFrame.__init__(self, root, text="Console")
         
-        self.console = tk.Text(self, state="disabled",cursor="arrow")
-        self.console.pack(fill=tk.Y)
+        self.console = tk.Text(self,
+                            state=tk.DISABLED,
+                            cursor="arrow",
+                            fg="#FFFFFF",
+                            bg="#000000",
+                            height=20)
+        self.console.pack(fill=tk.BOTH)
         self.stdout = sys.stdout
-        sys.stdout = self
 
+
+    ## we implement write and flush so the console viewer
+    #  can serve as a drop in replacement for sys.stdout
     def write(self, input):
-        self.console['state']="normal"
-        self.console.insert(tk.END, input)
-        self.stdout.write(input)
-        self.scrollDown()
-        self.console['state']="disabled"
+        color = "normal"
+        self.console.tag_config("red", foreground="red")
+        self.console.tag_config("green", foreground="red")
+        self.console['state']=tk.NORMAL
+        
+        # processing of input
+        input = re.sub("\r","\n", input)
+        input = re.sub("\x1b\[[0-9]{1,2};?[0-9]{,2}m", "", input)
+        #input = re.split("(\x1b\[[0-9]{1,2};?[0-9]{,2}m)", input)
+        
+        self.console.insert(tk.END, input, color)
+        self.console.yview(tk.END)
+        self.console['state']=tk.DISABLED
 
     def flush(self):
-        self.stdout.flush()
-
-    def scrollUp(self, *args):
-        self.console.yview('scroll', -1, 'units')
-
-    def scrollDown(self, *args):
-        self.console.yview('scroll', 1, 'units')
+        pass
+        
+    def clear(self):
+        self.console['state']=tk.NORMAL
+        self.console.delete(1.0, tk.END)
+        self.console['state']=tk.DISABLED
