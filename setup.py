@@ -11,6 +11,7 @@ from distutils.core import setup,Extension
 import os,sys
 import shutil
 import glob
+import argparse
 
 try:
     import numpy
@@ -60,7 +61,7 @@ def buildKeywordDictionary():
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
-    setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar", "forcebalance.gui"]
+    setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
     setupKeywords["package_dir"]       = {"forcebalance"         : "src",
                                           "forcebalance/pymbar"  : "ext/pymbar"
                                           }
@@ -116,13 +117,22 @@ def main():
     # if len(os.path.split(__file__)[0]) > 0:
     #     os.chdir(os.path.split(__file__)[0])
 
-    for i, option in enumerate(sys.argv):
-        if option == "-c" or option== "--clean":
-            doClean()
-            del sys.argv[i]
-            break
+    ## Install options
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--clean', action='store_true', help='remove previously installed forcebalance installation first')
+    parser.add_argument('-t', '--test', action='store_true', help='install forcebalance test suite')
+    parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
+    args, sys.argv= parser.parse_known_args(sys.argv)
     
     setupKeywords=buildKeywordDictionary()
+    
+    if args.clean: doClean()
+    if args.test:
+        setupKeywords["packages"].append("forcebalance.test")
+        setupKeywords["package_dir"].update({"forcebalance.test" : "test"})
+    if args.gui:
+        setupKeywords["packages"].append("forcebalance.gui")
+
     setup(**setupKeywords)
 
     shutil.rmtree('build')
