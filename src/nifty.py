@@ -638,9 +638,9 @@ def wq_wait1(wq, wait_time=10, verbose=False):
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
                     print "Command '%s' (task %i) finished successfully on host %s (%i seconds)" % (task.command, task.id, task.hostname, exectime)
-                for tnm in WQIDS:
-                    if task.id in WQIDS[tnm]:
-                        WQIDS[tnm].remove(task.id)
+                for tnm in forcebalance.WQIDS:
+                    if task.id in forcebalance.WQIDS[tnm]:
+                        forcebalance.WQIDS[tnm].remove(task.id)
                 del task
         if verbose:
             print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
