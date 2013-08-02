@@ -2,71 +2,42 @@ import unittest, os, sys, re, shutil, time
 import forcebalance
 from __init__ import ForceBalanceTestRunner
 import getopt
+import argparse
 
 def getOptions():
     """Parse options passed to forcebalance testing framework"""
     # set some defaults
-    exclude = []
     options = {
         'loglevel' : forcebalance.output.INFO,
         'pretend':False,
         }
     # handle options
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "mepvq", ["metatest","exclude","pretend", "verbose", "quiet", "headless-config="])
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-e', '--exclude', action='store_true', help="exclude specified modules from test loading")
+    parser.add_argument('-p', '--pretend', action='store_true', help="load tests but don't actually run them")
+    loglevel = parser.add_mutually_exclusive_group()
+    loglevel.add_argument('-v', '--verbose', dest='loglevel', action='store_const', const=forcebalance.output.DEBUG, default=forcebalance.output.INFO)
+    loglevel.add_argument('-q', '--quiet', dest='loglevel', action='store_const', const=forcebalance.output.WARNING, default=forcebalance.output.INFO)
+    parser.add_argument('--headless-config', type=argparse.FileType('r'))
+    parser.add_argument('test_modules', metavar="MODULE", nargs='*', default=[], help="module to load tests from")
+    
+    options = vars(parser.parse_args())
+    
+    for n, module in enumerate(options['test_modules']):
+        options['test_modules'][n] = 'test_' + module.split('.')[0]
 
-        # first parse module arguments which determine what modules to test
-        exclude = False
-        if args:
-            for o, a in opts:
-                if o in ("-e","--exclude"): exclude = True
-            module_args=[]
-            for module in args:
-                module = module.split('.')
-                module_args.append('test_' + module[0])
-            if exclude:
-                options['test_modules']=[module[:-3] for module in sorted(os.listdir('test'))
-                                        if re.match("^test_.*\.py$",module)
-                                        and module[:-3] not in module_args]
-            else:
-                options['test_modules']=module_args
-
-        for o, a in opts:
-            if o in ("-m", "--metatest"):
-                options['test_modules']=['__test__']
-            if o in ("-p", "--pretend"):
-                options['pretend']=True
-            if o in ("-v", "--verbose"):
-                options['loglevel']=forcebalance.output.DEBUG
-            elif o in ("-q", "--quiet"):
-                options['loglevel']=forcebalance.output.WARNING
-            if o in ("--headless-config",):
-                options['headless_config'] = a
-                
-    except getopt.GetoptError as err:
-        usage()
-        sys.exit()
+    if options['test_modules']:
+        if options['exclude']:
+            options['test_modules']=[module[:-3] for module in sorted(os.listdir('test'))
+                                if re.match("^test_.*\.py$",module)
+                                and module[:-3] not in options['test_modules']]
+    else:
+        del options['test_modules']
     return options
-
-def usage():
-    """Print information on running tests using this script"""
-    print """ForceBalance Test Suite
-Usage: python test [OPTIONS] [MODULES]
-Test suite will load all tests for forcebalance modules provided as arguments.
-If no modules are specified, all test modules in test/ are run
-
-Valid options are:
--e, --exclude\t\tRun all tests EXCEPT those listed
--m, --metatest\t\tRun tests on testing framework
--p, --pretend\t\tLoad tests but don't actually run them
--v, --verbose\t\tSet log level to DEBUG, printing additional test information
--q, --quiet\t\tSet log level to WARNING, printing only on failure or error
-"""
-
 
 def runHeadless(options):
     headless_options=dict()
-    with open(options["headless_config"], 'r') as f:
+    with options["headless_config"] as f:
         config = f.read().splitlines()
         for line in config:
             line = line.strip()
@@ -162,7 +133,7 @@ def run(options):
 
 options=getOptions()
 
-if options.has_key('headless_config'):
+if options['headless_config']:
     runHeadless(options)
 else:
     run(options)
