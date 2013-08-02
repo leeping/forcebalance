@@ -47,17 +47,8 @@ def runHeadless(options):
 
     os.chdir(os.path.dirname(__file__) + "/..")
 
-    class CleanFileHandler(forcebalance.output.FileHandler):
-        """File handler that does not write terminal escape codes to files, which
-        makes it easier to do things like send a log via email"""
-        def emit(self, record):
-            message = record.getMessage()
-            message = re.sub("\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m", "", message)
-            self.stream.write(message)
-            self.flush()
-
     os.mkdir('/tmp/forcebalance')
-    warningHandler = CleanFileHandler('/tmp/forcebalance/test.err','w')
+    warningHandler = forcebalance.output.CleanFileHandler('/tmp/forcebalance/test.err','w')
     warningHandler.setLevel(forcebalance.output.WARNING)
     logfile = "/tmp/forcebalance/%s.log" % time.strftime('%m%d%y_%H%M%S')
     debugHandler = CleanFileHandler(logfile,'w')
