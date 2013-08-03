@@ -627,13 +627,14 @@ def wq_wait1(wq, wait_time=10, verbose=False):
                 print "total_bytes_transferred = ", task.total_bytes_transferred
             if task.result != 0:
                 oldid = task.id
+                oldhost = task.hostname
                 tgtname = "None"
                 for tnm in forcebalance.WQIDS:
                     if task.id in forcebalance.WQIDS[tnm]:
                         tgtname = tnm
                         forcebalance.WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
-                print "Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i" % (task.command, oldid, task.hostname, exectime, taskid)
+                print "Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i" % (task.command, oldid, oldhost, exectime, taskid)
                 forcebalance.WQIDS[tgtname].append(taskid)
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
