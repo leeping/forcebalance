@@ -178,6 +178,7 @@ if __name__ == '__main__':
     os.system("git stash")
     print "Switching to doc repository..."
     os.system("git checkout gh-pages")
+    os.system("git pull origin gh-pages")
     print "Checking Doxygen config files..."
     doxyconf()
 
