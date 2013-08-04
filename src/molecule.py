@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                   Last updated July 10, 2013                       |#
+#|                   Last updated July 30, 2013                       |#
 #|                                                                    |#
 #|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
 #|                                                                    |#
@@ -199,19 +199,22 @@ def getElement(mass):
 try: _dcdlib = CDLL("_dcdlib.so")
 except:
     try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
-    except: warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+    except: 
+        if "nanoreactor" not in __name__: warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
 
 #============================#
 #| PDB read/write functions |#
 #============================#
 try: from PDB import *
-except: warn('The pdb module cannot be miported (Cannot read/write PDB files)')
+except: 
+    if "nanoreactor" not in __name__: warn('The pdb module cannot be miported (Cannot read/write PDB files)')
 
 #=============================#
 #| Mol2 read/write functions |#
 #=============================#
 try: import Mol2
-except: warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
+except: 
+    if "nanoreactor" not in __name__: warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
 
 #==============================#
 #| OpenMM interface functions |#
@@ -220,7 +223,8 @@ try:
     from simtk.unit import *
     from simtk.openmm import *
     from simtk.openmm.app import *
-except: warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+except: 
+    if "nanoreactor" not in __name__: warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
     
 #===========================#
 #| Convenience subroutines |#
@@ -1119,6 +1123,7 @@ class Molecule(object):
         if sn == None:
             sn = 0
         mindist = 1.0 # Any two atoms that are closer than this distance are bonded.
+        #Fac = 1.2     # Increase the threshold for determining whether atoms are bonded. 1.2 is conservative, 1.5 is crazy.
         # Create an atom-wise list of covalent radii.
         R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
         # Create a list of 2-tuples corresponding to combinations of atomic indices.
@@ -1991,21 +1996,17 @@ class Molecule(object):
             for key, val in matrix_match.items():
                 if Mats[key]["Mode"] >= 1:
                     if re.match("^[0-9]+( +[0-9]+)+$",line):
-                        # print "A", line
                         Mats[key]["This"] = add_strip_to_mat(Mats[key]["This"],Mats[key]["Strip"])
                         Mats[key]["Strip"] = []
                     elif re.match("^[0-9]+( +[-+]?([0-9]*\.)?[0-9]+)+$",line):
-                        # print "B", line
                         Mats[key]["Strip"].append([float(i) for i in line.split()[1:]])
                     else:
-                        # print "C", line
                         Mats[key]["This"] = add_strip_to_mat(Mats[key]["This"],Mats[key]["Strip"])
                         Mats[key]["Strip"] = []
                         Mats[key]["All"].append(np.array(Mats[key]["This"]))
                         Mats[key]["This"] = []
                         Mats[key]["Mode"] = 0
                 elif re.match(val.lower(), line.lower()):
-                    # print "D", line
                     Mats[key]["Mode"] = 1
 
         if len(Floats['mult']) == 0:
@@ -2070,9 +2071,9 @@ class Molecule(object):
                 Answer['qm_forces'][i] = frc.T
         # A strange peculiarity; Q-Chem sometimes prints out the final Mulliken charges a second time, after the geometry optimization.
         if mkchg != []:
-            Answer['qm_mulliken_charges'] = np.array(mkchg[:len(Answer['qm_energies'])])
+            Answer['qm_mulliken_charges'] = list(np.array(mkchg[:len(Answer['qm_energies'])]))
         if mkspn != []:
-            Answer['qm_mulliken_spins'] = np.array(mkspn[:len(Answer['qm_energies'])])
+            Answer['qm_mulliken_spins'] = list(np.array(mkspn[:len(Answer['qm_energies'])]))
 
         return Answer
     
