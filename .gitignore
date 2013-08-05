@@ -1,0 +1,7 @@
+*.pyc
+doc/*
+
+test.log
+temp
+backups
+result

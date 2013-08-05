@@ -1,0 +1,19 @@
+plugin_load("/home/egh4/lr_df/plugins/plugin_overlap/plugin_overlap.so")
+
+basis file cc-pvdz-overlap.gbs
+
+set {
+  basis cc-pvdz
+  freeze_core true
+}
+
+set plugin_overlap {
+  print 1
+  debug 1
+  ribasis cc-pvdz-overlap
+  zvals = [1,2,5,6,7,8,9,10]
+  s_cutoff = 1.0e-10
+}
+
+plugin("/home/egh4/lr_df/plugins/plugin_overlap/plugin_overlap.so")
+clean()

@@ -1,0 +1,13 @@
+ATOM      1  S   dms     1       3.840  13.360   6.210                          
+ATOM      2  C   dms     1       2.690  11.920   6.530                          
+ATOM      3  H   dms     1       3.240  11.020   6.240                          
+ATOM      4  H1  dms     1       2.310  11.790   7.540                          
+ATOM      5  H2  dms     1       1.810  12.070   5.890                          
+ATOM      6  C1  dms     1       5.350  12.830   7.030                          
+ATOM      7  H3  dms     1       5.290  11.770   7.310                          
+ATOM      8  H4  dms     1       6.200  13.040   6.390                          
+ATOM      9  H5  dms     1       5.420  13.310   8.000                          
+ENDMDL
+CONECT    1    2    6
+CONECT    2    3    4    5
+CONECT    6    9    7    8

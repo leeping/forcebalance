@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/pymbar/!svn/ver/346/trunk/pymbar
+END
+timeseries.py
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/pymbar/!svn/ver/311/trunk/pymbar/timeseries.py
+END
+pymbar.py
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/pymbar/!svn/ver/345/trunk/pymbar/pymbar.py
+END
+pystatebar.py
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/pymbar/!svn/ver/258/trunk/pymbar/pystatebar.py
+END
+__init__.py
+K 25
+svn:wc:ra_dav:version-url
+V 49
+/svn/pymbar/!svn/ver/174/trunk/pymbar/__init__.py
+END
+setup.py
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/pymbar/!svn/ver/311/trunk/pymbar/setup.py
+END
+_pymbar.c
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/pymbar/!svn/ver/307/trunk/pymbar/_pymbar.c
+END
+confidenceintervals.py
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/pymbar/!svn/ver/285/trunk/pymbar/confidenceintervals.py
+END
+testsystems.py
+K 25
+svn:wc:ra_dav:version-url
+V 52
+/svn/pymbar/!svn/ver/346/trunk/pymbar/testsystems.py
+END

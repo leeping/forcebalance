@@ -1,0 +1,8 @@
+#include "molecule_after.itp"
+
+[ system ]
+ LIG
+
+[ molecules ]
+; Compound        nmols
+ LIG              1     

@@ -1,0 +1,2 @@
+This directory contains useful scripts that aren't 100% tested.
+They are not installed along with the distribution, but you can still use them (at your own risk).

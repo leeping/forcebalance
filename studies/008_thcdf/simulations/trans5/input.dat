@@ -1,0 +1,43 @@
+import os
+
+os.system("rm -f objective.dat")
+
+molecules = []
+
+molecule acrolein_rotation {
+C       -0.6371024249    0.3333721291   -0.9759992117
+C        0.6379824697    0.0000000000    1.0498639464
+C        0.0352854844   -0.5000581937   -0.1704631192
+O        0.0000000000    0.0000000000    2.0897573872
+H       -1.0860077657   -0.0390850082   -1.8849324742
+H        1.6516591771    0.3724571374    1.0382358023
+H        0.1283047273   -1.5442352928   -0.4301583370
+H       -0.7301216678    1.3775492282   -0.7163039938
+
+symmetry c1
+}
+
+molecules.append(acrolein_rotation)
+
+plugin_load("/home/egh4/lr_df/plugins/plugin_objective/plugin_objective.so")
+
+basis file cc-pvdz-overlap.gbs
+
+for mol in molecules:
+    activate(mol)
+
+    set {
+      basis cc-pvdz
+      freeze_core true
+    }
+    
+    set plugin_objective {
+      print 1
+      debug 1
+      ribasis cc-pvdz-overlap
+      df_metric j
+    }
+    
+    plugin("/home/egh4/lr_df/plugins/plugin_objective/plugin_objective.so")
+    clean()
+

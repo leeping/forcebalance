@@ -1,0 +1,82 @@
+$options
+jobtype single                   # Indicates Newton-Raphson type optimization
+forcefield water.itp             # Specify names of force field files (files with tunable constants).  Try changing the PARM tags on the ITP file.
+penalty_additive 0.01            # Regularization prefactor.
+read_mvals
+   0 [  3.3161e-02 ] : VDWS:OW
+   1 [  4.3311e-02 ] : VDWT:OW
+   2 [  5.5070e-03 ] : BONDSB:HWOW
+   3 [ -4.5933e-02 ] : BONDSK:HWOW
+   4 [  1.5497e-02 ] : ANGLESB:HWOWHW
+   5 [ -3.7655e-01 ] : ANGLESK:HWOWHW
+   6 [  2.4929e-03 ] : COUL:SOL-2 COUL:SOL-3
+   7 [  1.1874e-02 ] : COUL:SOL-4
+   8 [  1.5108e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+/read_mvals
+$end
+
+$target
+simtype abinitio_gmx             # The target type; fitting ab initio data using GROMACS
+name cluster-02                  # Also the subdirectory containing data within "targets"
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-03     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-04     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-05     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-06     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-07     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-08     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-09     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-10     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-11     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-12     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-13     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-14     
+$end
+

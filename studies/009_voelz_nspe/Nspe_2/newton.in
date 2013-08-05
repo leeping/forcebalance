@@ -1,0 +1,34 @@
+$options
+jobtype newton
+forcefield molecule.itp                # Check out how the parameters are tagged
+trust0 -1                              # Negative number for "nonlinear search", positive number for "trust radius"
+penalty_type L2                        # L2 for Gaussian prior, L1 for Laplacian prior
+penalty_hyperbolic_b   1e-6            # Kicks in when penalty_type is set to L1
+penalty_additive       0.01            # Global prefactor for penalty function
+convergence_objective 0.001
+
+# Priors for different parameters can be adjusted this way, just read the parameter names off the output.
+
+priors
+   PDIHMULS1B                           : 1.80000e+02
+   PDIHMULS2B                           : 1.80000e+02
+   PDIHMULS3B                           : 1.80000e+02
+   PDIHMULS4B                           : 1.80000e+02
+   PIMPDIHS2B                           : 1.80000e+02
+   PDIHMULS1K                           : 9.64853e+01
+   PDIHMULS2K                           : 9.64853e+01
+   PDIHMULS3K                           : 9.64853e+01
+   PDIHMULS4K                           : 9.64853e+01
+   PIMPDIHS2K                           : 9.64853e+01
+/priors 
+
+$end
+
+$simulation
+simtype abinitio_gmx
+name nspe_2dscan
+weight 1
+w_energy 1.0
+shots -1
+$end
+

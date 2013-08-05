@@ -1,0 +1,72 @@
+$options
+jobtype newton                   # Indicates Newton-Raphson type optimization
+forcefield water.itp             # Specify names of force field files (files with tunable constants).  Try changing the PARM tags on the ITP file.
+trust0 -1                        # Negative trust radius indicates "nonlinear search" algorithm.  Try a positive trust radius.
+search_tolerance 1e-1            # Convergence threshold for nonlinear search
+$end
+
+$target
+simtype abinitio_gmx             # The target type; fitting ab initio data using GROMACS
+name cluster-02                  # Also the subdirectory containing data within "targets"
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-03     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-04     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-05     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-06     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-07     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-08     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-09     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-10     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-11     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-12     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-13     
+$end
+
+$target
+simtype abinitio_gmx
+name cluster-14     
+$end
+
