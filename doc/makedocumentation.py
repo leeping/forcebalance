@@ -64,6 +64,7 @@ def find_forcebalance():
         print "manually in api.cfg"
         exit()
 
+    print 'ForceBalance directory is:', forcebalance_dir
     return forcebalance_dir
 
 def find_doxypy():
@@ -111,7 +112,9 @@ def doxyconf():
 
     with open('api.cfg.tmp', 'w') as fout:
         for line in lines:
-            if line.startswith('INPUT                  =') and not re.match(".*forcebalance.*|.*src.*", line):
+            # I think the find_forcebalance() function needs to be called more often because it was missing the API documentation.
+            # if line.startswith('INPUT                  =') and not re.match(".*forcebalance.*|.*src.*", line):
+            if line.startswith('INPUT                  ='):
                 option = 'INPUT                  = api.dox ' + find_forcebalance() + '\n'
                 fout.write(option)
             elif line.startswith('FILTER_PATTERNS        =') and not re.match(".*doxypy.*", line):
@@ -187,7 +190,7 @@ if __name__ == '__main__':
         f.write(mainpage)
     with open('api.dox','w') as f:
         f.write(api)
-    generate_doc()
+    generate_doc(logfile="makedocumentation.log")
     print "Integrating HTML docs..."
     parse_html()
 
@@ -199,13 +202,16 @@ if __name__ == '__main__':
     os.system('git push origin gh-pages')
     print
 
-    print "Cleaning up..."
-    os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
-
+    clean = False
+    
+    if clean:
+        print "Cleaning up..."
+        os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
+    
     print "Returning to branch '%s'..." % branch
     os.system('git checkout %s' % branch)
-
-
+    
     print "Loading master branch stash if necessary..."
     os.system('git stash pop')
     print "Documentation successfully generated"
+    
