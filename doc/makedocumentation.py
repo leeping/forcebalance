@@ -145,50 +145,6 @@ def find_doxypy():
             print "Invalid path to doxypy"
             exit()
     return doxypy_path
-
-def doxyconf():
-    """Try setting values in doxygen config files to match local environment"""
-    doxypy_path=""
-
-    # read .cfg, make temp file to edit, replace original when done
-    with open('doxygen.cfg', 'r') as fin:
-        lines = fin.readlines()
-
-    shutil.copy('doxygen.cfg', 'doxygen.cfg.tmp')
-
-    # make sure FILTER_PATTERNS is set to use doxypy
-    with open('doxygen.cfg.tmp', 'w') as fout:
-        for line in lines:
-            if line.startswith('FILTER_PATTERNS        =') and not re.match(".*doxypy.*", line):
-                doxypy_path = find_doxypy()
-                option = 'FILTER_PATTERNS        = "*.py=' + doxypy_path + '"\n'
-                fout.write(option)
-            else:
-                fout.write(line)
-
-    shutil.move('doxygen.cfg.tmp', 'doxygen.cfg')
-
-    # same with api.cfg but also check INPUT flag is set to forcebalance location
-    # use same doxypy location as in doxygen.cfg
-    with open('api.cfg', 'r') as fin:
-        lines = fin.readlines()
-
-    shutil.copy('api.cfg','api.cfg.tmp')
-
-    with open('api.cfg.tmp', 'w') as fout:
-        for line in lines:
-            # I think the find_forcebalance() function needs to be called more often because it was missing the API documentation.
-            # if line.startswith('INPUT                  =') and not re.match(".*forcebalance.*|.*src.*", line):
-            if line.startswith('INPUT                  ='):
-                option = 'INPUT                  = api.dox ' + find_forcebalance() + '\n'
-                fout.write(option)
-            elif line.startswith('FILTER_PATTERNS        =') and not re.match(".*doxypy.*", line):
-                option = 'FILTER_PATTERNS        = "*.py=' + doxypy_path + '"\n'
-                fout.write(option)
-            else:
-                fout.write(line)
-    
-    shutil.move('api.cfg.tmp', 'api.cfg')
     
 def build_config():
     forcebalance_path = find_forcebalance()
@@ -244,12 +200,16 @@ def git():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--interactive', action='store_true')
-    parser.add_argument('--clean', action='store_true')
+    parser.add_argument('--interactive', action='store_true', help="run in interactive mode, pausing before each command")
+    parser.add_argument('--clean', action='store_true', help="remove temporary files after script is complete")
+    parser.add_argument('--configure', action='store_true', help="generate doxygen configuration files from templates")
     args = parser.parse_args()
     
-    if not os.path.isfile('doxygen.cfg') or not os.path.isfile('api.cfg'):
+    if args.configure:
         build_config()
+    elif not os.path.isfile('doxygen.cfg') or not os.path.isfile('api.cfg'):
+        print "Couldn't find required doxygen config files ('./doxygen.cfg' and './api.cfg').\nRun with --configure option to generate automatically"
+        sys.exit(1)
     
     build(interactive = args.interactive)
     
