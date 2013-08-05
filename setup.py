@@ -49,8 +49,78 @@ CONTACT = Extension('forcebalance/_contact_wrap',
                                         "-fopenmp", "-Wall"],
                     extra_link_args=['-lgomp'],
                     include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
+                    
+def installNetworkX():          
+    setup(
+        packages=["networkx",
+          "networkx.algorithms",
+          "networkx.algorithms.assortativity",
+          "networkx.algorithms.bipartite",
+          "networkx.algorithms.centrality",
+          "networkx.algorithms.chordal",
+          "networkx.algorithms.community",
+          "networkx.algorithms.components",
+          "networkx.algorithms.flow",
+          "networkx.algorithms.traversal",
+          "networkx.algorithms.isomorphism",
+          "networkx.algorithms.shortest_paths",
+          "networkx.algorithms.link_analysis",
+          "networkx.algorithms.operators",
+          "networkx.algorithms.approximation",
+          "networkx.classes",
+          "networkx.external",
+          "networkx.external.decorator",
+          "networkx.generators",
+          "networkx.drawing",
+          "networkx.linalg",
+          "networkx.readwrite",
+          "networkx.readwrite.json_graph",
+          "networkx.tests",
+          "networkx.testing",
+          "networkx.utils"],
+        package_dir      = {"networkx" : "ext/networkx"},
+        description = "Python package for creating and manipulating graphs and networks",
+        long_description = \
+        """
+        NetworkX is a Python package for the creation, manipulation, and
+        study of the structure, dynamics, and functions of complex networks.
+        """,
+        license = 'BSD',
+        authors = {'Hagberg' : ('Aric Hagberg','hagberg@lanl.gov'),
+                   'Schult' : ('Dan Schult','dschult@colgate.edu'),
+                   'Swart' : ('Pieter Swart','swart@lanl.gov')
+                   },
+        maintainer = "NetworkX Developers",
+        maintainer_email = "networkx-discuss@googlegroups.com",
+        url = 'http://networkx.lanl.gov/',
+        download_url="http://networkx.lanl.gov/download/networkx",
+        platforms = ['Linux','Mac OSX','Windows','Unix'],
+        keywords = ['Networks', 'Graph Theory', 'Mathematics', 'network', 'graph', 'discrete mathematics', 'math'],
+        classifiers = [
+                'Development Status :: 4 - Beta',
+                'Intended Audience :: Developers',
+                'Intended Audience :: Science/Research',
+                'License :: OSI Approved :: BSD License',
+                'Operating System :: OS Independent',
+                'Programming Language :: Python :: 2',
+                'Programming Language :: Python :: 2.6',
+                'Programming Language :: Python :: 2.7',
+                'Programming Language :: Python :: 3',
+                'Programming Language :: Python :: 3.1',
+                'Programming Language :: Python :: 3.2',
+                'Topic :: Software Development :: Libraries :: Python Modules',
+                'Topic :: Scientific/Engineering :: Bio-Informatics',
+                'Topic :: Scientific/Engineering :: Information Analysis',
+                'Topic :: Scientific/Engineering :: Mathematics',
+                'Topic :: Scientific/Engineering :: Physics'],
+      )
+      
+      try:
+        m = __import__("networkx")
+      except ImportError:
+        raw_input("Error installing networkx, press <Enter> to continue ForceBalance installation")
 
-def buildKeywordDictionary():
+def buildKeywordDictionary(args):
     from distutils.core import Extension
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
@@ -88,14 +158,12 @@ def buildKeywordDictionary():
 
     """
 
-    outputString=""
-    firstTab     = 40
-    secondTab    = 60
-    for key in sorted( setupKeywords.iterkeys() ):
-         value         = setupKeywords[key]
-         outputString += key.rjust(firstTab) + str( value ).rjust(secondTab) + "\n"
-    
-    print "%s" % outputString
+    if args.clean: doClean()
+    if args.test:
+        setupKeywords["packages"].append("forcebalance.test")
+        setupKeywords["package_dir"].update({"forcebalance.test" : "test"})
+    if args.gui:
+        setupKeywords["packages"].append("forcebalance.gui")
 
     return setupKeywords
 
@@ -124,15 +192,15 @@ def main():
     parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)
     
-    setupKeywords=buildKeywordDictionary()
+    try:
+        __import__("networkx")
+    except ImportError:
+        print "Could not import networkx module! Topology tools will not work without this..."
+        if raw_input("Would you like to install it now (y/n)? ").lower() == 'y':
+            installNetworkX()
+            print "NetworkX module successfully installed!"
     
-    if args.clean: doClean()
-    if args.test:
-        setupKeywords["packages"].append("forcebalance.test")
-        setupKeywords["package_dir"].update({"forcebalance.test" : "test"})
-    if args.gui:
-        setupKeywords["packages"].append("forcebalance.gui")
-
+    setupKeywords=buildKeywordDictionary(args)
     setup(**setupKeywords)
 
     shutil.rmtree('build')
