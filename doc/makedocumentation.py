@@ -194,7 +194,7 @@ def build_config():
     forcebalance_path = find_forcebalance()
     doxypy_path = find_doxypy()
 
-    with open('doxygen.cfg.template', 'r') as f:
+    with open('.doxygen.cfg', 'r') as f:
         lines = f.readlines()
         
     with open('doxygen.cfg', 'w') as f:
@@ -205,7 +205,7 @@ def build_config():
             else:
                 f.write(line)
     
-    with open('api.cfg.template', 'r') as f:
+    with open('.api.cfg', 'r') as f:
         lines = f.readlines()
         
     with open('api.cfg', 'w') as f:
