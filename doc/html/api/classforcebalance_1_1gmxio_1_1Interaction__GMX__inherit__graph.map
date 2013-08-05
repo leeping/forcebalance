@@ -1,5 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies." alt="" coords="44,155,291,181"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="73,80,263,107"/>
-<area shape="rect" id="node6" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="5,5,331,32"/>
+<map id="forcebalance.gmxio.Interaction_GMX" name="forcebalance.gmxio.Interaction_GMX">
+<area shape="rect" id="node2" href="$classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies." alt="" coords="41,254,193,298"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="37,177,197,205"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="29,83,205,127"/>
 </map>

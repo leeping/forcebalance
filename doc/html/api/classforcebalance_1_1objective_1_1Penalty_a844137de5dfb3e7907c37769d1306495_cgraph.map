@@ -1,8 +1,9 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1objective_1_1Penalty.html#ab59d5beafbab0918b7c3e0c61ece41a3" title="Harmonic L2&#45;norm constraints." alt="" coords="328,68,603,95"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1objective_1_1Penalty.html#a1f3fa55d1c27db3eca0af41bb57c04ef" title="Hyperbolic constraints." alt="" coords="651,68,893,95"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1objective_1_1Penalty.html#aafc1810e03e4e3f2ca1569588a8189d4" title="forcebalance.objective.Penalty.FUSE" alt="" coords="942,30,1194,56"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="1926,30,2165,56"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1objective_1_1Penalty.html#a9badc0a78d23016aa3dcc2d610e2e16c" title="forcebalance.objective.Penalty.FUSE_BARRIER" alt="" coords="1243,30,1555,56"/>
-<area shape="rect" id="node14" href="$classforcebalance_1_1objective_1_1Penalty.html#ab54cfe22065a5aa22766e16cc8cb90aa" title="forcebalance.objective.Penalty.FUSE_L0" alt="" coords="1603,55,1877,82"/>
+<map id="forcebalance.objective.Penalty.compute" name="forcebalance.objective.Penalty.compute">
+<area shape="rect" id="node2" href="$classforcebalance_1_1objective_1_1Penalty.html#ab59d5beafbab0918b7c3e0c61ece41a3" title="Harmonic L2&#45;norm constraints." alt="" coords="289,72,477,116"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1objective_1_1Penalty.html#a1f3fa55d1c27db3eca0af41bb57c04ef" title="Hyperbolic constraints." alt="" coords="526,80,741,108"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1objective_1_1Penalty.html#aafc1810e03e4e3f2ca1569588a8189d4" title="forcebalance.objective.Penalty.FUSE" alt="" coords="790,38,1010,66"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="1534,26,1682,70"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1objective_1_1Penalty.html#a9badc0a78d23016aa3dcc2d610e2e16c" title="forcebalance.objective.Penalty.\lFUSE_BARRIER" alt="" coords="1059,30,1247,74"/>
+<area shape="rect" id="node6" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="1731,34,1939,62"/>
+<area shape="rect" id="node8" href="$classforcebalance_1_1objective_1_1Penalty.html#ab54cfe22065a5aa22766e16cc8cb90aa" title="forcebalance.objective.Penalty.\lFUSE_L0" alt="" coords="1297,55,1485,99"/>
 </map>

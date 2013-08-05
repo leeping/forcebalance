@@ -1,11 +1,11 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html" title="Finite state machine for parsing FrcMod force field file." alt="" coords="328,5,589,32"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1amberio_1_1Mol2__Reader.html" title="Finite state machine for parsing Mol2 force field file." alt="" coords="335,56,582,83"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1custom__io_1_1Gen__Reader.html" title="Finite state machine for parsing custom GROMACS force field files." alt="" coords="331,107,586,133"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1ITP__Reader.html" title="Finite state machine for parsing GROMACS force field files." alt="" coords="349,157,569,184"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1openmmio_1_1OpenMM__Reader.html" title="Class for parsing OpenMM force field files." alt="" coords="315,208,603,235"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1psi4io_1_1GBS__Reader.html" title="Interaction type &#45;&gt; Parameter Dictionary." alt="" coords="345,259,573,285"/>
-<area shape="rect" id="node15" href="$classforcebalance_1_1psi4io_1_1Grid__Reader.html" title="Finite state machine for parsing DVR grid files." alt="" coords="345,309,572,336"/>
-<area shape="rect" id="node17" href="$classforcebalance_1_1qchemio_1_1QCIn__Reader.html" title="Finite state machine for parsing Q&#45;Chem input files." alt="" coords="335,360,583,387"/>
-<area shape="rect" id="node19" href="$classforcebalance_1_1tinkerio_1_1Tinker__Reader.html" title="Finite state machine for parsing TINKER force field files." alt="" coords="335,411,583,437"/>
+<map id="forcebalance.basereader.BaseReader" name="forcebalance.basereader.BaseReader">
+<area shape="rect" id="node3" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html" title="Finite state machine for parsing FrcMod force field file." alt="" coords="323,5,480,49"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1amberio_1_1Mol2__Reader.html" title="Finite state machine for parsing Mol2 force field file." alt="" coords="317,73,486,117"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1custom__io_1_1Gen__Reader.html" title="Finite state machine for parsing custom GROMACS force field files." alt="" coords="336,141,467,185"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1gmxio_1_1ITP__Reader.html" title="Finite state machine for parsing GROMACS force field files." alt="" coords="326,209,476,253"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1openmmio_1_1OpenMM__Reader.html" title="Class for parsing OpenMM force field files." alt="" coords="310,277,492,321"/>
+<area shape="rect" id="node8" href="$classforcebalance_1_1psi4io_1_1GBS__Reader.html" title="Interaction type &#45;&gt; Parameter Dictionary." alt="" coords="324,345,479,389"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1psi4io_1_1Grid__Reader.html" title="Finite state machine for parsing DVR grid files." alt="" coords="325,413,478,457"/>
+<area shape="rect" id="node10" href="$classforcebalance_1_1qchemio_1_1QCIn__Reader.html" title="Finite state machine for parsing Q&#45;Chem input files." alt="" coords="316,481,487,525"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1tinkerio_1_1Tinker__Reader.html" title="Finite state machine for parsing TINKER force field files." alt="" coords="315,549,488,593"/>
 </map>

@@ -1,3 +1,3 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$classforcebalance_1_1nifty_1_1RawStreamHandler.html" title="Exactly like logging.StreamHandler except it does no extra formatting before sending logging messages..." alt="" coords="6,5,266,32"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classforcebalance_1_1nifty_1_1Unpickler__LP.html" title="A subclass of the python Unpickler that implements unpickling of _ElementTree types." alt="" coords="128,5,325,33"/>
 </map>

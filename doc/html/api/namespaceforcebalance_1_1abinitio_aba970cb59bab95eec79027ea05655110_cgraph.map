@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1abinitio.html#ab9554761125a4ec7c3c13d6ae4ea537d" title="A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements..." alt="" coords="331,5,615,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1abinitio.html#aadd1d6c5a34c82d495d6be7380b73601" title="This function builds an objective function (number) from the complicated polytensor and covariance ma..." alt="" coords="665,5,917,32"/>
+<map id="forcebalance.abinitio.weighted_variance" name="forcebalance.abinitio.weighted_variance">
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1abinitio.html#ab9554761125a4ec7c3c13d6ae4ea537d" title="A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements..." alt="" coords="240,5,426,49"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1abinitio.html#aadd1d6c5a34c82d495d6be7380b73601" title="This function builds an objective function (number) from the complicated polytensor and covariance ma..." alt="" coords="475,5,639,49"/>
 </map>
