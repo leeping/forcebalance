@@ -1,5 +1,5 @@
-<map id="forcebalance.forcefield.FF.list_map" name="forcebalance.forcefield.FF.list_map">
-<area shape="rect" id="node2" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="203,5,381,33"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1forcefield_1_1FF.html#a3af07734a2378364ed533e2853ee6b82" title="Assign physical parameter values to the &#39;pvals0&#39; array." alt="" coords="218,57,366,101"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1forcefield_1_1FF.html#a8e7047c4b41a755c24996c9e1619df0b" title="forcebalance.forcefield.\lFF.__eq__" alt="" coords="430,57,578,101"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="315,5,523,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1forcefield_1_1FF.html#a3af07734a2378364ed533e2853ee6b82" title="Assign physical parameter values to the &#39;pvals0&#39; array." alt="" coords="293,56,544,83"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1forcefield_1_1FF.html#a8e7047c4b41a755c24996c9e1619df0b" title="forcebalance.forcefield.FF.__eq__" alt="" coords="593,56,823,83"/>
 </map>

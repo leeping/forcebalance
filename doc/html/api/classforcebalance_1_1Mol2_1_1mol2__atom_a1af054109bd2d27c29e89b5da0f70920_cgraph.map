@@ -1,5 +1,5 @@
-<map id="forcebalance.Mol2.mol2_atom.set_atom_id" name="forcebalance.Mol2.mol2_atom.set_atom_id">
-<area shape="rect" id="node2" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a3a6c9728119ace119108183920689a9d" title="the coordinates of the atom" alt="" coords="205,5,358,49"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#ae879ba27197a573b6e3e1e97f0b76aff" title="substructure identifier" alt="" coords="405,5,558,49"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#abfe80eac2952ad867d87e8b6e64f3c09" title="atomic charge" alt="" coords="605,5,758,49"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a3a6c9728119ace119108183920689a9d" title="the coordinates of the atom" alt="" coords="353,5,626,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#ae879ba27197a573b6e3e1e97f0b76aff" title="substructure identifier" alt="" coords="675,5,973,32"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#abfe80eac2952ad867d87e8b6e64f3c09" title="atomic charge" alt="" coords="1021,5,1312,32"/>
 </map>
