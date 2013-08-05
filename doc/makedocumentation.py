@@ -196,7 +196,7 @@ if __name__ == '__main__':
 
     print "Applying changes to local repository..."
     os.system('git add ./html *.pdf')
-    os.system('git commit -m "Automatic documentation generation on %s"' % datetime.now().strftime("%m-%d-%Y %H:%M"))
+    os.system('git commit -m "Automatic documentation generation at %s on %s"' % (os.environ['HOSTNAME'], datetime.now().strftime("%m-%d-%Y %H:%M")))
 
     print "\n----Enter username/password to push changes to remote repository or Ctrl-C to abort\n"
     os.system('git push origin gh-pages')
