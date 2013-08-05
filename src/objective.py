@@ -211,6 +211,7 @@ class Objective(ForceBalanceBaseClass):
         PrintDict = OrderedDict()
         Total = 0.0
         Change = False
+        color = "\x1b[0m"
         for key, val in self.ObjDict.items():
             if key == 'Total' : continue
             color = "\x1b[94m"
