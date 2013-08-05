@@ -209,6 +209,7 @@ if __name__ == '__main__':
         os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
     
     print "Returning to branch '%s'..." % branch
+    os.system('git reset --hard HEAD')
     os.system('git checkout %s' % branch)
     
     print "Loading master branch stash if necessary..."
