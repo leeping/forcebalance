@@ -1,3 +1,5 @@
 <map id="forcebalance.nifty.lp_dump" name="forcebalance.nifty.lp_dump">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="247,5,433,51"/>
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1nifty.html#abe1e72c32252d62a6551b47290c7584f" title="forcebalance.nifty.getWQIds" alt="" coords="224,5,400,33"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#ab5f3072ad95e9c75659cb1adac341051" title="forcebalance.nifty.create\lWorkQueue" alt="" coords="235,57,389,101"/>
+<area shape="rect" id="node4" href="$namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue." alt="" coords="449,57,602,101"/>
 </map>

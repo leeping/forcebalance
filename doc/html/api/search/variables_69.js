@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['implemented_5ftargets',['Implemented_Targets',['../namespaceforcebalance_1_1objective.html#a8c93e21f995ed17addb493ec94368ab5',1,'forcebalance::objective']]],
-  ['inter_5fopts',['inter_opts',['../classforcebalance_1_1binding_1_1BindingEnergy.html#a9d1f28fc62222da17c0fd12593042f10',1,'forcebalance::binding::BindingEnergy']]],
+  ['implemented_5ftargets',['Implemented_Targets',['../namespaceforcebalance_1_1implemented.html#a5599ffedbfefbfc826569608f6fe1d08',1,'forcebalance.implemented.Implemented_Targets()'],['../namespaceforcebalance_1_1objective.html#a8c93e21f995ed17addb493ec94368ab5',1,'forcebalance.objective.Implemented_Targets()']]],
+  ['inter_5fopts',['inter_opts',['../classforcebalance_1_1binding_1_1BindingEnergy.html#a9d1f28fc62222da17c0fd12593042f10',1,'forcebalance.binding.BindingEnergy.inter_opts()'],['../classforcebalance_1_1interactions_1_1Interactions.html#ae6b48474350974f36cbd47dc4ad90871',1,'forcebalance.interactions.Interactions.inter_opts()']]],
   ['invdists',['invdists',['../classforcebalance_1_1abinitio_1_1AbInitio.html#aa01ee600ba0f429ffc81135af9d8109b',1,'forcebalance::abinitio::AbInitio']]],
   ['isdata',['isdata',['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#a725975a6e197a132d3c4dba96412f9bb',1,'forcebalance.psi4io.GBS_Reader.isdata()'],['../classforcebalance_1_1psi4io_1_1Grid__Reader.html#a1134ad300de317ee30aa333d24978cc0',1,'forcebalance.psi4io.Grid_Reader.isdata()']]],
   ['iteration_5fnumber',['ITERATION_NUMBER',['../namespaceforcebalance_1_1optimizer.html#ac3e728fa9f2dacdcca7e1b51d9f2a49e',1,'forcebalance::optimizer']]],

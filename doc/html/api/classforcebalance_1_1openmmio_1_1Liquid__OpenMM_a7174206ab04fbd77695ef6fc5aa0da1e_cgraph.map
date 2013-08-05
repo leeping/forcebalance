@@ -1,31 +1,4 @@
 <map id="forcebalance.openmmio.Liquid_OpenMM.prepare_temp_directory" name="forcebalance.openmmio.Liquid_OpenMM.prepare_temp_directory">
-<area shape="rect" id="node3" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#ae4f88de8f954c789b003e33909585077" title="forcebalance.openmmio.Liquid\l_OpenMM.polarization_correction" alt="" coords="297,181,529,227"/>
-<area shape="rect" id="node62" href="$namespaceforcebalance_1_1openmmio.html#a9f9fc56475dbfcc94a40fef6a84ed25f" title="forcebalance.openmmio.Update\lSimulationParameters" alt="" coords="300,250,527,297"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1openmmio.html#af623fa5af97de6c6a0bc5f98ce8db432" title="Given a set of OpenMM&#45;compatible positions and a System object, compute the correct virtual site posi..." alt="" coords="847,17,1063,63"/>
-<area shape="rect" id="node29" href="$namespaceforcebalance_1_1openmmio.html#a8a2081dcaf027b9b9ab224e22680714d" title="Return the current dipole moment in Debye." alt="" coords="588,77,788,123"/>
-<area shape="rect" id="node32" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="619,146,757,193"/>
-<area shape="rect" id="node34" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#ad6a30e41f4c0bc319d7ffbbb09cfcf5d" title="Submit a NPT simulation to the Work Queue." alt="" coords="580,215,796,262"/>
-<area shape="rect" id="node48" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="2247,221,2404,267"/>
-<area shape="rect" id="node59" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="595,335,781,382"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1openmmio.html#a792a195b31612f2140b35927fe28fa1a" title="forcebalance.openmmio.Copy\lAmoebaBondParameters" alt="" coords="1113,6,1324,53"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1openmmio.html#a2e95f600757655d41660c25af8fd8e80" title="forcebalance.openmmio.Copy\lAmoebaOutOfPlaneBendParameters" alt="" coords="1373,5,1629,51"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1openmmio.html#abe9a6b9b200dc8487e56dad7249af3ec" title="forcebalance.openmmio.Copy\lAmoebaAngleParameters" alt="" coords="1679,5,1889,51"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1openmmio.html#ad0d4739f80f2aab1a861f2e03b8efcd6" title="forcebalance.openmmio.Copy\lAmoebaInPlaneAngleParameters" alt="" coords="1939,5,2171,51"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1openmmio.html#abe005f73c6dfe9ce1052c9434bcad9be" title="forcebalance.openmmio.Copy\lAmoebaVdwParameters" alt="" coords="2220,5,2431,51"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1openmmio.html#a3706c19e71969cabe5782a4535abeffe" title="forcebalance.openmmio.Copy\lAmoebaMultipoleParameters" alt="" coords="2481,5,2692,51"/>
-<area shape="rect" id="node19" href="$namespaceforcebalance_1_1openmmio.html#a616f12cc53381716e5fa41f00bf623be" title="forcebalance.openmmio.Copy\lHarmonicBondParameters" alt="" coords="2743,5,2953,51"/>
-<area shape="rect" id="node21" href="$namespaceforcebalance_1_1openmmio.html#af4ed16f5e2b1cd12bce2f25fab1b05bc" title="forcebalance.openmmio.Copy\lHarmonicAngleParameters" alt="" coords="3004,5,3215,51"/>
-<area shape="rect" id="node23" href="$namespaceforcebalance_1_1openmmio.html#a8f13702754f0b4e43e272139a2ce8341" title="forcebalance.openmmio.Copy\lPeriodicTorsionParameters" alt="" coords="3265,5,3476,51"/>
-<area shape="rect" id="node25" href="$namespaceforcebalance_1_1openmmio.html#afead47464a644d9225f9fa8eb568a8ed" title="forcebalance.openmmio.Copy\lNonbondedParameters" alt="" coords="3527,5,3737,51"/>
-<area shape="rect" id="node27" href="$namespaceforcebalance_1_1openmmio.html#a2bb7add6b813d94f2655372c51fe8fdc" title="forcebalance.openmmio.do\l_nothing" alt="" coords="3788,5,3983,51"/>
-<area shape="rect" id="node36" href="$namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue." alt="" coords="855,155,1055,184"/>
-<area shape="rect" id="node55" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#a92379bd73128234b309fae789946035d" title="forcebalance.openmmio.Liquid\l_OpenMM.__init__" alt="" coords="847,215,1063,262"/>
-<area shape="rect" id="node38" href="$namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue." alt="" coords="1131,77,1307,123"/>
-<area shape="rect" id="node40" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished." alt="" coords="1143,146,1295,193"/>
-<area shape="rect" id="node42" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="1409,75,1593,104"/>
-<area shape="rect" id="node44" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="1696,127,1872,156"/>
-<area shape="rect" id="node50" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="1412,179,1591,208"/>
-<area shape="rect" id="node53" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="1415,232,1588,261"/>
-<area shape="rect" id="node46" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="1963,166,2147,213"/>
-<area shape="rect" id="node57" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option" alt="" coords="1113,215,1324,262"/>
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1openmmio.html#a9f9fc56475dbfcc94a40fef6a84ed25f" title="forcebalance.openmmio.Update\lSimulationParameters" alt="" coords="267,5,458,49"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator." alt="" coords="507,13,778,41"/>
 </map>

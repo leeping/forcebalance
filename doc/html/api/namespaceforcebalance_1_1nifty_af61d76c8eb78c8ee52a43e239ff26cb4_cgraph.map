@@ -1,19 +1,21 @@
 <map id="forcebalance.nifty.pmat2d" name="forcebalance.nifty.pmat2d">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a3b437964dc22735bf8a7dcbaf99e413d" title="forcebalance.nifty.encode" alt="" coords="240,60,424,89"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a3b9fd8e29c5d8f1b2114e4d9662dfd61" title="forcebalance.nifty.segments" alt="" coords="472,33,672,63"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a9628ee448710667747d8aa5dc166532c" title="forcebalance.nifty.commadash" alt="" coords="720,33,936,63"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#afa670d68f01813ac8d429bc5cbdb4f9f" title="forcebalance.nifty.uncommadash" alt="" coords="984,33,1216,63"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a11babd62dc7bca389162c6318f9672ca" title="Cool&#45;looking printout for slick formatting of output." alt="" coords="1264,33,1456,63"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="2955,5,3120,51"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary..." alt="" coords="1504,101,1696,147"/>
-<area shape="rect" id="node19" href="$namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="1744,109,1907,139"/>
-<area shape="rect" id="node23" href="$namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="2201,137,2375,167"/>
-<area shape="rect" id="node21" href="$namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" title="Matches things with a decimal only; see isint and isfloat." alt="" coords="1956,84,2151,113"/>
-<area shape="rect" id="node32" href="$namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" title="Given any list, array, or matrix, return a 1&#45;column matrix." alt="" coords="2211,84,2365,113"/>
-<area shape="rect" id="node26" href="$namespaceforcebalance_1_1nifty.html#a8d63c8ae9a67c66673a6cf81357f827d" title="Returns a big number if we encounter NaN." alt="" coords="2425,163,2625,192"/>
-<area shape="rect" id="node28" href="$namespaceforcebalance_1_1nifty.html#a6c9727360cdff8f3011a12cc54d0e86e" title="Given any list, array, or matrix, return a 1&#45;row matrix." alt="" coords="2697,163,2855,192"/>
-<area shape="rect" id="node30" href="$namespaceforcebalance_1_1nifty.html#a7676236002c6a65ea7d2e69a09923889" title="Given two vectors vec1 and vec2, project out the component of vec1 that is along the vec2&#45;direction..." alt="" coords="2925,163,3149,192"/>
-<area shape="rect" id="node34" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="2448,109,2603,139"/>
-<area shape="rect" id="node36" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="2676,59,2876,88"/>
-<area shape="rect" id="node38" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get\l_least_squares" alt="" coords="2959,81,3116,127"/>
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1nifty.html#a3b437964dc22735bf8a7dcbaf99e413d" title="forcebalance.nifty.encode" alt="" coords="216,59,376,87"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a3b9fd8e29c5d8f1b2114e4d9662dfd61" title="forcebalance.nifty.segments" alt="" coords="424,33,595,61"/>
+<area shape="rect" id="node4" href="$namespaceforcebalance_1_1nifty.html#a9628ee448710667747d8aa5dc166532c" title="forcebalance.nifty.commadash" alt="" coords="644,33,828,61"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#afa670d68f01813ac8d429bc5cbdb4f9f" title="forcebalance.nifty.uncommadash" alt="" coords="878,33,1076,61"/>
+<area shape="rect" id="node6" href="$namespaceforcebalance_1_1nifty.html#a11babd62dc7bca389162c6318f9672ca" title="Cool&#45;looking printout for slick formatting of output." alt="" coords="1126,33,1295,61"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="2653,6,2801,50"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary..." alt="" coords="1345,102,1514,146"/>
+<area shape="rect" id="node8" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="2872,14,3080,42"/>
+<area shape="rect" id="node10" href="$namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="1563,110,1707,138"/>
+<area shape="rect" id="node12" href="$namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="1976,137,2131,165"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" title="Matches things with a decimal only; see isint and isfloat." alt="" coords="1755,85,1928,113"/>
+<area shape="rect" id="node16" href="$namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" title="Given any list, array, or matrix, return a 1&#45;column matrix." alt="" coords="1985,85,2122,113"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a8d63c8ae9a67c66673a6cf81357f827d" title="Returns a big number if we encounter NaN." alt="" coords="2179,162,2355,190"/>
+<area shape="rect" id="node14" href="$namespaceforcebalance_1_1nifty.html#a6c9727360cdff8f3011a12cc54d0e86e" title="Given any list, array, or matrix, return a 1&#45;row matrix." alt="" coords="2421,162,2563,190"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a7676236002c6a65ea7d2e69a09923889" title="Given two vectors vec1 and vec2, project out the component of vec1 that is along the vec2&#45;direction..." alt="" coords="2629,162,2824,190"/>
+<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="2197,110,2336,138"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="2403,58,2581,86"/>
+<area shape="rect" id="node19" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get\l_least_squares" alt="" coords="2658,81,2795,125"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10" title="Compute the (cross) statistical inefficiency of (two) timeseries." alt="" coords="2890,81,3062,125"/>
 </map>

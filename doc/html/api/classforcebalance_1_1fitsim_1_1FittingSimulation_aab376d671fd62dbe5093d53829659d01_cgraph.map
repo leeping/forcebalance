@@ -1,0 +1,16 @@
+<map id="forcebalance.fitsim.FittingSimulation.refresh_temp_directory" name="forcebalance.fitsim.FittingSimulation.refresh_temp_directory">
+<area shape="rect" id="node2" href="$classforcebalance_1_1fitsim_1_1FittingSimulation.html#ab973882d13b0b632a27e3507fcf47a7b" title="Every fitting simulation must be able to return a contribution to the objective function &#45; however..." alt="" coords="437,5,600,49"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1fitsim_1_1FittingSimulation.html#afbc9919622e07a763b8d71d0edc30a63" title="Stages the directory for the fitting simulation, and then calls &#39;get&#39;." alt="" coords="216,125,379,169"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b" title="forcebalance.optimizer.Counter" alt="" coords="660,43,850,71"/>
+<area shape="rect" id="node4" href="$namespaceforcebalance_1_1optimizer.html#ab43948ecf30c90d319e0c0b107fe484a" title="forcebalance.optimizer.GoodStep" alt="" coords="898,43,1099,71"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1fitsim_1_1FittingSimulation.html#af2467e635cc05270c463a9a3d01919a4" title="forcebalance.fitsim.Fitting\lSimulation.link_from_tempdir" alt="" coords="426,125,611,169"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#a2bb3ed7209707f688ec8b731392466b5" title="forcebalance.abinitio.Ab\lInitio.get" alt="" coords="442,193,595,237"/>
+<area shape="rect" id="node14" href="$classforcebalance_1_1binding_1_1BindingEnergy.html#a263fadef13141ef341a01d1f538f85af" title="forcebalance.binding.Binding\lEnergy.get" alt="" coords="429,261,609,305"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1counterpoise_1_1Counterpoise.html#a5fd50a4bb7d5e939b7e99ac648b35d59" title="Gets the objective function for fitting the counterpoise correction." alt="" coords="437,329,601,373"/>
+<area shape="rect" id="node8" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#a313c848f46579817803c8a3ff100974e" title="LPW 06&#45;30&#45;2013." alt="" coords="678,95,831,139"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#abfe50569805218075c5942fd3be8bbe7" title="Electrostatic potential fitting." alt="" coords="678,163,831,207"/>
+<area shape="rect" id="node10" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="694,231,815,275"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1abinitio.html#aba970cb59bab95eec79027ea05655110" title="A more generalized version of build_objective which is callable for derivatives, but the covariance i..." alt="" coords="662,299,848,343"/>
+<area shape="rect" id="node12" href="$namespaceforcebalance_1_1abinitio.html#ab9554761125a4ec7c3c13d6ae4ea537d" title="A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements..." alt="" coords="906,299,1092,343"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1abinitio.html#aadd1d6c5a34c82d495d6be7380b73601" title="This function builds an objective function (number) from the complicated polytensor and covariance ma..." alt="" coords="1147,299,1311,343"/>
+</map>
