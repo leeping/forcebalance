@@ -1,5 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node7" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html" title="forcebalance.psi4io.THCDF_Psi4" alt="" coords="55,229,280,256"/>
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="73,80,263,107"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="5,5,331,32"/>
+<map id="forcebalance.leastsq.LeastSquares" name="forcebalance.leastsq.LeastSquares">
+<area shape="rect" id="node5" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html" title="forcebalance.psi4io.THCDF_Psi4" alt="" coords="4,347,205,375"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="25,177,185,205"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="17,83,193,127"/>
 </map>

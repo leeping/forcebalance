@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$classforcebalance_1_1forcefield_1_1BackedUpDict.html" title="forcebalance.forcefield.BackedUpDict" alt="" coords="6,5,266,32"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classforcebalance_1_1fitsim_1_1FittingSimulation.html" title="Base class for all fitting simulations." alt="" coords="223,5,385,49"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1optimizer_1_1Optimizer.html" title="Optimizer class." alt="" coords="203,73,405,101"/>
 </map>

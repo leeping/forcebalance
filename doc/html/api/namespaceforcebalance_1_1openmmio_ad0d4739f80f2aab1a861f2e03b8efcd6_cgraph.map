@@ -1,9 +1,9 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1openmmio.html#abe005f73c6dfe9ce1052c9434bcad9be" title="forcebalance.openmmio.CopyAmoebaVdwParameters" alt="" coords="478,5,845,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1openmmio.html#a3706c19e71969cabe5782a4535abeffe" title="forcebalance.openmmio.CopyAmoebaMultipoleParameters" alt="" coords="894,5,1293,32"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1openmmio.html#a616f12cc53381716e5fa41f00bf623be" title="forcebalance.openmmio.CopyHarmonicBondParameters" alt="" coords="1342,5,1725,32"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1openmmio.html#af4ed16f5e2b1cd12bce2f25fab1b05bc" title="forcebalance.openmmio.CopyHarmonicAngleParameters" alt="" coords="1774,5,2159,32"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1openmmio.html#a8f13702754f0b4e43e272139a2ce8341" title="forcebalance.openmmio.CopyPeriodicTorsionParameters" alt="" coords="2208,5,2589,32"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1openmmio.html#afead47464a644d9225f9fa8eb568a8ed" title="forcebalance.openmmio.CopyNonbondedParameters" alt="" coords="2638,5,2999,32"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1openmmio.html#a2bb7add6b813d94f2655372c51fe8fdc" title="forcebalance.openmmio.do_nothing" alt="" coords="3049,5,3301,32"/>
+<map id="forcebalance.openmmio.CopyAmoebaInPlaneAngleParameters" name="forcebalance.openmmio.CopyAmoebaInPlaneAngleParameters">
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1openmmio.html#abe005f73c6dfe9ce1052c9434bcad9be" title="forcebalance.openmmio.Copy\lAmoebaVdwParameters" alt="" coords="254,5,436,49"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1openmmio.html#a3706c19e71969cabe5782a4535abeffe" title="forcebalance.openmmio.Copy\lAmoebaMultipoleParameters" alt="" coords="486,5,668,49"/>
+<area shape="rect" id="node4" href="$namespaceforcebalance_1_1openmmio.html#a616f12cc53381716e5fa41f00bf623be" title="forcebalance.openmmio.Copy\lHarmonicBondParameters" alt="" coords="718,5,900,49"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1openmmio.html#af4ed16f5e2b1cd12bce2f25fab1b05bc" title="forcebalance.openmmio.Copy\lHarmonicAngleParameters" alt="" coords="950,5,1132,49"/>
+<area shape="rect" id="node6" href="$namespaceforcebalance_1_1openmmio.html#a8f13702754f0b4e43e272139a2ce8341" title="forcebalance.openmmio.Copy\lPeriodicTorsionParameters" alt="" coords="1182,5,1364,49"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1openmmio.html#afead47464a644d9225f9fa8eb568a8ed" title="forcebalance.openmmio.Copy\lNonbondedParameters" alt="" coords="1414,5,1596,49"/>
+<area shape="rect" id="node8" href="$namespaceforcebalance_1_1openmmio.html#a2bb7add6b813d94f2655372c51fe8fdc" title="forcebalance.openmmio.do\l_nothing" alt="" coords="1646,5,1813,49"/>
 </map>

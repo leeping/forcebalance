@@ -1,9 +1,9 @@
-<map id="G" name="G">
-<area shape="rect" id="node7" href="$classforcebalance_1_1abinitio__internal_1_1AbInitio__Internal.html" title="Subclass of Target for force and energy matching using an internal implementation." alt="" coords="875,5,1189,32"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1amberio_1_1AbInitio__AMBER.html" title="Subclass of Target for force and energy matching using AMBER." alt="" coords="900,56,1164,83"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html" title="Subclass of AbInitio for force and energy matching using normal GROMACS." alt="" coords="915,107,1149,133"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html" title="Subclass of AbInitio for force and energy matching using OpenMM." alt="" coords="887,157,1177,184"/>
-<area shape="rect" id="node15" href="$classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html" title="Subclass of Target for force and energy matching using TINKER." alt="" coords="903,208,1161,235"/>
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="382,107,573,133"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="6,107,333,133"/>
+<map id="forcebalance.abinitio.AbInitio" name="forcebalance.abinitio.AbInitio">
+<area shape="rect" id="node5" href="$classforcebalance_1_1abinitio__internal_1_1AbInitio__Internal.html" title="Subclass of Target for force and energy matching using an internal implementation." alt="" coords="768,5,933,49"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1amberio_1_1AbInitio__AMBER.html" title="Subclass of Target for force and energy matching using AMBER." alt="" coords="758,73,943,117"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html" title="Subclass of AbInitio for force and energy matching using normal GROMACS." alt="" coords="744,141,957,169"/>
+<area shape="rect" id="node8" href="$classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html" title="Subclass of AbInitio for force and energy matching using OpenMM." alt="" coords="766,193,935,237"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html" title="Subclass of Target for force and energy matching using TINKER." alt="" coords="774,261,928,305"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="331,141,493,169"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="107,133,283,177"/>
 </map>

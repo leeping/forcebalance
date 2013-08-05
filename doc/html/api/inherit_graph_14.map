@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$classforcebalance_1_1objective_1_1Penalty.html" title="Penalty functions for regularizing the force field optimizer." alt="" coords="5,5,221,32"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node2" href="$classforcebalance_1_1output_1_1CleanFileHandler.html" title="File handler that does not write terminal escape codes to files." alt="" coords="146,5,307,49"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1output_1_1RawFileHandler.html" title="Exactly like output.FileHandler except it does no extra formatting before sending logging messages to..." alt="" coords="139,73,314,117"/>
 </map>

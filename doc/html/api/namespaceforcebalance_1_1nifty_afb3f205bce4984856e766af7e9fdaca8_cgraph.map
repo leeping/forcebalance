@@ -1,7 +1,8 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="208,56,365,83"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="413,5,616,32"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get_least_squares" alt="" coords="665,56,919,83"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="673,5,911,32"/>
-<area shape="rect" id="node10" href="$namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10" title="Compute the (cross) statistical inefficiency of (two) timeseries." alt="" coords="969,56,1237,83"/>
+<map id="forcebalance.nifty.col" name="forcebalance.nifty.col">
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="192,81,331,109"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="379,29,557,57"/>
+<area shape="rect" id="node4" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get\l_least_squares" alt="" coords="611,73,749,117"/>
+<area shape="rect" id="node6" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="606,5,754,49"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10" title="Compute the (cross) statistical inefficiency of (two) timeseries." alt="" coords="821,73,992,117"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="803,13,1011,41"/>
 </map>
