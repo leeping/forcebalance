@@ -1,10 +1,3 @@
-<map id="forcebalance.gmxqpio.Monomer_QTPIE.unpack_moments" name="forcebalance.gmxqpio.Monomer_QTPIE.unpack_moments">
-<area shape="rect" id="node3" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#a46144411b5166a1839bf954b584ca3a7" title="forcebalance.gmxqpio.Monomer\l_QTPIE.get" alt="" coords="284,95,511,142"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1gmxqpio.html#a499ed366638eae7be524b18760a986b8" title="forcebalance.gmxqpio.get\l_monomer_properties" alt="" coords="561,5,748,51"/>
-<area shape="rect" id="node10" href="$namespaceforcebalance_1_1finite__difference.html#aa69a8819e4680091f400303c1d6ddeb7" title="A three&#45;point finite difference stencil." alt="" coords="585,125,724,171"/>
-<area shape="rect" id="node12" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="832,78,971,125"/>
-<area shape="rect" id="node14" href="$namespaceforcebalance_1_1finite__difference.html#ae484c591ae8c4e5bae73a0ef2660c339" title="A function wrapper for finite difference designed for differentiating &#39;get&#39;&#45;type functions." alt="" coords="832,171,971,218"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="797,13,1005,43"/>
-<area shape="rect" id="node16" href="$namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t..." alt="" coords="1053,171,1208,218"/>
-<area shape="rect" id="node19" href="$namespaceforcebalance_1_1finite__difference.html#a77a0bc1ae3cbbcc8d38a0ef9ca877d6d" title="A driver to fdwrap for Hessians (see documentation for fdwrap) Inputs: tgt = The Target containing th..." alt="" coords="1053,241,1208,287"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#a46144411b5166a1839bf954b584ca3a7" title="Every target must be able to return a contribution to the objective function &#45; however, this must be implemented in the specific subclass." alt="" coords="445,5,741,32"/>
 </map>

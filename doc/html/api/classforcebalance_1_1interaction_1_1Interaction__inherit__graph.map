@@ -1,7 +1,7 @@
-<map id="forcebalance.interaction.Interaction" name="forcebalance.interaction.Interaction">
-<area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1Interaction__GMX.html" title="Subclass of Interaction for interaction energy matching using GROMACS." alt="" coords="841,5,1095,35"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html" title="Subclass of Target for interaction matching using OpenMM." alt="" coords="844,58,1092,105"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1tinkerio_1_1Interaction__TINKER.html" title="Subclass of Target for interaction matching using TINKER." alt="" coords="855,127,1081,174"/>
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="373,67,563,96"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="116,58,324,105"/>
+<map id="G" name="G">
+<area shape="rect" id="node7" href="$classforcebalance_1_1gmxio_1_1Interaction__GMX.html" title="Subclass of Interaction for interaction energy matching using GROMACS." alt="" coords="946,5,1201,32"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html" title="Subclass of Target for interaction matching using OpenMM." alt="" coords="917,56,1229,83"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1tinkerio_1_1Interaction__TINKER.html" title="Subclass of Target for interaction matching using TINKER." alt="" coords="934,107,1213,133"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="382,56,573,83"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="6,56,333,83"/>
 </map>

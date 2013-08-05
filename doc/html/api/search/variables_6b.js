@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['kb',['kb',['../namespaceforcebalance_1_1nifty.html#ae0916a3186f4f8b238a0d58bb9f6a3da',1,'forcebalance::nifty']]]
+  ['kb',['kb',['../namespaceforcebalance_1_1nifty.html#aace36d3e1ed8cd2ead67d53ec177063f',1,'forcebalance::nifty']]]
 ];

@@ -1,4 +1,4 @@
-<map id="forcebalance.Mol2.mol2.out" name="forcebalance.Mol2.mol2.out">
-<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2.html#a57bf99785e120a6aedd8be49585f4c5d" title="number of substructures (integer)" alt="" coords="253,29,451,75"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2.html#aaab9bc1afebb05a355c53db2a35740be" title="bond identifier (integer, starting from 1)" alt="" coords="499,29,696,75"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2.html#a57bf99785e120a6aedd8be49585f4c5d" title="number of substructures (integer)" alt="" coords="254,29,530,56"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2.html#aaab9bc1afebb05a355c53db2a35740be" title="bond identifier (integer, starting from 1)" alt="" coords="579,29,863,56"/>
 </map>
