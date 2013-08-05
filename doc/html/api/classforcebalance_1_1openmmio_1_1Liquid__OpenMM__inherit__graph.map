@@ -1,5 +1,5 @@
-<map id="forcebalance.openmmio.Liquid_OpenMM" name="forcebalance.openmmio.Liquid_OpenMM">
-<area shape="rect" id="node2" href="$classforcebalance_1_1liquid_1_1Liquid.html" title="Subclass of Target for liquid property matching." alt="" coords="17,254,180,282"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="18,177,179,205"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="11,83,187,127"/>
+<map id="G" name="G">
+<area shape="rect" id="node2" href="$classforcebalance_1_1liquid_1_1Liquid.html" title="Subclass of Target for liquid property matching." alt="" coords="77,155,259,181"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="73,80,263,107"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="5,5,331,32"/>
 </map>

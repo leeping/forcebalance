@@ -1,12 +1,12 @@
-<map id="forcebalance.Mol2.mol2_atom.set_subst_name" name="forcebalance.Mol2.mol2_atom.set_subst_name">
-<area shape="rect" id="node2" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a2b8855f5349976b26917fee353618354" title="Never to use (in theory)" alt="" coords="205,111,358,155"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a1d745e4db9ba351cb8e4e53bf544132c" title="if data is passed, it will be installed" alt="" coords="405,51,558,95"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a29aaa00b8fa91f4d18cef387622d339d" title="split the text line into a series of properties" alt="" coords="405,171,558,215"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a2e0ecf1c6da8fde8ab146d4341ac1341" title="assemble the properties as a text line, and return it" alt="" coords="605,111,758,155"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a3a6c9728119ace119108183920689a9d" title="the coordinates of the atom" alt="" coords="1005,213,1158,257"/>
-<area shape="rect" id="node6" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#ae879ba27197a573b6e3e1e97f0b76aff" title="substructure identifier" alt="" coords="1205,263,1358,307"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#abfe80eac2952ad867d87e8b6e64f3c09" title="atomic charge" alt="" coords="1405,294,1558,338"/>
-<area shape="rect" id="node8" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a233ebfedcde7e5d75b0ec54f194d2b4f" title="The mol2 type of the atom." alt="" coords="1005,43,1158,87"/>
-<area shape="rect" id="node10" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a1af054109bd2d27c29e89b5da0f70920" title="atom identifier (integer, starting from 1)" alt="" coords="805,111,958,155"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a4d57220ec5b591ad018112d600d4cc8b" title="The name of the atom (string)" alt="" coords="805,43,958,87"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a2b8855f5349976b26917fee353618354" title="Never to use (in theory)" alt="" coords="379,93,688,120"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a1d745e4db9ba351cb8e4e53bf544132c" title="if data is passed, it will be installed" alt="" coords="736,43,1003,69"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a29aaa00b8fa91f4d18cef387622d339d" title="split the text line into a series of properties" alt="" coords="742,144,997,171"/>
+<area shape="rect" id="node22" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a2e0ecf1c6da8fde8ab146d4341ac1341" title="assemble the properties as a text line, and return it" alt="" coords="1051,93,1325,120"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a3a6c9728119ace119108183920689a9d" title="the coordinates of the atom" alt="" coords="1767,195,2041,221"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#ae879ba27197a573b6e3e1e97f0b76aff" title="substructure identifier" alt="" coords="2109,245,2408,272"/>
+<area shape="rect" id="node13" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#abfe80eac2952ad867d87e8b6e64f3c09" title="atomic charge" alt="" coords="2456,271,2747,297"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a233ebfedcde7e5d75b0ec54f194d2b4f" title="The mol2 type of the atom." alt="" coords="1747,43,2061,69"/>
+<area shape="rect" id="node24" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a1af054109bd2d27c29e89b5da0f70920" title="atom identifier (integer, starting from 1)" alt="" coords="1387,93,1685,120"/>
+<area shape="rect" id="node27" href="$classforcebalance_1_1Mol2_1_1mol2__atom.html#a4d57220ec5b591ad018112d600d4cc8b" title="The name of the atom (string)" alt="" coords="1374,43,1698,69"/>
 </map>

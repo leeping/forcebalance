@@ -1,41 +1,12 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node2" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="116,530,292,574"/>
-<area shape="rect" id="node30" href="$classforcebalance_1_1basereader_1_1BaseReader.html" title="The &#39;reader&#39; class." alt="" coords="127,854,281,898"/>
-<area shape="rect" id="node40" href="$classforcebalance_1_1molecule_1_1Molecule.html" title="Lee&#45;Ping&#39;s general file format conversion class." alt="" coords="106,922,302,950"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1forcefield_1_1FF.html" title="Force field class." alt="" coords="367,459,529,487"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1objective_1_1Objective.html" title="Objective function." alt="" coords="350,511,546,539"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="367,563,529,591"/>
-<area shape="rect" id="node6" href="$classforcebalance_1_1abinitio_1_1AbInitio.html" title="Subclass of Target for fitting force fields to ab initio data." alt="" coords="619,163,773,207"/>
-<area shape="rect" id="node12" href="$classforcebalance_1_1binding_1_1BindingEnergy.html" title="Improved subclass of Target for fitting force fields to binding energies." alt="" coords="606,318,786,362"/>
-<area shape="rect" id="node14" href="$classforcebalance_1_1counterpoise_1_1Counterpoise.html" title="Target subclass for matching the counterpoise correction." alt="" coords="614,386,778,430"/>
-<area shape="rect" id="node15" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html" title="Subclass of Target for monomer properties of QTPIE (implemented within gromacs WCV branch)..." alt="" coords="598,454,794,498"/>
-<area shape="rect" id="node16" href="$classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies." alt="" coords="619,522,773,566"/>
-<area shape="rect" id="node20" href="$classforcebalance_1_1leastsq_1_1LeastSquares.html" title="Subclass of Target for general least squares fitting." alt="" coords="615,590,777,634"/>
-<area shape="rect" id="node22" href="$classforcebalance_1_1liquid_1_1Liquid.html" title="Subclass of Target for liquid property matching." alt="" coords="615,658,777,686"/>
-<area shape="rect" id="node26" href="$classforcebalance_1_1moments_1_1Moments.html" title="Subclass of Target for fitting force fields to multipole moments (from experiment or theory)..." alt="" coords="598,710,794,738"/>
-<area shape="rect" id="node28" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html" title="Subclass of Target for R&#45;DVR3 grid fitting." alt="" coords="595,762,797,790"/>
-<area shape="rect" id="node29" href="$classforcebalance_1_1vibration_1_1Vibration.html" title="Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory)..." alt="" coords="598,814,794,842"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1abinitio__internal_1_1AbInitio__Internal.html" title="Subclass of Target for force and energy matching using an internal implementation." alt="" coords="876,5,1041,49"/>
-<area shape="rect" id="node8" href="$classforcebalance_1_1amberio_1_1AbInitio__AMBER.html" title="Subclass of Target for force and energy matching using AMBER." alt="" coords="866,73,1051,117"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html" title="Subclass of AbInitio for force and energy matching using normal GROMACS." alt="" coords="852,141,1065,169"/>
-<area shape="rect" id="node10" href="$classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html" title="Subclass of AbInitio for force and energy matching using OpenMM." alt="" coords="874,193,1043,237"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html" title="Subclass of Target for force and energy matching using TINKER." alt="" coords="882,261,1036,305"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER.html" title="Subclass of BindingEnergy for binding energy matching using TINKER." alt="" coords="868,329,1049,373"/>
-<area shape="rect" id="node17" href="$classforcebalance_1_1gmxio_1_1Interaction__GMX.html" title="Subclass of Interaction for interaction energy matching using GROMACS." alt="" coords="846,406,1072,434"/>
-<area shape="rect" id="node18" href="$classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html" title="Subclass of Target for interaction matching using OpenMM." alt="" coords="853,458,1064,502"/>
-<area shape="rect" id="node19" href="$classforcebalance_1_1tinkerio_1_1Interaction__TINKER.html" title="Subclass of Target for interaction matching using TINKER." alt="" coords="861,526,1056,570"/>
-<area shape="rect" id="node21" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html" title="forcebalance.psi4io.THCDF_Psi4" alt="" coords="858,594,1060,622"/>
-<area shape="rect" id="node23" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html" title="forcebalance.gmxio.Liquid_GMX" alt="" coords="857,646,1060,674"/>
-<area shape="rect" id="node24" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html" title="forcebalance.openmmio.Liquid\l_OpenMM" alt="" coords="864,698,1053,742"/>
-<area shape="rect" id="node25" href="$classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html" title="forcebalance.tinkerio.Liquid\l_TINKER" alt="" coords="872,766,1045,810"/>
-<area shape="rect" id="node27" href="$classforcebalance_1_1tinkerio_1_1Moments__TINKER.html" title="Subclass of Target for multipole moment matching using TINKER." alt="" coords="865,834,1053,878"/>
-<area shape="rect" id="node31" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html" title="Finite state machine for parsing FrcMod force field file." alt="" coords="369,615,527,659"/>
-<area shape="rect" id="node32" href="$classforcebalance_1_1amberio_1_1Mol2__Reader.html" title="Finite state machine for parsing Mol2 force field file." alt="" coords="364,683,532,727"/>
-<area shape="rect" id="node33" href="$classforcebalance_1_1custom__io_1_1Gen__Reader.html" title="Finite state machine for parsing custom GROMACS force field files." alt="" coords="382,751,514,795"/>
-<area shape="rect" id="node34" href="$classforcebalance_1_1gmxio_1_1ITP__Reader.html" title="Finite state machine for parsing GROMACS force field files." alt="" coords="373,819,523,863"/>
-<area shape="rect" id="node35" href="$classforcebalance_1_1openmmio_1_1OpenMM__Reader.html" title="Class for parsing OpenMM force field files." alt="" coords="357,887,539,931"/>
-<area shape="rect" id="node36" href="$classforcebalance_1_1psi4io_1_1GBS__Reader.html" title="Interaction type &#45;&gt; Parameter Dictionary." alt="" coords="371,955,525,999"/>
-<area shape="rect" id="node37" href="$classforcebalance_1_1psi4io_1_1Grid__Reader.html" title="Finite state machine for parsing DVR grid files." alt="" coords="371,1023,525,1067"/>
-<area shape="rect" id="node38" href="$classforcebalance_1_1qchemio_1_1QCIn__Reader.html" title="Finite state machine for parsing Q&#45;Chem input files." alt="" coords="362,1091,534,1135"/>
-<area shape="rect" id="node39" href="$classforcebalance_1_1tinkerio_1_1Tinker__Reader.html" title="Finite state machine for parsing TINKER force field files." alt="" coords="361,1159,535,1203"/>
+<map id="G" name="G">
+<area shape="rect" id="node1" href="$classforcebalance_1_1basereader_1_1BaseReader.html" title="The &#39;reader&#39; class." alt="" coords="6,208,266,235"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html" title="Finite state machine for parsing FrcMod force field file." alt="" coords="328,5,589,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1amberio_1_1Mol2__Reader.html" title="Finite state machine for parsing Mol2 force field file." alt="" coords="335,56,582,83"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1custom__io_1_1Gen__Reader.html" title="Finite state machine for parsing custom GROMACS force field files." alt="" coords="331,107,586,133"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1ITP__Reader.html" title="Finite state machine for parsing GROMACS force field files." alt="" coords="349,157,569,184"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1openmmio_1_1OpenMM__Reader.html" title="Class for parsing OpenMM force field files." alt="" coords="315,208,603,235"/>
+<area shape="rect" id="node13" href="$classforcebalance_1_1psi4io_1_1GBS__Reader.html" title="Interaction type &#45;&gt; Parameter Dictionary." alt="" coords="345,259,573,285"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1psi4io_1_1Grid__Reader.html" title="Finite state machine for parsing DVR grid files." alt="" coords="345,309,572,336"/>
+<area shape="rect" id="node17" href="$classforcebalance_1_1qchemio_1_1QCIn__Reader.html" title="Finite state machine for parsing Q&#45;Chem input files." alt="" coords="335,360,583,387"/>
+<area shape="rect" id="node19" href="$classforcebalance_1_1tinkerio_1_1Tinker__Reader.html" title="Finite state machine for parsing TINKER force field files." alt="" coords="335,411,583,437"/>
 </map>

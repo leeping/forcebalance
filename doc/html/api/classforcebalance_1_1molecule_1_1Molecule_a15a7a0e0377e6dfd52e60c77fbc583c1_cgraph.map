@@ -1,5 +1,5 @@
-<map id="forcebalance.molecule.Molecule.read_xyz" name="forcebalance.molecule.Molecule.read_xyz">
-<area shape="rect" id="node2" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="325,5,499,49"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1molecule_1_1Molecule.html#a1d34af6a7d22dd34850d58efe8595b20" title="forcebalance.molecule.Molecule.read\l_qdata" alt="" coords="301,73,523,117"/>
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989" title="This function takes in three lattice vectors and tries to return a complete box specification." alt="" coords="571,5,746,49"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="341,5,712,32"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a1d34af6a7d22dd34850d58efe8595b20" title="forcebalance.molecule.Molecule.read_qdata" alt="" coords="375,56,678,83"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989" title="This function takes in three lattice vectors and tries to return a complete box specification." alt="" coords="761,5,1085,32"/>
 </map>

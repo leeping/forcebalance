@@ -1,8 +1,7 @@
-<map id="forcebalance.tinkerio.Moments_TINKER.__init__" name="forcebalance.tinkerio.Moments_TINKER.__init__">
-<area shape="rect" id="node2" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="243,17,410,45"/>
-<area shape="rect" id="node4" href="$namespaceforcebalance_1_1tinkerio.html#a9cde7bd64c6f5286c1f33a39211d5a11" title="Copies a TINKER .key file but changes the parameter keyword as necessary to reflect the ForceBalance ..." alt="" coords="244,73,409,117"/>
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="479,5,641,49"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="486,73,634,117"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1tinkerio.html#aa82c424420ad59b6a78b273d6c1fd469" title="Performs in&#45;place modification of a TINKER .key file." alt="" coords="459,141,661,169"/>
-<area shape="rect" id="node6" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="709,81,917,109"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="426,5,609,32"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1tinkerio.html#a9cde7bd64c6f5286c1f33a39211d5a11" title="Copies a TINKER .key file but changes the parameter keyword as necessary to reflect the ForceBalance ..." alt="" coords="376,56,659,83"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="707,5,951,32"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="710,56,949,83"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1tinkerio.html#aa82c424420ad59b6a78b273d6c1fd469" title="Performs in&#45;place modification of a TINKER .key file." alt="" coords="714,107,945,133"/>
 </map>

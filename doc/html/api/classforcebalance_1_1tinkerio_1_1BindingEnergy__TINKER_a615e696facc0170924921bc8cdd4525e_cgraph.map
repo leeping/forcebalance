@@ -1,8 +1,23 @@
-<map id="forcebalance.tinkerio.BindingEnergy_TINKER.system_driver" name="forcebalance.tinkerio.BindingEnergy_TINKER.system_driver">
-<area shape="rect" id="node2" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="270,5,418,49"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER.html#aa7a420d09d5b0370fa8c8bdd713e1adf" title="forcebalance.tinkerio.Binding\lEnergy_TINKER.__init__" alt="" coords="254,73,434,117"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="508,110,676,138"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER.html#a88b6b57fdddb3c8f79e8d0ae48b71e88" title="forcebalance.tinkerio.Binding\lEnergy_TINKER.prepare_temp\l_directory" alt="" coords="248,193,440,253"/>
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="488,13,696,41"/>
-<area shape="rect" id="node6" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="745,102,906,146"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="3078,125,3317,151"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER.html#aa7a420d09d5b0370fa8c8bdd713e1adf" title="All options here are intended to be usable by every conceivable type of target (in other words..." alt="" coords="501,49,853,75"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="1005,49,1187,75"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER.html#a88b6b57fdddb3c8f79e8d0ae48b71e88" title="forcebalance.tinkerio.BindingEnergy_TINKER.prepare_temp_directory" alt="" coords="448,150,907,177"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="1286,49,1530,75"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#afa670d68f01813ac8d429bc5cbdb4f9f" title="forcebalance.nifty.uncommadash" alt="" coords="979,201,1213,227"/>
+<area shape="rect" id="node47" href="$namespaceforcebalance_1_1tinkerio.html#a9cde7bd64c6f5286c1f33a39211d5a11" title="Copies a TINKER .key file but changes the parameter keyword as necessary to reflect the ForceBalance ..." alt="" coords="955,150,1237,177"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a11babd62dc7bca389162c6318f9672ca" title="Cool&#45;looking printout for slick formatting of output." alt="" coords="1312,201,1504,227"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary..." alt="" coords="1579,239,1840,266"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="1888,239,2051,266"/>
+<area shape="rect" id="node24" href="$namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="2345,290,2519,317"/>
+<area shape="rect" id="node22" href="$namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" title="Matches things with a decimal only; see isint and isfloat." alt="" coords="2099,214,2296,241"/>
+<area shape="rect" id="node33" href="$namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" title="Given any list, array, or matrix, return a 1&#45;column matrix." alt="" coords="2355,214,2509,241"/>
+<area shape="rect" id="node27" href="$namespaceforcebalance_1_1nifty.html#a8d63c8ae9a67c66673a6cf81357f827d" title="Returns a big number if we encounter NaN." alt="" coords="2568,302,2771,329"/>
+<area shape="rect" id="node29" href="$namespaceforcebalance_1_1nifty.html#a6c9727360cdff8f3011a12cc54d0e86e" title="Given any list, array, or matrix, return a 1&#45;row matrix." alt="" coords="2841,302,2999,329"/>
+<area shape="rect" id="node31" href="$namespaceforcebalance_1_1nifty.html#a7676236002c6a65ea7d2e69a09923889" title="Given two vectors vec1 and vec2, project out the component of vec1 that is along the vec2&#45;direction..." alt="" coords="3085,302,3309,329"/>
+<area shape="rect" id="node35" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="2591,251,2748,278"/>
+<area shape="rect" id="node37" href="$namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" title="Invert a matrix using singular value decomposition." alt="" coords="2819,201,3021,227"/>
+<area shape="rect" id="node39" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get_least_squares" alt="" coords="3070,226,3325,253"/>
+<area shape="rect" id="node42" href="$namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10" title="Compute the (cross) statistical inefficiency of (two) timeseries." alt="" coords="3374,226,3642,253"/>
+<area shape="rect" id="node50" href="$namespaceforcebalance_1_1tinkerio.html#aa82c424420ad59b6a78b273d6c1fd469" title="Performs in&#45;place modification of a TINKER .key file." alt="" coords="1293,150,1523,177"/>
 </map>

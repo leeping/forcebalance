@@ -1,14 +1,14 @@
-<map id="forcebalance.Mol2.mol2.set_mol_type" name="forcebalance.Mol2.mol2.set_mol_type">
-<area shape="rect" id="node2" href="$classforcebalance_1_1Mol2_1_1mol2.html#a067b764ea4c695738f51bc5f995f6f73" title="number of bonds (integer)" alt="" coords="224,5,395,49"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2.html#a57bf99785e120a6aedd8be49585f4c5d" title="number of substructures (integer)" alt="" coords="224,73,395,117"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2.html#ab5de4b8eef6e851d9be12ecb92cf8f86" title="number of features (integer)" alt="" coords="661,163,832,207"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1Mol2_1_1mol2.html#a981c9a485d4db6abbcb61b8188090078" title="number of sets (integer)" alt="" coords="224,226,395,270"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1Mol2_1_1mol2.html#aaab9bc1afebb05a355c53db2a35740be" title="bond identifier (integer, starting from 1)" alt="" coords="443,73,613,117"/>
-<area shape="rect" id="node6" href="$classforcebalance_1_1Mol2_1_1mol2.html#a8d49f0024dfe625e1b43a244ec76f3b3" title="Parse a series of text lines, and setup compound information." alt="" coords="880,171,1064,199"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1Mol2_1_1mol2.html#af5a261aefed1c65fd5f56b5b30e69995" title="return the atom instance given its atom identifier" alt="" coords="1112,119,1317,147"/>
-<area shape="rect" id="node8" href="$classforcebalance_1_1Mol2_1_1mol2.html#a2d2b34613f2b72ad3a7fcdc94a3de994" title="return a dictionnary of atom instances bonded to the atom, and their types" alt="" coords="1366,134,1538,178"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1Mol2_1_1mol2.html#aa5a8b41dee69923e1854b0385ba588a4" title="modify atom types to specify donnor, acceptor, or both" alt="" coords="1129,223,1300,267"/>
-<area shape="rect" id="node10" href="$classforcebalance_1_1Mol2_1_1mol2.html#ad2182f9984dda90dfbd036d70921d5d8" title="forcebalance.Mol2.mol2.\l__init__" alt="" coords="1374,223,1530,267"/>
-<area shape="rect" id="node12" href="$classforcebalance_1_1Mol2_1_1mol2.html#a4055fdaf7ab9a93d60577a8ce4d91ce1" title="bond identifier (integer, starting from 1)" alt="" coords="443,193,613,237"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1Mol2_1_1mol2.html#a9aa06696da4a8e209bf5fca3acdf790b" title="number of atoms (integer)" alt="" coords="443,261,613,305"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2.html#a067b764ea4c695738f51bc5f995f6f73" title="number of bonds (integer)" alt="" coords="317,5,597,32"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1Mol2_1_1mol2.html#a57bf99785e120a6aedd8be49585f4c5d" title="number of substructures (integer)" alt="" coords="319,56,595,83"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1Mol2_1_1mol2.html#ab5de4b8eef6e851d9be12ecb92cf8f86" title="number of features (integer)" alt="" coords="979,132,1245,159"/>
+<area shape="rect" id="node24" href="$classforcebalance_1_1Mol2_1_1mol2.html#a981c9a485d4db6abbcb61b8188090078" title="number of sets (integer)" alt="" coords="323,183,591,209"/>
+<area shape="rect" id="node8" href="$classforcebalance_1_1Mol2_1_1mol2.html#aaab9bc1afebb05a355c53db2a35740be" title="bond identifier (integer, starting from 1)" alt="" coords="646,56,930,83"/>
+<area shape="rect" id="node13" href="$classforcebalance_1_1Mol2_1_1mol2.html#a8d49f0024dfe625e1b43a244ec76f3b3" title="Parse a series of text lines, and setup compound information." alt="" coords="1294,132,1509,159"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1Mol2_1_1mol2.html#af5a261aefed1c65fd5f56b5b30e69995" title="return the atom instance given its atom identifier" alt="" coords="1619,81,1859,108"/>
+<area shape="rect" id="node17" href="$classforcebalance_1_1Mol2_1_1mol2.html#a2d2b34613f2b72ad3a7fcdc94a3de994" title="return a dictionnary of atom instances bonded to the atom, and their types" alt="" coords="1969,107,2271,133"/>
+<area shape="rect" id="node20" href="$classforcebalance_1_1Mol2_1_1mol2.html#aa5a8b41dee69923e1854b0385ba588a4" title="modify atom types to specify donnor, acceptor, or both" alt="" coords="1558,183,1919,209"/>
+<area shape="rect" id="node22" href="$classforcebalance_1_1Mol2_1_1mol2.html#ad2182f9984dda90dfbd036d70921d5d8" title="forcebalance.Mol2.mol2.__init__" alt="" coords="2007,183,2233,209"/>
+<area shape="rect" id="node26" href="$classforcebalance_1_1Mol2_1_1mol2.html#a4055fdaf7ab9a93d60577a8ce4d91ce1" title="bond identifier (integer, starting from 1)" alt="" coords="651,157,925,184"/>
+<area shape="rect" id="node29" href="$classforcebalance_1_1Mol2_1_1mol2.html#a9aa06696da4a8e209bf5fca3acdf790b" title="number of atoms (integer)" alt="" coords="647,208,929,235"/>
 </map>

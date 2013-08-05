@@ -1,5 +1,5 @@
-<map id="forcebalance.parser.read_mvals" name="forcebalance.parser.read_mvals">
-<area shape="rect" id="node2" href="$namespaceforcebalance_1_1parser.html#a56fb1e139dad24bac29f25a3870765ca" title="forcebalance.parser.read\l_pvals" alt="" coords="206,5,357,49"/>
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1parser.html#a94c3f1acd06b640db3042dc45e32af8e" title="forcebalance.parser.read\l_priors" alt="" coords="406,5,557,49"/>
-<area shape="rect" id="node4" href="$namespaceforcebalance_1_1parser.html#a10827b0b21d0463bc9e786f161a02654" title="forcebalance.parser.read\l_internals" alt="" coords="606,5,757,49"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1parser.html#a56fb1e139dad24bac29f25a3870765ca" title="forcebalance.parser.read_pvals" alt="" coords="280,5,501,32"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1parser.html#a94c3f1acd06b640db3042dc45e32af8e" title="forcebalance.parser.read_priors" alt="" coords="549,5,773,32"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1parser.html#a10827b0b21d0463bc9e786f161a02654" title="forcebalance.parser.read_internals" alt="" coords="821,5,1064,32"/>
 </map>
