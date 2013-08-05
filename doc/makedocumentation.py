@@ -4,53 +4,109 @@ streamline the process and provide some customizations to the automatically
 generated documents
 """
 
-import os
+import os, sys
 import re
 import shutil
 import subprocess
+import argparse
 from datetime import datetime
+        
+def build(interactive=False):
 
-def add_tab(fnm):
-    """Add tabs to html version of general documentation"""
-    newfile = []
-    installtag = ' class="current"' if fnm.split('/')[-1] == 'installation.html' else ''
-    usagetag = ' class="current"' if fnm.split('/')[-1] == 'usage.html' else ''
-    tutorialtag = ' class="current"' if fnm.split('/')[-1] == 'tutorial.html' else ''
-    glossarytag = ' class="current"' if fnm.split('/')[-1] == 'glossary.html' else ''
-    todotag = ' class="current"' if fnm.split('/')[-1] == 'todo.html' else ''
+    if interactive:
+        display = lambda txt : raw_input("\n$ %s\r" % txt)
+    else:
+        display = lambda txt : sys.stdout.write("$ %s\n" % txt)
+
+    display("python make-option-index.py > option_index.txt")
+    os.system("python make-option-index.py > option_index.txt")
+
+    # generate pages to be included in general documentation
+    mainpage=""
+    mainpage+="/**\n\n\\mainpage\n\n"
+    for fnm in ["introduction.txt", "installation.txt", "usage.txt", "tutorial.txt", "glossary.txt", "option_index.txt"]:
+        page=open(fnm,'r')
+        mainpage+=page.read()
+    mainpage+="\n\\image latex ForceBalance.pdf \"Logo.\" height=10cm\n\n*/"
     
-    for line in open(fnm):
-        newfile.append(line)
-        if re.match('.*a href="index\.html"',line):
-            newfile.append('      <li%s><a href="installation.html"><span>Installation</span></a></li>\n' % installtag)
-            newfile.append('      <li%s><a href="usage.html"><span>Usage</span></a></li>\n' % usagetag)
-            newfile.append('      <li%s><a href="tutorial.html"><span>Tutorial</span></a></li>\n' % tutorialtag)
-            newfile.append('      <li%s><a href="glossary.html"><span>Glossary</span></a></li>\n' % glossarytag)
-            newfile.append('      <li><a href="api/roadmap.html"><span>API</span></a></li>\n')
-    with open(fnm,'w') as f: f.writelines(newfile)
+    with open('mainpage.dox','w') as f:
+        f.write(mainpage)
 
-def redirect_main_tab(fnm):
-    """Redirect the 'main page' tab of API documentation to integrate with general documentation"""
-    newfile=[]
-    for line in open(fnm):
-        if re.match('.*a href="index\.html"',line):
-            newfile.append('      <li><a href="../index.html"><span>Main Page</span></a></li>\n')
-            newfile.append('      <li ')
-            if re.match('.*roadmap\.html$', fnm): newfile.append('class="current"')
-            newfile.append('><a href="roadmap.html"><span>Project Roadmap</span></a></li>\n')
-        else: newfile.append(line)
-    with open(fnm,'w') as f: f.writelines(newfile)
+    # generate pages to be included in API documentation
+    api=""
+    api+="/**\n\n"
+    for fnm in ["roadmap.txt"]:
+        page=open(fnm,'r')
+        api+=page.read()
+    api+="\n\n*/"
 
+    with open('api.dox','w') as f:
+        f.write(api)
+    
+    # Run doxygen to generate general documentation
+    display("doxygen doxygen.cfg")
+    subprocess.call(['doxygen', 'doxygen.cfg'])
 
-def parse_html():
-    """Look for HTML files that need processing"""
+    # Run doxygen to generate technical (API) documentation
+    display("doxygen api.cfg")
+    subprocess.call(['doxygen', 'api.cfg'])
+    
+    display("python -c 'from makedocumentation import add_tabs; add_tabs()'")
+    add_tabs(fnm)
+    
+    # Compile pdf formats
+    display("cp Images/ForceBalance.pdf latex/")
+    shutil.copy('Images/ForceBalance.pdf','latex/')
+    display("cd latex && make")
+    os.chdir('latex')
+    subprocess.call(['make'])
+    display("cd .. && cp latex/refman.pdf ForceBalance-Manual.pdf")
+    os.chdir('..')
+    shutil.copy('latex/refman.pdf', 'ForceBalance-Manual.pdf')
+    
+    display("cp Images/ForceBalance.pdf latex/api/")
+    shutil.copy('Images/ForceBalance.pdf','latex/api/')
+    display("cd latex/api/ && make")
+    os.chdir('latex/api/')
+    subprocess.call(['make'])
+    display("cd ../.. && cp latex/api/refman.pdf ForceBalance-Manual.pdf")
+    os.chdir('../..')
+    shutil.copy('latex/api/refman.pdf', 'ForceBalance-API.pdf')
+
+def add_tabs(fnm):
+    """Adjust tabs in html version of documentation"""
     for fnm in os.listdir('./html/'):
         if re.match('.*\.html$',fnm):
-            add_tab('./html/' + fnm)
+            fnm = './html/' + fnm
+            newfile = []
+            installtag = ' class="current"' if fnm.split('/')[-1] == 'installation.html' else ''
+            usagetag = ' class="current"' if fnm.split('/')[-1] == 'usage.html' else ''
+            tutorialtag = ' class="current"' if fnm.split('/')[-1] == 'tutorial.html' else ''
+            glossarytag = ' class="current"' if fnm.split('/')[-1] == 'glossary.html' else ''
+            todotag = ' class="current"' if fnm.split('/')[-1] == 'todo.html' else ''
+            
+            for line in open(fnm):
+                newfile.append(line)
+                if re.match('.*a href="index\.html"',line):
+                    newfile.append('      <li%s><a href="installation.html"><span>Installation</span></a></li>\n' % installtag)
+                    newfile.append('      <li%s><a href="usage.html"><span>Usage</span></a></li>\n' % usagetag)
+                    newfile.append('      <li%s><a href="tutorial.html"><span>Tutorial</span></a></li>\n' % tutorialtag)
+                    newfile.append('      <li%s><a href="glossary.html"><span>Glossary</span></a></li>\n' % glossarytag)
+                    newfile.append('      <li><a href="api/roadmap.html"><span>API</span></a></li>\n')
+            with open(fnm,'w') as f: f.writelines(newfile)
 
     for fnm in os.listdir('./html/api/'):
         if re.match('.*\.html$',fnm):
-            redirect_main_tab('./html/api/' + fnm)
+            fnm = './html/api/' + fnm
+            newfile=[]
+            for line in open(fnm):
+                if re.match('.*a href="index\.html"',line):
+                    newfile.append('      <li><a href="../index.html"><span>Main Page</span></a></li>\n')
+                    newfile.append('      <li ')
+                    if re.match('.*roadmap\.html$', fnm): newfile.append('class="current"')
+                    newfile.append('><a href="roadmap.html"><span>Project Roadmap</span></a></li>\n')
+                else: newfile.append(line)
+            with open(fnm,'w') as f: f.writelines(newfile)
 
 def find_forcebalance():
     """try to find forcebalance location in standard python path"""
@@ -124,76 +180,14 @@ def doxyconf():
                 fout.write(line)
     
     shutil.move('api.cfg.tmp', 'api.cfg')
-
-def generate_content():
-    """Parse text files and concatenate into mainpage and api"""
-    # generate pages to be included in general documentation
-    mainpage=""
-    mainpage+="/**\n\n\\mainpage\n\n"
-    for fnm in ["introduction.txt", "installation.txt", "usage.txt", "tutorial.txt", "glossary.txt", "option_index.txt"]:
-        page=open(fnm,'r')
-        mainpage+=page.read()
-    mainpage+="\n\\image latex ForceBalance.pdf \"Logo.\" height=10cm\n\n*/"
-
-    # generate pages to be included in API documentation
-    api=""
-    api+="/**\n\n"
-    for fnm in ["roadmap.txt"]:
-        page=open(fnm,'r')
-        api+=page.read()
-    api+="\n\n*/"
-
-    return (mainpage, api)
-
-def generate_doc(logfile=os.devnull):
-    """Run doxygen and compile generated latex into pdf, optionally writing output to a file
-    @param logfile Name of the log file to write to (defaults to null)
-    """
-    with open(logfile,'w') as log:
-        # generate general documentation
-        print "Generating program documentation with Doxygen..."
-        subprocess.call(['doxygen', 'doxygen.cfg'], stdout=log, stderr=subprocess.STDOUT)
-        shutil.copy('Images/ForceBalance.pdf','latex/')
-        print "Compiling pdf..."
-        os.chdir('latex')
-        subprocess.call(['make'], stdout=log, stderr=subprocess.STDOUT)
-        os.chdir('..')
-        shutil.copy('latex/refman.pdf', 'ForceBalance-Manual.pdf')
-
-        # generate technical (API) documentation
-        print "Generating API documentation..."
-        subprocess.call(['doxygen', 'api.cfg'], stdout=log, stderr=subprocess.STDOUT)
-        print "Compiling pdf..."
-        os.chdir('latex')
-        subprocess.call(['make'], stdout=log, stderr=subprocess.STDOUT)
-        os.chdir('..')
-        shutil.copy('latex/refman.pdf', 'ForceBalance-API.pdf')
-
-if __name__ == '__main__':
-    print "Collecting documents..."
-    os.system("python make-option-index.py > option_index.txt")
-    mainpage, api = generate_content()
-
-    branch = subprocess.check_output(['git','status']).splitlines()[0][12:]
-    
-    print "Stashing uncommitted changes on '%s'..." % branch
-
+        
+def git():
     os.system("git stash")
     print "Switching to doc repository..."
     os.system("git checkout gh-pages")
     os.system("git pull origin gh-pages")
-    print "Checking Doxygen config files..."
-    doxyconf()
-
-    print "Generating docs with Doxygen..."
-    with open('mainpage.dox','w') as f:
-        f.write(mainpage)
-    with open('api.dox','w') as f:
-        f.write(api)
-    generate_doc(logfile="makedocumentation.log")
-    print "Integrating HTML docs..."
-    parse_html()
-
+    
+    
     print "Applying changes to local repository..."
     os.system('git add ./html *.pdf')
     os.system('git commit -m "Automatic documentation generation at %s on %s"' % (os.environ['HOSTNAME'], datetime.now().strftime("%m-%d-%Y %H:%M")))
@@ -201,12 +195,7 @@ if __name__ == '__main__':
     print "\n----Enter username/password to push changes to remote repository or Ctrl-C to abort\n"
     os.system('git push origin gh-pages')
     print
-
-    clean = False
     
-    if clean:
-        print "Cleaning up..."
-        os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
     
     print "Returning to branch '%s'..." % branch
     os.system('git reset --hard HEAD')
@@ -214,5 +203,18 @@ if __name__ == '__main__':
     
     print "Loading master branch stash if necessary..."
     os.system('git stash pop')
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--interactive', action='store_true')
+    parser.add_argument('--clean', action='store_true')
+    args = parser.parse_args()
+    
+    build(interactive = args.interactive)
+    
+    if args.clean:
+        print "Cleaning up..."
+        os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
+        
     print "Documentation successfully generated"
     
