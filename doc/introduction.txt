@@ -160,8 +160,7 @@ targets can be combined to produce an aggregate
 <b>objective function</b> whose domain is the <b>parameter space</b>.
 This objective function, which typically depends on the parameters in
 a complex way, is minimized using nonlinear optimization algorithms.
-The result is a force field with high accuracy in all of the fitting
-simulations.
+The result is a force field which minimizes the errors for all of the targets.
 
 \image html cycle_sm.png "The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm."
 \image latex cycle.png "The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm." height=10cm
