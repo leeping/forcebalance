@@ -13,7 +13,7 @@ from traceback import print_exc
 from socket import gethostname
 from datetime import datetime
         
-def build(interactive=False, upload=False):
+def build(interactive=False, upstream=False):
 
     if interactive:
         display = lambda txt : raw_input("$ %s " % txt)
@@ -98,8 +98,8 @@ def build(interactive=False, upload=False):
         if os.system('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M"))):
             raise OSError("Error trying to commit files to local gh-pages branch")
         
-        # push changes upstream if upload option was given
-        if upload:
+        # push changes upstream if upstream option was given
+        if upstream:
             try:
                 print "\n# Push updated documentation upstream"
                 display("git push")
@@ -107,11 +107,12 @@ def build(interactive=False, upload=False):
             except:
                 print_exc()
                 print "\n# encountered ERROR (above). Documentation could not be pushed upstream." 
-                upload = False  # changes could not be pushed upstream so we should set upload=False to keep local copy of gh-pages
+                upstream = False  # changes could not be pushed upstream so we should switch to the local mode
         
     except:
         print_exc()
-        print "\n# encountered ERROR (above). Documentation could not be generated."   
+        print "\n# encountered ERROR (above). Documentation could not be generated."
+        upstream = False  # since documentation generation failed, 
     else:
         print "Documentation successfully generated"
     finally:
@@ -119,7 +120,7 @@ def build(interactive=False, upload=False):
         display("git checkout master")
         os.system('git checkout master')
         
-        if upload:
+        if upstream:
             print "\n# Remove local copy of successfully pushed documentation branch"
             display("git branch -D gh-pages")
             os.system('git branch -D gh-pages')
@@ -223,7 +224,7 @@ if __name__ == '__main__':
     parser.add_argument('--interactive', '-i', action='store_true', help="run in interactive mode, pausing before each command")
     parser.add_argument('--clean', '-c', action='store_true', help="remove temporary files after script is complete")
     parser.add_argument('--configure', action='store_true', help="generate doxygen configuration files from templates")
-    parser.add_argument('--upload', '-u', action='store_true', help="push updated documentation upstream")
+    parser.add_argument('--upstream', '-u', action='store_true', help="push updated documentation to upstream github repository")
     args = parser.parse_args()
     
     if args.configure:
@@ -232,7 +233,7 @@ if __name__ == '__main__':
         print "Couldn't find required doxygen config files ('./doxygen.cfg' and './api.cfg').\nRun with --configure option to generate automatically"
         sys.exit(1)
     
-    build(interactive = args.interactive, upload = args.upload)
+    build(interactive = args.interactive, upstream = args.upstream)
     
     if args.clean:
         print "Cleaning up..."
