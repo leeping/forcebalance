@@ -1,0 +1,5 @@
+# Documentation branch should only track doc folder
+src
+studies
+test
+/*.*
