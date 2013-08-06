@@ -106,13 +106,18 @@ def build(interactive=False, upstream=False):
                 if os.system('git push'): raise OSError("While trying to push changes upstream 'git push' gave a nonzero return code")
             except:
                 print_exc()
-                print "\n# encountered ERROR (above). Documentation could not be pushed upstream." 
                 upstream = False  # changes could not be pushed upstream so we should switch to the local mode
+                raw_input("\n# encountered ERROR. Documentation could not be pushed upstream.")
         
     except:
         print_exc()
-        print "\n# encountered ERROR (above). Documentation could not be generated."
-        upstream = False  # since documentation generation failed, 
+        upstream = False  # since documentation generation failed,
+        raw_input("\n# encountered ERROR (above). Documentation could not be generated.") 
+        
+        print "\n# Putting any uncommmited changes on the stash"
+        display("git stash")
+        os.system('git stash')
+        
     else:
         print "Documentation successfully generated"
     finally:
