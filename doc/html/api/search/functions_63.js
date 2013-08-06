@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['callgmxx2',['callgmxx2',['../classforcebalance_1_1abinitio__gmxx2_1_1AbInitio__GMXX2.html#ad3524d1acf965453947b0dc36131deab',1,'forcebalance::abinitio_gmxx2::AbInitio_GMXX2']]],
   ['center_5fof_5fmass',['center_of_mass',['../classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5',1,'forcebalance::molecule::Molecule']]],
   ['checkbasis',['CheckBasis',['../namespaceforcebalance_1_1leastsq.html#a8e7ef329e27aff738bc91dd79bd2dd1c',1,'forcebalance::leastsq']]],
   ['col',['col',['../namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8',1,'forcebalance::nifty']]],

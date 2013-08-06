@@ -1,0 +1,293 @@
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader}{\subsection{forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader Class Reference}
+\label{classforcebalance_1_1qchemio_1_1QCIn__Reader}\index{forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader@{forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader}}
+}
+
+
+Finite state machine for parsing Q-\/\-Chem input files.  
+
+
+
+
+Inheritance diagram for forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classforcebalance_1_1qchemio_1_1QCIn__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classforcebalance_1_1qchemio_1_1QCIn__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_af26e1915f9c2e2ae9ba0da2e7b6751c3}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_acdb1f9c0a523b1ae3a1aae0097744095}{feed}
+\begin{DoxyCompactList}\small\item\em Feed in a line. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}{Split}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}{Whites}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}{build\-\_\-pid}
+\begin{DoxyCompactList}\small\item\em Returns the parameter type (e.\-g. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_a292faa93e52c57c63d3c34d1bb9d5012}{atom}
+\item 
+\hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_ad3615ef269aab5468394d3d49d49b754}{snum}
+\item 
+\hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_a764399ea9f8814a39a26f44c2178d29c}{cnum}
+\item 
+\hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_a7cc88079e27ea6aa7550e28d57ec6afb}{shell}
+\item 
+\hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_a8164f42ffde838198f885a133c367941}{pdict}
+\item 
+\hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_adec1bddb76f9cb96812814181986b95c}{sec}
+\item 
+\hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_a7ad043dfeb891302b1b125eef9a235f3}{itype}
+\item 
+\hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader_ae20caa518b899a0f26916966625ca40c}{suffix}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{ln}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}{adict}
+\begin{DoxyCompactList}\small\item\em The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{molatom}
+\begin{DoxyCompactList}\small\item\em The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{Molecules}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{Atom\-Types}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing Q-\/\-Chem input files. 
+
+Definition at line 28 of file qchemio.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_af26e1915f9c2e2ae9ba0da2e7b6751c3}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{fnm}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_af26e1915f9c2e2ae9ba0da2e7b6751c3}
+
+
+Definition at line 30 of file qchemio.\-py.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!build\-\_\-pid@{build\-\_\-pid}}
+\index{build\-\_\-pid@{build\-\_\-pid}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{build\-\_\-pid}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-build\-\_\-pid (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{pfld}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}
+
+
+Returns the parameter type (e.\-g. 
+
+K in B\-O\-N\-D\-S\-K) based on the current interaction type.
+
+Both the 'pdict' dictionary (see \hyperlink{namespaceforcebalance_1_1gmxio_ae845e0b923ecde16c79f2742b94534a6}{gmxio.\-pdict}) and the interaction type 'state' (here, B\-O\-N\-D\-S) are needed to get the parameter type.
+
+If, however, 'pdict' does not contain the ptype value, a suitable substitute is simply the field number.
+
+Note that if the interaction type state is not set, then it defaults to the file name, so a generic parameter I\-D is 'filename.\-line\-\_\-num.\-field\-\_\-num' 
+
+Definition at line 68 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_acdb1f9c0a523b1ae3a1aae0097744095}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!feed@{feed}}
+\index{feed@{feed}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{feed}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-feed (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_acdb1f9c0a523b1ae3a1aae0097744095}
+
+
+Feed in a line. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & The line of data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 45 of file qchemio.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!Split@{Split}}
+\index{Split@{Split}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{Split}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-Split (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}
+
+
+Definition at line 43 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!Whites@{Whites}}
+\index{Whites@{Whites}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{Whites}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-Whites (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}
+
+
+Definition at line 46 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!adict@{adict}}
+\index{adict@{adict}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{adict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-adict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}
+
+
+The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. 
+
+
+
+Definition at line 33 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_a292faa93e52c57c63d3c34d1bb9d5012}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!atom@{atom}}
+\index{atom@{atom}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{atom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-atom}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_a292faa93e52c57c63d3c34d1bb9d5012}
+
+
+Definition at line 33 of file qchemio.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!Atom\-Types@{Atom\-Types}}
+\index{Atom\-Types@{Atom\-Types}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{Atom\-Types}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Atom\-Types\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}
+
+
+Definition at line 41 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_a764399ea9f8814a39a26f44c2178d29c}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!cnum@{cnum}}
+\index{cnum@{cnum}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{cnum}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-cnum}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_a764399ea9f8814a39a26f44c2178d29c}
+
+
+Definition at line 35 of file qchemio.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_a7ad043dfeb891302b1b125eef9a235f3}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!itype@{itype}}
+\index{itype@{itype}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{itype}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-itype}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_a7ad043dfeb891302b1b125eef9a235f3}
+
+
+Definition at line 64 of file qchemio.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!ln@{ln}}
+\index{ln@{ln}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{ln}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-ln\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}
+
+
+Definition at line 28 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!molatom@{molatom}}
+\index{molatom@{molatom}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{molatom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-molatom\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}
+
+
+The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. 
+
+self.\-moleculedict = Ordered\-Dict() The listing of 'R\-E\-S\-:A\-T\-O\-M\-N\-A\-M\-E\-S' for atom names in the line This is obviously a placeholder. 
+
+Definition at line 38 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!Molecules@{Molecules}}
+\index{Molecules@{Molecules}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{Molecules}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Molecules\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}
+
+
+Definition at line 40 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_a8164f42ffde838198f885a133c367941}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{pdict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-pdict}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_a8164f42ffde838198f885a133c367941}
+
+
+Definition at line 37 of file qchemio.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_adec1bddb76f9cb96812814181986b95c}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!sec@{sec}}
+\index{sec@{sec}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{sec}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-sec}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_adec1bddb76f9cb96812814181986b95c}
+
+
+Definition at line 55 of file qchemio.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_a7cc88079e27ea6aa7550e28d57ec6afb}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!shell@{shell}}
+\index{shell@{shell}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{shell}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-shell}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_a7cc88079e27ea6aa7550e28d57ec6afb}
+
+
+Definition at line 36 of file qchemio.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_ad3615ef269aab5468394d3d49d49b754}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!snum@{snum}}
+\index{snum@{snum}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{snum}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-snum}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_ad3615ef269aab5468394d3d49d49b754}
+
+
+Definition at line 34 of file qchemio.\-py.
+
+\hypertarget{classforcebalance_1_1qchemio_1_1QCIn__Reader_ae20caa518b899a0f26916966625ca40c}{\index{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!forcebalance::qchemio::QCIn_Reader@{forcebalance\-::qchemio\-::\-Q\-C\-In\-\_\-\-Reader}}
+\paragraph[{suffix}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-qchemio.\-Q\-C\-In\-\_\-\-Reader.\-suffix}}\label{classforcebalance_1_1qchemio_1_1QCIn__Reader_ae20caa518b899a0f26916966625ca40c}
+
+
+Definition at line 69 of file qchemio.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{qchemio_8py}{qchemio.\-py}\end{DoxyCompactItemize}

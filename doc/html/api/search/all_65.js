@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['e_5ferr',['e_err',['../classforcebalance_1_1abinitio_1_1AbInitio.html#aa569290969858e189935b3de37ead3f0',1,'forcebalance.abinitio.AbInitio.e_err()'],['../classforcebalance_1_1abinitio__gmxx2_1_1AbInitio__GMXX2.html#a0afa9d99946e98404b26a57060d3a4b7',1,'forcebalance.abinitio_gmxx2.AbInitio_GMXX2.e_err()'],['../classforcebalance_1_1interaction_1_1Interaction.html#a1577e34cd7031365ade75a2a56ec9b0d',1,'forcebalance.interaction.Interaction.e_err()']]],
+  ['e_5ferr',['e_err',['../classforcebalance_1_1abinitio_1_1AbInitio.html#aa569290969858e189935b3de37ead3f0',1,'forcebalance.abinitio.AbInitio.e_err()'],['../classforcebalance_1_1interaction_1_1Interaction.html#a1577e34cd7031365ade75a2a56ec9b0d',1,'forcebalance.interaction.Interaction.e_err()']]],
   ['e_5ferr_5fpct',['e_err_pct',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a4e3e525a03ab55bc004ebf0e3a0d60ce',1,'forcebalance.abinitio.AbInitio.e_err_pct()'],['../classforcebalance_1_1interaction_1_1Interaction.html#ae66b1b95cac5307950ae787b5409200b',1,'forcebalance.interaction.Interaction.e_err_pct()']]],
   ['e_5fref',['e_ref',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a71d13d3fabd98146c68bb5fc784f6732',1,'forcebalance::abinitio::AbInitio']]],
   ['edit_5fmdp',['edit_mdp',['../namespaceforcebalance_1_1gmxio.html#acc5bef2c5c991cd70a948a1dd43ef6a6',1,'forcebalance::gmxio']]],
@@ -19,7 +19,7 @@ var searchData=
   ['energy_5fforce_5fdriver_5fall_5finternal_5f',['energy_force_driver_all_internal_',['../classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html#a3aa19af835cfad23b245025adb036bb3',1,'forcebalance::openmmio::AbInitio_OpenMM']]],
   ['energy_5fforce_5ftransformer',['energy_force_transformer',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a9167da321a9fff748eef5ebe754cc7ca',1,'forcebalance::abinitio::AbInitio']]],
   ['energy_5fforce_5ftransformer_5fall',['energy_force_transformer_all',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a3d28520925c6dfd179647d0abf7e1368',1,'forcebalance::abinitio::AbInitio']]],
-  ['energy_5fpart',['energy_part',['../classforcebalance_1_1binding_1_1BindingEnergy.html#a4efa69b8f81d993b58851650d9b5ef89',1,'forcebalance.binding.BindingEnergy.energy_part()'],['../classforcebalance_1_1interactions_1_1Interactions.html#a608989b23e9fd4b3099b6bd3de436d14',1,'forcebalance.interactions.Interactions.energy_part()']]],
+  ['energy_5fpart',['energy_part',['../classforcebalance_1_1binding_1_1BindingEnergy.html#a4efa69b8f81d993b58851650d9b5ef89',1,'forcebalance::binding::BindingEnergy']]],
   ['engine',['engine',['../classforcebalance_1_1gmxio_1_1Liquid__GMX.html#a2d5bd477173807422906188c4656f200',1,'forcebalance.gmxio.Liquid_GMX.engine()'],['../classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#ac46cb2eaf7e4fcbe92d24d213b017d57',1,'forcebalance.openmmio.Liquid_OpenMM.engine()']]],
   ['eqcgmx',['eqcgmx',['../namespaceforcebalance_1_1nifty.html#a7cec4d46378b888cd867de05d0168d96',1,'forcebalance::nifty']]],
   ['eqm',['eqm',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a64387fae9bdfb0d03ca6961e67c779be',1,'forcebalance.abinitio.AbInitio.eqm()'],['../classforcebalance_1_1interaction_1_1Interaction.html#a4e609a6bd7e9a0852622ecc4ca5537d1',1,'forcebalance.interaction.Interaction.eqm()']]],

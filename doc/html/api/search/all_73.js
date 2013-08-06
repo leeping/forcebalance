@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['sampcorr',['sampcorr',['../classforcebalance_1_1abinitio__gmxx2_1_1AbInitio__GMXX2.html#ad3b4262bae0842ceb0a864e776edb8a3',1,'forcebalance::abinitio_gmxx2::AbInitio_GMXX2']]],
   ['save_5fvmvals',['save_vmvals',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a22037bf43728fa45f387390005e0b131',1,'forcebalance::abinitio::AbInitio']]],
   ['savedmval',['SavedMVal',['../classforcebalance_1_1liquid_1_1Liquid.html#a5b9df1bf79a641156429e292f47b6afd',1,'forcebalance::liquid::Liquid']]],
   ['savedtraj',['SavedTraj',['../classforcebalance_1_1liquid_1_1Liquid.html#a0da0c00cdc193c9c470d7e528043fb99',1,'forcebalance::liquid::Liquid']]],
@@ -35,11 +34,9 @@ var searchData=
   ['set_5fsubst_5fid',['set_subst_id',['../classforcebalance_1_1Mol2_1_1mol2__atom.html#ae879ba27197a573b6e3e1e97f0b76aff',1,'forcebalance::Mol2::mol2_atom']]],
   ['set_5fsubst_5fname',['set_subst_name',['../classforcebalance_1_1Mol2_1_1mol2__atom.html#af149e1d049adee0318eef510a8d32f9c',1,'forcebalance::Mol2::mol2_atom']]],
   ['set_5ftarget_5fatom_5fid',['set_target_atom_id',['../classforcebalance_1_1Mol2_1_1mol2__bond.html#afbc8421033001dbf5d29cccee1f503e3',1,'forcebalance::Mol2::mol2_bond']]],
-  ['sget',['sget',['../classforcebalance_1_1fitsim_1_1FittingSimulation.html#afbc9919622e07a763b8d71d0edc30a63',1,'forcebalance.fitsim.FittingSimulation.sget()'],['../classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c',1,'forcebalance.target.Target.sget()']]],
+  ['sget',['sget',['../classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c',1,'forcebalance::target::Target']]],
   ['shell',['shell',['../classforcebalance_1_1qchemio_1_1QCIn__Reader.html#a7cc88079e27ea6aa7550e28d57ec6afb',1,'forcebalance::qchemio::QCIn_Reader']]],
   ['simplex',['Simplex',['../classforcebalance_1_1optimizer_1_1Optimizer.html#a6b3af8115718f61a6a21c3297d717ead',1,'forcebalance::optimizer::Optimizer']]],
-  ['simtab',['simtab',['../namespacesimtab.html',1,'simtab'],['../namespaceforcebalance_1_1simtab.html#a49c5e21670cf8a8979f8c076fbceb13c',1,'forcebalance.simtab.SimTab()']]],
-  ['simtab_2epy',['simtab.py',['../simtab_8py.html',1,'']]],
   ['simulation',['simulation',['../classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html#ad999b78640bdd1bb9ea09f5ce82c95d7',1,'forcebalance::openmmio::AbInitio_OpenMM']]],
   ['simulations',['simulations',['../classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a914baf305ebbafd362e9b2ddfb69f7e7',1,'forcebalance::openmmio::Interaction_OpenMM']]],
   ['singlepoint',['SinglePoint',['../classforcebalance_1_1optimizer_1_1Optimizer.html#a1477d2b88faa1d4991418538133abcff',1,'forcebalance::optimizer::Optimizer']]],
@@ -47,7 +44,7 @@ var searchData=
   ['spacings',['spacings',['../classforcebalance_1_1objective_1_1Penalty.html#a9832c430eccb9edf404ba12ed2f54541',1,'forcebalance::objective::Penalty']]],
   ['specific_5fdct',['specific_dct',['../namespaceforcebalance_1_1nifty.html#ab652c941890b0f378100433699c8d255',1,'forcebalance::nifty']]],
   ['specific_5flst',['specific_lst',['../namespaceforcebalance_1_1nifty.html#abe850bcdf26cec4a0cf913a54a7ddfaa',1,'forcebalance::nifty']]],
-  ['split',['split',['../classforcebalance_1_1molecule_1_1Molecule.html#a71da1c1e530afd8b9b5f08d9bd27259f',1,'forcebalance.molecule.Molecule.split()'],['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#ac1234e56581721ab2da13eefaa8560f0',1,'forcebalance.amberio.FrcMod_Reader.Split()'],['../classforcebalance_1_1basereader_1_1BaseReader.html#ae0ea53a7d942ceb93bdc34499f694639',1,'forcebalance.basereader.BaseReader.Split()']]],
+  ['split',['Split',['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#ac1234e56581721ab2da13eefaa8560f0',1,'forcebalance.amberio.FrcMod_Reader.Split()'],['../classforcebalance_1_1basereader_1_1BaseReader.html#ae0ea53a7d942ceb93bdc34499f694639',1,'forcebalance.basereader.BaseReader.Split()'],['../classforcebalance_1_1molecule_1_1Molecule.html#a71da1c1e530afd8b9b5f08d9bd27259f',1,'forcebalance.molecule.Molecule.split()']]],
   ['splitter',['splitter',['../namespaceforcebalance_1_1molecule.html#a09d04113accea9c88b084051c5de29d1',1,'forcebalance::molecule']]],
   ['stage',['stage',['../classforcebalance_1_1target_1_1Target.html#af8d2a4658c87841e40296795aec478bb',1,'forcebalance::target::Target']]],
   ['statisticalinefficiency',['statisticalInefficiency',['../namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10',1,'forcebalance::nifty']]],

@@ -1,0 +1,271 @@
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader}{\subsection{forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader Class Reference}
+\label{classforcebalance_1_1amberio_1_1FrcMod__Reader}\index{forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader@{forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader}}
+}
+
+
+Finite state machine for parsing Frc\-Mod force field file.  
+
+
+
+
+Inheritance diagram for forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classforcebalance_1_1amberio_1_1FrcMod__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classforcebalance_1_1amberio_1_1FrcMod__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_a05ca6eb029ff4265c8a756421e57f0b5}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_ac1234e56581721ab2da13eefaa8560f0}{Split}
+\item 
+def \hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_a684b946f7faca6589c8ed49e77e31f73}{Whites}
+\item 
+def \hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_a689bb40a107f763472b15175be6f0f12}{feed}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}{build\-\_\-pid}
+\begin{DoxyCompactList}\small\item\em Returns the parameter type (e.\-g. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_a2d62765145dd710032844ac8d7ec8a34}{pdict}
+\begin{DoxyCompactList}\small\item\em The parameter dictionary (defined in this file) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_a2e670a076d15771ee362f76e04a80419}{atom}
+\begin{DoxyCompactList}\small\item\em The atom numbers in the interaction (stored in the parser) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_aa5326c1d9f32593724d4582e415b7771}{dihe}
+\begin{DoxyCompactList}\small\item\em Whether we're inside the dihedral section. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_afee8f33a13244afd3f595acad27e04f4}{adict}
+\begin{DoxyCompactList}\small\item\em The frcmod file never has any atoms in it. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_ab506962262c296d5f7c6abb66568d310}{itype}
+\item 
+\hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader_a4757a1ec953e5be7f8593071e0698731}{suffix}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{ln}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{molatom}
+\begin{DoxyCompactList}\small\item\em The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{Molecules}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{Atom\-Types}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing Frc\-Mod force field file. 
+
+
+
+Definition at line 96 of file amberio.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_a05ca6eb029ff4265c8a756421e57f0b5}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{fnm}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_a05ca6eb029ff4265c8a756421e57f0b5}
+
+
+Definition at line 98 of file amberio.\-py.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!build\-\_\-pid@{build\-\_\-pid}}
+\index{build\-\_\-pid@{build\-\_\-pid}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{build\-\_\-pid}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-build\-\_\-pid (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{pfld}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}
+
+
+Returns the parameter type (e.\-g. 
+
+K in B\-O\-N\-D\-S\-K) based on the current interaction type.
+
+Both the 'pdict' dictionary (see \hyperlink{namespaceforcebalance_1_1gmxio_ae845e0b923ecde16c79f2742b94534a6}{gmxio.\-pdict}) and the interaction type 'state' (here, B\-O\-N\-D\-S) are needed to get the parameter type.
+
+If, however, 'pdict' does not contain the ptype value, a suitable substitute is simply the field number.
+
+Note that if the interaction type state is not set, then it defaults to the file name, so a generic parameter I\-D is 'filename.\-line\-\_\-num.\-field\-\_\-num' 
+
+Definition at line 68 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_a689bb40a107f763472b15175be6f0f12}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!feed@{feed}}
+\index{feed@{feed}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{feed}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-feed (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_a689bb40a107f763472b15175be6f0f12}
+
+
+Definition at line 116 of file amberio.\-py.
+
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_ac1234e56581721ab2da13eefaa8560f0}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!Split@{Split}}
+\index{Split@{Split}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{Split}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-Split (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_ac1234e56581721ab2da13eefaa8560f0}
+
+
+Definition at line 110 of file amberio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1amberio_1_1FrcMod__Reader_ac1234e56581721ab2da13eefaa8560f0_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_a684b946f7faca6589c8ed49e77e31f73}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!Whites@{Whites}}
+\index{Whites@{Whites}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{Whites}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-Whites (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_a684b946f7faca6589c8ed49e77e31f73}
+
+
+Definition at line 113 of file amberio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1amberio_1_1FrcMod__Reader_a684b946f7faca6589c8ed49e77e31f73_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_afee8f33a13244afd3f595acad27e04f4}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!adict@{adict}}
+\index{adict@{adict}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{adict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-adict}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_afee8f33a13244afd3f595acad27e04f4}
+
+
+The frcmod file never has any atoms in it. 
+
+
+
+Definition at line 108 of file amberio.\-py.
+
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_a2e670a076d15771ee362f76e04a80419}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!atom@{atom}}
+\index{atom@{atom}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{atom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-atom}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_a2e670a076d15771ee362f76e04a80419}
+
+
+The atom numbers in the interaction (stored in the parser) 
+
+
+
+Definition at line 104 of file amberio.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!Atom\-Types@{Atom\-Types}}
+\index{Atom\-Types@{Atom\-Types}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{Atom\-Types}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Atom\-Types\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}
+
+
+Definition at line 41 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_aa5326c1d9f32593724d4582e415b7771}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!dihe@{dihe}}
+\index{dihe@{dihe}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{dihe}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-dihe}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_aa5326c1d9f32593724d4582e415b7771}
+
+
+Whether we're inside the dihedral section. 
+
+
+
+Definition at line 106 of file amberio.\-py.
+
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_ab506962262c296d5f7c6abb66568d310}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!itype@{itype}}
+\index{itype@{itype}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{itype}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-itype}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_ab506962262c296d5f7c6abb66568d310}
+
+
+Definition at line 127 of file amberio.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!ln@{ln}}
+\index{ln@{ln}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{ln}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-ln\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}
+
+
+Definition at line 28 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!molatom@{molatom}}
+\index{molatom@{molatom}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{molatom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-molatom\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}
+
+
+The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. 
+
+self.\-moleculedict = Ordered\-Dict() The listing of 'R\-E\-S\-:A\-T\-O\-M\-N\-A\-M\-E\-S' for atom names in the line This is obviously a placeholder. 
+
+Definition at line 38 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!Molecules@{Molecules}}
+\index{Molecules@{Molecules}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{Molecules}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Molecules\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}
+
+
+Definition at line 40 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_a2d62765145dd710032844ac8d7ec8a34}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{pdict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-pdict}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_a2d62765145dd710032844ac8d7ec8a34}
+
+
+The parameter dictionary (defined in this file) 
+
+
+
+Definition at line 102 of file amberio.\-py.
+
+\hypertarget{classforcebalance_1_1amberio_1_1FrcMod__Reader_a4757a1ec953e5be7f8593071e0698731}{\index{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!forcebalance::amberio::FrcMod_Reader@{forcebalance\-::amberio\-::\-Frc\-Mod\-\_\-\-Reader}}
+\paragraph[{suffix}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader.\-suffix}}\label{classforcebalance_1_1amberio_1_1FrcMod__Reader_a4757a1ec953e5be7f8593071e0698731}
+
+
+Definition at line 162 of file amberio.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{amberio_8py}{amberio.\-py}\end{DoxyCompactItemize}

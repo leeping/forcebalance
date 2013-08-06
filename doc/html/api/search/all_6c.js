@@ -15,7 +15,7 @@ var searchData=
   ['linedestroy_5fsave',['linedestroy_save',['../classforcebalance_1_1forcefield_1_1FF.html#aa4f1adc1fc16e922c98145553ac5b67f',1,'forcebalance::forcefield::FF']]],
   ['linedestroy_5fthis',['linedestroy_this',['../classforcebalance_1_1forcefield_1_1FF.html#ab2ca57079cb49527775d044a2b2db6db',1,'forcebalance::forcefield::FF']]],
   ['link_5fdir_5fcontents',['link_dir_contents',['../namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c',1,'forcebalance::nifty']]],
-  ['link_5ffrom_5ftempdir',['link_from_tempdir',['../classforcebalance_1_1fitsim_1_1FittingSimulation.html#af2467e635cc05270c463a9a3d01919a4',1,'forcebalance.fitsim.FittingSimulation.link_from_tempdir()'],['../classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82',1,'forcebalance.target.Target.link_from_tempdir()']]],
+  ['link_5ffrom_5ftempdir',['link_from_tempdir',['../classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82',1,'forcebalance::target::Target']]],
   ['linkfile',['LinkFile',['../namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1',1,'forcebalance::nifty']]],
   ['liquid',['Liquid',['../classforcebalance_1_1liquid_1_1Liquid.html',1,'forcebalance::liquid']]],
   ['liquid_2epy',['liquid.py',['../liquid_8py.html',1,'']]],

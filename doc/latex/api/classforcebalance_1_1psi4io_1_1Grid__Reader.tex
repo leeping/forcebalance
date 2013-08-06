@@ -1,0 +1,325 @@
+\hypertarget{classforcebalance_1_1psi4io_1_1Grid__Reader}{\subsection{forcebalance.\-psi4io.\-Grid\-\_\-\-Reader Class Reference}
+\label{classforcebalance_1_1psi4io_1_1Grid__Reader}\index{forcebalance.\-psi4io.\-Grid\-\_\-\-Reader@{forcebalance.\-psi4io.\-Grid\-\_\-\-Reader}}
+}
+
+
+Finite state machine for parsing D\-V\-R grid files.  
+
+
+
+
+Inheritance diagram for forcebalance.\-psi4io.\-Grid\-\_\-\-Reader\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classforcebalance_1_1psi4io_1_1Grid__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-psi4io.\-Grid\-\_\-\-Reader\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classforcebalance_1_1psi4io_1_1Grid__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1psi4io_1_1Grid__Reader_a8bf9998a339ce7491134537affc42466}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1psi4io_1_1Grid__Reader_a81d49a25035103313bcb99a106701e11}{build\-\_\-pid}
+\item 
+def \hyperlink{classforcebalance_1_1psi4io_1_1Grid__Reader_a900d43fb5dd26718b05846fe666b908d}{feed}
+\begin{DoxyCompactList}\small\item\em Feed in a line. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}{Split}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}{Whites}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}{feed}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1psi4io_1_1Grid__Reader_aef1fb2c7e576834299a1f926f83061b5}{element}
+\item 
+\hyperlink{classforcebalance_1_1psi4io_1_1Grid__Reader_a556a1786a7db1a738a680a784696bf2e}{point}
+\item 
+\hyperlink{classforcebalance_1_1psi4io_1_1Grid__Reader_a82c8a907130461776b26605ee022f951}{radii}
+\item 
+\hyperlink{classforcebalance_1_1psi4io_1_1Grid__Reader_a1134ad300de317ee30aa333d24978cc0}{isdata}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{ln}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}{itype}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}{suffix}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a1ca75e7775c49f57796fb3ba816486e7}{pdict}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}{adict}
+\begin{DoxyCompactList}\small\item\em The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{molatom}
+\begin{DoxyCompactList}\small\item\em The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{Molecules}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{Atom\-Types}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing D\-V\-R grid files. 
+
+Definition at line 246 of file psi4io.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1psi4io_1_1Grid__Reader_a8bf9998a339ce7491134537affc42466}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-psi4io.\-Grid\-\_\-\-Reader.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{fnm = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1psi4io_1_1Grid__Reader_a8bf9998a339ce7491134537affc42466}
+
+
+Definition at line 248 of file psi4io.\-py.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1psi4io_1_1Grid__Reader_a81d49a25035103313bcb99a106701e11}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!build\-\_\-pid@{build\-\_\-pid}}
+\index{build\-\_\-pid@{build\-\_\-pid}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{build\-\_\-pid}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-psi4io.\-Grid\-\_\-\-Reader.\-build\-\_\-pid (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{pfld}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1psi4io_1_1Grid__Reader_a81d49a25035103313bcb99a106701e11}
+
+
+Definition at line 254 of file psi4io.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1psi4io_1_1Grid__Reader_a81d49a25035103313bcb99a106701e11_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!feed@{feed}}
+\index{feed@{feed}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{feed}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-feed (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}
+
+
+Definition at line 49 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1psi4io_1_1Grid__Reader_a900d43fb5dd26718b05846fe666b908d}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!feed@{feed}}
+\index{feed@{feed}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{feed}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-psi4io.\-Grid\-\_\-\-Reader.\-feed (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line, }
+\item[{}]{linindep = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1psi4io_1_1Grid__Reader_a900d43fb5dd26718b05846fe666b908d}
+
+
+Feed in a line. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & The line of data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 269 of file psi4io.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1psi4io_1_1Grid__Reader_a900d43fb5dd26718b05846fe666b908d_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!Split@{Split}}
+\index{Split@{Split}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{Split}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-Split (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}
+
+
+Definition at line 43 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!Whites@{Whites}}
+\index{Whites@{Whites}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{Whites}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-Whites (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}
+
+
+Definition at line 46 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!adict@{adict}}
+\index{adict@{adict}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{adict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-adict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}
+
+
+The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. 
+
+
+
+Definition at line 33 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!Atom\-Types@{Atom\-Types}}
+\index{Atom\-Types@{Atom\-Types}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{Atom\-Types}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Atom\-Types\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}
+
+
+Definition at line 41 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1psi4io_1_1Grid__Reader_aef1fb2c7e576834299a1f926f83061b5}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!element@{element}}
+\index{element@{element}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{element}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-psi4io.\-Grid\-\_\-\-Reader.\-element}}\label{classforcebalance_1_1psi4io_1_1Grid__Reader_aef1fb2c7e576834299a1f926f83061b5}
+
+
+Definition at line 250 of file psi4io.\-py.
+
+\hypertarget{classforcebalance_1_1psi4io_1_1Grid__Reader_a1134ad300de317ee30aa333d24978cc0}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!isdata@{isdata}}
+\index{isdata@{isdata}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{isdata}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-psi4io.\-Grid\-\_\-\-Reader.\-isdata}}\label{classforcebalance_1_1psi4io_1_1Grid__Reader_a1134ad300de317ee30aa333d24978cc0}
+
+
+Definition at line 280 of file psi4io.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!itype@{itype}}
+\index{itype@{itype}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{itype}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-itype\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}
+
+
+Definition at line 29 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!ln@{ln}}
+\index{ln@{ln}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{ln}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-ln\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}
+
+
+Definition at line 28 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!molatom@{molatom}}
+\index{molatom@{molatom}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{molatom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-molatom\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}
+
+
+The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. 
+
+self.\-moleculedict = Ordered\-Dict() The listing of 'R\-E\-S\-:A\-T\-O\-M\-N\-A\-M\-E\-S' for atom names in the line This is obviously a placeholder. 
+
+Definition at line 38 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!Molecules@{Molecules}}
+\index{Molecules@{Molecules}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{Molecules}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Molecules\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}
+
+
+Definition at line 40 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a1ca75e7775c49f57796fb3ba816486e7}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{pdict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-pdict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a1ca75e7775c49f57796fb3ba816486e7}
+
+
+Definition at line 31 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1psi4io_1_1Grid__Reader_a556a1786a7db1a738a680a784696bf2e}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!point@{point}}
+\index{point@{point}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{point}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-psi4io.\-Grid\-\_\-\-Reader.\-point}}\label{classforcebalance_1_1psi4io_1_1Grid__Reader_a556a1786a7db1a738a680a784696bf2e}
+
+
+Definition at line 251 of file psi4io.\-py.
+
+\hypertarget{classforcebalance_1_1psi4io_1_1Grid__Reader_a82c8a907130461776b26605ee022f951}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!radii@{radii}}
+\index{radii@{radii}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{radii}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-psi4io.\-Grid\-\_\-\-Reader.\-radii}}\label{classforcebalance_1_1psi4io_1_1Grid__Reader_a82c8a907130461776b26605ee022f951}
+
+
+Definition at line 252 of file psi4io.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}{\index{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!forcebalance::psi4io::Grid_Reader@{forcebalance\-::psi4io\-::\-Grid\-\_\-\-Reader}}
+\paragraph[{suffix}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-suffix\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}
+
+
+Definition at line 30 of file basereader.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{psi4io_8py}{psi4io.\-py}\end{DoxyCompactItemize}

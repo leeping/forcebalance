@@ -1,0 +1,302 @@
+\hypertarget{classforcebalance_1_1openmmio_1_1OpenMM__Reader}{\subsection{forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader Class Reference}
+\label{classforcebalance_1_1openmmio_1_1OpenMM__Reader}\index{forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader@{forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader}}
+}
+
+
+Class for parsing Open\-M\-M force field files.  
+
+
+
+
+Inheritance diagram for forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classforcebalance_1_1openmmio_1_1OpenMM__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=240pt]{classforcebalance_1_1openmmio_1_1OpenMM__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM__Reader_a111f672a2f7b835da774dc5e6f265731}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM__Reader_ac89322d09d53425b5151f39306f4b38b}{build\-\_\-pid}
+\begin{DoxyCompactList}\small\item\em Build the parameter identifier (see {\itshape link} for an example) \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}{Split}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}{Whites}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}{feed}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}{build\-\_\-pid}
+\begin{DoxyCompactList}\small\item\em Returns the parameter type (e.\-g. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1openmmio_1_1OpenMM__Reader_a4fa2da992c7f0f525dcc465ffba69b86}{pdict}
+\begin{DoxyCompactList}\small\item\em Initialize the superclass. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{ln}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}{itype}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}{suffix}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}{adict}
+\begin{DoxyCompactList}\small\item\em The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{molatom}
+\begin{DoxyCompactList}\small\item\em The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{Molecules}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{Atom\-Types}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Class for parsing Open\-M\-M force field files. 
+
+
+
+Definition at line 302 of file openmmio.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1openmmio_1_1OpenMM__Reader_a111f672a2f7b835da774dc5e6f265731}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{fnm}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1openmmio_1_1OpenMM__Reader_a111f672a2f7b835da774dc5e6f265731}
+
+
+Definition at line 303 of file openmmio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1openmmio_1_1OpenMM__Reader_a111f672a2f7b835da774dc5e6f265731_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!build\-\_\-pid@{build\-\_\-pid}}
+\index{build\-\_\-pid@{build\-\_\-pid}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{build\-\_\-pid}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-build\-\_\-pid (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{pfld}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}
+
+
+Returns the parameter type (e.\-g. 
+
+K in B\-O\-N\-D\-S\-K) based on the current interaction type.
+
+Both the 'pdict' dictionary (see \hyperlink{namespaceforcebalance_1_1gmxio_ae845e0b923ecde16c79f2742b94534a6}{gmxio.\-pdict}) and the interaction type 'state' (here, B\-O\-N\-D\-S) are needed to get the parameter type.
+
+If, however, 'pdict' does not contain the ptype value, a suitable substitute is simply the field number.
+
+Note that if the interaction type state is not set, then it defaults to the file name, so a generic parameter I\-D is 'filename.\-line\-\_\-num.\-field\-\_\-num' 
+
+Definition at line 68 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1openmmio_1_1OpenMM__Reader_ac89322d09d53425b5151f39306f4b38b}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!build\-\_\-pid@{build\-\_\-pid}}
+\index{build\-\_\-pid@{build\-\_\-pid}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{build\-\_\-pid}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader.\-build\-\_\-pid (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{element, }
+\item[{}]{parameter}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1openmmio_1_1OpenMM__Reader_ac89322d09d53425b5151f39306f4b38b}
+
+
+Build the parameter identifier (see {\itshape link} for an example) 
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000015}{Todo}]Add a link here \end{DoxyRefDesc}
+
+
+Definition at line 312 of file openmmio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1openmmio_1_1OpenMM__Reader_ac89322d09d53425b5151f39306f4b38b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!feed@{feed}}
+\index{feed@{feed}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{feed}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-feed (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}
+
+
+Definition at line 49 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!Split@{Split}}
+\index{Split@{Split}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{Split}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-Split (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}
+
+
+Definition at line 43 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!Whites@{Whites}}
+\index{Whites@{Whites}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{Whites}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-Whites (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}
+
+
+Definition at line 46 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!adict@{adict}}
+\index{adict@{adict}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{adict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-adict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}
+
+
+The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. 
+
+
+
+Definition at line 33 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!Atom\-Types@{Atom\-Types}}
+\index{Atom\-Types@{Atom\-Types}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{Atom\-Types}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Atom\-Types\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}
+
+
+Definition at line 41 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!itype@{itype}}
+\index{itype@{itype}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{itype}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-itype\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}
+
+
+Definition at line 29 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!ln@{ln}}
+\index{ln@{ln}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{ln}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-ln\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}
+
+
+Definition at line 28 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!molatom@{molatom}}
+\index{molatom@{molatom}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{molatom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-molatom\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}
+
+
+The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. 
+
+self.\-moleculedict = Ordered\-Dict() The listing of 'R\-E\-S\-:A\-T\-O\-M\-N\-A\-M\-E\-S' for atom names in the line This is obviously a placeholder. 
+
+Definition at line 38 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!Molecules@{Molecules}}
+\index{Molecules@{Molecules}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{Molecules}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Molecules\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}
+
+
+Definition at line 40 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1openmmio_1_1OpenMM__Reader_a4fa2da992c7f0f525dcc465ffba69b86}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{pdict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader.\-pdict}}\label{classforcebalance_1_1openmmio_1_1OpenMM__Reader_a4fa2da992c7f0f525dcc465ffba69b86}
+
+
+Initialize the superclass. 
+
+\-:) The parameter dictionary (defined in this file) 
+
+Definition at line 307 of file openmmio.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}{\index{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!forcebalance::openmmio::OpenMM_Reader@{forcebalance\-::openmmio\-::\-Open\-M\-M\-\_\-\-Reader}}
+\paragraph[{suffix}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-suffix\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}
+
+
+Definition at line 30 of file basereader.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{openmmio_8py}{openmmio.\-py}\end{DoxyCompactItemize}

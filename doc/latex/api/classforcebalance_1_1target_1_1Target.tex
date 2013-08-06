@@ -1,0 +1,547 @@
+\hypertarget{classforcebalance_1_1target_1_1Target}{\subsection{forcebalance.\-target.\-Target Class Reference}
+\label{classforcebalance_1_1target_1_1Target}\index{forcebalance.\-target.\-Target@{forcebalance.\-target.\-Target}}
+}
+
+
+Base class for all fitting targets.  
+
+
+
+
+Inheritance diagram for forcebalance.\-target.\-Target\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-target.\-Target\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{classforcebalance_1_1target_1_1Target__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ab8f31f6e94e0fbd84f0ee54d326bb69a}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\begin{DoxyCompactList}\small\item\em All options here are intended to be usable by every conceivable type of target (in other words, only add content here if it's widely applicable.) \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{get\-\_\-\-X}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution without any parametric derivatives. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{get\-\_\-\-G}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{get\-\_\-\-H}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient / Hessian. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{link\-\_\-from\-\_\-tempdir}
+\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{refresh\-\_\-temp\-\_\-directory}
+\begin{DoxyCompactList}\small\item\em Back up the temporary directory if desired, delete it and then create a new one. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a}{get}
+\begin{DoxyCompactList}\small\item\em Every target must be able to return a contribution to the objective function -\/ however, this must be implemented in the specific subclass. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{sget}
+\begin{DoxyCompactList}\small\item\em Stages the directory for the target, and then calls 'get'. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}{submit\-\_\-jobs}
+\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{stage}
+\begin{DoxyCompactList}\small\item\em Stages the directory for the target, and then launches Work Queue processes if any. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{wq\-\_\-complete}
+\begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
+\begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}{set\-\_\-option}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{tempdir}
+\begin{DoxyCompactList}\small\item\em Root directory of the whole project. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{rundir}
+\begin{DoxyCompactList}\small\item\em The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{F\-F}
+\begin{DoxyCompactList}\small\item\em Need the forcefield (here for now) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{xct}
+\begin{DoxyCompactList}\small\item\em Counts how often the objective function was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{gct}
+\begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
+\begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{Print\-Option\-Dict}
+\item 
+\hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{verbose\-\_\-options}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Base class for all fitting targets. 
+
+In Force\-Balance a \hyperlink{classforcebalance_1_1target_1_1Target}{Target} is defined as a set of reference data plus a corresponding method to simulate that data using the force field.
+
+The 'computable quantities' may include energies and forces where the reference values come from Q\-M calculations (energy and force matching), energies from an E\-D\-A analysis (Maybe in the future, F\-D\-A?), molecular properties (like polarizability, refractive indices, multipole moments or vibrational frequencies), relative entropies, and bulk properties. Single-\/molecule or bulk properties can even come from the experiment!
+
+The central idea in Force\-Balance is that each quantity makes a contribution to the overall objective function. So we can build force fields that fit several quantities at once, rather than putting all of our chips behind energy and force matching. In the future Force\-Balance may even include multiobjective optimization into the optimizer.
+
+The optimization is done by way of minimizing an 'objective function', which is comprised of squared differences between the computed and reference values. These differences are not computed in this file, but rather in subclasses that use \hyperlink{classforcebalance_1_1target_1_1Target}{Target} as a base class. Thus, the contents of \hyperlink{classforcebalance_1_1target_1_1Target}{Target} itself are meant to be as general as possible, because the pertinent variables apply to all types of fitting targets.
+
+An important node\-: \hyperlink{classforcebalance_1_1target_1_1Target}{Target} requires that all subclasses have a method get(self,mvals,A\-Grad=False,A\-Hess=False) that does the following\-:
+
+Inputs\-: mvals = The parameter vector, which modifies the force field (Note to self\-: We include mvals with each \hyperlink{classforcebalance_1_1target_1_1Target}{Target} because we can create copies of the force field and do finite difference derivatives) A\-Grad, A\-Hess = Boolean switches for computing analytic gradients and Hessians
+
+Outputs\-: Answer = \{'X'\-: Number, 'G'\-: numpy.\-array(np), 'H'\-: numpy.\-array((np,np)) \} 'X' = The objective function itself 'G' = The gradient, elements not computed analytically are zero 'H' = The Hessian, elements not computed analytically are zero
+
+This is the only global requirement of a \hyperlink{classforcebalance_1_1target_1_1Target}{Target}. Obviously 'get' itself is not defined here, because its calculation will depend entirely on specifically which target we wish to use. However, this should give us a unified framework which will faciliate rapid implementation of Targets.
+
+Future work\-: Robert suggested that I could enable automatic detection of which parameters need to be computed by finite difference. Not a bad idea. \-:) 
+
+Definition at line 72 of file target.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1target_1_1Target_ab8f31f6e94e0fbd84f0ee54d326bb69a}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{options, }
+\item[{}]{tgt\-\_\-opts, }
+\item[{}]{forcefield}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_ab8f31f6e94e0fbd84f0ee54d326bb69a}
+
+
+All options here are intended to be usable by every conceivable type of target (in other words, only add content here if it's widely applicable.) 
+
+If we want to add attributes that are more specific (i.\-e. a set of reference forces for force matching), they are added in the subclass Ab\-Initio that inherits from \hyperlink{classforcebalance_1_1target_1_1Target}{Target}. 
+
+Definition at line 89 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_ab8f31f6e94e0fbd84f0ee54d326bb69a_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!get@{get}}
+\index{get@{get}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a}
+
+
+Every target must be able to return a contribution to the objective function -\/ however, this must be implemented in the specific subclass. 
+
+See abinitio for an example. 
+
+Definition at line 251 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!get\-\_\-\-G@{get\-\_\-\-G}}
+\index{get\-\_\-\-G@{get\-\_\-\-G}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{get\-\_\-\-G}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-G (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}
+
+
+Computes the objective function contribution and its gradient. 
+
+First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
+
+Definition at line 169 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!get\-\_\-\-H@{get\-\_\-\-H}}
+\index{get\-\_\-\-H@{get\-\_\-\-H}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{get\-\_\-\-H}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-H (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}
+
+
+Computes the objective function contribution and its gradient / Hessian. 
+
+First the low-\/level 'get' method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on.
+
+This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
+
+Definition at line 192 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!get\-\_\-\-X@{get\-\_\-\-X}}
+\index{get\-\_\-\-X@{get\-\_\-\-X}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{get\-\_\-\-X}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-X (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}
+
+
+Computes the objective function contribution without any parametric derivatives. 
+
+
+
+Definition at line 152 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}}
+\index{link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{link\-\_\-from\-\_\-tempdir}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-link\-\_\-from\-\_\-tempdir (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{absdestdir}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
+
+
+Definition at line 210 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!printcool\-\_\-table@{printcool\-\_\-table}}
+\index{printcool\-\_\-table@{printcool\-\_\-table}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{printcool\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-printcool\-\_\-table (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{data = {\ttfamily OrderedDict(\mbox{[}\mbox{]})}, }
+\item[{}]{headings = {\ttfamily \mbox{[}\mbox{]}}, }
+\item[{}]{banner = {\ttfamily None}, }
+\item[{}]{footnote = {\ttfamily None}, }
+\item[{}]{color = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}
+
+
+Print target information in an organized table format. 
+
+Implemented 6/30 because multiple targets are already printing out tabulated information in very similar ways. This method is a simple wrapper around printcool\-\_\-dictionary.
+
+The input should be something like\-:
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Column contents in the form of an Ordered\-Dict, with string keys and list vals. The key is printed in the leftmost column and the vals are printed in the other columns. If non-\/strings are passed, they will be converted to strings (not recommended).\\
+\hline
+{\em headings} & Column headings in the form of a list. It must be equal to the number to the list length for each of the \char`\"{}vals\char`\"{} in Ordered\-Dict, plus one. Use \char`\"{}\textbackslash{}n\char`\"{} characters to specify long column names that may take up more than one line.\\
+\hline
+{\em banner} & Optional heading line, which will be printed at the top in the title. \\
+\hline
+{\em footnote} & Optional footnote line, which will be printed at the bottom. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 364 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}}
+\index{refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{refresh\-\_\-temp\-\_\-directory}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-refresh\-\_\-temp\-\_\-directory (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}
+
+
+Back up the temporary directory if desired, delete it and then create a new one. 
+
+
+
+Definition at line 216 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!set\-\_\-option@{set\-\_\-option}}
+\index{set\-\_\-option@{set\-\_\-option}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-set\-\_\-option (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{in\-\_\-dict, }
+\item[{}]{src\-\_\-key, }
+\item[{}]{dest\-\_\-key = {\ttfamily None}, }
+\item[{}]{val = {\ttfamily None}, }
+\item[{}]{default = {\ttfamily None}, }
+\item[{}]{forceprint = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}
+
+
+Definition at line 12 of file baseclass.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!sget@{sget}}
+\index{sget@{sget}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{sget}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-sget (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}
+
+
+Stages the directory for the target, and then calls 'get'. 
+
+The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 263 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!stage@{stage}}
+\index{stage@{stage}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{stage}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-stage (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}
+
+
+Stages the directory for the target, and then launches Work Queue processes if any. 
+
+The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 298 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!submit\-\_\-jobs@{submit\-\_\-jobs}}
+\index{submit\-\_\-jobs@{submit\-\_\-jobs}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{submit\-\_\-jobs}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-submit\-\_\-jobs (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}
+
+
+Definition at line 288 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!wq\-\_\-complete@{wq\-\_\-complete}}
+\index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{wq\-\_\-complete}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-wq\-\_\-complete (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}
+
+
+This method determines whether the Work Queue tasks for the current target have completed. 
+
+
+
+Definition at line 328 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!F\-F@{F\-F}}
+\index{F\-F@{F\-F}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{F\-F}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-F\-F}}\label{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}
+
+
+Need the forcefield (here for now) 
+
+
+
+Definition at line 136 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!gct@{gct}}
+\index{gct@{gct}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{gct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-gct}}\label{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}
+
+
+Counts how often the gradient was computed. 
+
+
+
+Definition at line 140 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!hct@{hct}}
+\index{hct@{hct}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{hct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-hct}}\label{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}
+
+
+Counts how often the Hessian was computed. 
+
+
+
+Definition at line 142 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!Print\-Option\-Dict@{Print\-Option\-Dict}}
+\index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}
+
+
+Definition at line 9 of file baseclass.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!rundir@{rundir}}
+\index{rundir@{rundir}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{rundir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rundir}}\label{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}
+
+
+The directory in which the simulation is running -\/ this can be updated. 
+
+Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
+
+Definition at line 134 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!tempdir@{tempdir}}
+\index{tempdir@{tempdir}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{tempdir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempdir}}\label{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}
+
+
+Root directory of the whole project. 
+
+Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
+
+Definition at line 132 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!verbose\-\_\-options@{verbose\-\_\-options}}
+\index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}
+
+
+Definition at line 10 of file baseclass.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::target\-::\-Target@{forcebalance\-::target\-::\-Target}!xct@{xct}}
+\index{xct@{xct}!forcebalance::target::Target@{forcebalance\-::target\-::\-Target}}
+\paragraph[{xct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-xct}}\label{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}
+
+
+Counts how often the objective function was computed. 
+
+
+
+Definition at line 138 of file target.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{target_8py}{target.\-py}\end{DoxyCompactItemize}

@@ -13,10 +13,9 @@ var searchData=
   ['w_5ftorque',['w_torque',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a67643b98cce62c06c95f085d3a3e9722',1,'forcebalance::abinitio::AbInitio']]],
   ['weight',['weight',['../classforcebalance_1_1interaction_1_1Interaction.html#a68a6e43e48ec75f375fb987e177126a9',1,'forcebalance::interaction::Interaction']]],
   ['weights',['weights',['../classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#a4cbe02eccd28b60e657bbabc08ec25e0',1,'forcebalance::gmxqpio::Monomer_QTPIE']]],
-  ['whamboltz',['whamboltz',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a8f70f017ca8ec54c1acdbc85eff06ab9',1,'forcebalance.abinitio.AbInitio.whamboltz()'],['../classforcebalance_1_1abinitio__gmxx2_1_1AbInitio__GMXX2.html#a3c787a16268e5154f632d4981b3fe64f',1,'forcebalance.abinitio_gmxx2.AbInitio_GMXX2.whamboltz()']]],
+  ['whamboltz',['whamboltz',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a8f70f017ca8ec54c1acdbc85eff06ab9',1,'forcebalance::abinitio::AbInitio']]],
   ['whamboltz_5fwts',['whamboltz_wts',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a885e7ef58b9e7c6abbc24321e5f3c61a',1,'forcebalance::abinitio::AbInitio']]],
   ['work_5fqueue',['WORK_QUEUE',['../namespaceforcebalance.html#a730d54f7aa4e228b2475e31765b36b68',1,'forcebalance']]],
-  ['wq',['wq',['../classforcebalance_1_1fitsim_1_1FittingSimulation.html#a647bffed78aaa3b82dd7c2feeb65da9c',1,'forcebalance::fitsim::FittingSimulation']]],
   ['wqids',['WQIDS',['../namespaceforcebalance.html#a582a602e14175af1441d1ec96fe9a75a',1,'forcebalance']]],
   ['write_5ftab',['Write_Tab',['../classforcebalance_1_1molecule_1_1Molecule.html#a85310a28c678cb386f9d2b584b24320d',1,'forcebalance::molecule::Molecule']]],
   ['wtot',['WTot',['../classforcebalance_1_1objective_1_1Objective.html#a1ea300bb1db142dfdf43621454e8c589',1,'forcebalance::objective::Objective']]]

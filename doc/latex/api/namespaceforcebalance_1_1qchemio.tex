@@ -1,0 +1,86 @@
+\hypertarget{namespaceforcebalance_1_1qchemio}{\subsection{forcebalance.\-qchemio Namespace Reference}
+\label{namespaceforcebalance_1_1qchemio}\index{forcebalance.\-qchemio@{forcebalance.\-qchemio}}
+}
+
+
+Q-\/\-Chem input file parser.  
+
+
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader}{Q\-C\-In\-\_\-\-Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing Q-\/\-Chem input files. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespaceforcebalance_1_1qchemio_a067c1b4f6695fc5dc20b5de66114bb7f}{Q\-Chem\-\_\-\-Dielectric\-\_\-\-Energy}
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+list \hyperlink{namespaceforcebalance_1_1qchemio_a5c04a6c864770abe6ba25d3e6a5a8119}{ndtypes} = \mbox{[}None\mbox{]}
+\begin{DoxyCompactList}\small\item\em Types of counterpoise correction cptypes = \mbox{[}None, 'B\-A\-S\-S', 'B\-A\-S\-S\-P'\mbox{]} Types of N\-D\-D\-O correction. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespaceforcebalance_1_1qchemio_ad9040be76e063b08b49a26ca12295a18}{pdict}
+\begin{DoxyCompactList}\small\item\em Section -\/$>$ Interaction type dictionary. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Q-\/\-Chem input file parser. 
+
+\subsubsection{Function Documentation}
+\hypertarget{namespaceforcebalance_1_1qchemio_a067c1b4f6695fc5dc20b5de66114bb7f}{\index{forcebalance\-::qchemio@{forcebalance\-::qchemio}!Q\-Chem\-\_\-\-Dielectric\-\_\-\-Energy@{Q\-Chem\-\_\-\-Dielectric\-\_\-\-Energy}}
+\index{Q\-Chem\-\_\-\-Dielectric\-\_\-\-Energy@{Q\-Chem\-\_\-\-Dielectric\-\_\-\-Energy}!forcebalance::qchemio@{forcebalance\-::qchemio}}
+\paragraph[{Q\-Chem\-\_\-\-Dielectric\-\_\-\-Energy}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-qchemio.\-Q\-Chem\-\_\-\-Dielectric\-\_\-\-Energy (
+\begin{DoxyParamCaption}
+\item[{}]{fnm, }
+\item[{}]{wq}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1qchemio_a067c1b4f6695fc5dc20b5de66114bb7f}
+
+
+Definition at line 71 of file qchemio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1qchemio_a067c1b4f6695fc5dc20b5de66114bb7f_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\hypertarget{namespaceforcebalance_1_1qchemio_a5c04a6c864770abe6ba25d3e6a5a8119}{\index{forcebalance\-::qchemio@{forcebalance\-::qchemio}!ndtypes@{ndtypes}}
+\index{ndtypes@{ndtypes}!forcebalance::qchemio@{forcebalance\-::qchemio}}
+\paragraph[{ndtypes}]{\setlength{\rightskip}{0pt plus 5cm}list forcebalance.\-qchemio.\-ndtypes = \mbox{[}None\mbox{]}}}\label{namespaceforcebalance_1_1qchemio_a5c04a6c864770abe6ba25d3e6a5a8119}
+
+
+Types of counterpoise correction cptypes = \mbox{[}None, 'B\-A\-S\-S', 'B\-A\-S\-S\-P'\mbox{]} Types of N\-D\-D\-O correction. 
+
+
+
+Definition at line 13 of file qchemio.\-py.
+
+\hypertarget{namespaceforcebalance_1_1qchemio_ad9040be76e063b08b49a26ca12295a18}{\index{forcebalance\-::qchemio@{forcebalance\-::qchemio}!pdict@{pdict}}
+\index{pdict@{pdict}!forcebalance::qchemio@{forcebalance\-::qchemio}}
+\paragraph[{pdict}]{\setlength{\rightskip}{0pt plus 5cm}dictionary forcebalance.\-qchemio.\-pdict}}\label{namespaceforcebalance_1_1qchemio_ad9040be76e063b08b49a26ca12295a18}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = \{\textcolor{stringliteral}{'BASS'}:\{0:\textcolor{stringliteral}{'A'}, 1:\textcolor{stringliteral}{'C'}\},
+2          \textcolor{stringliteral}{'BASSP'} :\{0:\textcolor{stringliteral}{'A'}, 1:\textcolor{stringliteral}{'B'}, 2:\textcolor{stringliteral}{'C'}\}
+3          \}
+\end{DoxyCode}
+
+
+Section -\/$>$ Interaction type dictionary. 
+
+fdict = \{ 'basis' \-: bastypes \} Interaction type -\/$>$ Parameter Dictionary. 
+
+Definition at line 20 of file qchemio.\-py.
+

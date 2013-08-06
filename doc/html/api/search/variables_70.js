@@ -17,7 +17,7 @@ var searchData=
   ['point',['point',['../classforcebalance_1_1psi4io_1_1Grid__Reader.html#a556a1786a7db1a738a680a784696bf2e',1,'forcebalance::psi4io::Grid_Reader']]],
   ['positive_5fresid',['positive_resid',['../classforcebalance_1_1molecule_1_1Molecule.html#af9d8dc89fee54b2b89558633f2c9b70a',1,'forcebalance::molecule::Molecule']]],
   ['prefactor',['prefactor',['../classforcebalance_1_1interaction_1_1Interaction.html#ad4e78437713a0b9b809e4ba52cbbf9d2',1,'forcebalance::interaction::Interaction']]],
-  ['printdict',['PrintDict',['../classforcebalance_1_1binding_1_1BindingEnergy.html#ae88e256776152d847fd3c5d8609a5c6d',1,'forcebalance.binding.BindingEnergy.PrintDict()'],['../classforcebalance_1_1interactions_1_1Interactions.html#a576cd6ed3dcdc1fc77f8ce57dbf225fc',1,'forcebalance.interactions.Interactions.PrintDict()']]],
+  ['printdict',['PrintDict',['../classforcebalance_1_1binding_1_1BindingEnergy.html#ae88e256776152d847fd3c5d8609a5c6d',1,'forcebalance::binding::BindingEnergy']]],
   ['printoptiondict',['PrintOptionDict',['../classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#a5c55e661e746d1a4443f4e0bc34ebe05',1,'forcebalance::baseclass::ForceBalanceBaseClass']]],
   ['ptyp',['ptyp',['../classforcebalance_1_1objective_1_1Penalty.html#aafed9613564329fc6a760aec26a43116',1,'forcebalance::objective::Penalty']]],
   ['pvals0',['pvals0',['../classforcebalance_1_1forcefield_1_1FF.html#acfa4068ac91d195f89e65d6d725bb082',1,'forcebalance::forcefield::FF']]]
