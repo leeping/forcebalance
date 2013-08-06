@@ -9,10 +9,9 @@ import re
 import shutil
 import subprocess
 import argparse
-from socket import gethostname
 from datetime import datetime
         
-def build(interactive=False, upload=False):
+def build(interactive=False):
 
     if interactive:
         display = lambda txt : raw_input("$ %s " % txt)
@@ -30,10 +29,6 @@ def build(interactive=False, upload=False):
         page=open(fnm,'r')
         mainpage+=page.read()
     mainpage+="\n\\image latex ForceBalance.pdf \"Logo.\" height=10cm\n\n*/"
-    
-    print "\n# stash local branch changes before switching to documentation branch and updating local copy"
-    display("git stash && git checkout gh-pages && git pull")
-    os.system("git stash && git checkout gh-pages && git pull origin gh-pages")
     
     with open('mainpage.dox','w') as f:
         f.write(mainpage)
@@ -86,28 +81,6 @@ def build(interactive=False, upload=False):
     display("cd ../.. && cp latex/api/refman.pdf ForceBalance-API.pdf")
     os.chdir('../..')
     shutil.copy('latex/api/refman.pdf', 'ForceBalance-API.pdf')
-    
-    print "\n# Committing changes locally"
-    display('git add -f ./html *.pdf')
-    os.system('git add -f ./html *.pdf')
-    display('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M")))
-    os.system('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M")))
-    
-    if upload:
-        print "\n# Push changes upstream"
-        display("git push origin gh-pages")
-        os.system("git push origin gh-pages")
-        
-    print "\n# Return to master branch"
-    display("git reset --hard HEAD && git checkout master")
-    os.system('git reset --hard HEAD')
-    os.system('git checkout master')
-        
-    print "\n# Reapply stashed changes if necessary"
-    display("git stash pop")
-    os.system('git stash pop')
-    
-    
 
 def add_tabs(fnm):
     """Adjust tabs in html version of documentation"""
@@ -201,13 +174,35 @@ def build_config():
                 f.write(option)
             else:
                 f.write(line)
+          
+def git():
+    os.system("git stash")
+    print "Switching to doc repository..."
+    os.system("git checkout gh-pages")
+    os.system("git pull origin gh-pages")
+    
+    
+    print "Applying changes to local repository..."
+    os.system('git add ./html *.pdf')
+    os.system('git commit -m "Automatic documentation generation at %s on %s"' % (os.environ['HOSTNAME'], datetime.now().strftime("%m-%d-%Y %H:%M")))
+
+    print "\n----Enter username/password to push changes to remote repository or Ctrl-C to abort\n"
+    os.system('git push origin gh-pages')
+    print
+    
+    
+    print "Returning to branch '%s'..." % branch
+    os.system('git reset --hard HEAD')
+    os.system('git checkout %s' % branch)
+    
+    print "Loading master branch stash if necessary..."
+    os.system('git stash pop')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--interactive', '-i', action='store_true', help="run in interactive mode, pausing before each command")
-    parser.add_argument('--clean', '-c', action='store_true', help="remove temporary files after script is complete")
+    parser.add_argument('--interactive', action='store_true', help="run in interactive mode, pausing before each command")
+    parser.add_argument('--clean', action='store_true', help="remove temporary files after script is complete")
     parser.add_argument('--configure', action='store_true', help="generate doxygen configuration files from templates")
-    parser.add_argument('--upload', '-u', action='store_true', help="upload documentation to upstream github branch")
     args = parser.parse_args()
     
     if args.configure:
@@ -216,7 +211,7 @@ if __name__ == '__main__':
         print "Couldn't find required doxygen config files ('./doxygen.cfg' and './api.cfg').\nRun with --configure option to generate automatically"
         sys.exit(1)
     
-    build(interactive = args.interactive, upload = args.upload)
+    build(interactive = args.interactive)
     
     if args.clean:
         print "Cleaning up..."
