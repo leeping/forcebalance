@@ -115,9 +115,9 @@ def installNetworkX():
                 'Topic :: Scientific/Engineering :: Physics'],
       )
       
-      try:
+    try:
         m = __import__("networkx")
-      except ImportError:
+    except ImportError:
         raw_input("Error installing networkx, press <Enter> to continue ForceBalance installation")
 
 def buildKeywordDictionary(args):
