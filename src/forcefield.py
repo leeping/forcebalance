@@ -98,7 +98,7 @@ import sys
 from re import match, sub, split
 import forcebalance
 from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io 
-from finite_difference import in_fd
+from forcebalance.finite_difference import in_fd
 from numpy import argsort, arange, array, diag, exp, eye, log, mat, mean, ndarray, ones, vstack, zeros, sin, cos, pi, sqrt
 from numpy.linalg import norm
 from forcebalance.nifty import col, flat, invert_svd, isint, isfloat, kb, orthogonalize, pmat2d, printcool, row, warn_press_key, printcool_dictionary
