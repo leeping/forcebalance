@@ -3,7 +3,7 @@ import os, sys, time, re
 import traceback
 from collections import OrderedDict
 import numpy
-import forcebalance
+import forcebalance.output
 
 forcebalance.output.getLogger("forcebalance.test").propagate=False
 
