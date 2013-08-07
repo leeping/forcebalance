@@ -1,0 +1,39 @@
+comm_mode       = linear
+integrator	= md
+nsteps          = 1000000
+dt              = 0.002
+nstxout 	= 1000
+nstvout		= 0
+nstfout		= 0
+nstlog		= 0
+nstenergy	= 1000
+xtc_grps        = System
+energygrps      = System
+
+nstlist		= 20
+ns_type		= grid
+rlist		= 0.9
+vdwtype		= switch
+coulombtype	= cut-off
+rcoulomb	= 0.9
+rvdw		= 0.85
+rvdw_switch     = 0.8
+constraints	= all-bonds
+pbc		= xyz
+DispCorr        = EnerPres
+
+tcoupl		= v-rescale
+tc_grps		= System
+ref_t		= 298.0
+tau_t		= 1.0
+
+gen_vel 	= yes
+gen_temp	= 298.0
+gen_seed        = 123456
+
+pcoupl          = parrinello-rahman
+pcoupltype      = isotropic
+compressibility = 4.5e-5
+ref_p           = 1.0
+tau_p           = 1.5
+
