@@ -96,7 +96,8 @@ we need more modules!
 import os
 import sys
 from re import match, sub, split
-from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io, basereader 
+import forcebalance
+from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io 
 from finite_difference import in_fd
 from numpy import argsort, arange, array, diag, exp, eye, log, mat, mean, ndarray, ones, vstack, zeros, sin, cos, pi, sqrt
 from numpy.linalg import norm
@@ -109,7 +110,6 @@ except: pass
 import traceback
 import itertools
 from collections import OrderedDict, defaultdict
-from forcebalance.baseclass import ForceBalanceBaseClass
 
 FF_Extensions = {"itp" : "gmx",
                  "in"  : "qchem",
@@ -178,7 +178,7 @@ class BackedUpDict(dict):
         except:
             raise KeyError('The key %s does not exist as an atom attribute or as an atom type attribute!' % key)
 
-class FF(ForceBalanceBaseClass):
+class FF(forcebalance.BaseClass):
     """ Force field class.
 
     This class contains all methods for force field manipulation.
@@ -405,7 +405,7 @@ class FF(ForceBalanceBaseClass):
 
         # Determine the appropriate parser from the FF_IOModules dictionary.
         # If we can't figure it out, then use the base reader, it ain't so bad. :)
-        Reader = FF_IOModules.get(fftype,basereader.BaseReader)
+        Reader = FF_IOModules.get(fftype, forcebalance.BaseReader)
 
         # Open the force field using an absolute path and read its contents into memory.
         absff = os.path.join(self.root,self.ffdir,ffname)

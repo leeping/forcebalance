@@ -10,7 +10,7 @@ import os
 import re
 from forcebalance.nifty import isint, _exec, warn_press_key, getWorkQueue, LinkFile, link_dir_contents, printcool_dictionary
 from numpy import array
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction

@@ -12,11 +12,11 @@ import os, pickle, re, sys
 import numpy as np
 from copy import deepcopy
 from numpy.linalg import eig, norm, solve
+import forcebalance
 from nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
 from finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
-from baseclass import ForceBalanceBaseClass
 
 # Global variable corresponding to the iteration number.
 ITERATION_NUMBER = 0
@@ -31,7 +31,7 @@ def GoodStep():
     global GOODSTEP
     return GOODSTEP
 
-class Optimizer(ForceBalanceBaseClass):
+class Optimizer(forcebalance.BaseClass):
     """ Optimizer class.  Contains several methods for numerical optimization.
 
     For various reasons, the optimizer depends on the force field and fitting
