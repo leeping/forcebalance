@@ -71,8 +71,42 @@ class TestPenalty(ForceBalanceTestCase):
             result=penalty.compute([1]*self.np, objective)
             self.assertEqual(tuple, type(result))
             # more tests go here
+            
+class ObjectiveTests(object):            
+    def test_target_zero_order_terms(self):
+        """Check zero order target terms"""
+        obj = self.objective.Target_Terms(numpy.array([.5]*self.ff.np), Order=0)
+        self.assertEqual(type(obj),dict)
+        self.assertTrue(obj.has_key("X"))
+        self.assertNotEqual(int(obj["X"]), 0)
+        
+        self.assertTrue(obj.has_key("G"))
+        self.assertFalse(obj["G"].any())
+        
+        self.assertTrue(obj.has_key("H"))
+        self.assertEqual(obj["H"], numpy.diag([1]*self.ff.np))
+        
+    def test_target_first_order_terms(self):
+        """Check first order target terms"""
+        obj = self.objective.Target_Terms(numpy.array([.5]*self.ff.np), Order=1)
+        self.assertEqual(type(obj),dict)
+        self.assertTrue(obj.has_key("X"))
+        self.assertTrue(obj.has_key("G"))
+        self.assertTrue(obj.has_key("H"))
+        
+    def test_target_second_order_terms(self):
+        """Check second order target terms"""
+        obj = self.objective.Target_Terms(numpy.array([.5]*self.ff.np), Order=2)
+        self.assertEqual(type(obj),dict)
+        self.assertTrue(obj.has_key("X"))
+        self.assertTrue(obj.has_key("G"))
+        self.assertTrue(obj.has_key("H"))
+        
+    def test_indicate(self):
+        """Check objective.indicate() runs without errors"""
+        self.objective.Indicate()
 
-class TestObjective(ForceBalanceTestCase):
+class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
     def setUp(self):
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
@@ -89,12 +123,30 @@ class TestObjective(ForceBalanceTestCase):
         self.ff = forcebalance.forcefield.FF(self.options)
         
         self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
-
-    def test_target_terms(self):
-        self.objective.Target_Terms(numpy.array([.5]*self.ff.np))
         
-    def test_indicate(self):
-        self.objective.Indicate()
+    def shortDescription(self):
+        return super(TestWaterObjective, self).shortDescription() + " (AbInitio_GMX target)"
+        
+class TestBromineObjective(ForceBalanceTestCase, ObjectiveTests):
+    def setUp(self):
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options.update({
+                'root': os.getcwd() + '/test/files',
+                'penalty_additive': 0.01,
+                'jobtype': 'NEWTON',
+                'forcefield': ['bro.itp']})
+        os.chdir(self.options['root'])
+        
+        self.logger.debug(str(self.options))
+
+        self.tgt_opts = [ forcebalance.parser.tgt_opts_defaults.copy() ]
+        self.tgt_opts[0].update({"type" : "LIQUID_GMX", "name" : "LiquidBromine"})
+        self.ff = forcebalance.forcefield.FF(self.options)
+        
+        self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
+        
+    def shortDescription(self):
+        return super(TestBromineObjective, self).shortDescription() + " (Liquid_GMX target)"
 
 if __name__ == '__main__':           
     unittest.main()
