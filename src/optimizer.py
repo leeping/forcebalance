@@ -186,8 +186,7 @@ class Optimizer(ForceBalanceBaseClass):
             self.FF.print_map(self.FF.create_pvals(xk))
             logger.info(bar + '\n')
             self.FF.make(xk,False,'result')
-            print
-            logger.info("The final force field has been printed to the 'result' directory.\n")
+            logger.info("\nThe final force field has been printed to the 'result' directory.\n")
             #bar = printcool("\x1b[1;45;93mCongratulations, ForceBalance has finished\x1b[0m\n\x1b[1;45;93mGive yourself a pat on the back!\x1b[0m")
             bar = printcool("Congratulations, ForceBalance has finished\nGive yourself a pat on the back!",ansi="1;44;93")
 
@@ -242,7 +241,7 @@ class Optimizer(ForceBalanceBaseClass):
             X_best, xk_prev, trust = self.chk['x_best'], self.chk['xk_prev'], self.chk['trust']
         else:
             xk       = self.mvals0.copy()
-            print
+            logger.info('\n')
             data     = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H  = data['X'], data['G'], data['H']
             ehist    = np.array([X])
@@ -607,7 +606,7 @@ class Optimizer(ForceBalanceBaseClass):
         from scipy import optimize
         def xwrap(func,verbose=True):
             def my_func(mvals):
-                if verbose: print
+                if verbose: logger.info('\n')
                 Answer = func(mvals,Order=0,verbose=verbose)['X']
                 dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
                 if Answer < my_func.x_best or my_func.x_best == None:
@@ -627,7 +626,7 @@ class Optimizer(ForceBalanceBaseClass):
             return my_func
         def gwrap(func,verbose=True):
             def my_gfunc(mvals):
-                if verbose: print
+                if verbose: logger.info('\n')
                 Output = func(mvals,Order=1,verbose=verbose)
                 Answer = Output['G']
                 Objective = Output['X']
@@ -712,7 +711,7 @@ class Optimizer(ForceBalanceBaseClass):
             
         def xwrap(func,verbose=True):
             def my_func(mvals):
-                if verbose: print
+                if verbose: logger.info('\n')
                 Answer = func(mvals,Order=0,verbose=verbose)['X']
                 dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
                 if Answer < my_func.x_best or my_func.x_best == None:
