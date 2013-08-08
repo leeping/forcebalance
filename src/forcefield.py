@@ -1095,7 +1095,8 @@ class FF(ForceBalanceBaseClass):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
         if vals == None:
             vals = self.pvals0
-        logger.info('\n'.join(["%4i [ %s ]\n" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i for i in self.plist]))
+        logger.info('\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i for i in self.plist]))
+        logger.info('\n')
         
     def assign_p0(self,idx,val):
         """ Assign physical parameter values to the 'pvals0' array.

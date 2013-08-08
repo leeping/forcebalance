@@ -155,7 +155,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     bar = ''.join(["=" for i in range(width + 6)])
     bar = sym + bar + sym
     #bar = ''.join([sym for i in range(width + 8)])
-    logger.info('\r'+bar)
+    logger.info('\r'+bar + '\n')
     for line in text:
         if center:
             padleft = ' ' * ((width - newlen(line)) / 2)
@@ -164,21 +164,21 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
         padright = ' '* (width - newlen(line) - len(padleft))
         if ansi != None:
             ansi = str(ansi)
-            logger.info("%s| \x1b[%sm%s" % (sym, ansi, padleft)+line+"%s\x1b[0m |%s\n" % (padright, sym))
+            logger.info("%s| \x1b[%sm%s " % (sym, ansi, padleft)+line+" %s\x1b[0m |%s\n" % (padright, sym))
         elif color != None:
             if color == 0 and bold:
-                logger.info("%s| \x1b[1m%s" % (sym, padleft)+line+"%s\x1b[0m |%s\n" % (padright, sym))
+                logger.info("%s| \x1b[1m%s " % (sym, padleft) + line + " %s\x1b[0m |%s\n" % (padright, sym))
             elif color == 0:
-                logger.info("%s| %s" % (sym, padleft)+line+"%s |%s\n" % (padright, sym))
+                logger.info("%s| %s " % (sym, padleft)+line+" %s |%s\n" % (padright, sym))
             else:
-                logger.info("%s| \x1b[%s9%im%s" % (sym, bold and "1;" or "", color, padleft)+line+"%s\x1b[0m |%s\n" % (padright, sym))
+                logger.info("%s| \x1b[%s9%im%s " % (sym, bold and "1;" or "", color, padleft)+line+" %s\x1b[0m |%s\n" % (padright, sym))
             # if color == 3 or color == 7:
             #     print "%s\x1b[40m\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
             # else:
             #     print "%s\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
         else:
             warn_press_key("Inappropriate use of printcool")
-    logger.info(bar+'\n')
+    logger.info(bar + '\n')
     botbar = ''.join([bottom for i in range(width + 8)])
     return botbar + '\n'
 
@@ -201,7 +201,7 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
         logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None]))
     else:
         logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None]))
-    logger.info(bar)
+    logger.info("\n%s" % bar)
 
 #===============================#
 #| Math: Variable manipulation |#
