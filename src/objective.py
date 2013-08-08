@@ -145,7 +145,7 @@ class Objective(ForceBalanceBaseClass):
         # Create the work queue here.
         if self.wq_port != 0:
             createWorkQueue(self.wq_port)
-            print('Work Queue is listening on %d' % self.wq_port)
+            logger.info('Work Queue is listening on %d\n' % self.wq_port)
 
         printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
 

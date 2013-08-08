@@ -184,7 +184,7 @@ class Optimizer(ForceBalanceBaseClass):
             logger.info("/read_mvals\n")
             bar = printcool("Final physical parameters:",bold=True,color=4)
             self.FF.print_map(self.FF.create_pvals(xk))
-            logger.info(bar + '\n')
+            logger.info(bar)
             self.FF.make(xk,False,'result')
             logger.info("\nThe final force field has been printed to the 'result' directory.\n")
             #bar = printcool("\x1b[1;45;93mCongratulations, ForceBalance has finished\x1b[0m\n\x1b[1;45;93mGive yourself a pat on the back!\x1b[0m")
@@ -288,11 +288,11 @@ class Optimizer(ForceBalanceBaseClass):
             if self.print_grad:
                 bar = printcool("Total Gradient",color=4)
                 self.FF.print_map(vals=G,precision=8)
-                logger.info(bar + '\n')
+                logger.info(bar)
             if self.print_hess:
                 bar = printcool("Total Hessian",color=4)
                 pmat2d(H,precision=8)
-                logger.info(bar + '\n')
+                logger.info(bar)
             for key, val in self.Objective.ObjDict.items():
                 if Best_Step:
                     self.Objective.ObjDict_Last[key] = val
@@ -309,10 +309,10 @@ class Optimizer(ForceBalanceBaseClass):
                 dp = pk - old_pk
                 bar = printcool("Mathematical Parameters (Current + Step = Next)",color=5)
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_xk[i], '+' if dx[i] >= 0 else '-', abs(dx[i]), xk[i]) for i in range(len(xk))])
-                logger.info(bar + '\n')
+                logger.info(bar)
                 bar = printcool("Physical Parameters (Current + Step = Next)",color=5)
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
-                logger.info(bar + '\n')
+                logger.info(bar)
             # Evaluate the objective function and its derivatives.
             data        = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H = data['X'], data['G'], data['H']

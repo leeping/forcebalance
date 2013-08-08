@@ -524,7 +524,7 @@ class Liquid(Target):
             bar = printcool("Self-polarization correction to \nenthalpy of vaporization is % .3f kJ/mol%s" % (EPol, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=GEPol)
-                logger.info(bar + '\n')
+                logger.info(bar)
             
         for i, PT in enumerate(Points):
             T = PT[0]
@@ -661,7 +661,11 @@ class Liquid(Target):
             bar = printcool("Density objective function: % .3f%s" % (X_Rho, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Rho)
+<<<<<<< Updated upstream
                 logger.info(bar + '\n')
+=======
+                logger.info(bar)
+>>>>>>> Stashed changes
             PrintDict['Density'] = "% 10.5f % 8.3f % 14.5e" % (X_Rho, w_1, X_Rho*w_1)
 
         if X_Hvap > 0:
@@ -669,7 +673,11 @@ class Liquid(Target):
             bar = printcool("H_vap objective function: % .3f%s" % (X_Hvap, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Hvap)
+<<<<<<< Updated upstream
                 logger.info(bar + '\n')
+=======
+                logger.info(bar)
+>>>>>>> Stashed changes
             PrintDict['Enthalpy of Vaporization'] = "% 10.5f % 8.3f % 14.5e" % (X_Hvap, w_2, X_Hvap*w_2)
 
         if X_Alpha > 0:
@@ -677,7 +685,11 @@ class Liquid(Target):
             bar = printcool("Thermal Expansion objective function: % .3f%s" % (X_Alpha, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Alpha)
+<<<<<<< Updated upstream
                 logger.info(bar + '\n')
+=======
+                logger.info(bar)
+>>>>>>> Stashed changes
             PrintDict['Thermal Expansion Coefficient'] = "% 10.5f % 8.3f % 14.5e" % (X_Alpha, w_3, X_Alpha*w_3)
 
         if X_Kappa > 0:
@@ -685,7 +697,11 @@ class Liquid(Target):
             bar = printcool("Compressibility objective function: % .3f%s" % (X_Kappa, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Kappa)
+<<<<<<< Updated upstream
                 logger.info(bar + '\n')
+=======
+                logger.info(bar)
+>>>>>>> Stashed changes
             PrintDict['Isothermal Compressibility'] = "% 10.5f % 8.3f % 14.5e" % (X_Kappa, w_4, X_Kappa*w_4)
 
         if X_Cp > 0:
@@ -693,7 +709,11 @@ class Liquid(Target):
             bar = printcool("Heat Capacity objective function: % .3f%s" % (X_Cp, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Cp)
+<<<<<<< Updated upstream
                 logger.info(bar + '\n')
+=======
+                logger.info(bar)
+>>>>>>> Stashed changes
             PrintDict['Isobaric Heat Capacity'] = "% 10.5f % 8.3f % 14.5e" % (X_Cp, w_5, X_Cp*w_5)
 
         if X_Eps0 > 0:
@@ -701,7 +721,11 @@ class Liquid(Target):
             bar = printcool("Dielectric Constant objective function: % .3f%s" % (X_Eps0, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=G_Eps0)
+<<<<<<< Updated upstream
                 logger.info(bar + '\n')
+=======
+                logger.info(bar)
+>>>>>>> Stashed changes
             PrintDict['Dielectric Constant'] = "% 10.5f % 8.3f % 14.5e" % (X_Eps0, w_6, X_Eps0*w_6)
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",Objective)

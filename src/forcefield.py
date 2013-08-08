@@ -301,7 +301,7 @@ class FF(ForceBalanceBaseClass):
             ## Prints the plist to screen.
             bar = printcool("Starting parameter indices, physical values and IDs")
             self.print_map()                       
-            logger.info(bar + '\n')
+            logger.info(bar)
         ## Make the rescaling factors.
         self.rsmake(printfacs=verbose)            
         ## Make the transformation matrix.
@@ -894,7 +894,7 @@ class FF(ForceBalanceBaseClass):
         if printfacs:
             bar = printcool("Rescaling Factors (Lower Takes Precedence):",color=1)
             logger.info('\n'.join(["   %-35s  : %.5e\n" % (i, rsfactors[i]) for i in rsfac_list]))
-            logger.info(bar + '\n')
+            logger.info(bar)
         ## The array of rescaling factors
         self.rs = ones(len(self.pvals0))
         for pnum in range(len(self.pvals0)):

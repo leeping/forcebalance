@@ -180,7 +180,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
             warn_press_key("Inappropriate use of printcool")
     logger.info(bar+'\n')
     botbar = ''.join([bottom for i in range(width + 8)])
-    return botbar
+    return botbar + '\n'
 
 def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidth=25,topwidth=50,center=True,leftpad=0):
     """See documentation for printcool; this is a nice way to print out keys/values in a dictionary.
@@ -201,7 +201,7 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
         logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None]))
     else:
         logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None]))
-    logger.info(bar+'\n')
+    logger.info(bar)
 
 #===============================#
 #| Math: Variable manipulation |#
@@ -637,7 +637,7 @@ def wq_wait1(wq, wait_time=10, verbose=False):
                         tgtname = tnm
                         forcebalance.WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
-                logging.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
+                logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
                 forcebalance.WQIDS[tgtname].append(taskid)
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
@@ -825,12 +825,12 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     p.wait()
 
     if p.returncode != 0:
-        logging.warning("Received an error message:\n")
-        logging.warning("\n==== Error Message ====\n")
-        logging.warning(stderr)
-        logging.warning("== End Error Message ==\n")
+        logger.warning("Received an error message:\n")
+        logger.warning("\n==== Error Message ====\n")
+        logger.warning(stderr)
+        logger.warning("== End Error Message ==\n")
         if persist:
-            logging.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
+            logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
         else:
             # This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.
             # sys.stderr.write("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))

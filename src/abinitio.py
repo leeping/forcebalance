@@ -380,7 +380,7 @@ class AbInitio(Target):
                     shotcounter += genshots
             else:
                 logger.info("Oops... WHAM files don't exist?\n")
-            logger.info(bar + '\n')
+            logger.info(bar)
         else:
             self.whamboltz_wts = ones(self.ns)
         if self.qmboltz > 0:
