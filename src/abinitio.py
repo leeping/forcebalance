@@ -19,6 +19,9 @@ import itertools
 #from IPython import embed
 #from _increment import AbInitio_Build
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 class AbInitio(Target):
 
     """ Subclass of Target for fitting force fields to ab initio data.
@@ -167,16 +170,16 @@ class AbInitio(Target):
                     break
         if not self.new_vsites: return self.invdists
         if any(['VSITE' in i for i in self.FF.map.keys()]) or self.have_vsite:
-            print "\rGenerating virtual site positions.%s" % (" "*30),
+            logger.info("\rGenerating virtual site positions.%s" % (" "*30))
             pvals = self.FF.make(mvals)
             self.generate_vsite_positions()
         # prepare the distance matrix for esp computations
         if len(self.espxyz) > 0:
             invdists = []
-            print "\rPreparing the distance matrix... it will have %i * %i * %i = %i elements" % (self.ns, self.nesp, self.nparticles, self.ns * self.nesp * self.nparticles),
+            logger.info("\rPreparing the distance matrix... it will have %i * %i * %i = %i elements" % (self.ns, self.nesp, self.nparticles, self.ns * self.nesp * self.nparticles))
             sn = 0
             for espset, xyz in zip(self.espxyz, self.traj.xyzs):
-                print "\rGenerating ESP distances for snapshot %i%s" % (sn, " "*50),
+                logger.info("\rGenerating ESP distances for snapshot %i%s" % (sn, " "*50))
                 esparr = array(espset).reshape(-1,3)
                 # Create a matrix with Nesp rows and Natoms columns.
                 DistMat = array([[linalg.norm(i - j) for j in xyz] for i in esparr])
@@ -332,13 +335,13 @@ class AbInitio(Target):
         if not self.absolute:
             self.eqm -= mean(self.eqm)
         else:
-            print "Fitting absolute energies.  Make sure you know what you are doing!"
+            logger.info("Fitting absolute energies.  Make sure you know what you are doing!\n")
         if len(self.fqm) > 0:
             self.fqm = array(self.fqm)
             self.fqm *= fqcgmx
             self.qmatoms = self.fqm.shape[1]/3
         else:
-            print "QM forces are not present, only fitting energies."
+            logger.info("QM forces are not present, only fitting energies.\n")
             self.force = 0
             self.w_force = 0
         self.nesp = len(self.espval[0]) if len(self.espval) > 0 else 0
@@ -350,9 +353,9 @@ class AbInitio(Target):
                 warn_press_key("There are more fitting atoms than the total number of atoms in the QM calculation (something is probably wrong)")
             else:
                 # Indicate to Gromacs that we're only fitting the first however-many atoms.
-                print "We're only fitting the first %i atoms" % self.fitatoms
+                logger.info("We're only fitting the first %i atoms\n" % self.fitatoms)
                 #print "The quantum force matrix appears to contain more components (%i) than those being fit (%i)." % (fqmm.shape[1], 3*self.fitatoms)
-                print "Pruning the quantum force matrix..."
+                logger.info("Pruning the quantum force matrix...\n")
                 self.fqm  = self.fqm[:, :3*self.fitatoms].copy()
         else:
             self.fitatoms = 0
@@ -366,18 +369,18 @@ class AbInitio(Target):
             bar = printcool("Using WHAM MM Boltzmann weights.", color=4)
             if os.path.exists(os.path.join(self.root,self.tgtdir,"wham-master.txt")):
                 whaminfo = open(os.path.join(self.root,self.tgtdir,"wham-master.txt")).readlines()
-                print "From wham-master.txt, I can see that you're using %i generations" % len(whaminfo)
-                print "Relative weight of each generation:"
+                logger.info("From wham-master.txt, I can see that you're using %i generations\n" % len(whaminfo))
+                logger.info("Relative weight of each generation:\n")
                 shotcounter = 0
                 for line in whaminfo:
                     sline = line.split()
                     genshots = int(sline[2])
                     weight = sum(self.whamboltz_wts[shotcounter:shotcounter+genshots])/sum(self.whamboltz_wts)
-                    print " %s, %i snapshots, weight %.3e" % (sline[0], genshots, weight)
+                    logger.info(" %s, %i snapshots, weight %.3e\n" % (sline[0], genshots, weight))
                     shotcounter += genshots
             else:
-                print "Oops... WHAM files don't exist?"
-            print bar
+                logger.info("Oops... WHAM files don't exist?\n")
+            logger.info(bar + '\n')
         else:
             self.whamboltz_wts = ones(self.ns)
         if self.qmboltz > 0:
@@ -391,9 +394,9 @@ class AbInitio(Target):
             qbwhere = self.qmboltz_wts[where(self.qmboltz_wts)[0]]
             # Compute ze InfoContent!
             qmboltzent = -sum(qbwhere*log(qbwhere))
-            print "Quantum Boltzmann weights are ON, the formula is exp(-b(E_qm-E_mm)),",
-            print "distribution entropy is %.3f, equivalent to %.2f snapshots" % (qmboltzent, exp(qmboltzent))
-            print "%.1f%% is mixed into the MM boltzmann weights." % (self.qmboltz*100)
+            logger.info("Quantum Boltzmann weights are ON, the formula is exp(-b(E_qm-E_mm)),")
+            logger.info("distribution entropy is %.3f, equivalent to %.2f snapshots\n" % (qmboltzent, exp(qmboltzent)))
+            logger.info("%.1f%% is mixed into the MM boltzmann weights.\n" % (self.qmboltz*100))
         else:
             self.qmboltz_wts = ones(self.ns)
         # At this point, self.fqm is a (number of snapshots) x (3 x number of atoms) array.
@@ -630,18 +633,18 @@ class AbInitio(Target):
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
         if self.all_at_once:
-            print "\rExecuting\r",
+            logger.info("\rExecuting\r")
             M_all = self.energy_force_transformer_all()
             if not cv and (AGrad or AHess):
                 def callM(mvals_):
-                    print "\r",
+                    logger.info("\r")
                     pvals = self.FF.make(mvals_)
                     return self.energy_force_transformer_all()
                 for p in range(np):
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
         for i in range(ns):
             if i % 100 == 0:
-                print "\rIncrementing quantities for snapshot %i\r" % i,
+                logger.info("\rIncrementing quantities for snapshot %i\r" % i)
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
             Z  += P
@@ -661,7 +664,7 @@ class AbInitio(Target):
                 M = M_all[i]
             else:
                 if i % 100 == 0:
-                    print "Shot %i\r" % i,
+                    logger.info("Shot %i\r" % i)
                 M = self.energy_force_transformer(i)
                 M_all[i,:] = M.copy()
             if not cv:
@@ -718,7 +721,7 @@ class AbInitio(Target):
                     else:
                         def callM(mvals_):
                             if i % 100 == 0:
-                                print "\r",
+                                logger.info("\r")
                             pvals = self.FF.make(mvals_)
                             return self.energy_force_transformer(i)
                         M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
@@ -803,7 +806,7 @@ class AbInitio(Target):
         # In the case of no covariance, this is just a diagonal matrix #
         # with the RMSD energy in [0,0] and the RMS gradient in [n, n] #
         #==============================================================#
-        print "Done with snapshots, building objective function now\r",
+        logger.info("Done with snapshots, building objective function now\r")
         if (self.w_energy > 0.0 or self.w_force > 0.0 or self.w_netforce > 0.0 or self.w_torque > 0.0):
             wtot    = self.w_energy + self.w_force + self.w_netforce + self.w_torque
             EWt     = self.w_energy / wtot
@@ -1002,7 +1005,7 @@ class AbInitio(Target):
         Y = 0
         def getqatoms(mvals_):
             """ This function takes the mathematical parameter values and returns the charges on the ATOMS (fancy mapping going on) """
-            print "\r",
+            logger.info("\r")
             # Need to update the positions of atoms, if there are virtual sites.
             pvals = self.FF.create_pvals(mvals_)
             qvals = [pvals[i] for i in self.FF.qmap]
