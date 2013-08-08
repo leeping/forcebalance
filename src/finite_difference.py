@@ -139,7 +139,7 @@ def fdwrap(func,mvals0,pidx,key=None,**kwargs):
     def func1(arg):
         mvals = list(mvals0)
         mvals[pidx] += arg
-        print "\rfdwrap:", func.__name__, "[%i] = % .1e" % (pidx, arg), ' '*50,
+        logger.info("\rfdwrap:" + func.__name__ + "[%i] = % .1e" % (pidx, arg) + ' '*50)
         if key != None:
             return func(mvals,**kwargs)[key]
         else:
