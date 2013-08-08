@@ -13,6 +13,8 @@ from forcebalance.nifty import printcool_dictionary, createWorkQueue, getWorkQue
 from forcebalance.baseclass import ForceBalanceBaseClass
 import datetime
 import traceback
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 try:
     from forcebalance.gmxio import AbInitio_GMX, Liquid_GMX
