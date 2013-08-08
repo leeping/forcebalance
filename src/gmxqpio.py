@@ -17,6 +17,9 @@ from forcebalance.target import Target
 from collections import OrderedDict
 from forcebalance.finite_difference import *
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 # Prerequisite: Water monomer geometry with:
 # - Oxygen atom at the origin
 # - Molecule in the xz-plane with C2 axis along z
@@ -106,7 +109,7 @@ def get_monomer_properties(print_stuff=0):
     Objective   = Err_DipZ + (Err_QuadXX + Err_QuadYY + Err_QuadZZ)/3 + (Err_AlphaXX + Err_AlphaYY + Err_AlphaZZ)/3
     if print_stuff:
         #print "\rvalues (errors): mu_z = % .3f (%.3f) q_xx = % .3f (%.3f) q_yy = % .3f (%.3f) q_zz = % .3f (%.3f) o_xxz = % .3f (%.3f) o_yyz = % .3f (%.3f) o_zzz = % .3f (%.3f) a_xx = % .3f (%.3f) a_yy = % .3f (%.3f) a_zz = % .3f (%.3f)" % (DipZ,Err_DipZ,QuadXX,Err_QuadXX,QuadYY,Err_QuadYY,QuadZZ,Err_QuadZZ,OctXXZ,Err_OctXXZ,OctYYZ,Err_OctYYZ,OctZZZ,Err_OctZZZ,AlphaXX,Err_AlphaXX,AlphaYY,Err_AlphaYY,AlphaZZ,Err_AlphaZZ)
-        print "\rvalues (errors): mu_z = % .3f (%.3f) q = % .3f % .3f % .3f (% .3f % .3f % .3f) o = % .3f % .3f % .3f (% .3f % .3f % .3f) a = %.3f %.3f %.3f (%.3f %.3f %.3f) x2 = % .4f" % (DipZ,Err_DipZ,QuadXX,QuadYY,QuadZZ,Err_QuadXX,Err_QuadYY,Err_QuadZZ,OctXXZ,OctYYZ,OctZZZ,Err_OctXXZ,Err_OctYYZ,Err_OctZZZ,AlphaXX,AlphaYY,AlphaZZ,Err_AlphaXX,Err_AlphaYY,Err_AlphaZZ,Objective)
+        logger.info("\rvalues (errors): mu_z = % .3f (%.3f) q = % .3f % .3f % .3f (% .3f % .3f % .3f) o = % .3f % .3f % .3f (% .3f % .3f % .3f) a = %.3f %.3f %.3f (%.3f %.3f %.3f) x2 = % .4f\n" % (DipZ,Err_DipZ,QuadXX,QuadYY,QuadZZ,Err_QuadXX,Err_QuadYY,Err_QuadZZ,OctXXZ,OctYYZ,OctZZZ,Err_OctXXZ,Err_OctYYZ,Err_OctZZZ,AlphaXX,AlphaYY,AlphaZZ,Err_AlphaXX,Err_AlphaYY,Err_AlphaZZ,Objective))
     #Objective   = Err_DipZ + (Err_QuadXX + Err_QuadYY + Err_QuadZZ)/3 + (Err_OctXXZ + Err_OctYYZ + Err_OctZZZ)/3 + (Err_AlphaXX + Err_AlphaYY + Err_AlphaZZ)/3
     Properties = OrderedDict()
     Properties['DipZ'] = DipZ
@@ -171,7 +174,7 @@ class Monomer_QTPIE(Target):
         
     def indicate(self):
         """ Print qualitative indicator. """
-        print "\rTarget: %-15s" % self.name
+        logger.info("\rTarget: %-15s\n" % self.name)
 
         ref_momvals = self.unpack_moments(self.ref_moments)
         calc_momvals = self.unpack_moments(self.calc_moments)

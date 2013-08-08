@@ -19,6 +19,9 @@ from collections import defaultdict, OrderedDict
 import itertools
 from forcebalance.target import Target
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 ##Interaction type -> Parameter Dictionary.
 #pdict = {'Exponent':{0:'A', 1:'C'},
 #         'BASSP' :{0:'A', 1:'B', 2:'C'}
@@ -144,10 +147,8 @@ class THCDF_Psi4(LeastSquares):
         o.close()
 
     def indicate(self):
-        print "\rTarget: %-15s" % self.name, 
-        print "Molecules = %-30s" % str(self.Molecules),
         MAD = np.mean(np.abs(self.D))
-        print "Mean (Max) Error: %8.4f%% (%8.4f%%) Energies: DF %+.3e MP2 %+.3e Delta % .3e Objective = %.5e" % (100*MAD / self.MAQ, 100*np.max(np.abs(self.D)) / self.MAQ, self.DF_Energy, self.MP2_Energy, self.DF_Energy - self.MP2_Energy, self.objective)
+        logger.info("\rTarget: %-15s Molecules = %-30s %s" % (self.name, str(self.Molecules), "Mean (Max) Error: %8.4f%% (%8.4f%%) Energies: DF %+.3e MP2 %+.3e Delta % .3e Objective = %.5e" % (100*MAD / self.MAQ, 100*np.max(np.abs(self.D)) / self.MAQ, self.DF_Energy, self.MP2_Energy, self.DF_Energy - self.MP2_Energy, self.objective)))
         return
 
     def write_nested_destroy(self, fnm, linedestroy):
@@ -168,7 +169,7 @@ class THCDF_Psi4(LeastSquares):
     def driver(self):
         ## Actually run PSI4.
         if not in_fd() and CheckBasis():
-            print "Now checking for linear dependencies."
+            logger.info("Now checking for linear dependencies.\n")
             _exec("cp %s %s.bak" % (self.GBSfnm, self.GBSfnm), print_command=False)
             ln0 = self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save)
             o = open(".lindep.dat",'w')
@@ -189,10 +190,10 @@ class THCDF_Psi4(LeastSquares):
                 key = '.'.join([str(i) for i in LI.element,LI.amom,LI.basis_number[LI.element],LI.contraction_number])
                 if LI.isdata:
                     if key in LI_lines:
-                        print "Duplicate key found:"
-                        print key
-                        print LI_lines[key],
-                        print line,
+                        logger.info("Duplicate key found:\n")
+                        logger.info("%s\n" % key)
+                        logger.info(str(LI_lines[key]))
+                        logger.info(line)
                         warn_press_key("In %s, the LI_lines dictionary should not contain repeated keys!" % __file__)
                     LI_lines[key] = (line, LI.destroy)
             ## Now build a "Frankenstein" .gbs file composed of the original .gbs file but with data from the linindep.gbs file!
@@ -205,11 +206,11 @@ class THCDF_Psi4(LeastSquares):
                 key = '.'.join([str(i) for i in FK.element,FK.amom,FK.basis_number[FK.element],FK.contraction_number])
                 if FK.isdata and key in LI_lines:
                     if LI_lines[key][1]:
-                        print "Destroying line %i (originally %i):" % (ln, ln0[ln]), 
-                        print line,
+                        logger.info("Destroying line %i (originally %i): " % (ln, ln0[ln]))
+                        logger.info(line)
                         self.FF.linedestroy_this.append(ln)
                         for p_destroy in [i for i, fld in enumerate(self.FF.pfields) if any([subfld[0] == self.GBSfnm and subfld[1] == ln0[ln] for subfld in fld])]:
-                            print "Destroying parameter %i located at line %i (originally %i) with fields given by:" % (p_destroy, ln, ln0[ln]), self.FF.pfields[p_destroy]
+                            logger.info("Destroying parameter %i located at line %i (originally %i) with fields given by: %s" % (p_destroy, ln, ln0[ln], str(self.FF.pfields[p_destroy])))
                             self.FF.parmdestroy_this.append(p_destroy)
                     FK_lines.append(LI_lines[key][0])
                 else:
@@ -221,8 +222,8 @@ class THCDF_Psi4(LeastSquares):
             _exec("cp %s.bak %s" % (self.GBSfnm, self.GBSfnm), print_command=False)
             
             if len(list(itertools.chain(*(self.FF.linedestroy_save + [self.FF.linedestroy_this])))) > 0:
-                print "All lines removed:", self.FF.linedestroy_save + [self.FF.linedestroy_this]
-                print "All parms removed:", self.FF.parmdestroy_save + [self.FF.parmdestroy_this]
+                logger.info("All lines removed: " + self.FF.linedestroy_save + [self.FF.linedestroy_this] + '\n')
+                logger.info("All parms removed: " + self.FF.parmdestroy_save + [self.FF.parmdestroy_this] + '\n')
 
         self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save + [self.FF.linedestroy_this])
         _exec("psi4", print_command=False, outfnm="psi4.stdout")
@@ -391,7 +392,7 @@ class RDVR3_Psi4(Target):
                 mvals = list(mvals0)
                 mvals[pidx] += arg1
                 mvals[qidx] += arg2
-                print "\rfdwrap2:", func.__name__, "[%i] = % .1e , [%i] = % .1e" % (pidx, arg1, qidx, arg2), ' '*50,
+                logger.info("\rfdwrap2:" + func.__name__ + "[%i] = % .1e , [%i] = % .1e" % (pidx, arg1, qidx, arg2) + ' '*50)
                 if key != None:
                     return func(mvals,**kwargs)[key]
                 else:
@@ -412,7 +413,7 @@ class RDVR3_Psi4(Target):
             return fpp
 
         for d in self.objfiles:
-            print "\rNow working on", d, 50*' ','\r',
+            logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
             x = self.driver(mvals, d)
             grad  = np.zeros(n,dtype=float)
             hdiag = np.zeros(n,dtype=float)
