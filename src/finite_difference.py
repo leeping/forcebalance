@@ -2,6 +2,8 @@
 
 import traceback
 from numpy import dot
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 def f1d2p(f, h, f0 = None):
     """
