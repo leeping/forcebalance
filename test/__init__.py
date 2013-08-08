@@ -208,6 +208,8 @@ class ForceBalanceTestRunner(object):
             unittest.registerResult(result)
             try:
                 tests.run(result)
+            except KeyboardInterrupt:
+                self.logger.exception(msg="Test run cancelled by user")
             except:
                 self.logger.exception(msg="An unexpected exception occurred while running tests\n")
 
