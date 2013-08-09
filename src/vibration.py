@@ -17,6 +17,9 @@ from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from _assign import Assign
 #from _increment import Vibration_Build
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 class Vibration(Target):
 
     """ Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory).

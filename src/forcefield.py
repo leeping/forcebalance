@@ -893,7 +893,7 @@ class FF(ForceBalanceBaseClass):
         #     rsfactors[line.split()[0]] = float(line.split()[1])
         if printfacs:
             bar = printcool("Rescaling Factors (Lower Takes Precedence):",color=1)
-            logger.info('\n'.join(["   %-35s  : %.5e\n" % (i, rsfactors[i]) for i in rsfac_list]))
+            logger.info(''.join(["   %-35s  : %.5e\n" % (i, rsfactors[i]) for i in rsfac_list]))
             logger.info(bar)
         ## The array of rescaling factors
         self.rs = ones(len(self.pvals0))
