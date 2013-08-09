@@ -826,10 +826,11 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     p.wait()
 
     if p.returncode != 0:
-        logger.warning("Received an error message:\n")
-        logger.warning("\n==== Error Message ====\n")
-        logger.warning(stderr)
-        logger.warning("== End Error Message ==\n")
+        if stderr:
+            logger.warning("Received an error message:\n")
+            logger.warning("\n==== Error Message ====\n")
+            logger.warning(stderr)
+            logger.warning("== End Error Message ==\n")
         if persist:
             logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
         else:
