@@ -21,6 +21,9 @@ import itertools
 from collections import OrderedDict
 #import IPython
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 def edit_mdp(fin, fout, options, verbose=False):
     """
     Create or edit a Gromacs MDP file.

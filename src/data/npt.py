@@ -614,9 +614,9 @@ class OpenMM_MD(MDEngine):
         EnergyTerms['Potential'] = Potential
         EnergyTerms['Kinetic'] = Kinetic
         kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
-        Kinetic_Temperature = 2.0 * Kinetic / kB / self.ndof / kelvin
+        Kinetic_Temperature = 2.0 * Kinetic * kilojoule_per_mole / kB / self.ndof / kelvin
         EnergyTerms['Kinetic Temperature'] = Kinetic_Temperature
-        EnergyTerms['Total'] = Potential+Kinetic
+        EnergyTerms['Total Energy'] = Potential+Kinetic
         return EnergyTerms
     
     def run_simulation(self, phase, minimize=True, savexyz=True):

@@ -52,7 +52,7 @@ def pvec1d(vec1d, precision=1):
     """
     v2a = array(vec1d)
     for i in range(v2a.shape[0]):
-        logger.info("%% .%ie" % precision % v2a[i])
+        logger.info("%% .%ie " % precision % v2a[i])
     logger.info('\n')
 
 def pmat2d(mat2d, precision=1):
@@ -63,7 +63,7 @@ def pmat2d(mat2d, precision=1):
     m2a = array(mat2d)
     for i in range(m2a.shape[0]):
         for j in range(m2a.shape[1]):
-            logger.info("%% .%ie" % precision % m2a[i][j])
+            logger.info("%% .%ie " % precision % m2a[i][j])
         logger.info('\n')
 
 def encode(l): 	

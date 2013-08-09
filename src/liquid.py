@@ -264,7 +264,7 @@ class Liquid(Target):
         Sum = sum(Weights.values())
         for i in Weights:
             Weights[i] /= Sum
-        logger.info("Weights have been renormalized to " + str(sum(Weights.values())))
+        logger.info("Weights have been renormalized to " + str(sum(Weights.values())) + "\n")
         # Use least-squares or hyperbolic (experimental) objective.
         LeastSquares = True
 
