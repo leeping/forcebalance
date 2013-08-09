@@ -77,7 +77,7 @@ class Vibration(Target):
             elif len(s) == 0:
                 pass
             else:
-                print line
+                logger.info(line + '\n')
                 raise Exception("This line doesn't comply with our vibration file format!")
             ln += 1
         self.ref_eigvals = array(self.ref_eigvals)
@@ -91,10 +91,10 @@ class Vibration(Target):
         
     def indicate(self):
         """ Print qualitative indicator. """
-        print "\rTarget: %-15s" % self.name, 
-        print "Frequencies (wavenumbers), Reference:", self.ref_eigvals,
-        print "Calculated:", self.calc_eigvals,
-        print "Objective = %.5e" % self.objective
+        logger.info("\rTarget: %-15s " % self.name)
+        logger.info("Frequencies (wavenumbers), Reference: " + str(self.ref_eigvals))
+        logger.info("Calculated: " + str(self.calc_eigvals))
+        logger.info("Objective = %.5e\n" % self.objective)
         return
 
     def get(self, mvals, AGrad=False, AHess=False):

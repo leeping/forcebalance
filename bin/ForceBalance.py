@@ -10,6 +10,7 @@ from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
 from forcebalance.nifty import printcool
+from forcebalance.output import getLogger, RawStreamHandler, INFO
 import numpy
 numpy.seterr(all='raise')
 
@@ -27,6 +28,11 @@ def Run_ForceBalance(input_file):
     The objective function is a combination of target classes and a penalty function class.
     The optimizer is a class defined in this file.
     """
+    # Add logging handlers to print to console
+    logger=getLogger("forcebalance")
+    logger.addHandler(RawStreamHandler(sys.stdout))
+    logger.setLevel(INFO)
+    
     ## The general options and target options that come from parsing the input file
     options, tgt_opts = parse_inputs(input_file)
     ## The force field component of the project
