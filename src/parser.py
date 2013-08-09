@@ -55,6 +55,9 @@ from nifty import printcool, printcool_dictionary, which
 from copy import deepcopy
 from collections import OrderedDict
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 ## Default general options.
 ## Note that the documentation is included in part of the key; this will aid in automatic doc-extraction. :)
 ## In the 5-tuple we have: Default value, priority (larger number means printed first), short docstring, description of scope, list of filter strings for pulling out pertinent targets (MakeInputFile.py)
@@ -369,7 +372,7 @@ def parse_inputs(input_file=None):
     @todo Implement charge groups.
     """
     
-    print "Reading options from file: %s" % input_file
+    logger.info("Reading options from file: %s\n" % input_file)
     section = "NONE"
     # First load in all of the default options.
     options = deepcopy(gen_opts_defaults) # deepcopy to make sure options doesn't make changes to gen_opts_defaults
@@ -426,18 +429,17 @@ def parse_inputs(input_file=None):
                 elif key in opts_types['sections']:
                     this_opt[key] = ParsTab[key](fobj)
                 else:
-                    print "Unrecognized keyword: --- \x1b[1;91m%s\x1b[0m --- in %s section" \
-                          % (key, section)
-                    print "Perhaps this option actually belongs in %s section?" \
-                          % (section == "OPTIONS" and "a TARGET" or "the OPTIONS")
+                    logger.error("Unrecognized keyword: --- \x1b[1;91m%s\x1b[0m --- in %s section\n" \
+                          % (key, section))
+                    logger.error("Perhaps this option actually belongs in %s section?\n" \
+                          % (section == "OPTIONS" and "a TARGET" or "the OPTIONS"))
                     sys.exit(1)
             elif section not in mainsections:
-                print "Unrecognized section: %s" % section
+                logger.error("Unrecognized section: %s\n" % section)
                 sys.exit(1)
         except:
-            print "Failed to read in this line! Check your input file."
-            print line,
-            traceback.print_exc()
+            logger.error("Failed to read in this line! Check your input file.\n")
+            logger.exception(line + '\n')
             sys.exit(1)
     if section == "SIMULATION" or section == "TARGET":
         tgt_opts.append(this_tgt_opt)

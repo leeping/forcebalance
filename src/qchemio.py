@@ -6,6 +6,9 @@ from forcebalance.basereader import BaseReader
 from forcebalance.nifty import *
 from forcebalance.molecule import Molecule
 
+from forcebalance.output import getLogger
+logger=getLogger(__name__)
+
 ## Types of counterpoise correction
 #cptypes = [None, 'BASS', 'BASSP']
 ## Types of NDDO correction
@@ -59,10 +62,10 @@ class QCIn_Reader(BaseReader):
                 self.cnum  = -1
                 self.shell = s[0]
                 self.itype = 'BAS'+self.shell
-                print line
+                logger.info(line + '\n')
             elif all([isfloat(i) for i in s]):
                 self.cnum += 1
-                print line, self.snum, self.cnum
+                logger.info("%s %s %s\n" % (line, str(self.snum), str(self.cnum)))
                 self.suffix = '_at%s.sh%i.cf%i' % (self.atom,self.snum,self.cnum)
 
 def QChem_Dielectric_Energy(fnm,wq):

@@ -24,6 +24,8 @@ import sys
 from re import match
 from forcebalance.target import Target
 from numpy import array, dot, exp, linalg, mean, ones, zeros
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 class Counterpoise(Target):
     """ Target subclass for matching the counterpoise correction."""
@@ -56,7 +58,7 @@ class Counterpoise(Target):
         @todo I should probably put this into a more general library for reading coordinates.
         """
         
-        print "Loading XYZ file!"
+        logger.info("Loading XYZ file!\n")
         xyz  = []
         xyzs = []
         elem = []
@@ -86,7 +88,7 @@ class Counterpoise(Target):
     def load_cp(self,fnm):
         """ Load in the counterpoise data, which is easy; the file
         consists of floating point numbers separated by newlines.  """
-        print "Loading CP Data!"
+        logger.info("Loading CP Data!\n")
         return array([float(i.strip()) for i in open(fnm).readlines()])[:self.ns]
 
     def get(self,mvals,AGrad=False,AHess=False):
@@ -118,7 +120,7 @@ class Counterpoise(Target):
         # Create the force field physical values from the mathematical values
         pvals = self.FF.create_pvals(mvals)
         cpmm = []
-        print "CPMM: %s   \r" % self.name,
+        logger.info("CPMM: %s   \r" % self.name)
         # Loop through the snapshots
         for s in range(self.ns):
             xyz = self.xyzs[s] # Harvest the xyz. :)
