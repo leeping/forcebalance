@@ -1579,6 +1579,7 @@ class Molecule(object):
             elif ln == 1:
                 na = int(line.strip())
             elif is_gro_coord(line):
+                coord = []
                 if frame == 0: # Create the list of residues, atom names etc. only if it's the first frame.
                     # Name of the residue, for instance '153SOL1 -> SOL1' ; strips leading numbers
                     thisresid = int(line[0:5].strip())
@@ -1590,7 +1591,6 @@ class Molecule(object):
 
                     pdeci = [i for i, x in enumerate(line) if x == '.']
                     ndeci = pdeci[1] - pdeci[0] - 5
-                    cord = []
 
                     thiselem = sline[1]
                     if len(thiselem) > 1:
@@ -1598,9 +1598,9 @@ class Molecule(object):
                     elem.append(thiselem)
 
                 for i in range(1,4):
-                    thiscord = float(line[(pdeci[0]-4)+(5+ndeci)*(i-1):(pdeci[0]-4)+(5+ndeci)*i].strip())
-                    cord.append(thiscord)
-                xyz.append(cord)
+                    thiscoord = float(line[(pdeci[0]-4)+(5+ndeci)*(i-1):(pdeci[0]-4)+(5+ndeci)*i].strip())
+                    coord.append(thiscoord)
+                xyz.append(coord)
 
             elif is_gro_box(line) and ln == na + 2:
                 box = [float(i)*10 for i in sline]
