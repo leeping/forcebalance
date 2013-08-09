@@ -149,6 +149,7 @@ class ForceBalanceTestRunner(object):
        in the standard unittest.TestResult format"""
     def __init__(self, logger=forcebalance.output.getLogger("forcebalance.test"), verbose = False):
         self.logger = logger
+        forcebalance.output.getLogger("forcebalance.test")
         
     def check(self, test_modules=__all__):
         """This tries importing test modules which is helpful for error checking
@@ -193,6 +194,8 @@ class ForceBalanceTestRunner(object):
         tests.addTests(systemTests) # integration tests should be run after other tests
 
         result = ForceBalanceTestResult()
+        
+        forcebalance.output.getLogger("forcebalance").addHandler(forcebalance.output.NullHandler())
 
         ### START TESTING ###
         # run any pretest tasks before first test
