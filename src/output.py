@@ -34,6 +34,7 @@ class CleanFileHandler(FileHandler):
     def emit(self, record):
         message = record.getMessage()
         message = re.sub("\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m", "", message)
+        message = re.sub("\r", "", message)
         self.stream.write(message)
         self.flush()
 
