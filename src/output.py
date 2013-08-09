@@ -5,11 +5,13 @@ class ForceBalanceLogger(Logger):
     """This logger starts out with a default handler that writes to stdout
     addHandler removes this default the first time another handler is added.
     This is used for forcebalance package level logging, where a logger should
-    always be present unless otherwise specified. To silence, add a NullHandler"""
+    always be present unless otherwise specified. To silence, add a NullHandler
+    We also by default set the log level to INFO (logging.Logger starts at WARNING)"""
     def __init__(self, name):
         super(ForceBalanceLogger, self).__init__(name)
         self.defaultHandler = RawStreamHandler(sys.stdout)
         super(ForceBalanceLogger, self).addHandler(self.defaultHandler)
+        self.setLevel(INFO)
         
     def addHandler(self, hdlr):
         if self.defaultHandler:
