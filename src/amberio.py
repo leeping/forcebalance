@@ -14,6 +14,9 @@ import numpy as np
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 mol2_pdict = {'COUL':{'Atom':[1], 8:''}}
 
 frcmod_pdict = {'BONDS': {'Atom':[0], 1:'K', 2:'B'},

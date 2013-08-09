@@ -21,6 +21,9 @@ import itertools
 from collections import OrderedDict
 #import IPython
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 def edit_mdp(fin, fout, options, verbose=False):
     """
     Create or edit a Gromacs MDP file.
@@ -575,10 +578,13 @@ class Liquid_GMX(Liquid):
         self.nptpfx = 'sh rungmx.sh'
          # Suffix to command string for launching NPT simulations.
         self.nptsfx += ["--nt %i" % self.mdrun_threads]
-       # List of extra files to upload to Work Queue.
+        # List of extra files to upload to Work Queue.
         self.nptfiles += ['rungmx.sh', 'liquid.top', 'liquid.mdp', 'gas.top', 'gas.mdp']
         # MD engine argument supplied to command string for launching NPT simulations.
         self.engine = "gromacs"
+        # Send back the trajectory file.
+        if self.save_traj > 0:
+            self.extra_output = ['liquid-md.trr']
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
