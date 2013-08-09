@@ -825,7 +825,6 @@ def main():
 
     # Load the force field in from the ForceBalance pickle.
     FF,mvals,h,AGrad = lp_load(open('forcebalance.p'))
-    AGrad = True
     FF.make(mvals)
 
     #=================================================================#
