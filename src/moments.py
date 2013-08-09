@@ -17,6 +17,9 @@ from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 class Moments(Target):
 
     """ Subclass of Target for fitting force fields to multipole moments (from experiment or theory).
@@ -112,7 +115,7 @@ class Moments(Target):
                 self.ref_moments['polarizability']['yz'] = float(s[1])
                 self.ref_moments['polarizability']['zz'] = float(s[2])
             else:
-                print line
+                logger.info("%s\n" % line)
                 raise Exception("This line doesn't comply with our multipole file format!")
             ln += 1
         # Subtract the trace of the quadrupole moment.
@@ -130,7 +133,7 @@ class Moments(Target):
         
     def indicate(self):
         """ Print qualitative indicator. """
-        print "\rTarget: %-15s" % self.name
+        logger.info("\rTarget: %-15s\n" % self.name)
         #print "Multipole Moments and Po"
         #print "Reference :", self.ref_moments
         #print "Calculated:", self.calc_moments

@@ -110,6 +110,8 @@ import traceback
 import itertools
 from collections import OrderedDict, defaultdict
 from forcebalance.baseclass import ForceBalanceBaseClass
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 FF_Extensions = {"itp" : "gmx",
                  "in"  : "qchem",
@@ -142,28 +144,28 @@ def determine_fftype(ffname,verbose=False):
 
     fsplit = ffname.split('/')[-1].split(':')
     fftype = None
-    if verbose: print "Determining file type of %s ..." % fsplit[0],
+    if verbose: logger.info("Determining file type of %s ..." % fsplit[0])
     if len(fsplit) == 2:
         if fsplit[1] in FF_IOModules:
-            if verbose: print "We're golden! (%s)" % fsplit[1]
+            if verbose: logger.info("We're golden! (%s)\n" % fsplit[1])
             fftype = fsplit[1]
         else:
-            if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[1],', '.join(FF_IOModules.keys()))
+            if verbose: logger.info("\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!\n" % (fsplit[1],', '.join(FF_IOModules.keys())))
     elif len(fsplit) == 1:
-        if verbose: print "Guessing from extension (you may specify type with filename:type) ...", 
+        if verbose: logger.info("Guessing from extension (you may specify type with filename:type) ...")
         ffname = fsplit[0]
         ffext = ffname.split('.')[-1]
         if ffext in FF_Extensions:
             guesstype = FF_Extensions[ffext]
             if guesstype in FF_IOModules:
-                if verbose: print "guessing %s -> %s!" % (ffext, guesstype)
+                if verbose: logger.info("guessing %s -> %s!\n" % (ffext, guesstype))
                 fftype = guesstype
             else:
-                if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!" % (fsplit[0],', '.join(FF_IOModules.keys()))
+                if verbose: logger.info("\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!\n" % (fsplit[0],', '.join(FF_IOModules.keys())))
         else:
-            if verbose: print "\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!" % (ffext,', '.join(FF_Extensions.keys()))
+            if verbose: logger.info("\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!\n" % (ffext,', '.join(FF_Extensions.keys())))
     if fftype == None:
-        if verbose: print "Force field type not determined!"
+        if verbose: logger.warning("Force field type not determined!\n")
         #sys.exit(1)
     return fftype
 
@@ -261,7 +263,7 @@ class FF(ForceBalanceBaseClass):
         # Read the force fields into memory.
         for fnm in self.fnms:
             if verbose:
-                print "Reading force field from file: %s" % fnm
+                logger.info("Reading force field from file: %s\n" % fnm)
             self.addff(fnm)
 
         ## WORK IN PROGRESS ##
@@ -299,7 +301,7 @@ class FF(ForceBalanceBaseClass):
             ## Prints the plist to screen.
             bar = printcool("Starting parameter indices, physical values and IDs")
             self.print_map()                       
-            print bar
+            logger.info(bar)
         ## Make the rescaling factors.
         self.rsmake(printfacs=verbose)            
         ## Make the transformation matrix.
@@ -460,9 +462,9 @@ class FF(ForceBalanceBaseClass):
             try:
                 self.Readers[ffname].feed(line)
             except:
-                print traceback.format_exc()
-                print "The force field reader crashed when trying to read the following line:"
-                print line
+                logger.warning(traceback.format_exc() + '\n')
+                logger.warning("The force field reader crashed when trying to read the following line:\n")
+                logger.warning(line + '\n')
                 warn_press_key("The force field parser got confused!  The traceback and line in question are printed above.")
             sline = self.Readers[ffname].Split(line)
             if 'PARM' in sline:
@@ -480,7 +482,7 @@ class FF(ForceBalanceBaseClass):
                         while pid in self.map:
                             pid = "%s%i" % (pid0, extranum)
                             extranum += 1
-                        print "Encountered an duplicate parameter ID: parameter name has been changed to %s" % pid
+                        logger.info("Encountered an duplicate parameter ID: parameter name has been changed to %s\n" % pid)
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
                     self.patoms.append([self.Readers[ffname].molatom])
@@ -614,7 +616,7 @@ class FF(ForceBalanceBaseClass):
         if len(vals) != self.np:
             raise Exception('Input parameter array (%i) not the required size (%i)' % (len(vals), self.np))
         if use_pvals or self.use_pvals:
-            print "Using physical parameters directly!\r",
+            logger.info("Using physical parameters directly!\r")
             pvals = vals.copy().flatten()
         else:
             pvals = self.create_pvals(vals)
@@ -663,7 +665,7 @@ class FF(ForceBalanceBaseClass):
                     try:
                         wval = eval(cmd)
                     except:
-                        print traceback.format_exc()
+                        logger.error(traceback.format_exc() + '\n')
                         raise Exception("The command %s (written in the force field file) cannot be evaluated!" % cmd)
                 else:
                     wval = mult*pvals[i]
@@ -709,7 +711,7 @@ class FF(ForceBalanceBaseClass):
             absprintdir = os.getcwd()
 
         if not os.path.exists(absprintdir):
-            print 'Creating the directory %s to print the force field' % absprintdir
+            logger.info('Creating the directory %s to print the force field\n' % absprintdir)
             os.makedirs(absprintdir)
 
         for fnm in newffdata:
@@ -734,8 +736,8 @@ class FF(ForceBalanceBaseClass):
         #print "pvals: ", pvals
 
         pvals = self.create_pvals(mvals)
-        print "pvals:"
-        print pvals
+        logger.info("pvals:\n")
+        logger.info(str(pvals) + '\n')
 
         Thresh = 1e-4
 
@@ -773,8 +775,8 @@ class FF(ForceBalanceBaseClass):
             Groups[key].append(p)
 
         pvals = self.create_pvals(zeros(self.np,dtype=float))
-        print "pvals:"
-        print pvals
+        logger.info("pvals:\n")
+        logger.info(str(pvals) + '\n')
 
         spacdict = {}
         for gnm, pidx in Groups.items():
@@ -814,9 +816,7 @@ class FF(ForceBalanceBaseClass):
             try:
                 pvals = exp(mvals.flatten()) * self.pvals0
             except:
-                print mvals
-                import traceback
-                traceback.print_exc()
+                logger.exception(mvals + '\n')
                 raise Exception('What the hell did you do?')
         else:
             pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0
@@ -893,8 +893,8 @@ class FF(ForceBalanceBaseClass):
         #     rsfactors[line.split()[0]] = float(line.split()[1])
         if printfacs:
             bar = printcool("Rescaling Factors (Lower Takes Precedence):",color=1)
-            print '\n'.join(["   %-35s  : %.5e" % (i, rsfactors[i]) for i in rsfac_list])
-            print bar
+            logger.info('\n'.join(["   %-35s  : %.5e\n" % (i, rsfactors[i]) for i in rsfac_list]))
+            logger.info(bar)
         ## The array of rescaling factors
         self.rs = ones(len(self.pvals0))
         for pnum in range(len(self.pvals0)):
@@ -968,7 +968,7 @@ class FF(ForceBalanceBaseClass):
             return qtrans2
         # Here we build a charge constraint for each molecule.
         if any(len(r.adict) > 0 for r in self.Readers.values()):
-            print "Building charge constraints..."
+            logger.info("Building charge constraints...\n")
             # Build a concatenated dictionary
             Adict = OrderedDict()
             # This is a loop over files
@@ -994,7 +994,7 @@ class FF(ForceBalanceBaseClass):
                     if any([j in self.plist[i] for j in concern]) and qct > 0:
                         qmap.append(i)
                         qid.append(qidx)
-                        print "Parameter %i occurs %i times in molecule %s in locations %s (%s)" % (i, qct, molname, str(qidx), self.plist[i])
+                        logger.info("Parameter %i occurs %i times in molecule %s in locations %s (%s)\n" % (i, qct, molname, str(qidx), self.plist[i]))
                 #Here is where we build the qtrans2 matrix.
                 if len(qmap) > 0:
                     qtrans2 = build_qtrans2(tq, qid, qmap)
@@ -1004,7 +1004,7 @@ class FF(ForceBalanceBaseClass):
                     self.qid = qid
                     self.qmap = qmap
                 else:
-                    print "Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted." % molname
+                    logger.info("Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted.\n" % molname)
                 nmol += 1
         elif self.constrain_charge:
             warn_press_key("'adict' {molecule:atomnames} was not found.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
@@ -1012,7 +1012,7 @@ class FF(ForceBalanceBaseClass):
             if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
                 # Hack to count the number of atoms for each atomic charge parameter, when the force field is an XML file.
                 # This needs to be changed to Chain or Molecule
-                print [determine_fftype(k) for k in self.ffdata]
+                logger.info(str([determine_fftype(k) for k in self.ffdata]))
                 ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Residue/Atom')] for k in self.ffdata if determine_fftype(k) == "openmm"]))
             for i in range(self.np):
                 if any([j in self.plist[i] for j in concern]):
@@ -1055,7 +1055,7 @@ class FF(ForceBalanceBaseClass):
                 qid = [array([i]) for i in range(3)]
                 tq = 3
                 qtrans2 = build_qtrans2(tq, qid, Grp)
-                print "Making sure that quadrupoles are traceless (for parameter IDs %s)" % str(Grp)
+                logger.info("Making sure that quadrupoles are traceless (for parameter IDs %s)\n" % str(Grp))
                 insert_mat(qtrans2, Grp)
 
         #ListOfAtoms = list(itertools.chain(*[[e.get('type') for e in self.ffdata[k].getroot().xpath('//Multipole')] for k in self.ffdata]))
@@ -1095,7 +1095,8 @@ class FF(ForceBalanceBaseClass):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
         if vals == None:
             vals = self.pvals0
-        print '\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i for i in self.plist])
+        logger.info('\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i for i in self.plist]))
+        logger.info('\n')
         
     def assign_p0(self,idx,val):
         """ Assign physical parameter values to the 'pvals0' array.
