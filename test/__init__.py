@@ -205,17 +205,13 @@ class ForceBalanceTestRunner(object):
 
         # otherwise do a normal test run
         else:
-            self.console = sys.stdout
-            sys.stdout = open(logfile, 'w')
-
             unittest.registerResult(result)
             try:
                 tests.run(result)
+            except KeyboardInterrupt:
+                self.logger.exception(msg="Test run cancelled by user")
             except:
                 self.logger.exception(msg="An unexpected exception occurred while running tests\n")
-
-            sys.stdout.close()
-            sys.stdout = self.console
 
         result.stopTestRun(tests)
         ### STOP TESTING ###

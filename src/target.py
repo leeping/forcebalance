@@ -11,6 +11,8 @@ import forcebalance
 from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from forcebalance.optimizer import Counter
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 class Target(forcebalance.BaseClass):
     
@@ -221,7 +223,7 @@ class Target(forcebalance.BaseClass):
                         FileCount += 1
                     else:
                         # I could use the tarfile module here
-                        print "Backing up:", self.tempdir, 'to:', "backups/%s_%i.tar.bz2" % (self.name,FileCount)
+                        logger.info("Backing up: " + self.tempdir + ' to: ' + "backups/%s_%i.tar.bz2\n" % (self.name,FileCount))
                         subprocess.call(["tar","cjf",CandFile,self.name])
                         shutil.rmtree(self.name)
                         break
@@ -287,7 +289,7 @@ class Target(forcebalance.BaseClass):
         
         """
         if self.sleepy > 0:
-            print "Sleeping for %i seconds as directed.." % self.sleepy
+            logger.info("Sleeping for %i seconds as directed...\n" % self.sleepy)
             time.sleep(self.sleepy)
         ## Directory of the current iteration; if not None, then the simulation runs under
         ## temp/target_name/iteration_number

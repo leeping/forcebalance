@@ -16,6 +16,9 @@ from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 class Interaction(Target):
 
     """ Subclass of Target for fitting force fields to interaction energies.
@@ -83,7 +86,7 @@ class Interaction(Target):
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,tgt_opts)
 
-        print "The energy denominator is:", self.energy_denom, "kcal/mol"
+        logger.info("The energy denominator is: %s kcal/mol\n"  % str(self.energy_denom))
         # Internally things are handled in kJ/mol.
         denom = self.energy_denom * 4.184
         # Create the denominator.
@@ -102,9 +105,9 @@ class Interaction(Target):
         else:
             self.divisor = ones(len(self.eqm)) * denom
         if self.cauchy:
-            print "Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )"
+            logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
         if self.energy_upper > 0:
-            print "Interactions more repulsive than", self.energy_upper, "will not be fitted"
+            logger.info("Interactions more repulsive than %s will not be fitted\n" % str(self.energy_upper))
             ecut = self.energy_upper * 4.184
             self.prefactor = 1.0 * (self.eqm < ecut)
         else:
@@ -147,7 +150,7 @@ class Interaction(Target):
             printcool_dictionary(PrintDict,title="Target: %s\nInteraction Energies (kcal/mol), Objective = % .5e\n %-10s %9s %9s %9s %9s %11s" % 
                                  (self.name, self.objective, "Label", "Calc.", "Ref.", "Delta", "Divisor", "Term"),keywidth=15)
         else:
-            print "Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)" % (self.name,self.objective)
+            logger.info("Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)\n" % (self.name,self.objective))
         # if len(self.RMSDDict) > 0:
         #     printcool_dictionary(self.RMSDDict,title="Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s" % (self.rmsd_part, "System", "RMSD", "Term"), keywidth=45)
 
@@ -161,11 +164,11 @@ class Interaction(Target):
             AHess = False
 
         def callM(mvals_, dielectric=False):
-            print "\r",
+            logger.info("\r")
             pvals = self.FF.make(mvals_)
             return self.interaction_driver_all(dielectric)
 
-        print "Executing\r",
+        logger.info("Executing\r")
         emm = callM(mvals)
 
         D = emm - self.eqm

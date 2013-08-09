@@ -129,7 +129,11 @@ else:
 
 printcool("ForceBalance condensed phase simulation using engine: %s" % args.engine)
 print "For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" % (nprod, nsteps, args.liquid_timestep)
-print "For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" % (nprod, nsteps, args.liquid_timestep)
+print "For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" % (m_nprod, m_nsteps, args.gas_timestep)
+if nprod < 2:
+    raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' % (2 * nsteps))
+if m_nprod < 2:
+    raise Exception('Please set the number of gas time steps so that you collect at least two snapshots (minimum %i)' % (2 * m_nsteps))
 
 DoEDA = True
 if args.mts_vvvr:
@@ -368,13 +372,18 @@ class Gromacs_MD(MDEngine):
                 if len(s) > 0 and all([isint(i) for i in s[::2]]):
                     parsemode = 2
             if parsemode == 2:
-                if len(s) > 0 and all([isint(i) for i in s[::2]]):
-                    for j in range(len(s))[::2]:
-                        num = int(s[j])
-                        name = s[j+1]
-                        energyterms[name] = num
-                else:
-                    parsemode = 0
+                # g_energy garbles stdout and stderr so our parser
+                # needs to be more robust.
+                if len(s) > 0:
+                    try:
+                        if all([isint(i) for i in s[::2]]):
+                            for j in range(len(s))[::2]:
+                                num = int(s[j])
+                                name = s[j+1]
+                                energyterms[name] = num
+                    except: pass
+                # else:
+                #     parsemode = 0
         ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
         ekeep += ['Volume', 'Density']
         o = self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (phase, phase), stdin="\n".join(ekeep))
@@ -608,11 +617,15 @@ class OpenMM_MD(MDEngine):
         EnergyTerms = OrderedDict()
         Potential = Sim.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
         Kinetic = Sim.context.getState(getEnergy=True).getKineticEnergy() / kilojoules_per_mole
-        for i in range(Sim.system.getNumForces()):
-            EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
+        if DoEDA:
+            for i in range(Sim.system.getNumForces()):
+                EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
         EnergyTerms['Potential'] = Potential
         EnergyTerms['Kinetic'] = Kinetic
-        EnergyTerms['Total'] = Potential+Kinetic
+        kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
+        Kinetic_Temperature = 2.0 * Kinetic * kilojoule_per_mole / kB / self.ndof / kelvin
+        EnergyTerms['Kinetic Temperature'] = Kinetic_Temperature
+        EnergyTerms['Total Energy'] = Potential+Kinetic
         return EnergyTerms
     
     def run_simulation(self, phase, minimize=True, savexyz=True):
@@ -640,7 +653,7 @@ class OpenMM_MD(MDEngine):
 
         kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
         # Determine number of degrees of freedom; the center of mass motion remover is also a constraint.
-        ndof = 3*(system.getNumParticles() - sum([system.isVirtualSite(i) for i in range(system.getNumParticles())])) - system.getNumConstraints() - 3*pbc
+        self.ndof = 3*(system.getNumParticles() - sum([system.isVirtualSite(i) for i in range(system.getNumParticles())])) - system.getNumConstraints() - 3*pbc
         # Compute total mass.
         mass = self.compute_mass(system).in_units_of(gram / mole) /  AVOGADRO_CONSTANT_NA # total system mass in g
         # Initialize statistics.
@@ -670,7 +683,7 @@ class OpenMM_MD(MDEngine):
             else:
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            kinetic_temperature = 2.0 * kinetic / kB / ndof # (1/2) ndof * kB * T = KE
+            kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
             print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds,
                                                              kinetic_temperature / kelvin, potential / kilojoules_per_mole,
                                                              volume / nanometers**3, density / (kilogram / meter**3))
@@ -686,7 +699,7 @@ class OpenMM_MD(MDEngine):
             self.Xyzs[phase].append(state.getPositions())
             kinetic = state.getKineticEnergy()
             potential = state.getPotentialEnergy()
-            kinetic_temperature = 2.0 * kinetic / kB / ndof
+            kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -697,12 +710,11 @@ class OpenMM_MD(MDEngine):
                 density = 0.0 * kilogram / meter ** 3
             self.Boxes[phase].append(box_vectors)
             # Perform energy decomposition.
-            if DoEDA:
-                for comp, val in self.EnergyDecomposition(simulation).items():
-                    if comp in edecomp:
-                        edecomp[comp].append(val)
-                    else:
-                        edecomp[comp] = [val]
+            for comp, val in self.EnergyDecomposition(simulation).items():
+                if comp in edecomp:
+                    edecomp[comp].append(val)
+                else:
+                    edecomp[comp] = [val]
             print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds, kinetic_temperature / kelvin, potential / kilojoules_per_mole, volume / nanometers**3, density / (kilogram / meter**3))
             rhos.append(density.value_in_unit(kilogram / meter**3))
             potentials.append(potential / kilojoules_per_mole)
@@ -761,7 +773,15 @@ class OpenMM_MD(MDEngine):
         
         # Loop through the snapshots
         for xyz,box in zip(self.Xyzs[phase],self.Boxes[phase]):
-            xyz1 = ResetVirtualSites(xyz, system) if resetvs else xyz
+            # First set the positions in the simulation in order to apply the constraints.
+            simulation.context.setPositions(xyz)
+            if simulation.system.getNumConstraints() > 0:
+                simulation.context.applyConstraints(1e-8)
+                xyz0 = simulation.context.getState(getPositions=True).getPositions()
+            else:
+                xyz0 = xyz
+            # Then reset the virtual site positions manually.
+            xyz1 = ResetVirtualSites(xyz0, system) if resetvs else xyz0
             simulation.context.setPositions(xyz1)
             if box != None:
                 simulation.context.setPeriodicBoxVectors(box[0],box[1],box[2])
@@ -825,7 +845,6 @@ def main():
 
     # Load the force field in from the ForceBalance pickle.
     FF,mvals,h,AGrad = lp_load(open('forcebalance.p'))
-    AGrad = True
     FF.make(mvals)
 
     #=================================================================#
@@ -863,7 +882,7 @@ def main():
     pV = atm_unit * pressure * Volumes
     pV_avg, pV_err = mean_stderr(pV)
     Rho_avg, Rho_err = mean_stderr(Rhos)
-    if DoEDA: PrintEDA(EDA, NMol)
+    PrintEDA(EDA, NMol)
 
     #==============================================#
     # Now run the simulation for just the monomer. #
@@ -879,7 +898,7 @@ def main():
     _, mPotentials, mKinetics, __, ___, mEDA = Engine.run_simulation("gas", minimize=args.minimize_energy, savexyz=False)
     mEnergies = mPotentials + mKinetics
     mEne_avg, mEne_err = mean_stderr(mEnergies)
-    if DoEDA: PrintEDA(mEDA, 1)
+    PrintEDA(mEDA, 1)
 
     #============================================#
     #  Compute the potential energy derivatives. #

@@ -93,10 +93,17 @@ class CalculationObject(ForceBalanceObject):
         ## Actually run the optimizer.
         optimizer.Run()
         
+        
         resultopts = self.opts.copy()
         resultopts.update({"ffdir" : "result"})
+        
+        # temporarily silence nifty and forcefield while reading the results forcefield
+        forcebalance.output.getLogger("forcebalance.forcefield").propagate = False
+        forcebalance.output.getLogger("forcebalance.nifty").propagate = False
         self.properties['result'] = ForcefieldObject(resultopts)
-
+        forcebalance.output.getLogger("forcebalance.forcefield").propagate = True
+        forcebalance.output.getLogger("forcebalance.nifty").propagate = True
+        
 # maybe the current implementation of TargetObject should be merged here
 # to keep all options in the same place?
 class OptionObject(ForceBalanceObject):
