@@ -13,7 +13,7 @@ class MainWindow(tk.Tk):
         self.objectsPane = elements.ObjectViewer(self)
         self.detailsPane = elements.DetailViewer(self)
         self.consolePane = elements.ConsoleViewer(self)
-        sys.stdout = self.consolePane
+        
         self.objectsPane.grid(row=0, column=0)
         self.detailsPane.grid(row=0, column=1)
         self.consolePane.grid(row=1, columnspan=2, sticky=tk.W+tk.E+tk.N+tk.S)

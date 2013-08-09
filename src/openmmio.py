@@ -19,6 +19,8 @@ from forcebalance.chemistry import *
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 from collections import OrderedDict
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 try:
     from simtk.openmm.app import *
     from simtk.openmm import *
@@ -216,10 +218,10 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     for i in system.getForces():
         if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
             # Slow force.
-            print i.__class__.__name__, "is a Slow Force"
+            logger.info(i.__class__.__name__ + "is a Slow Force\n")
             i.setForceGroup(1)
         else:
-            print i.__class__.__name__, "is a Fast Force"
+            logger.info(i.__class__.__name__ + "is a Fast Force\n")
             # Fast force.
             i.setForceGroup(0)
 
@@ -314,7 +316,7 @@ class OpenMM_Reader(BaseReader):
                 Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
             return "/".join([InteractionType, parameter, Involved])
         except:
-            print "Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible" % ("/".join([InteractionType, parameter]))
+            logger.info("Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
             return "/".join([InteractionType, parameter])
 
 class Liquid_OpenMM(Liquid):
@@ -344,7 +346,7 @@ class Liquid_OpenMM(Liquid):
         self.gas_fnm = "gas.pdb"
         if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
             self.liquid_traj = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
-            print "Found collection of starting conformations, length %i!" % len(self.liquid_traj)
+            logger.info("Found collection of starting conformations, length %i!\n" % len(self.liquid_traj))
         # Prefix to command string for launching NPT simulations.
         self.nptpfx += "bash runcuda.sh"
         # List of extra files to upload to Work Queue.
@@ -377,7 +379,7 @@ class Liquid_OpenMM(Liquid):
         pos = ResetVirtualSites(pos, sys)
         d = get_dipole(self.msim, positions=pos)
         if not in_fd():
-            print "The molecular dipole moment is % .3f debye" % np.linalg.norm(d)
+            logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
         dd2 = ((np.linalg.norm(d)-self.self_pol_mu0)*debye)**2
         eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
         epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*np.pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
@@ -397,22 +399,22 @@ class AbInitio_OpenMM(AbInitio):
         try:
             PlatName = 'CUDA'
             ## Set the simulation platform
-            print "Setting Platform to", PlatName
+            logger.info("Setting Platform to %s\n" % PlatName)
             self.platform = openmm.Platform.getPlatformByName(PlatName)
             ## Set the device to the environment variable or zero otherwise
             device = os.environ.get('CUDA_DEVICE',"0")
-            print "Setting Device to", device
+            logger.info("Setting Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
             self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
         except:
             PlatName = 'Reference'
-            print "Setting Platform to", PlatName
+            logger.info("Setting Platform to %s\n" % PlatName)
             self.platform = openmm.Platform.getPlatformByName(PlatName)
             # warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
             # self.platform = None
         if PlatName == "CUDA":
             if tgt_opts['openmm_cuda_precision'] != '':
-                print "Setting Precision to %s" % tgt_opts['openmm_cuda_precision'].lower()
+                logger.info("Setting Precision to %s\n" % tgt_opts['openmm_cuda_precision'].lower())
                 try:
                     self.platform.setPropertyDefaultValue("CudaPrecision",tgt_opts['openmm_cuda_precision'].lower())
                 except:
@@ -544,26 +546,26 @@ class Interaction_OpenMM(Interaction):
         #     self.traj[0].write(os.path.join(self.root,self.tgtdir,"conf.pdb"))
         ## TODO: The following code should not be repeated everywhere.
         for pdbfnm in ["dimer.pdb", "fraga.pdb", "fragb.pdb"]:
-            print "Setting up Simulation object for %s" % pdbfnm
+            logger.info("Setting up Simulation object for %s\n" % pdbfnm)
             try:
                 PlatName = 'CUDA'
                 ## Set the simulation platform
-                print "Setting Platform to", PlatName
+                logger.info("Setting Platform to %s\n" % PlatName)
                 self.platform = openmm.Platform.getPlatformByName(PlatName)
                 ## Set the device to the environment variable or zero otherwise
                 device = os.environ.get('CUDA_DEVICE',"0")
-                print "Setting Device to", device
+                logger.info("Setting Device to %s\n" % device)
                 self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
                 self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
             except:
                 PlatName = 'Reference'
-                print "Setting Platform to", PlatName
+                logger.info("Setting Platform to %s\n" % PlatName)
                 self.platform = openmm.Platform.getPlatformByName(PlatName)
                 # warn_press_key("Setting Platform failed!  Have you loaded the CUDA environment variables?")
                 # self.platform = None
             if PlatName == "CUDA":
                 if tgt_opts['openmm_cuda_precision'] != '':
-                    print "Setting Precision to %s" % tgt_opts['openmm_cuda_precision'].lower()
+                    logger.info("Setting Precision to %s\n" % tgt_opts['openmm_cuda_precision'].lower())
                     try:
                         self.platform.setPropertyDefaultValue("CudaPrecision",tgt_opts['openmm_cuda_precision'].lower())
                     except:

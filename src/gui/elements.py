@@ -5,6 +5,7 @@ import threading
 
 import objects
 from eventhandlers import _bindEventHandler
+from forcebalance.output import getLogger, StreamHandler, INFO
 
 class ObjectViewer(tk.LabelFrame):
     """Provides a general overview of the loaded calculation objects"""
@@ -299,23 +300,30 @@ class ConsoleViewer(tk.LabelFrame):
                             bg="#000000",
                             height=20)
         self.console.pack(fill=tk.BOTH)
-        self.stdout = sys.stdout
+        
+        # console colors corresponding to ANSI escape sequences
+        self.console.tag_config("0", foreground="white", background="black")
+        #self.console.tag_config("1", font = )  # make text bold
+        self.console.tag_config("44", background="blue")
+        self.console.tag_config("91", foreground="red")
+        self.console.tag_config("92", foreground="green")
+        self.console.tag_config("93", foreground="yellow")
+        self.console.tag_config("94", foreground="blue")
+        self.console.tag_config("95", foreground="purple")
 
+        getLogger("forcebalance").addHandler(ConsolePaneHandler(self))
+        getLogger("forcebalance").setLevel(INFO)
 
     ## we implement write and flush so the console viewer
     #  can serve as a drop in replacement for sys.stdout
-    def write(self, input):
-        color = "normal"
-        self.console.tag_config("red", foreground="red")
-        self.console.tag_config("green", foreground="red")
+    def write(self, input, tags="0"):
         self.console['state']=tk.NORMAL
         
         # processing of input
         input = re.sub("\r","\n", input)
-        input = re.sub("\x1b\[.?;?[0-9]{1,2};?[0-9]{,2}m", "", input)
-        #input = re.split("(\x1b\[[0-9]{1,2};?[0-9]{,2}m)", input)
+        #input = re.sub("\x1b\[.?;?[0-9]{1,2};?[0-9]{,2}m", "", input)
         
-        self.console.insert(tk.END, input, color)
+        self.console.insert(tk.END, input, tags)
         self.console.yview(tk.END)
         self.console['state']=tk.DISABLED
 
@@ -326,3 +334,25 @@ class ConsoleViewer(tk.LabelFrame):
         self.console['state']=tk.NORMAL
         self.console.delete(1.0, tk.END)
         self.console['state']=tk.DISABLED
+        
+class ConsolePaneHandler(StreamHandler):
+    def __init__(self, console):
+        super(ConsolePaneHandler, self).__init__()
+        self.console = console
+        self.color = ["0"]
+    
+    def emit(self, record):
+        message = re.split("(\x1b\[[01]?;?[0-9]{1,2};?[0-9]{,2}m)", record.getMessage())
+        
+        print message
+        
+        tags={"fg":"normal","bg":"normal"}
+        for section in message:
+            if section[0] == "\x1b":
+                self.color = tuple(section[2:-1].split(';'))
+            else:
+                print self.color
+                self.console.write(section, tags=self.color)
+                
+        self.flush()
+
