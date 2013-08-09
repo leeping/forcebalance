@@ -1581,15 +1581,27 @@ class Molecule(object):
             elif is_gro_coord(line):
                 if frame == 0: # Create the list of residues, atom names etc. only if it's the first frame.
                     # Name of the residue, for instance '153SOL1 -> SOL1' ; strips leading numbers
-                    thisresname = re.sub('^[0-9]*','',sline[0])
+                    thisresid = int(line[0:5].strip())
+                    resid.append(thisresid)
+                    thisresname = line[5:10].strip()
                     resname.append(thisresname)
-                    resid.append(int(sline[0].replace(thisresname,'')))
-                    atomname.append(sline[1])
+                    thisatomname = line[10:15].strip()
+                    atomname.append(thisatomname)
+
+                    pdeci = [i for i, x in enumerate(line) if x == '.']
+                    ndeci = pdeci[1] - pdeci[0] - 5
+                    cord = []
+
                     thiselem = sline[1]
                     if len(thiselem) > 1:
                         thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
                     elem.append(thiselem)
-                xyz.append([float(i) for i in sline[-3:]])
+
+                for i in range(1,4):
+                    thiscord = float(line[(pdeci[0]-4)+(5+ndeci)*(i-1):(pdeci[0]-4)+(5+ndeci)*i].strip())
+                    cord.append(thiscord)
+                xyz.append(cord)
+
             elif is_gro_box(line) and ln == na + 2:
                 box = [float(i)*10 for i in sline]
                 if len(box) == 3:

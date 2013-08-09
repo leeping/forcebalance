@@ -22,7 +22,7 @@ except: pass
 from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple
-from forcebalance.optimizer import Counter
+from forcebalance.optimizer import Counter, GoodStep
 import csv
 
 def weight_info(W, PT, N_k, verbose=True):
@@ -47,15 +47,7 @@ class Liquid(Target):
     """ Subclass of Target for liquid property matching."""
     
     def __init__(self,options,tgt_opts,forcefield):
-        """Instantiation of the subclass.
-
-        We begin by instantiating the superclass here and also
-        defining a number of core concepts for energy / force
-        matching.
-
-        @todo Obtain the number of true atoms (or the particle -> atom mapping)
-        from the force field.
-        """
+        """ Create an instance of the class. """
         
         # Initialize the SuperClass!
         super(Liquid,self).__init__(options,tgt_opts,forcefield)
@@ -101,7 +93,9 @@ class Liquid(Target):
         self.do_self_pol = (self.self_pol_mu0 > 0.0 and self.self_pol_alpha > 0.0)
         # Enable anisotropic periodic box
         self.set_option(tgt_opts,'anisotropic_box',forceprint=True)
-        
+        # Whether to save trajectories (0 = never, 1 = delete after good step, 2 = keep all)
+        self.set_option(tgt_opts,'save_traj')       
+
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -110,6 +104,8 @@ class Liquid(Target):
         self.read_data()
         ## Prepare the temporary directory
         self.prepare_temp_directory(options,tgt_opts)
+        ## Extra platform-dependent data to send back
+        self.extra_output = []
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
@@ -133,6 +129,8 @@ class Liquid(Target):
                        ("--gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else None), 
                        ("--gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else None), 
                        ("--gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
+        # List of trajectory files that may be deleted if self.save_traj == 1.
+        self.last_traj = []
 
     def read_data(self):
         # Read the 'data.csv' file. The file should contain guidelines.
@@ -229,6 +227,7 @@ class Liquid(Target):
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
             if self.liquid_traj != None:
                 self.liquid_conf.xyzs[0] = self.liquid_traj.xyzs[simnum%len(self.liquid_traj)]
                 self.liquid_conf.boxes[0] = self.liquid_traj.boxes[simnum%len(self.liquid_traj)]
@@ -242,7 +241,7 @@ class Liquid(Target):
             else:
                 queue_up(wq, command = cmdstr+' &> npt.out',
                          input_files = self.nptfiles + ['npt.py', self.liquid_fnm, self.gas_fnm, 'forcebalance.p'],
-                         output_files = ['npt_result.p.bz2', 'npt.out'],
+                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output,
                          tgt=self)
 
     def indicate(self):
@@ -337,6 +336,13 @@ class Liquid(Target):
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == 0 and self.manual:
             warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=120)
+
+        # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
+        if Counter() > 0 and (Counter == 1 or GoodStep()) and self.save_traj < 2:
+            for fn in self.last_traj:
+                if os.path.exists(fn):
+                    os.remove(fn)
+        self.last_traj = []
 
         # Set up and run the NPT simulations.
         snum = 0
