@@ -368,13 +368,18 @@ class Gromacs_MD(MDEngine):
                 if len(s) > 0 and all([isint(i) for i in s[::2]]):
                     parsemode = 2
             if parsemode == 2:
-                if len(s) > 0 and all([isint(i) for i in s[::2]]):
-                    for j in range(len(s))[::2]:
-                        num = int(s[j])
-                        name = s[j+1]
-                        energyterms[name] = num
-                else:
-                    parsemode = 0
+                # g_energy garbles stdout and stderr so our parser
+                # needs to be more robust.
+                if len(s) > 0:
+                    try:
+                        if all([isint(i) for i in s[::2]]):
+                            for j in range(len(s))[::2]:
+                                num = int(s[j])
+                                name = s[j+1]
+                                energyterms[name] = num
+                    except: pass
+                # else:
+                #     parsemode = 0
         ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
         ekeep += ['Volume', 'Density']
         o = self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (phase, phase), stdin="\n".join(ekeep))
