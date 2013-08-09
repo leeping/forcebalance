@@ -757,7 +757,7 @@ def which(fnm):
     except:
         return ''
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stderr = False, persist = False, expand_cr=False):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -794,6 +794,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                                                                " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else ""))
         wtf("Executing process: %s%s\n" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else ""))
 
+    cmd_options.update(kwargs)
     p = subprocess.Popen(command, **cmd_options)
     
     stdout = ""
