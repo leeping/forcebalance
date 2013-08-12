@@ -216,8 +216,8 @@ class Liquid(Target):
             # printcool_dictionary(self.RefData[head],head)
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
-        # print global_opts
-        # print default_denoms
+        logger.debug("global_opts:\n%s\n" % str(global_opts))
+        logger.debug("default_denoms:\n%s\n" % str(default_denoms))
         for opt in global_opts:
             if "_denom" in opt:
                 # Record entries from the global_opts dictionary so they can be retrieved from other methods.
@@ -499,10 +499,10 @@ class Liquid(Target):
                 mm = BPoints.index(PT)
                 for kk, PT1 in enumerate(BPoints):
                     k = Points.index(PT1)
-                    # print "Will fill W2[%i:%i,%i] with W1[%i:%i,%i]" % (k*Shots,k*Shots+Shots,m,kk*Shots,kk*Shots+Shots,mm)
+                    logger.debug("Will fill W2[%i:%i,%i] with W1[%i:%i,%i]\n" % (k*Shots,k*Shots+Shots,m,kk*Shots,kk*Shots+Shots,mm))
                     W2[k*Shots:k*Shots+Shots,m] = W1[kk*Shots:kk*Shots+Shots,mm]
             else:
-                # print "Will fill W2[%i:%i,%i] with equal weights" % (m*Shots,m*Shots+Shots,m)
+                logger.debug("Will fill W2[%i:%i,%i] with equal weights\n" % (m*Shots,m*Shots+Shots,m))
                 W2[m*Shots:m*Shots+Shots,m] = 1.0/Shots
 
         # Run MBAR on the monomers.  This is barely necessary.
