@@ -111,7 +111,7 @@ Contains several methods for numerical optimization.
 
 For various reasons, the optimizer depends on the force field and fitting targets (i.\-e. we cannot treat it as a fully independent numerical optimizer). The dependency is rather weak which suggests that I can remove it someday. 
 
-Definition at line 42 of file optimizer.\-py.
+Definition at line 44 of file optimizer.\-py.
 
 
 
@@ -138,7 +138,7 @@ Here's what we do\-:
 \item Pass in the objective function, force field, all fitting targets 
 \end{DoxyItemize}
 
-Definition at line 55 of file optimizer.\-py.
+Definition at line 57 of file optimizer.\-py.
 
 
 
@@ -170,7 +170,7 @@ Use Sci\-Py's built-\/in simulated annealing algorithm to optimize the parameter
 \end{DoxySeeAlso}
 
 
-Definition at line 780 of file optimizer.\-py.
+Definition at line 784 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a58b957fe289822934711c29dfeb8d203}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!B\-F\-G\-S@{B\-F\-G\-S}}
 \index{B\-F\-G\-S@{B\-F\-G\-S}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -188,7 +188,7 @@ Optimize the force field parameters using the B\-F\-G\-S method; currently the r
 \end{DoxySeeAlso}
 
 
-Definition at line 600 of file optimizer.\-py.
+Definition at line 605 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_ad1e151204a172a4e75737b2b699d1623}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Conjugate\-Gradient@{Conjugate\-Gradient}}
 \index{Conjugate\-Gradient@{Conjugate\-Gradient}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -206,7 +206,7 @@ Use Sci\-Py's built-\/in simulated annealing algorithm to optimize the parameter
 \end{DoxySeeAlso}
 
 
-Definition at line 785 of file optimizer.\-py.
+Definition at line 789 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_aacf96d137fb0e491af7e380c8bd61eb9}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!F\-D\-Check\-G@{F\-D\-Check\-G}}
 \index{F\-D\-Check\-G@{F\-D\-Check\-G}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -221,7 +221,7 @@ Finite-\/difference checker for the objective function gradient.
 
 For each element in the gradient, use a five-\/point finite difference stencil to compute a finite-\/difference derivative, and compare it to the analytic result. 
 
-Definition at line 881 of file optimizer.\-py.
+Definition at line 885 of file optimizer.\-py.
 
 
 
@@ -251,7 +251,7 @@ This is meant to be a foolproof checker, so it is pretty slow. We could write a 
 
 The second derivative is computed by double-\/wrapping the objective function via the 'wrap2' function. 
 
-Definition at line 913 of file optimizer.\-py.
+Definition at line 917 of file optimizer.\-py.
 
 
 
@@ -278,10 +278,10 @@ Genetic algorithm, under development.
 It currently works but a genetic algorithm is more like a concept; i.\-e. there is no single way to implement it.
 
 \begin{DoxyRefDesc}{Todo}
-\item[\hyperlink{todo__todo000016}{Todo}]Massive parallelization hasn't been implemented yet\end{DoxyRefDesc}
+\item[\hyperlink{todo__todo000015}{Todo}]Massive parallelization hasn't been implemented yet\end{DoxyRefDesc}
 
 
-Definition at line 677 of file optimizer.\-py.
+Definition at line 681 of file optimizer.\-py.
 
 
 
@@ -307,7 +307,7 @@ A single-\/point gradient computation.
 
 
 
-Definition at line 859 of file optimizer.\-py.
+Definition at line 863 of file optimizer.\-py.
 
 
 
@@ -333,7 +333,7 @@ A single-\/point Hessian computation.
 
 
 
-Definition at line 867 of file optimizer.\-py.
+Definition at line 871 of file optimizer.\-py.
 
 
 
@@ -388,7 +388,7 @@ Tried and true in many situations. \-:) \begin{DoxyVerb}   Usually this function
 \end{DoxyParams}
 
 
-Definition at line 228 of file optimizer.\-py.
+Definition at line 229 of file optimizer.\-py.
 
 
 
@@ -417,7 +417,7 @@ Optimize the force field parameters using the Newton-\/\-Raphson method (.
 \end{DoxySeeAlso}
 
 
-Definition at line 595 of file optimizer.\-py.
+Definition at line 600 of file optimizer.\-py.
 
 
 
@@ -446,7 +446,7 @@ Use Sci\-Py's built-\/in Powell direction-\/set algorithm to optimize the parame
 \end{DoxySeeAlso}
 
 
-Definition at line 775 of file optimizer.\-py.
+Definition at line 779 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a05ee5fe985b3e2ec71071ca061e42d66}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!readchk@{readchk}}
 \index{readchk@{readchk}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -461,7 +461,7 @@ Read the checkpoint file for the main optimizer.
 
 
 
-Definition at line 941 of file optimizer.\-py.
+Definition at line 945 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a85688c895ce936fa4368d9e2f7fcb4b5}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Run@{Run}}
 \index{Run@{Run}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -476,7 +476,7 @@ Call the appropriate optimizer.
 
 This is the method we might want to call from an executable. 
 
-Definition at line 166 of file optimizer.\-py.
+Definition at line 168 of file optimizer.\-py.
 
 
 
@@ -519,7 +519,7 @@ This method goes to the specified parameter indices and scans through the suppli
 I hope this method will be useful for people who just want to look at changing one or two parameters and seeing how it affects the force field performance.
 
 \begin{DoxyRefDesc}{Todo}
-\item[\hyperlink{todo__todo000017}{Todo}]Maybe a multidimensional grid can be done. \end{DoxyRefDesc}
+\item[\hyperlink{todo__todo000016}{Todo}]Maybe a multidimensional grid can be done. \end{DoxyRefDesc}
 
 \begin{DoxyParams}[1]{Parameters}
 \mbox{\tt in}  & {\em Math\-Phys} & Switch to use mathematical (True) or physical (False) parameters. \\
@@ -527,7 +527,7 @@ I hope this method will be useful for people who just want to look at changing o
 \end{DoxyParams}
 
 
-Definition at line 811 of file optimizer.\-py.
+Definition at line 815 of file optimizer.\-py.
 
 
 
@@ -556,7 +556,7 @@ Optimizer\-::\-Scan\-Values
 \end{DoxySeeAlso}
 
 
-Definition at line 843 of file optimizer.\-py.
+Definition at line 847 of file optimizer.\-py.
 
 
 
@@ -585,7 +585,7 @@ Optimizer\-::\-Scan\-Values
 \end{DoxySeeAlso}
 
 
-Definition at line 848 of file optimizer.\-py.
+Definition at line 852 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a503e87533bd9c257cb9c4b505af9c1de}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Scipy\-Optimizer@{Scipy\-Optimizer}}
 \index{Scipy\-Optimizer@{Scipy\-Optimizer}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -612,7 +612,7 @@ Driver for Sci\-Py optimizations.
 \end{DoxyParams}
 
 
-Definition at line 613 of file optimizer.\-py.
+Definition at line 618 of file optimizer.\-py.
 
 
 
@@ -641,7 +641,7 @@ Use Sci\-Py's built-\/in simplex algorithm to optimize the parameters.
 \end{DoxySeeAlso}
 
 
-Definition at line 770 of file optimizer.\-py.
+Definition at line 774 of file optimizer.\-py.
 
 
 
@@ -667,7 +667,7 @@ A single-\/point objective function computation.
 
 
 
-Definition at line 853 of file optimizer.\-py.
+Definition at line 857 of file optimizer.\-py.
 
 
 
@@ -707,7 +707,7 @@ There are lots of tricks here that I will document later.
 \end{DoxyParams}
 
 
-Definition at line 420 of file optimizer.\-py.
+Definition at line 421 of file optimizer.\-py.
 
 
 
@@ -733,7 +733,7 @@ Write the checkpoint file for the main optimizer.
 
 
 
-Definition at line 953 of file optimizer.\-py.
+Definition at line 957 of file optimizer.\-py.
 
 
 
@@ -747,7 +747,7 @@ Whether the penalty function is hyperbolic.
 
 
 
-Definition at line 139 of file optimizer.\-py.
+Definition at line 141 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_aab04585adf73123d3187aa7dd22e7ce2}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!chk@{chk}}
 \index{chk@{chk}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -758,14 +758,14 @@ Put data into the checkpoint file.
 
 
 
-Definition at line 271 of file optimizer.\-py.
+Definition at line 272 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_aaa9b39385a4d067aec12a595da09cc16}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!dx@{dx}}
 \index{dx@{dx}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
 \paragraph[{dx}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-optimizer.\-Optimizer.\-dx}}\label{classforcebalance_1_1optimizer_1_1Optimizer_aaa9b39385a4d067aec12a595da09cc16}
 
 
-Definition at line 449 of file optimizer.\-py.
+Definition at line 450 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a1040c03a6361d782db8bd6a273d445e5}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!excision@{excision}}
 \index{excision@{excision}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -776,7 +776,7 @@ The indices to be excluded from the Hessian update.
 
 
 
-Definition at line 147 of file optimizer.\-py.
+Definition at line 149 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a873d6c3dfc5351d162613b596850af75}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!F\-F@{F\-F}}
 \index{F\-F@{F\-F}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -787,28 +787,28 @@ The force field itself.
 
 
 
-Definition at line 141 of file optimizer.\-py.
+Definition at line 143 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a91fbca8385133fa434eae3078e217fb6}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Grad@{Grad}}
 \index{Grad@{Grad}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
 \paragraph[{Grad}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-optimizer.\-Optimizer.\-Grad}}\label{classforcebalance_1_1optimizer_1_1Optimizer_a91fbca8385133fa434eae3078e217fb6}
 
 
-Definition at line 451 of file optimizer.\-py.
+Definition at line 452 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a7cf404b3b15afec4237344f09a31b6c7}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!H@{H}}
 \index{H@{H}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
 \paragraph[{H}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-optimizer.\-Optimizer.\-H}}\label{classforcebalance_1_1optimizer_1_1Optimizer_a7cf404b3b15afec4237344f09a31b6c7}
 
 
-Definition at line 448 of file optimizer.\-py.
+Definition at line 449 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_ab99276420d1c28932d2559c7f8e88922}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Hess@{Hess}}
 \index{Hess@{Hess}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
 \paragraph[{Hess}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-optimizer.\-Optimizer.\-Hess}}\label{classforcebalance_1_1optimizer_1_1Optimizer_ab99276420d1c28932d2559c7f8e88922}
 
 
-Definition at line 452 of file optimizer.\-py.
+Definition at line 453 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_aa1d7f33ea1c9341fb1c867ef01752a16}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!mvals0@{mvals0}}
 \index{mvals0@{mvals0}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -821,7 +821,7 @@ Sometimes the optimizer doesn't return anything (i.\-e.
 
 in the case of a single point calculation) In these situations, don't do anything Check derivatives by finite difference after the optimization is over (for good measure) 
 
-Definition at line 153 of file optimizer.\-py.
+Definition at line 155 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_af198da71b849e8e10611bf16ea5914cf}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!np@{np}}
 \index{np@{np}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -832,7 +832,7 @@ Number of parameters.
 
 
 
-Definition at line 150 of file optimizer.\-py.
+Definition at line 152 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a485c636c02ff86bb7709a44582c7693e}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Objective@{Objective}}
 \index{Objective@{Objective}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -843,7 +843,7 @@ The root directory.
 
 The job type Initial step size trust radius Minimum trust radius (for noisy objective functions) Lower bound on Hessian eigenvalue (below this, we add in steepest descent) Guess value for Brent Step size for numerical finite difference Number of steps to average over Function value convergence threshold Step size convergence threshold Gradient convergence threshold Maximum number of optimization steps For scan\mbox{[}mp\mbox{]}vals\-: The parameter index to scan over For scan\mbox{[}mp\mbox{]}vals\-: The parameter name to scan over, it just looks up an index For scan\mbox{[}mp\mbox{]}vals\-: The values that are fed into the scanner Name of the checkpoint file that we're reading in Name of the checkpoint file that we're writing out Whether to write the checkpoint file at every step Adaptive trust radius adjustment factor Adaptive trust radius adjustment damping Whether to print gradient during each step of the optimization Whether to print Hessian during each step of the optimization Whether to print parameters during each step of the optimization Error tolerance (if objective function rises by less than this, then the optimizer will forge ahead!) Search tolerance (The nonlinear search will stop if the change is below this threshold) The objective function (needs to pass in when I instantiate) 
 
-Definition at line 137 of file optimizer.\-py.
+Definition at line 139 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a30e7e28bf0af3cffc94aa51a58a3d345}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Opt\-Tab@{Opt\-Tab}}
 \index{Opt\-Tab@{Opt\-Tab}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
@@ -854,21 +854,21 @@ A list of all the things we can ask the optimizer to do.
 
 
 
-Definition at line 59 of file optimizer.\-py.
+Definition at line 61 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a5dc01aec7e22062a42cc83298c49cadd}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Penalty@{Penalty}}
 \index{Penalty@{Penalty}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
 \paragraph[{Penalty}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-optimizer.\-Optimizer.\-Penalty}}\label{classforcebalance_1_1optimizer_1_1Optimizer_a5dc01aec7e22062a42cc83298c49cadd}
 
 
-Definition at line 453 of file optimizer.\-py.
+Definition at line 454 of file optimizer.\-py.
 
 \hypertarget{classforcebalance_1_1optimizer_1_1Optimizer_a2577b97a9ee5f3fcd4aa108a2baafc04}{\index{forcebalance\-::optimizer\-::\-Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}!Val@{Val}}
 \index{Val@{Val}!forcebalance::optimizer::Optimizer@{forcebalance\-::optimizer\-::\-Optimizer}}
 \paragraph[{Val}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-optimizer.\-Optimizer.\-Val}}\label{classforcebalance_1_1optimizer_1_1Optimizer_a2577b97a9ee5f3fcd4aa108a2baafc04}
 
 
-Definition at line 450 of file optimizer.\-py.
+Definition at line 451 of file optimizer.\-py.
 
 
 

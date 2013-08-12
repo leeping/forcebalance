@@ -22,6 +22,11 @@ def \hyperlink{namespaceforcebalance_1_1finite__difference_a00322fb65860c390616f
 \begin{DoxyCompactList}\small\item\em A driver to fdwrap for gradients (see documentation for fdwrap) Inputs\-: tgt = The Target containing the objective function that we want to differentiate mvals0 = The 'central' values of the mathematical parameters -\/ i.\-e. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1finite__difference_a77a0bc1ae3cbbcc8d38a0ef9ca877d6d}{fdwrap\-\_\-\-H}
 \begin{DoxyCompactList}\small\item\em A driver to fdwrap for Hessians (see documentation for fdwrap) Inputs\-: tgt = The Target containing the objective function that we want to differentiate mvals0 = The 'central' values of the mathematical parameters -\/ i.\-e. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1finite__difference_a2bdf74505c45f442e1c96d557414254e}{logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\end{DoxyCompactItemize}
 
 
 \subsubsection{Function Documentation}
@@ -50,7 +55,7 @@ Inputs\-: f = The one-\/variable function f(x) that we're differentiating h = Th
 
 Outputs\-: fp = The finite difference derivative of the function f(x) around x=0. 
 
-Definition at line 107 of file finite\-\_\-difference.\-py.
+Definition at line 109 of file finite\-\_\-difference.\-py.
 
 
 
@@ -73,7 +78,7 @@ Here is the call graph for this function\-:\nopagebreak
 )}}\label{namespaceforcebalance_1_1finite__difference_acc281f85b668062745f711d9b4a610fa}
 
 
-Definition at line 73 of file finite\-\_\-difference.\-py.
+Definition at line 75 of file finite\-\_\-difference.\-py.
 
 
 
@@ -107,7 +112,7 @@ Inputs\-: f = The one-\/variable function f(x) that we're differentiating h = Th
 
 Outputs\-: fp = The finite difference derivative of the function f(x) around x=0. 
 
-Definition at line 27 of file finite\-\_\-difference.\-py.
+Definition at line 29 of file finite\-\_\-difference.\-py.
 
 
 
@@ -142,7 +147,7 @@ Inputs\-: f = The one-\/variable function f(x) that we're differentiating h = Th
 
 Outputs\-: fp = The finite difference derivative of the function f(x) around x=0. 
 
-Definition at line 58 of file finite\-\_\-difference.\-py.
+Definition at line 60 of file finite\-\_\-difference.\-py.
 
 
 
@@ -169,7 +174,7 @@ A highly accurate seven-\/point finite difference stencil for computing derivati
 
 
 
-Definition at line 68 of file finite\-\_\-difference.\-py.
+Definition at line 70 of file finite\-\_\-difference.\-py.
 
 
 
@@ -203,7 +208,7 @@ Inputs\-: func = Either get\-\_\-\-X or get\-\_\-\-G; these functions return dic
 
 Outputs\-: func1 = Wrapped version of func, which takes a single float argument. 
 
-Definition at line 145 of file finite\-\_\-difference.\-py.
+Definition at line 147 of file finite\-\_\-difference.\-py.
 
 
 
@@ -231,7 +236,7 @@ A driver to fdwrap for gradients (see documentation for fdwrap) Inputs\-: tgt = 
 
 the wrapped function's origin is here. pidx = The index of the parameter that we're differentiating 
 
-Definition at line 164 of file finite\-\_\-difference.\-py.
+Definition at line 166 of file finite\-\_\-difference.\-py.
 
 
 
@@ -259,7 +264,7 @@ A driver to fdwrap for Hessians (see documentation for fdwrap) Inputs\-: tgt = T
 
 the wrapped function's origin is here. pidx = The index of the parameter that we're differentiating 
 
-Definition at line 175 of file finite\-\_\-difference.\-py.
+Definition at line 177 of file finite\-\_\-difference.\-py.
 
 \hypertarget{namespaceforcebalance_1_1finite__difference_ad84d3e385db1190e7d8ef58bc08a6c52}{\index{forcebalance\-::finite\-\_\-difference@{forcebalance\-::finite\-\_\-difference}!in\-\_\-fd@{in\-\_\-fd}}
 \index{in\-\_\-fd@{in\-\_\-fd}!forcebalance::finite_difference@{forcebalance\-::finite\-\_\-difference}}
@@ -274,5 +279,15 @@ Invoking this function from anywhere will tell us whether we're being called by 
 
 This is mainly useful for deciding when to update the 'qualitative indicators' and when not to. 
 
-Definition at line 119 of file finite\-\_\-difference.\-py.
+Definition at line 121 of file finite\-\_\-difference.\-py.
+
+
+
+\subsubsection{Variable Documentation}
+\hypertarget{namespaceforcebalance_1_1finite__difference_a2bdf74505c45f442e1c96d557414254e}{\index{forcebalance\-::finite\-\_\-difference@{forcebalance\-::finite\-\_\-difference}!logger@{logger}}
+\index{logger@{logger}!forcebalance::finite_difference@{forcebalance\-::finite\-\_\-difference}}
+\paragraph[{logger}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-finite\-\_\-difference.\-logger = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)}}\label{namespaceforcebalance_1_1finite__difference_a2bdf74505c45f442e1c96d557414254e}
+
+
+Definition at line 7 of file finite\-\_\-difference.\-py.
 

@@ -4,6 +4,7 @@ var searchData=
   ['data',['Data',['../classforcebalance_1_1molecule_1_1Molecule.html#a69c18c3fad45cd38102d9582445f5c6d',1,'forcebalance.molecule.Molecule.Data()'],['../namespaceforcebalance_1_1Mol2.html#aa0ea6835b13b32f3c9dafbfc769fceda',1,'forcebalance.Mol2.data()']]],
   ['data_5ffrom_5fweb',['data_from_web',['../namespaceforcebalance_1_1chemistry.html#a4080110f15046bfd2f27bbb60ba2ef66',1,'forcebalance::chemistry']]],
   ['datfnm',['DATfnm',['../classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#a939888d130078cd0b36e3e19a9d0585a',1,'forcebalance::psi4io::THCDF_Psi4']]],
+  ['defaulthandler',['defaultHandler',['../classforcebalance_1_1output_1_1ForceBalanceLogger.html#a98390245191cb70e88ef22816959aa2c',1,'forcebalance::output::ForceBalanceLogger']]],
   ['denoms',['denoms',['../classforcebalance_1_1moments_1_1Moments.html#af8711c91b434e0c8a54a6e4c96e58f3b',1,'forcebalance::moments::Moments']]],
   ['destroy',['destroy',['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#a674b528af51d25b0c96da13946d4ea08',1,'forcebalance::psi4io::GBS_Reader']]],
   ['df_5fenergy',['DF_Energy',['../classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#a5992e04d0a4b8d1e96ad10ec58e7d06a',1,'forcebalance::psi4io::THCDF_Psi4']]],

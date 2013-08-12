@@ -1,0 +1,132 @@
+\hypertarget{classforcebalance_1_1output_1_1ForceBalanceLogger}{\subsection{forcebalance.\-output.\-Force\-Balance\-Logger Class Reference}
+\label{classforcebalance_1_1output_1_1ForceBalanceLogger}\index{forcebalance.\-output.\-Force\-Balance\-Logger@{forcebalance.\-output.\-Force\-Balance\-Logger}}
+}
+
+
+This logger starts out with a default handler that writes to stdout add\-Handler removes this default the first time another handler is added.  
+
+
+
+
+Inheritance diagram for forcebalance.\-output.\-Force\-Balance\-Logger\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{classforcebalance_1_1output_1_1ForceBalanceLogger__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-output.\-Force\-Balance\-Logger\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{classforcebalance_1_1output_1_1ForceBalanceLogger__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1output_1_1ForceBalanceLogger_aebc2ee02e48bab63b37dfbe1f8db5683}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1output_1_1ForceBalanceLogger_a7c6325e6fc8f6c99ef8ea9a3a3acff77}{add\-Handler}
+\item 
+def \hyperlink{classforcebalance_1_1output_1_1ForceBalanceLogger_ad8aa2fcfa32166607ee3d0cb0dcebd2d}{remove\-Handler}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1output_1_1ForceBalanceLogger_a98390245191cb70e88ef22816959aa2c}{default\-Handler}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+This logger starts out with a default handler that writes to stdout add\-Handler removes this default the first time another handler is added. 
+
+This is used for forcebalance package level logging, where a logger should always be present unless otherwise specified. To silence, add a Null\-Handler We also by default set the log level to I\-N\-F\-O (logging.\-Logger starts at W\-A\-R\-N\-I\-N\-G) 
+
+Definition at line 10 of file output.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1output_1_1ForceBalanceLogger_aebc2ee02e48bab63b37dfbe1f8db5683}{\index{forcebalance\-::output\-::\-Force\-Balance\-Logger@{forcebalance\-::output\-::\-Force\-Balance\-Logger}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::output::ForceBalanceLogger@{forcebalance\-::output\-::\-Force\-Balance\-Logger}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-output.\-Force\-Balance\-Logger.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{name}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1output_1_1ForceBalanceLogger_aebc2ee02e48bab63b37dfbe1f8db5683}
+
+
+Definition at line 11 of file output.\-py.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1output_1_1ForceBalanceLogger_a7c6325e6fc8f6c99ef8ea9a3a3acff77}{\index{forcebalance\-::output\-::\-Force\-Balance\-Logger@{forcebalance\-::output\-::\-Force\-Balance\-Logger}!add\-Handler@{add\-Handler}}
+\index{add\-Handler@{add\-Handler}!forcebalance::output::ForceBalanceLogger@{forcebalance\-::output\-::\-Force\-Balance\-Logger}}
+\paragraph[{add\-Handler}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-output.\-Force\-Balance\-Logger.\-add\-Handler (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{hdlr}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1output_1_1ForceBalanceLogger_a7c6325e6fc8f6c99ef8ea9a3a3acff77}
+
+
+Definition at line 17 of file output.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1output_1_1ForceBalanceLogger_a7c6325e6fc8f6c99ef8ea9a3a3acff77_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1output_1_1ForceBalanceLogger_ad8aa2fcfa32166607ee3d0cb0dcebd2d}{\index{forcebalance\-::output\-::\-Force\-Balance\-Logger@{forcebalance\-::output\-::\-Force\-Balance\-Logger}!remove\-Handler@{remove\-Handler}}
+\index{remove\-Handler@{remove\-Handler}!forcebalance::output::ForceBalanceLogger@{forcebalance\-::output\-::\-Force\-Balance\-Logger}}
+\paragraph[{remove\-Handler}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-output.\-Force\-Balance\-Logger.\-remove\-Handler (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{hdlr}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1output_1_1ForceBalanceLogger_ad8aa2fcfa32166607ee3d0cb0dcebd2d}
+
+
+Definition at line 23 of file output.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1output_1_1ForceBalanceLogger_ad8aa2fcfa32166607ee3d0cb0dcebd2d_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1output_1_1ForceBalanceLogger_a98390245191cb70e88ef22816959aa2c}{\index{forcebalance\-::output\-::\-Force\-Balance\-Logger@{forcebalance\-::output\-::\-Force\-Balance\-Logger}!default\-Handler@{default\-Handler}}
+\index{default\-Handler@{default\-Handler}!forcebalance::output::ForceBalanceLogger@{forcebalance\-::output\-::\-Force\-Balance\-Logger}}
+\paragraph[{default\-Handler}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-output.\-Force\-Balance\-Logger.\-default\-Handler}}\label{classforcebalance_1_1output_1_1ForceBalanceLogger_a98390245191cb70e88ef22816959aa2c}
+
+
+Definition at line 13 of file output.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{output_8py}{output.\-py}\end{DoxyCompactItemize}

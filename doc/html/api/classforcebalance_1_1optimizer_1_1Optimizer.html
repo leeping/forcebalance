@@ -225,7 +225,7 @@ Public Attributes</h2></td></tr>
 <p>Contains several methods for numerical optimization.</p>
 <p>For various reasons, the optimizer depends on the force field and fitting targets (i.e. we cannot treat it as a fully independent numerical optimizer). The dependency is rather weak which suggests that I can remove it someday. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00042">42</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00044">44</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a674f1c17cbfaffa7955fb5d833d33e0b"></a>
 <div class="memitem">
@@ -271,7 +271,7 @@ Public Attributes</h2></td></tr>
 <li>Pass in the objective function, force field, all fitting targets </li>
 </ul>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00055">55</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00057">57</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -300,7 +300,7 @@ Here is the call graph for this function:</div>
 <p>Use SciPy's built-in simulated annealing algorithm to optimize the parameters. </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="classforcebalance_1_1optimizer_1_1Optimizer.html#a503e87533bd9c257cb9c4b505af9c1de" title="Driver for SciPy optimizations.">Optimizer::ScipyOptimizer</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00780">780</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00784">784</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -321,7 +321,7 @@ Here is the call graph for this function:</div>
 <p>Optimize the force field parameters using the BFGS method; currently the recommended choice (. </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="classforcebalance_1_1optimizer_1_1Optimizer.html#a1d222f82239075ea0d6b9294b2f50e12" title="The main ForceBalance adaptive trust-radius pseudo-Newton optimizer.">MainOptimizer</a>) </dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00600">600</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00605">605</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -342,7 +342,7 @@ Here is the call graph for this function:</div>
 <p>Use SciPy's built-in simulated annealing algorithm to optimize the parameters. </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="classforcebalance_1_1optimizer_1_1Optimizer.html#a503e87533bd9c257cb9c4b505af9c1de" title="Driver for SciPy optimizations.">Optimizer::ScipyOptimizer</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00785">785</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00789">789</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -363,7 +363,7 @@ Here is the call graph for this function:</div>
 <p>Finite-difference checker for the objective function gradient. </p>
 <p>For each element in the gradient, use a five-point finite difference stencil to compute a finite-difference derivative, and compare it to the analytic result. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00881">881</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00885">885</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -393,7 +393,7 @@ Here is the call graph for this function:</div>
 <p>This is meant to be a foolproof checker, so it is pretty slow. We could write a faster checker if we assumed we had accurate first derivatives, but it's better to not make that assumption.</p>
 <p>The second derivative is computed by double-wrapping the objective function via the 'wrap2' function. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00913">913</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00917">917</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -420,9 +420,9 @@ Here is the call graph for this function:</div>
 
 <p>Genetic algorithm, under development. </p>
 <p>It currently works but a genetic algorithm is more like a concept; i.e. there is no single way to implement it.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000016">Todo:</a></b></dt><dd>Massive parallelization hasn't been implemented yet</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000015">Todo:</a></b></dt><dd>Massive parallelization hasn't been implemented yet</dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00677">677</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00681">681</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -449,7 +449,7 @@ Here is the call graph for this function:</div>
 
 <p>A single-point gradient computation. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00859">859</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00863">863</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -476,7 +476,7 @@ Here is the call graph for this function:</div>
 
 <p>A single-point Hessian computation. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00867">867</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00871">871</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -540,7 +540,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00228">228</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00229">229</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -568,7 +568,7 @@ Here is the call graph for this function:</div>
 <p>Optimize the force field parameters using the Newton-Raphson method (. </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="classforcebalance_1_1optimizer_1_1Optimizer.html#a1d222f82239075ea0d6b9294b2f50e12" title="The main ForceBalance adaptive trust-radius pseudo-Newton optimizer.">MainOptimizer</a>) </dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00595">595</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00600">600</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -596,7 +596,7 @@ Here is the call graph for this function:</div>
 <p>Use SciPy's built-in Powell direction-set algorithm to optimize the parameters. </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="classforcebalance_1_1optimizer_1_1Optimizer.html#a503e87533bd9c257cb9c4b505af9c1de" title="Driver for SciPy optimizations.">Optimizer::ScipyOptimizer</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00775">775</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00779">779</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -616,7 +616,7 @@ Here is the call graph for this function:</div>
 
 <p>Read the checkpoint file for the main optimizer. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00941">941</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00945">945</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -637,7 +637,7 @@ Here is the call graph for this function:</div>
 <p>Call the appropriate optimizer. </p>
 <p>This is the method we might want to call from an executable. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00166">166</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00168">168</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -680,7 +680,7 @@ Here is the call graph for this function:</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;scan_idxname (name)</div>
 </div><!-- fragment --><p>This method goes to the specified parameter indices and scans through the supplied values, evaluating the objective function at every step.</p>
 <p>I hope this method will be useful for people who just want to look at changing one or two parameters and seeing how it affects the force field performance.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000017">Todo:</a></b></dt><dd>Maybe a multidimensional grid can be done. </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000016">Todo:</a></b></dt><dd>Maybe a multidimensional grid can be done. </dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">MathPhys</td><td>Switch to use mathematical (True) or physical (False) parameters. </td></tr>
@@ -688,7 +688,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00811">811</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00815">815</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -716,7 +716,7 @@ Here is the call graph for this function:</div>
 <p>Scan through the mathematical parameter space. </p>
 <dl class="section see"><dt>See Also</dt><dd>Optimizer::ScanValues </dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00843">843</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00847">847</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -744,7 +744,7 @@ Here is the call graph for this function:</div>
 <p>Scan through the physical parameter space. </p>
 <dl class="section see"><dt>See Also</dt><dd>Optimizer::ScanValues </dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00848">848</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00852">852</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -783,7 +783,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00613">613</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00618">618</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -811,7 +811,7 @@ Here is the call graph for this function:</div>
 <p>Use SciPy's built-in simplex algorithm to optimize the parameters. </p>
 <dl class="section see"><dt>See Also</dt><dd><a class="el" href="classforcebalance_1_1optimizer_1_1Optimizer.html#a503e87533bd9c257cb9c4b505af9c1de" title="Driver for SciPy optimizations.">Optimizer::ScipyOptimizer</a> </dd></dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00770">770</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00774">774</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -838,7 +838,7 @@ Here is the call graph for this function:</div>
 
 <p>A single-point objective function computation. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00853">853</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00857">857</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -896,7 +896,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00420">420</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00421">421</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -923,7 +923,7 @@ Here is the call graph for this function:</div>
 
 <p>Write the checkpoint file for the main optimizer. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00953">953</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00957">957</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -940,7 +940,7 @@ Here is the call graph for this function:</div>
 
 <p>Whether the penalty function is hyperbolic. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00139">139</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00141">141</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -956,7 +956,7 @@ Here is the call graph for this function:</div>
 
 <p>Put data into the checkpoint file. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00271">271</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00272">272</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -970,7 +970,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00449">449</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00450">450</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -986,7 +986,7 @@ Here is the call graph for this function:</div>
 
 <p>The indices to be excluded from the Hessian update. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00147">147</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00149">149</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1002,7 +1002,7 @@ Here is the call graph for this function:</div>
 
 <p>The force field itself. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00141">141</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00143">143</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1016,7 +1016,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00451">451</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00452">452</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1030,7 +1030,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00448">448</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00449">449</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1044,7 +1044,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00452">452</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00453">453</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1062,7 +1062,7 @@ Here is the call graph for this function:</div>
 <p>Sometimes the optimizer doesn't return anything (i.e.</p>
 <p>in the case of a single point calculation) In these situations, don't do anything Check derivatives by finite difference after the optimization is over (for good measure) </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00153">153</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00155">155</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1078,7 +1078,7 @@ Here is the call graph for this function:</div>
 
 <p>Number of parameters. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00150">150</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00152">152</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1095,7 +1095,7 @@ Here is the call graph for this function:</div>
 <p>The root directory. </p>
 <p>The job type Initial step size trust radius Minimum trust radius (for noisy objective functions) Lower bound on Hessian eigenvalue (below this, we add in steepest descent) Guess value for Brent Step size for numerical finite difference Number of steps to average over Function value convergence threshold Step size convergence threshold Gradient convergence threshold Maximum number of optimization steps For scan[mp]vals: The parameter index to scan over For scan[mp]vals: The parameter name to scan over, it just looks up an index For scan[mp]vals: The values that are fed into the scanner Name of the checkpoint file that we're reading in Name of the checkpoint file that we're writing out Whether to write the checkpoint file at every step Adaptive trust radius adjustment factor Adaptive trust radius adjustment damping Whether to print gradient during each step of the optimization Whether to print Hessian during each step of the optimization Whether to print parameters during each step of the optimization Error tolerance (if objective function rises by less than this, then the optimizer will forge ahead!) Search tolerance (The nonlinear search will stop if the change is below this threshold) The objective function (needs to pass in when I instantiate) </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00137">137</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00139">139</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1111,7 +1111,7 @@ Here is the call graph for this function:</div>
 
 <p>A list of all the things we can ask the optimizer to do. </p>
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00059">59</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00061">61</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1125,7 +1125,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00453">453</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00454">454</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1139,7 +1139,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00450">450</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
+<p>Definition at line <a class="el" href="optimizer_8py_source.html#l00451">451</a> of file <a class="el" href="optimizer_8py_source.html">optimizer.py</a>.</p>
 
 </div>
 </div>
@@ -1149,7 +1149,7 @@ Here is the call graph for this function:</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 6 2013 12:18:03 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Aug 12 2013 14:10:48 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

@@ -330,7 +330,7 @@ Public Attributes</h2></td></tr>
 </ul>
 <p>This subclass contains the 'get' method for building the objective function from any simulation software (a driver to run the program and read output is still required). The 'get' method can be overridden by subclasses like AbInitio_GMX. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00044">44</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00047">47</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="ad6d702694d6cd99e3432183e5c4860c9"></a>
 <div class="memitem">
@@ -371,7 +371,7 @@ Public Attributes</h2></td></tr>
 <p>Initialization; define a few core concepts. </p>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000001">Todo:</a></b></dt><dd>Obtain the number of true atoms (or the particle -&gt; atom mapping) from the force field. </dd></dl>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00054">54</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00057">57</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -407,7 +407,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00165">165</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00168">168</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -454,7 +454,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00201">201</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00204">204</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -482,7 +482,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00455">455</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00458">458</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -507,7 +507,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00439">439</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00442">442</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -554,7 +554,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01095">1095</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01098">1098</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -663,7 +663,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Answer Contribution to the objective function </dd></dl>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00529">529</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -702,7 +702,7 @@ Here is the call graph for this function:</div>
 <p>Computes the objective function contribution and its gradient. </p>
 <p>First the low-level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1_pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00169">169</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00171">171</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -749,7 +749,7 @@ Here is the call graph for this function:</div>
 <p>First the low-level 'get' method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1_pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on.</p>
 <p>This is followed by looping through the fd2_pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00192">192</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00194">194</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -799,7 +799,7 @@ Here is the call graph for this function:</div>
 <p>Electrostatic potential fitting. </p>
 <p>Implements the RESP objective function. (In Python so obviously not optimized.) This function takes the mathematical parameter values and returns the charges on the ATOMS (fancy mapping going on) </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00996">996</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00999">999</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -837,7 +837,7 @@ Here is the call graph for this function:</div>
 
 <p>Computes the objective function contribution without any parametric derivatives. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00152">152</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00154">154</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -862,7 +862,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00419">419</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00422">422</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -905,7 +905,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00210">210</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00212">212</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -941,7 +941,7 @@ Here is the call graph for this function:</div>
 
 <p>Prepare the temporary directory, by default does nothing. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00416">416</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00419">419</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1014,7 +1014,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00364">364</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00366">366</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1083,7 +1083,7 @@ Here is the call graph for this function:</div>
 
      With uniform weights, InfoContent is equal to the number of snapshots;
      with horrible weights, InfoContent is closer to one.</pre> 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00314">314</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00317">317</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1101,7 +1101,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00161">161</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00164">164</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1136,12 +1136,13 @@ Here is the call graph for this function:</div>
 
 <p>Back up the temporary directory if desired, delete it and then create a new one. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00216">216</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00218">218</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8_cgraph.svg" width="1958" height="1795"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8_cgraph.svg" width="1958" height="1795"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1266,12 +1267,13 @@ Here is the call graph for this function:</div>
 <p>Stages the directory for the target, and then calls 'get'. </p>
 <p>The 'get' method should not worry about the directory that it's running in. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00263">263</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00265">265</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c_cgraph.svg" width="1824" height="2008"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c_cgraph.svg" width="1824" height="2008"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1330,12 +1332,13 @@ Here is the call graph for this function:</div>
 <p>Stages the directory for the target, and then launches Work Queue processes if any. </p>
 <p>The 'get' method should not worry about the directory that it's running in. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00298">298</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00300">300</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb_cgraph.svg" width="2806" height="1018"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb_cgraph.svg" width="2806" height="1018"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1385,7 +1388,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00288">288</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00290">290</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1413,7 +1416,7 @@ Here is the call graph for this function:</div>
 
 <p>This method determines whether the Work Queue tasks for the current target have completed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00328">328</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00330">330</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1437,7 +1440,7 @@ Here is the call graph for this function:</div>
 
 <p>This is a default-dict containing a number of atom-wise lists, such as the residue number of each atom, the mass of each atom, and so on. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00147">147</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00150">150</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1453,7 +1456,7 @@ Here is the call graph for this function:</div>
 
 <p>Qualitative Indicator: average energy error (in kJ/mol) </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00125">125</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00128">128</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1467,7 +1470,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00126">126</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00129">129</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1481,7 +1484,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00973">973</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00976">976</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1497,7 +1500,7 @@ Here is the call graph for this function:</div>
 
 <p>Energies of the sampling simulation. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00113">113</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00116">116</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1513,7 +1516,7 @@ Here is the call graph for this function:</div>
 
 <p>Reference (QM) energies. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00111">111</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00114">114</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1529,7 +1532,7 @@ Here is the call graph for this function:</div>
 
 <p>Qualitative Indicator: "relative RMS" for electrostatic potential. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00131">131</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00134">134</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1545,7 +1548,7 @@ Here is the call graph for this function:</div>
 
 <p>ESP values. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00119">119</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00122">122</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1561,7 +1564,7 @@ Here is the call graph for this function:</div>
 
 <p>ESP grid points. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00117">117</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00120">120</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1577,7 +1580,7 @@ Here is the call graph for this function:</div>
 
 <p>Qualitative Indicator: average force error (fractional) </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00128">128</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00131">131</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1591,7 +1594,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00129">129</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00132">132</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1605,7 +1608,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00977">977</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00980">980</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1629,7 +1632,7 @@ Here is the call graph for this function:</div>
 
 <p>Need the forcefield (here for now) </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00136">136</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00138">138</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1643,7 +1646,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00351">351</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00354">354</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1657,7 +1660,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00346">346</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00349">349</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1671,7 +1674,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00209">209</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00212">212</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1687,7 +1690,7 @@ Here is the call graph for this function:</div>
 
 <p>Reference (QM) forces. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00115">115</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00118">118</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1701,7 +1704,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00410">410</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00413">413</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1725,7 +1728,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the gradient was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00140">140</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00142">142</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1749,7 +1752,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the Hessian was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00142">142</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00144">144</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1763,7 +1766,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01004">1004</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01007">1007</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1777,7 +1780,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00348">348</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00351">351</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1794,7 +1797,7 @@ Here is the call graph for this function:</div>
 <p>Read in the topology. </p>
 <p>Read in the reference data Prepare the temporary directory The below two options are related to whether we want to rebuild virtual site positions. Rebuild the distance matrix if virtual site positions have changed </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00156">156</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00159">159</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1808,7 +1811,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00132">132</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00135">135</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1822,7 +1825,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00133">133</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00136">136</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1836,7 +1839,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00981">981</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00984">984</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1850,7 +1853,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00406">406</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00409">409</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1864,7 +1867,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00252">252</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00255">255</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1880,7 +1883,7 @@ Here is the call graph for this function:</div>
 
 <p>The number of (atoms + drude particles + virtual sites) </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00144">144</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00147">147</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1896,7 +1899,7 @@ Here is the call graph for this function:</div>
 
 <p>Read in the trajectory file. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00138">138</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00141">141</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1910,7 +1913,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00253">253</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00256">256</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1924,7 +1927,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01115">1115</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01118">1118</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1962,7 +1965,7 @@ Here is the call graph for this function:</div>
 
 <p>The qdata.txt file that contains the QM energies and forces. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00121">121</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00124">124</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1978,7 +1981,7 @@ Here is the call graph for this function:</div>
 
 <p>The number of atoms in the QM calculation (Irrelevant if not fitting forces) </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00123">123</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00126">126</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1994,7 +1997,7 @@ Here is the call graph for this function:</div>
 
 <p>QM Boltzmann weights. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00109">109</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00112">112</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2008,7 +2011,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01083">1083</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01086">1086</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2033,7 +2036,7 @@ Here is the call graph for this function:</div>
 <p>The directory in which the simulation is running - this can be updated. </p>
 <p>Directory of the current iteration; if not None, then the simulation runs under temp/target_name/iteration_number The 'customdir' is customizable and can go below anything.</p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00134">134</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00136">136</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -2049,7 +2052,7 @@ Here is the call graph for this function:</div>
 
 <p>Save the mvals from the last time we updated the vsites. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00158">158</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00161">161</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2074,7 +2077,7 @@ Here is the call graph for this function:</div>
 <p>Root directory of the whole project. </p>
 <p>Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for FD gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger FD gradient elements Parameter types that trigger FD Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target_name) Used for storing temporary variables that don't change through the course of the optimization </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00132">132</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00134">134</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -2088,7 +2091,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00163">163</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00166">166</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2102,7 +2105,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00985">985</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00988">988</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2116,7 +2119,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00134">134</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00137">137</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2130,7 +2133,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00984">984</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00987">987</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2144,7 +2147,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00139">139</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00142">142</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2160,7 +2163,7 @@ Here is the call graph for this function:</div>
 
 <p>Whether to compute net forces and torques, or not. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00136">136</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00139">139</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2196,7 +2199,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00568">568</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00571">571</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2210,7 +2213,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00347">347</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00350">350</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2224,7 +2227,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00568">568</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00571">571</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2238,7 +2241,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00997">997</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01000">1000</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2252,7 +2255,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00568">568</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00571">571</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2266,7 +2269,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00367">367</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00370">370</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2283,7 +2286,7 @@ Here is the call graph for this function:</div>
 <p>Initialize the base class. </p>
 <p>Number of snapshots Whether to use WHAM Boltzmann weights Whether to use the Sampling Correction Whether to match Absolute Energies (make sure you know what you're doing) Whether to use the Covariance Matrix Whether to use QM Boltzmann weights The temperature for QM Boltzmann weights Number of atoms that we are fitting Whether to fit Energies. Whether to fit Forces. Whether to fit Electrostatic Potential. Weights for the three components. Option for how much data to write to disk. Whether to do energy and force calculations for the whole trajectory, or to do one calculation per snapshot. OpenMM-only option - whether to run the energies and forces internally. Whether we have virtual sites (set at the global option level) WHAM Boltzmann weights </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00107">107</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00110">110</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2307,7 +2310,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the objective function was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00138">138</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00140">140</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -2317,7 +2320,7 @@ Here is the call graph for this function:</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 6 2013 12:18:02 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Aug 12 2013 14:10:47 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

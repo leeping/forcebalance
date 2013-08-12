@@ -99,7 +99,7 @@ Subclass of Binding\-Energy for binding energy matching using T\-I\-N\-K\-E\-R.
 
 
 
-Definition at line 483 of file tinkerio.\-py.
+Definition at line 486 of file tinkerio.\-py.
 
 
 
@@ -116,7 +116,7 @@ Definition at line 483 of file tinkerio.\-py.
 )}}\label{classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER_aa7a420d09d5b0370fa8c8bdd713e1adf}
 
 
-Definition at line 486 of file tinkerio.\-py.
+Definition at line 489 of file tinkerio.\-py.
 
 
 
@@ -144,7 +144,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1binding_1_1BindingEnergy_a263fadef13141ef341a01d1f538f85af}
 
 
-Definition at line 161 of file binding.\-py.
+Definition at line 164 of file binding.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!get\-\_\-\-G@{get\-\_\-\-G}}
 \index{get\-\_\-\-G@{get\-\_\-\-G}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -160,7 +160,7 @@ Computes the objective function contribution and its gradient.
 
 First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
 
-Definition at line 169 of file target.\-py.
+Definition at line 171 of file target.\-py.
 
 
 
@@ -189,7 +189,7 @@ First the low-\/level 'get' method is called with the analytic gradient and Hess
 
 This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
 
-Definition at line 192 of file target.\-py.
+Definition at line 194 of file target.\-py.
 
 
 
@@ -216,7 +216,7 @@ Computes the objective function contribution without any parametric derivatives.
 
 
 
-Definition at line 152 of file target.\-py.
+Definition at line 154 of file target.\-py.
 
 
 
@@ -238,7 +238,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1binding_1_1BindingEnergy_a12deb881863b64276bf847a949a36845}
 
 
-Definition at line 155 of file binding.\-py.
+Definition at line 158 of file binding.\-py.
 
 
 
@@ -261,7 +261,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
 
 
-Definition at line 210 of file target.\-py.
+Definition at line 212 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER_a88b6b57fdddb3c8f79e8d0ae48b71e88}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!prepare\-\_\-temp\-\_\-directory@{prepare\-\_\-temp\-\_\-directory}}
 \index{prepare\-\_\-temp\-\_\-directory@{prepare\-\_\-temp\-\_\-directory}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -274,7 +274,7 @@ Definition at line 210 of file target.\-py.
 )}}\label{classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER_a88b6b57fdddb3c8f79e8d0ae48b71e88}
 
 
-Definition at line 490 of file tinkerio.\-py.
+Definition at line 493 of file tinkerio.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!printcool\-\_\-table@{printcool\-\_\-table}}
 \index{printcool\-\_\-table@{printcool\-\_\-table}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -309,7 +309,7 @@ The input should be something like\-:
 \end{DoxyParams}
 
 
-Definition at line 364 of file target.\-py.
+Definition at line 366 of file target.\-py.
 
 
 
@@ -335,7 +335,7 @@ Back up the temporary directory if desired, delete it and then create a new one.
 
 
 
-Definition at line 216 of file target.\-py.
+Definition at line 218 of file target.\-py.
 
 
 
@@ -382,7 +382,7 @@ Stages the directory for the target, and then calls 'get'.
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 263 of file target.\-py.
+Definition at line 265 of file target.\-py.
 
 
 
@@ -412,7 +412,7 @@ Stages the directory for the target, and then launches Work Queue processes if a
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 298 of file target.\-py.
+Definition at line 300 of file target.\-py.
 
 
 
@@ -437,7 +437,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}
 
 
-Definition at line 288 of file target.\-py.
+Definition at line 290 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER_a615e696facc0170924921bc8cdd4525e}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!system\-\_\-driver@{system\-\_\-driver}}
 \index{system\-\_\-driver@{system\-\_\-driver}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -449,7 +449,7 @@ Definition at line 288 of file target.\-py.
 )}}\label{classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER_a615e696facc0170924921bc8cdd4525e}
 
 
-Definition at line 544 of file tinkerio.\-py.
+Definition at line 547 of file tinkerio.\-py.
 
 
 
@@ -475,7 +475,7 @@ This method determines whether the Work Queue tasks for the current target have 
 
 
 
-Definition at line 328 of file target.\-py.
+Definition at line 330 of file target.\-py.
 
 
 
@@ -496,7 +496,7 @@ Here is the call graph for this function\-:\nopagebreak
 \paragraph[{energy\-\_\-part}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-binding.\-Binding\-Energy.\-energy\-\_\-part\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1binding_1_1BindingEnergy_a4efa69b8f81d993b58851650d9b5ef89}
 
 
-Definition at line 201 of file binding.\-py.
+Definition at line 204 of file binding.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!F\-F@{F\-F}}
 \index{F\-F@{F\-F}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -507,7 +507,7 @@ Need the forcefield (here for now)
 
 
 
-Definition at line 136 of file target.\-py.
+Definition at line 138 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!gct@{gct}}
 \index{gct@{gct}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -518,7 +518,7 @@ Counts how often the gradient was computed.
 
 
 
-Definition at line 140 of file target.\-py.
+Definition at line 142 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!hct@{hct}}
 \index{hct@{hct}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -529,35 +529,35 @@ Counts how often the Hessian was computed.
 
 
 
-Definition at line 142 of file target.\-py.
+Definition at line 144 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1binding_1_1BindingEnergy_a9d1f28fc62222da17c0fd12593042f10}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!inter\-\_\-opts@{inter\-\_\-opts}}
 \index{inter\-\_\-opts@{inter\-\_\-opts}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
 \paragraph[{inter\-\_\-opts}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-binding.\-Binding\-Energy.\-inter\-\_\-opts\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1binding_1_1BindingEnergy_a9d1f28fc62222da17c0fd12593042f10}
 
 
-Definition at line 128 of file binding.\-py.
+Definition at line 131 of file binding.\-py.
 
 \hypertarget{classforcebalance_1_1binding_1_1BindingEnergy_a58ccde0bd9924fe6799acac8e1d2eadf}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!objective@{objective}}
 \index{objective@{objective}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
 \paragraph[{objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-binding.\-Binding\-Energy.\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1binding_1_1BindingEnergy_a58ccde0bd9924fe6799acac8e1d2eadf}
 
 
-Definition at line 225 of file binding.\-py.
+Definition at line 228 of file binding.\-py.
 
 \hypertarget{classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER_a559266d15507b16eebd56f38c6b588f6}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!optprog@{optprog}}
 \index{optprog@{optprog}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
 \paragraph[{optprog}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R.\-optprog}}\label{classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER_a559266d15507b16eebd56f38c6b588f6}
 
 
-Definition at line 493 of file tinkerio.\-py.
+Definition at line 496 of file tinkerio.\-py.
 
 \hypertarget{classforcebalance_1_1binding_1_1BindingEnergy_ae88e256776152d847fd3c5d8609a5c6d}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!Print\-Dict@{Print\-Dict}}
 \index{Print\-Dict@{Print\-Dict}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
 \paragraph[{Print\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-binding.\-Binding\-Energy.\-Print\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1binding_1_1BindingEnergy_ae88e256776152d847fd3c5d8609a5c6d}
 
 
-Definition at line 163 of file binding.\-py.
+Definition at line 166 of file binding.\-py.
 
 \hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -571,14 +571,14 @@ Definition at line 9 of file baseclass.\-py.
 \paragraph[{rmsd\-\_\-part}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-binding.\-Binding\-Energy.\-rmsd\-\_\-part\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1binding_1_1BindingEnergy_a9503044f7d14bfd9f8dc98dbe7950685}
 
 
-Definition at line 199 of file binding.\-py.
+Definition at line 202 of file binding.\-py.
 
 \hypertarget{classforcebalance_1_1binding_1_1BindingEnergy_a5f2f2a25d42e1b27f17fa7b289f0dd26}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!R\-M\-S\-D\-Dict@{R\-M\-S\-D\-Dict}}
 \index{R\-M\-S\-D\-Dict@{R\-M\-S\-D\-Dict}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
 \paragraph[{R\-M\-S\-D\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-binding.\-Binding\-Energy.\-R\-M\-S\-D\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1binding_1_1BindingEnergy_a5f2f2a25d42e1b27f17fa7b289f0dd26}
 
 
-Definition at line 164 of file binding.\-py.
+Definition at line 167 of file binding.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!rundir@{rundir}}
 \index{rundir@{rundir}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -589,7 +589,7 @@ The directory in which the simulation is running -\/ this can be updated.
 
 Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
 
-Definition at line 134 of file target.\-py.
+Definition at line 136 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!tempdir@{tempdir}}
 \index{tempdir@{tempdir}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -600,7 +600,7 @@ Root directory of the whole project.
 
 Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
 
-Definition at line 132 of file target.\-py.
+Definition at line 134 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{\index{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::tinkerio::BindingEnergy_TINKER@{forcebalance\-::tinkerio\-::\-Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}}
@@ -618,7 +618,7 @@ Counts how often the objective function was computed.
 
 
 
-Definition at line 138 of file target.\-py.
+Definition at line 140 of file target.\-py.
 
 
 

@@ -44,7 +44,7 @@ var searchData=
   ['spacings',['spacings',['../classforcebalance_1_1objective_1_1Penalty.html#a9832c430eccb9edf404ba12ed2f54541',1,'forcebalance::objective::Penalty']]],
   ['specific_5fdct',['specific_dct',['../namespaceforcebalance_1_1nifty.html#ab652c941890b0f378100433699c8d255',1,'forcebalance::nifty']]],
   ['specific_5flst',['specific_lst',['../namespaceforcebalance_1_1nifty.html#abe850bcdf26cec4a0cf913a54a7ddfaa',1,'forcebalance::nifty']]],
-  ['split',['Split',['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#ac1234e56581721ab2da13eefaa8560f0',1,'forcebalance.amberio.FrcMod_Reader.Split()'],['../classforcebalance_1_1basereader_1_1BaseReader.html#ae0ea53a7d942ceb93bdc34499f694639',1,'forcebalance.basereader.BaseReader.Split()'],['../classforcebalance_1_1molecule_1_1Molecule.html#a71da1c1e530afd8b9b5f08d9bd27259f',1,'forcebalance.molecule.Molecule.split()']]],
+  ['split',['split',['../classforcebalance_1_1molecule_1_1Molecule.html#a71da1c1e530afd8b9b5f08d9bd27259f',1,'forcebalance.molecule.Molecule.split()'],['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#ac1234e56581721ab2da13eefaa8560f0',1,'forcebalance.amberio.FrcMod_Reader.Split()'],['../classforcebalance_1_1basereader_1_1BaseReader.html#ae0ea53a7d942ceb93bdc34499f694639',1,'forcebalance.basereader.BaseReader.Split()']]],
   ['splitter',['splitter',['../namespaceforcebalance_1_1molecule.html#a09d04113accea9c88b084051c5de29d1',1,'forcebalance::molecule']]],
   ['stage',['stage',['../classforcebalance_1_1target_1_1Target.html#af8d2a4658c87841e40296795aec478bb',1,'forcebalance::target::Target']]],
   ['statisticalinefficiency',['statisticalInefficiency',['../namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10',1,'forcebalance::nifty']]],

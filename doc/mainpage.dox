@@ -1820,6 +1820,11 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 0
 \n(Needs full documentation)
 
+@li <b> SAVE_TRAJ </b> (Int)
+\n<b> One-line description </b>: Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save
+\n<b> Default Value </b>: 0
+\n(Needs full documentation)
+
 @li <b> SELF_POL_ALPHA </b> (Float)
 \n<b> One-line description </b>: Polarizability parameter for self-polarization correction (in debye).
 \n<b> Default Value </b>: 0.0

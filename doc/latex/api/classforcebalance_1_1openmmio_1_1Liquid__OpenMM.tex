@@ -81,8 +81,10 @@ def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99
 \item 
 \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a2cf65dd56f058636e68a0b3bf2af210e}{do\-\_\-self\-\_\-pol}
 \item 
-\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a5b9df1bf79a641156429e292f47b6afd}{Saved\-M\-Val}
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a646aeaaff46cf6a8e97f5cd5016a222f}{extra\-\_\-output}
 \begin{DoxyCompactList}\small\item\em Read the reference data. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a5b9df1bf79a641156429e292f47b6afd}{Saved\-M\-Val}
+\begin{DoxyCompactList}\small\item\em Saved force field mvals for all iterations. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a0da0c00cdc193c9c470d7e528043fb99}{Saved\-Traj}
 \begin{DoxyCompactList}\small\item\em Saved trajectories for all iterations and all temperatures \-:) \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a6c00a87ae43f535118b77d41af51a5d7}{M\-Bar\-Energy}
@@ -92,6 +94,8 @@ def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99
 \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a2030a7e21fcce59155a0258daed4f2f7}{nptfiles}
 \item 
 \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a4125a209929444b7cbfbd60b466dc763}{nptsfx}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a95bb7b38b7638acba286718e55f783bb}{last\-\_\-traj}
 \item 
 \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a472f32bbaf18b8ead19b9156f305b8fc}{Ref\-Data}
 \item 
@@ -132,7 +136,7 @@ def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99
 \subsubsection{Detailed Description}
 
 
-Definition at line 327 of file openmmio.\-py.
+Definition at line 329 of file openmmio.\-py.
 
 
 
@@ -149,7 +153,7 @@ Definition at line 327 of file openmmio.\-py.
 )}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_a92379bd73128234b309fae789946035d}
 
 
-Definition at line 328 of file openmmio.\-py.
+Definition at line 330 of file openmmio.\-py.
 
 
 
@@ -190,7 +194,7 @@ Answer Contribution to the objective function
 \end{DoxyReturn}
 
 
-Definition at line 392 of file liquid.\-py.
+Definition at line 401 of file liquid.\-py.
 
 
 
@@ -217,7 +221,7 @@ Computes the objective function contribution and its gradient.
 
 First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
 
-Definition at line 169 of file target.\-py.
+Definition at line 171 of file target.\-py.
 
 
 
@@ -246,7 +250,7 @@ First the low-\/level 'get' method is called with the analytic gradient and Hess
 
 This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
 
-Definition at line 192 of file target.\-py.
+Definition at line 194 of file target.\-py.
 
 
 
@@ -273,7 +277,7 @@ Computes the objective function contribution without any parametric derivatives.
 
 
 
-Definition at line 152 of file target.\-py.
+Definition at line 154 of file target.\-py.
 
 
 
@@ -295,7 +299,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_ae94ce30dfd0e92fdd6d746e6743be844}
 
 
-Definition at line 252 of file liquid.\-py.
+Definition at line 254 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}}
 \index{link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -307,7 +311,7 @@ Definition at line 252 of file liquid.\-py.
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
 
 
-Definition at line 210 of file target.\-py.
+Definition at line 212 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a07a59f9f335693329b789a9c7608fc9f}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!npt\-\_\-simulation@{npt\-\_\-simulation}}
 \index{npt\-\_\-simulation@{npt\-\_\-simulation}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -325,7 +329,7 @@ Submit a N\-P\-T simulation to the Work Queue.
 
 
 
-Definition at line 232 of file liquid.\-py.
+Definition at line 233 of file liquid.\-py.
 
 
 
@@ -354,7 +358,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a00c23db61bcb86cc19f79dacdb2bc1f3}
 
 
-Definition at line 256 of file liquid.\-py.
+Definition at line 258 of file liquid.\-py.
 
 
 
@@ -377,7 +381,7 @@ Here is the call graph for this function\-:\nopagebreak
 )}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_ae4f88de8f954c789b003e33909585077}
 
 
-Definition at line 375 of file openmmio.\-py.
+Definition at line 377 of file openmmio.\-py.
 
 
 
@@ -405,7 +409,7 @@ Prepare the temporary directory by copying in important files.
 
 
 
-Definition at line 368 of file openmmio.\-py.
+Definition at line 370 of file openmmio.\-py.
 
 
 
@@ -451,7 +455,7 @@ The input should be something like\-:
 \end{DoxyParams}
 
 
-Definition at line 364 of file target.\-py.
+Definition at line 366 of file target.\-py.
 
 
 
@@ -473,7 +477,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a08b698af913d56f780d0587821c922cd}
 
 
-Definition at line 140 of file liquid.\-py.
+Definition at line 141 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}}
 \index{refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -488,7 +492,7 @@ Back up the temporary directory if desired, delete it and then create a new one.
 
 
 
-Definition at line 216 of file target.\-py.
+Definition at line 218 of file target.\-py.
 
 
 
@@ -535,7 +539,7 @@ Stages the directory for the target, and then calls 'get'.
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 263 of file target.\-py.
+Definition at line 265 of file target.\-py.
 
 
 
@@ -565,7 +569,7 @@ Stages the directory for the target, and then launches Work Queue processes if a
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 298 of file target.\-py.
+Definition at line 300 of file target.\-py.
 
 
 
@@ -590,7 +594,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a716e28bb5572b3273036ac753b7e1e1d}
 
 
-Definition at line 334 of file liquid.\-py.
+Definition at line 336 of file liquid.\-py.
 
 
 
@@ -616,7 +620,7 @@ This method determines whether the Work Queue tasks for the current target have 
 
 
 
-Definition at line 328 of file target.\-py.
+Definition at line 330 of file target.\-py.
 
 
 
@@ -637,14 +641,25 @@ Here is the call graph for this function\-:\nopagebreak
 \paragraph[{do\-\_\-self\-\_\-pol}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-do\-\_\-self\-\_\-pol\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a2cf65dd56f058636e68a0b3bf2af210e}
 
 
-Definition at line 104 of file liquid.\-py.
+Definition at line 99 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_ac46cb2eaf7e4fcbe92d24d213b017d57}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!engine@{engine}}
 \index{engine@{engine}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{engine}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M.\-engine}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_ac46cb2eaf7e4fcbe92d24d213b017d57}
 
 
-Definition at line 364 of file openmmio.\-py.
+Definition at line 366 of file openmmio.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a646aeaaff46cf6a8e97f5cd5016a222f}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!extra\-\_\-output@{extra\-\_\-output}}
+\index{extra\-\_\-output@{extra\-\_\-output}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
+\paragraph[{extra\-\_\-output}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-extra\-\_\-output\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a646aeaaff46cf6a8e97f5cd5016a222f}
+
+
+Read the reference data. 
+
+Prepare the temporary directory Extra platform-\/dependent data to send back 
+
+Definition at line 114 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!F\-F@{F\-F}}
 \index{F\-F@{F\-F}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -655,14 +670,14 @@ Need the forcefield (here for now)
 
 
 
-Definition at line 136 of file target.\-py.
+Definition at line 138 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_a7b835f5dbacf1c31ead8c0c47e6895ce}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!gas\-\_\-fnm@{gas\-\_\-fnm}}
 \index{gas\-\_\-fnm@{gas\-\_\-fnm}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{gas\-\_\-fnm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M.\-gas\-\_\-fnm}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_a7b835f5dbacf1c31ead8c0c47e6895ce}
 
 
-Definition at line 351 of file openmmio.\-py.
+Definition at line 353 of file openmmio.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!gct@{gct}}
 \index{gct@{gct}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -673,7 +688,7 @@ Counts how often the gradient was computed.
 
 
 
-Definition at line 140 of file target.\-py.
+Definition at line 142 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!hct@{hct}}
 \index{hct@{hct}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -684,35 +699,42 @@ Counts how often the Hessian was computed.
 
 
 
-Definition at line 142 of file target.\-py.
+Definition at line 144 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a50f976d2d3d6a1c261756035a26390e2}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!Labels@{Labels}}
 \index{Labels@{Labels}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{Labels}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Labels\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a50f976d2d3d6a1c261756035a26390e2}
 
 
-Definition at line 220 of file liquid.\-py.
+Definition at line 221 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a95bb7b38b7638acba286718e55f783bb}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!last\-\_\-traj@{last\-\_\-traj}}
+\index{last\-\_\-traj@{last\-\_\-traj}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
+\paragraph[{last\-\_\-traj}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-last\-\_\-traj\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a95bb7b38b7638acba286718e55f783bb}
+
+
+Definition at line 139 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_ad7ba892bf3ec0f986f17ec12e478e977}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!liquid\-\_\-conf@{liquid\-\_\-conf}}
 \index{liquid\-\_\-conf@{liquid\-\_\-conf}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{liquid\-\_\-conf}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M.\-liquid\-\_\-conf}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_ad7ba892bf3ec0f986f17ec12e478e977}
 
 
-Definition at line 349 of file openmmio.\-py.
+Definition at line 351 of file openmmio.\-py.
 
 \hypertarget{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_a688bca0f29a2d62deb7fad0a488a7a14}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!liquid\-\_\-fnm@{liquid\-\_\-fnm}}
 \index{liquid\-\_\-fnm@{liquid\-\_\-fnm}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{liquid\-\_\-fnm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M.\-liquid\-\_\-fnm}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_a688bca0f29a2d62deb7fad0a488a7a14}
 
 
-Definition at line 348 of file openmmio.\-py.
+Definition at line 350 of file openmmio.\-py.
 
 \hypertarget{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_a113b333fdca5faedc03600d204c3a49b}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!liquid\-\_\-traj@{liquid\-\_\-traj}}
 \index{liquid\-\_\-traj@{liquid\-\_\-traj}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{liquid\-\_\-traj}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M.\-liquid\-\_\-traj}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_a113b333fdca5faedc03600d204c3a49b}
 
 
-Definition at line 350 of file openmmio.\-py.
+Definition at line 352 of file openmmio.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a6c00a87ae43f535118b77d41af51a5d7}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!M\-Bar\-Energy@{M\-Bar\-Energy}}
 \index{M\-Bar\-Energy@{M\-Bar\-Energy}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -723,56 +745,56 @@ Evaluated energies for all trajectories (i.\-e.
 
 all iterations and all temperatures), using all mvals 
 
-Definition at line 127 of file liquid.\-py.
+Definition at line 126 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_aaaa8d66c5bb45d847e1fbcd3953fe0d3}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!mpdb@{mpdb}}
 \index{mpdb@{mpdb}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{mpdb}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M.\-mpdb}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_aaaa8d66c5bb45d847e1fbcd3953fe0d3}
 
 
-Definition at line 336 of file openmmio.\-py.
+Definition at line 338 of file openmmio.\-py.
 
 \hypertarget{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_acf60da4350bb882795a8143b1b85ca57}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!msim@{msim}}
 \index{msim@{msim}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{msim}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M.\-msim}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_acf60da4350bb882795a8143b1b85ca57}
 
 
-Definition at line 346 of file openmmio.\-py.
+Definition at line 348 of file openmmio.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a2030a7e21fcce59155a0258daed4f2f7}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!nptfiles@{nptfiles}}
 \index{nptfiles@{nptfiles}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{nptfiles}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-nptfiles\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a2030a7e21fcce59155a0258daed4f2f7}
 
 
-Definition at line 131 of file liquid.\-py.
+Definition at line 130 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a0560795c55fc1b5d7668951c77ad97ab}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!nptpfx@{nptpfx}}
 \index{nptpfx@{nptpfx}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{nptpfx}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-nptpfx\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a0560795c55fc1b5d7668951c77ad97ab}
 
 
-Definition at line 129 of file liquid.\-py.
+Definition at line 128 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a4125a209929444b7cbfbd60b466dc763}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!nptsfx@{nptsfx}}
 \index{nptsfx@{nptsfx}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{nptsfx}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-nptsfx\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a4125a209929444b7cbfbd60b466dc763}
 
 
-Definition at line 133 of file liquid.\-py.
+Definition at line 132 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a2c10490d9073a069bd19361f386422ef}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!Phase\-Points@{Phase\-Points}}
 \index{Phase\-Points@{Phase\-Points}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{Phase\-Points}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Phase\-Points\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a2c10490d9073a069bd19361f386422ef}
 
 
-Definition at line 216 of file liquid.\-py.
+Definition at line 217 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_ab9cc3ba5e2cb545e714733efe99c00e1}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!platform@{platform}}
 \index{platform@{platform}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{platform}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M.\-platform}}\label{classforcebalance_1_1openmmio_1_1Liquid__OpenMM_ab9cc3ba5e2cb545e714733efe99c00e1}
 
 
-Definition at line 344 of file openmmio.\-py.
+Definition at line 346 of file openmmio.\-py.
 
 \hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -786,7 +808,7 @@ Definition at line 9 of file baseclass.\-py.
 \paragraph[{Ref\-Data}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Ref\-Data\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a472f32bbaf18b8ead19b9156f305b8fc}
 
 
-Definition at line 150 of file liquid.\-py.
+Definition at line 151 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!rundir@{rundir}}
 \index{rundir@{rundir}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -797,18 +819,18 @@ The directory in which the simulation is running -\/ this can be updated.
 
 Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
 
-Definition at line 134 of file target.\-py.
+Definition at line 136 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a5b9df1bf79a641156429e292f47b6afd}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!Saved\-M\-Val@{Saved\-M\-Val}}
 \index{Saved\-M\-Val@{Saved\-M\-Val}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{Saved\-M\-Val}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Saved\-M\-Val\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a5b9df1bf79a641156429e292f47b6afd}
 
 
-Read the reference data. 
+Saved force field mvals for all iterations. 
 
-Prepare the temporary directory Saved force field mvals for all iterations 
 
-Definition at line 123 of file liquid.\-py.
+
+Definition at line 122 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a0da0c00cdc193c9c470d7e528043fb99}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!Saved\-Traj@{Saved\-Traj}}
 \index{Saved\-Traj@{Saved\-Traj}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -819,7 +841,7 @@ Saved trajectories for all iterations and all temperatures \-:)
 
 
 
-Definition at line 125 of file liquid.\-py.
+Definition at line 124 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!tempdir@{tempdir}}
 \index{tempdir@{tempdir}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -830,7 +852,7 @@ Root directory of the whole project.
 
 Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
 
-Definition at line 132 of file target.\-py.
+Definition at line 134 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -844,35 +866,35 @@ Definition at line 10 of file baseclass.\-py.
 \paragraph[{w\-\_\-alpha}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-alpha\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a0d36d27d8c406b53bbb1096fbb76adbb}
 
 
-Definition at line 641 of file liquid.\-py.
+Definition at line 650 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a3809c649d95ac6c9f662d599e6b1b93d}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!w\-\_\-cp@{w\-\_\-cp}}
 \index{w\-\_\-cp@{w\-\_\-cp}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{w\-\_\-cp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-cp\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a3809c649d95ac6c9f662d599e6b1b93d}
 
 
-Definition at line 643 of file liquid.\-py.
+Definition at line 652 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a75ad3ea94ec845e91499f858e7be5f27}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!w\-\_\-eps0@{w\-\_\-eps0}}
 \index{w\-\_\-eps0@{w\-\_\-eps0}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{w\-\_\-eps0}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-eps0\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a75ad3ea94ec845e91499f858e7be5f27}
 
 
-Definition at line 644 of file liquid.\-py.
+Definition at line 653 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_abe985fe3aaa03d9f3a1b0a90f26b774d}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!w\-\_\-hvap@{w\-\_\-hvap}}
 \index{w\-\_\-hvap@{w\-\_\-hvap}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{w\-\_\-hvap}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-hvap\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_abe985fe3aaa03d9f3a1b0a90f26b774d}
 
 
-Definition at line 640 of file liquid.\-py.
+Definition at line 649 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a6b262d9343247a902063bf62d5f19108}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!w\-\_\-kappa@{w\-\_\-kappa}}
 \index{w\-\_\-kappa@{w\-\_\-kappa}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
 \paragraph[{w\-\_\-kappa}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-kappa\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a6b262d9343247a902063bf62d5f19108}
 
 
-Definition at line 642 of file liquid.\-py.
+Definition at line 651 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_aef8ad1dda086bde6f48130d273af9784}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!w\-\_\-rho@{w\-\_\-rho}}
 \index{w\-\_\-rho@{w\-\_\-rho}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -883,7 +905,7 @@ Density.
 
 Enthalpy of vaporization. Thermal expansion coefficient. Isothermal compressibility. Isobaric heat capacity. Static dielectric constant. Estimation of errors. 
 
-Definition at line 639 of file liquid.\-py.
+Definition at line 648 of file liquid.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}!xct@{xct}}
 \index{xct@{xct}!forcebalance::openmmio::Liquid_OpenMM@{forcebalance\-::openmmio\-::\-Liquid\-\_\-\-Open\-M\-M}}
@@ -894,7 +916,7 @@ Counts how often the objective function was computed.
 
 
 
-Definition at line 138 of file target.\-py.
+Definition at line 140 of file target.\-py.
 
 
 

@@ -89,7 +89,7 @@ Subclass of Target for general least squares fitting.
 
 
 
-Definition at line 32 of file leastsq.\-py.
+Definition at line 35 of file leastsq.\-py.
 
 
 
@@ -106,7 +106,7 @@ Definition at line 32 of file leastsq.\-py.
 )}}\label{classforcebalance_1_1leastsq_1_1LeastSquares_a761c0f4121b06e2a74b5fa548a88e400}
 
 
-Definition at line 35 of file leastsq.\-py.
+Definition at line 38 of file leastsq.\-py.
 
 
 
@@ -158,7 +158,7 @@ Answer Contribution to the objective function
 \end{DoxyReturn}
 
 
-Definition at line 72 of file leastsq.\-py.
+Definition at line 74 of file leastsq.\-py.
 
 
 
@@ -185,7 +185,7 @@ Computes the objective function contribution and its gradient.
 
 First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
 
-Definition at line 169 of file target.\-py.
+Definition at line 171 of file target.\-py.
 
 
 
@@ -214,7 +214,7 @@ First the low-\/level 'get' method is called with the analytic gradient and Hess
 
 This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
 
-Definition at line 192 of file target.\-py.
+Definition at line 194 of file target.\-py.
 
 
 
@@ -241,7 +241,7 @@ Computes the objective function contribution without any parametric derivatives.
 
 
 
-Definition at line 152 of file target.\-py.
+Definition at line 154 of file target.\-py.
 
 
 
@@ -263,7 +263,7 @@ Here is the call graph for this function\-:\nopagebreak
 )}}\label{classforcebalance_1_1leastsq_1_1LeastSquares_ac8e203986ec7507b627a4545d24239d5}
 
 
-Definition at line 50 of file leastsq.\-py.
+Definition at line 53 of file leastsq.\-py.
 
 
 
@@ -286,7 +286,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
 
 
-Definition at line 210 of file target.\-py.
+Definition at line 212 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!printcool\-\_\-table@{printcool\-\_\-table}}
 \index{printcool\-\_\-table@{printcool\-\_\-table}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -321,7 +321,7 @@ The input should be something like\-:
 \end{DoxyParams}
 
 
-Definition at line 364 of file target.\-py.
+Definition at line 366 of file target.\-py.
 
 
 
@@ -347,7 +347,7 @@ Back up the temporary directory if desired, delete it and then create a new one.
 
 
 
-Definition at line 216 of file target.\-py.
+Definition at line 218 of file target.\-py.
 
 
 
@@ -394,7 +394,7 @@ Stages the directory for the target, and then calls 'get'.
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 263 of file target.\-py.
+Definition at line 265 of file target.\-py.
 
 
 
@@ -424,7 +424,7 @@ Stages the directory for the target, and then launches Work Queue processes if a
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 298 of file target.\-py.
+Definition at line 300 of file target.\-py.
 
 
 
@@ -449,7 +449,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}
 
 
-Definition at line 288 of file target.\-py.
+Definition at line 290 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!wq\-\_\-complete@{wq\-\_\-complete}}
 \index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -464,7 +464,7 @@ This method determines whether the Work Queue tasks for the current target have 
 
 
 
-Definition at line 328 of file target.\-py.
+Definition at line 330 of file target.\-py.
 
 
 
@@ -489,14 +489,14 @@ Number of snapshots.
 
 Which parameters are differentiated? 
 
-Definition at line 48 of file leastsq.\-py.
+Definition at line 51 of file leastsq.\-py.
 
 \hypertarget{classforcebalance_1_1leastsq_1_1LeastSquares_aa2565a2a75466e9f759ba3a67b85d0d2}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!D@{D}}
 \index{D@{D}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
 \paragraph[{D}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-leastsq.\-Least\-Squares.\-D}}\label{classforcebalance_1_1leastsq_1_1LeastSquares_aa2565a2a75466e9f759ba3a67b85d0d2}
 
 
-Definition at line 135 of file leastsq.\-py.
+Definition at line 137 of file leastsq.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!F\-F@{F\-F}}
 \index{F\-F@{F\-F}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -507,7 +507,7 @@ Need the forcefield (here for now)
 
 
 
-Definition at line 136 of file target.\-py.
+Definition at line 138 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!gct@{gct}}
 \index{gct@{gct}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -518,7 +518,7 @@ Counts how often the gradient was computed.
 
 
 
-Definition at line 140 of file target.\-py.
+Definition at line 142 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!hct@{hct}}
 \index{hct@{hct}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -529,7 +529,7 @@ Counts how often the Hessian was computed.
 
 
 
-Definition at line 142 of file target.\-py.
+Definition at line 144 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1leastsq_1_1LeastSquares_a7f08641f45285414b080f21ed278f31e}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!M\-A\-Q@{M\-A\-Q}}
 \index{M\-A\-Q@{M\-A\-Q}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -540,14 +540,14 @@ Dictionary for derivative terms.
 
 
 
-Definition at line 98 of file leastsq.\-py.
+Definition at line 100 of file leastsq.\-py.
 
 \hypertarget{classforcebalance_1_1leastsq_1_1LeastSquares_a169fd8ca94e8f36539ec4ccfa0af4902}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!objective@{objective}}
 \index{objective@{objective}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
 \paragraph[{objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-leastsq.\-Least\-Squares.\-objective}}\label{classforcebalance_1_1leastsq_1_1LeastSquares_a169fd8ca94e8f36539ec4ccfa0af4902}
 
 
-Definition at line 136 of file leastsq.\-py.
+Definition at line 138 of file leastsq.\-py.
 
 \hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -565,7 +565,7 @@ The directory in which the simulation is running -\/ this can be updated.
 
 Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
 
-Definition at line 134 of file target.\-py.
+Definition at line 136 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!tempdir@{tempdir}}
 \index{tempdir@{tempdir}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -576,7 +576,7 @@ Root directory of the whole project.
 
 Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
 
-Definition at line 132 of file target.\-py.
+Definition at line 134 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{\index{forcebalance\-::leastsq\-::\-Least\-Squares@{forcebalance\-::leastsq\-::\-Least\-Squares}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::leastsq::LeastSquares@{forcebalance\-::leastsq\-::\-Least\-Squares}}
@@ -594,7 +594,7 @@ Counts how often the objective function was computed.
 
 
 
-Definition at line 138 of file target.\-py.
+Definition at line 140 of file target.\-py.
 
 
 

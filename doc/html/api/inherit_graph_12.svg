@@ -16,7 +16,7 @@
 </g>
 <!-- Node2 -->
 <g id="node3" class="node"><title>Node2</title>
-<a xlink:href="classforcebalance_1_1output_1_1CleanFileHandler.html" target="_top" xlink:title="File handler that does not write terminal escape codes to files.">
+<a xlink:href="classforcebalance_1_1output_1_1CleanFileHandler.html" target="_top" xlink:title="File handler that does not write terminal escape codes and carriage returns to files.">
 <polygon fill="white" stroke="black" points="110,-52 110,-86 252,-86 252,-52 110,-52"/>
 <text text-anchor="start" x="118" y="-73" font-family="Ubuntu-R" font-size="10.00">forcebalance.output.Clean</text>
 <text text-anchor="middle" x="181" y="-60" font-family="Ubuntu-R" font-size="10.00">FileHandler</text>

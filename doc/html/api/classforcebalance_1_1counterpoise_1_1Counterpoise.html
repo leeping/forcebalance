@@ -196,7 +196,7 @@ Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Target subclass for matching the counterpoise correction. </p>
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00031">31</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00033">33</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a59ca75843c1cc5fec89f40c8a220039d"></a>
 <div class="memitem">
@@ -236,7 +236,7 @@ Public Attributes</h2></td></tr>
 
 <p>To instantiate <a class="el" href="classforcebalance_1_1counterpoise_1_1Counterpoise.html" title="Target subclass for matching the counterpoise correction.">Counterpoise</a>, we read the coordinates and counterpoise data. </p>
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00035">35</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00037">37</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -310,7 +310,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Answer Contribution to the objective function </dd></dl>
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00122">122</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00124">124</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 
 </div>
 </div>
@@ -349,7 +349,7 @@ Here is the call graph for this function:</div>
 <p>Computes the objective function contribution and its gradient. </p>
 <p>First the low-level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1_pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00169">169</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00171">171</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -396,7 +396,7 @@ Here is the call graph for this function:</div>
 <p>First the low-level 'get' method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1_pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on.</p>
 <p>This is followed by looping through the fd2_pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00192">192</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00194">194</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -441,7 +441,7 @@ Here is the call graph for this function:</div>
 
 <p>Computes the objective function contribution without any parametric derivatives. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00152">152</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00154">154</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -484,7 +484,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00210">210</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00212">212</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -514,7 +514,7 @@ Here is the call graph for this function:</div>
 
 <p>Load in the counterpoise data, which is easy; the file consists of floating point numbers separated by newlines. </p>
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00093">93</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00095">95</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 
 </div>
 </div>
@@ -554,7 +554,7 @@ Here is the call graph for this function:</div>
 xyzs A list of XYZ coordinates (number of snapshots times number of atoms) </dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000006">Todo:</a></b></dt><dd>I should probably put this into a more general library for reading coordinates. </dd></dl>
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00061">61</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00063">63</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 
 </div>
 </div>
@@ -627,7 +627,7 @@ xyzs A list of XYZ coordinates (number of snapshots times number of atoms) </dd>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00364">364</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00366">366</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -662,7 +662,7 @@ Here is the call graph for this function:</div>
 
 <p>Back up the temporary directory if desired, delete it and then create a new one. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00216">216</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00218">218</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -792,7 +792,7 @@ Here is the call graph for this function:</div>
 <p>Stages the directory for the target, and then calls 'get'. </p>
 <p>The 'get' method should not worry about the directory that it's running in. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00263">263</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00265">265</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -856,7 +856,7 @@ Here is the call graph for this function:</div>
 <p>Stages the directory for the target, and then launches Work Queue processes if any. </p>
 <p>The 'get' method should not worry about the directory that it's running in. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00298">298</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00300">300</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -911,7 +911,7 @@ Here is the call graph for this function:</div>
 </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00288">288</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00290">290</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -939,7 +939,7 @@ Here is the call graph for this function:</div>
 
 <p>This method determines whether the Work Queue tasks for the current target have completed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00328">328</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00330">330</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -963,7 +963,7 @@ Here is the call graph for this function:</div>
 
 <p><a class="el" href="classforcebalance_1_1counterpoise_1_1Counterpoise.html" title="Target subclass for matching the counterpoise correction.">Counterpoise</a> correction data. </p>
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00051">51</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00053">53</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 
 </div>
 </div>
@@ -987,7 +987,7 @@ Here is the call graph for this function:</div>
 
 <p>Need the forcefield (here for now) </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00136">136</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00138">138</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1011,7 +1011,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the gradient was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00140">140</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00142">142</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1035,7 +1035,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the Hessian was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00142">142</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00144">144</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1051,7 +1051,7 @@ Here is the call graph for this function:</div>
 
 <p>Number of atoms. </p>
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00074">74</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00076">76</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 
 </div>
 </div>
@@ -1065,7 +1065,7 @@ Here is the call graph for this function:</div>
       </table>
 </div><div class="memdoc">
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00087">87</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00089">89</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 
 </div>
 </div>
@@ -1112,7 +1112,7 @@ Here is the call graph for this function:</div>
 <p>The directory in which the simulation is running - this can be updated. </p>
 <p>Directory of the current iteration; if not None, then the simulation runs under temp/target_name/iteration_number The 'customdir' is customizable and can go below anything.</p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00134">134</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00136">136</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1137,7 +1137,7 @@ Here is the call graph for this function:</div>
 <p>Root directory of the whole project. </p>
 <p>Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for FD gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger FD gradient elements Parameter types that trigger FD Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target_name) Used for storing temporary variables that don't change through the course of the optimization </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00132">132</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00134">134</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1183,7 +1183,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the objective function was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00138">138</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00140">140</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1200,7 +1200,7 @@ Here is the call graph for this function:</div>
 <p>Number of snapshots. </p>
 <p>XYZ elements and coordinates </p>
 
-<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00049">49</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
+<p>Definition at line <a class="el" href="counterpoise_8py_source.html#l00051">51</a> of file <a class="el" href="counterpoise_8py_source.html">counterpoise.py</a>.</p>
 
 </div>
 </div>
@@ -1210,7 +1210,7 @@ Here is the call graph for this function:</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 6 2013 12:18:03 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Aug 12 2013 14:10:47 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

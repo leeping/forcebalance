@@ -129,7 +129,7 @@ This class contains all methods for force field manipulation. To create an insta
 
 For details on force field parsing, see the detailed documentation for addff. 
 
-Definition at line 194 of file forcefield.\-py.
+Definition at line 196 of file forcefield.\-py.
 
 
 
@@ -149,7 +149,7 @@ Instantiation of force field class.
 
 Many variables here are initialized to zero, but they are filled out by methods like addff, rsmake, and mktransmat. 
 
-Definition at line 202 of file forcefield.\-py.
+Definition at line 204 of file forcefield.\-py.
 
 
 
@@ -175,7 +175,7 @@ Here is the call graph for this function\-:\nopagebreak
 )}}\label{classforcebalance_1_1forcefield_1_1FF_a8e7047c4b41a755c24996c9e1619df0b}
 
 
-Definition at line 1144 of file forcefield.\-py.
+Definition at line 1145 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a142d41c86b9b0ef57f93ec6fb349357b}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!addff@{addff}}
 \index{addff@{addff}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -255,7 +255,7 @@ I don't think the multiplier actually works for analytic derivatives unless the 
 \end{DoxyParams}
 
 
-Definition at line 393 of file forcefield.\-py.
+Definition at line 395 of file forcefield.\-py.
 
 
 
@@ -297,7 +297,7 @@ Additionally, when 'P\-A\-R\-M' is encountered\-:
 
 When 'R\-P\-T' is encountered we don't expand the parameter vector because this parameter is a copy of an existing one. If the parameter identifier is preceded by M\-I\-N\-U\-S\-\_\-, we chop off the prefix but remember that the sign needs to be flipped. 
 
-Definition at line 463 of file forcefield.\-py.
+Definition at line 465 of file forcefield.\-py.
 
 
 
@@ -346,7 +346,7 @@ The sign-\/flip hasn't been implemented yet. This shouldn't matter unless your c
 \end{DoxyWarning}
 
 
-Definition at line 571 of file forcefield.\-py.
+Definition at line 573 of file forcefield.\-py.
 
 
 
@@ -395,7 +395,7 @@ Record the locations of a parameter in a txt file; \mbox{[}\mbox{[}file name, li
 \end{DoxyParams}
 
 
-Definition at line 1138 of file forcefield.\-py.
+Definition at line 1139 of file forcefield.\-py.
 
 
 
@@ -430,7 +430,7 @@ Assign physical parameter values to the 'pvals0' array.
 \end{DoxyParams}
 
 
-Definition at line 1120 of file forcefield.\-py.
+Definition at line 1121 of file forcefield.\-py.
 
 
 
@@ -510,7 +510,7 @@ pvals The physical parameters
 \end{DoxyReturn}
 
 
-Definition at line 817 of file forcefield.\-py.
+Definition at line 819 of file forcefield.\-py.
 
 
 
@@ -532,7 +532,7 @@ Here is the call graph for this function\-:\nopagebreak
 )}}\label{classforcebalance_1_1forcefield_1_1FF_a2515e2361eb460edeab69f3d7742d3d9}
 
 
-Definition at line 772 of file forcefield.\-py.
+Definition at line 774 of file forcefield.\-py.
 
 
 
@@ -607,7 +607,7 @@ Create a new force field using provided parameter values.
 \end{DoxyParams}
 
 
-Definition at line 619 of file forcefield.\-py.
+Definition at line 621 of file forcefield.\-py.
 
 
 
@@ -630,7 +630,7 @@ Here is the call graph for this function\-:\nopagebreak
 )}}\label{classforcebalance_1_1forcefield_1_1FF_a0540c3df2c0dece9f2711cc04fd958d4}
 
 
-Definition at line 731 of file forcefield.\-py.
+Definition at line 733 of file forcefield.\-py.
 
 
 
@@ -786,7 +786,7 @@ A list of atom names (this is new, for E\-S\-P fitting)
 
 
 
-Definition at line 263 of file forcefield.\-py.
+Definition at line 265 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_ad573c583207080fa66592bcbf788cbad}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!excision@{excision}}
 \index{excision@{excision}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -799,7 +799,7 @@ Some customized constraints here.
 
 Quadrupoles must be traceless 
 
-Definition at line 255 of file forcefield.\-py.
+Definition at line 257 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a38e238188fdd105477cd3ad38ca3753b}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!F\-F\-Atom\-Types@{F\-F\-Atom\-Types}}
 \index{F\-F\-Atom\-Types@{F\-F\-Atom\-Types}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -810,7 +810,7 @@ W\-O\-R\-K I\-N P\-R\-O\-G\-R\-E\-S\-S \#\# This is a dictionary of \{'Atom\-Typ
 
 
 
-Definition at line 273 of file forcefield.\-py.
+Definition at line 275 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_aa33e01455044a76e265e6eafbf9c90d6}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!ffdata@{ffdata}}
 \index{ffdata@{ffdata}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -821,21 +821,21 @@ As these options proliferate, the force field class becomes less standalone.
 
 I need to think of a good solution here... The root directory of the project File names of force fields Directory containing force fields, relative to project directory Priors given by the user \-:) Whether to constrain the charges. Whether to constrain the charges. Switch for A\-M\-O\-E\-B\-A direct or mutual. Switch for rigid water molecules Bypass the transformation and use physical parameters directly The content of all force field files are stored in memory 
 
-Definition at line 235 of file forcefield.\-py.
+Definition at line 237 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_af942210095e12b4995a64ca461cd5d76}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!ffdata\-\_\-isxml@{ffdata\-\_\-isxml}}
 \index{ffdata\-\_\-isxml@{ffdata\-\_\-isxml}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
 \paragraph[{ffdata\-\_\-isxml}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-forcefield.\-F\-F.\-ffdata\-\_\-isxml}}\label{classforcebalance_1_1forcefield_1_1FF_af942210095e12b4995a64ca461cd5d76}
 
 
-Definition at line 236 of file forcefield.\-py.
+Definition at line 238 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_aa5ba15f51599b631b9be90cda847f1d9}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!F\-F\-Molecules@{F\-F\-Molecules}}
 \index{F\-F\-Molecules@{F\-F\-Molecules}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
 \paragraph[{F\-F\-Molecules}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-forcefield.\-F\-F.\-F\-F\-Molecules}}\label{classforcebalance_1_1forcefield_1_1FF_aa5ba15f51599b631b9be90cda847f1d9}
 
 
-Definition at line 286 of file forcefield.\-py.
+Definition at line 288 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_aa4f1adc1fc16e922c98145553ac5b67f}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!linedestroy\-\_\-save@{linedestroy\-\_\-save}}
 \index{linedestroy\-\_\-save@{linedestroy\-\_\-save}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -846,14 +846,14 @@ Destruction dictionary (experimental).
 
 
 
-Definition at line 314 of file forcefield.\-py.
+Definition at line 316 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_ab2ca57079cb49527775d044a2b2db6db}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!linedestroy\-\_\-this@{linedestroy\-\_\-this}}
 \index{linedestroy\-\_\-this@{linedestroy\-\_\-this}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
 \paragraph[{linedestroy\-\_\-this}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-forcefield.\-F\-F.\-linedestroy\-\_\-this}}\label{classforcebalance_1_1forcefield_1_1FF_ab2ca57079cb49527775d044a2b2db6db}
 
 
-Definition at line 316 of file forcefield.\-py.
+Definition at line 318 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_adac6add3391d052c319902ccc8e0a617}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!map@{map}}
 \index{map@{map}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -864,7 +864,7 @@ The mapping of interaction type -\/$>$ parameter number.
 
 
 
-Definition at line 238 of file forcefield.\-py.
+Definition at line 240 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a19eb80acc94a49f9ff806f13a95fef66}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!np@{np}}
 \index{np@{np}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -875,28 +875,28 @@ The total number of parameters.
 
 
 
-Definition at line 257 of file forcefield.\-py.
+Definition at line 259 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_aed4d7b3f12f4264b8a5afd70cffe80dc}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!openmmxml@{openmmxml}}
 \index{openmmxml@{openmmxml}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
 \paragraph[{openmmxml}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-forcefield.\-F\-F.\-openmmxml}}\label{classforcebalance_1_1forcefield_1_1FF_aed4d7b3f12f4264b8a5afd70cffe80dc}
 
 
-Definition at line 409 of file forcefield.\-py.
+Definition at line 411 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a4dd353f36f7a9f99f3355068c0bc73ce}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!parmdestroy\-\_\-save@{parmdestroy\-\_\-save}}
 \index{parmdestroy\-\_\-save@{parmdestroy\-\_\-save}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
 \paragraph[{parmdestroy\-\_\-save}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-forcefield.\-F\-F.\-parmdestroy\-\_\-save}}\label{classforcebalance_1_1forcefield_1_1FF_a4dd353f36f7a9f99f3355068c0bc73ce}
 
 
-Definition at line 315 of file forcefield.\-py.
+Definition at line 317 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a8644a3a48cef3af380d8e9af3584474f}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!parmdestroy\-\_\-this@{parmdestroy\-\_\-this}}
 \index{parmdestroy\-\_\-this@{parmdestroy\-\_\-this}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
 \paragraph[{parmdestroy\-\_\-this}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-forcefield.\-F\-F.\-parmdestroy\-\_\-this}}\label{classforcebalance_1_1forcefield_1_1FF_a8644a3a48cef3af380d8e9af3584474f}
 
 
-Definition at line 317 of file forcefield.\-py.
+Definition at line 319 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a3b22e1846666d6f704e0620413a95d14}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!patoms@{patoms}}
 \index{patoms@{patoms}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -907,7 +907,7 @@ A listing of parameter number -\/$>$ atoms involved.
 
 
 
-Definition at line 242 of file forcefield.\-py.
+Definition at line 244 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a8f5c9c11cd2f164a2ff6e310c1bc79f1}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!pfields@{pfields}}
 \index{pfields@{pfields}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -918,7 +918,7 @@ A list where pfields\mbox{[}pnum\mbox{]} = \mbox{[}'file',line,field,mult,cmd\mb
 
 
 
-Definition at line 247 of file forcefield.\-py.
+Definition at line 249 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a72d2a63abbeae0b783a1e3e4077b3ab1}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!plist@{plist}}
 \index{plist@{plist}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -929,7 +929,7 @@ The listing of parameter number -\/$>$ interaction types.
 
 
 
-Definition at line 240 of file forcefield.\-py.
+Definition at line 242 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -947,7 +947,7 @@ Initial value of physical parameters.
 
 
 
-Definition at line 259 of file forcefield.\-py.
+Definition at line 261 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_aef61d1ce1a5e9f46b9c1c779dc7c8ebe}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!qid@{qid}}
 \index{qid@{qid}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -979,7 +979,7 @@ A dictionary of force field reader classes.
 
 
 
-Definition at line 261 of file forcefield.\-py.
+Definition at line 263 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_ada9b82220eb6e6335a36617dd5746695}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!redirect@{redirect}}
 \index{redirect@{redirect}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -990,7 +990,7 @@ Creates plist from map.
 
 Prints the plist to screen. Make the rescaling factors. Make the transformation matrix. Redirection dictionary (experimental). 
 
-Definition at line 312 of file forcefield.\-py.
+Definition at line 314 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_acf33c8285b56b92510b5572448c3358e}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!rs@{rs}}
 \index{rs@{rs}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -1003,14 +1003,14 @@ Takes the dictionary 'B\-O\-N\-D\-S'\-:\{3\-:'B', 4\-:'K'\}, 'V\-D\-W'\-:\{4\-:'
 
 The array of rescaling factors 
 
-Definition at line 249 of file forcefield.\-py.
+Definition at line 251 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a62aa95ac960282ccae808ba05e3ecda1}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!tinkerprm@{tinkerprm}}
 \index{tinkerprm@{tinkerprm}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
 \paragraph[{tinkerprm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-forcefield.\-F\-F.\-tinkerprm}}\label{classforcebalance_1_1forcefield_1_1FF_a62aa95ac960282ccae808ba05e3ecda1}
 
 
-Definition at line 402 of file forcefield.\-py.
+Definition at line 404 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_aaf4763b05f3c1f7762d5c4d656ad106a}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!tm@{tm}}
 \index{tm@{tm}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -1021,7 +1021,7 @@ The transformation matrix for mathematical -\/$>$ physical parameters.
 
 
 
-Definition at line 251 of file forcefield.\-py.
+Definition at line 253 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1forcefield_1_1FF_a3a288d2514106e171af1d0e31311f97a}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!tm\-I@{tm\-I}}
 \index{tm\-I@{tm\-I}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
@@ -1032,7 +1032,7 @@ The transpose of the transformation matrix.
 
 
 
-Definition at line 253 of file forcefield.\-py.
+Definition at line 255 of file forcefield.\-py.
 
 \hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{\index{forcebalance\-::forcefield\-::\-F\-F@{forcebalance\-::forcefield\-::\-F\-F}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::forcefield::FF@{forcebalance\-::forcefield\-::\-F\-F}}
