@@ -43,7 +43,7 @@ class MainWindow(tk.Tk):
         filemenu.add_command(label="Close", command=self.close)
         filemenu.add_command(label="Exit", command=sys.exit)
         self.menubar.add_cascade(label="File", menu=filemenu)
-        self.menubar.add_command(label="Run", command=self.objectsPane.run)
+        self.menubar.add_command(label="Run", command=self.objectsPane.run, state="disabled")
 
         self['menu']=self.menubar
 
@@ -58,10 +58,13 @@ class MainWindow(tk.Tk):
         if inputfile:
             self.consolePane.clear()
             self.objectsPane.open(inputfile)
+            self.menubar.entryconfig(2, state=tk.NORMAL)
+            print dir(self.menubar)
 
     def close(self):
         self.objectsPane.clear()
         self.detailsPane.clear()
+        self.menubar.entryconfig(2, state=tk.DISABLED)
 
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
