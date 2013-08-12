@@ -313,6 +313,9 @@ class ConsoleViewer(tk.LabelFrame):
 
         getLogger("forcebalance").addHandler(ConsolePaneHandler(self))
         getLogger("forcebalance").setLevel(INFO)
+        
+        # scroll to bottom of text when widget is resized
+        self.bind("<Configure>", lambda e: self.console.yview(tk.END))
 
     ## we implement write and flush so the console viewer
     #  can serve as a drop in replacement for sys.stdout
