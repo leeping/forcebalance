@@ -45,17 +45,17 @@ bohrang = 0.529177249
 #=========================#
 #     I/O formatting      #
 #=========================#
-def pvec1d(vec1d, precision=1):
+def pvec1d(vec1d, precision=1, loglevel=forcebalance.output.INFO):
     """Printout of a 1-D vector.
 
     @param[in] vec1d a 1-D vector
     """
     v2a = array(vec1d)
     for i in range(v2a.shape[0]):
-        logger.info("%% .%ie " % precision % v2a[i])
-    logger.info('\n')
+        logger.log(loglevel, "%% .%ie " % precision % v2a[i])
+    logger.log(loglevel, '\n')
 
-def pmat2d(mat2d, precision=1):
+def pmat2d(mat2d, precision=1, loglevel=forcebalance.output.INFO):
     """Printout of a 2-D matrix.
 
     @param[in] mat2d a 2-D matrix
@@ -63,8 +63,8 @@ def pmat2d(mat2d, precision=1):
     m2a = array(mat2d)
     for i in range(m2a.shape[0]):
         for j in range(m2a.shape[1]):
-            logger.info("%% .%ie " % precision % m2a[i][j])
-        logger.info('\n')
+            logger.log(loglevel, "%% .%ie " % precision % m2a[i][j])
+        logger.log(loglevel, '\n')
 
 def encode(l): 	
     return [[len(list(group)),name] for name, group in itertools.groupby(l)]
