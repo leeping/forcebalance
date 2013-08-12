@@ -344,8 +344,6 @@ class ConsolePaneHandler(StreamHandler):
     def emit(self, record):
         message = re.split("(\x1b\[[01]?;?[0-9]{1,2};?[0-9]{,2}m)", record.getMessage())
         
-        print message
-        
         tags={"fg":"normal","bg":"normal"}
         for section in message:
             if section[0] == "\x1b":
