@@ -110,5 +110,5 @@ class are located in test/test_target.py in a TargetTests class. Note that to pr
 feature of Python to create classes derived from BOTH ForceBalanceTestCase and the abstract tests class. For example,
 the TestCase class header for the AbInitio_GMX class looks like this:
     class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests)
-In this way, TargetTests can provide tests for all Target subclasses but the setup for specific types of targets can be
+This way TargetTests can provide tests for all Target subclasses but the setup for specific types of targets can be
 done by the individual subclass test cases.
