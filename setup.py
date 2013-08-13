@@ -162,6 +162,11 @@ def buildKeywordDictionary(args):
     if args.test:
         setupKeywords["packages"].append("forcebalance.test")
         setupKeywords["package_dir"].update({"forcebalance.test" : "test"})
+        
+        os.chdir("test") # change directories to glob test files
+        test_data = glob.glob("files/*.*") + glob.glob("files/forcefield/*.*") + glob.glob("files/targets/*/*.*") + glob.glob("files/*.*") + ["files/work_queue_worker"]
+        os.chdir("..")
+        setupKeywords["package_data"].update({'forcebalance.test': test_data})
     if args.gui:
         setupKeywords["packages"].append("forcebalance.gui")
 
