@@ -7,6 +7,7 @@ import forcebalance
 
 forcebalance.output.getLogger("forcebalance.test").propagate=False
 
+os.chdir(os.path.dirname(__file__) + "/..")
 __all__ = [module[:-3] for module in sorted(os.listdir('test'))
            if re.match("^test_.*\.py$",module)]
 
