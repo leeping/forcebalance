@@ -4,7 +4,6 @@ import sys, os, re
 import threading
 
 import objects
-from eventhandlers import _bindEventHandler
 from forcebalance.output import getLogger, StreamHandler, INFO
 
 class ObjectViewer(tk.LabelFrame):
@@ -365,4 +364,11 @@ class ConsolePaneHandler(StreamHandler):
                 self.console.write(section, tags=self.color)
                 
         self.flush()
+        
+def _bindEventHandler(handler, **kwargs):
+    """Creates an event handler by taking a function that takes many arguments
+    and using kwargs to create a function that only takes in one argument"""
+    def f(e):
+        return handler(e, **kwargs)
+    return f
 
