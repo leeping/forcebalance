@@ -5,6 +5,12 @@ import os
 """
 This file contains classes that interface with forcebalance and act as an intermediary
 between the GUI frontend and lower level calculation elements.
+
+Objects that need to be displayed should implement a display() function that returns
+a type that can be recognized by the widget. Generic display function that returns a
+string filled with an object's properties is provided by ForceBalanceObject, but
+more complex data structures like dictionaries provide information on structure that
+can be used by the widget in creating more complicated views.
 """
 
 class ForceBalanceObject(object):

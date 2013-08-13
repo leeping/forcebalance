@@ -72,7 +72,7 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
     Override the setUp() to run tests on a different forcefield"""
     def setUp(self):
         # options used in 001_water_tutorial
-        self.logger.debug("Setting up options...\n")
+        self.logger.debug("\nSetting up options...\n")
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',
