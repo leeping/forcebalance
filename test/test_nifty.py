@@ -75,9 +75,13 @@ class TestNifty(ForceBalanceTestCase):
     
     def test_work_queue_functions(self):
         """Check work_queue functions behave as expected"""
+        
         self.logger.debug("Checking Work Queue is initialized to None...\n")
         self.assertEqual(forcebalance.WORK_QUEUE, None,
             msg="\nUnexpected initialization of WORK_QUEUE to %s" % str(forcebalance.WORK_QUEUE))
+            
+        self.logger.info("\n")
+            
         createWorkQueue(30000)
         self.assertEqual(type(forcebalance.WORK_QUEUE), work_queue.WorkQueue,
             msg="\nExpected WORK_QUEUE to be a WorkQueue object, but got a %s instead" % str(type(forcebalance.WORK_QUEUE)))
