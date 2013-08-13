@@ -28,7 +28,7 @@ def getOptions():
 
     if options['test_modules']:
         if options['exclude']:
-            options['test_modules']=[module[:-3] for module in sorted(os.listdir('test'))
+            options['test_modules']=[module[:-3] for module in sorted(os.listdir(os.path.dirname(__file__)))
                                 if re.match("^test_.*\.py$",module)
                                 and module[:-3] not in options['test_modules']]
     else:
