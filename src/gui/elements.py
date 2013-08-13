@@ -14,10 +14,15 @@ class ObjectViewer(tk.LabelFrame):
 
         self.calculation=None
         self.activeselection=None
-        self.selectionchanged=tk.BooleanVar()
-        self.selectionchanged.set(True)
+        
+        # needUpdate signals when the list of objects needs to be refreshed
         self.needUpdate=tk.BooleanVar()
         self.needUpdate.trace('r',self.update)
+        
+        # selectionchanged can be used by the root window to determine when
+        # the DetailViewer needs to be loaded with a new object
+        self.selectionchanged=tk.BooleanVar()
+        self.selectionchanged.set(True)
 
         self.content = tk.Text(self, cursor="arrow", state="disabled", width=30, height=20)
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
@@ -117,7 +122,6 @@ class ObjectViewer(tk.LabelFrame):
         for widget in self.content.winfo_children():
             widget["relief"]=tk.FLAT
         e.widget["relief"]="solid"
-
 
         if type(object) is not list: self.activeselection=[ object ]
         else: self.activeselection=object
