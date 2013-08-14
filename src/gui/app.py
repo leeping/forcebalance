@@ -10,13 +10,22 @@ class MainWindow(tk.Tk):
         self.title("ForceBalance 1.1")
 
         ## Window Components
+        # general view of selectable objects in calculation
         self.objectsPane = elements.ObjectViewer(self)
+        # more detailed properties relating to selected object(s)
         self.detailsPane = elements.DetailViewer(self)
+        # forcebalance output is routed to the console pane
         self.consolePane = elements.ConsoleViewer(self)
         
+        # Arrange components using grid manager
         self.objectsPane.grid(row=0, column=0)
         self.detailsPane.grid(row=0, column=1)
         self.consolePane.grid(row=1, columnspan=2, sticky=tk.W+tk.E+tk.N+tk.S)
+        
+        # Allow components to be resized
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+        self.rowconfigure(1, weight=1)
         
         self._initialize_menu()
 
@@ -34,13 +43,14 @@ class MainWindow(tk.Tk):
         filemenu.add_command(label="Close", command=self.close)
         filemenu.add_command(label="Exit", command=sys.exit)
         self.menubar.add_cascade(label="File", menu=filemenu)
+        self.menubar.add_command(label="Run", command=self.objectsPane.run, state="disabled")
 
         self['menu']=self.menubar
 
-        calculationmenu = tk.Menu(self.menubar, tearoff=0)
-        calculationmenu.add_command(label="Check", state="disabled")
-        calculationmenu.add_command(label="Run", command=self.objectsPane.run)
-        self.menubar.add_cascade(label="Calculation", menu=calculationmenu)
+        #calculationmenu = tk.Menu(self.menubar, tearoff=0)
+        #calculationmenu.add_command(label="Check", state="disabled")
+        #calculationmenu.add_command(label="Run", command=self.objectsPane.run)
+        #self.menubar.add_cascade(label="Calculation", menu=calculationmenu)
 
     def open(self):
         filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
@@ -48,44 +58,13 @@ class MainWindow(tk.Tk):
         if inputfile:
             self.consolePane.clear()
             self.objectsPane.open(inputfile)
+            self.menubar.entryconfig(2, state=tk.NORMAL)
+            print dir(self.menubar)
 
     def close(self):
         self.objectsPane.clear()
         self.detailsPane.clear()
+        self.menubar.entryconfig(2, state=tk.DISABLED)
 
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
-
-    def scrollWidgetDown(self, event):
-        p = {'x': self.winfo_pointerx(), 'y':self.winfo_pointery()}
-
-        for widget in self.winfo_children():
-            widgetTop={'x':widget.winfo_rootx(), 'y':widget.winfo_rooty()}
-            widgetBottom={'x': widget.winfo_rootx() + widget.winfo_width(),\
-                          'y': widget.winfo_rooty() + widget.winfo_height()}
-
-            if p[tk.X] > widgetTop[tk.X] and\
-               p[tk.Y] > widgetTop[tk.Y] and\
-               p[tk.X] < widgetBottom[tk.X] and\
-               p[tk.Y] < widgetBottom[tk.Y]:
-                try: 
-                    widget.scrollDown(event)
-                    break
-                except: pass
-
-    def scrollWidgetUp(self, event):
-        p = {'x': self.winfo_pointerx(), 'y':self.winfo_pointery()}
-
-        for widget in self.winfo_children():
-            widgetTop={'x':widget.winfo_rootx(), 'y':widget.winfo_rooty()}
-            widgetBottom={'x': widget.winfo_rootx() + widget.winfo_width(),\
-                          'y': widget.winfo_rooty() + widget.winfo_height()}
-
-            if p[tk.X] > widgetTop[tk.X] and\
-               p[tk.Y] > widgetTop[tk.Y] and\
-               p[tk.X] < widgetBottom[tk.X] and\
-               p[tk.Y] < widgetBottom[tk.Y]:
-                try: 
-                    widget.scrollUp(event)
-                    break
-                except: pass
