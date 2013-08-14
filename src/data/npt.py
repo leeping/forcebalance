@@ -129,7 +129,11 @@ else:
 
 printcool("ForceBalance condensed phase simulation using engine: %s" % args.engine)
 print "For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" % (nprod, nsteps, args.liquid_timestep)
-print "For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" % (nprod, nsteps, args.liquid_timestep)
+print "For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" % (m_nprod, m_nsteps, args.gas_timestep)
+if nprod < 2:
+    raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' % (2 * nsteps))
+if m_nprod < 2:
+    raise Exception('Please set the number of gas time steps so that you collect at least two snapshots (minimum %i)' % (2 * m_nsteps))
 
 DoEDA = True
 if args.mts_vvvr:

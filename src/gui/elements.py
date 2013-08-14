@@ -4,7 +4,6 @@ import sys, os, re
 import threading
 
 import objects
-from eventhandlers import _bindEventHandler
 from forcebalance.output import getLogger, StreamHandler, INFO
 
 class ObjectViewer(tk.LabelFrame):
@@ -15,10 +14,15 @@ class ObjectViewer(tk.LabelFrame):
 
         self.calculation=None
         self.activeselection=None
-        self.selectionchanged=tk.BooleanVar()
-        self.selectionchanged.set(True)
+        
+        # needUpdate signals when the list of objects needs to be refreshed
         self.needUpdate=tk.BooleanVar()
         self.needUpdate.trace('r',self.update)
+        
+        # selectionchanged can be used by the root window to determine when
+        # the DetailViewer needs to be loaded with a new object
+        self.selectionchanged=tk.BooleanVar()
+        self.selectionchanged.set(True)
 
         self.content = tk.Text(self, cursor="arrow", state="disabled", width=30, height=20)
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
@@ -59,6 +63,7 @@ class ObjectViewer(tk.LabelFrame):
             print "Calculation already running"
 
     def update(self, *args):
+        """Update the list of objects being displayed, based on the contents of self.calculation"""
         self.content["state"]= "normal"
         self.content.delete("1.0","end")
         self['text']="Objects"
@@ -78,7 +83,6 @@ class ObjectViewer(tk.LabelFrame):
             def toggle(e):
                 self.calculation['_expand_targets'] = not self.calculation['_expand_targets']
                 self.needUpdate.get()
-                print "toggle!"
 
             targetLabel = tk.Label(self.content,text="Targets", bg="#FFFFFF")
             targetLabel.bind("<Button-3>", toggle)
@@ -119,12 +123,11 @@ class ObjectViewer(tk.LabelFrame):
             widget["relief"]=tk.FLAT
         e.widget["relief"]="solid"
 
-
         if type(object) is not list: self.activeselection=[ object ]
         else: self.activeselection=object
 
         self.selectionchanged.get() # reading this variable triggers a refresh
-
+        
     def scrollUp(self, e):
         self.content.yview('scroll', -2, 'units')
 
@@ -169,6 +172,8 @@ class DetailViewer(tk.LabelFrame):
         self.printAll.trace('w', lambda *x : self.load())
 
     def load(self,newObject=None):
+        """update current object if a new one is passed in. Then clear existing text and
+        replace it with whatever the current object says to write"""
         if newObject:
             self.currentObject = newObject
             self.printAll.set(0)    # reset view to only show values changed from default
@@ -195,11 +200,14 @@ class DetailViewer(tk.LabelFrame):
 
     def populate(self, object):
         """Populate the view with information in displayText argument"""
+        # ask object to tell us how to display it
         displayText = object.display(self.printAll.get())
 
+        # if object provides string back, just print it to the content area
         if type(displayText)==str:
             self.content.insert("end", displayText)
 
+        # if object provides dictionary, iterate through key value pairs and organize using tk.Label objects
         if type(displayText)==dict:
             for key in displayText.keys():
                 frame = tk.Frame(self.content)
@@ -218,6 +226,8 @@ class DetailViewer(tk.LabelFrame):
                 self.content.window_create("end", window = frame)
                 self.content.insert("end", '\n')
 
+        # tuple is used to separate out options set at default values
+        # (<options dictionary>, <default options dictionary>)
         if type(displayText)==tuple:
             for key in displayText[0].keys():
                 frame = tk.Frame(self.content)
@@ -263,16 +273,12 @@ class DetailViewer(tk.LabelFrame):
         self.content.insert("end",'\n')
 
     def clear(self):
+        """Clear the current object and reload a blank page"""
         self.currentObject=None
         self.load()
 
-    def scrollUp(self, e):
-        self.content.yview('scroll', -2, 'units')
-
-    def scrollDown(self, e):
-        self.content.yview('scroll', 2, 'units')
-
     def showHelp(self, e, object, option):
+        """Update and display help window showing option documentation string"""
         self.helptext["state"]="normal"
         self.helptext.delete("1.0","end")
 
@@ -287,6 +293,12 @@ class DetailViewer(tk.LabelFrame):
         self.helptext.place(x=e.x, y=e.y_root-self.root.winfo_y())
         self.root.bind("<Motion>", lambda e : self.helptext.place_forget())
         self.root.bind("<Button>", lambda e : self.helptext.place_forget())
+        
+    def scrollUp(self, e):
+        self.content.yview('scroll', -2, 'units')
+
+    def scrollDown(self, e):
+        self.content.yview('scroll', 2, 'units')
 
 class ConsoleViewer(tk.LabelFrame):
     """Tries to emulate a terminal by displaying standard output"""
@@ -303,7 +315,7 @@ class ConsoleViewer(tk.LabelFrame):
         
         # console colors corresponding to ANSI escape sequences
         self.console.tag_config("0", foreground="white", background="black")
-        #self.console.tag_config("1", font = )  # make text bold
+        #self.console.tag_config("1")  # make text bold
         self.console.tag_config("44", background="blue")
         self.console.tag_config("91", foreground="red")
         self.console.tag_config("92", foreground="green")
@@ -313,6 +325,9 @@ class ConsoleViewer(tk.LabelFrame):
 
         getLogger("forcebalance").addHandler(ConsolePaneHandler(self))
         getLogger("forcebalance").setLevel(INFO)
+        
+        # scroll to bottom of text when widget is resized
+        self.bind("<Configure>", lambda e: self.console.yview(tk.END))
 
     ## we implement write and flush so the console viewer
     #  can serve as a drop in replacement for sys.stdout
@@ -321,14 +336,13 @@ class ConsoleViewer(tk.LabelFrame):
         
         # processing of input
         input = re.sub("\r","\n", input)
-        #input = re.sub("\x1b\[.?;?[0-9]{1,2};?[0-9]{,2}m", "", input)
         
         self.console.insert(tk.END, input, tags)
         self.console.yview(tk.END)
         self.console['state']=tk.DISABLED
 
     def flush(self):
-        pass
+        pass    # does nothing since messages are sent to the console immediately on write
         
     def clear(self):
         self.console['state']=tk.NORMAL
@@ -342,17 +356,23 @@ class ConsolePaneHandler(StreamHandler):
         self.color = ["0"]
     
     def emit(self, record):
+        # split messages by looking for terminal escape sequences
         message = re.split("(\x1b\[[01]?;?[0-9]{1,2};?[0-9]{,2}m)", record.getMessage())
         
-        print message
-        
-        tags={"fg":"normal","bg":"normal"}
         for section in message:
+            # if we get a new escape sequence, assign self.color to new color codes
+            # else write text using the current color codes
             if section[0] == "\x1b":
                 self.color = tuple(section[2:-1].split(';'))
             else:
-                print self.color
                 self.console.write(section, tags=self.color)
                 
         self.flush()
+        
+def _bindEventHandler(handler, **kwargs):
+    """Creates an event handler by taking a function that takes many arguments
+    and using kwargs to create a function that only takes in one argument"""
+    def f(e):
+        return handler(e, **kwargs)
+    return f
 

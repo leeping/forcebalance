@@ -12,6 +12,15 @@ Basic usage:
 You can call the GUI implementation directly from the command line using
 python -m forcebalance.gui
 
+Currently implemented widgets:
+-ObjectViewer lists currently implemented objects that have been loaded as a calculation
+
+-DetailViewer takes a selected object in an associated ObjectViewer and prints the output of
+object.display() to a text widget
+
+-ConsoleViewer uses the provided ConsolePaneHandler to send log records to a text widget. To function,
+a ConsoleViewer needs to be attached to a Handler, and the Handler should be added to a logging source
+
 TODO:
 Allow editing of calculation options, targets, etc
 Document code to make it more understandable
