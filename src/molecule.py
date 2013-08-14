@@ -1956,7 +1956,6 @@ class Molecule(object):
     
         for line in open(fnm):
             line = line.strip().expandtabs()
-            print XMode, line
             if 'fatal error' in line:
                 raise Exception('Calculation encountered a fatal error!')
             if XMode >= 1:
