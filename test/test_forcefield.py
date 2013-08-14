@@ -26,16 +26,20 @@ class FFTests(object):
         self.assertEqual(pvals.size,new_pvals.size)
         # given zero matrix, make should return unchanged pvals
         self.assertEqual(pvals,new_pvals,
-        msg="\nmake() should produce unchanged pvals when given zero vector")
+                    msg="\nmake() should produce unchanged pvals when given zero vector")
         self.logger.debug("ok\n")
 
+        self.logger.debug("make() should return different values when passed in nonzero pval matrix... ")
         new_pvals = np.array(self.ff.make(np.ones(self.ff.np)))
         self.assertEqual(pvals.size,new_pvals.size)
         # given arbitrary nonzero input, make should return new pvals
         self.assertFalse((pvals==new_pvals).all(), msg="\nmake() returned unchanged pvals even when given nonzero matrix")
+        self.logger.debug("ok\n")
 
+        self.logger.debug("make(use_pvals=True) should return the same pvals... ")
         new_pvals = np.array(self.ff.make(np.ones(self.ff.np),use_pvals=True))
         self.assertEqual(np.ones(self.ff.np),new_pvals, msg="\nmake() did not return input pvals with use_pvals=True")
+        self.logger.debug("ok\n")
 
         os.remove(self.options['root'] + '/' + self.ff.fnms[0])
 
@@ -68,7 +72,7 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
     Override the setUp() to run tests on a different forcefield"""
     def setUp(self):
         # options used in 001_water_tutorial
-        self.logger.debug("Setting up options...\n")
+        self.logger.debug("\nSetting up options...\n")
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd() + '/test/files',

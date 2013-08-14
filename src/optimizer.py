@@ -17,7 +17,7 @@ from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, 
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
-from forcebalance.output import getLogger
+from forcebalance.output import getLogger, DEBUG
 logger = getLogger(__name__)
 
 # Global variable corresponding to the iteration number.
@@ -494,19 +494,23 @@ class Optimizer(forcebalance.BaseClass):
             G = np.delete(G, self.excision)
             H = np.delete(H, self.excision, axis=0)
             H = np.delete(H, self.excision, axis=1)
-            # print "Inverting Hessian:"                 ###
-            # print " G:"                                ###
-            # pvec1d(G,precision=5)                      ###
-            # print " H:"                                ###
-            # pmat2d(H,precision=5)                      ###
+            
+            logger.debug("Inverting Hessian:\n")                 ###
+            logger.debug(" G:\n")                                ###
+            pvec1d(G,precision=5, loglevel=DEBUG)                ###
+            logger.debug(" H:\n")                                ###
+            pmat2d(H,precision=5, loglevel=DEBUG)                ###
+            
             Hi = invert_svd(np.mat(H))
             dx = flat(-1 * Hi * col(G))
-            # print " dx:"                               ###
-            # pvec1d(dx,precision=5)                     ###
+            
+            logger.debug(" dx:\n")                               ###
+            pvec1d(dx,precision=5, loglevel=DEBUG)                     ###
             # dxa = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
             # dxa = flat(dxa)
             # print " dxa:"                              ###
             # pvec1d(dxa,precision=5)                    ###
+            
             logger.info('\n')                                      ###
             for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                 dx = np.insert(dx, i, 0)
@@ -515,15 +519,15 @@ class Optimizer(forcebalance.BaseClass):
                 # HT = H + (L-1)**2*np.diag(np.diag(H))
                 # Attempt to use plain Levenberg
                 HT = H + (L-1)**2*np.eye(len(H))
-                # print "Inverting Scaled Hessian:"                       ###
-                # print " G:"                                             ###
-                # pvec1d(G,precision=5)                                   ###
-                # print " HT: (Scal = %.4f)" % (1+(L-1)**2)               ###
-                # pmat2d(HT,precision=5)                                  ###
+                logger.debug("Inverting Scaled Hessian:\n")                       ###
+                logger.debug(" G:\n")                                             ###
+                pvec1d(G,precision=5, loglevel=DEBUG)                                   ###
+                logger.debug(" HT: (Scal = %.4f)\n" % (1+(L-1)**2))               ###
+                pmat2d(HT,precision=5, loglevel=DEBUG)                                  ###
                 Hi = invert_svd(np.mat(HT))
                 dx = flat(-1 * Hi * col(G))
-                # print " dx:"                                            ###
-                # pvec1d(dx,precision=5)                                  ###
+                logger.debug(" dx:\n")                                            ###
+                pvec1d(dx,precision=5, loglevel=DEBUG)                                  ###
                 # dxa = -solve(HT, G)
                 # dxa = flat(dxa)
                 # print " dxa:"                                           ###
@@ -539,7 +543,7 @@ class Optimizer(forcebalance.BaseClass):
     
         def trust_fun(L):
             N = norm(solver(L)[0])
-            #print "\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e" % (L, (L-1)**2, N, (N - trust)**2)
+            logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
             return (N - trust)**2
 
         def search_fun(L):
@@ -566,7 +570,7 @@ class Optimizer(forcebalance.BaseClass):
                 ### LOpt = Result[0]
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
-                # print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .8f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2)
+
                 logger.info("\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal\n" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2))
         else: # This is the nonlinear search code.
             # First obtain a step that is the same length as the provided trust radius.

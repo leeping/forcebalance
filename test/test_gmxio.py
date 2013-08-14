@@ -26,6 +26,7 @@ class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests):
         self.filetype = self.options['forcefield'][0][-3:]
         self.mvals = [.5]*self.ff.np
 
+        self.logger.debug("Setting up AbInitio_GMX target\n")
         self.target = forcebalance.gmxio.AbInitio_GMX(self.options, self.tgt_opt, self.ff)
         self.addCleanup(os.system, 'rm -rf temp')
 

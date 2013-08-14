@@ -24,7 +24,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
 
     def test_xyz_conversion(self):
         """Check molecule conversion from pdb to xyz format"""
-        self.logger.debug("Creating xyz file from pdb... ")
+        self.logger.debug("\nCreating xyz file from pdb... ")
         self.molecule.write(self.source[:-3] + 'xyz')
         self.logger.debug("done\nTrying to read generated xyz file... ")
         try:
@@ -40,7 +40,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
 
     def test_gro_conversion(self):
         """Check molecule conversion from pdb to gro format"""
-        self.logger.debug("Creating gro file from pdb... ")
+        self.logger.debug("\nCreating gro file from pdb... ")
         self.molecule.write(self.source[:-3] + 'gro')
         self.logger.debug("done\nTrying to read generated gro file... ")
         try:
@@ -49,7 +49,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
         except:
             self.fail("\nConversion to gro format creates unreadable file")
 
-        self.logger.debug("Checking that conversion has not changed number of residues\n")
+        self.logger.debug("\nChecking that conversion has not changed number of residues\n")
         self.assertEqual(len(self.molecule.Data['resid']), len(molecule1.Data['resid']),
                         msg = "\nConversion from pdb to gro yields different number of residues")
 
@@ -60,7 +60,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
 
     def test_arc_conversion(self):
         """Check molecule conversion from pdb to arc format"""
-        self.logger.debug("Creating arc file from pdb... ")
+        self.logger.debug("\nCreating arc file from pdb... ")
         self.molecule.Data['tinkersuf']=['']*len(self.molecule.Data['resname'])  # suppress topology warning
         self.molecule.write(self.source[:-3] + 'arc')
         self.logger.debug("done\nTrying to read generated gro file... ")
@@ -81,7 +81,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
 
     def test_pdb_topology_build(self):
         """Check reading pdb with build_topology=True"""
-        self.logger.debug("Trying to read molecule with topology... ")
+        self.logger.debug("\nTrying to read molecule with topology... ")
         try:
             molecule = forcebalance.molecule.Molecule(self.source, build_topology=True)
             self.logger.debug("done\nChecking molecule has correct number of residues\n")

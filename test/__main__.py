@@ -28,7 +28,7 @@ def getOptions():
 
     if options['test_modules']:
         if options['exclude']:
-            options['test_modules']=[module[:-3] for module in sorted(os.listdir('test'))
+            options['test_modules']=[module[:-3] for module in sorted(os.listdir(os.path.dirname(__file__)))
                                 if re.match("^test_.*\.py$",module)
                                 and module[:-3] not in options['test_modules']]
     else:
@@ -47,11 +47,11 @@ def runHeadless(options):
 
     os.chdir(os.path.dirname(__file__) + "/..")
 
-    os.mkdir('/tmp/forcebalance')
+    if not os.path.exists('/tmp/forcebalance'): os.mkdir('/tmp/forcebalance')
     warningHandler = forcebalance.output.CleanFileHandler('/tmp/forcebalance/test.err','w')
     warningHandler.setLevel(forcebalance.output.WARNING)
     logfile = "/tmp/forcebalance/%s.log" % time.strftime('%m%d%y_%H%M%S')
-    debugHandler = CleanFileHandler(logfile,'w')
+    debugHandler = forcebalance.output.CleanFileHandler(logfile,'w')
     debugHandler.setLevel(forcebalance.output.DEBUG)
     
     forcebalance.output.getLogger("forcebalance.test").addHandler(warningHandler)

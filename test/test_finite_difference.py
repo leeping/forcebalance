@@ -7,7 +7,7 @@ from math import cos, sin, pi
 
 class TestFiniteDifference(ForceBalanceTestCase):
     def setUp(self):
-        # functions is a list of tuples containing (function, d/dp, d^2/dp^2)
+        # functions is a list of 3-tuples containing (function p, d/dp, d^2/dp^2)
         self.functions = []
 
         # f(x) = 2x
@@ -29,6 +29,7 @@ class TestFiniteDifference(ForceBalanceTestCase):
         for func in self.functions:
             msg = "\nfdwrap alters function behavior"
             f=forcebalance.finite_difference.fdwrap(func[0], [0]*3, 0)
+            self.logger.debug("Checking to make sure fdwrap returns a function\n")
             self.assertEqual(type(f), type(lambda : ''), "\nfdwrap did not return a function")
             # some test values
             for x in range(-10, 11):
@@ -39,6 +40,7 @@ class TestFiniteDifference(ForceBalanceTestCase):
         func = lambda x: x[0]**2
         fd_stencils = [function for function in dir(forcebalance.finite_difference) if re.match('^f..?d.p$',function)]
 
+        self.logger.debug("Comparing fd stencils against some simple functions\n")
         for func in self.functions:
             for p in range(1):
                 for x in range(10):
