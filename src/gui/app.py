@@ -8,6 +8,7 @@ class MainWindow(tk.Tk):
         tk.Tk.__init__(self)
 
         self.title("ForceBalance 1.1")
+        self.geometry("800x600")
 
         ## Window Components
         # general view of selectable objects in calculation
@@ -15,7 +16,7 @@ class MainWindow(tk.Tk):
         # more detailed properties relating to selected object(s)
         self.detailsPane = elements.DetailViewer(self)
         # forcebalance output is routed to the console pane
-        self.consolePane = elements.ConsoleViewer(self)
+        self.consolePane = elements.ConsoleViewer(self, height = 500)
         
         self.showObjects = tk.IntVar()
         self.showObjects.set(True)
@@ -40,10 +41,10 @@ class MainWindow(tk.Tk):
         filemenu.add_command(label="Exit", command=sys.exit)
         self.menubar.add_cascade(label="File", menu=filemenu)
         
-        viewmenu = tk.Menu(self.menubar, tearoff=0)
-        viewmenu.add_checkbutton(label="show object viewer", variable=self.showObjects)
-        viewmenu.add_checkbutton(label="show default options", variable=self.detailsPane.printAll)
-        self.menubar.add_cascade(label="View", menu=viewmenu)
+        optionsmenu = tk.Menu(self.menubar, tearoff=0)
+        optionsmenu.add_checkbutton(label="show object viewer", variable=self.showObjects)
+        optionsmenu.add_checkbutton(label="show default options", variable=self.detailsPane.printAll)
+        self.menubar.add_cascade(label="Options", menu=optionsmenu)
         
         self.menubar.add_command(label="Run", command=self.objectsPane.run, state="disabled")
 
@@ -74,8 +75,8 @@ class MainWindow(tk.Tk):
     
         if self.showObjects.get():
             self.consolePane.grid(row=1, columnspan=2, sticky=tk.W+tk.E+tk.N+tk.S)
-            self.objectsPane.grid(row=0, column=0)
-            self.detailsPane.grid(row=0, column=1)
+            self.objectsPane.grid(row=0, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
+            self.detailsPane.grid(row=0, column=1, sticky=tk.W+tk.E+tk.N+tk.S)
             self.rowconfigure(0, weight=0)
             self.rowconfigure(1, weight=1)
             self.columnconfigure(0, weight=1)
