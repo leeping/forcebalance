@@ -9,7 +9,7 @@ class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
         """Check classes listed in Implemented_Targets are derived from Target"""
         for key in forcebalance.objective.Implemented_Targets.iterkeys():
-            self.logger("Assert %s is subclass of target\n" % str(forcebalance.objective.Implemented_Targets[key]))
+            self.logger.debug("Assert %s is subclass of target\n" % str(forcebalance.objective.Implemented_Targets[key]))
             self.assertTrue(issubclass(forcebalance.objective.Implemented_Targets[key],forcebalance.target.Target))
     
     def test_no_unlisted_classes_derived_from_Target(self):
