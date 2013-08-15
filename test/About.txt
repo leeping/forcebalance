@@ -71,7 +71,8 @@ Test Cases contain several special methods which determine what happens during a
 Test methods will usually perform some action and call self.assert* functions provided by the unittest framework.
 These assert methods check some condition. If the condition is not met, the test fails and an error message is printed.
 The most common asserts used are self.assertEqual/self.assertNotEqual and self.assertTrue/self.assertFalse, but there
-are a number of others provided by the unittest framework.
+are a number of others provided by the unittest framework (http://docs.python.org/2/library/unittest.html#assert-methods).
+Test cases have fail and skipTest methods which both take as input a string explaining the reason for failing or skipping.
 
 Some forcebalance modules/classes provide base classes which are never instantiated themselves, but which provide
 a framework for other more specific classes to expand upon. In this case, classes with general tests that can be run
