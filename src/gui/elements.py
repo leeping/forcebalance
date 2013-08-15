@@ -8,8 +8,8 @@ from forcebalance.output import getLogger, StreamHandler, INFO
 
 class ObjectViewer(tk.LabelFrame):
     """Provides a general overview of the loaded calculation objects"""
-    def __init__(self,root):
-        tk.LabelFrame.__init__(self, root, text="Loaded Objects")
+    def __init__(self,root, **kwargs):
+        tk.LabelFrame.__init__(self, root, text="Loaded Objects", **kwargs)
         self.root = root
 
         self.calculation=None
@@ -32,7 +32,7 @@ class ObjectViewer(tk.LabelFrame):
         self.content['yscrollcommand']=self.scrollbar.set
 
         # arrange and display list elements
-        self.content.pack(side=tk.LEFT, fill=tk.Y)
+        self.content.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.content.update()
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y)
 
@@ -137,7 +137,7 @@ class ObjectViewer(tk.LabelFrame):
 class DetailViewer(tk.LabelFrame):
     """Shows detailed properties of the currently selected object (as defined in
     and ObjectViewer)"""
-    def __init__(self, root, opts=''):
+    def __init__(self, root, opts='', **kwargs):
         # initialize variables
         self.root = root
         self.printAll = tk.IntVar()
@@ -146,7 +146,7 @@ class DetailViewer(tk.LabelFrame):
         self.currentElement= None # currently selected element within current object
 
         # Viewer GUI elements
-        tk.LabelFrame.__init__(self, root, text="Details")
+        tk.LabelFrame.__init__(self, root, text="Details", **kwargs)
         self.content = tk.Text(self,cursor="arrow",state="disabled", height=20)
         self.content.tag_config("error", foreground="red")
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
@@ -160,7 +160,7 @@ class DetailViewer(tk.LabelFrame):
         self.root.bind_class("scrollable", "<Button-5>", self.scrollDown)
 
         # arrange and display list elements
-        self.content.pack(side=tk.LEFT, fill=tk.Y)
+        self.content.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.content.update()
 
         # update when printAll variable is changed
@@ -296,8 +296,8 @@ class DetailViewer(tk.LabelFrame):
 
 class ConsoleViewer(tk.LabelFrame):
     """Tries to emulate a terminal by displaying standard output"""
-    def __init__(self, root):
-        tk.LabelFrame.__init__(self, root, text="Console")
+    def __init__(self, root, **kwargs):
+        tk.LabelFrame.__init__(self, root, text="Console", **kwargs)
         
         self.console = tk.Text(self,
                             state=tk.DISABLED,
