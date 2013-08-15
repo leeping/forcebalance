@@ -9,10 +9,16 @@ class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
         """Check classes listed in Implemented_Targets are derived from Target"""
         for key in forcebalance.objective.Implemented_Targets.iterkeys():
+            self.logger("Assert %s is subclass of target\n" % str(forcebalance.objective.Implemented_Targets[key]))
             self.assertTrue(issubclass(forcebalance.objective.Implemented_Targets[key],forcebalance.target.Target))
     
     def test_no_unlisted_classes_derived_from_Target(self):
-        """Check for unknown omissions from Implemented_Targets"""
+        """Check for unknown omissions from Implemented_Targets
+        
+        Check to make sure any classes derived from Target are either
+        listed in Implemented_Targets or in the exclusion list in this
+        test case
+        """
         forcebalance_modules=[module[:-3] for module in os.listdir(forcebalance.__path__[0])
                      if re.compile(".*\.py$").match(module)
                      and module not in ["__init__.py"]]
@@ -116,7 +122,7 @@ class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
                 'forcefield': ['water.itp']})
         os.chdir(self.options['root'])
         
-        self.logger.debug(str(self.options))
+        self.logger.debug("\nUsing the following options:\n%s\n" % str(self.options))
 
         self.tgt_opts = [ forcebalance.parser.tgt_opts_defaults.copy() ]
         self.tgt_opts[0].update({"type" : "ABINITIO_GMX", "name" : "cluster-06"})
@@ -137,7 +143,7 @@ class TestBromineObjective(ForceBalanceTestCase, ObjectiveTests):
                 'forcefield': ['bro.itp']})
         os.chdir(self.options['root'])
         
-        self.logger.debug(str(self.options))
+        self.logger.debug("\nUsing the following options:\n%s\n" % str(self.options))
 
         self.tgt_opts = [ forcebalance.parser.tgt_opts_defaults.copy() ]
         self.tgt_opts[0].update({"type" : "LIQUID_GMX", "name" : "LiquidBromine"})

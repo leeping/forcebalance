@@ -18,7 +18,8 @@ def getOptions():
     loglevel = parser.add_mutually_exclusive_group()
     loglevel.add_argument('-v', '--verbose', dest='loglevel', action='store_const', const=forcebalance.output.DEBUG, default=forcebalance.output.INFO)
     loglevel.add_argument('-q', '--quiet', dest='loglevel', action='store_const', const=forcebalance.output.WARNING, default=forcebalance.output.INFO)
-    parser.add_argument('--headless-config', type=argparse.FileType('r'))
+    parser.add_argument('--headless-config', type=argparse.FileType('r'), help="run tests in 'headless' mode, using the\
+    configuration from the config file provided")
     parser.add_argument('test_modules', metavar="MODULE", nargs='*', default=[], help="module to load tests from")
     
     options = vars(parser.parse_args())
