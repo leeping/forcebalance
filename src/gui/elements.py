@@ -150,7 +150,7 @@ class DetailViewer(tk.LabelFrame):
         self.content = tk.Text(self,cursor="arrow",state="disabled", height=20)
         self.content.tag_config("error", foreground="red")
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
-        self.helptext = tk.Text(self, width=70, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
+        self.helptext = tk.Text(self.root, width=70, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
 
         # bind scrollbar actions
         self.scrollbar.config(command = self.content.yview)
@@ -163,12 +163,7 @@ class DetailViewer(tk.LabelFrame):
         self.content.pack(side=tk.LEFT, fill=tk.Y)
         self.content.update()
 
-        # right click context menu
-        self.contextmenu = tk.Menu(self, tearoff=0)
-        self.contextmenu.add_command(label="Add option", state="disabled")
-        self.contextmenu.add_checkbutton(label="show all", variable=self.printAll)
-        self.content.bind("<Button-3>", lambda e : self.contextmenu.post(e.x_root, e.y_root))
-        self.content.bind("<Button-1>", lambda e : self.contextmenu.unpost())
+        # update when printAll variable is changed
         self.printAll.trace('w', lambda *x : self.load())
 
     def load(self,newObject=None):
@@ -176,7 +171,6 @@ class DetailViewer(tk.LabelFrame):
         replace it with whatever the current object says to write"""
         if newObject:
             self.currentObject = newObject
-            self.printAll.set(0)    # reset view to only show values changed from default
 
         self['text']="Details"
 
@@ -290,7 +284,7 @@ class DetailViewer(tk.LabelFrame):
 
         self.helptext.insert("end", helpmessage)
         self.helptext['height']=height
-        self.helptext.place(x=e.x, y=e.y_root-self.root.winfo_y())
+        self.helptext.place(x=e.x_root-self.root.winfo_x(), y=e.y_root-self.root.winfo_y())
         self.root.bind("<Motion>", lambda e : self.helptext.place_forget())
         self.root.bind("<Button>", lambda e : self.helptext.place_forget())
         
@@ -309,9 +303,8 @@ class ConsoleViewer(tk.LabelFrame):
                             state=tk.DISABLED,
                             cursor="arrow",
                             fg="#FFFFFF",
-                            bg="#000000",
-                            height=20)
-        self.console.pack(fill=tk.BOTH)
+                            bg="#000000")
+        self.console.pack(fill=tk.BOTH, expand=1)
         
         # console colors corresponding to ANSI escape sequences
         self.console.tag_config("0", foreground="white", background="black")
