@@ -17,20 +17,16 @@ class MainWindow(tk.Tk):
         # forcebalance output is routed to the console pane
         self.consolePane = elements.ConsoleViewer(self)
         
-        # Arrange components using grid manager
-        self.objectsPane.grid(row=0, column=0)
-        self.detailsPane.grid(row=0, column=1)
-        self.consolePane.grid(row=1, columnspan=2, sticky=tk.W+tk.E+tk.N+tk.S)
+        self.showObjects = tk.IntVar()
+        self.showObjects.set(True)
         
-        # Allow components to be resized
-        self.columnconfigure(0, weight=1)
-        self.columnconfigure(1, weight=1)
-        self.rowconfigure(1, weight=1)
+        self.arrangeWindow()
         
         self._initialize_menu()
 
         # Application-wide event bindings
         self.objectsPane.selectionchanged.trace('r', self.updateDetailView)
+        self.showObjects.trace('w', self.arrangeWindow)
 
     def _initialize_menu(self):
         self.menubar = tk.Menu(self)
@@ -43,6 +39,12 @@ class MainWindow(tk.Tk):
         filemenu.add_command(label="Close", command=self.close)
         filemenu.add_command(label="Exit", command=sys.exit)
         self.menubar.add_cascade(label="File", menu=filemenu)
+        
+        viewmenu = tk.Menu(self.menubar, tearoff=0)
+        viewmenu.add_checkbutton(label="show object viewer", variable=self.showObjects)
+        viewmenu.add_checkbutton(label="show default options", variable=self.detailsPane.printAll)
+        self.menubar.add_cascade(label="View", menu=viewmenu)
+        
         self.menubar.add_command(label="Run", command=self.objectsPane.run, state="disabled")
 
         self['menu']=self.menubar
@@ -58,13 +60,33 @@ class MainWindow(tk.Tk):
         if inputfile:
             self.consolePane.clear()
             self.objectsPane.open(inputfile)
-            self.menubar.entryconfig(2, state=tk.NORMAL)
-            print dir(self.menubar)
+            self.menubar.entryconfig(3, state=tk.NORMAL)
 
     def close(self):
         self.objectsPane.clear()
         self.detailsPane.clear()
-        self.menubar.entryconfig(2, state=tk.DISABLED)
+        self.menubar.entryconfig(3, state=tk.DISABLED)
+        
+    def arrangeWindow(self, *args):
+        self.objectsPane.grid_forget()
+        self.detailsPane.grid_forget()
+        self.consolePane.grid_forget()
+    
+        if self.showObjects.get():
+            self.consolePane.grid(row=1, columnspan=2, sticky=tk.W+tk.E+tk.N+tk.S)
+            self.objectsPane.grid(row=0, column=0)
+            self.detailsPane.grid(row=0, column=1)
+            self.rowconfigure(0, weight=0)
+            self.rowconfigure(1, weight=1)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=1)            
+            
+        else:
+            self.consolePane.grid(sticky=tk.W+tk.E+tk.N+tk.S)
+            self.rowconfigure(0, weight=1)
+            self.rowconfigure(1, weight=0)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)  
 
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
