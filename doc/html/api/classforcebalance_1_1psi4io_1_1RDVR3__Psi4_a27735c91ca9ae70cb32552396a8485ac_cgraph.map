@@ -1,4 +1,4 @@
 <map id="forcebalance.psi4io.RDVR3_Psi4.indicate" name="forcebalance.psi4io.RDVR3_Psi4.indicate">
-<area shape="rect" id="node2" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a8c4cf7a59ef8714519631145669a5df9" title="forcebalance.psi4io.RDVR3\l_Psi4.driver" alt="" coords="227,5,400,49"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a70936cb704ab5df307013cc6aa5b85c8" title="LPW 04&#45;17&#45;2013." alt="" coords="448,5,621,49"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a728adb334e4ad6e26200c265fc2f351a" title="Create a grid file and a psi4 input file in the absolute path and submit it to the work queue..." alt="" coords="247,5,436,51"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="248,74,435,121"/>
 </map>

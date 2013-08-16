@@ -92,7 +92,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 <a href="output_8py.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1output.html">    1</a></span>&#160;<span class="keyword">from</span> logging <span class="keyword">import</span> *</div>
-<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="keyword">import</span> sys</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;<span class="keyword">import</span> sys, re</div>
 <div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;</div>
 <div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;<span class="keyword">class </span><a class="code" href="classforcebalance_1_1output_1_1ForceBalanceLogger.html" title="This logger starts out with a default handler that writes to stdout addHandler removes this default t...">ForceBalanceLogger</a>(Logger):</div>
 <div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;This logger starts out with a default handler that writes to stdout</span></div>
@@ -146,7 +146,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">def </span><a class="code" href="classforcebalance_1_1output_1_1RawFileHandler.html#a55d391dbd042a51aa1d15106151eecd3">emit</a>(self, record):</div>
 <div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        message = record.getMessage()</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        message = re.sub(<span class="stringliteral">&quot;\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, message)</div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html">   56</a></span>&#160;        message = re.sub(<span class="stringliteral">&quot;\r&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, message)</div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html">   56</a></span>&#160;        message = re.sub(<span class="stringliteral">&quot;\r&quot;</span>, <span class="stringliteral">&quot;\n&quot;</span>, message)</div>
 <div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html#a1bb68743fcd45e71a280599a3658c00c">   57</a></span>&#160;        self.stream.write(message)</div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        self.flush()</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
@@ -158,7 +158,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 12 2013 14:10:47 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Aug 16 2013 10:59:24 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

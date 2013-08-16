@@ -34,6 +34,6 @@ var searchData=
   ['stage',['stage',['../classforcebalance_1_1target_1_1Target.html#af8d2a4658c87841e40296795aec478bb',1,'forcebalance::target::Target']]],
   ['statisticalinefficiency',['statisticalInefficiency',['../namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10',1,'forcebalance::nifty']]],
   ['step',['step',['../classforcebalance_1_1optimizer_1_1Optimizer.html#aacc231ff56f5d87597a95f4e543360a2',1,'forcebalance::optimizer::Optimizer']]],
-  ['submit_5fjobs',['submit_jobs',['../classforcebalance_1_1liquid_1_1Liquid.html#a716e28bb5572b3273036ac753b7e1e1d',1,'forcebalance.liquid.Liquid.submit_jobs()'],['../classforcebalance_1_1target_1_1Target.html#a78cd29b94cbcc201eed99c78aaef46a4',1,'forcebalance.target.Target.submit_jobs()']]],
+  ['submit_5fjobs',['submit_jobs',['../classforcebalance_1_1liquid_1_1Liquid.html#a716e28bb5572b3273036ac753b7e1e1d',1,'forcebalance.liquid.Liquid.submit_jobs()'],['../classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a728adb334e4ad6e26200c265fc2f351a',1,'forcebalance.psi4io.RDVR3_Psi4.submit_jobs()'],['../classforcebalance_1_1target_1_1Target.html#a78cd29b94cbcc201eed99c78aaef46a4',1,'forcebalance.target.Target.submit_jobs()']]],
   ['system_5fdriver',['system_driver',['../classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER.html#a615e696facc0170924921bc8cdd4525e',1,'forcebalance::tinkerio::BindingEnergy_TINKER']]]
 ];

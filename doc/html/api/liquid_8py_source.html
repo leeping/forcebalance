@@ -309,8 +309,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;            <span class="comment"># printcool_dictionary(self.RefData[head],head)</span></div>
 <div class="line"><a name="l00217"></a><span class="lineno"><a class="code" href="classforcebalance_1_1liquid_1_1Liquid.html#a2c10490d9073a069bd19361f386422ef">  217</a></span>&#160;        <span class="comment"># Create labels for the directories.</span></div>
 <div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;        self.<a class="code" href="classforcebalance_1_1liquid_1_1Liquid.html#a50f976d2d3d6a1c261756035a26390e2">Labels</a> = [<span class="stringliteral">&quot;%.2fK-%.1f%s&quot;</span> % i <span class="keywordflow">for</span> i <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1liquid_1_1Liquid.html#a2c10490d9073a069bd19361f386422ef">PhasePoints</a>]</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        <span class="comment"># print global_opts</span></div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        <span class="comment"># print default_denoms</span></div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;        logger.debug(<span class="stringliteral">&quot;global_opts:\n%s\n&quot;</span> % str(global_opts))</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;        logger.debug(<span class="stringliteral">&quot;default_denoms:\n%s\n&quot;</span> % str(default_denoms))</div>
 <div class="line"><a name="l00221"></a><span class="lineno"><a class="code" href="classforcebalance_1_1liquid_1_1Liquid.html#a50f976d2d3d6a1c261756035a26390e2">  221</a></span>&#160;        <span class="keywordflow">for</span> opt <span class="keywordflow">in</span> global_opts:</div>
 <div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;            <span class="keywordflow">if</span> <span class="stringliteral">&quot;_denom&quot;</span> <span class="keywordflow">in</span> opt:</div>
 <div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;                <span class="comment"># Record entries from the global_opts dictionary so they can be retrieved from other methods.</span></div>
@@ -592,10 +592,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00499"></a><span class="lineno">  499</span>&#160;                mm = BPoints.index(PT)</div>
 <div class="line"><a name="l00500"></a><span class="lineno">  500</span>&#160;                <span class="keywordflow">for</span> kk, PT1 <span class="keywordflow">in</span> enumerate(BPoints):</div>
 <div class="line"><a name="l00501"></a><span class="lineno">  501</span>&#160;                    k = Points.index(PT1)</div>
-<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;                    <span class="comment"># print &quot;Will fill W2[%i:%i,%i] with W1[%i:%i,%i]&quot; % (k*Shots,k*Shots+Shots,m,kk*Shots,kk*Shots+Shots,mm)</span></div>
+<div class="line"><a name="l00502"></a><span class="lineno">  502</span>&#160;                    logger.debug(<span class="stringliteral">&quot;Will fill W2[%i:%i,%i] with W1[%i:%i,%i]\n&quot;</span> % (k*Shots,k*Shots+Shots,m,kk*Shots,kk*Shots+Shots,mm))</div>
 <div class="line"><a name="l00503"></a><span class="lineno">  503</span>&#160;                    W2[k*Shots:k*Shots+Shots,m] = W1[kk*Shots:kk*Shots+Shots,mm]</div>
 <div class="line"><a name="l00504"></a><span class="lineno">  504</span>&#160;            <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;                <span class="comment"># print &quot;Will fill W2[%i:%i,%i] with equal weights&quot; % (m*Shots,m*Shots+Shots,m)</span></div>
+<div class="line"><a name="l00505"></a><span class="lineno">  505</span>&#160;                logger.debug(<span class="stringliteral">&quot;Will fill W2[%i:%i,%i] with equal weights\n&quot;</span> % (m*Shots,m*Shots+Shots,m))</div>
 <div class="line"><a name="l00506"></a><span class="lineno">  506</span>&#160;                W2[m*Shots:m*Shots+Shots,m] = 1.0/Shots</div>
 <div class="line"><a name="l00507"></a><span class="lineno">  507</span>&#160;</div>
 <div class="line"><a name="l00508"></a><span class="lineno">  508</span>&#160;        <span class="comment"># Run MBAR on the monomers.  This is barely necessary.</span></div>
@@ -829,7 +829,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 12 2013 14:10:47 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Aug 16 2013 10:59:24 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>
