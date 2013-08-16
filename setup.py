@@ -4,7 +4,6 @@ setup.py: Install ForceBalance.
 """
 VERSION="1.1" # Make sure to change the version here, and also in bin/ForceBalance.py, doc/header.tex and doc/doxygen.cfg!
 __author__ = "Lee-Ping Wang"
-__version__ = VERSION
 
 from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
@@ -12,6 +11,7 @@ import os,sys
 import shutil
 import glob
 import argparse
+import subprocess
 
 try:
     import numpy
@@ -20,6 +20,18 @@ except ImportError:
     print "Error importing numpy and scipy but these are required to install ForceBalance"
     print "Please make sure the numpy and scipy modules are installed and try again"
     exit()
+    
+# use git to find current version, or read from .__version__    
+versioning_file = os.path.join(os.path.dirname(__file__), '.__version__')
+try:
+    __version__ = '-'.join(subprocess.check_output(["git", "describe"]).strip().split('-'))
+    
+    with open(versioning_file, 'w') as fh:
+        fh.write(__version__)
+    subprocess.call(["git", "add", ".__version__"])
+except:
+    with open(versioning_file, 'r') as fh:
+        __version__ = fh.read().strip()
 
 # DCD file reading module
 DCD = Extension('forcebalance/_dcdlib',
@@ -125,7 +137,7 @@ def buildKeywordDictionary(args):
     from distutils.core import Extension
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
-    setupKeywords["version"]           = VERSION
+    setupKeywords["version"]           = __version__
     setupKeywords["author"]            = "Lee-Ping Wang"
     setupKeywords["author_email"]      = "leeping@stanford.edu"
     setupKeywords["license"]           = "GPL 3.0"
@@ -176,7 +188,7 @@ def buildKeywordDictionary(args):
 def doClean():
     """Remove existing forcebalance module folder before installing"""
     try:
-        dir=os.path.dirname(__import__('forcebalance').__file__)
+        forcebalance_dir=os.path.dirname(__import__('forcebalance').__file__)
     except ImportError:
         print "Couldn't find existing forcebalance installation. Nothing to clean...\n"
         return
@@ -184,8 +196,9 @@ def doClean():
         print "Couldn't read forcebalance location... Continuing with regular install"
         return
 
-    raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % dir)
-    shutil.rmtree(dir)
+    raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % forcebalance_dir)
+    os.system("rm -f %s/../forcebalance-*.egg-info" % forcebalance_dir)
+    shutil.rmtree(forcebalance_dir)
     
 def main():
     # if len(os.path.split(__file__)[0]) > 0:
