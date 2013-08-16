@@ -7,7 +7,7 @@ modules for other programs because it's so simple.
 @date 01/2012
 """
 
-import os, shutil
+import os, sys, glob, shutil
 from re import match, sub, split, findall
 from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
 import numpy as np
@@ -18,7 +18,7 @@ from forcebalance.finite_difference import in_fd, f1d2p, f12d3p, fdwrap
 from collections import defaultdict, OrderedDict
 import itertools
 from forcebalance.target import Target
-
+from forcebalance.nifty import queue_up_src_dest, getWorkQueue
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
@@ -338,6 +338,74 @@ class RDVR3_Psi4(Target):
 
         return
 
+    def submit_jobs(self, mvals, AGrad=True, AHess=True):
+        # This routine is called by Objective.stage() will run before "get".
+        # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
+        #
+        self.tdir = os.getcwd()
+        wq = getWorkQueue()
+        if wq == None:
+            return
+
+        def fdwrap_(func,mvals0,pidx,key=None,**kwargs):
+            def func1(arg):
+                mvals = list(mvals0)
+                mvals[pidx] += arg
+                logger.info("\rfdwrap: " + func.__name__ + " [%i] = % .1e " % (pidx, arg) + ' '*50)
+                if key != None:
+                    return func(mvals,arg,**kwargs)[key]
+                else:
+                    return func(mvals,arg,**kwargs)
+            return func1
+
+        def submit_psi(this_apath, mname, these_mvals):
+            """ Create a grid file and a psi4 input file in the absolute path and submit it to the work queue. """
+            # print "Setting up the calculation:", this_apath
+            cwd = os.getcwd()
+            if not os.path.exists(this_apath) : os.makedirs(this_apath)
+            os.chdir(this_apath)
+            self.FF.make(these_mvals)
+            o = open('objective.dat','w')
+            for line in self.objfiles[d]:
+                s = line.split()
+                if len(s) > 2 and s[0] == 'path' and s[1] == '=':
+                    print >> o, "path = '%s'" % os.getcwd()
+                elif len(s) > 2 and s[0] == 'set' and s[1] == 'objective_path':
+                    print >> o, "opath = '%s'" % os.getcwd()
+                    print >> o, "set objective_path $opath"
+                else:
+                    print >> o, line,
+            o.close()
+            if wq == None:
+                logger.info("There is no Work Queue!!!\n")
+                sys.exit()
+            else:
+                input_files = [(os.path.join(this_apath, i), i) for i in glob.glob("*")]
+                input_files += [(os.path.join(self.tgtdir,d,"build.dat"), "build.dat")]
+                input_files += [(os.path.join(os.path.split(__file__)[0],"data","run_psi_rdvr3_objective.sh"), "run_psi_rdvr3_objective.sh")]
+                queue_up_src_dest(wq,"sh run_psi_rdvr3_objective.sh %s &> run_psi_rdvr3_objective.log" % mname,
+                                  input_files=input_files,
+                                  output_files=[(os.path.join(this_apath, i),i) for i in ["run_psi_rdvr3_objective.log", "output.dat"]])
+            os.chdir(cwd)
+
+        for d in self.objfiles:
+            logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
+            odir = os.path.join(os.getcwd(),d)
+            if os.path.exists(odir):
+                shutil.rmtree(odir)
+            os.makedirs(odir)
+            apath = os.path.join(odir, "current")
+            submit_psi(apath, d, mvals)
+            for p in range(self.FF.np):
+                def subjob(mvals_,h):
+                    apath = os.path.join(odir, str(p), str(h))
+                    submit_psi(apath, d, mvals_)
+                    #logger.info("Will set up a job for %s, parameter %i\n" % (d, p))
+                    return 0.0
+                if self.callderivs[d][p]:
+                    f12d3p(fdwrap_(subjob, mvals, p), h = self.h, f0 = 0.0)
+            
+
     def driver(self, mvals, d):
         ## Create the force field file.
         pvals = self.FF.make(mvals)
@@ -386,6 +454,7 @@ class RDVR3_Psi4(Target):
         self.gradd = OrderedDict()
         self.hdiagd = OrderedDict()
         bidirect = False
+        wq = getWorkQueue()
 
         def fdwrap2(func,mvals0,pidx,qidx,key=None,**kwargs):
             def func2(arg1,arg2):
@@ -414,28 +483,42 @@ class RDVR3_Psi4(Target):
 
         for d in self.objfiles:
             logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
-            x = self.driver(mvals, d)
+            if wq == None:
+                x = self.driver(mvals, d)
             grad  = np.zeros(n,dtype=float)
             hdiag = np.zeros(n,dtype=float)
             hess  = np.zeros((n,n),dtype=float)
             for p in range(self.FF.np):
                 if self.callderivs[d][p]:
+                    def reader(mvals_,h):
+                        apath = os.path.join(self.tdir, d, str(p), str(h))
+                        answer = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
+                        return answer
                     if AHess:
-                        grad[p], hdiag[p] = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                        if wq != None:
+                            apath = os.path.join(self.tdir, d, "current")
+                            x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
+                            grad[p], hdiag[p] = f12d3p(fdwrap(reader, mvals), h = self.h, f0 = x)
+                        else:
+                            grad[p], hdiag[p] = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
                         hess[p,p] = hdiag[p]
-                        # for q in range(p):
-                        #     if self.callderivs[d][q]:
-                        #         if bidirect:
-                        #             hessentry = f2d5p(fdwrap2(self.driver, mvals, p, q, d=d), h = self.h)
-                        #         else:
-                        #             hessentry = f2d4p(fdwrap2(self.driver, mvals, p, q, d=d), h = self.h, f0 = x)
-                        #         hess[p,q] = hessentry
-                        #         hess[q,p] = hessentry
                     elif AGrad:
                         if bidirect:
-                            grad[p], _ = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                            if wq != None:
+                                apath = os.path.join(self.tdir, d, "current")
+                                x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
+                                grad[p], _ = f12d3p(fdwrap(reader, mvals), h = self.h, f0 = x)
+                            else:
+                                grad[p], _ = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
                         else:
-                            grad[p] = f1d2p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                            if wq != None:
+                                # Since the calculations are submitted as 3-point finite difference, this part of the code
+                                # actually only reads from half of the completed calculations.
+                                apath = os.path.join(self.tdir, d, "current")
+                                x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
+                                grad[p] = f1d2p(fdwrap(reader, mvals), h = self.h, f0 = x)
+                            else:
+                                grad[p] = f1d2p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
                             
             self.objd[d] = x
             self.gradd[d] = grad

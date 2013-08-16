@@ -89,26 +89,31 @@ class CalculationObject(ForceBalanceObject):
         return properties
 
     def run(self):
-        #options, tgt_opts = parse_inputs(input_file)
-        ## The force field component of the project
-        #forcefield  = FF(options)
-        ## The objective function
-        objective   = forcebalance.objective.Objective(self.opts, self.tgt_opts, self.properties['forcefield'].forcefield)
-        ## The optimizer component of the project
-        optimizer   = forcebalance.optimizer.Optimizer(self.opts, objective, self.properties['forcefield'].forcefield)
-        ## Actually run the optimizer.
-        optimizer.Run()
-        
-        
-        resultopts = self.opts.copy()
-        resultopts.update({"ffdir" : "result"})
-        
-        # temporarily silence nifty and forcefield while reading the results forcefield
-        forcebalance.output.getLogger("forcebalance.forcefield").propagate = False
-        forcebalance.output.getLogger("forcebalance.nifty").propagate = False
-        self.properties['result'] = ForcefieldObject(resultopts)
-        forcebalance.output.getLogger("forcebalance.forcefield").propagate = True
-        forcebalance.output.getLogger("forcebalance.nifty").propagate = True
+        try:
+            #options, tgt_opts = parse_inputs(input_file)
+            ## The force field component of the project
+            #forcefield  = FF(options)
+            ## The objective function
+            objective   = forcebalance.objective.Objective(self.opts, self.tgt_opts, self.properties['forcefield'].forcefield)
+            ## The optimizer component of the project
+            optimizer   = forcebalance.optimizer.Optimizer(self.opts, objective, self.properties['forcefield'].forcefield)
+            ## Actually run the optimizer.
+            optimizer.Run()
+            
+            
+            resultopts = self.opts.copy()
+            resultopts.update({"ffdir" : "result"})
+            
+            # temporarily silence nifty and forcefield while reading the results forcefield
+            forcebalance.output.getLogger("forcebalance.forcefield").disabled = True
+            forcebalance.output.getLogger("forcebalance.nifty").propagate = True
+            self.properties['result'] = ForcefieldObject(resultopts)
+            forcebalance.output.getLogger("forcebalance.forcefield").disabled = False
+            forcebalance.output.getLogger("forcebalance.nifty").disabled = False
+        except:
+            import traceback
+            logger = forcebalance.output.getLogger("forcebalance")
+            logger.critical("Calculation failed\n%s" % traceback.format_exc())
         
 # maybe the current implementation of TargetObject should be merged here
 # to keep all options in the same place?

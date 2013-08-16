@@ -183,7 +183,7 @@ def doClean():
         print "Couldn't read forcebalance location... Continuing with regular install"
         return
 
-    raw_input("All files in %s will be deleted for clean install\nPress <Enter> to continue, <Ctrl+C> to abort\n" % dir)
+    raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % dir)
     shutil.rmtree(dir)
     
 def main():
