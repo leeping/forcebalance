@@ -12,6 +12,8 @@ except ImportError:
 
 import parser, forcefield, optimizer, objective, output
 from collections import defaultdict
+import pkg_resources
+__version__ = pkg_resources.get_distribution("forcebalance").version
 
 # Global variable corresponding to the Work Queue object
 WORK_QUEUE = None
