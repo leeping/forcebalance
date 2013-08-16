@@ -21,6 +21,7 @@ class TargetTests(object):
 
         self.logger.debug("Evaluating objective function for target...\n")
         objective = self.target.get(self.mvals)
+        self.target.indicate()
         self.logger.debug("objective =\n%s" % str(objective))
         
         # check objective dictionary keys
