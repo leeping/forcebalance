@@ -58,7 +58,19 @@ class ForceBalanceTestCase(unittest.TestCase):
             if self.longMessage and msg:
                 reason += msg
             raise self.failureException(reason)
-
+            
+    def assertEqual(self, first, second, msg=None):
+        self.logger.debug(">ASSERT(%s==%s)\n" % (str(first), str(second)))
+        return super(ForceBalanceTestCase,self).assertEqual(first,second,msg)
+        
+    def assertNotEqual(self, first, second, msg=None):
+        self.logger.debug(">ASSERT(%s!=%s)\n" % (str(first), str(second)))
+        return super(ForceBalanceTestCase,self).assertNotEqual(first,second,msg)
+        
+    def assertTrue(self, expr, msg=None):
+        self.logger.debug(">ASSERT(%s)\n" % (str(expr)))
+        return super(ForceBalanceTestCase,self).assertTrue(expr, msg)
+        
 class ForceBalanceTestResult(unittest.TestResult):
     """This manages the reporting of test results as they are run,
        and also records results in the internal data structures provided

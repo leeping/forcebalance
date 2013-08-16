@@ -3,9 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                   Last updated July 30, 2013                       |#
-#|                                                                    |#
-#|               [ IN PROGRESS, USE AT YOUR OWN RISK ]                |#
+#|                  Last updated August 14, 2013                      |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -1282,6 +1280,7 @@ class Molecule(object):
             elif ln == 1:
                 comms.append(line.strip())
             else:
+                line = re.sub(r"([0-9])(-[0-9])", r"\1 \2", line)
                 sline = line.split()
                 xyz.append([float(i) for i in sline[1:]])
                 if len(elem) < na:
@@ -1975,6 +1974,8 @@ class Molecule(object):
                     xyzs.append(np.array(xyz))
                     xyz  = []
                     XMode = 0
+            elif re.match("Standard Nuclear Orientation".lower(), line.lower()):
+                XMode = 1
             if MMode >= 1:
                 # Perfectionist here; matches integer, element, and two floating points
                 if re.match("^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){2}$", line):
@@ -1988,8 +1989,6 @@ class Molecule(object):
                     mkchgThis = []
                     mkspnThis = []
                     MMode = 0
-            elif re.match("Standard Nuclear Orientation".lower(), line.lower()):
-                XMode = 1
             elif re.match("Ground-State Mulliken Net Atomic Charges".lower(), line.lower()):
                 MMode = 1
             for key, val in float_match.items():
