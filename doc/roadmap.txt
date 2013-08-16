@@ -2,10 +2,11 @@
 
 ForceBalance is a work in progress and is continually being improved and expanded! Here are some current and future project development ideas.
 
-\section summer Short Term (summer 2013)
-\li Create and expand project unit testing framework to encourage a test driven development approach
-\li Improve/consolidate existing documentation
+\section current Current Development Goals:
+\li Implementing and expanding support for running target calculations in parallel across multiple nodes
+\li Expand unit test cases to provide more thorough coverage of forcebalance modules
 
-\section longterm Long Term
+\section longterm Longterm Development Ideas
 \li Development of a ForceBalance GUI interface to complement the current command line interface
+\li Visualization of running calculations
 \li More comprehensive tutorial to walk users through the initial process of setting up targets and preparing for a successful ForceBalance run
