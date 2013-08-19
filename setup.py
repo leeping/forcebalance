@@ -15,9 +15,10 @@ import argparse
 
 try:
     import numpy
+    import scipy
 except ImportError:
-    print "Couldn't import numpy but this is required to install ForceBalance"
-    print "Please install the numpy package and try again"
+    print "Error importing numpy and scipy but these are required to install ForceBalance"
+    print "Please make sure the numpy and scipy modules are installed and try again"
     exit()
 
 # DCD file reading module
