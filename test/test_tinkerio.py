@@ -21,11 +21,6 @@ class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
                              'fragment1':'1-5',
                              'fragment2':'6-8',
                              'energy-upper':20.0})
-                             
-        self.logger.debug("\nOptions:\n%s\n" % str(self.options))
-        self.logger.debug("\nTarget Options:\n%s\n" % str(self.tgt_opt))
-                             
-        if not os.path.exists(self.options['tinkerpath']): self.skipTest("options['tinkerpath'] is not a valid path")
 
         try:
             self.ff = forcebalance.forcefield.FF(self.options)
