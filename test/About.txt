@@ -19,31 +19,6 @@ before running the test suite to ensure tests are being run on the proper file v
 possibly running setup.py to make sure the latest version of forcebalance is installed.
 
 =====================
-=   Headless Config =
-=====================
-In headless mode, tests results are not printed to the screen. Tests will be run in this
-mode when a headless config file is provided as a command line argument:
-python test --headless-config=config_file.conf
-
-the config file is a line separated list of options in the form
-option=value
-which determine where test results are sent
-
-Available options to be placed in the headless config file are:
-log_location (string)       : path to put test log. If not specified, log is not saved
-enable_smtp (string)        : valid values are
-                              'true'- send test results via email after every test
-                              'error'- only send if any tests fail or have errors
-smtp_server (string)        : the url of the smtp server used for sending log information
-smtp_port (integer)         : the port number to use when connecting to the smtp server
-smtp_user (string)          : the user to use when connecting to the smtp server
-smtp_password (string)      : the password to use when connecting to the smtp server
-smtp_tls (boolean)          : whether the smtp server requires TLS when authenticating
-smtp_destination (string)   : the destination address where the error log will be sent
-smtp_source (string)        : specifies the "from:" header in the outgoing email
-smtp_subject (string)       : specifies the subject of the outgoing email
-
-=====================
 =   Contents        =
 =====================
 Contents of this directory are as follows:
@@ -60,10 +35,6 @@ Contents of this directory are as follows:
 
     __test__.py : some basic test cases that test result presentation
                   This is also a good template to use when creating a new test module file
-
-==========================
-=   Test Organization    =
-==========================
 
 =========================
 =   Writing Test Cases  =
@@ -100,7 +71,8 @@ Test Cases contain several special methods which determine what happens during a
 Test methods will usually perform some action and call self.assert* functions provided by the unittest framework.
 These assert methods check some condition. If the condition is not met, the test fails and an error message is printed.
 The most common asserts used are self.assertEqual/self.assertNotEqual and self.assertTrue/self.assertFalse, but there
-are a number of others provided by the unittest framework.
+are a number of others provided by the unittest framework (http://docs.python.org/2/library/unittest.html#assert-methods).
+Test cases have fail and skipTest methods which both take as input a string explaining the reason for failing or skipping.
 
 Some forcebalance modules/classes provide base classes which are never instantiated themselves, but which provide
 a framework for other more specific classes to expand upon. In this case, classes with general tests that can be run
@@ -112,3 +84,37 @@ the TestCase class header for the AbInitio_GMX class looks like this:
     class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests)
 This way TargetTests can provide tests for all Target subclasses but the setup for specific types of targets can be
 done by the individual subclass test cases.
+
+=============================
+=   Test case documentation =
+=============================
+
+When possible, try to include docstrings and comments within test cases. The test runner will automatically print
+the first line of the docstring for the test method currently being run. In addition, it would probably be helpful to 
+send as much information as possible to the debug logger (ForceBalanceTestCase provides an instance logger, so you can use
+self.logger.debug(msg) from anywhere within a test case and not worry about having to import things in a test module.
+
+=====================
+=   Headless Config =
+=====================
+In headless mode, tests results are not printed to the screen. Tests will be run in this
+mode when a headless config file is provided as a command line argument:
+python test --headless-config=config_file.conf
+
+the config file is a line separated list of options in the form
+option=value
+which determine where test results are sent
+
+Available options to be placed in the headless config file are:
+log_location (string)       : path to put test log. If not specified, log is not saved
+enable_smtp (string)        : valid values are
+                              'true'- send test results via email after every test
+                              'error'- only send if any tests fail or have errors
+smtp_server (string)        : the url of the smtp server used for sending log information
+smtp_port (integer)         : the port number to use when connecting to the smtp server
+smtp_user (string)          : the user to use when connecting to the smtp server
+smtp_password (string)      : the password to use when connecting to the smtp server
+smtp_tls (boolean)          : whether the smtp server requires TLS when authenticating
+smtp_destination (string)   : the destination address where the error log will be sent
+smtp_source (string)        : specifies the "from:" header in the outgoing email
+smtp_subject (string)       : specifies the subject of the outgoing email
