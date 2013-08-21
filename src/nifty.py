@@ -23,7 +23,7 @@ from numpy import array, diag, dot, eye, mat, mean, transpose
 from numpy.linalg import norm, svd
 import threading
 import pickle
-import time, datetime
+import time
 import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
@@ -654,7 +654,7 @@ def wq_wait1(wq, wait_time=10, verbose=False):
             logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
         else:
             logger.info("%s : %i/%i workers busy; %i/%i jobs complete\r" %\
-            (datetime.datetime.fromtimestamp(time.mktime(datetime.datetime.now().timetuple())).ctime(),
+            (time.ctime(),
              wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
              wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched)) 
             if time.time() - wq_wait1.t0 > 900:
