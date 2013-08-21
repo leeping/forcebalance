@@ -350,7 +350,10 @@ class Gromacs_MD(MDEngine):
             self.callgmx("mdrun -v -deffnm %s-min" % phase)
         # Run equilibration.
         edit_mdp("%s.mdp" % phase, "%s-eq.mdp" % phase, dict(eq_opts[phase], **save_opts), verbose=True)
-        self.callgmx("grompp -maxwarn 1 -c %s-min.gro -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (phase, phase, phase, phase))
+        if minimize:
+            self.callgmx("grompp -maxwarn 1 -c %s-min.gro -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (phase, phase, phase, phase))
+        else:
+            self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (phase, phase, phase, phase))
         self.callgmx("mdrun -v -deffnm %s-eq -nt %i -stepout %i" % (phase, args.nt, nsteps), expand_cr=True)
         if int(eq_opts[phase]["nsteps"]) == 0:
             shutil.copy2("%s-min.gro" % phase, "%s-eq.gro" % phase)
