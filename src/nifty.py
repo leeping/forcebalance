@@ -71,8 +71,8 @@ def encode(l):
 
 def segments(e):
     # Takes encoded input.
-    begins = np.array([sum([k[0] for k in e][:j]) for j,i in enumerate(e) if i[1] == 1])
-    lens = np.array([i[0] for i in e if i[1] == 1])
+    begins = array([sum([k[0] for k in e][:j]) for j,i in enumerate(e) if i[1] == 1])
+    lens = array([i[0] for i in e if i[1] == 1])
     return [(i, i+j) for i, j in zip(begins, lens)]
 
 def commadash(l):
@@ -418,11 +418,11 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     """
 
     # Create numpy copies of input arguments.
-    A_n = np.array(A_n)
+    A_n = array(A_n)
     if B_n is not None:
-        B_n = np.array(B_n)
+        B_n = array(B_n)
     else:
-        B_n = np.array(A_n)
+        B_n = array(A_n)
     # Get the length of the timeseries.
     N = A_n.size
     # Be sure A_n and B_n have the same dimensions.

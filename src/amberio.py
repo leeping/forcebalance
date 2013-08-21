@@ -11,7 +11,7 @@ import os
 from re import match, sub, split, findall
 from forcebalance.nifty import isint, isfloat, _exec, LinkFile
 import numpy as np
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 
 from forcebalance.output import getLogger
