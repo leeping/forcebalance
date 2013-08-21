@@ -1,14 +1,23 @@
 from __init__ import ForceBalanceTestCase
 import unittest
 import numpy
-import os
-import work_queue
+import os, re
 import forcebalance
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 from collections import defaultdict
 
+try:
+    import work_queue
+except ImportError:
+    work_queue = None
+
 class TestNifty(ForceBalanceTestCase):
+    def setUp(self):
+        # skip work_queue tests if work_queue could not be imported
+        if re.match(".*work_queue.*", self.id().split('.')[-1]) and not work_queue:
+            self.skipTest("work_queue module not installed")
+        
     def test_nifty_functions(self):
         """Check utility functions in forcebalance.nifty"""
 
