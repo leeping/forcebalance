@@ -405,7 +405,7 @@ class RemoteTarget(Target):
         with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, self.r_options, self.r_tgt_opts, self.FF),f)
         
         tar = tarfile.open(name="target.tar.bz2", mode='w:bz2')
-        tar.add("%s/targets/%s" % (self.root, self.name), arcname = self.name)
+        tar.add("%s/targets/%s" % (self.root, self.name), arcname = "targets/%s" % self.name)
         tar.close()
         
         tar = tarfile.open(name="forcefield.tar.bz2", mode='w:bz2')
@@ -429,7 +429,8 @@ class RemoteTarget(Target):
             tgt=self)
 
     def get(self,mvals,AGrad=False,AHess=False):
-        return forcebalance.nifty.lp_load('objective.p')
+        with open('objective.p','r') as f:
+            return forcebalance.nifty.lp_load(f)
         
     def indicate(self):
         pass
