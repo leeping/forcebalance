@@ -37,8 +37,5 @@ logger = forcebalance.output.getLogger("forcebalance")
 logger.addHandler(forcebalance.output.RawFileHandler('%s_%i_indicate.log' % (Tgt.name, n)))
 Tgt.indicate()
 
-os.chdir(Tgt.root)
-os.system('rm -rf temp forcefield targets backups')
-
 print "\n"
     
