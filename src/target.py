@@ -401,14 +401,17 @@ class RemoteTarget(Target):
         self.r_tgt_opts = tgt_opts.copy()
         self.r_tgt_opts["remote"]=False
         
-    def submit_jobs(self, mvals, AGrad=False, AHess=False):
-        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, Counter(), self.r_options, self.r_tgt_opts, self.FF),f)
-        
-        tar = tarfile.open(name="target.tar.bz2", mode='w:bz2')
+        tar = tarfile.open(name="temp/%s/target.tar.bz2" % self.name, mode='w:bz2')
         tar.add("%s/targets/%s" % (self.root, self.name), arcname = "targets/%s" % self.name)
         tar.close()
         
+        self.remote_indicate = ""
+        
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, Counter(), self.r_options, self.r_tgt_opts, self.FF),f)
+        
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
+        forcebalance.nifty.LinkFile(os.path.join(self.root,"temp", self.name, "target.tar.bz2"),"target.tar.bz2")
         
         wq = getWorkQueue()
         
@@ -426,11 +429,12 @@ class RemoteTarget(Target):
             tgt=self)
 
     def get(self,mvals,AGrad=False,AHess=False):
+        with open('%s_%i_indicate.log' % (self.name, Counter())) as f:
+            self.remote_indicate = f.read()
         with open('%s_%i_objective.p' % (self.name, Counter()),'r') as f:
             return forcebalance.nifty.lp_load(f)
         
     def indicate(self):
-        pass
-        # should take output from remote target.indicate() call
+        logger.info(self.remote_indicate + '\n')
 
 
