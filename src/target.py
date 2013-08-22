@@ -402,20 +402,17 @@ class RemoteTarget(Target):
         self.r_tgt_opts["remote"]=False
         
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
-        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, self.r_options, self.r_tgt_opts, self.FF),f)
+        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, Counter(), self.r_options, self.r_tgt_opts, self.FF),f)
         
         tar = tarfile.open(name="target.tar.bz2", mode='w:bz2')
         tar.add("%s/targets/%s" % (self.root, self.name), arcname = "targets/%s" % self.name)
-        tar.close()
-        
-        tar = tarfile.open(name="forcefield.tar.bz2", mode='w:bz2')
-        tar.add("%s/forcefield" % self.root, arcname = "forcefield")
         tar.close()
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
         
         wq = getWorkQueue()
         
+        logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
         # input:
         #   forcebalance.p: pickled mvals, options, and forcefield
         #   rtarget.py: remote target evaluation script
@@ -423,13 +420,13 @@ class RemoteTarget(Target):
         # output:
         #   objective.p: pickled objective function dictionary
         #   indicate.log: results of target.indicate() written to file
-        forcebalance.nifty.queue_up(wq, "python rtarget.py > rtarget.out",
-            ["forcebalance.p", "rtarget.py", "target.tar.bz2", "forcefield.tar.bz2"],
-            ["objective.p", "indicate.log", "rtarget.out"],
+        forcebalance.nifty.queue_up(wq, "python rtarget.py > %s_%i_rtarget.out" % (self.name, Counter()),
+            ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
+            ['%s_%i_objective.p' % (self.name, Counter()), '%s_%i_indicate.log' % (self.name, Counter()), '%s_%i_rtarget.out' % (self.name, Counter())],
             tgt=self)
 
     def get(self,mvals,AGrad=False,AHess=False):
-        with open('objective.p','r') as f:
+        with open('%s_%i_objective.p' % (self.name, Counter()),'r') as f:
             return forcebalance.nifty.lp_load(f)
         
     def indicate(self):
