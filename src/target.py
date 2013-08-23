@@ -408,7 +408,8 @@ class RemoteTarget(Target):
         self.remote_indicate = ""
         
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
-        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, Counter(), self.r_options, self.r_tgt_opts, self.FF),f)
+        id_string = "%s_%i" % (self.name, Counter())
+        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
         forcebalance.nifty.LinkFile(os.path.join(self.root,"temp", self.name, "target.tar.bz2"),"target.tar.bz2")
@@ -423,9 +424,9 @@ class RemoteTarget(Target):
         # output:
         #   objective.p: pickled objective function dictionary
         #   indicate.log: results of target.indicate() written to file
-        forcebalance.nifty.queue_up(wq, "python rtarget.py > %s_%i.out 2>&1" % (self.name, Counter()),
+        forcebalance.nifty.queue_up(wq, "python rtarget.py > %s.out 2>&1" % id_string,
             ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
-            ['%s_%i_objective.p' % (self.name, Counter()), '%s_%i_indicate.log' % (self.name, Counter()), '%s_%i.out' % (self.name, Counter())],
+            ['%s_objective.p' % id_string, '%s_indicate.log' % id_string, '%s.out' % id_string],
             tgt=self)
 
     def get(self,mvals,AGrad=False,AHess=False):

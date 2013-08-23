@@ -11,7 +11,7 @@ logger.setLevel(forcebalance.output.DEBUG)
 
 # load pickled variables from forcebalance.p
 f=open('forcebalance.p', 'r')
-mvals, AGrad, AHess, n, options, tgt_opts, forcefield = forcebalance.nifty.lp_load(f)
+mvals, AGrad, AHess, id_string, options, tgt_opts, forcefield = forcebalance.nifty.lp_load(f)
 f.close()
 
 options['root'] = os.getcwd()
@@ -29,12 +29,12 @@ Tgt.submit_jobs(mvals, AGrad = True, AHess = True)
 
 Ans = Tgt.sget(mvals, AGrad=True, AHess=True)
 
-with open('%s_%i_objective.p' % (Tgt.name, n), 'w') as f:
+with open('%s_objective.p' % id_string, 'w') as f:
     forcebalance.nifty.lp_dump(Ans, f)        # or some other method of storing resulting objective
 
 # also run target.indicate()
 logger = forcebalance.output.getLogger("forcebalance")
-logger.addHandler(forcebalance.output.RawFileHandler('%s_%i_indicate.log' % (Tgt.name, n)))
+logger.addHandler(forcebalance.output.RawFileHandler('%s_indicate.log' % id_string))
 Tgt.indicate()
 
 print "\n"
