@@ -11,7 +11,7 @@ import os, shutil
 from re import match, sub
 from forcebalance.nifty import *
 import numpy as Np
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 from subprocess import Popen, PIPE
 from forcebalance.abinitio import AbInitio
 from vibration import Vibration

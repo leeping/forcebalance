@@ -12,7 +12,7 @@ from re import match, sub, split, findall
 from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
 import numpy as np
 from forcebalance.leastsq import LeastSquares, CheckBasis
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 from string import capitalize
 from forcebalance.finite_difference import in_fd, f1d2p, f12d3p, fdwrap
 from collections import defaultdict, OrderedDict

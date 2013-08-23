@@ -6,11 +6,10 @@ import sys
 import inspect
 #from implemented import Implemented_Targets
 from numpy import argsort, array, diag, dot, eye, linalg, ones, reshape, sum, zeros, exp, log
-from collections import defaultdict
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
+import forcebalance
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import printcool_dictionary, createWorkQueue, getWorkQueue, wq_wait
-from forcebalance.baseclass import ForceBalanceBaseClass
 import datetime
 import traceback
 from forcebalance.output import getLogger
@@ -88,7 +87,7 @@ Implemented_Targets = {
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
 Letters = ['X','G','H']
 
-class Objective(ForceBalanceBaseClass):
+class Objective(forcebalance.BaseClass):
     """ Objective function.
     
     The objective function is a combination of contributions from the different
