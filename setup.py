@@ -2,7 +2,7 @@
 """
 setup.py: Install ForceBalance. 
 """
-VERSION="1.1" # Make sure to change the version here, and also in bin/ForceBalance.py, doc/header.tex and doc/doxygen.cfg!
+VERSION="1.2" # Make sure to change the version here, and also in bin/ForceBalance.py, doc/header.tex and doc/doxygen.cfg!
 __author__ = "Lee-Ping Wang"
 __version__ = VERSION
 
