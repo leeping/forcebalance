@@ -3,7 +3,8 @@
 }
 
 
-Inheritance diagram for forcebalance.\-psi4io.\-T\-H\-C\-D\-F\-\_\-\-Psi4\-:\nopagebreak
+Inheritance diagram for forcebalance.\-psi4io.\-T\-H\-C\-D\-F\-\_\-\-Psi4\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -12,7 +13,8 @@ Inheritance diagram for forcebalance.\-psi4io.\-T\-H\-C\-D\-F\-\_\-\-Psi4\-:\nop
 \end{figure}
 
 
-Collaboration diagram for forcebalance.\-psi4io.\-T\-H\-C\-D\-F\-\_\-\-Psi4\-:\nopagebreak
+Collaboration diagram for forcebalance.\-psi4io.\-T\-H\-C\-D\-F\-\_\-\-Psi4\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -54,7 +56,7 @@ def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491b
 \begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
 \begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
-def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}{set\-\_\-option}
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
 \end{DoxyCompactItemize}
 \subsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
@@ -93,9 +95,9 @@ def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99
 \begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
 \begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
-\hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{Print\-Option\-Dict}
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
 \item 
-\hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{verbose\-\_\-options}
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
 \end{DoxyCompactItemize}
 
 
@@ -209,7 +211,7 @@ Computes the objective function contribution and its gradient.
 
 First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
 
-Definition at line 171 of file target.\-py.
+Definition at line 172 of file target.\-py.
 
 
 
@@ -238,7 +240,7 @@ First the low-\/level 'get' method is called with the analytic gradient and Hess
 
 This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
 
-Definition at line 194 of file target.\-py.
+Definition at line 195 of file target.\-py.
 
 
 
@@ -265,7 +267,7 @@ Computes the objective function contribution without any parametric derivatives.
 
 
 
-Definition at line 154 of file target.\-py.
+Definition at line 155 of file target.\-py.
 
 
 
@@ -310,7 +312,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
 
 
-Definition at line 212 of file target.\-py.
+Definition at line 213 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1psi4io_1_1THCDF__Psi4_aaaa58c83926697adacd34c31af342fc8}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!prepare\-\_\-temp\-\_\-directory@{prepare\-\_\-temp\-\_\-directory}}
 \index{prepare\-\_\-temp\-\_\-directory@{prepare\-\_\-temp\-\_\-directory}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -369,7 +371,7 @@ The input should be something like\-:
 \end{DoxyParams}
 
 
-Definition at line 366 of file target.\-py.
+Definition at line 367 of file target.\-py.
 
 
 
@@ -395,7 +397,7 @@ Back up the temporary directory if desired, delete it and then create a new one.
 
 
 
-Definition at line 218 of file target.\-py.
+Definition at line 219 of file target.\-py.
 
 
 
@@ -408,9 +410,9 @@ Here is the call graph for this function\-:\nopagebreak
 \end{figure}
 
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!set\-\_\-option@{set\-\_\-option}}
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!set\-\_\-option@{set\-\_\-option}}
 \index{set\-\_\-option@{set\-\_\-option}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
-\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-set\-\_\-option (
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-set\-\_\-option (
 \begin{DoxyParamCaption}
 \item[{}]{self, }
 \item[{}]{in\-\_\-dict, }
@@ -420,10 +422,10 @@ Here is the call graph for this function\-:\nopagebreak
 \item[{}]{default = {\ttfamily None}, }
 \item[{}]{forceprint = {\ttfamily False}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 
 
-Definition at line 12 of file baseclass.\-py.
+Definition at line 35 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!sget@{sget}}
 \index{sget@{sget}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -442,7 +444,7 @@ Stages the directory for the target, and then calls 'get'.
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 265 of file target.\-py.
+Definition at line 266 of file target.\-py.
 
 
 
@@ -472,7 +474,7 @@ Stages the directory for the target, and then launches Work Queue processes if a
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 300 of file target.\-py.
+Definition at line 301 of file target.\-py.
 
 
 
@@ -497,7 +499,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}
 
 
-Definition at line 290 of file target.\-py.
+Definition at line 291 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!wq\-\_\-complete@{wq\-\_\-complete}}
 \index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -512,7 +514,7 @@ This method determines whether the Work Queue tasks for the current target have 
 
 
 
-Definition at line 330 of file target.\-py.
+Definition at line 331 of file target.\-py.
 
 
 
@@ -604,7 +606,7 @@ Need the forcefield (here for now)
 
 
 
-Definition at line 138 of file target.\-py.
+Definition at line 139 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1psi4io_1_1THCDF__Psi4_ab406b703826e225ec1e1bb174faf0537}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!G\-B\-Sfnm@{G\-B\-Sfnm}}
 \index{G\-B\-Sfnm@{G\-B\-Sfnm}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -626,7 +628,7 @@ Counts how often the gradient was computed.
 
 
 
-Definition at line 142 of file target.\-py.
+Definition at line 143 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!hct@{hct}}
 \index{hct@{hct}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -637,7 +639,7 @@ Counts how often the Hessian was computed.
 
 
 
-Definition at line 144 of file target.\-py.
+Definition at line 145 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1leastsq_1_1LeastSquares_a7f08641f45285414b080f21ed278f31e}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!M\-A\-Q@{M\-A\-Q}}
 \index{M\-A\-Q@{M\-A\-Q}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -675,12 +677,12 @@ Definition at line 236 of file psi4io.\-py.
 
 Definition at line 138 of file leastsq.\-py.
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!Print\-Option\-Dict@{Print\-Option\-Dict}}
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
-\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}
+\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
 
 
-Definition at line 9 of file baseclass.\-py.
+Definition at line 32 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!rundir@{rundir}}
 \index{rundir@{rundir}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -691,7 +693,7 @@ The directory in which the simulation is running -\/ this can be updated.
 
 Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
 
-Definition at line 136 of file target.\-py.
+Definition at line 137 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!tempdir@{tempdir}}
 \index{tempdir@{tempdir}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -702,7 +704,7 @@ Root directory of the whole project.
 
 Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
 
-Definition at line 134 of file target.\-py.
+Definition at line 135 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1psi4io_1_1THCDF__Psi4_a2325dfcc249e17fce558eaff4ed2f7f1}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!throw\-\_\-outs@{throw\-\_\-outs}}
 \index{throw\-\_\-outs@{throw\-\_\-outs}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -711,12 +713,12 @@ Definition at line 134 of file target.\-py.
 
 Definition at line 106 of file psi4io.\-py.
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!verbose\-\_\-options@{verbose\-\_\-options}}
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
-\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
 
 
-Definition at line 10 of file baseclass.\-py.
+Definition at line 33 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}!xct@{xct}}
 \index{xct@{xct}!forcebalance::psi4io::THCDF_Psi4@{forcebalance\-::psi4io\-::\-T\-H\-C\-D\-F\-\_\-\-Psi4}}
@@ -727,7 +729,7 @@ Counts how often the objective function was computed.
 
 
 
-Definition at line 140 of file target.\-py.
+Definition at line 141 of file target.\-py.
 
 
 

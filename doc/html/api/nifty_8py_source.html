@@ -116,7 +116,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00023"></a><span class="lineno">   23</span>&#160;<span class="keyword">from</span> numpy.linalg <span class="keyword">import</span> norm, svd</div>
 <div class="line"><a name="l00024"></a><span class="lineno">   24</span>&#160;<span class="keyword">import</span> threading</div>
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="keyword">import</span> pickle</div>
-<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">import</span> time, datetime</div>
+<div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="keyword">import</span> time</div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="keyword">import</span> subprocess</div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">from</span> subprocess <span class="keyword">import</span> PIPE, STDOUT</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict, defaultdict</div>
@@ -164,8 +164,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
 <div class="line"><a name="l00072"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a3b437964dc22735bf8a7dcbaf99e413d">   72</a></span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a3b9fd8e29c5d8f1b2114e4d9662dfd61">segments</a>(e):</div>
 <div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="comment"># Takes encoded input.</span></div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    begins = np.array([sum([k[0] <span class="keywordflow">for</span> k <span class="keywordflow">in</span> e][:j]) <span class="keywordflow">for</span> j,i <span class="keywordflow">in</span> enumerate(e) <span class="keywordflow">if</span> i[1] == 1])</div>
-<div class="line"><a name="l00075"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a3b9fd8e29c5d8f1b2114e4d9662dfd61">   75</a></span>&#160;    lens = np.array([i[0] <span class="keywordflow">for</span> i <span class="keywordflow">in</span> e <span class="keywordflow">if</span> i[1] == 1])</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    begins = array([sum([k[0] <span class="keywordflow">for</span> k <span class="keywordflow">in</span> e][:j]) <span class="keywordflow">for</span> j,i <span class="keywordflow">in</span> enumerate(e) <span class="keywordflow">if</span> i[1] == 1])</div>
+<div class="line"><a name="l00075"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a3b9fd8e29c5d8f1b2114e4d9662dfd61">   75</a></span>&#160;    lens = array([i[0] <span class="keywordflow">for</span> i <span class="keywordflow">in</span> e <span class="keywordflow">if</span> i[1] == 1])</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keywordflow">return</span> [(i, i+j) <span class="keywordflow">for</span> i, j <span class="keywordflow">in</span> zip(begins, lens)]</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a9628ee448710667747d8aa5dc166532c">commadash</a>(l):</div>
@@ -511,11 +511,11 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
 <div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;</div>
 <div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;    <span class="comment"># Create numpy copies of input arguments.</span></div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    A_n = np.array(A_n)</div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;    A_n = array(A_n)</div>
 <div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;    <span class="keywordflow">if</span> B_n <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        B_n = np.array(B_n)</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;        B_n = array(B_n)</div>
 <div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;        B_n = np.array(A_n)</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;        B_n = array(A_n)</div>
 <div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    <span class="comment"># Get the length of the timeseries.</span></div>
 <div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;    N = A_n.size</div>
 <div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;    <span class="comment"># Be sure A_n and B_n have the same dimensions.</span></div>
@@ -642,395 +642,396 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00549"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a2ff762a2f2d2b6bb1c7dd067bd1a1e88">  549</a></span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#abe1e72c32252d62a6551b47290c7584f">getWQIds</a>():</div>
 <div class="line"><a name="l00550"></a><span class="lineno">  550</span>&#160;    <span class="keywordflow">return</span> forcebalance.WQIDS</div>
 <div class="line"><a name="l00551"></a><span class="lineno">  551</span>&#160;</div>
-<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ab5f3072ad95e9c75659cb1adac341051">createWorkQueue</a>(wq_port):</div>
-<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;    work_queue.set_debug_flag(<span class="stringliteral">&#39;all&#39;</span>)</div>
-<div class="line"><a name="l00554"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a577abfd36638c5f4dfdade136abaef12">  554</a></span>&#160;    forcebalance.WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=<span class="keyword">True</span>, exclusive=<span class="keyword">False</span>, shutdown=<span class="keyword">False</span>)</div>
-<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    forcebalance.WORK_QUEUE.specify_name(<span class="stringliteral">&#39;forcebalance&#39;</span>)</div>
-<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    forcebalance.WORK_QUEUE.specify_keepalive_timeout(8640000)</div>
-<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;    forcebalance.WORK_QUEUE.specify_keepalive_interval(8640000)</div>
-<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;</div>
-<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue.">queue_up</a>(wq, command, input_files, output_files, tgt=None, verbose=True):</div>
-<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; </span></div>
-<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;<span class="stringliteral">    Submit a job to the Work Queue.</span></div>
-<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;<span class="stringliteral">    @param[in] wq (Work Queue Object)</span></div>
-<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;<span class="stringliteral">    @param[in] command (string) The command to run on the remote worker.</span></div>
-<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;<span class="stringliteral">    @param[in] input_files (list of files) A list of locations of the input files.</span></div>
-<div class="line"><a name="l00566"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d">  566</a></span>&#160;<span class="stringliteral">    @param[in] output_files (list of files) A list of locations of the output files.</span></div>
-<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;    task = work_queue.Task(command)</div>
-<div class="line"><a name="l00569"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#abe1e72c32252d62a6551b47290c7584f">  569</a></span>&#160;    cwd = os.getcwd()</div>
-<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    <span class="keywordflow">for</span> f <span class="keywordflow">in</span> input_files:</div>
-<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;        lf = os.path.join(cwd,f)</div>
-<div class="line"><a name="l00572"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ab5f3072ad95e9c75659cb1adac341051">  572</a></span>&#160;        task.specify_input_file(lf,f)</div>
-<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;    <span class="keywordflow">for</span> f <span class="keywordflow">in</span> output_files:</div>
-<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;        lf = os.path.join(cwd,f)</div>
-<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;        task.specify_output_file(lf,f)</div>
-<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;    task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)</div>
-<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;    task.specify_tag(command)</div>
-<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    taskid = wq.submit(task)</div>
-<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;    <span class="keywordflow">if</span> verbose:</div>
-<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;        logger.info(<span class="stringliteral">&quot;Submitting command &#39;%s&#39; to the Work Queue, taskid %i\n&quot;</span> % (command, taskid))</div>
-<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;    <span class="keywordflow">if</span> tgt != <span class="keywordtype">None</span>:</div>
-<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;        forcebalance.WQIDS[tgt.name].append(taskid)</div>
-<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;        forcebalance.WQIDS[<span class="stringliteral">&quot;None&quot;</span>].append(taskid)</div>
-<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;    </div>
-<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue.">queue_up_src_dest</a>(wq, command, input_files, output_files, tgt=None, verbose=True):</div>
-<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; </span></div>
-<div class="line"><a name="l00588"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7">  588</a></span>&#160;<span class="stringliteral">    Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly</span></div>
-<div class="line"><a name="l00589"></a><span class="lineno">  589</span>&#160;<span class="stringliteral">    specify where the input files come from, and where the output files go to.</span></div>
-<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;<span class="stringliteral">    @param[in] wq (Work Queue Object)</span></div>
-<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;<span class="stringliteral">    @param[in] command (string) The command to run on the remote worker.</span></div>
-<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;<span class="stringliteral">    @param[in] input_files (list of 2-tuples) A list of local and</span></div>
-<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;<span class="stringliteral">    remote locations of the input files.</span></div>
-<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;<span class="stringliteral">    @param[in] output_files (list of 2-tuples) A list of local and</span></div>
-<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="stringliteral">    remote locations of the output files.</span></div>
-<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;    task = work_queue.Task(command)</div>
-<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;    <span class="keywordflow">for</span> f <span class="keywordflow">in</span> input_files:</div>
-<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;        <span class="comment"># print f[0], f[1]</span></div>
-<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;        task.specify_input_file(f[0],f[1])</div>
-<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;    <span class="keywordflow">for</span> f <span class="keywordflow">in</span> output_files:</div>
-<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;        <span class="comment"># print f[0], f[1]</span></div>
-<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        task.specify_output_file(f[0],f[1])</div>
-<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;    task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)</div>
-<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    task.specify_tag(command)</div>
-<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;    taskid = wq.submit(task)</div>
-<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    <span class="keywordflow">if</span> verbose:</div>
-<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;        logger.info(<span class="stringliteral">&quot;Submitting command &#39;%s&#39; to the Work Queue, taskid %i\n&quot;</span> % (command, taskid))</div>
-<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;    <span class="keywordflow">if</span> tgt != <span class="keywordtype">None</span>:</div>
-<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;        forcebalance.WQIDS[tgt.name].append(taskid)</div>
-<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;        forcebalance.WQIDS[<span class="stringliteral">&quot;None&quot;</span>].append(taskid)</div>
-<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;</div>
-<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished.">wq_wait1</a>(wq, wait_time=10, verbose=False):</div>
-<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; This function waits ten seconds to see if a task in the Work Queue has finished. &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="keywordflow">if</span> verbose: logger.info(<span class="stringliteral">&#39;---\n&#39;</span>)</div>
-<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;    <span class="keywordflow">for</span> sec <span class="keywordflow">in</span> range(wait_time):</div>
-<div class="line"><a name="l00619"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee">  619</a></span>&#160;        task = wq.wait(1)</div>
-<div class="line"><a name="l00620"></a><span class="lineno">  620</span>&#160;        <span class="keywordflow">if</span> task:</div>
-<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;            exectime = task.cmd_execution_time/1000000</div>
-<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;            <span class="keywordflow">if</span> verbose:</div>
-<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;                logger.info(<span class="stringliteral">&#39;A job has finished!\n&#39;</span>)</div>
-<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;                logger.info(<span class="stringliteral">&#39;Job name = &#39;</span> + task.tag + <span class="stringliteral">&#39;command = &#39;</span> + task.command + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;                logger.info(<span class="stringliteral">&quot;status = &quot;</span> + task.status + <span class="stringliteral">&#39;\n&#39;</span>) </div>
-<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;                logger.info(<span class="stringliteral">&quot;return_status = &quot;</span> + task.return_status)</div>
-<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;                logger.info(<span class="stringliteral">&quot;result = &quot;</span> + task.result) </div>
-<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;                logger.info(<span class="stringliteral">&quot;host = &quot;</span> + task.hostname + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;                logger.info(<span class="stringliteral">&quot;execution time = &quot;</span> + exectime) </div>
-<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;                logger.info(<span class="stringliteral">&quot;total_bytes_transferred = &quot;</span> + task.total_bytes_transferred + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;            <span class="keywordflow">if</span> task.result != 0:</div>
-<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;                oldid = task.id</div>
-<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;                oldhost = task.hostname</div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;                tgtname = <span class="stringliteral">&quot;None&quot;</span></div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;                <span class="keywordflow">for</span> tnm <span class="keywordflow">in</span> forcebalance.WQIDS:</div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;                    <span class="keywordflow">if</span> task.id <span class="keywordflow">in</span> forcebalance.WQIDS[tnm]:</div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;                        tgtname = tnm</div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;                        forcebalance.WQIDS[tnm].remove(task.id)</div>
-<div class="line"><a name="l00639"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0">  639</a></span>&#160;                taskid = wq.submit(task)</div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;                logger.warning(<span class="stringliteral">&quot;Command &#39;%s&#39; (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n&quot;</span> % (task.command, oldid, oldhost, exectime, taskid))</div>
-<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;                forcebalance.WQIDS[tgtname].append(taskid)</div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;            <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;                <span class="keywordflow">if</span> exectime &gt; 60: <span class="comment"># Assume that we&#39;re only interested in printing jobs that last longer than a minute.</span></div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;                    logger.info(<span class="stringliteral">&quot;Command &#39;%s&#39; (task %i) finished successfully on host %s (%i seconds)\n&quot;</span> % (task.command, task.id, task.hostname, exectime))</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;                <span class="keywordflow">for</span> tnm <span class="keywordflow">in</span> forcebalance.WQIDS:</div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;                    <span class="keywordflow">if</span> task.id <span class="keywordflow">in</span> forcebalance.WQIDS[tnm]:</div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;                        forcebalance.WQIDS[tnm].remove(task.id)</div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;                del task</div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;        <span class="keywordflow">if</span> verbose:</div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;            logger.info(<span class="stringliteral">&quot;Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n&quot;</span> \</div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;                % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))</div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;            logger.info(<span class="stringliteral">&quot;Tasks: %i running, %i waiting, %i total dispatched, %i total complete\n&quot;</span> \</div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;                % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete))</div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;            logger.info(<span class="stringliteral">&quot;Data: %i / %i kb sent/received\n&quot;</span> % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))</div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;        <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;            logger.info(<span class="stringliteral">&quot;%s : %i/%i workers busy; %i/%i jobs complete\r&quot;</span> %\</div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;            (datetime.datetime.fromtimestamp(time.mktime(datetime.datetime.now().timetuple())).ctime(),</div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;             wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),</div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;             wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched)) </div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;            <span class="keywordflow">if</span> time.time() - wq_wait1.t0 &gt; 900:</div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;                wq_wait1.t0 = time.time()</div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;                logger.info(<span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;wq_wait1.t0 = time.time()</div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;</div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty.">wq_wait</a>(wq, verbose=False):</div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; This function waits until the work queue is completely empty. &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    <span class="keywordflow">while</span> <span class="keywordflow">not</span> wq.empty():</div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;        <a class="code" href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished.">wq_wait1</a>(wq, verbose=verbose)</div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;</div>
-<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;<span class="comment">#=====================================#</span></div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;<span class="comment">#| File and process management stuff |#</span></div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;<span class="comment">#=====================================#</span></div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36">GoInto</a>(Dir):</div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;    <span class="keywordflow">if</span> os.path.exists(Dir):</div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;        <span class="keywordflow">if</span> os.path.isdir(Dir): <span class="keywordflow">pass</span></div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;        <span class="keywordflow">else</span>: <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to create directory %s, it exists but isn&#39;t a directory&quot;</span> % newdir)</div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;        os.makedirs(Dir)</div>
-<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;    os.chdir(Dir)</div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;</div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">allsplit</a>(Dir):</div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;    <span class="comment"># Split a directory into all directories involved.</span></div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    s = os.path.split(os.path.normpath(Dir))</div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;    <span class="keywordflow">if</span> s[1] == <span class="stringliteral">&#39;&#39;</span> <span class="keywordflow">or</span> s[1] == <span class="stringliteral">&#39;.&#39;</span> : <span class="keywordflow">return</span> []</div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">allsplit</a>(s[0]) + [s[1]]</div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;</div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120">Leave</a>(Dir):</div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;    <span class="keywordflow">if</span> os.path.split(os.getcwd())[1] != Dir:</div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;        <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Trying to leave directory %s, but we&#39;re actually in directory %s (check your code)&quot;</span> % (Dir,os.path.split(os.getcwd())[1]))</div>
-<div class="line"><a name="l00690"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c">  690</a></span>&#160;    <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(len(<a class="code" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">allsplit</a>(Dir))):</div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;        os.chdir(<span class="stringliteral">&#39;..&#39;</span>)</div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;</div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;<span class="comment"># Dictionary containing specific error messages for specific missing files or file patterns</span></div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;specific_lst = [([<span class="stringliteral">&#39;mdrun&#39;</span>,<span class="stringliteral">&#39;grompp&#39;</span>,<span class="stringliteral">&#39;trjconv&#39;</span>,<span class="stringliteral">&#39;g_energy&#39;</span>,<span class="stringliteral">&#39;g_traj&#39;</span>], <span class="stringliteral">&quot;Make sure to install GROMACS and add it to your path (or set the gmxpath option)&quot;</span>),</div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;                ([<span class="stringliteral">&#39;force.mdin&#39;</span>, <span class="stringliteral">&#39;stage.leap&#39;</span>], <span class="stringliteral">&quot;This file is needed for setting up AMBER force matching targets&quot;</span>),</div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;                ([<span class="stringliteral">&#39;conf.pdb&#39;</span>, <span class="stringliteral">&#39;mono.pdb&#39;</span>], <span class="stringliteral">&quot;This file is needed for setting up OpenMM condensed phase property targets&quot;</span>),</div>
-<div class="line"><a name="l00697"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36">  697</a></span>&#160;                ([<span class="stringliteral">&#39;liquid.xyz&#39;</span>, <span class="stringliteral">&#39;liquid.key&#39;</span>, <span class="stringliteral">&#39;mono.xyz&#39;</span>, <span class="stringliteral">&#39;mono.key&#39;</span>], <span class="stringliteral">&quot;This file is needed for setting up OpenMM condensed phase property targets&quot;</span>),</div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;                ([<span class="stringliteral">&#39;dynamic&#39;</span>, <span class="stringliteral">&#39;analyze&#39;</span>, <span class="stringliteral">&#39;minimize&#39;</span>, <span class="stringliteral">&#39;testgrad&#39;</span>, <span class="stringliteral">&#39;vibrate&#39;</span>, <span class="stringliteral">&#39;optimize&#39;</span>, <span class="stringliteral">&#39;polarize&#39;</span>, <span class="stringliteral">&#39;superpose&#39;</span>], <span class="stringliteral">&quot;Make sure to install TINKER and add it to your path (or set the tinkerpath option)&quot;</span>),</div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;                ([<span class="stringliteral">&#39;runcuda.sh&#39;</span>, <span class="stringliteral">&#39;npt.py&#39;</span>, <span class="stringliteral">&#39;npt_tinker.py&#39;</span>], <span class="stringliteral">&quot;This file belongs in the ForceBalance source directory, not sure why it is missing&quot;</span>),</div>
-<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;                ([<span class="stringliteral">&#39;input.xyz&#39;</span>], <span class="stringliteral">&quot;This file is needed for TINKER molecular property targets&quot;</span>),</div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;                ([<span class="stringliteral">&#39;.*key$&#39;</span>, <span class="stringliteral">&#39;.*xyz$&#39;</span>], <span class="stringliteral">&quot;I am guessing this file is probably needed by TINKER&quot;</span>),</div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;                ([<span class="stringliteral">&#39;.*gro$&#39;</span>, <span class="stringliteral">&#39;.*top$&#39;</span>, <span class="stringliteral">&#39;.*itp$&#39;</span>, <span class="stringliteral">&#39;.*mdp$&#39;</span>, <span class="stringliteral">&#39;.*ndx$&#39;</span>], <span class="stringliteral">&quot;I am guessing this file is probably needed by GROMACS&quot;</span>)</div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;                ]</div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;</div>
-<div class="line"><a name="l00705"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">  705</a></span>&#160;<span class="comment"># Build a dictionary mapping all of the keys in the above lists to their error messages</span></div>
-<div class="line"><a name="l00706"></a><span class="lineno">  706</span>&#160;specific_dct = dict(list(itertools.chain(*[[(j,i[1]) <span class="keywordflow">for</span> j <span class="keywordflow">in</span> i[0]] <span class="keywordflow">for</span> i <span class="keywordflow">in</span> specific_lst])))</div>
-<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;</div>
-<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f">MissingFileInspection</a>(fnm):</div>
-<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;    fnm = os.path.split(fnm)[1]</div>
-<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    answer = <span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><a name="l00711"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120">  711</a></span>&#160;    <span class="keywordflow">for</span> key <span class="keywordflow">in</span> specific_dct:</div>
-<div class="line"><a name="l00712"></a><span class="lineno">  712</span>&#160;        <span class="keywordflow">if</span> answer == <span class="stringliteral">&quot;&quot;</span>:</div>
-<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;            answer += <span class="stringliteral">&quot;\n&quot;</span></div>
-<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;        <span class="keywordflow">if</span> match(key, fnm):</div>
-<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;            answer += <span class="stringliteral">&quot;%s\n&quot;</span> % specific_dct[key]</div>
-<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;    <span class="keywordflow">return</span> answer</div>
-<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;</div>
-<div class="line"><a name="l00718"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#abe850bcdf26cec4a0cf913a54a7ddfaa">  718</a></span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1">LinkFile</a>(src, dest):</div>
-<div class="line"><a name="l00719"></a><span class="lineno">  719</span>&#160;    <span class="keywordflow">if</span> os.path.exists(src):</div>
-<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;        <span class="keywordflow">if</span> os.path.exists(dest):</div>
-<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;            <span class="keywordflow">if</span> os.path.islink(dest): <span class="keywordflow">pass</span></div>
-<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;            <span class="keywordflow">else</span>: <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to create symbolic link %s to %s, destination exists but isn&#39;t a symbolic link&quot;</span> % (src, dest))</div>
-<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;        <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;            os.symlink(src, dest)</div>
-<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;        <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to create symbolic link %s to %s, but source file doesn&#39;t exist%s&quot;</span> % (src,dest,<a class="code" href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f">MissingFileInspection</a>(src)))</div>
-<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;    </div>
-<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;</div>
-<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#af5f0e1ba7689f1ab40383ba0480560a9">CopyFile</a>(src, dest):</div>
-<div class="line"><a name="l00730"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ab652c941890b0f378100433699c8d255">  730</a></span>&#160;    <span class="keywordflow">if</span> os.path.exists(src):</div>
-<div class="line"><a name="l00731"></a><span class="lineno">  731</span>&#160;        <span class="keywordflow">if</span> os.path.exists(dest):</div>
-<div class="line"><a name="l00732"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f">  732</a></span>&#160;            <span class="keywordflow">if</span> os.path.islink(dest): </div>
-<div class="line"><a name="l00733"></a><span class="lineno">  733</span>&#160;                <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to copy %s to %s, destination exists but it&#39;s a symbolic link&quot;</span> % (src, dest))</div>
-<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;        <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;            shutil.copy2(src, dest)</div>
-<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;        <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to copy %s to %s, but source file doesn&#39;t exist%s&quot;</span> % (src,dest,<a class="code" href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f">MissingFileInspection</a>(src)))</div>
-<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;</div>
-<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c">link_dir_contents</a>(abssrcdir, absdestdir):</div>
-<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;    <span class="keywordflow">for</span> fnm <span class="keywordflow">in</span> os.listdir(abssrcdir):</div>
-<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;        srcfnm = os.path.join(abssrcdir, fnm)</div>
-<div class="line"><a name="l00742"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1">  742</a></span>&#160;        destfnm = os.path.join(absdestdir, fnm)</div>
-<div class="line"><a name="l00743"></a><span class="lineno">  743</span>&#160;        <span class="keywordflow">if</span> os.path.isfile(srcfnm):</div>
-<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;            <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.exists(destfnm):</div>
-<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;                <span class="comment">#print &quot;Linking %s to %s&quot; % (srcfnm, destfnm)</span></div>
-<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;                os.symlink(srcfnm, destfnm)</div>
-<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;</div>
-<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error).">remove_if_exists</a>(fnm):</div>
-<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; Remove the file if it exists (doesn&#39;t return an error). &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    <span class="keywordflow">if</span> os.path.exists(fnm):</div>
-<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;        os.remove(fnm)</div>
-<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;</div>
-<div class="line"><a name="l00753"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#af5f0e1ba7689f1ab40383ba0480560a9">  753</a></span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#aa1ff334c4b4e30e91978b91d9a9ec065">which</a>(fnm):</div>
-<div class="line"><a name="l00754"></a><span class="lineno">  754</span>&#160;    <span class="comment"># Get the location of a file.  Works only on UNIX-like file systems.</span></div>
-<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    <span class="keywordflow">try</span>:</div>
-<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;        <span class="keywordflow">return</span> os.path.split(os.popen(<span class="stringliteral">&#39;which %s 2&gt; /dev/null&#39;</span> % fnm).readlines()[0].strip())[0]</div>
-<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;    <span class="keywordflow">except</span>:</div>
-<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span></div>
-<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;</div>
-<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;<span class="keyword">def </span>_exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = &quot;&quot;, print_command = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):</div>
-<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;Runs command line using subprocess, optionally returning stdout.</span></div>
-<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;<span class="stringliteral">    Options:</span></div>
-<div class="line"><a name="l00763"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c">  763</a></span>&#160;<span class="stringliteral">    command (required) = Name of the command you want to execute</span></div>
-<div class="line"><a name="l00764"></a><span class="lineno">  764</span>&#160;<span class="stringliteral">    outfnm (optional) = Name of the output file name (overwritten if exists)</span></div>
-<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;<span class="stringliteral">    logfnm (optional) = Name of the log file name (appended if exists)</span></div>
-<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;<span class="stringliteral">    stdin (optional) = A string to be passed to stdin, as if it were typed (use newline character to mimic Enter key)</span></div>
-<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;<span class="stringliteral">    print_command = Whether to print the command.</span></div>
-<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;<span class="stringliteral">    copy_stderr = Whether to copy the stderr stream to the stdout stream; useful for GROMACS which prints out everything to stderr (argh.)</span></div>
-<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;<span class="stringliteral">    expand_cr = Whether to expand carriage returns into newlines (useful for GROMACS mdrun).</span></div>
-<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;<span class="stringliteral">    persist = Continue execution even if the command gives a nonzero return code.</span></div>
-<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;    <span class="comment"># Dictionary of options to be passed to the Popen object.</span></div>
-<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;    cmd_options={<span class="stringliteral">&#39;shell&#39;</span>:(type(command) <span class="keywordflow">is</span> str), <span class="stringliteral">&#39;stdin&#39;</span>:<span class="keywordtype">None</span>, <span class="stringliteral">&#39;stdout&#39;</span>:PIPE, <span class="stringliteral">&#39;stderr&#39;</span>:PIPE, <span class="stringliteral">&#39;universal_newlines&#39;</span>:expand_cr}</div>
-<div class="line"><a name="l00774"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e">  774</a></span>&#160;</div>
-<div class="line"><a name="l00775"></a><span class="lineno">  775</span>&#160;    <span class="comment"># &quot;write to file&quot; : Function for writing some characters to the log and/or output files.</span></div>
-<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    <span class="keyword">def </span>wtf(out):</div>
-<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;        <span class="keywordflow">if</span> logfnm != <span class="keywordtype">None</span>: </div>
-<div class="line"><a name="l00778"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#aa1ff334c4b4e30e91978b91d9a9ec065">  778</a></span>&#160;            with open(logfnm,<span class="stringliteral">&#39;a+&#39;</span>) <span class="keyword">as</span> f: </div>
-<div class="line"><a name="l00779"></a><span class="lineno">  779</span>&#160;                f.write(out)</div>
-<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;                f.flush()</div>
-<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;        <span class="keywordflow">if</span> outfnm != <span class="keywordtype">None</span>: </div>
-<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;            with open(outfnm,<span class="stringliteral">&#39;w+&#39;</span> <span class="keywordflow">if</span> wtf.first <span class="keywordflow">else</span> <span class="stringliteral">&#39;a+&#39;</span>) <span class="keyword">as</span> f: </div>
-<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;                f.write(out)</div>
-<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;                f.flush()</div>
-<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;        wtf.first = <span class="keyword">False</span></div>
-<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;    wtf.first = <span class="keyword">True</span></div>
-<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;</div>
-<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;    <span class="keywordflow">if</span> stdin: cmd_options[<span class="stringliteral">&#39;stdin&#39;</span>] = PIPE</div>
-<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;</div>
-<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;    <span class="keywordflow">if</span> print_command:</div>
-<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;        logger.info(<span class="stringliteral">&quot;Executing process: \x1b[92m%-50s\x1b[0m%s%s%s\n&quot;</span> % (<span class="stringliteral">&#39; &#39;</span>.join(command) <span class="keywordflow">if</span> type(command) <span class="keywordflow">is</span> list <span class="keywordflow">else</span> command, </div>
-<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;                                                               <span class="stringliteral">&quot; Output: %s&quot;</span> % outfnm <span class="keywordflow">if</span> outfnm != <span class="keywordtype">None</span> <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>, </div>
-<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;                                                               <span class="stringliteral">&quot; Append: %s&quot;</span> % logfnm <span class="keywordflow">if</span> logfnm != <span class="keywordtype">None</span> <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>, </div>
-<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;                                                               <span class="stringliteral">&quot; Stdin: %s&quot;</span> % stdin.replace(<span class="stringliteral">&#39;\n&#39;</span>,<span class="stringliteral">&#39;\\n&#39;</span>) <span class="keywordflow">if</span> stdin != <span class="keywordtype">None</span> <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>))</div>
-<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;        wtf(<span class="stringliteral">&quot;Executing process: %s%s\n&quot;</span> % (command, <span class="stringliteral">&quot; Stdin: %s&quot;</span> % stdin.replace(<span class="stringliteral">&#39;\n&#39;</span>,<span class="stringliteral">&#39;\\n&#39;</span>) <span class="keywordflow">if</span> stdin != <span class="keywordtype">None</span> <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>))</div>
-<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;</div>
-<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;    cmd_options.update(kwargs)</div>
-<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    p = subprocess.Popen(command, **cmd_options)</div>
-<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    </div>
-<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;    stdout = <span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    stderr = <span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;</div>
-<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;    <span class="keywordflow">if</span> p.stdin:</div>
-<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;        p.stdin.write(stdin)</div>
-<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        p.stdin.close()</div>
-<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;</div>
-<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;    <span class="keywordflow">while</span> <span class="keyword">True</span>:</div>
-<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;        reads = [p.stdout.fileno(), p.stderr.fileno()]</div>
-<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;        ret = select(reads, [], [])</div>
-<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;        <span class="keywordflow">for</span> fd <span class="keywordflow">in</span> ret[0]:</div>
-<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;            <span class="keywordflow">if</span> fd == p.stdout.fileno():</div>
-<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;                read = p.stdout.readline()</div>
-<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;                <span class="keywordflow">if</span> print_to_screen: sys.stdout.write(read)</div>
-<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;                stdout += read</div>
-<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;                wtf(read)</div>
-<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;            <span class="keywordflow">if</span> fd == p.stderr.fileno():</div>
-<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;                read = p.stderr.readline()</div>
-<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;                <span class="keywordflow">if</span> print_to_screen: sys.stderr.write(read)</div>
-<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;                stderr += read</div>
-<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;                <span class="keywordflow">if</span> copy_stderr: </div>
-<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;                    stdout += read</div>
-<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;                    wtf(read)</div>
-<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;        <span class="keywordflow">if</span> <span class="keywordflow">not</span> read:</div>
-<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;            <span class="keywordflow">break</span></div>
-<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;</div>
-<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;    p.wait()</div>
-<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;</div>
-<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;    <span class="keywordflow">if</span> p.returncode != 0:</div>
-<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;        <span class="keywordflow">if</span> stderr:</div>
-<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;            logger.warning(<span class="stringliteral">&quot;Received an error message:\n&quot;</span>)</div>
-<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;            logger.warning(<span class="stringliteral">&quot;\n==== Error Message ====\n&quot;</span>)</div>
-<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;            logger.warning(stderr)</div>
-<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;            logger.warning(<span class="stringliteral">&quot;== End Error Message ==\n&quot;</span>)</div>
-<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;        <span class="keywordflow">if</span> persist:</div>
-<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;            logger.info(<span class="stringliteral">&quot;%s gave a return code of %i (it may have crashed) -- carrying on\n&quot;</span> % (command, p.returncode))</div>
-<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;        <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;            <span class="comment"># This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.</span></div>
-<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;            <span class="comment"># sys.stderr.write(&quot;\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n&quot; % (command, p.returncode))</span></div>
-<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;            <span class="comment"># sys.exit(p.returncode)</span></div>
-<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;            <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n&quot;</span> % (command, p.returncode))</div>
-<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;        </div>
-<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;    <span class="comment"># Return the output in the form of a list of lines, so we can loop over it using &quot;for line in output&quot;.</span></div>
-<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    <span class="keywordflow">return</span> stdout.split(<span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;</div>
-<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(warning, timeout=10):</div>
-<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;    <span class="keywordflow">if</span> type(warning) <span class="keywordflow">is</span> str:</div>
-<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;        logger.warning(warning + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;    <span class="keywordflow">elif</span> type(warning) <span class="keywordflow">is</span> list:</div>
-<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;        <span class="keywordflow">for</span> line <span class="keywordflow">in</span> warning:</div>
-<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;            logger.warning(line + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;        logger.warning(<span class="stringliteral">&quot;You&#39;re not supposed to pass me a variable of this type: &quot;</span> + str(type(warning)))</div>
-<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;    <span class="keywordflow">if</span> sys.stdin.isatty():</div>
-<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;        logger.warning(<span class="stringliteral">&quot;\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m\n&quot;</span> % timeout)</div>
-<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;        <span class="keywordflow">try</span>: rlist, wlist, xlist = select([sys.stdin], [], [], timeout)</div>
-<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;        <span class="keywordflow">except</span>: <span class="keywordflow">pass</span></div>
-<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;</div>
-<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a26e563ec71ed229c30f3d61d3448c8f1" title="Prints a warning but will only do so once in a given run.">warn_once</a>(warning, warnhash = None):</div>
-<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; Prints a warning but will only do so once in a given run. &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;    <span class="keywordflow">if</span> warnhash == <span class="keywordtype">None</span>:</div>
-<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;        warnhash = warning</div>
-<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;    <span class="keywordflow">if</span> warnhash <span class="keywordflow">in</span> warn_once.already:</div>
-<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;        <span class="keywordflow">return</span></div>
-<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;    warn_once.already.add(warnhash)</div>
-<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;    <span class="keywordflow">if</span> type(warning) <span class="keywordflow">is</span> str:</div>
-<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;        logger.info(warning + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;    <span class="keywordflow">elif</span> type(warning) <span class="keywordflow">is</span> list:</div>
-<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;        <span class="keywordflow">for</span> line <span class="keywordflow">in</span> warning:</div>
-<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;            logger.info(line + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;warn_once.already = set()</div>
-<div class="line"><a name="l00871"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">  871</a></span>&#160;</div>
-<div class="line"><a name="l00872"></a><span class="lineno">  872</span>&#160;<span class="comment">#=========================================#</span></div>
-<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;<span class="comment">#| Development stuff (not commonly used) |#</span></div>
-<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;<span class="comment">#=========================================#</span></div>
-<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map().">concurrent_map</a>(func, data):</div>
-<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;<span class="stringliteral">    Similar to the bultin function map(). But spawn a thread for each argument</span></div>
-<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;<span class="stringliteral">    and apply `func` concurrently.</span></div>
-<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;<span class="stringliteral">    Note: unlike map(), we cannot take an iterable argument. `data` should be an</span></div>
-<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;<span class="stringliteral">    indexable sequence.</span></div>
-<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;</div>
-<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;    N = len(data)</div>
-<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    result = [<span class="keywordtype">None</span>] * N</div>
-<div class="line"><a name="l00886"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a26e563ec71ed229c30f3d61d3448c8f1">  886</a></span>&#160;</div>
-<div class="line"><a name="l00887"></a><span class="lineno">  887</span>&#160;    <span class="comment"># wrapper to dispose the result in the right slot</span></div>
-<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;    <span class="keyword">def </span>task_wrapper(i):</div>
-<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;        result[i] = func(data[i])</div>
-<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;</div>
-<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;    threads = [threading.Thread(target=task_wrapper, args=(i,)) <span class="keywordflow">for</span> i <span class="keywordflow">in</span> xrange(N)]</div>
-<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;    <span class="keywordflow">for</span> t <span class="keywordflow">in</span> threads:</div>
-<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;        t.start()</div>
-<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;    <span class="keywordflow">for</span> t <span class="keywordflow">in</span> threads:</div>
-<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;        t.join()</div>
-<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;</div>
-<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;    <span class="keywordflow">return</span> result</div>
-<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;</div>
+<div class="line"><a name="l00552"></a><span class="lineno">  552</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ab5f3072ad95e9c75659cb1adac341051">createWorkQueue</a>(wq_port, debug=True):</div>
+<div class="line"><a name="l00553"></a><span class="lineno">  553</span>&#160;    <span class="keywordflow">if</span> debug:</div>
+<div class="line"><a name="l00554"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a577abfd36638c5f4dfdade136abaef12">  554</a></span>&#160;        work_queue.set_debug_flag(<span class="stringliteral">&#39;all&#39;</span>)</div>
+<div class="line"><a name="l00555"></a><span class="lineno">  555</span>&#160;    forcebalance.WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=<span class="keyword">True</span>, exclusive=<span class="keyword">False</span>, shutdown=<span class="keyword">False</span>)</div>
+<div class="line"><a name="l00556"></a><span class="lineno">  556</span>&#160;    forcebalance.WORK_QUEUE.specify_name(<span class="stringliteral">&#39;forcebalance&#39;</span>)</div>
+<div class="line"><a name="l00557"></a><span class="lineno">  557</span>&#160;    forcebalance.WORK_QUEUE.specify_keepalive_timeout(8640000)</div>
+<div class="line"><a name="l00558"></a><span class="lineno">  558</span>&#160;    forcebalance.WORK_QUEUE.specify_keepalive_interval(8640000)</div>
+<div class="line"><a name="l00559"></a><span class="lineno">  559</span>&#160;</div>
+<div class="line"><a name="l00560"></a><span class="lineno">  560</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue.">queue_up</a>(wq, command, input_files, output_files, tgt=None, verbose=True):</div>
+<div class="line"><a name="l00561"></a><span class="lineno">  561</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; </span></div>
+<div class="line"><a name="l00562"></a><span class="lineno">  562</span>&#160;<span class="stringliteral">    Submit a job to the Work Queue.</span></div>
+<div class="line"><a name="l00563"></a><span class="lineno">  563</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00564"></a><span class="lineno">  564</span>&#160;<span class="stringliteral">    @param[in] wq (Work Queue Object)</span></div>
+<div class="line"><a name="l00565"></a><span class="lineno">  565</span>&#160;<span class="stringliteral">    @param[in] command (string) The command to run on the remote worker.</span></div>
+<div class="line"><a name="l00566"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d">  566</a></span>&#160;<span class="stringliteral">    @param[in] input_files (list of files) A list of locations of the input files.</span></div>
+<div class="line"><a name="l00567"></a><span class="lineno">  567</span>&#160;<span class="stringliteral">    @param[in] output_files (list of files) A list of locations of the output files.</span></div>
+<div class="line"><a name="l00568"></a><span class="lineno">  568</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00569"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#abe1e72c32252d62a6551b47290c7584f">  569</a></span>&#160;    task = work_queue.Task(command)</div>
+<div class="line"><a name="l00570"></a><span class="lineno">  570</span>&#160;    cwd = os.getcwd()</div>
+<div class="line"><a name="l00571"></a><span class="lineno">  571</span>&#160;    <span class="keywordflow">for</span> f <span class="keywordflow">in</span> input_files:</div>
+<div class="line"><a name="l00572"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ab5f3072ad95e9c75659cb1adac341051">  572</a></span>&#160;        lf = os.path.join(cwd,f)</div>
+<div class="line"><a name="l00573"></a><span class="lineno">  573</span>&#160;        task.specify_input_file(lf,f)</div>
+<div class="line"><a name="l00574"></a><span class="lineno">  574</span>&#160;    <span class="keywordflow">for</span> f <span class="keywordflow">in</span> output_files:</div>
+<div class="line"><a name="l00575"></a><span class="lineno">  575</span>&#160;        lf = os.path.join(cwd,f)</div>
+<div class="line"><a name="l00576"></a><span class="lineno">  576</span>&#160;        task.specify_output_file(lf,f)</div>
+<div class="line"><a name="l00577"></a><span class="lineno">  577</span>&#160;    task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)</div>
+<div class="line"><a name="l00578"></a><span class="lineno">  578</span>&#160;    task.specify_tag(command)</div>
+<div class="line"><a name="l00579"></a><span class="lineno">  579</span>&#160;    taskid = wq.submit(task)</div>
+<div class="line"><a name="l00580"></a><span class="lineno">  580</span>&#160;    <span class="keywordflow">if</span> verbose:</div>
+<div class="line"><a name="l00581"></a><span class="lineno">  581</span>&#160;        logger.info(<span class="stringliteral">&quot;Submitting command &#39;%s&#39; to the Work Queue, taskid %i\n&quot;</span> % (command, taskid))</div>
+<div class="line"><a name="l00582"></a><span class="lineno">  582</span>&#160;    <span class="keywordflow">if</span> tgt != <span class="keywordtype">None</span>:</div>
+<div class="line"><a name="l00583"></a><span class="lineno">  583</span>&#160;        forcebalance.WQIDS[tgt.name].append(taskid)</div>
+<div class="line"><a name="l00584"></a><span class="lineno">  584</span>&#160;    <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00585"></a><span class="lineno">  585</span>&#160;        forcebalance.WQIDS[<span class="stringliteral">&quot;None&quot;</span>].append(taskid)</div>
+<div class="line"><a name="l00586"></a><span class="lineno">  586</span>&#160;    </div>
+<div class="line"><a name="l00587"></a><span class="lineno">  587</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue.">queue_up_src_dest</a>(wq, command, input_files, output_files, tgt=None, verbose=True):</div>
+<div class="line"><a name="l00588"></a><span class="lineno">  588</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; </span></div>
+<div class="line"><a name="l00589"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7">  589</a></span>&#160;<span class="stringliteral">    Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly</span></div>
+<div class="line"><a name="l00590"></a><span class="lineno">  590</span>&#160;<span class="stringliteral">    specify where the input files come from, and where the output files go to.</span></div>
+<div class="line"><a name="l00591"></a><span class="lineno">  591</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00592"></a><span class="lineno">  592</span>&#160;<span class="stringliteral">    @param[in] wq (Work Queue Object)</span></div>
+<div class="line"><a name="l00593"></a><span class="lineno">  593</span>&#160;<span class="stringliteral">    @param[in] command (string) The command to run on the remote worker.</span></div>
+<div class="line"><a name="l00594"></a><span class="lineno">  594</span>&#160;<span class="stringliteral">    @param[in] input_files (list of 2-tuples) A list of local and</span></div>
+<div class="line"><a name="l00595"></a><span class="lineno">  595</span>&#160;<span class="stringliteral">    remote locations of the input files.</span></div>
+<div class="line"><a name="l00596"></a><span class="lineno">  596</span>&#160;<span class="stringliteral">    @param[in] output_files (list of 2-tuples) A list of local and</span></div>
+<div class="line"><a name="l00597"></a><span class="lineno">  597</span>&#160;<span class="stringliteral">    remote locations of the output files.</span></div>
+<div class="line"><a name="l00598"></a><span class="lineno">  598</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00599"></a><span class="lineno">  599</span>&#160;    task = work_queue.Task(command)</div>
+<div class="line"><a name="l00600"></a><span class="lineno">  600</span>&#160;    <span class="keywordflow">for</span> f <span class="keywordflow">in</span> input_files:</div>
+<div class="line"><a name="l00601"></a><span class="lineno">  601</span>&#160;        <span class="comment"># print f[0], f[1]</span></div>
+<div class="line"><a name="l00602"></a><span class="lineno">  602</span>&#160;        task.specify_input_file(f[0],f[1])</div>
+<div class="line"><a name="l00603"></a><span class="lineno">  603</span>&#160;    <span class="keywordflow">for</span> f <span class="keywordflow">in</span> output_files:</div>
+<div class="line"><a name="l00604"></a><span class="lineno">  604</span>&#160;        <span class="comment"># print f[0], f[1]</span></div>
+<div class="line"><a name="l00605"></a><span class="lineno">  605</span>&#160;        task.specify_output_file(f[0],f[1])</div>
+<div class="line"><a name="l00606"></a><span class="lineno">  606</span>&#160;    task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)</div>
+<div class="line"><a name="l00607"></a><span class="lineno">  607</span>&#160;    task.specify_tag(command)</div>
+<div class="line"><a name="l00608"></a><span class="lineno">  608</span>&#160;    taskid = wq.submit(task)</div>
+<div class="line"><a name="l00609"></a><span class="lineno">  609</span>&#160;    <span class="keywordflow">if</span> verbose:</div>
+<div class="line"><a name="l00610"></a><span class="lineno">  610</span>&#160;        logger.info(<span class="stringliteral">&quot;Submitting command &#39;%s&#39; to the Work Queue, taskid %i\n&quot;</span> % (command, taskid))</div>
+<div class="line"><a name="l00611"></a><span class="lineno">  611</span>&#160;    <span class="keywordflow">if</span> tgt != <span class="keywordtype">None</span>:</div>
+<div class="line"><a name="l00612"></a><span class="lineno">  612</span>&#160;        forcebalance.WQIDS[tgt.name].append(taskid)</div>
+<div class="line"><a name="l00613"></a><span class="lineno">  613</span>&#160;    <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00614"></a><span class="lineno">  614</span>&#160;        forcebalance.WQIDS[<span class="stringliteral">&quot;None&quot;</span>].append(taskid)</div>
+<div class="line"><a name="l00615"></a><span class="lineno">  615</span>&#160;</div>
+<div class="line"><a name="l00616"></a><span class="lineno">  616</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished.">wq_wait1</a>(wq, wait_time=10, verbose=False):</div>
+<div class="line"><a name="l00617"></a><span class="lineno">  617</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; This function waits ten seconds to see if a task in the Work Queue has finished. &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00618"></a><span class="lineno">  618</span>&#160;    <span class="keywordflow">if</span> verbose: logger.info(<span class="stringliteral">&#39;---\n&#39;</span>)</div>
+<div class="line"><a name="l00619"></a><span class="lineno">  619</span>&#160;    <span class="keywordflow">for</span> sec <span class="keywordflow">in</span> range(wait_time):</div>
+<div class="line"><a name="l00620"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee">  620</a></span>&#160;        task = wq.wait(1)</div>
+<div class="line"><a name="l00621"></a><span class="lineno">  621</span>&#160;        <span class="keywordflow">if</span> task:</div>
+<div class="line"><a name="l00622"></a><span class="lineno">  622</span>&#160;            exectime = task.cmd_execution_time/1000000</div>
+<div class="line"><a name="l00623"></a><span class="lineno">  623</span>&#160;            <span class="keywordflow">if</span> verbose:</div>
+<div class="line"><a name="l00624"></a><span class="lineno">  624</span>&#160;                logger.info(<span class="stringliteral">&#39;A job has finished!\n&#39;</span>)</div>
+<div class="line"><a name="l00625"></a><span class="lineno">  625</span>&#160;                logger.info(<span class="stringliteral">&#39;Job name = &#39;</span> + task.tag + <span class="stringliteral">&#39;command = &#39;</span> + task.command + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00626"></a><span class="lineno">  626</span>&#160;                logger.info(<span class="stringliteral">&quot;status = &quot;</span> + task.status + <span class="stringliteral">&#39;\n&#39;</span>) </div>
+<div class="line"><a name="l00627"></a><span class="lineno">  627</span>&#160;                logger.info(<span class="stringliteral">&quot;return_status = &quot;</span> + task.return_status)</div>
+<div class="line"><a name="l00628"></a><span class="lineno">  628</span>&#160;                logger.info(<span class="stringliteral">&quot;result = &quot;</span> + task.result) </div>
+<div class="line"><a name="l00629"></a><span class="lineno">  629</span>&#160;                logger.info(<span class="stringliteral">&quot;host = &quot;</span> + task.hostname + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00630"></a><span class="lineno">  630</span>&#160;                logger.info(<span class="stringliteral">&quot;execution time = &quot;</span> + exectime) </div>
+<div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;                logger.info(<span class="stringliteral">&quot;total_bytes_transferred = &quot;</span> + task.total_bytes_transferred + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;            <span class="keywordflow">if</span> task.result != 0:</div>
+<div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;                oldid = task.id</div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;                oldhost = task.hostname</div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;                tgtname = <span class="stringliteral">&quot;None&quot;</span></div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;                <span class="keywordflow">for</span> tnm <span class="keywordflow">in</span> forcebalance.WQIDS:</div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;                    <span class="keywordflow">if</span> task.id <span class="keywordflow">in</span> forcebalance.WQIDS[tnm]:</div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;                        tgtname = tnm</div>
+<div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;                        forcebalance.WQIDS[tnm].remove(task.id)</div>
+<div class="line"><a name="l00640"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0">  640</a></span>&#160;                taskid = wq.submit(task)</div>
+<div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;                logger.warning(<span class="stringliteral">&quot;Command &#39;%s&#39; (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n&quot;</span> % (task.command, oldid, oldhost, exectime, taskid))</div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;                forcebalance.WQIDS[tgtname].append(taskid)</div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;            <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;                <span class="keywordflow">if</span> exectime &gt; 60: <span class="comment"># Assume that we&#39;re only interested in printing jobs that last longer than a minute.</span></div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;                    logger.info(<span class="stringliteral">&quot;Command &#39;%s&#39; (task %i) finished successfully on host %s (%i seconds)\n&quot;</span> % (task.command, task.id, task.hostname, exectime))</div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;                <span class="keywordflow">for</span> tnm <span class="keywordflow">in</span> forcebalance.WQIDS:</div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;                    <span class="keywordflow">if</span> task.id <span class="keywordflow">in</span> forcebalance.WQIDS[tnm]:</div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;                        forcebalance.WQIDS[tnm].remove(task.id)</div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;                del task</div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;        <span class="keywordflow">if</span> verbose:</div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;            logger.info(<span class="stringliteral">&quot;Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n&quot;</span> \</div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;                % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))</div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;            logger.info(<span class="stringliteral">&quot;Tasks: %i running, %i waiting, %i total dispatched, %i total complete\n&quot;</span> \</div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;                % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete))</div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;            logger.info(<span class="stringliteral">&quot;Data: %i / %i kb sent/received\n&quot;</span> % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))</div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;        <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;            logger.info(<span class="stringliteral">&quot;%s : %i/%i workers busy; %i/%i jobs complete\r&quot;</span> %\</div>
+<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;            (time.ctime(),</div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;             wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),</div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;             wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched)) </div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;            <span class="keywordflow">if</span> time.time() - wq_wait1.t0 &gt; 900:</div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;                wq_wait1.t0 = time.time()</div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;                logger.info(<span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;wq_wait1.t0 = time.time()</div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;</div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty.">wq_wait</a>(wq, verbose=False):</div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; This function waits until the work queue is completely empty. &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;    <span class="keywordflow">while</span> <span class="keywordflow">not</span> wq.empty():</div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;        <a class="code" href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished.">wq_wait1</a>(wq, verbose=verbose)</div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;</div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;<span class="comment">#=====================================#</span></div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;<span class="comment">#| File and process management stuff |#</span></div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;<span class="comment">#=====================================#</span></div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36">GoInto</a>(Dir):</div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;    <span class="keywordflow">if</span> os.path.exists(Dir):</div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;        <span class="keywordflow">if</span> os.path.isdir(Dir): <span class="keywordflow">pass</span></div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;        <span class="keywordflow">else</span>: <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to create directory %s, it exists but isn&#39;t a directory&quot;</span> % newdir)</div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;    <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;        os.makedirs(Dir)</div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;    os.chdir(Dir)</div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;</div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">allsplit</a>(Dir):</div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;    <span class="comment"># Split a directory into all directories involved.</span></div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;    s = os.path.split(os.path.normpath(Dir))</div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;    <span class="keywordflow">if</span> s[1] == <span class="stringliteral">&#39;&#39;</span> <span class="keywordflow">or</span> s[1] == <span class="stringliteral">&#39;.&#39;</span> : <span class="keywordflow">return</span> []</div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">allsplit</a>(s[0]) + [s[1]]</div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;</div>
+<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120">Leave</a>(Dir):</div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;    <span class="keywordflow">if</span> os.path.split(os.getcwd())[1] != Dir:</div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;        <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Trying to leave directory %s, but we&#39;re actually in directory %s (check your code)&quot;</span> % (Dir,os.path.split(os.getcwd())[1]))</div>
+<div class="line"><a name="l00691"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c">  691</a></span>&#160;    <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(len(<a class="code" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">allsplit</a>(Dir))):</div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;        os.chdir(<span class="stringliteral">&#39;..&#39;</span>)</div>
+<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;</div>
+<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;<span class="comment"># Dictionary containing specific error messages for specific missing files or file patterns</span></div>
+<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;specific_lst = [([<span class="stringliteral">&#39;mdrun&#39;</span>,<span class="stringliteral">&#39;grompp&#39;</span>,<span class="stringliteral">&#39;trjconv&#39;</span>,<span class="stringliteral">&#39;g_energy&#39;</span>,<span class="stringliteral">&#39;g_traj&#39;</span>], <span class="stringliteral">&quot;Make sure to install GROMACS and add it to your path (or set the gmxpath option)&quot;</span>),</div>
+<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;                ([<span class="stringliteral">&#39;force.mdin&#39;</span>, <span class="stringliteral">&#39;stage.leap&#39;</span>], <span class="stringliteral">&quot;This file is needed for setting up AMBER force matching targets&quot;</span>),</div>
+<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;                ([<span class="stringliteral">&#39;conf.pdb&#39;</span>, <span class="stringliteral">&#39;mono.pdb&#39;</span>], <span class="stringliteral">&quot;This file is needed for setting up OpenMM condensed phase property targets&quot;</span>),</div>
+<div class="line"><a name="l00698"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36">  698</a></span>&#160;                ([<span class="stringliteral">&#39;liquid.xyz&#39;</span>, <span class="stringliteral">&#39;liquid.key&#39;</span>, <span class="stringliteral">&#39;mono.xyz&#39;</span>, <span class="stringliteral">&#39;mono.key&#39;</span>], <span class="stringliteral">&quot;This file is needed for setting up OpenMM condensed phase property targets&quot;</span>),</div>
+<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;                ([<span class="stringliteral">&#39;dynamic&#39;</span>, <span class="stringliteral">&#39;analyze&#39;</span>, <span class="stringliteral">&#39;minimize&#39;</span>, <span class="stringliteral">&#39;testgrad&#39;</span>, <span class="stringliteral">&#39;vibrate&#39;</span>, <span class="stringliteral">&#39;optimize&#39;</span>, <span class="stringliteral">&#39;polarize&#39;</span>, <span class="stringliteral">&#39;superpose&#39;</span>], <span class="stringliteral">&quot;Make sure to install TINKER and add it to your path (or set the tinkerpath option)&quot;</span>),</div>
+<div class="line"><a name="l00700"></a><span class="lineno">  700</span>&#160;                ([<span class="stringliteral">&#39;runcuda.sh&#39;</span>, <span class="stringliteral">&#39;npt.py&#39;</span>, <span class="stringliteral">&#39;npt_tinker.py&#39;</span>], <span class="stringliteral">&quot;This file belongs in the ForceBalance source directory, not sure why it is missing&quot;</span>),</div>
+<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;                ([<span class="stringliteral">&#39;input.xyz&#39;</span>], <span class="stringliteral">&quot;This file is needed for TINKER molecular property targets&quot;</span>),</div>
+<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;                ([<span class="stringliteral">&#39;.*key$&#39;</span>, <span class="stringliteral">&#39;.*xyz$&#39;</span>], <span class="stringliteral">&quot;I am guessing this file is probably needed by TINKER&quot;</span>),</div>
+<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160;                ([<span class="stringliteral">&#39;.*gro$&#39;</span>, <span class="stringliteral">&#39;.*top$&#39;</span>, <span class="stringliteral">&#39;.*itp$&#39;</span>, <span class="stringliteral">&#39;.*mdp$&#39;</span>, <span class="stringliteral">&#39;.*ndx$&#39;</span>], <span class="stringliteral">&quot;I am guessing this file is probably needed by GROMACS&quot;</span>)</div>
+<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;                ]</div>
+<div class="line"><a name="l00705"></a><span class="lineno">  705</span>&#160;</div>
+<div class="line"><a name="l00706"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">  706</a></span>&#160;<span class="comment"># Build a dictionary mapping all of the keys in the above lists to their error messages</span></div>
+<div class="line"><a name="l00707"></a><span class="lineno">  707</span>&#160;specific_dct = dict(list(itertools.chain(*[[(j,i[1]) <span class="keywordflow">for</span> j <span class="keywordflow">in</span> i[0]] <span class="keywordflow">for</span> i <span class="keywordflow">in</span> specific_lst])))</div>
+<div class="line"><a name="l00708"></a><span class="lineno">  708</span>&#160;</div>
+<div class="line"><a name="l00709"></a><span class="lineno">  709</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f">MissingFileInspection</a>(fnm):</div>
+<div class="line"><a name="l00710"></a><span class="lineno">  710</span>&#160;    fnm = os.path.split(fnm)[1]</div>
+<div class="line"><a name="l00711"></a><span class="lineno">  711</span>&#160;    answer = <span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a name="l00712"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120">  712</a></span>&#160;    <span class="keywordflow">for</span> key <span class="keywordflow">in</span> specific_dct:</div>
+<div class="line"><a name="l00713"></a><span class="lineno">  713</span>&#160;        <span class="keywordflow">if</span> answer == <span class="stringliteral">&quot;&quot;</span>:</div>
+<div class="line"><a name="l00714"></a><span class="lineno">  714</span>&#160;            answer += <span class="stringliteral">&quot;\n&quot;</span></div>
+<div class="line"><a name="l00715"></a><span class="lineno">  715</span>&#160;        <span class="keywordflow">if</span> match(key, fnm):</div>
+<div class="line"><a name="l00716"></a><span class="lineno">  716</span>&#160;            answer += <span class="stringliteral">&quot;%s\n&quot;</span> % specific_dct[key]</div>
+<div class="line"><a name="l00717"></a><span class="lineno">  717</span>&#160;    <span class="keywordflow">return</span> answer</div>
+<div class="line"><a name="l00718"></a><span class="lineno">  718</span>&#160;</div>
+<div class="line"><a name="l00719"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#abe850bcdf26cec4a0cf913a54a7ddfaa">  719</a></span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1">LinkFile</a>(src, dest):</div>
+<div class="line"><a name="l00720"></a><span class="lineno">  720</span>&#160;    <span class="keywordflow">if</span> os.path.exists(src):</div>
+<div class="line"><a name="l00721"></a><span class="lineno">  721</span>&#160;        <span class="keywordflow">if</span> os.path.exists(dest):</div>
+<div class="line"><a name="l00722"></a><span class="lineno">  722</span>&#160;            <span class="keywordflow">if</span> os.path.islink(dest): <span class="keywordflow">pass</span></div>
+<div class="line"><a name="l00723"></a><span class="lineno">  723</span>&#160;            <span class="keywordflow">else</span>: <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to create symbolic link %s to %s, destination exists but isn&#39;t a symbolic link&quot;</span> % (src, dest))</div>
+<div class="line"><a name="l00724"></a><span class="lineno">  724</span>&#160;        <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00725"></a><span class="lineno">  725</span>&#160;            os.symlink(src, dest)</div>
+<div class="line"><a name="l00726"></a><span class="lineno">  726</span>&#160;    <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00727"></a><span class="lineno">  727</span>&#160;        <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to create symbolic link %s to %s, but source file doesn&#39;t exist%s&quot;</span> % (src,dest,<a class="code" href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f">MissingFileInspection</a>(src)))</div>
+<div class="line"><a name="l00728"></a><span class="lineno">  728</span>&#160;    </div>
+<div class="line"><a name="l00729"></a><span class="lineno">  729</span>&#160;</div>
+<div class="line"><a name="l00730"></a><span class="lineno">  730</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#af5f0e1ba7689f1ab40383ba0480560a9">CopyFile</a>(src, dest):</div>
+<div class="line"><a name="l00731"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ab652c941890b0f378100433699c8d255">  731</a></span>&#160;    <span class="keywordflow">if</span> os.path.exists(src):</div>
+<div class="line"><a name="l00732"></a><span class="lineno">  732</span>&#160;        <span class="keywordflow">if</span> os.path.exists(dest):</div>
+<div class="line"><a name="l00733"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f">  733</a></span>&#160;            <span class="keywordflow">if</span> os.path.islink(dest): </div>
+<div class="line"><a name="l00734"></a><span class="lineno">  734</span>&#160;                <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to copy %s to %s, destination exists but it&#39;s a symbolic link&quot;</span> % (src, dest))</div>
+<div class="line"><a name="l00735"></a><span class="lineno">  735</span>&#160;        <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00736"></a><span class="lineno">  736</span>&#160;            shutil.copy2(src, dest)</div>
+<div class="line"><a name="l00737"></a><span class="lineno">  737</span>&#160;    <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00738"></a><span class="lineno">  738</span>&#160;        <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;Tried to copy %s to %s, but source file doesn&#39;t exist%s&quot;</span> % (src,dest,<a class="code" href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f">MissingFileInspection</a>(src)))</div>
+<div class="line"><a name="l00739"></a><span class="lineno">  739</span>&#160;</div>
+<div class="line"><a name="l00740"></a><span class="lineno">  740</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c">link_dir_contents</a>(abssrcdir, absdestdir):</div>
+<div class="line"><a name="l00741"></a><span class="lineno">  741</span>&#160;    <span class="keywordflow">for</span> fnm <span class="keywordflow">in</span> os.listdir(abssrcdir):</div>
+<div class="line"><a name="l00742"></a><span class="lineno">  742</span>&#160;        srcfnm = os.path.join(abssrcdir, fnm)</div>
+<div class="line"><a name="l00743"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1">  743</a></span>&#160;        destfnm = os.path.join(absdestdir, fnm)</div>
+<div class="line"><a name="l00744"></a><span class="lineno">  744</span>&#160;        <span class="keywordflow">if</span> os.path.isfile(srcfnm):</div>
+<div class="line"><a name="l00745"></a><span class="lineno">  745</span>&#160;            <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.exists(destfnm):</div>
+<div class="line"><a name="l00746"></a><span class="lineno">  746</span>&#160;                <span class="comment">#print &quot;Linking %s to %s&quot; % (srcfnm, destfnm)</span></div>
+<div class="line"><a name="l00747"></a><span class="lineno">  747</span>&#160;                os.symlink(srcfnm, destfnm)</div>
+<div class="line"><a name="l00748"></a><span class="lineno">  748</span>&#160;</div>
+<div class="line"><a name="l00749"></a><span class="lineno">  749</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error).">remove_if_exists</a>(fnm):</div>
+<div class="line"><a name="l00750"></a><span class="lineno">  750</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; Remove the file if it exists (doesn&#39;t return an error). &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00751"></a><span class="lineno">  751</span>&#160;    <span class="keywordflow">if</span> os.path.exists(fnm):</div>
+<div class="line"><a name="l00752"></a><span class="lineno">  752</span>&#160;        os.remove(fnm)</div>
+<div class="line"><a name="l00753"></a><span class="lineno">  753</span>&#160;</div>
+<div class="line"><a name="l00754"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#af5f0e1ba7689f1ab40383ba0480560a9">  754</a></span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#aa1ff334c4b4e30e91978b91d9a9ec065">which</a>(fnm):</div>
+<div class="line"><a name="l00755"></a><span class="lineno">  755</span>&#160;    <span class="comment"># Get the location of a file.  Works only on UNIX-like file systems.</span></div>
+<div class="line"><a name="l00756"></a><span class="lineno">  756</span>&#160;    <span class="keywordflow">try</span>:</div>
+<div class="line"><a name="l00757"></a><span class="lineno">  757</span>&#160;        <span class="keywordflow">return</span> os.path.split(os.popen(<span class="stringliteral">&#39;which %s 2&gt; /dev/null&#39;</span> % fnm).readlines()[0].strip())[0]</div>
+<div class="line"><a name="l00758"></a><span class="lineno">  758</span>&#160;    <span class="keywordflow">except</span>:</div>
+<div class="line"><a name="l00759"></a><span class="lineno">  759</span>&#160;        <span class="keywordflow">return</span> <span class="stringliteral">&#39;&#39;</span></div>
+<div class="line"><a name="l00760"></a><span class="lineno">  760</span>&#160;</div>
+<div class="line"><a name="l00761"></a><span class="lineno">  761</span>&#160;<span class="keyword">def </span>_exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = &quot;&quot;, print_command = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):</div>
+<div class="line"><a name="l00762"></a><span class="lineno">  762</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;Runs command line using subprocess, optionally returning stdout.</span></div>
+<div class="line"><a name="l00763"></a><span class="lineno">  763</span>&#160;<span class="stringliteral">    Options:</span></div>
+<div class="line"><a name="l00764"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c">  764</a></span>&#160;<span class="stringliteral">    command (required) = Name of the command you want to execute</span></div>
+<div class="line"><a name="l00765"></a><span class="lineno">  765</span>&#160;<span class="stringliteral">    outfnm (optional) = Name of the output file name (overwritten if exists)</span></div>
+<div class="line"><a name="l00766"></a><span class="lineno">  766</span>&#160;<span class="stringliteral">    logfnm (optional) = Name of the log file name (appended if exists)</span></div>
+<div class="line"><a name="l00767"></a><span class="lineno">  767</span>&#160;<span class="stringliteral">    stdin (optional) = A string to be passed to stdin, as if it were typed (use newline character to mimic Enter key)</span></div>
+<div class="line"><a name="l00768"></a><span class="lineno">  768</span>&#160;<span class="stringliteral">    print_command = Whether to print the command.</span></div>
+<div class="line"><a name="l00769"></a><span class="lineno">  769</span>&#160;<span class="stringliteral">    copy_stderr = Whether to copy the stderr stream to the stdout stream; useful for GROMACS which prints out everything to stderr (argh.)</span></div>
+<div class="line"><a name="l00770"></a><span class="lineno">  770</span>&#160;<span class="stringliteral">    expand_cr = Whether to expand carriage returns into newlines (useful for GROMACS mdrun).</span></div>
+<div class="line"><a name="l00771"></a><span class="lineno">  771</span>&#160;<span class="stringliteral">    persist = Continue execution even if the command gives a nonzero return code.</span></div>
+<div class="line"><a name="l00772"></a><span class="lineno">  772</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00773"></a><span class="lineno">  773</span>&#160;    <span class="comment"># Dictionary of options to be passed to the Popen object.</span></div>
+<div class="line"><a name="l00774"></a><span class="lineno">  774</span>&#160;    cmd_options={<span class="stringliteral">&#39;shell&#39;</span>:(type(command) <span class="keywordflow">is</span> str), <span class="stringliteral">&#39;stdin&#39;</span>:<span class="keywordtype">None</span>, <span class="stringliteral">&#39;stdout&#39;</span>:PIPE, <span class="stringliteral">&#39;stderr&#39;</span>:PIPE, <span class="stringliteral">&#39;universal_newlines&#39;</span>:expand_cr}</div>
+<div class="line"><a name="l00775"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e">  775</a></span>&#160;</div>
+<div class="line"><a name="l00776"></a><span class="lineno">  776</span>&#160;    <span class="comment"># &quot;write to file&quot; : Function for writing some characters to the log and/or output files.</span></div>
+<div class="line"><a name="l00777"></a><span class="lineno">  777</span>&#160;    <span class="keyword">def </span>wtf(out):</div>
+<div class="line"><a name="l00778"></a><span class="lineno">  778</span>&#160;        <span class="keywordflow">if</span> logfnm != <span class="keywordtype">None</span>: </div>
+<div class="line"><a name="l00779"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#aa1ff334c4b4e30e91978b91d9a9ec065">  779</a></span>&#160;            with open(logfnm,<span class="stringliteral">&#39;a+&#39;</span>) <span class="keyword">as</span> f: </div>
+<div class="line"><a name="l00780"></a><span class="lineno">  780</span>&#160;                f.write(out)</div>
+<div class="line"><a name="l00781"></a><span class="lineno">  781</span>&#160;                f.flush()</div>
+<div class="line"><a name="l00782"></a><span class="lineno">  782</span>&#160;        <span class="keywordflow">if</span> outfnm != <span class="keywordtype">None</span>: </div>
+<div class="line"><a name="l00783"></a><span class="lineno">  783</span>&#160;            with open(outfnm,<span class="stringliteral">&#39;w+&#39;</span> <span class="keywordflow">if</span> wtf.first <span class="keywordflow">else</span> <span class="stringliteral">&#39;a+&#39;</span>) <span class="keyword">as</span> f: </div>
+<div class="line"><a name="l00784"></a><span class="lineno">  784</span>&#160;                f.write(out)</div>
+<div class="line"><a name="l00785"></a><span class="lineno">  785</span>&#160;                f.flush()</div>
+<div class="line"><a name="l00786"></a><span class="lineno">  786</span>&#160;        wtf.first = <span class="keyword">False</span></div>
+<div class="line"><a name="l00787"></a><span class="lineno">  787</span>&#160;    wtf.first = <span class="keyword">True</span></div>
+<div class="line"><a name="l00788"></a><span class="lineno">  788</span>&#160;</div>
+<div class="line"><a name="l00789"></a><span class="lineno">  789</span>&#160;    <span class="keywordflow">if</span> stdin: cmd_options[<span class="stringliteral">&#39;stdin&#39;</span>] = PIPE</div>
+<div class="line"><a name="l00790"></a><span class="lineno">  790</span>&#160;</div>
+<div class="line"><a name="l00791"></a><span class="lineno">  791</span>&#160;    <span class="keywordflow">if</span> print_command:</div>
+<div class="line"><a name="l00792"></a><span class="lineno">  792</span>&#160;        logger.info(<span class="stringliteral">&quot;Executing process: \x1b[92m%-50s\x1b[0m%s%s%s\n&quot;</span> % (<span class="stringliteral">&#39; &#39;</span>.join(command) <span class="keywordflow">if</span> type(command) <span class="keywordflow">is</span> list <span class="keywordflow">else</span> command, </div>
+<div class="line"><a name="l00793"></a><span class="lineno">  793</span>&#160;                                                               <span class="stringliteral">&quot; Output: %s&quot;</span> % outfnm <span class="keywordflow">if</span> outfnm != <span class="keywordtype">None</span> <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>, </div>
+<div class="line"><a name="l00794"></a><span class="lineno">  794</span>&#160;                                                               <span class="stringliteral">&quot; Append: %s&quot;</span> % logfnm <span class="keywordflow">if</span> logfnm != <span class="keywordtype">None</span> <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>, </div>
+<div class="line"><a name="l00795"></a><span class="lineno">  795</span>&#160;                                                               <span class="stringliteral">&quot; Stdin: %s&quot;</span> % stdin.replace(<span class="stringliteral">&#39;\n&#39;</span>,<span class="stringliteral">&#39;\\n&#39;</span>) <span class="keywordflow">if</span> stdin != <span class="keywordtype">None</span> <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>))</div>
+<div class="line"><a name="l00796"></a><span class="lineno">  796</span>&#160;        wtf(<span class="stringliteral">&quot;Executing process: %s%s\n&quot;</span> % (command, <span class="stringliteral">&quot; Stdin: %s&quot;</span> % stdin.replace(<span class="stringliteral">&#39;\n&#39;</span>,<span class="stringliteral">&#39;\\n&#39;</span>) <span class="keywordflow">if</span> stdin != <span class="keywordtype">None</span> <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>))</div>
+<div class="line"><a name="l00797"></a><span class="lineno">  797</span>&#160;</div>
+<div class="line"><a name="l00798"></a><span class="lineno">  798</span>&#160;    cmd_options.update(kwargs)</div>
+<div class="line"><a name="l00799"></a><span class="lineno">  799</span>&#160;    p = subprocess.Popen(command, **cmd_options)</div>
+<div class="line"><a name="l00800"></a><span class="lineno">  800</span>&#160;    </div>
+<div class="line"><a name="l00801"></a><span class="lineno">  801</span>&#160;    stdout = <span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a name="l00802"></a><span class="lineno">  802</span>&#160;    stderr = <span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a name="l00803"></a><span class="lineno">  803</span>&#160;</div>
+<div class="line"><a name="l00804"></a><span class="lineno">  804</span>&#160;    <span class="keywordflow">if</span> p.stdin:</div>
+<div class="line"><a name="l00805"></a><span class="lineno">  805</span>&#160;        p.stdin.write(stdin)</div>
+<div class="line"><a name="l00806"></a><span class="lineno">  806</span>&#160;        p.stdin.close()</div>
+<div class="line"><a name="l00807"></a><span class="lineno">  807</span>&#160;</div>
+<div class="line"><a name="l00808"></a><span class="lineno">  808</span>&#160;    <span class="keywordflow">while</span> <span class="keyword">True</span>:</div>
+<div class="line"><a name="l00809"></a><span class="lineno">  809</span>&#160;        reads = [p.stdout.fileno(), p.stderr.fileno()]</div>
+<div class="line"><a name="l00810"></a><span class="lineno">  810</span>&#160;        ret = select(reads, [], [])</div>
+<div class="line"><a name="l00811"></a><span class="lineno">  811</span>&#160;        <span class="keywordflow">for</span> fd <span class="keywordflow">in</span> ret[0]:</div>
+<div class="line"><a name="l00812"></a><span class="lineno">  812</span>&#160;            <span class="keywordflow">if</span> fd == p.stdout.fileno():</div>
+<div class="line"><a name="l00813"></a><span class="lineno">  813</span>&#160;                read = p.stdout.readline()</div>
+<div class="line"><a name="l00814"></a><span class="lineno">  814</span>&#160;                <span class="keywordflow">if</span> print_to_screen: sys.stdout.write(read)</div>
+<div class="line"><a name="l00815"></a><span class="lineno">  815</span>&#160;                stdout += read</div>
+<div class="line"><a name="l00816"></a><span class="lineno">  816</span>&#160;                wtf(read)</div>
+<div class="line"><a name="l00817"></a><span class="lineno">  817</span>&#160;            <span class="keywordflow">if</span> fd == p.stderr.fileno():</div>
+<div class="line"><a name="l00818"></a><span class="lineno">  818</span>&#160;                read = p.stderr.readline()</div>
+<div class="line"><a name="l00819"></a><span class="lineno">  819</span>&#160;                <span class="keywordflow">if</span> print_to_screen: sys.stderr.write(read)</div>
+<div class="line"><a name="l00820"></a><span class="lineno">  820</span>&#160;                stderr += read</div>
+<div class="line"><a name="l00821"></a><span class="lineno">  821</span>&#160;                <span class="keywordflow">if</span> copy_stderr: </div>
+<div class="line"><a name="l00822"></a><span class="lineno">  822</span>&#160;                    stdout += read</div>
+<div class="line"><a name="l00823"></a><span class="lineno">  823</span>&#160;                    wtf(read)</div>
+<div class="line"><a name="l00824"></a><span class="lineno">  824</span>&#160;        <span class="keywordflow">if</span> <span class="keywordflow">not</span> read:</div>
+<div class="line"><a name="l00825"></a><span class="lineno">  825</span>&#160;            <span class="keywordflow">break</span></div>
+<div class="line"><a name="l00826"></a><span class="lineno">  826</span>&#160;</div>
+<div class="line"><a name="l00827"></a><span class="lineno">  827</span>&#160;    p.wait()</div>
+<div class="line"><a name="l00828"></a><span class="lineno">  828</span>&#160;</div>
+<div class="line"><a name="l00829"></a><span class="lineno">  829</span>&#160;    <span class="keywordflow">if</span> p.returncode != 0:</div>
+<div class="line"><a name="l00830"></a><span class="lineno">  830</span>&#160;        <span class="keywordflow">if</span> stderr:</div>
+<div class="line"><a name="l00831"></a><span class="lineno">  831</span>&#160;            logger.warning(<span class="stringliteral">&quot;Received an error message:\n&quot;</span>)</div>
+<div class="line"><a name="l00832"></a><span class="lineno">  832</span>&#160;            logger.warning(<span class="stringliteral">&quot;\n==== Error Message ====\n&quot;</span>)</div>
+<div class="line"><a name="l00833"></a><span class="lineno">  833</span>&#160;            logger.warning(stderr)</div>
+<div class="line"><a name="l00834"></a><span class="lineno">  834</span>&#160;            logger.warning(<span class="stringliteral">&quot;== End Error Message ==\n&quot;</span>)</div>
+<div class="line"><a name="l00835"></a><span class="lineno">  835</span>&#160;        <span class="keywordflow">if</span> persist:</div>
+<div class="line"><a name="l00836"></a><span class="lineno">  836</span>&#160;            logger.info(<span class="stringliteral">&quot;%s gave a return code of %i (it may have crashed) -- carrying on\n&quot;</span> % (command, p.returncode))</div>
+<div class="line"><a name="l00837"></a><span class="lineno">  837</span>&#160;        <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00838"></a><span class="lineno">  838</span>&#160;            <span class="comment"># This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.</span></div>
+<div class="line"><a name="l00839"></a><span class="lineno">  839</span>&#160;            <span class="comment"># sys.stderr.write(&quot;\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n&quot; % (command, p.returncode))</span></div>
+<div class="line"><a name="l00840"></a><span class="lineno">  840</span>&#160;            <span class="comment"># sys.exit(p.returncode)</span></div>
+<div class="line"><a name="l00841"></a><span class="lineno">  841</span>&#160;            <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&quot;\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n&quot;</span> % (command, p.returncode))</div>
+<div class="line"><a name="l00842"></a><span class="lineno">  842</span>&#160;        </div>
+<div class="line"><a name="l00843"></a><span class="lineno">  843</span>&#160;    <span class="comment"># Return the output in the form of a list of lines, so we can loop over it using &quot;for line in output&quot;.</span></div>
+<div class="line"><a name="l00844"></a><span class="lineno">  844</span>&#160;    <span class="keywordflow">return</span> stdout.split(<span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00845"></a><span class="lineno">  845</span>&#160;</div>
+<div class="line"><a name="l00846"></a><span class="lineno">  846</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(warning, timeout=10):</div>
+<div class="line"><a name="l00847"></a><span class="lineno">  847</span>&#160;    <span class="keywordflow">if</span> type(warning) <span class="keywordflow">is</span> str:</div>
+<div class="line"><a name="l00848"></a><span class="lineno">  848</span>&#160;        logger.warning(warning + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00849"></a><span class="lineno">  849</span>&#160;    <span class="keywordflow">elif</span> type(warning) <span class="keywordflow">is</span> list:</div>
+<div class="line"><a name="l00850"></a><span class="lineno">  850</span>&#160;        <span class="keywordflow">for</span> line <span class="keywordflow">in</span> warning:</div>
+<div class="line"><a name="l00851"></a><span class="lineno">  851</span>&#160;            logger.warning(line + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00852"></a><span class="lineno">  852</span>&#160;    <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00853"></a><span class="lineno">  853</span>&#160;        logger.warning(<span class="stringliteral">&quot;You&#39;re not supposed to pass me a variable of this type: &quot;</span> + str(type(warning)))</div>
+<div class="line"><a name="l00854"></a><span class="lineno">  854</span>&#160;    <span class="keywordflow">if</span> sys.stdin.isatty():</div>
+<div class="line"><a name="l00855"></a><span class="lineno">  855</span>&#160;        logger.warning(<span class="stringliteral">&quot;\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m\n&quot;</span> % timeout)</div>
+<div class="line"><a name="l00856"></a><span class="lineno">  856</span>&#160;        <span class="keywordflow">try</span>: rlist, wlist, xlist = select([sys.stdin], [], [], timeout)</div>
+<div class="line"><a name="l00857"></a><span class="lineno">  857</span>&#160;        <span class="keywordflow">except</span>: <span class="keywordflow">pass</span></div>
+<div class="line"><a name="l00858"></a><span class="lineno">  858</span>&#160;</div>
+<div class="line"><a name="l00859"></a><span class="lineno">  859</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a26e563ec71ed229c30f3d61d3448c8f1" title="Prints a warning but will only do so once in a given run.">warn_once</a>(warning, warnhash = None):</div>
+<div class="line"><a name="l00860"></a><span class="lineno">  860</span>&#160;    <span class="stringliteral">&quot;&quot;&quot; Prints a warning but will only do so once in a given run. &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00861"></a><span class="lineno">  861</span>&#160;    <span class="keywordflow">if</span> warnhash == <span class="keywordtype">None</span>:</div>
+<div class="line"><a name="l00862"></a><span class="lineno">  862</span>&#160;        warnhash = warning</div>
+<div class="line"><a name="l00863"></a><span class="lineno">  863</span>&#160;    <span class="keywordflow">if</span> warnhash <span class="keywordflow">in</span> warn_once.already:</div>
+<div class="line"><a name="l00864"></a><span class="lineno">  864</span>&#160;        <span class="keywordflow">return</span></div>
+<div class="line"><a name="l00865"></a><span class="lineno">  865</span>&#160;    warn_once.already.add(warnhash)</div>
+<div class="line"><a name="l00866"></a><span class="lineno">  866</span>&#160;    <span class="keywordflow">if</span> type(warning) <span class="keywordflow">is</span> str:</div>
+<div class="line"><a name="l00867"></a><span class="lineno">  867</span>&#160;        logger.info(warning + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00868"></a><span class="lineno">  868</span>&#160;    <span class="keywordflow">elif</span> type(warning) <span class="keywordflow">is</span> list:</div>
+<div class="line"><a name="l00869"></a><span class="lineno">  869</span>&#160;        <span class="keywordflow">for</span> line <span class="keywordflow">in</span> warning:</div>
+<div class="line"><a name="l00870"></a><span class="lineno">  870</span>&#160;            logger.info(line + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00871"></a><span class="lineno">  871</span>&#160;warn_once.already = set()</div>
+<div class="line"><a name="l00872"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">  872</a></span>&#160;</div>
+<div class="line"><a name="l00873"></a><span class="lineno">  873</span>&#160;<span class="comment">#=========================================#</span></div>
+<div class="line"><a name="l00874"></a><span class="lineno">  874</span>&#160;<span class="comment">#| Development stuff (not commonly used) |#</span></div>
+<div class="line"><a name="l00875"></a><span class="lineno">  875</span>&#160;<span class="comment">#=========================================#</span></div>
+<div class="line"><a name="l00876"></a><span class="lineno">  876</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map().">concurrent_map</a>(func, data):</div>
+<div class="line"><a name="l00877"></a><span class="lineno">  877</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00878"></a><span class="lineno">  878</span>&#160;<span class="stringliteral">    Similar to the bultin function map(). But spawn a thread for each argument</span></div>
+<div class="line"><a name="l00879"></a><span class="lineno">  879</span>&#160;<span class="stringliteral">    and apply `func` concurrently.</span></div>
+<div class="line"><a name="l00880"></a><span class="lineno">  880</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00881"></a><span class="lineno">  881</span>&#160;<span class="stringliteral">    Note: unlike map(), we cannot take an iterable argument. `data` should be an</span></div>
+<div class="line"><a name="l00882"></a><span class="lineno">  882</span>&#160;<span class="stringliteral">    indexable sequence.</span></div>
+<div class="line"><a name="l00883"></a><span class="lineno">  883</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00884"></a><span class="lineno">  884</span>&#160;</div>
+<div class="line"><a name="l00885"></a><span class="lineno">  885</span>&#160;    N = len(data)</div>
+<div class="line"><a name="l00886"></a><span class="lineno">  886</span>&#160;    result = [<span class="keywordtype">None</span>] * N</div>
+<div class="line"><a name="l00887"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a26e563ec71ed229c30f3d61d3448c8f1">  887</a></span>&#160;</div>
+<div class="line"><a name="l00888"></a><span class="lineno">  888</span>&#160;    <span class="comment"># wrapper to dispose the result in the right slot</span></div>
+<div class="line"><a name="l00889"></a><span class="lineno">  889</span>&#160;    <span class="keyword">def </span>task_wrapper(i):</div>
+<div class="line"><a name="l00890"></a><span class="lineno">  890</span>&#160;        result[i] = func(data[i])</div>
+<div class="line"><a name="l00891"></a><span class="lineno">  891</span>&#160;</div>
+<div class="line"><a name="l00892"></a><span class="lineno">  892</span>&#160;    threads = [threading.Thread(target=task_wrapper, args=(i,)) <span class="keywordflow">for</span> i <span class="keywordflow">in</span> xrange(N)]</div>
+<div class="line"><a name="l00893"></a><span class="lineno">  893</span>&#160;    <span class="keywordflow">for</span> t <span class="keywordflow">in</span> threads:</div>
+<div class="line"><a name="l00894"></a><span class="lineno">  894</span>&#160;        t.start()</div>
+<div class="line"><a name="l00895"></a><span class="lineno">  895</span>&#160;    <span class="keywordflow">for</span> t <span class="keywordflow">in</span> threads:</div>
+<div class="line"><a name="l00896"></a><span class="lineno">  896</span>&#160;        t.join()</div>
+<div class="line"><a name="l00897"></a><span class="lineno">  897</span>&#160;</div>
+<div class="line"><a name="l00898"></a><span class="lineno">  898</span>&#160;    <span class="keywordflow">return</span> result</div>
 <div class="line"><a name="l00899"></a><span class="lineno">  899</span>&#160;</div>
-<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a64b7c6ca7afa1c11681f5c2897c55cc3" title="This function be given any of several variable types (single file name, file object, or list of lines, or a list of the above) and give a list of files:">multiopen</a>(arg):</div>
-<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;<span class="stringliteral">    This function be given any of several variable types</span></div>
-<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;<span class="stringliteral">    (single file name, file object, or list of lines, or a list of the above)</span></div>
-<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;<span class="stringliteral">    and give a list of files:</span></div>
-<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;<span class="stringliteral">    [file1, file2, file3 ... ]</span></div>
-<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;<span class="stringliteral">    each of which can then be iterated over:</span></div>
-<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;<span class="stringliteral"></span></div>
-<div class="line"><a name="l00910"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc">  910</a></span>&#160;<span class="stringliteral">    [[file1_line1, file1_line2 ... ], [file2_line1, file2_line2 ... ]]</span></div>
-<div class="line"><a name="l00911"></a><span class="lineno">  911</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;    <span class="keywordflow">if</span> type(arg) == str:</div>
-<div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;        <span class="comment"># A single file name</span></div>
-<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;        fins = [open(arg)]</div>
-<div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;    <span class="keywordflow">elif</span> type(arg) == file:</div>
-<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;        <span class="comment"># A file object</span></div>
-<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;        fins = [[arg]]</div>
-<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;    <span class="keywordflow">elif</span> type(arg) == list:</div>
-<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;        <span class="keywordflow">if</span> all([type(l) == str <span class="keywordflow">for</span> l <span class="keywordflow">in</span> arg]):</div>
-<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;            <span class="comment"># A list of lines (as in, open(file).readlines()) is expected to end with \n on most of the lines.</span></div>
-<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;            <span class="keywordflow">if</span> any([match(<span class="stringliteral">&quot;^.*\n$&quot;</span>,l) <span class="keywordflow">for</span> l <span class="keywordflow">in</span> arg]):</div>
-<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;                fins = [[arg]]</div>
-<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;            <span class="comment"># In contrast, a list of file names doesn&#39;t have \n characters.</span></div>
-<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;            <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;                fins = [open(l) <span class="keywordflow">for</span> l <span class="keywordflow">in</span> arg]</div>
-<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;        <span class="keywordflow">elif</span> all([type(l) == file <span class="keywordflow">or</span> type(l) == list <span class="keywordflow">for</span> l <span class="keywordflow">in</span> arg]):</div>
-<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;            fins = arg</div>
-<div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;        <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;            logger.info(<span class="stringliteral">&quot;What did you give this program as input?\n&quot;</span>)</div>
-<div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;            logger.info(str(arg) + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;            exit(1)</div>
-<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;    <span class="keywordflow">else</span>:</div>
-<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;        logger.info(<span class="stringliteral">&quot;What did you give this program as input?\n&quot;</span>)</div>
-<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;        logger.info(str(arg) + <span class="stringliteral">&#39;\n&#39;</span>)</div>
-<div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;        exit(1)</div>
-<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;    <span class="keywordflow">return</span> fins</div>
+<div class="line"><a name="l00900"></a><span class="lineno">  900</span>&#160;</div>
+<div class="line"><a name="l00901"></a><span class="lineno">  901</span>&#160;<span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1nifty.html#a64b7c6ca7afa1c11681f5c2897c55cc3" title="This function be given any of several variable types (single file name, file object, or list of lines, or a list of the above) and give a list of files:">multiopen</a>(arg):</div>
+<div class="line"><a name="l00902"></a><span class="lineno">  902</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00903"></a><span class="lineno">  903</span>&#160;<span class="stringliteral">    This function be given any of several variable types</span></div>
+<div class="line"><a name="l00904"></a><span class="lineno">  904</span>&#160;<span class="stringliteral">    (single file name, file object, or list of lines, or a list of the above)</span></div>
+<div class="line"><a name="l00905"></a><span class="lineno">  905</span>&#160;<span class="stringliteral">    and give a list of files:</span></div>
+<div class="line"><a name="l00906"></a><span class="lineno">  906</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00907"></a><span class="lineno">  907</span>&#160;<span class="stringliteral">    [file1, file2, file3 ... ]</span></div>
+<div class="line"><a name="l00908"></a><span class="lineno">  908</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00909"></a><span class="lineno">  909</span>&#160;<span class="stringliteral">    each of which can then be iterated over:</span></div>
+<div class="line"><a name="l00910"></a><span class="lineno">  910</span>&#160;<span class="stringliteral"></span></div>
+<div class="line"><a name="l00911"></a><span class="lineno"><a class="code" href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc">  911</a></span>&#160;<span class="stringliteral">    [[file1_line1, file1_line2 ... ], [file2_line1, file2_line2 ... ]]</span></div>
+<div class="line"><a name="l00912"></a><span class="lineno">  912</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00913"></a><span class="lineno">  913</span>&#160;    <span class="keywordflow">if</span> type(arg) == str:</div>
+<div class="line"><a name="l00914"></a><span class="lineno">  914</span>&#160;        <span class="comment"># A single file name</span></div>
+<div class="line"><a name="l00915"></a><span class="lineno">  915</span>&#160;        fins = [open(arg)]</div>
+<div class="line"><a name="l00916"></a><span class="lineno">  916</span>&#160;    <span class="keywordflow">elif</span> type(arg) == file:</div>
+<div class="line"><a name="l00917"></a><span class="lineno">  917</span>&#160;        <span class="comment"># A file object</span></div>
+<div class="line"><a name="l00918"></a><span class="lineno">  918</span>&#160;        fins = [[arg]]</div>
+<div class="line"><a name="l00919"></a><span class="lineno">  919</span>&#160;    <span class="keywordflow">elif</span> type(arg) == list:</div>
+<div class="line"><a name="l00920"></a><span class="lineno">  920</span>&#160;        <span class="keywordflow">if</span> all([type(l) == str <span class="keywordflow">for</span> l <span class="keywordflow">in</span> arg]):</div>
+<div class="line"><a name="l00921"></a><span class="lineno">  921</span>&#160;            <span class="comment"># A list of lines (as in, open(file).readlines()) is expected to end with \n on most of the lines.</span></div>
+<div class="line"><a name="l00922"></a><span class="lineno">  922</span>&#160;            <span class="keywordflow">if</span> any([match(<span class="stringliteral">&quot;^.*\n$&quot;</span>,l) <span class="keywordflow">for</span> l <span class="keywordflow">in</span> arg]):</div>
+<div class="line"><a name="l00923"></a><span class="lineno">  923</span>&#160;                fins = [[arg]]</div>
+<div class="line"><a name="l00924"></a><span class="lineno">  924</span>&#160;            <span class="comment"># In contrast, a list of file names doesn&#39;t have \n characters.</span></div>
+<div class="line"><a name="l00925"></a><span class="lineno">  925</span>&#160;            <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00926"></a><span class="lineno">  926</span>&#160;                fins = [open(l) <span class="keywordflow">for</span> l <span class="keywordflow">in</span> arg]</div>
+<div class="line"><a name="l00927"></a><span class="lineno">  927</span>&#160;        <span class="keywordflow">elif</span> all([type(l) == file <span class="keywordflow">or</span> type(l) == list <span class="keywordflow">for</span> l <span class="keywordflow">in</span> arg]):</div>
+<div class="line"><a name="l00928"></a><span class="lineno">  928</span>&#160;            fins = arg</div>
+<div class="line"><a name="l00929"></a><span class="lineno">  929</span>&#160;        <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00930"></a><span class="lineno">  930</span>&#160;            logger.info(<span class="stringliteral">&quot;What did you give this program as input?\n&quot;</span>)</div>
+<div class="line"><a name="l00931"></a><span class="lineno">  931</span>&#160;            logger.info(str(arg) + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00932"></a><span class="lineno">  932</span>&#160;            exit(1)</div>
+<div class="line"><a name="l00933"></a><span class="lineno">  933</span>&#160;    <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00934"></a><span class="lineno">  934</span>&#160;        logger.info(<span class="stringliteral">&quot;What did you give this program as input?\n&quot;</span>)</div>
+<div class="line"><a name="l00935"></a><span class="lineno">  935</span>&#160;        logger.info(str(arg) + <span class="stringliteral">&#39;\n&#39;</span>)</div>
+<div class="line"><a name="l00936"></a><span class="lineno">  936</span>&#160;        exit(1)</div>
+<div class="line"><a name="l00937"></a><span class="lineno">  937</span>&#160;    <span class="keywordflow">return</span> fins</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Aug 16 2013 10:59:24 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Aug 23 2013 10:40:05 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

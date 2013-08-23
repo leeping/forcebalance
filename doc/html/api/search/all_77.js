@@ -21,7 +21,7 @@ var searchData=
   ['whamboltz',['whamboltz',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a8f70f017ca8ec54c1acdbc85eff06ab9',1,'forcebalance::abinitio::AbInitio']]],
   ['whamboltz_5fwts',['whamboltz_wts',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a885e7ef58b9e7c6abbc24321e5f3c61a',1,'forcebalance::abinitio::AbInitio']]],
   ['which',['which',['../namespaceforcebalance_1_1nifty.html#aa1ff334c4b4e30e91978b91d9a9ec065',1,'forcebalance::nifty']]],
-  ['whites',['Whites',['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#a684b946f7faca6589c8ed49e77e31f73',1,'forcebalance.amberio.FrcMod_Reader.Whites()'],['../classforcebalance_1_1basereader_1_1BaseReader.html#a2819ab1e523b6ff8e7467e56e3582386',1,'forcebalance.basereader.BaseReader.Whites()']]],
+  ['whites',['Whites',['../classforcebalance_1_1BaseReader.html#af2af8a559625614474a1c6fe245b5e13',1,'forcebalance.BaseReader.Whites()'],['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#a684b946f7faca6589c8ed49e77e31f73',1,'forcebalance.amberio.FrcMod_Reader.Whites()']]],
   ['work_5fqueue',['WORK_QUEUE',['../namespaceforcebalance.html#a730d54f7aa4e228b2475e31765b36b68',1,'forcebalance']]],
   ['wq_5fcomplete',['wq_complete',['../classforcebalance_1_1target_1_1Target.html#af6099ec09486213869dba2491bd8ea04',1,'forcebalance::target::Target']]],
   ['wq_5fwait',['wq_wait',['../namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c',1,'forcebalance::nifty']]],

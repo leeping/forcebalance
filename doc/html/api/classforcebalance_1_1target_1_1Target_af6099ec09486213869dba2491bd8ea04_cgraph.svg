@@ -17,7 +17,7 @@
 </g>
 <!-- Node2 -->
 <g id="node2" class="node"><title>Node2</title>
-<g id="a_node2"><a xlink:href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" target="_top" xlink:title="This function waits ten seconds to see if a task in the Work Queue has finished.">
+<g id="a_node2"><a xlink:href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" target="_top" target="_top" xlink:title="This function waits ten seconds to see if a task in the Work Queue has finished.">
 <polygon fill="white" stroke="black" points="200.411,-84 200.411,-116 303.589,-116 303.589,-84 200.411,-84"/>
 <text text-anchor="start" x="208.411" y="-103" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.wq</text>
 <text text-anchor="middle" x="252" y="-91" font-family="Ubuntu-R" font-size="10.00">_wait1</text>
@@ -31,7 +31,7 @@
 </g>
 <!-- Node9 -->
 <g id="node9" class="node"><title>Node9</title>
-<g id="a_node9"><a xlink:href="classforcebalance_1_1target_1_1Target.html#ac30a4e9d7d9fe06f7caefa5f7cfab09b" target="_top" xlink:title="Print target information in an organized table format.">
+<g id="a_node9"><a xlink:href="classforcebalance_1_1target_1_1Target.html#ac30a4e9d7d9fe06f7caefa5f7cfab09b" target="_top" target="_top" xlink:title="Print target information in an organized table format.">
 <polygon fill="white" stroke="black" points="172.232,-17 172.232,-49 331.768,-49 331.768,-17 172.232,-17"/>
 <text text-anchor="start" x="180.232" y="-36" font-family="Ubuntu-R" font-size="10.00">forcebalance.target.Target.printcool</text>
 <text text-anchor="middle" x="252" y="-24" font-family="Ubuntu-R" font-size="10.00">_table</text>
@@ -45,7 +45,7 @@
 </g>
 <!-- Node3 -->
 <g id="node3" class="node"><title>Node3</title>
-<g id="a_node3"><a xlink:href="namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" target="_top" xlink:title="This function waits until the work queue is completely empty.">
+<g id="a_node3"><a xlink:href="namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" target="_top" target="_top" xlink:title="This function waits until the work queue is completely empty.">
 <polygon fill="white" stroke="black" points="369.303,-90 369.303,-110 494.697,-110 494.697,-90 369.303,-90"/>
 <text text-anchor="middle" x="432" y="-97" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.wq_wait</text>
 </a>
@@ -58,7 +58,7 @@
 </g>
 <!-- Node4 -->
 <g id="node4" class="node"><title>Node4</title>
-<g id="a_node4"><a xlink:href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" target="_top" xlink:title="forcebalance.nifty.allsplit">
+<g id="a_node4"><a xlink:href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" target="_top" target="_top" xlink:title="forcebalance.nifty.allsplit">
 <polygon fill="white" stroke="black" points="531.909,-109 531.909,-129 650.091,-129 650.091,-109 531.909,-109"/>
 <text text-anchor="middle" x="591" y="-116" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.allsplit</text>
 </a>
@@ -71,7 +71,7 @@
 </g>
 <!-- Node7 -->
 <g id="node7" class="node"><title>Node7</title>
-<g id="a_node7"><a xlink:href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" target="_top" xlink:title="forcebalance.nifty.GoInto">
+<g id="a_node7"><a xlink:href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" target="_top" target="_top" xlink:title="forcebalance.nifty.GoInto">
 <polygon fill="white" stroke="black" points="372.357,-51 372.357,-71 491.643,-71 491.643,-51 372.357,-51"/>
 <text text-anchor="middle" x="432" y="-58" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.GoInto</text>
 </a>
@@ -84,7 +84,7 @@
 </g>
 <!-- Node8 -->
 <g id="node8" class="node"><title>Node8</title>
-<g id="a_node8"><a xlink:href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" target="_top" xlink:title="forcebalance.nifty.Leave">
+<g id="a_node8"><a xlink:href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" target="_top" target="_top" xlink:title="forcebalance.nifty.Leave">
 <polygon fill="white" stroke="black" points="374.308,-168 374.308,-188 489.692,-188 489.692,-168 374.308,-168"/>
 <text text-anchor="middle" x="432" y="-175" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.Leave</text>
 </a>
@@ -102,7 +102,7 @@
 </g>
 <!-- Node5 -->
 <g id="node5" class="node"><title>Node5</title>
-<g id="a_node5"><a xlink:href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" target="_top" xlink:title="forcebalance.nifty.Missing\lFileInspection">
+<g id="a_node5"><a xlink:href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" target="_top" target="_top" xlink:title="forcebalance.nifty.Missing\lFileInspection">
 <polygon fill="white" stroke="black" points="689.409,-103 689.409,-135 812.591,-135 812.591,-103 689.409,-103"/>
 <text text-anchor="start" x="697.409" y="-122" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.Missing</text>
 <text text-anchor="middle" x="751" y="-110" font-family="Ubuntu-R" font-size="10.00">FileInspection</text>
@@ -116,7 +116,7 @@
 </g>
 <!-- Node6 -->
 <g id="node6" class="node"><title>Node6</title>
-<g id="a_node6"><a xlink:href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" target="_top" xlink:title="forcebalance.nifty.link\l_dir_contents">
+<g id="a_node6"><a xlink:href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" target="_top" target="_top" xlink:title="forcebalance.nifty.link\l_dir_contents">
 <polygon fill="white" stroke="black" points="856.742,-103 856.742,-135 963.258,-135 963.258,-103 856.742,-103"/>
 <text text-anchor="start" x="864.742" y="-122" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.link</text>
 <text text-anchor="middle" x="910" y="-110" font-family="Ubuntu-R" font-size="10.00">_dir_contents</text>
@@ -130,7 +130,7 @@
 </g>
 <!-- Node10 -->
 <g id="node10" class="node"><title>Node10</title>
-<g id="a_node10"><a xlink:href="namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" target="_top" xlink:title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary...">
+<g id="a_node10"><a xlink:href="namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" target="_top" target="_top" xlink:title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary...">
 <polygon fill="white" stroke="black" points="368.469,-0 368.469,-32 495.531,-32 495.531,-0 368.469,-0"/>
 <text text-anchor="start" x="376.469" y="-19" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.printcool</text>
 <text text-anchor="middle" x="432" y="-7" font-family="Ubuntu-R" font-size="10.00">_dictionary</text>
@@ -144,7 +144,7 @@
 </g>
 <!-- Node11 -->
 <g id="node11" class="node"><title>Node11</title>
-<g id="a_node11"><a xlink:href="namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" target="_top" xlink:title="ONLY matches integers! If you have a decimal point? None shall pass!">
+<g id="a_node11"><a xlink:href="namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" target="_top" target="_top" xlink:title="ONLY matches integers! If you have a decimal point? None shall pass!">
 <polygon fill="white" stroke="black" points="536.908,-26 536.908,-46 645.092,-46 645.092,-26 536.908,-26"/>
 <text text-anchor="middle" x="591" y="-33" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.isint</text>
 </a>
@@ -157,7 +157,7 @@
 </g>
 <!-- Node13 -->
 <g id="node13" class="node"><title>Node13</title>
-<g id="a_node13"><a xlink:href="namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" target="_top" xlink:title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ...">
+<g id="a_node13"><a xlink:href="namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" target="_top" target="_top" xlink:title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ...">
 <polygon fill="white" stroke="black" points="852.024,-20 852.024,-40 967.976,-40 967.976,-20 852.024,-20"/>
 <text text-anchor="middle" x="910" y="-27" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.isfloat</text>
 </a>
@@ -170,7 +170,7 @@
 </g>
 <!-- Node12 -->
 <g id="node12" class="node"><title>Node12</title>
-<g id="a_node12"><a xlink:href="namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" target="_top" xlink:title="Matches things with a decimal only; see isint and isfloat.">
+<g id="a_node12"><a xlink:href="namespaceforcebalance_1_1nifty.html#a09263927eaec9deff283fbf1a820242f" target="_top" target="_top" xlink:title="Matches things with a decimal only; see isint and isfloat.">
 <polygon fill="white" stroke="black" points="686.36,-64 686.36,-84 815.64,-84 815.64,-64 686.36,-64"/>
 <text text-anchor="middle" x="751" y="-71" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.isdecimal</text>
 </a>
@@ -188,7 +188,7 @@
 </g>
 <!-- Node17 -->
 <g id="node17" class="node"><title>Node17</title>
-<g id="a_node17"><a xlink:href="namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" target="_top" xlink:title="Given any list, array, or matrix, return a 1&#45;column matrix.">
+<g id="a_node17"><a xlink:href="namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" target="_top" target="_top" xlink:title="Given any list, array, or matrix, return a 1&#45;column matrix.">
 <polygon fill="white" stroke="black" points="858.412,-64 858.412,-84 961.588,-84 961.588,-64 858.412,-64"/>
 <text text-anchor="middle" x="910" y="-71" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.col</text>
 </a>
@@ -206,7 +206,7 @@
 </g>
 <!-- Node14 -->
 <g id="node14" class="node"><title>Node14</title>
-<g id="a_node14"><a xlink:href="namespaceforcebalance_1_1nifty.html#a8d63c8ae9a67c66673a6cf81357f827d" target="_top" xlink:title="Returns a big number if we encounter NaN.">
+<g id="a_node14"><a xlink:href="namespaceforcebalance_1_1nifty.html#a8d63c8ae9a67c66673a6cf81357f827d" target="_top" target="_top" xlink:title="Returns a big number if we encounter NaN.">
 <polygon fill="white" stroke="black" points="1003.97,-19 1003.97,-39 1136.03,-39 1136.03,-19 1003.97,-19"/>
 <text text-anchor="middle" x="1070" y="-26" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.floatornan</text>
 </a>
@@ -219,7 +219,7 @@
 </g>
 <!-- Node15 -->
 <g id="node15" class="node"><title>Node15</title>
-<g id="a_node15"><a xlink:href="namespaceforcebalance_1_1nifty.html#a6c9727360cdff8f3011a12cc54d0e86e" target="_top" xlink:title="Given any list, array, or matrix, return a 1&#45;row matrix.">
+<g id="a_node15"><a xlink:href="namespaceforcebalance_1_1nifty.html#a6c9727360cdff8f3011a12cc54d0e86e" target="_top" target="_top" xlink:title="Given any list, array, or matrix, return a 1&#45;row matrix.">
 <polygon fill="white" stroke="black" points="1185.75,-18 1185.75,-38 1292.25,-38 1292.25,-18 1185.75,-18"/>
 <text text-anchor="middle" x="1239" y="-25" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.row</text>
 </a>
@@ -232,7 +232,7 @@
 </g>
 <!-- Node16 -->
 <g id="node16" class="node"><title>Node16</title>
-<g id="a_node16"><a xlink:href="namespaceforcebalance_1_1nifty.html#a7676236002c6a65ea7d2e69a09923889" target="_top" xlink:title="Given two vectors vec1 and vec2, project out the component of vec1 that is along the vec2&#45;direction...">
+<g id="a_node16"><a xlink:href="namespaceforcebalance_1_1nifty.html#a7676236002c6a65ea7d2e69a09923889" target="_top" target="_top" xlink:title="Given two vectors vec1 and vec2, project out the component of vec1 that is along the vec2&#45;direction...">
 <polygon fill="white" stroke="black" points="1342.03,-18 1342.03,-38 1487.97,-38 1487.97,-18 1342.03,-18"/>
 <text text-anchor="middle" x="1415" y="-25" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.orthogonalize</text>
 </a>
@@ -245,7 +245,7 @@
 </g>
 <!-- Node18 -->
 <g id="node18" class="node"><title>Node18</title>
-<g id="a_node18"><a xlink:href="namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" target="_top" xlink:title="Given any list, array, or matrix, return a single&#45;index array.">
+<g id="a_node18"><a xlink:href="namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" target="_top" target="_top" xlink:title="Given any list, array, or matrix, return a single&#45;index array.">
 <polygon fill="white" stroke="black" points="1017.86,-103 1017.86,-123 1122.14,-123 1122.14,-103 1017.86,-103"/>
 <text text-anchor="middle" x="1070" y="-110" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.flat</text>
 </a>
@@ -258,7 +258,7 @@
 </g>
 <!-- Node19 -->
 <g id="node19" class="node"><title>Node19</title>
-<g id="a_node19"><a xlink:href="namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" target="_top" xlink:title="Invert a matrix using singular value decomposition.">
+<g id="a_node19"><a xlink:href="namespaceforcebalance_1_1nifty.html#a4c82187e92dfeb8a159f4aa44b501c40" target="_top" target="_top" xlink:title="Invert a matrix using singular value decomposition.">
 <polygon fill="white" stroke="black" points="1172.41,-67 1172.41,-87 1305.59,-87 1305.59,-67 1172.41,-67"/>
 <text text-anchor="middle" x="1239" y="-74" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.invert_svd</text>
 </a>
@@ -276,7 +276,7 @@
 </g>
 <!-- Node20 -->
 <g id="node20" class="node"><title>Node20</title>
-<g id="a_node20"><a xlink:href="namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" target="_top" xlink:title="forcebalance.nifty.get\l_least_squares">
+<g id="a_node20"><a xlink:href="namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" target="_top" target="_top" xlink:title="forcebalance.nifty.get\l_least_squares">
 <polygon fill="white" stroke="black" points="1363.41,-108 1363.41,-140 1466.59,-140 1466.59,-108 1363.41,-108"/>
 <text text-anchor="start" x="1371.41" y="-127" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.get</text>
 <text text-anchor="middle" x="1415" y="-115" font-family="Ubuntu-R" font-size="10.00">_least_squares</text>
@@ -290,7 +290,7 @@
 </g>
 <!-- Node22 -->
 <g id="node22" class="node"><title>Node22</title>
-<g id="a_node22"><a xlink:href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" target="_top" xlink:title="forcebalance.nifty.warn\l_press_key">
+<g id="a_node22"><a xlink:href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" target="_top" target="_top" xlink:title="forcebalance.nifty.warn\l_press_key">
 <polygon fill="white" stroke="black" points="1359.53,-57 1359.53,-89 1470.47,-89 1470.47,-57 1359.53,-57"/>
 <text text-anchor="start" x="1367.53" y="-76" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.warn</text>
 <text text-anchor="middle" x="1415" y="-64" font-family="Ubuntu-R" font-size="10.00">_press_key</text>
@@ -309,7 +309,7 @@
 </g>
 <!-- Node21 -->
 <g id="node21" class="node"><title>Node21</title>
-<g id="a_node21"><a xlink:href="namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10" target="_top" xlink:title="Compute the (cross) statistical inefficiency of (two) timeseries.">
+<g id="a_node21"><a xlink:href="namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10" target="_top" target="_top" xlink:title="Compute the (cross) statistical inefficiency of (two) timeseries.">
 <polygon fill="white" stroke="black" points="1537.64,-108 1537.64,-140 1666.36,-140 1666.36,-108 1537.64,-108"/>
 <text text-anchor="start" x="1545.64" y="-127" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.statistical</text>
 <text text-anchor="middle" x="1602" y="-115" font-family="Ubuntu-R" font-size="10.00">Inefficiency</text>
@@ -323,7 +323,7 @@
 </g>
 <!-- Node23 -->
 <g id="node23" class="node"><title>Node23</title>
-<g id="a_node23"><a xlink:href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" target="_top" xlink:title="Similar to the bultin function map().">
+<g id="a_node23"><a xlink:href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" target="_top" target="_top" xlink:title="Similar to the bultin function map().">
 <polygon fill="white" stroke="black" points="1524.04,-63 1524.04,-83 1679.96,-83 1679.96,-63 1524.04,-63"/>
 <text text-anchor="middle" x="1602" y="-70" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.concurrent_map</text>
 </a>

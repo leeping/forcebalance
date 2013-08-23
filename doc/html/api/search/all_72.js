@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['r_5foptions',['r_options',['../classforcebalance_1_1target_1_1RemoteTarget.html#a29cbbe48b817f527628d68d844b36b1d',1,'forcebalance::target::RemoteTarget']]],
+  ['r_5ftgt_5fopts',['r_tgt_opts',['../classforcebalance_1_1target_1_1RemoteTarget.html#a49d8b3e812fc2114c73fafeb5e8abe51',1,'forcebalance::target::RemoteTarget']]],
   ['radian',['radian',['../namespaceforcebalance_1_1molecule.html#a1ee5389ce8a9042e053c7972dbbfb005',1,'forcebalance::molecule']]],
   ['radii',['radii',['../classforcebalance_1_1psi4io_1_1Grid__Reader.html#a82c8a907130461776b26605ee022f951',1,'forcebalance.psi4io.Grid_Reader.radii()'],['../namespaceforcebalance_1_1chemistry.html#a5b56f8045a8e79c5b088a58695fa460f',1,'forcebalance.chemistry.Radii()'],['../namespaceforcebalance_1_1molecule.html#a74f55a89a14ca676b5a06441d1fdab19',1,'forcebalance.molecule.Radii()']]],
   ['radius_5fof_5fgyration',['radius_of_gyration',['../classforcebalance_1_1molecule_1_1Molecule.html#a02ff6f6642ed47c3b1fa3bb00191c32a',1,'forcebalance::molecule::Molecule']]],
@@ -35,6 +37,8 @@ var searchData=
   ['ref_5fmoments',['ref_moments',['../classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#a17de0cabe736ba52ae17f8476db7d35a',1,'forcebalance.gmxqpio.Monomer_QTPIE.ref_moments()'],['../classforcebalance_1_1moments_1_1Moments.html#a482e5ec495c5466d32de15a97758a63c',1,'forcebalance.moments.Moments.ref_moments()']]],
   ['refdata',['RefData',['../classforcebalance_1_1liquid_1_1Liquid.html#a472f32bbaf18b8ead19b9156f305b8fc',1,'forcebalance::liquid::Liquid']]],
   ['refresh_5ftemp_5fdirectory',['refresh_temp_directory',['../classforcebalance_1_1target_1_1Target.html#afe815eafab06ac92f10bbf4b88ad95c8',1,'forcebalance::target::Target']]],
+  ['remote_5findicate',['remote_indicate',['../classforcebalance_1_1target_1_1RemoteTarget.html#a0c110e0c641b57839fb0b150cd3d3b63',1,'forcebalance::target::RemoteTarget']]],
+  ['remotetarget',['RemoteTarget',['../classforcebalance_1_1target_1_1RemoteTarget.html',1,'forcebalance::target']]],
   ['remove_5fif_5fexists',['remove_if_exists',['../namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e',1,'forcebalance::nifty']]],
   ['removehandler',['removeHandler',['../classforcebalance_1_1output_1_1ForceBalanceLogger.html#ad8aa2fcfa32166607ee3d0cb0dcebd2d',1,'forcebalance::output::ForceBalanceLogger']]],
   ['replace_5fperatom',['replace_peratom',['../classforcebalance_1_1molecule_1_1Molecule.html#ad825186bec1659fdad2521a1b377323b',1,'forcebalance::molecule::Molecule']]],

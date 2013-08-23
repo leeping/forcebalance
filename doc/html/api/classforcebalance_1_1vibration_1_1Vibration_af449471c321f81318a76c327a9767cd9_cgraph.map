@@ -1,5 +1,5 @@
 <map id="forcebalance.vibration.Vibration.__init__" name="forcebalance.vibration.Vibration.__init__">
-<area shape="rect" id="node3" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option" alt="" coords="311,5,521,51"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1BaseClass.html#a73e9a37a7632e79eb99f49bd15aced45" title="forcebalance.BaseClass.set\l_option" alt="" coords="317,5,515,51"/>
 <area shape="rect" id="node5" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#aa73bedbf1e2cf19f2fa1e88815f1bd86" title="Read the reference ab initio data from a file such as qdata.txt." alt="" coords="323,74,509,121"/>
 <area shape="rect" id="node7" href="$classforcebalance_1_1interaction_1_1Interaction.html#aa67c082c3b6fa2d87ba3f4cf1a74e4f8" title="Read the reference ab initio data from a file such as qdata.txt." alt="" coords="303,143,529,190"/>
 <area shape="rect" id="node11" href="$classforcebalance_1_1moments_1_1Moments.html#a2048e58340147becb826702f61442227" title="Read the reference data from a file." alt="" coords="283,213,549,259"/>

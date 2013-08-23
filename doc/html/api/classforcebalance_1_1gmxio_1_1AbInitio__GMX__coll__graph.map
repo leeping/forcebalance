@@ -1,5 +1,5 @@
 <map id="forcebalance.gmxio.AbInitio_GMX" name="forcebalance.gmxio.AbInitio_GMX">
-<area shape="rect" id="node2" href="$classforcebalance_1_1abinitio_1_1AbInitio.html" title="Subclass of Target for fitting force fields to ab initio data." alt="" coords="34,254,187,298"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="30,177,191,205"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="23,83,199,127"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1abinitio_1_1AbInitio.html" title="Subclass of Target for fitting force fields to ab initio data." alt="" coords="35,238,208,285"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="27,160,216,189"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="35,83,208,112"/>
 </map>

@@ -140,25 +140,37 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00047"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1RawFileHandler.html">   47</a></span>&#160;        self.stream.write(message)</div>
 <div class="line"><a name="l00048"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1RawFileHandler.html#a55d391dbd042a51aa1d15106151eecd3">   48</a></span>&#160;        self.flush()</div>
 <div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        </div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">class </span><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html" title="File handler that does not write terminal escape codes and carriage returns to files.">CleanFileHandler</a>(FileHandler):</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;File handler that does not write terminal escape codes and carriage returns</span></div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="stringliteral">    to files. Use this when writing to a file that will probably not be viewed in a terminal&quot;&quot;&quot;</span></div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">def </span><a class="code" href="classforcebalance_1_1output_1_1RawFileHandler.html#a55d391dbd042a51aa1d15106151eecd3">emit</a>(self, record):</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        message = record.getMessage()</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        message = re.sub(<span class="stringliteral">&quot;\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, message)</div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html">   56</a></span>&#160;        message = re.sub(<span class="stringliteral">&quot;\r&quot;</span>, <span class="stringliteral">&quot;\n&quot;</span>, message)</div>
-<div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html#a1bb68743fcd45e71a280599a3658c00c">   57</a></span>&#160;        self.stream.write(message)</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        self.flush()</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;<span class="comment"># set up package level logger that by default prints to sys.stdout</span></div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;setLoggerClass(ForceBalanceLogger)</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;logger=getLogger(<span class="stringliteral">&#39;forcebalance&#39;</span>)</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;setLoggerClass(Logger)  <span class="comment"># module level loggers should use the default logger object</span></div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;logger.setLevel(INFO)</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">class </span><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html" title="Similar to RawStreamHandler except it does not write terminal escape codes.">CleanStreamHandler</a>(StreamHandler):</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;Similar to RawStreamHandler except it does not write terminal escape codes.</span></div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;<span class="stringliteral">    Use this for &#39;plain&#39; terminal output without any fancy colors or formatting&quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">def </span>__init__(self, stream = sys.stdout):</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        super(CleanStreamHandler, self).__init__(stream)</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    </div>
+<div class="line"><a name="l00056"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html">   56</a></span>&#160;    <span class="keyword">def </span><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html#a54af06d396c934827a60c07319b61c9b">emit</a>(self, record):</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html#af3e4e5c143659317693cfd5e6c4098d5">   57</a></span>&#160;        message = record.getMessage()</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        message = re.sub(<span class="stringliteral">&quot;\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, message)</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;        self.stream.write(message)</div>
+<div class="line"><a name="l00060"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html#a54af06d396c934827a60c07319b61c9b">   60</a></span>&#160;        self.flush()</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        </div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;<span class="keyword">class </span><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html" title="File handler that does not write terminal escape codes and carriage returns to files.">CleanFileHandler</a>(FileHandler):</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;File handler that does not write terminal escape codes and carriage returns</span></div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="stringliteral">    to files. Use this when writing to a file that will probably not be viewed in a terminal&quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;    <span class="keyword">def </span><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html#a54af06d396c934827a60c07319b61c9b">emit</a>(self, record):</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        message = record.getMessage()</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        message = re.sub(<span class="stringliteral">&quot;\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, message)</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        message = re.sub(<span class="stringliteral">&quot;\r&quot;</span>, <span class="stringliteral">&quot;\n&quot;</span>, message)</div>
+<div class="line"><a name="l00069"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html">   69</a></span>&#160;        self.stream.write(message)</div>
+<div class="line"><a name="l00070"></a><span class="lineno"><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html#a1bb68743fcd45e71a280599a3658c00c">   70</a></span>&#160;        self.flush()</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;<span class="comment"># set up package level logger that by default prints to sys.stdout</span></div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;setLoggerClass(ForceBalanceLogger)</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;logger=getLogger(<span class="stringliteral">&#39;forcebalance&#39;</span>)</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;setLoggerClass(Logger)  <span class="comment"># module level loggers should use the default logger object</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;logger.setLevel(INFO)</div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Aug 16 2013 10:59:24 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Aug 23 2013 10:40:05 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

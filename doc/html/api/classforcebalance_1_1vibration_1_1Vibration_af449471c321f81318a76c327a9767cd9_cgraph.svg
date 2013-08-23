@@ -17,16 +17,16 @@
 </g>
 <!-- Node2 -->
 <g id="node3" class="node"><title>Node2</title>
-<a xlink:href="classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" target="_top" xlink:title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option">
-<polygon fill="white" stroke="black" points="229,-208 229,-242 387,-242 387,-208 229,-208"/>
-<text text-anchor="start" x="237" y="-229" font-family="Ubuntu-R" font-size="10.00">forcebalance.baseclass.Force</text>
-<text text-anchor="middle" x="308" y="-216" font-family="Ubuntu-R" font-size="10.00">BalanceBaseClass.set_option</text>
+<a xlink:href="classforcebalance_1_1BaseClass.html#a73e9a37a7632e79eb99f49bd15aced45" target="_top" xlink:title="forcebalance.BaseClass.set\l_option">
+<polygon fill="white" stroke="black" points="234,-208 234,-242 382,-242 382,-208 234,-208"/>
+<text text-anchor="start" x="242" y="-229" font-family="Ubuntu-R" font-size="10.00">forcebalance.BaseClass.set</text>
+<text text-anchor="middle" x="308" y="-216" font-family="Ubuntu-R" font-size="10.00">_option</text>
 </a>
 </g>
 <!-- Node1&#45;&gt;Node2 -->
 <g id="edge2" class="edge"><title>Node1&#45;&gt;Node2</title>
-<path fill="none" stroke="midnightblue" d="M108.17,-138.236C131.735,-155.799 170.676,-182.706 208,-199 212.658,-201.034 217.511,-202.936 222.457,-204.71"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="221.464,-208.069 232.059,-207.967 223.713,-201.44 221.464,-208.069"/>
+<path fill="none" stroke="midnightblue" d="M108.17,-138.236C131.735,-155.799 170.676,-182.706 208,-199 213.266,-201.299 218.78,-203.429 224.397,-205.398"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="223.329,-208.731 233.922,-208.559 225.533,-202.087 223.329,-208.731"/>
 </g>
 <!-- Node3 -->
 <g id="node5" class="node"><title>Node3</title>

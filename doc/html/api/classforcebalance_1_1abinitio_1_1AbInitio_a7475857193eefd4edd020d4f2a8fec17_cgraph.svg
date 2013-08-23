@@ -17,7 +17,7 @@
 </g>
 <!-- Node2 -->
 <g id="node2" class="node"><title>Node2</title>
-<g id="a_node2"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ae17e3c379d82935d725dd31f01df23e5" target="_top" xlink:title="Call mdrun in order to update the virtual site positions.">
+<g id="a_node2"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ae17e3c379d82935d725dd31f01df23e5" target="_top" target="_top" xlink:title="Call mdrun in order to update the virtual site positions.">
 <polygon fill="white" stroke="black" points="152.154,-63 152.154,-95 297.846,-95 297.846,-63 152.154,-63"/>
 <text text-anchor="start" x="160.154" y="-82" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="225" y="-70" font-family="Ubuntu-R" font-size="10.00">_GMX.generate_vsite_positions</text>
@@ -31,7 +31,7 @@
 </g>
 <!-- Node14 -->
 <g id="node14" class="node"><title>Node14</title>
-<g id="a_node14"><a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#afbf86c26158a68cae7460b4106809fdd" target="_top" xlink:title="forcebalance.abinitio.Ab\lInitio.compute_netforce\l_torque">
+<g id="a_node14"><a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#afbf86c26158a68cae7460b4106809fdd" target="_top" target="_top" xlink:title="forcebalance.abinitio.Ab\lInitio.compute_netforce\l_torque">
 <polygon fill="white" stroke="black" points="167.577,-0 167.577,-44 282.423,-44 282.423,-0 167.577,-0"/>
 <text text-anchor="start" x="175.577" y="-31" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.Ab</text>
 <text text-anchor="start" x="175.577" y="-19" font-family="Ubuntu-R" font-size="10.00">Initio.compute_netforce</text>
@@ -46,7 +46,7 @@
 </g>
 <!-- Node3 -->
 <g id="node3" class="node"><title>Node3</title>
-<g id="a_node3"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" target="_top" xlink:title="forcebalance.gmxio.AbInitio\l_GMX.__init__">
+<g id="a_node3"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" target="_top" target="_top" xlink:title="forcebalance.gmxio.AbInitio\l_GMX.__init__">
 <polygon fill="white" stroke="black" points="335.243,-114 335.243,-146 466.757,-146 466.757,-114 335.243,-114"/>
 <text text-anchor="start" x="343.243" y="-133" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="401" y="-121" font-family="Ubuntu-R" font-size="10.00">_GMX.__init__</text>
@@ -60,7 +60,7 @@
 </g>
 <!-- Node13 -->
 <g id="node13" class="node"><title>Node13</title>
-<g id="a_node13"><a xlink:href="classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" target="_top" xlink:title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option">
+<g id="a_node13"><a xlink:href="classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" target="_top" target="_top" xlink:title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option">
 <polygon fill="white" stroke="black" points="334.265,-63 334.265,-95 467.735,-95 467.735,-63 334.265,-63"/>
 <text text-anchor="start" x="342.265" y="-82" font-family="Ubuntu-R" font-size="10.00">forcebalance.baseclass.Force</text>
 <text text-anchor="middle" x="401" y="-70" font-family="Ubuntu-R" font-size="10.00">BalanceBaseClass.set_option</text>
@@ -74,7 +74,7 @@
 </g>
 <!-- Node4 -->
 <g id="node4" class="node"><title>Node4</title>
-<g id="a_node4"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" target="_top" xlink:title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th...">
+<g id="a_node4"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" target="_top" target="_top" xlink:title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th...">
 <polygon fill="white" stroke="black" points="504.243,-114 504.243,-146 635.757,-146 635.757,-114 504.243,-114"/>
 <text text-anchor="start" x="512.243" y="-133" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="570" y="-121" font-family="Ubuntu-R" font-size="10.00">_GMX.read_topology</text>
@@ -88,7 +88,7 @@
 </g>
 <!-- Node5 -->
 <g id="node5" class="node"><title>Node5</title>
-<g id="a_node5"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ab2eac76585bdb8401812f0c8e465a44e" target="_top" xlink:title="forcebalance.gmxio.AbInitio\l_GMX.prepare_temp_directory">
+<g id="a_node5"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ab2eac76585bdb8401812f0c8e465a44e" target="_top" target="_top" xlink:title="forcebalance.gmxio.AbInitio\l_GMX.prepare_temp_directory">
 <polygon fill="white" stroke="black" points="672.553,-114 672.553,-146 815.447,-146 815.447,-114 672.553,-114"/>
 <text text-anchor="start" x="680.553" y="-133" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="744" y="-121" font-family="Ubuntu-R" font-size="10.00">_GMX.prepare_temp_directory</text>
@@ -102,7 +102,7 @@
 </g>
 <!-- Node6 -->
 <g id="node6" class="node"><title>Node6</title>
-<g id="a_node6"><a xlink:href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" target="_top" xlink:title="forcebalance.nifty.warn\l_press_key">
+<g id="a_node6"><a xlink:href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" target="_top" target="_top" xlink:title="forcebalance.nifty.warn\l_press_key">
 <polygon fill="white" stroke="black" points="862.528,-153 862.528,-185 973.472,-185 973.472,-153 862.528,-153"/>
 <text text-anchor="start" x="870.528" y="-172" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.warn</text>
 <text text-anchor="middle" x="918" y="-160" font-family="Ubuntu-R" font-size="10.00">_press_key</text>
@@ -116,7 +116,7 @@
 </g>
 <!-- Node8 -->
 <g id="node8" class="node"><title>Node8</title>
-<g id="a_node8"><a xlink:href="namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" target="_top" xlink:title="forcebalance.nifty.LinkFile">
+<g id="a_node8"><a xlink:href="namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" target="_top" target="_top" xlink:title="forcebalance.nifty.LinkFile">
 <polygon fill="white" stroke="black" points="855.299,-114 855.299,-134 980.701,-134 980.701,-114 855.299,-114"/>
 <text text-anchor="middle" x="918" y="-121" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.LinkFile</text>
 </a>
@@ -129,7 +129,7 @@
 </g>
 <!-- Node10 -->
 <g id="node10" class="node"><title>Node10</title>
-<g id="a_node10"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd" target="_top" xlink:title="Computes the energy and force using GROMACS for a single snapshot.">
+<g id="a_node10"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd" target="_top" target="_top" xlink:title="Computes the energy and force using GROMACS for a single snapshot.">
 <polygon fill="white" stroke="black" points="852.243,-63 852.243,-95 983.757,-95 983.757,-63 852.243,-63"/>
 <text text-anchor="start" x="860.243" y="-82" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="918" y="-70" font-family="Ubuntu-R" font-size="10.00">_GMX.energy_force_driver</text>
@@ -143,7 +143,7 @@
 </g>
 <!-- Node12 -->
 <g id="node12" class="node"><title>Node12</title>
-<g id="a_node12"><a xlink:href="namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" target="_top" xlink:title="forcebalance.gmxio.rm\l_gmx_baks">
+<g id="a_node12"><a xlink:href="namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" target="_top" target="_top" xlink:title="forcebalance.gmxio.rm\l_gmx_baks">
 <polygon fill="white" stroke="black" points="1212.63,-63 1212.63,-95 1321.37,-95 1321.37,-63 1212.63,-63"/>
 <text text-anchor="start" x="1220.63" y="-82" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.rm</text>
 <text text-anchor="middle" x="1267" y="-70" font-family="Ubuntu-R" font-size="10.00">_gmx_baks</text>
@@ -157,7 +157,7 @@
 </g>
 <!-- Node7 -->
 <g id="node7" class="node"><title>Node7</title>
-<g id="a_node7"><a xlink:href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" target="_top" xlink:title="Similar to the bultin function map().">
+<g id="a_node7"><a xlink:href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" target="_top" target="_top" xlink:title="Similar to the bultin function map().">
 <polygon fill="white" stroke="black" points="1020.03,-159 1020.03,-179 1175.96,-179 1175.96,-159 1020.03,-159"/>
 <text text-anchor="middle" x="1098" y="-166" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.concurrent_map</text>
 </a>
@@ -170,7 +170,7 @@
 </g>
 <!-- Node9 -->
 <g id="node9" class="node"><title>Node9</title>
-<g id="a_node9"><a xlink:href="namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" target="_top" xlink:title="Remove the file if it exists (doesn&#39;t return an error).">
+<g id="a_node9"><a xlink:href="namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" target="_top" target="_top" xlink:title="Remove the file if it exists (doesn&#39;t return an error).">
 <polygon fill="white" stroke="black" points="1037.53,-108 1037.53,-140 1158.47,-140 1158.47,-108 1037.53,-108"/>
 <text text-anchor="start" x="1045.53" y="-127" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.remove</text>
 <text text-anchor="middle" x="1098" y="-115" font-family="Ubuntu-R" font-size="10.00">_if_exists</text>
@@ -184,7 +184,7 @@
 </g>
 <!-- Node11 -->
 <g id="node11" class="node"><title>Node11</title>
-<g id="a_node11"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a6e43c323b2286c546ff8afd3377f8808" target="_top" xlink:title="Computes the energy and force using GROMACS for a trajectory.">
+<g id="a_node11"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a6e43c323b2286c546ff8afd3377f8808" target="_top" target="_top" xlink:title="Computes the energy and force using GROMACS for a trajectory.">
 <polygon fill="white" stroke="black" points="1026.28,-18 1026.28,-50 1169.72,-50 1169.72,-18 1026.28,-18"/>
 <text text-anchor="start" x="1034.28" y="-37" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="1098" y="-25" font-family="Ubuntu-R" font-size="10.00">_GMX.energy_force_driver_all</text>

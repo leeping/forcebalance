@@ -105,7 +105,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00012"></a><span class="lineno">   12</span>&#160;<span class="keyword">from</span> <a class="code" href="namespaceforcebalance_1_1nifty.html" title="Nifty functions, intended to be imported by any module within ForceBalance.">forcebalance.nifty</a> <span class="keyword">import</span> isint, isfloat, _exec, warn_press_key, printcool_dictionary</div>
 <div class="line"><a name="l00013"></a><span class="lineno">   13</span>&#160;<span class="keyword">import</span> numpy <span class="keyword">as</span> np</div>
 <div class="line"><a name="l00014"></a><span class="lineno">   14</span>&#160;<span class="keyword">from</span> <a class="code" href="namespaceforcebalance_1_1leastsq.html">forcebalance.leastsq</a> <span class="keyword">import</span> LeastSquares, CheckBasis</div>
-<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">from</span> <a class="code" href="namespaceforcebalance_1_1basereader.html" title="Base class for force field line reader.">forcebalance.basereader</a> <span class="keyword">import</span> BaseReader</div>
+<div class="line"><a name="l00015"></a><span class="lineno">   15</span>&#160;<span class="keyword">from</span> forcebalance <span class="keyword">import</span> BaseReader</div>
 <div class="line"><a name="l00016"></a><span class="lineno">   16</span>&#160;<span class="keyword">from</span> string <span class="keyword">import</span> capitalize</div>
 <div class="line"><a name="l00017"></a><span class="lineno">   17</span>&#160;<span class="keyword">from</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html">forcebalance.finite_difference</a> <span class="keyword">import</span> in_fd, f1d2p, f12d3p, fdwrap</div>
 <div class="line"><a name="l00018"></a><span class="lineno">   18</span>&#160;<span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict, OrderedDict</div>
@@ -120,7 +120,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160;<span class="comment">#         &#39;BASSP&#39; :{0:&#39;A&#39;, 1:&#39;B&#39;, 2:&#39;C&#39;}</span></div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="comment">#         }</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;</div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">class </span><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html" title="Interaction type -&gt; Parameter Dictionary.">GBS_Reader</a>(<a class="code" href="classforcebalance_1_1basereader_1_1BaseReader.html" title="The &#39;reader&#39; class.">BaseReader</a>):</div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="keyword">class </span><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html" title="Interaction type -&gt; Parameter Dictionary.">GBS_Reader</a>(<a class="code" href="classforcebalance_1_1BaseReader.html" title="The &#39;reader&#39; class.">BaseReader</a>):</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;Finite state machine for parsing basis set files.</span></div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="stringliteral">    </span></div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
@@ -132,7 +132,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00039"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#afa3e259eab3e92b51c2b064f882dd776">   39</a></span>&#160;        self.<a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#ae498cfab81dfd12bd0e86037be80135d">last_amom</a> = <span class="stringliteral">&#39;&#39;</span></div>
 <div class="line"><a name="l00040"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#a322f36949ce67389f107cac80e8f5b40">   40</a></span>&#160;        self.<a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#acef6f87327455c97f05e603f9330a0d3">basis_number</a>  = defaultdict(int)</div>
 <div class="line"><a name="l00041"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#ae498cfab81dfd12bd0e86037be80135d">   41</a></span>&#160;        self.<a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#a77ab2b3c48ee692e3678131c96de9708">contraction_number</a> = -1</div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#acef6f87327455c97f05e603f9330a0d3">   42</a></span>&#160;        self.<a class="code" href="classforcebalance_1_1basereader_1_1BaseReader.html#a84a513e0e43145b2fdaf38e73c32f83a" title="The mapping of (this residue, atom number) to (atom name) for building atom-specific interactions in ...">adict</a>={<span class="keywordtype">None</span>:<span class="keywordtype">None</span>}</div>
+<div class="line"><a name="l00042"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#acef6f87327455c97f05e603f9330a0d3">   42</a></span>&#160;        self.<a class="code" href="classforcebalance_1_1BaseReader.html#a2c46ad6b66cf09a30e917ce4a1997e2a" title="The mapping of (this residue, atom number) to (atom name) for building atom-specific interactions in ...">adict</a>={<span class="keywordtype">None</span>:<span class="keywordtype">None</span>}</div>
 <div class="line"><a name="l00043"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#a77ab2b3c48ee692e3678131c96de9708">   43</a></span>&#160;        self.<a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#a725975a6e197a132d3c4dba96412f9bb">isdata</a>=<span class="keyword">False</span></div>
 <div class="line"><a name="l00044"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#ac42c3b29532e11a0d8d78b48347739ff">   44</a></span>&#160;        self.<a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#a674b528af51d25b0c96da13946d4ea08">destroy</a>=<span class="keyword">False</span></div>
 <div class="line"><a name="l00045"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1GBS__Reader.html#a725975a6e197a132d3c4dba96412f9bb">   45</a></span>&#160;    </div>
@@ -158,7 +158,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;</div>
 <div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        line       = line.split(<span class="stringliteral">&#39;!&#39;</span>)[0].strip()</div>
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        s          = line.split()</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        self.<a class="code" href="classforcebalance_1_1basereader_1_1BaseReader.html#ab04436f3968d9bd6ec09238ee6537ec6">ln</a>   += 1</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        self.<a class="code" href="classforcebalance_1_1BaseReader.html#a80c8e3bea212600742968aa8669e557b">ln</a>   += 1</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;        <span class="comment"># No sense in doing anything for an empty line or a comment line.</span></div>
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">if</span> len(s) == 0 <span class="keywordflow">or</span> match(<span class="stringliteral">&#39;^ *!&#39;</span>,line): <span class="keywordflow">return</span> <span class="keywordtype">None</span>, <span class="keywordtype">None</span></div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;        <span class="comment"># Now go through all the cases.</span></div>
@@ -330,7 +330,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;        os.unlink(<span class="stringliteral">&quot;objective.dat&quot;</span>)</div>
 <div class="line"><a name="l00238"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#a5992e04d0a4b8d1e96ad10ec58e7d06a">  238</a></span>&#160;        <span class="keywordflow">return</span> Ans</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="keyword">class </span><a class="code" href="classforcebalance_1_1psi4io_1_1Grid__Reader.html" title="Finite state machine for parsing DVR grid files.">Grid_Reader</a>(<a class="code" href="classforcebalance_1_1basereader_1_1BaseReader.html" title="The &#39;reader&#39; class.">BaseReader</a>):</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="keyword">class </span><a class="code" href="classforcebalance_1_1psi4io_1_1Grid__Reader.html" title="Finite state machine for parsing DVR grid files.">Grid_Reader</a>(<a class="code" href="classforcebalance_1_1BaseReader.html" title="The &#39;reader&#39; class.">BaseReader</a>):</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="stringliteral">&quot;&quot;&quot;Finite state machine for parsing DVR grid files.</span></div>
 <div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;<span class="stringliteral">    </span></div>
 <div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;<span class="stringliteral">    &quot;&quot;&quot;</span></div>
@@ -358,7 +358,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div>
 <div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        line       = line.split(<span class="stringliteral">&#39;!&#39;</span>)[0].strip()</div>
 <div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        s          = line.split()</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        self.<a class="code" href="classforcebalance_1_1basereader_1_1BaseReader.html#ab04436f3968d9bd6ec09238ee6537ec6">ln</a>   += 1</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;        self.<a class="code" href="classforcebalance_1_1BaseReader.html#a80c8e3bea212600742968aa8669e557b">ln</a>   += 1</div>
 <div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;        <span class="comment"># No sense in doing anything for an empty line or a comment line.</span></div>
 <div class="line"><a name="l00270"></a><span class="lineno"><a class="code" href="classforcebalance_1_1psi4io_1_1Grid__Reader.html#a900d43fb5dd26718b05846fe666b908d">  270</a></span>&#160;        <span class="keywordflow">if</span> len(s) == 0 <span class="keywordflow">or</span> match(<span class="stringliteral">&#39;^ *!&#39;</span>,line): <span class="keywordflow">return</span> <span class="keywordtype">None</span>, <span class="keywordtype">None</span></div>
 <div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;        <span class="comment"># Now go through all the cases.</span></div>
@@ -634,7 +634,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Aug 16 2013 10:59:24 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Aug 23 2013 10:40:05 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.3.1
 </small></address>

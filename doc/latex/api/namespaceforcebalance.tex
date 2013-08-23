@@ -10,10 +10,6 @@ namespace \hyperlink{namespaceforcebalance_1_1abinitio__internal}{abinitio\-\_\-
 \begin{DoxyCompactList}\small\item\em Internal implementation of energy matching (for T\-I\-P3\-P water only) \end{DoxyCompactList}\item 
 namespace \hyperlink{namespaceforcebalance_1_1amberio}{amberio}
 \begin{DoxyCompactList}\small\item\em A\-M\-B\-E\-R force field input/output. \end{DoxyCompactList}\item 
-namespace \hyperlink{namespaceforcebalance_1_1baseclass}{baseclass}
-\item 
-namespace \hyperlink{namespaceforcebalance_1_1basereader}{basereader}
-\begin{DoxyCompactList}\small\item\em Base class for force field line reader. \end{DoxyCompactList}\item 
 namespace \hyperlink{namespaceforcebalance_1_1binding}{binding}
 \begin{DoxyCompactList}\small\item\em Binding energy fitting module. \end{DoxyCompactList}\item 
 namespace \hyperlink{namespaceforcebalance_1_1chemistry}{chemistry}
@@ -70,8 +66,17 @@ namespace \hyperlink{namespaceforcebalance_1_1tinkerio}{tinkerio}
 \begin{DoxyCompactList}\small\item\em T\-I\-N\-K\-E\-R input/output. \end{DoxyCompactList}\item 
 namespace \hyperlink{namespaceforcebalance_1_1vibration}{vibration}
 \begin{DoxyCompactList}\small\item\em Vibrational mode fitting module. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classforcebalance_1_1BaseClass}{Base\-Class}
+\begin{DoxyCompactList}\small\item\em Provides some nifty functions that are common to all Force\-Balance classes. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1BaseReader}{Base\-Reader}
+\begin{DoxyCompactList}\small\item\em The 'reader' class. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Variables}
 \begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_a415490bd425b364421271cb8e2ce6672}{\-\_\-\-\_\-version\-\_\-\-\_\-} = pkg\-\_\-resources.\-get\-\_\-distribution(\char`\"{}forcebalance\char`\"{})
 \item 
 \hyperlink{namespaceforcebalance_a730d54f7aa4e228b2475e31765b36b68}{W\-O\-R\-K\-\_\-\-Q\-U\-E\-U\-E} = None
 \item 
@@ -80,17 +85,24 @@ tuple \hyperlink{namespaceforcebalance_a582a602e14175af1441d1ec96fe9a75a}{W\-Q\-
 
 
 \subsubsection{Variable Documentation}
+\hypertarget{namespaceforcebalance_a415490bd425b364421271cb8e2ce6672}{\index{forcebalance@{forcebalance}!\-\_\-\-\_\-version\-\_\-\-\_\-@{\-\_\-\-\_\-version\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-version\-\_\-\-\_\-@{\-\_\-\-\_\-version\-\_\-\-\_\-}!forcebalance@{forcebalance}}
+\paragraph[{\-\_\-\-\_\-version\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-\_\-\-\_\-version\-\_\-\-\_\- = pkg\-\_\-resources.\-get\-\_\-distribution(\char`\"{}forcebalance\char`\"{})}}\label{namespaceforcebalance_a415490bd425b364421271cb8e2ce6672}
+
+
+Definition at line 16 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
 \hypertarget{namespaceforcebalance_a730d54f7aa4e228b2475e31765b36b68}{\index{forcebalance@{forcebalance}!W\-O\-R\-K\-\_\-\-Q\-U\-E\-U\-E@{W\-O\-R\-K\-\_\-\-Q\-U\-E\-U\-E}}
 \index{W\-O\-R\-K\-\_\-\-Q\-U\-E\-U\-E@{W\-O\-R\-K\-\_\-\-Q\-U\-E\-U\-E}!forcebalance@{forcebalance}}
 \paragraph[{W\-O\-R\-K\-\_\-\-Q\-U\-E\-U\-E}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-W\-O\-R\-K\-\_\-\-Q\-U\-E\-U\-E = None}}\label{namespaceforcebalance_a730d54f7aa4e228b2475e31765b36b68}
 
 
-Definition at line 17 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 19 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{namespaceforcebalance_a582a602e14175af1441d1ec96fe9a75a}{\index{forcebalance@{forcebalance}!W\-Q\-I\-D\-S@{W\-Q\-I\-D\-S}}
 \index{W\-Q\-I\-D\-S@{W\-Q\-I\-D\-S}!forcebalance@{forcebalance}}
 \paragraph[{W\-Q\-I\-D\-S}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-W\-Q\-I\-D\-S = defaultdict(list)}}\label{namespaceforcebalance_a582a602e14175af1441d1ec96fe9a75a}
 
 
-Definition at line 20 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 22 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 

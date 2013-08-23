@@ -563,6 +563,11 @@ This section contains a listing of the target options available when running a F
 {\bfseries  Default Value }\-: 1.\-0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
+\item {\bfseries  R\-E\-M\-O\-T\-E } (Bool) \par
+{\bfseries  One-\/line description }\-: Evaluate target as a remote work\-\_\-queue task \par
+{\bfseries  Default Value }\-: 0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
 \item {\bfseries  R\-E\-S\-P } (Bool) \par
 {\bfseries  One-\/line description }\-: Enable the R\-E\-S\-P objective function \par
 {\bfseries  Default Value }\-: 0 \par
@@ -624,7 +629,7 @@ This section contains a listing of the target options available when running a F
 {\bfseries  One-\/line description }\-: The type of fitting target, for instance Ab\-Initio\-\_\-\-G\-M\-X ; this must correspond to the name of a Target subclass. \par
 {\bfseries  Default Value }\-: None \par
 {\bfseries  Scope }\-: All targets ({\bfseries {\itshape Required}}) \par
-{\bfseries  Full description }\-: This is the type of target that you are running. The current accepted values for the target type are given in the beginning of the objective.\-py file\-: C\-O\-U\-N\-T\-E\-R\-P\-O\-I\-S\-E, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-A\-M\-B\-E\-R, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-G\-M\-X, L\-I\-Q\-U\-I\-D\-\_\-\-G\-M\-X, L\-I\-Q\-U\-I\-D\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-T\-I\-N\-K\-E\-R, B\-I\-N\-D\-I\-N\-G\-E\-N\-E\-R\-G\-Y\-\_\-\-T\-I\-N\-K\-E\-R, M\-O\-N\-O\-M\-E\-R\-\_\-\-Q\-T\-P\-I\-E, R\-D\-V\-R3\-\_\-\-P\-S\-I4, I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-I\-N\-T\-E\-R\-N\-A\-L, M\-O\-M\-E\-N\-T\-S\-\_\-\-T\-I\-N\-K\-E\-R, T\-H\-C\-D\-F\-\_\-\-P\-S\-I4, V\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R, L\-I\-Q\-U\-I\-D\-\_\-\-T\-I\-N\-K\-E\-R, I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R. \par
+{\bfseries  Full description }\-: This is the type of target that you are running. The current accepted values for the target type are given in the beginning of the objective.\-py file\-: C\-O\-U\-N\-T\-E\-R\-P\-O\-I\-S\-E, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-A\-M\-B\-E\-R, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-G\-M\-X, L\-I\-Q\-U\-I\-D\-\_\-\-G\-M\-X, L\-I\-Q\-U\-I\-D\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-T\-I\-N\-K\-E\-R, B\-I\-N\-D\-I\-N\-G\-E\-N\-E\-R\-G\-Y\-\_\-\-T\-I\-N\-K\-E\-R, M\-O\-N\-O\-M\-E\-R\-\_\-\-Q\-T\-P\-I\-E, R\-D\-V\-R3\-\_\-\-P\-S\-I4, I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-I\-N\-T\-E\-R\-N\-A\-L, M\-O\-M\-E\-N\-T\-S\-\_\-\-T\-I\-N\-K\-E\-R, T\-H\-C\-D\-F\-\_\-\-P\-S\-I4, R\-E\-M\-O\-T\-E\-\_\-\-T\-A\-R\-G\-E\-T, V\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R, L\-I\-Q\-U\-I\-D\-\_\-\-T\-I\-N\-K\-E\-R, I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R. \par
 {\bfseries  Recommendation }\-: Choose the appropriate type, and if the target type is missing, feel free to implement your own (or ask me for help).\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  W\-\_\-\-A\-L\-P\-H\-A } (Float) \par

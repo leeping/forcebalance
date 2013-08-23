@@ -8,20 +8,22 @@ Improved subclass of Target for fitting force fields to binding energies.
 
 
 
-Inheritance diagram for forcebalance.\-binding.\-Binding\-Energy\-:\nopagebreak
+Inheritance diagram for forcebalance.\-binding.\-Binding\-Energy\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=236pt]{classforcebalance_1_1binding_1_1BindingEnergy__inherit__graph}
+\includegraphics[width=234pt]{classforcebalance_1_1binding_1_1BindingEnergy__inherit__graph}
 \end{center}
 \end{figure}
 
 
-Collaboration diagram for forcebalance.\-binding.\-Binding\-Energy\-:\nopagebreak
+Collaboration diagram for forcebalance.\-binding.\-Binding\-Energy\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=236pt]{classforcebalance_1_1binding_1_1BindingEnergy__coll__graph}
+\includegraphics[width=234pt]{classforcebalance_1_1binding_1_1BindingEnergy__coll__graph}
 \end{center}
 \end{figure}
 \subsubsection*{Public Member Functions}
@@ -53,7 +55,7 @@ def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491b
 \begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
 \begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
-def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}{set\-\_\-option}
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
 \end{DoxyCompactItemize}
 \subsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
@@ -82,9 +84,9 @@ def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99
 \begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
 \begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
-\hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{Print\-Option\-Dict}
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
 \item 
-\hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{verbose\-\_\-options}
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
 \end{DoxyCompactItemize}
 
 
@@ -154,7 +156,7 @@ Computes the objective function contribution and its gradient.
 
 First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
 
-Definition at line 171 of file target.\-py.
+Definition at line 172 of file target.\-py.
 
 
 
@@ -183,7 +185,7 @@ First the low-\/level 'get' method is called with the analytic gradient and Hess
 
 This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
 
-Definition at line 194 of file target.\-py.
+Definition at line 195 of file target.\-py.
 
 
 
@@ -210,7 +212,7 @@ Computes the objective function contribution without any parametric derivatives.
 
 
 
-Definition at line 154 of file target.\-py.
+Definition at line 155 of file target.\-py.
 
 
 
@@ -255,7 +257,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
 
 
-Definition at line 212 of file target.\-py.
+Definition at line 213 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!printcool\-\_\-table@{printcool\-\_\-table}}
 \index{printcool\-\_\-table@{printcool\-\_\-table}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -290,7 +292,7 @@ The input should be something like\-:
 \end{DoxyParams}
 
 
-Definition at line 366 of file target.\-py.
+Definition at line 367 of file target.\-py.
 
 
 
@@ -316,7 +318,7 @@ Back up the temporary directory if desired, delete it and then create a new one.
 
 
 
-Definition at line 218 of file target.\-py.
+Definition at line 219 of file target.\-py.
 
 
 
@@ -329,9 +331,9 @@ Here is the call graph for this function\-:\nopagebreak
 \end{figure}
 
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!set\-\_\-option@{set\-\_\-option}}
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!set\-\_\-option@{set\-\_\-option}}
 \index{set\-\_\-option@{set\-\_\-option}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
-\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-set\-\_\-option (
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-set\-\_\-option (
 \begin{DoxyParamCaption}
 \item[{}]{self, }
 \item[{}]{in\-\_\-dict, }
@@ -341,10 +343,10 @@ Here is the call graph for this function\-:\nopagebreak
 \item[{}]{default = {\ttfamily None}, }
 \item[{}]{forceprint = {\ttfamily False}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 
 
-Definition at line 12 of file baseclass.\-py.
+Definition at line 35 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!sget@{sget}}
 \index{sget@{sget}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -363,7 +365,7 @@ Stages the directory for the target, and then calls 'get'.
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 265 of file target.\-py.
+Definition at line 266 of file target.\-py.
 
 
 
@@ -393,7 +395,7 @@ Stages the directory for the target, and then launches Work Queue processes if a
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 300 of file target.\-py.
+Definition at line 301 of file target.\-py.
 
 
 
@@ -418,7 +420,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}
 
 
-Definition at line 290 of file target.\-py.
+Definition at line 291 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!wq\-\_\-complete@{wq\-\_\-complete}}
 \index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -433,7 +435,7 @@ This method determines whether the Work Queue tasks for the current target have 
 
 
 
-Definition at line 330 of file target.\-py.
+Definition at line 331 of file target.\-py.
 
 
 
@@ -465,7 +467,7 @@ Need the forcefield (here for now)
 
 
 
-Definition at line 138 of file target.\-py.
+Definition at line 139 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!gct@{gct}}
 \index{gct@{gct}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -476,7 +478,7 @@ Counts how often the gradient was computed.
 
 
 
-Definition at line 142 of file target.\-py.
+Definition at line 143 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!hct@{hct}}
 \index{hct@{hct}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -487,7 +489,7 @@ Counts how often the Hessian was computed.
 
 
 
-Definition at line 144 of file target.\-py.
+Definition at line 145 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1binding_1_1BindingEnergy_a9d1f28fc62222da17c0fd12593042f10}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!inter\-\_\-opts@{inter\-\_\-opts}}
 \index{inter\-\_\-opts@{inter\-\_\-opts}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -510,12 +512,12 @@ Definition at line 228 of file binding.\-py.
 
 Definition at line 166 of file binding.\-py.
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!Print\-Option\-Dict@{Print\-Option\-Dict}}
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
-\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}
+\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
 
 
-Definition at line 9 of file baseclass.\-py.
+Definition at line 32 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1binding_1_1BindingEnergy_a9503044f7d14bfd9f8dc98dbe7950685}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!rmsd\-\_\-part@{rmsd\-\_\-part}}
 \index{rmsd\-\_\-part@{rmsd\-\_\-part}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -540,7 +542,7 @@ The directory in which the simulation is running -\/ this can be updated.
 
 Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
 
-Definition at line 136 of file target.\-py.
+Definition at line 137 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!tempdir@{tempdir}}
 \index{tempdir@{tempdir}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -551,14 +553,14 @@ Root directory of the whole project.
 
 Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
 
-Definition at line 134 of file target.\-py.
+Definition at line 135 of file target.\-py.
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!verbose\-\_\-options@{verbose\-\_\-options}}
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
-\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
 
 
-Definition at line 10 of file baseclass.\-py.
+Definition at line 33 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::binding\-::\-Binding\-Energy@{forcebalance\-::binding\-::\-Binding\-Energy}!xct@{xct}}
 \index{xct@{xct}!forcebalance::binding::BindingEnergy@{forcebalance\-::binding\-::\-Binding\-Energy}}
@@ -569,7 +571,7 @@ Counts how often the objective function was computed.
 
 
 
-Definition at line 140 of file target.\-py.
+Definition at line 141 of file target.\-py.
 
 
 

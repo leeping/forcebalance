@@ -1,7 +1,7 @@
 var searchData=
 [
   ['a',['a',['../classforcebalance_1_1objective_1_1Penalty.html#abab984da8a8f62adbd1decbaf56ac2fa',1,'forcebalance.objective.Penalty.a()'],['../namespaceforcebalance_1_1chemistry.html#a352fe220850f433a698a751ed1210881',1,'forcebalance.chemistry.A()']]],
-  ['adict',['adict',['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#afee8f33a13244afd3f595acad27e04f4',1,'forcebalance.amberio.FrcMod_Reader.adict()'],['../classforcebalance_1_1basereader_1_1BaseReader.html#a84a513e0e43145b2fdaf38e73c32f83a',1,'forcebalance.basereader.BaseReader.adict()'],['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#ac42c3b29532e11a0d8d78b48347739ff',1,'forcebalance.psi4io.GBS_Reader.adict()']]],
+  ['adict',['adict',['../classforcebalance_1_1BaseReader.html#a2c46ad6b66cf09a30e917ce4a1997e2a',1,'forcebalance.BaseReader.adict()'],['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#afee8f33a13244afd3f595acad27e04f4',1,'forcebalance.amberio.FrcMod_Reader.adict()'],['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#ac42c3b29532e11a0d8d78b48347739ff',1,'forcebalance.psi4io.GBS_Reader.adict()']]],
   ['aftypes',['aftypes',['../namespaceforcebalance_1_1gmxio.html#aef89ff391902f81feb14e28ec301296c',1,'forcebalance::gmxio']]],
   ['alive',['Alive',['../namespaceforcebalance_1_1molecule.html#a2986996d4f957928047df06fbec3717d',1,'forcebalance::molecule']]],
   ['all_5fat_5fonce',['all_at_once',['../classforcebalance_1_1amberio_1_1AbInitio__AMBER.html#a39462b1942be0f7fb6202862ad1afa9c',1,'forcebalance.amberio.AbInitio_AMBER.all_at_once()'],['../classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#a1825352ec4711fd59eb2872eef46c1a6',1,'forcebalance.tinkerio.AbInitio_TINKER.all_at_once()']]],
@@ -16,6 +16,6 @@ var searchData=
   ['atomnames',['atomnames',['../classforcebalance_1_1amberio_1_1Mol2__Reader.html#a8ac078ee1a9b7a7d8837d5822564376a',1,'forcebalance.amberio.Mol2_Reader.atomnames()'],['../classforcebalance_1_1forcefield_1_1FF.html#ae18c15606b40f8c417cbfd6129554793',1,'forcebalance.forcefield.FF.atomnames()'],['../classforcebalance_1_1gmxio_1_1ITP__Reader.html#a0cbe42a9c0bf233255cfb8dd6ebe102e',1,'forcebalance.gmxio.ITP_Reader.atomnames()']]],
   ['atoms',['atoms',['../classforcebalance_1_1Mol2_1_1mol2.html#a0c0f2e9e963175713692b51bdc7f08e9',1,'forcebalance.Mol2.mol2.atoms()'],['../namespaceforcebalance_1_1chemistry.html#ab17d5407c5d506aba3077ed57ffd9b97',1,'forcebalance.chemistry.atoms()']]],
   ['atomtype_5fto_5fmass',['atomtype_to_mass',['../classforcebalance_1_1gmxio_1_1ITP__Reader.html#ae4ae7fb78a864a7ca15f68b376e84c35',1,'forcebalance::gmxio::ITP_Reader']]],
-  ['atomtypes',['AtomTypes',['../classforcebalance_1_1basereader_1_1BaseReader.html#ad5765e192499937376950410364014af',1,'forcebalance.basereader.BaseReader.AtomTypes()'],['../classforcebalance_1_1gmxio_1_1ITP__Reader.html#a771f60fa6b3020c422062bb9ceb51291',1,'forcebalance.gmxio.ITP_Reader.atomtypes()']]],
+  ['atomtypes',['AtomTypes',['../classforcebalance_1_1BaseReader.html#a69ca7d949a4a3df4d9f61e617fe0e270',1,'forcebalance.BaseReader.AtomTypes()'],['../classforcebalance_1_1gmxio_1_1ITP__Reader.html#a771f60fa6b3020c422062bb9ceb51291',1,'forcebalance.gmxio.ITP_Reader.atomtypes()']]],
   ['atomvariablenames',['AtomVariableNames',['../namespaceforcebalance_1_1molecule.html#a5daa68e835dcb9877d6c3f2fb559b54b',1,'forcebalance::molecule']]]
 ];

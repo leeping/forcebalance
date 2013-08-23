@@ -8,7 +8,8 @@ Subclass of Target for liquid property matching.
 
 
 
-Inheritance diagram for forcebalance.\-liquid.\-Liquid\-:\nopagebreak
+Inheritance diagram for forcebalance.\-liquid.\-Liquid\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -17,11 +18,12 @@ Inheritance diagram for forcebalance.\-liquid.\-Liquid\-:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for forcebalance.\-liquid.\-Liquid\-:\nopagebreak
+Collaboration diagram for forcebalance.\-liquid.\-Liquid\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=236pt]{classforcebalance_1_1liquid_1_1Liquid__coll__graph}
+\includegraphics[width=222pt]{classforcebalance_1_1liquid_1_1Liquid__coll__graph}
 \end{center}
 \end{figure}
 \subsubsection*{Public Member Functions}
@@ -61,7 +63,7 @@ def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491b
 \begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
 \begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
-def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}{set\-\_\-option}
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
 \end{DoxyCompactItemize}
 \subsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
@@ -114,9 +116,9 @@ def \hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99
 \begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
 \begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
-\hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{Print\-Option\-Dict}
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
 \item 
-\hyperlink{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{verbose\-\_\-options}
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
 \end{DoxyCompactItemize}
 
 
@@ -150,7 +152,8 @@ Definition at line 56 of file liquid.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -225,7 +228,7 @@ Computes the objective function contribution and its gradient.
 
 First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
 
-Definition at line 171 of file target.\-py.
+Definition at line 172 of file target.\-py.
 
 
 
@@ -254,7 +257,7 @@ First the low-\/level 'get' method is called with the analytic gradient and Hess
 
 This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
 
-Definition at line 194 of file target.\-py.
+Definition at line 195 of file target.\-py.
 
 
 
@@ -281,7 +284,7 @@ Computes the objective function contribution without any parametric derivatives.
 
 
 
-Definition at line 154 of file target.\-py.
+Definition at line 155 of file target.\-py.
 
 
 
@@ -315,7 +318,7 @@ Definition at line 254 of file liquid.\-py.
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
 
 
-Definition at line 212 of file target.\-py.
+Definition at line 213 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a07a59f9f335693329b789a9c7608fc9f}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!npt\-\_\-simulation@{npt\-\_\-simulation}}
 \index{npt\-\_\-simulation@{npt\-\_\-simulation}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
@@ -424,7 +427,7 @@ The input should be something like\-:
 \end{DoxyParams}
 
 
-Definition at line 366 of file target.\-py.
+Definition at line 367 of file target.\-py.
 
 
 
@@ -461,7 +464,7 @@ Back up the temporary directory if desired, delete it and then create a new one.
 
 
 
-Definition at line 218 of file target.\-py.
+Definition at line 219 of file target.\-py.
 
 
 
@@ -474,9 +477,9 @@ Here is the call graph for this function\-:\nopagebreak
 \end{figure}
 
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!set\-\_\-option@{set\-\_\-option}}
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!set\-\_\-option@{set\-\_\-option}}
 \index{set\-\_\-option@{set\-\_\-option}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
-\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-set\-\_\-option (
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-set\-\_\-option (
 \begin{DoxyParamCaption}
 \item[{}]{self, }
 \item[{}]{in\-\_\-dict, }
@@ -486,10 +489,10 @@ Here is the call graph for this function\-:\nopagebreak
 \item[{}]{default = {\ttfamily None}, }
 \item[{}]{forceprint = {\ttfamily False}}
 \end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_abaaf4d99b043d41f02fabc41db59252b}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 
 
-Definition at line 12 of file baseclass.\-py.
+Definition at line 35 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!sget@{sget}}
 \index{sget@{sget}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
@@ -508,7 +511,7 @@ Stages the directory for the target, and then calls 'get'.
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 265 of file target.\-py.
+Definition at line 266 of file target.\-py.
 
 
 
@@ -538,7 +541,7 @@ Stages the directory for the target, and then launches Work Queue processes if a
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 300 of file target.\-py.
+Definition at line 301 of file target.\-py.
 
 
 
@@ -589,7 +592,7 @@ This method determines whether the Work Queue tasks for the current target have 
 
 
 
-Definition at line 330 of file target.\-py.
+Definition at line 331 of file target.\-py.
 
 
 
@@ -632,7 +635,7 @@ Need the forcefield (here for now)
 
 
 
-Definition at line 138 of file target.\-py.
+Definition at line 139 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!gct@{gct}}
 \index{gct@{gct}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
@@ -643,7 +646,7 @@ Counts how often the gradient was computed.
 
 
 
-Definition at line 142 of file target.\-py.
+Definition at line 143 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!hct@{hct}}
 \index{hct@{hct}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
@@ -654,7 +657,7 @@ Counts how often the Hessian was computed.
 
 
 
-Definition at line 144 of file target.\-py.
+Definition at line 145 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a50f976d2d3d6a1c261756035a26390e2}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!Labels@{Labels}}
 \index{Labels@{Labels}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
@@ -709,12 +712,12 @@ Definition at line 132 of file liquid.\-py.
 
 Definition at line 217 of file liquid.\-py.
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!Print\-Option\-Dict@{Print\-Option\-Dict}}
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
-\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a5c55e661e746d1a4443f4e0bc34ebe05}
+\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
 
 
-Definition at line 9 of file baseclass.\-py.
+Definition at line 32 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a472f32bbaf18b8ead19b9156f305b8fc}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!Ref\-Data@{Ref\-Data}}
 \index{Ref\-Data@{Ref\-Data}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
@@ -732,7 +735,7 @@ The directory in which the simulation is running -\/ this can be updated.
 
 Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
 
-Definition at line 136 of file target.\-py.
+Definition at line 137 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a5b9df1bf79a641156429e292f47b6afd}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!Saved\-M\-Val@{Saved\-M\-Val}}
 \index{Saved\-M\-Val@{Saved\-M\-Val}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
@@ -765,14 +768,14 @@ Root directory of the whole project.
 
 Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
 
-Definition at line 134 of file target.\-py.
+Definition at line 135 of file target.\-py.
 
-\hypertarget{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!verbose\-\_\-options@{verbose\-\_\-options}}
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
-\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-baseclass.\-Force\-Balance\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass_a8088e1e20cbd6bc175fb9c9fe9fa0f18}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
 
 
-Definition at line 10 of file baseclass.\-py.
+Definition at line 33 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1liquid_1_1Liquid_a0d36d27d8c406b53bbb1096fbb76adbb}{\index{forcebalance\-::liquid\-::\-Liquid@{forcebalance\-::liquid\-::\-Liquid}!w\-\_\-alpha@{w\-\_\-alpha}}
 \index{w\-\_\-alpha@{w\-\_\-alpha}!forcebalance::liquid::Liquid@{forcebalance\-::liquid\-::\-Liquid}}
@@ -829,7 +832,7 @@ Counts how often the objective function was computed.
 
 
 
-Definition at line 140 of file target.\-py.
+Definition at line 141 of file target.\-py.
 
 
 

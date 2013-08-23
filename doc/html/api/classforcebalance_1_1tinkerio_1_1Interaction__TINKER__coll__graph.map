@@ -1,5 +1,5 @@
 <map id="forcebalance.tinkerio.Interaction_TINKER" name="forcebalance.tinkerio.Interaction_TINKER">
-<area shape="rect" id="node2" href="$classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies." alt="" coords="26,254,179,298"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="22,177,183,205"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="15,83,191,127"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies." alt="" coords="29,238,208,285"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="24,160,213,189"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="32,83,205,112"/>
 </map>

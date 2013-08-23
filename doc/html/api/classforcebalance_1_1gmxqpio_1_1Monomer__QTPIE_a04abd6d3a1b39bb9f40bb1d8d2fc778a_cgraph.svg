@@ -264,10 +264,10 @@
 </g>
 <!-- Node17 -->
 <g id="node35" class="node"><title>Node17</title>
-<a xlink:href="classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" target="_top" xlink:title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option">
-<polygon fill="white" stroke="black" points="1048,-238 1048,-272 1206,-272 1206,-238 1048,-238"/>
-<text text-anchor="start" x="1056" y="-259" font-family="Ubuntu-R" font-size="10.00">forcebalance.baseclass.Force</text>
-<text text-anchor="middle" x="1127" y="-246" font-family="Ubuntu-R" font-size="10.00">BalanceBaseClass.set_option</text>
+<a xlink:href="classforcebalance_1_1BaseClass.html#a73e9a37a7632e79eb99f49bd15aced45" target="_top" xlink:title="forcebalance.BaseClass.set\l_option">
+<polygon fill="white" stroke="black" points="1053,-238 1053,-272 1201,-272 1201,-238 1053,-238"/>
+<text text-anchor="start" x="1061" y="-259" font-family="Ubuntu-R" font-size="10.00">forcebalance.BaseClass.set</text>
+<text text-anchor="middle" x="1127" y="-246" font-family="Ubuntu-R" font-size="10.00">_option</text>
 </a>
 </g>
 <!-- Node14&#45;&gt;Node17 -->

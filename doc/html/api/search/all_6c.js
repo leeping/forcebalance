@@ -27,7 +27,7 @@ var searchData=
   ['liquid_5ftinker',['Liquid_TINKER',['../classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html',1,'forcebalance::tinkerio']]],
   ['liquid_5ftraj',['liquid_traj',['../classforcebalance_1_1gmxio_1_1Liquid__GMX.html#a3c56ce2033676d667a183772dbd9c050',1,'forcebalance.gmxio.Liquid_GMX.liquid_traj()'],['../classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#a113b333fdca5faedc03600d204c3a49b',1,'forcebalance.openmmio.Liquid_OpenMM.liquid_traj()']]],
   ['list_5fmap',['list_map',['../classforcebalance_1_1forcefield_1_1FF.html#ac0046446695a65cb2489fdb560ef5929',1,'forcebalance::forcefield::FF']]],
-  ['ln',['ln',['../classforcebalance_1_1basereader_1_1BaseReader.html#ab04436f3968d9bd6ec09238ee6537ec6',1,'forcebalance::basereader::BaseReader']]],
+  ['ln',['ln',['../classforcebalance_1_1BaseReader.html#a80c8e3bea212600742968aa8669e557b',1,'forcebalance::BaseReader']]],
   ['load_5fcp',['load_cp',['../classforcebalance_1_1counterpoise_1_1Counterpoise.html#afdbc053ae726ac5e4066087bcc1039b1',1,'forcebalance::counterpoise::Counterpoise']]],
   ['load_5fframes',['load_frames',['../classforcebalance_1_1molecule_1_1Molecule.html#a68e276a95910d534fa2e937abbc60e1c',1,'forcebalance::molecule::Molecule']]],
   ['loadxyz',['loadxyz',['../classforcebalance_1_1counterpoise_1_1Counterpoise.html#a8795bd01b0f62b3f612e4e5c762f96f8',1,'forcebalance::counterpoise::Counterpoise']]],

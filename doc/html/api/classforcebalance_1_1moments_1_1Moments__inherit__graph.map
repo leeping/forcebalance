@@ -1,5 +1,5 @@
 <map id="forcebalance.moments.Moments" name="forcebalance.moments.Moments">
-<area shape="rect" id="node5" href="$classforcebalance_1_1tinkerio_1_1Moments__TINKER.html" title="Subclass of Target for multipole moment matching using TINKER." alt="" coords="9,331,196,375"/>
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="22,177,183,205"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="15,83,191,127"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1tinkerio_1_1Moments__TINKER.html" title="Subclass of Target for multipole moment matching using TINKER." alt="" coords="12,315,231,362"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="27,160,216,189"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="35,83,208,112"/>
 </map>
