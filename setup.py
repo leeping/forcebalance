@@ -2,12 +2,11 @@
 """
 setup.py: Install ForceBalance. 
 """
-VERSION="1.2" # Make sure to change the version here, and also in bin/ForceBalance.py, doc/header.tex and doc/doxygen.cfg!
-__author__ = "Lee-Ping Wang"
+__author__ = "Lee-Ping Wang, Arthur Vigil"
 
 from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
-import os,sys
+import os,sys,re
 import shutil
 import glob
 import argparse
@@ -22,9 +21,15 @@ except ImportError:
     exit()
     
 # use git to find current version, or read from .__version__    
+#===================================#
+#| Make sure to update the version |#
+#| manually in doc/header.tex and  |#
+#| doc/api_header.tex!!            |#
+#===================================#
 versioning_file = os.path.join(os.path.dirname(__file__), '.__version__')
 try:
-    __version__ = '-'.join(subprocess.check_output(["git", "describe"]).strip().split('-'))
+    git_describe = subprocess.check_output(["git", "describe"]).strip()
+    __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
     
     with open(versioning_file, 'w') as fh:
         fh.write(__version__)
@@ -138,7 +143,7 @@ def buildKeywordDictionary(args):
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
     setupKeywords["version"]           = __version__
-    setupKeywords["author"]            = "Lee-Ping Wang"
+    setupKeywords["author"]            = "Lee-Ping Wang, Arthur Vigil"
     setupKeywords["author_email"]      = "leeping@stanford.edu"
     setupKeywords["license"]           = "GPL 3.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
