@@ -4,7 +4,7 @@
 
 If you're reading this, you are probably looking for help. :)
 
-The ForceBalance project website can be found at
+The main ForceBalance project website can be found at
 https://simtk.org/home/forcebalance
 
 There is documentation available online in html at:
