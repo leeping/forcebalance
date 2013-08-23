@@ -63,6 +63,12 @@ except:
     logging.warning(traceback.format_exc())
     logging.warning("PSI4 module import failed\n")
 
+try:
+    from forcebalance.target import RemoteTarget
+except:
+    logging.warning(traceback.format_exc())
+    logging.warning("Remote Target import failed\n")
+
 ## The table of implemented Targets
 Implemented_Targets = {
     'ABINITIO_GMX':AbInitio_GMX,
@@ -82,6 +88,7 @@ Implemented_Targets = {
     'BINDINGENERGY_TINKER':BindingEnergy_TINKER,
     'MOMENTS_TINKER':Moments_TINKER,
     'MONOMER_QTPIE':Monomer_QTPIE,
+    'REMOTE_TARGET':RemoteTarget,
     }
 
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
