@@ -69,6 +69,8 @@ def build(interactive=False, upstream=False):
         # Compile pdf formats
         print "\n# Copy images referenced in latex files to proper folders"
         display("cp Images/ForceBalance.pdf latex/ && cp Images/ForceBalance.pdf latex/api/")
+        if not os.path.exists('latex/api'):
+            os.makedirs('latex/api')
         shutil.copy('Images/ForceBalance.pdf','latex/')
         shutil.copy('Images/ForceBalance.pdf','latex/api/')
         
