@@ -1,6 +1,6 @@
-#==================#
-#|  ForceBalance  |#
-#==================#
+#================#
+#| ForceBalance |#
+#================#
 
 If you're reading this, you are probably looking for help. :)
 
@@ -13,9 +13,9 @@ http://leeping.github.io/forcebalance/doc/html/index.html
 You can also download the documentation in pdf format here:
 http://leeping.github.io/forcebalance/doc/ForceBalance-Manual.pdf
 
-#==================#
-#|   Quick Help   |#
-#==================#
+#================#
+#|  Quick Help  |#
+#================#
 
 To build the package:
 
