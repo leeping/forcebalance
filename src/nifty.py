@@ -549,8 +549,9 @@ def getWorkQueue():
 def getWQIds():
     return forcebalance.WQIDS
 
-def createWorkQueue(wq_port):
-    work_queue.set_debug_flag('all')
+def createWorkQueue(wq_port, debug=True):
+    if debug:
+        work_queue.set_debug_flag('all')
     forcebalance.WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
     forcebalance.WORK_QUEUE.specify_name('forcebalance')
     forcebalance.WORK_QUEUE.specify_keepalive_timeout(8640000)
