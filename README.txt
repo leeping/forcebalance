@@ -1,6 +1,6 @@
-===========
-ForceBalance
-===========
+#================#
+#| ForceBalance |#
+#================#
 
 If you're reading this, you are probably looking for help. :)
 
