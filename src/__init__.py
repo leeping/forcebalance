@@ -10,9 +10,10 @@ except ImportError:
     print "Could not load scipy module, exiting..."
     exit()
 
-from collections import defaultdict
 from re import split, findall
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
+import pkg_resources
+__version__ = pkg_resources.get_distribution("forcebalance").version
 
 # Global variable corresponding to the Work Queue object
 WORK_QUEUE = None

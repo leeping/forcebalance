@@ -90,9 +90,9 @@ class TestNifty(ForceBalanceTestCase):
         self.assertEqual(forcebalance.WORK_QUEUE, None,
             msg="\nUnexpected initialization of WORK_QUEUE to %s" % str(forcebalance.WORK_QUEUE))
             
-        self.logger.info("\n")
+        #self.logger.info("\n")
             
-        createWorkQueue(30000)
+        createWorkQueue(30000, debug=False)
         self.logger.debug("Created work queue, verifying...\n")
         self.assertEqual(type(forcebalance.WORK_QUEUE), work_queue.WorkQueue,
             msg="\nExpected WORK_QUEUE to be a WorkQueue object, but got a %s instead" % str(type(forcebalance.WORK_QUEUE)))
@@ -102,21 +102,25 @@ class TestNifty(ForceBalanceTestCase):
         self.assertEqual(type(wq), work_queue.WorkQueue,
             msg="\nExpected getWorkQueue() to return a WorkQueue object, but got %s instead" % str(type(forcebalance.WORK_QUEUE)))
         
-        self.logger.debug("Submitting test job 'echo work queue test > test.job'\n")
-        queue_up(wq, "echo work queue test > test.job", [], ["test.job"], tgt=None, verbose=False)
-        self.logger.debug("Verifying that work queue has a task waiting\n")
-        self.assertEqual(wq.stats.tasks_waiting, 1, msg = "\nExpected queue to have a task waiting")
-        
-        self.logger.debug("Creating work_queue_worker process... ")
-        worker = subprocess.Popen(["test/files/work_queue_worker", "localhost", str(wq.port)], stdout=subprocess.PIPE)
-        self.addCleanup(worker.terminate)
-        self.logger.debug("Done\nTrying to get task from work queue\n")
-        
-        self.logger.debug("Calling wq_wait1 to fetch task\n")
-        wq_wait1(wq, wait_time=5)
-        self.logger.debug("wq_wait1(wq, wait_time=5) finished\n")
-        self.logger.debug("Checking that wq.stats.total_tasks_complete == 1\n")
-        self.assertEqual(wq.stats.total_tasks_complete, 1, msg = "\nExpected queue to have a task completed")
+        worker_program = which('work_queue_worker')
+        if worker_program != '':
+            self.logger.debug("Submitting test job 'echo work queue test > test.job'\n")
+            queue_up(wq, "echo work queue test > test.job", [], ["test.job"], tgt=None, verbose=False)
+            self.logger.debug("Verifying that work queue has a task waiting\n")
+            self.assertEqual(wq.stats.tasks_waiting, 1, msg = "\nExpected queue to have a task waiting")
+            
+            self.logger.debug("Creating work_queue_worker process... ")
+            worker = subprocess.Popen([os.path.join(worker_program, "work_queue_worker"), "localhost", str(wq.port)], stdout=subprocess.PIPE)
+            self.addCleanup(worker.terminate)
+            self.logger.debug("Done\nTrying to get task from work queue\n")
+            
+            self.logger.debug("Calling wq_wait1 to fetch task\n")
+            wq_wait1(wq, wait_time=5)
+            self.logger.debug("wq_wait1(wq, wait_time=5) finished\n")
+            self.logger.debug("Checking that wq.stats.total_tasks_complete == 1\n")
+            self.assertEqual(wq.stats.total_tasks_complete, 1, msg = "\nExpected queue to have a task completed")
+        else:
+            self.logger.debug("work_queue_worker is not in the PATH.")
         
         forcebalance.WORK_QUEUE = None
         forcebalance.WQIDS = defaultdict(list)
