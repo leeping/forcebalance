@@ -1,7 +1,7 @@
-<map id="forcebalance.liquid.Liquid" name="forcebalance.liquid.Liquid">
-<area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html" title="forcebalance.gmxio.Liquid_GMX" alt="" coords="803,5,1027,35"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html" title="forcebalance.openmmio.Liquid\l_OpenMM" alt="" coords="807,58,1023,105"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html" title="forcebalance.tinkerio.Liquid\l_TINKER" alt="" coords="817,127,1012,174"/>
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="336,67,525,96"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="115,67,288,96"/>
+<map id="G" name="G">
+<area shape="rect" id="node7" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html" title="forcebalance.gmxio.Liquid_GMX" alt="" coords="731,5,955,32"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html" title="forcebalance.openmmio.Liquid_OpenMM" alt="" coords="702,56,983,83"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html" title="forcebalance.tinkerio.Liquid_TINKER" alt="" coords="719,107,966,133"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="230,56,421,83"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="6,56,181,83"/>
 </map>

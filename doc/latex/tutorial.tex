@@ -1,22 +1,25 @@
-This is a tutorial page, but if you haven't installed Force\-Balance yet please go to the Installation page first. It is very much in process, and there are many more examples to come.\hypertarget{tutorial_tip4p}{}\subsection{Fitting a T\-I\-P4\-P potential to Q\-M cluster calculations}\label{tutorial_tip4p}
-After everything is installed, go to the {\ttfamily studies/001\-\_\-water\-\_\-tutorial} directory in the distribution. Extract the {\ttfamily targets.\-tar.\-bz2} archive file. Now execute\-:
+\-This is a tutorial page, but if you haven't installed \-Force\-Balance yet please go to the \-Installation page first. \-It is very much in process, and there are many more examples to come.\hypertarget{tutorial_tip4p}{}\subsection{\-Fitting a T\-I\-P4\-P potential to Q\-M cluster calculations}\label{tutorial_tip4p}
+\-After everything is installed, go to the {\ttfamily studies/001\-\_\-water\-\_\-tutorial} directory in the distribution. \-Extract the {\ttfamily targets.\-tar.\-bz2} archive file. \-Now execute\-:
 
-\begin{DoxyVerb}ForceBalance.py very_simple.in
+\begin{DoxyVerb}
+ForceBalance.py very_simple.in
 \end{DoxyVerb}
 
 
-If the installation was successful, you will get an output file similar to {\ttfamily very\-\_\-simple.\-out} . What follows is a description of the output file and what Force\-Balance is actually doing.
+\-If the installation was successful, you will get an output file similar to {\ttfamily very\-\_\-simple.\-out} . \-What follows is a description of the output file and what \-Force\-Balance is actually doing.
 
-Force\-Balance begins by reading the force field files from the {\ttfamily forcefield} directory. The parameters to be optimized are specified in the parameter file by adding a special comment inside the file. For example, in the {\ttfamily water.\-itp} file, we specify that the two van der Waals parameters on oxygen are to be optimized, using the following syntax\-:
+\-Force\-Balance begins by reading the force field files from the {\ttfamily forcefield} directory. \-The parameters to be optimized are specified in the parameter file by adding a special comment inside the file. \-For example, in the {\ttfamily water.\-itp} file, we specify that the two van der \-Waals parameters on oxygen are to be optimized, using the following syntax\-:
 
-\begin{DoxyVerb}OW      8     15.99940     0.000       A    3.15365e-01  6.48520e-01 ; PARM 5 6
+\begin{DoxyVerb}
+OW	8     15.99940     0.000       A    3.15365e-01  6.48520e-01 ; PARM 5 6
 \end{DoxyVerb}
 
 
-The comment {\ttfamily P\-A\-R\-M 5 6} signals that \char`\"{}the parameters in fields 5
-and 6 are to be optimized.\char`\"{} The force field parser stores the physical value of the parameter and gives the parameter a name. These are printed out in the output file\-:
+\-The comment {\ttfamily \-P\-A\-R\-M 5 6} signals that \char`\"{}the parameters in fields 5
+and 6 are to be optimized.\char`\"{} \-The force field parser stores the physical value of the parameter and gives the parameter a name. \-These are printed out in the output file\-:
 
-\begin{DoxyVerb}Reading force field from file: water.itp
+\begin{DoxyVerb}
+Reading force field from file: water.itp
 #=========================================================#
 #|  Starting parameter indices, physical values and IDs  |#
 #=========================================================#
@@ -33,9 +36,10 @@ and 6 are to be optimized.\char`\"{} The force field parser stores the physical 
 \end{DoxyVerb}
 
 
-The next section it prints out are a set of rescaling factors which are important for various aspects of the optimization. They are discussed further in this \href{https://simtk.org/forums/viewtopic.php?f=710&t=3827}{\tt forum post}. For now it suffices to say that these values represent the natural size of the parameter, or more specifically how much the parameter is expected to vary.
+\-The next section it prints out are a set of rescaling factors which are important for various aspects of the optimization. \-They are discussed further in this \href{https://simtk.org/forums/viewtopic.php?f=710&t=3827}{\tt forum post}. \-For now it suffices to say that these values represent the natural size of the parameter, or more specifically how much the parameter is expected to vary.
 
-\begin{DoxyVerb}#========================================================#
+\begin{DoxyVerb}
+#========================================================#
 #|     Rescaling Factors (Lower Takes Precedence):      |#
 #========================================================#
    BONDSB                               : 5.29177e-02
@@ -51,11 +55,12 @@ The next section it prints out are a set of rescaling factors which are importan
 \end{DoxyVerb}
 
 
-Next, it prints out user-\/specified options that pertain to the force field the targets, the objective function and the optimizer. Options that are left at their default values (in this case, most) are not printed out. Use {\ttfamily verbose\-\_\-options True} in the input file to print out all of the options.
+\-Next, it prints out user-\/specified options that pertain to the force field the targets, the objective function and the optimizer. \-Options that are left at their default values (in this case, most) are not printed out. \-Use {\ttfamily verbose\-\_\-options \-True} in the input file to print out all of the options.
 
-Now for the good stuff -\/ the optimizer begins. Force\-Balance computes each target and prints out an indicator for each one, then provides a breakdown of the overall objective function\-:
+\-Now for the good stuff -\/ the optimizer begins. \-Force\-Balance computes each target and prints out an indicator for each one, then provides a breakdown of the overall objective function\-:
 
-\begin{DoxyVerb}#========================================================#
+\begin{DoxyVerb}
+#========================================================#
 #|                    Main Optimizer                    |#
 #|        Newton-Raphson Mode (Adaptive Radius)         |#
 #========================================================#
@@ -90,11 +95,12 @@ Total                                                  1.08037e-01
 \end{DoxyVerb}
 
 
-In this example job, the targets were Q\-M energies and forces for clusters of 6 and 12 water molecules. In the initial step (using the default T\-I\-P4\-P parameters) and for the first target (6-\/mers), the R\-M\-S error for energies is 9.\-4124 k\-J/mol (34\% of the variance in the Q\-M energies themselves), and the R\-M\-S error for atomistic forces is 32\% (again, scaled to the variance of the Q\-M forces). Similar information is printed out for the 12-\/mers. Each target contributes to the overall objective function, whose value is 1.\-080e-\/01. The parameters are at their initial values, which means that any penalty function will have a value of zero (the Regularization term).
+\-In this example job, the targets were \-Q\-M energies and forces for clusters of 6 and 12 water molecules. \-In the initial step (using the default \-T\-I\-P4\-P parameters) and for the first target (6-\/mers), the \-R\-M\-S error for energies is 9.\-4124 k\-J/mol (34\% of the variance in the \-Q\-M energies themselves), and the \-R\-M\-S error for atomistic forces is 32\% (again, scaled to the variance of the \-Q\-M forces). \-Similar information is printed out for the 12-\/mers. \-Each target contributes to the overall objective function, whose value is 1.\-080e-\/01. \-The parameters are at their initial values, which means that any penalty function will have a value of zero (the \-Regularization term).
 
-Next, Force\-Balance takes a step in the parameter space. The default algorithm (a variation of Newton-\/\-Raphson) uses first and second derivative information; the gradient is printed to the screen, as is the parameter step.
+\-Next, \-Force\-Balance takes a step in the parameter space. \-The default algorithm (a variation of \-Newton-\/\-Raphson) uses first and second derivative information; the gradient is printed to the screen, as is the parameter step.
 
-\begin{DoxyVerb}#========================================================#
+\begin{DoxyVerb}
+#========================================================#
 #|                    Total Gradient                    |#
 #========================================================#
    0 [ -1.36605285e-01 ] : VDWS:OW
@@ -138,11 +144,12 @@ Levenberg-Marquardt: Newton-Raphson step found (length 1.000e-01),  0.92958359 a
 \end{DoxyVerb}
 
 
-Note that the step length is limited to a \char`\"{}trust radius\char`\"{} of 0.\-1 -\/ this option is tunable. The step in parameter space is given in terms of the \char`\"{}mathematical parameters\char`\"{} -\/ the internal optimization variables -\/ and the \char`\"{}physical parameters\char`\"{} which are the actual values in the force field files. The mathematical parameters are mainly useful because they can be used to restart an optimization by creating a {\ttfamily read\-\_\-mvals} section to the input file and pasting the lines from the output.
+\-Note that the step length is limited to a \char`\"{}trust radius\char`\"{} of 0.\-1 -\/ this option is tunable. \-The step in parameter space is given in terms of the \char`\"{}mathematical parameters\char`\"{} -\/ the internal optimization variables -\/ and the \char`\"{}physical parameters\char`\"{} which are the actual values in the force field files. \-The mathematical parameters are mainly useful because they can be used to restart an optimization by creating a {\ttfamily read\-\_\-mvals} section to the input file and pasting the lines from the output.
 
-Force\-Balance now computes the objective function again, using the new parameter values.
+\-Force\-Balance now computes the objective function again, using the new parameter values.
 
-\begin{DoxyVerb}#=======================================================================#
+\begin{DoxyVerb}
+#=======================================================================#
 #|  Target: cluster-06 Type: AbInitio_GMX Objective = 7.55909e-02      |#
 #|                              Difference   Denominator     Percent   |#
 #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
@@ -172,15 +179,16 @@ Total                                                  7.37469e-02 ( -3.429e-02 
 \end{DoxyVerb}
 
 
-Using the new parameter values, the values for each target have gone down -\/ that is to say, the force field now produces better agreement with the reference data. In the objective function breakdown, improvements (i.\-e. decreasing values) from the previous step are printed in green while increasing values are printed in red. The \char`\"{}\-Regularization\char`\"{} term is printed in red because the parameters have moved from their initial values, so the penalty function is now finite.
+\-Using the new parameter values, the values for each target have gone down -\/ that is to say, the force field now produces better agreement with the reference data. \-In the objective function breakdown, improvements (i.\-e. decreasing values) from the previous step are printed in green while increasing values are printed in red. \-The \char`\"{}\-Regularization\char`\"{} term is printed in red because the parameters have moved from their initial values, so the penalty function is now finite.
 
-The last line reports\-:
+\-The last line reports\-:
 
 \begin{DoxyItemize}
-\item The step number ({\ttfamily Step}) \item The length of the parameter vector in the mathematical parameter space ({\ttfamily $|$k$|$}) \item The length of the most recent step ({\ttfamily $|$dk$|$}) \item The magnitude of the objective function gradient vector ({\ttfamily $|$grad$|$}) \item The objective function value ({\ttfamily -\/=X2=-\/}) \item The standard deviation of the objective function over a user-\/specified number of optimization steps \item The ratio of actual-\/to-\/predicted change in the objective function value. A {\ttfamily Step\-Qual} value of 1.\-0 signifies that the trust radius can be increased.\end{DoxyItemize}
-Eventually, the optimization will converge. For this job (and when this documentation was written) it took five steps\-:
+\item \-The step number ({\ttfamily \-Step}) \item \-The length of the parameter vector in the mathematical parameter space ({\ttfamily $|$k$|$}) \item \-The length of the most recent step ({\ttfamily $|$dk$|$}) \item \-The magnitude of the objective function gradient vector ({\ttfamily $|$grad$|$}) \item \-The objective function value ({\ttfamily -\/=\-X2=-\/}) \item \-The standard deviation of the objective function over a user-\/specified number of optimization steps \item \-The ratio of actual-\/to-\/predicted change in the objective function value. \-A {\ttfamily \-Step\-Qual} value of 1.\-0 signifies that the trust radius can be increased.\end{DoxyItemize}
+\-Eventually, the optimization will converge. \-For this job (and when this documentation was written) it took five steps\-:
 
-\begin{DoxyVerb}#=======================================================================#
+\begin{DoxyVerb}
+#=======================================================================#
 #|  Target: cluster-06 Type: AbInitio_GMX Objective = 6.30676e-02      |#
 #|                              Difference   Denominator     Percent   |#
 #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
@@ -250,15 +258,16 @@ The final force field has been printed to the 'result' directory.
 \end{DoxyVerb}
 
 
-As you can see, the objective function has decreased considerably since the previous step, and most of the improvement was due to reducing the error in the atomistic forces. In the {\ttfamily result} directory, you will find an updated {\ttfamily water.\-itp} file with the optimized parameter values.
+\-As you can see, the objective function has decreased considerably since the previous step, and most of the improvement was due to reducing the error in the atomistic forces. \-In the {\ttfamily result} directory, you will find an updated {\ttfamily water.\-itp} file with the optimized parameter values.
 
-This newly generated force field is a better fit to the reference data, but is it actually a better force field or did we just overfit the data? To answer this question, look at {\ttfamily validate.\-in} where the job type is set to {\ttfamily single}, and there are many more targets. In particular, we are now including Q\-M energies and forces for many cluster sizes ranging from 2 to 12.
+\-This newly generated force field is a better fit to the reference data, but is it actually a better force field or did we just overfit the data? \-To answer this question, look at {\ttfamily validate.\-in} where the job type is set to {\ttfamily single}, and there are many more targets. \-In particular, we are now including \-Q\-M energies and forces for many cluster sizes ranging from 2 to 12.
 
-Take the {\ttfamily read\-\_\-mvals} section from the output file of your previous run, paste it intointo the {\ttfamily \$options} section of {\ttfamily validate.\-in}, and run {\ttfamily Force\-Balance.\-py validate.\-in} . Force\-Balance will now evaluate the objective function using the force field parameters from the previous optimization.
+\-Take the {\ttfamily read\-\_\-mvals} section from the output file of your previous run, paste it intointo the {\ttfamily \$options} section of {\ttfamily validate.\-in}, and run {\ttfamily \-Force\-Balance.\-py validate.\-in} . \-Force\-Balance will now evaluate the objective function using the force field parameters from the previous optimization.
 
-You should see the following output\-:
+\-You should see the following output\-:
 
-\begin{DoxyVerb}#=======================================================================#
+\begin{DoxyVerb}
+#=======================================================================#
 #|  Target: cluster-02 Type: AbInitio_GMX Objective = 6.59279e-02      |#
 #|                              Difference   Denominator     Percent   |#
 #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
@@ -385,11 +394,11 @@ Total                                                  6.55802e-02
 \end{DoxyVerb}
 
 
-As you can see, the agreement is comparable for all of the cluster sizes, and this effectively means that we were able to achieve an accurate fit to Q\-M energies and forces for a wide range of cluster sizes using only the 6-\/mers and 12-\/mers.
+\-As you can see, the agreement is comparable for all of the cluster sizes, and this effectively means that we were able to achieve an accurate fit to \-Q\-M energies and forces for a wide range of cluster sizes using only the 6-\/mers and 12-\/mers.
 
-A truly good force field needs to accurately reproduce experimental measurements, but these are more difficult to compute and optimize. Force\-Balance provides methods for optimizing using experimental targets, but it is beyond the scope of this tutorial. However, hopefully this simple example helps to explain how force field optimization works within the framework of Force\-Balance.
+\-A truly good force field needs to accurately reproduce experimental measurements, but these are more difficult to compute and optimize. \-Force\-Balance provides methods for optimizing using experimental targets, but it is beyond the scope of this tutorial. \-However, hopefully this simple example helps to explain how force field optimization works within the framework of \-Force\-Balance.
 
-Feel free to explore using the other provided input files\-:
+\-Feel free to explore using the other provided input files\-:
 
 \begin{DoxyItemize}
-\item {\ttfamily 0.\-energy\-\_\-force.\-in} uses all of the targets -\/ cluster sizes 2 through 14 -\/ in the optimization. \item {\ttfamily 1.\-netforce\-\_\-torque.\-in} includes net forces on water molecules and torques in the optimization. \item {\ttfamily 2.\-L1\-\_\-penalty.\-in} uses a L1 penalty function, effectively causing only some parameters to change and not others. \item {\ttfamily 3.\-no\-\_\-penalty.\-in} illustrates what happens when no penalty function is used at all. \item {\ttfamily 4.\-change\-\_\-factor.\-in} shows the effect of changing the rescaling factors. \item {\ttfamily 5.\-gradient.\-in} performs a finite-\/difference check on the objective function gradient. \end{DoxyItemize}
+\item {\ttfamily 0.\-energy\-\_\-force.\-in} uses all of the targets -\/ cluster sizes 2 through 14 -\/ in the optimization. \item {\ttfamily 1.\-netforce\-\_\-torque.\-in} includes net forces on water molecules and torques in the optimization. \item {\ttfamily 2.\-L1\-\_\-penalty.\-in} uses a \-L1 penalty function, effectively causing only some parameters to change and not others. \item {\ttfamily 3.\-no\-\_\-penalty.\-in} illustrates what happens when no penalty function is used at all. \item {\ttfamily 4.\-change\-\_\-factor.\-in} shows the effect of changing the rescaling factors. \item {\ttfamily 5.\-gradient.\-in} performs a finite-\/difference check on the objective function gradient. \end{DoxyItemize}

@@ -17,7 +17,7 @@
 </g>
 <!-- Node2 -->
 <g id="node3" class="node"><title>Node2</title>
-<a xlink:href="classforcebalance_1_1BaseReader.html#af2af8a559625614474a1c6fe245b5e13" target="_top" xlink:title="forcebalance.BaseReader.\lWhites">
+<a xlink:href="classforcebalance_1_1BaseReader.html#af2af8a559625614474a1c6fe245b5e13" target="_top" target="_top" xlink:title="forcebalance.BaseReader.\lWhites">
 <polygon fill="white" stroke="black" points="176,-0 176,-34 316,-34 316,-0 176,-0"/>
 <text text-anchor="start" x="184" y="-21" font-family="Ubuntu-R" font-size="10.00">forcebalance.BaseReader.</text>
 <text text-anchor="middle" x="246" y="-8" font-family="Ubuntu-R" font-size="10.00">Whites</text>
@@ -30,7 +30,7 @@
 </g>
 <!-- Node3 -->
 <g id="node5" class="node"><title>Node3</title>
-<a xlink:href="classforcebalance_1_1BaseReader.html#a3c46942ef8cc25ece21d52be5b7ba05f" target="_top" xlink:title="forcebalance.BaseReader.feed">
+<a xlink:href="classforcebalance_1_1BaseReader.html#a3c46942ef8cc25ece21d52be5b7ba05f" target="_top" target="_top" xlink:title="forcebalance.BaseReader.feed">
 <polygon fill="white" stroke="black" points="352.5,-6.5 352.5,-27.5 513.5,-27.5 513.5,-6.5 352.5,-6.5"/>
 <text text-anchor="middle" x="433" y="-14.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.BaseReader.feed</text>
 </a>
@@ -42,7 +42,7 @@
 </g>
 <!-- Node4 -->
 <g id="node7" class="node"><title>Node4</title>
-<a xlink:href="classforcebalance_1_1BaseReader.html#aab2c64ccf0f803d4eff3bbf40a6cb0b7" target="_top" xlink:title="Returns the parameter type (e.g.">
+<a xlink:href="classforcebalance_1_1BaseReader.html#aab2c64ccf0f803d4eff3bbf40a6cb0b7" target="_top" target="_top" xlink:title="Returns the parameter type (e.g.">
 <polygon fill="white" stroke="black" points="550,-6.5 550,-27.5 732,-27.5 732,-6.5 550,-6.5"/>
 <text text-anchor="middle" x="641" y="-14.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.BaseReader.build_pid</text>
 </a>

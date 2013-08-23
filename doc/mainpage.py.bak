@@ -1,0 +1,1023 @@
+""" 
+
+@mainpage
+
+@section preface_sec Preface: How to use this document
+
+The documentation for ForceBalance exists in two forms: a web page and
+a PDF manual.  They contain equivalent content.  The newest versions
+of the software and documentation, along with relevant literature, can
+be found on the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>.
+
+\b Users of the program should read the <em>Introduction,
+Installation</em>, <em>Usage</em>, and <em>Tutorial</em> sections on
+the main page.
+
+<b>Developers and contributors</b> should read the
+Introduction chapter, including the <em>Program Layout</em> and
+<em>Creating Documentation</em> sections.  The <em>API
+documentation</em>, which describes all of the modules, classes and
+functions in the program, is intended as a reference
+for contributors who are writing code.
+
+ForceBalance is a work in progress; using the program is nontrivial
+and many features are still being actively developed.  Thus, users and
+developers are highly encouraged to contact me through
+the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>, either by sending me email or posting to the
+public forum, in order to get things up and running.
+
+Thanks!
+
+Lee-Ping Wang
+
+@section intro_sec Introduction
+
+Welcome to ForceBalance! :)
+
+This is a <em> theoretical and computational chemistry </em> program
+primarily developed by Lee-Ping Wang.  The full list of people who
+made this project possible are given in the \ref credits.
+
+The function of ForceBalance is <em>automatic potential
+optimization</em>.  It addresses the problem of parameterizing
+empirical potential functions, colloquially called <em>force
+fields</em>.  Here I will provide some background, which for the sake
+of brevity and readability will lack precision and details.  In the
+future, this documentation will include literature citations which
+will guide further reading.
+
+@subsection background Background: Empirical Potentials
+
+In theoretical and computational chemistry, there are many methods for
+computing the potential energy of a collection of atoms and molecules
+given their positions in space.  For a system of \a N particles, the
+potential energy surface (or <em>potential</em> for short) is a
+function of the \a 3N variables that specify the atomic coordinates.
+The potential is the foundation for many types of atomistic
+simulations, including molecular dynamics and Monte Carlo, which are
+used to simulate all sorts of chemical and biochemical processes
+ranging from protein folding and enzyme catalysis to reactions between
+small molecules in interstellar clouds.
+
+The true potential is given by the energy eigenvalue of the
+time-independent Schrodinger's equation, but since the exact solution
+is intractable for virtually all systems of interest, approximate
+methods are used.  Some are <em>ab initio</em> methods ('from first
+principles') since they are derived directly from approximating
+Schrodinger's equation; examples include the independent electron
+approximation (Hartree-Fock) and perturbation theory (MP2).  However,
+the vast majority of methods contain some tunable constants or
+<em>empirical parameters</em> which are carefully chosen to make the
+method as accurate as possible.  Three examples: the widely used B3LYP
+approximation in density functional theory (DFT) contains three
+parameters, the semiempirical PM3 method has 10-20 parameters per
+chemical element, and classical force fields have hundreds to
+thousands of parameters.  All such formulations require an accurate
+parameterization to properly describe reality.
+
+\image html ladder_sm.png "An arrangement of simulation methods by accuracy vs. computational cost."
+\image latex ladder.png "An arrangement of simulation methods by accuracy vs. computational cost." width=10cm
+
+A major audience of ForceBalance is the scientific community that uses
+and develops classical force fields.  These force fields do not use
+the Schrodinger's equation as a starting point; instead, the potential
+is entirely specified using elementary mathematical functions.  Thus,
+the rigorous physical foundation is sacrificed but the computational
+cost is reduced by a factor of millions, enabling atomic-resolution
+simulations of large biomolecules on long timescales and allowing the
+study of problems like protein folding.
+
+In classical force fields, relatively few parameters may be determined
+directly from experiment - for instance, a chemical bond may be
+described using a harmonic spring with the experimental bond length
+and vibrational frequency.  More often there is no experimentally
+measurable counterpart to a parameter - for example, electrostatic
+interactions are often described as interactions between pairs of
+point charges on atomic centers, but the fractional charge assigned to
+each atom has no rigorous experimental of theoretical definition.  To
+complicate matters further, most molecular motions arise from a
+combination of interactions and are sensitive to many parameters at
+once - for example, the dihedral interaction term is intended to
+govern torsional motion about a bond, but these motions are modulated
+by the flexibility of the nearby bond and angle interactions as well
+as the nonbonded interactions on either side.
+
+\image html interactions_sm.png "An illustration of some interactions typically found in classical force fields."
+\image latex interactions.png "An illustration of some interactions typically found in classical force fields." width=10cm
+
+For all of these reasons, force field parameterization is difficult.
+In the current practice, parameters are often determined by fitting to
+results from other calculations (for example, restrained electrostatic
+potential fitting (RESP) for determining the partial charges) or
+chosen to reproduce experimental measurements which depend indirectly
+on the parameters (for example, adjusting the partial charges on a
+solvent molecule to reproduce the bulk dielectric constant.)
+Published force fields have been modified by hand over decades to
+maximize their agreement with experimental observations (for example,
+adjusting some parameters in order to reproduce a protein crystal
+structure) at the expense of reproducibility and predictive power.
+
+@subsection mission_statement Purpose and brief description of this program 
+
+Given this background, I can make the following statement.
+<b>ForceBalance aims to advance the methods of empirical potential
+development by applying a highly general and systematic process with
+explicitly specified input data and mathematical optimization
+algorithms, paving the way to higher accuracy potentials, improved
+reproducibility of potential development, and well-defined scopes of
+validity and error estimation for the parameters. </b>
+
+At a high level, ForceBalance takes an empirical potential and a set of
+reference data as inputs, and tunes the parameters such that the
+reference data is reproduced as accurately as possible.  Examples of
+reference data include energy and forces from high-level QM
+calculations, experimentally known molecular properties
+(e.g. polarizabilities and multipole moments), and experimentally
+measured bulk properties (e.g. density and dielectric constant).
+
+ForceBalance presents the problem of potential optimization in a
+unified and easily extensible framework.  Since there are many
+empirical potentials in theoretical chemistry and similarly many types
+of reference data, significant effort is taken to provide an
+infrastructure which allows a researcher to fit any type of
+potential to any type of reference data.
+
+Conceptually, a set of reference data (usually a physical quantity of
+some kind), in combination with a method for computing the
+corresponding quantity with the empirical potential, is called a
+<b>fitting simulation</b>.  For example:
+
+- A force field can predict the density of a liquid by running NPT
+molecular dynamics, and this computed value can be compared against
+the experimental density.
+
+- A force field can be used to evaluate the energies and forces at
+several molecular geometries, and these can be compared against
+energies and forces from higher-level quantum chemistry calculations
+using these same geometries.  This is known as <tt>force and energy
+matching</tt>.
+
+- A force field can predict the multipole moments and polarizabilities
+of a molecule isolated in vacuum, and these can be compared against
+experimental measurements.
+
+Within the context of a fitting simulation, the accuracy of the force
+field can be optimized by tuning the parameters to minimize the
+difference between the computed and reference quantities.  One or more
+fitting simulations can be combined to produce an aggregate
+<b>objective function</b> whose domain is the <b>parameter space</b>.
+This objective function, which typically depends on the parameters in
+a complex way, is minimized using nonlinear optimization algorithms.
+The result is a force field with high accuracy in all of the fitting
+simulations.
+
+\image html flowchart_sm.png "The division of the potential optimization problem into three parts; the force field, fitting simulations and optimization algorithm."
+\image latex flowchart.png "The division of the potential optimization problem into three parts; the force field, fitting simulations and optimization algorithm." height=10cm
+
+The problem is now split into three main components; the force field,
+the fitting simulations, and the optimization algorithm.  ForceBalance
+uses this conceptual division to define three classes with minimal
+interdependence.  Thus, if a researcher wishes to explore a new
+functional form, incorporate a new type of reference data or try a new
+optimization algorithm, he or she would only need to contribute to one
+branch of the program without having to restructure the entire code
+base.
+
+The scientific problems and concepts that this program is based upon
+are further described in my Powerpoint presentations and publications,
+which can be found on the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>.
+
+@section credits Credits
+
+- Lee-Ping Wang is the principal developer and author.
+
+- Troy Van Voorhis provided scientific guidance and many of
+the central ideas as well as financial support.
+
+- Jiahao Chen contributed the call graph generator, the QTPIE
+fluctuating-charge force field (which Lee-Ping implemented into
+GROMACS), the interface to the MOPAC semiempirical code, and many
+helpful discussions.
+
+- Matt Welborn contributed the parallelization-over-snapshots
+functionality in the general force matching module.
+
+- Vijay Pande provided scientific guidance and financial support,
+and through the SimBios program gave this software a home on the Web
+at the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>.
+
+- Todd Martinez provided scientific guidance and financial support.
+
+\page installation Installation
+
+This section covers how to install ForceBalance and its companion
+software GROMACS-X2.  Currently only Linux is supported, though
+installation on other Unix-based systems (e.g. Mac OS) should also be
+straightforward.
+
+Importantly, note that <em>ForceBalance does not contain any simulation
+software or methods for generating the reference data</em>.  Fitting
+simulations are performed by interfacing ForceBalance with simulation
+software like GROMACS, TINKER or OpenMM; reference data is obtained
+from experimental measurements (consult the literature), or from
+simulation / quantum chemistry software (for example, NWChem or Q-Chem).
+
+I have provided a specialized version of GROMACS (dubbed version
+4.0.7-X2) on the <a href=https://simtk.org/home/forcebalance/>SimTK
+website</a> which interfaces with ForceBalance through the
+forceenergymatch_gmxx2 module.  Although interfacing with unmodified
+simulation software is straightforward, GROMACS-X2 is optimized
+for our task and makes things much faster.  Soon, I will also
+implement functions for grid-scale computation of reference energies
+and forces using Q-Chem (a commercial software).  However, you should
+be prepared to write some simple code to interface with a fitting
+simulation or quantum chemistry software of your choice.  If you
+choose to do so, please contact me as I would be happy to include your
+contribution in the main distribution.
+
+@section installing_forcebalance Installing ForceBalance
+
+ForceBalance is an ordinary Python module, so if you know how to install Python
+modules, you shouldn't have any trouble with this.
+
+@subsection installing_forcebalance_prereq Prerequisites
+
+The only required software for installing ForceBalance are Python and
+NumPy.  ForceBalance also allows the usage of SciPy optimizers; they
+aren't as effective as the internal optimizer but still often helpful
+- if you want to use these, then SciPy is needed.  A few more packages
+are required if you want to \ref create_doc.  Here is a list of Python
+packages and software:
+
+Needed for ForceBalance:
+@li Python version 2.7.1
+@li NumPy version 1.5.0
+@li SciPy version 0.9.0 (optional; needed for some of the non-default optimizers)
+Needed for making documentation:
+@li Doxygen version 1.7.6.1
+@li Doxypy plugin for Doxygen
+@li LaTeX software like TeXLive
+
+@subsection installing_forcebalance_install Installing
+
+To install the package, first extract the tarball that you downloaded from the
+webpage using the command:
+
+@verbatim tar xvzf ForceBalance-[version].tar.gz @endverbatim
+
+Upon extracting the distribution you will notice this directory structure:
+
+@verbatim
+<root>
+  +- bin
+  |   |- <Executable scripts>
+  +- forcebalance
+  |   |- <Python module files>
+  +- test
+  |   +- <ForceBalance example jobs>
+  +- doc
+  |   +- callgraph
+  |   |   |- <Stuff for making a call graph>
+  |   +- Images
+  |   |   |- <Images for the website and PDF manual>
+  |   |- mainpage.py (Contains most user documentation and this text)
+  |   |- header.tex (Customize the LaTex documentation)
+  |   |- add-tabs.py (Adds more navigation tabs to the webpage)
+  |   |- DoxygenLayout.xml (Removes a navigation tab from the webpage)
+  |   |- doxygen.cfg (Main configuration file for Doxygen)
+  |   |- ForceBalance-Manual.pdf (PDF manual, but the one on the SimTK website is probably newer)
+  |- PKG-INFO (Auto-generated package information)
+  |- README.txt (Points to the SimTK website)
+  |- setup.py (Python script for installation)
+@endverbatim
+
+To install the code into your default Python location, run this (you might need to be root):
+
+@verbatim python setup.py install @endverbatim
+
+Alternatively, you can do a local install by running:
+
+@verbatim python setup.py install --prefix=/home/your_username/local_directory @endverbatim
+
+where you would of course replace your_username and local_directory with your username and preferred install location.  The executable scripts will be placed into <tt>/home/your_username/local_directory/bin</tt> and the module will be placed into <tt>/home/your_username/local_directory/lib/python[version]/site-packages/forcebalance</tt>.
+
+Note that if you do a local installation, for Python to recognize the newly installed module you may need to append your PYTHONPATH environment variable using a command like the one below:
+
+@verbatim export PYTHONPATH=$PYTHONPATH:/home/your_username/local_directory/lib/python[version] @endverbatim
+
+@section install_gmxx2 Installing GROMACS-X2
+
+GROMACS-X2 contains major modifications from GROMACS 4.0.7.
+Most importantly, it enables computation of the objective function
+<a>and its analytic derivatives</a> for rapid force matching.  There
+is also an implementation of the QTPIE fluctuating-charge polarizable
+force field, and the beginnings of a GROMACS/Q-Chem interface
+(carefully implemented but not extensively tested).  Most of the
+changes were added in several new source files (less than ten): \c
+qtpie.c, \c fortune.c, \c fortune_utils.c, \c fortune_vsite.c, \c
+fortune_nb_utils.c, \c zmatrix.c and their corresponding header files,
+and \c fortunerec.h for the force matching struct.  The name 'fortune'
+derives from back when this code was called ForTune.
+
+The force matching functions are turned on by calling \c mdrun with
+the command line argument \c '-fortune' ; without this option, there
+should be no impact on the performance of normal MD simulations.
+
+ForceBalance interfaces with GROMACS-X2 by calling the program
+with special options and input files; the objective function and
+derivatives are computed and printed to output files.  The interface
+is defined in \c fortune.c on the GROMACS side and \c
+forceenergymatch_gmxx2 on the Python side.  ForceBalance needs to know
+where the GROMACS-X2 executables are located, and this is specified
+using the \c gmxpath option in the input file.
+
+@subsection install_gmxx2_prerequisites Prerequisites for GROMACS-X2
+
+GROMACS-X2 needs the base GROMACS requirements and several other libraries.
+
+@li FFTW version 3.3
+@li GLib version 2.0
+@li Intel MKL library
+
+GLib is the utility library provided by the GNOME foundation (the
+folks who make the GNOME desktop manager and GTK+ libraries).
+GROMACS-X2 requires GLib for its hash table (dictionary)
+implementation.
+
+GLib and FFTW can be compiled from source, but it is much easier if
+you're using a Linux distribution with a package manager.  If you're
+running Ubuntu or Debian, run <tt>sudo apt-get install libglib2.0-dev
+libfftw3-dev</tt>; if you're using CentOS or some other distro with
+the yum package manager, run <tt>sudo yum install glib2-devel.x86_64
+fftw3-devel.x86_64</tt> (or replace \c x86_64 with \c i386 if you're
+not on a 64-bit system.
+
+GROMACS-X2 requires the Intel Math Kernel Library (MKL) for linear algebra.
+In principle this requirement can be lifted if I rewrite the source
+code, but it's a lot of trouble, plus MKL is faster than other
+implementations of BLAS and LAPACK.
+
+The Intel MKL can be obtained from the Intel website, free of charge
+for noncommercial use.  Currently GROMACS-X2 is built with MKL version
+10.2, which ships with compiler version 11.1/072 ; this is not the
+newest version, but it can still be obtained from the Intel website
+after you register for a free account.
+
+After installing these packages, extract the tarball that you downloaded
+from the website using the command:
+
+@verbatim tar xvjf gromacs-[version]-x2.tar.bz2 @endverbatim
+
+The directory structure is identical to GROMACS 4.0.7, but I added
+some shell scripts. \c Build.sh will run the configure script using
+some special options, compile the objects, create the executables and
+install them; you will probably need to modify it slightly for your
+environment.  The comments in the script will help further
+with installation.
+
+Don't forget to specify the install location of the GROMACS-X2 executables
+in the ForceBalance input file!
+
+@section create_doc Create documentation
+
+This documentation is created by Doxygen with the Doxypy plugin.
+To create new documentation or expand on what's here, follow the
+examples on the source code or visit the Doxygen home page.
+
+To create this documentation from the source files, go to the \c doc
+directory in the distribution and run <tt> doxygen doxygen.cfg </tt>
+to generate the HTML documentation and LaTeX source files.  Run the \c
+add-tabs.py script to generate the extra navigation tabs for the HTML
+documentation.  Then go to the \c latex directory and type in <tt> make
+</tt> to build the PDF manual (You might need a LaTeX distribution for
+this.)
+
+
+\page usage Usage
+
+This page describes how to use the ForceBalance software.
+
+A good starting point for using this software package is to run
+the scripts in the \c bin directory of the distribution.
+
+\c OptimizePotential.py is the executable script that performs force
+field optimization.  It requires an input file and a \ref
+directory_structure.  \c MakeInputFile.py will create an example input
+file that contains all options, their default values, and a short
+description for each option.  There are plans to automatically
+generate the correct input file from the provided directory structure,
+but for now the autogenerated input file only provides the hardcoded
+default options.
+
+@section input_file Input file
+
+A typical input file for ForceBalance might look something like this:
+
+@verbatim
+$options
+jobtype                  bfgs
+gmxpath                  /home/leeping/opt/gromacs-4.0.7-x2/bin
+forcefield               water.itp
+penalty_multiplicative   0.01
+convergence_objective    1e-6
+convergence_step         1e-6
+convergence_gradient     1e-4
+$end
+
+$simulation
+simtype                  forceenergymatch_gmx
+name                     water12_gen1
+weight                   1
+efweight                 0.5
+shots                    300
+fd_ptypes                VSITE
+fdhessdiag               1
+covariance               0
+$end
+
+$simulation
+simtype                  forceenergymatch_gmx
+name                     water12_gen2
+weight                   1
+efweight                 0.5
+shots                    300
+fd_ptypes                VSITE
+fdhessdiag               1
+covariance               0
+$end
+@endverbatim
+
+Global options for a ForceBalance job are given in the \c $options
+section while the settings for each fitting simulation are given in
+the \c $simulation sections.  At this time, these are the only two
+section types.
+
+The most important general options to note are: \c jobtype specifies
+the optimization algorithm to use and \c forcefield specifies the
+force field file name (there may be more than one of these).  The most
+important simulation options to note are: \c simtype specifies the
+type of fitting simulation and \c name specifies the simulation name
+(must correspond to a subdirectory in \c simulations/ ).  All options
+are explained in the Option Index.
+
+@section directory_structure Directory structure
+
+The directory structure for our example job would look like:
+
+@verbatim
+<root>
+  +- forcefield
+  |   |- water.itp
+  +- simulations
+  |   +- water12_gen1
+  |   |   |- all.gro (containing 300 geometries)
+  |   |   |- qdata.txt
+  |   |   |- shot.mdp
+  |   |   |- topol.top
+  |   +- water12_gen2
+  |   |   |- all.gro (containing 300 geometries)
+  |   |   |- qdata.txt
+  |   |   |- shot.mdp
+  |   |   |- topol.top
+  |- input_file.in
+@endverbatim
+
+The top-level directory names \b forcefield and \b simulations are
+fixed and cannot be changed.  \b forcefield contains the force field
+files that you're optimizing, and \b simulations contains all of the
+fitting simulations and reference data.  Each subdirectory in \b
+simulations corresponds to a single fitting simulation, and its
+contents depend on the specific kind of simulation and its
+corresponding \c FittingSimulation subclass.
+
+The \b temp directory is the temporary workspace of the program, and
+the \b result directory is where the optimized force field files are
+deposited after the optimization job is done.  These two directories
+are created if they're not already there.
+
+Note the force field file, \c water.itp and the two fitting
+simulations \c water12_gen1 and \c water12_gen2 correspond to the
+entries in the input file.  There are two energy and force matching
+simulations here; each directory contains the relevant geometries (in
+\c all.gro ) and reference data (in \c qdata.txt ).
+
+\page tutorial Tutorial
+
+This is a tutorial page, but if you haven't installed ForceBalance yet
+please go to the Installation page first.  It is very much in process,
+and there are many more examples to come.
+
+\section tip4p Fitting a TIP4P potential using two fitting simulations
+After everything is installed, go to the \c test directory in the distribution
+and run:
+
+@verbatim
+cd 001_water12_tip4p/
+OptimizePotential.py 01_bfgs_from_start.in | tee my_job.out
+@endverbatim
+
+If the installation was successful, you will get an output file
+similar to \c 01_bfgs_from_start.out .  \c OptimizePotential.py begins
+by taking the force field files from the \c forcefield directory and
+the fitting simulations / reference data from the \c simulations
+directory.  Then it calls GROMACS-X2 to compute the objective function
+and its derivatives, uses the internal optimizer (based on BFGS) to
+take a step in the parameter space, and repeats the process until
+convergence criteria were made.
+
+At every step, you will see output like:
+@verbatim
+  Step       |k|        |dk|       |grad|       -=X2=-     Stdev(X2)
+    35   6.370e-01   1.872e-02   9.327e-02   2.48773e-01   1.149e-04
+
+Sim: water12_sixpt   E_err(kJ/mol)=     8.8934 F_err(%)=    29.3236
+Sim: water12_fourpt  E_err(kJ/mol)=    14.7967 F_err(%)=    39.2558
+@endverbatim
+
+The first line reports the step number, the length of the parameter
+displacement vector, the gradient of the objective function, the
+objective function itself, and the standard deviation of the last ten
+\a improved steps in the objective function.  There are three kinds of
+convergence criteria - the step size, the gradient, and the objective
+function itself; all of them can be specified in the input file.
+
+The next two lines report on the two fitting simulations in this job,
+both of which use force/energy matching.  First, note that there are
+two fitting simulations named \c water12_sixpt and \c water12_fourpt;
+the names are because one set of geometries was sampled using a
+six-site QTPIE force field, and the other was sampled using the TIP4P
+force field.  However, the TIP4P force field is what we are fitting
+for this ForceBalance job.  This shows how only one force field or
+parameter set is optimized for each ForceBalance job, but the method
+for sampling the configuration space is completely up to the user.
+The geometries can be seen in the \c all.gro files, and the reference
+data is provided in \c qdata.txt .  Note that the extra virtual sites
+in \c water12_sixpt have been replaced with a single TIP4P site.
+
+\c E_err and \c F_err report the RMS energy error in kJ/mol and the
+percentage force error; note the significant difference in the quality
+of agreement!  This illustrates that the quality of fit depends not
+only on the functional form of the potential but also the
+configurations that are sampled.  \c E_err and \c F_err are
+'indicators' of our progress - that is, they are not quantities to be
+optimized but they give us a mental picture of how we're doing.
+
+The other input files in the directory use the same fitting
+simulations, but they go through the various options of
+reading/writing checkpoint files, testing gradients and Hessians by
+finite difference, and different optimizers in SciPy.  Feel free to
+explore some optimization jobs of your own - for example, vary the
+weights on the fitting simulations and see what happens.  You will
+notice that the optimizer will try very hard to fit one simulation but
+not the other.
+
+\page glossary Glossary
+
+This is a glossary page containing scientific concepts for the discussion of
+potential optimization, as well as the (automatically generated) documentation
+of ForceBalance keywords.
+
+\section concepts Scientific concepts
+
+@li <b> Empirical parameter </b> : Any adjustable parameter in the
+empirical potential that affects the potential energy, such as the
+partial charge on an atom, the equilibrium length of a chemical
+bond, or the fraction of Hartree-Fock exchange in a density functional.
+
+@li <b> Empirical Potential </b> : A formula that contains empirical
+parameters and computes the potential energy of a collection of atoms.
+Note that in ForceBalance this is used very loosely; even a DFT
+functional may contain many empirical parameters, and ForceBalance has the
+ability to optimize these as well!
+
+@li <b> Fitting simulation </b> : A simulation protocol that allows
+a force field to predict a physical quantity, paired with some reference
+data.  The accuracy of the force field is given by its closeness 
+
+@li <b> Force field </b> : This term is used interchangeably with
+empirical potential; it is more prevalent in the biomolecular simulation
+community.
+
+@li <b> Functional form </b> : The mathematical functions in the force
+field.  For instance, a CHARMM-type functional form has harmonic interactions
+for bonds and angles, a cosine expansion for the dihedrals, Coulomb interactions
+between point charges and Lennard-Jones terms for van der Waals interactions.
+
+@li <b> Reference data </b> : In general, any accurately known
+quantity that the force field is optimized to reproduce.  Reference
+data can come from either theory or experiment.  For instance,
+energies and forces from a high-level QM method can be used as
+reference data (for instance, a CHARMM-type force field can be fitted
+to reproduce forces from a DFT or MP2 calculation), or a force field
+can be optimized to reproduce the experimental density of a liquid,
+its enthalpy of vaporization or the solvation free energy of a solute.
+
+
+\section gen_option_index Option index: General options
+
+This section contains a listing of the general options available when running
+a ForceBalance job, which go into the $options section.  The general options
+are global for the ForceBalance job, in contrast to 'Simulation options' which apply to one
+fitting simulation within a job (described in the next section).
+The option index is generated by running make-option-index.py.
+
+@li <b> BACKUP </b> (Bool)
+\n<b> Scope </b>: All force field optimizations (Optional)
+\n<b> One-line description </b>: Write temp directories to backup before wiping them
+\n<b> Default Value </b>: 1
+
+@li <b> CONVERGENCE_GRADIENT </b> (Float)
+\n<b> Scope </b>: Main optimizer (Optional)
+\n<b> One-line description </b>: Convergence criterion of gradient norm
+\n<b> Full description </b>: The main optimizer will quit when the objective function gradient falls below this number.
+                                          Since this is a newly implemented option, I can't say when this option will fail.
+\n<b> Default Value </b>: 0.0001
+\n<b> Recommendation </b>: Leave at the default, or set to several orders of magnitude below a typical value of the gradient (perhaps the gradient at the start of the optimization.)
+
+@li <b> CONVERGENCE_OBJECTIVE </b> (Float)
+\n<b> Scope </b>: Main optimizer (Optional)
+\n<b> One-line description </b>: Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)
+\n<b> Full description </b>: The main optimizer will quit when the last ten good values of the objective function have a
+                                           standard deviation that falls below this number.  We use the last ten good values (instead of the latest
+                                           change in the objective function), otherwise this condition would be triggered by taking tiny steps.
+\n<b> Default Value </b>: 0.0001
+\n<b> Recommendation </b>: Decrease this value if it's being triggered by small step sizes.
+
+@li <b> CONVERGENCE_STEP </b> (Float)
+\n<b> Scope </b>: Main optimizer (Optional)
+\n<b> One-line description </b>: Convergence criterion of step size (just needs to fall below this threshold)
+\n<b> Full description </b>: The main optimizer will quit when the step size falls below this number.  This happens if we are
+                                      approaching a local minimum, or if the optimizer is constantly taking bad steps and the trust radius is
+                                      reduced until it falls below this number.  In the latter case, this usually means that the derivatives are
+                                      wrong.
+\n<b> Default Value </b>: 0.0001
+\n<b> Recommendation </b>: Make sure that this value is much smaller than trust0.
+
+@li <b> EIG_LOWERBOUND </b> (Float)
+\n<b> Scope </b>: Main optimizer (Optional)
+\n<b> One-line description </b>: Minimum eigenvalue for applying steepest descent correction in the MainOptimizer
+\n<b> Full description </b>: The main optimizer will misbehave if there are negative or very small eigenvalues in the
+                                    objective function Hessian.  In the former case the optimizer will travel toward a saddle point (or
+                                    local maximum), and in the latter case the matrix inversion will fail because of the matrix singularity.
+                                    If the smallest eigenvalue is below this value, then a multiple of the identity matrix is added to the
+                                    Hessian to increase the smallest eigenvalue to at least this value.
+\n<b> Default Value </b>: 0.0001
+\n<b> Recommendation </b>: Shouldn't have to worry about this setting, unless the optimizer appears to be taking bad steps or inverting nearly singular matrices.
+
+@li <b> FFDIR </b> (String)
+\n<b> Scope </b>: All force field optimizations (Optional)
+\n<b> One-line description </b>: Directory containing force fields, relative to project directory
+\n<b> Default Value </b>: forcefield
+\n<b> Recommendation </b>: Unless you're using a nonstandard location for force field files, you probably shouldn't change this.
+
+@li <b> FINITE_DIFFERENCE_H </b> (Float)
+\n<b> Scope </b>: fdcheck_G or fdcheck_H job types, or whenever the objective function is evaluated using finite difference (Optional)
+\n<b> One-line description </b>: Step size for finite difference derivatives in many functions (get_(G/H) in fitsim, FDCheckG)
+\n<b> Full description </b>: When the objective function derivatives are checked using finite difference, or when the objective function derivative
+                                         requires finite difference, this is the step size that is used (in the mathematical space).  The actual parameter in the
+                                         force field is changed by this amount times the rescaling factor.
+\n<b> Default Value </b>: 0.01
+\n<b> Recommendation </b>: 1e-2 to 1e-4; run FDCheckG to see if derivatives are accurate; if derivatives are inaccurate then adjust accordingly.
+                                         If the objective function itself requires finite difference, there will still be a difference because FDCheckG(H) uses an accurate
+                                         seven-point (five-point) stencil.  Make sure that the derivatives agree before settling on a value to use.
+
+@li <b> FORCEFIELD </b> (List)
+\n<b> Scope </b>: All force field optimizations (<b><em>Required</em></b>)
+\n<b> One-line description </b>: The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
+\n<b> Default Value </b>: []
+
+@li <b> GMXPATH </b> (String)
+\n<b> Scope </b>: Fitting simulations that use GROMACS (GROMACS-X2 for ForceEnergyMatch_GMX) (<b><em>Required</em></b>)
+\n<b> One-line description </b>: Path for GROMACS executables
+\n<b> Full description </b>: Specify the path where GROMACS executables are installed, most likely ending in 'bin'.
+                             Note that executables are only installed 'bin' if the program is installed using 'make install';
+                             this will NOT be the case if you simply ran 'make'.
+\n<b> Default Value </b>: None
+\n<b> Recommendation </b>: Depends on your local installation and environment.
+
+@li <b> GMXSUFFIX </b> (String)
+\n<b> Scope </b>: Fitting simulations that use GROMACS (Optional)
+\n<b> One-line description </b>: The suffix of GROMACS executables
+\n<b> Full description </b>: Depending on how GROMACS is configured and installed, a suffix may be appended to executable
+                               names.  If there is a suffix, it needs to be specified here (or else ForceBalance will not find the
+                               GROMACS executable and it will crash.
+\n<b> Default Value </b>: 
+\n<b> Recommendation </b>: Depends on your local installation and environment.
+
+@li <b> JOBTYPE </b> (Allcap)
+\n<b> Scope </b>: All force field optimizations (<b><em>Required</em></b>)
+\n<b> One-line description </b>: The job type, defaults to a single-point evaluation of objective function
+\n<b> Full description </b>: Here you may specify the type of ForceBalance job.  This ranges from gradient-based and stochastic
+                             optimizations to simple scans over the parameter space and finite difference checking of gradients.
+\n<b> Default Value </b>: sp
+\n<b> Recommendation </b>: See the Optimizer class documentation for which optimizer is best suited for you.
+
+@li <b> MAXSTEP </b> (Int)
+\n<b> Scope </b>: All iterative optimization jobs (Optional)
+\n<b> One-line description </b>: Maximum number of steps in an optimization
+\n<b> Default Value </b>: 100
+\n<b> Recommendation </b>: At least 100 optimization steps are recommended.
+
+@li <b> PENALTY_ADDITIVE </b> (Float)
+\n<b> Scope </b>: Objective function (Optional)
+\n<b> One-line description </b>: Factor for additive penalty function in objective function
+\n<b> Full description </b>: Add a penalty to the objective function (e.g. L2 or L1 norm) with this prefactor.
+                                      Using an additive penalty requires an assessment of the order of magnitude of the objective function,
+                                      but it is closer to the statistical concept of ridge or LASSO regression.
+\n<b> Default Value </b>: 0.0
+\n<b> Recommendation </b>: No recommendation; run a single-point calculation to choose a prefactor.  Consider 0.01
+                                      for an objective function of order 1.
+
+@li <b> PENALTY_MULTIPLICATIVE </b> (Float)
+\n<b> Scope </b>: Objective function (Optional)
+\n<b> One-line description </b>: Factor for multiplicative penalty function in objective function
+\n<b> Full description </b>: Multiply the objective function by (1+X) where X is this value.
+                                            Using an multiplicative penalty works well for objective functions of any size but it is not
+                                            equivalent to statistical regularization methods.
+\n<b> Default Value </b>: 0.1
+\n<b> Recommendation </b>: A value of 0.01 tends to keep the length of the parameter vector from exceeding 1.
+
+@li <b> PENALTY_TYPE </b> (String)
+\n<b> Scope </b>: All force field optimizations (Optional)
+\n<b> One-line description </b>: Type of the penalty, L2 or L1 in the optimizer
+\n<b> Full description </b>: To prevent the optimization from changing the parameters too much, an additional penalty
+                                  is applied to the objective function that depends linearly (L1) or quadratically (L2) on the norm
+                                  of the parameter displacement vector.  L1 corresponds to LASSO regularization while L2 is known as
+                                  Tikhonov regularization or ridge regression.
+\n<b> Default Value </b>: L2
+\n<b> Recommendation </b>: L2; tested and known to be working.  Implementation of L1 in progress.
+
+@li <b> READ_MVALS </b> (Section)
+\n<b> Scope </b>: All force field optimizations (Optional)
+\n<b> One-line description </b>: Paste mathematical parameters into the input file for them to be read in directly
+\n<b> Full description </b>: Read in mathematical parameters before starting the optimization.  There is a standardized syntax, given by:
+@verbatim read_mvals
+0 [ -2.9766e-01 ] : VDWSOW
+1 [  2.2283e-01 ] : VDWTOW
+2 [ -1.1138e-03 ] : BONDSBHWOW
+3 [ -9.0883e-02 ] : BONDSKHWOW
+\read_mvals @endverbatim
+\n<b> Default Value </b>: None
+\n<b> Recommendation </b>: If you run the main optimizer, it will print out this block at the very end for you to use and/or modify.
+
+@li <b> READ_PVALS </b> (Section)
+\n<b> Scope </b>: All force field optimizations (Optional)
+\n<b> One-line description </b>: Paste physical parameters into the input file for them to be read in directly
+\n<b> Full description </b>: Read in physical parameters before starting the optimization.  There is a standardized
+                                syntax, given by:
+@verbatim read_pvals
+ 0 [  2.9961e-01 ] : VDWSOW
+ 1 [  1.2009e+00 ] : VDWTOW
+ 2 [  9.5661e-02 ] : BONDSBHWOW
+ 3 [  4.1721e+05 ] : BONDSKHWOW
+ \read_pvals @endverbatim
+                                These are the actual numbers that go into the force field file, so note the large changes in magnitude.
+\n<b> Default Value </b>: None
+\n<b> Recommendation </b>: If you run the main optimizer, it will print out this block at the very end for you to use and/or modify.
+
+@li <b> READCHK </b> (String)
+\n<b> Scope </b>: Main optimizer (Optional)
+\n<b> One-line description </b>: Name of the restart file we read from
+\n<b> Full description </b>: The main optimizer has the ability to pick up where it left off by reading / writing checkpoint
+                             files.  Here you may specify the checkpoint file to read in from a previous optimization run.  This is
+                             equivalent to reading in stored parameter values, except the gradient and Hessian (which contains memory from previous
+                             steps) is recorded too.
+\n<b> Default Value </b>: None
+
+@li <b> SCAN_VALS </b> (String)
+\n<b> Scope </b>: scan_mvals and scan_pvals job types (Optional)
+\n<b> One-line description </b>: Values to scan in the parameter space for job type "scan[mp]vals", given like this: -0.1:0.01:0.1
+\n<b> Full description </b>: This specifies a range of parameter values to scan in a uniform grid.  scan_mvals works in
+                               the mathematical parameter space while scan_pvals works in the physical parameter space.  The syntax
+                               is lower:step:upper .  Both lower and upper limits are included in the range.
+\n<b> Default Value </b>: None
+\n<b> Recommendation </b>: For scan_mvals, a range of values between -1 and +1 is recommended; for scan_pvals, choose values close to the physical parameter value.
+
+@li <b> SCANINDEX_NAME </b> (List)
+\n<b> Scope </b>: scan_mvals and scan_pvals job types (Optional)
+\n<b> One-line description </b>: Parameter name to scan over (should convert to a numerical index) in job type "scan[mp]vals"
+\n<b> Full description </b>: ForceBalance assigns to each adjustable parameter a 'parameter name'.  By specifying
+                                    this option, this tells the parameter scanner to locate the correct parameter with the specified name and then
+                                    scan over it.
+\n<b> Default Value </b>: []
+\n<b> Recommendation </b>: Look at the printout from a single-point job to determine the parameter names.
+
+@li <b> SCANINDEX_NUM </b> (List)
+\n<b> Scope </b>: scan_mvals and scan_pvals job types (Optional)
+\n<b> One-line description </b>: Numerical index of the parameter to scan over in job type "scan[mp]vals"
+\n<b> Full description </b>: ForceBalance assigns to each adjustable parameter a 'parameter number' corresponding to
+                                   its position in the parameter vector.  This tells the parameter scanner which number to scan over.
+\n<b> Default Value </b>: []
+\n<b> Recommendation </b>: Look at the printout from a single-point job to decide which parameter number you wish to scan over.
+
+@li <b> TINKERPATH </b> (String)
+\n<b> Scope </b>: Fitting simulations that use TINKER (<b><em>Required</em></b>)
+\n<b> One-line description </b>: Path for TINKER executables
+\n<b> Default Value </b>: None
+\n<b> Recommendation </b>: Depends on your local installation and environment.
+
+@li <b> TRUST0 </b> (Float)
+\n<b> Scope </b>: Main optimizer (Optional)
+\n<b> One-line description </b>: Trust radius for the MainOptimizer
+\n<b> Full description </b>: The main optimizer uses a trust radius which 'adapts' (i.e. increases or decreases) based on whether the last step
+                            was a good or bad step.  'trust0' provides the starting trust radius, and the trust radius is not allowed to increase too much
+                            from trust0.
+\n<b> Default Value </b>: 0.01
+\n<b> Recommendation </b>: Increase from the default if the optimizer takes many good steps but takes too long; decrease if the optimizer takes many bad steps.
+
+@li <b> WRITECHK </b> (String)
+\n<b> Scope </b>: Main optimizer (Optional)
+\n<b> One-line description </b>: Name of the restart file we write to (can be same as readchk)
+\n<b> Full description </b>: The main optimizer has the ability to pick up where it left off by reading / writing checkpoint
+                              files.  Here you may specify the checkpoint file to write after the job is finished.
+\n<b> Default Value </b>: None
+\n<b> Recommendation </b>: Writing the checkpoint file is highly recommended.
+
+@li <b> WRITECHK_STEP </b> (Bool)
+\n<b> Scope </b>: Main optimizer when 'writechk' is turned on (Optional)
+\n<b> One-line description </b>: Write the checkpoint file at every optimization step
+\n<b> Full description </b>: Write a checkpoint file every single step, not just after the job is finished.
+\n<b> Default Value </b>: 0
+\n<b> Recommendation </b>: Useful if you want to quit an optimization before it finishes and restart, but make sure you don't overwrite existing checkpoint files by accident.
+
+\section sim_option_index Option index: Simulation options
+
+This section contains a listing of the simulation options available when running
+a ForceBalance job, which go into the $sim_opts section.  There can be multiple 
+$sim_opts sections in a ForceBalance input file, one for each fitting simulation.
+
+@li <b> BATCH_FD </b> (Bool)
+\n<b> Scope </b>: All fitting simulations (Optional)
+\n<b> One-line description </b>: Whether to batch and queue up finite difference jobs, defaults to False
+\n<b> Full description </b>: This is a stub for future functionality.  When the flag is switched on, the jobs corresponding to finite
+                              difference derivatives are evaluated in parallel on a distributed computing platform.
+\n<b> Default Value </b>: 0
+
+@li <b> COVARIANCE </b> (Bool)
+\n<b> Scope </b>: Force and energy matching simulations (Optional)
+\n<b> One-line description </b>: Whether to use the quantum covariance matrix (force+energy match), defaults to True
+\n<b> Full description </b>: The components of the energy and force contribution to the objective function are rescaled to be on the 
+                                same footing when the objective function is optimized.  This can be done by dividing each component by its variance,
+                                or by multiplying the energy-force polytensor by the inverse of the quantum energy-force covariance matrix.  The
+                                latter method was proposed as a way to emphasize intermolecular interactions but it is unproven.
+\n<b> Default Value </b>: 1
+\n<b> Recommendation </b>: No recommendation; turn the covariance off if the number of snapshots is not much larger than
+                                the number of coordinates.
+
+@li <b> EFWEIGHT </b> (Float)
+\n<b> Scope </b>: Force and energy matching simulations (Optional)
+\n<b> One-line description </b>: 1.0 for all energy and 0.0 for all force (force+energy match), defaults to 0.5
+\n<b> Full description </b>: Energies and forces are evaluated together in a force/energy matching simulation, and this option
+                              specifies the relative weight of the energy and force contributions.
+\n<b> Default Value </b>: 0.5
+\n<b> Recommendation </b>: Based on experience, it should be okay to leave this option at its default value, unless you wish
+                              to emphasize only the force (then choose 0.0) or only the energy (then choose 1.0).
+
+@li <b> FD_PTYPES </b> (List)
+\n<b> Scope </b>: All fitting simulations (Optional)
+\n<b> One-line description </b>: The parameter types that need to be differentiated using finite difference
+\n<b> Full description </b>: To compute the objective function derivatives, some components may require numerical finite difference in the derivatives.
+                             Here you may specify the parameter types that finite difference is applied to,
+                             or write 'ALL' to take finite-difference derivatives in all parameter types.
+\n<b> Default Value </b>: []
+\n<b> Recommendation </b>: If you aren't sure, either use 'ALL' to do finite difference in each component (this is costly), or run a fdcheckG(H)
+                             job with this option set to 'NONE' to check which analytic derivatives are missing.
+                             Usually analytic derivatives will be missing in anything but FORCEENERGYMATCH_GMXX2 jobs.
+
+@li <b> FDGRAD </b> (Bool)
+\n<b> Scope </b>: All fitting simulations (Optional)
+\n<b> One-line description </b>: Finite difference gradients
+\n<b> Full description </b>: When this option is enabled, finite difference gradients will be enabled for selected parameter types 
+                            (using the fd_ptypes option).  Gradients are computed using two-point finite difference of the objective function.
+\n<b> Default Value </b>: 1
+\n<b> Recommendation </b>: If analytic derivatives are implemented (and correct), then they are much faster than finite difference
+                            derivatives.  Run the 'fdcheckG' routine with this option set to Off to check which finite difference derivatives you need.
+
+@li <b> FDHESS </b> (Bool)
+\n<b> Scope </b>: All fitting simulations (Optional)
+\n<b> One-line description </b>: Finite difference Hessian diagonals (costs np times a gradient calculation)
+\n<b> Full description </b>: When this option is enabled, finite difference Hessians will be enabled for selected parameter types 
+                            (using the fd_ptypes option).  Hessians are computed using two-point finite difference of the gradient.
+\n<b> Default Value </b>: 1
+\n<b> Recommendation </b>: Run the 'fdcheckH' routine with this option set to Off to check which finite difference Hessian elements you need.
+                            Note that this requires a very large number of objective function evaluations, so use sparingly.
+
+@li <b> FDHESSDIAG </b> (Bool)
+\n<b> Scope </b>: All fitting simulations (Optional)
+\n<b> One-line description </b>: Finite difference Hessian diagonals (cheap; costs 2np times a objective calculation)
+\n<b> Full description </b>: When this option is enabled, finite difference gradients and Hessian diagonal elements will be enabled 
+                                for selected parameter types (using the fd_ptypes option).  This is done using a three-point finite difference of
+                                the objective function.
+\n<b> Default Value </b>: 1
+\n<b> Recommendation </b>: Use this as a substitute for 'fdgrad'; it doubles the cost but provides more accurate derivatives
+                                plus the Hessian diagonal values (these are very nice for quasi-Newton optimizers like BFGS).
+
+@li <b> FITATOMS </b> (Int)
+\n<b> Scope </b>: Force and energy matching simulations (Optional)
+\n<b> One-line description </b>: Number of fitting atoms (force+energy matching); defaults to all of them
+\n<b> Full description </b>: Choose a subset of atoms from the force matching simulation to fit forces to.  This is useful in situations where
+                              it is undesirable to fit the forces on part of the system (e.g. the part that is described by another force field.)
+                              Currently, you are only allowed to choose from the atoms in the front of the trajectory;
+                              soon this will be expanded for random flexibility (see 'shots').  However, random coordinate selections are not allowed. ;)
+\n<b> Default Value </b>: 0
+\n<b> Recommendation </b>: Situation-dependent; this should be based on the part of the simulation that you're fitting, or leave blank
+                              if you're fitting the whole system.
+
+@li <b> NAME </b> (String)
+\n<b> Scope </b>: All fitting simulations (<b><em>Required</em></b>)
+\n<b> One-line description </b>: The name of the simulation, which corresponds to the directory simulations/dir_name
+\n<b> Default Value </b>: None
+\n<b> Recommendation </b>: Choose a descriptive name and make sure all fitting simulations have different names.
+
+@li <b> QMBOLTZ </b> (Float)
+\n<b> Scope </b>: Force and energy matching simulations (Optional)
+\n<b> One-line description </b>: Fraction of Quantum Boltzmann Weights (force+energy match), 1.0 for full reweighting, 0.0 < 1.0 for hybrid
+\n<b> Full description </b>: When Boltzmann sampling is used to gather snapshots for force/energy matching, there is a potential
+                             ambiguity regarding which ensemble one should sample from (either the force field's ensemble or the QM calculation's
+                             ensemble.  The QM ensemble may be sampled using MM-sampled snapshots by reweighting; this tuning parameter specifies
+                             the fraction of QM Boltzmann weight to include.  Note that when two ensembles are different, reweighting will decrease
+                             the statistical significance of the number of snapshots (i.e. there is less InfoContent).
+\n<b> Default Value </b>: 0.0
+\n<b> Recommendation </b>: If you want to reweight your snapshots entirely to the QM ensemble, choose 1.0; for hybrid weights,
+                             use 0.5.  Avoid if the fitting simulation has a very large RMS energy difference between QM and MM.
+
+@li <b> QMBOLTZTEMP </b> (Float)
+\n<b> Scope </b>: Force and energy matching simulations (Optional)
+\n<b> One-line description </b>: Temperature for Quantum Boltzmann Weights (force+energy match), defaults to room temperature
+\n<b> Full description </b>: The reweighting of an ensemble involves an exponential of (DE)/kT, so there is a massive degradation of sample
+                                 quality if (DE) is large.  This option allows you to change the temperature in the denominator, which is unphysical (but
+                                 it does decrease the effect of moving toward the QM ensemble.
+\n<b> Default Value </b>: 298.15
+\n<b> Recommendation </b>: Irrelevant if 'qmboltz' is set to zero.  Leave at the default value unless you're performing experiments.
+
+@li <b> SAMPCORR </b> (Bool)
+\n<b> Scope </b>: Force and energy matching simulations that use GROMACS-X2 (Optional)
+\n<b> One-line description </b>: Whether to use the (archaic) sampling correction (force+energy match), defaults to False
+\n<b> Full description </b>: Every time the force field parameters are updated, the ensemble is different.  In principle this applies
+                              to not only the self-consistent optimization cycles (which include re-running dynamics, QM calculations etc) but also
+                              the numerical optimization itself.  When this option is turned on, the Boltzmann weights of the snapshots are updated
+                              in every step of the optimization and the derivatives are modified accordingly.  My investigations reveal that this makes
+                              the force field more accurate in energy minima and less accurate for barriers, which was not very useful.  I haven't touched
+                              the 'sampling corrected' code in a long time; thus this option is vestigial and may be removed in the future.
+\n<b> Default Value </b>: 0
+\n<b> Recommendation </b>: Off.
+
+@li <b> SHOTS </b> (Int)
+\n<b> Scope </b>: Force and energy matching simulations (Optional)
+\n<b> One-line description </b>: Number of snapshots (force+energy matching); defaults to all of the snapshots
+\n<b> Full description </b>: This option allows you to choose a subset from the snapshots available in the force matching 'simulations' directory.
+                           The subset is simply taken from the front of the trajectory.
+                           In the future this option will be expanded to allow a random selection of snapshots, or a specific selection
+\n<b> Default Value </b>: -1
+\n<b> Recommendation </b>: 100-10,000 snapshots are recommended.  Note that you need at least 3x (number of atoms) if
+                           the covariance matrix is turned on.
+
+@li <b> SIMTYPE </b> (Allcap)
+\n<b> Scope </b>: All fitting simulations (<b><em>Required</em></b>)
+\n<b> One-line description </b>: The type of fitting simulation, for instance ForceEnergyMatch_GMXX2
+\n<b> Full description </b>: This is the type of fitting simulation that you are running.  The current accepted values for the fitting simulation
+                             are given in the SimTab.py file: FORCEENERGYMATCH_TINKER, FORCEENERGYMATCH_GMX, COUNTERPOISEMATCH, FORCEENERGYMATCH_GMXX2.
+\n<b> Default Value </b>: None
+\n<b> Recommendation </b>: Choose the appropriate type, and if the fitting simulation is missing, feel free to implement your own (or ask me for help).
+
+@li <b> USE_PVALS </b> (Bool)
+\n<b> Scope </b>: All fitting simulations (Optional)
+\n<b> One-line description </b>: Bypass the transformation matrix and use the physical parameters directly
+\n<b> Full description </b>: When this option is enabled, the coordinate transformation in parameter space will be bypassed, and 
+                               parameters passed into the 'get' subroutines will be plugged directly into the force field files.  This
+                               option is turned on automatically if we are running a 'scan_pvals' job.  Note that the coordinate transformation
+                               is essential in multi-parameter optimizations and preserves the condition number of the Hessian, so turning it off
+                               should generally be avoided.
+\n<b> Default Value </b>: 0
+\n<b> Recommendation </b>: This option should almost always be off unless the user really knows what he/she is doing.
+
+@li <b> WEIGHT </b> (Float)
+\n<b> Scope </b>: All fitting simulations (Optional)
+\n<b> One-line description </b>: Weight of the current simulation (with respect to other simulations)
+\n<b> Full description </b>: This option specifies the weight that the fitting simulation will contribute to the objective function.
+                            A larger weight for a given fitting simulation means that the optimizer will prioritize it over the others.
+                            When several fitting simulations are used, the weight should be chosen carefully such that all fitting simulations
+                            contribute a finite amount to the objective function.  Note that the choice of weight determines the final outcome
+                            of the force field, although we hope not by too much.
+\n<b> Default Value </b>: 1.0
+\n<b> Recommendation </b>: It is important to specify something here (giving everything equal weight is unlikely to work.)  
+                            Run a single-point objective function evaluation with all weights set to one to get a handle on
+                            the natural size of each fitting simulation's contribution, and then add weights accordingly.
+
+@li <b> WHAMBOLTZ </b> (Bool)
+\n<b> Scope </b>: Force and energy matching simulations (Optional)
+\n<b> One-line description </b>: Whether to use WHAM Boltzmann Weights (force+energy match), defaults to False
+\n<b> Full description </b>: In self-consistent energy/force matching projects, the data from previous cycles can be reused by applying the
+                               Weighted Histogram Analysis Method (WHAM).  However, the WHAM data is currently generated by external scripts that
+                               haven't made it into this distribution yet.  In the future, generation of WHAM data will be incorporated into this
+                               program automatically.
+\n<b> Default Value </b>: 0
+\n<b> Recommendation </b>: Leave off unless you have an externally generated wham-master.txt and wham-weights.txt files.
+
+
+
+\image latex ForceBalance.pdf "Logo." height=10cm
+
+"""
+
+"""

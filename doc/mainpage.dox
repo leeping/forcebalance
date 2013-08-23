@@ -196,7 +196,7 @@ helpful discussions.
 
 - Arthur Vigil contributed the unit testing framework and many unit tests,
 significant improvements to the automatic documentation generation, 
-and various code improvements.
+logging of output, graphical user interface, and various code improvements.
 
 - Matt Welborn contributed the parallelization-over-snapshots
 functionality in the general force matching module.
@@ -1288,7 +1288,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 
 @li <b> GMXPATH </b> (String)
 \n<b> One-line description </b>: Path for GROMACS executables (if not the default)
-\n<b> Default Value </b>: /usr/bin
+\n<b> Default Value </b>: /home/leeping/opt/gromacs-4.5.5/bin
 \n<b> Scope </b>: Targets that use GROMACS (<b><em>Required</em></b>)
 \n<b> Full description </b>: Specify the path where GROMACS executables are installed, most likely ending in 'bin'.
                              Note that executables are only installed 'bin' if the program is installed using 'make install';
@@ -1482,7 +1482,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 
 @li <b> TINKERPATH </b> (String)
 \n<b> One-line description </b>: Path for TINKER executables (if not the default)
-\n<b> Default Value </b>: 
+\n<b> Default Value </b>: /home/leeping/opt/tinker-6.1.01-intel/bin
 \n<b> Scope </b>: Targets that use TINKER (<b><em>Required</em></b>)
 \n<b> Recommendation </b>: Depends on your local installation and environment.
 
@@ -1790,11 +1790,6 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 1.0
 \n(Needs full documentation)
 
-@li <b> REMOTE </b> (Bool)
-\n<b> One-line description </b>: Evaluate target as a remote work_queue task
-\n<b> Default Value </b>: 0
-\n(Needs full documentation)
-
 @li <b> RESP </b> (Bool)
 \n<b> One-line description </b>: Enable the RESP objective function
 \n<b> Default Value </b>: 0
@@ -1860,7 +1855,7 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: None
 \n<b> Scope </b>: All targets (<b><em>Required</em></b>)
 \n<b> Full description </b>: This is the type of target that you are running.  The current accepted values for the target type
-                             are given in the beginning of the objective.py file: COUNTERPOISE, ABINITIO_AMBER, ABINITIO_GMX, LIQUID_GMX, LIQUID_OPENMM, ABINITIO_OPENMM, ABINITIO_TINKER, BINDINGENERGY_TINKER, MONOMER_QTPIE, RDVR3_PSI4, INTERACTION_OPENMM, ABINITIO_INTERNAL, MOMENTS_TINKER, THCDF_PSI4, REMOTE_TARGET, VIBRATION_TINKER, LIQUID_TINKER, INTERACTION_TINKER.
+                             are given in the beginning of the objective.py file: COUNTERPOISE, ABINITIO_AMBER, ABINITIO_GMX, LIQUID_GMX, LIQUID_OPENMM, ABINITIO_OPENMM, ABINITIO_TINKER, BINDINGENERGY_TINKER, MONOMER_QTPIE, RDVR3_PSI4, INTERACTION_OPENMM, ABINITIO_INTERNAL, MOMENTS_TINKER, THCDF_PSI4, VIBRATION_TINKER, LIQUID_TINKER, INTERACTION_TINKER.
 \n<b> Recommendation </b>: Choose the appropriate type, and if the target type is missing, feel free to implement your own (or ask me for help).
 
 @li <b> W_ALPHA </b> (Float)
