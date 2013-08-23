@@ -13,9 +13,9 @@ http://leeping.github.io/forcebalance/doc/html/index.html
 You can also download the documentation in pdf format here:
 http://leeping.github.io/forcebalance/doc/ForceBalance-Manual.pdf
 
-=========
-Quick help
-=========
+#================#
+#|  Quick Help  |#
+#================#
 
 To build the package:
 
