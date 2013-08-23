@@ -18,56 +18,56 @@ logger = getLogger(__name__)
 try:
     from forcebalance.gmxio import AbInitio_GMX, Liquid_GMX
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("Gromacs module import failed\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("Gromacs module import failed\n")
 
 try:
     from forcebalance.gmxqpio import Monomer_QTPIE
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("QTPIE Monomer module import failed\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("QTPIE Monomer module import failed\n")
 
 try:
     from forcebalance.tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER, Liquid_TINKER
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("Tinker module import failed\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("Tinker module import failed\n")
 
 try:
     from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("OpenMM module import failed; check OpenMM package\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("OpenMM module import failed; check OpenMM package\n")
 
 try:
     from forcebalance.abinitio_internal import AbInitio_Internal
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("Internal energy fitting module import failed\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("Internal energy fitting module import failed\n")
 
 try:
     from forcebalance.counterpoise import Counterpoise
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("Counterpoise module import failed\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("Counterpoise module import failed\n")
 
 try:
     from forcebalance.amberio import AbInitio_AMBER
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("Amber module import failed\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("Amber module import failed\n")
 
 try:
     from forcebalance.psi4io import THCDF_Psi4, RDVR3_Psi4
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("PSI4 module import failed\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("PSI4 module import failed\n")
 
 try:
     from forcebalance.target import RemoteTarget
 except:
-    logging.warning(traceback.format_exc())
-    logging.warning("Remote Target import failed\n")
+    logger.warning(traceback.format_exc())
+    logger.warning("Remote Target import failed\n")
 
 ## The table of implemented Targets
 Implemented_Targets = {
