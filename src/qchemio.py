@@ -2,7 +2,7 @@
 
 import os
 from re import match, sub
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 from forcebalance.nifty import *
 from forcebalance.molecule import Molecule
 
