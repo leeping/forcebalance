@@ -12,7 +12,7 @@ import argparse
 from traceback import print_exc
 from socket import gethostname
 from datetime import datetime
-        
+
 def build(interactive=False, upstream=False):
 
     if interactive:
@@ -227,8 +227,8 @@ def build_config():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--interactive', '-i', action='store_true', help="run in interactive mode, pausing before each command")
-    parser.add_argument('--clean', '-c', action='store_true', help="remove temporary files after script is complete")
-    parser.add_argument('--configure', action='store_true', help="generate doxygen configuration files from templates")
+    parser.add_argument('--clean', '-k', action='store_true', help="remove temporary files after script is complete")
+    parser.add_argument('--configure', '-c', action='store_true', help="generate doxygen configuration files from templates")
     parser.add_argument('--upstream', '-u', action='store_true', help="push updated documentation to upstream github repository")
     args = parser.parse_args()
     
@@ -244,3 +244,9 @@ if __name__ == '__main__':
         print "Cleaning up..."
         os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
     
+    print "#===================================#"
+    print "#| Make sure to update the version |#"
+    print "#| manually in doc/header.tex and  |#"
+    print "#| doc/api_header.tex!!            |#"
+    print "#===================================#"
+        
