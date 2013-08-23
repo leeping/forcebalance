@@ -2,7 +2,7 @@
 
 """ @package ForceBalance
 
-Python script for starting ForceBalance. """
+Executable  script for starting ForceBalance. """
 
 import sys, re
 import argparse
