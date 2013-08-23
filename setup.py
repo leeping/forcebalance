@@ -171,7 +171,7 @@ def buildKeywordDictionary(args):
 
     """
 
-    if args.clean: doClean()
+    if not args.dirty: doClean()
     if args.test:
         setupKeywords["packages"].append("forcebalance.test")
         setupKeywords["package_dir"].update({"forcebalance.test" : "test"})
@@ -196,7 +196,8 @@ def doClean():
         print "Couldn't read forcebalance location... Continuing with regular install"
         return
 
-    raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % forcebalance_dir)
+    #raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % forcebalance_dir)
+    print "Removing the directory tree prior to install: %s" % forcebalance_dir
     os.system("rm -f %s/../forcebalance-*.egg-info" % forcebalance_dir)
     shutil.rmtree(forcebalance_dir)
     
@@ -206,7 +207,7 @@ def main():
 
     ## Install options
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--clean', action='store_true', help='remove previously installed forcebalance installation first')
+    parser.add_argument('-d', '--dirty', action='store_true', help="don't remove previously installed forcebalance installation first")
     parser.add_argument('-t', '--test', action='store_true', help='install forcebalance test suite')
     parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)
