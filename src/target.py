@@ -7,6 +7,7 @@ import shutil
 import numpy as np
 import time
 from collections import OrderedDict
+import tarfile
 import forcebalance
 from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
@@ -389,5 +390,51 @@ class Target(forcebalance.BaseClass):
         tlines += clines
         PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
         printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=False, leftpad=4, color=color)
+        
+class RemoteTarget(Target):
+    def __init__(self,options,tgt_opts,forcefield):
+        super(RemoteTarget, self).__init__(options,tgt_opts,forcefield)
+        
+        self.r_options = options.copy()
+        self.r_options["type"]="single"
+        
+        self.r_tgt_opts = tgt_opts.copy()
+        self.r_tgt_opts["remote"]=False
+        
+        tar = tarfile.open(name="temp/%s/target.tar.bz2" % self.name, mode='w:bz2')
+        tar.add("%s/targets/%s" % (self.root, self.name), arcname = "targets/%s" % self.name)
+        tar.close()
+        
+        self.remote_indicate = ""
+        
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, Counter(), self.r_options, self.r_tgt_opts, self.FF),f)
+        
+        forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
+        forcebalance.nifty.LinkFile(os.path.join(self.root,"temp", self.name, "target.tar.bz2"),"target.tar.bz2")
+        
+        wq = getWorkQueue()
+        
+        logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
+        # input:
+        #   forcebalance.p: pickled mvals, options, and forcefield
+        #   rtarget.py: remote target evaluation script
+        #   target.tar.bz2: tarred target
+        # output:
+        #   objective.p: pickled objective function dictionary
+        #   indicate.log: results of target.indicate() written to file
+        forcebalance.nifty.queue_up(wq, "python rtarget.py > %s_%i.out" % (self.name, Counter()),
+            ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
+            ['%s_%i_objective.p' % (self.name, Counter()), '%s_%i_indicate.log' % (self.name, Counter()), '%s_%i.out' % (self.name, Counter())],
+            tgt=self)
+
+    def get(self,mvals,AGrad=False,AHess=False):
+        with open('%s_%i_indicate.log' % (self.name, Counter())) as f:
+            self.remote_indicate = f.read()
+        with open('%s_%i_objective.p' % (self.name, Counter()),'r') as f:
+            return forcebalance.nifty.lp_load(f)
+        
+    def indicate(self):
+        logger.info(self.remote_indicate + '\n')
 
 
