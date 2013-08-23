@@ -1,5 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#afbf86c26158a68cae7460b4106809fdd" title="forcebalance.abinitio.AbInitio.compute_netforce_torque" alt="" coords="430,5,805,32"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#a313c848f46579817803c8a3ff100974e" title="LPW 06&#45;30&#45;2013." alt="" coords="454,56,781,83"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="498,107,737,133"/>
+<map id="forcebalance.abinitio.AbInitio.energy_force_transformer" name="forcebalance.abinitio.AbInitio.energy_force_transformer">
+<area shape="rect" id="node2" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#afbf86c26158a68cae7460b4106809fdd" title="forcebalance.abinitio.Ab\lInitio.compute_netforce\l_torque" alt="" coords="249,5,402,65"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#a313c848f46579817803c8a3ff100974e" title="LPW 06&#45;30&#45;2013." alt="" coords="249,89,402,133"/>
+<area shape="rect" id="node4" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="251,157,399,201"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="451,165,659,193"/>
 </map>

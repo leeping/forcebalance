@@ -1,5 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a5f529179461765fadbd0a742cdc2c677" title="Creates a list of number sequences divided as evenly as possible." alt="" coords="336,31,563,57"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="620,5,809,32"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="611,56,818,83"/>
+<map id="forcebalance.molecule.add_strip_to_mat" name="forcebalance.molecule.add_strip_to_mat">
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1molecule.html#a5f529179461765fadbd0a742cdc2c677" title="Creates a list of number sequences divided as evenly as possible." alt="" coords="219,31,413,59"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="467,5,631,33"/>
+<area shape="rect" id="node4" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="462,57,637,85"/>
 </map>

@@ -1,0 +1,870 @@
+\hypertarget{namespaceforcebalance_1_1molecule}{\subsection{forcebalance.\-molecule Namespace Reference}
+\label{namespaceforcebalance_1_1molecule}\index{forcebalance.\-molecule@{forcebalance.\-molecule}}
+}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classforcebalance_1_1molecule_1_1MolfileTimestep}{Molfile\-Timestep}
+\begin{DoxyCompactList}\small\item\em Wrapper for the timestep C structure used in molfile plugins. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1molecule_1_1Molecule}{Molecule}
+\begin{DoxyCompactList}\small\item\em Lee-\/\-Ping's general file format conversion class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_af28de4693e5b8e82df900d0ac3c6c370}{get\-Element}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_ab8464fea13fad2a506792c2f1d7c93f3}{nodematch}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a0dd31eff88d2bed0884ab21a13261d42}{isint}
+\begin{DoxyCompactList}\small\item\em O\-N\-L\-Y matches integers! If you have a decimal point? None shall pass! \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_afe989ffd119568047fc8265b1d329a70}{isfloat}
+\begin{DoxyCompactList}\small\item\em Matches A\-N\-Y number; it can be a decimal, scientific notation, integer, or what have you. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a0a6e3e79b04534bf2e83d09def189444}{Build\-Lattice\-From\-Lengths\-Angles}
+\begin{DoxyCompactList}\small\item\em This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a29fb1ac9324f4280f07c65baea339989}{Build\-Lattice\-From\-Vectors}
+\begin{DoxyCompactList}\small\item\em This function takes in three lattice vectors and tries to return a complete box specification. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a2eba3cad44138b3b10ea883240888412}{format\-\_\-xyz\-\_\-coord}
+\begin{DoxyCompactList}\small\item\em Print a line consisting of (element, x, y, z) in accordance with .xyz file format. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a41c13064e4285973aa6c49369d3d3390}{format\-\_\-gro\-\_\-coord}
+\begin{DoxyCompactList}\small\item\em Print a line in accordance with .gro file format, with six decimal points of precision. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a4948e4662b8d2c8d515427d1bbb3d01e}{format\-\_\-xyzgen\-\_\-coord}
+\begin{DoxyCompactList}\small\item\em Print a line consisting of (element, p, q, r, s, t, ...) where (p, q, r) are arbitrary atom-\/wise data (this might happen, for instance, with atomic charges) \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_ae25aa5331b3a2dd0e9d1e184380357db}{format\-\_\-gro\-\_\-box}
+\begin{DoxyCompactList}\small\item\em Print a line corresponding to the box vector in accordance with .gro file format. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a12b7bb398c2fa49a223f258ec7737483}{is\-\_\-gro\-\_\-coord}
+\begin{DoxyCompactList}\small\item\em Determines whether a line contains G\-R\-O\-M\-A\-C\-S data or not. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a838d85848bd817e801d0f5f6502217ef}{is\-\_\-charmm\-\_\-coord}
+\begin{DoxyCompactList}\small\item\em Determines whether a line contains C\-H\-A\-R\-M\-M data or not. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_aafc8c924eed4480fed8ddc9c474d3bc1}{is\-\_\-gro\-\_\-box}
+\begin{DoxyCompactList}\small\item\em Determines whether a line contains a G\-R\-O\-M\-A\-C\-S box vector or not. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a4cdb2086978b281ed84cd66179c3f5b2}{add\-\_\-strip\-\_\-to\-\_\-mat}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a58c3f09152db4d1c6e1db9df29c60c43}{pvec}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a7fe52c2928c7b0329882541bef2e34cd}{grouper}
+\begin{DoxyCompactList}\small\item\em Groups a big long iterable into groups of ten or what have you. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a5f529179461765fadbd0a742cdc2c677}{even\-\_\-list}
+\begin{DoxyCompactList}\small\item\em Creates a list of number sequences divided as evenly as possible. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a5b50df23cc4d0e617fdc56538f0bea63}{both}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a6f7c6217b1c64da309a8abd21dfdcf08}{diff}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a75775be6563ad7f10695a9a45ff49ba9}{either}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_af02bf73765f34bbef81c4a5b000b86ce}{Euler\-Matrix}
+\begin{DoxyCompactList}\small\item\em Constructs an Euler matrix from three Euler angles. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a8fcbb4a2b3470a85d25699b6f28a54fc}{Compute\-Overlap}
+\begin{DoxyCompactList}\small\item\em Computes an 'overlap' between two molecules based on some fictitious density. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a9a58eb1746e51420f50da3f3a6d51485}{Align\-To\-Density}
+\begin{DoxyCompactList}\small\item\em Computes a \char`\"{}overlap density\char`\"{} from two frames. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_aa9ad9b92efa7bd3c1d589d62bbb8108e}{Align\-To\-Moments}
+\begin{DoxyCompactList}\small\item\em Pre-\/aligns molecules to 'moment of inertia'. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a08840b73e95bf34bf9ca7ea36ad0492d}{get\-\_\-rotate\-\_\-translate}
+\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_ab9cb167fbbd809aedcf8c7434d405547}{main}
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1molecule_a0044fa397e0923635a8b3e9625aa70f7}{Frame\-Variable\-Names}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1molecule_a5daa68e835dcb9877d6c3f2fb559b54b}{Atom\-Variable\-Names} = set(\mbox{[}'elem', 'partial\-\_\-charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm\-\_\-ghost', 'chain', 'altloc', 'icode'\mbox{]})
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1molecule_a38e1c99e9567fe42b792af43db9b7488}{Meta\-Variable\-Names} = set(\mbox{[}'fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult', 'bonds'\mbox{]})
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1molecule_ab67efeab6049ec1f416b9ad1eed6ffcc}{Quantum\-Variable\-Names} = set(\mbox{[}'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm\-\_\-ghost'\mbox{]})
+\item 
+\hyperlink{namespaceforcebalance_1_1molecule_a8fcfb88fe12a9256b61980f3d4fe3b63}{All\-Variable\-Names} = \hyperlink{namespaceforcebalance_1_1molecule_ab67efeab6049ec1f416b9ad1eed6ffcc}{Quantum\-Variable\-Names}$|$\hyperlink{namespaceforcebalance_1_1molecule_a5daa68e835dcb9877d6c3f2fb559b54b}{Atom\-Variable\-Names}$|$\hyperlink{namespaceforcebalance_1_1molecule_a38e1c99e9567fe42b792af43db9b7488}{Meta\-Variable\-Names}$|$\hyperlink{namespaceforcebalance_1_1molecule_a0044fa397e0923635a8b3e9625aa70f7}{Frame\-Variable\-Names}
+\item 
+list \hyperlink{namespaceforcebalance_1_1molecule_a74f55a89a14ca676b5a06441d1fdab19}{Radii}
+\item 
+list \hyperlink{namespaceforcebalance_1_1molecule_a1c99a11e8a749468698c9af6361a8a4c}{Elements}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1molecule_adc5040ec456762f2ac240fb08febbfdd}{Periodic\-Table}
+\item 
+float \hyperlink{namespaceforcebalance_1_1molecule_a76af9edfbaaa8999680e32aafe1b1b61}{bohrang} = 0.\-529177249
+\begin{DoxyCompactList}\small\item\em One bohr equals this many angstroms. \end{DoxyCompactList}\item 
+tuple \hyperlink{namespaceforcebalance_1_1molecule_a09d04113accea9c88b084051c5de29d1}{splitter} = re.\-compile(r'(\textbackslash{}s+$|$\textbackslash{}S+)')
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1molecule_aa761cf1cf260e15d0b03a6f61569c840}{Box} = namedtuple('Box',\mbox{[}'a','b','c','alpha','beta','gamma','A','B','C','V'\mbox{]})
+\item 
+int \hyperlink{namespaceforcebalance_1_1molecule_a1ee5389ce8a9042e053c7972dbbfb005}{radian} = 180
+\item 
+\hyperlink{namespaceforcebalance_1_1molecule_a2986996d4f957928047df06fbec3717d}{Alive}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\hypertarget{namespaceforcebalance_1_1molecule_a4cdb2086978b281ed84cd66179c3f5b2}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!add\-\_\-strip\-\_\-to\-\_\-mat@{add\-\_\-strip\-\_\-to\-\_\-mat}}
+\index{add\-\_\-strip\-\_\-to\-\_\-mat@{add\-\_\-strip\-\_\-to\-\_\-mat}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{add\-\_\-strip\-\_\-to\-\_\-mat}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-add\-\_\-strip\-\_\-to\-\_\-mat (
+\begin{DoxyParamCaption}
+\item[{}]{mat, }
+\item[{}]{strip}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a4cdb2086978b281ed84cd66179c3f5b2}
+
+
+Definition at line 436 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a4cdb2086978b281ed84cd66179c3f5b2_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a9a58eb1746e51420f50da3f3a6d51485}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Align\-To\-Density@{Align\-To\-Density}}
+\index{Align\-To\-Density@{Align\-To\-Density}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Align\-To\-Density}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-Align\-To\-Density (
+\begin{DoxyParamCaption}
+\item[{}]{elem, }
+\item[{}]{xyz1, }
+\item[{}]{xyz2, }
+\item[{}]{binary = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a9a58eb1746e51420f50da3f3a6d51485}
+
+
+Computes a \char`\"{}overlap density\char`\"{} from two frames. 
+
+This function can be called by Align\-To\-Moments to get rid of inversion problems 
+
+Definition at line 539 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a9a58eb1746e51420f50da3f3a6d51485_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_aa9ad9b92efa7bd3c1d589d62bbb8108e}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Align\-To\-Moments@{Align\-To\-Moments}}
+\index{Align\-To\-Moments@{Align\-To\-Moments}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Align\-To\-Moments}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-Align\-To\-Moments (
+\begin{DoxyParamCaption}
+\item[{}]{elem, }
+\item[{}]{xyz1, }
+\item[{}]{xyz2 = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_aa9ad9b92efa7bd3c1d589d62bbb8108e}
+
+
+Pre-\/aligns molecules to 'moment of inertia'. 
+
+If xyz2 is passed in, it will assume that xyz1 is already aligned to the moment of inertia, and it simply does 180-\/degree rotations to make sure nothing is inverted. 
+
+Definition at line 551 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a5b50df23cc4d0e617fdc56538f0bea63}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!both@{both}}
+\index{both@{both}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{both}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-both (
+\begin{DoxyParamCaption}
+\item[{}]{A, }
+\item[{}]{B, }
+\item[{}]{key}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a5b50df23cc4d0e617fdc56538f0bea63}
+
+
+Definition at line 474 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a0a6e3e79b04534bf2e83d09def189444}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Build\-Lattice\-From\-Lengths\-Angles@{Build\-Lattice\-From\-Lengths\-Angles}}
+\index{Build\-Lattice\-From\-Lengths\-Angles@{Build\-Lattice\-From\-Lengths\-Angles}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Build\-Lattice\-From\-Lengths\-Angles}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-Build\-Lattice\-From\-Lengths\-Angles (
+\begin{DoxyParamCaption}
+\item[{}]{a, }
+\item[{}]{b, }
+\item[{}]{c, }
+\item[{}]{alpha, }
+\item[{}]{beta, }
+\item[{}]{gamma}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a0a6e3e79b04534bf2e83d09def189444}
+
+
+This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification. 
+
+
+
+Definition at line 256 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a0a6e3e79b04534bf2e83d09def189444_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a29fb1ac9324f4280f07c65baea339989}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Build\-Lattice\-From\-Vectors@{Build\-Lattice\-From\-Vectors}}
+\index{Build\-Lattice\-From\-Vectors@{Build\-Lattice\-From\-Vectors}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Build\-Lattice\-From\-Vectors}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-Build\-Lattice\-From\-Vectors (
+\begin{DoxyParamCaption}
+\item[{}]{v1, }
+\item[{}]{v2, }
+\item[{}]{v3}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a29fb1ac9324f4280f07c65baea339989}
+
+
+This function takes in three lattice vectors and tries to return a complete box specification. 
+
+The hash function is something we can use to discard two things that are obviously not equal. Here we neglect the hash. Return a list of the sorted atom numbers in this graph. Return a string of atoms, which serves as a rudimentary 'fingerprint' \-: '99,100,103,151' . Return an array of the elements. For instance \mbox{[}'H' 'C' 'C' 'H'\mbox{]}. Create an Empirical Formula Get a list of the coordinates. 
+
+Definition at line 271 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a8fcbb4a2b3470a85d25699b6f28a54fc}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Compute\-Overlap@{Compute\-Overlap}}
+\index{Compute\-Overlap@{Compute\-Overlap}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Compute\-Overlap}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-Compute\-Overlap (
+\begin{DoxyParamCaption}
+\item[{}]{theta, }
+\item[{}]{elem, }
+\item[{}]{xyz1, }
+\item[{}]{xyz2}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a8fcbb4a2b3470a85d25699b6f28a54fc}
+
+
+Computes an 'overlap' between two molecules based on some fictitious density. 
+
+Good for fine-\/tuning alignment but gets stuck in local minima. 
+
+Definition at line 522 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a8fcbb4a2b3470a85d25699b6f28a54fc_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a6f7c6217b1c64da309a8abd21dfdcf08}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!diff@{diff}}
+\index{diff@{diff}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{diff}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-diff (
+\begin{DoxyParamCaption}
+\item[{}]{A, }
+\item[{}]{B, }
+\item[{}]{key}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a6f7c6217b1c64da309a8abd21dfdcf08}
+
+
+Definition at line 477 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a75775be6563ad7f10695a9a45ff49ba9}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!either@{either}}
+\index{either@{either}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{either}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-either (
+\begin{DoxyParamCaption}
+\item[{}]{A, }
+\item[{}]{B, }
+\item[{}]{key}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a75775be6563ad7f10695a9a45ff49ba9}
+
+
+Definition at line 485 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_af02bf73765f34bbef81c4a5b000b86ce}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Euler\-Matrix@{Euler\-Matrix}}
+\index{Euler\-Matrix@{Euler\-Matrix}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Euler\-Matrix}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-Euler\-Matrix (
+\begin{DoxyParamCaption}
+\item[{}]{T1, }
+\item[{}]{T2, }
+\item[{}]{T3}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_af02bf73765f34bbef81c4a5b000b86ce}
+
+
+Constructs an Euler matrix from three Euler angles. 
+
+
+
+Definition at line 494 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_af02bf73765f34bbef81c4a5b000b86ce_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a5f529179461765fadbd0a742cdc2c677}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!even\-\_\-list@{even\-\_\-list}}
+\index{even\-\_\-list@{even\-\_\-list}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{even\-\_\-list}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-even\-\_\-list (
+\begin{DoxyParamCaption}
+\item[{}]{totlen, }
+\item[{}]{splitsize}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a5f529179461765fadbd0a742cdc2c677}
+
+
+Creates a list of number sequences divided as evenly as possible. 
+
+
+
+Definition at line 456 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a5f529179461765fadbd0a742cdc2c677_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_ae25aa5331b3a2dd0e9d1e184380357db}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!format\-\_\-gro\-\_\-box@{format\-\_\-gro\-\_\-box}}
+\index{format\-\_\-gro\-\_\-box@{format\-\_\-gro\-\_\-box}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{format\-\_\-gro\-\_\-box}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-format\-\_\-gro\-\_\-box (
+\begin{DoxyParamCaption}
+\item[{}]{box}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_ae25aa5331b3a2dd0e9d1e184380357db}
+
+
+Print a line corresponding to the box vector in accordance with .gro file format. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em box} & Box Named\-Tuple \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 387 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_ae25aa5331b3a2dd0e9d1e184380357db_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a41c13064e4285973aa6c49369d3d3390}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!format\-\_\-gro\-\_\-coord@{format\-\_\-gro\-\_\-coord}}
+\index{format\-\_\-gro\-\_\-coord@{format\-\_\-gro\-\_\-coord}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{format\-\_\-gro\-\_\-coord}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-format\-\_\-gro\-\_\-coord (
+\begin{DoxyParamCaption}
+\item[{}]{resid, }
+\item[{}]{resname, }
+\item[{}]{aname, }
+\item[{}]{seqno, }
+\item[{}]{xyz}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a41c13064e4285973aa6c49369d3d3390}
+
+
+Print a line in accordance with .gro file format, with six decimal points of precision. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em resid} & The number of the residue that the atom belongs to \\
+\hline
+\mbox{\tt in}  & {\em resname} & The name of the residue that the atom belongs to \\
+\hline
+\mbox{\tt in}  & {\em aname} & The name of the atom \\
+\hline
+\mbox{\tt in}  & {\em seqno} & The sequential number of the atom \\
+\hline
+\mbox{\tt in}  & {\em xyz} & A 3-\/element array containing x, y, z coordinates of that atom \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 366 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a41c13064e4285973aa6c49369d3d3390_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a2eba3cad44138b3b10ea883240888412}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!format\-\_\-xyz\-\_\-coord@{format\-\_\-xyz\-\_\-coord}}
+\index{format\-\_\-xyz\-\_\-coord@{format\-\_\-xyz\-\_\-coord}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{format\-\_\-xyz\-\_\-coord}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-format\-\_\-xyz\-\_\-coord (
+\begin{DoxyParamCaption}
+\item[{}]{element, }
+\item[{}]{xyz, }
+\item[{}]{tinker = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a2eba3cad44138b3b10ea883240888412}
+
+
+Print a line consisting of (element, x, y, z) in accordance with .xyz file format. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em element} & A chemical element of a single atom \\
+\hline
+\mbox{\tt in}  & {\em xyz} & A 3-\/element array containing x, y, z coordinates of that atom \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 350 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a2eba3cad44138b3b10ea883240888412_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a4948e4662b8d2c8d515427d1bbb3d01e}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!format\-\_\-xyzgen\-\_\-coord@{format\-\_\-xyzgen\-\_\-coord}}
+\index{format\-\_\-xyzgen\-\_\-coord@{format\-\_\-xyzgen\-\_\-coord}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{format\-\_\-xyzgen\-\_\-coord}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-format\-\_\-xyzgen\-\_\-coord (
+\begin{DoxyParamCaption}
+\item[{}]{element, }
+\item[{}]{xyzgen}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a4948e4662b8d2c8d515427d1bbb3d01e}
+
+
+Print a line consisting of (element, p, q, r, s, t, ...) where (p, q, r) are arbitrary atom-\/wise data (this might happen, for instance, with atomic charges) 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em element} & A chemical element of a single atom \\
+\hline
+\mbox{\tt in}  & {\em xyzgen} & A N-\/element array containing data for that atom \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 378 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a4948e4662b8d2c8d515427d1bbb3d01e_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a08840b73e95bf34bf9ca7ea36ad0492d}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!get\-\_\-rotate\-\_\-translate@{get\-\_\-rotate\-\_\-translate}}
+\index{get\-\_\-rotate\-\_\-translate@{get\-\_\-rotate\-\_\-translate}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{get\-\_\-rotate\-\_\-translate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-get\-\_\-rotate\-\_\-translate (
+\begin{DoxyParamCaption}
+\item[{}]{matrix1, }
+\item[{}]{matrix2}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a08840b73e95bf34bf9ca7ea36ad0492d}
+
+
+Definition at line 574 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_af28de4693e5b8e82df900d0ac3c6c370}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!get\-Element@{get\-Element}}
+\index{get\-Element@{get\-Element}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{get\-Element}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-get\-Element (
+\begin{DoxyParamCaption}
+\item[{}]{mass}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_af28de4693e5b8e82df900d0ac3c6c370}
+
+
+Definition at line 189 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a7fe52c2928c7b0329882541bef2e34cd}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!grouper@{grouper}}
+\index{grouper@{grouper}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{grouper}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-grouper (
+\begin{DoxyParamCaption}
+\item[{}]{n, }
+\item[{}]{iterable}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a7fe52c2928c7b0329882541bef2e34cd}
+
+
+Groups a big long iterable into groups of ten or what have you. 
+
+
+
+Definition at line 450 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a7fe52c2928c7b0329882541bef2e34cd_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a838d85848bd817e801d0f5f6502217ef}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!is\-\_\-charmm\-\_\-coord@{is\-\_\-charmm\-\_\-coord}}
+\index{is\-\_\-charmm\-\_\-coord@{is\-\_\-charmm\-\_\-coord}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{is\-\_\-charmm\-\_\-coord}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-is\-\_\-charmm\-\_\-coord (
+\begin{DoxyParamCaption}
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a838d85848bd817e801d0f5f6502217ef}
+
+
+Determines whether a line contains C\-H\-A\-R\-M\-M data or not. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & The line to be tested \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 414 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a838d85848bd817e801d0f5f6502217ef_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_aafc8c924eed4480fed8ddc9c474d3bc1}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!is\-\_\-gro\-\_\-box@{is\-\_\-gro\-\_\-box}}
+\index{is\-\_\-gro\-\_\-box@{is\-\_\-gro\-\_\-box}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{is\-\_\-gro\-\_\-box}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-is\-\_\-gro\-\_\-box (
+\begin{DoxyParamCaption}
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_aafc8c924eed4480fed8ddc9c474d3bc1}
+
+
+Determines whether a line contains a G\-R\-O\-M\-A\-C\-S box vector or not. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & The line to be tested \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 427 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_aafc8c924eed4480fed8ddc9c474d3bc1_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a12b7bb398c2fa49a223f258ec7737483}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!is\-\_\-gro\-\_\-coord@{is\-\_\-gro\-\_\-coord}}
+\index{is\-\_\-gro\-\_\-coord@{is\-\_\-gro\-\_\-coord}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{is\-\_\-gro\-\_\-coord}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-is\-\_\-gro\-\_\-coord (
+\begin{DoxyParamCaption}
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a12b7bb398c2fa49a223f258ec7737483}
+
+
+Determines whether a line contains G\-R\-O\-M\-A\-C\-S data or not. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & The line to be tested \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 399 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a12b7bb398c2fa49a223f258ec7737483_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_afe989ffd119568047fc8265b1d329a70}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!isfloat@{isfloat}}
+\index{isfloat@{isfloat}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{isfloat}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-isfloat (
+\begin{DoxyParamCaption}
+\item[{}]{word}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_afe989ffd119568047fc8265b1d329a70}
+
+
+Matches A\-N\-Y number; it can be a decimal, scientific notation, integer, or what have you. 
+
+
+
+Definition at line 245 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a0dd31eff88d2bed0884ab21a13261d42}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!isint@{isint}}
+\index{isint@{isint}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{isint}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-isint (
+\begin{DoxyParamCaption}
+\item[{}]{word}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a0dd31eff88d2bed0884ab21a13261d42}
+
+
+O\-N\-L\-Y matches integers! If you have a decimal point? None shall pass! 
+
+
+
+Definition at line 240 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a0dd31eff88d2bed0884ab21a13261d42_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_ab9cb167fbbd809aedcf8c7434d405547}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!main@{main}}
+\index{main@{main}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{main}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-main (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_ab9cb167fbbd809aedcf8c7434d405547}
+
+
+Definition at line 2500 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_ab8464fea13fad2a506792c2f1d7c93f3}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!nodematch@{nodematch}}
+\index{nodematch@{nodematch}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{nodematch}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-nodematch (
+\begin{DoxyParamCaption}
+\item[{}]{node1, }
+\item[{}]{node2}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_ab8464fea13fad2a506792c2f1d7c93f3}
+
+
+Definition at line 234 of file molecule.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_ab8464fea13fad2a506792c2f1d7c93f3_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1molecule_a58c3f09152db4d1c6e1db9df29c60c43}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!pvec@{pvec}}
+\index{pvec@{pvec}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{pvec}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-molecule.\-pvec (
+\begin{DoxyParamCaption}
+\item[{}]{vec}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a58c3f09152db4d1c6e1db9df29c60c43}
+
+
+Definition at line 445 of file molecule.\-py.
+
+
+
+\subsubsection{Variable Documentation}
+\hypertarget{namespaceforcebalance_1_1molecule_a2986996d4f957928047df06fbec3717d}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Alive@{Alive}}
+\index{Alive@{Alive}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Alive}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-molecule.\-Alive}}\label{namespaceforcebalance_1_1molecule_a2986996d4f957928047df06fbec3717d}
+
+
+Definition at line 300 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a8fcfb88fe12a9256b61980f3d4fe3b63}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!All\-Variable\-Names@{All\-Variable\-Names}}
+\index{All\-Variable\-Names@{All\-Variable\-Names}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{All\-Variable\-Names}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-molecule.\-All\-Variable\-Names = {\bf Quantum\-Variable\-Names}$|${\bf Atom\-Variable\-Names}$|${\bf Meta\-Variable\-Names}$|${\bf Frame\-Variable\-Names}}}\label{namespaceforcebalance_1_1molecule_a8fcfb88fe12a9256b61980f3d4fe3b63}
+
+
+Definition at line 137 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a5daa68e835dcb9877d6c3f2fb559b54b}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Atom\-Variable\-Names@{Atom\-Variable\-Names}}
+\index{Atom\-Variable\-Names@{Atom\-Variable\-Names}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Atom\-Variable\-Names}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-molecule.\-Atom\-Variable\-Names = set(\mbox{[}'elem', 'partial\-\_\-charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm\-\_\-ghost', 'chain', 'altloc', 'icode'\mbox{]})}}\label{namespaceforcebalance_1_1molecule_a5daa68e835dcb9877d6c3f2fb559b54b}
+
+
+Definition at line 120 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a76af9edfbaaa8999680e32aafe1b1b61}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!bohrang@{bohrang}}
+\index{bohrang@{bohrang}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{bohrang}]{\setlength{\rightskip}{0pt plus 5cm}float forcebalance.\-molecule.\-bohrang = 0.\-529177249}}\label{namespaceforcebalance_1_1molecule_a76af9edfbaaa8999680e32aafe1b1b61}
+
+
+One bohr equals this many angstroms. 
+
+
+
+Definition at line 232 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_aa761cf1cf260e15d0b03a6f61569c840}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Box@{Box}}
+\index{Box@{Box}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Box}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-molecule.\-Box = namedtuple('Box',\mbox{[}'a','b','c','alpha','beta','gamma','A','B','C','V'\mbox{]})}}\label{namespaceforcebalance_1_1molecule_aa761cf1cf260e15d0b03a6f61569c840}
+
+
+Definition at line 252 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a1c99a11e8a749468698c9af6361a8a4c}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Elements@{Elements}}
+\index{Elements@{Elements}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Elements}]{\setlength{\rightskip}{0pt plus 5cm}list forcebalance.\-molecule.\-Elements}}\label{namespaceforcebalance_1_1molecule_a1c99a11e8a749468698c9af6361a8a4c}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = [\textcolor{stringliteral}{"None"},\textcolor{stringliteral}{'H'},\textcolor{stringliteral}{'He'},
+2             \textcolor{stringliteral}{'Li'},\textcolor{stringliteral}{'Be'},\textcolor{stringliteral}{'B'},\textcolor{stringliteral}{'C'},\textcolor{stringliteral}{'N'},\textcolor{stringliteral}{'O'},\textcolor{stringliteral}{'F'},\textcolor{stringliteral}{'Ne'},
+3             \textcolor{stringliteral}{'Na'},\textcolor{stringliteral}{'Mg'},\textcolor{stringliteral}{'Al'},\textcolor{stringliteral}{'Si'},\textcolor{stringliteral}{'P'},\textcolor{stringliteral}{'S'},\textcolor{stringliteral}{'Cl'},\textcolor{stringliteral}{'Ar'},
+4             \textcolor{stringliteral}{'K'},\textcolor{stringliteral}{'Ca'},\textcolor{stringliteral}{'Sc'},\textcolor{stringliteral}{'Ti'},\textcolor{stringliteral}{'V'},\textcolor{stringliteral}{'Cr'},\textcolor{stringliteral}{'Mn'},\textcolor{stringliteral}{'Fe'},\textcolor{stringliteral}{'Co'},\textcolor{stringliteral}{'Ni'},\textcolor{stringliteral}{'Cu'},\textcolor{stringliteral}{'Zn'},\textcolor{stringliteral}{'Ga'},\textcolor{stringliteral}{'Ge'},\textcolor{stringliteral}{'As'},\textcolor{stringliteral}{'Se'},\textcolor{stringliteral}{'Br'},\textcolor{stringliteral}{'Kr'},
+5             \textcolor{stringliteral}{'Rb'},\textcolor{stringliteral}{'Sr'},\textcolor{stringliteral}{'Y'},\textcolor{stringliteral}{'Zr'},\textcolor{stringliteral}{'Nb'},\textcolor{stringliteral}{'Mo'},\textcolor{stringliteral}{'Tc'},\textcolor{stringliteral}{'Ru'},\textcolor{stringliteral}{'Rh'},\textcolor{stringliteral}{'Pd'},\textcolor{stringliteral}{'Ag'},\textcolor{stringliteral}{'Cd'},\textcolor{stringliteral}{'In'},\textcolor{stringliteral}{'Sn'},\textcolor{stringliteral}{'Sb'},\textcolor{stringliteral}{'Te'},\textcolor{stringliteral}{'I'},\textcolor{stringliteral}{'Xe'},
+6             \textcolor{stringliteral}{'Cs'},\textcolor{stringliteral}{'Ba'},\textcolor{stringliteral}{'La'},\textcolor{stringliteral}{'Ce'},\textcolor{stringliteral}{'Pr'},\textcolor{stringliteral}{'Nd'},\textcolor{stringliteral}{'Pm'},\textcolor{stringliteral}{'Sm'},\textcolor{stringliteral}{'Eu'},\textcolor{stringliteral}{'Gd'},\textcolor{stringliteral}{'Tb'},\textcolor{stringliteral}{'Dy'},\textcolor{stringliteral}{'Ho'},\textcolor{stringliteral}{'Er'},\textcolor{stringliteral}{'Tm'},\textcolor{stringliteral}{'Yb'},
+7             \textcolor{stringliteral}{'Lu'},\textcolor{stringliteral}{'Hf'},\textcolor{stringliteral}{'Ta'},\textcolor{stringliteral}{'W'},\textcolor{stringliteral}{'Re'},\textcolor{stringliteral}{'Os'},\textcolor{stringliteral}{'Ir'},\textcolor{stringliteral}{'Pt'},\textcolor{stringliteral}{'Au'},\textcolor{stringliteral}{'Hg'},\textcolor{stringliteral}{'Tl'},\textcolor{stringliteral}{'Pb'},\textcolor{stringliteral}{'Bi'},\textcolor{stringliteral}{'Po'},\textcolor{stringliteral}{'At'},\textcolor{stringliteral}{'Rn'},
+8             \textcolor{stringliteral}{'Fr'},\textcolor{stringliteral}{'Ra'},\textcolor{stringliteral}{'Ac'},\textcolor{stringliteral}{'Th'},\textcolor{stringliteral}{'Pa'},\textcolor{stringliteral}{'}\textcolor{stringliteral}{U','}Np','Pu','Am','Cm','Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','
+      Sg','Bh','Hs','Mt']
+\end{DoxyCode}
+
+
+Definition at line 164 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a0044fa397e0923635a8b3e9625aa70f7}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Frame\-Variable\-Names@{Frame\-Variable\-Names}}
+\index{Frame\-Variable\-Names@{Frame\-Variable\-Names}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Frame\-Variable\-Names}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-molecule.\-Frame\-Variable\-Names}}\label{namespaceforcebalance_1_1molecule_a0044fa397e0923635a8b3e9625aa70f7}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = set([\textcolor{stringliteral}{'xyzs'}, \textcolor{stringliteral}{'comms'}, \textcolor{stringliteral}{'boxes'}, \textcolor{stringliteral}{'qm\_forces'}, \textcolor{stringliteral}{'qm\_energies'}, \textcolor{stringliteral}{'qm\_interaction'}, 
+2                           \textcolor{stringliteral}{'qm\_espxyzs'}, \textcolor{stringliteral}{'qm\_espvals'}, \textcolor{stringliteral}{'qm\_extchgs'}, \textcolor{stringliteral}{'qm\_mulliken\_charges'}, \textcolor{stringliteral}{'
+      qm\_mulliken\_spins'}])
+\end{DoxyCode}
+
+
+Definition at line 106 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a38e1c99e9567fe42b792af43db9b7488}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Meta\-Variable\-Names@{Meta\-Variable\-Names}}
+\index{Meta\-Variable\-Names@{Meta\-Variable\-Names}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Meta\-Variable\-Names}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-molecule.\-Meta\-Variable\-Names = set(\mbox{[}'fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult', 'bonds'\mbox{]})}}\label{namespaceforcebalance_1_1molecule_a38e1c99e9567fe42b792af43db9b7488}
+
+
+Definition at line 133 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_adc5040ec456762f2ac240fb08febbfdd}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Periodic\-Table@{Periodic\-Table}}
+\index{Periodic\-Table@{Periodic\-Table}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Periodic\-Table}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-molecule.\-Periodic\-Table}}\label{namespaceforcebalance_1_1molecule_adc5040ec456762f2ac240fb08febbfdd}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = OrderedDict([(\textcolor{stringliteral}{'H'} , 1.0079), (\textcolor{stringliteral}{'He'} , 4.0026), 
+2                              (\textcolor{stringliteral}{'Li'} , 6.941), (\textcolor{stringliteral}{'Be'} , 9.0122), (\textcolor{stringliteral}{'B'} , 10.811), (\textcolor{stringliteral}{'C'} , 12.0107), (\textcolor{stringliteral}{'N'} , 14.00
+      67), (\textcolor{stringliteral}{'O'} , 15.9994), (\textcolor{stringliteral}{'F'} , 18.9984), (\textcolor{stringliteral}{'Ne'} , 20.1797),
+3                              (\textcolor{stringliteral}{'Na'} , 22.9897), (\textcolor{stringliteral}{'Mg'} , 24.305), (\textcolor{stringliteral}{'Al'} , 26.9815), (\textcolor{stringliteral}{'Si'} , 28.0855), (\textcolor{stringliteral}{'P'} , 
+      30.9738), (\textcolor{stringliteral}{'S'} , 32.065), (\textcolor{stringliteral}{'Cl'} , 35.453), (\textcolor{stringliteral}{'Ar'} , 39.948), 
+4                              (\textcolor{stringliteral}{'K'} , 39.0983), (\textcolor{stringliteral}{'Ca'} , 40.078), (\textcolor{stringliteral}{'Sc'} , 44.9559), (\textcolor{stringliteral}{'Ti'} , 47.867), (\textcolor{stringliteral}{'V'} , 50
+      .9415), (\textcolor{stringliteral}{'Cr'} , 51.9961), (\textcolor{stringliteral}{'Mn'} , 54.938), (\textcolor{stringliteral}{'Fe'} , 55.845), (\textcolor{stringliteral}{'Co'} , 58.9332), 
+5                              (\textcolor{stringliteral}{'Ni'} , 58.6934), (\textcolor{stringliteral}{'Cu'} , 63.546), (\textcolor{stringliteral}{'Zn'} , 65.39), (\textcolor{stringliteral}{'Ga'} , 69.723), (\textcolor{stringliteral}{'Ge'} , 72
+      .64), (\textcolor{stringliteral}{'As'} , 74.9216), (\textcolor{stringliteral}{'Se'} , 78.96), (\textcolor{stringliteral}{'Br'} , 79.904), (\textcolor{stringliteral}{'Kr'} , 83.8), 
+6                              (\textcolor{stringliteral}{'Rb'} , 85.4678), (\textcolor{stringliteral}{'Sr'} , 87.62), (\textcolor{stringliteral}{'Y'} , 88.9059), (\textcolor{stringliteral}{'Zr'} , 91.224), (\textcolor{stringliteral}{'Nb'} , 92
+      .9064), (\textcolor{stringliteral}{'Mo'} , 95.94), (\textcolor{stringliteral}{'Tc'} , 98), (\textcolor{stringliteral}{'Ru'} , 101.07), (\textcolor{stringliteral}{'Rh'} , 102.9055), 
+7                              (\textcolor{stringliteral}{'Pd'} , 106.42), (\textcolor{stringliteral}{'Ag'} , 107.8682), (\textcolor{stringliteral}{'Cd'} , 112.411), (\textcolor{stringliteral}{'In'} , 114.818), (\textcolor{stringliteral}{'Sn'} 
+      , 118.71), (\textcolor{stringliteral}{'Sb'} , 121.76), (\textcolor{stringliteral}{'Te'} , 127.6), (\textcolor{stringliteral}{'I'} , 126.9045), (\textcolor{stringliteral}{'Xe'} , 131.293), 
+8                              (\textcolor{stringliteral}{'Cs'} , 132.9055), (\textcolor{stringliteral}{'Ba'} , 137.327), (\textcolor{stringliteral}{'La'} , 138.9055), (\textcolor{stringliteral}{'Ce'} , 140.116), (\textcolor{stringliteral}{'Pr
+      '} , 140.9077), (\textcolor{stringliteral}{'Nd'} , 144.24), (\textcolor{stringliteral}{'Pm'} , 145), (\textcolor{stringliteral}{'Sm'} , 150.36), 
+9                              (\textcolor{stringliteral}{'Eu'} , 151.964), (\textcolor{stringliteral}{'Gd'} , 157.25), (\textcolor{stringliteral}{'Tb'} , 158.9253), (\textcolor{stringliteral}{'Dy'} , 162.5), (\textcolor{stringliteral}{'Ho'} , 
+      164.9303), (\textcolor{stringliteral}{'Er'} , 167.259), (\textcolor{stringliteral}{'Tm'} , 168.9342), (\textcolor{stringliteral}{'Yb'} , 173.04), 
+10                              (\textcolor{stringliteral}{'Lu'} , 174.967), (\textcolor{stringliteral}{'Hf'} , 178.49), (\textcolor{stringliteral}{'Ta'} , 180.9479), (\textcolor{stringliteral}{'W'} , 183.84), (\textcolor{stringliteral}{'Re'} , 
+      186.207), (\textcolor{stringliteral}{'Os'} , 190.23), (\textcolor{stringliteral}{'Ir'} , 192.217), (\textcolor{stringliteral}{'Pt'} , 195.078), 
+11                              (\textcolor{stringliteral}{'Au'} , 196.9665), (\textcolor{stringliteral}{'Hg'} , 200.59), (\textcolor{stringliteral}{'Tl'} , 204.3833), (\textcolor{stringliteral}{'Pb'} , 207.2), (\textcolor{stringliteral}{'Bi'} ,
+       208.9804), (\textcolor{stringliteral}{'Po'} , 209), (\textcolor{stringliteral}{'At'} , 210), (\textcolor{stringliteral}{'Rn'} , 222), 
+12                              (\textcolor{stringliteral}{'Fr'} , 223), (\textcolor{stringliteral}{'Ra'} , 226), (\textcolor{stringliteral}{'Ac'} , 227), (\textcolor{stringliteral}{'Th'} , 232.0381), (\textcolor{stringliteral}{'Pa'} , 231.0359)
+      , (\textcolor{stringliteral}{'}\textcolor{stringliteral}{U' , 238.0289), ('}Np' , 237), ('Pu' , 244), 
+13                              (\textcolor{stringliteral}{'Am'} , 243), (\textcolor{stringliteral}{'Cm'} , 247), (\textcolor{stringliteral}{'Bk'} , 247), (\textcolor{stringliteral}{'Cf'} , 251), (\textcolor{stringliteral}{'Es'} , 252), (\textcolor{stringliteral}{'Fm'} , 
+      257), (\textcolor{stringliteral}{'Md'} , 258), (\textcolor{stringliteral}{'No'} , 259), 
+14                              (\textcolor{stringliteral}{'Lr'} , 262), (\textcolor{stringliteral}{'Rf'} , 261), (\textcolor{stringliteral}{'Db'} , 262), (\textcolor{stringliteral}{'Sg'} , 266), (\textcolor{stringliteral}{'Bh'} , 264), (\textcolor{stringliteral}{'Hs'} , 
+      277), (\textcolor{stringliteral}{'Mt'} , 268)])
+\end{DoxyCode}
+
+
+Definition at line 174 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_ab67efeab6049ec1f416b9ad1eed6ffcc}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Quantum\-Variable\-Names@{Quantum\-Variable\-Names}}
+\index{Quantum\-Variable\-Names@{Quantum\-Variable\-Names}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Quantum\-Variable\-Names}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-molecule.\-Quantum\-Variable\-Names = set(\mbox{[}'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm\-\_\-ghost'\mbox{]})}}\label{namespaceforcebalance_1_1molecule_ab67efeab6049ec1f416b9ad1eed6ffcc}
+
+
+Definition at line 135 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a1ee5389ce8a9042e053c7972dbbfb005}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!radian@{radian}}
+\index{radian@{radian}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{radian}]{\setlength{\rightskip}{0pt plus 5cm}int forcebalance.\-molecule.\-radian = 180}}\label{namespaceforcebalance_1_1molecule_a1ee5389ce8a9042e053c7972dbbfb005}
+
+
+Definition at line 253 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a74f55a89a14ca676b5a06441d1fdab19}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!Radii@{Radii}}
+\index{Radii@{Radii}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{Radii}]{\setlength{\rightskip}{0pt plus 5cm}list forcebalance.\-molecule.\-Radii}}\label{namespaceforcebalance_1_1molecule_a74f55a89a14ca676b5a06441d1fdab19}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = [0.31, 0.28, \textcolor{comment}{# H and He}
+2          1.28, 0.96, 0.84, 0.76, 0.71, 0.66, 0.57, 0.58, \textcolor{comment}{# First row elements}
+3          1.66, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, \textcolor{comment}{# Second row elements}
+4          2.03, 1.76, 1.70, 1.60, 1.53, 1.39, 1.61, 1.52, 1.50, 
+5          1.24, 1.32, 1.22, 1.22, 1.20, 1.19, 1.20, 1.20, 1.16, \textcolor{comment}{# Third row elements, K through Kr}
+6          2.20, 1.95, 1.90, 1.75, 1.64, 1.54, 1.47, 1.46, 1.42, 
+7          1.39, 1.45, 1.44, 1.42, 1.39, 1.39, 1.38, 1.39, 1.40, \textcolor{comment}{# Fourth row elements, Rb through Xe}
+8          2.44, 2.15, 2.07, 2.04, 2.03, 2.01, 1.99, 1.98, 
+9          1.98, 1.96, 1.94, 1.92, 1.92, 1.89, 1.90, 1.87, \textcolor{comment}{# Fifth row elements, s and f blocks}
+10          1.87, 1.75, 1.70, 1.62, 1.51, 1.44, 1.41, 1.36, 
+11          1.36, 1.32, 1.45, 1.46, 1.48, 1.40, 1.50, 1.50, \textcolor{comment}{# Fifth row elements, d and p blocks}
+12          2.60, 2.21, 2.15, 2.06, 2.00, 1.96, 1.90, 1.87, 1.80, 1.69]
+\end{DoxyCode}
+
+
+Definition at line 150 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a09d04113accea9c88b084051c5de29d1}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!splitter@{splitter}}
+\index{splitter@{splitter}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{splitter}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-molecule.\-splitter = re.\-compile(r'(\textbackslash{}s+$|$\textbackslash{}S+)')}}\label{namespaceforcebalance_1_1molecule_a09d04113accea9c88b084051c5de29d1}
+
+
+Definition at line 249 of file molecule.\-py.
+

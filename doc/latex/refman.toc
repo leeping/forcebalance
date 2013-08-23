@@ -1,0 +1,27 @@
+\contentsline {section}{\numberline {1}Main Page}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Preface\discretionary {-}{}{}: How to use this document}{2}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Introduction}{2}{subsection.1.2}
+\contentsline {subsubsection}{\numberline {1.2.1}Background\discretionary {-}{}{}: Empirical Potentials}{2}{subsubsection.1.2.1}
+\contentsline {subsubsection}{\numberline {1.2.2}Purpose and brief description of this program}{4}{subsubsection.1.2.2}
+\contentsline {subsection}{\numberline {1.3}Credits}{5}{subsection.1.3}
+\contentsline {section}{\numberline {2}Installation}{6}{section.2}
+\contentsline {subsection}{\numberline {2.1}Installing Force\discretionary {-}{}{}Balance}{6}{subsection.2.1}
+\contentsline {subsubsection}{\numberline {2.1.1}Prerequisites}{6}{subsubsection.2.1.1}
+\contentsline {subsubsection}{\numberline {2.1.2}Installing}{7}{subsubsection.2.1.2}
+\contentsline {subsection}{\numberline {2.2}Create documentation}{9}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Installing G\discretionary {-}{}{}R\discretionary {-}{}{}O\discretionary {-}{}{}M\discretionary {-}{}{}A\discretionary {-}{}{}C\discretionary {-}{}{}S-\/\discretionary {-}{}{}X2}{9}{subsection.2.3}
+\contentsline {subsubsection}{\numberline {2.3.1}Prerequisites for G\discretionary {-}{}{}R\discretionary {-}{}{}O\discretionary {-}{}{}M\discretionary {-}{}{}A\discretionary {-}{}{}C\discretionary {-}{}{}S-\/\discretionary {-}{}{}X2}{9}{subsubsection.2.3.1}
+\contentsline {section}{\numberline {3}Usage}{10}{section.3}
+\contentsline {subsection}{\numberline {3.1}Input file}{10}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Directory structure}{10}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Setting up the targets}{11}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Energy and force matching}{12}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}potentials}{12}{subsubsection.3.3.2}
+\contentsline {subsection}{\numberline {3.4}Running the optimization}{13}{subsection.3.4}
+\contentsline {section}{\numberline {4}Tutorial}{13}{section.4}
+\contentsline {subsection}{\numberline {4.1}Fitting a T\discretionary {-}{}{}I\discretionary {-}{}{}P4\discretionary {-}{}{}P potential to Q\discretionary {-}{}{}M cluster calculations}{13}{subsection.4.1}
+\contentsline {section}{\numberline {5}Glossary}{20}{section.5}
+\contentsline {subsection}{\numberline {5.1}Scientific concepts}{20}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Option index\discretionary {-}{}{}: General options}{20}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Option index\discretionary {-}{}{}: Target options}{29}{subsection.5.3}
+\contentsline {part}{Index}{39}{figure.4}

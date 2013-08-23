@@ -1,0 +1,174 @@
+\hypertarget{namespaceforcebalance_1_1forcefield}{\subsection{forcebalance.\-forcefield Namespace Reference}
+\label{namespaceforcebalance_1_1forcefield}\index{forcebalance.\-forcefield@{forcebalance.\-forcefield}}
+}
+
+
+Force field module.  
+
+
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classforcebalance_1_1forcefield_1_1BackedUpDict}{Backed\-Up\-Dict}
+\item 
+class \hyperlink{classforcebalance_1_1forcefield_1_1FF}{F\-F}
+\begin{DoxyCompactList}\small\item\em Force field class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespaceforcebalance_1_1forcefield_a99c9997d5158a04be089f291bd6f99bd}{determine\-\_\-fftype}
+\begin{DoxyCompactList}\small\item\em Determine the type of a force field file. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1forcefield_ab1a855bace20dd5e45928467e2a133f1}{rs\-\_\-override}
+\begin{DoxyCompactList}\small\item\em This function takes in a dictionary (rsfactors) and a string (termtype). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1forcefield_ab770be419e9b4522779dc3dfb1d7d019}{logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\item 
+dictionary \hyperlink{namespaceforcebalance_1_1forcefield_abc5e12aa78c5742f028b954ede086c51}{F\-F\-\_\-\-Extensions}
+\item 
+dictionary \hyperlink{namespaceforcebalance_1_1forcefield_a3beac9806e0438b79b9ae60a47c7b131}{F\-F\-\_\-\-I\-O\-Modules}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Force field module. In Force\-Balance a 'force field' is built from a set of files containing physical parameters. These files can be anything that enter into any computation -\/ our original program was quite dependent on the G\-R\-O\-M\-A\-C\-S force field format, but this program is set up to allow very general input formats.
+
+We introduce several important concepts\-:
+
+1) Adjustable parameters are allocated into a vector.
+
+To cast the force field optimization as a math problem, we treat all of the parameters on equal footing and write them as indices in a parameter vector.
+
+2) A mapping from interaction type to parameter number.
+
+Each element in the parameter vector corresponds to one or more interaction types. Whenever we change the parameter vector and recompute the objective function, this amounts to changing the physical parameters in the simulations, so we print out new force field files for external programs. In addition, when these programs are computing the objective function we are often in low-\/level subroutines that compute terms in the energy and force. If we need an analytic derivative of the objective function, then these subroutines need to know which index of the parameter vector needs to be modified.
+
+This is done by way of a hash table\-: for example, when we are computing a Coulomb interaction between atom 4 and atom 5, we can build the words 'C\-O\-U\-L4' and 'C\-O\-U\-L5' and look it up in the parameter map; this gives us two numbers (say, 10 and 11) corresponding to the eleventh and twelfth element of the parameter vector. Then we can compute the derivatives of the energy w/r.\-t. these parameters (in this case, C\-O\-U\-L5/rij and C\-O\-U\-L4/rij) and increment these values in the objective function gradient.
+
+In custom-\/implemented force fields (see counterpoisematch.\-py) the hash table can also be used to look up parameter values for computation of interactions. This is probably not the fastest way to do things, however.
+
+3) Distinction between physical and mathematical parameters.
+
+The optimization algorithm works in a space that is related to, but not exactly the same as the physical parameter space. The reasons for why we do this are\-:
+
+a) Each parameter has its own physical units. On the one hand it's not right to treat different physical units all on the same footing, so nondimensionalization is desirable. To make matters worse, the force field parameters can be small as 1e-\/8 or as large as 1e+6 depending on the parameter type. This means the elements of the objective function gradient / Hessian have elements that differ from each other in size by 10+ orders of magnitude, leading to mathematical instabilities in the optimizer.
+
+b) The parameter space can be constrained, most notably for atomic partial charges where we don't want to change the overall charge on a molecule. Thus we wish to project out certain movements in the mathematical parameters such that they don't change the physical parameters.
+
+c) We wish to regularize our optimization so as to avoid changing our parameters in very insensitive directions (linear dependencies). However, the sensitivity of the objective function to changes in the force field depends on the physical units!
+
+For all of these reasons, we introduce a 'transformation matrix' which maps mathematical parameters onto physical parameters. The diagonal elements in this matrix are rescaling factors; they take the mathematical parameter and magnify it by this constant factor. The off-\/diagonal elements correspond to rotations and other linear transformations, and currently I just use them to project out the 'increase the net charge' direction in the physical parameter space.
+
+Note that with regularization, these rescaling factors are equivalent to the widths of prior distributions in a maximum likelihood framework. Because there is such a correspondence between rescaling factors and choosing a prior, they need to be chosen carefully. This is work in progress. Another possibility is to sample the width of the priors from a noninformative distribution -- the hyperprior (we can choose the Jeffreys prior or something). This is work in progress.
+
+Right now only G\-R\-O\-M\-A\-C\-S parameters are supported, but this class is extensible, we need more modules!
+
+\begin{DoxyAuthor}{Author}
+Lee-\/\-Ping Wang 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+04/2012 
+\end{DoxyDate}
+
+
+\subsubsection{Function Documentation}
+\hypertarget{namespaceforcebalance_1_1forcefield_a99c9997d5158a04be089f291bd6f99bd}{\index{forcebalance\-::forcefield@{forcebalance\-::forcefield}!determine\-\_\-fftype@{determine\-\_\-fftype}}
+\index{determine\-\_\-fftype@{determine\-\_\-fftype}!forcebalance::forcefield@{forcebalance\-::forcefield}}
+\paragraph[{determine\-\_\-fftype}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-forcefield.\-determine\-\_\-fftype (
+\begin{DoxyParamCaption}
+\item[{}]{ffname, }
+\item[{}]{verbose = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1forcefield_a99c9997d5158a04be089f291bd6f99bd}
+
+
+Determine the type of a force field file. 
+
+It is possible to specify the file type explicitly in the input file using the syntax 'force\-\_\-field.\-ext\-:type'. Otherwise this function will try to determine the force field type by extension. 
+
+Definition at line 145 of file forcefield.\-py.
+
+\hypertarget{namespaceforcebalance_1_1forcefield_ab1a855bace20dd5e45928467e2a133f1}{\index{forcebalance\-::forcefield@{forcebalance\-::forcefield}!rs\-\_\-override@{rs\-\_\-override}}
+\index{rs\-\_\-override@{rs\-\_\-override}!forcebalance::forcefield@{forcebalance\-::forcefield}}
+\paragraph[{rs\-\_\-override}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-forcefield.\-rs\-\_\-override (
+\begin{DoxyParamCaption}
+\item[{}]{rsfactors, }
+\item[{}]{termtype, }
+\item[{}]{Temperature = {\ttfamily 298.15}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1forcefield_ab1a855bace20dd5e45928467e2a133f1}
+
+
+This function takes in a dictionary (rsfactors) and a string (termtype). 
+
+\begin{DoxyVerb} If termtype matches any of the strings below, rsfactors[termtype] is assigned
+ to one of the numbers below.
+
+ This is LPW's attempt to simplify the rescaling factors.
+\end{DoxyVerb}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em rsfactors} & The computed rescaling factor. \\
+\hline
+\mbox{\tt in}  & {\em termtype} & The interaction type (corresponding to a physical unit) \\
+\hline
+\mbox{\tt in}  & {\em Temperature} & The temperature for computing the k\-T energy scale \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1172 of file forcefield.\-py.
+
+
+
+\subsubsection{Variable Documentation}
+\hypertarget{namespaceforcebalance_1_1forcefield_abc5e12aa78c5742f028b954ede086c51}{\index{forcebalance\-::forcefield@{forcebalance\-::forcefield}!F\-F\-\_\-\-Extensions@{F\-F\-\_\-\-Extensions}}
+\index{F\-F\-\_\-\-Extensions@{F\-F\-\_\-\-Extensions}!forcebalance::forcefield@{forcebalance\-::forcefield}}
+\paragraph[{F\-F\-\_\-\-Extensions}]{\setlength{\rightskip}{0pt plus 5cm}dictionary forcebalance.\-forcefield.\-F\-F\-\_\-\-Extensions}}\label{namespaceforcebalance_1_1forcefield_abc5e12aa78c5742f028b954ede086c51}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = \{\textcolor{stringliteral}{"itp"} : \textcolor{stringliteral}{"gmx"},
+2                  \textcolor{stringliteral}{"in"}  : \textcolor{stringliteral}{"qchem"},
+3                  \textcolor{stringliteral}{"prm"} : \textcolor{stringliteral}{"tinker"},
+4                  \textcolor{stringliteral}{"gen"} : \textcolor{stringliteral}{"custom"},
+5                  \textcolor{stringliteral}{"xml"} : \textcolor{stringliteral}{"openmm"},
+6                  \textcolor{stringliteral}{"frcmod"} : \textcolor{stringliteral}{"frcmod"},
+7                  \textcolor{stringliteral}{"mol2"} : \textcolor{stringliteral}{"mol2"},
+8                  \textcolor{stringliteral}{"gbs"}  : \textcolor{stringliteral}{"gbs"},
+9                  \textcolor{stringliteral}{"grid"} : \textcolor{stringliteral}{"grid"}
+10                  \}
+\end{DoxyCode}
+
+
+Definition at line 117 of file forcefield.\-py.
+
+\hypertarget{namespaceforcebalance_1_1forcefield_a3beac9806e0438b79b9ae60a47c7b131}{\index{forcebalance\-::forcefield@{forcebalance\-::forcefield}!F\-F\-\_\-\-I\-O\-Modules@{F\-F\-\_\-\-I\-O\-Modules}}
+\index{F\-F\-\_\-\-I\-O\-Modules@{F\-F\-\_\-\-I\-O\-Modules}!forcebalance::forcefield@{forcebalance\-::forcefield}}
+\paragraph[{F\-F\-\_\-\-I\-O\-Modules}]{\setlength{\rightskip}{0pt plus 5cm}dictionary forcebalance.\-forcefield.\-F\-F\-\_\-\-I\-O\-Modules}}\label{namespaceforcebalance_1_1forcefield_a3beac9806e0438b79b9ae60a47c7b131}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = \{\textcolor{stringliteral}{"gmx"}: \hyperlink{classforcebalance_1_1gmxio_1_1ITP__Reader}{gmxio.ITP\_Reader} ,
+2                 \textcolor{stringliteral}{"qchem"}: \hyperlink{classforcebalance_1_1qchemio_1_1QCIn__Reader}{qchemio.QCIn\_Reader} ,
+3                 \textcolor{stringliteral}{"tinker"}: \hyperlink{classforcebalance_1_1tinkerio_1_1Tinker__Reader}{tinkerio.Tinker\_Reader} ,
+4                 \textcolor{stringliteral}{"custom"}: \hyperlink{classforcebalance_1_1custom__io_1_1Gen__Reader}{custom\_io.Gen\_Reader} , 
+5                 \textcolor{stringliteral}{"openmm"} : \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM__Reader}{openmmio.OpenMM\_Reader},
+6                 \textcolor{stringliteral}{"frcmod"} : \hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader}{amberio.FrcMod\_Reader},
+7                 \textcolor{stringliteral}{"mol2"} : \hyperlink{classforcebalance_1_1amberio_1_1Mol2__Reader}{amberio.Mol2\_Reader},
+8                 \textcolor{stringliteral}{"gbs"} : \hyperlink{classforcebalance_1_1psi4io_1_1GBS__Reader}{psi4io.GBS\_Reader},
+9                 \textcolor{stringliteral}{"grid"} : \hyperlink{classforcebalance_1_1psi4io_1_1Grid__Reader}{psi4io.Grid\_Reader}
+10                 \}
+\end{DoxyCode}
+
+
+Definition at line 129 of file forcefield.\-py.
+
+\hypertarget{namespaceforcebalance_1_1forcefield_ab770be419e9b4522779dc3dfb1d7d019}{\index{forcebalance\-::forcefield@{forcebalance\-::forcefield}!logger@{logger}}
+\index{logger@{logger}!forcebalance::forcefield@{forcebalance\-::forcefield}}
+\paragraph[{logger}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-forcefield.\-logger = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)}}\label{namespaceforcebalance_1_1forcefield_ab770be419e9b4522779dc3dfb1d7d019}
+
+
+Definition at line 115 of file forcefield.\-py.
+

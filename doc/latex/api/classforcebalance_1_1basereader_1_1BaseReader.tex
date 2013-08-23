@@ -1,0 +1,252 @@
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader}{\subsection{forcebalance.\-basereader.\-Base\-Reader Class Reference}
+\label{classforcebalance_1_1basereader_1_1BaseReader}\index{forcebalance.\-basereader.\-Base\-Reader@{forcebalance.\-basereader.\-Base\-Reader}}
+}
+
+
+The 'reader' class.  
+
+
+
+
+Inheritance diagram for forcebalance.\-basereader.\-Base\-Reader\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-basereader.\-Base\-Reader\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classforcebalance_1_1basereader_1_1BaseReader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ae547018f39a9b0c187163c6377df4ef7}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}{Split}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}{Whites}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}{feed}
+\item 
+def \hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}{build\-\_\-pid}
+\begin{DoxyCompactList}\small\item\em Returns the parameter type (e.\-g. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{ln}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}{itype}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}{suffix}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a1ca75e7775c49f57796fb3ba816486e7}{pdict}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}{adict}
+\begin{DoxyCompactList}\small\item\em The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{molatom}
+\begin{DoxyCompactList}\small\item\em The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{Molecules}
+\item 
+\hyperlink{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{Atom\-Types}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+The 'reader' class. 
+
+It serves two main functions\-:
+
+1) When parsing a text force field file, the 'feed' method is called once for every line. Calling the 'feed' method stores the internal variables that are needed for making the unique parameter identifier.
+
+2) The 'reader' also stores the 'pdict' dictionary, which is needed for building the matrix of rescaling factors. This is not needed for the X\-M\-L force fields, so in X\-M\-L force fields pdict is replaced with a string called \char`\"{}\-X\-M\-L\-\_\-\-Override\char`\"{}. 
+
+Definition at line 25 of file basereader.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ae547018f39a9b0c187163c6377df4ef7}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{fnm}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1basereader_1_1BaseReader_ae547018f39a9b0c187163c6377df4ef7}
+
+
+Definition at line 27 of file basereader.\-py.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!build\-\_\-pid@{build\-\_\-pid}}
+\index{build\-\_\-pid@{build\-\_\-pid}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{build\-\_\-pid}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-build\-\_\-pid (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{pfld}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1basereader_1_1BaseReader_a208a252b78a079e81a4a0b5320f3d564}
+
+
+Returns the parameter type (e.\-g. 
+
+K in B\-O\-N\-D\-S\-K) based on the current interaction type.
+
+Both the 'pdict' dictionary (see \hyperlink{namespaceforcebalance_1_1gmxio_ae845e0b923ecde16c79f2742b94534a6}{gmxio.\-pdict}) and the interaction type 'state' (here, B\-O\-N\-D\-S) are needed to get the parameter type.
+
+If, however, 'pdict' does not contain the ptype value, a suitable substitute is simply the field number.
+
+Note that if the interaction type state is not set, then it defaults to the file name, so a generic parameter I\-D is 'filename.\-line\-\_\-num.\-field\-\_\-num' 
+
+Definition at line 68 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!feed@{feed}}
+\index{feed@{feed}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{feed}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-feed (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6}
+
+
+Definition at line 49 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_ad345848c6683d9ba66eed0d2b0197fb6_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!Split@{Split}}
+\index{Split@{Split}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{Split}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-Split (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639}
+
+
+Definition at line 43 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_ae0ea53a7d942ceb93bdc34499f694639_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!Whites@{Whites}}
+\index{Whites@{Whites}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{Whites}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-basereader.\-Base\-Reader.\-Whites (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{line}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386}
+
+
+Definition at line 46 of file basereader.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1basereader_1_1BaseReader_a2819ab1e523b6ff8e7467e56e3582386_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!adict@{adict}}
+\index{adict@{adict}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{adict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-adict}}\label{classforcebalance_1_1basereader_1_1BaseReader_a84a513e0e43145b2fdaf38e73c32f83a}
+
+
+The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. 
+
+
+
+Definition at line 33 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!Atom\-Types@{Atom\-Types}}
+\index{Atom\-Types@{Atom\-Types}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{Atom\-Types}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Atom\-Types}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad5765e192499937376950410364014af}
+
+
+Definition at line 41 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!itype@{itype}}
+\index{itype@{itype}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{itype}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-itype}}\label{classforcebalance_1_1basereader_1_1BaseReader_a0c5b4d7b1c87dbcc9a8a0fdc82eee023}
+
+
+Definition at line 29 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!ln@{ln}}
+\index{ln@{ln}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{ln}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-ln}}\label{classforcebalance_1_1basereader_1_1BaseReader_ab04436f3968d9bd6ec09238ee6537ec6}
+
+
+Definition at line 28 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!molatom@{molatom}}
+\index{molatom@{molatom}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{molatom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-molatom}}\label{classforcebalance_1_1basereader_1_1BaseReader_a56e6e6024825ada94ab24f5f3ce59851}
+
+
+The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. 
+
+self.\-moleculedict = Ordered\-Dict() The listing of 'R\-E\-S\-:A\-T\-O\-M\-N\-A\-M\-E\-S' for atom names in the line This is obviously a placeholder. 
+
+Definition at line 38 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!Molecules@{Molecules}}
+\index{Molecules@{Molecules}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{Molecules}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-Molecules}}\label{classforcebalance_1_1basereader_1_1BaseReader_ad2842550aa690f1cd82e41ec8d6fe541}
+
+
+Definition at line 40 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_a1ca75e7775c49f57796fb3ba816486e7}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{pdict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-pdict}}\label{classforcebalance_1_1basereader_1_1BaseReader_a1ca75e7775c49f57796fb3ba816486e7}
+
+
+Definition at line 31 of file basereader.\-py.
+
+\hypertarget{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}{\index{forcebalance\-::basereader\-::\-Base\-Reader@{forcebalance\-::basereader\-::\-Base\-Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!forcebalance::basereader::BaseReader@{forcebalance\-::basereader\-::\-Base\-Reader}}
+\paragraph[{suffix}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-basereader.\-Base\-Reader.\-suffix}}\label{classforcebalance_1_1basereader_1_1BaseReader_ab2aba0f349b78cb3c1e11c35f56d6bdf}
+
+
+Definition at line 30 of file basereader.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{basereader_8py}{basereader.\-py}\end{DoxyCompactItemize}

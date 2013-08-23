@@ -1,7 +1,5 @@
-*.pyc
-doc/*
-
-test.log
-temp
-backups
-result
+# Documentation branch should only track doc folder
+src
+studies
+test
+/*.*

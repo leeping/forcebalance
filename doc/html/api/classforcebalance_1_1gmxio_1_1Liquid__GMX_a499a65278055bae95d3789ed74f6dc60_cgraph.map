@@ -1,6 +1,8 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="533,5,715,32"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html#a70a950655df19e6ed0365ba873fd0cc5" title="Return the self&#45;polarization correction as described in Berendsen et al., JPC 1987." alt="" coords="437,56,811,83"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html#a858330327e84a1186b9a932fe2437489" title="Instantiation of the subclass." alt="" coords="859,81,1133,108"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="874,5,1118,32"/>
+<map id="forcebalance.gmxio.Liquid_GMX.prepare_temp_directory" name="forcebalance.gmxio.Liquid_GMX.prepare_temp_directory">
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="255,13,422,41"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html#a70a950655df19e6ed0365ba873fd0cc5" title="forcebalance.gmxio.Liquid\l_GMX.polarization_correction" alt="" coords="245,65,432,109"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html#a858330327e84a1186b9a932fe2437489" title="forcebalance.gmxio.Liquid\l_GMX.__init__" alt="" coords="480,98,646,142"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="482,5,643,49"/>
+<area shape="rect" id="node6" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="694,98,842,142"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="891,106,1099,134"/>
 </map>

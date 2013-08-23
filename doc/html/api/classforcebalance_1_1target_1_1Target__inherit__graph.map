@@ -1,27 +1,28 @@
-<map id="G" name="G">
-<area shape="rect" id="node5" href="$classforcebalance_1_1abinitio_1_1AbInitio.html" title="Subclass of Target for fitting force fields to ab initio data." alt="" coords="659,132,864,159"/>
-<area shape="rect" id="node17" href="$classforcebalance_1_1binding_1_1BindingEnergy.html" title="Improved subclass of Target for fitting force fields to binding energies." alt="" coords="637,259,886,285"/>
-<area shape="rect" id="node21" href="$classforcebalance_1_1counterpoise_1_1Counterpoise.html" title="Target subclass for matching the counterpoise correction." alt="" coords="621,309,901,336"/>
-<area shape="rect" id="node23" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html" title="Subclass of Target for monomer properties of QTPIE (implemented within gromacs WCV branch)..." alt="" coords="626,360,897,387"/>
-<area shape="rect" id="node25" href="$classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies." alt="" coords="637,411,885,437"/>
-<area shape="rect" id="node33" href="$classforcebalance_1_1leastsq_1_1LeastSquares.html" title="Subclass of Target for general least squares fitting." alt="" coords="638,461,885,488"/>
-<area shape="rect" id="node37" href="$classforcebalance_1_1liquid_1_1Liquid.html" title="Subclass of Target for liquid property matching." alt="" coords="670,512,853,539"/>
-<area shape="rect" id="node45" href="$classforcebalance_1_1moments_1_1Moments.html" title="Subclass of Target for fitting force fields to multipole moments (from experiment or theory)..." alt="" coords="644,563,879,589"/>
-<area shape="rect" id="node49" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html" title="Subclass of Target for R&#45;DVR3 grid fitting." alt="" coords="649,613,874,640"/>
-<area shape="rect" id="node51" href="$classforcebalance_1_1vibration_1_1Vibration.html" title="Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory)..." alt="" coords="649,664,873,691"/>
-<area shape="rect" id="node2" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="6,436,333,463"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1abinitio__internal_1_1AbInitio__Internal.html" title="Subclass of Target for force and energy matching using an internal implementation." alt="" coords="949,5,1264,32"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1amberio_1_1AbInitio__AMBER.html" title="Subclass of Target for force and energy matching using AMBER." alt="" coords="975,56,1239,83"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html" title="Subclass of AbInitio for force and energy matching using normal GROMACS." alt="" coords="989,107,1224,133"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html" title="Subclass of AbInitio for force and energy matching using OpenMM." alt="" coords="961,157,1252,184"/>
-<area shape="rect" id="node15" href="$classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html" title="Subclass of Target for force and energy matching using TINKER." alt="" coords="978,208,1235,235"/>
-<area shape="rect" id="node19" href="$classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER.html" title="Subclass of BindingEnergy for binding energy matching using TINKER." alt="" coords="956,259,1257,285"/>
-<area shape="rect" id="node27" href="$classforcebalance_1_1gmxio_1_1Interaction__GMX.html" title="Subclass of Interaction for interaction energy matching using GROMACS." alt="" coords="979,309,1234,336"/>
-<area shape="rect" id="node29" href="$classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html" title="Subclass of Target for interaction matching using OpenMM." alt="" coords="951,360,1263,387"/>
-<area shape="rect" id="node31" href="$classforcebalance_1_1tinkerio_1_1Interaction__TINKER.html" title="Subclass of Target for interaction matching using TINKER." alt="" coords="967,411,1246,437"/>
-<area shape="rect" id="node35" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html" title="forcebalance.psi4io.THCDF_Psi4" alt="" coords="994,461,1219,488"/>
-<area shape="rect" id="node39" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html" title="forcebalance.gmxio.Liquid_GMX" alt="" coords="995,512,1219,539"/>
-<area shape="rect" id="node41" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html" title="forcebalance.openmmio.Liquid_OpenMM" alt="" coords="966,563,1247,589"/>
-<area shape="rect" id="node43" href="$classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html" title="forcebalance.tinkerio.Liquid_TINKER" alt="" coords="983,613,1230,640"/>
-<area shape="rect" id="node47" href="$classforcebalance_1_1tinkerio_1_1Moments__TINKER.html" title="Subclass of Target for multipole moment matching using TINKER." alt="" coords="971,664,1242,691"/>
+<map id="forcebalance.target.Target" name="forcebalance.target.Target">
+<area shape="rect" id="node7" href="$classforcebalance_1_1abinitio_1_1AbInitio.html" title="Subclass of Target for fitting force fields to ab initio data." alt="" coords="604,166,777,213"/>
+<area shape="rect" id="node19" href="$classforcebalance_1_1binding_1_1BindingEnergy.html" title="Improved subclass of Target for fitting force fields to binding energies." alt="" coords="588,327,793,374"/>
+<area shape="rect" id="node23" href="$classforcebalance_1_1counterpoise_1_1Counterpoise.html" title="Target subclass for matching the counterpoise correction." alt="" coords="593,397,788,443"/>
+<area shape="rect" id="node25" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html" title="Subclass of Target for monomer properties of QTPIE (implemented within gromacs WCV branch)..." alt="" coords="577,466,804,513"/>
+<area shape="rect" id="node27" href="$classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies." alt="" coords="601,535,780,582"/>
+<area shape="rect" id="node35" href="$classforcebalance_1_1leastsq_1_1LeastSquares.html" title="Subclass of Target for general least squares fitting." alt="" coords="595,605,787,651"/>
+<area shape="rect" id="node39" href="$classforcebalance_1_1liquid_1_1Liquid.html" title="Subclass of Target for liquid property matching." alt="" coords="600,675,781,704"/>
+<area shape="rect" id="node47" href="$classforcebalance_1_1moments_1_1Moments.html" title="Subclass of Target for fitting force fields to multipole moments (from experiment or theory)..." alt="" coords="575,728,807,757"/>
+<area shape="rect" id="node51" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html" title="Subclass of Target for R&#45;DVR3 grid fitting." alt="" coords="579,781,803,811"/>
+<area shape="rect" id="node53" href="$classforcebalance_1_1target_1_1RemoteTarget.html" title="forcebalance.target.Remote\lTarget" alt="" coords="591,834,791,881"/>
+<area shape="rect" id="node55" href="$classforcebalance_1_1vibration_1_1Vibration.html" title="Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory)..." alt="" coords="579,904,803,933"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="115,613,288,643"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1abinitio__internal_1_1AbInitio__Internal.html" title="Subclass of Target for force and energy matching using an internal implementation." alt="" coords="893,5,1075,51"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1amberio_1_1AbInitio__AMBER.html" title="Subclass of Target for force and energy matching using AMBER." alt="" coords="879,74,1089,121"/>
+<area shape="rect" id="node13" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html" title="Subclass of AbInitio for force and energy matching using normal GROMACS." alt="" coords="868,144,1100,173"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html" title="Subclass of AbInitio for force and energy matching using OpenMM." alt="" coords="885,197,1083,243"/>
+<area shape="rect" id="node17" href="$classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html" title="Subclass of Target for force and energy matching using TINKER." alt="" coords="897,266,1071,313"/>
+<area shape="rect" id="node21" href="$classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER.html" title="Subclass of BindingEnergy for binding energy matching using TINKER." alt="" coords="881,335,1087,382"/>
+<area shape="rect" id="node29" href="$classforcebalance_1_1gmxio_1_1Interaction__GMX.html" title="Subclass of Interaction for interaction energy matching using GROMACS." alt="" coords="857,417,1111,447"/>
+<area shape="rect" id="node31" href="$classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html" title="Subclass of Target for interaction matching using OpenMM." alt="" coords="860,470,1108,517"/>
+<area shape="rect" id="node33" href="$classforcebalance_1_1tinkerio_1_1Interaction__TINKER.html" title="Subclass of Target for interaction matching using TINKER." alt="" coords="871,539,1097,586"/>
+<area shape="rect" id="node37" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html" title="forcebalance.psi4io.THCDF_Psi4" alt="" coords="872,609,1096,639"/>
+<area shape="rect" id="node41" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html" title="forcebalance.gmxio.Liquid_GMX" alt="" coords="872,663,1096,692"/>
+<area shape="rect" id="node43" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html" title="forcebalance.openmmio.Liquid\l_OpenMM" alt="" coords="876,715,1092,762"/>
+<area shape="rect" id="node45" href="$classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html" title="forcebalance.tinkerio.Liquid\l_TINKER" alt="" coords="887,785,1081,831"/>
+<area shape="rect" id="node49" href="$classforcebalance_1_1tinkerio_1_1Moments__TINKER.html" title="Subclass of Target for multipole moment matching using TINKER." alt="" coords="875,854,1093,901"/>
 </map>

@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="73,80,263,107"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="5,5,331,32"/>
+<map id="forcebalance.psi4io.RDVR3_Psi4" name="forcebalance.psi4io.RDVR3_Psi4">
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="23,160,212,189"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="31,83,204,112"/>
 </map>

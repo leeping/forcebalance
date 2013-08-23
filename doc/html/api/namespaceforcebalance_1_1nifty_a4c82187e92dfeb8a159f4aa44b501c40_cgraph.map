@@ -1,7 +1,8 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get_least_squares" alt="" coords="257,157,511,184"/>
-<area shape="rect" id="node10" href="$namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" title="Given any list, array, or matrix, return a 1&#45;column matrix." alt="" coords="307,5,461,32"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="265,107,503,133"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="616,56,773,83"/>
-<area shape="rect" id="node8" href="$namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10" title="Compute the (cross) statistical inefficiency of (two) timeseries." alt="" coords="561,157,829,184"/>
+<map id="forcebalance.nifty.invert_svd" name="forcebalance.nifty.invert_svd">
+<area shape="rect" id="node2" href="$namespaceforcebalance_1_1nifty.html#aa9fb9c7c65231eca50a7afc04f489b64" title="forcebalance.nifty.get\l_least_squares" alt="" coords="238,109,375,153"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#afb3f205bce4984856e766af7e9fdaca8" title="Given any list, array, or matrix, return a 1&#45;column matrix." alt="" coords="238,5,375,33"/>
+<area shape="rect" id="node6" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="233,177,381,221"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a52114ceee9d55f94d9aecb3e176de294" title="Given any list, array, or matrix, return a single&#45;index array." alt="" coords="464,57,603,85"/>
+<area shape="rect" id="node4" href="$namespaceforcebalance_1_1nifty.html#ad5ca60565c864b4245a8212fe9d92e10" title="Compute the (cross) statistical inefficiency of (two) timeseries." alt="" coords="448,109,619,153"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="429,185,637,213"/>
 </map>

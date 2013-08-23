@@ -1,0 +1,164 @@
+\hypertarget{namespaceforcebalance_1_1tinkerio}{\subsection{forcebalance.\-tinkerio Namespace Reference}
+\label{namespaceforcebalance_1_1tinkerio}\index{forcebalance.\-tinkerio@{forcebalance.\-tinkerio}}
+}
+
+
+T\-I\-N\-K\-E\-R input/output.  
+
+
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classforcebalance_1_1tinkerio_1_1Tinker__Reader}{Tinker\-\_\-\-Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing T\-I\-N\-K\-E\-R force field files. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER}{Liquid\-\_\-\-T\-I\-N\-K\-E\-R}
+\item 
+class \hyperlink{classforcebalance_1_1tinkerio_1_1AbInitio__TINKER}{Ab\-Initio\-\_\-\-T\-I\-N\-K\-E\-R}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for force and energy matching using T\-I\-N\-K\-E\-R. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1tinkerio_1_1Vibration__TINKER}{Vibration\-\_\-\-T\-I\-N\-K\-E\-R}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for vibrational frequency matching using T\-I\-N\-K\-E\-R. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1tinkerio_1_1Moments__TINKER}{Moments\-\_\-\-T\-I\-N\-K\-E\-R}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for multipole moment matching using T\-I\-N\-K\-E\-R. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1tinkerio_1_1BindingEnergy__TINKER}{Binding\-Energy\-\_\-\-T\-I\-N\-K\-E\-R}
+\begin{DoxyCompactList}\small\item\em Subclass of Binding\-Energy for binding energy matching using T\-I\-N\-K\-E\-R. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1tinkerio_1_1Interaction__TINKER}{Interaction\-\_\-\-T\-I\-N\-K\-E\-R}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for interaction matching using T\-I\-N\-K\-E\-R. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespaceforcebalance_1_1tinkerio_a9cde7bd64c6f5286c1f33a39211d5a11}{write\-\_\-key\-\_\-with\-\_\-prm}
+\begin{DoxyCompactList}\small\item\em Copies a T\-I\-N\-K\-E\-R .key file but changes the parameter keyword as necessary to reflect the Force\-Balance settings. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1tinkerio_aa82c424420ad59b6a78b273d6c1fd469}{modify\-\_\-key}
+\begin{DoxyCompactList}\small\item\em Performs in-\/place modification of a T\-I\-N\-K\-E\-R .key file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1tinkerio_afc11cbd0e4ef0c777487ccb9708e0b08}{logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\item 
+dictionary \hyperlink{namespaceforcebalance_1_1tinkerio_a714d1b926359d7d11559720e422ec34d}{pdict}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+T\-I\-N\-K\-E\-R input/output. This serves as a good template for writing future force matching I/\-O modules for other programs because it's so simple.
+
+\begin{DoxyAuthor}{Author}
+Lee-\/\-Ping Wang 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+01/2012 
+\end{DoxyDate}
+
+
+\subsubsection{Function Documentation}
+\hypertarget{namespaceforcebalance_1_1tinkerio_aa82c424420ad59b6a78b273d6c1fd469}{\index{forcebalance\-::tinkerio@{forcebalance\-::tinkerio}!modify\-\_\-key@{modify\-\_\-key}}
+\index{modify\-\_\-key@{modify\-\_\-key}!forcebalance::tinkerio@{forcebalance\-::tinkerio}}
+\paragraph[{modify\-\_\-key}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-modify\-\_\-key (
+\begin{DoxyParamCaption}
+\item[{}]{src, }
+\item[{}]{in\-\_\-dict}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1tinkerio_aa82c424420ad59b6a78b273d6c1fd469}
+
+
+Performs in-\/place modification of a T\-I\-N\-K\-E\-R .key file. 
+
+\begin{DoxyVerb} The input dictionary contains key:value pairs such as
+ "polarization direct".  If the key exists in the TINKER file, then
+ that line is modified such that it contains the value in the
+ dictionary.  Note that this "key" is not to be confused with the
+ .key extension in the TINKER file that we're modifying.
+
+ Sometimes keys like 'archive' do not have a value, in which case
+ the dictionary should contain a None value or a blank space.
+
+ If the key doesn't exist in the TINKER file, then the key:value pair
+ will be printed at the end.
+\end{DoxyVerb}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em src} & Name of the T\-I\-N\-K\-E\-R file to be modified. \\
+\hline
+\mbox{\tt in}  & {\em in\-\_\-dict} & Dictionary containing key-\/value pairs used to modify the T\-I\-N\-K\-E\-R file. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 202 of file tinkerio.\-py.
+
+\hypertarget{namespaceforcebalance_1_1tinkerio_a9cde7bd64c6f5286c1f33a39211d5a11}{\index{forcebalance\-::tinkerio@{forcebalance\-::tinkerio}!write\-\_\-key\-\_\-with\-\_\-prm@{write\-\_\-key\-\_\-with\-\_\-prm}}
+\index{write\-\_\-key\-\_\-with\-\_\-prm@{write\-\_\-key\-\_\-with\-\_\-prm}!forcebalance::tinkerio@{forcebalance\-::tinkerio}}
+\paragraph[{write\-\_\-key\-\_\-with\-\_\-prm}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-write\-\_\-key\-\_\-with\-\_\-prm (
+\begin{DoxyParamCaption}
+\item[{}]{src, }
+\item[{}]{dest, }
+\item[{}]{prmfnm = {\ttfamily None}, }
+\item[{}]{ffobj = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1tinkerio_a9cde7bd64c6f5286c1f33a39211d5a11}
+
+
+Copies a T\-I\-N\-K\-E\-R .key file but changes the parameter keyword as necessary to reflect the Force\-Balance settings. 
+
+
+
+Definition at line 146 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1tinkerio_a9cde7bd64c6f5286c1f33a39211d5a11_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Variable Documentation}
+\hypertarget{namespaceforcebalance_1_1tinkerio_afc11cbd0e4ef0c777487ccb9708e0b08}{\index{forcebalance\-::tinkerio@{forcebalance\-::tinkerio}!logger@{logger}}
+\index{logger@{logger}!forcebalance::tinkerio@{forcebalance\-::tinkerio}}
+\paragraph[{logger}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-tinkerio.\-logger = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)}}\label{namespaceforcebalance_1_1tinkerio_afc11cbd0e4ef0c777487ccb9708e0b08}
+
+
+Definition at line 32 of file tinkerio.\-py.
+
+\hypertarget{namespaceforcebalance_1_1tinkerio_a714d1b926359d7d11559720e422ec34d}{\index{forcebalance\-::tinkerio@{forcebalance\-::tinkerio}!pdict@{pdict}}
+\index{pdict@{pdict}!forcebalance::tinkerio@{forcebalance\-::tinkerio}}
+\paragraph[{pdict}]{\setlength{\rightskip}{0pt plus 5cm}dictionary forcebalance.\-tinkerio.\-pdict}}\label{namespaceforcebalance_1_1tinkerio_a714d1b926359d7d11559720e422ec34d}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = \{\textcolor{stringliteral}{'VDW'}          : \{\textcolor{stringliteral}{'Atom'}:[1], 2:\textcolor{stringliteral}{'S'},3:\textcolor{stringliteral}{'T'},4:\textcolor{stringliteral}{'D'}\}, \textcolor{comment}{# Van der Waals distance, well depth, distance from
+       bonded neighbor?}
+2          \textcolor{stringliteral}{'BOND'}         : \{\textcolor{stringliteral}{'Atom'}:[1,2], 3:\textcolor{stringliteral}{'K'},4:\textcolor{stringliteral}{'B'}\},     \textcolor{comment}{# Bond force constant and equilibrium distance
+       (Angstrom)}
+3          \textcolor{stringliteral}{'ANGLE'}        : \{\textcolor{stringliteral}{'Atom'}:[1,2,3], 4:\textcolor{stringliteral}{'K'},5:\textcolor{stringliteral}{'B'}\},   \textcolor{comment}{# Angle force constant and equilibrium angle}
+4          \textcolor{stringliteral}{'UREYBRAD'}     : \{\textcolor{stringliteral}{'Atom'}:[1,2,3], 4:\textcolor{stringliteral}{'K'},5:\textcolor{stringliteral}{'B'}\},   \textcolor{comment}{# Urey-Bradley force constant and equilibrium
+       distance (Angstrom)}
+5          \textcolor{stringliteral}{'MCHARGE'}       : \{\textcolor{stringliteral}{'Atom'}:[1,2,3], 4:\textcolor{stringliteral}{''}\},          \textcolor{comment}{# Atomic charge}
+6          \textcolor{stringliteral}{'DIPOLE'}       : \{0:\textcolor{stringliteral}{'X'},1:\textcolor{stringliteral}{'Y'},2:\textcolor{stringliteral}{'Z'}\},             \textcolor{comment}{# Dipole moment in local frame}
+7          \textcolor{stringliteral}{'QUADX'}        : \{0:\textcolor{stringliteral}{'X'}\},                         \textcolor{comment}{# Quadrupole moment, X component}
+8          \textcolor{stringliteral}{'QUADY'}        : \{0:\textcolor{stringliteral}{'X'},1:\textcolor{stringliteral}{'Y'}\},                   \textcolor{comment}{# Quadrupole moment, Y component}
+9          \textcolor{stringliteral}{'QUADZ'}        : \{0:\textcolor{stringliteral}{'X'},1:\textcolor{stringliteral}{'Y'},2:\textcolor{stringliteral}{'Z'}\},             \textcolor{comment}{# Quadrupole moment, Y component}
+10          \textcolor{stringliteral}{'POLARIZE'}     : \{\textcolor{stringliteral}{'Atom'}:[1], 2:\textcolor{stringliteral}{'A'},3:\textcolor{stringliteral}{'T'}\},       \textcolor{comment}{# Atomic dipole polarizability}
+11          \textcolor{stringliteral}{'BOND-CUBIC'}   : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},    \textcolor{comment}{# Below are global parameters.}
+12          \textcolor{stringliteral}{'BOND-QUARTIC'} : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+13          \textcolor{stringliteral}{'ANGLE-CUBIC'}  : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+14          \textcolor{stringliteral}{'ANGLE-QUARTIC'}: \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+15          \textcolor{stringliteral}{'ANGLE-PENTIC'} : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+16          \textcolor{stringliteral}{'ANGLE-SEXTIC'} : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+17          \textcolor{stringliteral}{'DIELECTRIC'}   : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+18          \textcolor{stringliteral}{'POLAR-SOR'}    : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\}
+19                                                 \textcolor{comment}{# Ignored for now: stretch/bend coupling, out-of-plane
+       bending,}
+20                                                 \textcolor{comment}{# torsional parameters, pi-torsion, torsion-torsion}
+21          \}
+\end{DoxyCode}
+
+
+Definition at line 34 of file tinkerio.\-py.
+
