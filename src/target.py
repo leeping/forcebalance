@@ -423,7 +423,7 @@ class RemoteTarget(Target):
         # output:
         #   objective.p: pickled objective function dictionary
         #   indicate.log: results of target.indicate() written to file
-        forcebalance.nifty.queue_up(wq, "python rtarget.py > %s_%i.out" % (self.name, Counter()),
+        forcebalance.nifty.queue_up(wq, "python rtarget.py > %s_%i.out 2>&1" % (self.name, Counter()),
             ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
             ['%s_%i_objective.p' % (self.name, Counter()), '%s_%i_indicate.log' % (self.name, Counter()), '%s_%i.out' % (self.name, Counter())],
             tgt=self)
