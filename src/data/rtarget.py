@@ -20,7 +20,7 @@ options['root'] = os.getcwd()
 forcefield.make(mvals)
 
 # set up and evaluate target
-tar = tarfile.open("target.tar.bz2", "r")
+tar = tarfile.open("%s.tar.bz2" % tgt_opts["name"], "r")
 tar.extractall()
 tar.close()
 
@@ -29,12 +29,12 @@ Tgt.submit_jobs(mvals, AGrad = True, AHess = True)
 
 Ans = Tgt.sget(mvals, AGrad=True, AHess=True)
 
-with open('%s_objective.p' % id_string, 'w') as f:
+with open('objective_%s.p' % id_string, 'w') as f:
     forcebalance.nifty.lp_dump(Ans, f)        # or some other method of storing resulting objective
 
 # also run target.indicate()
 logger = forcebalance.output.getLogger("forcebalance")
-logger.addHandler(forcebalance.output.RawFileHandler('%s_indicate.log' % id_string))
+logger.addHandler(forcebalance.output.RawFileHandler('indicate_%s.log' % id_string))
 Tgt.indicate()
 
 print "\n"
