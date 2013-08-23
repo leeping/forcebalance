@@ -408,11 +408,17 @@ class RemoteTarget(Target):
         self.remote_indicate = ""
         
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
-        id_string = "%s_%i" % (self.name, Counter())
+        n=0
+        id_string = "%s_%i-%i" % (self.name, Counter(), n)
+        
+        while os.path.exists('%s.out' % id_string):
+            n+=1
+            id_string = "%s_%i-%i" % (self.name, Counter(), n)
+        
         with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
-        forcebalance.nifty.LinkFile(os.path.join(self.root,"temp", self.name, "target.tar.bz2"),"target.tar.bz2")
+        forcebalance.nifty.LinkFile(os.path.join(self.root,"temp", self.name, "target.tar.bz2"),"%s.tar.bz2" % self.name)
         
         wq = getWorkQueue()
         
@@ -425,14 +431,16 @@ class RemoteTarget(Target):
         #   objective.p: pickled objective function dictionary
         #   indicate.log: results of target.indicate() written to file
         forcebalance.nifty.queue_up(wq, "python rtarget.py > %s.out 2>&1" % id_string,
-            ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
-            ['%s_objective.p' % id_string, '%s_indicate.log' % id_string, '%s.out' % id_string],
+            ["forcebalance.p", "rtarget.py", "%s.tar.bz2" % self.name],
+            ['objective_%s.p' % id_string, 'indicate_%s.log' % id_string, '%s.out' % id_string],
             tgt=self)
+            
+        self.id_string = id_string
 
     def get(self,mvals,AGrad=False,AHess=False):
-        with open('%s_%i_indicate.log' % (self.name, Counter())) as f:
+        with open('indicate_%s.log' % self.id_string, 'r') as f:
             self.remote_indicate = f.read()
-        with open('%s_%i_objective.p' % (self.name, Counter()),'r') as f:
+        with open('objective_%s.p' % self.id_string, 'r') as f:
             return forcebalance.nifty.lp_load(f)
         
     def indicate(self):
