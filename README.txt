@@ -7,6 +7,9 @@ If you're reading this, you are probably looking for help. :)
 The main ForceBalance project website can be found at
 https://simtk.org/home/forcebalance
 
+The ForceBalance source code is hosted at
+http://www.github.com/leeping/forcebalance
+
 There is documentation available online in html at:
 http://leeping.github.io/forcebalance/doc/html/index.html
 
