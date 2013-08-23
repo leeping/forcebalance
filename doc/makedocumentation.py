@@ -227,7 +227,7 @@ def build_config():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--interactive', '-i', action='store_true', help="run in interactive mode, pausing before each command")
-    parser.add_argument('--clean', '-k', action='store_true', help="remove temporary files after script is complete")
+    parser.add_argument('--clean', '-k', action='store_true', help="remove temporary files after the script is complete")
     parser.add_argument('--configure', '-c', action='store_true', help="generate doxygen configuration files from templates")
     parser.add_argument('--upstream', '-u', action='store_true', help="push updated documentation to upstream github repository")
     args = parser.parse_args()
