@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.8.25)  25 AUG 2013 11:23
+This is pdfTeX, Version 3.1415926-1.40.10 (TeX Live 2009/Debian) (format=pdflatex 2013.8.25)  25 AUG 2013 11:24
 entering extended mode
  %&-line parsing enabled.
 **refman
@@ -1152,7 +1152,7 @@ nts/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/urw/courier/ucrr8a.pfb>
 -texlive/fonts/type1/urw/helvetic/uhvb8ac.pfb></usr/share/texmf-texlive/fonts/t
 ype1/urw/helvetic/uhvbo8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/helveti
 c/uhvr8a.pfb></usr/share/texmf-texlive/fonts/type1/urw/helvetic/uhvro8a.pfb>
-Output written on refman.pdf (40 pages, 1568376 bytes).
+Output written on refman.pdf (40 pages, 1568350 bytes).
 PDF statistics:
  439 PDF objects out of 1000 (max. 8388607)
  97 named destinations out of 1000 (max. 500000)
