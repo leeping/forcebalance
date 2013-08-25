@@ -1288,7 +1288,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 
 @li <b> GMXPATH </b> (String)
 \n<b> One-line description </b>: Path for GROMACS executables (if not the default)
-\n<b> Default Value </b>: /home/leeping/opt/gromacs-4.5.5/bin
+\n<b> Default Value </b>: /home/leeping/opt/gromacs-4.5.5-double/bin
 \n<b> Scope </b>: Targets that use GROMACS (<b><em>Required</em></b>)
 \n<b> Full description </b>: Specify the path where GROMACS executables are installed, most likely ending in 'bin'.
                              Note that executables are only installed 'bin' if the program is installed using 'make install';
@@ -1482,7 +1482,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 
 @li <b> TINKERPATH </b> (String)
 \n<b> One-line description </b>: Path for TINKER executables (if not the default)
-\n<b> Default Value </b>: /home/leeping/opt/tinker-6.1.01-intel/bin
+\n<b> Default Value </b>: 
 \n<b> Scope </b>: Targets that use TINKER (<b><em>Required</em></b>)
 \n<b> Recommendation </b>: Depends on your local installation and environment.
 

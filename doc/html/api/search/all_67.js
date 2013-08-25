@@ -27,7 +27,7 @@ var searchData=
   ['gmxio_2epy',['gmxio.py',['../gmxio_8py.html',1,'']]],
   ['gmxqpio_2epy',['gmxqpio.py',['../gmxqpio_8py.html',1,'']]],
   ['gointo',['GoInto',['../namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36',1,'forcebalance::nifty']]],
-  ['goodstep',['GoodStep',['../namespaceforcebalance_1_1optimizer.html#ab43948ecf30c90d319e0c0b107fe484a',1,'forcebalance::optimizer.GoodStep'],['../namespaceforcebalance_1_1optimizer.html#a638d98f2fea0c85ac05d0cf5f7efef84',1,'forcebalance::optimizer.GOODSTEP()']]],
+  ['goodstep',['GOODSTEP',['../namespaceforcebalance_1_1optimizer.html#a638d98f2fea0c85ac05d0cf5f7efef84',1,'forcebalance::optimizer.GOODSTEP()'],['../namespaceforcebalance_1_1optimizer.html#ab43948ecf30c90d319e0c0b107fe484a',1,'forcebalance::optimizer.GoodStep']]],
   ['grad',['Grad',['../classforcebalance_1_1optimizer_1_1Optimizer.html#afda86a3f46feafc0f581f4e6f223ebcf',1,'forcebalance::optimizer::Optimizer']]],
   ['gradd',['gradd',['../classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a81fffe9a1474f8b3fcb1c96659042cdb',1,'forcebalance::psi4io::RDVR3_Psi4']]],
   ['gradient',['Gradient',['../classforcebalance_1_1optimizer_1_1Optimizer.html#ac5adf24cf3ea3976eb67f75b6b89d101',1,'forcebalance::optimizer::Optimizer']]],

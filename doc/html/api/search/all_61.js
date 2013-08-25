@@ -28,6 +28,8 @@ var searchData=
   ['all_5fpairwise_5frmsd',['all_pairwise_rmsd',['../classforcebalance_1_1molecule_1_1Molecule.html#af412b655371674434ec63b4bfea6d8c0',1,'forcebalance::molecule::Molecule']]],
   ['allsplit',['allsplit',['../namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3',1,'forcebalance::nifty']]],
   ['allvariablenames',['AllVariableNames',['../namespaceforcebalance_1_1molecule.html#ab103b4aacb65cce6b558135c39a6e9a4',1,'forcebalance::molecule']]],
+  ['alpha_5fexp',['Alpha_exp',['../namespaceforcebalance_1_1data.html#aa22aaf25066bf8d28b16de90a229ab14',1,'forcebalance::data']]],
+  ['alpha_5fwt',['Alpha_wt',['../namespaceforcebalance_1_1data.html#ac28ea53dfde9bd9108ff2b1d5205c454',1,'forcebalance::data']]],
   ['amberio_2epy',['amberio.py',['../amberio_8py.html',1,'']]],
   ['amom',['amom',['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#a63e3817ced77c19c882858dca1511c41',1,'forcebalance::psi4io::GBS_Reader']]],
   ['anneal',['Anneal',['../classforcebalance_1_1optimizer_1_1Optimizer.html#a183911848e43ca0be1893b87290dc31e',1,'forcebalance::optimizer::Optimizer']]],

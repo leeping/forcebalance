@@ -17,7 +17,7 @@ var searchData=
   ['weight_5finfo',['weight_info',['../namespaceforcebalance_1_1liquid.html#a6f7d54263236f8788c319aee86b460b6',1,'forcebalance::liquid']]],
   ['weighted_5fvariance',['weighted_variance',['../namespaceforcebalance_1_1abinitio.html#aba970cb59bab95eec79027ea05655110',1,'forcebalance::abinitio']]],
   ['weighted_5fvariance2',['weighted_variance2',['../namespaceforcebalance_1_1abinitio.html#ab9554761125a4ec7c3c13d6ae4ea537d',1,'forcebalance::abinitio']]],
-  ['weights',['weights',['../classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#ae76136a1b3ab33adaf25ea357f1cfb84',1,'forcebalance::gmxqpio::Monomer_QTPIE']]],
+  ['weights',['weights',['../classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#ae76136a1b3ab33adaf25ea357f1cfb84',1,'forcebalance::gmxqpio::Monomer_QTPIE.weights()'],['../namespaceforcebalance_1_1data.html#a56682bb9f72fbaf228f67a9b7c3b260c',1,'forcebalance::data.Weights()']]],
   ['whamboltz',['whamboltz',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a8f3cbe570dfaf74f84f71817cd3fb008',1,'forcebalance::abinitio::AbInitio']]],
   ['whamboltz_5fwts',['whamboltz_wts',['../classforcebalance_1_1abinitio_1_1AbInitio.html#ae5c60f421336c2ecb716be16b8d51fdf',1,'forcebalance::abinitio::AbInitio']]],
   ['which',['which',['../namespaceforcebalance_1_1nifty.html#aa1ff334c4b4e30e91978b91d9a9ec065',1,'forcebalance::nifty']]],

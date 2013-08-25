@@ -13,6 +13,8 @@ var searchData=
   ['comms',['comms',['../classforcebalance_1_1molecule_1_1Molecule.html#a5e092c726455a18c9300f5c5362121d8',1,'forcebalance::molecule::Molecule']]],
   ['compounds',['compounds',['../classforcebalance_1_1Mol2_1_1mol2__set.html#a8f6f74cef966e8862548505600451c15',1,'forcebalance::Mol2::mol2_set']]],
   ['contraction_5fnumber',['contraction_number',['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#a0abd86255911daa2c9c1b5fbbd073d02',1,'forcebalance::psi4io::GBS_Reader']]],
+  ['cp_5fexp',['Cp_exp',['../namespaceforcebalance_1_1data.html#a05528f17d34352e3993ef0ffbc5f45f5',1,'forcebalance::data']]],
+  ['cp_5fwt',['Cp_wt',['../namespaceforcebalance_1_1data.html#aaf9b38b123578380133a90c041d25f8b',1,'forcebalance::data']]],
   ['cpqm',['cpqm',['../classforcebalance_1_1counterpoise_1_1Counterpoise.html#ae7622f5b81661b6c993fb1eae9b5a2dd',1,'forcebalance::counterpoise::Counterpoise']]],
   ['cptypes',['cptypes',['../namespaceforcebalance_1_1custom__io.html#a509d4c2b5eeee4278adde414e55eb560',1,'forcebalance::custom_io']]]
 ];

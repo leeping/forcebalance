@@ -40,6 +40,8 @@ var searchData=
   ['counter',['Counter',['../namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b',1,'forcebalance::optimizer']]],
   ['counterpoise',['Counterpoise',['../classforcebalance_1_1counterpoise_1_1Counterpoise.html',1,'forcebalance::counterpoise']]],
   ['counterpoise_2epy',['counterpoise.py',['../counterpoise_8py.html',1,'']]],
+  ['cp_5fexp',['Cp_exp',['../namespaceforcebalance_1_1data.html#a05528f17d34352e3993ef0ffbc5f45f5',1,'forcebalance::data']]],
+  ['cp_5fwt',['Cp_wt',['../namespaceforcebalance_1_1data.html#aaf9b38b123578380133a90c041d25f8b',1,'forcebalance::data']]],
   ['cpqm',['cpqm',['../classforcebalance_1_1counterpoise_1_1Counterpoise.html#ae7622f5b81661b6c993fb1eae9b5a2dd',1,'forcebalance::counterpoise::Counterpoise']]],
   ['cptypes',['cptypes',['../namespaceforcebalance_1_1custom__io.html#a509d4c2b5eeee4278adde414e55eb560',1,'forcebalance::custom_io']]],
   ['create_5fmvals',['create_mvals',['../classforcebalance_1_1forcefield_1_1FF.html#ae5fba4d3e22f210632ead3653e6e12dd',1,'forcebalance::forcefield::FF']]],

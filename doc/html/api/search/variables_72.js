@@ -12,6 +12,8 @@ var searchData=
   ['resid',['resid',['../classforcebalance_1_1molecule_1_1Molecule.html#afcd4c8e1671af626d0267a243e69530d',1,'forcebalance::molecule::Molecule']]],
   ['resname',['resname',['../classforcebalance_1_1molecule_1_1Molecule.html#a4aebc6ada9bda74a6740568d4f3658eb',1,'forcebalance::molecule::Molecule']]],
   ['respterm',['respterm',['../classforcebalance_1_1abinitio_1_1AbInitio.html#ac4f8e85daeccb2e46b724eddc76d38e1',1,'forcebalance::abinitio::AbInitio']]],
+  ['rho_5fexp',['Rho_exp',['../namespaceforcebalance_1_1data.html#adc1abf955f8b53a4451b5e409d1cb48e',1,'forcebalance::data']]],
+  ['rho_5fwt',['Rho_wt',['../namespaceforcebalance_1_1data.html#a215c92b741d8fdf8d1d207f4ba004757',1,'forcebalance::data']]],
   ['rmsd_5fpart',['rmsd_part',['../classforcebalance_1_1binding_1_1BindingEnergy.html#a4af9005899de2d060261e535a2e6b465',1,'forcebalance::binding::BindingEnergy']]],
   ['rmsddict',['RMSDDict',['../classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3',1,'forcebalance::binding::BindingEnergy']]],
   ['rs',['rs',['../classforcebalance_1_1forcefield_1_1FF.html#a3424d0271d9eebf1962ad87286ec9fc3',1,'forcebalance::forcefield::FF']]],
