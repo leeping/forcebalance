@@ -204,7 +204,8 @@ def doClean():
     #raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % forcebalance_dir)
     print "Removing the directory tree prior to install: %s" % forcebalance_dir
     os.system("rm -f %s/../forcebalance-*.egg-info" % forcebalance_dir)
-    shutil.rmtree(forcebalance_dir)
+    if os.path.exists(forcebalance_dir):
+        shutil.rmtree(forcebalance_dir)
     
 def main():
     # if len(os.path.split(__file__)[0]) > 0:
