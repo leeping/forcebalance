@@ -47,6 +47,18 @@ class RawFileHandler(FileHandler):
         self.stream.write(message)
         self.flush()
         
+class CleanStreamHandler(StreamHandler):
+    """Similar to RawStreamHandler except it does not write terminal escape codes.
+    Use this for 'plain' terminal output without any fancy colors or formatting"""
+    def __init__(self, stream = sys.stdout):
+        super(CleanStreamHandler, self).__init__(stream)
+    
+    def emit(self, record):
+        message = record.getMessage()
+        message = re.sub("\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m", "", message)
+        self.stream.write(message)
+        self.flush()
+        
 class CleanFileHandler(FileHandler):
     """File handler that does not write terminal escape codes and carriage returns
     to files. Use this when writing to a file that will probably not be viewed in a terminal"""

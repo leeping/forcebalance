@@ -153,7 +153,9 @@ class ForceBalanceTestResult(unittest.TestResult):
         self.logger.debug("\nCompleted test suite\n")
         self.logger.info("\n<run=%d errors=%d fail=%d in %.2fs>\n" % (self.testsRun,len(self.errors),len(self.failures), self.runTime))
         if self.wasSuccessful(): self.logger.info("All tests passed successfully\n")
-        else: self.logger.info("Some tests failed or had errors!\n")
+        else: 
+            self.logger.info("Some tests failed or had errors!\n")
+            sys.exit(1)
 
 class ForceBalanceTestRunner(object):
     """This test runner class manages the running and logging of tests.

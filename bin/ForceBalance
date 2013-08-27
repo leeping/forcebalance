@@ -19,7 +19,7 @@ blkwht=0
 
 show_help() 
 {
-    echo "Usage: `basename $0` [options] ForceBalance.py job.in [job.out]"
+    echo "Usage: `basename $0` [options] ForceBalance job.in [job.out]"
     echo "Values in brackets are optional."
     echo "Options are:"
     echo "  -b               Black and white output file (no ANSI colors in output file)."

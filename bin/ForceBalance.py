@@ -2,7 +2,7 @@
 
 """ @package ForceBalance
 
-Executable script for starting ForceBalance. """
+Executable  script for starting ForceBalance. """
 
 import sys, re
 import argparse
@@ -56,7 +56,7 @@ def process(word, color):
     return Answer
 
 def main():
-    printcool("Welcome to ForceBalance version 1.1! =D\nForce Field Optimization System\nAuthor: Lee-Ping Wang", ansi="1", bold=True, minwidth=64)
+    printcool("Welcome to ForceBalance version 1.2! =D\nForce Field Optimization System\nAuthor: Lee-Ping Wang, Arthur Vigil", ansi="1", bold=True, minwidth=64)
     logostr = """
                           ,'+++                                        
                        ,++++++.      .:,,.                              
