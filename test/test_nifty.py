@@ -1,14 +1,24 @@
 from __init__ import ForceBalanceTestCase
 import unittest
 import numpy
-import os
-import work_queue
+import os, re
+import subprocess
 import forcebalance
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 from collections import defaultdict
 
+try:
+    import work_queue
+except ImportError:
+    work_queue = None
+
 class TestNifty(ForceBalanceTestCase):
+    def setUp(self):
+        # skip work_queue tests if work_queue could not be imported
+        if re.match(".*work_queue.*", self.id().split('.')[-1]) and not work_queue:
+            self.skipTest("work_queue module not installed")
+        
     def test_nifty_functions(self):
         """Check utility functions in forcebalance.nifty"""
 
@@ -76,22 +86,41 @@ class TestNifty(ForceBalanceTestCase):
     def test_work_queue_functions(self):
         """Check work_queue functions behave as expected"""
         
-        self.logger.debug("Checking Work Queue is initialized to None...\n")
+        self.logger.debug("\nChecking Work Queue is initialized to None...\n")
         self.assertEqual(forcebalance.WORK_QUEUE, None,
             msg="\nUnexpected initialization of WORK_QUEUE to %s" % str(forcebalance.WORK_QUEUE))
             
-        self.logger.info("\n")
+        #self.logger.info("\n")
             
-        createWorkQueue(30000)
+        createWorkQueue(30000, debug=False)
+        self.logger.debug("Created work queue, verifying...\n")
         self.assertEqual(type(forcebalance.WORK_QUEUE), work_queue.WorkQueue,
             msg="\nExpected WORK_QUEUE to be a WorkQueue object, but got a %s instead" % str(type(forcebalance.WORK_QUEUE)))
             
+        self.logger.debug("Checking that getWorkQueue() returns valid WorkQueue object...\n")
         wq = getWorkQueue()
         self.assertEqual(type(wq), work_queue.WorkQueue,
             msg="\nExpected getWorkQueue() to return a WorkQueue object, but got %s instead" % str(type(forcebalance.WORK_QUEUE)))
         
-        queue_up(wq, "echo work queue test > test.job", [], ["test.job"], tgt=None, verbose=False)
-        self.assertEqual(wq.stats.tasks_waiting, 1, msg = "\nExpected queue to have a task waiting")
+        worker_program = which('work_queue_worker')
+        if worker_program != '':
+            self.logger.debug("Submitting test job 'echo work queue test > test.job'\n")
+            queue_up(wq, "echo work queue test > test.job", [], ["test.job"], tgt=None, verbose=False)
+            self.logger.debug("Verifying that work queue has a task waiting\n")
+            self.assertEqual(wq.stats.tasks_waiting, 1, msg = "\nExpected queue to have a task waiting")
+            
+            self.logger.debug("Creating work_queue_worker process... ")
+            worker = subprocess.Popen([os.path.join(worker_program, "work_queue_worker"), "localhost", str(wq.port)], stdout=subprocess.PIPE)
+            self.addCleanup(worker.terminate)
+            self.logger.debug("Done\nTrying to get task from work queue\n")
+            
+            self.logger.debug("Calling wq_wait1 to fetch task\n")
+            wq_wait1(wq, wait_time=5)
+            self.logger.debug("wq_wait1(wq, wait_time=5) finished\n")
+            self.logger.debug("Checking that wq.stats.total_tasks_complete == 1\n")
+            self.assertEqual(wq.stats.total_tasks_complete, 1, msg = "\nExpected queue to have a task completed")
+        else:
+            self.logger.debug("work_queue_worker is not in the PATH.")
         
         forcebalance.WORK_QUEUE = None
         forcebalance.WQIDS = defaultdict(list)

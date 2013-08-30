@@ -1,10 +1,10 @@
-===========
-ForceBalance
-===========
+#==================#
+#|  ForceBalance  |#
+#==================#
 
 If you're reading this, you are probably looking for help. :)
 
-The main ForceBalance project website can be found at
+The ForceBalance project website is located at
 https://simtk.org/home/forcebalance
 
 There is documentation available online in html at:
@@ -13,9 +13,9 @@ http://leeping.github.io/forcebalance/doc/html/index.html
 You can also download the documentation in pdf format here:
 http://leeping.github.io/forcebalance/doc/ForceBalance-Manual.pdf
 
-=========
-Quick help
-=========
+#==================#
+#|   Quick Help   |#
+#==================#
 
 To build the package:
 

@@ -2,23 +2,41 @@
 """
 setup.py: Install ForceBalance. 
 """
-VERSION="1.1" # Make sure to change the version here, and also in bin/ForceBalance.py, doc/header.tex and doc/doxygen.cfg!
-__author__ = "Lee-Ping Wang"
-__version__ = VERSION
+__author__ = "Lee-Ping Wang, Arthur Vigil"
 
 from distutils.sysconfig import get_config_var
 from distutils.core import setup,Extension
-import os,sys
+import os,sys,re
 import shutil
 import glob
 import argparse
+import subprocess
 
 try:
     import numpy
+    import scipy
 except ImportError:
-    print "Couldn't import numpy but this is required to install ForceBalance"
-    print "Please install the numpy package and try again"
+    print "Error importing numpy and scipy but these are required to install ForceBalance"
+    print "Please make sure the numpy and scipy modules are installed and try again"
     exit()
+    
+# use git to find current version, or read from .__version__    
+#===================================#
+#| Make sure to update the version |#
+#| manually in doc/header.tex and  |#
+#| doc/api_header.tex!!            |#
+#===================================#
+versioning_file = os.path.join(os.path.dirname(__file__), '.__version__')
+try:
+    git_describe = subprocess.check_output(["git", "describe"]).strip()
+    __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
+    
+    with open(versioning_file, 'w') as fh:
+        fh.write(__version__)
+    subprocess.call(["git", "add", ".__version__"])
+except:
+    with open(versioning_file, 'r') as fh:
+        __version__ = fh.read().strip()
 
 # DCD file reading module
 DCD = Extension('forcebalance/_dcdlib',
@@ -124,8 +142,8 @@ def buildKeywordDictionary(args):
     from distutils.core import Extension
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
-    setupKeywords["version"]           = VERSION
-    setupKeywords["author"]            = "Lee-Ping Wang"
+    setupKeywords["version"]           = __version__
+    setupKeywords["author"]            = "Lee-Ping Wang, Arthur Vigil"
     setupKeywords["author_email"]      = "leeping@stanford.edu"
     setupKeywords["license"]           = "GPL 3.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
@@ -158,7 +176,7 @@ def buildKeywordDictionary(args):
 
     """
 
-    if args.clean: doClean()
+    if not args.dirty: doClean()
     if args.test:
         setupKeywords["packages"].append("forcebalance.test")
         setupKeywords["package_dir"].update({"forcebalance.test" : "test"})
@@ -175,7 +193,7 @@ def buildKeywordDictionary(args):
 def doClean():
     """Remove existing forcebalance module folder before installing"""
     try:
-        dir=os.path.dirname(__import__('forcebalance').__file__)
+        forcebalance_dir=os.path.dirname(__import__('forcebalance').__file__)
     except ImportError:
         print "Couldn't find existing forcebalance installation. Nothing to clean...\n"
         return
@@ -183,8 +201,11 @@ def doClean():
         print "Couldn't read forcebalance location... Continuing with regular install"
         return
 
-    raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % dir)
-    shutil.rmtree(dir)
+    #raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % forcebalance_dir)
+    print "Removing the directory tree prior to install: %s" % forcebalance_dir
+    os.system("rm -f %s/../forcebalance-*.egg-info" % forcebalance_dir)
+    if os.path.exists(forcebalance_dir):
+        shutil.rmtree(forcebalance_dir)
     
 def main():
     # if len(os.path.split(__file__)[0]) > 0:
@@ -192,7 +213,7 @@ def main():
 
     ## Install options
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--clean', action='store_true', help='remove previously installed forcebalance installation first')
+    parser.add_argument('-d', '--dirty', action='store_true', help="don't remove previously installed forcebalance installation first")
     parser.add_argument('-t', '--test', action='store_true', help='install forcebalance test suite')
     parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)

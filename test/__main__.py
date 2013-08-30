@@ -15,6 +15,7 @@ def getOptions():
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--exclude', action='store_true', help="exclude specified modules from test loading")
     parser.add_argument('-p', '--pretend', action='store_true', help="load tests but don't actually run them")
+    parser.add_argument('--no-color', action='store_true', help="print test results in black and white (no extra formatting)")
     loglevel = parser.add_mutually_exclusive_group()
     loglevel.add_argument('-v', '--verbose', dest='loglevel', action='store_const', const=forcebalance.output.DEBUG, default=forcebalance.output.INFO)
     loglevel.add_argument('-q', '--quiet', dest='loglevel', action='store_const', const=forcebalance.output.WARNING, default=forcebalance.output.INFO)
@@ -116,7 +117,10 @@ def runHeadless(options):
     shutil.rmtree('/tmp/forcebalance')
 
 def run(options):
-    forcebalance.output.getLogger("forcebalance.test").addHandler(forcebalance.output.RawStreamHandler(sys.stderr))
+    if options["no_color"]:
+        forcebalance.output.getLogger("forcebalance.test").addHandler(forcebalance.output.CleanStreamHandler(sys.stderr))
+    else:
+        forcebalance.output.getLogger("forcebalance.test").addHandler(forcebalance.output.RawStreamHandler(sys.stderr))
     runner=ForceBalanceTestRunner()
     runner.run(**options)
 

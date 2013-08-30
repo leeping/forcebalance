@@ -5,7 +5,7 @@
 """
 
 import os
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
