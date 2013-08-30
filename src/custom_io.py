@@ -9,7 +9,7 @@ rather, they are computed within our program.
 """
 
 from re import match, sub
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 
 ## Types of counterpoise correction
 cptypes = [None, 'CPGAUSS', 'CPEXPG', 'CPGEXP']

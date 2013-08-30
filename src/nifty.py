@@ -23,7 +23,7 @@ from numpy import array, diag, dot, eye, mat, mean, transpose
 from numpy.linalg import norm, svd
 import threading
 import pickle
-import time, datetime
+import time
 import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
@@ -71,8 +71,8 @@ def encode(l):
 
 def segments(e):
     # Takes encoded input.
-    begins = np.array([sum([k[0] for k in e][:j]) for j,i in enumerate(e) if i[1] == 1])
-    lens = np.array([i[0] for i in e if i[1] == 1])
+    begins = array([sum([k[0] for k in e][:j]) for j,i in enumerate(e) if i[1] == 1])
+    lens = array([i[0] for i in e if i[1] == 1])
     return [(i, i+j) for i, j in zip(begins, lens)]
 
 def commadash(l):
@@ -418,11 +418,11 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     """
 
     # Create numpy copies of input arguments.
-    A_n = np.array(A_n)
+    A_n = array(A_n)
     if B_n is not None:
-        B_n = np.array(B_n)
+        B_n = array(B_n)
     else:
-        B_n = np.array(A_n)
+        B_n = array(A_n)
     # Get the length of the timeseries.
     N = A_n.size
     # Be sure A_n and B_n have the same dimensions.
@@ -549,8 +549,9 @@ def getWorkQueue():
 def getWQIds():
     return forcebalance.WQIDS
 
-def createWorkQueue(wq_port):
-    work_queue.set_debug_flag('all')
+def createWorkQueue(wq_port, debug=True):
+    if debug:
+        work_queue.set_debug_flag('all')
     forcebalance.WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
     forcebalance.WORK_QUEUE.specify_name('forcebalance')
     forcebalance.WORK_QUEUE.specify_keepalive_timeout(8640000)
@@ -654,7 +655,7 @@ def wq_wait1(wq, wait_time=10, verbose=False):
             logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
         else:
             logger.info("%s : %i/%i workers busy; %i/%i jobs complete\r" %\
-            (datetime.datetime.fromtimestamp(time.mktime(datetime.datetime.now().timetuple())).ctime(),
+            (time.ctime(),
              wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
              wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched)) 
             if time.time() - wq_wait1.t0 > 900:

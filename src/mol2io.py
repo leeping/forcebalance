@@ -11,7 +11,7 @@ import os
 from re import match, sub
 from nifty import isint, isfloat
 from numpy import array
-from basereader import BaseReader
+from forcebalance import BaseReader
 from subprocess import Popen, PIPE
 
 mol2_pdict = {'COUL':{'Atom':[1], 6:''}}
