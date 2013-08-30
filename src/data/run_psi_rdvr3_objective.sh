@@ -24,11 +24,12 @@ if [ $USER == "skokkila" ] ; then
     export PSISCRATCH=/u/skokkila
 fi
 
-if [ ! -f $PSISCRATCH/$1.dat ] ; then
-    echo "Running psi4 build.dat since $PSISCRATCH/$1.dat does not exist"
-    psi4 build.dat
-fi
+#if [ ! -f $PSISCRATCH/$1.dat ] ; then
+#    echo "Running psi4 build.dat since $PSISCRATCH/$1.dat does not exist"
+#    psi4 build.dat
+#fi
 
+echo "--> objective.dat <--"
 cat objective.dat
 
 psi4 objective.dat
