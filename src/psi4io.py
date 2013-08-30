@@ -371,7 +371,7 @@ class RDVR3_Psi4(Target):
                 sys.exit()
             else:
                 input_files = [(os.path.join(this_apath, i), i) for i in glob.glob("*")]
-                input_files += [(os.path.join(self.tgtdir,d,"build.dat"), "build.dat")]
+                # input_files += [(os.path.join(self.tgtdir,d,"build.dat"), "build.dat")]
                 input_files += [(os.path.join(os.path.split(__file__)[0],"data","run_psi_rdvr3_objective.sh"), "run_psi_rdvr3_objective.sh")]
                 logger.info("\r")
                 queue_up_src_dest(wq,"sh run_psi_rdvr3_objective.sh %s &> run_psi_rdvr3_objective.log" % mname,
