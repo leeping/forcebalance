@@ -3,6 +3,8 @@
 . /etc/profile
 . $HOME/.bashrc
 
+export PATH=/opt/python/2.7.2/bin:$PATH
+export LD_LIBRARY_PATH=/opt/python/2.7.2/lib:$LD_LIBRARY_PATH
 module load psi/tip.opt
 
 echo "#=======================#"
