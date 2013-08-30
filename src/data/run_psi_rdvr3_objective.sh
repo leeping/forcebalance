@@ -19,8 +19,16 @@ echo "#=======================#"
 echo
 echo $@
 
+# Sara-specific hack.
+if [ $USER == "skokkila" ] ; then
+    export PSISCRATCH=/u/skokkila
+fi
+
 if [ ! -f $PSISCRATCH/$1.dat ] ; then
-    print "Running psi4 build.dat since $PSISCRATCH/$1.dat does not exist"
+    echo "Running psi4 build.dat since $PSISCRATCH/$1.dat does not exist"
     psi4 build.dat
 fi
+
+cat objective.dat
+
 psi4 objective.dat

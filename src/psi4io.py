@@ -365,6 +365,7 @@ class RDVR3_Psi4(Target):
                 else:
                     print >> o, line,
             o.close()
+            os.system("rm -f objective.out")
             if wq == None:
                 logger.info("There is no Work Queue!!!\n")
                 sys.exit()
@@ -381,9 +382,9 @@ class RDVR3_Psi4(Target):
         for d in self.objfiles:
             logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
             odir = os.path.join(os.getcwd(),d)
-            if os.path.exists(odir):
-                shutil.rmtree(odir)
-            os.makedirs(odir)
+            #if os.path.exists(odir):
+            #    shutil.rmtree(odir)
+            if not os.path.exists(odir): os.makedirs(odir)
             apath = os.path.join(odir, "current")
             submit_psi(apath, d, mvals)
             for p in range(self.FF.np):
@@ -406,9 +407,9 @@ class RDVR3_Psi4(Target):
         pvals = self.FF.make(mvals)
         ## Actually run PSI4.
         odir = os.path.join(os.getcwd(),d)
-        if os.path.exists(odir):
-            shutil.rmtree(odir)
-        os.makedirs(odir)
+        #if os.path.exists(odir):
+        #    shutil.rmtree(odir)
+        if not os.path.exists(odir): os.makedirs(odir)
         os.chdir(odir)
         o = open('objective.dat','w')
         for line in self.objfiles[d]:
@@ -421,6 +422,7 @@ class RDVR3_Psi4(Target):
             else:
                 print >> o, line,
         o.close()
+        os.system("rm -f objective.out")
         _exec("psi4 objective.dat", print_command=False)
         answer = float(open('objective.out').readlines()[0].split()[1])*self.factor
         os.chdir('..')
