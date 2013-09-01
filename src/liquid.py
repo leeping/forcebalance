@@ -338,7 +338,7 @@ class Liquid(Target):
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == 0 and self.manual:
-            warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=120)
+            warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
         if Counter() > 0 and (Counter == 1 or GoodStep()) and self.save_traj < 2:
