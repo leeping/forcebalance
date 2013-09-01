@@ -1205,7 +1205,6 @@ class Molecule(object):
         # Create a NetworkX graph object.
         G = MyG()
         bonds = [[] for i in range(self.na)]
-        lengths = []
         for i, a in enumerate(self.elem):
             G.add_node(i)
             if 'atomname' in self.Data:
@@ -1213,7 +1212,6 @@ class Molecule(object):
             nx.set_node_attributes(G,'e',{i:a})
             nx.set_node_attributes(G,'x',{i:self.xyzs[sn][i]})
         bond_bool = dxij[0] < BondThresh
-        nbond = 0
         for i, a in enumerate(bond_bool):
             if not a: continue
             (ii, jj) = AtomIterator[i]
@@ -1221,10 +1219,6 @@ class Molecule(object):
             bonds[ii].append(jj)
             bonds[jj].append(ii)
             G.add_edge(ii, jj)
-            lengths.append(dxij[0][i])
-            nbond += 1
-        for i in range(len(bonds)):
-            bonds[i] = sorted(bonds[i])
         return G
 
     def measure_dihedrals(self, i, j, k, l):
