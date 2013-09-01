@@ -142,7 +142,7 @@ import numpy as np
 from numpy import sin, cos, arcsin, arccos
 import imp
 import itertools
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict, defaultdict, namedtuple
 from ctypes import *
 from warnings import warn
 
@@ -579,6 +579,14 @@ def get_rotate_translate(matrix1,matrix2):
 
     trans_matrix = avg_pos2-np.dot(avg_pos1,rot_matrix)
     return trans_matrix, rot_matrix
+
+def cartesian_product2(arrays):
+    """ Form a Cartesian product of two NumPy arrays. """
+    la = len(arrays)
+    arr = np.empty([len(a) for a in arrays] + [la], dtype=int)
+    for i, a in enumerate(np.ix_(*arrays)):
+        arr[...,i] = a
+    return arr.reshape(-1, la)
 
 class Molecule(object):
     """ Lee-Ping's general file format conversion class.
@@ -1121,14 +1129,68 @@ class Molecule(object):
         if sn == None:
             sn = 0
         mindist = 1.0 # Any two atoms that are closer than this distance are bonded.
-        #Fac = 1.2     # Increase the threshold for determining whether atoms are bonded. 1.2 is conservative, 1.5 is crazy.
         # Create an atom-wise list of covalent radii.
         R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
-        # Create a list of 2-tuples corresponding to combinations of atomic indices.
-        # This is optimized and much faster than using itertools.combinations.
-        AtomIterator = np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=int), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=int))).T
+        # Create a list of 2-tuples corresponding to combinations of atomic indices using a grid algorithm.
+        mins = np.min(self.xyzs[sn],axis=0)
+        maxs = np.max(self.xyzs[sn],axis=0)
+        # Grid size in Angstrom.  This number is optimized for speed in a 15,000 atom system (united atom pentadecane).
+        gsz = 6.0
+        # Run algorithm to determine bonds.
+        # Decide if we want to use the grid algorithm.
+        use_grid = np.max(maxs - mins) > 2.0*gsz
+        if use_grid:
+            # Inside the grid algorithm.
+            # 1) Determine the left edges of the grid cells.
+            xgrd = np.arange(mins[0]-gsz, maxs[0], 2*gsz)
+            ygrd = np.arange(mins[0]-gsz, maxs[0], 2*gsz)
+            zgrd = np.arange(mins[0]-gsz, maxs[0], 2*gsz)
+            # 2) Grid cells are denoted by a three-index tuple.
+            gidx = list(itertools.product(range(len(xgrd)), range(len(ygrd)), range(len(zgrd))))
+            # 3) Build a dictionary which maps a grid cell to itself plus its neighboring grid cells.
+            # Two grid cells are defined to be neighbors if the differences between their x, y, z indices are at most 1.
+            gngh = OrderedDict()
+            amax = np.array(gidx[-1])
+            amin = np.array(gidx[0])
+            n27 = np.array(list(itertools.product([-1,0,1],repeat=3)))
+            for i in gidx:
+                gngh[i] = []
+                ai = np.array(i)
+                for j in n27:
+                    nj = ai+j
+                    if np.all(nj >= amin) and np.all(nj <= amax):
+                        gngh[i].append(tuple(nj))
+            # 4) Loop over the atoms and assign each to a grid cell.
+            # Note: I think this step becomes the bottleneck if we choose very small grid sizes.
+            gasn = OrderedDict([(i, []) for i in gidx])
+            for i in range(self.na):
+                xidx = -1
+                yidx = -1
+                zidx = -1
+                for j in xgrd:
+                    if self.xyzs[sn][i][0] < j: break
+                    xidx += 1
+                for j in ygrd:
+                    if self.xyzs[sn][i][1] < j: break
+                    yidx += 1
+                for j in zgrd:
+                    if self.xyzs[sn][i][2] < j: break
+                    zidx += 1
+                gasn[(xidx,yidx,zidx)].append(i)
+            # 5) Create list of 2-tuples corresponding to combinations of atomic indices.
+            # This is done by looping over pairs of neighboring grid cells and getting Cartesian products of atom indices inside.
+            # It may be possible to get a 2x speedup by eliminating forward-reverse pairs (e.g. (5, 4) and (4, 5) and duplicates (5,5).)
+            AtomIterator = []
+            for i in gasn:
+                for j in gngh[i]:
+                    AtomIterator.append(cartesian_product2([gasn[i], gasn[j]]))
+            AtomIterator = np.vstack(AtomIterator)
+        else:
+            # Create a list of 2-tuples corresponding to combinations of atomic indices.
+            # This is much faster than using itertools.combinations.
+            AtomIterator = np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=int), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=int))).T
+
         # Create a list of thresholds for determining whether a certain interatomic distance is considered to be a bond.
-        # BondThresh = np.fromiter([max(mindist,(R[i[0]] + R[i[1]])*Fac) for i in AtomIterator], dtype=float)
         BT0 = R[AtomIterator[:,0]]
         BT1 = R[AtomIterator[:,1]]
         BondThresh = (BT0+BT1) * Fac
@@ -1136,8 +1198,11 @@ class Molecule(object):
         try:
             dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
         except:
-            # Extremely inefficient implementation if importing contact doesn't work.
+            # Inefficient implementation if importing contact doesn't work.
+            print "Warning: Using inefficient distance algorithm because 'contact' module was not imported successfully."
             dxij = [np.array(list(itertools.chain(*[[np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i in range(j+1,self.na)] for j in range(self.na)])))]
+
+        # Create a NetworkX graph object.
         G = MyG()
         bonds = [[] for i in range(self.na)]
         lengths = []
@@ -1148,13 +1213,18 @@ class Molecule(object):
             nx.set_node_attributes(G,'e',{i:a})
             nx.set_node_attributes(G,'x',{i:self.xyzs[sn][i]})
         bond_bool = dxij[0] < BondThresh
+        nbond = 0
         for i, a in enumerate(bond_bool):
             if not a: continue
             (ii, jj) = AtomIterator[i]
+            if ii >= jj: continue
             bonds[ii].append(jj)
             bonds[jj].append(ii)
             G.add_edge(ii, jj)
             lengths.append(dxij[0][i])
+            nbond += 1
+        for i in range(len(bonds)):
+            bonds[i] = sorted(bonds[i])
         return G
 
     def measure_dihedrals(self, i, j, k, l):
