@@ -227,6 +227,10 @@ class ForceBalanceTestRunner(object):
             try:
                 tests.run(result)
             except KeyboardInterrupt:
+                # Adding this allows us to determine
+                # what is causing tests to hang indefinitely.
+                import traceback
+                traceback.print_exc()
                 self.logger.exception(msg="Test run cancelled by user")
             except:
                 self.logger.exception(msg="An unexpected exception occurred while running tests\n")
