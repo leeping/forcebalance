@@ -1126,7 +1126,7 @@ class Molecule(object):
         R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
         # Create a list of 2-tuples corresponding to combinations of atomic indices.
         # This is optimized and much faster than using itertools.combinations.
-        AtomIterator = np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=int), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=int))).T
+        AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
         # Create a list of thresholds for determining whether a certain interatomic distance is considered to be a bond.
         # BondThresh = np.fromiter([max(mindist,(R[i[0]] + R[i[1]])*Fac) for i in AtomIterator], dtype=float)
         BT0 = R[AtomIterator[:,0]]
