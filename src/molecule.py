@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated August 14, 2013                      |#
+#|                 Last updated September 1, 2013                     |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -142,7 +142,7 @@ import numpy as np
 from numpy import sin, cos, arcsin, arccos
 import imp
 import itertools
-from collections import OrderedDict, defaultdict, namedtuple
+from collections import OrderedDict, namedtuple
 from ctypes import *
 from warnings import warn
 
@@ -583,7 +583,7 @@ def get_rotate_translate(matrix1,matrix2):
 def cartesian_product2(arrays):
     """ Form a Cartesian product of two NumPy arrays. """
     la = len(arrays)
-    arr = np.empty([len(a) for a in arrays] + [la], dtype=int)
+    arr = np.empty([len(a) for a in arrays] + [la], dtype=np.int32)
     for i, a in enumerate(np.ix_(*arrays)):
         arr[...,i] = a
     return arr.reshape(-1, la)
@@ -1184,12 +1184,11 @@ class Molecule(object):
             for i in gasn:
                 for j in gngh[i]:
                     AtomIterator.append(cartesian_product2([gasn[i], gasn[j]]))
-            AtomIterator = np.vstack(AtomIterator)
+            AtomIterator = np.ascontiguousarray(np.vstack(AtomIterator))
         else:
             # Create a list of 2-tuples corresponding to combinations of atomic indices.
             # This is much faster than using itertools.combinations.
-            AtomIterator = np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=int), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=int))).T
-
+            AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
         # Create a list of thresholds for determining whether a certain interatomic distance is considered to be a bond.
         BT0 = R[AtomIterator[:,0]]
         BT1 = R[AtomIterator[:,1]]
@@ -1263,6 +1262,22 @@ class Molecule(object):
                 Mat[i,j] = rmsd
                 Mat[j,i] = rmsd
         return Mat
+
+    def pathwise_rmsd(self):
+        """ Find RMSD between frames along path. """
+        N = len(self)
+        Vec = np.zeros(N-1 ,dtype=float)
+        for i in range(N-1):
+            xyzi = self.xyzs[i].copy()
+            xyzi -= xyzi.mean(0)
+            j=i+1
+            xyzj = self.xyzs[j].copy()
+            xyzj -= xyzj.mean(0)
+            tr, rt = get_rotate_translate(xyzj, xyzi)
+            xyzj = np.dot(xyzj, rt) + tr
+            rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+            Vec[i] = rmsd
+        return Vec
 
     def align_center(self):
         self.align()
@@ -2144,6 +2159,9 @@ class Molecule(object):
         if 'qm_forces' in Answer:
             for i, frc in enumerate(Answer['qm_forces']):
                 Answer['qm_forces'][i] = frc.T
+            if len(Answer['qm_forces']) != len(Answer['qm_energies']):
+                warn("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
+                del Answer['qm_forces']
         # A strange peculiarity; Q-Chem sometimes prints out the final Mulliken charges a second time, after the geometry optimization.
         if mkchg != []:
             Answer['qm_mulliken_charges'] = list(np.array(mkchg[:len(Answer['qm_energies'])]))
