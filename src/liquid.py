@@ -338,7 +338,7 @@ class Liquid(Target):
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == 0 and self.manual:
-            warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=120)
+            warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
         if Counter() > 0 and (Counter == 1 or GoodStep()) and self.save_traj < 2:
@@ -405,7 +405,10 @@ class Liquid(Target):
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if os.path.exists('./%s/npt_result.p.bz2' % label):
-                os.system('bunzip2 ./%s/npt_result.p.bz2' % label)
+                _exec('bunzip2 ./%s/npt_result.p.bz2' % label)
+            else:
+                logger.warning('In %s :' % os.getcwd())
+                logger.warning('The file ./%s/npt_result.p.bz2 does not exist so we cannot unzip it' % label)
             if os.path.exists('./%s/npt_result.p' % label):
                 Points.append(PT)
                 Results[tt] = lp_load(open('./%s/npt_result.p' % label))
@@ -415,6 +418,7 @@ class Liquid(Target):
                     BPoints.append(PT)
                 tt += 1
             else:
+                logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it' % label)
                 pass
                 # for obs in self.RefData:
                 #     del self.RefData[obs][PT]

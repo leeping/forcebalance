@@ -33,7 +33,7 @@ try:
     
     with open(versioning_file, 'w') as fh:
         fh.write(__version__)
-    subprocess.call(["git", "add", ".__version__"])
+    #subprocess.call(["git", "add", ".__version__"])
 except:
     with open(versioning_file, 'r') as fh:
         __version__ = fh.read().strip()
