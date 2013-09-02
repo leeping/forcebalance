@@ -86,9 +86,10 @@ class TestNifty(ForceBalanceTestCase):
     def test_work_queue_functions(self):
         """Check work_queue functions behave as expected"""
         
-        self.logger.debug("\nChecking Work Queue is initialized to None...\n")
-        self.assertEqual(WORK_QUEUE, None,
-            msg="\nUnexpected initialization of WORK_QUEUE to %s" % str(WORK_QUEUE))
+        # Work Queue will no longer be initialized to None
+        # self.logger.debug("\nChecking Work Queue is initialized to None...\n")
+        # self.assertEqual(WORK_QUEUE, None,
+        #     msg="\nUnexpected initialization of WORK_QUEUE to %s" % str(WORK_QUEUE))
             
         #self.logger.info("\n")
             
