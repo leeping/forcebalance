@@ -577,6 +577,12 @@ def createWorkQueue(wq_port, debug=True):
     #WORK_QUEUE.specify_keepalive_timeout(8640000)
     WORK_QUEUE.specify_keepalive_interval(8640000)
 
+def destroyWorkQueue():
+    # Convenience function to destroy the Work Queue objects.
+    global WORK_QUEUE, WQIDS
+    WORK_QUEUE = None
+    WQIDS = defaultdict(list)
+
 def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
     Submit a job to the Work Queue.
