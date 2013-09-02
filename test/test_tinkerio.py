@@ -4,6 +4,7 @@ import forcebalance
 import abc
 import numpy
 from __init__ import ForceBalanceTestCase
+from forcebalance.nifty import *
 from test_target import TargetTests # general targets tests defined in test_target.py
 
 class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
@@ -31,10 +32,12 @@ class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
         self.filetype = self.options['forcefield'][0][-3:]
         self.mvals = [.5]*self.ff.np
 
+        if (which('testgrad') == ''):
+            self.skipTest("TINKER programs are not in the PATH.")
+
         self.logger.debug("Setting up Interaction_TINKER target\n")
         self.target = forcebalance.tinkerio.Interaction_TINKER(self.options, self.tgt_opt, self.ff)
         self.addCleanup(os.system, 'rm -rf temp')
-
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""
         return super(TestInteraction_TINKER,self).shortDescription() + " (Interaction_TINKER)"
