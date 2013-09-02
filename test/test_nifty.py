@@ -87,20 +87,20 @@ class TestNifty(ForceBalanceTestCase):
         """Check work_queue functions behave as expected"""
         
         self.logger.debug("\nChecking Work Queue is initialized to None...\n")
-        self.assertEqual(forcebalance.WORK_QUEUE, None,
-            msg="\nUnexpected initialization of WORK_QUEUE to %s" % str(forcebalance.WORK_QUEUE))
+        self.assertEqual(WORK_QUEUE, None,
+            msg="\nUnexpected initialization of WORK_QUEUE to %s" % str(WORK_QUEUE))
             
         #self.logger.info("\n")
             
         createWorkQueue(30000, debug=False)
         self.logger.debug("Created work queue, verifying...\n")
-        self.assertEqual(type(forcebalance.WORK_QUEUE), work_queue.WorkQueue,
-            msg="\nExpected WORK_QUEUE to be a WorkQueue object, but got a %s instead" % str(type(forcebalance.WORK_QUEUE)))
+        self.assertEqual(type(WORK_QUEUE), work_queue.WorkQueue,
+            msg="\nExpected WORK_QUEUE to be a WorkQueue object, but got a %s instead" % str(type(WORK_QUEUE)))
             
         self.logger.debug("Checking that getWorkQueue() returns valid WorkQueue object...\n")
         wq = getWorkQueue()
         self.assertEqual(type(wq), work_queue.WorkQueue,
-            msg="\nExpected getWorkQueue() to return a WorkQueue object, but got %s instead" % str(type(forcebalance.WORK_QUEUE)))
+            msg="\nExpected getWorkQueue() to return a WorkQueue object, but got %s instead" % str(type(WORK_QUEUE)))
         
         worker_program = which('work_queue_worker')
         if worker_program != '':
@@ -122,8 +122,8 @@ class TestNifty(ForceBalanceTestCase):
         else:
             self.logger.debug("work_queue_worker is not in the PATH.")
         
-        forcebalance.WORK_QUEUE = None
-        forcebalance.WQIDS = defaultdict(list)
+        WORK_QUEUE = None
+        WQIDS = defaultdict(list)
         
 if __name__ == '__main__':           
     unittest.main()
