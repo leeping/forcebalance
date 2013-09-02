@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated August 14, 2013                      |#
+#|                 Last updated September 1, 2013                     |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -142,7 +142,7 @@ import numpy as np
 from numpy import sin, cos, arcsin, arccos
 import imp
 import itertools
-from collections import OrderedDict, defaultdict, namedtuple
+from collections import OrderedDict, namedtuple
 from ctypes import *
 from warnings import warn
 
@@ -1263,6 +1263,22 @@ class Molecule(object):
                 Mat[j,i] = rmsd
         return Mat
 
+    def pathwise_rmsd(self):
+        """ Find RMSD between frames along path. """
+        N = len(self)
+        Vec = np.zeros(N-1 ,dtype=float)
+        for i in range(N-1):
+            xyzi = self.xyzs[i].copy()
+            xyzi -= xyzi.mean(0)
+            j=i+1
+            xyzj = self.xyzs[j].copy()
+            xyzj -= xyzj.mean(0)
+            tr, rt = get_rotate_translate(xyzj, xyzi)
+            xyzj = np.dot(xyzj, rt) + tr
+            rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+            Vec[i] = rmsd
+        return Vec
+
     def align_center(self):
         self.align()
 
@@ -2143,6 +2159,9 @@ class Molecule(object):
         if 'qm_forces' in Answer:
             for i, frc in enumerate(Answer['qm_forces']):
                 Answer['qm_forces'][i] = frc.T
+            if len(Answer['qm_forces']) != len(Answer['qm_energies']):
+                warn("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
+                del Answer['qm_forces']
         # A strange peculiarity; Q-Chem sometimes prints out the final Mulliken charges a second time, after the geometry optimization.
         if mkchg != []:
             Answer['qm_mulliken_charges'] = list(np.array(mkchg[:len(Answer['qm_energies'])]))
