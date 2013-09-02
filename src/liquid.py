@@ -406,10 +406,12 @@ class Liquid(Target):
         for label, PT in zip(self.Labels, self.PhasePoints):
             if os.path.exists('./%s/npt_result.p.bz2' % label):
                 _exec('bunzip2 ./%s/npt_result.p.bz2' % label)
+            elif os.path.exists('./%s/npt_result.p' % label): pass
             else:
-                logger.warning('In %s :' % os.getcwd())
-                logger.warning('The file ./%s/npt_result.p.bz2 does not exist so we cannot unzip it' % label)
+                logger.warning('In %s :\n' % os.getcwd())
+                logger.warning('The file ./%s/npt_result.p.bz2 does not exist so we cannot unzip it\n' % label)
             if os.path.exists('./%s/npt_result.p' % label):
+                logger.info('Reading information from ./%s/npt_result.p\n' % label)
                 Points.append(PT)
                 Results[tt] = lp_load(open('./%s/npt_result.p' % label))
                 if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mPoints]:
@@ -418,7 +420,7 @@ class Liquid(Target):
                     BPoints.append(PT)
                 tt += 1
             else:
-                logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it' % label)
+                logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it\n' % label)
                 pass
                 # for obs in self.RefData:
                 #     del self.RefData[obs][PT]
