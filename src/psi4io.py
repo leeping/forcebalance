@@ -302,6 +302,7 @@ class RDVR3_Psi4(Target):
         self.molecules = OrderedDict()
         self.callderivs = OrderedDict()
         self.factor = 1e6
+        self.bidirect = False
         for d in sorted(os.listdir(self.tgtdir)):
             if os.path.isdir(os.path.join(self.tgtdir,d)) and os.path.exists(os.path.join(self.tgtdir,d,'objective.dat')):
                 self.callderivs[d] = [True for i in range(forcefield.np)]
@@ -347,20 +348,8 @@ class RDVR3_Psi4(Target):
         if wq == None:
             return
 
-        def fdwrap_(func,mvals0,pidx,key=None,**kwargs):
-            def func1(arg):
-                mvals = list(mvals0)
-                mvals[pidx] += arg
-                logger.info("\rfdwrap: " + func.__name__ + " [%i] = % .1e " % (pidx, arg) + ' '*50)
-                if key != None:
-                    return func(mvals,arg,**kwargs)[key]
-                else:
-                    return func(mvals,arg,**kwargs)
-            return func1
-
         def submit_psi(this_apath, mname, these_mvals):
             """ Create a grid file and a psi4 input file in the absolute path and submit it to the work queue. """
-            # print "Setting up the calculation:", this_apath
             cwd = os.getcwd()
             if not os.path.exists(this_apath) : os.makedirs(this_apath)
             os.chdir(this_apath)
@@ -376,24 +365,26 @@ class RDVR3_Psi4(Target):
                 else:
                     print >> o, line,
             o.close()
+            os.system("rm -f objective.out")
             if wq == None:
                 logger.info("There is no Work Queue!!!\n")
                 sys.exit()
             else:
                 input_files = [(os.path.join(this_apath, i), i) for i in glob.glob("*")]
-                input_files += [(os.path.join(self.tgtdir,d,"build.dat"), "build.dat")]
+                # input_files += [(os.path.join(self.tgtdir,d,"build.dat"), "build.dat")]
                 input_files += [(os.path.join(os.path.split(__file__)[0],"data","run_psi_rdvr3_objective.sh"), "run_psi_rdvr3_objective.sh")]
+                logger.info("\r")
                 queue_up_src_dest(wq,"sh run_psi_rdvr3_objective.sh %s &> run_psi_rdvr3_objective.log" % mname,
                                   input_files=input_files,
-                                  output_files=[(os.path.join(this_apath, i),i) for i in ["run_psi_rdvr3_objective.log", "output.dat"]])
+                                  output_files=[(os.path.join(this_apath, i),i) for i in ["run_psi_rdvr3_objective.log", "output.dat"]], verbose=False)
             os.chdir(cwd)
 
         for d in self.objfiles:
             logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
             odir = os.path.join(os.getcwd(),d)
-            if os.path.exists(odir):
-                shutil.rmtree(odir)
-            os.makedirs(odir)
+            #if os.path.exists(odir):
+            #    shutil.rmtree(odir)
+            if not os.path.exists(odir): os.makedirs(odir)
             apath = os.path.join(odir, "current")
             submit_psi(apath, d, mvals)
             for p in range(self.FF.np):
@@ -403,17 +394,22 @@ class RDVR3_Psi4(Target):
                     #logger.info("Will set up a job for %s, parameter %i\n" % (d, p))
                     return 0.0
                 if self.callderivs[d][p]:
-                    f12d3p(fdwrap_(subjob, mvals, p), h = self.h, f0 = 0.0)
-            
+                    if AHess:
+                        f12d3p(fdwrap(subjob, mvals, p, h=self.h), h = self.h, f0 = 0.0)
+                    elif AGrad:
+                        if self.bidirect:
+                            f12d3p(fdwrap(subjob, mvals, p, h=self.h), h = self.h, f0 = 0.0)
+                        else:
+                            f1d2p(fdwrap(subjob, mvals, p, h=self.h), h = self.h, f0 = 0.0)
 
     def driver(self, mvals, d):
         ## Create the force field file.
         pvals = self.FF.make(mvals)
         ## Actually run PSI4.
         odir = os.path.join(os.getcwd(),d)
-        if os.path.exists(odir):
-            shutil.rmtree(odir)
-        os.makedirs(odir)
+        #if os.path.exists(odir):
+        #    shutil.rmtree(odir)
+        if not os.path.exists(odir): os.makedirs(odir)
         os.chdir(odir)
         o = open('objective.dat','w')
         for line in self.objfiles[d]:
@@ -426,6 +422,7 @@ class RDVR3_Psi4(Target):
             else:
                 print >> o, line,
         o.close()
+        os.system("rm -f objective.out")
         _exec("psi4 objective.dat", print_command=False)
         answer = float(open('objective.out').readlines()[0].split()[1])*self.factor
         os.chdir('..')
@@ -453,7 +450,6 @@ class RDVR3_Psi4(Target):
         self.objd = OrderedDict()
         self.gradd = OrderedDict()
         self.hdiagd = OrderedDict()
-        bidirect = False
         wq = getWorkQueue()
 
         def fdwrap2(func,mvals0,pidx,qidx,key=None,**kwargs):
@@ -488,6 +484,8 @@ class RDVR3_Psi4(Target):
             grad  = np.zeros(n,dtype=float)
             hdiag = np.zeros(n,dtype=float)
             hess  = np.zeros((n,n),dtype=float)
+            apath = os.path.join(self.tdir, d, "current")
+            x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
             for p in range(self.FF.np):
                 if self.callderivs[d][p]:
                     def reader(mvals_,h):
@@ -498,25 +496,23 @@ class RDVR3_Psi4(Target):
                         if wq != None:
                             apath = os.path.join(self.tdir, d, "current")
                             x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
-                            grad[p], hdiag[p] = f12d3p(fdwrap(reader, mvals), h = self.h, f0 = x)
+                            grad[p], hdiag[p] = f12d3p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)
                         else:
                             grad[p], hdiag[p] = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
                         hess[p,p] = hdiag[p]
                     elif AGrad:
-                        if bidirect:
+                        if self.bidirect:
                             if wq != None:
                                 apath = os.path.join(self.tdir, d, "current")
                                 x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
-                                grad[p], _ = f12d3p(fdwrap(reader, mvals), h = self.h, f0 = x)
+                                grad[p], _ = f12d3p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)
                             else:
                                 grad[p], _ = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
                         else:
                             if wq != None:
                                 # Since the calculations are submitted as 3-point finite difference, this part of the code
                                 # actually only reads from half of the completed calculations.
-                                apath = os.path.join(self.tdir, d, "current")
-                                x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
-                                grad[p] = f1d2p(fdwrap(reader, mvals), h = self.h, f0 = x)
+                                grad[p] = f1d2p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)
                             else:
                                 grad[p] = f1d2p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
                             
