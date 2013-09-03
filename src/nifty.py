@@ -600,7 +600,7 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
         task.specify_input_file(lf,f,cache=False)
     for f in output_files:
         lf = os.path.join(cwd,f)
-        task.specify_output_file(lf,f)
+        task.specify_output_file(lf,f,cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
     taskid = wq.submit(task)
@@ -630,7 +630,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
         task.specify_input_file(f[0],f[1],cache=False)
     for f in output_files:
         # print f[0], f[1]
-        task.specify_output_file(f[0],f[1])
+        task.specify_output_file(f[0],f[1],cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
     taskid = wq.submit(task)
