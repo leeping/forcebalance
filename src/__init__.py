@@ -15,12 +15,6 @@ from collections import defaultdict, OrderedDict
 import pkg_resources
 __version__ = pkg_resources.get_distribution("forcebalance").version
 
-# Global variable corresponding to the Work Queue object
-WORK_QUEUE = None
-
-# Global variable containing a mapping from target names to Work Queue task IDs
-WQIDS = defaultdict(list)
-
 from collections import OrderedDict
 from parser import tgt_opts_defaults, gen_opts_defaults
 
