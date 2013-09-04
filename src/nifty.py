@@ -28,20 +28,9 @@ import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
 
-try:
-    import forcebalance
-    from forcebalance.output import *
-    logger = getLogger(__name__)
-except:
-    from logging import *
-    basicConfig()
-    logger = getLogger(__name__)
-    logger.setLevel('INFO')
-    sh = StreamHandler(sys.stdout)
-    # formatter = Formatter(fmt='%(asctime)s - %(message)s', datefmt="%H:%M:%S")
-    # sh.setFormatter(formatter)
-    logger.addHandler(sh)
-    logger.propagate = False
+import forcebalance
+from forcebalance.output import *
+logger = getLogger(__name__)
 
 # import IPython as ip # For debugging
 
