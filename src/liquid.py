@@ -1,6 +1,6 @@
 """ @package forcebalance.liquid Matching of liquid bulk properties.  Under development.
 
-@author Lee-Ping Wang
+author Lee-Ping Wang
 @date 04/2012
 """
 
@@ -401,6 +401,7 @@ class Liquid(Target):
         Results = {}
         Points = []  # These are the phase points for which data exists.
         BPoints = [] # These are the phase points for which we are doing MBAR for the condensed phase.
+        mBPoints = [] # These are the phase points for which we are doing MBAR for the monomers.
         mPoints = [] # These are the phase points to use for enthalpy of vaporization; if we're scanning pressure then set hvap_wt for higher pressures to zero.
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
@@ -413,6 +414,8 @@ class Liquid(Target):
                     mPoints.append(PT)
                 if 'mbar' in self.RefData and PT in self.RefData['mbar'] and self.RefData['mbar'][PT]:
                     BPoints.append(PT)
+                    if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mBPoints]:
+                        mBPoints.append(PT)
                 tt += 1
             else:
                 pass
@@ -484,6 +487,7 @@ class Liquid(Target):
                 kk = Points.index(BPoints[k])
                 U_kln[k, m, :]   = Energies[kk] + P*Vols[kk]*pvkj
                 U_kln[k, m, :]  *= beta
+        W1 = None
         if len(BPoints) > 1:
             logger.info("Running MBAR analysis on %i states...\n" % len(BPoints))
             mbar = pymbar.MBAR(U_kln, N_k, verbose=True, relative_tolerance=5.0e-8)
@@ -493,37 +497,47 @@ class Liquid(Target):
             W1 = np.ones((BPoints*Shots,BPoints),dtype=float)
             W1 /= BPoints*Shots
         
-        W2 = np.zeros([len(Points)*Shots,len(Points)],dtype=np.float64)
-        for m, PT in enumerate(Points):
-            if PT in BPoints:
-                mm = BPoints.index(PT)
-                for kk, PT1 in enumerate(BPoints):
-                    k = Points.index(PT1)
-                    logger.debug("Will fill W2[%i:%i,%i] with W1[%i:%i,%i]\n" % (k*Shots,k*Shots+Shots,m,kk*Shots,kk*Shots+Shots,mm))
-                    W2[k*Shots:k*Shots+Shots,m] = W1[kk*Shots:kk*Shots+Shots,mm]
-            else:
-                logger.debug("Will fill W2[%i:%i,%i] with equal weights\n" % (m*Shots,m*Shots+Shots,m))
-                W2[m*Shots:m*Shots+Shots,m] = 1.0/Shots
+        def fill_weights(weights, phase_points, mbar_points, snapshots):
+            """ Fill in the weight matrix with MBAR weights where MBAR was run, 
+            and equal weights otherwise. """
+            new_weights = np.zeros([len(phase_points)*snapshots,len(phase_points)],dtype=np.float64)
+            for m, PT in enumerate(phase_points):
+                if PT in mbar_points:
+                    mm = mbar_points.index(PT)
+                    for kk, PT1 in enumerate(mbar_points):
+                        k = phase_points.index(PT1)
+                        logger.debug("Will fill W2[%i:%i,%i] with W1[%i:%i,%i]\n" % (k*snapshots,k*snapshots+snapshots,m,kk*snapshots,kk*snapshots+snapshots,mm))
+                        new_weights[k*snapshots:(k+1)*snapshots,m] = weights[kk*snapshots:(kk+1)*snapshots,mm]
+                else:
+                    logger.debug("Will fill W2[%i:%i,%i] with equal weights\n" % (m*snapshots,(m+1)*snapshots,m))
+                    new_weights[m*snapshots:(m+1)*snapshots,m] = 1.0/snapshots
+            return new_weights
+        
+        W2 = fill_weights(W1, Points, BPoints, Shots)
 
         # Run MBAR on the monomers.  This is barely necessary.
-        if len(mPoints) > 0:
-            mSims = len(mPoints)
-            mShots = len(mEnergies[0])
-            mN_k = np.ones(mSims)*mShots
-            mU_kln = np.zeros([mSims,mSims,mShots], dtype = np.float64)
-            for m, PT in enumerate(mPoints):
+        mW1 = None
+        mShots = len(mEnergies[0])
+        if len(mBPoints) > 0:
+            mBSims = len(mBPoints)
+            mN_k = np.ones(mBSims)*mShots
+            mU_kln = np.zeros([mBSims,mBSims,mShots], dtype = np.float64)
+            for m, PT in enumerate(mBPoints):
                 T = PT[0]
                 beta = 1. / (kb * T)
-                for k in range(mSims):
-                    mU_kln[k, m, :]  = mEnergies[k]
+                for k in range(mBSims):
+                    kk = Points.index(mBPoints[k])
+                    mU_kln[k, m, :]  = mEnergies[kk]
                     mU_kln[k, m, :] *= beta
-            if np.abs(np.std(mEnergies)) > 1e-6 and mSims > 1:
+            if np.abs(np.std(mEnergies)) > 1e-6 and mBSims > 1:
                 mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
                 mW1 = mmbar.getWeights()
-            else:
-                mW1 = np.ones((mSims*mShots,mSims),dtype=float)
-                mW1 /= mSims*mShots
+        elif len(mBPoints) == 1:
+            mW1 = np.ones((mBSims*mShots,mSims),dtype=float)
+            mW1 /= mBSims*mShots
 
+        mW2 = fill_weights(mW1, mPoints, mBPoints, mShots)
+         
         if self.do_self_pol:
             EPol = self.polarization_correction(mvals)
             GEPol = np.array([f12d3p(fdwrap(self.polarization_correction, mvals, p), h = self.h, f0 = EPol)[0] for p in range(self.FF.np)])
@@ -557,7 +571,7 @@ class Liquid(Target):
             ## Enthalpy of vaporization.
             if PT in mPoints:
                 ii = mPoints.index(PT)
-                mW = flat(mW1[:,ii])
+                mW = flat(mW2[:,ii])
                 mGbar = flat(np.mat(mG)*col(mW))
                 Hvap_calc[PT]  = np.dot(mW,mE) - np.dot(W,E)/NMol + kb*T - np.dot(W, PV)/NMol
                 Hvap_grad[PT]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
