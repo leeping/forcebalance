@@ -27,10 +27,11 @@ import time
 import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
-import forcebalance
 
-from forcebalance.output import getLogger
+import forcebalance
+from forcebalance.output import *
 logger = getLogger(__name__)
+
 # import IPython as ip # For debugging
 
 ## Boltzmann constant
@@ -45,7 +46,7 @@ bohrang = 0.529177249
 #=========================#
 #     I/O formatting      #
 #=========================#
-def pvec1d(vec1d, precision=1, loglevel=forcebalance.output.INFO):
+def pvec1d(vec1d, precision=1, loglevel=INFO):
     """Printout of a 1-D vector.
 
     @param[in] vec1d a 1-D vector
@@ -55,7 +56,7 @@ def pvec1d(vec1d, precision=1, loglevel=forcebalance.output.INFO):
         logger.log(loglevel, "%% .%ie " % precision % v2a[i])
     logger.log(loglevel, '\n')
 
-def pmat2d(mat2d, precision=1, loglevel=forcebalance.output.INFO):
+def pmat2d(mat2d, precision=1, loglevel=INFO):
     """Printout of a 2-D matrix.
 
     @param[in] mat2d a 2-D matrix
@@ -71,8 +72,8 @@ def encode(l):
 
 def segments(e):
     # Takes encoded input.
-    begins = array([sum([k[0] for k in e][:j]) for j,i in enumerate(e) if i[1] == 1])
-    lens = array([i[0] for i in e if i[1] == 1])
+    begins = np.array([sum([k[0] for k in e][:j]) for j,i in enumerate(e) if i[1] == 1])
+    lens = np.array([i[0] for i in e if i[1] == 1])
     return [(i, i+j) for i, j in zip(begins, lens)]
 
 def commadash(l):
@@ -542,20 +543,34 @@ try:
 except:
     logger.warning("Work Queue library import fail (You can't queue up jobs using Work Queue)\n")
 
+# Global variable corresponding to the Work Queue object
+WORK_QUEUE = None
+
+# Global variable containing a mapping from target names to Work Queue task IDs
+WQIDS = defaultdict(list)
 
 def getWorkQueue():
-    return forcebalance.WORK_QUEUE
+    global WORK_QUEUE
+    return WORK_QUEUE
 
 def getWQIds():
-    return forcebalance.WQIDS
+    global WQIDS
+    return WQIDS
 
 def createWorkQueue(wq_port, debug=True):
+    global WORK_QUEUE
     if debug:
         work_queue.set_debug_flag('all')
-    forcebalance.WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
-    forcebalance.WORK_QUEUE.specify_name('forcebalance')
-    forcebalance.WORK_QUEUE.specify_keepalive_timeout(8640000)
-    forcebalance.WORK_QUEUE.specify_keepalive_interval(8640000)
+    WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
+    WORK_QUEUE.specify_name('forcebalance')
+    #WORK_QUEUE.specify_keepalive_timeout(8640000)
+    WORK_QUEUE.specify_keepalive_interval(8640000)
+
+def destroyWorkQueue():
+    # Convenience function to destroy the Work Queue objects.
+    global WORK_QUEUE, WQIDS
+    WORK_QUEUE = None
+    WQIDS = defaultdict(list)
 
 def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
@@ -566,23 +581,24 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     @param[in] input_files (list of files) A list of locations of the input files.
     @param[in] output_files (list of files) A list of locations of the output files.
     """
+    global WQIDS
     task = work_queue.Task(command)
     cwd = os.getcwd()
     for f in input_files:
         lf = os.path.join(cwd,f)
-        task.specify_input_file(lf,f)
+        task.specify_input_file(lf,f,cache=False)
     for f in output_files:
         lf = os.path.join(cwd,f)
-        task.specify_output_file(lf,f)
+        task.specify_output_file(lf,f,cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
     if tgt != None:
-        forcebalance.WQIDS[tgt.name].append(taskid)
+        WQIDS[tgt.name].append(taskid)
     else:
-        forcebalance.WQIDS["None"].append(taskid)
+        WQIDS["None"].append(taskid)
     
 def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
@@ -596,25 +612,27 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     @param[in] output_files (list of 2-tuples) A list of local and
     remote locations of the output files.
     """
+    global WQIDS
     task = work_queue.Task(command)
     for f in input_files:
         # print f[0], f[1]
-        task.specify_input_file(f[0],f[1])
+        task.specify_input_file(f[0],f[1],cache=False)
     for f in output_files:
         # print f[0], f[1]
-        task.specify_output_file(f[0],f[1])
+        task.specify_output_file(f[0],f[1],cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
     if tgt != None:
-        forcebalance.WQIDS[tgt.name].append(taskid)
+        WQIDS[tgt.name].append(taskid)
     else:
-        forcebalance.WQIDS["None"].append(taskid)
+        WQIDS["None"].append(taskid)
 
 def wq_wait1(wq, wait_time=10, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
+    global WQIDS
     if verbose: logger.info('---\n')
     for sec in range(wait_time):
         task = wq.wait(1)
@@ -633,30 +651,35 @@ def wq_wait1(wq, wait_time=10, verbose=False):
                 oldid = task.id
                 oldhost = task.hostname
                 tgtname = "None"
-                for tnm in forcebalance.WQIDS:
-                    if task.id in forcebalance.WQIDS[tnm]:
+                for tnm in WQIDS:
+                    if task.id in WQIDS[tnm]:
                         tgtname = tnm
-                        forcebalance.WQIDS[tnm].remove(task.id)
+                        WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
                 logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
-                forcebalance.WQIDS[tgtname].append(taskid)
+                WQIDS[tgtname].append(taskid)
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
                     logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
-                for tnm in forcebalance.WQIDS:
-                    if task.id in forcebalance.WQIDS[tnm]:
-                        forcebalance.WQIDS[tnm].remove(task.id)
+                for tnm in WQIDS:
+                    if task.id in WQIDS[tnm]:
+                        WQIDS[tnm].remove(task.id)
                 del task
+        try:
+            # Full workers were added with CCTools 4.0.1
+            nbusy = wq.stats.workers_busy + wq.stats.workers_full
+        except:
+            nbusy = wq.stats.workers_busy
         if verbose:
             logger.info("Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n" \
-                % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))
+                % (wq.stats.workers_init, wq.stats.workers_ready, nbusy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))
             logger.info("Tasks: %i running, %i waiting, %i total dispatched, %i total complete\n" \
                 % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete))
             logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
         else:
             logger.info("%s : %i/%i workers busy; %i/%i jobs complete\r" %\
             (time.ctime(),
-             wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
+             nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
              wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched)) 
             if time.time() - wq_wait1.t0 > 900:
                 wq_wait1.t0 = time.time()
