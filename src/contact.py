@@ -4,6 +4,7 @@ a trajectory
 '''
 import numpy as np
 import _contact_wrap
+import warnings
 
 def atom_distances(xyzlist, atom_contacts):
     '''
@@ -48,7 +49,7 @@ def atom_distances(xyzlist, atom_contacts):
         xyzlist = np.copy(xyzlist)
     if not atom_contacts.flags.contiguous:
         warnings.warn("contacts is not contiguous: copying", RuntimeWarning)
-        contacts = np.copy(contacts)
+        atom_contacts = np.copy(atom_contacts)
     
     results = np.zeros((traj_length, num_contacts), dtype=np.float32)
     
