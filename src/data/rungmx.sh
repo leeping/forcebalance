@@ -32,6 +32,9 @@ echo $@
 
 rm -f npt_result.p npt_result.p.bz2
 export PYTHONUNBUFFERED="y"
+# Unset OMP_NUM_THREADS otherwise gromacs will complain.
+unset OMP_NUM_THREADS
+unset MKL_NUM_THREADS
 time $@
 # Delete backup files that are older than one week.
 find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
