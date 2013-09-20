@@ -794,7 +794,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     persist = Continue execution even if the command gives a nonzero return code.
     """
     # Dictionary of options to be passed to the Popen object.
-    cmd_options={'shell':(type(command) is str), 'stdin':None, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
+    cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
 
     # "write to file" : Function for writing some characters to the log and/or output files.
     def wtf(out):
@@ -809,14 +809,14 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         wtf.first = False
     wtf.first = True
 
-    if stdin: cmd_options['stdin'] = PIPE
+    # if stdin: cmd_options['stdin'] = PIPE
 
     if print_command:
         logger.info("Executing process: \x1b[92m%-50s\x1b[0m%s%s%s\n" % (' '.join(command) if type(command) is list else command, 
                                                                " Output: %s" % outfnm if outfnm != None else "", 
                                                                " Append: %s" % logfnm if logfnm != None else "", 
-                                                               " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else ""))
-        wtf("Executing process: %s%s\n" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else ""))
+                                                               (" Stdin: %s" % stdin.replace('\n','\\n')) if stdin else ""))
+        wtf("Executing process: %s%s\n" % (command, (" Stdin: %s" % stdin.replace('\n','\\n')) if stdin else ""))
 
     cmd_options.update(kwargs)
     p = subprocess.Popen(command, **cmd_options)
@@ -824,9 +824,8 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     stdout = ""
     stderr = ""
 
-    if p.stdin:
-        p.stdin.write(stdin)
-        p.stdin.close()
+    p.stdin.write(stdin)
+    p.stdin.close()
 
     while True:
         reads = [p.stdout.fileno(), p.stderr.fileno()]
@@ -852,9 +851,9 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     if p.returncode != 0:
         if stderr:
             logger.warning("Received an error message:\n")
-            logger.warning("\n==== Error Message ====\n")
+            logger.warning("\n[====] \x1b[91mError Message\x1b[0m [====]\n")
             logger.warning(stderr)
-            logger.warning("== End Error Message ==\n")
+            logger.warning("[====] \x1b[91mEnd o'Message\x1b[0m [====]\n")
         if persist:
             logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
         else:
