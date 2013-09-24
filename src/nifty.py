@@ -809,7 +809,8 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         wtf.first = False
     wtf.first = True
 
-    # if stdin: cmd_options['stdin'] = PIPE
+    # Preserve backwards compatibility; sometimes None gets passed to stdin.
+    if stdin == None: stdin = ""
 
     if print_command:
         logger.info("Executing process: \x1b[92m%-50s\x1b[0m%s%s%s\n" % (' '.join(command) if type(command) is list else command, 
