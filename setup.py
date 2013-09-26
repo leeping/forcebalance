@@ -68,15 +68,25 @@ PERMUTE = Extension('forcebalance/_assign',
                     include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')]
                     )
 
-# Copied from MSMBuilder 'contact' library for rapidly computing interatomic distances.
-CONTACT = Extension('forcebalance/_contact_wrap',
-                    sources = ["ext/contact/contact.c",
-                               "ext/contact/contact_wrap.c"],
-                    extra_compile_args=["-std=c99","-O3","-shared",
-                                        "-fopenmp", "-Wall"],
-                    extra_link_args=['-lgomp'],
-                    include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
-                    
+# 'contact' library from MSMBuilder for rapidly computing interatomic distances.
+# If we're on Mac OS, it can't find the OpenMP libraries
+import platform
+if platform.system() == 'Darwin':
+    CONTACT = Extension('forcebalance/_contact_wrap',
+                        sources = ["ext/contact/contact.c",
+                                   "ext/contact/contact_wrap.c"],
+                        extra_compile_args=["-std=c99","-O3","-shared",
+                                            "-Wall"],
+                        include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
+else:
+    CONTACT = Extension('forcebalance/_contact_wrap',
+                        sources = ["ext/contact/contact.c",
+                                   "ext/contact/contact_wrap.c"],
+                        extra_compile_args=["-std=c99","-O3","-shared",
+                                            "-fopenmp", "-Wall"],
+                        extra_link_args=['-lgomp'],
+                        include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
+    
 def installNetworkX():          
     setup(
         packages=["networkx",
