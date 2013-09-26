@@ -20,23 +20,32 @@ except ImportError:
     print "Please make sure the numpy and scipy modules are installed and try again"
     exit()
     
-# use git to find current version, or read from .__version__    
 #===================================#
+#|   ForceBalance version number   |#
 #| Make sure to update the version |#
 #| manually in doc/header.tex and  |#
 #| doc/api_header.tex!!            |#
 #===================================#
-versioning_file = os.path.join(os.path.dirname(__file__), '.__version__')
+__version__ = "v1.2.1"
 try:
+    # use git to find current version
     git_describe = subprocess.check_output(["git", "describe"]).strip()
     __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
-    
-    with open(versioning_file, 'w') as fh:
-        fh.write(__version__)
-    #subprocess.call(["git", "add", ".__version__"])
-except:
-    with open(versioning_file, 'r') as fh:
-        __version__ = fh.read().strip()
+except: pass
+
+# The versioning file logic does not work.  
+# Commenting out until further notice.
+# versioning_file = os.path.join(os.path.dirname(__file__), '.__version__')
+# try:
+#     git_describe = subprocess.check_output(["git", "describe"]).strip()
+#     __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
+#     with open(versioning_file, 'w') as fh:
+#         fh.write(__version__)
+#     #subprocess.call(["git", "add", ".__version__"])
+# except:
+#     with open(versioning_file, 'r') as fh:
+#         __version__ = fh.read().strip()
+
 
 # DCD file reading module
 DCD = Extension('forcebalance/_dcdlib',
