@@ -181,6 +181,26 @@ def UpdateSimulationParameters(src_system, dest_simulation):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
 
+def SetAmoebaVirtualExclusions(system):
+    if any([f.__class__.__name__ == "AmoebaMultipoleForce" for f in system.getForces()]):
+        # print "Cajoling AMOEBA covalent maps so they work with virtual sites."
+        vss = [(i, [system.getVirtualSite(i).getParticle(j) for j in range(system.getVirtualSite(i).getNumParticles())]) \
+                   for i in range(system.getNumParticles()) if system.isVirtualSite(i)]
+        for f in system.getForces():
+            if f.__class__.__name__ == "AmoebaMultipoleForce":
+                # print "--- Before ---"
+                # for i in range(f.getNumMultipoles()):
+                #     print f.getCovalentMaps(i)
+                for i, j in vss:
+                    f.setCovalentMap(i, 0, j)
+                    f.setCovalentMap(i, 4, j+[i])
+                    for k in j:
+                        f.setCovalentMap(k, 0, list(f.getCovalentMap(k, 0))+[i])
+                        f.setCovalentMap(k, 4, list(f.getCovalentMap(k, 4))+[i])
+                # print "--- After ---"
+                # for i in range(f.getNumMultipoles()):
+                #     print f.getCovalentMaps(i)
+
 def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
     """
     Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
@@ -313,7 +333,7 @@ class OpenMM_Reader(BaseReader):
                 pfx = list(element.iterancestors())[0].attrib["name"]
                 Involved = '.'.join([pfx+"-"+element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
             else:
-                Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
+                Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType] if i in element.attrib])
             return "/".join([InteractionType, parameter, Involved])
         except:
             logger.info("Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
@@ -333,6 +353,7 @@ class Liquid_OpenMM(Liquid):
             mod = Modeller(self.mpdb.topology, self.mpdb.positions)
             mod.addExtraParticles(forcefield)
             system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
+            SetAmoebaVirtualExclusions(system)
             # Create the simulation; we're not actually going to use the integrator
             integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
             # Create a Reference platform (this will be faster than CUDA since it's small)
@@ -371,12 +392,13 @@ class Liquid_OpenMM(Liquid):
         ff = ForceField(self.FF.openmmxml)
         mod = Modeller(self.mpdb.topology, self.mpdb.positions)
         mod.addExtraParticles(ff)
-        sys = ff.createSystem(mod.topology, rigidWater=self.FF.rigid_water)
-        UpdateSimulationParameters(sys, self.msim)
+        system = ff.createSystem(mod.topology, rigidWater=self.FF.rigid_water)
+        # SetAmoebaVirtualExclusions(system)
+        UpdateSimulationParameters(system, self.msim)
         self.msim.context.setPositions(mod.getPositions())
         self.msim.minimizeEnergy()
         pos = self.msim.context.getState(getPositions=True).getPositions()
-        pos = ResetVirtualSites(pos, sys)
+        pos = ResetVirtualSites(pos, system)
         d = get_dipole(self.msim, positions=pos)
         if not in_fd():
             logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
@@ -432,6 +454,7 @@ class AbInitio_OpenMM(AbInitio):
             system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
+        SetAmoebaVirtualExclusions(system)
         self.simulation = Simulation(mod.topology, system, integrator, self.platform)
         # Generate OpenMM-compatible positions
         self.xyz_omms = []
@@ -490,6 +513,7 @@ class AbInitio_OpenMM(AbInitio):
             UpdateSimulationParameters(system, self.simulation)
             simulation = self.simulation
         else:
+            SetAmoebaVirtualExclusions(system)
             if self.platform != None:
                 simulation = Simulation(mod.topology, system, integrator, self.platform)
             else:
@@ -582,6 +606,7 @@ class Interaction_OpenMM(Interaction):
             elif self.FF.amoeba_pol == 'nonpolarizable':
                 system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
             # Create the simulation; we're not actually going to use the integrator
+            SetAmoebaVirtualExclusions(system)
             integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
             self.simulations[os.path.splitext(pdbfnm)[0]] = Simulation(mod.topology, system, integrator, self.platform)
         os.chdir(cwd)
@@ -613,6 +638,7 @@ class Interaction_OpenMM(Interaction):
         elif self.FF.amoeba_pol == 'nonpolarizable':
             system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
         # Create the simulation; we're not actually going to use the integrator
+        # SetAmoebaVirtualExclusions(system)
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         if hasattr(self,'simulations'):
             UpdateSimulationParameters(system, self.simulations[mode])

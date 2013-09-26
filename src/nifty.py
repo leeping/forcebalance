@@ -562,6 +562,7 @@ def createWorkQueue(wq_port, debug=True):
     if debug:
         work_queue.set_debug_flag('all')
     WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
+    WORK_QUEUE.tasks_failed = 0 # Counter for tasks that fail at the application level
     WORK_QUEUE.specify_name('forcebalance')
     #WORK_QUEUE.specify_keepalive_timeout(8640000)
     WORK_QUEUE.specify_keepalive_interval(8640000)
@@ -658,6 +659,7 @@ def wq_wait1(wq, wait_time=10, verbose=False):
                 taskid = wq.submit(task)
                 logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
+                wq.tasks_failed += 1
             else:
                 if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
                     logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
@@ -670,17 +672,26 @@ def wq_wait1(wq, wait_time=10, verbose=False):
             nbusy = wq.stats.workers_busy + wq.stats.workers_full
         except:
             nbusy = wq.stats.workers_busy
+
+        try:
+            Complete = wq.stats.total_tasks_complete - wq.tasks_failed
+            Total = wq.stats.total_tasks_dispatched - wq.tasks_failed
+        except:
+            logger.warning("wq object has no tasks_failed attribute, please use createWorkQueue() function.\n")
+            Complete = wq.stats.total_tasks_complete
+            Total = wq.stats.total_tasks_dispatched
+            
         if verbose:
             logger.info("Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n" \
                 % (wq.stats.workers_init, wq.stats.workers_ready, nbusy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))
             logger.info("Tasks: %i running, %i waiting, %i total dispatched, %i total complete\n" \
-                % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete))
+                % (wq.stats.tasks_running,wq.stats.tasks_waiting,Total,Complete))
             logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
         else:
             logger.info("%s : %i/%i workers busy; %i/%i jobs complete\r" %\
             (time.ctime(),
              nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
-             wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched)) 
+             Complete, Total)) 
             if time.time() - wq_wait1.t0 > 900:
                 wq_wait1.t0 = time.time()
                 logger.info('\n')
