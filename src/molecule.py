@@ -189,6 +189,10 @@ PeriodicTable = OrderedDict([('H' , 1.0079), ('He' , 4.0026),
 def getElement(mass):
     return PeriodicTable.keys()[np.argmin([np.abs(m-mass) for m in PeriodicTable.values()])]
 
+def elem_from_atomname(atomname):
+    """ Given an atom name, attempt to get the element in most cases. """
+    return re.search('[A-Z][a-z]*',atomname).group(0)
+
 #============================#
 #| DCD read/write functions |#
 #============================#
@@ -565,18 +569,21 @@ def get_rotate_translate(matrix1,matrix2):
     covar = np.dot(avg_matrix1.T,avg_matrix2)
     
     # Do the SVD in order to get rotation matrix
-    u,s,wt = np.linalg.svd(covar)
+    v,s,wt = np.linalg.svd(covar)
+    v = np.matrix(v)
+    wt = np.matrix(wt)
     
     # Rotation matrix
-    # Transposition of u,wt
-    rot_matrix = wt.T*u.T
-    
-    # Insure a right-handed coordinate system
-    # need to fix this!!
-    #if np.linalg.det(rot_matrix) > 0:
-    #    wt[2] = -wt[2]
-    rot_matrix = np.transpose(np.dot(np.transpose(wt),np.transpose(u)))
+    # Transposition of v,wt
+    wvt = wt.T*v.T
 
+    # Ensure a right-handed coordinate system
+    d = np.matrix(np.eye(3))
+    if np.linalg.det(wvt) < 0:
+        d[2,2] = -1.0
+    
+    rot_matrix = np.array((wt.T*d*v.T).T)
+    # rot_matrix = np.transpose(np.dot(np.transpose(wt),np.transpose(v)))
     trans_matrix = avg_pos2-np.dot(avg_pos1,rot_matrix)
     return trans_matrix, rot_matrix
 
@@ -1098,7 +1105,7 @@ class Molecule(object):
             xyz2 = AlignToMoments(self.elem,xyz1,xyz2)
             self.xyzs[index2] = xyz2
 
-    def align(self, smooth = True, center = True):
+    def align(self, smooth = False, center = True, select=None):
         """ Align molecules. 
         
         Has the option to create smooth trajectories 
@@ -1107,7 +1114,12 @@ class Molecule(object):
 
         Also has the option to remove the center of mass.
 
+        Provide a list of atom indices to align along selected atoms.
+
         """
+        if isinstance(select, list):
+            select = np.array(select)
+
         xyz1 = self.xyzs[0]
         if center:
             xyz1 -= xyz1.mean(0)
@@ -1118,7 +1130,10 @@ class Molecule(object):
                 ref = index2-1
             else:
                 ref = 0
-            tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
+            if select != None:
+                tr, rt = get_rotate_translate(xyz2[select],self.xyzs[ref][select])
+            else:
+                tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
             xyz2 = np.dot(xyz2, rt) + tr
             self.xyzs[index2] = xyz2
 
@@ -1277,6 +1292,21 @@ class Molecule(object):
             xyzj = np.dot(xyzj, rt) + tr
             rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
             Vec[i] = rmsd
+        return Vec
+
+    def ref_rmsd(self, i):
+        """ Find RMSD to a reference frame. """
+        N = len(self)
+        Vec = np.zeros(N,dtype=float)
+        xyzi = self.xyzs[i].copy()
+        xyzi -= xyzi.mean(0)
+        for j in range(N):
+            xyzj = self.xyzs[j].copy()
+            xyzj -= xyzj.mean(0)
+            tr, rt = get_rotate_translate(xyzj, xyzi)
+            xyzj = np.dot(xyzj, rt) + tr
+            rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+            Vec[j] = rmsd
         return Vec
 
     def align_center(self):
@@ -1602,7 +1632,7 @@ class Molecule(object):
             elif len(sline) >= 5:
                 if isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]): # A line of data better look like this
                     if nframes == 0:
-                        elem.append(sline[1])
+                        elem.append(elem_from_atomname(sline[1]))
                         resid.append(thisresid)
                         whites      = re.split('[^ ]+',line)
                         if len(sline) > 5:
@@ -1676,7 +1706,10 @@ class Molecule(object):
                     elem.append(thiselem)
 
                 for i in range(1,4):
-                    thiscoord = float(line[(pdeci[0]-4)+(5+ndeci)*(i-1):(pdeci[0]-4)+(5+ndeci)*i].strip())
+                    try:
+                        thiscoord = float(line[(pdeci[0]-4)+(5+ndeci)*(i-1):(pdeci[0]-4)+(5+ndeci)*i].strip())
+                    except: # Attempt to read incorrectly formatted GRO files.
+                        thiscoord = float(line.split()[i+2])
                     coord.append(thiscoord)
                 xyz.append(coord)
 
