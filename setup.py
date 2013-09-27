@@ -23,8 +23,11 @@ except ImportError:
 #===================================#
 #|   ForceBalance version number   |#
 #| Make sure to update the version |#
-#| manually in doc/header.tex and  |#
-#| doc/api_header.tex!!            |#
+#| manually in :                   |#
+#|                                 |#
+#| doc/header.tex                  |#
+#| doc/api_header.tex              |#
+#| src/__init__.py                 |#
 #===================================#
 __version__ = "v1.2.1"
 try:
