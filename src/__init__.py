@@ -12,8 +12,11 @@ except ImportError:
 
 from re import split, findall
 from collections import defaultdict, OrderedDict
-import pkg_resources
-__version__ = pkg_resources.get_distribution("forcebalance").version
+try:
+    import pkg_resources
+    __version__ = pkg_resources.get_distribution("forcebalance").version
+except:
+    __version__ = "v1.2.1"
 
 from collections import OrderedDict
 from parser import tgt_opts_defaults, gen_opts_defaults
