@@ -23,9 +23,7 @@ from forcebalance.interaction import Interaction
 from forcebalance.finite_difference import in_fd
 from collections import OrderedDict
 from forcebalance.optimizer import GoodStep
-try:
-    from simtk.unit import *
-except: pass
+from forcebalance.unit import *
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
