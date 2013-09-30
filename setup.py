@@ -199,6 +199,7 @@ def buildKeywordDictionary(args):
     """
 
     if not args.dirty: doClean()
+    setupKeywords["packages"].append("forcebalance.unit")
     if args.test:
         setupKeywords["packages"].append("forcebalance.test")
         setupKeywords["package_dir"].update({"forcebalance.test" : "test"})

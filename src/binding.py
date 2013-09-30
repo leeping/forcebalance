@@ -16,12 +16,10 @@ from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 from multiprocessing import Pool
+from forcebalance.unit import *
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
-try:
-    from simtk.unit import *
-except: pass
 
 def parse_interactions(input_file):
     """ Parse through the interactions input file.
