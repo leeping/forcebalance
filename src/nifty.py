@@ -631,12 +631,17 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     else:
         WQIDS["None"].append(taskid)
 
-def wq_wait1(wq, wait_time=10, verbose=False):
+def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
     global WQIDS
     if verbose: logger.info('---\n')
-    for sec in range(wait_time):
-        task = wq.wait(1)
+    if wait_intvl >= wait_time:
+        wait_time = wait_intvl
+        numwaits = 1
+    else:
+        numwaits = wait_time / wait_intvl
+    for sec in range(numwaits):
+        task = wq.wait(wait_intvl)
         if task:
             exectime = task.cmd_execution_time/1000000
             if verbose:
@@ -661,7 +666,7 @@ def wq_wait1(wq, wait_time=10, verbose=False):
                 WQIDS[tgtname].append(taskid)
                 wq.tasks_failed += 1
             else:
-                if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
+                if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
                     logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
                 for tnm in WQIDS:
                     if task.id in WQIDS[tnm]:
@@ -688,7 +693,7 @@ def wq_wait1(wq, wait_time=10, verbose=False):
                 % (wq.stats.tasks_running,wq.stats.tasks_waiting,Total,Complete))
             logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
         else:
-            logger.info("%s : %i/%i workers busy; %i/%i jobs complete\r" %\
+            logger.info("\r%s : %i/%i workers busy; %i/%i jobs complete\r" %\
             (time.ctime(),
              nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
              Complete, Total)) 
@@ -697,10 +702,10 @@ def wq_wait1(wq, wait_time=10, verbose=False):
                 logger.info('\n')
 wq_wait1.t0 = time.time()
 
-def wq_wait(wq, verbose=False):
+def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
     """ This function waits until the work queue is completely empty. """
     while not wq.empty():
-        wq_wait1(wq, verbose=verbose)
+        wq_wait1(wq, wait_time=wait_time, wait_intvl=wait_intvl, print_time=print_time, verbose=verbose)
 
 #=====================================#
 #| File and process management stuff |#
