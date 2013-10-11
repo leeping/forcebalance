@@ -1429,7 +1429,6 @@ class Molecule(object):
         boxes  = []
         ln     = 0
         for line in open(fnm):
-            line = line.strip().expandtabs()
             sline = line.split()
             if ln == 0:
                 pass
@@ -1690,7 +1689,6 @@ class Molecule(object):
         frame    = 0
         absln    = 0
         for line in open(fnm):
-            line = line.strip().expandtabs()
             sline = line.split()
             if ln == 0:
                 comms.append(line.strip())
@@ -1995,7 +1993,6 @@ class Molecule(object):
         # Read in CONECT records.
         F2=open(fnm,'r')
         for line in F2:
-            line = line.strip().expandtabs()
             s = line.split()
             if s[0].upper() == "CONECT":
                 if len(s) > 2:
