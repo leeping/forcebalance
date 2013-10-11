@@ -1386,6 +1386,7 @@ class Molecule(object):
         ln    = 0
         absln = 0
         for line in open(fnm):
+            line = line.strip().expandtabs()
             if ln == 0:
                 # Skip blank lines.
                 if len(line.strip()) > 0:
@@ -1428,6 +1429,7 @@ class Molecule(object):
         boxes  = []
         ln     = 0
         for line in open(fnm):
+            line = line.strip().expandtabs()
             sline = line.split()
             if ln == 0:
                 pass
@@ -1454,6 +1456,7 @@ class Molecule(object):
         espvals  = []
         interaction = []
         for line in open(fnm):
+            line = line.strip().expandtabs()
             if 'COORDS' in line:
                 xyzs.append(np.array([float(i) for i in line.split()[1:]]).reshape(-1,3))
             elif 'FORCES' in line:
@@ -1576,6 +1579,7 @@ class Molecule(object):
         comfile = open(fnm).readlines()
         inxyz = 0
         for line in comfile:
+            line = line.strip().expandtabs()
             # Everything after exclamation point is a comment
             sline = line.split('!')[0].split()
             if len(sline) == 2:
@@ -1625,6 +1629,7 @@ class Molecule(object):
         ln = 0
         thisatom = 0
         for line in open(fnm):
+            line = line.strip().expandtabs()
             sline = line.split()
             if len(sline) == 0: continue
             # The first line always contains the number of atoms
@@ -1685,6 +1690,7 @@ class Molecule(object):
         frame    = 0
         absln    = 0
         for line in open(fnm):
+            line = line.strip().expandtabs()
             sline = line.split()
             if ln == 0:
                 comms.append(line.strip())
@@ -1763,6 +1769,7 @@ class Molecule(object):
         frame    = 0
         an       = 0
         for line in open(fnm):
+            line = line.strip().expandtabs()
             sline = line.split()
             if re.match('^\*',line):
                 if len(sline) == 1:
@@ -1988,6 +1995,7 @@ class Molecule(object):
         # Read in CONECT records.
         F2=open(fnm,'r')
         for line in F2:
+            line = line.strip().expandtabs()
             s = line.split()
             if s[0].upper() == "CONECT":
                 if len(s) > 2:
@@ -2009,6 +2017,7 @@ class Molecule(object):
         espxyz = []
         espval = []
         for line in open(fnm):
+            line = line.strip().expandtabs()
             sline = line.split()
             if len(sline) == 4 and all([isfloat(sline[i]) for i in range(4)]):
                 espxyz.append([float(sline[i]) for i in range(3)])
