@@ -310,6 +310,7 @@ class AbInitio_TINKER(AbInitio):
         o, e = Popen(["./testgrad","shot.arc","y","n"],stdout=PIPE,stderr=PIPE).communicate()
         # Read data from stdout and stderr, and convert it to GROMACS
         # units for consistency with existing code.
+        E = []
         F = []
         for line in o.split('\n'):
             s = line.split()
