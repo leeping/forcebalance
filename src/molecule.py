@@ -790,7 +790,7 @@ class Molecule(object):
     def append(self,other):
         self += other
 
-    def __init__(self, fnm = None, ftype = None, positive_resid=True, build_topology = True):
+    def __init__(self, fnm = None, ftype = None, positive_resid=True, build_topology = True, **kwargs):
         """ To create the Molecule object, we simply define the table of
         file reading/writing functions and read in a file if it is
         provided."""
@@ -855,7 +855,7 @@ class Molecule(object):
                 raise IOError('Tried to create Molecule object from a file that does not exist: %s' % fnm)
             self.Data['ftype'] = ftype
             ## Actually read the file.
-            Parsed = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)
+            Parsed = self.Read_Tab[self.Funnel[ftype.lower()]](fnm, **kwargs)
             ## Set member variables.
             for key, val in Parsed.items():
                 self.Data[key] = val
@@ -2024,7 +2024,7 @@ class Molecule(object):
                   }
         return Answer
     
-    def read_qcout(self, fnm):
+    def read_qcout(self, fnm, maxopt=1):
         """ Q-Chem output file reader, adapted for our parser. 
     
         Q-Chem output files are very flexible and there's no way I can account for all of them.  Here's what
@@ -2034,6 +2034,8 @@ class Molecule(object):
         - Coordinates
         - Energies
         - Forces
+
+        Calling with maxopt = 1 will result in a successful read (with warning) even when maximum optimization cycles are reached.
         
         Note that each step in a geometry optimization counts as a frame.
     
@@ -2078,17 +2080,16 @@ class Molecule(object):
         for key, val in float_match.items():
             Floats[key] = []
     
-        maxopt = 0
         fatal = 0
         for line in open(fnm):
             line = line.strip().expandtabs()
-            if "MAXIMUM OPTIMIZATION CYCLES REACHED" in line:
-                maxopt = 1
+            if "MAXIMUM OPTIMIZATION CYCLES REACHED" in line and maxopt == 1:
+                maxopt = 2
             if fatal and len(line.split()) > 0:
                 # Print the error message that comes after the "fatal error" line.
                 raise Exception('Calculation encountered a fatal error! (%s)' % line)
             if 'fatal error' in line:
-                if maxopt:
+                if maxopt == 2:
                     warn("Maximum number of optimization cycles was reached.")
                     # Discard one set of coordinates.
                     xyzs = xyzs[:-1]
