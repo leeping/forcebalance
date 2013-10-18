@@ -710,6 +710,28 @@ def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
 #=====================================#
 #| File and process management stuff |#
 #=====================================#
+# Search for exactly one file with a provided extension.
+# ext: File extension
+# arg: String name of an argument
+# kwargs: Dictionary of keyword arguments.
+def onefile(ext, arg=None):
+    fnm = None
+    if arg != None:
+        if os.path.exists(arg):
+            fnm = os.path.basename(arg)
+        else:
+            logger.warning("File specified by %s (%s) does not exist - will try to autodetect\n" % (ext, arg))
+
+    if fnm == None:
+        cwd = os.getcwd()
+        ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
+        logger.info("Autodetecting .%s in %s\n" % (ext, cwd))
+        if len(ls) != 1:
+            logger.warning("Cannot autodetect .%s file in %s (%i found)\n" % (ext, cwd, len(ls)))
+        else:
+            fnm = os.path.basename(ls[0])
+    return fnm
+
 def GoInto(Dir):
     if os.path.exists(Dir):
         if os.path.isdir(Dir): pass
@@ -755,7 +777,8 @@ def MissingFileInspection(fnm):
             answer += "%s\n" % specific_dct[key]
     return answer
 
-def LinkFile(src, dest):
+def LinkFile(src, dest, nosrcok = False):
+    if src == dest: return
     if os.path.exists(src):
         if os.path.exists(dest):
             if os.path.islink(dest): pass
@@ -763,7 +786,8 @@ def LinkFile(src, dest):
         else:
             os.symlink(src, dest)
     else:
-        raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist%s" % (src,dest,MissingFileInspection(src)))
+        if not nosrcok:
+            raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist%s" % (src,dest,MissingFileInspection(src)))
     
 
 def CopyFile(src, dest):
@@ -796,6 +820,33 @@ def which(fnm):
         return os.path.split(os.popen('which %s 2> /dev/null' % fnm).readlines()[0].strip())[0]
     except:
         return ''
+
+# Thanks to cesarkawakami on #python (IRC freenode) for this code.
+class LineChunker(object):
+    def __init__(self, callback):
+        self.callback = callback
+        self.buf = ""
+
+    def push(self, data):
+        self.buf += data
+        self.nomnom()
+
+    def close(self):
+        if self.buf:
+            self.callback(self.buf + "\n")
+
+    def nomnom(self):
+        # Splits buffer by new line or carriage return, and passes
+        # the splitted results onto processing.
+        while "\n" in self.buf or "\r" in self.buf:
+            chunk, sep, self.buf = re.split(r"(\r|\n)", self.buf, maxsplit=1)
+            self.callback(chunk + sep)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.close()
 
 def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
@@ -837,39 +888,60 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
 
     cmd_options.update(kwargs)
     p = subprocess.Popen(command, **cmd_options)
-    
-    stdout = ""
-    stderr = ""
 
+    # Write the stdin stream to the process.
     p.stdin.write(stdin)
     p.stdin.close()
 
-    while True:
-        reads = [p.stdout.fileno(), p.stderr.fileno()]
-        ret = select(reads, [], [])
-        for fd in ret[0]:
-            if fd == p.stdout.fileno():
-                read = p.stdout.readline()
-                if print_to_screen: sys.stdout.write(read)
-                stdout += read
-                wtf(read)
-            if fd == p.stderr.fileno():
-                read = p.stderr.readline()
-                if print_to_screen: sys.stderr.write(read)
-                stderr += read
-                if copy_stderr: 
-                    stdout += read
-                    wtf(read)
-        if not read:
-            break
+    #===============================================================#
+    #| Read the output streams from the process.  This is a bit    |#
+    #| complicated because programs like GROMACS tend to print out |#
+    #| stdout as well as stderr streams, and also carriage returns |#
+    #| along with newline characters.                              |#
+    #===============================================================#
+    # stdout and stderr streams of the process.
+    streams = [p.stdout, p.stderr]
+    # These are functions that take chunks of lines (read) as inputs.
+    def process_out(read):
+        if print_to_screen: sys.stdout.write(read)
+        process_out.stdout += read
+        wtf(read)
+    process_out.stdout = ""
+
+    def process_err(read):
+        if print_to_screen: sys.stderr.write(read)
+        process_err.stderr += read
+        if copy_stderr: 
+            process_out.stdout += read
+            wtf(read)
+    process_err.stderr = ""
+    # This reads the streams one byte at a time, and passes it to the LineChunker
+    # which splits it by either newline or carriage return.
+    # If the stream has ended, then it is removed from the list.
+    with LineChunker(process_out) as out_chunker, LineChunker(process_err) as err_chunker:
+        while True:
+            to_read, _, _ = select(streams, [], [])
+
+            for fh in to_read:
+                if fh is p.stdout:
+                    read = fh.read(1)
+                    out_chunker.push(read)
+                    if not read: streams.remove(p.stdout)
+                elif fh is p.stderr:
+                    read = fh.read(1)
+                    err_chunker.push(read)
+                    if not read: streams.remove(p.stderr)
+                else:
+                    raise RuntimeError
+            if len(streams) == 0: break
 
     p.wait()
 
     if p.returncode != 0:
-        if stderr:
+        if process_err.stderr:
             logger.warning("Received an error message:\n")
             logger.warning("\n[====] \x1b[91mError Message\x1b[0m [====]\n")
-            logger.warning(stderr)
+            logger.warning(process_err.stderr)
             logger.warning("[====] \x1b[91mEnd o'Message\x1b[0m [====]\n")
         if persist:
             logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
@@ -880,7 +952,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             raise Exception("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
         
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
-    return stdout.split('\n')
+    return process_out.stdout.split('\n')
 
 def warn_press_key(warning, timeout=10):
     if type(warning) is str:

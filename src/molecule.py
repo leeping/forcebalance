@@ -1688,13 +1688,33 @@ class Molecule(object):
         ln       = 0
         frame    = 0
         absln    = 0
+        na       = -10
         for line in open(fnm):
             sline = line.split()
             if ln == 0:
                 comms.append(line.strip())
             elif ln == 1:
                 na = int(line.strip())
-            elif is_gro_coord(line):
+            elif ln == na + 2:
+                box = [float(i)*10 for i in sline]
+                if len(box) == 3:
+                    a = box[0]
+                    b = box[1]
+                    c = box[2]
+                    alpha = 90.0
+                    beta = 90.0
+                    gamma = 90.0
+                    boxes.append(BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma))
+                elif len(box) == 9:
+                    v1 = np.array([box[0], box[3], box[4]])
+                    v2 = np.array([box[5], box[1], box[6]])
+                    v3 = np.array([box[7], box[8], box[2]])
+                    boxes.append(BuildLatticeFromVectors(v1, v2, v3))
+                xyzs.append(np.array(xyz)*10)
+                xyz = []
+                ln = -1
+                frame += 1
+            else:
                 coord = []
                 if frame == 0: # Create the list of residues, atom names etc. only if it's the first frame.
                     # Name of the residue, for instance '153SOL1 -> SOL1' ; strips leading numbers
@@ -1721,25 +1741,6 @@ class Molecule(object):
                     coord.append(thiscoord)
                 xyz.append(coord)
 
-            elif is_gro_box(line) and ln == na + 2:
-                box = [float(i)*10 for i in sline]
-                if len(box) == 3:
-                    a = box[0]
-                    b = box[1]
-                    c = box[2]
-                    alpha = 90.0
-                    beta = 90.0
-                    gamma = 90.0
-                    boxes.append(BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma))
-                elif len(box) == 9:
-                    v1 = np.array([box[0], box[3], box[4]])
-                    v2 = np.array([box[5], box[1], box[6]])
-                    v3 = np.array([box[7], box[8], box[2]])
-                    boxes.append(BuildLatticeFromVectors(v1, v2, v3))
-                xyzs.append(np.array(xyz)*10)
-                xyz = []
-                ln = -1
-                frame += 1
             ln += 1
             absln += 1
         Answer = {'xyzs'     : xyzs,
@@ -2322,11 +2323,14 @@ class Molecule(object):
         return out
 
     def write_gro(self, select):
-        self.require('elem','xyzs')
         out = []
-        self.require_resname()
-        self.require_resid()
-        self.require_boxes()
+        if sys.stdin.isatty():
+            self.require('elem','xyzs')
+            self.require_resname()
+            self.require_resid()
+            self.require_boxes()
+        else:
+            self.require('elem','xyzs','resname','resid','boxes')
 
         if 'atomname' not in self.Data:
             atomname = ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
@@ -2401,9 +2405,12 @@ class Molecule(object):
         67-70    int    z      Z value.
 
         """
-        self.require('xyzs')
-        self.require_resname()
-        self.require_resid()
+        if sys.stdin.isatty():
+            self.require('xyzs')
+            self.require_resname()
+            self.require_resid()
+        else:
+            self.require('xyzs','resname','resid')
         ATOMS = self.atomname if 'atomname' in self.Data else ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
         CHAIN = self.chain if 'chain' in self.Data else [1 for i in range(self.na)]
         RESNAMES = self.resname
