@@ -63,6 +63,10 @@ def \hyperlink{classforcebalance_1_1molecule_1_1Molecule_aa6b0a08a6579f697667c83
 \begin{DoxyCompactList}\small\item\em \-Return a series of dihedral angles, given four atom indices numbered from zero. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1molecule_1_1Molecule_af412b655371674434ec63b4bfea6d8c0}{all\-\_\-pairwise\-\_\-rmsd}
 \begin{DoxyCompactList}\small\item\em \-Find pairwise \-R\-M\-S\-D (super slow, not like the one in \-M\-S\-M\-Builder.) \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1molecule_1_1Molecule_ac0fd89e640485f7216183f9a7601c51f}{pathwise\-\_\-rmsd}
+\begin{DoxyCompactList}\small\item\em \-Find \-R\-M\-S\-D between frames along path. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1molecule_1_1Molecule_a58191a79257fbad7f2c636239bfa7596}{ref\-\_\-rmsd}
+\begin{DoxyCompactList}\small\item\em \-Find \-R\-M\-S\-D to a reference frame. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1molecule_1_1Molecule_aff7a0e2413297088a5bc3e91e5951f3f}{align\-\_\-center}
 \item 
 def \hyperlink{classforcebalance_1_1molecule_1_1Molecule_a57edc8d72f7e4c1a1452de7b438f3c55}{openmm\-\_\-positions}
@@ -132,6 +136,8 @@ def \hyperlink{classforcebalance_1_1molecule_1_1Molecule_a03af3cfb99ea8f1c8c7e93
 \begin{DoxyCompactList}\small\item\em \-A funnel dictionary that takes redundant file types and maps them down to a few. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1molecule_1_1Molecule_a5ba227fb037995246be7bca5cf633b8b}{positive\-\_\-resid}
 \begin{DoxyCompactList}\small\item\em \-Creates entries like 'gromacs' \-: 'gromacs' and 'xyz' \-: 'xyz' in the \-Funnel. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1molecule_1_1Molecule_aa0768b07267ac7def14dd5224caa5708}{built\-\_\-bonds}
+\item 
 \hyperlink{classforcebalance_1_1molecule_1_1Molecule_a8698f94608be34eeba6eaa4c52dc5249}{\-Data}
 \item 
 \hyperlink{classforcebalance_1_1molecule_1_1Molecule_a5e092c726455a18c9300f5c5362121d8}{comms}
@@ -183,7 +189,7 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 \-Unit system\-: \-Angstroms. 
 
-\-Definition at line 645 of file molecule.\-py.
+\-Definition at line 662 of file molecule.\-py.
 
 
 
@@ -196,7 +202,8 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 \item[{}]{fnm = {\ttfamily \-None}, }
 \item[{}]{ftype = {\ttfamily \-None}, }
 \item[{}]{positive\-\_\-resid = {\ttfamily \-True}, }
-\item[{}]{build\-\_\-topology = {\ttfamily \-True}}
+\item[{}]{build\-\_\-topology = {\ttfamily \-True}, }
+\item[{}]{kwargs}
 \end{DoxyParamCaption}
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a3f8233f4e9911d7af0f17ca66c16ff92}
 
@@ -205,7 +212,7 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 815 of file molecule.\-py.
+\-Definition at line 832 of file molecule.\-py.
 
 
 
@@ -224,11 +231,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 754 of file molecule.\-py.
+\-Definition at line 771 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -251,7 +259,7 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 734 of file molecule.\-py.
+\-Definition at line 751 of file molecule.\-py.
 
 
 
@@ -278,11 +286,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 665 of file molecule.\-py.
+\-Definition at line 682 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -305,11 +314,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 \-If we say \-My\-Molecule\mbox{[}0\-:10\mbox{]}, then we'll return a copy of \-My\-Molecule with frames 0 through 9. 
 
-\-Definition at line 713 of file molecule.\-py.
+\-Definition at line 730 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -332,11 +342,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 784 of file molecule.\-py.
+\-Definition at line 801 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -358,11 +369,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 \-Note that these values are returned by reference. \-Note that this is intended to be more efficient than \-\_\-\-\_\-getitem\-\_\-\-\_\-, so when we loop over a trajectory, it's best to go \char`\"{}for m in M\char`\"{} instead of \char`\"{}for i in range(len(\-M))\-: m = M\mbox{[}i\mbox{]}\char`\"{} 
 
-\-Definition at line 743 of file molecule.\-py.
+\-Definition at line 760 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -384,7 +396,7 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 649 of file molecule.\-py.
+\-Definition at line 666 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a3e716bb5d0b0450d5774cfc42a44c789}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}}
 \index{\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -401,11 +413,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 701 of file molecule.\-py.
+\-Definition at line 718 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -424,11 +437,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a33020ff5e5cec23a3d9d1fe7adfa8583}
 
 
-\-Definition at line 995 of file molecule.\-py.
+\-Definition at line 1014 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -452,15 +466,16 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 \-This does \-N\-O\-T set the position of the virtual site; it sits at the origin. 
 
-\-Definition at line 1007 of file molecule.\-py.
+\-Definition at line 1026 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a87e66db685214a9cdd4feff49d4ea5dc}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!align@{align}}
 \index{align@{align}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
 \paragraph[{align}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-molecule.\-Molecule.\-align} (
 \begin{DoxyParamCaption}
 \item[{}]{self, }
-\item[{}]{smooth = {\ttfamily \-True}, }
-\item[{}]{center = {\ttfamily \-True}}
+\item[{}]{smooth = {\ttfamily \-False}, }
+\item[{}]{center = {\ttfamily \-True}, }
+\item[{}]{select = {\ttfamily \-None}}
 \end{DoxyParamCaption}
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a87e66db685214a9cdd4feff49d4ea5dc}
 
@@ -469,13 +484,16 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 \-Has the option to create smooth trajectories (align each frame to the previous one) or to align each frame to the first one.
 
-\-Also has the option to remove the center of mass. 
+\-Also has the option to remove the center of mass.
 
-\-Definition at line 1143 of file molecule.\-py.
+\-Provide a list of atom indices to align along selected atoms. 
+
+\-Definition at line 1166 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -497,7 +515,7 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 1124 of file molecule.\-py.
+\-Definition at line 1145 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_aff7a0e2413297088a5bc3e91e5951f3f}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!align\-\_\-center@{align\-\_\-center}}
 \index{align\-\_\-center@{align\-\_\-center}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -508,7 +526,7 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_aff7a0e2413297088a5bc3e91e5951f3f}
 
 
-\-Definition at line 1247 of file molecule.\-py.
+\-Definition at line 1364 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_af412b655371674434ec63b4bfea6d8c0}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!all\-\_\-pairwise\-\_\-rmsd@{all\-\_\-pairwise\-\_\-rmsd}}
 \index{all\-\_\-pairwise\-\_\-rmsd@{all\-\_\-pairwise\-\_\-rmsd}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -523,11 +541,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 1231 of file molecule.\-py.
+\-Definition at line 1315 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -546,11 +565,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a77417ff99b19f6d0b7c6f527e83fa7f1}
 
 
-\-Definition at line 808 of file molecule.\-py.
+\-Definition at line 825 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -573,7 +593,19 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 \-Takes an integer, list or array as argument. 
 
-\-Definition at line 1045 of file molecule.\-py.
+\-Definition at line 1064 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a432affdec68562b5b19fd249124480c3_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a63dd7bc0347cc3dec5e8fa0ebfd567ec}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!atom\-\_\-stack@{atom\-\_\-stack}}
 \index{atom\-\_\-stack@{atom\-\_\-stack}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -589,11 +621,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 \-W\-A\-R\-N\-I\-N\-G\-: \-This function may invalidate stuff like \-Q\-M energies. 
 
-\-Definition at line 1080 of file molecule.\-py.
+\-Definition at line 1101 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -617,11 +650,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 \-Returns a \-Network\-X graph that depicts the molecular topology, which might be useful for stuff. \-Provide, optionally, the frame number used to compute the topology. 
 
-\-Definition at line 1162 of file molecule.\-py.
+\-Definition at line 1191 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -639,18 +673,7 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a6aa22586a5590f63ea20e269e3f195a5}
 
 
-\-Definition at line 952 of file molecule.\-py.
-
-
-
-\-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a6aa22586a5590f63ea20e269e3f195a5_cgraph}
-\end{center}
-\end{figure}
-
+\-Definition at line 971 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a441d8367806c9a802bd0693fea16c62a}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!edit\-\_\-qcrems@{edit\-\_\-qcrems}}
 \index{edit\-\_\-qcrems@{edit\-\_\-qcrems}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -663,11 +686,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a441d8367806c9a802bd0693fea16c62a}
 
 
-\-Definition at line 986 of file molecule.\-py.
+\-Definition at line 1005 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -686,7 +710,19 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a68e276a95910d534fa2e937abbc60e1c}
 
 
-\-Definition at line 979 of file molecule.\-py.
+\-Definition at line 998 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a68e276a95910d534fa2e937abbc60e1c_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_aa6b0a08a6579f697667c83e04927298c}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!measure\-\_\-dihedrals@{measure\-\_\-dihedrals}}
 \index{measure\-\_\-dihedrals@{measure\-\_\-dihedrals}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -705,11 +741,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 1204 of file molecule.\-py.
+\-Definition at line 1288 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -731,7 +768,7 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 1273 of file molecule.\-py.
+\-Definition at line 1390 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a57edc8d72f7e4c1a1452de7b438f3c55}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!openmm\-\_\-positions@{openmm\-\_\-positions}}
 \index{openmm\-\_\-positions@{openmm\-\_\-positions}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -746,15 +783,31 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 
 
 
-\-Definition at line 1256 of file molecule.\-py.
+\-Definition at line 1373 of file molecule.\-py.
+
+\hypertarget{classforcebalance_1_1molecule_1_1Molecule_ac0fd89e640485f7216183f9a7601c51f}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!pathwise\-\_\-rmsd@{pathwise\-\_\-rmsd}}
+\index{pathwise\-\_\-rmsd@{pathwise\-\_\-rmsd}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
+\paragraph[{pathwise\-\_\-rmsd}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-molecule.\-Molecule.\-pathwise\-\_\-rmsd} (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1molecule_1_1Molecule_ac0fd89e640485f7216183f9a7601c51f}
+
+
+\-Find \-R\-M\-S\-D between frames along path. 
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Definition at line 1333 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a57edc8d72f7e4c1a1452de7b438f3c55_cgraph}
+\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_ac0fd89e640485f7216183f9a7601c51f_cgraph}
 \end{center}
 \end{figure}
 
@@ -768,11 +821,12 @@ na = \-The number of atoms. \-You'll get this if you use \-My\-Mol.\-na or \-My\
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a02ff6f6642ed47c3b1fa3bb00191c32a}
 
 
-\-Definition at line 956 of file molecule.\-py.
+\-Definition at line 975 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -811,11 +865,12 @@ tinkersuf \-The suffix that comes after lines in the \-X\-Y\-Z coordinates; this
 \end{DoxyReturn}
 
 
-\-Definition at line 1551 of file molecule.\-py.
+\-Definition at line 1671 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -838,11 +893,12 @@ tinkersuf \-The suffix that comes after lines in the \-X\-Y\-Z coordinates; this
 
 
 
-\-Definition at line 1690 of file molecule.\-py.
+\-Definition at line 1815 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -881,11 +937,12 @@ mult \-The spin multiplicity of the system.
 \end{DoxyReturn}
 
 
-\-Definition at line 1508 of file molecule.\-py.
+\-Definition at line 1627 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -904,11 +961,12 @@ mult \-The spin multiplicity of the system.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_ad8fa6cc7424aae00ee3f5bb87d28e037}
 
 
-\-Definition at line 1469 of file molecule.\-py.
+\-Definition at line 1588 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -931,11 +989,12 @@ mult \-The spin multiplicity of the system.
 
 
 
-\-Definition at line 1614 of file molecule.\-py.
+\-Definition at line 1735 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -970,11 +1029,12 @@ boxes \-Boxes (if present.)
 \end{DoxyReturn}
 
 
-\-Definition at line 1360 of file molecule.\-py.
+\-Definition at line 1478 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -993,11 +1053,12 @@ boxes \-Boxes (if present.)
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a14b1fbc70a083d21fd016b5dd854fd56}
 
 
-\-Definition at line 1420 of file molecule.\-py.
+\-Definition at line 1539 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1020,11 +1081,12 @@ boxes \-Boxes (if present.)
 
 
 
-\-Definition at line 1870 of file molecule.\-py.
+\-Definition at line 1998 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1043,7 +1105,7 @@ boxes \-Boxes (if present.)
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a27fb6201b435a3b205ae62f605256f3d}
 
 
-\-Definition at line 1945 of file molecule.\-py.
+\-Definition at line 2073 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a003b182b54de4473c4691ae1474b1ada}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!read\-\_\-qcin@{read\-\_\-qcin}}
 \index{read\-\_\-qcin@{read\-\_\-qcin}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1067,11 +1129,12 @@ boxes \-Boxes (if present.)
 
 4) \-We can read in all of the xyz's as a trajectory, but only the \-Q-\/\-Chem settings belonging to the first xyz will be saved. 
 
-\-Definition at line 1758 of file molecule.\-py.
+\-Definition at line 1884 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1085,7 +1148,8 @@ boxes \-Boxes (if present.)
 \paragraph[{read\-\_\-qcout}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-molecule.\-Molecule.\-read\-\_\-qcout} (
 \begin{DoxyParamCaption}
 \item[{}]{self, }
-\item[{}]{fnm}
+\item[{}]{fnm, }
+\item[{}]{maxopt = {\ttfamily 1}}
 \end{DoxyParamCaption}
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a8c9e71843e7123c57c43c24af2d84f25}
 
@@ -1101,15 +1165,18 @@ boxes \-Boxes (if present.)
 \item \-Forces
 \end{DoxyItemize}
 
+\-Calling with maxopt = 1 will result in a successful read (with warning) even when maximum optimization cycles are reached.
+
 \-Note that each step in a geometry optimization counts as a frame.
 
 \-As with all \-Q-\/\-Chem output files, note that successive calculations can have different numbers of atoms. 
 
-\-Definition at line 1974 of file molecule.\-py.
+\-Definition at line 2105 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1128,7 +1195,19 @@ boxes \-Boxes (if present.)
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a1d34af6a7d22dd34850d58efe8595b20}
 
 
-\-Definition at line 1385 of file molecule.\-py.
+\-Definition at line 1503 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a1d34af6a7d22dd34850d58efe8595b20_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a15a7a0e0377e6dfd52e60c77fbc583c1}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!read\-\_\-xyz@{read\-\_\-xyz}}
 \index{read\-\_\-xyz@{read\-\_\-xyz}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1156,11 +1235,12 @@ xyzs \-A list of \-X\-Y\-Z coordinates (number of snapshots times number of atom
 \end{DoxyReturn}
 
 
-\-Definition at line 1314 of file molecule.\-py.
+\-Definition at line 1431 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1168,6 +1248,22 @@ xyzs \-A list of \-X\-Y\-Z coordinates (number of snapshots times number of atom
 \end{center}
 \end{figure}
 
+
+\hypertarget{classforcebalance_1_1molecule_1_1Molecule_a58191a79257fbad7f2c636239bfa7596}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!ref\-\_\-rmsd@{ref\-\_\-rmsd}}
+\index{ref\-\_\-rmsd@{ref\-\_\-rmsd}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
+\paragraph[{ref\-\_\-rmsd}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-molecule.\-Molecule.\-ref\-\_\-rmsd} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{i}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1molecule_1_1Molecule_a58191a79257fbad7f2c636239bfa7596}
+
+
+\-Find \-R\-M\-S\-D to a reference frame. 
+
+
+
+\-Definition at line 1350 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_ad825186bec1659fdad2521a1b377323b}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!replace\-\_\-peratom@{replace\-\_\-peratom}}
 \index{replace\-\_\-peratom@{replace\-\_\-peratom}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1185,7 +1281,7 @@ xyzs \-A list of \-X\-Y\-Z coordinates (number of snapshots times number of atom
 
 
 
-\-Definition at line 1024 of file molecule.\-py.
+\-Definition at line 1043 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_ae565eb57c2ee21f2be19b9761754aba5}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!replace\-\_\-peratom\-\_\-conditional@{replace\-\_\-peratom\-\_\-conditional}}
 \index{replace\-\_\-peratom\-\_\-conditional@{replace\-\_\-peratom\-\_\-conditional}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1205,11 +1301,12 @@ xyzs \-A list of \-X\-Y\-Z coordinates (number of snapshots times number of atom
 
 \-For instance\-: replace \-H1 with \-H2 if resname is \-S\-O\-L. 
 
-\-Definition at line 1035 of file molecule.\-py.
+\-Definition at line 1054 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1228,7 +1325,19 @@ xyzs \-A list of \-X\-Y\-Z coordinates (number of snapshots times number of atom
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a80851250d8e749bea882d5aa4bcfcdd1}
 
 
-\-Definition at line 903 of file molecule.\-py.
+\-Definition at line 922 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a80851250d8e749bea882d5aa4bcfcdd1_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a03af3cfb99ea8f1c8c7e93d04bdcf967}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!require\-\_\-boxes@{require\-\_\-boxes}}
 \index{require\-\_\-boxes@{require\-\_\-boxes}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1239,18 +1348,7 @@ xyzs \-A list of \-X\-Y\-Z coordinates (number of snapshots times number of atom
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a03af3cfb99ea8f1c8c7e93d04bdcf967}
 
 
-\-Definition at line 2447 of file molecule.\-py.
-
-
-
-\-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a03af3cfb99ea8f1c8c7e93d04bdcf967_cgraph}
-\end{center}
-\end{figure}
-
+\-Definition at line 2595 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a90fe456919fda305703e36af389e60e1}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!require\-\_\-resid@{require\-\_\-resid}}
 \index{require\-\_\-resid@{require\-\_\-resid}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1261,7 +1359,7 @@ xyzs \-A list of \-X\-Y\-Z coordinates (number of snapshots times number of atom
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a90fe456919fda305703e36af389e60e1}
 
 
-\-Definition at line 2434 of file molecule.\-py.
+\-Definition at line 2582 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_ad47d05a3ea76e013a628bd7b25ae3050}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!require\-\_\-resname@{require\-\_\-resname}}
 \index{require\-\_\-resname@{require\-\_\-resname}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1272,7 +1370,7 @@ xyzs \-A list of \-X\-Y\-Z coordinates (number of snapshots times number of atom
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_ad47d05a3ea76e013a628bd7b25ae3050}
 
 
-\-Definition at line 2442 of file molecule.\-py.
+\-Definition at line 2590 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a71da1c1e530afd8b9b5f08d9bd27259f}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!split@{split}}
 \index{split@{split}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1300,11 +1398,12 @@ fnms \-A list of the file names that were written.
 \end{DoxyReturn}
 
 
-\-Definition at line 1296 of file molecule.\-py.
+\-Definition at line 1413 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1326,11 +1425,12 @@ fnms \-A list of the file names that were written.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a4ecfdf28aacff9c081dd50cd4ac84f89}
 
 
-\-Definition at line 918 of file molecule.\-py.
+\-Definition at line 937 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1349,18 +1449,7 @@ fnms \-A list of the file names that were written.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a95782abfb36e7080a1b98bfad2ced4f3}
 
 
-\-Definition at line 2231 of file molecule.\-py.
-
-
-
-\-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a95782abfb36e7080a1b98bfad2ced4f3_cgraph}
-\end{center}
-\end{figure}
-
+\-Definition at line 2373 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a0dee435704418bf51199d6bab6d92249}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!write\-\_\-dcd@{write\-\_\-dcd}}
 \index{write\-\_\-dcd@{write\-\_\-dcd}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1372,11 +1461,12 @@ fnms \-A list of the file names that were written.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a0dee435704418bf51199d6bab6d92249}
 
 
-\-Definition at line 2267 of file molecule.\-py.
+\-Definition at line 2412 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1395,7 +1485,19 @@ fnms \-A list of the file names that were written.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_a503eae2cee228e4cc5fc736504714925}
 
 
-\-Definition at line 2243 of file molecule.\-py.
+\-Definition at line 2385 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_a503eae2cee228e4cc5fc736504714925_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_aab5ea35ab9d68559fd6ea7b747c2bddb}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!write\-\_\-mdcrd@{write\-\_\-mdcrd}}
 \index{write\-\_\-mdcrd@{write\-\_\-mdcrd}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1407,7 +1509,19 @@ fnms \-A list of the file names that were written.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_aab5ea35ab9d68559fd6ea7b747c2bddb}
 
 
-\-Definition at line 2220 of file molecule.\-py.
+\-Definition at line 2362 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1molecule_1_1Molecule_aab5ea35ab9d68559fd6ea7b747c2bddb_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_aba14226f272f91c91ecf7060ff136a2b}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!write\-\_\-molproq@{write\-\_\-molproq}}
 \index{write\-\_\-molproq@{write\-\_\-molproq}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1419,11 +1533,12 @@ fnms \-A list of the file names that were written.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_aba14226f272f91c91ecf7060ff136a2b}
 
 
-\-Definition at line 2208 of file molecule.\-py.
+\-Definition at line 2350 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1448,11 +1563,12 @@ fnms \-A list of the file names that were written.
 
 \-C\-R\-Y\-S\-T1 line, added by \-Lee-\/\-Ping \-C\-O\-L\-U\-M\-N\-S \-T\-Y\-P\-E \-F\-I\-E\-L\-D \-D\-E\-F\-I\-N\-I\-T\-I\-O\-N -\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/ 7-\/15 float a a (\-Angstroms). 16-\/24 float b b (\-Angstroms). 25-\/33 float c c (\-Angstroms). 34-\/40 float alpha alpha (degrees). 41-\/47 float beta beta (degrees). 48-\/54 float gamma gamma (degrees). 56-\/66 string s\-Group \-Space group. 67-\/70 int z \-Z value. 
 
-\-Definition at line 2323 of file molecule.\-py.
+\-Definition at line 2468 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1471,11 +1587,12 @@ fnms \-A list of the file names that were written.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_af46b2ba6ef777cf8301bc16e157c724d}
 
 
-\-Definition at line 2151 of file molecule.\-py.
+\-Definition at line 2293 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1498,11 +1615,12 @@ fnms \-A list of the file names that were written.
 
 
 
-\-Definition at line 2413 of file molecule.\-py.
+\-Definition at line 2561 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1521,11 +1639,12 @@ fnms \-A list of the file names that were written.
 )}}\label{classforcebalance_1_1molecule_1_1Molecule_adc6620e8287edabe161442de12295f75}
 
 
-\-Definition at line 2197 of file molecule.\-py.
+\-Definition at line 2339 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -1542,7 +1661,14 @@ fnms \-A list of the file names that were written.
 \paragraph[{boxes}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::molecule.\-Molecule\-::boxes}}}\label{classforcebalance_1_1molecule_1_1Molecule_ac84c67d37f00c0f65e6fb6126e19f9bb}
 
 
-\-Definition at line 2447 of file molecule.\-py.
+\-Definition at line 2595 of file molecule.\-py.
+
+\hypertarget{classforcebalance_1_1molecule_1_1Molecule_aa0768b07267ac7def14dd5224caa5708}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!built\-\_\-bonds@{built\-\_\-bonds}}
+\index{built\-\_\-bonds@{built\-\_\-bonds}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
+\paragraph[{built\-\_\-bonds}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::molecule.\-Molecule\-::built\-\_\-bonds}}}\label{classforcebalance_1_1molecule_1_1Molecule_aa0768b07267ac7def14dd5224caa5708}
+
+
+\-Definition at line 838 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a5e092c726455a18c9300f5c5362121d8}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!comms@{comms}}
 \index{comms@{comms}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1553,14 +1679,14 @@ fnms \-A list of the file names that were written.
 
 \-Try to determine from the file name using the extension. \-Actually read the file. \-Set member variables. \-Create a list of comment lines if we don't already have them from reading the file. 
 
-\-Definition at line 826 of file molecule.\-py.
+\-Definition at line 843 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a8698f94608be34eeba6eaa4c52dc5249}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!\-Data@{\-Data}}
 \index{\-Data@{\-Data}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
 \paragraph[{\-Data}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::molecule.\-Molecule\-::\-Data}}}\label{classforcebalance_1_1molecule_1_1Molecule_a8698f94608be34eeba6eaa4c52dc5249}
 
 
-\-Definition at line 821 of file molecule.\-py.
+\-Definition at line 838 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a7887451529cc2b396240b6e4ebfcc2de}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!fout@{fout}}
 \index{fout@{fout}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1571,7 +1697,7 @@ fnms \-A list of the file names that were written.
 
 \-I needed to add in this line because the \-D\-C\-D writer requires the file name, but the other methods don't. 
 
-\-Definition at line 921 of file molecule.\-py.
+\-Definition at line 940 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a8ee3f691f4ff9c4236afa756ed5482e3}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!\-Funnel@{\-Funnel}}
 \index{\-Funnel@{\-Funnel}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1582,14 +1708,14 @@ fnms \-A list of the file names that were written.
 
 
 
-\-Definition at line 819 of file molecule.\-py.
+\-Definition at line 836 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_ac0a283e8dd0d63a852311ccdc904e31f}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!molecules@{molecules}}
 \index{molecules@{molecules}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
 \paragraph[{molecules}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::molecule.\-Molecule\-::molecules}}}\label{classforcebalance_1_1molecule_1_1Molecule_ac0a283e8dd0d63a852311ccdc904e31f}
 
 
-\-Definition at line 830 of file molecule.\-py.
+\-Definition at line 847 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a5ba227fb037995246be7bca5cf633b8b}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!positive\-\_\-resid@{positive\-\_\-resid}}
 \index{positive\-\_\-resid@{positive\-\_\-resid}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1600,7 +1726,7 @@ fnms \-A list of the file names that were written.
 
 
 
-\-Definition at line 821 of file molecule.\-py.
+\-Definition at line 838 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_ab812bbb4ae25ee4f6b69a7926a2ef3e8}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!\-Read\-\_\-\-Tab@{\-Read\-\_\-\-Tab}}
 \index{\-Read\-\_\-\-Tab@{\-Read\-\_\-\-Tab}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1611,21 +1737,21 @@ fnms \-A list of the file names that were written.
 
 
 
-\-Definition at line 816 of file molecule.\-py.
+\-Definition at line 833 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_afcd4c8e1671af626d0267a243e69530d}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!resid@{resid}}
 \index{resid@{resid}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
 \paragraph[{resid}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::molecule.\-Molecule\-::resid}}}\label{classforcebalance_1_1molecule_1_1Molecule_afcd4c8e1671af626d0267a243e69530d}
 
 
-\-Definition at line 2434 of file molecule.\-py.
+\-Definition at line 2582 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a4aebc6ada9bda74a6740568d4f3658eb}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!resname@{resname}}
 \index{resname@{resname}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
 \paragraph[{resname}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::molecule.\-Molecule\-::resname}}}\label{classforcebalance_1_1molecule_1_1Molecule_a4aebc6ada9bda74a6740568d4f3658eb}
 
 
-\-Definition at line 2442 of file molecule.\-py.
+\-Definition at line 2590 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_accabf9159aa7f3c6e514ec048d88eeaa}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!topology@{topology}}
 \index{topology@{topology}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1636,7 +1762,7 @@ fnms \-A list of the file names that were written.
 
 \-:) 
 
-\-Definition at line 830 of file molecule.\-py.
+\-Definition at line 847 of file molecule.\-py.
 
 \hypertarget{classforcebalance_1_1molecule_1_1Molecule_a950a2ec0b5697bf88f192dec676825fc}{\index{forcebalance\-::molecule\-::\-Molecule@{forcebalance\-::molecule\-::\-Molecule}!\-Write\-\_\-\-Tab@{\-Write\-\_\-\-Tab}}
 \index{\-Write\-\_\-\-Tab@{\-Write\-\_\-\-Tab}!forcebalance::molecule::Molecule@{forcebalance\-::molecule\-::\-Molecule}}
@@ -1647,7 +1773,7 @@ fnms \-A list of the file names that were written.
 
 
 
-\-Definition at line 817 of file molecule.\-py.
+\-Definition at line 834 of file molecule.\-py.
 
 
 

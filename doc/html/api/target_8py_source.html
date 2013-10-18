@@ -91,390 +91,446 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00007"></a>00007 <span class="keyword">import</span> numpy <span class="keyword">as</span> np
 <a name="l00008"></a>00008 <span class="keyword">import</span> time
 <a name="l00009"></a>00009 <span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict
-<a name="l00010"></a>00010 <span class="keyword">import</span> forcebalance
-<a name="l00011"></a>00011 <span class="keyword">from</span> forcebalance.nifty <span class="keyword">import</span> row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
-<a name="l00012"></a>00012 <span class="keyword">from</span> forcebalance.finite_difference <span class="keyword">import</span> fdwrap_G, fdwrap_H, f1d2p, f12d3p
-<a name="l00013"></a>00013 <span class="keyword">from</span> forcebalance.optimizer <span class="keyword">import</span> Counter
-<a name="l00014"></a>00014 <span class="keyword">from</span> forcebalance.output <span class="keyword">import</span> getLogger
-<a name="l00015"></a>00015 logger = getLogger(__name__)
-<a name="l00016"></a><a class="code" href="namespaceforcebalance_1_1target.html#a6b5ddff6e409717872f8dbdb243183eb">00016</a> 
-<a name="l00017"></a>00017 <span class="keyword">class </span><a class="code" href="classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets.">Target</a>(forcebalance.BaseClass):
-<a name="l00018"></a>00018     
-<a name="l00019"></a>00019     <span class="stringliteral">&quot;&quot;&quot;</span>
-<a name="l00020"></a>00020 <span class="stringliteral">    Base class for all fitting targets.</span>
-<a name="l00021"></a>00021 <span class="stringliteral">    </span>
-<a name="l00022"></a>00022 <span class="stringliteral">    In ForceBalance a Target is defined as a set of reference data</span>
-<a name="l00023"></a>00023 <span class="stringliteral">    plus a corresponding method to simulate that data using the force field.</span>
-<a name="l00024"></a>00024 <span class="stringliteral">    </span>
-<a name="l00025"></a>00025 <span class="stringliteral">    The &#39;computable quantities&#39; may include energies and forces where the</span>
-<a name="l00026"></a>00026 <span class="stringliteral">    reference values come from QM calculations (energy and force matching),</span>
-<a name="l00027"></a>00027 <span class="stringliteral">    energies from an EDA analysis (Maybe in the future, FDA?), molecular</span>
-<a name="l00028"></a>00028 <span class="stringliteral">    properties (like polarizability, refractive indices, multipole moments</span>
-<a name="l00029"></a>00029 <span class="stringliteral">    or vibrational frequencies), relative entropies, and bulk properties.</span>
-<a name="l00030"></a>00030 <span class="stringliteral">    Single-molecule or bulk properties can even come from the experiment!</span>
-<a name="l00031"></a>00031 <span class="stringliteral">    </span>
-<a name="l00032"></a>00032 <span class="stringliteral">    The central idea in ForceBalance is that each quantity makes a</span>
-<a name="l00033"></a>00033 <span class="stringliteral">    contribution to the overall objective function.  So we can build force</span>
-<a name="l00034"></a>00034 <span class="stringliteral">    fields that fit several quantities at once, rather than putting all of</span>
-<a name="l00035"></a>00035 <span class="stringliteral">    our chips behind energy and force matching.  In the future</span>
-<a name="l00036"></a>00036 <span class="stringliteral">    ForceBalance may even include multiobjective optimization into the</span>
-<a name="l00037"></a>00037 <span class="stringliteral">    optimizer.</span>
-<a name="l00038"></a>00038 <span class="stringliteral">    </span>
-<a name="l00039"></a>00039 <span class="stringliteral">    The optimization is done by way of minimizing an &#39;objective</span>
-<a name="l00040"></a>00040 <span class="stringliteral">    function&#39;, which is comprised of squared differences between the</span>
-<a name="l00041"></a>00041 <span class="stringliteral">    computed and reference values.  These differences are not computed</span>
-<a name="l00042"></a>00042 <span class="stringliteral">    in this file, but rather in subclasses that use Target</span>
-<a name="l00043"></a>00043 <span class="stringliteral">    as a base class.  Thus, the contents of Target itself</span>
-<a name="l00044"></a>00044 <span class="stringliteral">    are meant to be as general as possible, because the pertinent</span>
-<a name="l00045"></a>00045 <span class="stringliteral">    variables apply to all types of fitting targets.</span>
-<a name="l00046"></a>00046 <span class="stringliteral"></span>
-<a name="l00047"></a>00047 <span class="stringliteral">    An important node: Target requires that all subclasses</span>
-<a name="l00048"></a>00048 <span class="stringliteral">    have a method get(self,mvals,AGrad=False,AHess=False)</span>
-<a name="l00049"></a>00049 <span class="stringliteral">    that does the following:</span>
-<a name="l00050"></a>00050 <span class="stringliteral">    </span>
-<a name="l00051"></a>00051 <span class="stringliteral">    Inputs: </span>
-<a name="l00052"></a>00052 <span class="stringliteral">    mvals        = The parameter vector, which modifies the force field</span>
-<a name="l00053"></a>00053 <span class="stringliteral">    (Note to self: We include mvals with each Target because we can create</span>
-<a name="l00054"></a>00054 <span class="stringliteral">    copies of the force field and do finite difference derivatives)</span>
-<a name="l00055"></a>00055 <span class="stringliteral">    AGrad, AHess = Boolean switches for computing analytic gradients and Hessians</span>
-<a name="l00056"></a>00056 <span class="stringliteral"></span>
-<a name="l00057"></a>00057 <span class="stringliteral">    Outputs:</span>
-<a name="l00058"></a>00058 <span class="stringliteral">    Answer       = {&#39;X&#39;: Number, &#39;G&#39;: numpy.array(np), &#39;H&#39;: numpy.array((np,np)) }</span>
-<a name="l00059"></a>00059 <span class="stringliteral">    &#39;X&#39;          = The objective function itself</span>
-<a name="l00060"></a>00060 <span class="stringliteral">    &#39;G&#39;          = The gradient, elements not computed analytically are zero</span>
-<a name="l00061"></a>00061 <span class="stringliteral">    &#39;H&#39;          = The Hessian, elements not computed analytically are zero</span>
-<a name="l00062"></a>00062 <span class="stringliteral"></span>
-<a name="l00063"></a>00063 <span class="stringliteral">    This is the only global requirement of a Target.</span>
-<a name="l00064"></a>00064 <span class="stringliteral">    Obviously &#39;get&#39; itself is not defined here, because its</span>
-<a name="l00065"></a>00065 <span class="stringliteral">    calculation will depend entirely on specifically which target</span>
-<a name="l00066"></a>00066 <span class="stringliteral">    we wish to use.  However, this should give us a unified framework</span>
-<a name="l00067"></a>00067 <span class="stringliteral">    which will faciliate rapid implementation of Targets.</span>
-<a name="l00068"></a>00068 <span class="stringliteral"></span>
-<a name="l00069"></a>00069 <span class="stringliteral">    Future work:</span>
-<a name="l00070"></a>00070 <span class="stringliteral">    Robert suggested that I could enable automatic detection of which</span>
-<a name="l00071"></a>00071 <span class="stringliteral">    parameters need to be computed by finite difference.  Not a bad idea. :)</span>
-<a name="l00072"></a>00072 <span class="stringliteral"></span>
-<a name="l00073"></a>00073 <span class="stringliteral">    &quot;&quot;&quot;</span>
-<a name="l00074"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html">00074</a> 
-<a name="l00075"></a>00075     __metaclass__ = abc.ABCMeta
-<a name="l00076"></a>00076     
-<a name="l00077"></a>00077     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#ab8f31f6e94e0fbd84f0ee54d326bb69a" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(self,options,tgt_opts,forcefield):
-<a name="l00078"></a>00078         <span class="stringliteral">&quot;&quot;&quot;</span>
-<a name="l00079"></a>00079 <span class="stringliteral">        All options here are intended to be usable by every</span>
-<a name="l00080"></a>00080 <span class="stringliteral">        conceivable type of target (in other words, only</span>
-<a name="l00081"></a>00081 <span class="stringliteral">        add content here if it&#39;s widely applicable.)</span>
-<a name="l00082"></a>00082 <span class="stringliteral"></span>
-<a name="l00083"></a>00083 <span class="stringliteral">        If we want to add attributes that are more specific</span>
-<a name="l00084"></a>00084 <span class="stringliteral">        (i.e. a set of reference forces for force matching), they</span>
-<a name="l00085"></a>00085 <span class="stringliteral">        are added in the subclass AbInitio that inherits from</span>
-<a name="l00086"></a>00086 <span class="stringliteral">        Target.</span>
-<a name="l00087"></a>00087 <span class="stringliteral"></span>
-<a name="l00088"></a>00088 <span class="stringliteral">        &quot;&quot;&quot;</span>
-<a name="l00089"></a>00089         super(Target, self).<a class="code" href="classforcebalance_1_1target_1_1Target.html#ab8f31f6e94e0fbd84f0ee54d326bb69a" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(options)
-<a name="l00090"></a>00090         <span class="comment">#======================================#</span>
-<a name="l00091"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#ab8f31f6e94e0fbd84f0ee54d326bb69a">00091</a>         <span class="comment"># Options that are given by the parser #</span>
-<a name="l00092"></a>00092         <span class="comment">#======================================#</span>
-<a name="l00093"></a>00093         <span class="comment">## Root directory of the whole project</span>
-<a name="l00094"></a>00094         self.set_option(options, <span class="stringliteral">&#39;root&#39;</span>)
-<a name="l00095"></a>00095         <span class="comment">## Name of the target</span>
-<a name="l00096"></a>00096         self.set_option(tgt_opts, <span class="stringliteral">&#39;name&#39;</span>)
-<a name="l00097"></a>00097         <span class="comment">## Type of target</span>
-<a name="l00098"></a>00098         self.set_option(tgt_opts, <span class="stringliteral">&#39;type&#39;</span>)
-<a name="l00099"></a>00099         <span class="comment">## Relative weight of the target</span>
-<a name="l00100"></a>00100         self.set_option(tgt_opts, <span class="stringliteral">&#39;weight&#39;</span>)
-<a name="l00101"></a>00101         <span class="comment">## Switch for finite difference gradients</span>
-<a name="l00102"></a>00102         self.set_option(tgt_opts, <span class="stringliteral">&#39;fdgrad&#39;</span>)
-<a name="l00103"></a>00103         <span class="comment">## Switch for finite difference Hessians</span>
-<a name="l00104"></a>00104         self.set_option(tgt_opts, <span class="stringliteral">&#39;fdhess&#39;</span>)
-<a name="l00105"></a>00105         <span class="comment">## Switch for FD gradients + Hessian diagonals</span>
-<a name="l00106"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6">00106</a>         self.set_option(tgt_opts, <span class="stringliteral">&#39;fdhessdiag&#39;</span>)
-<a name="l00107"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9">00107</a>         <span class="comment">## How many seconds to sleep (if any)</span>
-<a name="l00108"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f">00108</a>         self.set_option(tgt_opts, <span class="stringliteral">&#39;sleepy&#39;</span>)
-<a name="l00109"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#ad4cd0ab38d8fc97d3e7a6e22ce130a16">00109</a>         <span class="comment">## Parameter types that trigger FD gradient elements</span>
-<a name="l00110"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#aff6e42b84dd8eb5a4dc3b47aa58bc64c">00110</a>         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;fd1_pids&#39;</span>, [i.upper() <span class="keywordflow">for</span> i <span class="keywordflow">in</span> tgt_opts[<span class="stringliteral">&#39;fd_ptypes&#39;</span>]], default = [])
-<a name="l00111"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#ae929918b7e695a99d7ec946d06d793e1">00111</a>         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;fd2_pids&#39;</span>, [i.upper() <span class="keywordflow">for</span> i <span class="keywordflow">in</span> tgt_opts[<span class="stringliteral">&#39;fd_ptypes&#39;</span>]], default = [])
-<a name="l00112"></a>00112         <span class="comment">## Parameter types that trigger FD Hessian elements</span>
-<a name="l00113"></a>00113         <span class="comment">## Finite difference step size</span>
-<a name="l00114"></a>00114         self.set_option(options, <span class="stringliteral">&#39;finite_difference_h&#39;</span>, <span class="stringliteral">&#39;h&#39;</span>)
-<a name="l00115"></a>00115         <span class="comment">## Whether to make backup files</span>
-<a name="l00116"></a>00116         self.set_option(options, <span class="stringliteral">&#39;backup&#39;</span>)
-<a name="l00117"></a>00117                                                                  
-<a name="l00118"></a>00118         <span class="comment">#======================================#</span>
-<a name="l00119"></a>00119         <span class="comment">#     Variables which are set here     #</span>
-<a name="l00120"></a>00120         <span class="comment">#======================================#</span>
-<a name="l00121"></a>00121         <span class="comment">## Relative directory of target</span>
-<a name="l00122"></a>00122         <span class="keywordflow">if</span> os.path.exists(<span class="stringliteral">&#39;targets&#39;</span>):
-<a name="l00123"></a>00123             tgtdir = <span class="stringliteral">&#39;targets&#39;</span>
-<a name="l00124"></a>00124         <span class="keywordflow">elif</span> os.path.exists(<span class="stringliteral">&#39;simulations&#39;</span>):
-<a name="l00125"></a>00125             tgtdir = <span class="stringliteral">&#39;simulations&#39;</span>
-<a name="l00126"></a>00126         <span class="keywordflow">else</span>:
-<a name="l00127"></a>00127             <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&#39;\x1b[91mThe targets directory is missing!\x1b[0m\nDid you finish setting up the target data?\nPlace the data in a directory called &quot;targets&quot; or &quot;simulations&quot;&#39;</span>)
-<a name="l00128"></a>00128         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;tgtdir&#39;</span>, os.path.join(tgtdir,self.name))
-<a name="l00129"></a>00129         <span class="comment">## Temporary (working) directory; it is temp/(target_name)</span>
-<a name="l00130"></a>00130         <span class="comment">## Used for storing temporary variables that don&#39;t change through the course of the optimization</span>
-<a name="l00131"></a>00131         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>     = os.path.join(<span class="stringliteral">&#39;temp&#39;</span>,self.name)
-<a name="l00132"></a>00132         <span class="comment">## The directory in which the simulation is running - this can be updated.</span>
-<a name="l00133"></a>00133         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9" title="The directory in which the simulation is running - this can be updated.">rundir</a>      = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>
-<a name="l00134"></a>00134         <span class="comment">## Need the forcefield (here for now)</span>
-<a name="l00135"></a>00135         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>          = forcefield
-<a name="l00136"></a>00136         <span class="comment">## Counts how often the objective function was computed</span>
-<a name="l00137"></a>00137         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#ad4cd0ab38d8fc97d3e7a6e22ce130a16" title="Counts how often the objective function was computed.">xct</a>         = 0
-<a name="l00138"></a>00138         <span class="comment">## Counts how often the gradient was computed</span>
-<a name="l00139"></a>00139         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aff6e42b84dd8eb5a4dc3b47aa58bc64c" title="Counts how often the gradient was computed.">gct</a>         = 0
-<a name="l00140"></a>00140         <span class="comment">## Counts how often the Hessian was computed</span>
-<a name="l00141"></a>00141         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#ae929918b7e695a99d7ec946d06d793e1" title="Counts how often the Hessian was computed.">hct</a>         = 0
-<a name="l00142"></a>00142         
-<a name="l00143"></a>00143         <span class="comment">#======================================#</span>
-<a name="l00144"></a>00144         <span class="comment">#          UNDER DEVELOPMENT           #</span>
-<a name="l00145"></a>00145         <span class="comment">#======================================#</span>
-<a name="l00146"></a>00146         <span class="comment"># Create a new temp directory.</span>
-<a name="l00147"></a>00147         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#afe815eafab06ac92f10bbf4b88ad95c8" title="Back up the temporary directory if desired, delete it and then create a new one.">refresh_temp_directory</a>()
-<a name="l00148"></a>00148 
-<a name="l00149"></a>00149     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a606dd136f195c267c05a2455405e5949" title="Computes the objective function contribution without any parametric derivatives.">get_X</a>(self,mvals=None):
-<a name="l00150"></a>00150         <span class="stringliteral">&quot;&quot;&quot;Computes the objective function contribution without any parametric derivatives&quot;&quot;&quot;</span>
-<a name="l00151"></a>00151         Ans = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c" title="Stages the directory for the target, and then calls &#39;get&#39;.">sget</a>(mvals,0,0)
-<a name="l00152"></a>00152         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#ad4cd0ab38d8fc97d3e7a6e22ce130a16" title="Counts how often the objective function was computed.">xct</a> += 1
-<a name="l00153"></a>00153         <span class="keywordflow">if</span> Ans[<span class="stringliteral">&#39;X&#39;</span>] != Ans[<span class="stringliteral">&#39;X&#39;</span>]:
-<a name="l00154"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a606dd136f195c267c05a2455405e5949">00154</a>             <span class="keywordflow">return</span> {<span class="stringliteral">&#39;X&#39;</span>:1e10, <span class="stringliteral">&#39;G&#39;</span>:np.zeros(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np), <span class="stringliteral">&#39;H&#39;</span>:np.zeros((self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np))}
-<a name="l00155"></a>00155         <span class="keywordflow">return</span> Ans
-<a name="l00156"></a>00156 
-<a name="l00157"></a>00157     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#afa8cc38c8bba8861c072e789717aa049" title="Computes the objective function contribution and its gradient.">get_G</a>(self,mvals=None):
-<a name="l00158"></a>00158         <span class="stringliteral">&quot;&quot;&quot;Computes the objective function contribution and its gradient.</span>
-<a name="l00159"></a>00159 <span class="stringliteral"></span>
-<a name="l00160"></a>00160 <span class="stringliteral">        First the low-level &#39;get&#39; method is called with the analytic gradient</span>
-<a name="l00161"></a>00161 <span class="stringliteral">        switch turned on.  Then we loop through the fd1_pids and compute</span>
-<a name="l00162"></a>00162 <span class="stringliteral">        the corresponding elements of the gradient by finite difference,</span>
-<a name="l00163"></a>00163 <span class="stringliteral">        if the &#39;fdgrad&#39; switch is turned on.  Alternately we can compute</span>
-<a name="l00164"></a>00164 <span class="stringliteral">        the gradient elements and diagonal Hessian elements at the same time</span>
-<a name="l00165"></a>00165 <span class="stringliteral">        using central difference if &#39;fdhessdiag&#39; is turned on.</span>
-<a name="l00166"></a>00166 <span class="stringliteral">        &quot;&quot;&quot;</span>
-<a name="l00167"></a>00167         Ans = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c" title="Stages the directory for the target, and then calls &#39;get&#39;.">sget</a>(mvals,1,0)
-<a name="l00168"></a>00168         <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np):
-<a name="l00169"></a>00169             <span class="keywordflow">if</span> any([j <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.plist[i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> self.fd1_pids]) <span class="keywordflow">or</span> <span class="stringliteral">&#39;ALL&#39;</span> <span class="keywordflow">in</span> self.fd1_pids:
-<a name="l00170"></a>00170                 <span class="keywordflow">if</span> self.fdhessdiag:
-<a name="l00171"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#afa8cc38c8bba8861c072e789717aa049">00171</a>                     Ans[<span class="stringliteral">&#39;G&#39;</span>][i], Ans[<span class="stringliteral">&#39;H&#39;</span>][i,i] = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#aa69a8819e4680091f400303c1d6ddeb7" title="A three-point finite difference stencil.">f12d3p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t...">fdwrap_G</a>(self,mvals,i),self.h,f0 = Ans[<span class="stringliteral">&#39;X&#39;</span>])
-<a name="l00172"></a>00172                 <span class="keywordflow">elif</span> self.fdgrad:
-<a name="l00173"></a>00173                     Ans[<span class="stringliteral">&#39;G&#39;</span>][i] = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ac5bb1552a9b8dd22c9c80e6444de2218" title="A two-point finite difference stencil.">f1d2p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t...">fdwrap_G</a>(self,mvals,i),self.h,f0 = Ans[<span class="stringliteral">&#39;X&#39;</span>])
-<a name="l00174"></a>00174         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aff6e42b84dd8eb5a4dc3b47aa58bc64c" title="Counts how often the gradient was computed.">gct</a> += 1
-<a name="l00175"></a>00175         <span class="keywordflow">return</span> Ans
-<a name="l00176"></a>00176 
-<a name="l00177"></a>00177     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1d2ee27fe86a09769c1816af23b09adb" title="Computes the objective function contribution and its gradient / Hessian.">get_H</a>(self,mvals=None):
-<a name="l00178"></a>00178         <span class="stringliteral">&quot;&quot;&quot;Computes the objective function contribution and its gradient / Hessian.</span>
-<a name="l00179"></a>00179 <span class="stringliteral"></span>
-<a name="l00180"></a>00180 <span class="stringliteral">        First the low-level &#39;get&#39; method is called with the analytic gradient</span>
-<a name="l00181"></a>00181 <span class="stringliteral">        and Hessian both turned on.  Then we loop through the fd1_pids and compute</span>
-<a name="l00182"></a>00182 <span class="stringliteral">        the corresponding elements of the gradient by finite difference,</span>
-<a name="l00183"></a>00183 <span class="stringliteral">        if the &#39;fdgrad&#39; switch is turned on.</span>
-<a name="l00184"></a>00184 <span class="stringliteral"></span>
-<a name="l00185"></a>00185 <span class="stringliteral">        This is followed by looping through the fd2_pids and computing the corresponding</span>
-<a name="l00186"></a>00186 <span class="stringliteral">        Hessian elements by finite difference.  Forward finite difference is used</span>
-<a name="l00187"></a>00187 <span class="stringliteral">        throughout for the sake of speed.</span>
-<a name="l00188"></a>00188 <span class="stringliteral">        &quot;&quot;&quot;</span>
-<a name="l00189"></a>00189         Ans = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c" title="Stages the directory for the target, and then calls &#39;get&#39;.">sget</a>(mvals,1,1)
-<a name="l00190"></a>00190         <span class="keywordflow">if</span> self.fdhess:
-<a name="l00191"></a>00191             <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np):
-<a name="l00192"></a>00192                 <span class="keywordflow">if</span> any([j <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.plist[i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> self.fd1_pids]) <span class="keywordflow">or</span> <span class="stringliteral">&#39;ALL&#39;</span> <span class="keywordflow">in</span> self.fd1_pids:
-<a name="l00193"></a>00193                     Ans[<span class="stringliteral">&#39;G&#39;</span>][i] = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ac5bb1552a9b8dd22c9c80e6444de2218" title="A two-point finite difference stencil.">f1d2p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t...">fdwrap_G</a>(self,mvals,i),self.h,f0 = Ans[<span class="stringliteral">&#39;X&#39;</span>])
-<a name="l00194"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1d2ee27fe86a09769c1816af23b09adb">00194</a>             <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np):
-<a name="l00195"></a>00195                 <span class="keywordflow">if</span> any([j <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.plist[i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> self.fd2_pids]) <span class="keywordflow">or</span> <span class="stringliteral">&#39;ALL&#39;</span> <span class="keywordflow">in</span> self.fd2_pids:
-<a name="l00196"></a>00196                     FDSlice = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ac5bb1552a9b8dd22c9c80e6444de2218" title="A two-point finite difference stencil.">f1d2p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a77a0bc1ae3cbbcc8d38a0ef9ca877d6d" title="A driver to fdwrap for Hessians (see documentation for fdwrap) Inputs: tgt = The Target containing th...">fdwrap_H</a>(self,mvals,i),self.h,f0 = Ans[<span class="stringliteral">&#39;G&#39;</span>])
-<a name="l00197"></a>00197                     Ans[<span class="stringliteral">&#39;H&#39;</span>][i,:] = FDSlice
-<a name="l00198"></a>00198                     Ans[<span class="stringliteral">&#39;H&#39;</span>][:,i] = FDSlice
-<a name="l00199"></a>00199         <span class="keywordflow">elif</span> self.fdhessdiag:
-<a name="l00200"></a>00200             <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np):
-<a name="l00201"></a>00201                 <span class="keywordflow">if</span> any([j <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.plist[i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> self.fd2_pids]) <span class="keywordflow">or</span> <span class="stringliteral">&#39;ALL&#39;</span> <span class="keywordflow">in</span> self.fd2_pids:
-<a name="l00202"></a>00202                     Ans[<span class="stringliteral">&#39;G&#39;</span>][i], Ans[<span class="stringliteral">&#39;H&#39;</span>][i,i] = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#aa69a8819e4680091f400303c1d6ddeb7" title="A three-point finite difference stencil.">f12d3p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t...">fdwrap_G</a>(self,mvals,i),self.h, f0 = Ans[<span class="stringliteral">&#39;X&#39;</span>])
-<a name="l00203"></a>00203         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#ae929918b7e695a99d7ec946d06d793e1" title="Counts how often the Hessian was computed.">hct</a> += 1
-<a name="l00204"></a>00204         <span class="keywordflow">return</span> Ans
-<a name="l00205"></a>00205     
-<a name="l00206"></a>00206     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82">link_from_tempdir</a>(self,absdestdir):
-<a name="l00207"></a>00207         <a class="code" href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c">link_dir_contents</a>(os.path.join(self.root,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>), absdestdir)
-<a name="l00208"></a>00208 
-<a name="l00209"></a>00209     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#afe815eafab06ac92f10bbf4b88ad95c8" title="Back up the temporary directory if desired, delete it and then create a new one.">refresh_temp_directory</a>(self):
-<a name="l00210"></a>00210         <span class="stringliteral">&quot;&quot;&quot; Back up the temporary directory if desired, delete it</span>
-<a name="l00211"></a>00211 <span class="stringliteral">        and then create a new one.&quot;&quot;&quot;</span>
-<a name="l00212"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82">00212</a>         cwd = os.getcwd()
-<a name="l00213"></a>00213         abstempdir = os.path.join(self.root,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>)
-<a name="l00214"></a>00214         <span class="keywordflow">if</span> self.backup:
-<a name="l00215"></a>00215             <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.exists(os.path.join(self.root,<span class="stringliteral">&#39;backups&#39;</span>)):
-<a name="l00216"></a>00216                 os.makedirs(os.path.join(self.root,<span class="stringliteral">&#39;backups&#39;</span>))
-<a name="l00217"></a>00217             <span class="keywordflow">if</span> os.path.exists(abstempdir):
-<a name="l00218"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#afe815eafab06ac92f10bbf4b88ad95c8">00218</a>                 os.chdir(os.path.join(self.root,<span class="stringliteral">&quot;temp&quot;</span>))
-<a name="l00219"></a>00219                 FileCount = 0
-<a name="l00220"></a>00220                 <span class="keywordflow">while</span> <span class="keyword">True</span>:
-<a name="l00221"></a>00221                     CandFile = os.path.join(self.root,<span class="stringliteral">&#39;backups&#39;</span>,<span class="stringliteral">&quot;%s_%i.tar.bz2&quot;</span> % (self.name,FileCount))
-<a name="l00222"></a>00222                     <span class="keywordflow">if</span> os.path.exists(CandFile):
-<a name="l00223"></a>00223                         FileCount += 1
-<a name="l00224"></a>00224                     <span class="keywordflow">else</span>:
-<a name="l00225"></a>00225                         <span class="comment"># I could use the tarfile module here</span>
-<a name="l00226"></a>00226                         logger.info(<span class="stringliteral">&quot;Backing up: &quot;</span> + self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a> + <span class="stringliteral">&#39; to: &#39;</span> + <span class="stringliteral">&quot;backups/%s_%i.tar.bz2\n&quot;</span> % (self.name,FileCount))
-<a name="l00227"></a>00227                         subprocess.call([<span class="stringliteral">&quot;tar&quot;</span>,<span class="stringliteral">&quot;cjf&quot;</span>,CandFile,self.name])
-<a name="l00228"></a>00228                         shutil.rmtree(self.name)
-<a name="l00229"></a>00229                         <span class="keywordflow">break</span>
-<a name="l00230"></a>00230                 os.chdir(cwd)
-<a name="l00231"></a>00231         <span class="comment"># Delete the temporary directory</span>
-<a name="l00232"></a>00232         shutil.rmtree(abstempdir,ignore_errors=<span class="keyword">True</span>)
-<a name="l00233"></a>00233         <span class="comment"># Create a new temporary directory from scratch</span>
-<a name="l00234"></a>00234         os.makedirs(abstempdir)
-<a name="l00235"></a>00235 
-<a name="l00236"></a>00236     @abc.abstractmethod
-<a name="l00237"></a>00237     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1389888302c49d529716cb45b13a6f5a" title="Every target must be able to return a contribution to the objective function - however, this must be implemented in the specific subclass.">get</a>(self,mvals,AGrad=False,AHess=False):
-<a name="l00238"></a>00238 
-<a name="l00239"></a>00239         <span class="stringliteral">&quot;&quot;&quot; </span>
-<a name="l00240"></a>00240 <span class="stringliteral">        </span>
-<a name="l00241"></a>00241 <span class="stringliteral">        Every target must be able to return a contribution</span>
-<a name="l00242"></a>00242 <span class="stringliteral">        to the objective function - however, this must be implemented</span>
-<a name="l00243"></a>00243 <span class="stringliteral">        in the specific subclass.  See abinitio for an</span>
-<a name="l00244"></a>00244 <span class="stringliteral">        example.</span>
-<a name="l00245"></a>00245 <span class="stringliteral"></span>
-<a name="l00246"></a>00246 <span class="stringliteral">        &quot;&quot;&quot;</span>
-<a name="l00247"></a>00247         
-<a name="l00248"></a>00248         <span class="keywordflow">raise</span> NotImplementedError(<span class="stringliteral">&#39;The get method is not implemented in the Target base class&#39;</span>)
-<a name="l00249"></a>00249 
-<a name="l00250"></a>00250     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c" title="Stages the directory for the target, and then calls &#39;get&#39;.">sget</a>(self, mvals, AGrad=False, AHess=False, customdir=None):
-<a name="l00251"></a>00251         <span class="stringliteral">&quot;&quot;&quot; </span>
-<a name="l00252"></a>00252 <span class="stringliteral"></span>
-<a name="l00253"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1389888302c49d529716cb45b13a6f5a">00253</a> <span class="stringliteral">        Stages the directory for the target, and then calls &#39;get&#39;.</span>
-<a name="l00254"></a>00254 <span class="stringliteral">        The &#39;get&#39; method should not worry about the directory that it&#39;s running in.</span>
-<a name="l00255"></a>00255 <span class="stringliteral">        </span>
-<a name="l00256"></a>00256 <span class="stringliteral">        &quot;&quot;&quot;</span>
-<a name="l00257"></a>00257         <span class="comment">## Directory of the current iteration; if not None, then the simulation runs under</span>
-<a name="l00258"></a>00258         <span class="comment">## temp/target_name/iteration_number</span>
-<a name="l00259"></a>00259         <span class="comment">## The &#39;customdir&#39; is customizable and can go below anything</span>
-<a name="l00260"></a>00260         cwd = os.getcwd()
-<a name="l00261"></a>00261         
-<a name="l00262"></a>00262         absgetdir = os.path.join(self.root,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>)
-<a name="l00263"></a>00263         <span class="keywordflow">if</span> <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>() <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:
-<a name="l00264"></a>00264             <span class="comment"># Not expecting more than ten thousand iterations</span>
-<a name="l00265"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c">00265</a>             iterdir = <span class="stringliteral">&quot;iter_%04i&quot;</span> % <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>()
-<a name="l00266"></a>00266             absgetdir = os.path.join(absgetdir,iterdir)
-<a name="l00267"></a>00267         <span class="keywordflow">if</span> customdir <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:
-<a name="l00268"></a>00268             absgetdir = os.path.join(absgetdir,customdir)
-<a name="l00269"></a>00269 
-<a name="l00270"></a>00270         <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.exists(absgetdir):
-<a name="l00271"></a>00271             os.makedirs(absgetdir)
-<a name="l00272"></a>00272         os.chdir(absgetdir)
-<a name="l00273"></a>00273         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82">link_from_tempdir</a>(absgetdir)
-<a name="l00274"></a>00274         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9" title="The directory in which the simulation is running - this can be updated.">rundir</a> = absgetdir.replace(self.root+<span class="stringliteral">&#39;/&#39;</span>,<span class="stringliteral">&#39;&#39;</span>)
-<a name="l00275"></a>00275 
-<a name="l00276"></a>00276         Answer = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a1389888302c49d529716cb45b13a6f5a" title="Every target must be able to return a contribution to the objective function - however, this must be implemented in the specific subclass.">get</a>(mvals, AGrad, AHess)
-<a name="l00277"></a>00277         os.chdir(cwd)
-<a name="l00278"></a>00278         
-<a name="l00279"></a>00279         <span class="keywordflow">return</span> Answer
-<a name="l00280"></a>00280 
-<a name="l00281"></a>00281     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a78cd29b94cbcc201eed99c78aaef46a4">submit_jobs</a>(self, mvals, AGrad=False, AHess=False):
-<a name="l00282"></a>00282         <span class="keywordflow">return</span>
-<a name="l00283"></a>00283 
-<a name="l00284"></a>00284     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#af8d2a4658c87841e40296795aec478bb" title="Stages the directory for the target, and then launches Work Queue processes if any.">stage</a>(self, mvals, AGrad=False, AHess=False, customdir=None):
-<a name="l00285"></a>00285         <span class="stringliteral">&quot;&quot;&quot; </span>
-<a name="l00286"></a>00286 <span class="stringliteral"></span>
-<a name="l00287"></a>00287 <span class="stringliteral">        Stages the directory for the target, and then launches Work Queue processes if any.</span>
-<a name="l00288"></a>00288 <span class="stringliteral">        The &#39;get&#39; method should not worry about the directory that it&#39;s running in.</span>
-<a name="l00289"></a>00289 <span class="stringliteral">        </span>
-<a name="l00290"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a78cd29b94cbcc201eed99c78aaef46a4">00290</a> <span class="stringliteral">        &quot;&quot;&quot;</span>
-<a name="l00291"></a>00291         <span class="keywordflow">if</span> self.sleepy &gt; 0:
-<a name="l00292"></a>00292             logger.info(<span class="stringliteral">&quot;Sleeping for %i seconds as directed...\n&quot;</span> % self.sleepy)
-<a name="l00293"></a>00293             time.sleep(self.sleepy)
-<a name="l00294"></a>00294         <span class="comment">## Directory of the current iteration; if not None, then the simulation runs under</span>
-<a name="l00295"></a>00295         <span class="comment">## temp/target_name/iteration_number</span>
-<a name="l00296"></a>00296         <span class="comment">## The &#39;customdir&#39; is customizable and can go below anything</span>
-<a name="l00297"></a>00297         cwd = os.getcwd()
-<a name="l00298"></a>00298         
-<a name="l00299"></a>00299         absgetdir = os.path.join(self.root,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>)
-<a name="l00300"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#af8d2a4658c87841e40296795aec478bb">00300</a>         <span class="keywordflow">if</span> <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>() <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:
-<a name="l00301"></a>00301             <span class="comment"># Not expecting more than ten thousand iterations</span>
-<a name="l00302"></a>00302             iterdir = <span class="stringliteral">&quot;iter_%04i&quot;</span> % <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>()
-<a name="l00303"></a>00303             absgetdir = os.path.join(absgetdir,iterdir)
-<a name="l00304"></a>00304         <span class="keywordflow">if</span> customdir <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:
-<a name="l00305"></a>00305             absgetdir = os.path.join(absgetdir,customdir)
-<a name="l00306"></a>00306 
-<a name="l00307"></a>00307         <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.exists(absgetdir):
-<a name="l00308"></a>00308             os.makedirs(absgetdir)
-<a name="l00309"></a>00309         os.chdir(absgetdir)
-<a name="l00310"></a>00310         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82">link_from_tempdir</a>(absgetdir)
-<a name="l00311"></a>00311         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9" title="The directory in which the simulation is running - this can be updated.">rundir</a> = absgetdir.replace(self.root+<span class="stringliteral">&#39;/&#39;</span>,<span class="stringliteral">&#39;&#39;</span>)
-<a name="l00312"></a>00312         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a78cd29b94cbcc201eed99c78aaef46a4">submit_jobs</a>(mvals, AGrad, AHess)
-<a name="l00313"></a>00313 
-<a name="l00314"></a>00314         os.chdir(cwd)
-<a name="l00315"></a>00315         
-<a name="l00316"></a>00316         <span class="keywordflow">return</span>
-<a name="l00317"></a>00317 
-<a name="l00318"></a>00318     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#af6099ec09486213869dba2491bd8ea04" title="This method determines whether the Work Queue tasks for the current target have completed.">wq_complete</a>(self):
-<a name="l00319"></a>00319         <span class="stringliteral">&quot;&quot;&quot; This method determines whether the Work Queue tasks for the current target have completed. &quot;&quot;&quot;</span>
-<a name="l00320"></a>00320         wq = <a class="code" href="namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d">getWorkQueue</a>()
-<a name="l00321"></a>00321         WQIds = <a class="code" href="namespaceforcebalance_1_1nifty.html#abe1e72c32252d62a6551b47290c7584f">getWQIds</a>()
-<a name="l00322"></a>00322         <span class="keywordflow">if</span> wq == <span class="keywordtype">None</span>:
-<a name="l00323"></a>00323             <span class="keywordflow">return</span> <span class="keyword">True</span>
-<a name="l00324"></a>00324         <span class="keywordflow">elif</span> wq.empty():
-<a name="l00325"></a>00325             WQIds[self.name] = []
-<a name="l00326"></a>00326             <span class="keywordflow">return</span> <span class="keyword">True</span>
-<a name="l00327"></a>00327         <span class="keywordflow">elif</span> len(WQIds[self.name]) == 0:
-<a name="l00328"></a>00328             <span class="keywordflow">return</span> <span class="keyword">True</span>
-<a name="l00329"></a>00329         <span class="keywordflow">else</span>:
-<a name="l00330"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#af6099ec09486213869dba2491bd8ea04">00330</a>             <a class="code" href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished.">wq_wait1</a>(wq, wait_time=30)
-<a name="l00331"></a>00331             <span class="keywordflow">if</span> len(WQIds[self.name]) == 0:
-<a name="l00332"></a>00332                 <span class="keywordflow">return</span> <span class="keyword">True</span>
-<a name="l00333"></a>00333             <span class="keywordflow">else</span>:
-<a name="l00334"></a>00334                 <span class="keywordflow">return</span> <span class="keyword">False</span>
-<a name="l00335"></a>00335 
-<a name="l00336"></a>00336     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#ac30a4e9d7d9fe06f7caefa5f7cfab09b" title="Print target information in an organized table format.">printcool_table</a>(self, data=OrderedDict([]), headings=[], banner=<span class="keywordtype">None</span>, footnote=<span class="keywordtype">None</span>, color=0):
-<a name="l00337"></a>00337         <span class="stringliteral">&quot;&quot;&quot; Print target information in an organized table format.  Implemented 6/30 because</span>
-<a name="l00338"></a>00338 <span class="stringliteral">        multiple targets are already printing out tabulated information in very similar ways.</span>
-<a name="l00339"></a>00339 <span class="stringliteral">        This method is a simple wrapper around printcool_dictionary.  </span>
-<a name="l00340"></a>00340 <span class="stringliteral"></span>
-<a name="l00341"></a>00341 <span class="stringliteral">        The input should be something like:</span>
-<a name="l00342"></a>00342 <span class="stringliteral"></span>
-<a name="l00343"></a>00343 <span class="stringliteral">        @param data Column contents in the form of an OrderedDict, with string keys and list vals.</span>
-<a name="l00344"></a>00344 <span class="stringliteral">        The key is printed in the leftmost column and the vals are printed in the other columns.</span>
-<a name="l00345"></a>00345 <span class="stringliteral">        If non-strings are passed, they will be converted to strings (not recommended).</span>
-<a name="l00346"></a>00346 <span class="stringliteral">        </span>
-<a name="l00347"></a>00347 <span class="stringliteral">        @param headings Column headings in the form of a list.  It must be equal to the number to the list length</span>
-<a name="l00348"></a>00348 <span class="stringliteral">        for each of the &quot;vals&quot; in OrderedDict, plus one.  Use &quot;\n&quot; characters to specify long</span>
-<a name="l00349"></a>00349 <span class="stringliteral">        column names that may take up more than one line.</span>
-<a name="l00350"></a>00350 <span class="stringliteral"></span>
-<a name="l00351"></a>00351 <span class="stringliteral">        @param banner Optional heading line, which will be printed at the top in the title.</span>
-<a name="l00352"></a>00352 <span class="stringliteral">        @param footnote Optional footnote line, which will be printed at the bottom.</span>
-<a name="l00353"></a>00353 <span class="stringliteral">        </span>
-<a name="l00354"></a>00354 <span class="stringliteral">        &quot;&quot;&quot;</span>
-<a name="l00355"></a>00355         tline=<span class="stringliteral">&quot;Target: %s Type: %s Objective = %.5e&quot;</span> % (self.name, self.__class__.__name__, self.objective)
-<a name="l00356"></a>00356         nc = len(headings)
-<a name="l00357"></a>00357         <span class="keywordflow">if</span> banner != <span class="keywordtype">None</span>:
-<a name="l00358"></a>00358             tlines = [banner, tline]
-<a name="l00359"></a>00359         <span class="keywordflow">else</span>:
-<a name="l00360"></a>00360             tlines = [tline]
-<a name="l00361"></a>00361         <span class="comment"># Sanity check.</span>
-<a name="l00362"></a>00362         <span class="keywordflow">for</span> val <span class="keywordflow">in</span> data.values():
-<a name="l00363"></a>00363             <span class="keywordflow">if</span> (len(val)+1) != nc:
-<a name="l00364"></a>00364                 <span class="keywordflow">raise</span> RuntimeError(<span class="stringliteral">&#39;There are %i column headings, so the values in the data dictionary must be lists of length %i (currently %i)&#39;</span> % (nc, nc-1, len(val)))
-<a name="l00365"></a>00365         cwidths = [0 <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(nc)]
-<a name="l00366"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#ac30a4e9d7d9fe06f7caefa5f7cfab09b">00366</a>         <span class="comment"># Figure out maximum column width.</span>
-<a name="l00367"></a>00367         <span class="comment"># First look at all of the column headings...</span>
-<a name="l00368"></a>00368         crows = []
-<a name="l00369"></a>00369         <span class="keywordflow">for</span> cnum, cname <span class="keywordflow">in</span> enumerate(headings):
-<a name="l00370"></a>00370             crows.append(len(cname.split(<span class="stringliteral">&#39;\n&#39;</span>)))
-<a name="l00371"></a>00371             <span class="keywordflow">for</span> l <span class="keywordflow">in</span> cname.split(<span class="stringliteral">&#39;\n&#39;</span>):
-<a name="l00372"></a>00372                 cwidths[cnum] = max(cwidths[cnum], len(l))
-<a name="l00373"></a>00373         <span class="comment"># Then look at the row names to stretch out the first column width...</span>
-<a name="l00374"></a>00374         <span class="keywordflow">for</span> k <span class="keywordflow">in</span> data.keys():
-<a name="l00375"></a>00375             cwidths[0] = max(cwidths[0], len(k))
-<a name="l00376"></a>00376         <span class="comment"># Then look at the data values to stretch out the other column widths.</span>
-<a name="l00377"></a>00377         <span class="keywordflow">for</span> v <span class="keywordflow">in</span> data.values():
-<a name="l00378"></a>00378             <span class="keywordflow">for</span> n, f <span class="keywordflow">in</span> enumerate(v):
-<a name="l00379"></a>00379                 cwidths[n+1] = max(cwidths[n+1], len(str(f)))
-<a name="l00380"></a>00380         <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(1, len(cwidths)):
-<a name="l00381"></a>00381             cwidths[i] += 2
-<a name="l00382"></a>00382         <span class="keywordflow">if</span> cwidths[0] &lt; 25:
-<a name="l00383"></a>00383             cwidths[0] = 25
-<a name="l00384"></a>00384         cblocks = [[<span class="stringliteral">&#39;&#39;</span> <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(max(crows) - len(cname.split(<span class="stringliteral">&#39;\n&#39;</span>)))] + cname.split(<span class="stringliteral">&#39;\n&#39;</span>) <span class="keywordflow">for</span> cnum, cname <span class="keywordflow">in</span> enumerate(headings)]
-<a name="l00385"></a>00385         <span class="comment"># The formatting line consisting of variable column widths</span>
-<a name="l00386"></a>00386         fline = <span class="stringliteral">&#39; &#39;</span>.join(<span class="stringliteral">&quot;%%%s%is&quot;</span> % ((<span class="stringliteral">&quot;-&quot;</span> <span class="keywordflow">if</span> i==0 <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>), j) <span class="keywordflow">for</span> i, j <span class="keywordflow">in</span> enumerate(cwidths))
-<a name="l00387"></a>00387         vline = <span class="stringliteral">&#39; &#39;</span>.join([<span class="stringliteral">&quot;%%%is&quot;</span> % j <span class="keywordflow">for</span> i, j <span class="keywordflow">in</span> enumerate(cwidths) <span class="keywordflow">if</span> i &gt; 0])
-<a name="l00388"></a>00388         clines = [fline % (tuple(cblocks[j][i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> range(nc))) <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(max(crows))]
-<a name="l00389"></a>00389         tlines += clines
-<a name="l00390"></a>00390         PrintDict = OrderedDict([(key, vline % (tuple(val))) <span class="keywordflow">for</span> key, val <span class="keywordflow">in</span> data.items()])
-<a name="l00391"></a>00391         <a class="code" href="namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary...">printcool_dictionary</a>(PrintDict, title=<span class="stringliteral">&#39;\n&#39;</span>.join(tlines), keywidth=cwidths[0], center=<span class="keyword">False</span>, leftpad=4, color=color)
-<a name="l00392"></a>00392 
-<a name="l00393"></a>00393 
+<a name="l00010"></a>00010 <span class="keyword">import</span> tarfile
+<a name="l00011"></a>00011 <span class="keyword">import</span> forcebalance
+<a name="l00012"></a>00012 <span class="keyword">from</span> forcebalance.nifty <span class="keyword">import</span> row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
+<a name="l00013"></a>00013 <span class="keyword">from</span> forcebalance.finite_difference <span class="keyword">import</span> fdwrap_G, fdwrap_H, f1d2p, f12d3p
+<a name="l00014"></a>00014 <span class="keyword">from</span> forcebalance.optimizer <span class="keyword">import</span> Counter
+<a name="l00015"></a>00015 <span class="keyword">from</span> forcebalance.output <span class="keyword">import</span> getLogger
+<a name="l00016"></a>00016 logger = getLogger(__name__)
+<a name="l00017"></a><a class="code" href="namespaceforcebalance_1_1target.html#a6b5ddff6e409717872f8dbdb243183eb">00017</a> 
+<a name="l00018"></a>00018 <span class="keyword">class </span><a class="code" href="classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets.">Target</a>(forcebalance.BaseClass):
+<a name="l00019"></a>00019     
+<a name="l00020"></a>00020     <span class="stringliteral">&quot;&quot;&quot;</span>
+<a name="l00021"></a>00021 <span class="stringliteral">    Base class for all fitting targets.</span>
+<a name="l00022"></a>00022 <span class="stringliteral">    </span>
+<a name="l00023"></a>00023 <span class="stringliteral">    In ForceBalance a Target is defined as a set of reference data</span>
+<a name="l00024"></a>00024 <span class="stringliteral">    plus a corresponding method to simulate that data using the force field.</span>
+<a name="l00025"></a>00025 <span class="stringliteral">    </span>
+<a name="l00026"></a>00026 <span class="stringliteral">    The &#39;computable quantities&#39; may include energies and forces where the</span>
+<a name="l00027"></a>00027 <span class="stringliteral">    reference values come from QM calculations (energy and force matching),</span>
+<a name="l00028"></a>00028 <span class="stringliteral">    energies from an EDA analysis (Maybe in the future, FDA?), molecular</span>
+<a name="l00029"></a>00029 <span class="stringliteral">    properties (like polarizability, refractive indices, multipole moments</span>
+<a name="l00030"></a>00030 <span class="stringliteral">    or vibrational frequencies), relative entropies, and bulk properties.</span>
+<a name="l00031"></a>00031 <span class="stringliteral">    Single-molecule or bulk properties can even come from the experiment!</span>
+<a name="l00032"></a>00032 <span class="stringliteral">    </span>
+<a name="l00033"></a>00033 <span class="stringliteral">    The central idea in ForceBalance is that each quantity makes a</span>
+<a name="l00034"></a>00034 <span class="stringliteral">    contribution to the overall objective function.  So we can build force</span>
+<a name="l00035"></a>00035 <span class="stringliteral">    fields that fit several quantities at once, rather than putting all of</span>
+<a name="l00036"></a>00036 <span class="stringliteral">    our chips behind energy and force matching.  In the future</span>
+<a name="l00037"></a>00037 <span class="stringliteral">    ForceBalance may even include multiobjective optimization into the</span>
+<a name="l00038"></a>00038 <span class="stringliteral">    optimizer.</span>
+<a name="l00039"></a>00039 <span class="stringliteral">    </span>
+<a name="l00040"></a>00040 <span class="stringliteral">    The optimization is done by way of minimizing an &#39;objective</span>
+<a name="l00041"></a>00041 <span class="stringliteral">    function&#39;, which is comprised of squared differences between the</span>
+<a name="l00042"></a>00042 <span class="stringliteral">    computed and reference values.  These differences are not computed</span>
+<a name="l00043"></a>00043 <span class="stringliteral">    in this file, but rather in subclasses that use Target</span>
+<a name="l00044"></a>00044 <span class="stringliteral">    as a base class.  Thus, the contents of Target itself</span>
+<a name="l00045"></a>00045 <span class="stringliteral">    are meant to be as general as possible, because the pertinent</span>
+<a name="l00046"></a>00046 <span class="stringliteral">    variables apply to all types of fitting targets.</span>
+<a name="l00047"></a>00047 <span class="stringliteral"></span>
+<a name="l00048"></a>00048 <span class="stringliteral">    An important node: Target requires that all subclasses</span>
+<a name="l00049"></a>00049 <span class="stringliteral">    have a method get(self,mvals,AGrad=False,AHess=False)</span>
+<a name="l00050"></a>00050 <span class="stringliteral">    that does the following:</span>
+<a name="l00051"></a>00051 <span class="stringliteral">    </span>
+<a name="l00052"></a>00052 <span class="stringliteral">    Inputs: </span>
+<a name="l00053"></a>00053 <span class="stringliteral">    mvals        = The parameter vector, which modifies the force field</span>
+<a name="l00054"></a>00054 <span class="stringliteral">    (Note to self: We include mvals with each Target because we can create</span>
+<a name="l00055"></a>00055 <span class="stringliteral">    copies of the force field and do finite difference derivatives)</span>
+<a name="l00056"></a>00056 <span class="stringliteral">    AGrad, AHess = Boolean switches for computing analytic gradients and Hessians</span>
+<a name="l00057"></a>00057 <span class="stringliteral"></span>
+<a name="l00058"></a>00058 <span class="stringliteral">    Outputs:</span>
+<a name="l00059"></a>00059 <span class="stringliteral">    Answer       = {&#39;X&#39;: Number, &#39;G&#39;: numpy.array(np), &#39;H&#39;: numpy.array((np,np)) }</span>
+<a name="l00060"></a>00060 <span class="stringliteral">    &#39;X&#39;          = The objective function itself</span>
+<a name="l00061"></a>00061 <span class="stringliteral">    &#39;G&#39;          = The gradient, elements not computed analytically are zero</span>
+<a name="l00062"></a>00062 <span class="stringliteral">    &#39;H&#39;          = The Hessian, elements not computed analytically are zero</span>
+<a name="l00063"></a>00063 <span class="stringliteral"></span>
+<a name="l00064"></a>00064 <span class="stringliteral">    This is the only global requirement of a Target.</span>
+<a name="l00065"></a>00065 <span class="stringliteral">    Obviously &#39;get&#39; itself is not defined here, because its</span>
+<a name="l00066"></a>00066 <span class="stringliteral">    calculation will depend entirely on specifically which target</span>
+<a name="l00067"></a>00067 <span class="stringliteral">    we wish to use.  However, this should give us a unified framework</span>
+<a name="l00068"></a>00068 <span class="stringliteral">    which will faciliate rapid implementation of Targets.</span>
+<a name="l00069"></a>00069 <span class="stringliteral"></span>
+<a name="l00070"></a>00070 <span class="stringliteral">    Future work:</span>
+<a name="l00071"></a>00071 <span class="stringliteral">    Robert suggested that I could enable automatic detection of which</span>
+<a name="l00072"></a>00072 <span class="stringliteral">    parameters need to be computed by finite difference.  Not a bad idea. :)</span>
+<a name="l00073"></a>00073 <span class="stringliteral"></span>
+<a name="l00074"></a>00074 <span class="stringliteral">    &quot;&quot;&quot;</span>
+<a name="l00075"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html">00075</a> 
+<a name="l00076"></a>00076     __metaclass__ = abc.ABCMeta
+<a name="l00077"></a>00077     
+<a name="l00078"></a>00078     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#ab8f31f6e94e0fbd84f0ee54d326bb69a" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(self,options,tgt_opts,forcefield):
+<a name="l00079"></a>00079         <span class="stringliteral">&quot;&quot;&quot;</span>
+<a name="l00080"></a>00080 <span class="stringliteral">        All options here are intended to be usable by every</span>
+<a name="l00081"></a>00081 <span class="stringliteral">        conceivable type of target (in other words, only</span>
+<a name="l00082"></a>00082 <span class="stringliteral">        add content here if it&#39;s widely applicable.)</span>
+<a name="l00083"></a>00083 <span class="stringliteral"></span>
+<a name="l00084"></a>00084 <span class="stringliteral">        If we want to add attributes that are more specific</span>
+<a name="l00085"></a>00085 <span class="stringliteral">        (i.e. a set of reference forces for force matching), they</span>
+<a name="l00086"></a>00086 <span class="stringliteral">        are added in the subclass AbInitio that inherits from</span>
+<a name="l00087"></a>00087 <span class="stringliteral">        Target.</span>
+<a name="l00088"></a>00088 <span class="stringliteral"></span>
+<a name="l00089"></a>00089 <span class="stringliteral">        &quot;&quot;&quot;</span>
+<a name="l00090"></a>00090         super(Target, self).<a class="code" href="classforcebalance_1_1target_1_1Target.html#ab8f31f6e94e0fbd84f0ee54d326bb69a" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(options)
+<a name="l00091"></a>00091         <span class="comment">#======================================#</span>
+<a name="l00092"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#ab8f31f6e94e0fbd84f0ee54d326bb69a">00092</a>         <span class="comment"># Options that are given by the parser #</span>
+<a name="l00093"></a>00093         <span class="comment">#======================================#</span>
+<a name="l00094"></a>00094         <span class="comment">## Root directory of the whole project</span>
+<a name="l00095"></a>00095         self.set_option(options, <span class="stringliteral">&#39;root&#39;</span>)
+<a name="l00096"></a>00096         <span class="comment">## Name of the target</span>
+<a name="l00097"></a>00097         self.set_option(tgt_opts, <span class="stringliteral">&#39;name&#39;</span>)
+<a name="l00098"></a>00098         <span class="comment">## Type of target</span>
+<a name="l00099"></a>00099         self.set_option(tgt_opts, <span class="stringliteral">&#39;type&#39;</span>)
+<a name="l00100"></a>00100         <span class="comment">## Relative weight of the target</span>
+<a name="l00101"></a>00101         self.set_option(tgt_opts, <span class="stringliteral">&#39;weight&#39;</span>)
+<a name="l00102"></a>00102         <span class="comment">## Switch for finite difference gradients</span>
+<a name="l00103"></a>00103         self.set_option(tgt_opts, <span class="stringliteral">&#39;fdgrad&#39;</span>)
+<a name="l00104"></a>00104         <span class="comment">## Switch for finite difference Hessians</span>
+<a name="l00105"></a>00105         self.set_option(tgt_opts, <span class="stringliteral">&#39;fdhess&#39;</span>)
+<a name="l00106"></a>00106         <span class="comment">## Switch for FD gradients + Hessian diagonals</span>
+<a name="l00107"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6">00107</a>         self.set_option(tgt_opts, <span class="stringliteral">&#39;fdhessdiag&#39;</span>)
+<a name="l00108"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9">00108</a>         <span class="comment">## How many seconds to sleep (if any)</span>
+<a name="l00109"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f">00109</a>         self.set_option(tgt_opts, <span class="stringliteral">&#39;sleepy&#39;</span>)
+<a name="l00110"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#ad4cd0ab38d8fc97d3e7a6e22ce130a16">00110</a>         <span class="comment">## Parameter types that trigger FD gradient elements</span>
+<a name="l00111"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#aff6e42b84dd8eb5a4dc3b47aa58bc64c">00111</a>         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;fd1_pids&#39;</span>, [i.upper() <span class="keywordflow">for</span> i <span class="keywordflow">in</span> tgt_opts[<span class="stringliteral">&#39;fd_ptypes&#39;</span>]], default = [])
+<a name="l00112"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#ae929918b7e695a99d7ec946d06d793e1">00112</a>         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;fd2_pids&#39;</span>, [i.upper() <span class="keywordflow">for</span> i <span class="keywordflow">in</span> tgt_opts[<span class="stringliteral">&#39;fd_ptypes&#39;</span>]], default = [])
+<a name="l00113"></a>00113         <span class="comment">## Parameter types that trigger FD Hessian elements</span>
+<a name="l00114"></a>00114         <span class="comment">## Finite difference step size</span>
+<a name="l00115"></a>00115         self.set_option(options, <span class="stringliteral">&#39;finite_difference_h&#39;</span>, <span class="stringliteral">&#39;h&#39;</span>)
+<a name="l00116"></a>00116         <span class="comment">## Whether to make backup files</span>
+<a name="l00117"></a>00117         self.set_option(options, <span class="stringliteral">&#39;backup&#39;</span>)
+<a name="l00118"></a>00118                                                                  
+<a name="l00119"></a>00119         <span class="comment">#======================================#</span>
+<a name="l00120"></a>00120         <span class="comment">#     Variables which are set here     #</span>
+<a name="l00121"></a>00121         <span class="comment">#======================================#</span>
+<a name="l00122"></a>00122         <span class="comment">## Relative directory of target</span>
+<a name="l00123"></a>00123         <span class="keywordflow">if</span> os.path.exists(<span class="stringliteral">&#39;targets&#39;</span>):
+<a name="l00124"></a>00124             tgtdir = <span class="stringliteral">&#39;targets&#39;</span>
+<a name="l00125"></a>00125         <span class="keywordflow">elif</span> os.path.exists(<span class="stringliteral">&#39;simulations&#39;</span>):
+<a name="l00126"></a>00126             tgtdir = <span class="stringliteral">&#39;simulations&#39;</span>
+<a name="l00127"></a>00127         <span class="keywordflow">else</span>:
+<a name="l00128"></a>00128             <span class="keywordflow">raise</span> Exception(<span class="stringliteral">&#39;\x1b[91mThe targets directory is missing!\x1b[0m\nDid you finish setting up the target data?\nPlace the data in a directory called &quot;targets&quot; or &quot;simulations&quot;&#39;</span>)
+<a name="l00129"></a>00129         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;tgtdir&#39;</span>, os.path.join(tgtdir,self.name))
+<a name="l00130"></a>00130         <span class="comment">## Temporary (working) directory; it is temp/(target_name)</span>
+<a name="l00131"></a>00131         <span class="comment">## Used for storing temporary variables that don&#39;t change through the course of the optimization</span>
+<a name="l00132"></a>00132         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>     = os.path.join(<span class="stringliteral">&#39;temp&#39;</span>,self.name)
+<a name="l00133"></a>00133         <span class="comment">## The directory in which the simulation is running - this can be updated.</span>
+<a name="l00134"></a>00134         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9" title="The directory in which the simulation is running - this can be updated.">rundir</a>      = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>
+<a name="l00135"></a>00135         <span class="comment">## Need the forcefield (here for now)</span>
+<a name="l00136"></a>00136         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>          = forcefield
+<a name="l00137"></a>00137         <span class="comment">## Counts how often the objective function was computed</span>
+<a name="l00138"></a>00138         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#ad4cd0ab38d8fc97d3e7a6e22ce130a16" title="Counts how often the objective function was computed.">xct</a>         = 0
+<a name="l00139"></a>00139         <span class="comment">## Counts how often the gradient was computed</span>
+<a name="l00140"></a>00140         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aff6e42b84dd8eb5a4dc3b47aa58bc64c" title="Counts how often the gradient was computed.">gct</a>         = 0
+<a name="l00141"></a>00141         <span class="comment">## Counts how often the Hessian was computed</span>
+<a name="l00142"></a>00142         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#ae929918b7e695a99d7ec946d06d793e1" title="Counts how often the Hessian was computed.">hct</a>         = 0
+<a name="l00143"></a>00143         
+<a name="l00144"></a>00144         <span class="comment">#======================================#</span>
+<a name="l00145"></a>00145         <span class="comment">#          UNDER DEVELOPMENT           #</span>
+<a name="l00146"></a>00146         <span class="comment">#======================================#</span>
+<a name="l00147"></a>00147         <span class="comment"># Create a new temp directory.</span>
+<a name="l00148"></a>00148         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#afe815eafab06ac92f10bbf4b88ad95c8" title="Back up the temporary directory if desired, delete it and then create a new one.">refresh_temp_directory</a>()
+<a name="l00149"></a>00149 
+<a name="l00150"></a>00150     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a606dd136f195c267c05a2455405e5949" title="Computes the objective function contribution without any parametric derivatives.">get_X</a>(self,mvals=None):
+<a name="l00151"></a>00151         <span class="stringliteral">&quot;&quot;&quot;Computes the objective function contribution without any parametric derivatives&quot;&quot;&quot;</span>
+<a name="l00152"></a>00152         Ans = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c" title="Stages the directory for the target, and then calls &#39;get&#39;.">sget</a>(mvals,0,0)
+<a name="l00153"></a>00153         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#ad4cd0ab38d8fc97d3e7a6e22ce130a16" title="Counts how often the objective function was computed.">xct</a> += 1
+<a name="l00154"></a>00154         <span class="keywordflow">if</span> Ans[<span class="stringliteral">&#39;X&#39;</span>] != Ans[<span class="stringliteral">&#39;X&#39;</span>]:
+<a name="l00155"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a606dd136f195c267c05a2455405e5949">00155</a>             <span class="keywordflow">return</span> {<span class="stringliteral">&#39;X&#39;</span>:1e10, <span class="stringliteral">&#39;G&#39;</span>:np.zeros(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np), <span class="stringliteral">&#39;H&#39;</span>:np.zeros((self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np))}
+<a name="l00156"></a>00156         <span class="keywordflow">return</span> Ans
+<a name="l00157"></a>00157 
+<a name="l00158"></a>00158     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#afa8cc38c8bba8861c072e789717aa049" title="Computes the objective function contribution and its gradient.">get_G</a>(self,mvals=None):
+<a name="l00159"></a>00159         <span class="stringliteral">&quot;&quot;&quot;Computes the objective function contribution and its gradient.</span>
+<a name="l00160"></a>00160 <span class="stringliteral"></span>
+<a name="l00161"></a>00161 <span class="stringliteral">        First the low-level &#39;get&#39; method is called with the analytic gradient</span>
+<a name="l00162"></a>00162 <span class="stringliteral">        switch turned on.  Then we loop through the fd1_pids and compute</span>
+<a name="l00163"></a>00163 <span class="stringliteral">        the corresponding elements of the gradient by finite difference,</span>
+<a name="l00164"></a>00164 <span class="stringliteral">        if the &#39;fdgrad&#39; switch is turned on.  Alternately we can compute</span>
+<a name="l00165"></a>00165 <span class="stringliteral">        the gradient elements and diagonal Hessian elements at the same time</span>
+<a name="l00166"></a>00166 <span class="stringliteral">        using central difference if &#39;fdhessdiag&#39; is turned on.</span>
+<a name="l00167"></a>00167 <span class="stringliteral">        &quot;&quot;&quot;</span>
+<a name="l00168"></a>00168         Ans = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c" title="Stages the directory for the target, and then calls &#39;get&#39;.">sget</a>(mvals,1,0)
+<a name="l00169"></a>00169         <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np):
+<a name="l00170"></a>00170             <span class="keywordflow">if</span> any([j <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.plist[i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> self.fd1_pids]) <span class="keywordflow">or</span> <span class="stringliteral">&#39;ALL&#39;</span> <span class="keywordflow">in</span> self.fd1_pids:
+<a name="l00171"></a>00171                 <span class="keywordflow">if</span> self.fdhessdiag:
+<a name="l00172"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#afa8cc38c8bba8861c072e789717aa049">00172</a>                     Ans[<span class="stringliteral">&#39;G&#39;</span>][i], Ans[<span class="stringliteral">&#39;H&#39;</span>][i,i] = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#aa69a8819e4680091f400303c1d6ddeb7" title="A three-point finite difference stencil.">f12d3p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t...">fdwrap_G</a>(self,mvals,i),self.h,f0 = Ans[<span class="stringliteral">&#39;X&#39;</span>])
+<a name="l00173"></a>00173                 <span class="keywordflow">elif</span> self.fdgrad:
+<a name="l00174"></a>00174                     Ans[<span class="stringliteral">&#39;G&#39;</span>][i] = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ac5bb1552a9b8dd22c9c80e6444de2218" title="A two-point finite difference stencil.">f1d2p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t...">fdwrap_G</a>(self,mvals,i),self.h,f0 = Ans[<span class="stringliteral">&#39;X&#39;</span>])
+<a name="l00175"></a>00175         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aff6e42b84dd8eb5a4dc3b47aa58bc64c" title="Counts how often the gradient was computed.">gct</a> += 1
+<a name="l00176"></a>00176         <span class="keywordflow">return</span> Ans
+<a name="l00177"></a>00177 
+<a name="l00178"></a>00178     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1d2ee27fe86a09769c1816af23b09adb" title="Computes the objective function contribution and its gradient / Hessian.">get_H</a>(self,mvals=None):
+<a name="l00179"></a>00179         <span class="stringliteral">&quot;&quot;&quot;Computes the objective function contribution and its gradient / Hessian.</span>
+<a name="l00180"></a>00180 <span class="stringliteral"></span>
+<a name="l00181"></a>00181 <span class="stringliteral">        First the low-level &#39;get&#39; method is called with the analytic gradient</span>
+<a name="l00182"></a>00182 <span class="stringliteral">        and Hessian both turned on.  Then we loop through the fd1_pids and compute</span>
+<a name="l00183"></a>00183 <span class="stringliteral">        the corresponding elements of the gradient by finite difference,</span>
+<a name="l00184"></a>00184 <span class="stringliteral">        if the &#39;fdgrad&#39; switch is turned on.</span>
+<a name="l00185"></a>00185 <span class="stringliteral"></span>
+<a name="l00186"></a>00186 <span class="stringliteral">        This is followed by looping through the fd2_pids and computing the corresponding</span>
+<a name="l00187"></a>00187 <span class="stringliteral">        Hessian elements by finite difference.  Forward finite difference is used</span>
+<a name="l00188"></a>00188 <span class="stringliteral">        throughout for the sake of speed.</span>
+<a name="l00189"></a>00189 <span class="stringliteral">        &quot;&quot;&quot;</span>
+<a name="l00190"></a>00190         Ans = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c" title="Stages the directory for the target, and then calls &#39;get&#39;.">sget</a>(mvals,1,1)
+<a name="l00191"></a>00191         <span class="keywordflow">if</span> self.fdhess:
+<a name="l00192"></a>00192             <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np):
+<a name="l00193"></a>00193                 <span class="keywordflow">if</span> any([j <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.plist[i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> self.fd1_pids]) <span class="keywordflow">or</span> <span class="stringliteral">&#39;ALL&#39;</span> <span class="keywordflow">in</span> self.fd1_pids:
+<a name="l00194"></a>00194                     Ans[<span class="stringliteral">&#39;G&#39;</span>][i] = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ac5bb1552a9b8dd22c9c80e6444de2218" title="A two-point finite difference stencil.">f1d2p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t...">fdwrap_G</a>(self,mvals,i),self.h,f0 = Ans[<span class="stringliteral">&#39;X&#39;</span>])
+<a name="l00195"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1d2ee27fe86a09769c1816af23b09adb">00195</a>             <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np):
+<a name="l00196"></a>00196                 <span class="keywordflow">if</span> any([j <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.plist[i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> self.fd2_pids]) <span class="keywordflow">or</span> <span class="stringliteral">&#39;ALL&#39;</span> <span class="keywordflow">in</span> self.fd2_pids:
+<a name="l00197"></a>00197                     FDSlice = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ac5bb1552a9b8dd22c9c80e6444de2218" title="A two-point finite difference stencil.">f1d2p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a77a0bc1ae3cbbcc8d38a0ef9ca877d6d" title="A driver to fdwrap for Hessians (see documentation for fdwrap) Inputs: tgt = The Target containing th...">fdwrap_H</a>(self,mvals,i),self.h,f0 = Ans[<span class="stringliteral">&#39;G&#39;</span>])
+<a name="l00198"></a>00198                     Ans[<span class="stringliteral">&#39;H&#39;</span>][i,:] = FDSlice
+<a name="l00199"></a>00199                     Ans[<span class="stringliteral">&#39;H&#39;</span>][:,i] = FDSlice
+<a name="l00200"></a>00200         <span class="keywordflow">elif</span> self.fdhessdiag:
+<a name="l00201"></a>00201             <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.np):
+<a name="l00202"></a>00202                 <span class="keywordflow">if</span> any([j <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a796dc30a19a60c63fb43b088d40a963f" title="Need the forcefield (here for now)">FF</a>.plist[i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> self.fd2_pids]) <span class="keywordflow">or</span> <span class="stringliteral">&#39;ALL&#39;</span> <span class="keywordflow">in</span> self.fd2_pids:
+<a name="l00203"></a>00203                     Ans[<span class="stringliteral">&#39;G&#39;</span>][i], Ans[<span class="stringliteral">&#39;H&#39;</span>][i,i] = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#aa69a8819e4680091f400303c1d6ddeb7" title="A three-point finite difference stencil.">f12d3p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t...">fdwrap_G</a>(self,mvals,i),self.h, f0 = Ans[<span class="stringliteral">&#39;X&#39;</span>])
+<a name="l00204"></a>00204         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#ae929918b7e695a99d7ec946d06d793e1" title="Counts how often the Hessian was computed.">hct</a> += 1
+<a name="l00205"></a>00205         <span class="keywordflow">return</span> Ans
+<a name="l00206"></a>00206     
+<a name="l00207"></a>00207     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82">link_from_tempdir</a>(self,absdestdir):
+<a name="l00208"></a>00208         <a class="code" href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c">link_dir_contents</a>(os.path.join(self.root,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>), absdestdir)
+<a name="l00209"></a>00209 
+<a name="l00210"></a>00210     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#afe815eafab06ac92f10bbf4b88ad95c8" title="Back up the temporary directory if desired, delete it and then create a new one.">refresh_temp_directory</a>(self):
+<a name="l00211"></a>00211         <span class="stringliteral">&quot;&quot;&quot; Back up the temporary directory if desired, delete it</span>
+<a name="l00212"></a>00212 <span class="stringliteral">        and then create a new one.&quot;&quot;&quot;</span>
+<a name="l00213"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82">00213</a>         cwd = os.getcwd()
+<a name="l00214"></a>00214         abstempdir = os.path.join(self.root,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>)
+<a name="l00215"></a>00215         <span class="keywordflow">if</span> self.backup:
+<a name="l00216"></a>00216             <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.exists(os.path.join(self.root,<span class="stringliteral">&#39;backups&#39;</span>)):
+<a name="l00217"></a>00217                 os.makedirs(os.path.join(self.root,<span class="stringliteral">&#39;backups&#39;</span>))
+<a name="l00218"></a>00218             <span class="keywordflow">if</span> os.path.exists(abstempdir):
+<a name="l00219"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#afe815eafab06ac92f10bbf4b88ad95c8">00219</a>                 os.chdir(os.path.join(self.root,<span class="stringliteral">&quot;temp&quot;</span>))
+<a name="l00220"></a>00220                 FileCount = 0
+<a name="l00221"></a>00221                 <span class="keywordflow">while</span> <span class="keyword">True</span>:
+<a name="l00222"></a>00222                     CandFile = os.path.join(self.root,<span class="stringliteral">&#39;backups&#39;</span>,<span class="stringliteral">&quot;%s_%i.tar.bz2&quot;</span> % (self.name,FileCount))
+<a name="l00223"></a>00223                     <span class="keywordflow">if</span> os.path.exists(CandFile):
+<a name="l00224"></a>00224                         FileCount += 1
+<a name="l00225"></a>00225                     <span class="keywordflow">else</span>:
+<a name="l00226"></a>00226                         <span class="comment"># I could use the tarfile module here</span>
+<a name="l00227"></a>00227                         logger.info(<span class="stringliteral">&quot;Backing up: &quot;</span> + self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a> + <span class="stringliteral">&#39; to: &#39;</span> + <span class="stringliteral">&quot;backups/%s_%i.tar.bz2\n&quot;</span> % (self.name,FileCount))
+<a name="l00228"></a>00228                         subprocess.call([<span class="stringliteral">&quot;tar&quot;</span>,<span class="stringliteral">&quot;cjf&quot;</span>,CandFile,self.name])
+<a name="l00229"></a>00229                         shutil.rmtree(self.name)
+<a name="l00230"></a>00230                         <span class="keywordflow">break</span>
+<a name="l00231"></a>00231                 os.chdir(cwd)
+<a name="l00232"></a>00232         <span class="comment"># Delete the temporary directory</span>
+<a name="l00233"></a>00233         shutil.rmtree(abstempdir,ignore_errors=<span class="keyword">True</span>)
+<a name="l00234"></a>00234         <span class="comment"># Create a new temporary directory from scratch</span>
+<a name="l00235"></a>00235         os.makedirs(abstempdir)
+<a name="l00236"></a>00236 
+<a name="l00237"></a>00237     @abc.abstractmethod
+<a name="l00238"></a>00238     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1389888302c49d529716cb45b13a6f5a" title="Every target must be able to return a contribution to the objective function - however, this must be implemented in the specific subclass.">get</a>(self,mvals,AGrad=False,AHess=False):
+<a name="l00239"></a>00239 
+<a name="l00240"></a>00240         <span class="stringliteral">&quot;&quot;&quot; </span>
+<a name="l00241"></a>00241 <span class="stringliteral">        </span>
+<a name="l00242"></a>00242 <span class="stringliteral">        Every target must be able to return a contribution</span>
+<a name="l00243"></a>00243 <span class="stringliteral">        to the objective function - however, this must be implemented</span>
+<a name="l00244"></a>00244 <span class="stringliteral">        in the specific subclass.  See abinitio for an</span>
+<a name="l00245"></a>00245 <span class="stringliteral">        example.</span>
+<a name="l00246"></a>00246 <span class="stringliteral"></span>
+<a name="l00247"></a>00247 <span class="stringliteral">        &quot;&quot;&quot;</span>
+<a name="l00248"></a>00248         
+<a name="l00249"></a>00249         <span class="keywordflow">raise</span> NotImplementedError(<span class="stringliteral">&#39;The get method is not implemented in the Target base class&#39;</span>)
+<a name="l00250"></a>00250 
+<a name="l00251"></a>00251     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c" title="Stages the directory for the target, and then calls &#39;get&#39;.">sget</a>(self, mvals, AGrad=False, AHess=False, customdir=None):
+<a name="l00252"></a>00252         <span class="stringliteral">&quot;&quot;&quot; </span>
+<a name="l00253"></a>00253 <span class="stringliteral"></span>
+<a name="l00254"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a1389888302c49d529716cb45b13a6f5a">00254</a> <span class="stringliteral">        Stages the directory for the target, and then calls &#39;get&#39;.</span>
+<a name="l00255"></a>00255 <span class="stringliteral">        The &#39;get&#39; method should not worry about the directory that it&#39;s running in.</span>
+<a name="l00256"></a>00256 <span class="stringliteral">        </span>
+<a name="l00257"></a>00257 <span class="stringliteral">        &quot;&quot;&quot;</span>
+<a name="l00258"></a>00258         <span class="comment">## Directory of the current iteration; if not None, then the simulation runs under</span>
+<a name="l00259"></a>00259         <span class="comment">## temp/target_name/iteration_number</span>
+<a name="l00260"></a>00260         <span class="comment">## The &#39;customdir&#39; is customizable and can go below anything</span>
+<a name="l00261"></a>00261         cwd = os.getcwd()
+<a name="l00262"></a>00262         
+<a name="l00263"></a>00263         absgetdir = os.path.join(self.root,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>)
+<a name="l00264"></a>00264         <span class="keywordflow">if</span> <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>() <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:
+<a name="l00265"></a>00265             <span class="comment"># Not expecting more than ten thousand iterations</span>
+<a name="l00266"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a51d58b55242bf4d4909c1837174f5f3c">00266</a>             iterdir = <span class="stringliteral">&quot;iter_%04i&quot;</span> % <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>()
+<a name="l00267"></a>00267             absgetdir = os.path.join(absgetdir,iterdir)
+<a name="l00268"></a>00268         <span class="keywordflow">if</span> customdir <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:
+<a name="l00269"></a>00269             absgetdir = os.path.join(absgetdir,customdir)
+<a name="l00270"></a>00270 
+<a name="l00271"></a>00271         <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.exists(absgetdir):
+<a name="l00272"></a>00272             os.makedirs(absgetdir)
+<a name="l00273"></a>00273         os.chdir(absgetdir)
+<a name="l00274"></a>00274         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82">link_from_tempdir</a>(absgetdir)
+<a name="l00275"></a>00275         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9" title="The directory in which the simulation is running - this can be updated.">rundir</a> = absgetdir.replace(self.root+<span class="stringliteral">&#39;/&#39;</span>,<span class="stringliteral">&#39;&#39;</span>)
+<a name="l00276"></a>00276 
+<a name="l00277"></a>00277         Answer = self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a1389888302c49d529716cb45b13a6f5a" title="Every target must be able to return a contribution to the objective function - however, this must be implemented in the specific subclass.">get</a>(mvals, AGrad, AHess)
+<a name="l00278"></a>00278         os.chdir(cwd)
+<a name="l00279"></a>00279         
+<a name="l00280"></a>00280         <span class="keywordflow">return</span> Answer
+<a name="l00281"></a>00281 
+<a name="l00282"></a>00282     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#a78cd29b94cbcc201eed99c78aaef46a4">submit_jobs</a>(self, mvals, AGrad=False, AHess=False):
+<a name="l00283"></a>00283         <span class="keywordflow">return</span>
+<a name="l00284"></a>00284 
+<a name="l00285"></a>00285     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#af8d2a4658c87841e40296795aec478bb" title="Stages the directory for the target, and then launches Work Queue processes if any.">stage</a>(self, mvals, AGrad=False, AHess=False, customdir=None):
+<a name="l00286"></a>00286         <span class="stringliteral">&quot;&quot;&quot; </span>
+<a name="l00287"></a>00287 <span class="stringliteral"></span>
+<a name="l00288"></a>00288 <span class="stringliteral">        Stages the directory for the target, and then launches Work Queue processes if any.</span>
+<a name="l00289"></a>00289 <span class="stringliteral">        The &#39;get&#39; method should not worry about the directory that it&#39;s running in.</span>
+<a name="l00290"></a>00290 <span class="stringliteral">        </span>
+<a name="l00291"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#a78cd29b94cbcc201eed99c78aaef46a4">00291</a> <span class="stringliteral">        &quot;&quot;&quot;</span>
+<a name="l00292"></a>00292         <span class="keywordflow">if</span> self.sleepy &gt; 0:
+<a name="l00293"></a>00293             logger.info(<span class="stringliteral">&quot;Sleeping for %i seconds as directed...\n&quot;</span> % self.sleepy)
+<a name="l00294"></a>00294             time.sleep(self.sleepy)
+<a name="l00295"></a>00295         <span class="comment">## Directory of the current iteration; if not None, then the simulation runs under</span>
+<a name="l00296"></a>00296         <span class="comment">## temp/target_name/iteration_number</span>
+<a name="l00297"></a>00297         <span class="comment">## The &#39;customdir&#39; is customizable and can go below anything</span>
+<a name="l00298"></a>00298         cwd = os.getcwd()
+<a name="l00299"></a>00299         
+<a name="l00300"></a>00300         absgetdir = os.path.join(self.root,self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#aede2856573b890cd47054ad36937d6f6" title="Root directory of the whole project.">tempdir</a>)
+<a name="l00301"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#af8d2a4658c87841e40296795aec478bb">00301</a>         <span class="keywordflow">if</span> <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>() <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:
+<a name="l00302"></a>00302             <span class="comment"># Not expecting more than ten thousand iterations</span>
+<a name="l00303"></a>00303             iterdir = <span class="stringliteral">&quot;iter_%04i&quot;</span> % <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>()
+<a name="l00304"></a>00304             absgetdir = os.path.join(absgetdir,iterdir)
+<a name="l00305"></a>00305         <span class="keywordflow">if</span> customdir <span class="keywordflow">is</span> <span class="keywordflow">not</span> <span class="keywordtype">None</span>:
+<a name="l00306"></a>00306             absgetdir = os.path.join(absgetdir,customdir)
+<a name="l00307"></a>00307 
+<a name="l00308"></a>00308         <span class="keywordflow">if</span> <span class="keywordflow">not</span> os.path.exists(absgetdir):
+<a name="l00309"></a>00309             os.makedirs(absgetdir)
+<a name="l00310"></a>00310         os.chdir(absgetdir)
+<a name="l00311"></a>00311         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a5aa4958cea0a48138511567a076c5a82">link_from_tempdir</a>(absgetdir)
+<a name="l00312"></a>00312         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9" title="The directory in which the simulation is running - this can be updated.">rundir</a> = absgetdir.replace(self.root+<span class="stringliteral">&#39;/&#39;</span>,<span class="stringliteral">&#39;&#39;</span>)
+<a name="l00313"></a>00313         self.<a class="code" href="classforcebalance_1_1target_1_1Target.html#a78cd29b94cbcc201eed99c78aaef46a4">submit_jobs</a>(mvals, AGrad, AHess)
+<a name="l00314"></a>00314 
+<a name="l00315"></a>00315         os.chdir(cwd)
+<a name="l00316"></a>00316         
+<a name="l00317"></a>00317         <span class="keywordflow">return</span>
+<a name="l00318"></a>00318 
+<a name="l00319"></a>00319     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#af6099ec09486213869dba2491bd8ea04" title="This method determines whether the Work Queue tasks for the current target have completed.">wq_complete</a>(self):
+<a name="l00320"></a>00320         <span class="stringliteral">&quot;&quot;&quot; This method determines whether the Work Queue tasks for the current target have completed. &quot;&quot;&quot;</span>
+<a name="l00321"></a>00321         wq = <a class="code" href="namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d">getWorkQueue</a>()
+<a name="l00322"></a>00322         WQIds = <a class="code" href="namespaceforcebalance_1_1nifty.html#abe1e72c32252d62a6551b47290c7584f">getWQIds</a>()
+<a name="l00323"></a>00323         <span class="keywordflow">if</span> wq == <span class="keywordtype">None</span>:
+<a name="l00324"></a>00324             <span class="keywordflow">return</span> <span class="keyword">True</span>
+<a name="l00325"></a>00325         <span class="keywordflow">elif</span> wq.empty():
+<a name="l00326"></a>00326             WQIds[self.name] = []
+<a name="l00327"></a>00327             <span class="keywordflow">return</span> <span class="keyword">True</span>
+<a name="l00328"></a>00328         <span class="keywordflow">elif</span> len(WQIds[self.name]) == 0:
+<a name="l00329"></a>00329             <span class="keywordflow">return</span> <span class="keyword">True</span>
+<a name="l00330"></a>00330         <span class="keywordflow">else</span>:
+<a name="l00331"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#af6099ec09486213869dba2491bd8ea04">00331</a>             <a class="code" href="namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished.">wq_wait1</a>(wq, wait_time=30)
+<a name="l00332"></a>00332             <span class="keywordflow">if</span> len(WQIds[self.name]) == 0:
+<a name="l00333"></a>00333                 <span class="keywordflow">return</span> <span class="keyword">True</span>
+<a name="l00334"></a>00334             <span class="keywordflow">else</span>:
+<a name="l00335"></a>00335                 <span class="keywordflow">return</span> <span class="keyword">False</span>
+<a name="l00336"></a>00336 
+<a name="l00337"></a>00337     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#ac30a4e9d7d9fe06f7caefa5f7cfab09b" title="Print target information in an organized table format.">printcool_table</a>(self, data=OrderedDict([]), headings=[], banner=<span class="keywordtype">None</span>, footnote=<span class="keywordtype">None</span>, color=0):
+<a name="l00338"></a>00338         <span class="stringliteral">&quot;&quot;&quot; Print target information in an organized table format.  Implemented 6/30 because</span>
+<a name="l00339"></a>00339 <span class="stringliteral">        multiple targets are already printing out tabulated information in very similar ways.</span>
+<a name="l00340"></a>00340 <span class="stringliteral">        This method is a simple wrapper around printcool_dictionary.  </span>
+<a name="l00341"></a>00341 <span class="stringliteral"></span>
+<a name="l00342"></a>00342 <span class="stringliteral">        The input should be something like:</span>
+<a name="l00343"></a>00343 <span class="stringliteral"></span>
+<a name="l00344"></a>00344 <span class="stringliteral">        @param data Column contents in the form of an OrderedDict, with string keys and list vals.</span>
+<a name="l00345"></a>00345 <span class="stringliteral">        The key is printed in the leftmost column and the vals are printed in the other columns.</span>
+<a name="l00346"></a>00346 <span class="stringliteral">        If non-strings are passed, they will be converted to strings (not recommended).</span>
+<a name="l00347"></a>00347 <span class="stringliteral">        </span>
+<a name="l00348"></a>00348 <span class="stringliteral">        @param headings Column headings in the form of a list.  It must be equal to the number to the list length</span>
+<a name="l00349"></a>00349 <span class="stringliteral">        for each of the &quot;vals&quot; in OrderedDict, plus one.  Use &quot;\n&quot; characters to specify long</span>
+<a name="l00350"></a>00350 <span class="stringliteral">        column names that may take up more than one line.</span>
+<a name="l00351"></a>00351 <span class="stringliteral"></span>
+<a name="l00352"></a>00352 <span class="stringliteral">        @param banner Optional heading line, which will be printed at the top in the title.</span>
+<a name="l00353"></a>00353 <span class="stringliteral">        @param footnote Optional footnote line, which will be printed at the bottom.</span>
+<a name="l00354"></a>00354 <span class="stringliteral">        </span>
+<a name="l00355"></a>00355 <span class="stringliteral">        &quot;&quot;&quot;</span>
+<a name="l00356"></a>00356         tline=<span class="stringliteral">&quot;Target: %s Type: %s Objective = %.5e&quot;</span> % (self.name, self.__class__.__name__, self.objective)
+<a name="l00357"></a>00357         nc = len(headings)
+<a name="l00358"></a>00358         <span class="keywordflow">if</span> banner != <span class="keywordtype">None</span>:
+<a name="l00359"></a>00359             tlines = [banner, tline]
+<a name="l00360"></a>00360         <span class="keywordflow">else</span>:
+<a name="l00361"></a>00361             tlines = [tline]
+<a name="l00362"></a>00362         <span class="comment"># Sanity check.</span>
+<a name="l00363"></a>00363         <span class="keywordflow">for</span> val <span class="keywordflow">in</span> data.values():
+<a name="l00364"></a>00364             <span class="keywordflow">if</span> (len(val)+1) != nc:
+<a name="l00365"></a>00365                 <span class="keywordflow">raise</span> RuntimeError(<span class="stringliteral">&#39;There are %i column headings, so the values in the data dictionary must be lists of length %i (currently %i)&#39;</span> % (nc, nc-1, len(val)))
+<a name="l00366"></a>00366         cwidths = [0 <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(nc)]
+<a name="l00367"></a><a class="code" href="classforcebalance_1_1target_1_1Target.html#ac30a4e9d7d9fe06f7caefa5f7cfab09b">00367</a>         <span class="comment"># Figure out maximum column width.</span>
+<a name="l00368"></a>00368         <span class="comment"># First look at all of the column headings...</span>
+<a name="l00369"></a>00369         crows = []
+<a name="l00370"></a>00370         <span class="keywordflow">for</span> cnum, cname <span class="keywordflow">in</span> enumerate(headings):
+<a name="l00371"></a>00371             crows.append(len(cname.split(<span class="stringliteral">&#39;\n&#39;</span>)))
+<a name="l00372"></a>00372             <span class="keywordflow">for</span> l <span class="keywordflow">in</span> cname.split(<span class="stringliteral">&#39;\n&#39;</span>):
+<a name="l00373"></a>00373                 cwidths[cnum] = max(cwidths[cnum], len(l))
+<a name="l00374"></a>00374         <span class="comment"># Then look at the row names to stretch out the first column width...</span>
+<a name="l00375"></a>00375         <span class="keywordflow">for</span> k <span class="keywordflow">in</span> data.keys():
+<a name="l00376"></a>00376             cwidths[0] = max(cwidths[0], len(k))
+<a name="l00377"></a>00377         <span class="comment"># Then look at the data values to stretch out the other column widths.</span>
+<a name="l00378"></a>00378         <span class="keywordflow">for</span> v <span class="keywordflow">in</span> data.values():
+<a name="l00379"></a>00379             <span class="keywordflow">for</span> n, f <span class="keywordflow">in</span> enumerate(v):
+<a name="l00380"></a>00380                 cwidths[n+1] = max(cwidths[n+1], len(str(f)))
+<a name="l00381"></a>00381         <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(1, len(cwidths)):
+<a name="l00382"></a>00382             cwidths[i] += 2
+<a name="l00383"></a>00383         <span class="keywordflow">if</span> cwidths[0] &lt; 25:
+<a name="l00384"></a>00384             cwidths[0] = 25
+<a name="l00385"></a>00385         cblocks = [[<span class="stringliteral">&#39;&#39;</span> <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(max(crows) - len(cname.split(<span class="stringliteral">&#39;\n&#39;</span>)))] + cname.split(<span class="stringliteral">&#39;\n&#39;</span>) <span class="keywordflow">for</span> cnum, cname <span class="keywordflow">in</span> enumerate(headings)]
+<a name="l00386"></a>00386         <span class="comment"># The formatting line consisting of variable column widths</span>
+<a name="l00387"></a>00387         fline = <span class="stringliteral">&#39; &#39;</span>.join(<span class="stringliteral">&quot;%%%s%is&quot;</span> % ((<span class="stringliteral">&quot;-&quot;</span> <span class="keywordflow">if</span> i==0 <span class="keywordflow">else</span> <span class="stringliteral">&quot;&quot;</span>), j) <span class="keywordflow">for</span> i, j <span class="keywordflow">in</span> enumerate(cwidths))
+<a name="l00388"></a>00388         vline = <span class="stringliteral">&#39; &#39;</span>.join([<span class="stringliteral">&quot;%%%is&quot;</span> % j <span class="keywordflow">for</span> i, j <span class="keywordflow">in</span> enumerate(cwidths) <span class="keywordflow">if</span> i &gt; 0])
+<a name="l00389"></a>00389         clines = [fline % (tuple(cblocks[j][i] <span class="keywordflow">for</span> j <span class="keywordflow">in</span> range(nc))) <span class="keywordflow">for</span> i <span class="keywordflow">in</span> range(max(crows))]
+<a name="l00390"></a>00390         tlines += clines
+<a name="l00391"></a>00391         PrintDict = OrderedDict([(key, vline % (tuple(val))) <span class="keywordflow">for</span> key, val <span class="keywordflow">in</span> data.items()])
+<a name="l00392"></a>00392         <a class="code" href="namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary...">printcool_dictionary</a>(PrintDict, title=<span class="stringliteral">&#39;\n&#39;</span>.join(tlines), keywidth=cwidths[0], center=<span class="keyword">False</span>, leftpad=4, color=color)
+<a name="l00393"></a>00393         
+<a name="l00394"></a>00394 <span class="keyword">class </span><a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html">RemoteTarget</a>(<a class="code" href="classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets.">Target</a>):
+<a name="l00395"></a>00395     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1Target.html#ab8f31f6e94e0fbd84f0ee54d326bb69a" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(self,options,tgt_opts,forcefield):
+<a name="l00396"></a>00396         super(RemoteTarget, self).<a class="code" href="classforcebalance_1_1target_1_1Target.html#ab8f31f6e94e0fbd84f0ee54d326bb69a" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(options,tgt_opts,forcefield)
+<a name="l00397"></a>00397         
+<a name="l00398"></a>00398         self.r_options = options.copy()
+<a name="l00399"></a>00399         self.r_options[<span class="stringliteral">&quot;type&quot;</span>]=<span class="stringliteral">&quot;single&quot;</span>
+<a name="l00400"></a>00400         
+<a name="l00401"></a>00401         self.r_tgt_opts = tgt_opts.copy()
+<a name="l00402"></a>00402         self.r_tgt_opts[<span class="stringliteral">&quot;remote&quot;</span>]=<span class="keyword">False</span>
+<a name="l00403"></a>00403         
+<a name="l00404"></a>00404         tar = tarfile.open(name=<span class="stringliteral">&quot;temp/%s/target.tar.bz2&quot;</span> % self.name, mode=<span class="stringliteral">&#39;w:bz2&#39;</span>)
+<a name="l00405"></a>00405         tar.add(<span class="stringliteral">&quot;%s/targets/%s&quot;</span> % (self.root, self.name), arcname = <span class="stringliteral">&quot;targets/%s&quot;</span> % self.name)
+<a name="l00406"></a><a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html">00406</a>         tar.close()
+<a name="l00407"></a><a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a43b4e2f91fc38e2062b9f3623b34a0a4">00407</a>         
+<a name="l00408"></a>00408         self.<a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a43b4e2f91fc38e2062b9f3623b34a0a4">remote_indicate</a> = <span class="stringliteral">&quot;&quot;</span>
+<a name="l00409"></a>00409         
+<a name="l00410"></a>00410     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a59354bb1a7f474e82c65cb0ef2b55098">submit_jobs</a>(self, mvals, AGrad=False, AHess=False):
+<a name="l00411"></a>00411         n=0
+<a name="l00412"></a>00412         id_string = <span class="stringliteral">&quot;%s_%i-%i&quot;</span> % (self.name, <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>(), n)
+<a name="l00413"></a>00413         
+<a name="l00414"></a>00414         <span class="keywordflow">while</span> os.path.exists(<span class="stringliteral">&#39;%s.out&#39;</span> % id_string):
+<a name="l00415"></a>00415             n+=1
+<a name="l00416"></a>00416             id_string = <span class="stringliteral">&quot;%s_%i-%i&quot;</span> % (self.name, <a class="code" href="namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b">Counter</a>(), n)
+<a name="l00417"></a>00417         
+<a name="l00418"></a>00418         with open(<span class="stringliteral">&#39;forcebalance.p&#39;</span>,<span class="stringliteral">&#39;w&#39;</span>) <span class="keyword">as</span> f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.<a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a55f79d109555cbb63f6b332009a1bf9d">r_options</a>, self.<a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a281a3bd11be2fe3d78d804d0708004f4">r_tgt_opts</a>, self.FF),f)
+<a name="l00419"></a>00419         
+<a name="l00420"></a>00420         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],<span class="stringliteral">&quot;data&quot;</span>,<span class="stringliteral">&quot;rtarget.py&quot;</span>),<span class="stringliteral">&quot;rtarget.py&quot;</span>)
+<a name="l00421"></a>00421         forcebalance.nifty.LinkFile(os.path.join(self.root,<span class="stringliteral">&quot;temp&quot;</span>, self.name, <span class="stringliteral">&quot;target.tar.bz2&quot;</span>),<span class="stringliteral">&quot;%s.tar.bz2&quot;</span> % self.name)
+<a name="l00422"></a><a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a59354bb1a7f474e82c65cb0ef2b55098">00422</a>         
+<a name="l00423"></a>00423         wq = <a class="code" href="namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d">getWorkQueue</a>()
+<a name="l00424"></a>00424         
+<a name="l00425"></a>00425         logger.info(<span class="stringliteral">&quot;Sending target &#39;%s&#39; to work queue for remote evaluation\n&quot;</span> % self.name)
+<a name="l00426"></a>00426         <span class="comment"># input:</span>
+<a name="l00427"></a>00427         <span class="comment">#   forcebalance.p: pickled mvals, options, and forcefield</span>
+<a name="l00428"></a>00428         <span class="comment">#   rtarget.py: remote target evaluation script</span>
+<a name="l00429"></a>00429         <span class="comment">#   target.tar.bz2: tarred target</span>
+<a name="l00430"></a>00430         <span class="comment"># output:</span>
+<a name="l00431"></a>00431         <span class="comment">#   objective.p: pickled objective function dictionary</span>
+<a name="l00432"></a>00432         <span class="comment">#   indicate.log: results of target.indicate() written to file</span>
+<a name="l00433"></a>00433         forcebalance.nifty.queue_up(wq, <span class="stringliteral">&quot;python rtarget.py &gt; %s.out 2&gt;&amp;1&quot;</span> % id_string,
+<a name="l00434"></a>00434             [<span class="stringliteral">&quot;forcebalance.p&quot;</span>, <span class="stringliteral">&quot;rtarget.py&quot;</span>, <span class="stringliteral">&quot;%s.tar.bz2&quot;</span> % self.name],
+<a name="l00435"></a>00435             [<span class="stringliteral">&#39;objective_%s.p&#39;</span> % id_string, <span class="stringliteral">&#39;indicate_%s.log&#39;</span> % id_string, <span class="stringliteral">&#39;%s.out&#39;</span> % id_string],
+<a name="l00436"></a>00436             tgt=self)
+<a name="l00437"></a>00437             
+<a name="l00438"></a>00438         self.<a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a5c0aec85fdf529eaa82a087d6680f7f4">id_string</a> = id_string
+<a name="l00439"></a>00439 
+<a name="l00440"></a>00440     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a7a186f5b2e135448f9249154f7da8752" title="Every target must be able to return a contribution to the objective function - however, this must be implemented in the specific subclass.">get</a>(self,mvals,AGrad=False,AHess=False):
+<a name="l00441"></a>00441         with open(<span class="stringliteral">&#39;indicate_%s.log&#39;</span> % self.<a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a5c0aec85fdf529eaa82a087d6680f7f4">id_string</a>, <span class="stringliteral">&#39;</span><span class="stringliteral">r&#39;) as f:</span>
+<a name="l00442"></a>00442 <span class="stringliteral">            self.<a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a43b4e2f91fc38e2062b9f3623b34a0a4">remote_indicate</a> = f.read()</span>
+<a name="l00443"></a>00443 <span class="stringliteral">        with open(</span><span class="stringliteral">&#39;objective_%s.p&#39;</span> % self.<a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a5c0aec85fdf529eaa82a087d6680f7f4">id_string</a>, <span class="stringliteral">&#39;</span><span class="stringliteral">r&#39;) as f:</span>
+<a name="l00444"></a>00444 <span class="stringliteral">            </span><span class="keywordflow">return</span> forcebalance.nifty.lp_load(f)
+<a name="l00445"></a>00445         
+<a name="l00446"></a>00446     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#abbdb5171b47a8f5380bf537c809b3b1f">indicate</a>(self):
+<a name="l00447"></a>00447         logger.info(self.<a class="code" href="classforcebalance_1_1target_1_1RemoteTarget.html#a43b4e2f91fc38e2062b9f3623b34a0a4">remote_indicate</a> + <span class="stringliteral">&#39;\n&#39;</span>)
+<a name="l00448"></a>00448 
+<a name="l00449"></a>00449 
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -493,7 +549,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:14 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:07 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

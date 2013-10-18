@@ -131,21 +131,33 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00047"></a><a class="code" href="classforcebalance_1_1output_1_1RawFileHandler.html">00047</a>         self.stream.write(message)
 <a name="l00048"></a><a class="code" href="classforcebalance_1_1output_1_1RawFileHandler.html#a55d391dbd042a51aa1d15106151eecd3">00048</a>         self.flush()
 <a name="l00049"></a>00049         
-<a name="l00050"></a>00050 <span class="keyword">class </span><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html" title="File handler that does not write terminal escape codes and carriage returns to files.">CleanFileHandler</a>(FileHandler):
-<a name="l00051"></a>00051     <span class="stringliteral">&quot;&quot;&quot;File handler that does not write terminal escape codes and carriage returns</span>
-<a name="l00052"></a>00052 <span class="stringliteral">    to files. Use this when writing to a file that will probably not be viewed in a terminal&quot;&quot;&quot;</span>
-<a name="l00053"></a>00053     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1output_1_1RawFileHandler.html#a55d391dbd042a51aa1d15106151eecd3">emit</a>(self, record):
-<a name="l00054"></a>00054         message = record.getMessage()
-<a name="l00055"></a>00055         message = re.sub(<span class="stringliteral">&quot;\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, message)
-<a name="l00056"></a><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html">00056</a>         message = re.sub(<span class="stringliteral">&quot;\r&quot;</span>, <span class="stringliteral">&quot;\n&quot;</span>, message)
-<a name="l00057"></a><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html#a1bb68743fcd45e71a280599a3658c00c">00057</a>         self.stream.write(message)
-<a name="l00058"></a>00058         self.flush()
-<a name="l00059"></a>00059 
-<a name="l00060"></a>00060 <span class="comment"># set up package level logger that by default prints to sys.stdout</span>
-<a name="l00061"></a>00061 setLoggerClass(ForceBalanceLogger)
-<a name="l00062"></a>00062 logger=getLogger(<span class="stringliteral">&#39;forcebalance&#39;</span>)
-<a name="l00063"></a>00063 setLoggerClass(Logger)  <span class="comment"># module level loggers should use the default logger object</span>
-<a name="l00064"></a>00064 logger.setLevel(INFO)
+<a name="l00050"></a>00050 <span class="keyword">class </span><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html" title="Similar to RawStreamHandler except it does not write terminal escape codes.">CleanStreamHandler</a>(StreamHandler):
+<a name="l00051"></a>00051     <span class="stringliteral">&quot;&quot;&quot;Similar to RawStreamHandler except it does not write terminal escape codes.</span>
+<a name="l00052"></a>00052 <span class="stringliteral">    Use this for &#39;plain&#39; terminal output without any fancy colors or formatting&quot;&quot;&quot;</span>
+<a name="l00053"></a>00053     <span class="keyword">def </span>__init__(self, stream = sys.stdout):
+<a name="l00054"></a>00054         super(CleanStreamHandler, self).__init__(stream)
+<a name="l00055"></a>00055     
+<a name="l00056"></a><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html">00056</a>     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html#a54af06d396c934827a60c07319b61c9b">emit</a>(self, record):
+<a name="l00057"></a><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html#af3e4e5c143659317693cfd5e6c4098d5">00057</a>         message = record.getMessage()
+<a name="l00058"></a>00058         message = re.sub(<span class="stringliteral">&quot;\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, message)
+<a name="l00059"></a>00059         self.stream.write(message)
+<a name="l00060"></a><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html#a54af06d396c934827a60c07319b61c9b">00060</a>         self.flush()
+<a name="l00061"></a>00061         
+<a name="l00062"></a>00062 <span class="keyword">class </span><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html" title="File handler that does not write terminal escape codes and carriage returns to files.">CleanFileHandler</a>(FileHandler):
+<a name="l00063"></a>00063     <span class="stringliteral">&quot;&quot;&quot;File handler that does not write terminal escape codes and carriage returns</span>
+<a name="l00064"></a>00064 <span class="stringliteral">    to files. Use this when writing to a file that will probably not be viewed in a terminal&quot;&quot;&quot;</span>
+<a name="l00065"></a>00065     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1output_1_1CleanStreamHandler.html#a54af06d396c934827a60c07319b61c9b">emit</a>(self, record):
+<a name="l00066"></a>00066         message = record.getMessage()
+<a name="l00067"></a>00067         message = re.sub(<span class="stringliteral">&quot;\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m&quot;</span>, <span class="stringliteral">&quot;&quot;</span>, message)
+<a name="l00068"></a>00068         message = re.sub(<span class="stringliteral">&quot;\r&quot;</span>, <span class="stringliteral">&quot;\n&quot;</span>, message)
+<a name="l00069"></a><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html">00069</a>         self.stream.write(message)
+<a name="l00070"></a><a class="code" href="classforcebalance_1_1output_1_1CleanFileHandler.html#a1bb68743fcd45e71a280599a3658c00c">00070</a>         self.flush()
+<a name="l00071"></a>00071 
+<a name="l00072"></a>00072 <span class="comment"># set up package level logger that by default prints to sys.stdout</span>
+<a name="l00073"></a>00073 setLoggerClass(ForceBalanceLogger)
+<a name="l00074"></a>00074 logger=getLogger(<span class="stringliteral">&#39;forcebalance&#39;</span>)
+<a name="l00075"></a>00075 setLoggerClass(Logger)  <span class="comment"># module level loggers should use the default logger object</span>
+<a name="l00076"></a>00076 logger.setLevel(INFO)
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -164,7 +176,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:14 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:07 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

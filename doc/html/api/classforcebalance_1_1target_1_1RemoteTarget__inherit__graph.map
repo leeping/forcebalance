@@ -1,4 +1,4 @@
-<map id="forcebalance.target.RemoteTarget" name="forcebalance.target.RemoteTarget">
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="11,160,200,189"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="19,83,192,112"/>
+<map id="G" name="G">
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="29,80,219,107"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="37,5,211,32"/>
 </map>

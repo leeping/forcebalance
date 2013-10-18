@@ -127,12 +127,15 @@ Variables</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default general options.  <a href="#a2ac3b892432d1c614c32eebeb8de41c5"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#a1725a6ea3c588046339f9476f3e3f32e">tgt_opts_types</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default fitting target options.  <a href="#a1725a6ea3c588046339f9476f3e3f32e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#ab0f8ac22b808f515531c830439d70bbb">all_opts_names</a> = list(itertools.chain(*[i.keys() for i in gen_opts_types.values()]))</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">list&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#af730ef69e27de8ffbf475f844c5c2d5f">iocc</a> = []</td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Check for uniqueness of option names.  <a href="#af730ef69e27de8ffbf475f844c5c2d5f"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#a807ea3a28fedbdfd494f5cc8da063202">gen_opts_defaults</a> = {}</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default general options - basically a collapsed veresion of gen_opts_types.  <a href="#a807ea3a28fedbdfd494f5cc8da063202"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#abb7a7e9723de629aa97727a85bcdbad1">subdict</a> = {}</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#ad2c80e2b742fbd9594fd813dd51550e6">tgt_opts_defaults</a> = {}</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default target options - basically a collapsed version of tgt_opts_types.  <a href="#ad2c80e2b742fbd9594fd813dd51550e6"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#a37193d7ceabbf07a61e65677372b7dab">bkwd</a> = {&quot;simtype&quot; : &quot;type&quot;}</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">dictionary&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#a37193d7ceabbf07a61e65677372b7dab">bkwd</a> = {&quot;simtype&quot; : &quot;type&quot;, &quot;masterfile&quot; : &quot;binding_txt&quot;}</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Option maps for maintaining backward compatibility.  <a href="#a37193d7ceabbf07a61e65677372b7dab"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">list&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1parser.html#a525ac339b645dbfb9fbb7cc672712504">mainsections</a> = [&quot;SIMULATION&quot;,&quot;TARGET&quot;,&quot;OPTIONS&quot;,&quot;END&quot;,&quot;NONE&quot;]</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Listing of sections in the input file.  <a href="#a525ac339b645dbfb9fbb7cc672712504"></a><br/></td></tr>
@@ -202,7 +205,7 @@ tgt_opts List of fitting target options.</dd></dl>
 <p class="enddd">Implement charge groups. </p>
 </dd></dl>
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00376">376</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00396">396</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -256,7 +259,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Answer List of strings for the section that we are printing out. </dd></dl>
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00279">279</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00299">299</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -282,7 +285,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00253">253</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00273">273</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 </div>
 </div>
@@ -301,7 +304,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00228">228</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00248">248</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -327,7 +330,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00244">244</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00264">264</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -353,7 +356,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00236">236</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00256">256</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -365,12 +368,27 @@ Here is the call graph for this function:</div>
 </div>
 </div>
 <hr/><h2>Variable Documentation</h2>
+<a class="anchor" id="ab0f8ac22b808f515531c830439d70bbb"></a><!-- doxytag: member="forcebalance::parser::all_opts_names" ref="ab0f8ac22b808f515531c830439d70bbb" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">tuple <a class="el" href="namespaceforcebalance_1_1parser.html#ab0f8ac22b808f515531c830439d70bbb">forcebalance::parser::all_opts_names</a> = list(itertools.chain(*[i.keys() for i in gen_opts_types.values()]))</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00213">213</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+
+</div>
+</div>
 <a class="anchor" id="a37193d7ceabbf07a61e65677372b7dab"></a><!-- doxytag: member="forcebalance::parser::bkwd" ref="a37193d7ceabbf07a61e65677372b7dab" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">dictionary <a class="el" href="namespaceforcebalance_1_1parser.html#a37193d7ceabbf07a61e65677372b7dab">forcebalance::parser::bkwd</a> = {&quot;simtype&quot; : &quot;type&quot;}</td>
+          <td class="memname">dictionary <a class="el" href="namespaceforcebalance_1_1parser.html#a37193d7ceabbf07a61e65677372b7dab">forcebalance::parser::bkwd</a> = {&quot;simtype&quot; : &quot;type&quot;, &quot;masterfile&quot; : &quot;binding_txt&quot;}</td>
         </tr>
       </table>
 </div>
@@ -378,7 +396,7 @@ Here is the call graph for this function:</div>
 
 <p>Option maps for maintaining backward compatibility. </p>
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00223">223</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00243">243</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 </div>
 </div>
@@ -395,7 +413,7 @@ Here is the call graph for this function:</div>
 
 <p>Default general options - basically a collapsed veresion of gen_opts_types. </p>
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00207">207</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00227">227</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 </div>
 </div>
@@ -414,6 +432,23 @@ Here is the call graph for this function:</div>
 <p>Note that the documentation is included in part of the key; this will aid in automatic doc-extraction. :) In the 5-tuple we have: Default value, priority (larger number means printed first), short docstring, description of scope, list of filter strings for pulling out pertinent targets (MakeInputFile.py) </p>
 
 <p>Definition at line <a class="el" href="parser_8py_source.html#l00065">65</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="af730ef69e27de8ffbf475f844c5c2d5f"></a><!-- doxytag: member="forcebalance::parser::iocc" ref="af730ef69e27de8ffbf475f844c5c2d5f" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">list <a class="el" href="namespaceforcebalance_1_1parser.html#af730ef69e27de8ffbf475f844c5c2d5f">forcebalance::parser::iocc</a> = []</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Check for uniqueness of option names. </p>
+
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00216">216</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 </div>
 </div>
@@ -445,7 +480,7 @@ Here is the call graph for this function:</div>
 
 <p>Listing of sections in the input file. </p>
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00226">226</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00246">246</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 </div>
 </div>
@@ -467,7 +502,7 @@ Here is the call graph for this function:</div>
 </pre></div>
 <p>ParsTab that refers to subsection parsers. </p>
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00257">257</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00277">277</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 </div>
 </div>
@@ -482,7 +517,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00209">209</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00229">229</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 </div>
 </div>
@@ -499,7 +534,7 @@ Here is the call graph for this function:</div>
 
 <p>Default target options - basically a collapsed version of tgt_opts_types. </p>
 
-<p>Definition at line <a class="el" href="parser_8py_source.html#l00215">215</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
+<p>Definition at line <a class="el" href="parser_8py_source.html#l00235">235</a> of file <a class="el" href="parser_8py_source.html">parser.py</a>.</p>
 
 </div>
 </div>
@@ -538,7 +573,7 @@ Here is the call graph for this function:</div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:15 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:08 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

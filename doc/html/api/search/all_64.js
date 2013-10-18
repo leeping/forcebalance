@@ -1,13 +1,13 @@
 var searchData=
 [
   ['d',['D',['../classforcebalance_1_1leastsq_1_1LeastSquares.html#a1691b076e288ed6a3685c38f56653767',1,'forcebalance::leastsq::LeastSquares']]],
-  ['data',['Data',['../classforcebalance_1_1molecule_1_1Molecule.html#a8698f94608be34eeba6eaa4c52dc5249',1,'forcebalance::molecule::Molecule.Data()'],['../namespaceforcebalance_1_1data.html#a3f325d696a5bf504db1219d69a4e5a43',1,'forcebalance::data::data()'],['../namespaceforcebalance_1_1Mol2.html#a41537283c77bf1c8e05a63667003ae1c',1,'forcebalance::Mol2.data()']]],
-  ['data_2epy',['data.py',['../data_8py.html',1,'']]],
+  ['data',['Data',['../classforcebalance_1_1molecule_1_1Molecule.html#a8698f94608be34eeba6eaa4c52dc5249',1,'forcebalance::molecule::Molecule.Data()'],['../namespaceforcebalance_1_1Mol2.html#a41537283c77bf1c8e05a63667003ae1c',1,'forcebalance::Mol2.data()']]],
   ['data_5ffrom_5fweb',['data_from_web',['../namespaceforcebalance_1_1chemistry.html#a244dd58baf4c171b37316e64561c1021',1,'forcebalance::chemistry']]],
   ['datfnm',['DATfnm',['../classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#a25c973d669a48061482765bb057fa25b',1,'forcebalance::psi4io::THCDF_Psi4']]],
   ['defaulthandler',['defaultHandler',['../classforcebalance_1_1output_1_1ForceBalanceLogger.html#abc9e80457d0e8d0eafce905309a7da45',1,'forcebalance::output::ForceBalanceLogger']]],
   ['denoms',['denoms',['../classforcebalance_1_1moments_1_1Moments.html#a10c5750909afd196478a2f81a3a9b1c6',1,'forcebalance::moments::Moments']]],
   ['destroy',['destroy',['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#a49f92a123ac138ba4b17a29c4c95bdd5',1,'forcebalance::psi4io::GBS_Reader']]],
+  ['destroyworkqueue',['destroyWorkQueue',['../namespaceforcebalance_1_1nifty.html#a09605ee2819749913bbbb6206af1af70',1,'forcebalance::nifty']]],
   ['determine_5ffftype',['determine_fftype',['../namespaceforcebalance_1_1forcefield.html#a99c9997d5158a04be089f291bd6f99bd',1,'forcebalance::forcefield']]],
   ['df_5fenergy',['DF_Energy',['../classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#ab214bc03cb5cf110fc94c3c66b637b60',1,'forcebalance::psi4io::THCDF_Psi4']]],
   ['dftypes',['dftypes',['../namespaceforcebalance_1_1gmxio.html#a5520b315e210120bb3e14af3665d568c',1,'forcebalance::gmxio']]],

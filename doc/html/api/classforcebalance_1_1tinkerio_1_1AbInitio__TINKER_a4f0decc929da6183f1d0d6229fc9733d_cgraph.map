@@ -7,6 +7,7 @@
 <area shape="rect" id="node17" href="$classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a535ff72686dc66b91f5dda007e252189" title="forcebalance.openmmio.Interaction_OpenMM.energy_driver_all" alt="" coords="1323,104,1747,130"/>
 <area shape="rect" id="node14" href="$classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#adeddb898c79da3df601bc742bc2c2be7" title="Initialization; define a few core concepts." alt="" coords="1865,154,2173,181"/>
 <area shape="rect" id="node19" href="$namespaceforcebalance_1_1openmmio.html#a9f9fc56475dbfcc94a40fef6a84ed25f" title="forcebalance.openmmio.UpdateSimulationParameters" alt="" coords="1833,104,2204,130"/>
-<area shape="rect" id="node23" href="$classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a9813c1a24af88156703d05ebe57bf707" title="forcebalance.openmmio.Interaction_OpenMM.interaction_driver_all" alt="" coords="1795,53,2243,80"/>
-<area shape="rect" id="node21" href="$namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator." alt="" coords="2291,104,2597,130"/>
+<area shape="rect" id="node25" href="$classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a9813c1a24af88156703d05ebe57bf707" title="forcebalance.openmmio.Interaction_OpenMM.interaction_driver_all" alt="" coords="1795,53,2243,80"/>
+<area shape="rect" id="node21" href="$namespaceforcebalance_1_1openmmio.html#a95d91538d72e354fc95433539c42450c" title="forcebalance.openmmio.SetAmoebaVirtualExclusions" alt="" coords="2291,104,2655,130"/>
+<area shape="rect" id="node23" href="$namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator." alt="" coords="2704,104,3011,130"/>
 </map>

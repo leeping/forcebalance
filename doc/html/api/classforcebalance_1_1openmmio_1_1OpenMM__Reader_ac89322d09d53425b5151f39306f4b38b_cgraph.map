@@ -1,5 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1openmmio_1_1OpenMM__Reader.html#a111f672a2f7b835da774dc5e6f265731" title="forcebalance.openmmio.OpenMM_Reader.__init__" alt="" coords="431,5,769,32"/>
-<area shape="rect" id="node6" href="$classforcebalance_1_1BaseClass.html#a73e9a37a7632e79eb99f49bd15aced45" title="forcebalance.BaseClass.set_option" alt="" coords="477,56,723,83"/>
-<area shape="rect" id="node8" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" title="forcebalance.baseclass.ForceBalanceBaseClass.set_option" alt="" coords="401,107,799,133"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1openmmio_1_1OpenMM__Reader.html#a111f672a2f7b835da774dc5e6f265731" title="forcebalance.openmmio.OpenMM_Reader.__init__" alt="" coords="400,5,739,32"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1BaseClass.html#a73e9a37a7632e79eb99f49bd15aced45" title="forcebalance.BaseClass.set_option" alt="" coords="447,56,692,83"/>
 </map>

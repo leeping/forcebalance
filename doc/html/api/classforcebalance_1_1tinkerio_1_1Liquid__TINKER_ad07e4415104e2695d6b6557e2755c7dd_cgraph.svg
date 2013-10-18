@@ -62,27 +62,27 @@
 <path fill="none" stroke="midnightblue" d="M304.059,-133.917C312.727,-133.396 321.422,-132.873 330.042,-132.355"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="330.346,-135.843 340.118,-131.749 329.926,-128.856 330.346,-135.843"/>
 </g>
-<!-- Node15 -->
-<g id="node30" class="node"><title>Node15</title>
+<!-- Node17 -->
+<g id="node34" class="node"><title>Node17</title>
 <a xlink:href="namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" target="_top" xlink:title="forcebalance.nifty.link_dir_contents">
-<polygon fill="white" stroke="black" points="1698.5,-76.5 1698.5,-95.5 1881.5,-95.5 1881.5,-76.5 1698.5,-76.5"/>
-<text text-anchor="middle" x="1790" y="-83.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.link_dir_contents</text>
+<polygon fill="white" stroke="black" points="1698.5,-66.5 1698.5,-85.5 1881.5,-85.5 1881.5,-66.5 1698.5,-66.5"/>
+<text text-anchor="middle" x="1790" y="-73.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.link_dir_contents</text>
 </a>
 </g>
-<!-- Node1&#45;&gt;Node15 -->
-<g id="edge42" class="edge"><title>Node1&#45;&gt;Node15</title>
-<path fill="none" stroke="midnightblue" d="M187.838,-133.456C278.949,-109.365 532.124,-48 747,-48 747,-48 747,-48 1358,-48 1482.46,-48 1626.36,-63.9182 1712.4,-75.1493"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1711.97,-78.623 1722.34,-76.46 1712.88,-71.683 1711.97,-78.623"/>
+<!-- Node1&#45;&gt;Node17 -->
+<g id="edge42" class="edge"><title>Node1&#45;&gt;Node17</title>
+<path fill="none" stroke="midnightblue" d="M187.838,-133.456C278.949,-109.365 532.124,-48 747,-48 747,-48 747,-48 1358,-48 1471.24,-48 1600.87,-57.7443 1688.14,-65.7361"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1688.02,-69.2401 1698.3,-66.6764 1688.67,-62.2699 1688.02,-69.2401"/>
 </g>
-<!-- Node19 -->
-<g id="node39" class="node"><title>Node19</title>
+<!-- Node20 -->
+<g id="node40" class="node"><title>Node20</title>
 <a xlink:href="namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" target="_top" xlink:title="forcebalance.nifty.getWorkQueue">
 <polygon fill="white" stroke="black" points="383.5,-0.5 383.5,-19.5 556.5,-19.5 556.5,-0.5 383.5,-0.5"/>
 <text text-anchor="middle" x="470" y="-7.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.getWorkQueue</text>
 </a>
 </g>
-<!-- Node1&#45;&gt;Node19 -->
-<g id="edge40" class="edge"><title>Node1&#45;&gt;Node19</title>
+<!-- Node1&#45;&gt;Node20 -->
+<g id="edge40" class="edge"><title>Node1&#45;&gt;Node20</title>
 <path fill="none" stroke="midnightblue" d="M165.817,-133.393C195.043,-111.983 269.552,-60.1828 340,-34 353.706,-28.906 368.649,-24.8576 383.346,-21.6508"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="384.378,-25.0117 393.464,-19.5627 382.963,-18.1562 384.378,-25.0117"/>
 </g>
@@ -151,15 +151,15 @@
 <path fill="none" stroke="midnightblue" d="M599.707,-124C621.01,-124 642.608,-124 662.461,-124"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="662.673,-127.5 672.673,-124 662.673,-120.5 662.673,-127.5"/>
 </g>
-<!-- Node18 -->
-<g id="node37" class="node"><title>Node18</title>
+<!-- Node19 -->
+<g id="node38" class="node"><title>Node19</title>
 <a xlink:href="classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html#a307529b9902b34a790a8b016e153c7d6" target="_top" xlink:title="Create an instance of the class.">
 <polygon fill="white" stroke="black" points="636,-76.5 636,-95.5 860,-95.5 860,-76.5 636,-76.5"/>
 <text text-anchor="middle" x="748" y="-83.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.tinkerio.Liquid_TINKER.__init__</text>
 </a>
 </g>
-<!-- Node8&#45;&gt;Node18 -->
-<g id="edge38" class="edge"><title>Node8&#45;&gt;Node18</title>
+<!-- Node8&#45;&gt;Node19 -->
+<g id="edge38" class="edge"><title>Node8&#45;&gt;Node19</title>
 <path fill="none" stroke="midnightblue" d="M540.29,-114.46C579.005,-109.13 627.407,-102.466 667.64,-96.9264"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="668.252,-100.375 677.681,-95.5439 667.297,-93.4406 668.252,-100.375"/>
 </g>
@@ -178,72 +178,79 @@
 <!-- Node12 -->
 <g id="node24" class="node"><title>Node12</title>
 <a xlink:href="namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" target="_top" xlink:title="This function waits until the work queue is completely empty.">
-<polygon fill="white" stroke="black" points="1114,-190.5 1114,-209.5 1254,-209.5 1254,-190.5 1114,-190.5"/>
-<text text-anchor="middle" x="1184" y="-197.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.wq_wait</text>
+<polygon fill="white" stroke="black" points="1114,-152.5 1114,-171.5 1254,-171.5 1254,-152.5 1114,-152.5"/>
+<text text-anchor="middle" x="1184" y="-159.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.wq_wait</text>
 </a>
 </g>
 <!-- Node11&#45;&gt;Node12 -->
 <g id="edge24" class="edge"><title>Node11&#45;&gt;Node12</title>
-<path fill="none" stroke="midnightblue" d="M1010.15,-133.589C1035.2,-144.326 1077.28,-162.049 1114,-176 1123.87,-179.75 1134.62,-183.599 1144.63,-187.086"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1143.74,-190.482 1154.33,-190.436 1146.02,-183.865 1143.74,-190.482"/>
-</g>
-<!-- Node13 -->
-<g id="node26" class="node"><title>Node13</title>
-<a xlink:href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" target="_top" xlink:title="forcebalance.nifty.allsplit">
-<polygon fill="white" stroke="black" points="1290.5,-152.5 1290.5,-171.5 1423.5,-171.5 1423.5,-152.5 1290.5,-152.5"/>
-<text text-anchor="middle" x="1357" y="-159.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.allsplit</text>
-</a>
-</g>
-<!-- Node11&#45;&gt;Node13 -->
-<g id="edge34" class="edge"><title>Node11&#45;&gt;Node13</title>
-<path fill="none" stroke="midnightblue" d="M1045.28,-133.519C1066.78,-136.861 1091.47,-140.42 1114,-143 1169.49,-149.354 1232.38,-154.221 1280.14,-157.438"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1280.19,-160.949 1290.4,-158.119 1280.65,-153.964 1280.19,-160.949"/>
-</g>
-<!-- Node16 -->
-<g id="node32" class="node"><title>Node16</title>
-<a xlink:href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" target="_top" xlink:title="forcebalance.nifty.GoInto">
-<polygon fill="white" stroke="black" points="1117,-114.5 1117,-133.5 1251,-133.5 1251,-114.5 1117,-114.5"/>
-<text text-anchor="middle" x="1184" y="-121.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.GoInto</text>
-</a>
-</g>
-<!-- Node11&#45;&gt;Node16 -->
-<g id="edge32" class="edge"><title>Node11&#45;&gt;Node16</title>
-<path fill="none" stroke="midnightblue" d="M1060.06,-124C1075.13,-124 1091.08,-124 1106.31,-124"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1106.73,-127.5 1116.73,-124 1106.73,-120.5 1106.73,-127.5"/>
-</g>
-<!-- Node17 -->
-<g id="node35" class="node"><title>Node17</title>
-<a xlink:href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" target="_top" xlink:title="forcebalance.nifty.Leave">
-<polygon fill="white" stroke="black" points="1118.5,-76.5 1118.5,-95.5 1249.5,-95.5 1249.5,-76.5 1118.5,-76.5"/>
-<text text-anchor="middle" x="1184" y="-83.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.Leave</text>
-</a>
-</g>
-<!-- Node11&#45;&gt;Node17 -->
-<g id="edge36" class="edge"><title>Node11&#45;&gt;Node17</title>
-<path fill="none" stroke="midnightblue" d="M1036.96,-114.46C1063.38,-109.31 1096.19,-102.916 1124.02,-97.4935"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1124.88,-100.892 1134.02,-95.5439 1123.54,-94.0213 1124.88,-100.892"/>
-</g>
-<!-- Node12&#45;&gt;Node13 -->
-<g id="edge26" class="edge"><title>Node12&#45;&gt;Node13</title>
-<path fill="none" stroke="midnightblue" d="M1228.15,-190.411C1250.92,-185.351 1279.05,-179.1 1303.12,-173.751"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1304.16,-177.106 1313.16,-171.52 1302.64,-170.273 1304.16,-177.106"/>
+<path fill="none" stroke="midnightblue" d="M1036.96,-133.54C1063.38,-138.69 1096.19,-145.084 1124.02,-150.506"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1123.54,-153.979 1134.02,-152.456 1124.88,-147.108 1123.54,-153.979"/>
 </g>
 <!-- Node14 -->
 <g id="node28" class="node"><title>Node14</title>
-<a xlink:href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" target="_top" xlink:title="forcebalance.nifty.MissingFileInspection">
-<polygon fill="white" stroke="black" points="1460,-114.5 1460,-133.5 1662,-133.5 1662,-114.5 1460,-114.5"/>
-<text text-anchor="middle" x="1561" y="-121.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.MissingFileInspection</text>
+<a xlink:href="namespaceforcebalance_1_1nifty.html#ab5417ad84c6c760965cd195c6c387914" target="_top" xlink:title="forcebalance.nifty.onefile">
+<polygon fill="white" stroke="black" points="1117,-114.5 1117,-133.5 1251,-133.5 1251,-114.5 1117,-114.5"/>
+<text text-anchor="middle" x="1184" y="-121.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.onefile</text>
 </a>
 </g>
-<!-- Node13&#45;&gt;Node14 -->
-<g id="edge28" class="edge"><title>Node13&#45;&gt;Node14</title>
-<path fill="none" stroke="midnightblue" d="M1408.71,-152.46C1436.21,-147.288 1470.38,-140.86 1499.28,-135.422"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1500.09,-138.832 1509.27,-133.544 1498.79,-131.953 1500.09,-138.832"/>
+<!-- Node11&#45;&gt;Node14 -->
+<g id="edge28" class="edge"><title>Node11&#45;&gt;Node14</title>
+<path fill="none" stroke="midnightblue" d="M1060.06,-124C1075.13,-124 1091.08,-124 1106.31,-124"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1106.73,-127.5 1116.73,-124 1106.73,-120.5 1106.73,-127.5"/>
+</g>
+<!-- Node13 -->
+<g id="node26" class="node"><title>Node13</title>
+<a xlink:href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" target="_top" xlink:title="forcebalance.nifty.GoInto">
+<polygon fill="white" stroke="black" points="1290,-152.5 1290,-171.5 1424,-171.5 1424,-152.5 1290,-152.5"/>
+<text text-anchor="middle" x="1357" y="-159.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.GoInto</text>
+</a>
+</g>
+<!-- Node12&#45;&gt;Node13 -->
+<g id="edge26" class="edge"><title>Node12&#45;&gt;Node13</title>
+<path fill="none" stroke="midnightblue" d="M1254.06,-162C1262.43,-162 1271.02,-162 1279.48,-162"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1279.73,-165.5 1289.73,-162 1279.73,-158.5 1279.73,-165.5"/>
+</g>
+<!-- Node15 -->
+<g id="node30" class="node"><title>Node15</title>
+<a xlink:href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" target="_top" xlink:title="forcebalance.nifty.allsplit">
+<polygon fill="white" stroke="black" points="1290.5,-114.5 1290.5,-133.5 1423.5,-133.5 1423.5,-114.5 1290.5,-114.5"/>
+<text text-anchor="middle" x="1357" y="-121.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.allsplit</text>
+</a>
 </g>
 <!-- Node14&#45;&gt;Node15 -->
 <g id="edge30" class="edge"><title>Node14&#45;&gt;Node15</title>
-<path fill="none" stroke="midnightblue" d="M1618.99,-114.46C1650.29,-109.22 1689.29,-102.691 1722.04,-97.2091"/>
-<polygon fill="midnightblue" stroke="midnightblue" points="1722.7,-100.647 1731.99,-95.5439 1721.55,-93.743 1722.7,-100.647"/>
+<path fill="none" stroke="midnightblue" d="M1251.11,-124C1260.67,-124 1270.57,-124 1280.29,-124"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1280.34,-127.5 1290.34,-124 1280.34,-120.5 1280.34,-127.5"/>
+</g>
+<!-- Node18 -->
+<g id="node36" class="node"><title>Node18</title>
+<a xlink:href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" target="_top" xlink:title="forcebalance.nifty.Leave">
+<polygon fill="white" stroke="black" points="1291.5,-76.5 1291.5,-95.5 1422.5,-95.5 1422.5,-76.5 1291.5,-76.5"/>
+<text text-anchor="middle" x="1357" y="-83.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.Leave</text>
+</a>
+</g>
+<!-- Node14&#45;&gt;Node18 -->
+<g id="edge36" class="edge"><title>Node14&#45;&gt;Node18</title>
+<path fill="none" stroke="midnightblue" d="M1228.15,-114.411C1250.92,-109.351 1279.05,-103.1 1303.12,-97.7512"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1304.16,-101.106 1313.16,-95.5201 1302.64,-94.2728 1304.16,-101.106"/>
+</g>
+<!-- Node16 -->
+<g id="node32" class="node"><title>Node16</title>
+<a xlink:href="namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" target="_top" xlink:title="forcebalance.nifty.MissingFileInspection">
+<polygon fill="white" stroke="black" points="1460,-95.5 1460,-114.5 1662,-114.5 1662,-95.5 1460,-95.5"/>
+<text text-anchor="middle" x="1561" y="-102.5" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.MissingFileInspection</text>
+</a>
+</g>
+<!-- Node15&#45;&gt;Node16 -->
+<g id="edge32" class="edge"><title>Node15&#45;&gt;Node16</title>
+<path fill="none" stroke="midnightblue" d="M1423.58,-117.831C1432.04,-117.036 1440.87,-116.205 1449.8,-115.365"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1450.28,-118.836 1459.91,-114.415 1449.62,-111.867 1450.28,-118.836"/>
+</g>
+<!-- Node16&#45;&gt;Node17 -->
+<g id="edge34" class="edge"><title>Node16&#45;&gt;Node17</title>
+<path fill="none" stroke="midnightblue" d="M1636.64,-95.4641C1658.27,-92.7012 1682.04,-89.6647 1704.24,-86.8288"/>
+<polygon fill="midnightblue" stroke="midnightblue" points="1704.84,-90.2807 1714.31,-85.5416 1703.95,-83.3371 1704.84,-90.2807"/>
 </g>
 </g>
 </svg>

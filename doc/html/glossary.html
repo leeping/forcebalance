@@ -193,7 +193,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 <ul>
 <li><b> GMXPATH </b> (String) <br/>
 <b> One-line description </b>: Path for GROMACS executables (if not the default) <br/>
-<b> Default Value </b>: /home/leeping/opt/gromacs-4.5.5-double/bin <br/>
+<b> Default Value </b>: /home/leeping/opt/gromacs/bin <br/>
 <b> Scope </b>: Targets that use GROMACS (<b><em>Required</em></b>) <br/>
 <b> Full description </b>: Specify the path where GROMACS executables are installed, most likely ending in 'bin'. Note that executables are only installed 'bin' if the program is installed using 'make install'; this will NOT be the case if you simply ran 'make'. <br/>
 <b> Recommendation </b>: Depends on your local installation and environment.</li>
@@ -389,7 +389,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 <ul>
 <li><b> TINKERPATH </b> (String) <br/>
 <b> One-line description </b>: Path for TINKER executables (if not the default) <br/>
-<b> Default Value </b>: <br/>
+<b> Default Value </b>: /home/leeping/opt/tinker/bin <br/>
 <b> Scope </b>: Targets that use TINKER (<b><em>Required</em></b>) <br/>
 <b> Recommendation </b>: Depends on your local installation and environment.</li>
 </ul>
@@ -470,9 +470,21 @@ Option index: Target options</h2>
 <b> Full description </b>: This is a stub for future functionality. When the flag is switched on, the jobs corresponding to finite difference derivatives are evaluated in parallel on a distributed computing platform.</li>
 </ul>
 <ul>
+<li><b> BINDING_TXT </b> (String) <br/>
+<b> One-line description </b>: Text file containing interacting systems. If not provided, will search for a default. <br/>
+<b> Default Value </b>: None <br/>
+(Needs full documentation)</li>
+</ul>
+<ul>
 <li><b> CAUCHY </b> (Bool) <br/>
 <b> One-line description </b>: Normalize interaction energies each using 1/(denom**2 + reference**2) which resembles a Cauchy distribution <br/>
 <b> Default Value </b>: 0 <br/>
+(Needs full documentation)</li>
+</ul>
+<ul>
+<li><b> COORDS </b> (List) <br/>
+<b> One-line description </b>: Coordinates for single point evaluation; if not provided, will search for a default. <br/>
+<b> Default Value </b>: None <br/>
 (Needs full documentation)</li>
 </ul>
 <ul>
@@ -511,6 +523,12 @@ Option index: Target options</h2>
 <li><b> ENERGY_UPPER </b> (Float) <br/>
 <b> One-line description </b>: Upper energy cutoff (in kcal/mol); super-repulsive interactions are given zero weight <br/>
 <b> Default Value </b>: 30.0 <br/>
+(Needs full documentation)</li>
+</ul>
+<ul>
+<li><b> ENGINE </b> (Allcap) <br/>
+<b> One-line description </b>: The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM) <br/>
+<b> Default Value </b>: None <br/>
 (Needs full documentation)</li>
 </ul>
 <ul>
@@ -608,6 +626,18 @@ Option index: Target options</h2>
 (Needs full documentation)</li>
 </ul>
 <ul>
+<li><b> GMX_MDP </b> (List) <br/>
+<b> One-line description </b>: Gromacs .mdp files. If not provided, will search for default. <br/>
+<b> Default Value </b>: None <br/>
+(Needs full documentation)</li>
+</ul>
+<ul>
+<li><b> GMX_TOP </b> (List) <br/>
+<b> One-line description </b>: Gromacs .top files. If not provided, will search for default. <br/>
+<b> Default Value </b>: None <br/>
+(Needs full documentation)</li>
+</ul>
+<ul>
 <li><b> HVAP_SUBAVERAGE </b> (Bool) <br/>
 <b> One-line description </b>: Don't target the average enthalpy of vaporization and allow it to freely float (experimental) <br/>
 <b> Default Value </b>: 0 <br/>
@@ -641,12 +671,6 @@ Option index: Target options</h2>
 <li><b> MANUAL </b> (Bool) <br/>
 <b> One-line description </b>: Give the user a chance to fill in condensed phase stuff on the zeroth step <br/>
 <b> Default Value </b>: 0 <br/>
-(Needs full documentation)</li>
-</ul>
-<ul>
-<li><b> MASTERFILE </b> (String) <br/>
-<b> One-line description </b>: The name of the master file containing interacting systems <br/>
-<b> Default Value </b>: interactions.txt <br/>
 (Needs full documentation)</li>
 </ul>
 <ul>
@@ -693,6 +717,12 @@ Option index: Target options</h2>
 (Needs full documentation)</li>
 </ul>
 <ul>
+<li><b> QDATA_TXT </b> (String) <br/>
+<b> One-line description </b>: Text file containing quantum data. If not provided, will search for a default (qdata.txt). <br/>
+<b> Default Value </b>: None <br/>
+(Needs full documentation)</li>
+</ul>
+<ul>
 <li><b> QMBOLTZ </b> (Float) <br/>
 <b> One-line description </b>: Fraction of Quantum Boltzmann Weights (ab initio), 1.0 for full reweighting, 0.5 for hybrid <br/>
 <b> Default Value </b>: 0.0 <br/>
@@ -712,6 +742,12 @@ Option index: Target options</h2>
 <li><b> QUADRUPOLE_DENOM </b> (Float) <br/>
 <b> One-line description </b>: Quadrupole normalization (Buckingham) ; set to 0 if a zero weight is desired <br/>
 <b> Default Value </b>: 1.0 <br/>
+(Needs full documentation)</li>
+</ul>
+<ul>
+<li><b> REMOTE </b> (Bool) <br/>
+<b> One-line description </b>: Evaluate target as a remote work_queue task <br/>
+<b> Default Value </b>: 0 <br/>
 (Needs full documentation)</li>
 </ul>
 <ul>
@@ -783,11 +819,17 @@ Option index: Target options</h2>
 (Needs full documentation)</li>
 </ul>
 <ul>
+<li><b> TINKER_KEY </b> (List) <br/>
+<b> One-line description </b>: TINKER .key files. If not provided, will search for default. <br/>
+<b> Default Value </b>: None <br/>
+(Needs full documentation)</li>
+</ul>
+<ul>
 <li><b> TYPE </b> (Allcap) <br/>
-<b> One-line description </b>: The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass. <br/>
+<b> One-line description </b>: The type of fitting target (Abinitio, BindingEnergy, Liquid, Moments, Vibration) ; must correspond to the name of a Target subclass. <br/>
 <b> Default Value </b>: None <br/>
 <b> Scope </b>: All targets (<b><em>Required</em></b>) <br/>
-<b> Full description </b>: This is the type of target that you are running. The current accepted values for the target type are given in the beginning of the objective.py file: COUNTERPOISE, ABINITIO_AMBER, ABINITIO_GMX, LIQUID_GMX, LIQUID_OPENMM, ABINITIO_OPENMM, ABINITIO_TINKER, BINDINGENERGY_TINKER, MONOMER_QTPIE, RDVR3_PSI4, INTERACTION_OPENMM, ABINITIO_INTERNAL, MOMENTS_TINKER, THCDF_PSI4, VIBRATION_TINKER, LIQUID_TINKER, INTERACTION_TINKER. <br/>
+<b> Full description </b>: This is the type of target that you are running. The current accepted values for the target type are given in the beginning of the objective.py file: COUNTERPOISE, ABINITIO_AMBER, ABINITIO_GMX, LIQUID_GMX, LIQUID_OPENMM, ABINITIO_OPENMM, ABINITIO_TINKER, BINDINGENERGY_TINKER, MONOMER_QTPIE, RDVR3_PSI4, INTERACTION_OPENMM, ABINITIO_INTERNAL, MOMENTS_TINKER, THCDF_PSI4, REMOTE_TARGET, VIBRATION_TINKER, LIQUID_TINKER, INTERACTION_TINKER. <br/>
 <b> Recommendation </b>: Choose the appropriate type, and if the target type is missing, feel free to implement your own (or ask me for help).</li>
 </ul>
 <ul>
@@ -888,7 +930,7 @@ Option index: Target options</h2>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:13 for ForceBalance by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:05 for ForceBalance by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

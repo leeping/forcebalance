@@ -118,7 +118,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 \begin{DoxyItemize}
 \item {\bfseries  \-G\-M\-X\-P\-A\-T\-H } (\-String) \par
 {\bfseries  \-One-\/line description }\-: \-Path for \-G\-R\-O\-M\-A\-C\-S executables (if not the default) \par
-{\bfseries  \-Default \-Value }\-: /home/leeping/opt/gromacs-\/4.5.\-5-\/double/bin \par
+{\bfseries  \-Default \-Value }\-: /home/leeping/opt/gromacs/bin \par
 {\bfseries  \-Scope }\-: \-Targets that use \-G\-R\-O\-M\-A\-C\-S ({\bfseries {\itshape \-Required\/}}) \par
 {\bfseries  \-Full description }\-: \-Specify the path where \-G\-R\-O\-M\-A\-C\-S executables are installed, most likely ending in 'bin'. \-Note that executables are only installed 'bin' if the program is installed using 'make install'; this will \-N\-O\-T be the case if you simply ran 'make'. \par
 {\bfseries  \-Recommendation }\-: \-Depends on your local installation and environment.\end{DoxyItemize}
@@ -289,7 +289,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 \begin{DoxyItemize}
 \item {\bfseries  \-T\-I\-N\-K\-E\-R\-P\-A\-T\-H } (\-String) \par
 {\bfseries  \-One-\/line description }\-: \-Path for \-T\-I\-N\-K\-E\-R executables (if not the default) \par
-{\bfseries  \-Default \-Value }\-: \par
+{\bfseries  \-Default \-Value }\-: /home/leeping/opt/tinker/bin \par
 {\bfseries  \-Scope }\-: \-Targets that use \-T\-I\-N\-K\-E\-R ({\bfseries {\itshape \-Required\/}}) \par
 {\bfseries  \-Recommendation }\-: \-Depends on your local installation and environment.\end{DoxyItemize}
 \begin{DoxyItemize}
@@ -358,9 +358,19 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 {\bfseries  \-Scope }\-: \-All target types (\-Optional) \par
 {\bfseries  \-Full description }\-: \-This is a stub for future functionality. \-When the flag is switched on, the jobs corresponding to finite difference derivatives are evaluated in parallel on a distributed computing platform.\end{DoxyItemize}
 \begin{DoxyItemize}
+\item {\bfseries  \-B\-I\-N\-D\-I\-N\-G\-\_\-\-T\-X\-T } (\-String) \par
+{\bfseries  \-One-\/line description }\-: \-Text file containing interacting systems. \-If not provided, will search for a default. \par
+{\bfseries  \-Default \-Value }\-: \-None \par
+(\-Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
 \item {\bfseries  \-C\-A\-U\-C\-H\-Y } (\-Bool) \par
 {\bfseries  \-One-\/line description }\-: \-Normalize interaction energies each using 1/(denom$\ast$$\ast$2 + reference$\ast$$\ast$2) which resembles a \-Cauchy distribution \par
 {\bfseries  \-Default \-Value }\-: 0 \par
+(\-Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  \-C\-O\-O\-R\-D\-S } (\-List) \par
+{\bfseries  \-One-\/line description }\-: \-Coordinates for single point evaluation; if not provided, will search for a default. \par
+{\bfseries  \-Default \-Value }\-: \-None \par
 (\-Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  \-C\-O\-V\-A\-R\-I\-A\-N\-C\-E } (\-Bool) \par
@@ -393,6 +403,11 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 \item {\bfseries  \-E\-N\-E\-R\-G\-Y\-\_\-\-U\-P\-P\-E\-R } (\-Float) \par
 {\bfseries  \-One-\/line description }\-: \-Upper energy cutoff (in kcal/mol); super-\/repulsive interactions are given zero weight \par
 {\bfseries  \-Default \-Value }\-: 30.\-0 \par
+(\-Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  \-E\-N\-G\-I\-N\-E } (\-Allcap) \par
+{\bfseries  \-One-\/line description }\-: \-The external code used to execute the simulations (\-G\-M\-X, \-T\-I\-N\-K\-E\-R, \-A\-M\-B\-E\-R, \-Open\-M\-M) \par
+{\bfseries  \-Default \-Value }\-: \-None \par
 (\-Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  \-F\-D\-\_\-\-P\-T\-Y\-P\-E\-S } (\-List) \par
@@ -475,6 +490,16 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 {\bfseries  \-Default \-Value }\-: 0.\-0 \par
 (\-Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
+\item {\bfseries  \-G\-M\-X\-\_\-\-M\-D\-P } (\-List) \par
+{\bfseries  \-One-\/line description }\-: \-Gromacs .mdp files. \-If not provided, will search for default. \par
+{\bfseries  \-Default \-Value }\-: \-None \par
+(\-Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  \-G\-M\-X\-\_\-\-T\-O\-P } (\-List) \par
+{\bfseries  \-One-\/line description }\-: \-Gromacs .top files. \-If not provided, will search for default. \par
+{\bfseries  \-Default \-Value }\-: \-None \par
+(\-Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
 \item {\bfseries  \-H\-V\-A\-P\-\_\-\-S\-U\-B\-A\-V\-E\-R\-A\-G\-E } (\-Bool) \par
 {\bfseries  \-One-\/line description }\-: \-Don't target the average enthalpy of vaporization and allow it to freely float (experimental) \par
 {\bfseries  \-Default \-Value }\-: 0 \par
@@ -503,11 +528,6 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 \item {\bfseries  \-M\-A\-N\-U\-A\-L } (\-Bool) \par
 {\bfseries  \-One-\/line description }\-: \-Give the user a chance to fill in condensed phase stuff on the zeroth step \par
 {\bfseries  \-Default \-Value }\-: 0 \par
-(\-Needs full documentation)\end{DoxyItemize}
-\begin{DoxyItemize}
-\item {\bfseries  \-M\-A\-S\-T\-E\-R\-F\-I\-L\-E } (\-String) \par
-{\bfseries  \-One-\/line description }\-: \-The name of the master file containing interacting systems \par
-{\bfseries  \-Default \-Value }\-: interactions.\-txt \par
 (\-Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  \-M\-D\-R\-U\-N\-\_\-\-T\-H\-R\-E\-A\-D\-S } (\-Int) \par
@@ -546,6 +566,11 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 {\bfseries  \-Default \-Value }\-: 1.\-0 \par
 (\-Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
+\item {\bfseries  \-Q\-D\-A\-T\-A\-\_\-\-T\-X\-T } (\-String) \par
+{\bfseries  \-One-\/line description }\-: \-Text file containing quantum data. \-If not provided, will search for a default (qdata.\-txt). \par
+{\bfseries  \-Default \-Value }\-: \-None \par
+(\-Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
 \item {\bfseries  \-Q\-M\-B\-O\-L\-T\-Z } (\-Float) \par
 {\bfseries  \-One-\/line description }\-: \-Fraction of \-Quantum \-Boltzmann \-Weights (ab initio), 1.\-0 for full reweighting, 0.\-5 for hybrid \par
 {\bfseries  \-Default \-Value }\-: 0.\-0 \par
@@ -563,6 +588,11 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 \item {\bfseries  \-Q\-U\-A\-D\-R\-U\-P\-O\-L\-E\-\_\-\-D\-E\-N\-O\-M } (\-Float) \par
 {\bfseries  \-One-\/line description }\-: \-Quadrupole normalization (\-Buckingham) ; set to 0 if a zero weight is desired \par
 {\bfseries  \-Default \-Value }\-: 1.\-0 \par
+(\-Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  \-R\-E\-M\-O\-T\-E } (\-Bool) \par
+{\bfseries  \-One-\/line description }\-: \-Evaluate target as a remote work\-\_\-queue task \par
+{\bfseries  \-Default \-Value }\-: 0 \par
 (\-Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  \-R\-E\-S\-P } (\-Bool) \par
@@ -622,11 +652,16 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 {\bfseries  \-Default \-Value }\-: 0 \par
 (\-Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
+\item {\bfseries  \-T\-I\-N\-K\-E\-R\-\_\-\-K\-E\-Y } (\-List) \par
+{\bfseries  \-One-\/line description }\-: \-T\-I\-N\-K\-E\-R .key files. \-If not provided, will search for default. \par
+{\bfseries  \-Default \-Value }\-: \-None \par
+(\-Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
 \item {\bfseries  \-T\-Y\-P\-E } (\-Allcap) \par
-{\bfseries  \-One-\/line description }\-: \-The type of fitting target, for instance \-Ab\-Initio\-\_\-\-G\-M\-X ; this must correspond to the name of a \-Target subclass. \par
+{\bfseries  \-One-\/line description }\-: \-The type of fitting target (\-Abinitio, \-Binding\-Energy, \-Liquid, \-Moments, \-Vibration) ; must correspond to the name of a \-Target subclass. \par
 {\bfseries  \-Default \-Value }\-: \-None \par
 {\bfseries  \-Scope }\-: \-All targets ({\bfseries {\itshape \-Required\/}}) \par
-{\bfseries  \-Full description }\-: \-This is the type of target that you are running. \-The current accepted values for the target type are given in the beginning of the objective.\-py file\-: \-C\-O\-U\-N\-T\-E\-R\-P\-O\-I\-S\-E, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-A\-M\-B\-E\-R, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-G\-M\-X, \-L\-I\-Q\-U\-I\-D\-\_\-\-G\-M\-X, \-L\-I\-Q\-U\-I\-D\-\_\-\-O\-P\-E\-N\-M\-M, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-O\-P\-E\-N\-M\-M, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-T\-I\-N\-K\-E\-R, \-B\-I\-N\-D\-I\-N\-G\-E\-N\-E\-R\-G\-Y\-\_\-\-T\-I\-N\-K\-E\-R, \-M\-O\-N\-O\-M\-E\-R\-\_\-\-Q\-T\-P\-I\-E, \-R\-D\-V\-R3\-\_\-\-P\-S\-I4, \-I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-O\-P\-E\-N\-M\-M, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-I\-N\-T\-E\-R\-N\-A\-L, \-M\-O\-M\-E\-N\-T\-S\-\_\-\-T\-I\-N\-K\-E\-R, \-T\-H\-C\-D\-F\-\_\-\-P\-S\-I4, \-V\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R, \-L\-I\-Q\-U\-I\-D\-\_\-\-T\-I\-N\-K\-E\-R, \-I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R. \par
+{\bfseries  \-Full description }\-: \-This is the type of target that you are running. \-The current accepted values for the target type are given in the beginning of the objective.\-py file\-: \-C\-O\-U\-N\-T\-E\-R\-P\-O\-I\-S\-E, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-A\-M\-B\-E\-R, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-G\-M\-X, \-L\-I\-Q\-U\-I\-D\-\_\-\-G\-M\-X, \-L\-I\-Q\-U\-I\-D\-\_\-\-O\-P\-E\-N\-M\-M, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-O\-P\-E\-N\-M\-M, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-T\-I\-N\-K\-E\-R, \-B\-I\-N\-D\-I\-N\-G\-E\-N\-E\-R\-G\-Y\-\_\-\-T\-I\-N\-K\-E\-R, \-M\-O\-N\-O\-M\-E\-R\-\_\-\-Q\-T\-P\-I\-E, \-R\-D\-V\-R3\-\_\-\-P\-S\-I4, \-I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-O\-P\-E\-N\-M\-M, \-A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-I\-N\-T\-E\-R\-N\-A\-L, \-M\-O\-M\-E\-N\-T\-S\-\_\-\-T\-I\-N\-K\-E\-R, \-T\-H\-C\-D\-F\-\_\-\-P\-S\-I4, \-R\-E\-M\-O\-T\-E\-\_\-\-T\-A\-R\-G\-E\-T, \-V\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R, \-L\-I\-Q\-U\-I\-D\-\_\-\-T\-I\-N\-K\-E\-R, \-I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R. \par
 {\bfseries  \-Recommendation }\-: \-Choose the appropriate type, and if the target type is missing, feel free to implement your own (or ask me for help).\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  \-W\-\_\-\-A\-L\-P\-H\-A } (\-Float) \par

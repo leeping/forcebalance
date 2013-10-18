@@ -13,6 +13,8 @@ class \hyperlink{classforcebalance_1_1molecule_1_1Molecule}{\-Molecule}
 \item 
 def \hyperlink{namespaceforcebalance_1_1molecule_af28de4693e5b8e82df900d0ac3c6c370}{get\-Element}
 \item 
+def \hyperlink{namespaceforcebalance_1_1molecule_a7429f0c377d6396711c128f6590ef810}{elem\-\_\-from\-\_\-atomname}
+\begin{DoxyCompactList}\small\item\em \-Given an atom name, attempt to get the element in most cases. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1molecule_ab8464fea13fad2a506792c2f1d7c93f3}{nodematch}
 \item 
 def \hyperlink{namespaceforcebalance_1_1molecule_a0dd31eff88d2bed0884ab21a13261d42}{isint}
@@ -61,6 +63,8 @@ def \hyperlink{namespaceforcebalance_1_1molecule_aa9ad9b92efa7bd3c1d589d62bbb810
 \begin{DoxyCompactList}\small\item\em \-Pre-\/aligns molecules to 'moment of inertia'. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1molecule_a08840b73e95bf34bf9ca7ea36ad0492d}{get\-\_\-rotate\-\_\-translate}
 \item 
+def \hyperlink{namespaceforcebalance_1_1molecule_ae76fc5d05f43acc6006a4d1733818d71}{cartesian\-\_\-product2}
+\begin{DoxyCompactList}\small\item\em \-Form a \-Cartesian product of two \-Num\-Py arrays. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1molecule_ab9cb167fbbd809aedcf8c7434d405547}{main}
 \end{DoxyCompactItemize}
 \subsubsection*{\-Variables}
@@ -105,18 +109,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 )}}\label{namespaceforcebalance_1_1molecule_a4cdb2086978b281ed84cd66179c3f5b2}
 
 
-\-Definition at line 436 of file molecule.\-py.
-
-
-
-\-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a4cdb2086978b281ed84cd66179c3f5b2_cgraph}
-\end{center}
-\end{figure}
-
+\-Definition at line 441 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_a9a58eb1746e51420f50da3f3a6d51485}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!\-Align\-To\-Density@{\-Align\-To\-Density}}
 \index{\-Align\-To\-Density@{\-Align\-To\-Density}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -134,11 +127,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 \-This function can be called by \-Align\-To\-Moments to get rid of inversion problems 
 
-\-Definition at line 539 of file molecule.\-py.
+\-Definition at line 544 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -162,7 +156,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 \-If xyz2 is passed in, it will assume that xyz1 is already aligned to the moment of inertia, and it simply does 180-\/degree rotations to make sure nothing is inverted. 
 
-\-Definition at line 551 of file molecule.\-py.
+\-Definition at line 556 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_a5b50df23cc4d0e617fdc56538f0bea63}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!both@{both}}
 \index{both@{both}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -175,7 +169,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 )}}\label{namespaceforcebalance_1_1molecule_a5b50df23cc4d0e617fdc56538f0bea63}
 
 
-\-Definition at line 474 of file molecule.\-py.
+\-Definition at line 479 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_a0a6e3e79b04534bf2e83d09def189444}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!\-Build\-Lattice\-From\-Lengths\-Angles@{\-Build\-Lattice\-From\-Lengths\-Angles}}
 \index{\-Build\-Lattice\-From\-Lengths\-Angles@{\-Build\-Lattice\-From\-Lengths\-Angles}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -195,7 +189,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 
 
-\-Definition at line 256 of file molecule.\-py.
+\-Definition at line 261 of file molecule.\-py.
 
 
 
@@ -223,7 +217,22 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 \-The hash function is something we can use to discard two things that are obviously not equal. \-Here we neglect the hash. \-Return a list of the sorted atom numbers in this graph. \-Return a string of atoms, which serves as a rudimentary 'fingerprint' \-: '99,100,103,151' . \-Return an array of the elements. \-For instance \mbox{[}'\-H' '\-C' '\-C' '\-H'\mbox{]}. \-Create an \-Empirical \-Formula \-Get a list of the coordinates. 
 
-\-Definition at line 271 of file molecule.\-py.
+\-Definition at line 276 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_ae76fc5d05f43acc6006a4d1733818d71}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!cartesian\-\_\-product2@{cartesian\-\_\-product2}}
+\index{cartesian\-\_\-product2@{cartesian\-\_\-product2}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{cartesian\-\_\-product2}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-molecule.\-cartesian\-\_\-product2} (
+\begin{DoxyParamCaption}
+\item[{}]{arrays}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_ae76fc5d05f43acc6006a4d1733818d71}
+
+
+\-Form a \-Cartesian product of two \-Num\-Py arrays. 
+
+
+
+\-Definition at line 617 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_a8fcbb4a2b3470a85d25699b6f28a54fc}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!\-Compute\-Overlap@{\-Compute\-Overlap}}
 \index{\-Compute\-Overlap@{\-Compute\-Overlap}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -241,7 +250,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 \-Good for fine-\/tuning alignment but gets stuck in local minima. 
 
-\-Definition at line 522 of file molecule.\-py.
+\-Definition at line 527 of file molecule.\-py.
 
 
 
@@ -265,7 +274,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 )}}\label{namespaceforcebalance_1_1molecule_a6f7c6217b1c64da309a8abd21dfdcf08}
 
 
-\-Definition at line 477 of file molecule.\-py.
+\-Definition at line 482 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_a75775be6563ad7f10695a9a45ff49ba9}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!either@{either}}
 \index{either@{either}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -278,7 +287,22 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 )}}\label{namespaceforcebalance_1_1molecule_a75775be6563ad7f10695a9a45ff49ba9}
 
 
-\-Definition at line 485 of file molecule.\-py.
+\-Definition at line 490 of file molecule.\-py.
+
+\hypertarget{namespaceforcebalance_1_1molecule_a7429f0c377d6396711c128f6590ef810}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!elem\-\_\-from\-\_\-atomname@{elem\-\_\-from\-\_\-atomname}}
+\index{elem\-\_\-from\-\_\-atomname@{elem\-\_\-from\-\_\-atomname}!forcebalance::molecule@{forcebalance\-::molecule}}
+\paragraph[{elem\-\_\-from\-\_\-atomname}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-molecule.\-elem\-\_\-from\-\_\-atomname} (
+\begin{DoxyParamCaption}
+\item[{}]{atomname}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1molecule_a7429f0c377d6396711c128f6590ef810}
+
+
+\-Given an atom name, attempt to get the element in most cases. 
+
+
+
+\-Definition at line 194 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_af02bf73765f34bbef81c4a5b000b86ce}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!\-Euler\-Matrix@{\-Euler\-Matrix}}
 \index{\-Euler\-Matrix@{\-Euler\-Matrix}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -295,11 +319,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 
 
-\-Definition at line 494 of file molecule.\-py.
+\-Definition at line 499 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -322,7 +347,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 
 
-\-Definition at line 456 of file molecule.\-py.
+\-Definition at line 461 of file molecule.\-py.
 
 
 
@@ -353,11 +378,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \end{DoxyParams}
 
 
-\-Definition at line 387 of file molecule.\-py.
+\-Definition at line 392 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -396,11 +422,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \end{DoxyParams}
 
 
-\-Definition at line 366 of file molecule.\-py.
+\-Definition at line 371 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -431,11 +458,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \end{DoxyParams}
 
 
-\-Definition at line 350 of file molecule.\-py.
+\-Definition at line 355 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -465,11 +493,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \end{DoxyParams}
 
 
-\-Definition at line 378 of file molecule.\-py.
+\-Definition at line 383 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -488,7 +517,19 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 )}}\label{namespaceforcebalance_1_1molecule_a08840b73e95bf34bf9ca7ea36ad0492d}
 
 
-\-Definition at line 574 of file molecule.\-py.
+\-Definition at line 579 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_a08840b73e95bf34bf9ca7ea36ad0492d_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{namespaceforcebalance_1_1molecule_af28de4693e5b8e82df900d0ac3c6c370}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!get\-Element@{get\-Element}}
 \index{get\-Element@{get\-Element}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -500,6 +541,18 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 
 \-Definition at line 189 of file molecule.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1molecule_af28de4693e5b8e82df900d0ac3c6c370_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{namespaceforcebalance_1_1molecule_a7fe52c2928c7b0329882541bef2e34cd}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!grouper@{grouper}}
 \index{grouper@{grouper}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -515,7 +568,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 
 
-\-Definition at line 450 of file molecule.\-py.
+\-Definition at line 455 of file molecule.\-py.
 
 
 
@@ -546,11 +599,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \end{DoxyParams}
 
 
-\-Definition at line 414 of file molecule.\-py.
+\-Definition at line 419 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -577,11 +631,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \end{DoxyParams}
 
 
-\-Definition at line 427 of file molecule.\-py.
+\-Definition at line 432 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -608,11 +663,12 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \end{DoxyParams}
 
 
-\-Definition at line 399 of file molecule.\-py.
+\-Definition at line 404 of file molecule.\-py.
 
 
 
-\-Here is the call graph for this function\-:\nopagebreak
+\-Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -634,7 +690,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 
 
-\-Definition at line 245 of file molecule.\-py.
+\-Definition at line 250 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_a0dd31eff88d2bed0884ab21a13261d42}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!isint@{isint}}
 \index{isint@{isint}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -649,7 +705,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 
 
-\-Definition at line 240 of file molecule.\-py.
+\-Definition at line 245 of file molecule.\-py.
 
 
 
@@ -671,7 +727,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 )}}\label{namespaceforcebalance_1_1molecule_ab9cb167fbbd809aedcf8c7434d405547}
 
 
-\-Definition at line 2500 of file molecule.\-py.
+\-Definition at line 2648 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_ab8464fea13fad2a506792c2f1d7c93f3}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!nodematch@{nodematch}}
 \index{nodematch@{nodematch}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -683,7 +739,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 )}}\label{namespaceforcebalance_1_1molecule_ab8464fea13fad2a506792c2f1d7c93f3}
 
 
-\-Definition at line 234 of file molecule.\-py.
+\-Definition at line 239 of file molecule.\-py.
 
 
 
@@ -705,7 +761,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 )}}\label{namespaceforcebalance_1_1molecule_a58c3f09152db4d1c6e1db9df29c60c43}
 
 
-\-Definition at line 445 of file molecule.\-py.
+\-Definition at line 450 of file molecule.\-py.
 
 
 
@@ -715,7 +771,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \paragraph[{\-Alive}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::molecule\-::\-Alive}}}\label{namespaceforcebalance_1_1molecule_a247e1def6c85f832dd332dea40da62d3}
 
 
-\-Definition at line 276 of file molecule.\-py.
+\-Definition at line 281 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_ab103b4aacb65cce6b558135c39a6e9a4}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!\-All\-Variable\-Names@{\-All\-Variable\-Names}}
 \index{\-All\-Variable\-Names@{\-All\-Variable\-Names}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -740,14 +796,14 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 
 
 
-\-Definition at line 232 of file molecule.\-py.
+\-Definition at line 237 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_aa9de7b4fcb815b9f7ad490d461131e72}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!\-Box@{\-Box}}
 \index{\-Box@{\-Box}!forcebalance::molecule@{forcebalance\-::molecule}}
 \paragraph[{\-Box}]{\setlength{\rightskip}{0pt plus 5cm}tuple {\bf forcebalance\-::molecule\-::\-Box} = namedtuple('{\bf \-Box}',\mbox{[}'a','b','c','alpha','beta','gamma','\-A','\-B','\-C','\-V'\mbox{]})}}\label{namespaceforcebalance_1_1molecule_aa9de7b4fcb815b9f7ad490d461131e72}
 
 
-\-Definition at line 252 of file molecule.\-py.
+\-Definition at line 257 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_af1987e9e7f33b828c15f1e4f7dcded2c}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!\-Elements@{\-Elements}}
 \index{\-Elements@{\-Elements}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -851,7 +907,7 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \paragraph[{radian}]{\setlength{\rightskip}{0pt plus 5cm}int {\bf forcebalance\-::molecule\-::radian} = 180}}\label{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a4487}
 
 
-\-Definition at line 253 of file molecule.\-py.
+\-Definition at line 258 of file molecule.\-py.
 
 \hypertarget{namespaceforcebalance_1_1molecule_ae100906fa209012ddf9d4b19ee69b0b7}{\index{forcebalance\-::molecule@{forcebalance\-::molecule}!\-Radii@{\-Radii}}
 \index{\-Radii@{\-Radii}!forcebalance::molecule@{forcebalance\-::molecule}}
@@ -884,5 +940,5 @@ int \hyperlink{namespaceforcebalance_1_1molecule_a922ed32eb838098c0b77423c624a44
 \paragraph[{splitter}]{\setlength{\rightskip}{0pt plus 5cm}tuple {\bf forcebalance\-::molecule\-::splitter} = re.\-compile(r'($\backslash$s+$|$$\backslash$\-S+)')}}\label{namespaceforcebalance_1_1molecule_a41b84501c57b5adca693580d4c27d099}
 
 
-\-Definition at line 249 of file molecule.\-py.
+\-Definition at line 254 of file molecule.\-py.
 

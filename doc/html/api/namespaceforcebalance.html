@@ -99,10 +99,6 @@ Packages</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1amberio.html">amberio</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>AMBER force field input/output. </p>
 <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1baseclass.html">baseclass</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1basereader.html">basereader</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Base class for force field line reader. </p>
-<br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1binding.html">binding</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Binding energy fitting module. </p>
 <br/></td></tr>
@@ -114,7 +110,7 @@ Packages</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1custom__io.html">custom_io</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Custom force field parser. </p>
 <br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1data.html">data</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1engine.html">engine</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1finite__difference.html">finite_difference</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1forcefield.html">forcefield</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Force field module. </p>
@@ -123,9 +119,6 @@ Packages</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>GROMACS input/output. </p>
 <br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1gmxqpio.html">gmxqpio</a></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1implemented.html">implemented</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p>Contains the dictionary of usable Target classes. </p>
-<br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">namespace &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1interaction.html">interaction</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight"><p><a class="el" href="classforcebalance_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies.">Interaction</a> energy fitting module. </p>
 <br/></td></tr>
@@ -179,37 +172,21 @@ Classes</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The 'reader' class.  <a href="classforcebalance_1_1BaseReader.html#details">More...</a><br/></td></tr>
 <tr><td colspan="2"><h2><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance.html#a9cf7d53eb5cdb4db2b876eb59ba83075">WORK_QUEUE</a> = None</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance.html#a77a3598d98b784c79e15e9fef3a1c72c">WQIDS</a> = defaultdict(list)</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance.html#a6c10581ea309550b5703fbe56f62e8a2">__version__</a> = pkg_resources.get_distribution(&quot;forcebalance&quot;)</td></tr>
 </table>
 <hr/><h2>Variable Documentation</h2>
-<a class="anchor" id="a9cf7d53eb5cdb4db2b876eb59ba83075"></a><!-- doxytag: member="forcebalance::WORK_QUEUE" ref="a9cf7d53eb5cdb4db2b876eb59ba83075" args="" -->
+<a class="anchor" id="a6c10581ea309550b5703fbe56f62e8a2"></a><!-- doxytag: member="forcebalance::__version__" ref="a6c10581ea309550b5703fbe56f62e8a2" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespaceforcebalance.html#a9cf7d53eb5cdb4db2b876eb59ba83075">forcebalance::WORK_QUEUE</a> = None</td>
+          <td class="memname">string <a class="el" href="namespaceforcebalance.html#a6c10581ea309550b5703fbe56f62e8a2">forcebalance::__version__</a> = pkg_resources.get_distribution(&quot;forcebalance&quot;)</td>
         </tr>
       </table>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="____init_____8py_source.html#l00018">18</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a77a3598d98b784c79e15e9fef3a1c72c"></a><!-- doxytag: member="forcebalance::WQIDS" ref="a77a3598d98b784c79e15e9fef3a1c72c" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">tuple <a class="el" href="namespaceforcebalance.html#a77a3598d98b784c79e15e9fef3a1c72c">forcebalance::WQIDS</a> = defaultdict(list)</td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="____init_____8py_source.html#l00021">21</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
+<p>Definition at line <a class="el" href="____init_____8py_source.html#l00017">17</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
 
 </div>
 </div>
@@ -231,7 +208,7 @@ Variables</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:14 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:07 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

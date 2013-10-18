@@ -1,9 +1,4 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a6e43c323b2286c546ff8afd3377f8808" title="Computes the energy and force using GROMACS for a trajectory." alt="" coords="419,56,805,83"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" title="forcebalance.gmxio.rm_gmx_baks" alt="" coords="931,107,1173,133"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ae17e3c379d82935d725dd31f01df23e5" title="Call mdrun in order to update the virtual site positions." alt="" coords="853,56,1251,83"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" title="Initialization; define a few core concepts." alt="" coords="1356,5,1641,32"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1BaseClass.html#a73e9a37a7632e79eb99f49bd15aced45" title="forcebalance.BaseClass.set_option" alt="" coords="1376,56,1621,83"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" title="forcebalance.baseclass.ForceBalanceBaseClass.set_option" alt="" coords="1299,107,1698,133"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th..." alt="" coords="1747,5,2077,32"/>
+<area shape="rect" id="node3" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" title="Initialization; define a few core concepts." alt="" coords="419,5,704,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1BaseClass.html#a73e9a37a7632e79eb99f49bd15aced45" title="forcebalance.BaseClass.set_option" alt="" coords="439,56,684,83"/>
 </map>

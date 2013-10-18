@@ -208,328 +208,348 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00124"></a>00124 <span class="comment">## Default fitting target options.</span>
 <a name="l00125"></a>00125 tgt_opts_types = {
 <a name="l00126"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a1725a6ea3c588046339f9476f3e3f32e">00126</a>     <span class="stringliteral">&#39;strings&#39;</span> : {<span class="stringliteral">&quot;name&quot;</span>      : (<span class="keywordtype">None</span>, 200, <span class="stringliteral">&#39;The name of the target, corresponding to the directory targets/name&#39;</span>, <span class="stringliteral">&#39;All targets (important)&#39;</span>),
-<a name="l00127"></a>00127                  <span class="stringliteral">&quot;masterfile&quot;</span>: (<span class="stringliteral">&#39;interactions.txt&#39;</span>, 0, <span class="stringliteral">&#39;The name of the master file containing interacting systems&#39;</span>, <span class="stringliteral">&#39;Binding energy target&#39;</span>, <span class="stringliteral">&#39;BindingEnergy&#39;</span>),
-<a name="l00128"></a>00128                  <span class="stringliteral">&quot;force_map&quot;</span> : (<span class="stringliteral">&#39;residue&#39;</span>, 0, <span class="stringliteral">&#39;The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule &gt; residue &gt; charge-group&#39;</span>, <span class="stringliteral">&#39;Force Matching&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
-<a name="l00129"></a>00129                  <span class="stringliteral">&quot;fragment1&quot;</span> : (<span class="stringliteral">&#39;&#39;</span>, 0, <span class="stringliteral">&#39;Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)&#39;</span>, <span class="stringliteral">&#39;Interaction energies&#39;</span>, <span class="stringliteral">&#39;Interaction&#39;</span>),
-<a name="l00130"></a>00130                  <span class="stringliteral">&quot;fragment2&quot;</span> : (<span class="stringliteral">&#39;&#39;</span>, 0, <span class="stringliteral">&#39;Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.&#39;</span>, <span class="stringliteral">&#39;Interaction energies&#39;</span>, <span class="stringliteral">&#39;Interaction&#39;</span>),
-<a name="l00131"></a>00131                  <span class="stringliteral">&quot;openmm_cuda_precision&quot;</span> : (<span class="stringliteral">&#39;&#39;</span>, -10, <span class="stringliteral">&#39;Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.&#39;</span>, <span class="stringliteral">&#39;Targets that use OpenMM&#39;</span>, <span class="stringliteral">&#39;OpenMM&#39;</span>),
-<a name="l00132"></a>00132                  },
-<a name="l00133"></a>00133     <span class="stringliteral">&#39;allcaps&#39;</span> : {<span class="stringliteral">&quot;type&quot;</span>   : (<span class="keywordtype">None</span>, 200, <span class="stringliteral">&#39;The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.&#39;</span>, <span class="stringliteral">&#39;All targets (important)&#39;</span> ,<span class="stringliteral">&#39;&#39;</span>)
-<a name="l00134"></a>00134                  },
-<a name="l00135"></a>00135     <span class="stringliteral">&#39;lists&#39;</span>   : {<span class="stringliteral">&quot;fd_ptypes&quot;</span> : ([], -100, <span class="stringliteral">&#39;The parameter types that are differentiated using finite difference&#39;</span>, <span class="stringliteral">&#39;In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed&#39;</span>)
+<a name="l00127"></a>00127                  <span class="stringliteral">&quot;force_map&quot;</span> : (<span class="stringliteral">&#39;residue&#39;</span>, 0, <span class="stringliteral">&#39;The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule &gt; residue &gt; charge-group&#39;</span>, <span class="stringliteral">&#39;Force Matching&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
+<a name="l00128"></a>00128                  <span class="stringliteral">&quot;fragment1&quot;</span> : (<span class="stringliteral">&#39;&#39;</span>, 0, <span class="stringliteral">&#39;Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)&#39;</span>, <span class="stringliteral">&#39;Interaction energies&#39;</span>, <span class="stringliteral">&#39;Interaction&#39;</span>),
+<a name="l00129"></a>00129                  <span class="stringliteral">&quot;fragment2&quot;</span> : (<span class="stringliteral">&#39;&#39;</span>, 0, <span class="stringliteral">&#39;Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.&#39;</span>, <span class="stringliteral">&#39;Interaction energies&#39;</span>, <span class="stringliteral">&#39;Interaction&#39;</span>),
+<a name="l00130"></a>00130                  <span class="stringliteral">&quot;openmm_cuda_precision&quot;</span> : (<span class="stringliteral">&#39;&#39;</span>, -10, <span class="stringliteral">&#39;Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.&#39;</span>, <span class="stringliteral">&#39;Targets that use OpenMM&#39;</span>, <span class="stringliteral">&#39;OpenMM&#39;</span>),
+<a name="l00131"></a>00131                  <span class="stringliteral">&quot;qdata_txt&quot;</span>             : (<span class="keywordtype">None</span>, -10, <span class="stringliteral">&#39;Text file containing quantum data.  If not provided, will search for a default (qdata.txt).&#39;</span>, <span class="stringliteral">&#39;Energy/force matching, ESP evaluations, interaction energies&#39;</span>, <span class="stringliteral">&#39;TINKER&#39;</span>),
+<a name="l00132"></a>00132                  <span class="stringliteral">&quot;binding_txt&quot;</span>           : (<span class="keywordtype">None</span>, 0, <span class="stringliteral">&#39;Text file containing interacting systems.  If not provided, will search for a default.&#39;</span>, <span class="stringliteral">&#39;Binding energy target&#39;</span>, <span class="stringliteral">&#39;BindingEnergy&#39;</span>),
+<a name="l00133"></a>00133                  },
+<a name="l00134"></a>00134     <span class="stringliteral">&#39;allcaps&#39;</span> : {<span class="stringliteral">&quot;type&quot;</span>   : (<span class="keywordtype">None</span>, 200, <span class="stringliteral">&#39;The type of fitting target (Abinitio, BindingEnergy, Liquid, Moments, Vibration) ; must correspond to the name of a Target subclass.&#39;</span>, <span class="stringliteral">&#39;All targets (important)&#39;</span> ,<span class="stringliteral">&#39;&#39;</span>),
+<a name="l00135"></a>00135                  <span class="stringliteral">&quot;engine&quot;</span> : (<span class="keywordtype">None</span>, 180, <span class="stringliteral">&#39;The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)&#39;</span>, <span class="stringliteral">&#39;All targets (important)&#39;</span>, <span class="stringliteral">&#39;&#39;</span>)
 <a name="l00136"></a>00136                  },
-<a name="l00137"></a>00137     <span class="stringliteral">&#39;ints&#39;</span>    : {<span class="stringliteral">&quot;shots&quot;</span>              : (-1, 0, <span class="stringliteral">&#39;Number of snapshots; defaults to all of the snapshots&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
-<a name="l00138"></a>00138                  <span class="stringliteral">&quot;fitatoms&quot;</span>           : (0, 0, <span class="stringliteral">&#39;Number of fitting atoms; defaults to all of them&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
-<a name="l00139"></a>00139                  <span class="stringliteral">&quot;sleepy&quot;</span>             : (0, -50, <span class="stringliteral">&#39;Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)&#39;</span>, <span class="stringliteral">&#39;All targets (advanced usage)&#39;</span>),
-<a name="l00140"></a>00140                  <span class="stringliteral">&quot;liquid_prod_steps&quot;</span>  : (20000, 0, <span class="stringliteral">&#39;Number of time steps for the liquid production run.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00141"></a>00141                  <span class="stringliteral">&quot;liquid_equ_steps&quot;</span>   : (10000, 0, <span class="stringliteral">&#39;Number of time steps for the liquid equilibration run.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00142"></a>00142                  <span class="stringliteral">&quot;gas_prod_steps&quot;</span>     : (0, 0, <span class="stringliteral">&#39;Number of time steps for the gas production run, if different from default.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00143"></a>00143                  <span class="stringliteral">&quot;gas_equ_steps&quot;</span>      : (0, 0, <span class="stringliteral">&#39;Number of time steps for the gas equilibration run, if different from default.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00144"></a>00144                  <span class="stringliteral">&quot;writelevel&quot;</span>         : (1, 0, <span class="stringliteral">&#39;Affects the amount of data being printed to the temp directory.&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
-<a name="l00145"></a>00145                  <span class="stringliteral">&quot;mdrun_threads&quot;</span>      : (1, 0, <span class="stringliteral">&#39;Set the number of threads used by remote Gromacs processes&#39;</span>, <span class="stringliteral">&#39;Condensed phase properties in GROMACS&#39;</span>, <span class="stringliteral">&#39;Liquid_GMX&#39;</span>),
-<a name="l00146"></a>00146                  <span class="stringliteral">&quot;save_traj&quot;</span>          : (0, -10, <span class="stringliteral">&#39;Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save&#39;</span>, <span class="stringliteral">&#39;Condensed phase properties&#39;</span>, <span class="stringliteral">&#39;Liquid&#39;</span>),
-<a name="l00147"></a>00147                  },
-<a name="l00148"></a>00148     <span class="stringliteral">&#39;bools&#39;</span>   : {<span class="stringliteral">&quot;whamboltz&quot;</span>        : (0, -100, <span class="stringliteral">&#39;Whether to use WHAM Boltzmann Weights&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with Boltzmann weights (advanced usage)&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
-<a name="l00149"></a>00149                  <span class="stringliteral">&quot;sampcorr&quot;</span>         : (0, -150, <span class="stringliteral">&#39;Whether to use the archaic sampling correction&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching, very old option, do not use&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
-<a name="l00150"></a>00150                  <span class="stringliteral">&quot;covariance&quot;</span>       : (0, -100, <span class="stringliteral">&#39;Whether to use the quantum covariance matrix&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching, only if you know what you are doing&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
-<a name="l00151"></a>00151                  <span class="stringliteral">&quot;batch_fd&quot;</span>         : (0, -150, <span class="stringliteral">&#39;Whether to batch and queue up finite difference jobs, defaults to False&#39;</span>, <span class="stringliteral">&#39;Currently unused&#39;</span>),
-<a name="l00152"></a>00152                  <span class="stringliteral">&quot;fdgrad&quot;</span>           : (0, -100, <span class="stringliteral">&#39;Finite difference gradient of objective function w/r.t. specified parameters&#39;</span>, <span class="stringliteral">&#39;Use together with fd_ptypes (advanced usage)&#39;</span>),
-<a name="l00153"></a>00153                  <span class="stringliteral">&quot;fdhess&quot;</span>           : (0, -100, <span class="stringliteral">&#39;Finite difference Hessian of objective function w/r.t. specified parameters&#39;</span>, <span class="stringliteral">&#39;Use together with fd_ptypes (advanced usage)&#39;</span>),
-<a name="l00154"></a>00154                  <span class="stringliteral">&quot;fdhessdiag&quot;</span>       : (0, -100, <span class="stringliteral">&#39;Finite difference Hessian diagonals w/r.t. specified parameters (costs 2np times a objective calculation)&#39;</span>, <span class="stringliteral">&#39;Use together with fd_ptypes (advanced usage)&#39;</span>),
-<a name="l00155"></a>00155                  <span class="stringliteral">&quot;all_at_once&quot;</span>      : (1, -50, <span class="stringliteral">&#39;Compute all energies and forces in one fell swoop where possible(as opposed to calling the simulation code once per snapshot)&#39;</span>, <span class="stringliteral">&#39;Various QM targets and MD codes&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
-<a name="l00156"></a>00156                  <span class="stringliteral">&quot;run_internal&quot;</span>     : (1, -50, <span class="stringliteral">&#39;For OpenMM or other codes with Python interface: Compute energies and forces internally&#39;</span>, <span class="stringliteral">&#39;OpenMM interface&#39;</span>, <span class="stringliteral">&#39;OpenMM&#39;</span>),
-<a name="l00157"></a>00157                  <span class="stringliteral">&quot;energy&quot;</span>           : (1, 0, <span class="stringliteral">&#39;Enable the energy objective function&#39;</span>, <span class="stringliteral">&#39;All ab initio targets&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>), 
-<a name="l00158"></a>00158                  <span class="stringliteral">&quot;force&quot;</span>            : (1, 0, <span class="stringliteral">&#39;Enable the force objective function&#39;</span>, <span class="stringliteral">&#39;All ab initio targets&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>), 
-<a name="l00159"></a>00159                  <span class="stringliteral">&quot;resp&quot;</span>             : (0, -150, <span class="stringliteral">&#39;Enable the RESP objective function&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with RESP; experimental (remember to set espweight)&#39;</span>),
-<a name="l00160"></a>00160                  <span class="stringliteral">&quot;do_cosmo&quot;</span>         : (0, -150, <span class="stringliteral">&#39;Call Q-Chem to do MM COSMO on MM snapshots.&#39;</span>, <span class="stringliteral">&#39;Currently unused, but possible in AbInitio target&#39;</span>),
-<a name="l00161"></a>00161                  <span class="stringliteral">&quot;optimize_geometry&quot;</span>: (1, 0, <span class="stringliteral">&#39;Perform a geometry optimization before computing properties&#39;</span>, <span class="stringliteral">&#39;Monomer properties&#39;</span>, <span class="stringliteral">&#39;moments&#39;</span>),
-<a name="l00162"></a>00162                  <span class="stringliteral">&quot;absolute&quot;</span>         : (0, -150, <span class="stringliteral">&#39;When matching energies in AbInitio, do not subtract the mean energy gap.&#39;</span>, <span class="stringliteral">&#39;Energy matching (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
-<a name="l00163"></a>00163                  <span class="stringliteral">&quot;cauchy&quot;</span>           : (0, 0, <span class="stringliteral">&#39;Normalize interaction energies each using 1/(denom**2 + reference**2) which resembles a Cauchy distribution&#39;</span>, <span class="stringliteral">&#39;Interaction energy targets&#39;</span>, <span class="stringliteral">&#39;interaction&#39;</span>),
-<a name="l00164"></a>00164                  <span class="stringliteral">&quot;attenuate&quot;</span>        : (0, 0, <span class="stringliteral">&#39;Normalize interaction energies using 1/(denom**2 + reference**2) only for repulsive interactions greater than denom.&#39;</span>, <span class="stringliteral">&#39;Interaction energy targets&#39;</span>, <span class="stringliteral">&#39;interaction&#39;</span>),
-<a name="l00165"></a>00165                  <span class="stringliteral">&quot;manual&quot;</span>           : (0, -150, <span class="stringliteral">&#39;Give the user a chance to fill in condensed phase stuff on the zeroth step&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00166"></a>00166                  <span class="stringliteral">&quot;hvap_subaverage&quot;</span>  : (0, -150, <span class="stringliteral">&#39;Don\&#39;t target the average enthalpy of vaporization and allow it to freely float (experimental)&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00167"></a>00167                  <span class="stringliteral">&quot;force_cuda&quot;</span>       : (0, -150, <span class="stringliteral">&#39;Force the external npt.py script to crash if CUDA Platform not available&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid_openmm&#39;</span>),
-<a name="l00168"></a>00168                  <span class="stringliteral">&quot;anisotropic_box&quot;</span>  : (0, -150, <span class="stringliteral">&#39;Enable anisotropic box scaling (e.g. for crystals or two-phase simulations) in external npt.py script&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid_openmm&#39;</span>),
-<a name="l00169"></a>00169                  <span class="stringliteral">&quot;mts_vvvr&quot;</span>         : (0, -150, <span class="stringliteral">&#39;Enable multiple-timestep integrator in external npt.py script&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid_openmm&#39;</span>),
-<a name="l00170"></a>00170                  <span class="stringliteral">&quot;minimize_energy&quot;</span>  : (1, 0, <span class="stringliteral">&#39;Minimize the energy of the system prior to running dynamics&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid_openmm&#39;</span>, <span class="stringliteral">&#39;liquid_tinker&#39;</span>),
-<a name="l00171"></a>00171                 },
-<a name="l00172"></a>00172     <span class="stringliteral">&#39;floats&#39;</span>  : {<span class="stringliteral">&quot;weight&quot;</span>       : (1.0, 150, <span class="stringliteral">&#39;Weight of the target (determines its importance vs. other targets)&#39;</span>, <span class="stringliteral">&#39;All targets (important)&#39;</span>),
-<a name="l00173"></a>00173                  <span class="stringliteral">&quot;w_rho&quot;</span>        : (1.0, 0, <span class="stringliteral">&#39;Weight of experimental density&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00174"></a>00174                  <span class="stringliteral">&quot;w_hvap&quot;</span>       : (1.0, 0, <span class="stringliteral">&#39;Weight of enthalpy of vaporization&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00175"></a>00175                  <span class="stringliteral">&quot;w_alpha&quot;</span>      : (1.0, 0, <span class="stringliteral">&#39;Weight of thermal expansion coefficient&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00176"></a>00176                  <span class="stringliteral">&quot;w_kappa&quot;</span>      : (1.0, 0, <span class="stringliteral">&#39;Weight of isothermal compressibility&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00177"></a>00177                  <span class="stringliteral">&quot;w_cp&quot;</span>         : (1.0, 0, <span class="stringliteral">&#39;Weight of isobaric heat capacity&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00178"></a>00178                  <span class="stringliteral">&quot;w_eps0&quot;</span>       : (1.0, 0, <span class="stringliteral">&#39;Weight of dielectric constant&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00179"></a>00179                  <span class="stringliteral">&quot;w_energy&quot;</span>     : (1.0, 0, <span class="stringliteral">&#39;Weight of energy&#39;</span>, <span class="stringliteral">&#39;Ab initio targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00180"></a>00180                  <span class="stringliteral">&quot;w_force&quot;</span>      : (1.0, 0, <span class="stringliteral">&#39;Weight of atomistic forces&#39;</span>, <span class="stringliteral">&#39;Ab initio targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00181"></a>00181                  <span class="stringliteral">&quot;w_netforce&quot;</span>   : (0.0, 0, <span class="stringliteral">&#39;Weight of net forces (condensed to molecules, residues, or charge groups)&#39;</span>, <span class="stringliteral">&#39;Ab initio targets&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
-<a name="l00182"></a>00182                  <span class="stringliteral">&quot;w_torque&quot;</span>     : (0.0, 0, <span class="stringliteral">&#39;Weight of torques (condensed to molecules, residues, or charge groups)&#39;</span>, <span class="stringliteral">&#39;Ab initio targets&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
-<a name="l00183"></a>00183                  <span class="stringliteral">&quot;w_resp&quot;</span>       : (0.0, -150, <span class="stringliteral">&#39;Weight of RESP&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with RESP (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
-<a name="l00184"></a>00184                  <span class="stringliteral">&quot;resp_a&quot;</span>       : (0.001, -150, <span class="stringliteral">&#39;RESP &quot;a&quot; parameter for strength of penalty; 0.001 is strong, 0.0005 is weak&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with RESP (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
-<a name="l00185"></a>00185                  <span class="stringliteral">&quot;resp_b&quot;</span>       : (0.1, -150, <span class="stringliteral">&#39;RESP &quot;b&quot; parameter for hyperbolic behavior; 0.1 is recommended&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with RESP (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
-<a name="l00186"></a>00186                  <span class="stringliteral">&quot;energy_upper&quot;</span> : (30.0, 0, <span class="stringliteral">&#39;Upper energy cutoff (in kcal/mol); super-repulsive interactions are given zero weight&#39;</span>, <span class="stringliteral">&#39;Interaction energy targets&#39;</span>, <span class="stringliteral">&#39;interaction&#39;</span>),
-<a name="l00187"></a>00187                  <span class="stringliteral">&quot;qmboltz&quot;</span>      : (0.0, -100, <span class="stringliteral">&#39;Fraction of Quantum Boltzmann Weights (ab initio), 1.0 for full reweighting, 0.5 for hybrid&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with Boltzmann weights (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
-<a name="l00188"></a>00188                  <span class="stringliteral">&quot;qmboltztemp&quot;</span>  : (298.15, -100, <span class="stringliteral">&#39;Temperature for Quantum Boltzmann Weights (ab initio), defaults to room temperature&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with Boltzmann weights (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
-<a name="l00189"></a>00189                  <span class="stringliteral">&quot;energy_denom&quot;</span>   : (1.0, 0, <span class="stringliteral">&#39;Energy normalization for binding energies in kcal/mol (default is to use stdev)&#39;</span>, <span class="stringliteral">&#39;Binding energy targets&#39;</span>, <span class="stringliteral">&#39;binding&#39;</span>),
-<a name="l00190"></a>00190                  <span class="stringliteral">&quot;rmsd_denom&quot;</span>     : (0.1, 0, <span class="stringliteral">&#39;RMSD normalization for optimized geometries in Angstrom&#39;</span>, <span class="stringliteral">&#39;Binding energy targets&#39;</span>, <span class="stringliteral">&#39;binding&#39;</span>),
-<a name="l00191"></a>00191                  <span class="stringliteral">&quot;wavenumber_tol&quot;</span> : (10.0, 0, <span class="stringliteral">&#39;Frequency normalization (in wavenumber) for vibrational frequencies&#39;</span>, <span class="stringliteral">&#39;Vibrational frequency targets&#39;</span>, <span class="stringliteral">&#39;vibration&#39;</span>),
-<a name="l00192"></a>00192                  <span class="stringliteral">&quot;dipole_denom&quot;</span>   : (1.0, 0, <span class="stringliteral">&#39;Dipole normalization (Debye) ; set to 0 if a zero weight is desired&#39;</span>, <span class="stringliteral">&#39;Monomer property targets&#39;</span>, <span class="stringliteral">&#39;monomer&#39;</span>),
-<a name="l00193"></a>00193                  <span class="stringliteral">&quot;quadrupole_denom&quot;</span>   : (1.0, 0, <span class="stringliteral">&#39;Quadrupole normalization (Buckingham) ; set to 0 if a zero weight is desired&#39;</span>, <span class="stringliteral">&#39;Monomer property targets&#39;</span>, <span class="stringliteral">&#39;monomer&#39;</span>),
-<a name="l00194"></a>00194                  <span class="stringliteral">&quot;polarizability_denom&quot;</span>   : (1.0, 0, <span class="stringliteral">&#39;Dipole polarizability tensor normalization (cubic Angstrom) ; set to 0 if a zero weight is desired&#39;</span>, <span class="stringliteral">&#39;Monomer property targets with polarizability&#39;</span>, <span class="stringliteral">&#39;monomer&#39;</span>),
-<a name="l00195"></a>00195                  <span class="stringliteral">&quot;liquid_timestep&quot;</span>  : (0.5, 0, <span class="stringliteral">&#39;Time step size for the liquid simulation.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00196"></a>00196                  <span class="stringliteral">&quot;liquid_interval&quot;</span>  : (0.05, 0, <span class="stringliteral">&#39;Time interval for saving coordinates for the liquid production run.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00197"></a>00197                  <span class="stringliteral">&quot;gas_timestep&quot;</span>  : (0.0, 0, <span class="stringliteral">&#39;Time step size for the gas simulation (if zero, use default in external script.).&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00198"></a>00198                  <span class="stringliteral">&quot;gas_interval&quot;</span>  : (0.0, 0, <span class="stringliteral">&#39;Time interval for saving coordinates for the gas production run (if zero, use default in external script.)&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00199"></a>00199                  <span class="stringliteral">&quot;self_pol_mu0&quot;</span>  : (0.0, -150, <span class="stringliteral">&#39;Gas-phase dipole parameter for self-polarization correction (in debye).&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00200"></a>00200                  <span class="stringliteral">&quot;self_pol_alpha&quot;</span>  : (0.0, -150, <span class="stringliteral">&#39;Polarizability parameter for self-polarization correction (in debye).&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
-<a name="l00201"></a>00201                  },
-<a name="l00202"></a>00202     <span class="stringliteral">&#39;sections&#39;</span>: {}
-<a name="l00203"></a>00203     }
-<a name="l00204"></a>00204 
-<a name="l00205"></a>00205 <span class="comment">## Default general options - basically a collapsed veresion of gen_opts_types.</span>
-<a name="l00206"></a>00206 gen_opts_defaults = {}
-<a name="l00207"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a807ea3a28fedbdfd494f5cc8da063202">00207</a> <span class="keywordflow">for</span> t <span class="keywordflow">in</span> gen_opts_types:
-<a name="l00208"></a>00208     subdict = {}
-<a name="l00209"></a><a class="code" href="namespaceforcebalance_1_1parser.html#abb7a7e9723de629aa97727a85bcdbad1">00209</a>     <span class="keywordflow">for</span> i <span class="keywordflow">in</span> gen_opts_types[t]:
-<a name="l00210"></a>00210         subdict[i] = gen_opts_types[t][i][0]
-<a name="l00211"></a>00211     gen_opts_defaults.update(subdict)
-<a name="l00212"></a>00212 
-<a name="l00213"></a>00213 <span class="comment">## Default target options - basically a collapsed version of tgt_opts_types.</span>
-<a name="l00214"></a>00214 tgt_opts_defaults = {}
-<a name="l00215"></a><a class="code" href="namespaceforcebalance_1_1parser.html#ad2c80e2b742fbd9594fd813dd51550e6">00215</a> <span class="keywordflow">for</span> t <span class="keywordflow">in</span> tgt_opts_types:
-<a name="l00216"></a>00216     subdict = {}
-<a name="l00217"></a>00217     <span class="keywordflow">for</span> i <span class="keywordflow">in</span> tgt_opts_types[t]:
-<a name="l00218"></a>00218         subdict[i] = tgt_opts_types[t][i][0]
-<a name="l00219"></a>00219     tgt_opts_defaults.update(subdict)
-<a name="l00220"></a>00220 
-<a name="l00221"></a>00221 <span class="comment">## Option maps for maintaining backward compatibility.</span>
-<a name="l00222"></a>00222 bkwd = {<span class="stringliteral">&quot;simtype&quot;</span> : <span class="stringliteral">&quot;type&quot;</span>}
-<a name="l00223"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a37193d7ceabbf07a61e65677372b7dab">00223</a> 
-<a name="l00224"></a>00224 <span class="comment">## Listing of sections in the input file.</span>
-<a name="l00225"></a>00225 mainsections = [<span class="stringliteral">&quot;SIMULATION&quot;</span>,<span class="stringliteral">&quot;TARGET&quot;</span>,<span class="stringliteral">&quot;OPTIONS&quot;</span>,<span class="stringliteral">&quot;END&quot;</span>,<span class="stringliteral">&quot;NONE&quot;</span>]
-<a name="l00226"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a525ac339b645dbfb9fbb7cc672712504">00226</a> 
-<a name="l00227"></a>00227 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#aef8b51dba6bb9767a9a956319eb3cc08">read_mvals</a>(fobj):
-<a name="l00228"></a><a class="code" href="namespaceforcebalance_1_1parser.html#aef8b51dba6bb9767a9a956319eb3cc08">00228</a>     Answer = []
-<a name="l00229"></a>00229     <span class="keywordflow">for</span> line <span class="keywordflow">in</span> fobj:
-<a name="l00230"></a>00230         <span class="keywordflow">if</span> re.match(<span class="stringliteral">&quot;(/read_mvals)|(^\$end)&quot;</span>,line):
-<a name="l00231"></a>00231             <span class="keywordflow">break</span>
-<a name="l00232"></a>00232         Answer.append(float(line.split(<span class="stringliteral">&#39;[&#39;</span>)[-1].split(<span class="stringliteral">&#39;]&#39;</span>)[0].split()[-1]))
-<a name="l00233"></a>00233     <span class="keywordflow">return</span> Answer
-<a name="l00234"></a>00234         
-<a name="l00235"></a>00235 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#a56fb1e139dad24bac29f25a3870765ca">read_pvals</a>(fobj):
-<a name="l00236"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a56fb1e139dad24bac29f25a3870765ca">00236</a>     Answer = []
-<a name="l00237"></a>00237     <span class="keywordflow">for</span> line <span class="keywordflow">in</span> fobj:
-<a name="l00238"></a>00238         <span class="keywordflow">if</span> re.match(<span class="stringliteral">&quot;(/read_pvals)|(^\$end)&quot;</span>,line):
-<a name="l00239"></a>00239             <span class="keywordflow">break</span>
-<a name="l00240"></a>00240         Answer.append(float(line.split(<span class="stringliteral">&#39;[&#39;</span>)[-1].split(<span class="stringliteral">&#39;]&#39;</span>)[0].split()[-1]))
-<a name="l00241"></a>00241     <span class="keywordflow">return</span> Answer
-<a name="l00242"></a>00242 
-<a name="l00243"></a>00243 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#a94c3f1acd06b640db3042dc45e32af8e">read_priors</a>(fobj):
-<a name="l00244"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a94c3f1acd06b640db3042dc45e32af8e">00244</a>     Answer = OrderedDict()
-<a name="l00245"></a>00245     <span class="keywordflow">for</span> line <span class="keywordflow">in</span> fobj:
-<a name="l00246"></a>00246         line = line.split(<span class="stringliteral">&quot;#&quot;</span>)[0]
-<a name="l00247"></a>00247         <span class="keywordflow">if</span> re.match(<span class="stringliteral">&quot;(/priors)|(^\$end)&quot;</span>,line):
-<a name="l00248"></a>00248             <span class="keywordflow">break</span>
-<a name="l00249"></a>00249         Answer[line.split()[0]] = float(line.split()[-1])
-<a name="l00250"></a>00250     <span class="keywordflow">return</span> Answer
-<a name="l00251"></a>00251 
-<a name="l00252"></a>00252 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#a10827b0b21d0463bc9e786f161a02654">read_internals</a>(fobj):
-<a name="l00253"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a10827b0b21d0463bc9e786f161a02654">00253</a>     <span class="keywordflow">return</span>
-<a name="l00254"></a>00254 
-<a name="l00255"></a>00255 <span class="comment">## ParsTab that refers to subsection parsers.</span>
-<a name="l00256"></a>00256 ParsTab  = {<span class="stringliteral">&quot;read_mvals&quot;</span> : read_mvals,
-<a name="l00257"></a><a class="code" href="namespaceforcebalance_1_1parser.html#af0a8dc5cdc54cc88ded3ee3b46d71672">00257</a>             <span class="stringliteral">&quot;read_pvals&quot;</span> : read_pvals,
-<a name="l00258"></a>00258             <span class="stringliteral">&quot;priors&quot;</span>     : read_priors,
-<a name="l00259"></a>00259             <span class="stringliteral">&quot;internal&quot;</span>   : read_internals
-<a name="l00260"></a>00260             }
-<a name="l00261"></a>00261 
-<a name="l00262"></a>00262 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#a00a8cb7b534312c13b11d4bb39bb3959" title="Print out a section of the input file in a parser-compliant and readable format.">printsection</a>(heading,optdict,typedict):
-<a name="l00263"></a>00263     <span class="stringliteral">&quot;&quot;&quot; Print out a section of the input file in a parser-compliant and readable format.</span>
-<a name="l00264"></a>00264 <span class="stringliteral"></span>
-<a name="l00265"></a>00265 <span class="stringliteral">    At the time of writing of this function, it&#39;s mainly intended to be called by MakeInputFile.py.</span>
-<a name="l00266"></a>00266 <span class="stringliteral">    The heading is printed first (it is something like $options or $target).  Then it loops</span>
-<a name="l00267"></a>00267 <span class="stringliteral">    through the variable types (strings, allcaps, etc...) and the keys in each variable type.</span>
-<a name="l00268"></a>00268 <span class="stringliteral">    The one-line description of each key is printed out as a comment, and then the key itself is</span>
-<a name="l00269"></a>00269 <span class="stringliteral">    printed out along with the value provided in optdict.  If optdict is None, then the default</span>
-<a name="l00270"></a>00270 <span class="stringliteral">    value is printed out instead.</span>
-<a name="l00271"></a>00271 <span class="stringliteral"></span>
-<a name="l00272"></a>00272 <span class="stringliteral">    @param[in] heading Heading, either $options or $target</span>
-<a name="l00273"></a>00273 <span class="stringliteral">    @param[in] optdict Options dictionary or None.</span>
-<a name="l00274"></a>00274 <span class="stringliteral">    @param[in] typedict Option type dictionary, either gen_opts_types or tgt_opts_types specified in this file.</span>
-<a name="l00275"></a>00275 <span class="stringliteral">    @return Answer List of strings for the section that we are printing out.</span>
-<a name="l00276"></a>00276 <span class="stringliteral">    </span>
-<a name="l00277"></a>00277 <span class="stringliteral">    &quot;&quot;&quot;</span>
-<a name="l00278"></a>00278     <span class="keyword">from</span> forcebalance.objective <span class="keyword">import</span> Implemented_Targets
-<a name="l00279"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a00a8cb7b534312c13b11d4bb39bb3959">00279</a>     <span class="keyword">from</span> forcebalance.optimizer <span class="keyword">import</span> Optimizer
-<a name="l00280"></a>00280 
-<a name="l00281"></a>00281     <span class="keyword">def </span>FilterTargets(search):
-<a name="l00282"></a>00282         <span class="keywordflow">if</span> type(search) == str:
-<a name="l00283"></a>00283             search = [search]
-<a name="l00284"></a>00284         list_out = []
-<a name="l00285"></a>00285         <span class="keywordflow">for</span> key <span class="keywordflow">in</span> sorted(Implemented_Targets.keys()):
-<a name="l00286"></a>00286             <span class="keywordflow">if</span> any([i.lower() <span class="keywordflow">in</span> key.lower() <span class="keywordflow">for</span> i <span class="keywordflow">in</span> search]):
-<a name="l00287"></a>00287                 list_out.append(Implemented_Targets[key].__name__)
-<a name="l00288"></a>00288         <span class="keywordflow">return</span> <span class="stringliteral">&#39;, &#39;</span>.join(sorted(list_out))
-<a name="l00289"></a>00289 
-<a name="l00290"></a>00290     Answer = [heading]
-<a name="l00291"></a>00291     firstentry = 1
-<a name="l00292"></a>00292     Options = []
-<a name="l00293"></a>00293     <span class="keywordflow">for</span> i <span class="keywordflow">in</span> [<span class="stringliteral">&#39;strings&#39;</span>,<span class="stringliteral">&#39;allcaps&#39;</span>,<span class="stringliteral">&#39;lists&#39;</span>,<span class="stringliteral">&#39;ints&#39;</span>,<span class="stringliteral">&#39;bools&#39;</span>,<span class="stringliteral">&#39;floats&#39;</span>,<span class="stringliteral">&#39;sections&#39;</span>]:
-<a name="l00294"></a>00294         vartype = re.sub(<span class="stringliteral">&#39;s$&#39;</span>,<span class="stringliteral">&#39;&#39;</span>,i)
-<a name="l00295"></a>00295         <span class="keywordflow">for</span> j <span class="keywordflow">in</span> typedict[i]:
-<a name="l00296"></a>00296             Option = []
-<a name="l00297"></a>00297             val = optdict[j] <span class="keywordflow">if</span> optdict != <span class="keywordtype">None</span> <span class="keywordflow">else</span> typedict[i][j][0]
-<a name="l00298"></a>00298             <span class="keywordflow">if</span> firstentry:
-<a name="l00299"></a>00299                 firstentry = 0
-<a name="l00300"></a>00300             <span class="keywordflow">else</span>:
-<a name="l00301"></a>00301                 Option.append(<span class="stringliteral">&quot;&quot;</span>)
-<a name="l00302"></a>00302             Priority = typedict[i][j][1]
-<a name="l00303"></a>00303             Option.append(<span class="stringliteral">&quot;# (%s) %s&quot;</span> % (vartype, typedict[i][j][2]))
-<a name="l00304"></a>00304             <span class="keywordflow">if</span> len(typedict[i][j]) &gt;= 4:
-<a name="l00305"></a>00305                 Relevance = typedict[i][j][3]
-<a name="l00306"></a>00306                 str2 = <span class="stringliteral">&quot;# used in: %s&quot;</span> % Relevance
-<a name="l00307"></a>00307                 <span class="keywordflow">if</span> len(typedict[i][j]) &gt;= 5:
-<a name="l00308"></a>00308                     TargetName = FilterTargets(typedict[i][j][4])
-<a name="l00309"></a>00309                     str2 += <span class="stringliteral">&quot; (%s)&quot;</span> % TargetName
-<a name="l00310"></a>00310                 <span class="keywordflow">else</span>:
-<a name="l00311"></a>00311                     TargetName = <span class="stringliteral">&quot;None&quot;</span>
-<a name="l00312"></a>00312                 Option.append(str2)
-<a name="l00313"></a>00313             <span class="keywordflow">else</span>:
-<a name="l00314"></a>00314                 Relevance = <span class="stringliteral">&quot;None&quot;</span>
-<a name="l00315"></a>00315             Option.append(<span class="stringliteral">&quot;%s %s&quot;</span> % (str(j),str(val)))
-<a name="l00316"></a>00316             Options.append((Option, Priority, TargetName, j))
-<a name="l00317"></a>00317     <span class="keyword">def </span>key1(o):
-<a name="l00318"></a>00318         <span class="keywordflow">return</span> o[1]
-<a name="l00319"></a>00319     <span class="keyword">def </span>key2(o):
-<a name="l00320"></a>00320         <span class="keywordflow">return</span> o[2]
-<a name="l00321"></a>00321     <span class="keyword">def </span>key3(o):
-<a name="l00322"></a>00322         <span class="keywordflow">return</span> o[3]
-<a name="l00323"></a>00323     Options.sort(key=key3)
-<a name="l00324"></a>00324     Options.sort(key=key2)
-<a name="l00325"></a>00325     Options.sort(key=key1, reverse=<span class="keyword">True</span>)
-<a name="l00326"></a>00326     <span class="keywordflow">for</span> o <span class="keywordflow">in</span> Options:
-<a name="l00327"></a>00327         Answer += o[0]
-<a name="l00328"></a>00328 
-<a name="l00329"></a>00329     <span class="comment"># PriSet = sorted(list(set(Priorities)))[::-1]</span>
-<a name="l00330"></a>00330     <span class="comment"># TgtSet = sorted(list(set(TargetNames)))</span>
-<a name="l00331"></a>00331     <span class="comment"># RelSet = sorted(list(set(Relevances)))</span>
-<a name="l00332"></a>00332     <span class="comment"># for p0 in PriSet:</span>
-<a name="l00333"></a>00333     <span class="comment">#     ogrp = []</span>
-<a name="l00334"></a>00334     <span class="comment">#     rgrp = []</span>
-<a name="l00335"></a>00335     <span class="comment">#     tgrp = []</span>
-<a name="l00336"></a>00336     <span class="comment">#     for o, p, r, t in zip(Options, Priorities, Relevances, TargetNames):</span>
-<a name="l00337"></a>00337     <span class="comment">#         if p == p0:</span>
-<a name="l00338"></a>00338     <span class="comment">#             ogrp.append(o)</span>
-<a name="l00339"></a>00339     <span class="comment">#             rgrp.append(r)</span>
-<a name="l00340"></a>00340     <span class="comment">#             tgrp.append(t)</span>
-<a name="l00341"></a>00341     <span class="comment">#     ogrp2 = []</span>
-<a name="l00342"></a>00342     <span class="comment">#     rgrp2 = []</span>
-<a name="l00343"></a>00343     <span class="comment">#     for t0 in TgtSet:</span>
-<a name="l00344"></a>00344     <span class="comment">#         for o, r, t in zip(ogrp, rgrp, tgrp):</span>
-<a name="l00345"></a>00345     <span class="comment">#             if t == t0:</span>
-<a name="l00346"></a>00346     <span class="comment">#                 ogrp2.append(</span>
-<a name="l00347"></a>00347                 
-<a name="l00348"></a>00348     Answer.append(<span class="stringliteral">&quot;$end&quot;</span>)
-<a name="l00349"></a>00349     <span class="keywordflow">return</span> Answer
-<a name="l00350"></a>00350 
-<a name="l00351"></a>00351 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#ac184c809737a27f35530020322431f7c" title="Parse through the input file and read all user-supplied options.">parse_inputs</a>(input_file=None):
-<a name="l00352"></a>00352     <span class="stringliteral">&quot;&quot;&quot; Parse through the input file and read all user-supplied options.</span>
-<a name="l00353"></a>00353 <span class="stringliteral"></span>
-<a name="l00354"></a>00354 <span class="stringliteral">    This is usually the first thing that happens when an executable script is called.</span>
-<a name="l00355"></a>00355 <span class="stringliteral">    Our parser first loads the default options, and then updates these options as it</span>
-<a name="l00356"></a>00356 <span class="stringliteral">    encounters keywords.</span>
-<a name="l00357"></a>00357 <span class="stringliteral"></span>
-<a name="l00358"></a>00358 <span class="stringliteral">    Each keyword corresponds to a variable type; each variable type (e.g. string,</span>
-<a name="l00359"></a>00359 <span class="stringliteral">    integer, float, boolean) is treated differently.  For more elaborate inputs,</span>
-<a name="l00360"></a>00360 <span class="stringliteral">    there is a &#39;section&#39; variable type.</span>
-<a name="l00361"></a>00361 <span class="stringliteral"></span>
-<a name="l00362"></a>00362 <span class="stringliteral">    There is only one set of general options, but multiple sets of target options.</span>
-<a name="l00363"></a>00363 <span class="stringliteral">    Each target has its own section delimited by the \em $target keyword,</span>
-<a name="l00364"></a>00364 <span class="stringliteral">    and we build a list of target options.  </span>
-<a name="l00365"></a>00365 <span class="stringliteral"></span>
-<a name="l00366"></a>00366 <span class="stringliteral">    @param[in]  input_file The name of the input file.</span>
-<a name="l00367"></a>00367 <span class="stringliteral">    @return     options    General options.</span>
-<a name="l00368"></a>00368 <span class="stringliteral">    @return     tgt_opts   List of fitting target options.</span>
-<a name="l00369"></a>00369 <span class="stringliteral">    </span>
-<a name="l00370"></a>00370 <span class="stringliteral">    @todo Implement internal coordinates.</span>
-<a name="l00371"></a>00371 <span class="stringliteral">    @todo Implement sampling correction.</span>
-<a name="l00372"></a>00372 <span class="stringliteral">    @todo Implement charge groups.</span>
-<a name="l00373"></a>00373 <span class="stringliteral">    &quot;&quot;&quot;</span>
-<a name="l00374"></a>00374     
-<a name="l00375"></a>00375     logger.info(<span class="stringliteral">&quot;Reading options from file: %s\n&quot;</span> % input_file)
-<a name="l00376"></a><a class="code" href="namespaceforcebalance_1_1parser.html#ac184c809737a27f35530020322431f7c">00376</a>     section = <span class="stringliteral">&quot;NONE&quot;</span>
-<a name="l00377"></a>00377     <span class="comment"># First load in all of the default options.</span>
-<a name="l00378"></a>00378     options = deepcopy(gen_opts_defaults) <span class="comment"># deepcopy to make sure options doesn&#39;t make changes to gen_opts_defaults</span>
-<a name="l00379"></a>00379     options[<span class="stringliteral">&#39;root&#39;</span>] = os.getcwd()
-<a name="l00380"></a>00380     tgt_opts = []
-<a name="l00381"></a>00381     this_tgt_opt = deepcopy(tgt_opts_defaults)
-<a name="l00382"></a>00382     <span class="comment"># Give back a bunch of default options if input file isn&#39;t specified.</span>
-<a name="l00383"></a>00383     <span class="keywordflow">if</span> input_file == <span class="keywordtype">None</span>:
-<a name="l00384"></a>00384         <span class="keywordflow">return</span> (options, [this_tgt_opt])
-<a name="l00385"></a>00385     fobj = open(input_file)
-<a name="l00386"></a>00386     <span class="keywordflow">for</span> line <span class="keywordflow">in</span> fobj:
-<a name="l00387"></a>00387         <span class="keywordflow">try</span>:
-<a name="l00388"></a>00388             <span class="comment"># Anything after &quot;#&quot; is a comment</span>
-<a name="l00389"></a>00389             line = line.split(<span class="stringliteral">&quot;#&quot;</span>)[0].strip()
-<a name="l00390"></a>00390             s = line.split()
-<a name="l00391"></a>00391             <span class="comment"># Skip over blank lines</span>
-<a name="l00392"></a>00392             <span class="keywordflow">if</span> len(s) == 0:
-<a name="l00393"></a>00393                 <span class="keywordflow">continue</span>
-<a name="l00394"></a>00394             key = s[0].lower()
-<a name="l00395"></a>00395             <span class="keywordflow">if</span> key <span class="keywordflow">in</span> bkwd: <span class="comment"># Do option replacement for backward compatibility.</span>
-<a name="l00396"></a>00396                 key = bkwd[key]
-<a name="l00397"></a>00397             <span class="comment"># If line starts with a $, this signifies that we&#39;re in a new section.</span>
-<a name="l00398"></a>00398             <span class="keywordflow">if</span> re.match(<span class="stringliteral">&#39;^\$&#39;</span>,line):
-<a name="l00399"></a>00399                 newsection = re.sub(<span class="stringliteral">&#39;^\$&#39;</span>,<span class="stringliteral">&#39;&#39;</span>,line).upper()
-<a name="l00400"></a>00400                 <span class="keywordflow">if</span> section <span class="keywordflow">in</span> [<span class="stringliteral">&quot;SIMULATION&quot;</span>,<span class="stringliteral">&quot;TARGET&quot;</span>] <span class="keywordflow">and</span> newsection <span class="keywordflow">in</span> mainsections:
-<a name="l00401"></a>00401                     tgt_opts.append(this_tgt_opt)
-<a name="l00402"></a>00402                     this_tgt_opt = deepcopy(tgt_opts_defaults)
-<a name="l00403"></a>00403                 section = newsection
-<a name="l00404"></a>00404             <span class="keywordflow">elif</span> section <span class="keywordflow">in</span> [<span class="stringliteral">&quot;OPTIONS&quot;</span>,<span class="stringliteral">&quot;SIMULATION&quot;</span>,<span class="stringliteral">&quot;TARGET&quot;</span>]:
-<a name="l00405"></a>00405                 <span class="comment">## Depending on which section we are in, we choose the correct type dictionary</span>
-<a name="l00406"></a>00406                 <span class="comment">## and add stuff to &#39;options&#39; and &#39;this_tgt_opt&#39;</span>
-<a name="l00407"></a>00407                 (this_opt, opts_types) = (options, gen_opts_types) <span class="keywordflow">if</span> section == <span class="stringliteral">&quot;OPTIONS&quot;</span> <span class="keywordflow">else</span> (this_tgt_opt, tgt_opts_types)
-<a name="l00408"></a>00408                 <span class="comment">## Note that &quot;None&quot; is a special keyword!  The variable will ACTUALLY be set to None.</span>
-<a name="l00409"></a>00409                 <span class="keywordflow">if</span> len(s) &gt; 1 <span class="keywordflow">and</span> s[1].upper() == <span class="stringliteral">&quot;NONE&quot;</span>:
-<a name="l00410"></a>00410                     this_opt[key] = <span class="keywordtype">None</span>
-<a name="l00411"></a>00411                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;strings&#39;</span>]:
-<a name="l00412"></a>00412                     this_opt[key] = s[1]
-<a name="l00413"></a>00413                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;allcaps&#39;</span>]:
-<a name="l00414"></a>00414                     this_opt[key] = s[1].upper()
-<a name="l00415"></a>00415                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;lists&#39;</span>]:
-<a name="l00416"></a>00416                     <span class="keywordflow">for</span> word <span class="keywordflow">in</span> s[1:]:
-<a name="l00417"></a>00417                         this_opt.setdefault(key,[]).append(word)
-<a name="l00418"></a>00418                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;ints&#39;</span>]:
-<a name="l00419"></a>00419                     this_opt[key] = int(s[1])
-<a name="l00420"></a>00420                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;bools&#39;</span>]:
-<a name="l00421"></a>00421                     <span class="keywordflow">if</span> len(s) == 1:
-<a name="l00422"></a>00422                         this_opt[key] = <span class="keyword">True</span>
-<a name="l00423"></a>00423                     <span class="keywordflow">elif</span> s[1].upper() <span class="keywordflow">in</span> [<span class="stringliteral">&quot;0&quot;</span>, <span class="stringliteral">&quot;NO&quot;</span>, <span class="stringliteral">&quot;FALSE&quot;</span>]:
-<a name="l00424"></a>00424                         this_opt[key] = <span class="keyword">False</span>
-<a name="l00425"></a>00425                     <span class="keywordflow">else</span>:
-<a name="l00426"></a>00426                         this_opt[key] = <span class="keyword">True</span>
-<a name="l00427"></a>00427                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;floats&#39;</span>]:
-<a name="l00428"></a>00428                     this_opt[key] = float(s[1])
-<a name="l00429"></a>00429                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;sections&#39;</span>]:
-<a name="l00430"></a>00430                     this_opt[key] = ParsTab[key](fobj)
-<a name="l00431"></a>00431                 <span class="keywordflow">else</span>:
-<a name="l00432"></a>00432                     logger.error(<span class="stringliteral">&quot;Unrecognized keyword: --- \x1b[1;91m%s\x1b[0m --- in %s section\n&quot;</span> \
-<a name="l00433"></a>00433                           % (key, section))
-<a name="l00434"></a>00434                     logger.error(<span class="stringliteral">&quot;Perhaps this option actually belongs in %s section?\n&quot;</span> \
-<a name="l00435"></a>00435                           % (section == <span class="stringliteral">&quot;OPTIONS&quot;</span> <span class="keywordflow">and</span> <span class="stringliteral">&quot;a TARGET&quot;</span> <span class="keywordflow">or</span> <span class="stringliteral">&quot;the OPTIONS&quot;</span>))
-<a name="l00436"></a>00436                     sys.exit(1)
-<a name="l00437"></a>00437             <span class="keywordflow">elif</span> section <span class="keywordflow">not</span> <span class="keywordflow">in</span> mainsections:
-<a name="l00438"></a>00438                 logger.error(<span class="stringliteral">&quot;Unrecognized section: %s\n&quot;</span> % section)
-<a name="l00439"></a>00439                 sys.exit(1)
-<a name="l00440"></a>00440         <span class="keywordflow">except</span>:
-<a name="l00441"></a>00441             logger.error(<span class="stringliteral">&quot;Failed to read in this line! Check your input file.\n&quot;</span>)
-<a name="l00442"></a>00442             logger.exception(line + <span class="stringliteral">&#39;\n&#39;</span>)
-<a name="l00443"></a>00443             sys.exit(1)
-<a name="l00444"></a>00444     <span class="keywordflow">if</span> section == <span class="stringliteral">&quot;SIMULATION&quot;</span> <span class="keywordflow">or</span> section == <span class="stringliteral">&quot;TARGET&quot;</span>:
-<a name="l00445"></a>00445         tgt_opts.append(this_tgt_opt)
-<a name="l00446"></a>00446     <span class="keywordflow">if</span> <span class="keywordflow">not</span> options[<span class="stringliteral">&#39;verbose_options&#39;</span>]:
-<a name="l00447"></a>00447         <a class="code" href="namespaceforcebalance_1_1nifty.html#a11babd62dc7bca389162c6318f9672ca" title="Cool-looking printout for slick formatting of output.">printcool</a>(<span class="stringliteral">&quot;Options at their default values are not printed\n Use &#39;verbose_options True&#39; to Enable&quot;</span>, color=5)
-<a name="l00448"></a>00448     <span class="keywordflow">return</span> options, tgt_opts
+<a name="l00137"></a>00137     <span class="stringliteral">&#39;lists&#39;</span>   : {<span class="stringliteral">&quot;fd_ptypes&quot;</span> : ([], -100, <span class="stringliteral">&#39;The parameter types that are differentiated using finite difference&#39;</span>, <span class="stringliteral">&#39;In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed&#39;</span>),
+<a name="l00138"></a>00138                  <span class="stringliteral">&quot;coords&quot;</span>                : (<span class="keywordtype">None</span>, -10, <span class="stringliteral">&#39;Coordinates for single point evaluation; if not provided, will search for a default.&#39;</span>, <span class="stringliteral">&#39;Energy/force matching, ESP evaluations, interaction energies&#39;</span>),
+<a name="l00139"></a>00139                  <span class="stringliteral">&quot;gmx_mdp&quot;</span>               : (<span class="keywordtype">None</span>, -10, <span class="stringliteral">&#39;Gromacs .mdp files.  If not provided, will search for default.&#39;</span>, <span class="stringliteral">&#39;Targets that use GROMACS&#39;</span>, <span class="stringliteral">&#39;GMX&#39;</span>),
+<a name="l00140"></a>00140                  <span class="stringliteral">&quot;gmx_top&quot;</span>               : (<span class="keywordtype">None</span>, -10, <span class="stringliteral">&#39;Gromacs .top files.  If not provided, will search for default.&#39;</span>, <span class="stringliteral">&#39;Targets that use GROMACS&#39;</span>, <span class="stringliteral">&#39;GMX&#39;</span>),
+<a name="l00141"></a>00141                  <span class="stringliteral">&quot;tinker_key&quot;</span>            : (<span class="keywordtype">None</span>, -10, <span class="stringliteral">&#39;TINKER .key files.  If not provided, will search for default.&#39;</span>, <span class="stringliteral">&#39;Targets that use TINKER&#39;</span>, <span class="stringliteral">&#39;TINKER&#39;</span>),
+<a name="l00142"></a>00142                  },
+<a name="l00143"></a>00143     <span class="stringliteral">&#39;ints&#39;</span>    : {<span class="stringliteral">&quot;shots&quot;</span>              : (-1, 0, <span class="stringliteral">&#39;Number of snapshots; defaults to all of the snapshots&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
+<a name="l00144"></a>00144                  <span class="stringliteral">&quot;fitatoms&quot;</span>           : (0, 0, <span class="stringliteral">&#39;Number of fitting atoms; defaults to all of them&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
+<a name="l00145"></a>00145                  <span class="stringliteral">&quot;sleepy&quot;</span>             : (0, -50, <span class="stringliteral">&#39;Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)&#39;</span>, <span class="stringliteral">&#39;All targets (advanced usage)&#39;</span>),
+<a name="l00146"></a>00146                  <span class="stringliteral">&quot;liquid_prod_steps&quot;</span>  : (20000, 0, <span class="stringliteral">&#39;Number of time steps for the liquid production run.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00147"></a>00147                  <span class="stringliteral">&quot;liquid_equ_steps&quot;</span>   : (10000, 0, <span class="stringliteral">&#39;Number of time steps for the liquid equilibration run.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00148"></a>00148                  <span class="stringliteral">&quot;gas_prod_steps&quot;</span>     : (0, 0, <span class="stringliteral">&#39;Number of time steps for the gas production run, if different from default.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00149"></a>00149                  <span class="stringliteral">&quot;gas_equ_steps&quot;</span>      : (0, 0, <span class="stringliteral">&#39;Number of time steps for the gas equilibration run, if different from default.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00150"></a>00150                  <span class="stringliteral">&quot;writelevel&quot;</span>         : (1, 0, <span class="stringliteral">&#39;Affects the amount of data being printed to the temp directory.&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
+<a name="l00151"></a>00151                  <span class="stringliteral">&quot;mdrun_threads&quot;</span>      : (1, 0, <span class="stringliteral">&#39;Set the number of threads used by remote Gromacs processes&#39;</span>, <span class="stringliteral">&#39;Condensed phase properties in GROMACS&#39;</span>, <span class="stringliteral">&#39;Liquid_GMX&#39;</span>),
+<a name="l00152"></a>00152                  <span class="stringliteral">&quot;save_traj&quot;</span>          : (0, -10, <span class="stringliteral">&#39;Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save&#39;</span>, <span class="stringliteral">&#39;Condensed phase properties&#39;</span>, <span class="stringliteral">&#39;Liquid&#39;</span>),
+<a name="l00153"></a>00153                  },
+<a name="l00154"></a>00154     <span class="stringliteral">&#39;bools&#39;</span>   : {<span class="stringliteral">&quot;whamboltz&quot;</span>        : (0, -100, <span class="stringliteral">&#39;Whether to use WHAM Boltzmann Weights&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with Boltzmann weights (advanced usage)&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
+<a name="l00155"></a>00155                  <span class="stringliteral">&quot;sampcorr&quot;</span>         : (0, -150, <span class="stringliteral">&#39;Whether to use the archaic sampling correction&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching, very old option, do not use&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
+<a name="l00156"></a>00156                  <span class="stringliteral">&quot;covariance&quot;</span>       : (0, -100, <span class="stringliteral">&#39;Whether to use the quantum covariance matrix&#39;</span>, <span class="stringliteral">&#39;Energy + Force Matching, only if you know what you are doing&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
+<a name="l00157"></a>00157                  <span class="stringliteral">&quot;batch_fd&quot;</span>         : (0, -150, <span class="stringliteral">&#39;Whether to batch and queue up finite difference jobs, defaults to False&#39;</span>, <span class="stringliteral">&#39;Currently unused&#39;</span>),
+<a name="l00158"></a>00158                  <span class="stringliteral">&quot;fdgrad&quot;</span>           : (0, -100, <span class="stringliteral">&#39;Finite difference gradient of objective function w/r.t. specified parameters&#39;</span>, <span class="stringliteral">&#39;Use together with fd_ptypes (advanced usage)&#39;</span>),
+<a name="l00159"></a>00159                  <span class="stringliteral">&quot;fdhess&quot;</span>           : (0, -100, <span class="stringliteral">&#39;Finite difference Hessian of objective function w/r.t. specified parameters&#39;</span>, <span class="stringliteral">&#39;Use together with fd_ptypes (advanced usage)&#39;</span>),
+<a name="l00160"></a>00160                  <span class="stringliteral">&quot;fdhessdiag&quot;</span>       : (0, -100, <span class="stringliteral">&#39;Finite difference Hessian diagonals w/r.t. specified parameters (costs 2np times a objective calculation)&#39;</span>, <span class="stringliteral">&#39;Use together with fd_ptypes (advanced usage)&#39;</span>),
+<a name="l00161"></a>00161                  <span class="stringliteral">&quot;all_at_once&quot;</span>      : (1, -50, <span class="stringliteral">&#39;Compute all energies and forces in one fell swoop where possible(as opposed to calling the simulation code once per snapshot)&#39;</span>, <span class="stringliteral">&#39;Various QM targets and MD codes&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>),
+<a name="l00162"></a>00162                  <span class="stringliteral">&quot;run_internal&quot;</span>     : (1, -50, <span class="stringliteral">&#39;For OpenMM or other codes with Python interface: Compute energies and forces internally&#39;</span>, <span class="stringliteral">&#39;OpenMM interface&#39;</span>, <span class="stringliteral">&#39;OpenMM&#39;</span>),
+<a name="l00163"></a>00163                  <span class="stringliteral">&quot;energy&quot;</span>           : (1, 0, <span class="stringliteral">&#39;Enable the energy objective function&#39;</span>, <span class="stringliteral">&#39;All ab initio targets&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>), 
+<a name="l00164"></a>00164                  <span class="stringliteral">&quot;force&quot;</span>            : (1, 0, <span class="stringliteral">&#39;Enable the force objective function&#39;</span>, <span class="stringliteral">&#39;All ab initio targets&#39;</span>, <span class="stringliteral">&#39;AbInitio&#39;</span>), 
+<a name="l00165"></a>00165                  <span class="stringliteral">&quot;resp&quot;</span>             : (0, -150, <span class="stringliteral">&#39;Enable the RESP objective function&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with RESP; experimental (remember to set espweight)&#39;</span>),
+<a name="l00166"></a>00166                  <span class="stringliteral">&quot;do_cosmo&quot;</span>         : (0, -150, <span class="stringliteral">&#39;Call Q-Chem to do MM COSMO on MM snapshots.&#39;</span>, <span class="stringliteral">&#39;Currently unused, but possible in AbInitio target&#39;</span>),
+<a name="l00167"></a>00167                  <span class="stringliteral">&quot;optimize_geometry&quot;</span>: (1, 0, <span class="stringliteral">&#39;Perform a geometry optimization before computing properties&#39;</span>, <span class="stringliteral">&#39;Monomer properties&#39;</span>, <span class="stringliteral">&#39;moments&#39;</span>),
+<a name="l00168"></a>00168                  <span class="stringliteral">&quot;absolute&quot;</span>         : (0, -150, <span class="stringliteral">&#39;When matching energies in AbInitio, do not subtract the mean energy gap.&#39;</span>, <span class="stringliteral">&#39;Energy matching (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
+<a name="l00169"></a>00169                  <span class="stringliteral">&quot;cauchy&quot;</span>           : (0, 0, <span class="stringliteral">&#39;Normalize interaction energies each using 1/(denom**2 + reference**2) which resembles a Cauchy distribution&#39;</span>, <span class="stringliteral">&#39;Interaction energy targets&#39;</span>, <span class="stringliteral">&#39;interaction&#39;</span>),
+<a name="l00170"></a>00170                  <span class="stringliteral">&quot;attenuate&quot;</span>        : (0, 0, <span class="stringliteral">&#39;Normalize interaction energies using 1/(denom**2 + reference**2) only for repulsive interactions greater than denom.&#39;</span>, <span class="stringliteral">&#39;Interaction energy targets&#39;</span>, <span class="stringliteral">&#39;interaction&#39;</span>),
+<a name="l00171"></a>00171                  <span class="stringliteral">&quot;manual&quot;</span>           : (0, -150, <span class="stringliteral">&#39;Give the user a chance to fill in condensed phase stuff on the zeroth step&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00172"></a>00172                  <span class="stringliteral">&quot;hvap_subaverage&quot;</span>  : (0, -150, <span class="stringliteral">&#39;Don\&#39;t target the average enthalpy of vaporization and allow it to freely float (experimental)&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00173"></a>00173                  <span class="stringliteral">&quot;force_cuda&quot;</span>       : (0, -150, <span class="stringliteral">&#39;Force the external npt.py script to crash if CUDA Platform not available&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid_openmm&#39;</span>),
+<a name="l00174"></a>00174                  <span class="stringliteral">&quot;anisotropic_box&quot;</span>  : (0, -150, <span class="stringliteral">&#39;Enable anisotropic box scaling (e.g. for crystals or two-phase simulations) in external npt.py script&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid_openmm&#39;</span>),
+<a name="l00175"></a>00175                  <span class="stringliteral">&quot;mts_vvvr&quot;</span>         : (0, -150, <span class="stringliteral">&#39;Enable multiple-timestep integrator in external npt.py script&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid_openmm&#39;</span>),
+<a name="l00176"></a>00176                  <span class="stringliteral">&quot;minimize_energy&quot;</span>  : (1, 0, <span class="stringliteral">&#39;Minimize the energy of the system prior to running dynamics&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets (advanced usage)&#39;</span>, <span class="stringliteral">&#39;liquid_openmm&#39;</span>, <span class="stringliteral">&#39;liquid_tinker&#39;</span>),
+<a name="l00177"></a>00177                  <span class="stringliteral">&quot;remote&quot;</span>           : (0, 50, <span class="stringliteral">&#39;Evaluate target as a remote work_queue task&#39;</span>, <span class="stringliteral">&#39;All targets (optional)&#39;</span>),
+<a name="l00178"></a>00178                 },
+<a name="l00179"></a>00179     <span class="stringliteral">&#39;floats&#39;</span>  : {<span class="stringliteral">&quot;weight&quot;</span>       : (1.0, 150, <span class="stringliteral">&#39;Weight of the target (determines its importance vs. other targets)&#39;</span>, <span class="stringliteral">&#39;All targets (important)&#39;</span>),
+<a name="l00180"></a>00180                  <span class="stringliteral">&quot;w_rho&quot;</span>        : (1.0, 0, <span class="stringliteral">&#39;Weight of experimental density&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00181"></a>00181                  <span class="stringliteral">&quot;w_hvap&quot;</span>       : (1.0, 0, <span class="stringliteral">&#39;Weight of enthalpy of vaporization&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00182"></a>00182                  <span class="stringliteral">&quot;w_alpha&quot;</span>      : (1.0, 0, <span class="stringliteral">&#39;Weight of thermal expansion coefficient&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00183"></a>00183                  <span class="stringliteral">&quot;w_kappa&quot;</span>      : (1.0, 0, <span class="stringliteral">&#39;Weight of isothermal compressibility&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00184"></a>00184                  <span class="stringliteral">&quot;w_cp&quot;</span>         : (1.0, 0, <span class="stringliteral">&#39;Weight of isobaric heat capacity&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00185"></a>00185                  <span class="stringliteral">&quot;w_eps0&quot;</span>       : (1.0, 0, <span class="stringliteral">&#39;Weight of dielectric constant&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00186"></a>00186                  <span class="stringliteral">&quot;w_energy&quot;</span>     : (1.0, 0, <span class="stringliteral">&#39;Weight of energy&#39;</span>, <span class="stringliteral">&#39;Ab initio targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00187"></a>00187                  <span class="stringliteral">&quot;w_force&quot;</span>      : (1.0, 0, <span class="stringliteral">&#39;Weight of atomistic forces&#39;</span>, <span class="stringliteral">&#39;Ab initio targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00188"></a>00188                  <span class="stringliteral">&quot;w_netforce&quot;</span>   : (0.0, 0, <span class="stringliteral">&#39;Weight of net forces (condensed to molecules, residues, or charge groups)&#39;</span>, <span class="stringliteral">&#39;Ab initio targets&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
+<a name="l00189"></a>00189                  <span class="stringliteral">&quot;w_torque&quot;</span>     : (0.0, 0, <span class="stringliteral">&#39;Weight of torques (condensed to molecules, residues, or charge groups)&#39;</span>, <span class="stringliteral">&#39;Ab initio targets&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
+<a name="l00190"></a>00190                  <span class="stringliteral">&quot;w_resp&quot;</span>       : (0.0, -150, <span class="stringliteral">&#39;Weight of RESP&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with RESP (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
+<a name="l00191"></a>00191                  <span class="stringliteral">&quot;resp_a&quot;</span>       : (0.001, -150, <span class="stringliteral">&#39;RESP &quot;a&quot; parameter for strength of penalty; 0.001 is strong, 0.0005 is weak&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with RESP (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
+<a name="l00192"></a>00192                  <span class="stringliteral">&quot;resp_b&quot;</span>       : (0.1, -150, <span class="stringliteral">&#39;RESP &quot;b&quot; parameter for hyperbolic behavior; 0.1 is recommended&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with RESP (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
+<a name="l00193"></a>00193                  <span class="stringliteral">&quot;energy_upper&quot;</span> : (30.0, 0, <span class="stringliteral">&#39;Upper energy cutoff (in kcal/mol); super-repulsive interactions are given zero weight&#39;</span>, <span class="stringliteral">&#39;Interaction energy targets&#39;</span>, <span class="stringliteral">&#39;interaction&#39;</span>),
+<a name="l00194"></a>00194                  <span class="stringliteral">&quot;qmboltz&quot;</span>      : (0.0, -100, <span class="stringliteral">&#39;Fraction of Quantum Boltzmann Weights (ab initio), 1.0 for full reweighting, 0.5 for hybrid&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with Boltzmann weights (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
+<a name="l00195"></a>00195                  <span class="stringliteral">&quot;qmboltztemp&quot;</span>  : (298.15, -100, <span class="stringliteral">&#39;Temperature for Quantum Boltzmann Weights (ab initio), defaults to room temperature&#39;</span>, <span class="stringliteral">&#39;Ab initio targets with Boltzmann weights (advanced usage)&#39;</span>, <span class="stringliteral">&#39;abinitio&#39;</span>),
+<a name="l00196"></a>00196                  <span class="stringliteral">&quot;energy_denom&quot;</span>   : (1.0, 0, <span class="stringliteral">&#39;Energy normalization for binding energies in kcal/mol (default is to use stdev)&#39;</span>, <span class="stringliteral">&#39;Binding energy targets&#39;</span>, <span class="stringliteral">&#39;binding&#39;</span>),
+<a name="l00197"></a>00197                  <span class="stringliteral">&quot;rmsd_denom&quot;</span>     : (0.1, 0, <span class="stringliteral">&#39;RMSD normalization for optimized geometries in Angstrom&#39;</span>, <span class="stringliteral">&#39;Binding energy targets&#39;</span>, <span class="stringliteral">&#39;binding&#39;</span>),
+<a name="l00198"></a>00198                  <span class="stringliteral">&quot;wavenumber_tol&quot;</span> : (10.0, 0, <span class="stringliteral">&#39;Frequency normalization (in wavenumber) for vibrational frequencies&#39;</span>, <span class="stringliteral">&#39;Vibrational frequency targets&#39;</span>, <span class="stringliteral">&#39;vibration&#39;</span>),
+<a name="l00199"></a>00199                  <span class="stringliteral">&quot;dipole_denom&quot;</span>   : (1.0, 0, <span class="stringliteral">&#39;Dipole normalization (Debye) ; set to 0 if a zero weight is desired&#39;</span>, <span class="stringliteral">&#39;Monomer property targets&#39;</span>, <span class="stringliteral">&#39;monomer&#39;</span>),
+<a name="l00200"></a>00200                  <span class="stringliteral">&quot;quadrupole_denom&quot;</span>   : (1.0, 0, <span class="stringliteral">&#39;Quadrupole normalization (Buckingham) ; set to 0 if a zero weight is desired&#39;</span>, <span class="stringliteral">&#39;Monomer property targets&#39;</span>, <span class="stringliteral">&#39;monomer&#39;</span>),
+<a name="l00201"></a>00201                  <span class="stringliteral">&quot;polarizability_denom&quot;</span>   : (1.0, 0, <span class="stringliteral">&#39;Dipole polarizability tensor normalization (cubic Angstrom) ; set to 0 if a zero weight is desired&#39;</span>, <span class="stringliteral">&#39;Monomer property targets with polarizability&#39;</span>, <span class="stringliteral">&#39;monomer&#39;</span>),
+<a name="l00202"></a>00202                  <span class="stringliteral">&quot;liquid_timestep&quot;</span>  : (0.5, 0, <span class="stringliteral">&#39;Time step size for the liquid simulation.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00203"></a>00203                  <span class="stringliteral">&quot;liquid_interval&quot;</span>  : (0.05, 0, <span class="stringliteral">&#39;Time interval for saving coordinates for the liquid production run.&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00204"></a>00204                  <span class="stringliteral">&quot;gas_timestep&quot;</span>  : (0.0, 0, <span class="stringliteral">&#39;Time step size for the gas simulation (if zero, use default in external script.).&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00205"></a>00205                  <span class="stringliteral">&quot;gas_interval&quot;</span>  : (0.0, 0, <span class="stringliteral">&#39;Time interval for saving coordinates for the gas production run (if zero, use default in external script.)&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00206"></a>00206                  <span class="stringliteral">&quot;self_pol_mu0&quot;</span>  : (0.0, -150, <span class="stringliteral">&#39;Gas-phase dipole parameter for self-polarization correction (in debye).&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00207"></a>00207                  <span class="stringliteral">&quot;self_pol_alpha&quot;</span>  : (0.0, -150, <span class="stringliteral">&#39;Polarizability parameter for self-polarization correction (in debye).&#39;</span>, <span class="stringliteral">&#39;Condensed phase property targets&#39;</span>, <span class="stringliteral">&#39;liquid&#39;</span>),
+<a name="l00208"></a>00208                  },
+<a name="l00209"></a>00209     <span class="stringliteral">&#39;sections&#39;</span>: {}
+<a name="l00210"></a>00210     }
+<a name="l00211"></a>00211 
+<a name="l00212"></a>00212 all_opts_names = list(itertools.chain(*[i.keys() <span class="keywordflow">for</span> i <span class="keywordflow">in</span> gen_opts_types.values()])) + list(itertools.chain(*[i.keys() <span class="keywordflow">for</span> i <span class="keywordflow">in</span> tgt_opts_types.values()]))
+<a name="l00213"></a><a class="code" href="namespaceforcebalance_1_1parser.html#ab0f8ac22b808f515531c830439d70bbb">00213</a> <span class="comment">## Check for uniqueness of option names.</span>
+<a name="l00214"></a>00214 <span class="keywordflow">for</span> i <span class="keywordflow">in</span> all_opts_names:
+<a name="l00215"></a>00215     iocc = []
+<a name="l00216"></a><a class="code" href="namespaceforcebalance_1_1parser.html#af730ef69e27de8ffbf475f844c5c2d5f">00216</a>     <span class="keywordflow">for</span> typ, dct <span class="keywordflow">in</span> gen_opts_types.items():
+<a name="l00217"></a>00217         <span class="keywordflow">if</span> i <span class="keywordflow">in</span> dct:
+<a name="l00218"></a>00218             iocc.append(<span class="stringliteral">&quot;gen_opt_types %s&quot;</span> % typ)
+<a name="l00219"></a>00219     <span class="keywordflow">for</span> typ, dct <span class="keywordflow">in</span> tgt_opts_types.items():
+<a name="l00220"></a>00220         <span class="keywordflow">if</span> i <span class="keywordflow">in</span> dct:
+<a name="l00221"></a>00221             iocc.append(<span class="stringliteral">&quot;gen_opt_types %s&quot;</span> % typ)
+<a name="l00222"></a>00222     <span class="keywordflow">if</span> len(iocc) != 1:
+<a name="l00223"></a>00223         <span class="keywordflow">raise</span> RuntimeError(<span class="stringliteral">&quot;CODING ERROR: ForceBalance option %s occurs in more than one place (%s)&quot;</span> % (i, str(iocc)))
+<a name="l00224"></a>00224 
+<a name="l00225"></a>00225 <span class="comment">## Default general options - basically a collapsed veresion of gen_opts_types.</span>
+<a name="l00226"></a>00226 gen_opts_defaults = {}
+<a name="l00227"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a807ea3a28fedbdfd494f5cc8da063202">00227</a> <span class="keywordflow">for</span> t <span class="keywordflow">in</span> gen_opts_types:
+<a name="l00228"></a>00228     subdict = {}
+<a name="l00229"></a><a class="code" href="namespaceforcebalance_1_1parser.html#abb7a7e9723de629aa97727a85bcdbad1">00229</a>     <span class="keywordflow">for</span> i <span class="keywordflow">in</span> gen_opts_types[t]:
+<a name="l00230"></a>00230         subdict[i] = gen_opts_types[t][i][0]
+<a name="l00231"></a>00231     gen_opts_defaults.update(subdict)
+<a name="l00232"></a>00232 
+<a name="l00233"></a>00233 <span class="comment">## Default target options - basically a collapsed version of tgt_opts_types.</span>
+<a name="l00234"></a>00234 tgt_opts_defaults = {}
+<a name="l00235"></a><a class="code" href="namespaceforcebalance_1_1parser.html#ad2c80e2b742fbd9594fd813dd51550e6">00235</a> <span class="keywordflow">for</span> t <span class="keywordflow">in</span> tgt_opts_types:
+<a name="l00236"></a>00236     subdict = {}
+<a name="l00237"></a>00237     <span class="keywordflow">for</span> i <span class="keywordflow">in</span> tgt_opts_types[t]:
+<a name="l00238"></a>00238         subdict[i] = tgt_opts_types[t][i][0]
+<a name="l00239"></a>00239     tgt_opts_defaults.update(subdict)
+<a name="l00240"></a>00240 
+<a name="l00241"></a>00241 <span class="comment">## Option maps for maintaining backward compatibility.</span>
+<a name="l00242"></a>00242 bkwd = {<span class="stringliteral">&quot;simtype&quot;</span> : <span class="stringliteral">&quot;type&quot;</span>, <span class="stringliteral">&quot;masterfile&quot;</span> : <span class="stringliteral">&quot;binding_txt&quot;</span>}
+<a name="l00243"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a37193d7ceabbf07a61e65677372b7dab">00243</a> 
+<a name="l00244"></a>00244 <span class="comment">## Listing of sections in the input file.</span>
+<a name="l00245"></a>00245 mainsections = [<span class="stringliteral">&quot;SIMULATION&quot;</span>,<span class="stringliteral">&quot;TARGET&quot;</span>,<span class="stringliteral">&quot;OPTIONS&quot;</span>,<span class="stringliteral">&quot;END&quot;</span>,<span class="stringliteral">&quot;NONE&quot;</span>]
+<a name="l00246"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a525ac339b645dbfb9fbb7cc672712504">00246</a> 
+<a name="l00247"></a>00247 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#aef8b51dba6bb9767a9a956319eb3cc08">read_mvals</a>(fobj):
+<a name="l00248"></a><a class="code" href="namespaceforcebalance_1_1parser.html#aef8b51dba6bb9767a9a956319eb3cc08">00248</a>     Answer = []
+<a name="l00249"></a>00249     <span class="keywordflow">for</span> line <span class="keywordflow">in</span> fobj:
+<a name="l00250"></a>00250         <span class="keywordflow">if</span> re.match(<span class="stringliteral">&quot;(/read_mvals)|(^\$end)&quot;</span>,line):
+<a name="l00251"></a>00251             <span class="keywordflow">break</span>
+<a name="l00252"></a>00252         Answer.append(float(line.split(<span class="stringliteral">&#39;[&#39;</span>)[-1].split(<span class="stringliteral">&#39;]&#39;</span>)[0].split()[-1]))
+<a name="l00253"></a>00253     <span class="keywordflow">return</span> Answer
+<a name="l00254"></a>00254         
+<a name="l00255"></a>00255 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#a56fb1e139dad24bac29f25a3870765ca">read_pvals</a>(fobj):
+<a name="l00256"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a56fb1e139dad24bac29f25a3870765ca">00256</a>     Answer = []
+<a name="l00257"></a>00257     <span class="keywordflow">for</span> line <span class="keywordflow">in</span> fobj:
+<a name="l00258"></a>00258         <span class="keywordflow">if</span> re.match(<span class="stringliteral">&quot;(/read_pvals)|(^\$end)&quot;</span>,line):
+<a name="l00259"></a>00259             <span class="keywordflow">break</span>
+<a name="l00260"></a>00260         Answer.append(float(line.split(<span class="stringliteral">&#39;[&#39;</span>)[-1].split(<span class="stringliteral">&#39;]&#39;</span>)[0].split()[-1]))
+<a name="l00261"></a>00261     <span class="keywordflow">return</span> Answer
+<a name="l00262"></a>00262 
+<a name="l00263"></a>00263 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#a94c3f1acd06b640db3042dc45e32af8e">read_priors</a>(fobj):
+<a name="l00264"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a94c3f1acd06b640db3042dc45e32af8e">00264</a>     Answer = OrderedDict()
+<a name="l00265"></a>00265     <span class="keywordflow">for</span> line <span class="keywordflow">in</span> fobj:
+<a name="l00266"></a>00266         line = line.split(<span class="stringliteral">&quot;#&quot;</span>)[0]
+<a name="l00267"></a>00267         <span class="keywordflow">if</span> re.match(<span class="stringliteral">&quot;(/priors)|(^\$end)&quot;</span>,line):
+<a name="l00268"></a>00268             <span class="keywordflow">break</span>
+<a name="l00269"></a>00269         Answer[line.split()[0]] = float(line.split()[-1])
+<a name="l00270"></a>00270     <span class="keywordflow">return</span> Answer
+<a name="l00271"></a>00271 
+<a name="l00272"></a>00272 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#a10827b0b21d0463bc9e786f161a02654">read_internals</a>(fobj):
+<a name="l00273"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a10827b0b21d0463bc9e786f161a02654">00273</a>     <span class="keywordflow">return</span>
+<a name="l00274"></a>00274 
+<a name="l00275"></a>00275 <span class="comment">## ParsTab that refers to subsection parsers.</span>
+<a name="l00276"></a>00276 ParsTab  = {<span class="stringliteral">&quot;read_mvals&quot;</span> : read_mvals,
+<a name="l00277"></a><a class="code" href="namespaceforcebalance_1_1parser.html#af0a8dc5cdc54cc88ded3ee3b46d71672">00277</a>             <span class="stringliteral">&quot;read_pvals&quot;</span> : read_pvals,
+<a name="l00278"></a>00278             <span class="stringliteral">&quot;priors&quot;</span>     : read_priors,
+<a name="l00279"></a>00279             <span class="stringliteral">&quot;internal&quot;</span>   : read_internals
+<a name="l00280"></a>00280             }
+<a name="l00281"></a>00281 
+<a name="l00282"></a>00282 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#a00a8cb7b534312c13b11d4bb39bb3959" title="Print out a section of the input file in a parser-compliant and readable format.">printsection</a>(heading,optdict,typedict):
+<a name="l00283"></a>00283     <span class="stringliteral">&quot;&quot;&quot; Print out a section of the input file in a parser-compliant and readable format.</span>
+<a name="l00284"></a>00284 <span class="stringliteral"></span>
+<a name="l00285"></a>00285 <span class="stringliteral">    At the time of writing of this function, it&#39;s mainly intended to be called by MakeInputFile.py.</span>
+<a name="l00286"></a>00286 <span class="stringliteral">    The heading is printed first (it is something like $options or $target).  Then it loops</span>
+<a name="l00287"></a>00287 <span class="stringliteral">    through the variable types (strings, allcaps, etc...) and the keys in each variable type.</span>
+<a name="l00288"></a>00288 <span class="stringliteral">    The one-line description of each key is printed out as a comment, and then the key itself is</span>
+<a name="l00289"></a>00289 <span class="stringliteral">    printed out along with the value provided in optdict.  If optdict is None, then the default</span>
+<a name="l00290"></a>00290 <span class="stringliteral">    value is printed out instead.</span>
+<a name="l00291"></a>00291 <span class="stringliteral"></span>
+<a name="l00292"></a>00292 <span class="stringliteral">    @param[in] heading Heading, either $options or $target</span>
+<a name="l00293"></a>00293 <span class="stringliteral">    @param[in] optdict Options dictionary or None.</span>
+<a name="l00294"></a>00294 <span class="stringliteral">    @param[in] typedict Option type dictionary, either gen_opts_types or tgt_opts_types specified in this file.</span>
+<a name="l00295"></a>00295 <span class="stringliteral">    @return Answer List of strings for the section that we are printing out.</span>
+<a name="l00296"></a>00296 <span class="stringliteral">    </span>
+<a name="l00297"></a>00297 <span class="stringliteral">    &quot;&quot;&quot;</span>
+<a name="l00298"></a>00298     <span class="keyword">from</span> forcebalance.objective <span class="keyword">import</span> Implemented_Targets
+<a name="l00299"></a><a class="code" href="namespaceforcebalance_1_1parser.html#a00a8cb7b534312c13b11d4bb39bb3959">00299</a>     <span class="keyword">from</span> forcebalance.optimizer <span class="keyword">import</span> Optimizer
+<a name="l00300"></a>00300 
+<a name="l00301"></a>00301     <span class="keyword">def </span>FilterTargets(search):
+<a name="l00302"></a>00302         <span class="keywordflow">if</span> type(search) == str:
+<a name="l00303"></a>00303             search = [search]
+<a name="l00304"></a>00304         list_out = []
+<a name="l00305"></a>00305         <span class="keywordflow">for</span> key <span class="keywordflow">in</span> sorted(Implemented_Targets.keys()):
+<a name="l00306"></a>00306             <span class="keywordflow">if</span> any([i.lower() <span class="keywordflow">in</span> key.lower() <span class="keywordflow">for</span> i <span class="keywordflow">in</span> search]):
+<a name="l00307"></a>00307                 list_out.append(Implemented_Targets[key].__name__)
+<a name="l00308"></a>00308         <span class="keywordflow">return</span> <span class="stringliteral">&#39;, &#39;</span>.join(sorted(list_out))
+<a name="l00309"></a>00309 
+<a name="l00310"></a>00310     Answer = [heading]
+<a name="l00311"></a>00311     firstentry = 1
+<a name="l00312"></a>00312     Options = []
+<a name="l00313"></a>00313     <span class="keywordflow">for</span> i <span class="keywordflow">in</span> [<span class="stringliteral">&#39;strings&#39;</span>,<span class="stringliteral">&#39;allcaps&#39;</span>,<span class="stringliteral">&#39;lists&#39;</span>,<span class="stringliteral">&#39;ints&#39;</span>,<span class="stringliteral">&#39;bools&#39;</span>,<span class="stringliteral">&#39;floats&#39;</span>,<span class="stringliteral">&#39;sections&#39;</span>]:
+<a name="l00314"></a>00314         vartype = re.sub(<span class="stringliteral">&#39;s$&#39;</span>,<span class="stringliteral">&#39;&#39;</span>,i)
+<a name="l00315"></a>00315         <span class="keywordflow">for</span> j <span class="keywordflow">in</span> typedict[i]:
+<a name="l00316"></a>00316             Option = []
+<a name="l00317"></a>00317             val = optdict[j] <span class="keywordflow">if</span> optdict != <span class="keywordtype">None</span> <span class="keywordflow">else</span> typedict[i][j][0]
+<a name="l00318"></a>00318             <span class="keywordflow">if</span> firstentry:
+<a name="l00319"></a>00319                 firstentry = 0
+<a name="l00320"></a>00320             <span class="keywordflow">else</span>:
+<a name="l00321"></a>00321                 Option.append(<span class="stringliteral">&quot;&quot;</span>)
+<a name="l00322"></a>00322             Priority = typedict[i][j][1]
+<a name="l00323"></a>00323             Option.append(<span class="stringliteral">&quot;# (%s) %s&quot;</span> % (vartype, typedict[i][j][2]))
+<a name="l00324"></a>00324             <span class="keywordflow">if</span> len(typedict[i][j]) &gt;= 4:
+<a name="l00325"></a>00325                 Relevance = typedict[i][j][3]
+<a name="l00326"></a>00326                 str2 = <span class="stringliteral">&quot;# used in: %s&quot;</span> % Relevance
+<a name="l00327"></a>00327                 <span class="keywordflow">if</span> len(typedict[i][j]) &gt;= 5:
+<a name="l00328"></a>00328                     TargetName = FilterTargets(typedict[i][j][4])
+<a name="l00329"></a>00329                     str2 += <span class="stringliteral">&quot; (%s)&quot;</span> % TargetName
+<a name="l00330"></a>00330                 <span class="keywordflow">else</span>:
+<a name="l00331"></a>00331                     TargetName = <span class="stringliteral">&quot;None&quot;</span>
+<a name="l00332"></a>00332                 Option.append(str2)
+<a name="l00333"></a>00333             <span class="keywordflow">else</span>:
+<a name="l00334"></a>00334                 Relevance = <span class="stringliteral">&quot;None&quot;</span>
+<a name="l00335"></a>00335             Option.append(<span class="stringliteral">&quot;%s %s&quot;</span> % (str(j),str(val)))
+<a name="l00336"></a>00336             Options.append((Option, Priority, TargetName, j))
+<a name="l00337"></a>00337     <span class="keyword">def </span>key1(o):
+<a name="l00338"></a>00338         <span class="keywordflow">return</span> o[1]
+<a name="l00339"></a>00339     <span class="keyword">def </span>key2(o):
+<a name="l00340"></a>00340         <span class="keywordflow">return</span> o[2]
+<a name="l00341"></a>00341     <span class="keyword">def </span>key3(o):
+<a name="l00342"></a>00342         <span class="keywordflow">return</span> o[3]
+<a name="l00343"></a>00343     Options.sort(key=key3)
+<a name="l00344"></a>00344     Options.sort(key=key2)
+<a name="l00345"></a>00345     Options.sort(key=key1, reverse=<span class="keyword">True</span>)
+<a name="l00346"></a>00346     <span class="keywordflow">for</span> o <span class="keywordflow">in</span> Options:
+<a name="l00347"></a>00347         Answer += o[0]
+<a name="l00348"></a>00348 
+<a name="l00349"></a>00349     <span class="comment"># PriSet = sorted(list(set(Priorities)))[::-1]</span>
+<a name="l00350"></a>00350     <span class="comment"># TgtSet = sorted(list(set(TargetNames)))</span>
+<a name="l00351"></a>00351     <span class="comment"># RelSet = sorted(list(set(Relevances)))</span>
+<a name="l00352"></a>00352     <span class="comment"># for p0 in PriSet:</span>
+<a name="l00353"></a>00353     <span class="comment">#     ogrp = []</span>
+<a name="l00354"></a>00354     <span class="comment">#     rgrp = []</span>
+<a name="l00355"></a>00355     <span class="comment">#     tgrp = []</span>
+<a name="l00356"></a>00356     <span class="comment">#     for o, p, r, t in zip(Options, Priorities, Relevances, TargetNames):</span>
+<a name="l00357"></a>00357     <span class="comment">#         if p == p0:</span>
+<a name="l00358"></a>00358     <span class="comment">#             ogrp.append(o)</span>
+<a name="l00359"></a>00359     <span class="comment">#             rgrp.append(r)</span>
+<a name="l00360"></a>00360     <span class="comment">#             tgrp.append(t)</span>
+<a name="l00361"></a>00361     <span class="comment">#     ogrp2 = []</span>
+<a name="l00362"></a>00362     <span class="comment">#     rgrp2 = []</span>
+<a name="l00363"></a>00363     <span class="comment">#     for t0 in TgtSet:</span>
+<a name="l00364"></a>00364     <span class="comment">#         for o, r, t in zip(ogrp, rgrp, tgrp):</span>
+<a name="l00365"></a>00365     <span class="comment">#             if t == t0:</span>
+<a name="l00366"></a>00366     <span class="comment">#                 ogrp2.append(</span>
+<a name="l00367"></a>00367                 
+<a name="l00368"></a>00368     Answer.append(<span class="stringliteral">&quot;$end&quot;</span>)
+<a name="l00369"></a>00369     <span class="keywordflow">return</span> Answer
+<a name="l00370"></a>00370 
+<a name="l00371"></a>00371 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1parser.html#ac184c809737a27f35530020322431f7c" title="Parse through the input file and read all user-supplied options.">parse_inputs</a>(input_file=None):
+<a name="l00372"></a>00372     <span class="stringliteral">&quot;&quot;&quot; Parse through the input file and read all user-supplied options.</span>
+<a name="l00373"></a>00373 <span class="stringliteral"></span>
+<a name="l00374"></a>00374 <span class="stringliteral">    This is usually the first thing that happens when an executable script is called.</span>
+<a name="l00375"></a>00375 <span class="stringliteral">    Our parser first loads the default options, and then updates these options as it</span>
+<a name="l00376"></a>00376 <span class="stringliteral">    encounters keywords.</span>
+<a name="l00377"></a>00377 <span class="stringliteral"></span>
+<a name="l00378"></a>00378 <span class="stringliteral">    Each keyword corresponds to a variable type; each variable type (e.g. string,</span>
+<a name="l00379"></a>00379 <span class="stringliteral">    integer, float, boolean) is treated differently.  For more elaborate inputs,</span>
+<a name="l00380"></a>00380 <span class="stringliteral">    there is a &#39;section&#39; variable type.</span>
+<a name="l00381"></a>00381 <span class="stringliteral"></span>
+<a name="l00382"></a>00382 <span class="stringliteral">    There is only one set of general options, but multiple sets of target options.</span>
+<a name="l00383"></a>00383 <span class="stringliteral">    Each target has its own section delimited by the \em $target keyword,</span>
+<a name="l00384"></a>00384 <span class="stringliteral">    and we build a list of target options.  </span>
+<a name="l00385"></a>00385 <span class="stringliteral"></span>
+<a name="l00386"></a>00386 <span class="stringliteral">    @param[in]  input_file The name of the input file.</span>
+<a name="l00387"></a>00387 <span class="stringliteral">    @return     options    General options.</span>
+<a name="l00388"></a>00388 <span class="stringliteral">    @return     tgt_opts   List of fitting target options.</span>
+<a name="l00389"></a>00389 <span class="stringliteral">    </span>
+<a name="l00390"></a>00390 <span class="stringliteral">    @todo Implement internal coordinates.</span>
+<a name="l00391"></a>00391 <span class="stringliteral">    @todo Implement sampling correction.</span>
+<a name="l00392"></a>00392 <span class="stringliteral">    @todo Implement charge groups.</span>
+<a name="l00393"></a>00393 <span class="stringliteral">    &quot;&quot;&quot;</span>
+<a name="l00394"></a>00394     
+<a name="l00395"></a>00395     logger.info(<span class="stringliteral">&quot;Reading options from file: %s\n&quot;</span> % input_file)
+<a name="l00396"></a><a class="code" href="namespaceforcebalance_1_1parser.html#ac184c809737a27f35530020322431f7c">00396</a>     section = <span class="stringliteral">&quot;NONE&quot;</span>
+<a name="l00397"></a>00397     <span class="comment"># First load in all of the default options.</span>
+<a name="l00398"></a>00398     options = deepcopy(gen_opts_defaults) <span class="comment"># deepcopy to make sure options doesn&#39;t make changes to gen_opts_defaults</span>
+<a name="l00399"></a>00399     options[<span class="stringliteral">&#39;root&#39;</span>] = os.getcwd()
+<a name="l00400"></a>00400     tgt_opts = []
+<a name="l00401"></a>00401     this_tgt_opt = deepcopy(tgt_opts_defaults)
+<a name="l00402"></a>00402     <span class="comment"># Give back a bunch of default options if input file isn&#39;t specified.</span>
+<a name="l00403"></a>00403     <span class="keywordflow">if</span> input_file == <span class="keywordtype">None</span>:
+<a name="l00404"></a>00404         <span class="keywordflow">return</span> (options, [this_tgt_opt])
+<a name="l00405"></a>00405     fobj = open(input_file)
+<a name="l00406"></a>00406     <span class="keywordflow">for</span> line <span class="keywordflow">in</span> fobj:
+<a name="l00407"></a>00407         <span class="keywordflow">try</span>:
+<a name="l00408"></a>00408             <span class="comment"># Anything after &quot;#&quot; is a comment</span>
+<a name="l00409"></a>00409             line = line.split(<span class="stringliteral">&quot;#&quot;</span>)[0].strip()
+<a name="l00410"></a>00410             s = line.split()
+<a name="l00411"></a>00411             <span class="comment"># Skip over blank lines</span>
+<a name="l00412"></a>00412             <span class="keywordflow">if</span> len(s) == 0:
+<a name="l00413"></a>00413                 <span class="keywordflow">continue</span>
+<a name="l00414"></a>00414             key = s[0].lower()
+<a name="l00415"></a>00415             <span class="keywordflow">if</span> key <span class="keywordflow">in</span> bkwd: <span class="comment"># Do option replacement for backward compatibility.</span>
+<a name="l00416"></a>00416                 key = bkwd[key]
+<a name="l00417"></a>00417             <span class="comment"># If line starts with a $, this signifies that we&#39;re in a new section.</span>
+<a name="l00418"></a>00418             <span class="keywordflow">if</span> re.match(<span class="stringliteral">&#39;^\$&#39;</span>,line):
+<a name="l00419"></a>00419                 newsection = re.sub(<span class="stringliteral">&#39;^\$&#39;</span>,<span class="stringliteral">&#39;&#39;</span>,line).upper()
+<a name="l00420"></a>00420                 <span class="keywordflow">if</span> section <span class="keywordflow">in</span> [<span class="stringliteral">&quot;SIMULATION&quot;</span>,<span class="stringliteral">&quot;TARGET&quot;</span>] <span class="keywordflow">and</span> newsection <span class="keywordflow">in</span> mainsections:
+<a name="l00421"></a>00421                     tgt_opts.append(this_tgt_opt)
+<a name="l00422"></a>00422                     this_tgt_opt = deepcopy(tgt_opts_defaults)
+<a name="l00423"></a>00423                 section = newsection
+<a name="l00424"></a>00424             <span class="keywordflow">elif</span> section <span class="keywordflow">in</span> [<span class="stringliteral">&quot;OPTIONS&quot;</span>,<span class="stringliteral">&quot;SIMULATION&quot;</span>,<span class="stringliteral">&quot;TARGET&quot;</span>]:
+<a name="l00425"></a>00425                 <span class="comment">## Depending on which section we are in, we choose the correct type dictionary</span>
+<a name="l00426"></a>00426                 <span class="comment">## and add stuff to &#39;options&#39; and &#39;this_tgt_opt&#39;</span>
+<a name="l00427"></a>00427                 (this_opt, opts_types) = (options, gen_opts_types) <span class="keywordflow">if</span> section == <span class="stringliteral">&quot;OPTIONS&quot;</span> <span class="keywordflow">else</span> (this_tgt_opt, tgt_opts_types)
+<a name="l00428"></a>00428                 <span class="comment">## Note that &quot;None&quot; is a special keyword!  The variable will ACTUALLY be set to None.</span>
+<a name="l00429"></a>00429                 <span class="keywordflow">if</span> len(s) &gt; 1 <span class="keywordflow">and</span> s[1].upper() == <span class="stringliteral">&quot;NONE&quot;</span>:
+<a name="l00430"></a>00430                     this_opt[key] = <span class="keywordtype">None</span>
+<a name="l00431"></a>00431                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;strings&#39;</span>]:
+<a name="l00432"></a>00432                     this_opt[key] = s[1]
+<a name="l00433"></a>00433                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;allcaps&#39;</span>]:
+<a name="l00434"></a>00434                     this_opt[key] = s[1].upper()
+<a name="l00435"></a>00435                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;lists&#39;</span>]:
+<a name="l00436"></a>00436                     <span class="keywordflow">for</span> word <span class="keywordflow">in</span> s[1:]:
+<a name="l00437"></a>00437                         this_opt.setdefault(key,[]).append(word)
+<a name="l00438"></a>00438                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;ints&#39;</span>]:
+<a name="l00439"></a>00439                     this_opt[key] = int(s[1])
+<a name="l00440"></a>00440                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;bools&#39;</span>]:
+<a name="l00441"></a>00441                     <span class="keywordflow">if</span> len(s) == 1:
+<a name="l00442"></a>00442                         this_opt[key] = <span class="keyword">True</span>
+<a name="l00443"></a>00443                     <span class="keywordflow">elif</span> s[1].upper() <span class="keywordflow">in</span> [<span class="stringliteral">&quot;0&quot;</span>, <span class="stringliteral">&quot;NO&quot;</span>, <span class="stringliteral">&quot;FALSE&quot;</span>]:
+<a name="l00444"></a>00444                         this_opt[key] = <span class="keyword">False</span>
+<a name="l00445"></a>00445                     <span class="keywordflow">else</span>:
+<a name="l00446"></a>00446                         this_opt[key] = <span class="keyword">True</span>
+<a name="l00447"></a>00447                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;floats&#39;</span>]:
+<a name="l00448"></a>00448                     this_opt[key] = float(s[1])
+<a name="l00449"></a>00449                 <span class="keywordflow">elif</span> key <span class="keywordflow">in</span> opts_types[<span class="stringliteral">&#39;sections&#39;</span>]:
+<a name="l00450"></a>00450                     this_opt[key] = ParsTab[key](fobj)
+<a name="l00451"></a>00451                 <span class="keywordflow">else</span>:
+<a name="l00452"></a>00452                     logger.error(<span class="stringliteral">&quot;Unrecognized keyword: --- \x1b[1;91m%s\x1b[0m --- in %s section\n&quot;</span> \
+<a name="l00453"></a>00453                           % (key, section))
+<a name="l00454"></a>00454                     logger.error(<span class="stringliteral">&quot;Perhaps this option actually belongs in %s section?\n&quot;</span> \
+<a name="l00455"></a>00455                           % (section == <span class="stringliteral">&quot;OPTIONS&quot;</span> <span class="keywordflow">and</span> <span class="stringliteral">&quot;a TARGET&quot;</span> <span class="keywordflow">or</span> <span class="stringliteral">&quot;the OPTIONS&quot;</span>))
+<a name="l00456"></a>00456                     sys.exit(1)
+<a name="l00457"></a>00457             <span class="keywordflow">elif</span> section <span class="keywordflow">not</span> <span class="keywordflow">in</span> mainsections:
+<a name="l00458"></a>00458                 logger.error(<span class="stringliteral">&quot;Unrecognized section: %s\n&quot;</span> % section)
+<a name="l00459"></a>00459                 sys.exit(1)
+<a name="l00460"></a>00460         <span class="keywordflow">except</span>:
+<a name="l00461"></a>00461             logger.error(<span class="stringliteral">&quot;Failed to read in this line! Check your input file.\n&quot;</span>)
+<a name="l00462"></a>00462             logger.exception(line + <span class="stringliteral">&#39;\n&#39;</span>)
+<a name="l00463"></a>00463             sys.exit(1)
+<a name="l00464"></a>00464     <span class="keywordflow">if</span> section == <span class="stringliteral">&quot;SIMULATION&quot;</span> <span class="keywordflow">or</span> section == <span class="stringliteral">&quot;TARGET&quot;</span>:
+<a name="l00465"></a>00465         tgt_opts.append(this_tgt_opt)
+<a name="l00466"></a>00466     <span class="keywordflow">if</span> <span class="keywordflow">not</span> options[<span class="stringliteral">&#39;verbose_options&#39;</span>]:
+<a name="l00467"></a>00467         <a class="code" href="namespaceforcebalance_1_1nifty.html#a11babd62dc7bca389162c6318f9672ca" title="Cool-looking printout for slick formatting of output.">printcool</a>(<span class="stringliteral">&quot;Options at their default values are not printed\n Use &#39;verbose_options True&#39; to Enable&quot;</span>, color=5)
+<a name="l00468"></a>00468     <span class="keywordflow">return</span> options, tgt_opts
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -548,7 +568,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:14 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:07 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

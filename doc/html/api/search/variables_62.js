@@ -6,6 +6,7 @@ var searchData=
   ['be',['BE',['../namespaceforcebalance_1_1chemistry.html#a2e8b0b69254f9a7346919dc00f606e74',1,'forcebalance::chemistry']]],
   ['bftypes',['bftypes',['../namespaceforcebalance_1_1gmxio.html#ac8e059e7c8d46326654f585b23f2d0b0',1,'forcebalance::gmxio']]],
   ['bhyp',['bhyp',['../classforcebalance_1_1optimizer_1_1Optimizer.html#a45f221523fe7b5b869967d7640b49864',1,'forcebalance::optimizer::Optimizer']]],
+  ['bidirect',['bidirect',['../classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a8c26d354891fd4b35233d0ce5cfe093f',1,'forcebalance::psi4io::RDVR3_Psi4']]],
   ['bkwd',['bkwd',['../namespaceforcebalance_1_1parser.html#a37193d7ceabbf07a61e65677372b7dab',1,'forcebalance::parser']]],
   ['bo',['bo',['../namespaceforcebalance_1_1chemistry.html#a1ef8f483a40113a668ff3743bb56d7ad',1,'forcebalance::chemistry']]],
   ['bohrang',['bohrang',['../namespaceforcebalance_1_1molecule.html#af69f9f12bed5faede1948498e9f0d2e5',1,'forcebalance::molecule.bohrang()'],['../namespaceforcebalance_1_1nifty.html#a9d8921e29d14572a15a6bd1755d240d4',1,'forcebalance::nifty.bohrang()']]],
@@ -15,5 +16,7 @@ var searchData=
   ['bondenergies',['BondEnergies',['../namespaceforcebalance_1_1chemistry.html#aa32672abf21f3992401f7869fef4b579',1,'forcebalance::chemistry']]],
   ['bonds',['bonds',['../classforcebalance_1_1Mol2_1_1mol2.html#a7740f63859ce71c82e3efe020ea7e449',1,'forcebalance::Mol2::mol2']]],
   ['box',['Box',['../namespaceforcebalance_1_1molecule.html#aa9de7b4fcb815b9f7ad490d461131e72',1,'forcebalance::molecule']]],
-  ['boxes',['boxes',['../classforcebalance_1_1molecule_1_1Molecule.html#ac84c67d37f00c0f65e6fb6126e19f9bb',1,'forcebalance::molecule::Molecule']]]
+  ['boxes',['boxes',['../classforcebalance_1_1molecule_1_1Molecule.html#ac84c67d37f00c0f65e6fb6126e19f9bb',1,'forcebalance::molecule::Molecule']]],
+  ['buf',['buf',['../classforcebalance_1_1nifty_1_1LineChunker.html#ac5104269bab688eae457d141e44f91b1',1,'forcebalance::nifty::LineChunker']]],
+  ['built_5fbonds',['built_bonds',['../classforcebalance_1_1molecule_1_1Molecule.html#aa0768b07267ac7def14dd5224caa5708',1,'forcebalance::molecule::Molecule']]]
 ];

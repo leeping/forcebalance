@@ -1,7 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="376,5,584,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a4cdb2086978b281ed84cd66179c3f5b2" title="forcebalance.molecule.add_strip_to_mat" alt="" coords="339,56,621,83"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a5f529179461765fadbd0a742cdc2c677" title="Creates a list of number sequences divided as evenly as possible." alt="" coords="669,56,896,83"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="953,31,1143,57"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="945,81,1151,108"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a4cdb2086978b281ed84cd66179c3f5b2" title="forcebalance.molecule.add_strip_to_mat" alt="" coords="339,5,621,32"/>
 </map>

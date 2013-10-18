@@ -22,6 +22,7 @@ var searchData=
   ['read_5ftopology',['read_topology',['../classforcebalance_1_1abinitio_1_1AbInitio.html#a9f405c452a0a4081cd7da07938520920',1,'forcebalance::abinitio::AbInitio.read_topology()'],['../classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07',1,'forcebalance::gmxio::AbInitio_GMX.read_topology()'],['../classforcebalance_1_1openmmio_1_1AbInitio__OpenMM.html#a19b75b06ae4e8cb5a3f5460da101010e',1,'forcebalance::openmmio::AbInitio_OpenMM.read_topology()']]],
   ['read_5fxyz',['read_xyz',['../classforcebalance_1_1molecule_1_1Molecule.html#a15a7a0e0377e6dfd52e60c77fbc583c1',1,'forcebalance::molecule::Molecule']]],
   ['readchk',['readchk',['../classforcebalance_1_1optimizer_1_1Optimizer.html#a05ee5fe985b3e2ec71071ca061e42d66',1,'forcebalance::optimizer::Optimizer']]],
+  ['ref_5frmsd',['ref_rmsd',['../classforcebalance_1_1molecule_1_1Molecule.html#a58191a79257fbad7f2c636239bfa7596',1,'forcebalance::molecule::Molecule']]],
   ['refresh_5ftemp_5fdirectory',['refresh_temp_directory',['../classforcebalance_1_1target_1_1Target.html#afe815eafab06ac92f10bbf4b88ad95c8',1,'forcebalance::target::Target']]],
   ['remove_5fif_5fexists',['remove_if_exists',['../namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e',1,'forcebalance::nifty']]],
   ['removehandler',['removeHandler',['../classforcebalance_1_1output_1_1ForceBalanceLogger.html#ad8aa2fcfa32166607ee3d0cb0dcebd2d',1,'forcebalance::output::ForceBalanceLogger']]],

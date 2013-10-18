@@ -117,6 +117,7 @@ Classes</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A subclass of the python Pickler that implements pickling of _ElementTree types.  <a href="classforcebalance_1_1nifty_1_1Pickler__LP.html#details">More...</a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1nifty_1_1Unpickler__LP.html">Unpickler_LP</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">A subclass of the python Unpickler that implements unpickling of _ElementTree types.  <a href="classforcebalance_1_1nifty_1_1Unpickler__LP.html#details">More...</a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1nifty_1_1LineChunker.html">LineChunker</a></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a27e3a9dc144a5ad505509ac9ede08d7d">pvec1d</a></td></tr>
@@ -159,6 +160,7 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d">getWorkQueue</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#abe1e72c32252d62a6551b47290c7584f">getWQIds</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#ab5f3072ad95e9c75659cb1adac341051">createWorkQueue</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a09605ee2819749913bbbb6206af1af70">destroyWorkQueue</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7">queue_up</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Submit a job to the Work Queue.  <a href="#a673f4a044169f5d8d822823989a836a7"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee">queue_up_src_dest</a></td></tr>
@@ -167,6 +169,7 @@ Functions</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This function waits ten seconds to see if a task in the Work Queue has finished.  <a href="#a374aac2ef003be02fab49b20ff0a82f0"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c">wq_wait</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This function waits until the work queue is completely empty.  <a href="#a576de8c5b6f236280e07e73e39b2ab7c"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#ab5417ad84c6c760965cd195c6c387914">onefile</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36">GoInto</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3">allsplit</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120">Leave</a></td></tr>
@@ -197,6 +200,8 @@ Variables</h2></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">One bohr equals this many angstroms.  <a href="#a9d8921e29d14572a15a6bd1755d240d4"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a89b76b7b16a8e2533c6599fa9ff8cff6">XMLFILE</a> = 'x'</td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Pickle uses 'flags' to pickle and unpickle different variable types.  <a href="#a89b76b7b16a8e2533c6599fa9ff8cff6"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#abceb325c49650f2b4e443fc65adb12c1">WORK_QUEUE</a> = None</td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a1410db09cf3d0507bcf758d46e83c711">WQIDS</a> = defaultdict(list)</td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">list&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a451beef98f339cc46bf19b8b4b9dd755">specific_lst</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">tuple&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1nifty.html#a41091c8b7861352d9cba164b15d0d022">specific_dct</a> = dict(list(itertools.chain(*[[(j,i[1]) for j in i[0]] for i in <a class="el" href="namespaceforcebalance_1_1nifty.html#a451beef98f339cc46bf19b8b4b9dd755">specific_lst</a>])))</td></tr>
 </table>
@@ -230,7 +235,7 @@ Variables</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00706">706</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00767">767</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -260,7 +265,7 @@ Here is the call graph for this function:</div>
 <p>Input: vec = The input vector that is to be made into a column</p>
 <p>Output: A column matrix </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00270">270</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00271">271</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -286,7 +291,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00081">81</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00082">82</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -326,7 +331,7 @@ Here is the call graph for this function:</div>
 <p>But spawn a thread for each argument and apply `func` concurrently.</p>
 <p>Note: unlike map(), we cannot take an iterable argument. `data` should be an indexable sequence. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00911">911</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l01022">1022</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -355,12 +360,13 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00754">754</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00817">817</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_af5f0e1ba7689f1ab40383ba0480560a9_cgraph.svg" width="1000" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_af5f0e1ba7689f1ab40383ba0480560a9_cgraph.svg" width="422" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -391,12 +397,31 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00572">572</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00580">580</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a09605ee2819749913bbbb6206af1af70"></a><!-- doxytag: member="forcebalance::nifty::destroyWorkQueue" ref="a09605ee2819749913bbbb6206af1af70" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def <a class="el" href="namespaceforcebalance_1_1nifty.html#a09605ee2819749913bbbb6206af1af70">forcebalance.nifty.destroyWorkQueue</a> </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00590">590</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_ab5f3072ad95e9c75659cb1adac341051_cgraph.svg" width="571" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a09605ee2819749913bbbb6206af1af70_cgraph.svg" width="579" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -417,7 +442,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00072">72</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00073">73</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -452,7 +477,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>answer The flattened data </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00289">289</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00290">290</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -488,7 +513,7 @@ Here is the call graph for this function:</div>
 <dl class="return"><dt><b>Returns:</b></dt><dd>answer The string converted to a float; if not a float, return 1e10 </dd></dl>
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000013">Todo:</a></b></dt><dd>I could use suggestions for making this better. </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00252">252</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00253">253</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -556,7 +581,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00357">357</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00358">358</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -581,7 +606,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00566">566</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00572">572</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -599,7 +624,15 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00569">569</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00576">576</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_abe1e72c32252d62a6551b47290c7584f_cgraph.svg" width="1771" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
 
 </div>
 </div>
@@ -618,7 +651,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00698">698</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00759">759</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -657,7 +690,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Xt The inverted matrix </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00316">316</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00317">317</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -692,7 +725,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>answer Boolean which specifies whether the string is a number with a decimal point </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00242">242</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00243">243</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -727,7 +760,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>answer Boolean which specifies whether the string is any number </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00232">232</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00233">233</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -762,7 +795,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>answer Boolean which specifies whether the string is an integer (only +/- sign followed by digits) </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00221">221</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00222">222</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -788,7 +821,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00712">712</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00773">773</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -817,7 +850,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00764">764</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00827">827</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -835,7 +868,13 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>dest</em>&#160;</td>
+          <td class="paramname"><em>dest</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>nosrcok</em> = <code>False</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -846,7 +885,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00743">743</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00804">804</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -890,12 +929,13 @@ Here is the call graph for this function:</div>
 
 <p>Use this instead of pickle.dump for pickling anything that contains _ElementTree types. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00549">549</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00550">550</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a2ff762a2f2d2b6bb1c7dd067bd1a1e88_cgraph.svg" width="811" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a2ff762a2f2d2b6bb1c7dd067bd1a1e88_cgraph.svg" width="483" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -918,12 +958,13 @@ Here is the call graph for this function:</div>
 
 <p>Use this instead of pickle.load for unpickling anything that contains _ElementTree types. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00554">554</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00555">555</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a577abfd36638c5f4dfdade136abaef12_cgraph.svg" width="1758" height="190"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a577abfd36638c5f4dfdade136abaef12_cgraph.svg" width="2056" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -944,7 +985,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00733">733</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00794">794</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -975,7 +1016,44 @@ Here is the call graph for this function:</div>
 <p>each of which can then be iterated over:</p>
 <p>[[file1_line1, file1_line2 ... ], [file2_line1, file2_line2 ... ]] </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00941">941</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l01052">1052</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ab5417ad84c6c760965cd195c6c387914"></a><!-- doxytag: member="forcebalance::nifty::onefile" ref="ab5417ad84c6c760965cd195c6c387914" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def <a class="el" href="namespaceforcebalance_1_1nifty.html#ab5417ad84c6c760965cd195c6c387914">forcebalance.nifty.onefile</a> </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>ext</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>arg</em> = <code>None</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00741">741</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_ab5417ad84c6c760965cd195c6c387914_cgraph.svg" width="1027" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
 
 </div>
 </div>
@@ -1014,7 +1092,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>answer A copy of vec1 but with the vec2-component projected out. </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00303">303</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00304">304</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1038,7 +1116,7 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>loglevel</em> = <code>forcebalance.output.INFO</code>&#160;</td>
+          <td class="paramname"><em>loglevel</em> = <code>INFO</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1057,7 +1135,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00065">65</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00066">66</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1154,7 +1232,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>bar The bottom bar is returned for the user to print later, e.g. to mark off a 'section' </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00154">154</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00155">155</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1236,7 +1314,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00197">197</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00198">198</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1267,7 +1345,7 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname"><em>loglevel</em> = <code>forcebalance.output.INFO</code>&#160;</td>
+          <td class="paramname"><em>loglevel</em> = <code>INFO</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1286,7 +1364,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00054">54</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00055">55</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1357,12 +1435,13 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00589">589</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00605">605</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a673f4a044169f5d8d822823989a836a7_cgraph.svg" width="1526" height="190"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a673f4a044169f5d8d822823989a836a7_cgraph.svg" width="1526" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1429,7 +1508,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00620">620</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00637">637</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1450,7 +1529,7 @@ Here is the call graph for this function:</div>
 
 <p>Remove the file if it exists (doesn't return an error). </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00775">775</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00838">838</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1478,7 +1557,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>answer A row matrix </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00280">280</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00281">281</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1504,7 +1583,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00075">75</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00076">76</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1575,7 +1654,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>g The estimated statistical inefficiency (equal to 1 + 2 tau, where tau is the correlation time). We enforce g &gt;= 1.0. </dd></dl>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00433">433</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00434">434</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1594,7 +1673,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00091">91</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00092">92</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1632,7 +1711,7 @@ Here is the call graph for this function:</div>
 
 <p>Prints a warning but will only do so once in a given run. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00887">887</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00998">998</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1668,7 +1747,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00872">872</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00983">983</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1694,14 +1773,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00779">779</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_aa1ff334c4b4e30e91978b91d9a9ec065_cgraph.svg" width="763" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00842">842</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1714,6 +1786,24 @@ Here is the call graph for this function:</div>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname"><em>wq</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>wait_time</em> = <code>10</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>wait_intvl</em> = <code>10</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>print_time</em> = <code>60</code>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -1732,12 +1822,13 @@ Here is the call graph for this function:</div>
 
 <p>This function waits until the work queue is completely empty. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00691">691</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00730">730</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a576de8c5b6f236280e07e73e39b2ab7c_cgraph.svg" width="1035" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a576de8c5b6f236280e07e73e39b2ab7c_cgraph.svg" width="424" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1763,6 +1854,18 @@ Here is the call graph for this function:</div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>wait_intvl</em> = <code>1</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>print_time</em> = <code>60</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
           <td class="paramname"><em>verbose</em> = <code>False</code>&#160;</td>
         </tr>
         <tr>
@@ -1776,12 +1879,13 @@ Here is the call graph for this function:</div>
 
 <p>This function waits ten seconds to see if a task in the Work Queue has finished. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00640">640</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00658">658</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a374aac2ef003be02fab49b20ff0a82f0_cgraph.svg" width="1278" height="190"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1nifty_a374aac2ef003be02fab49b20ff0a82f0_cgraph.svg" width="1278" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1801,7 +1905,7 @@ Here is the call graph for this function:</div>
 
 <p>One bohr equals this many angstroms. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00044">44</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00045">45</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1818,7 +1922,7 @@ Here is the call graph for this function:</div>
 
 <p>Q-Chem to GMX unit conversion for energy. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00040">40</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00041">41</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1835,7 +1939,7 @@ Here is the call graph for this function:</div>
 
 <p>Q-Chem to GMX unit conversion for force. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00042">42</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00043">43</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1852,7 +1956,7 @@ Here is the call graph for this function:</div>
 
 <p>Boltzmann constant. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00038">38</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00039">39</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1882,7 +1986,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00731">731</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00792">792</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1907,7 +2011,37 @@ Here is the call graph for this function:</div>
 <a name="l00009"></a>00009                 ([<span class="stringliteral">&#39;.*gro$&#39;</span>, <span class="stringliteral">&#39;.*top$&#39;</span>, <span class="stringliteral">&#39;.*itp$&#39;</span>, <span class="stringliteral">&#39;.*mdp$&#39;</span>, <span class="stringliteral">&#39;.*ndx$&#39;</span>], <span class="stringliteral">&quot;I am guessing this file is probably needed by GROMACS&quot;</span>)
 <a name="l00010"></a>00010                 ]
 </pre></div>
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00719">719</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00780">780</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="abceb325c49650f2b4e443fc65adb12c1"></a><!-- doxytag: member="forcebalance::nifty::WORK_QUEUE" ref="abceb325c49650f2b4e443fc65adb12c1" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespaceforcebalance_1_1nifty.html#abceb325c49650f2b4e443fc65adb12c1">forcebalance::nifty::WORK_QUEUE</a> = None</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00567">567</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a1410db09cf3d0507bcf758d46e83c711"></a><!-- doxytag: member="forcebalance::nifty::WQIDS" ref="a1410db09cf3d0507bcf758d46e83c711" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">tuple <a class="el" href="namespaceforcebalance_1_1nifty.html#a1410db09cf3d0507bcf758d46e83c711">forcebalance::nifty::WQIDS</a> = defaultdict(list)</td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00570">570</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1925,7 +2059,7 @@ Here is the call graph for this function:</div>
 <p>Pickle uses 'flags' to pickle and unpickle different variable types. </p>
 <p>Here we use the letter 'x' to signify that the variable type is an XML file. </p>
 
-<p>Definition at line <a class="el" href="nifty_8py_source.html#l00495">495</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
+<p>Definition at line <a class="el" href="nifty_8py_source.html#l00496">496</a> of file <a class="el" href="nifty_8py_source.html">nifty.py</a>.</p>
 
 </div>
 </div>
@@ -1947,7 +2081,7 @@ Here is the call graph for this function:</div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:15 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:07 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

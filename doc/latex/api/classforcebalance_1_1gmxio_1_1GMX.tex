@@ -1,0 +1,446 @@
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX}{\subsection{forcebalance.\-gmxio.\-G\-M\-X \-Class \-Reference}
+\label{classforcebalance_1_1gmxio_1_1GMX}\index{forcebalance.\-gmxio.\-G\-M\-X@{forcebalance.\-gmxio.\-G\-M\-X}}
+}
+
+
+\-Derived from \-Engine object for carrying out general purpose \-G\-R\-O\-M\-A\-C\-S calculations.  
+
+
+
+
+\-Inheritance diagram for forcebalance.\-gmxio.\-G\-M\-X\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{classforcebalance_1_1gmxio_1_1GMX__inherit__graph}
+\end{center}
+\end{figure}
+
+
+\-Collaboration diagram for forcebalance.\-gmxio.\-G\-M\-X\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{classforcebalance_1_1gmxio_1_1GMX__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1gmxio_1_1GMX_a4d5f9e8fb40a37a4c22551d2f30418f4}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1gmxio_1_1GMX_a4e472c27d2c244c9ad6edb5b35f46a75}{callgmx}
+\begin{DoxyCompactList}\small\item\em \-Call \-G\-R\-O\-M\-A\-C\-S; prepend the gmxpath to the call to the \-G\-R\-O\-M\-A\-C\-S program. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1gmxio_1_1GMX_af2dcb1a6a406a62e38985673bd903463}{prepare}
+\begin{DoxyCompactList}\small\item\em \-Prepare the calculation. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1gmxio_1_1GMX_a2256beedb26e249848acc34db64f4a74}{energy\-\_\-force\-\_\-driver}
+\begin{DoxyCompactList}\small\item\em \-Computes the energy and force using \-G\-R\-O\-M\-A\-C\-S for a single snapshot. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1gmxio_1_1GMX_af253e5d8ea66628a0bc755339b488dcb}{energy\-\_\-force\-\_\-driver\-\_\-all}
+\begin{DoxyCompactList}\small\item\em \-Computes the energy and force using \-G\-R\-O\-M\-A\-C\-S over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1gmxio_1_1GMX_aea0f6d954e7042b70221a55e600f89a5}{generate\-\_\-vsite\-\_\-positions}
+\item 
+def \hyperlink{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}{prepare}
+\item 
+def \hyperlink{classforcebalance_1_1engine_1_1Engine_aceb1ac74d5f048dfbe620ceac7df8d32}{evaluate\-\_\-snapshots}
+\begin{DoxyCompactList}\small\item\em \-Evaluate properties over a collection of snapshots. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1engine_1_1Engine_a0e88d58a45ebff5a5d741290e3589ee6}{evaluate\-\_\-optimized}
+\begin{DoxyCompactList}\small\item\em \-Evaluate properties on the optimized geometry. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
+\end{DoxyCompactItemize}
+\subsubsection*{\-Public \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1GMX_aa4a785e2fe56ab52dc7ba697f11ade38}{gmxsuffix}
+\begin{DoxyCompactList}\small\item\em \-Disable some optimizations. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1GMX_ac95b0bbbf2116fe2a568a5fffeec8dfb}{gmxpath}
+\begin{DoxyCompactList}\small\item\em \-The directory containing \-G\-R\-O\-M\-A\-C\-S executables (e.\-g. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1GMX_a807d5d8c04c41e1c4fdd9a68487efc80}{srcdir}
+\begin{DoxyCompactList}\small\item\em \-Attempt to determine file names of .gro, .top, and .mdp files. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1GMX_a028f08b3c967c49c38855b75bb5ea629}{top}
+\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1GMX_aff0a58dbc932d5721c034b6d94f0572f}{mdp}
+\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1GMX_a8aa31cbeac385856edf0cbeeeae59138}{mol}
+\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1GMX_ab64c929dcf94ae0675174995c7014cb7}{\-Atom\-Mask}
+\begin{DoxyCompactList}\small\item\em \-First move into the temp directory if specified by the input arguments. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1GMX_a19372f8fcd41247cba35691d5a68695d}{\-Atom\-Lists}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_ac8043b1c763d4a3ccc1a29ec99f4cd26}{name}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_a5e2383d62ef4df388a04c1c8b8409cab}{target}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_a7be99908e51fe6d616a665bf2ad70b1c}{root}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\-Print\-Option\-Dict}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{\-Detailed \-Description}
+\-Derived from \-Engine object for carrying out general purpose \-G\-R\-O\-M\-A\-C\-S calculations. 
+
+
+
+\-Definition at line 461 of file gmxio.\-py.
+
+
+
+\subsubsection{\-Constructor \& \-Destructor \-Documentation}
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_a4d5f9e8fb40a37a4c22551d2f30418f4}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-gmxio.\-G\-M\-X.\-\_\-\-\_\-init\-\_\-\-\_\-} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{name = {\ttfamily \char`\"{}gmx\char`\"{}}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1gmxio_1_1GMX_a4d5f9e8fb40a37a4c22551d2f30418f4}
+
+
+\-Reimplemented from \hyperlink{classforcebalance_1_1engine_1_1Engine_a907af5bf51d9ba4b010d6c2fa8cd85ff}{forcebalance.\-engine.\-Engine}.
+
+
+
+\-Definition at line 462 of file gmxio.\-py.
+
+
+
+\subsubsection{\-Member \-Function \-Documentation}
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_a4e472c27d2c244c9ad6edb5b35f46a75}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!callgmx@{callgmx}}
+\index{callgmx@{callgmx}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{callgmx}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-gmxio.\-G\-M\-X.\-callgmx} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{command, }
+\item[{}]{stdin = {\ttfamily \-None}, }
+\item[{}]{print\-\_\-to\-\_\-screen = {\ttfamily \-False}, }
+\item[{}]{print\-\_\-command = {\ttfamily \-False}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1gmxio_1_1GMX_a4e472c27d2c244c9ad6edb5b35f46a75}
+
+
+\-Call \-G\-R\-O\-M\-A\-C\-S; prepend the gmxpath to the call to the \-G\-R\-O\-M\-A\-C\-S program. 
+
+
+
+\-Definition at line 511 of file gmxio.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1gmxio_1_1GMX_a4e472c27d2c244c9ad6edb5b35f46a75_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_a2256beedb26e249848acc34db64f4a74}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!energy\-\_\-force\-\_\-driver@{energy\-\_\-force\-\_\-driver}}
+\index{energy\-\_\-force\-\_\-driver@{energy\-\_\-force\-\_\-driver}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{energy\-\_\-force\-\_\-driver}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-gmxio.\-G\-M\-X.\-energy\-\_\-force\-\_\-driver} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{shot}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1gmxio_1_1GMX_a2256beedb26e249848acc34db64f4a74}
+
+
+\-Computes the energy and force using \-G\-R\-O\-M\-A\-C\-S for a single snapshot. 
+
+
+
+\-Definition at line 583 of file gmxio.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1gmxio_1_1GMX_a2256beedb26e249848acc34db64f4a74_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_af253e5d8ea66628a0bc755339b488dcb}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!energy\-\_\-force\-\_\-driver\-\_\-all@{energy\-\_\-force\-\_\-driver\-\_\-all}}
+\index{energy\-\_\-force\-\_\-driver\-\_\-all@{energy\-\_\-force\-\_\-driver\-\_\-all}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{energy\-\_\-force\-\_\-driver\-\_\-all}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-gmxio.\-G\-M\-X.\-energy\-\_\-force\-\_\-driver\-\_\-all} (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1gmxio_1_1GMX_af253e5d8ea66628a0bc755339b488dcb}
+
+
+\-Computes the energy and force using \-G\-R\-O\-M\-A\-C\-S over a trajectory. 
+
+
+
+\-Definition at line 605 of file gmxio.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1gmxio_1_1GMX_af253e5d8ea66628a0bc755339b488dcb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a0e88d58a45ebff5a5d741290e3589ee6}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!evaluate\-\_\-optimized@{evaluate\-\_\-optimized}}
+\index{evaluate\-\_\-optimized@{evaluate\-\_\-optimized}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{evaluate\-\_\-optimized}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-engine.\-Engine.\-evaluate\-\_\-optimized} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{\-M}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1engine_1_1Engine_a0e88d58a45ebff5a5d741290e3589ee6}
+
+
+\-Evaluate properties on the optimized geometry. 
+
+
+
+\-Definition at line 86 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_aceb1ac74d5f048dfbe620ceac7df8d32}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!evaluate\-\_\-snapshots@{evaluate\-\_\-snapshots}}
+\index{evaluate\-\_\-snapshots@{evaluate\-\_\-snapshots}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{evaluate\-\_\-snapshots}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-engine.\-Engine.\-evaluate\-\_\-snapshots} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{\-M}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1engine_1_1Engine_aceb1ac74d5f048dfbe620ceac7df8d32}
+
+
+\-Evaluate properties over a collection of snapshots. 
+
+
+
+\-Definition at line 80 of file engine.\-py.
+
+
+
+\-Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1engine_1_1Engine_aceb1ac74d5f048dfbe620ceac7df8d32_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_aea0f6d954e7042b70221a55e600f89a5}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!generate\-\_\-vsite\-\_\-positions@{generate\-\_\-vsite\-\_\-positions}}
+\index{generate\-\_\-vsite\-\_\-positions@{generate\-\_\-vsite\-\_\-positions}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{generate\-\_\-vsite\-\_\-positions}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-gmxio.\-G\-M\-X.\-generate\-\_\-vsite\-\_\-positions} (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1gmxio_1_1GMX_aea0f6d954e7042b70221a55e600f89a5}
+
+
+\-Definition at line 627 of file gmxio.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1gmxio_1_1GMX_aea0f6d954e7042b70221a55e600f89a5_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!prepare@{prepare}}
+\index{prepare@{prepare}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{prepare}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-engine.\-Engine.\-prepare} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}
+
+
+\-Definition at line 74 of file engine.\-py.
+
+
+
+\-Here is the call graph for this function\-:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_af2dcb1a6a406a62e38985673bd903463}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!prepare@{prepare}}
+\index{prepare@{prepare}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{prepare}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-gmxio.\-G\-M\-X.\-prepare} (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1gmxio_1_1GMX_af2dcb1a6a406a62e38985673bd903463}
+
+
+\-Prepare the calculation. 
+
+\-Write conformation to the temporary directory. \-Read the topology. 
+
+\-Definition at line 523 of file gmxio.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1gmxio_1_1GMX_af2dcb1a6a406a62e38985673bd903463_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!set\-\_\-option@{set\-\_\-option}}
+\index{set\-\_\-option@{set\-\_\-option}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-Base\-Class.\-set\-\_\-option} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{in\-\_\-dict, }
+\item[{}]{src\-\_\-key, }
+\item[{}]{dest\-\_\-key = {\ttfamily \-None}, }
+\item[{}]{val = {\ttfamily \-None}, }
+\item[{}]{default = {\ttfamily \-None}, }
+\item[{}]{forceprint = {\ttfamily \-False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
+
+
+\-Definition at line 32 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+
+
+\subsubsection{\-Member \-Data \-Documentation}
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_a19372f8fcd41247cba35691d5a68695d}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!\-Atom\-Lists@{\-Atom\-Lists}}
+\index{\-Atom\-Lists@{\-Atom\-Lists}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{\-Atom\-Lists}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::gmxio.\-G\-M\-X\-::\-Atom\-Lists}}}\label{classforcebalance_1_1gmxio_1_1GMX_a19372f8fcd41247cba35691d5a68695d}
+
+
+\-Definition at line 527 of file gmxio.\-py.
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_ab64c929dcf94ae0675174995c7014cb7}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!\-Atom\-Mask@{\-Atom\-Mask}}
+\index{\-Atom\-Mask@{\-Atom\-Mask}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{\-Atom\-Mask}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::gmxio.\-G\-M\-X\-::\-Atom\-Mask}}}\label{classforcebalance_1_1gmxio_1_1GMX_ab64c929dcf94ae0675174995c7014cb7}
+
+
+\-First move into the temp directory if specified by the input arguments. 
+
+\-Link files into the temp directory because it's good for reproducibility. \-Write the appropriate coordinate files. \-Call grompp followed by gmxdump to read the trajectory 
+
+\-Definition at line 527 of file gmxio.\-py.
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_ac95b0bbbf2116fe2a568a5fffeec8dfb}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!gmxpath@{gmxpath}}
+\index{gmxpath@{gmxpath}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{gmxpath}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::gmxio.\-G\-M\-X\-::gmxpath}}}\label{classforcebalance_1_1gmxio_1_1GMX_ac95b0bbbf2116fe2a568a5fffeec8dfb}
+
+
+\-The directory containing \-G\-R\-O\-M\-A\-C\-S executables (e.\-g. 
+
+mdrun) 
+
+\-Definition at line 465 of file gmxio.\-py.
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_aa4a785e2fe56ab52dc7ba697f11ade38}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!gmxsuffix@{gmxsuffix}}
+\index{gmxsuffix@{gmxsuffix}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{gmxsuffix}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::gmxio.\-G\-M\-X\-::gmxsuffix}}}\label{classforcebalance_1_1gmxio_1_1GMX_aa4a785e2fe56ab52dc7ba697f11ade38}
+
+
+\-Disable some optimizations. 
+
+\-The suffix to \-G\-R\-O\-M\-A\-C\-S executables, e.\-g. '\-\_\-d' for double precision. 
+
+\-Definition at line 464 of file gmxio.\-py.
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_aff0a58dbc932d5721c034b6d94f0572f}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!mdp@{mdp}}
+\index{mdp@{mdp}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{mdp}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::gmxio.\-G\-M\-X\-::mdp}}}\label{classforcebalance_1_1gmxio_1_1GMX_aff0a58dbc932d5721c034b6d94f0572f}
+
+
+\-Definition at line 466 of file gmxio.\-py.
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_a8aa31cbeac385856edf0cbeeeae59138}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!mol@{mol}}
+\index{mol@{mol}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{mol}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::gmxio.\-G\-M\-X\-::mol}}}\label{classforcebalance_1_1gmxio_1_1GMX_a8aa31cbeac385856edf0cbeeeae59138}
+
+
+\-Definition at line 466 of file gmxio.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_ac8043b1c763d4a3ccc1a29ec99f4cd26}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!name@{name}}
+\index{name@{name}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{name}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::engine.\-Engine\-::name}\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1engine_1_1Engine_ac8043b1c763d4a3ccc1a29ec99f4cd26}
+
+
+\-Definition at line 63 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!\-Print\-Option\-Dict@{\-Print\-Option\-Dict}}
+\index{\-Print\-Option\-Dict@{\-Print\-Option\-Dict}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{\-Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance.\-Base\-Class\-::\-Print\-Option\-Dict}\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
+
+
+\-Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a7be99908e51fe6d616a665bf2ad70b1c}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!root@{root}}
+\index{root@{root}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{root}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::engine.\-Engine\-::root}\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1engine_1_1Engine_a7be99908e51fe6d616a665bf2ad70b1c}
+
+
+\-Definition at line 63 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_a807d5d8c04c41e1c4fdd9a68487efc80}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!srcdir@{srcdir}}
+\index{srcdir@{srcdir}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{srcdir}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::gmxio.\-G\-M\-X\-::srcdir}}}\label{classforcebalance_1_1gmxio_1_1GMX_a807d5d8c04c41e1c4fdd9a68487efc80}
+
+
+\-Attempt to determine file names of .gro, .top, and .mdp files. 
+
+
+
+\-Definition at line 466 of file gmxio.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a5e2383d62ef4df388a04c1c8b8409cab}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!target@{target}}
+\index{target@{target}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{target}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::engine.\-Engine\-::target}\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1engine_1_1Engine_a5e2383d62ef4df388a04c1c8b8409cab}
+
+
+\-Definition at line 63 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1gmxio_1_1GMX_a028f08b3c967c49c38855b75bb5ea629}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!top@{top}}
+\index{top@{top}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{top}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::gmxio.\-G\-M\-X\-::top}}}\label{classforcebalance_1_1gmxio_1_1GMX_a028f08b3c967c49c38855b75bb5ea629}
+
+
+\-Definition at line 466 of file gmxio.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::gmxio\-::\-G\-M\-X@{forcebalance\-::gmxio\-::\-G\-M\-X}!verbose\-\_\-options@{verbose\-\_\-options}}
+\index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::gmxio::GMX@{forcebalance\-::gmxio\-::\-G\-M\-X}}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance.\-Base\-Class\-::verbose\-\_\-options}\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
+
+
+\-Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{gmxio_8py}{gmxio.\-py}\end{DoxyCompactItemize}

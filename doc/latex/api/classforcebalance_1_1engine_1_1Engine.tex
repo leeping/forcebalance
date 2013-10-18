@@ -1,0 +1,248 @@
+\hypertarget{classforcebalance_1_1engine_1_1Engine}{\subsection{forcebalance.\-engine.\-Engine \-Class \-Reference}
+\label{classforcebalance_1_1engine_1_1Engine}\index{forcebalance.\-engine.\-Engine@{forcebalance.\-engine.\-Engine}}
+}
+
+
+\-Base class for all engines.  
+
+
+
+
+\-Inheritance diagram for forcebalance.\-engine.\-Engine\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{classforcebalance_1_1engine_1_1Engine__inherit__graph}
+\end{center}
+\end{figure}
+
+
+\-Collaboration diagram for forcebalance.\-engine.\-Engine\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=228pt]{classforcebalance_1_1engine_1_1Engine__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{\-Public \-Member \-Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1engine_1_1Engine_a907af5bf51d9ba4b010d6c2fa8cd85ff}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}{prepare}
+\item 
+def \hyperlink{classforcebalance_1_1engine_1_1Engine_aceb1ac74d5f048dfbe620ceac7df8d32}{evaluate\-\_\-snapshots}
+\begin{DoxyCompactList}\small\item\em \-Evaluate properties over a collection of snapshots. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1engine_1_1Engine_a0e88d58a45ebff5a5d741290e3589ee6}{evaluate\-\_\-optimized}
+\begin{DoxyCompactList}\small\item\em \-Evaluate properties on the optimized geometry. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
+\end{DoxyCompactItemize}
+\subsubsection*{\-Public \-Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_ac8043b1c763d4a3ccc1a29ec99f4cd26}{name}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_a5e2383d62ef4df388a04c1c8b8409cab}{target}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_a7be99908e51fe6d616a665bf2ad70b1c}{root}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\-Print\-Option\-Dict}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{\-Detailed \-Description}
+\-Base class for all engines. 
+
+1. \-Introduction
+
+\-In \-Force\-Balance an \hyperlink{classforcebalance_1_1engine_1_1Engine}{\-Engine} represents a molecular dynamics code and the calculations that may be carried out with that code.
+
+\-The \hyperlink{classforcebalance_1_1engine_1_1Engine}{\-Engine} implements methods that execute operations such as\-:
+\begin{DoxyItemize}
+\item \-Input\-: trajectory object
+\item \-Return\-: energy over trajectory
+\item \-Return\-: energy and force over trajectory
+\item \-Return\-: electrostatic potential over trajectory
+\item \-How about\-:
+\item evaluate\-\_\-snapshots(\-Molecule, \-Energy=\-True, \-Force=\-True, \-E\-S\-P=\-True) where all information passed in belongs in the \-Molecule object. \-:)
+\item \-Return a dictionary
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item \-Input\-: molecular geometry,
+\item \-Return\-: optimized geometry
+\item \-Return\-: vibrational modes at optimized geometry
+\item \-Return\-: multipole moments at optimized geometry
+\item evaluate\-\_\-optimized(\-Molecule, \-Energy=\-True, \-Frequencies=\-True, \-Moments=\-True)
+\end{DoxyItemize}
+
+
+\begin{DoxyItemize}
+\item \hyperlink{classforcebalance_1_1engine_1_1Engine}{\-Engine} objects may be initialized using a molecule object and a force field object.
+\end{DoxyItemize}
+
+2. \-Purpose
+
+\-Previously system calls to \-M\-D software have been made by the \-Target. \-Duplication of code was occurring, because different \-Targets were carrying out the same type of calculation.
+
+3. \-Also
+
+\-Target objects should contain \hyperlink{classforcebalance_1_1engine_1_1Engine}{\-Engine} objects, because \-Open\-M\-M \hyperlink{classforcebalance_1_1engine_1_1Engine}{\-Engine} objects need to be initialized at the start of a calculation. 
+
+\-Definition at line 60 of file engine.\-py.
+
+
+
+\subsubsection{\-Constructor \& \-Destructor \-Documentation}
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a907af5bf51d9ba4b010d6c2fa8cd85ff}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-engine.\-Engine.\-\_\-\-\_\-init\-\_\-\-\_\-} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{name = {\ttfamily \char`\"{}engine\char`\"{}}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1engine_1_1Engine_a907af5bf51d9ba4b010d6c2fa8cd85ff}
+
+
+\-Reimplemented in \hyperlink{classforcebalance_1_1gmxio_1_1GMX_a4d5f9e8fb40a37a4c22551d2f30418f4}{forcebalance.\-gmxio.\-G\-M\-X}.
+
+
+
+\-Definition at line 63 of file engine.\-py.
+
+
+
+\subsubsection{\-Member \-Function \-Documentation}
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a0e88d58a45ebff5a5d741290e3589ee6}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!evaluate\-\_\-optimized@{evaluate\-\_\-optimized}}
+\index{evaluate\-\_\-optimized@{evaluate\-\_\-optimized}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{evaluate\-\_\-optimized}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-engine.\-Engine.\-evaluate\-\_\-optimized} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{\-M}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1engine_1_1Engine_a0e88d58a45ebff5a5d741290e3589ee6}
+
+
+\-Evaluate properties on the optimized geometry. 
+
+
+
+\-Definition at line 86 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_aceb1ac74d5f048dfbe620ceac7df8d32}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!evaluate\-\_\-snapshots@{evaluate\-\_\-snapshots}}
+\index{evaluate\-\_\-snapshots@{evaluate\-\_\-snapshots}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{evaluate\-\_\-snapshots}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-engine.\-Engine.\-evaluate\-\_\-snapshots} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{\-M}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1engine_1_1Engine_aceb1ac74d5f048dfbe620ceac7df8d32}
+
+
+\-Evaluate properties over a collection of snapshots. 
+
+
+
+\-Definition at line 80 of file engine.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1engine_1_1Engine_aceb1ac74d5f048dfbe620ceac7df8d32_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!prepare@{prepare}}
+\index{prepare@{prepare}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{prepare}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-engine.\-Engine.\-prepare} (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}
+
+
+\-Definition at line 74 of file engine.\-py.
+
+
+
+\-Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!set\-\_\-option@{set\-\_\-option}}
+\index{set\-\_\-option@{set\-\_\-option}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def {\bf forcebalance.\-Base\-Class.\-set\-\_\-option} (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{in\-\_\-dict, }
+\item[{}]{src\-\_\-key, }
+\item[{}]{dest\-\_\-key = {\ttfamily \-None}, }
+\item[{}]{val = {\ttfamily \-None}, }
+\item[{}]{default = {\ttfamily \-None}, }
+\item[{}]{forceprint = {\ttfamily \-False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
+
+
+\-Definition at line 32 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+
+
+\subsubsection{\-Member \-Data \-Documentation}
+\hypertarget{classforcebalance_1_1engine_1_1Engine_ac8043b1c763d4a3ccc1a29ec99f4cd26}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!name@{name}}
+\index{name@{name}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{name}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::engine.\-Engine\-::name}}}\label{classforcebalance_1_1engine_1_1Engine_ac8043b1c763d4a3ccc1a29ec99f4cd26}
+
+
+\-Definition at line 63 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!\-Print\-Option\-Dict@{\-Print\-Option\-Dict}}
+\index{\-Print\-Option\-Dict@{\-Print\-Option\-Dict}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{\-Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance.\-Base\-Class\-::\-Print\-Option\-Dict}\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
+
+
+\-Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a7be99908e51fe6d616a665bf2ad70b1c}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!root@{root}}
+\index{root@{root}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{root}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::engine.\-Engine\-::root}}}\label{classforcebalance_1_1engine_1_1Engine_a7be99908e51fe6d616a665bf2ad70b1c}
+
+
+\-Definition at line 63 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a5e2383d62ef4df388a04c1c8b8409cab}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!target@{target}}
+\index{target@{target}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{target}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance\-::engine.\-Engine\-::target}}}\label{classforcebalance_1_1engine_1_1Engine_a5e2383d62ef4df388a04c1c8b8409cab}
+
+
+\-Definition at line 63 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::engine\-::\-Engine@{forcebalance\-::engine\-::\-Engine}!verbose\-\_\-options@{verbose\-\_\-options}}
+\index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::engine::Engine@{forcebalance\-::engine\-::\-Engine}}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}{\bf forcebalance.\-Base\-Class\-::verbose\-\_\-options}\hspace{0.3cm}{\ttfamily  \mbox{[}inherited\mbox{]}}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
+
+
+\-Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+
+
+\-The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{engine_8py}{engine.\-py}\end{DoxyCompactItemize}

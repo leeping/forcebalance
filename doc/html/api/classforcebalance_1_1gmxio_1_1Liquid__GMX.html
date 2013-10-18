@@ -203,7 +203,7 @@ Public Attributes</h2></td></tr>
 </table>
 <hr/><a name="details" id="details"></a><h2>Detailed Description</h2>
 <div class="textblock">
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00573">573</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00681">681</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a858330327e84a1186b9a932fe2437489"></a><!-- doxytag: member="forcebalance::gmxio::Liquid_GMX::__init__" ref="a858330327e84a1186b9a932fe2437489" args="" -->
 <div class="memitem">
@@ -246,7 +246,7 @@ Public Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1liquid_1_1Liquid.html#a73a35541914580d0d918d34d94065f39">forcebalance.liquid.Liquid</a>.</p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00574">574</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00682">682</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -301,7 +301,7 @@ Public Attributes</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="return"><dt><b>Returns:</b></dt><dd>Answer Contribution to the objective function </dd></dl>
+<dl class="return"><dt><b>Returns:</b></dt><dd>Answer Contribution to the objective function Fill in the weight matrix with MBAR weights where MBAR was run, and equal weights otherwise. </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1target_1_1Target.html#a1389888302c49d529716cb45b13a6f5a">forcebalance.target.Target</a>.</p>
 
@@ -337,7 +337,7 @@ Public Attributes</h2></td></tr>
 <p>Computes the objective function contribution and its gradient. </p>
 <p>First the low-level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1_pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00171">171</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00172">172</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -377,7 +377,7 @@ Here is the call graph for this function:</div>
 <p>First the low-level 'get' method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1_pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on.</p>
 <p>This is followed by looping through the fd2_pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00194">194</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00195">195</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -415,7 +415,7 @@ Here is the call graph for this function:</div>
 
 <p>Computes the objective function contribution without any parametric derivatives. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00154">154</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00155">155</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -470,7 +470,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00212">212</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00213">213</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -520,7 +520,8 @@ Here is the call graph for this function:</div>
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1liquid_1_1Liquid_a07a59f9f335693329b789a9c7608fc9f_cgraph.svg" width="1464" height="195"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1liquid_1_1Liquid_a07a59f9f335693329b789a9c7608fc9f_cgraph.svg" width="1464" height="195"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -592,7 +593,8 @@ Here is the call graph for this function:</div>
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1liquid_1_1Liquid_a00c23db61bcb86cc19f79dacdb2bc1f3_cgraph.svg" width="2888" height="899"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1liquid_1_1Liquid_a00c23db61bcb86cc19f79dacdb2bc1f3_cgraph.svg" width="2888" height="899"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -627,12 +629,13 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1liquid_1_1Liquid.html#a51ea9d9fb4418ec2497fe8e2d8033d41">forcebalance.liquid.Liquid</a>.</p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00618">618</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00726">726</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1Liquid__GMX_a70a950655df19e6ed0365ba873fd0cc5_cgraph.svg" width="1432" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1Liquid__GMX_a70a950655df19e6ed0365ba873fd0cc5_cgraph.svg" width="1432" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -671,12 +674,13 @@ Here is the call graph for this function:</div>
 
 <p>Prepare the temporary directory by copying in important files. </p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00601">601</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00709">709</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1Liquid__GMX_a499a65278055bae95d3789ed74f6dc60_cgraph.svg" width="1139" height="114"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1Liquid__GMX_a499a65278055bae95d3789ed74f6dc60_cgraph.svg" width="1400" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -744,7 +748,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00366">366</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00367">367</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -791,7 +795,7 @@ Here is the call graph for this function:</div>
 
 <p>Back up the temporary directory if desired, delete it and then create a new one. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00218">218</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00219">219</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -857,7 +861,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="____init_____8py_source.html#l00034">34</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
+<p>Definition at line <a class="el" href="____init_____8py_source.html#l00032">32</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
 
 </div>
 </div>
@@ -907,7 +911,7 @@ Here is the call graph for this function:</div>
 <p>Stages the directory for the target, and then calls 'get'. </p>
 <p>The 'get' method should not worry about the directory that it's running in. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00265">265</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00266">266</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -964,7 +968,7 @@ Here is the call graph for this function:</div>
 <p>Stages the directory for the target, and then launches Work Queue processes if any. </p>
 <p>The 'get' method should not worry about the directory that it's running in. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00300">300</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00301">301</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1019,7 +1023,8 @@ Here is the call graph for this function:</div>
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1liquid_1_1Liquid_a716e28bb5572b3273036ac753b7e1e1d_cgraph.svg" width="2611" height="950"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1liquid_1_1Liquid_a716e28bb5572b3273036ac753b7e1e1d_cgraph.svg" width="2611" height="950"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1042,7 +1047,7 @@ Here is the call graph for this function:</div>
 
 <p>This method determines whether the Work Queue tasks for the current target have completed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00330">330</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00331">331</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1080,7 +1085,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00574">574</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00682">682</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1100,7 +1105,7 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1liquid_1_1Liquid.html#a3d7e00beaf0c7d71751699e05b87c501">forcebalance.liquid.Liquid</a>.</p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00574">574</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00682">682</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1117,7 +1122,7 @@ Here is the call graph for this function:</div>
 
 <p>Need the forcefield (here for now) </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00108">108</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00109">109</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1132,7 +1137,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00574">574</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00682">682</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1149,7 +1154,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the gradient was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00110">110</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00111">111</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1166,7 +1171,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the Hessian was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00111">111</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00112">112</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1211,7 +1216,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00574">574</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00682">682</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1226,7 +1231,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00574">574</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00682">682</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1241,7 +1246,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00574">574</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00682">682</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1291,7 +1296,7 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1liquid_1_1Liquid.html#a2e379d0030f788029f9778b33f456cb8">forcebalance.liquid.Liquid</a>.</p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00574">574</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00682">682</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1336,7 +1341,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="____init_____8py_source.html#l00030">30</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
+<p>Definition at line <a class="el" href="____init_____8py_source.html#l00028">28</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
 
 </div>
 </div>
@@ -1369,7 +1374,7 @@ Here is the call graph for this function:</div>
 <p>The directory in which the simulation is running - this can be updated. </p>
 <p>Directory of the current iteration; if not None, then the simulation runs under temp/target_name/iteration_number The 'customdir' is customizable and can go below anything.</p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00107">107</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00108">108</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1421,7 +1426,7 @@ Here is the call graph for this function:</div>
 <p>Root directory of the whole project. </p>
 <p>Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for FD gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger FD gradient elements Parameter types that trigger FD Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target_name) Used for storing temporary variables that don't change through the course of the optimization </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00106">106</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00107">107</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1436,7 +1441,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="____init_____8py_source.html#l00030">30</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
+<p>Definition at line <a class="el" href="____init_____8py_source.html#l00028">28</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
 
 </div>
 </div>
@@ -1546,7 +1551,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the objective function was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00109">109</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00110">110</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1571,7 +1576,7 @@ Here is the call graph for this function:</div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:15 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:07 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

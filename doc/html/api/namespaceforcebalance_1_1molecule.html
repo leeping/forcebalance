@@ -117,6 +117,8 @@ Classes</h2></td></tr>
 <tr><td colspan="2"><h2><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#af28de4693e5b8e82df900d0ac3c6c370">getElement</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a7429f0c377d6396711c128f6590ef810">elem_from_atomname</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Given an atom name, attempt to get the element in most cases.  <a href="#a7429f0c377d6396711c128f6590ef810"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#ab8464fea13fad2a506792c2f1d7c93f3">nodematch</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42">isint</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">ONLY matches integers! If you have a decimal point? None shall pass!  <a href="#a0dd31eff88d2bed0884ab21a13261d42"></a><br/></td></tr>
@@ -158,6 +160,8 @@ Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#aa9ad9b92efa7bd3c1d589d62bbb8108e">AlignToMoments</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Pre-aligns molecules to 'moment of inertia'.  <a href="#aa9ad9b92efa7bd3c1d589d62bbb8108e"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#a08840b73e95bf34bf9ca7ea36ad0492d">get_rotate_translate</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#ae76fc5d05f43acc6006a4d1733818d71">cartesian_product2</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Form a Cartesian product of two NumPy arrays.  <a href="#ae76fc5d05f43acc6006a4d1733818d71"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceforcebalance_1_1molecule.html#ab9cb167fbbd809aedcf8c7434d405547">main</a></td></tr>
 <tr><td colspan="2"><h2><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -202,14 +206,7 @@ Variables</h2></td></tr>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00436">436</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a4cdb2086978b281ed84cd66179c3f5b2_cgraph.svg" width="824" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00441">441</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -253,12 +250,13 @@ Here is the call graph for this function:</div>
 <p>Computes a "overlap density" from two frames. </p>
 <p>This function can be called by AlignToMoments to get rid of inversion problems </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00539">539</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00544">544</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a9a58eb1746e51420f50da3f3a6d51485_cgraph.svg" width="624" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a9a58eb1746e51420f50da3f3a6d51485_cgraph.svg" width="966" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -298,7 +296,7 @@ Here is the call graph for this function:</div>
 <p>Pre-aligns molecules to 'moment of inertia'. </p>
 <p>If xyz2 is passed in, it will assume that xyz1 is already aligned to the moment of inertia, and it simply does 180-degree rotations to make sure nothing is inverted. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00551">551</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00556">556</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -333,7 +331,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00474">474</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00479">479</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -388,7 +386,7 @@ Here is the call graph for this function:</div>
 
 <p>This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00256">256</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00261">261</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -433,7 +431,28 @@ Here is the call graph for this function:</div>
 <p>This function takes in three lattice vectors and tries to return a complete box specification. </p>
 <p>The hash function is something we can use to discard two things that are obviously not equal. Here we neglect the hash. Return a list of the sorted atom numbers in this graph. Return a string of atoms, which serves as a rudimentary 'fingerprint' : '99,100,103,151' . Return an array of the elements. For instance ['H' 'C' 'C' 'H']. Create an Empirical Formula Get a list of the coordinates. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00271">271</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00276">276</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="ae76fc5d05f43acc6006a4d1733818d71"></a><!-- doxytag: member="forcebalance::molecule::cartesian_product2" ref="ae76fc5d05f43acc6006a4d1733818d71" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def <a class="el" href="namespaceforcebalance_1_1molecule.html#ae76fc5d05f43acc6006a4d1733818d71">forcebalance.molecule.cartesian_product2</a> </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>arrays</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Form a Cartesian product of two NumPy arrays. </p>
+
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00617">617</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -477,7 +496,7 @@ Here is the call graph for this function:</div>
 <p>Computes an 'overlap' between two molecules based on some fictitious density. </p>
 <p>Good for fine-tuning alignment but gets stuck in local minima. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00522">522</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00527">527</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -519,7 +538,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00477">477</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00482">482</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -554,7 +573,28 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00485">485</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00490">490</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a7429f0c377d6396711c128f6590ef810"></a><!-- doxytag: member="forcebalance::molecule::elem_from_atomname" ref="a7429f0c377d6396711c128f6590ef810" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">def <a class="el" href="namespaceforcebalance_1_1molecule.html#a7429f0c377d6396711c128f6590ef810">forcebalance.molecule.elem_from_atomname</a> </td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname"><em>atomname</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Given an atom name, attempt to get the element in most cases. </p>
+
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00194">194</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -591,12 +631,13 @@ Here is the call graph for this function:</div>
 
 <p>Constructs an Euler matrix from three Euler angles. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00494">494</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00499">499</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_af02bf73765f34bbef81c4a5b000b86ce_cgraph.svg" width="931" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_af02bf73765f34bbef81c4a5b000b86ce_cgraph.svg" width="1272" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -629,7 +670,7 @@ Here is the call graph for this function:</div>
 
 <p>Creates a list of number sequences divided as evenly as possible. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00456">456</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00461">461</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -663,12 +704,13 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00387">387</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00392">392</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_ae25aa5331b3a2dd0e9d1e184380357db_cgraph.svg" width="1478" height="164"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_ae25aa5331b3a2dd0e9d1e184380357db_cgraph.svg" width="947" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -729,12 +771,13 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00366">366</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00371">371</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a41c13064e4285973aa6c49369d3d3390_cgraph.svg" width="1811" height="164"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a41c13064e4285973aa6c49369d3d3390_cgraph.svg" width="1280" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -780,12 +823,13 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00350">350</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00355">355</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a2eba3cad44138b3b10ea883240888412_cgraph.svg" width="1758" height="164"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a2eba3cad44138b3b10ea883240888412_cgraph.svg" width="1771" height="212"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -825,12 +869,13 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00378">378</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00383">383</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a4948e4662b8d2c8d515427d1bbb3d01e_cgraph.svg" width="1424" height="164"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a4948e4662b8d2c8d515427d1bbb3d01e_cgraph.svg" width="1438" height="212"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -861,7 +906,15 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00574">574</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00579">579</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a08840b73e95bf34bf9ca7ea36ad0492d_cgraph.svg" width="654" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
 
 </div>
 </div>
@@ -881,6 +934,14 @@ Here is the call graph for this function:</div>
 <div class="memdoc">
 
 <p>Definition at line <a class="el" href="molecule_8py_source.html#l00189">189</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+
+<p><div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_af28de4693e5b8e82df900d0ac3c6c370_cgraph.svg" width="622" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
+</div>
+</p>
 
 </div>
 </div>
@@ -911,7 +972,7 @@ Here is the call graph for this function:</div>
 
 <p>Groups a big long iterable into groups of ten or what have you. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00450">450</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00455">455</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -945,12 +1006,13 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00414">414</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00419">419</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a838d85848bd817e801d0f5f6502217ef_cgraph.svg" width="1158" height="114"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a838d85848bd817e801d0f5f6502217ef_cgraph.svg" width="627" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -979,12 +1041,13 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00427">427</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00432">432</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_aafc8c924eed4480fed8ddc9c474d3bc1_cgraph.svg" width="768" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_aafc8c924eed4480fed8ddc9c474d3bc1_cgraph.svg" width="782" height="190"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1013,12 +1076,13 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00399">399</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00404">404</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a12b7bb398c2fa49a223f258ec7737483_cgraph.svg" width="1067" height="164"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="namespaceforcebalance_1_1molecule_a12b7bb398c2fa49a223f258ec7737483_cgraph.svg" width="1080" height="240"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -1041,7 +1105,7 @@ Here is the call graph for this function:</div>
 
 <p>Matches ANY number; it can be a decimal, scientific notation, integer, or what have you. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00245">245</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00250">250</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -1062,7 +1126,7 @@ Here is the call graph for this function:</div>
 
 <p>ONLY matches integers! If you have a decimal point? None shall pass! </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00240">240</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00245">245</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1087,7 +1151,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l02500">2500</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l02648">2648</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -1116,7 +1180,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00234">234</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00239">239</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1142,7 +1206,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00445">445</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00450">450</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -1158,7 +1222,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00276">276</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00281">281</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -1205,7 +1269,7 @@ Here is the call graph for this function:</div>
 
 <p>One bohr equals this many angstroms. </p>
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00232">232</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00237">237</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -1220,7 +1284,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00252">252</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00257">257</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -1334,7 +1398,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00253">253</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00258">258</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -1376,7 +1440,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="molecule_8py_source.html#l00249">249</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
+<p>Definition at line <a class="el" href="molecule_8py_source.html#l00254">254</a> of file <a class="el" href="molecule_8py_source.html">molecule.py</a>.</p>
 
 </div>
 </div>
@@ -1398,7 +1462,7 @@ Here is the call graph for this function:</div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:15 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:07 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

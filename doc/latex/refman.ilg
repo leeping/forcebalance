@@ -1,4 +1,4 @@
-This is makeindex, version 2.15 [TeX Live 2009] (kpathsea + Thai support).
+This is makeindex, version 2.15 [TeX Live 2011] (kpathsea + Thai support).
 Scanning input file refman.tex...
 !! Input index error (file = refman.tex, line = 1):
    -- Unknown index keyword \documentclass[letterpaper].

@@ -100,216 +100,214 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00016"></a>00016 <span class="keyword">from</span> forcebalance.finite_difference <span class="keyword">import</span> fdwrap, f1d2p, f12d3p, in_fd
 <a name="l00017"></a>00017 <span class="keyword">from</span> collections <span class="keyword">import</span> OrderedDict
 <a name="l00018"></a>00018 <span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Pool
-<a name="l00019"></a>00019 
-<a name="l00020"></a>00020 <span class="keyword">from</span> forcebalance.output <span class="keyword">import</span> getLogger
-<a name="l00021"></a>00021 logger = getLogger(__name__)
-<a name="l00022"></a><a class="code" href="namespaceforcebalance_1_1binding.html#a9573ed198e78a3f38380c1d16cbf9b36">00022</a> <span class="keywordflow">try</span>:
-<a name="l00023"></a>00023     <span class="keyword">from</span> simtk.unit <span class="keyword">import</span> *
-<a name="l00024"></a>00024 <span class="keywordflow">except</span>: <span class="keywordflow">pass</span>
-<a name="l00025"></a>00025 
-<a name="l00026"></a>00026 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1binding.html#a0ae2f9f7a4ab7f4c64f8826de52331e9" title="Parse through the interactions input file.">parse_interactions</a>(input_file):
-<a name="l00027"></a>00027     <span class="stringliteral">&quot;&quot;&quot; Parse through the interactions input file.</span>
-<a name="l00028"></a>00028 <span class="stringliteral"></span>
-<a name="l00029"></a>00029 <span class="stringliteral">    @param[in]  input_file The name of the input file.</span>
-<a name="l00030"></a>00030 <span class="stringliteral">    </span>
-<a name="l00031"></a>00031 <span class="stringliteral">    &quot;&quot;&quot;</span>
-<a name="l00032"></a>00032     <span class="comment"># Three dictionaries of return variables.</span>
-<a name="l00033"></a><a class="code" href="namespaceforcebalance_1_1binding.html#a0ae2f9f7a4ab7f4c64f8826de52331e9">00033</a>     Systems = OrderedDict()
-<a name="l00034"></a>00034     Interactions = OrderedDict()
-<a name="l00035"></a>00035     Globals = {}
-<a name="l00036"></a>00036     InterNum = 0
-<a name="l00037"></a>00037     InterName = <span class="stringliteral">&quot;I0&quot;</span>
-<a name="l00038"></a>00038     InterDict = {}
-<a name="l00039"></a>00039     SystemName = <span class="keywordtype">None</span>
-<a name="l00040"></a>00040     SystemDict = {}
-<a name="l00041"></a>00041     
-<a name="l00042"></a>00042     logger.info(<span class="stringliteral">&quot;Reading interactions from file: %s\n&quot;</span> % input_file)
-<a name="l00043"></a>00043     section = <span class="stringliteral">&quot;NONE&quot;</span>
-<a name="l00044"></a>00044     fobj = open(input_file).readlines()
-<a name="l00045"></a>00045     <span class="keywordflow">for</span> ln, line <span class="keywordflow">in</span> enumerate(fobj):
-<a name="l00046"></a>00046         <span class="comment"># Anything after &quot;#&quot; is a comment</span>
-<a name="l00047"></a>00047         line = line.split(<span class="stringliteral">&quot;#&quot;</span>)[0].strip()
-<a name="l00048"></a>00048         s = line.split()
-<a name="l00049"></a>00049         <span class="comment"># Skip over blank lines</span>
-<a name="l00050"></a>00050         <span class="keywordflow">if</span> len(s) == 0:
-<a name="l00051"></a>00051             <span class="keywordflow">continue</span>
-<a name="l00052"></a>00052         key = s[0].lower()
-<a name="l00053"></a>00053         <span class="comment"># If line starts with a $, this signifies that we&#39;re in a new section.</span>
-<a name="l00054"></a>00054         <span class="keywordflow">if</span> re.match(<span class="stringliteral">&#39;^\$&#39;</span>,line):
-<a name="l00055"></a>00055             word = re.sub(<span class="stringliteral">&#39;^\$&#39;</span>,<span class="stringliteral">&#39;&#39;</span>,line).upper()
-<a name="l00056"></a>00056             <span class="keywordflow">if</span> word == <span class="stringliteral">&quot;END&quot;</span>: <span class="comment"># End of a section, time to reinitialize variables.</span>
-<a name="l00057"></a>00057                 <span class="keywordflow">if</span> section == <span class="stringliteral">&quot;GLOBAL&quot;</span>: <span class="keywordflow">pass</span>
-<a name="l00058"></a>00058                 <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;SYSTEM&quot;</span>:
-<a name="l00059"></a>00059                     <span class="keywordflow">if</span> SystemName == <span class="keywordtype">None</span>:
-<a name="l00060"></a>00060                         <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;You need to specify a name for the system on line %i&quot;</span> % ln)
-<a name="l00061"></a>00061                     <span class="keywordflow">elif</span> SystemName <span class="keywordflow">in</span> Systems:
-<a name="l00062"></a>00062                         <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;A system named %s already exists in Systems&quot;</span> % SystemName)
-<a name="l00063"></a>00063                     Systems[SystemName] = SystemDict
-<a name="l00064"></a>00064                     SystemName = <span class="keywordtype">None</span>
-<a name="l00065"></a>00065                     SystemDict = {}
-<a name="l00066"></a>00066                 <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;INTERACTION&quot;</span>:
-<a name="l00067"></a>00067                     <span class="keywordflow">if</span> InterName <span class="keywordflow">in</span> InterDict:
-<a name="l00068"></a>00068                         <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;A system named %s already exists in InterDict&quot;</span> % InterName)
-<a name="l00069"></a>00069                     Interactions[InterName] = InterDict
-<a name="l00070"></a>00070                     InterNum += 1
-<a name="l00071"></a>00071                     InterName = <span class="stringliteral">&quot;I%i&quot;</span> % InterNum
-<a name="l00072"></a>00072                     InterDict = {}
-<a name="l00073"></a>00073                 <span class="keywordflow">else</span>:
-<a name="l00074"></a>00074                     <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered $end for unsupported section %s on line %i&quot;</span> % (word, ln))
-<a name="l00075"></a>00075                 section = <span class="stringliteral">&quot;NONE&quot;</span>
-<a name="l00076"></a>00076             <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;NONE&quot;</span>:
-<a name="l00077"></a>00077                 section = word
-<a name="l00078"></a>00078             <span class="keywordflow">else</span>:
-<a name="l00079"></a>00079                 <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered section keyword %s when already in section %s&quot;</span> % (word, section))
-<a name="l00080"></a>00080         <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;GLOBAL&quot;</span>:
-<a name="l00081"></a>00081             <span class="keywordflow">if</span> key <span class="keywordflow">in</span> [<span class="stringliteral">&#39;keyfile&#39;</span>, <span class="stringliteral">&#39;energy_unit&#39;</span>]:
-<a name="l00082"></a>00082                 Globals[key] = s[1]
-<a name="l00083"></a>00083             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;optimize&#39;</span>:
-<a name="l00084"></a>00084                 <span class="keywordflow">if</span> len(s) == 1 <span class="keywordflow">or</span> s[1].lower() <span class="keywordflow">in</span> [<span class="stringliteral">&#39;y&#39;</span>,<span class="stringliteral">&#39;yes&#39;</span>,<span class="stringliteral">&#39;true&#39;</span>]:
-<a name="l00085"></a>00085                     logger.info(<span class="stringliteral">&quot;Optimizing ALL systems by default\n&quot;</span>)
-<a name="l00086"></a>00086                     Globals[key] = <span class="keyword">True</span>
-<a name="l00087"></a>00087                 <span class="keywordflow">else</span>:
-<a name="l00088"></a>00088                     Globals[key] = <span class="keyword">False</span>
-<a name="l00089"></a>00089             <span class="keywordflow">else</span>:
-<a name="l00090"></a>00090                 <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered unsupported key %s in section %s on line %i&quot;</span> % (key, section, ln))
-<a name="l00091"></a>00091         <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;SYSTEM&quot;</span>:
-<a name="l00092"></a>00092             <span class="keywordflow">if</span> key == <span class="stringliteral">&#39;name&#39;</span>:
-<a name="l00093"></a>00093                 SystemName = s[1]
-<a name="l00094"></a>00094             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;geometry&#39;</span>:
-<a name="l00095"></a>00095                 SystemDict[key] = s[1]
-<a name="l00096"></a>00096             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;rmsd_weight&#39;</span>:
-<a name="l00097"></a>00097                 SystemDict[key] = float(s[1])
-<a name="l00098"></a>00098             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;select&#39;</span>:
-<a name="l00099"></a>00099                 SystemDict[key] = s[1]
-<a name="l00100"></a>00100             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;optimize&#39;</span>:
-<a name="l00101"></a>00101                 <span class="keywordflow">if</span> len(s) == 1 <span class="keywordflow">or</span> s[1].lower() <span class="keywordflow">in</span> [<span class="stringliteral">&#39;y&#39;</span>,<span class="stringliteral">&#39;yes&#39;</span>,<span class="stringliteral">&#39;true&#39;</span>]:
-<a name="l00102"></a>00102                     SystemDict[key] = <span class="keyword">True</span>
-<a name="l00103"></a>00103                     logger.info(<span class="stringliteral">&quot;Optimizing system %s\n&quot;</span> % SystemName)
-<a name="l00104"></a>00104                 <span class="keywordflow">else</span>:
-<a name="l00105"></a>00105                     SystemDict[key] = <span class="keyword">False</span>
-<a name="l00106"></a>00106             <span class="keywordflow">else</span>:
-<a name="l00107"></a>00107                 <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered unsupported key %s in section %s on line %i&quot;</span> % (key, section, ln))
-<a name="l00108"></a>00108         <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;INTERACTION&quot;</span>:
-<a name="l00109"></a>00109             <span class="keywordflow">if</span> key == <span class="stringliteral">&#39;name&#39;</span>:
-<a name="l00110"></a>00110                 InterName = s[1]
-<a name="l00111"></a>00111             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;equation&#39;</span>:
-<a name="l00112"></a>00112                 InterDict[key] = <span class="stringliteral">&#39; &#39;</span>.join(s[1:])
-<a name="l00113"></a>00113             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;energy&#39;</span>:
+<a name="l00019"></a>00019 <span class="keyword">from</span> forcebalance.unit <span class="keyword">import</span> *
+<a name="l00020"></a>00020 
+<a name="l00021"></a>00021 <span class="keyword">from</span> forcebalance.output <span class="keyword">import</span> getLogger
+<a name="l00022"></a>00022 logger = getLogger(__name__)
+<a name="l00023"></a><a class="code" href="namespaceforcebalance_1_1binding.html#a9573ed198e78a3f38380c1d16cbf9b36">00023</a> 
+<a name="l00024"></a>00024 <span class="keyword">def </span><a class="code" href="namespaceforcebalance_1_1binding.html#a0ae2f9f7a4ab7f4c64f8826de52331e9" title="Parse through the interactions input file.">parse_interactions</a>(input_file):
+<a name="l00025"></a>00025     <span class="stringliteral">&quot;&quot;&quot; Parse through the interactions input file.</span>
+<a name="l00026"></a>00026 <span class="stringliteral"></span>
+<a name="l00027"></a>00027 <span class="stringliteral">    @param[in]  input_file The name of the input file.</span>
+<a name="l00028"></a>00028 <span class="stringliteral">    </span>
+<a name="l00029"></a>00029 <span class="stringliteral">    &quot;&quot;&quot;</span>
+<a name="l00030"></a>00030     <span class="comment"># Three dictionaries of return variables.</span>
+<a name="l00031"></a><a class="code" href="namespaceforcebalance_1_1binding.html#a0ae2f9f7a4ab7f4c64f8826de52331e9">00031</a>     Systems = OrderedDict()
+<a name="l00032"></a>00032     Interactions = OrderedDict()
+<a name="l00033"></a>00033     Globals = {}
+<a name="l00034"></a>00034     InterNum = 0
+<a name="l00035"></a>00035     InterName = <span class="stringliteral">&quot;I0&quot;</span>
+<a name="l00036"></a>00036     InterDict = {}
+<a name="l00037"></a>00037     SystemName = <span class="keywordtype">None</span>
+<a name="l00038"></a>00038     SystemDict = {}
+<a name="l00039"></a>00039     
+<a name="l00040"></a>00040     logger.info(<span class="stringliteral">&quot;Reading interactions from file: %s\n&quot;</span> % input_file)
+<a name="l00041"></a>00041     section = <span class="stringliteral">&quot;NONE&quot;</span>
+<a name="l00042"></a>00042     fobj = open(input_file).readlines()
+<a name="l00043"></a>00043     <span class="keywordflow">for</span> ln, line <span class="keywordflow">in</span> enumerate(fobj):
+<a name="l00044"></a>00044         <span class="comment"># Anything after &quot;#&quot; is a comment</span>
+<a name="l00045"></a>00045         line = line.split(<span class="stringliteral">&quot;#&quot;</span>)[0].strip()
+<a name="l00046"></a>00046         s = line.split()
+<a name="l00047"></a>00047         <span class="comment"># Skip over blank lines</span>
+<a name="l00048"></a>00048         <span class="keywordflow">if</span> len(s) == 0:
+<a name="l00049"></a>00049             <span class="keywordflow">continue</span>
+<a name="l00050"></a>00050         key = s[0].lower()
+<a name="l00051"></a>00051         <span class="comment"># If line starts with a $, this signifies that we&#39;re in a new section.</span>
+<a name="l00052"></a>00052         <span class="keywordflow">if</span> re.match(<span class="stringliteral">&#39;^\$&#39;</span>,line):
+<a name="l00053"></a>00053             word = re.sub(<span class="stringliteral">&#39;^\$&#39;</span>,<span class="stringliteral">&#39;&#39;</span>,line).upper()
+<a name="l00054"></a>00054             <span class="keywordflow">if</span> word == <span class="stringliteral">&quot;END&quot;</span>: <span class="comment"># End of a section, time to reinitialize variables.</span>
+<a name="l00055"></a>00055                 <span class="keywordflow">if</span> section == <span class="stringliteral">&quot;GLOBAL&quot;</span>: <span class="keywordflow">pass</span>
+<a name="l00056"></a>00056                 <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;SYSTEM&quot;</span>:
+<a name="l00057"></a>00057                     <span class="keywordflow">if</span> SystemName == <span class="keywordtype">None</span>:
+<a name="l00058"></a>00058                         <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;You need to specify a name for the system on line %i&quot;</span> % ln)
+<a name="l00059"></a>00059                     <span class="keywordflow">elif</span> SystemName <span class="keywordflow">in</span> Systems:
+<a name="l00060"></a>00060                         <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;A system named %s already exists in Systems&quot;</span> % SystemName)
+<a name="l00061"></a>00061                     Systems[SystemName] = SystemDict
+<a name="l00062"></a>00062                     SystemName = <span class="keywordtype">None</span>
+<a name="l00063"></a>00063                     SystemDict = {}
+<a name="l00064"></a>00064                 <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;INTERACTION&quot;</span>:
+<a name="l00065"></a>00065                     <span class="keywordflow">if</span> InterName <span class="keywordflow">in</span> InterDict:
+<a name="l00066"></a>00066                         <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;A system named %s already exists in InterDict&quot;</span> % InterName)
+<a name="l00067"></a>00067                     Interactions[InterName] = InterDict
+<a name="l00068"></a>00068                     InterNum += 1
+<a name="l00069"></a>00069                     InterName = <span class="stringliteral">&quot;I%i&quot;</span> % InterNum
+<a name="l00070"></a>00070                     InterDict = {}
+<a name="l00071"></a>00071                 <span class="keywordflow">else</span>:
+<a name="l00072"></a>00072                     <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered $end for unsupported section %s on line %i&quot;</span> % (word, ln))
+<a name="l00073"></a>00073                 section = <span class="stringliteral">&quot;NONE&quot;</span>
+<a name="l00074"></a>00074             <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;NONE&quot;</span>:
+<a name="l00075"></a>00075                 section = word
+<a name="l00076"></a>00076             <span class="keywordflow">else</span>:
+<a name="l00077"></a>00077                 <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered section keyword %s when already in section %s&quot;</span> % (word, section))
+<a name="l00078"></a>00078         <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;GLOBAL&quot;</span>:
+<a name="l00079"></a>00079             <span class="keywordflow">if</span> key <span class="keywordflow">in</span> [<span class="stringliteral">&#39;keyfile&#39;</span>, <span class="stringliteral">&#39;energy_unit&#39;</span>]:
+<a name="l00080"></a>00080                 Globals[key] = s[1]
+<a name="l00081"></a>00081             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;optimize&#39;</span>:
+<a name="l00082"></a>00082                 <span class="keywordflow">if</span> len(s) == 1 <span class="keywordflow">or</span> s[1].lower() <span class="keywordflow">in</span> [<span class="stringliteral">&#39;y&#39;</span>,<span class="stringliteral">&#39;yes&#39;</span>,<span class="stringliteral">&#39;true&#39;</span>]:
+<a name="l00083"></a>00083                     logger.info(<span class="stringliteral">&quot;Optimizing ALL systems by default\n&quot;</span>)
+<a name="l00084"></a>00084                     Globals[key] = <span class="keyword">True</span>
+<a name="l00085"></a>00085                 <span class="keywordflow">else</span>:
+<a name="l00086"></a>00086                     Globals[key] = <span class="keyword">False</span>
+<a name="l00087"></a>00087             <span class="keywordflow">else</span>:
+<a name="l00088"></a>00088                 <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered unsupported key %s in section %s on line %i&quot;</span> % (key, section, ln))
+<a name="l00089"></a>00089         <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;SYSTEM&quot;</span>:
+<a name="l00090"></a>00090             <span class="keywordflow">if</span> key == <span class="stringliteral">&#39;name&#39;</span>:
+<a name="l00091"></a>00091                 SystemName = s[1]
+<a name="l00092"></a>00092             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;geometry&#39;</span>:
+<a name="l00093"></a>00093                 SystemDict[key] = s[1]
+<a name="l00094"></a>00094             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;rmsd_weight&#39;</span>:
+<a name="l00095"></a>00095                 SystemDict[key] = float(s[1])
+<a name="l00096"></a>00096             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;select&#39;</span>:
+<a name="l00097"></a>00097                 SystemDict[key] = s[1]
+<a name="l00098"></a>00098             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;optimize&#39;</span>:
+<a name="l00099"></a>00099                 <span class="keywordflow">if</span> len(s) == 1 <span class="keywordflow">or</span> s[1].lower() <span class="keywordflow">in</span> [<span class="stringliteral">&#39;y&#39;</span>,<span class="stringliteral">&#39;yes&#39;</span>,<span class="stringliteral">&#39;true&#39;</span>]:
+<a name="l00100"></a>00100                     SystemDict[key] = <span class="keyword">True</span>
+<a name="l00101"></a>00101                     logger.info(<span class="stringliteral">&quot;Optimizing system %s\n&quot;</span> % SystemName)
+<a name="l00102"></a>00102                 <span class="keywordflow">else</span>:
+<a name="l00103"></a>00103                     SystemDict[key] = <span class="keyword">False</span>
+<a name="l00104"></a>00104             <span class="keywordflow">else</span>:
+<a name="l00105"></a>00105                 <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered unsupported key %s in section %s on line %i&quot;</span> % (key, section, ln))
+<a name="l00106"></a>00106         <span class="keywordflow">elif</span> section == <span class="stringliteral">&quot;INTERACTION&quot;</span>:
+<a name="l00107"></a>00107             <span class="keywordflow">if</span> key == <span class="stringliteral">&#39;name&#39;</span>:
+<a name="l00108"></a>00108                 InterName = s[1]
+<a name="l00109"></a>00109             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;equation&#39;</span>:
+<a name="l00110"></a>00110                 InterDict[key] = <span class="stringliteral">&#39; &#39;</span>.join(s[1:])
+<a name="l00111"></a>00111             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;energy&#39;</span>:
+<a name="l00112"></a>00112                 InterDict[key] = float(s[1])
+<a name="l00113"></a>00113             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;weight&#39;</span>:
 <a name="l00114"></a>00114                 InterDict[key] = float(s[1])
-<a name="l00115"></a>00115             <span class="keywordflow">elif</span> key == <span class="stringliteral">&#39;weight&#39;</span>:
-<a name="l00116"></a>00116                 InterDict[key] = float(s[1])
-<a name="l00117"></a>00117             <span class="keywordflow">else</span>:
-<a name="l00118"></a>00118                 <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered unsupported key %s in section %s on line %i&quot;</span> % (key, section, ln))
-<a name="l00119"></a>00119     <span class="keywordflow">return</span> Globals, Systems, Interactions
+<a name="l00115"></a>00115             <span class="keywordflow">else</span>:
+<a name="l00116"></a>00116                 <a class="code" href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01">warn_press_key</a>(<span class="stringliteral">&quot;Encountered unsupported key %s in section %s on line %i&quot;</span> % (key, section, ln))
+<a name="l00117"></a>00117     <span class="keywordflow">return</span> Globals, Systems, Interactions
+<a name="l00118"></a>00118 
+<a name="l00119"></a>00119 <span class="keyword">class </span><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html" title="Improved subclass of Target for fitting force fields to binding energies.">BindingEnergy</a>(<a class="code" href="classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets.">Target</a>):
 <a name="l00120"></a>00120 
-<a name="l00121"></a>00121 <span class="keyword">class </span><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html" title="Improved subclass of Target for fitting force fields to binding energies.">BindingEnergy</a>(<a class="code" href="classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets.">Target</a>):
+<a name="l00121"></a>00121     <span class="stringliteral">&quot;&quot;&quot; Improved subclass of Target for fitting force fields to binding energies. &quot;&quot;&quot;</span>
 <a name="l00122"></a>00122 
-<a name="l00123"></a>00123     <span class="stringliteral">&quot;&quot;&quot; Improved subclass of Target for fitting force fields to binding energies. &quot;&quot;&quot;</span>
-<a name="l00124"></a>00124 
-<a name="l00125"></a><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html">00125</a>     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0896e853f40719dc6e1c4574adbbb152" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(self,options,tgt_opts,forcefield):
-<a name="l00126"></a>00126         super(BindingEnergy,self).<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0896e853f40719dc6e1c4574adbbb152" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(options,tgt_opts,forcefield)
-<a name="l00127"></a>00127         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;masterfile&#39;</span>, os.path.join(self.tgtdir,tgt_opts[<span class="stringliteral">&#39;masterfile&#39;</span>]))
-<a name="l00128"></a><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">00128</a>         self.global_opts, self.sys_opts, self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a> = <a class="code" href="namespaceforcebalance_1_1binding.html#a0ae2f9f7a4ab7f4c64f8826de52331e9" title="Parse through the interactions input file.">parse_interactions</a>(self.masterfile)
-<a name="l00129"></a>00129         <span class="comment"># If the global option doesn&#39;t exist in the system / interaction, then it is copied over.</span>
-<a name="l00130"></a>00130         <span class="keywordflow">for</span> opt <span class="keywordflow">in</span> self.global_opts:
-<a name="l00131"></a>00131             <span class="keywordflow">for</span> sys <span class="keywordflow">in</span> self.sys_opts:
-<a name="l00132"></a>00132                 <span class="keywordflow">if</span> opt <span class="keywordflow">not</span> <span class="keywordflow">in</span> self.sys_opts[sys]:
-<a name="l00133"></a>00133                     self.sys_opts[sys][opt] = self.global_opts[opt]
-<a name="l00134"></a>00134             <span class="keywordflow">for</span> inter <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>:
-<a name="l00135"></a>00135                 <span class="keywordflow">if</span> opt <span class="keywordflow">not</span> <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter]:
-<a name="l00136"></a>00136                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter][opt] = self.global_opts[opt]
-<a name="l00137"></a>00137         <span class="keywordflow">for</span> inter <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>:
-<a name="l00138"></a>00138             self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter][<span class="stringliteral">&#39;reference_physical&#39;</span>] = self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter][<span class="stringliteral">&#39;energy&#39;</span>] * eval(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter][<span class="stringliteral">&#39;energy_unit&#39;</span>])
-<a name="l00139"></a>00139 
-<a name="l00140"></a>00140         <span class="keywordflow">if</span> tgt_opts[<span class="stringliteral">&#39;energy_denom&#39;</span>] == 0.0:
-<a name="l00141"></a>00141             self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;energy_denom&#39;</span>, val=std(array([val[<span class="stringliteral">&#39;reference_physical&#39;</span>].value_in_unit(kilocalories_per_mole) <span class="keywordflow">for</span> val <span class="keywordflow">in</span> self.inter_opts.values()])) * kilocalories_per_mole)
-<a name="l00142"></a>00142         <span class="keywordflow">else</span>:
-<a name="l00143"></a>00143             self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;energy_denom&#39;</span>, val=tgt_opts[<span class="stringliteral">&#39;energy_denom&#39;</span>] * kilocalories_per_mole)
+<a name="l00123"></a><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html">00123</a>     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0896e853f40719dc6e1c4574adbbb152" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(self,options,tgt_opts,forcefield):
+<a name="l00124"></a>00124         super(BindingEnergy,self).<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0896e853f40719dc6e1c4574adbbb152" title="All options here are intended to be usable by every conceivable type of target (in other words...">__init__</a>(options,tgt_opts,forcefield)
+<a name="l00125"></a>00125         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;masterfile&#39;</span>, os.path.join(self.tgtdir,tgt_opts[<span class="stringliteral">&#39;masterfile&#39;</span>]))
+<a name="l00126"></a><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">00126</a>         self.global_opts, self.sys_opts, self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a> = <a class="code" href="namespaceforcebalance_1_1binding.html#a0ae2f9f7a4ab7f4c64f8826de52331e9" title="Parse through the interactions input file.">parse_interactions</a>(self.masterfile)
+<a name="l00127"></a>00127         <span class="comment"># If the global option doesn&#39;t exist in the system / interaction, then it is copied over.</span>
+<a name="l00128"></a>00128         <span class="keywordflow">for</span> opt <span class="keywordflow">in</span> self.global_opts:
+<a name="l00129"></a>00129             <span class="keywordflow">for</span> sys <span class="keywordflow">in</span> self.sys_opts:
+<a name="l00130"></a>00130                 <span class="keywordflow">if</span> opt <span class="keywordflow">not</span> <span class="keywordflow">in</span> self.sys_opts[sys]:
+<a name="l00131"></a>00131                     self.sys_opts[sys][opt] = self.global_opts[opt]
+<a name="l00132"></a>00132             <span class="keywordflow">for</span> inter <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>:
+<a name="l00133"></a>00133                 <span class="keywordflow">if</span> opt <span class="keywordflow">not</span> <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter]:
+<a name="l00134"></a>00134                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter][opt] = self.global_opts[opt]
+<a name="l00135"></a>00135         <span class="keywordflow">for</span> inter <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>:
+<a name="l00136"></a>00136             self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter][<span class="stringliteral">&#39;reference_physical&#39;</span>] = self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter][<span class="stringliteral">&#39;energy&#39;</span>] * eval(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter][<span class="stringliteral">&#39;energy_unit&#39;</span>])
+<a name="l00137"></a>00137 
+<a name="l00138"></a>00138         <span class="keywordflow">if</span> tgt_opts[<span class="stringliteral">&#39;energy_denom&#39;</span>] == 0.0:
+<a name="l00139"></a>00139             self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;energy_denom&#39;</span>, val=std(array([val[<span class="stringliteral">&#39;reference_physical&#39;</span>].value_in_unit(kilocalories_per_mole) <span class="keywordflow">for</span> val <span class="keywordflow">in</span> self.inter_opts.values()])) * kilocalories_per_mole)
+<a name="l00140"></a>00140         <span class="keywordflow">else</span>:
+<a name="l00141"></a>00141             self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;energy_denom&#39;</span>, val=tgt_opts[<span class="stringliteral">&#39;energy_denom&#39;</span>] * kilocalories_per_mole)
+<a name="l00142"></a>00142 
+<a name="l00143"></a>00143         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;rmsd_denom&#39;</span>, val=tgt_opts[<span class="stringliteral">&#39;rmsd_denom&#39;</span>] * angstrom)
 <a name="l00144"></a>00144 
-<a name="l00145"></a>00145         self.set_option(<span class="keywordtype">None</span>, <span class="keywordtype">None</span>, <span class="stringliteral">&#39;rmsd_denom&#39;</span>, val=tgt_opts[<span class="stringliteral">&#39;rmsd_denom&#39;</span>] * angstrom)
+<a name="l00145"></a>00145         self.set_option(tgt_opts,<span class="stringliteral">&#39;cauchy&#39;</span>,<span class="stringliteral">&#39;cauchy&#39;</span>)
 <a name="l00146"></a>00146 
-<a name="l00147"></a>00147         self.set_option(tgt_opts,<span class="stringliteral">&#39;cauchy&#39;</span>,<span class="stringliteral">&#39;cauchy&#39;</span>)
-<a name="l00148"></a>00148 
-<a name="l00149"></a>00149         logger.info(<span class="stringliteral">&quot;The energy denominator is: %s\n&quot;</span> % str(self.energy_denom)) 
-<a name="l00150"></a>00150         logger.info(<span class="stringliteral">&quot;The RMSD denominator is: %s\n&quot;</span> % str(self.rmsd_denom))
-<a name="l00151"></a>00151 
-<a name="l00152"></a>00152         <span class="keywordflow">if</span> self.cauchy:
-<a name="l00153"></a>00153             logger.info(<span class="stringliteral">&quot;Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n&quot;</span>)
-<a name="l00154"></a>00154 
-<a name="l00155"></a>00155     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a12deb881863b64276bf847a949a36845">indicate</a>(self):
-<a name="l00156"></a>00156         <a class="code" href="namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary...">printcool_dictionary</a>(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#afa4bc73efa73b10aa56f60548de96751">PrintDict</a>,title=<span class="stringliteral">&quot;Interaction Energies (kcal/mol), Objective = % .5e\n %-20s %9s %9s %9s %11s&quot;</span> % 
-<a name="l00157"></a>00157                              (self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0bac2f1084de788b25d23820fea6465b">energy_part</a>, <span class="stringliteral">&quot;Interaction&quot;</span>, <span class="stringliteral">&quot;Calc.&quot;</span>, <span class="stringliteral">&quot;Ref.&quot;</span>, <span class="stringliteral">&quot;Delta&quot;</span>, <span class="stringliteral">&quot;Term&quot;</span>))
-<a name="l00158"></a><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a12deb881863b64276bf847a949a36845">00158</a>         <span class="keywordflow">if</span> len(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">RMSDDict</a>) &gt; 0:
-<a name="l00159"></a>00159             <a class="code" href="namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary...">printcool_dictionary</a>(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">RMSDDict</a>,title=<span class="stringliteral">&quot;Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s&quot;</span> % (self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a4af9005899de2d060261e535a2e6b465">rmsd_part</a>, <span class="stringliteral">&quot;System&quot;</span>, <span class="stringliteral">&quot;RMSD&quot;</span>, <span class="stringliteral">&quot;Term&quot;</span>), keywidth=45)
-<a name="l00160"></a>00160 
-<a name="l00161"></a>00161     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a263fadef13141ef341a01d1f538f85af" title="Every target must be able to return a contribution to the objective function - however, this must be implemented in the specific subclass.">get</a>(self, mvals, AGrad=False, AHess=False):
-<a name="l00162"></a>00162         Answer = {<span class="stringliteral">&#39;X&#39;</span>:0.0, <span class="stringliteral">&#39;G&#39;</span>:zeros(self.FF.np, dtype=float), <span class="stringliteral">&#39;H&#39;</span>:zeros((self.FF.np, self.FF.np), dtype=float)}
-<a name="l00163"></a>00163         self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#afa4bc73efa73b10aa56f60548de96751">PrintDict</a> = OrderedDict()
-<a name="l00164"></a><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">00164</a>         self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">RMSDDict</a> = OrderedDict()
-<a name="l00165"></a>00165         <span class="comment">#pool = Pool(processes=4)</span>
-<a name="l00166"></a>00166         <span class="keyword">def </span>compute(mvals_):
-<a name="l00167"></a>00167             <span class="comment"># This function has automatically assigned variable names from the interaction master file</span>
-<a name="l00168"></a>00168             <span class="comment"># Thus, all variable names in here are protected using an underscore.</span>
-<a name="l00169"></a>00169             self.FF.make(mvals_)
-<a name="l00170"></a>00170             VectorD_ = []
-<a name="l00171"></a>00171             <span class="keywordflow">for</span> sys_ <span class="keywordflow">in</span> self.sys_opts:
-<a name="l00172"></a>00172                 Energy_, RMSD_ = self.system_driver(sys_)
-<a name="l00173"></a>00173                 <span class="comment">#print &quot;Setting %s to&quot; % sys_, Energy_</span>
-<a name="l00174"></a>00174                 exec(<span class="stringliteral">&quot;%s = Energy_&quot;</span> % sys_) <span class="keywordflow">in</span> locals()
-<a name="l00175"></a>00175                 RMSDNrm_ = RMSD_ / self.rmsd_denom
-<a name="l00176"></a>00176                 w_ = self.sys_opts[sys_][<span class="stringliteral">&#39;rmsd_weight&#39;</span>] <span class="keywordflow">if</span> <span class="stringliteral">&#39;rmsd_weight&#39;</span> <span class="keywordflow">in</span> self.sys_opts[sys_] <span class="keywordflow">else</span> 1.0
-<a name="l00177"></a>00177                 VectorD_.append(sqrt(w_)*RMSDNrm_)
-<a name="l00178"></a>00178                 <span class="keywordflow">if</span> <span class="keywordflow">not</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite-difference f...">in_fd</a>() <span class="keywordflow">and</span> RMSD_ != 0.0 * angstrom:
-<a name="l00179"></a>00179                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">RMSDDict</a>[sys_] = <span class="stringliteral">&quot;% 9.3f % 12.5f&quot;</span> % (RMSD_ / angstrom, w_*RMSDNrm_**2)
-<a name="l00180"></a>00180             VectorE_ = []
-<a name="l00181"></a>00181             <span class="keywordflow">for</span> inter_ <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>:
-<a name="l00182"></a>00182                 Calculated_ = eval(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter_][<span class="stringliteral">&#39;equation&#39;</span>])
-<a name="l00183"></a>00183                 Reference_ = self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter_][<span class="stringliteral">&#39;reference_physical&#39;</span>]
-<a name="l00184"></a>00184                 Delta_ = Calculated_ - Reference_
-<a name="l00185"></a>00185                 <span class="keywordflow">if</span> self.cauchy:
-<a name="l00186"></a>00186                     Divisor_ = sqrt(self.energy_denom**2 + Reference_**2)
-<a name="l00187"></a>00187                 <span class="keywordflow">else</span>:
-<a name="l00188"></a>00188                     Divisor_ = self.energy_denom
-<a name="l00189"></a>00189                 DeltaNrm_ = Delta_ / Divisor_
-<a name="l00190"></a>00190                 w_ = self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter_][<span class="stringliteral">&#39;weight&#39;</span>] <span class="keywordflow">if</span> <span class="stringliteral">&#39;weight&#39;</span> <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter_] <span class="keywordflow">else</span> 1.0
-<a name="l00191"></a>00191                 VectorE_.append(sqrt(w_)*DeltaNrm_)
-<a name="l00192"></a>00192                 <span class="keywordflow">if</span> <span class="keywordflow">not</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite-difference f...">in_fd</a>():
-<a name="l00193"></a>00193                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#afa4bc73efa73b10aa56f60548de96751">PrintDict</a>[inter_] = <span class="stringliteral">&quot;% 9.3f % 9.3f % 9.3f % 12.5f&quot;</span> % (Calculated_ / kilocalories_per_mole, 
-<a name="l00194"></a>00194                                                                                   Reference_ / kilocalories_per_mole, 
-<a name="l00195"></a>00195                                                                                   Delta_ / kilocalories_per_mole, w_*DeltaNrm_**2)
-<a name="l00196"></a>00196                 <span class="comment"># print &quot;%-20s&quot; % inter_, &quot;Calculated:&quot;, Calculated_, &quot;Reference:&quot;, Reference_, &quot;Delta:&quot;, Delta_, &quot;DeltaNrm:&quot;, DeltaNrm_</span>
-<a name="l00197"></a>00197             <span class="comment"># The return value is an array of normalized interaction energy differences.</span>
-<a name="l00198"></a>00198             <span class="keywordflow">if</span> <span class="keywordflow">not</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite-difference f...">in_fd</a>():
-<a name="l00199"></a>00199                 self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a4af9005899de2d060261e535a2e6b465">rmsd_part</a> = dot(array(VectorD_),array(VectorD_))
-<a name="l00200"></a>00200                 <span class="keywordflow">if</span> len(VectorE_) &gt; 0:
-<a name="l00201"></a>00201                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0bac2f1084de788b25d23820fea6465b">energy_part</a> = dot(array(VectorE_),array(VectorE_))
-<a name="l00202"></a>00202                 <span class="keywordflow">else</span>:
-<a name="l00203"></a>00203                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0bac2f1084de788b25d23820fea6465b">energy_part</a> = 0.0
-<a name="l00204"></a>00204             <span class="keywordflow">if</span> len(VectorE_) &gt; 0 <span class="keywordflow">and</span> len(VectorD_) &gt; 0:
-<a name="l00205"></a>00205                 <span class="keywordflow">return</span> array(VectorD_ + VectorE_)
-<a name="l00206"></a>00206             <span class="keywordflow">elif</span> len(VectorD_) &gt; 0:
-<a name="l00207"></a>00207                 <span class="keywordflow">return</span> array(VectorD_)
-<a name="l00208"></a>00208             <span class="keywordflow">elif</span> len(VectorE_) &gt; 0:
-<a name="l00209"></a>00209                 <span class="keywordflow">return</span> array(VectorE_)
-<a name="l00210"></a>00210                     
-<a name="l00211"></a>00211         V = compute(mvals)
-<a name="l00212"></a>00212 
-<a name="l00213"></a>00213         dV = zeros((self.FF.np,len(V)),dtype=float)
-<a name="l00214"></a>00214         <span class="keywordflow">if</span> AGrad <span class="keywordflow">or</span> AHess:
-<a name="l00215"></a>00215             <span class="keywordflow">for</span> p <span class="keywordflow">in</span> range(self.FF.np):
-<a name="l00216"></a>00216                 dV[p,:], _ = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#aa69a8819e4680091f400303c1d6ddeb7" title="A three-point finite difference stencil.">f12d3p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#ae484c591ae8c4e5bae73a0ef2660c339" title="A function wrapper for finite difference designed for differentiating &#39;get&#39;-type functions.">fdwrap</a>(compute, mvals, p), h = self.h, f0 = V)
-<a name="l00217"></a>00217 
-<a name="l00218"></a>00218         Answer[<span class="stringliteral">&#39;X&#39;</span>] = dot(V,V)
-<a name="l00219"></a>00219         <span class="keywordflow">for</span> p <span class="keywordflow">in</span> range(self.FF.np):
-<a name="l00220"></a>00220             Answer[<span class="stringliteral">&#39;G&#39;</span>][p] = 2*dot(V, dV[p,:])
-<a name="l00221"></a>00221             <span class="keywordflow">for</span> q <span class="keywordflow">in</span> range(self.FF.np):
-<a name="l00222"></a>00222                 Answer[<span class="stringliteral">&#39;H&#39;</span>][p,q] = 2*dot(dV[p,:], dV[q,:])
-<a name="l00223"></a>00223 
-<a name="l00224"></a>00224         <span class="keywordflow">if</span> <span class="keywordflow">not</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite-difference f...">in_fd</a>():
-<a name="l00225"></a>00225             self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a7d1774098b8fbf465484334477db59ab">objective</a> = Answer[<span class="stringliteral">&#39;X&#39;</span>]
-<a name="l00226"></a>00226             self.FF.make(mvals)
-<a name="l00227"></a>00227 
-<a name="l00228"></a>00228         <span class="keywordflow">return</span> Answer
+<a name="l00147"></a>00147         logger.info(<span class="stringliteral">&quot;The energy denominator is: %s\n&quot;</span> % str(self.energy_denom)) 
+<a name="l00148"></a>00148         logger.info(<span class="stringliteral">&quot;The RMSD denominator is: %s\n&quot;</span> % str(self.rmsd_denom))
+<a name="l00149"></a>00149 
+<a name="l00150"></a>00150         <span class="keywordflow">if</span> self.cauchy:
+<a name="l00151"></a>00151             logger.info(<span class="stringliteral">&quot;Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n&quot;</span>)
+<a name="l00152"></a>00152 
+<a name="l00153"></a>00153     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a12deb881863b64276bf847a949a36845">indicate</a>(self):
+<a name="l00154"></a>00154         <a class="code" href="namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary...">printcool_dictionary</a>(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#afa4bc73efa73b10aa56f60548de96751">PrintDict</a>,title=<span class="stringliteral">&quot;Interaction Energies (kcal/mol), Objective = % .5e\n %-20s %9s %9s %9s %11s&quot;</span> % 
+<a name="l00155"></a>00155                              (self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0bac2f1084de788b25d23820fea6465b">energy_part</a>, <span class="stringliteral">&quot;Interaction&quot;</span>, <span class="stringliteral">&quot;Calc.&quot;</span>, <span class="stringliteral">&quot;Ref.&quot;</span>, <span class="stringliteral">&quot;Delta&quot;</span>, <span class="stringliteral">&quot;Term&quot;</span>))
+<a name="l00156"></a><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a12deb881863b64276bf847a949a36845">00156</a>         <span class="keywordflow">if</span> len(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">RMSDDict</a>) &gt; 0:
+<a name="l00157"></a>00157             <a class="code" href="namespaceforcebalance_1_1nifty.html#a51180e960742cc7547749fdfb3513ec4" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary...">printcool_dictionary</a>(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">RMSDDict</a>,title=<span class="stringliteral">&quot;Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s&quot;</span> % (self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a4af9005899de2d060261e535a2e6b465">rmsd_part</a>, <span class="stringliteral">&quot;System&quot;</span>, <span class="stringliteral">&quot;RMSD&quot;</span>, <span class="stringliteral">&quot;Term&quot;</span>), keywidth=45)
+<a name="l00158"></a>00158 
+<a name="l00159"></a>00159     <span class="keyword">def </span><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a263fadef13141ef341a01d1f538f85af" title="Every target must be able to return a contribution to the objective function - however, this must be implemented in the specific subclass.">get</a>(self, mvals, AGrad=False, AHess=False):
+<a name="l00160"></a>00160         Answer = {<span class="stringliteral">&#39;X&#39;</span>:0.0, <span class="stringliteral">&#39;G&#39;</span>:zeros(self.FF.np, dtype=float), <span class="stringliteral">&#39;H&#39;</span>:zeros((self.FF.np, self.FF.np), dtype=float)}
+<a name="l00161"></a>00161         self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#afa4bc73efa73b10aa56f60548de96751">PrintDict</a> = OrderedDict()
+<a name="l00162"></a><a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">00162</a>         self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">RMSDDict</a> = OrderedDict()
+<a name="l00163"></a>00163         <span class="comment">#pool = Pool(processes=4)</span>
+<a name="l00164"></a>00164         <span class="keyword">def </span>compute(mvals_):
+<a name="l00165"></a>00165             <span class="comment"># This function has automatically assigned variable names from the interaction master file</span>
+<a name="l00166"></a>00166             <span class="comment"># Thus, all variable names in here are protected using an underscore.</span>
+<a name="l00167"></a>00167             self.FF.make(mvals_)
+<a name="l00168"></a>00168             VectorD_ = []
+<a name="l00169"></a>00169             <span class="keywordflow">for</span> sys_ <span class="keywordflow">in</span> self.sys_opts:
+<a name="l00170"></a>00170                 Energy_, RMSD_ = self.system_driver(sys_)
+<a name="l00171"></a>00171                 <span class="comment">#print &quot;Setting %s to&quot; % sys_, Energy_</span>
+<a name="l00172"></a>00172                 exec(<span class="stringliteral">&quot;%s = Energy_&quot;</span> % sys_) <span class="keywordflow">in</span> locals()
+<a name="l00173"></a>00173                 RMSDNrm_ = RMSD_ / self.rmsd_denom
+<a name="l00174"></a>00174                 w_ = self.sys_opts[sys_][<span class="stringliteral">&#39;rmsd_weight&#39;</span>] <span class="keywordflow">if</span> <span class="stringliteral">&#39;rmsd_weight&#39;</span> <span class="keywordflow">in</span> self.sys_opts[sys_] <span class="keywordflow">else</span> 1.0
+<a name="l00175"></a>00175                 VectorD_.append(sqrt(w_)*RMSDNrm_)
+<a name="l00176"></a>00176                 <span class="keywordflow">if</span> <span class="keywordflow">not</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite-difference f...">in_fd</a>() <span class="keywordflow">and</span> RMSD_ != 0.0 * angstrom:
+<a name="l00177"></a>00177                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3">RMSDDict</a>[sys_] = <span class="stringliteral">&quot;% 9.3f % 12.5f&quot;</span> % (RMSD_ / angstrom, w_*RMSDNrm_**2)
+<a name="l00178"></a>00178             VectorE_ = []
+<a name="l00179"></a>00179             <span class="keywordflow">for</span> inter_ <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>:
+<a name="l00180"></a>00180                 Calculated_ = eval(self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter_][<span class="stringliteral">&#39;equation&#39;</span>])
+<a name="l00181"></a>00181                 Reference_ = self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter_][<span class="stringliteral">&#39;reference_physical&#39;</span>]
+<a name="l00182"></a>00182                 Delta_ = Calculated_ - Reference_
+<a name="l00183"></a>00183                 <span class="keywordflow">if</span> self.cauchy:
+<a name="l00184"></a>00184                     Divisor_ = sqrt(self.energy_denom**2 + Reference_**2)
+<a name="l00185"></a>00185                 <span class="keywordflow">else</span>:
+<a name="l00186"></a>00186                     Divisor_ = self.energy_denom
+<a name="l00187"></a>00187                 DeltaNrm_ = Delta_ / Divisor_
+<a name="l00188"></a>00188                 w_ = self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter_][<span class="stringliteral">&#39;weight&#39;</span>] <span class="keywordflow">if</span> <span class="stringliteral">&#39;weight&#39;</span> <span class="keywordflow">in</span> self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a930899b4602a6a10a803cf46464ed532">inter_opts</a>[inter_] <span class="keywordflow">else</span> 1.0
+<a name="l00189"></a>00189                 VectorE_.append(sqrt(w_)*DeltaNrm_)
+<a name="l00190"></a>00190                 <span class="keywordflow">if</span> <span class="keywordflow">not</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite-difference f...">in_fd</a>():
+<a name="l00191"></a>00191                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#afa4bc73efa73b10aa56f60548de96751">PrintDict</a>[inter_] = <span class="stringliteral">&quot;% 9.3f % 9.3f % 9.3f % 12.5f&quot;</span> % (Calculated_ / kilocalories_per_mole, 
+<a name="l00192"></a>00192                                                                                   Reference_ / kilocalories_per_mole, 
+<a name="l00193"></a>00193                                                                                   Delta_ / kilocalories_per_mole, w_*DeltaNrm_**2)
+<a name="l00194"></a>00194                 <span class="comment"># print &quot;%-20s&quot; % inter_, &quot;Calculated:&quot;, Calculated_, &quot;Reference:&quot;, Reference_, &quot;Delta:&quot;, Delta_, &quot;DeltaNrm:&quot;, DeltaNrm_</span>
+<a name="l00195"></a>00195             <span class="comment"># The return value is an array of normalized interaction energy differences.</span>
+<a name="l00196"></a>00196             <span class="keywordflow">if</span> <span class="keywordflow">not</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite-difference f...">in_fd</a>():
+<a name="l00197"></a>00197                 self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a4af9005899de2d060261e535a2e6b465">rmsd_part</a> = dot(array(VectorD_),array(VectorD_))
+<a name="l00198"></a>00198                 <span class="keywordflow">if</span> len(VectorE_) &gt; 0:
+<a name="l00199"></a>00199                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0bac2f1084de788b25d23820fea6465b">energy_part</a> = dot(array(VectorE_),array(VectorE_))
+<a name="l00200"></a>00200                 <span class="keywordflow">else</span>:
+<a name="l00201"></a>00201                     self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a0bac2f1084de788b25d23820fea6465b">energy_part</a> = 0.0
+<a name="l00202"></a>00202             <span class="keywordflow">if</span> len(VectorE_) &gt; 0 <span class="keywordflow">and</span> len(VectorD_) &gt; 0:
+<a name="l00203"></a>00203                 <span class="keywordflow">return</span> array(VectorD_ + VectorE_)
+<a name="l00204"></a>00204             <span class="keywordflow">elif</span> len(VectorD_) &gt; 0:
+<a name="l00205"></a>00205                 <span class="keywordflow">return</span> array(VectorD_)
+<a name="l00206"></a>00206             <span class="keywordflow">elif</span> len(VectorE_) &gt; 0:
+<a name="l00207"></a>00207                 <span class="keywordflow">return</span> array(VectorE_)
+<a name="l00208"></a>00208                     
+<a name="l00209"></a>00209         V = compute(mvals)
+<a name="l00210"></a>00210 
+<a name="l00211"></a>00211         dV = zeros((self.FF.np,len(V)),dtype=float)
+<a name="l00212"></a>00212         <span class="keywordflow">if</span> AGrad <span class="keywordflow">or</span> AHess:
+<a name="l00213"></a>00213             <span class="keywordflow">for</span> p <span class="keywordflow">in</span> range(self.FF.np):
+<a name="l00214"></a>00214                 dV[p,:], _ = <a class="code" href="namespaceforcebalance_1_1finite__difference.html#aa69a8819e4680091f400303c1d6ddeb7" title="A three-point finite difference stencil.">f12d3p</a>(<a class="code" href="namespaceforcebalance_1_1finite__difference.html#ae484c591ae8c4e5bae73a0ef2660c339" title="A function wrapper for finite difference designed for differentiating &#39;get&#39;-type functions.">fdwrap</a>(compute, mvals, p), h = self.h, f0 = V)
+<a name="l00215"></a>00215 
+<a name="l00216"></a>00216         Answer[<span class="stringliteral">&#39;X&#39;</span>] = dot(V,V)
+<a name="l00217"></a>00217         <span class="keywordflow">for</span> p <span class="keywordflow">in</span> range(self.FF.np):
+<a name="l00218"></a>00218             Answer[<span class="stringliteral">&#39;G&#39;</span>][p] = 2*dot(V, dV[p,:])
+<a name="l00219"></a>00219             <span class="keywordflow">for</span> q <span class="keywordflow">in</span> range(self.FF.np):
+<a name="l00220"></a>00220                 Answer[<span class="stringliteral">&#39;H&#39;</span>][p,q] = 2*dot(dV[p,:], dV[q,:])
+<a name="l00221"></a>00221 
+<a name="l00222"></a>00222         <span class="keywordflow">if</span> <span class="keywordflow">not</span> <a class="code" href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite-difference f...">in_fd</a>():
+<a name="l00223"></a>00223             self.<a class="code" href="classforcebalance_1_1binding_1_1BindingEnergy.html#a7d1774098b8fbf465484334477db59ab">objective</a> = Answer[<span class="stringliteral">&#39;X&#39;</span>]
+<a name="l00224"></a>00224             self.FF.make(mvals)
+<a name="l00225"></a>00225 
+<a name="l00226"></a>00226         <span class="keywordflow">return</span> Answer
 </pre></div></div><!-- contents -->
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
@@ -328,7 +326,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:14 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:06 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>

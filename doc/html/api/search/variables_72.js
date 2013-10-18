@@ -1,5 +1,7 @@
 var searchData=
 [
+  ['r_5foptions',['r_options',['../classforcebalance_1_1target_1_1RemoteTarget.html#a55f79d109555cbb63f6b332009a1bf9d',1,'forcebalance::target::RemoteTarget']]],
+  ['r_5ftgt_5fopts',['r_tgt_opts',['../classforcebalance_1_1target_1_1RemoteTarget.html#a281a3bd11be2fe3d78d804d0708004f4',1,'forcebalance::target::RemoteTarget']]],
   ['radian',['radian',['../namespaceforcebalance_1_1molecule.html#a922ed32eb838098c0b77423c624a4487',1,'forcebalance::molecule']]],
   ['radii',['radii',['../classforcebalance_1_1psi4io_1_1Grid__Reader.html#a9a2872913fab88d4a8586123f66b6f41',1,'forcebalance::psi4io::Grid_Reader.radii()'],['../namespaceforcebalance_1_1chemistry.html#a5db7a023d3980e17137379852d5c8551',1,'forcebalance::chemistry.Radii()'],['../namespaceforcebalance_1_1molecule.html#ae100906fa209012ddf9d4b19ee69b0b7',1,'forcebalance::molecule.Radii()']]],
   ['read_5ftab',['Read_Tab',['../classforcebalance_1_1molecule_1_1Molecule.html#ab812bbb4ae25ee4f6b69a7926a2ef3e8',1,'forcebalance::molecule::Molecule']]],
@@ -9,13 +11,13 @@ var searchData=
   ['ref_5feigvecs',['ref_eigvecs',['../classforcebalance_1_1moments_1_1Moments.html#a44e515a9fce615d96f722fb274000f4a',1,'forcebalance::moments::Moments.ref_eigvecs()'],['../classforcebalance_1_1vibration_1_1Vibration.html#a4c0f0bfd387a5e30f73431d366c6c650',1,'forcebalance::vibration::Vibration.ref_eigvecs()']]],
   ['ref_5fmoments',['ref_moments',['../classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#a4685ece92ad2b47ac1a07de535016edf',1,'forcebalance::gmxqpio::Monomer_QTPIE::ref_moments()'],['../classforcebalance_1_1moments_1_1Moments.html#a34ef88133ccf7d1e506fee93a8a7c3a8',1,'forcebalance::moments::Moments.ref_moments()']]],
   ['refdata',['RefData',['../classforcebalance_1_1liquid_1_1Liquid.html#a2567b4431d446cbe76e491c00ac9b6c1',1,'forcebalance::liquid::Liquid']]],
+  ['remote_5findicate',['remote_indicate',['../classforcebalance_1_1target_1_1RemoteTarget.html#a43b4e2f91fc38e2062b9f3623b34a0a4',1,'forcebalance::target::RemoteTarget']]],
   ['resid',['resid',['../classforcebalance_1_1molecule_1_1Molecule.html#afcd4c8e1671af626d0267a243e69530d',1,'forcebalance::molecule::Molecule']]],
   ['resname',['resname',['../classforcebalance_1_1molecule_1_1Molecule.html#a4aebc6ada9bda74a6740568d4f3658eb',1,'forcebalance::molecule::Molecule']]],
   ['respterm',['respterm',['../classforcebalance_1_1abinitio_1_1AbInitio.html#ac4f8e85daeccb2e46b724eddc76d38e1',1,'forcebalance::abinitio::AbInitio']]],
-  ['rho_5fexp',['Rho_exp',['../namespaceforcebalance_1_1data.html#adc1abf955f8b53a4451b5e409d1cb48e',1,'forcebalance::data']]],
-  ['rho_5fwt',['Rho_wt',['../namespaceforcebalance_1_1data.html#a215c92b741d8fdf8d1d207f4ba004757',1,'forcebalance::data']]],
   ['rmsd_5fpart',['rmsd_part',['../classforcebalance_1_1binding_1_1BindingEnergy.html#a4af9005899de2d060261e535a2e6b465',1,'forcebalance::binding::BindingEnergy']]],
   ['rmsddict',['RMSDDict',['../classforcebalance_1_1binding_1_1BindingEnergy.html#aed49db6bc9305a0ca359f2a5035438b3',1,'forcebalance::binding::BindingEnergy']]],
+  ['root',['root',['../classforcebalance_1_1engine_1_1Engine.html#a7be99908e51fe6d616a665bf2ad70b1c',1,'forcebalance::engine::Engine']]],
   ['rs',['rs',['../classforcebalance_1_1forcefield_1_1FF.html#a3424d0271d9eebf1962ad87286ec9fc3',1,'forcebalance::forcefield::FF']]],
   ['rundir',['rundir',['../classforcebalance_1_1target_1_1Target.html#a1da470037ef61c22dc44beb85cfa01a9',1,'forcebalance::target::Target']]]
 ];

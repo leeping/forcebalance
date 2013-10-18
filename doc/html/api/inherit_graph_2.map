@@ -1,13 +1,3 @@
 <map id="G" name="G">
-<area shape="rect" id="node1" href="$classforcebalance_1_1BaseReader.html" title="The &#39;reader&#39; class." alt="" coords="5,233,189,260"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html" title="Finite state machine for parsing FrcMod force field file." alt="" coords="251,5,512,32"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1amberio_1_1Mol2__Reader.html" title="Finite state machine for parsing Mol2 force field file." alt="" coords="258,56,505,83"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1custom__io_1_1Gen__Reader.html" title="Finite state machine for parsing custom GROMACS force field files." alt="" coords="254,107,509,133"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1gmxio_1_1ITP__Reader.html" title="Finite state machine for parsing GROMACS force field files." alt="" coords="271,157,491,184"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1mol2io_1_1Mol2__Reader.html" title="Finite state machine for parsing Mol2 force field file." alt="" coords="263,208,499,235"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1openmmio_1_1OpenMM__Reader.html" title="Class for parsing OpenMM force field files." alt="" coords="237,259,525,285"/>
-<area shape="rect" id="node15" href="$classforcebalance_1_1psi4io_1_1GBS__Reader.html" title="Interaction type &#45;&gt; Parameter Dictionary." alt="" coords="267,309,495,336"/>
-<area shape="rect" id="node17" href="$classforcebalance_1_1psi4io_1_1Grid__Reader.html" title="Finite state machine for parsing DVR grid files." alt="" coords="268,360,495,387"/>
-<area shape="rect" id="node19" href="$classforcebalance_1_1qchemio_1_1QCIn__Reader.html" title="Finite state machine for parsing Q&#45;Chem input files." alt="" coords="257,411,505,437"/>
-<area shape="rect" id="node21" href="$classforcebalance_1_1tinkerio_1_1Tinker__Reader.html" title="Finite state machine for parsing TINKER force field files." alt="" coords="257,461,505,488"/>
+<area shape="rect" id="node1" href="$classforcebalance_1_1forcefield_1_1BackedUpDict.html" title="forcebalance.forcefield.BackedUpDict" alt="" coords="6,5,266,32"/>
 </map>

@@ -8,8 +8,9 @@
 <area shape="rect" id="node37" href="$classforcebalance_1_1liquid_1_1Liquid.html" title="Subclass of Target for liquid property matching." alt="" coords="518,512,701,539"/>
 <area shape="rect" id="node45" href="$classforcebalance_1_1moments_1_1Moments.html" title="Subclass of Target for fitting force fields to multipole moments (from experiment or theory)..." alt="" coords="492,563,727,589"/>
 <area shape="rect" id="node49" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html" title="Subclass of Target for R&#45;DVR3 grid fitting." alt="" coords="497,613,722,640"/>
-<area shape="rect" id="node51" href="$classforcebalance_1_1vibration_1_1Vibration.html" title="Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory)..." alt="" coords="497,664,721,691"/>
-<area shape="rect" id="node2" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="6,436,181,463"/>
+<area shape="rect" id="node51" href="$classforcebalance_1_1target_1_1RemoteTarget.html" title="forcebalance.target.RemoteTarget" alt="" coords="490,664,729,691"/>
+<area shape="rect" id="node53" href="$classforcebalance_1_1vibration_1_1Vibration.html" title="Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory)..." alt="" coords="497,715,721,741"/>
+<area shape="rect" id="node2" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="6,461,181,488"/>
 <area shape="rect" id="node7" href="$classforcebalance_1_1abinitio__internal_1_1AbInitio__Internal.html" title="Subclass of Target for force and energy matching using an internal implementation." alt="" coords="797,5,1112,32"/>
 <area shape="rect" id="node9" href="$classforcebalance_1_1amberio_1_1AbInitio__AMBER.html" title="Subclass of Target for force and energy matching using AMBER." alt="" coords="823,56,1087,83"/>
 <area shape="rect" id="node11" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html" title="Subclass of AbInitio for force and energy matching using normal GROMACS." alt="" coords="837,107,1072,133"/>

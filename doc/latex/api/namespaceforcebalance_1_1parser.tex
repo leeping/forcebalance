@@ -30,13 +30,17 @@ dictionary \hyperlink{namespaceforcebalance_1_1parser_a2ac3b892432d1c614c32eebeb
 \begin{DoxyCompactList}\small\item\em \-Default general options. \end{DoxyCompactList}\item 
 dictionary \hyperlink{namespaceforcebalance_1_1parser_a1725a6ea3c588046339f9476f3e3f32e}{tgt\-\_\-opts\-\_\-types}
 \begin{DoxyCompactList}\small\item\em \-Default fitting target options. \end{DoxyCompactList}\item 
+tuple \hyperlink{namespaceforcebalance_1_1parser_ab0f8ac22b808f515531c830439d70bbb}{all\-\_\-opts\-\_\-names} = list(itertools.\-chain($\ast$\mbox{[}i.\-keys() for i in gen\-\_\-opts\-\_\-types.\-values()\mbox{]}))
+\item 
+list \hyperlink{namespaceforcebalance_1_1parser_af730ef69e27de8ffbf475f844c5c2d5f}{iocc} = \mbox{[}$\,$\mbox{]}
+\begin{DoxyCompactList}\small\item\em \-Check for uniqueness of option names. \end{DoxyCompactList}\item 
 dictionary \hyperlink{namespaceforcebalance_1_1parser_a807ea3a28fedbdfd494f5cc8da063202}{gen\-\_\-opts\-\_\-defaults} = \{\}
 \begin{DoxyCompactList}\small\item\em \-Default general options -\/ basically a collapsed veresion of gen\-\_\-opts\-\_\-types. \end{DoxyCompactList}\item 
 dictionary \hyperlink{namespaceforcebalance_1_1parser_abb7a7e9723de629aa97727a85bcdbad1}{subdict} = \{\}
 \item 
 dictionary \hyperlink{namespaceforcebalance_1_1parser_ad2c80e2b742fbd9594fd813dd51550e6}{tgt\-\_\-opts\-\_\-defaults} = \{\}
 \begin{DoxyCompactList}\small\item\em \-Default target options -\/ basically a collapsed version of tgt\-\_\-opts\-\_\-types. \end{DoxyCompactList}\item 
-dictionary \hyperlink{namespaceforcebalance_1_1parser_a37193d7ceabbf07a61e65677372b7dab}{bkwd} = \{\char`\"{}simtype\char`\"{} \-: \char`\"{}type\char`\"{}\}
+dictionary \hyperlink{namespaceforcebalance_1_1parser_a37193d7ceabbf07a61e65677372b7dab}{bkwd} = \{\char`\"{}simtype\char`\"{} \-: \char`\"{}type\char`\"{}, \char`\"{}masterfile\char`\"{} \-: \char`\"{}binding\-\_\-txt\char`\"{}\}
 \begin{DoxyCompactList}\small\item\em \-Option maps for maintaining backward compatibility. \end{DoxyCompactList}\item 
 list \hyperlink{namespaceforcebalance_1_1parser_a525ac339b645dbfb9fbb7cc672712504}{mainsections} = \mbox{[}\char`\"{}\-S\-I\-M\-U\-L\-A\-T\-I\-O\-N\char`\"{},\char`\"{}\-T\-A\-R\-G\-E\-T\char`\"{},\char`\"{}\-O\-P\-T\-I\-O\-N\-S\char`\"{},\char`\"{}\-E\-N\-D\char`\"{},\char`\"{}\-N\-O\-N\-E\char`\"{}\mbox{]}
 \begin{DoxyCompactList}\small\item\em \-Listing of sections in the input file. \end{DoxyCompactList}\item 
@@ -124,7 +128,7 @@ tgt\-\_\-opts \-List of fitting target options.
 \-Implement charge groups. \end{DoxyRefDesc}
 
 
-\-Definition at line 376 of file parser.\-py.
+\-Definition at line 396 of file parser.\-py.
 
 
 
@@ -166,7 +170,7 @@ tgt\-\_\-opts \-List of fitting target options.
 \end{DoxyReturn}
 
 
-\-Definition at line 279 of file parser.\-py.
+\-Definition at line 299 of file parser.\-py.
 
 
 
@@ -188,7 +192,7 @@ tgt\-\_\-opts \-List of fitting target options.
 )}}\label{namespaceforcebalance_1_1parser_a10827b0b21d0463bc9e786f161a02654}
 
 
-\-Definition at line 253 of file parser.\-py.
+\-Definition at line 273 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_aef8b51dba6bb9767a9a956319eb3cc08}{\index{forcebalance\-::parser@{forcebalance\-::parser}!read\-\_\-mvals@{read\-\_\-mvals}}
 \index{read\-\_\-mvals@{read\-\_\-mvals}!forcebalance::parser@{forcebalance\-::parser}}
@@ -199,7 +203,7 @@ tgt\-\_\-opts \-List of fitting target options.
 )}}\label{namespaceforcebalance_1_1parser_aef8b51dba6bb9767a9a956319eb3cc08}
 
 
-\-Definition at line 228 of file parser.\-py.
+\-Definition at line 248 of file parser.\-py.
 
 
 
@@ -221,7 +225,7 @@ tgt\-\_\-opts \-List of fitting target options.
 )}}\label{namespaceforcebalance_1_1parser_a94c3f1acd06b640db3042dc45e32af8e}
 
 
-\-Definition at line 244 of file parser.\-py.
+\-Definition at line 264 of file parser.\-py.
 
 
 
@@ -243,7 +247,7 @@ tgt\-\_\-opts \-List of fitting target options.
 )}}\label{namespaceforcebalance_1_1parser_a56fb1e139dad24bac29f25a3870765ca}
 
 
-\-Definition at line 236 of file parser.\-py.
+\-Definition at line 256 of file parser.\-py.
 
 
 
@@ -259,16 +263,23 @@ tgt\-\_\-opts \-List of fitting target options.
 
 
 \subsubsection{\-Variable \-Documentation}
+\hypertarget{namespaceforcebalance_1_1parser_ab0f8ac22b808f515531c830439d70bbb}{\index{forcebalance\-::parser@{forcebalance\-::parser}!all\-\_\-opts\-\_\-names@{all\-\_\-opts\-\_\-names}}
+\index{all\-\_\-opts\-\_\-names@{all\-\_\-opts\-\_\-names}!forcebalance::parser@{forcebalance\-::parser}}
+\paragraph[{all\-\_\-opts\-\_\-names}]{\setlength{\rightskip}{0pt plus 5cm}tuple {\bf forcebalance\-::parser\-::all\-\_\-opts\-\_\-names} = list(itertools.\-chain($\ast$\mbox{[}i.\-keys() for i in gen\-\_\-opts\-\_\-types.\-values()\mbox{]}))}}\label{namespaceforcebalance_1_1parser_ab0f8ac22b808f515531c830439d70bbb}
+
+
+\-Definition at line 213 of file parser.\-py.
+
 \hypertarget{namespaceforcebalance_1_1parser_a37193d7ceabbf07a61e65677372b7dab}{\index{forcebalance\-::parser@{forcebalance\-::parser}!bkwd@{bkwd}}
 \index{bkwd@{bkwd}!forcebalance::parser@{forcebalance\-::parser}}
-\paragraph[{bkwd}]{\setlength{\rightskip}{0pt plus 5cm}dictionary {\bf forcebalance\-::parser\-::bkwd} = \{\char`\"{}simtype\char`\"{} \-: \char`\"{}type\char`\"{}\}}}\label{namespaceforcebalance_1_1parser_a37193d7ceabbf07a61e65677372b7dab}
+\paragraph[{bkwd}]{\setlength{\rightskip}{0pt plus 5cm}dictionary {\bf forcebalance\-::parser\-::bkwd} = \{\char`\"{}simtype\char`\"{} \-: \char`\"{}type\char`\"{}, \char`\"{}masterfile\char`\"{} \-: \char`\"{}binding\-\_\-txt\char`\"{}\}}}\label{namespaceforcebalance_1_1parser_a37193d7ceabbf07a61e65677372b7dab}
 
 
 \-Option maps for maintaining backward compatibility. 
 
 
 
-\-Definition at line 223 of file parser.\-py.
+\-Definition at line 243 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a807ea3a28fedbdfd494f5cc8da063202}{\index{forcebalance\-::parser@{forcebalance\-::parser}!gen\-\_\-opts\-\_\-defaults@{gen\-\_\-opts\-\_\-defaults}}
 \index{gen\-\_\-opts\-\_\-defaults@{gen\-\_\-opts\-\_\-defaults}!forcebalance::parser@{forcebalance\-::parser}}
@@ -279,7 +290,7 @@ tgt\-\_\-opts \-List of fitting target options.
 
 
 
-\-Definition at line 207 of file parser.\-py.
+\-Definition at line 227 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a2ac3b892432d1c614c32eebeb8de41c5}{\index{forcebalance\-::parser@{forcebalance\-::parser}!gen\-\_\-opts\-\_\-types@{gen\-\_\-opts\-\_\-types}}
 \index{gen\-\_\-opts\-\_\-types@{gen\-\_\-opts\-\_\-types}!forcebalance::parser@{forcebalance\-::parser}}
@@ -291,6 +302,17 @@ tgt\-\_\-opts \-List of fitting target options.
 \-Note that the documentation is included in part of the key; this will aid in automatic doc-\/extraction. \-:) \-In the 5-\/tuple we have\-: \-Default value, priority (larger number means printed first), short docstring, description of scope, list of filter strings for pulling out pertinent targets (\-Make\-Input\-File.\-py) 
 
 \-Definition at line 65 of file parser.\-py.
+
+\hypertarget{namespaceforcebalance_1_1parser_af730ef69e27de8ffbf475f844c5c2d5f}{\index{forcebalance\-::parser@{forcebalance\-::parser}!iocc@{iocc}}
+\index{iocc@{iocc}!forcebalance::parser@{forcebalance\-::parser}}
+\paragraph[{iocc}]{\setlength{\rightskip}{0pt plus 5cm}list {\bf forcebalance\-::parser\-::iocc} = \mbox{[}$\,$\mbox{]}}}\label{namespaceforcebalance_1_1parser_af730ef69e27de8ffbf475f844c5c2d5f}
+
+
+\-Check for uniqueness of option names. 
+
+
+
+\-Definition at line 216 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a0e0761161c5ff444c7afbcc9157cd710}{\index{forcebalance\-::parser@{forcebalance\-::parser}!logger@{logger}}
 \index{logger@{logger}!forcebalance::parser@{forcebalance\-::parser}}
@@ -308,7 +330,7 @@ tgt\-\_\-opts \-List of fitting target options.
 
 
 
-\-Definition at line 226 of file parser.\-py.
+\-Definition at line 246 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_af0a8dc5cdc54cc88ded3ee3b46d71672}{\index{forcebalance\-::parser@{forcebalance\-::parser}!\-Pars\-Tab@{\-Pars\-Tab}}
 \index{\-Pars\-Tab@{\-Pars\-Tab}!forcebalance::parser@{forcebalance\-::parser}}
@@ -327,14 +349,14 @@ tgt\-\_\-opts \-List of fitting target options.
 
 
 
-\-Definition at line 257 of file parser.\-py.
+\-Definition at line 277 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_abb7a7e9723de629aa97727a85bcdbad1}{\index{forcebalance\-::parser@{forcebalance\-::parser}!subdict@{subdict}}
 \index{subdict@{subdict}!forcebalance::parser@{forcebalance\-::parser}}
 \paragraph[{subdict}]{\setlength{\rightskip}{0pt plus 5cm}dictionary {\bf forcebalance\-::parser\-::subdict} = \{\}}}\label{namespaceforcebalance_1_1parser_abb7a7e9723de629aa97727a85bcdbad1}
 
 
-\-Definition at line 209 of file parser.\-py.
+\-Definition at line 229 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_ad2c80e2b742fbd9594fd813dd51550e6}{\index{forcebalance\-::parser@{forcebalance\-::parser}!tgt\-\_\-opts\-\_\-defaults@{tgt\-\_\-opts\-\_\-defaults}}
 \index{tgt\-\_\-opts\-\_\-defaults@{tgt\-\_\-opts\-\_\-defaults}!forcebalance::parser@{forcebalance\-::parser}}
@@ -345,7 +367,7 @@ tgt\-\_\-opts \-List of fitting target options.
 
 
 
-\-Definition at line 215 of file parser.\-py.
+\-Definition at line 235 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a1725a6ea3c588046339f9476f3e3f32e}{\index{forcebalance\-::parser@{forcebalance\-::parser}!tgt\-\_\-opts\-\_\-types@{tgt\-\_\-opts\-\_\-types}}
 \index{tgt\-\_\-opts\-\_\-types@{tgt\-\_\-opts\-\_\-types}!forcebalance::parser@{forcebalance\-::parser}}

@@ -1,15 +1,5 @@
-<map id="forcebalance.target.RemoteTarget.submit_jobs" name="forcebalance.target.RemoteTarget.submit_jobs">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue." alt="" coords="540,119,740,148"/>
-<area shape="rect" id="node20" href="$namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b" title="forcebalance.optimizer.Counter" alt="" coords="253,5,475,35"/>
-<area shape="rect" id="node24" href="$classforcebalance_1_1target_1_1RemoteTarget.html#a7a186f5b2e135448f9249154f7da8752" title="forcebalance.target.Remote\lTarget.get" alt="" coords="264,109,464,155"/>
-<area shape="rect" id="node26" href="$namespaceforcebalance_1_1nifty.html#a577abfd36638c5f4dfdade136abaef12" title="Use this instead of pickle.load for unpickling anything that contains _ElementTree types..." alt="" coords="273,179,455,208"/>
-<area shape="rect" id="node29" href="$classforcebalance_1_1target_1_1RemoteTarget.html#abbdb5171b47a8f5380bf537c809b3b1f" title="forcebalance.target.Remote\lTarget.indicate" alt="" coords="264,231,464,278"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished." alt="" coords="807,110,959,157"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="1009,40,1193,69"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="1243,67,1419,96"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="1012,144,1191,173"/>
-<area shape="rect" id="node18" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="1015,197,1188,227"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="1467,58,1651,105"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="1699,58,1856,105"/>
-<area shape="rect" id="node22" href="$namespaceforcebalance_1_1optimizer.html#ab43948ecf30c90d319e0c0b107fe484a" title="forcebalance.optimizer.GoodStep" alt="" coords="523,5,757,35"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWorkQueue" alt="" coords="405,5,635,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1target_1_1RemoteTarget.html#a7a186f5b2e135448f9249154f7da8752" title="Every target must be able to return a contribution to the objective function &#45; however, this must be implemented in the specific subclass." alt="" coords="388,56,652,83"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1target_1_1RemoteTarget.html#abbdb5171b47a8f5380bf537c809b3b1f" title="forcebalance.target.RemoteTarget.indicate" alt="" coords="373,107,667,133"/>
 </map>

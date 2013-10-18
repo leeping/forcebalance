@@ -129,10 +129,9 @@ Collaboration diagram for forcebalance.gmxio.AbInitio_GMX:</div>
 Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af">__init__</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization; define a few core concepts.  <a href="#a1d03ae8104bcecacf96884058f2698af"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07">read_topology</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This function parses the GROMACS topology file (.top) which contains a listing of the molecules in the simulation.  <a href="#aba138ca4195a1737f2f00bd8c5f3ca07"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ab2eac76585bdb8401812f0c8e465a44e">prepare_temp_directory</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare the temporary directory, by default does nothing.  <a href="#ab2eac76585bdb8401812f0c8e465a44e"></a><br/></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07">read_topology</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd">energy_force_driver</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the energy and force using GROMACS for a single snapshot.  <a href="#a4bc31d1c02d47749d26b14779f025ebd"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a6e43c323b2286c546ff8afd3377f8808">energy_force_driver_all</a></td></tr>
@@ -173,10 +172,11 @@ Public Member Functions</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">def&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1BaseClass.html#a73e9a37a7632e79eb99f49bd15aced45">set_option</a></td></tr>
 <tr><td colspan="2"><h2><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a03444ffaa9a007c19a14062eba187375">trajfnm</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Name of the trajectory.  <a href="#a03444ffaa9a007c19a14062eba187375"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ac86e5eeee4ed51aad1bb70c186ab69f6">topfnm</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aef897301b265ddb98b1d47ce62cb8195">engine</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Default file names for coordinates, top and mdp files.  <a href="#aef897301b265ddb98b1d47ce62cb8195"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#abd8d6bf2f0b8287a77bfbf055b84371e">AtomMask</a></td></tr>
+<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a8d290a57f595a592fb93aba4af2f5134">AtomLists</a></td></tr>
+<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This is a default-dict containing a number of atom-wise lists, such as the residue number of each atom, the mass of each atom, and so on.  <a href="#a8d290a57f595a592fb93aba4af2f5134"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aed68d5926a58dd23476835caaa5722b3">topology_flag</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#ae5c60f421336c2ecb716be16b8d51fdf">whamboltz_wts</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the base class.  <a href="#ae5c60f421336c2ecb716be16b8d51fdf"></a><br/></td></tr>
@@ -214,8 +214,6 @@ Public Attributes</h2></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#a112c4e1af07517633c5c149c07c4aa8c">traj</a></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#ad3dfbd9d397bb7b2bbc3fe0374291e34">nparticles</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of (atoms + drude particles + virtual sites)  <a href="#ad3dfbd9d397bb7b2bbc3fe0374291e34"></a><br/></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#a3eceb701813ccb83d11a0dc71df835b7">AtomLists</a></td></tr>
-<tr><td class="mdescLeft">&#160;</td><td class="mdescRight">This is a default-dict containing a number of atom-wise lists, such as the residue number of each atom, the mass of each atom, and so on.  <a href="#a3eceb701813ccb83d11a0dc71df835b7"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#abab8d9c8cbf4eddc5a3c10b6240423e6">new_vsites</a></td></tr>
 <tr><td class="mdescLeft">&#160;</td><td class="mdescRight">Read in the topology.  <a href="#abab8d9c8cbf4eddc5a3c10b6240423e6"></a><br/></td></tr>
 <tr><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#a430661954fff8c1979eb9ac28523bb5e">save_vmvals</a></td></tr>
@@ -261,7 +259,7 @@ Public Attributes</h2></td></tr>
 <div class="textblock"><p>Subclass of AbInitio for force and energy matching using normal GROMACS. </p>
 <p>Implements the prepare_temp_directory and energy_force_driver methods. </p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00438">438</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00638">638</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a1d03ae8104bcecacf96884058f2698af"></a><!-- doxytag: member="forcebalance::gmxio::AbInitio_GMX::__init__" ref="a1d03ae8104bcecacf96884058f2698af" args="" -->
 <div class="memitem">
@@ -305,14 +303,7 @@ Public Attributes</h2></td></tr>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#ad6d702694d6cd99e3432183e5c4860c9">forcebalance.abinitio.AbInitio</a>.</p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00440">440</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1AbInitio__GMX_a1d03ae8104bcecacf96884058f2698af_cgraph.svg" width="675" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00640">640</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -422,12 +413,13 @@ Here is the call graph for this function:</div>
 <p>Computes the energy and force using GROMACS for a single snapshot. </p>
 <p>This does not require GROMACS-X2. </p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00518">518</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00668">668</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1AbInitio__GMX_a4bc31d1c02d47749d26b14779f025ebd_cgraph.svg" width="2083" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1AbInitio__GMX_a4bc31d1c02d47749d26b14779f025ebd_cgraph.svg" width="710" height="88"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -451,14 +443,7 @@ Here is the call graph for this function:</div>
 <p>Computes the energy and force using GROMACS for a trajectory. </p>
 <p>This does not require GROMACS-X2. </p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00539">539</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
-
-<p><div class="dynheader">
-Here is the call graph for this function:</div>
-<div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1AbInitio__GMX_a6e43c323b2286c546ff8afd3377f8808_cgraph.svg" width="1670" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
-</div>
-</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00673">673</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -487,7 +472,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00458">458</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00459">459</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -541,12 +526,13 @@ Here is the call graph for this function:</div>
 
 <p>Call mdrun in order to update the virtual site positions. </p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00562">562</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00678">678</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1AbInitio__GMX_ae17e3c379d82935d725dd31f01df23e5_cgraph.svg" width="1235" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1AbInitio__GMX_ae17e3c379d82935d725dd31f01df23e5_cgraph.svg" width="987" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -594,7 +580,7 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1target_1_1Target.html#a1389888302c49d529716cb45b13a6f5a">forcebalance.target.Target</a>.</p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01098">1098</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01100">1100</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -658,7 +644,7 @@ Here is the call graph for this function:</div>
 </dl>
 <dl class="return"><dt><b>Returns:</b></dt><dd>Answer Contribution to the objective function </dd></dl>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -690,7 +676,7 @@ Here is the call graph for this function:</div>
 <p>Computes the objective function contribution and its gradient. </p>
 <p>First the low-level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1_pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00171">171</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00172">172</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -730,7 +716,7 @@ Here is the call graph for this function:</div>
 <p>First the low-level 'get' method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1_pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on.</p>
 <p>This is followed by looping through the fd2_pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00194">194</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00195">195</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -781,7 +767,7 @@ Here is the call graph for this function:</div>
 <p>Electrostatic potential fitting. </p>
 <p>Implements the RESP objective function. (In Python so obviously not optimized.) This function takes the mathematical parameter values and returns the charges on the ATOMS (fancy mapping going on) </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00999">999</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01001">1001</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -812,7 +798,7 @@ Here is the call graph for this function:</div>
 
 <p>Computes the objective function contribution without any parametric derivatives. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00154">154</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00155">155</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -874,7 +860,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00212">212</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00213">213</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -913,12 +899,13 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#a2d0f465f1988fd6bc611f7de4b59fd04">forcebalance.abinitio.AbInitio</a>.</p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00493">493</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00659">659</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1AbInitio__GMX_ab2eac76585bdb8401812f0c8e465a44e_cgraph.svg" width="2523" height="190"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="classforcebalance_1_1gmxio_1_1AbInitio__GMX_ab2eac76585bdb8401812f0c8e465a44e_cgraph.svg" width="838" height="38"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe>
+</div>
 </div>
 </p>
 
@@ -986,7 +973,7 @@ Here is the call graph for this function:</div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00366">366</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00367">367</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1044,13 +1031,9 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>This function parses the GROMACS topology file (.top) which contains a listing of the molecules in the simulation. </p>
-<p>For each molecule, it loads up a "FFMolecule" dictionary which contains information about each atom in the molecule - which residue (i.e. molecular fragment) the atom belongs in, the charge group, the particle type etc.</p>
-<p>This allows us to do things like condense the gradients into net forces and torques, determine which particles are real atoms and which are virtual sites, and so on. </p>
-
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#a9f405c452a0a4081cd7da07938520920">forcebalance.abinitio.AbInitio</a>.</p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00455">455</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00662">662</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1071,7 +1054,7 @@ Here is the call graph for this function:</div>
 
 <p>Back up the temporary directory if desired, delete it and then create a new one. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00218">218</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00219">219</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1137,7 +1120,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="____init_____8py_source.html#l00034">34</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
+<p>Definition at line <a class="el" href="____init_____8py_source.html#l00032">32</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
 
 </div>
 </div>
@@ -1187,7 +1170,7 @@ Here is the call graph for this function:</div>
 <p>Stages the directory for the target, and then calls 'get'. </p>
 <p>The 'get' method should not worry about the directory that it's running in. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00265">265</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00266">266</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1244,7 +1227,7 @@ Here is the call graph for this function:</div>
 <p>Stages the directory for the target, and then launches Work Queue processes if any. </p>
 <p>The 'get' method should not worry about the directory that it's running in. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00300">300</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00301">301</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1292,9 +1275,9 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Reimplemented in <a class="el" href="classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a728adb334e4ad6e26200c265fc2f351a">forcebalance.psi4io.RDVR3_Psi4</a>, and <a class="el" href="classforcebalance_1_1liquid_1_1Liquid.html#a716e28bb5572b3273036ac753b7e1e1d">forcebalance.liquid.Liquid</a>.</p>
+<p>Reimplemented in <a class="el" href="classforcebalance_1_1target_1_1RemoteTarget.html#a59354bb1a7f474e82c65cb0ef2b55098">forcebalance.target.RemoteTarget</a>, <a class="el" href="classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a728adb334e4ad6e26200c265fc2f351a">forcebalance.psi4io.RDVR3_Psi4</a>, and <a class="el" href="classforcebalance_1_1liquid_1_1Liquid.html#a716e28bb5572b3273036ac753b7e1e1d">forcebalance.liquid.Liquid</a>.</p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00290">290</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00291">291</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1315,7 +1298,7 @@ Here is the call graph for this function:</div>
 
 <p>This method determines whether the Work Queue tasks for the current target have completed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00330">330</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00331">331</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 <p><div class="dynheader">
 Here is the call graph for this function:</div>
@@ -1327,12 +1310,12 @@ Here is the call graph for this function:</div>
 </div>
 </div>
 <hr/><h2>Member Data Documentation</h2>
-<a class="anchor" id="a3eceb701813ccb83d11a0dc71df835b7"></a><!-- doxytag: member="forcebalance::gmxio::AbInitio_GMX::AtomLists" ref="a3eceb701813ccb83d11a0dc71df835b7" args="" -->
+<a class="anchor" id="a8d290a57f595a592fb93aba4af2f5134"></a><!-- doxytag: member="forcebalance::gmxio::AbInitio_GMX::AtomLists" ref="a8d290a57f595a592fb93aba4af2f5134" args="" -->
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#a3eceb701813ccb83d11a0dc71df835b7">forcebalance::abinitio.AbInitio::AtomLists</a><code> [inherited]</code></td>
+          <td class="memname"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a8d290a57f595a592fb93aba4af2f5134">forcebalance::gmxio.AbInitio_GMX::AtomLists</a></td>
         </tr>
       </table>
 </div>
@@ -1340,7 +1323,9 @@ Here is the call graph for this function:</div>
 
 <p>This is a default-dict containing a number of atom-wise lists, such as the residue number of each atom, the mass of each atom, and so on. </p>
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00092">92</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Reimplemented from <a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#a3eceb701813ccb83d11a0dc71df835b7">forcebalance.abinitio.AbInitio</a>.</p>
+
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00644">644</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1355,7 +1340,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00455">455</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00644">644</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1402,7 +1387,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1420,6 +1405,24 @@ Here is the call graph for this function:</div>
 <p>Energies of the sampling simulation. </p>
 
 <p>Definition at line <a class="el" href="abinitio_8py_source.html#l00079">79</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="aef897301b265ddb98b1d47ce62cb8195"></a><!-- doxytag: member="forcebalance::gmxio::AbInitio_GMX::engine" ref="aef897301b265ddb98b1d47ce62cb8195" args="" -->
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aef897301b265ddb98b1d47ce62cb8195">forcebalance::gmxio.AbInitio_GMX::engine</a></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Default file names for coordinates, top and mdp files. </p>
+<p>Initialize base class. Build keyword dictionaries to pass to engine. Create engine object. </p>
+
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00644">644</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -1534,7 +1537,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1551,7 +1554,7 @@ Here is the call graph for this function:</div>
 
 <p>Need the forcefield (here for now) </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00108">108</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00109">109</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1645,7 +1648,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the gradient was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00110">110</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00111">111</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1662,7 +1665,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the Hessian was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00111">111</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00112">112</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1677,7 +1680,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00999">999</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01001">1001</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1755,7 +1758,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1849,7 +1852,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01098">1098</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01100">1100</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1864,7 +1867,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="____init_____8py_source.html#l00030">30</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
+<p>Definition at line <a class="el" href="____init_____8py_source.html#l00028">28</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
 
 </div>
 </div>
@@ -1930,7 +1933,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00999">999</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01001">1001</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -1948,7 +1951,7 @@ Here is the call graph for this function:</div>
 <p>The directory in which the simulation is running - this can be updated. </p>
 <p>Directory of the current iteration; if not None, then the simulation runs under temp/target_name/iteration_number The 'customdir' is customizable and can go below anything.</p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00107">107</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00108">108</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -1983,22 +1986,7 @@ Here is the call graph for this function:</div>
 <p>Root directory of the whole project. </p>
 <p>Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for FD gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger FD gradient elements Parameter types that trigger FD Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target_name) Used for storing temporary variables that don't change through the course of the optimization </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00106">106</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="ac86e5eeee4ed51aad1bb70c186ab69f6"></a><!-- doxytag: member="forcebalance::gmxio::AbInitio_GMX::topfnm" ref="ac86e5eeee4ed51aad1bb70c186ab69f6" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ac86e5eeee4ed51aad1bb70c186ab69f6">forcebalance::gmxio.AbInitio_GMX::topfnm</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00441">441</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00107">107</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -2015,7 +2003,7 @@ Here is the call graph for this function:</div>
 
 <p>Reimplemented from <a class="el" href="classforcebalance_1_1abinitio_1_1AbInitio.html#a32164696f808febd50eafae10d10a7e7">forcebalance.abinitio.AbInitio</a>.</p>
 
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00455">455</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
+<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00662">662</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -2030,7 +2018,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2060,7 +2048,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2076,23 +2064,6 @@ Here is the call graph for this function:</div>
 <div class="memdoc">
 
 <p>Definition at line <a class="el" href="abinitio_8py_source.html#l00089">89</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
-
-</div>
-</div>
-<a class="anchor" id="a03444ffaa9a007c19a14062eba187375"></a><!-- doxytag: member="forcebalance::gmxio::AbInitio_GMX::trajfnm" ref="a03444ffaa9a007c19a14062eba187375" args="" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a03444ffaa9a007c19a14062eba187375">forcebalance::gmxio.AbInitio_GMX::trajfnm</a></td>
-        </tr>
-      </table>
-</div>
-<div class="memdoc">
-
-<p>Name of the trajectory. </p>
-
-<p>Definition at line <a class="el" href="gmxio_8py_source.html#l00441">441</a> of file <a class="el" href="gmxio_8py_source.html">gmxio.py</a>.</p>
 
 </div>
 </div>
@@ -2124,7 +2095,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="____init_____8py_source.html#l00030">30</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
+<p>Definition at line <a class="el" href="____init_____8py_source.html#l00028">28</a> of file <a class="el" href="____init_____8py_source.html">__init__.py</a>.</p>
 
 </div>
 </div>
@@ -2139,7 +2110,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2169,7 +2140,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2184,7 +2155,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00999">999</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l01001">1001</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2199,7 +2170,7 @@ Here is the call graph for this function:</div>
 </div>
 <div class="memdoc">
 
-<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00532">532</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
+<p>Definition at line <a class="el" href="abinitio_8py_source.html#l00534">534</a> of file <a class="el" href="abinitio_8py_source.html">abinitio.py</a>.</p>
 
 </div>
 </div>
@@ -2249,7 +2220,7 @@ Here is the call graph for this function:</div>
 
 <p>Counts how often the objective function was computed. </p>
 
-<p>Definition at line <a class="el" href="target_8py_source.html#l00109">109</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
+<p>Definition at line <a class="el" href="target_8py_source.html#l00110">110</a> of file <a class="el" href="target_8py_source.html">target.py</a>.</p>
 
 </div>
 </div>
@@ -2274,7 +2245,7 @@ Here is the call graph for this function:</div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Aug 25 2013 11:24:15 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Oct 18 2013 09:33:07 for ForceBalance API by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.7.6.1
 </small></address>
