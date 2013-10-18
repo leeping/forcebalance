@@ -1,5 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$classforcebalance_1_1abinitio_1_1AbInitio.html" title="Subclass of Target for fitting force fields to ab initio data." alt="" coords="48,155,253,181"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="55,80,245,107"/>
-<area shape="rect" id="node6" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="63,5,237,32"/>
+<map id="forcebalance.openmmio.AbInitio_OpenMM" name="forcebalance.openmmio.AbInitio_OpenMM">
+<area shape="rect" id="node2" href="$classforcebalance_1_1abinitio_1_1AbInitio.html" title="Subclass of Target for fitting force fields to ab initio data. " alt="" coords="17,230,191,271"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets. " alt="" coords="9,155,199,181"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes. " alt="" coords="17,80,191,107"/>
 </map>

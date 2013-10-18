@@ -1,5 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a0dee435704418bf51199d6bab6d92249" title="forcebalance.molecule.Molecule.write_dcd" alt="" coords="373,5,664,32"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="712,5,987,32"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center_of_mass" alt="" coords="1035,5,1367,32"/>
+<map id="forcebalance.molecule.Molecule.write_molproq" name="forcebalance.molecule.Molecule.write_molproq">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a0dee435704418bf51199d6bab6d92249" title="forcebalance.molecule.Molecule.write_dcd" alt="" coords="315,12,605,39"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="653,12,928,39"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center\l_of_mass" alt="" coords="977,5,1247,46"/>
 </map>

@@ -1,11 +1,11 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="326,5,522,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="601,5,809,32"/>
-<area shape="rect" id="node8" href="$namespaceforcebalance_1_1molecule.html#aafc8c924eed4480fed8ddc9c474d3bc1" title="Determines whether a line contains a GROMACS box vector or not." alt="" coords="305,107,543,133"/>
-<area shape="rect" id="node10" href="$namespaceforcebalance_1_1molecule.html#a58c3f09152db4d1c6e1db9df29c60c43" title="forcebalance.molecule.pvec" alt="" coords="605,56,805,83"/>
-<area shape="rect" id="node12" href="$namespaceforcebalance_1_1molecule.html#a7fe52c2928c7b0329882541bef2e34cd" title="Groups a big long iterable into groups of ten or what have you." alt="" coords="595,107,815,133"/>
-<area shape="rect" id="node16" href="$namespaceforcebalance_1_1molecule.html#a5f529179461765fadbd0a742cdc2c677" title="Creates a list of number sequences divided as evenly as possible." alt="" coords="592,157,819,184"/>
-<area shape="rect" id="node14" href="$namespaceforcebalance_1_1molecule.html#a5b50df23cc4d0e617fdc56538f0bea63" title="forcebalance.molecule.both" alt="" coords="871,107,1070,133"/>
-<area shape="rect" id="node18" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="876,157,1065,184"/>
-<area shape="rect" id="node20" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="867,208,1074,235"/>
+<map id="forcebalance.molecule.is_gro_coord" name="forcebalance.molecule.is_gro_coord">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="235,5,431,32"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="489,9,697,36"/>
+<area shape="rect" id="node8" href="$namespaceforcebalance_1_1molecule.html#aafc8c924eed4480fed8ddc9c474d3bc1" title="Determines whether a line contains a GROMACS box vector or not. " alt="" coords="243,107,423,149"/>
+<area shape="rect" id="node10" href="$namespaceforcebalance_1_1molecule.html#a58c3f09152db4d1c6e1db9df29c60c43" title="forcebalance.molecule.pvec" alt="" coords="493,64,693,91"/>
+<area shape="rect" id="node12" href="$namespaceforcebalance_1_1molecule.html#a7fe52c2928c7b0329882541bef2e34cd" title="Groups a big long iterable into groups of ten or what have you. " alt="" coords="483,115,703,141"/>
+<area shape="rect" id="node16" href="$namespaceforcebalance_1_1molecule.html#a5f529179461765fadbd0a742cdc2c677" title="Creates a list of number sequences divided as evenly as possible. " alt="" coords="480,165,707,192"/>
+<area shape="rect" id="node14" href="$namespaceforcebalance_1_1molecule.html#a5b50df23cc4d0e617fdc56538f0bea63" title="forcebalance.molecule.both" alt="" coords="759,115,958,141"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="764,165,953,192"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="755,216,962,243"/>
 </map>

@@ -17,7 +17,7 @@
 </g>
 <!-- Node2 -->
 <g id="node2" class="node"><title>Node2</title>
-<g id="a_node2"><a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#afbf86c26158a68cae7460b4106809fdd" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.abinitio.Ab\lInitio.compute_netforce\l_torque">
+<g id="a_node2"><a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#afbf86c26158a68cae7460b4106809fdd" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.abinitio.Ab\lInitio.compute_netforce\l_torque">
 <polygon fill="white" stroke="black" points="397.577,-600.287 397.577,-644.287 512.423,-644.287 512.423,-600.287 397.577,-600.287"/>
 <text text-anchor="start" x="405.577" y="-631.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.Ab</text>
 <text text-anchor="start" x="405.577" y="-619.287" font-family="Ubuntu-R" font-size="10.00">Initio.compute_netforce</text>
@@ -32,7 +32,7 @@
 </g>
 <!-- Node3 -->
 <g id="node3" class="node"><title>Node3</title>
-<g id="a_node3"><a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#a9167da321a9fff748eef5ebe754cc7ca" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.abinitio.Ab\lInitio.energy_force_transformer">
+<g id="a_node3"><a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#a9167da321a9fff748eef5ebe754cc7ca" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.abinitio.Ab\lInitio.energy_force_transformer">
 <polygon fill="white" stroke="black" points="196.725,-518.287 196.725,-550.287 341.275,-550.287 341.275,-518.287 196.725,-518.287"/>
 <text text-anchor="start" x="204.725" y="-537.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.Ab</text>
 <text text-anchor="middle" x="269" y="-525.287" font-family="Ubuntu-R" font-size="10.00">Initio.energy_force_transformer</text>
@@ -46,7 +46,7 @@
 </g>
 <!-- Node7 -->
 <g id="node7" class="node"><title>Node7</title>
-<g id="a_node7"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd" target="_top" target="_top" target="_top" target="_top" xlink:title="Computes the energy and force using GROMACS for a single snapshot.">
+<g id="a_node7"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a4bc31d1c02d47749d26b14779f025ebd" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="Computes the energy and force using GROMACS for a single snapshot.">
 <polygon fill="white" stroke="black" points="203.243,-430.287 203.243,-462.287 334.757,-462.287 334.757,-430.287 203.243,-430.287"/>
 <text text-anchor="start" x="211.243" y="-449.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="269" y="-437.287" font-family="Ubuntu-R" font-size="10.00">_GMX.energy_force_driver</text>
@@ -60,7 +60,7 @@
 </g>
 <!-- Node17 -->
 <g id="node17" class="node"><title>Node17</title>
-<g id="a_node17"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#ab3835da0b951f77bfef0f14acd133c26" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.energy_force\l_driver">
+<g id="a_node17"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#ab3835da0b951f77bfef0f14acd133c26" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.energy_force\l_driver">
 <polygon fill="white" stroke="black" points="201.719,-50.2867 201.719,-94.2867 336.281,-94.2867 336.281,-50.2867 201.719,-50.2867"/>
 <text text-anchor="start" x="209.719" y="-81.2867" font-family="Ubuntu-R" font-size="10.00">forcebalance.tinkerio.Ab</text>
 <text text-anchor="start" x="209.719" y="-69.2867" font-family="Ubuntu-R" font-size="10.00">Initio_TINKER.energy_force</text>
@@ -80,7 +80,7 @@
 </g>
 <!-- Node4 -->
 <g id="node4" class="node"><title>Node4</title>
-<g id="a_node4"><a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#a313c848f46579817803c8a3ff100974e" target="_top" target="_top" target="_top" target="_top" xlink:title="LPW 06&#45;30&#45;2013.">
+<g id="a_node4"><a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#a313c848f46579817803c8a3ff100974e" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="LPW 06&#45;30&#45;2013.">
 <polygon fill="white" stroke="black" points="397.437,-549.287 397.437,-581.287 512.563,-581.287 512.563,-549.287 397.437,-549.287"/>
 <text text-anchor="start" x="405.437" y="-568.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.Ab</text>
 <text text-anchor="middle" x="455" y="-556.287" font-family="Ubuntu-R" font-size="10.00">Initio.get_energy_force_</text>
@@ -94,7 +94,7 @@
 </g>
 <!-- Node5 -->
 <g id="node5" class="node"><title>Node5</title>
-<g id="a_node5"><a xlink:href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.nifty.warn\l_press_key">
+<g id="a_node5"><a xlink:href="namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.nifty.warn\l_press_key">
 <polygon fill="white" stroke="black" points="1383.53,-485.287 1383.53,-517.287 1494.47,-517.287 1494.47,-485.287 1383.53,-485.287"/>
 <text text-anchor="start" x="1391.53" y="-504.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.warn</text>
 <text text-anchor="middle" x="1439" y="-492.287" font-family="Ubuntu-R" font-size="10.00">_press_key</text>
@@ -108,7 +108,7 @@
 </g>
 <!-- Node6 -->
 <g id="node6" class="node"><title>Node6</title>
-<g id="a_node6"><a xlink:href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" target="_top" target="_top" target="_top" target="_top" xlink:title="Similar to the bultin function map().">
+<g id="a_node6"><a xlink:href="namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="Similar to the bultin function map().">
 <polygon fill="white" stroke="black" points="1538.04,-491.287 1538.04,-511.287 1693.96,-511.287 1693.96,-491.287 1538.04,-491.287"/>
 <text text-anchor="middle" x="1616" y="-498.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.concurrent_map</text>
 </a>
@@ -121,7 +121,7 @@
 </g>
 <!-- Node8 -->
 <g id="node8" class="node"><title>Node8</title>
-<g id="a_node8"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a6e43c323b2286c546ff8afd3377f8808" target="_top" target="_top" target="_top" target="_top" xlink:title="Computes the energy and force using GROMACS for a trajectory.">
+<g id="a_node8"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a6e43c323b2286c546ff8afd3377f8808" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="Computes the energy and force using GROMACS for a trajectory.">
 <polygon fill="white" stroke="black" points="383.279,-395.287 383.279,-427.287 526.721,-427.287 526.721,-395.287 383.279,-395.287"/>
 <text text-anchor="start" x="391.279" y="-414.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="455" y="-402.287" font-family="Ubuntu-R" font-size="10.00">_GMX.energy_force_driver_all</text>
@@ -135,7 +135,7 @@
 </g>
 <!-- Node15 -->
 <g id="node15" class="node"><title>Node15</title>
-<g id="a_node15"><a xlink:href="namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.gmxio.rm\l_gmx_baks">
+<g id="a_node15"><a xlink:href="namespaceforcebalance_1_1gmxio.html#acac8488f29b62fb0d4cb54bb5a041026" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.gmxio.rm\l_gmx_baks">
 <polygon fill="white" stroke="black" points="1384.63,-325.287 1384.63,-357.287 1493.37,-357.287 1493.37,-325.287 1384.63,-325.287"/>
 <text text-anchor="start" x="1392.63" y="-344.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.rm</text>
 <text text-anchor="middle" x="1439" y="-332.287" font-family="Ubuntu-R" font-size="10.00">_gmx_baks</text>
@@ -149,7 +149,7 @@
 </g>
 <!-- Node9 -->
 <g id="node9" class="node"><title>Node9</title>
-<g id="a_node9"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ae17e3c379d82935d725dd31f01df23e5" target="_top" target="_top" target="_top" target="_top" xlink:title="Call mdrun in order to update the virtual site positions.">
+<g id="a_node9"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ae17e3c379d82935d725dd31f01df23e5" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="Call mdrun in order to update the virtual site positions.">
 <polygon fill="white" stroke="black" points="574.154,-395.287 574.154,-427.287 719.846,-427.287 719.846,-395.287 574.154,-395.287"/>
 <text text-anchor="start" x="582.154" y="-414.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="647" y="-402.287" font-family="Ubuntu-R" font-size="10.00">_GMX.generate_vsite_positions</text>
@@ -168,7 +168,7 @@
 </g>
 <!-- Node10 -->
 <g id="node10" class="node"><title>Node10</title>
-<g id="a_node10"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.gmxio.AbInitio\l_GMX.__init__">
+<g id="a_node10"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.gmxio.AbInitio\l_GMX.__init__">
 <polygon fill="white" stroke="black" points="775.243,-421.287 775.243,-453.287 906.757,-453.287 906.757,-421.287 775.243,-421.287"/>
 <text text-anchor="start" x="783.243" y="-440.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="841" y="-428.287" font-family="Ubuntu-R" font-size="10.00">_GMX.__init__</text>
@@ -182,7 +182,7 @@
 </g>
 <!-- Node16 -->
 <g id="node16" class="node"><title>Node16</title>
-<g id="a_node16"><a xlink:href="classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option">
+<g id="a_node16"><a xlink:href="classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option">
 <polygon fill="white" stroke="black" points="774.265,-370.287 774.265,-402.287 907.735,-402.287 907.735,-370.287 774.265,-370.287"/>
 <text text-anchor="start" x="782.265" y="-389.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.baseclass.Force</text>
 <text text-anchor="middle" x="841" y="-377.287" font-family="Ubuntu-R" font-size="10.00">BalanceBaseClass.set_option</text>
@@ -196,7 +196,7 @@
 </g>
 <!-- Node11 -->
 <g id="node11" class="node"><title>Node11</title>
-<g id="a_node11"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" target="_top" target="_top" target="_top" target="_top" xlink:title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th...">
+<g id="a_node11"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th...">
 <polygon fill="white" stroke="black" points="992.243,-421.287 992.243,-453.287 1123.76,-453.287 1123.76,-421.287 992.243,-421.287"/>
 <text text-anchor="start" x="1000.24" y="-440.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="1058" y="-428.287" font-family="Ubuntu-R" font-size="10.00">_GMX.read_topology</text>
@@ -210,7 +210,7 @@
 </g>
 <!-- Node12 -->
 <g id="node12" class="node"><title>Node12</title>
-<g id="a_node12"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ab2eac76585bdb8401812f0c8e465a44e" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.gmxio.AbInitio\l_GMX.prepare_temp_directory">
+<g id="a_node12"><a xlink:href="classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#ab2eac76585bdb8401812f0c8e465a44e" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.gmxio.AbInitio\l_GMX.prepare_temp_directory">
 <polygon fill="white" stroke="black" points="1196.55,-431.287 1196.55,-463.287 1339.45,-463.287 1339.45,-431.287 1196.55,-431.287"/>
 <text text-anchor="start" x="1204.55" y="-450.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.gmxio.AbInitio</text>
 <text text-anchor="middle" x="1268" y="-438.287" font-family="Ubuntu-R" font-size="10.00">_GMX.prepare_temp_directory</text>
@@ -234,7 +234,7 @@
 </g>
 <!-- Node13 -->
 <g id="node13" class="node"><title>Node13</title>
-<g id="a_node13"><a xlink:href="namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.nifty.LinkFile">
+<g id="a_node13"><a xlink:href="namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.nifty.LinkFile">
 <polygon fill="white" stroke="black" points="1376.3,-437.287 1376.3,-457.287 1501.7,-457.287 1501.7,-437.287 1376.3,-437.287"/>
 <text text-anchor="middle" x="1439" y="-444.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.LinkFile</text>
 </a>
@@ -252,7 +252,7 @@
 </g>
 <!-- Node14 -->
 <g id="node14" class="node"><title>Node14</title>
-<g id="a_node14"><a xlink:href="namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" target="_top" target="_top" target="_top" target="_top" xlink:title="Remove the file if it exists (doesn&#39;t return an error).">
+<g id="a_node14"><a xlink:href="namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="Remove the file if it exists (doesn&#39;t return an error).">
 <polygon fill="white" stroke="black" points="1555.53,-431.287 1555.53,-463.287 1676.47,-463.287 1676.47,-431.287 1555.53,-431.287"/>
 <text text-anchor="start" x="1563.53" y="-450.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.nifty.remove</text>
 <text text-anchor="middle" x="1616" y="-438.287" font-family="Ubuntu-R" font-size="10.00">_if_exists</text>
@@ -266,7 +266,7 @@
 </g>
 <!-- Node18 -->
 <g id="node18" class="node"><title>Node18</title>
-<g id="a_node18"><a xlink:href="namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" target="_top" target="_top" target="_top" target="_top" xlink:title="ONLY matches integers! If you have a decimal point? None shall pass!">
+<g id="a_node18"><a xlink:href="namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="ONLY matches integers! If you have a decimal point? None shall pass!">
 <polygon fill="white" stroke="black" points="392.024,-23.2867 392.024,-43.2867 517.976,-43.2867 517.976,-23.2867 392.024,-23.2867"/>
 <text text-anchor="middle" x="455" y="-30.2867" font-family="Ubuntu-R" font-size="10.00">forcebalance.molecule.isint</text>
 </a>
@@ -279,7 +279,7 @@
 </g>
 <!-- Node19 -->
 <g id="node19" class="node"><title>Node19</title>
-<g id="a_node19"><a xlink:href="namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" target="_top" target="_top" target="_top" target="_top" xlink:title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you...">
+<g id="a_node19"><a xlink:href="namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you...">
 <polygon fill="white" stroke="black" points="580.14,-3.28669 580.14,-23.2867 713.86,-23.2867 713.86,-3.28669 580.14,-3.28669"/>
 <text text-anchor="middle" x="647" y="-10.2867" font-family="Ubuntu-R" font-size="10.00">forcebalance.molecule.isfloat</text>
 </a>
@@ -292,7 +292,7 @@
 </g>
 <!-- Node20 -->
 <g id="node20" class="node"><title>Node20</title>
-<g id="a_node20"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#aafbf91f1422d7b8f65a4aa588d1c6e18" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.energy_driver_all">
+<g id="a_node20"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#aafbf91f1422d7b8f65a4aa588d1c6e18" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.energy_driver_all">
 <polygon fill="white" stroke="black" points="378.55,-120.287 378.55,-152.287 531.45,-152.287 531.45,-120.287 378.55,-120.287"/>
 <text text-anchor="start" x="386.55" y="-139.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.tinkerio.Ab</text>
 <text text-anchor="middle" x="455" y="-127.287" font-family="Ubuntu-R" font-size="10.00">Initio_TINKER.energy_driver_all</text>
@@ -316,7 +316,7 @@
 </g>
 <!-- Node21 -->
 <g id="node21" class="node"><title>Node21</title>
-<g id="a_node21"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#a27835affec49391fc41b832839a2b0e8" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.energy_force\l_driver_all">
+<g id="a_node21"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#a27835affec49391fc41b832839a2b0e8" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.energy_force\l_driver_all">
 <polygon fill="white" stroke="black" points="579.718,-114.287 579.718,-158.287 714.282,-158.287 714.282,-114.287 579.718,-114.287"/>
 <text text-anchor="start" x="587.718" y="-145.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.tinkerio.Ab</text>
 <text text-anchor="start" x="587.718" y="-133.287" font-family="Ubuntu-R" font-size="10.00">Initio_TINKER.energy_force</text>
@@ -331,7 +331,7 @@
 </g>
 <!-- Node24 -->
 <g id="node24" class="node"><title>Node24</title>
-<g id="a_node24"><a xlink:href="classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a535ff72686dc66b91f5dda007e252189" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.openmmio.Interaction\l_OpenMM.energy_driver_all">
+<g id="a_node24"><a xlink:href="classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a535ff72686dc66b91f5dda007e252189" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.openmmio.Interaction\l_OpenMM.energy_driver_all">
 <polygon fill="white" stroke="black" points="567.92,-191.287 567.92,-223.287 726.08,-223.287 726.08,-191.287 567.92,-191.287"/>
 <text text-anchor="start" x="575.92" y="-210.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.openmmio.Interaction</text>
 <text text-anchor="middle" x="647" y="-198.287" font-family="Ubuntu-R" font-size="10.00">_OpenMM.energy_driver_all</text>
@@ -345,7 +345,7 @@
 </g>
 <!-- Node22 -->
 <g id="node22" class="node"><title>Node22</title>
-<g id="a_node22"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#adeddb898c79da3df601bc742bc2c2be7" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.__init__">
+<g id="a_node22"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#adeddb898c79da3df601bc742bc2c2be7" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.__init__">
 <polygon fill="white" stroke="black" points="783.303,-101.287 783.303,-133.287 898.697,-133.287 898.697,-101.287 783.303,-101.287"/>
 <text text-anchor="start" x="791.303" y="-120.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.tinkerio.Ab</text>
 <text text-anchor="middle" x="841" y="-108.287" font-family="Ubuntu-R" font-size="10.00">Initio_TINKER.__init__</text>
@@ -359,7 +359,7 @@
 </g>
 <!-- Node23 -->
 <g id="node23" class="node"><title>Node23</title>
-<g id="a_node23"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#a4f0decc929da6183f1d0d6229fc9733d" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.prepare\l_temp_directory">
+<g id="a_node23"><a xlink:href="classforcebalance_1_1tinkerio_1_1AbInitio__TINKER.html#a4f0decc929da6183f1d0d6229fc9733d" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.tinkerio.Ab\lInitio_TINKER.prepare\l_temp_directory">
 <polygon fill="white" stroke="black" points="1000.3,-95.2867 1000.3,-139.287 1115.7,-139.287 1115.7,-95.2867 1000.3,-95.2867"/>
 <text text-anchor="start" x="1008.3" y="-126.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.tinkerio.Ab</text>
 <text text-anchor="start" x="1008.3" y="-114.287" font-family="Ubuntu-R" font-size="10.00">Initio_TINKER.prepare</text>
@@ -389,7 +389,7 @@
 </g>
 <!-- Node25 -->
 <g id="node25" class="node"><title>Node25</title>
-<g id="a_node25"><a xlink:href="namespaceforcebalance_1_1openmmio.html#a9f9fc56475dbfcc94a40fef6a84ed25f" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.openmmio.Update\lSimulationParameters">
+<g id="a_node25"><a xlink:href="namespaceforcebalance_1_1openmmio.html#a9f9fc56475dbfcc94a40fef6a84ed25f" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.openmmio.Update\lSimulationParameters">
 <polygon fill="white" stroke="black" points="769.139,-191.287 769.139,-223.287 912.861,-223.287 912.861,-191.287 769.139,-191.287"/>
 <text text-anchor="start" x="777.139" y="-210.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.openmmio.Update</text>
 <text text-anchor="middle" x="841" y="-198.287" font-family="Ubuntu-R" font-size="10.00">SimulationParameters</text>
@@ -403,7 +403,7 @@
 </g>
 <!-- Node27 -->
 <g id="node27" class="node"><title>Node27</title>
-<g id="a_node27"><a xlink:href="classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a9813c1a24af88156703d05ebe57bf707" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.openmmio.Interaction\l_OpenMM.interaction_driver_all">
+<g id="a_node27"><a xlink:href="classforcebalance_1_1openmmio_1_1Interaction__OpenMM.html#a9813c1a24af88156703d05ebe57bf707" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="forcebalance.openmmio.Interaction\l_OpenMM.interaction_driver_all">
 <polygon fill="white" stroke="black" points="761.92,-242.287 761.92,-274.287 920.08,-274.287 920.08,-242.287 761.92,-242.287"/>
 <text text-anchor="start" x="769.92" y="-261.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.openmmio.Interaction</text>
 <text text-anchor="middle" x="841" y="-249.287" font-family="Ubuntu-R" font-size="10.00">_OpenMM.interaction_driver_all</text>
@@ -417,7 +417,7 @@
 </g>
 <!-- Node26 -->
 <g id="node26" class="node"><title>Node26</title>
-<g id="a_node26"><a xlink:href="namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" target="_top" target="_top" target="_top" target="_top" xlink:title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.">
+<g id="a_node26"><a xlink:href="namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" target="_top" target="_top" target="_top" target="_top" target="_top" xlink:title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.">
 <polygon fill="white" stroke="black" points="956.423,-197.287 956.423,-217.287 1159.58,-217.287 1159.58,-197.287 956.423,-197.287"/>
 <text text-anchor="middle" x="1058" y="-204.287" font-family="Ubuntu-R" font-size="10.00">forcebalance.openmmio.MTSVVVRIntegrator</text>
 </a>

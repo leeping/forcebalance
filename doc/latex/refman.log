@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.10.30)  18 OCT 2013 09:33
+This is pdfTeX, Version 3.1415926-2.3-1.40.12 (TeX Live 2011) (format=pdflatex 2011.10.30)  18 OCT 2013 09:40
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -815,75 +815,45 @@ LaTeX Info: Redefining \addtolength on input line 77.
 \calc@Ccount=\count125
 \calc@Cskip=\skip84
 )
-(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/fancyhdr/fancyhdr.sty
-\fancy@headwidth=\skip85
-\f@ncyO@elh=\skip86
-\f@ncyO@erh=\skip87
-\f@ncyO@olh=\skip88
-\f@ncyO@orh=\skip89
-\f@ncyO@elf=\skip90
-\f@ncyO@erf=\skip91
-\f@ncyO@olf=\skip92
-\f@ncyO@orf=\skip93
-)
-(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/tools/longtable.sty
-Package: longtable 2004/02/01 v4.11 Multi-page Table package (DPC)
-\LTleft=\skip94
-\LTright=\skip95
-\LTpre=\skip96
-\LTpost=\skip97
-\LTchunksize=\count126
-\LTcapwidth=\dimen132
-\LT@head=\box56
-\LT@firsthead=\box57
-\LT@foot=\box58
-\LT@lastfoot=\box59
-\LT@cols=\count127
-\LT@rows=\count128
-\c@LT@tables=\count129
-\c@LT@chunks=\count130
-\LT@p@ftn=\toks23
-)
 (/home/leeping/local/texlive/2011/texmf-dist/tex/latex/tools/verbatim.sty
 Package: verbatim 2003/08/22 v1.5q LaTeX2e package for verbatim enhancements
-\every@verbatim=\toks24
-\verbatim@line=\toks25
+\every@verbatim=\toks23
+\verbatim@line=\toks24
 \verbatim@in@stream=\read1
 )
-
-Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
-less on input line 31.
-
-
-Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
-less on input line 32.
-
-
-Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
-less on input line 33.
-
-
-Package Fancyhdr Warning: \fancyfoot's `E' option without twoside option is use
-less on input line 37.
-
-
-Package Fancyhdr Warning: \fancyfoot's `E' option without twoside option is use
-less on input line 38.
-
-
-Package Fancyhdr Warning: \fancyfoot's `E' option without twoside option is use
-less on input line 39.
-
-\tmplength=\skip98
-\xrefbox=\box60
-\xreflength=\skip99
-(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/base/fontenc.sty
-Package: fontenc 2005/09/27 v1.99g Standard LaTeX package
-
-(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/base/t1enc.def
-File: t1enc.def 2005/09/27 v1.99g Standard LaTeX file
-LaTeX Font Info:    Redeclaring font encoding T1 on input line 43.
-)))
+(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/xtab/xtab.sty
+Package: xtab 2011/07/31 v2.3f Extended supertabular package
+\c@tracingst=\count126
+\PWSTcapht=\dimen132
+\ST@wd=\dimen133
+\ST@rightskip=\skip85
+\ST@leftskip=\skip86
+\ST@parfillskip=\skip87
+\c@PWSTtable=\count127
+\PWSTlastpage=\count128
+\PWSTpenultimate=\count129
+\PWSTcurpage=\count130
+\PWSTtempc=\count131
+\PWSTlines=\count132
+\PWST@lastht=\dimen134
+\PWST@generalht=\dimen135
+\PWST@ht=\dimen136
+\ST@pageleft=\dimen137
+\ST@headht=\dimen138
+\ST@tailht=\dimen139
+\ST@pagesofar=\dimen140
+\ST@pboxht=\dimen141
+\ST@lineht=\dimen142
+\ST@stretchht=\dimen143
+\ST@prevht=\dimen144
+\ST@toadd=\dimen145
+\ST@dimen=\dimen146
+\ST@pbox=\box56
+)
+\xrefbox=\box57
+\xreflength=\skip88
+\tmplength=\skip89
+)
 (/home/leeping/local/texlive/2011/texmf-dist/tex/latex/listings/lstlang1.sty
 File: lstlang1.sty 2004/09/05 1.3 listings language file
 )
@@ -901,36 +871,36 @@ Writing index file refman.idx
 (./refman.aux)
 \openout1 = `refman.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 47.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 47.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 46.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 46.
 
 (/home/leeping/local/texlive/2011/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 47.
-LaTeX Font Info:    ... okay on input line 47.
-LaTeX Font Info:    Try loading font information for T1+phv on input line 47.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 46.
+LaTeX Font Info:    ... okay on input line 46.
+LaTeX Font Info:    Try loading font information for OT1+phv on input line 46.
 
-(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/psnfss/t1phv.fd
-File: t1phv.fd 2001/06/04 scalable font definitions for T1/phv.
+(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/psnfss/ot1phv.fd
+File: ot1phv.fd 2001/06/04 scalable font definitions for OT1/phv.
 )
-LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 8.99994pt on input line 47.
+LaTeX Font Info:    Font shape `OT1/phv/m/n' will be
+(Font)              scaled to size 8.99994pt on input line 46.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -968,17 +938,17 @@ LaTeX Font Info:    Font shape `T1/phv/m/n' will be
 
 (/home/leeping/local/texlive/2011/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count131
-\scratchdimen=\dimen133
-\scratchbox=\box61
-\nofMPsegments=\count132
-\nofMParguments=\count133
-\everyMPshowfont=\toks26
-\MPscratchCnt=\count134
-\MPscratchDim=\dimen134
-\MPnumerator=\count135
-\makeMPintoPDFobject=\count136
-\everyMPtoPDFconversion=\toks27
+\scratchcounter=\count133
+\scratchdimen=\dimen147
+\scratchbox=\box58
+\nofMPsegments=\count134
+\nofMParguments=\count135
+\everyMPshowfont=\toks25
+\MPscratchCnt=\count136
+\MPscratchDim=\dimen148
+\MPnumerator=\count137
+\makeMPintoPDFobject=\count138
+\everyMPtoPDFconversion=\toks26
 )
 (/home/leeping/local/texlive/2011/texmf-dist/tex/latex/oberdiek/epstopdf-base.s
 ty
@@ -996,10 +966,10 @@ G,.JBIG2,.JB2,.eps]
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
 e
 ))
-\c@lstlisting=\count137
-\AtBeginShipoutBox=\box62
-Package backref Info: ** backref set up for natbib ** on input line 47.
-Package hyperref Info: Link coloring ON on input line 47.
+\c@lstlisting=\count139
+\AtBeginShipoutBox=\box59
+Package backref Info: ** backref set up for natbib ** on input line 46.
+Package hyperref Info: Link coloring ON on input line 46.
 
 (/home/leeping/local/texlive/2011/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2010/04/30 v2.40 Cross-referencing by name of section
@@ -1008,47 +978,39 @@ Package: nameref 2010/04/30 v2.40 Cross-referencing by name of section
 g.sty
 Package: gettitlestring 2010/12/03 v1.4 Cleanup title references (HO)
 )
-\c@section@level=\count138
+\c@section@level=\count140
 )
-LaTeX Info: Redefining \ref on input line 47.
-LaTeX Info: Redefining \pageref on input line 47.
-LaTeX Info: Redefining \nameref on input line 47.
+LaTeX Info: Redefining \ref on input line 46.
+LaTeX Info: Redefining \pageref on input line 46.
+LaTeX Info: Redefining \nameref on input line 46.
  (./refman.out) (./refman.out)
 \@outlinefile=\write4
 \openout4 = `refman.out'.
 
-\big@size=\dimen135
-Package hyperref Info: Option `pageanchor' set `false' on input line 48.
-LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 12.9599pt on input line 53.
-LaTeX Font Info:    Font shape `T1/phv/m/n' will be
-(Font)              scaled to size 10.79993pt on input line 55.
+\big@size=\dimen149
+Package hyperref Info: Option `pageanchor' set `false' on input line 47.
+LaTeX Font Info:    Font shape `OT1/phv/m/n' will be
+(Font)              scaled to size 12.9599pt on input line 52.
+LaTeX Font Info:    Font shape `OT1/phv/m/n' will be
+(Font)              scaled to size 10.79993pt on input line 54.
 
 <ForceBalance.pdf, id=108, 72.27pt x 72.27pt>
 File: ForceBalance.pdf Graphic file (type pdf)
  <use ForceBalance.pdf>
-Package pdftex.def Info: ForceBalance.pdf used on input line 57.
+Package pdftex.def Info: ForceBalance.pdf used on input line 56.
 (pdftex.def)             Requested size: 216.81pt x 216.82153pt.
  [1
 
 {/home/leeping/local/texlive/2011/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
  <./ForceBalance.pdf>]
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <14.4> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 61.
-LaTeX Font Info:    Font shape `T1/phv/b/n' will be
-(Font)              scaled to size 12.9599pt on input line 61.
-LaTeX Font Info:    Try loading font information for OT1+phv on input line 61.
-
-(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/psnfss/ot1phv.fd
-File: ot1phv.fd 2001/06/04 scalable font definitions for OT1/phv.
-)
-LaTeX Font Info:    Font shape `OT1/phv/bc/n' will be
-(Font)              scaled to size 12.9599pt on input line 61.
-
-(./refman.toc
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <10> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 1.
-LaTeX Font Info:    Font shape `T1/phv/b/n' will be
+LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <14.4> not available
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 60.
+LaTeX Font Info:    Font shape `OT1/phv/b/n' will be
+(Font)              scaled to size 12.9599pt on input line 60.
+ (./refman.toc
+LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <10> not available
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `OT1/phv/b/n' will be
 (Font)              scaled to size 8.99994pt on input line 1.
 LaTeX Font Info:    Try loading font information for OT1+ztmcm on input line 1.
 
@@ -1089,45 +1051,35 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
 \tf@toc=\write5
 \openout5 = `refman.toc'.
 
-Package hyperref Info: Option `pageanchor' set `true' on input line 63.
+Package hyperref Info: Option `pageanchor' set `true' on input line 62.
 
 (./index.tex
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <12> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 1.
-LaTeX Font Info:    Font shape `T1/phv/b/n' will be
+LaTeX Font Info:    Font shape `OT1/phv/bx/n' in size <12> not available
+(Font)              Font shape `OT1/phv/b/n' tried instead on input line 1.
+LaTeX Font Info:    Font shape `OT1/phv/b/n' will be
 (Font)              scaled to size 10.79993pt on input line 1.
-LaTeX Font Info:    Font shape `OT1/phv/bc/n' will be
-(Font)              scaled to size 10.79993pt on input line 1.
-LaTeX Font Info:    Try loading font information for T1+pcr on input line 2.
+LaTeX Font Info:    Try loading font information for OT1+pcr on input line 2.
 
-(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/psnfss/t1pcr.fd
-File: t1pcr.fd 2001/06/04 font definitions for T1/pcr.
+(/home/leeping/local/texlive/2011/texmf-dist/tex/latex/psnfss/ot1pcr.fd
+File: ot1pcr.fd 2001/06/04 font definitions for OT1/pcr.
 )
-LaTeX Font Info:    Font shape `T1/phv/m/it' in size <10> not available
-(Font)              Font shape `T1/phv/m/sl' tried instead on input line 4.
-LaTeX Font Info:    Font shape `T1/phv/m/sl' will be
+LaTeX Font Info:    Font shape `OT1/phv/m/it' in size <10> not available
+(Font)              Font shape `OT1/phv/m/sl' tried instead on input line 4.
+LaTeX Font Info:    Font shape `OT1/phv/m/sl' will be
 (Font)              scaled to size 8.99994pt on input line 4.
-LaTeX Font Info:    Font shape `T1/phv/bx/n' in size <7> not available
-(Font)              Font shape `T1/phv/b/n' tried instead on input line 6.
-LaTeX Font Info:    Font shape `T1/phv/b/n' will be
-(Font)              scaled to size 6.29996pt on input line 6.
 
-[1]
-LaTeX Font Info:    Font shape `OT1/phv/bc/n' will be
-(Font)              scaled to size 8.99994pt on input line 17.
- <ladder.png, id=173, 440.847pt x 440.847pt>
+[1] <ladder.png, id=175, 440.847pt x 440.847pt>
 File: ladder.png Graphic file (type png)
  <use ladder.png>
 Package pdftex.def Info: ladder.png used on input line 24.
 (pdftex.def)             Requested size: 284.52756pt x 284.52238pt.
- [2]
-<interactions.png, id=184, 793.46437pt x 793.46437pt>
+ [2 <./ladder.png>] <interactions.png, id=185, 793.46437pt x 793.46437pt>
 File: interactions.png Graphic file (type png)
- <use interactions.png>
+
+<use interactions.png>
 Package pdftex.def Info: interactions.png used on input line 35.
 (pdftex.def)             Requested size: 284.52756pt x 284.53308pt.
-
-[3 <./ladder.png>]
+ [3 <./interactions.png>]
 LaTeX Font Info:    Try loading font information for TS1+phv on input line 51.
 
 (/home/leeping/local/texlive/2011/texmf-dist/tex/latex/psnfss/ts1phv.fd
@@ -1136,92 +1088,94 @@ File: ts1phv.fd 2001/06/04 scalable font definitions for TS1/phv.
 LaTeX Font Info:    Font shape `TS1/phv/m/n' will be
 (Font)              scaled to size 8.99994pt on input line 51.
 
-[4 <./interactions.png>] <cycle.png, id=198, 2256.43pt x 2256.43pt>
+<cycle.png, id=193, 2256.43pt x 2256.43pt>
 File: cycle.png Graphic file (type png)
-
-<use cycle.png>
-Package pdftex.def Info: cycle.png used on input line 68.
+ <use cycle.png>
+Package pdftex.def Info: cycle.png used on input line 60.
 (pdftex.def)             Requested size: 284.4976pt x 284.52756pt.
- [5 <./cycle.png>]) (./installation.tex [6]
-LaTeX Font Info:    Font shape `T1/phv/m/n' will be
+ [4 <./cycle.png>])
+(./installation.tex [5]
+LaTeX Font Info:    Font shape `OT1/phv/m/n' will be
 (Font)              scaled to size 7.19995pt on input line 24.
- [7]
-Underfull \hbox (badness 905) in paragraph at lines 100--100
-\T1/pcr/m/n/10 libxml2-dev libxslt1-dev\T1/phv/m/n/10 . -To com-pile from sourc
-e, run \T1/pcr/m/n/10 ./configure --prefix=$-H-O-M-
+
+Overfull \hbox (26.65541pt too wide) in paragraph at lines 78--79
+\OT1/phv/m/n/10 and the mod-ule will be placed into \OT1/pcr/m/n/10 /home/leepi
+ng/local/lib/python2.7/site-packages/forcebalance\OT1/phv/m/n/10 . 
  []
 
-[8] [9]) (./usage.tex
-Underfull \hbox (badness 787) in paragraph at lines 30--30
-[]\T1/phv/m/n/10 -The most im-por-tant gen-eral op-tions to note are-: \T1/pcr/
-m/n/10 jobtype \T1/phv/m/n/10 spec-i-fies the op-ti-miza-tion al-go-rithm to us
-e and
+[6]
+LaTeX Font Info:    Try loading font information for TS1+pcr on input line 98.
+ (/home/leeping/local/texlive/2011/texmf-dist/tex/latex/psnfss/ts1pcr.fd
+File: ts1pcr.fd 2001/06/04 font definitions for TS1/pcr.
+)
+Underfull \hbox (badness 905) in paragraph at lines 98--98
+\OT1/pcr/m/n/10 libxml2-dev libxslt1-dev\OT1/phv/m/n/10 . To com-pile from sour
+ce, run \OT1/pcr/m/n/10 ./configure --prefix=\TS1/pcr/m/n/10 $\OT1/pcr/m/n/10 -
+H-O-M-
  []
 
-[10] [11]
-Overfull \hbox (303.04547pt too wide) in paragraph at lines 82--82
-[]\T1/pcr/m/n/8 FORCES fx1 fy1 fz1 ... (floating point numbers in Hartree/bohr 
-- this is a misnomer because they are actually gradients, which differ by a sig
-n from the forces.)[] 
+[7]) (./usage.tex [8] [9]
+Overfull \hbox (303.04547pt too wide) in paragraph at lines 76--76
+[]\OT1/pcr/m/n/8 FORCES fx1 fy1 fz1 ... (floating point numbers in Hartree/bohr
+ - this is a misnomer because they are actually gradients, which differ by a si
+gn from the forces.)[] 
  []
 
-[12]) (./tutorial.tex [13] [14]
-Overfull \hbox (29.4453pt too wide) in paragraph at lines 117--117
-[]\T1/pcr/m/n/8 Levenberg-Marquardt: Newton-Raphson step found (length 1.000e-0
-1),  0.92958359 added to Hessian diagonal[] 
+[10]) (./tutorial.tex [11] [12]
+Overfull \hbox (29.4453pt too wide) in paragraph at lines 111--111
+[]\OT1/pcr/m/n/8 Levenberg-Marquardt: Newton-Raphson step found (length 1.000e-
+01),  0.92958359 added to Hessian diagonal[] 
  []
 
-[15] [16] [17] [18]) [19] (./glossary.tex [20] [21] [22]
-Overfull \hbox (43.23582pt too wide) in paragraph at lines 115--115
-[]\T1/phv/b/n/10 -One-line de-scrip-tion \T1/phv/m/n/10 -: -The names of force 
-fields, cor-re-spond-ing to di-rec-tory forcefields/file-_-name.(itp,xml,prm,fr
-cmod,mol2) 
+[13] [14] [15] [16] [17]) (./glossary.tex [18] [19] [20]
+Overfull \hbox (41.47188pt too wide) in paragraph at lines 113--113
+[]\OT1/phv/b/n/10 One-line de-scrip-tion \OT1/phv/m/n/10 -: The names of force 
+fields, cor-re-spond-ing to di-rec-tory forcefields/file-[]-name.(itp,xml,prm,f
+rcmod,mol2) 
  []
 
-LaTeX Font Info:    Font shape `T1/phv/bx/it' in size <10> not available
-(Font)              Font shape `T1/phv/b/it' tried instead on input line 117.
-LaTeX Font Info:    Font shape `T1/phv/b/it' in size <10> not available
-(Font)              Font shape `T1/phv/b/sl' tried instead on input line 117.
-LaTeX Font Info:    Font shape `T1/phv/b/sl' will be
-(Font)              scaled to size 8.99994pt on input line 117.
-[23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35] [36] [37]
-[38]
+LaTeX Font Info:    Font shape `OT1/phv/bx/it' in size <10> not available
+(Font)              Font shape `OT1/phv/b/it' tried instead on input line 115.
+LaTeX Font Info:    Font shape `OT1/phv/b/it' in size <10> not available
+(Font)              Font shape `OT1/phv/b/sl' tried instead on input line 115.
+LaTeX Font Info:    Font shape `OT1/phv/b/sl' will be
+(Font)              scaled to size 8.99994pt on input line 115.
+[21] [22] [23] [24] [25] [26] [27] [28] [29] [30] [31] [32] [33] [34] [35]
+[36]
 File: ForceBalance.pdf Graphic file (type pdf)
  <use ForceBalance.pdf>
-Package pdftex.def Info: ForceBalance.pdf used on input line 747.
+Package pdftex.def Info: ForceBalance.pdf used on input line 745.
 (pdftex.def)             Requested size: 284.60536pt x 284.52756pt.
-) (./refman.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 83.
- [39]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 83.
+) [37] (./refman.ind)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 89.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 89.
  (./refman.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 83.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 83.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 89.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 89.
 Package rerunfilecheck Info: File `refman.out' has not changed.
 (rerunfilecheck)             Checksum: 3F11153A8988E08D9E7354B53217C23B;4248.
  ) 
 Here is how much of TeX's memory you used:
- 11093 strings out of 493629
- 156099 string characters out of 3139560
- 293915 words of memory out of 3000000
- 14082 multiletter control sequences out of 15000+200000
- 47072 words of font info for 66 fonts, out of 3000000 for 9000
+ 10960 strings out of 493629
+ 154618 string characters out of 3139560
+ 292019 words of memory out of 3000000
+ 13961 multiletter control sequences out of 15000+200000
+ 30914 words of font info for 60 fonts, out of 3000000 for 9000
  831 hyphenation exceptions out of 8191
- 41i,13n,58p,2312b,484s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 41i,6n,58p,2246b,486s stack positions out of 5000i,500n,10000p,200000b,50000s
 {/home/leeping/local/texlive/2011/texmf-dist/fonts/enc/dvips/base/8r.enc}</ho
 me/leeping/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.
 pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1/public/amsfonts/cm
 /cmsy10.pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1/urw/courie
 r/ucrr8a.pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1/urw/helve
 tic/uhvb8a.pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1/urw/hel
-vetic/uhvb8ac.pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1/urw/
-helvetic/uhvbo8a.pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1/u
-rw/helvetic/uhvr8a.pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1
-/urw/helvetic/uhvro8a.pfb>
-Output written on refman.pdf (40 pages, 1528014 bytes).
+vetic/uhvbo8a.pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1/urw/
+helvetic/uhvr8a.pfb></home/leeping/local/texlive/2011/texmf-dist/fonts/type1/ur
+w/helvetic/uhvro8a.pfb>
+Output written on refman.pdf (38 pages, 1512822 bytes).
 PDF statistics:
- 444 PDF objects out of 1000 (max. 8388607)
- 371 compressed objects within 4 object streams
- 97 named destinations out of 1000 (max. 500000)
+ 430 PDF objects out of 1000 (max. 8388607)
+ 360 compressed objects within 4 object streams
+ 95 named destinations out of 1000 (max. 500000)
  229 words of extra memory for PDF output out of 10000 (max. 10000000)
 

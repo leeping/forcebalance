@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a728adb334e4ad6e26200c265fc2f351a" title="Create a grid file and a psi4 input file in the absolute path and submit it to the work queue..." alt="" coords="333,5,640,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWorkQueue" alt="" coords="371,56,602,83"/>
+<map id="forcebalance.psi4io.RDVR3_Psi4.indicate" name="forcebalance.psi4io.RDVR3_Psi4.indicate">
+<area shape="rect" id="node3" href="$classforcebalance_1_1psi4io_1_1RDVR3__Psi4.html#a728adb334e4ad6e26200c265fc2f351a" title="Create a grid file and a psi4 input file in the absolute path and submit it to the work queue..." alt="" coords="245,5,437,46"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="247,70,435,111"/>
 </map>

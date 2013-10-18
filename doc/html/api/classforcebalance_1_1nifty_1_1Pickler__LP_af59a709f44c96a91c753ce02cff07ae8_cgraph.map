@@ -1,6 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a26e563ec71ed229c30f3d61d3448c8f1" title="Prints a warning but will only do so once in a given run." alt="" coords="341,5,547,32"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a77417ff99b19f6d0b7c6f527e83fa7f1" title="forcebalance.molecule.Molecule.append" alt="" coords="305,56,583,83"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a64b7c6ca7afa1c11681f5c2897c55cc3" title="This function be given any of several variable types (single file name, file object, or list of lines, or a list of the above) and give a list of files:" alt="" coords="675,5,877,32"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a95782abfb36e7080a1b98bfad2ced4f3" title="forcebalance.molecule.Molecule.write_arc" alt="" coords="633,56,919,83"/>
+<map id="forcebalance.nifty.Pickler_LP.__init__" name="forcebalance.nifty.Pickler_LP.__init__">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a26e563ec71ed229c30f3d61d3448c8f1" title="Prints a warning but will only do so once in a given run. " alt="" coords="269,5,475,32"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a77417ff99b19f6d0b7c6f527e83fa7f1" title="forcebalance.molecule.Molecule.append" alt="" coords="233,56,511,83"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a64b7c6ca7afa1c11681f5c2897c55cc3" title="This function be given any of several variable types (single file name, file object, or list of lines, or a list of the above) and give a list of files: " alt="" coords="603,5,805,32"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a95782abfb36e7080a1b98bfad2ced4f3" title="forcebalance.molecule.Molecule.write_arc" alt="" coords="561,56,847,83"/>
 </map>

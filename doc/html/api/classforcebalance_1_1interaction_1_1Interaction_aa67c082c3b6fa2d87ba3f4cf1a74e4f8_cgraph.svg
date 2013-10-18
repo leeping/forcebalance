@@ -17,7 +17,7 @@
 </g>
 <!-- Node2 -->
 <g id="node2" class="node"><title>Node2</title>
-<g id="a_node2"><a xlink:href="classforcebalance_1_1interaction_1_1Interaction.html#a7b5dea70b67d3b2c0449a7cea8b12bf4" target="_top" target="_top" xlink:title="Prepare the temporary directory, by default does nothing.">
+<g id="a_node2"><a xlink:href="classforcebalance_1_1interaction_1_1Interaction.html#a7b5dea70b67d3b2c0449a7cea8b12bf4" target="_top" target="_top" target="_top" xlink:title="Prepare the temporary directory, by default does nothing.">
 <polygon fill="white" stroke="black" points="180.608,-0 180.608,-44 297.392,-44 297.392,-0 180.608,-0"/>
 <text text-anchor="start" x="188.608" y="-31" font-family="Ubuntu-R" font-size="10.00">forcebalance.interaction.</text>
 <text text-anchor="start" x="188.608" y="-19" font-family="Ubuntu-R" font-size="10.00">Interaction.prepare_temp</text>

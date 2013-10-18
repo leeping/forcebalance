@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="33,80,223,107"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="41,5,215,32"/>
+<map id="forcebalance.leastsq.LeastSquares" name="forcebalance.leastsq.LeastSquares">
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets. " alt="" coords="6,155,196,181"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes. " alt="" coords="14,80,188,107"/>
 </map>

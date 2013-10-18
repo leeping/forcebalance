@@ -1,9 +1,9 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#aff7a0e2413297088a5bc3e91e5951f3f" title="forcebalance.molecule.Molecule.align_center" alt="" coords="419,5,727,32"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a87e66db685214a9cdd4feff49d4ea5dc" title="Align molecules." alt="" coords="443,56,703,83"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1molecule_1_1Molecule.html#a57edc8d72f7e4c1a1452de7b438f3c55" title="Returns the Cartesian coordinates in the Molecule object in a list of OpenMM&#45;compatible positions..." alt="" coords="397,107,749,133"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="436,157,711,184"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a77417ff99b19f6d0b7c6f527e83fa7f1" title="forcebalance.molecule.Molecule.append" alt="" coords="825,56,1103,83"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a95782abfb36e7080a1b98bfad2ced4f3" title="forcebalance.molecule.Molecule.write_arc" alt="" coords="1179,56,1466,83"/>
-<area shape="rect" id="node15" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center_of_mass" alt="" coords="798,157,1130,184"/>
+<map id="forcebalance.molecule.Molecule.all_pairwise_rmsd" name="forcebalance.molecule.Molecule.all_pairwise_rmsd">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#aff7a0e2413297088a5bc3e91e5951f3f" title="forcebalance.molecule.Molecule.align\l_center" alt="" coords="313,5,573,46"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a87e66db685214a9cdd4feff49d4ea5dc" title="Align molecules. " alt="" coords="313,71,573,97"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1molecule_1_1Molecule.html#a57edc8d72f7e4c1a1452de7b438f3c55" title="Returns the Cartesian coordinates in the Molecule object in a list of OpenMM&#45;compatible positions..." alt="" coords="299,122,587,163"/>
+<area shape="rect" id="node13" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="305,188,580,215"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a77417ff99b19f6d0b7c6f527e83fa7f1" title="forcebalance.molecule.Molecule.append" alt="" coords="635,71,914,97"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a95782abfb36e7080a1b98bfad2ced4f3" title="forcebalance.molecule.Molecule.write_arc" alt="" coords="963,71,1250,97"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center\l_of_mass" alt="" coords="639,181,910,222"/>
 </map>

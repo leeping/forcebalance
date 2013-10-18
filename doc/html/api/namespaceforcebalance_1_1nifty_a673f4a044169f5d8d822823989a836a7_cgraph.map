@@ -1,10 +1,10 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished." alt="" coords="253,31,448,57"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="496,5,683,32"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#ab5417ad84c6c760965cd195c6c387914" title="forcebalance.nifty.onefile" alt="" coords="500,56,679,83"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="731,5,909,32"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="731,56,909,83"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="733,107,907,133"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.MissingFileInspection" alt="" coords="957,56,1227,83"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link_dir_contents" alt="" coords="1275,56,1519,83"/>
+<map id="forcebalance.nifty.queue_up" name="forcebalance.nifty.queue_up">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished. " alt="" coords="253,23,408,65"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty. " alt="" coords="456,5,643,32"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#ab5417ad84c6c760965cd195c6c387914" title="forcebalance.nifty.onefile" alt="" coords="460,56,639,83"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="691,5,869,32"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="691,56,869,83"/>
+<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="693,107,867,133"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="917,49,1101,90"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="1150,49,1309,90"/>
 </map>

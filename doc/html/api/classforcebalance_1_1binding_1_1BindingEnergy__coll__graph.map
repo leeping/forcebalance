@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets." alt="" coords="34,80,224,107"/>
-<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes." alt="" coords="42,5,216,32"/>
+<map id="forcebalance.binding.BindingEnergy" name="forcebalance.binding.BindingEnergy">
+<area shape="rect" id="node2" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets. " alt="" coords="13,155,203,181"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes. " alt="" coords="21,80,195,107"/>
 </map>

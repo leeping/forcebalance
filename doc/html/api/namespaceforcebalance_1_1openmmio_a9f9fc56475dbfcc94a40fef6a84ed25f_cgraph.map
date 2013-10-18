@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1openmmio.html#a95d91538d72e354fc95433539c42450c" title="forcebalance.openmmio.SetAmoebaVirtualExclusions" alt="" coords="425,5,789,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator." alt="" coords="837,5,1144,32"/>
+<map id="forcebalance.openmmio.UpdateSimulationParameters" name="forcebalance.openmmio.UpdateSimulationParameters">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1openmmio.html#a95d91538d72e354fc95433539c42450c" title="forcebalance.openmmio.Set\lAmoebaVirtualExclusions" alt="" coords="283,5,485,46"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator. " alt="" coords="533,12,840,39"/>
 </map>

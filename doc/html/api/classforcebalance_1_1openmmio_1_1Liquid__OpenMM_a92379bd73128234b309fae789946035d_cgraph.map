@@ -1,3 +1,4 @@
 <map id="forcebalance.openmmio.Liquid_OpenMM.__init__" name="forcebalance.openmmio.Liquid_OpenMM.__init__">
-<area shape="rect" id="node3" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option" alt="" coords="272,5,483,51"/>
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1openmmio.html#a95d91538d72e354fc95433539c42450c" title="forcebalance.openmmio.Set\lAmoebaVirtualExclusions" alt="" coords="272,5,475,46"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator. " alt="" coords="523,12,829,39"/>
 </map>

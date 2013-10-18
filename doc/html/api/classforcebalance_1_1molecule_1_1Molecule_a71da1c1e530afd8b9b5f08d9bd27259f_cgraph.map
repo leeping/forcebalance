@@ -1,12 +1,12 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#ab1b56d66b7673b2631e2cee013a80b93" title="Parse an AMBER .mdcrd file." alt="" coords="309,31,616,57"/>
-<area shape="rect" id="node22" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="325,132,600,159"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a14b1fbc70a083d21fd016b5dd854fd56" title="forcebalance.molecule.Molecule.read_mol2" alt="" coords="681,56,980,83"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="1045,5,1416,32"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1molecule_1_1Molecule.html#a861feda06e1f60ab25c45eaaaf228cfc" title="Parse a Gaussian .com file and return a SINGLE&#45;ELEMENT list of xyz coordinates (no multiple file supp..." alt="" coords="1083,107,1378,133"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="1529,56,1725,83"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989" title="This function takes in three lattice vectors and tries to return a complete box specification." alt="" coords="1465,5,1789,32"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="1837,81,2045,108"/>
-<area shape="rect" id="node18" href="$namespaceforcebalance_1_1molecule.html#a7429f0c377d6396711c128f6590ef810" title="Given an atom name, attempt to get the element in most cases." alt="" coords="1468,157,1785,184"/>
-<area shape="rect" id="node24" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center_of_mass" alt="" coords="665,132,997,159"/>
+<map id="forcebalance.molecule.Molecule.split" name="forcebalance.molecule.Molecule.split">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#ab1b56d66b7673b2631e2cee013a80b93" title="Parse an AMBER .mdcrd file. " alt="" coords="317,39,576,81"/>
+<area shape="rect" id="node22" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="309,156,584,183"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a14b1fbc70a083d21fd016b5dd854fd56" title="forcebalance.molecule.Molecule.read_mol2" alt="" coords="632,72,931,99"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="1026,6,1227,47"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1molecule_1_1Molecule.html#a861feda06e1f60ab25c45eaaaf228cfc" title="Parse a Gaussian .com file and return a SINGLE&#45;ELEMENT list of xyz coordinates (no multiple file supp..." alt="" coords="979,123,1274,149"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="1326,72,1522,99"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989" title="This function takes in three lattice vectors and tries to return a complete box specification. " alt="" coords="1323,6,1525,47"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="1573,97,1781,124"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1molecule.html#a7429f0c377d6396711c128f6590ef810" title="Given an atom name, attempt to get the element in most cases. " alt="" coords="1323,174,1525,215"/>
+<area shape="rect" id="node24" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center\l_of_mass" alt="" coords="646,149,917,190"/>
 </map>

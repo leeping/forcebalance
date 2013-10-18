@@ -17,7 +17,7 @@
 </g>
 <!-- Node2 -->
 <g id="node3" class="node"><title>Node2</title>
-<a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#a313c848f46579817803c8a3ff100974e" target="_top" xlink:title="LPW 06&#45;30&#45;2013.">
+<a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#a313c848f46579817803c8a3ff100974e" target="_top" target="_top" xlink:title="LPW 06&#45;30&#45;2013.">
 <polygon fill="white" stroke="black" points="183.5,-156 183.5,-190 314.5,-190 314.5,-156 183.5,-156"/>
 <text text-anchor="start" x="191.5" y="-177" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.Ab</text>
 <text text-anchor="middle" x="249" y="-164" font-family="Ubuntu-R" font-size="10.00">Initio.get_energy_force_</text>
@@ -30,7 +30,7 @@
 </g>
 <!-- Node3 -->
 <g id="node5" class="node"><title>Node3</title>
-<a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#abfe50569805218075c5942fd3be8bbe7" target="_top" xlink:title="Electrostatic potential fitting.">
+<a xlink:href="classforcebalance_1_1abinitio_1_1AbInitio.html#abfe50569805218075c5942fd3be8bbe7" target="_top" target="_top" xlink:title="Electrostatic potential fitting.">
 <polygon fill="white" stroke="black" points="183.5,-104 183.5,-138 314.5,-138 314.5,-104 183.5,-104"/>
 <text text-anchor="start" x="191.5" y="-125" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.Ab</text>
 <text text-anchor="middle" x="249" y="-112" font-family="Ubuntu-R" font-size="10.00">Initio.get_resp_</text>
@@ -43,7 +43,7 @@
 </g>
 <!-- Node4 -->
 <g id="node7" class="node"><title>Node4</title>
-<a xlink:href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" target="_top" xlink:title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f...">
+<a xlink:href="namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" target="_top" target="_top" xlink:title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f...">
 <polygon fill="white" stroke="black" points="197,-52 197,-86 301,-86 301,-52 197,-52"/>
 <text text-anchor="start" x="205" y="-73" font-family="Ubuntu-R" font-size="10.00">forcebalance.finite</text>
 <text text-anchor="middle" x="249" y="-60" font-family="Ubuntu-R" font-size="10.00">_difference.in_fd</text>
@@ -56,7 +56,7 @@
 </g>
 <!-- Node5 -->
 <g id="node9" class="node"><title>Node5</title>
-<a xlink:href="namespaceforcebalance_1_1abinitio.html#aba970cb59bab95eec79027ea05655110" target="_top" xlink:title="A more generalized version of build_objective which is callable for derivatives, but the covariance i...">
+<a xlink:href="namespaceforcebalance_1_1abinitio.html#aba970cb59bab95eec79027ea05655110" target="_top" target="_top" xlink:title="A more generalized version of build_objective which is callable for derivatives, but the covariance i...">
 <polygon fill="white" stroke="black" points="168.5,-0 168.5,-34 329.5,-34 329.5,-0 168.5,-0"/>
 <text text-anchor="start" x="176.5" y="-21" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.weighted</text>
 <text text-anchor="middle" x="249" y="-8" font-family="Ubuntu-R" font-size="10.00">_variance</text>
@@ -69,7 +69,7 @@
 </g>
 <!-- Node6 -->
 <g id="node11" class="node"><title>Node6</title>
-<a xlink:href="namespaceforcebalance_1_1abinitio.html#ab9554761125a4ec7c3c13d6ae4ea537d" target="_top" xlink:title="A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements...">
+<a xlink:href="namespaceforcebalance_1_1abinitio.html#ab9554761125a4ec7c3c13d6ae4ea537d" target="_top" target="_top" xlink:title="A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements...">
 <polygon fill="white" stroke="black" points="366.5,-0 366.5,-34 527.5,-34 527.5,-0 366.5,-0"/>
 <text text-anchor="start" x="374.5" y="-21" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.weighted</text>
 <text text-anchor="middle" x="447" y="-8" font-family="Ubuntu-R" font-size="10.00">_variance2</text>
@@ -82,7 +82,7 @@
 </g>
 <!-- Node7 -->
 <g id="node13" class="node"><title>Node7</title>
-<a xlink:href="namespaceforcebalance_1_1abinitio.html#aadd1d6c5a34c82d495d6be7380b73601" target="_top" xlink:title="This function builds an objective function (number) from the complicated polytensor and covariance ma...">
+<a xlink:href="namespaceforcebalance_1_1abinitio.html#aadd1d6c5a34c82d495d6be7380b73601" target="_top" target="_top" xlink:title="This function builds an objective function (number) from the complicated polytensor and covariance ma...">
 <polygon fill="white" stroke="black" points="564.5,-0 564.5,-34 705.5,-34 705.5,-0 564.5,-0"/>
 <text text-anchor="start" x="572.5" y="-21" font-family="Ubuntu-R" font-size="10.00">forcebalance.abinitio.build</text>
 <text text-anchor="middle" x="635" y="-8" font-family="Ubuntu-R" font-size="10.00">_objective</text>

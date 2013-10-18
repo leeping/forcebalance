@@ -1,12 +1,12 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1tinkerio_1_1Vibration__TINKER.html#a5d118d5c5f66c81653cc2be3329fdc96" title="forcebalance.tinkerio.Vibration_TINKER.vibration_driver" alt="" coords="481,56,850,83"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="961,5,1157,32"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="1304,5,1512,32"/>
-<area shape="rect" id="node10" href="$classforcebalance_1_1tinkerio_1_1Vibration__TINKER.html#a4f4dcaa18b29ae9dd69e6c0a60e40b09" title="forcebalance.tinkerio.Vibration_TINKER.__init__" alt="" coords="899,107,1218,133"/>
-<area shape="rect" id="node12" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="1317,56,1499,83"/>
-<area shape="rect" id="node16" href="$namespaceforcebalance_1_1tinkerio.html#a9cde7bd64c6f5286c1f33a39211d5a11" title="Copies a TINKER .key file but changes the parameter keyword as necessary to reflect the ForceBalance ..." alt="" coords="1267,107,1549,133"/>
-<area shape="rect" id="node14" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="1598,56,1842,83"/>
-<area shape="rect" id="node18" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="1601,107,1839,133"/>
-<area shape="rect" id="node22" href="$namespaceforcebalance_1_1tinkerio.html#aa82c424420ad59b6a78b273d6c1fd469" title="Performs in&#45;place modification of a TINKER .key file." alt="" coords="1605,157,1835,184"/>
-<area shape="rect" id="node20" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="1891,107,2133,133"/>
+<map id="forcebalance.tinkerio.Vibration_TINKER.prepare_temp_directory" name="forcebalance.tinkerio.Vibration_TINKER.prepare_temp_directory">
+<area shape="rect" id="node3" href="$classforcebalance_1_1tinkerio_1_1Vibration__TINKER.html#a5d118d5c5f66c81653cc2be3329fdc96" title="forcebalance.tinkerio.Vibration\l_TINKER.vibration_driver" alt="" coords="285,49,501,90"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="559,5,755,32"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="813,5,1021,32"/>
+<area shape="rect" id="node10" href="$classforcebalance_1_1tinkerio_1_1Vibration__TINKER.html#a4f4dcaa18b29ae9dd69e6c0a60e40b09" title="forcebalance.tinkerio.Vibration\l_TINKER.__init__" alt="" coords="549,107,765,149"/>
+<area shape="rect" id="node12" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="826,56,1009,83"/>
+<area shape="rect" id="node16" href="$namespaceforcebalance_1_1tinkerio.html#a9cde7bd64c6f5286c1f33a39211d5a11" title="Copies a TINKER .key file but changes the parameter keyword as necessary to reflect the ForceBalance ..." alt="" coords="823,110,1012,151"/>
+<area shape="rect" id="node14" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error). " alt="" coords="1092,45,1279,86"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="1102,110,1269,151"/>
+<area shape="rect" id="node22" href="$namespaceforcebalance_1_1tinkerio.html#aa82c424420ad59b6a78b273d6c1fd469" title="Performs in&#45;place modification of a TINKER .key file. " alt="" coords="1070,176,1301,203"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map(). " alt="" coords="1349,117,1592,144"/>
 </map>

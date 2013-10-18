@@ -1,6 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="370,5,566,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="696,31,904,57"/>
-<area shape="rect" id="node8" href="$namespaceforcebalance_1_1molecule.html#a838d85848bd817e801d0f5f6502217ef" title="Determines whether a line contains CHARMM data or not." alt="" coords="326,107,610,133"/>
-<area shape="rect" id="node10" href="$namespaceforcebalance_1_1molecule.html#a4cdb2086978b281ed84cd66179c3f5b2" title="forcebalance.molecule.add_strip_to_mat" alt="" coords="659,107,941,133"/>
+<map id="forcebalance.molecule.format_gro_box" name="forcebalance.molecule.format_gro_box">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="267,5,463,32"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="512,31,720,57"/>
+<area shape="rect" id="node8" href="$namespaceforcebalance_1_1molecule.html#a838d85848bd817e801d0f5f6502217ef" title="Determines whether a line contains CHARMM data or not. " alt="" coords="275,107,455,149"/>
+<area shape="rect" id="node10" href="$namespaceforcebalance_1_1molecule.html#a4cdb2086978b281ed84cd66179c3f5b2" title="forcebalance.molecule.add\l_strip_to_mat" alt="" coords="519,107,713,149"/>
 </map>

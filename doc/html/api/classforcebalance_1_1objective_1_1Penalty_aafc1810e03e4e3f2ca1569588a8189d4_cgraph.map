@@ -1,6 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="990,31,1229,57"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1objective_1_1Penalty.html#a9badc0a78d23016aa3dcc2d610e2e16c" title="forcebalance.objective.Penalty.FUSE_BARRIER" alt="" coords="307,31,619,57"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="1277,31,1520,57"/>
-<area shape="rect" id="node10" href="$classforcebalance_1_1objective_1_1Penalty.html#ab54cfe22065a5aa22766e16cc8cb90aa" title="forcebalance.objective.Penalty.FUSE_L0" alt="" coords="667,81,941,108"/>
+<map id="forcebalance.objective.Penalty.FUSE" name="forcebalance.objective.Penalty.FUSE">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="841,19,1007,61"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1objective_1_1Penalty.html#a9badc0a78d23016aa3dcc2d610e2e16c" title="forcebalance.objective.Penalty.\lFUSE_BARRIER" alt="" coords="307,27,525,69"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map(). " alt="" coords="1056,27,1299,53"/>
+<area shape="rect" id="node10" href="$classforcebalance_1_1objective_1_1Penalty.html#ab54cfe22065a5aa22766e16cc8cb90aa" title="forcebalance.objective.Penalty.\lFUSE_L0" alt="" coords="573,78,792,119"/>
 </map>

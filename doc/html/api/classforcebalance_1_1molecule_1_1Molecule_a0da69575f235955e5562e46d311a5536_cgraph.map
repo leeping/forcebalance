@@ -1,9 +1,9 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a3e82ae8215555b543f1e5800b718c409" title="Add method for Molecule objects." alt="" coords="363,95,645,121"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="739,5,928,32"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a5b50df23cc4d0e617fdc56538f0bea63" title="forcebalance.molecule.both" alt="" coords="734,56,933,83"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="730,107,937,133"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1molecule_1_1Molecule.html#a77417ff99b19f6d0b7c6f527e83fa7f1" title="forcebalance.molecule.Molecule.append" alt="" coords="694,157,973,184"/>
-<area shape="rect" id="node15" href="$classforcebalance_1_1molecule_1_1Molecule.html#a3f8233f4e9911d7af0f17ca66c16ff92" title="To create the Molecule object, we simply define the table of file reading/writing functions and read ..." alt="" coords="695,208,972,235"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1molecule_1_1Molecule.html#a95782abfb36e7080a1b98bfad2ced4f3" title="forcebalance.molecule.Molecule.write_arc" alt="" coords="1022,157,1309,184"/>
+<map id="forcebalance.molecule.Molecule.__getitem__" name="forcebalance.molecule.Molecule.__getitem__">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a3e82ae8215555b543f1e5800b718c409" title="Add method for Molecule objects. " alt="" coords="286,89,517,130"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="611,5,800,32"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a5b50df23cc4d0e617fdc56538f0bea63" title="forcebalance.molecule.both" alt="" coords="606,56,805,83"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="602,107,809,133"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1molecule_1_1Molecule.html#a77417ff99b19f6d0b7c6f527e83fa7f1" title="forcebalance.molecule.Molecule.append" alt="" coords="566,157,845,184"/>
+<area shape="rect" id="node15" href="$classforcebalance_1_1molecule_1_1Molecule.html#a3f8233f4e9911d7af0f17ca66c16ff92" title="To create the Molecule object, we simply define the table of file reading/writing functions and read ..." alt="" coords="590,209,821,250"/>
+<area shape="rect" id="node13" href="$classforcebalance_1_1molecule_1_1Molecule.html#a95782abfb36e7080a1b98bfad2ced4f3" title="forcebalance.molecule.Molecule.write_arc" alt="" coords="894,157,1181,184"/>
 </map>

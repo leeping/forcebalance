@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1optimizer_1_1Optimizer.html#a05ee5fe985b3e2ec71071ca061e42d66" title="Read the checkpoint file for the main optimizer." alt="" coords="358,5,645,32"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1optimizer_1_1Optimizer.html#aa7ac7cda43b70ac58ccbd6c8445e88ef" title="Write the checkpoint file for the main optimizer." alt="" coords="357,56,645,83"/>
+<map id="forcebalance.optimizer.Optimizer.FDCheckH" name="forcebalance.optimizer.Optimizer.FDCheckH">
+<area shape="rect" id="node3" href="$classforcebalance_1_1optimizer_1_1Optimizer.html#a05ee5fe985b3e2ec71071ca061e42d66" title="Read the checkpoint file for the main optimizer. " alt="" coords="291,5,578,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1optimizer_1_1Optimizer.html#aa7ac7cda43b70ac58ccbd6c8445e88ef" title="Write the checkpoint file for the main optimizer. " alt="" coords="291,56,579,83"/>
 </map>

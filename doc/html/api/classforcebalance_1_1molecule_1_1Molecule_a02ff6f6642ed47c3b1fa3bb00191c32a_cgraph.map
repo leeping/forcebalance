@@ -1,6 +1,6 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a33020ff5e5cec23a3d9d1fe7adfa8583" title="forcebalance.molecule.Molecule.add_quantum" alt="" coords="406,5,725,32"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a13d86eb62139bdc2a835756cacb3be66" title="Add a virtual site to the system." alt="" coords="400,56,731,83"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a432affdec68562b5b19fd249124480c3" title="Return a copy of the object with certain atoms selected." alt="" coords="779,5,1088,32"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a685c8092020a46cd7cf5b52ab45ca6e4" title="Align molecules using the &quot;moment of inertia.&quot; Note that we&#39;re following the MSMBuilder convention ..." alt="" coords="1137,5,1487,32"/>
+<map id="forcebalance.molecule.Molecule.radius_of_gyration" name="forcebalance.molecule.Molecule.radius_of_gyration">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a33020ff5e5cec23a3d9d1fe7adfa8583" title="forcebalance.molecule.Molecule.add\l_quantum" alt="" coords="323,5,578,46"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a13d86eb62139bdc2a835756cacb3be66" title="Add a virtual site to the system. " alt="" coords="323,70,578,111"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a432affdec68562b5b19fd249124480c3" title="Return a copy of the object with certain atoms selected. " alt="" coords="627,5,891,46"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a685c8092020a46cd7cf5b52ab45ca6e4" title="Align molecules using the &quot;moment of inertia.&quot; Note that we&#39;re following the MSMBuilder convention ..." alt="" coords="939,5,1199,46"/>
 </map>

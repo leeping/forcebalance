@@ -1,4 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a432affdec68562b5b19fd249124480c3" title="Return a copy of the object with certain atoms selected." alt="" coords="373,5,683,32"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a685c8092020a46cd7cf5b52ab45ca6e4" title="Align molecules using the &quot;moment of inertia.&quot; Note that we&#39;re following the MSMBuilder convention ..." alt="" coords="731,5,1082,32"/>
+<map id="forcebalance.molecule.Molecule.add_quantum" name="forcebalance.molecule.Molecule.add_quantum">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a432affdec68562b5b19fd249124480c3" title="Return a copy of the object with certain atoms selected. " alt="" coords="309,5,573,46"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a685c8092020a46cd7cf5b52ab45ca6e4" title="Align molecules using the &quot;moment of inertia.&quot; Note that we&#39;re following the MSMBuilder convention ..." alt="" coords="622,5,882,46"/>
 </map>
