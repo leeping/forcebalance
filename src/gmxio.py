@@ -316,7 +316,8 @@ class ITP_Reader(BaseReader):
         self.itype = None
         self.ln   += 1
         # No sense in doing anything for an empty line or a comment line.
-        if len(s) == 0 or re.match('^ *;',line): return None, None
+        # Also skip C preprocessor lines.
+        if len(s) == 0 or re.match('^ *;',line) or re.match('^#',line): return None, None
         # Now go through all the cases.
         if re.match('^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
