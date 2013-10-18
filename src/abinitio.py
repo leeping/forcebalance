@@ -172,7 +172,7 @@ class AbInitio(Target):
         if any(['VSITE' in i for i in self.FF.map.keys()]) or self.have_vsite:
             logger.info("\rGenerating virtual site positions.%s" % (" "*30))
             pvals = self.FF.make(mvals)
-            self.generate_vsite_positions()
+            self.traj.xyzs = self.engine.generate_vsite_positions()
         # prepare the distance matrix for esp computations
         if len(self.espxyz) > 0:
             invdists = []
@@ -436,6 +436,7 @@ class AbInitio(Target):
 
     def energy_force_transformer_all(self):
         M = self.energy_force_driver_all()
+        M = M[:, :3*self.fitatoms+1]
         if self.force:
             if self.use_nft:
                 Nfts = []
@@ -452,6 +453,7 @@ class AbInitio(Target):
 
     def energy_force_transformer(self,i):
         M = self.energy_force_driver(i)
+        M = M[:3*self.fitatoms+1]
         if self.force:
             if self.use_nft:
                 Fm  = M[1:]

@@ -124,15 +124,21 @@ gen_opts_types = {
 ## Default fitting target options.
 tgt_opts_types = {
     'strings' : {"name"      : (None, 200, 'The name of the target, corresponding to the directory targets/name', 'All targets (important)'),
-                 "masterfile": ('interactions.txt', 0, 'The name of the master file containing interacting systems', 'Binding energy target', 'BindingEnergy'),
                  "force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
                  "fragment1" : ('', 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
                  "fragment2" : ('', 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
                  "openmm_cuda_precision" : ('', -10, 'Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
+                 "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
+                 "binding_txt"           : (None, 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
                  },
-    'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,'')
+    'allcaps' : {"type"   : (None, 200, 'The type of fitting target (Abinitio, BindingEnergy, Liquid, Moments, Vibration) ; must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
+                 "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
                  },
-    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed')
+    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
+                 "coords"                : (None, -10, 'Coordinates for single point evaluation; if not provided, will search for a default.', 'Energy/force matching, ESP evaluations, interaction energies'),
+                 "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
+                 "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
+                 "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
@@ -203,6 +209,19 @@ tgt_opts_types = {
     'sections': {}
     }
 
+all_opts_names = list(itertools.chain(*[i.keys() for i in gen_opts_types.values()])) + list(itertools.chain(*[i.keys() for i in tgt_opts_types.values()]))
+## Check for uniqueness of option names.
+for i in all_opts_names:
+    iocc = []
+    for typ, dct in gen_opts_types.items():
+        if i in dct:
+            iocc.append("gen_opt_types %s" % typ)
+    for typ, dct in tgt_opts_types.items():
+        if i in dct:
+            iocc.append("gen_opt_types %s" % typ)
+    if len(iocc) != 1:
+        raise RuntimeError("CODING ERROR: ForceBalance option %s occurs in more than one place (%s)" % (i, str(iocc)))
+
 ## Default general options - basically a collapsed veresion of gen_opts_types.
 gen_opts_defaults = {}
 for t in gen_opts_types:
@@ -220,7 +239,7 @@ for t in tgt_opts_types:
     tgt_opts_defaults.update(subdict)
 
 ## Option maps for maintaining backward compatibility.
-bkwd = {"simtype" : "type"}
+bkwd = {"simtype" : "type", "masterfile" : "binding_txt"}
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]
