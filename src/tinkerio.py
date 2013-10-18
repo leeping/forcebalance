@@ -11,7 +11,7 @@ import os, shutil
 from re import match, sub
 from forcebalance.nifty import *
 import numpy as Np
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 from subprocess import Popen, PIPE
 from forcebalance.abinitio import AbInitio
 from vibration import Vibration
@@ -23,9 +23,10 @@ from forcebalance.interaction import Interaction
 from forcebalance.finite_difference import in_fd
 from collections import OrderedDict
 from forcebalance.optimizer import GoodStep
-try:
-    from simtk.unit import *
-except: pass
+from forcebalance.unit import *
+
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
@@ -165,11 +166,11 @@ def write_key_with_prm(src, dest, prmfnm=None, ffobj=None):
             # This is the case where "parameters" correctly corresponds to optimize.in
             if line.split()[1] in prms: pass
             else:
-                print line
+                logger.info(line + '\n')
                 warn_press_key("The above line was found in %s, but we expected something like %s" % (src,prmfnm))
         outlines.append(line)
     if not prmflag:
-        print "Adding parameter file %s to key file" % prmfnm
+        logger.info("Adding parameter file %s to key file\n" % prmfnm)
         outlines.insert(0,"parameters %s\n" % prmfnm)
     with open(dest,'w') as f: f.writelines(outlines)
 
@@ -255,14 +256,14 @@ class Liquid_TINKER(Liquid):
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             if wq == None:
-                print "Running condensed phase simulation locally."
-                print "You may tail -f %s/npt_tinker.out in another terminal window" % os.getcwd()
+                logger.info("Running condensed phase simulation locally.\n")
+                logger.info("You may tail -f %s/npt_tinker.out in another terminal window\n" % os.getcwd())
                 if GoodStep() and (temperature, pressure) in self.DynDict_New:
                     self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
                 if (temperature, pressure) in self.DynDict:
                     dynsrc = self.DynDict[(temperature, pressure)]
                     dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
-                    print "Copying .dyn file: %s to %s" % (dynsrc, dyndest)
+                    logger.info("Copying .dyn file: %s to %s\n" % (dynsrc, dyndest))
                     shutil.copy2(dynsrc,dyndest)
                 cmdstr = 'python npt_tinker.py liquid.xyz %i %.3f %.3f %.3f %.3f %s --liquid_equ_steps %i &> npt_tinker.out' % \
                     (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps,
@@ -309,6 +310,7 @@ class AbInitio_TINKER(AbInitio):
         o, e = Popen(["./testgrad","shot.arc","y","n"],stdout=PIPE,stderr=PIPE).communicate()
         # Read data from stdout and stderr, and convert it to GROMACS
         # units for consistency with existing code.
+        E = []
         F = []
         for line in o.split('\n'):
             s = line.split()
@@ -546,8 +548,8 @@ class BindingEnergy_TINKER(BindingEnergy):
                 if "Normal Termination" in line:
                     cnvgd = 1
             if not cnvgd:
-                print o
-                print "The system %s did not converge in the geometry optimization - printout is above." % sysname
+                logger.info(str(o) + '\n')
+                logger.info("The system %s did not converge in the geometry optimization - printout is above.\n" % sysname)
                 #warn_press_key("The system %s did not converge in the geometry optimization" % sysname)
             o, e = Popen(["./analyze",xyzfnm+'_2',"E"],stdout=PIPE,stderr=PIPE).communicate()
             if self.FF.rigid_water:

@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "apc.h"
-#include <omp.h>
 
 static PyObject *_Assign(PyObject *self, PyObject *args) {
   // Given a cost matrix as input,

@@ -3,10 +3,11 @@ import os, sys, time, re
 import traceback
 from collections import OrderedDict
 import numpy
-import forcebalance
+import forcebalance.output
 
 forcebalance.output.getLogger("forcebalance.test").propagate=False
 
+os.chdir(os.path.dirname(__file__) + "/..")
 __all__ = [module[:-3] for module in sorted(os.listdir('test'))
            if re.match("^test_.*\.py$",module)]
 
@@ -57,7 +58,19 @@ class ForceBalanceTestCase(unittest.TestCase):
             if self.longMessage and msg:
                 reason += msg
             raise self.failureException(reason)
-
+            
+    def assertEqual(self, first, second, msg=None):
+        self.logger.debug(">ASSERT(%s==%s)\n" % (str(first), str(second)))
+        return super(ForceBalanceTestCase,self).assertEqual(first,second,msg)
+        
+    def assertNotEqual(self, first, second, msg=None):
+        self.logger.debug(">ASSERT(%s!=%s)\n" % (str(first), str(second)))
+        return super(ForceBalanceTestCase,self).assertNotEqual(first,second,msg)
+        
+    def assertTrue(self, expr, msg=None):
+        self.logger.debug(">ASSERT(%s)\n" % (str(expr)))
+        return super(ForceBalanceTestCase,self).assertTrue(expr, msg)
+        
 class ForceBalanceTestResult(unittest.TestResult):
     """This manages the reporting of test results as they are run,
        and also records results in the internal data structures provided
@@ -140,7 +153,9 @@ class ForceBalanceTestResult(unittest.TestResult):
         self.logger.debug("\nCompleted test suite\n")
         self.logger.info("\n<run=%d errors=%d fail=%d in %.2fs>\n" % (self.testsRun,len(self.errors),len(self.failures), self.runTime))
         if self.wasSuccessful(): self.logger.info("All tests passed successfully\n")
-        else: self.logger.info("Some tests failed or had errors!\n")
+        else: 
+            self.logger.info("Some tests failed or had errors!\n")
+            sys.exit(1)
 
 class ForceBalanceTestRunner(object):
     """This test runner class manages the running and logging of tests.
@@ -149,6 +164,7 @@ class ForceBalanceTestRunner(object):
        in the standard unittest.TestResult format"""
     def __init__(self, logger=forcebalance.output.getLogger("forcebalance.test"), verbose = False):
         self.logger = logger
+        forcebalance.output.getLogger("forcebalance.test")
         
     def check(self, test_modules=__all__):
         """This tries importing test modules which is helpful for error checking
@@ -193,6 +209,8 @@ class ForceBalanceTestRunner(object):
         tests.addTests(systemTests) # integration tests should be run after other tests
 
         result = ForceBalanceTestResult()
+        
+        forcebalance.output.getLogger("forcebalance").addHandler(forcebalance.output.NullHandler())
 
         ### START TESTING ###
         # run any pretest tasks before first test
@@ -205,17 +223,17 @@ class ForceBalanceTestRunner(object):
 
         # otherwise do a normal test run
         else:
-            self.console = sys.stdout
-            sys.stdout = open(logfile, 'w')
-
             unittest.registerResult(result)
             try:
                 tests.run(result)
+            except KeyboardInterrupt:
+                # Adding this allows us to determine
+                # what is causing tests to hang indefinitely.
+                import traceback
+                traceback.print_exc()
+                self.logger.exception(msg="Test run cancelled by user")
             except:
                 self.logger.exception(msg="An unexpected exception occurred while running tests\n")
-
-            sys.stdout.close()
-            sys.stdout = self.console
 
         result.stopTestRun(tests)
         ### STOP TESTING ###

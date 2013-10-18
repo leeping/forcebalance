@@ -16,6 +16,9 @@ from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from forcebalance.optimizer import Counter
 
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
+
 CHECK_BASIS = False
 def CheckBasis():
     global CHECK_BASIS
@@ -48,8 +51,7 @@ class LeastSquares(Target):
     def indicate(self):
         #RMSD = sqrt(mean(self.D ** 2))
         MAD = mean(abs(self.D))
-        print "\rTarget: %-15s" % self.name, 
-        print "MeanAbsErr/MeanExact: %.5e Objective = %.5e" % (MAD / self.MAQ, self.objective)
+        logger.info( "\rTarget: %-15s MeanAbsErr/MeanExact: %.5e Objective = %.5e" % (self.name, MAD / self.MAQ, self.objective))
         return
 
     def get(self, mvals, AGrad=False, AHess=False):
@@ -109,7 +111,7 @@ class LeastSquares(Target):
                 if self.call_derivatives[p] == False: continue
                 dM_arr = f1d2p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                 if max(abs(dM_arr)) == 0.0 and Counter() == 0:
-                    print "\r Simulation %s will skip over parameter %i in subsequent steps" % (self.name, p)
+                    logger.info("\r Simulation %s will skip over parameter %i in subsequent steps\n" % (self.name, p))
                     self.call_derivatives[p] = False
                 else:
                     dM[p] = dM_arr.copy()

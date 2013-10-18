@@ -4,20 +4,25 @@ import sys, os, re
 import threading
 
 import objects
-from eventhandlers import _bindEventHandler
+from forcebalance.output import getLogger, StreamHandler, INFO
 
 class ObjectViewer(tk.LabelFrame):
     """Provides a general overview of the loaded calculation objects"""
-    def __init__(self,root):
-        tk.LabelFrame.__init__(self, root, text="Loaded Objects")
+    def __init__(self,root, **kwargs):
+        tk.LabelFrame.__init__(self, root, text="Loaded Objects", **kwargs)
         self.root = root
 
         self.calculation=None
         self.activeselection=None
-        self.selectionchanged=tk.BooleanVar()
-        self.selectionchanged.set(True)
+        
+        # needUpdate signals when the list of objects needs to be refreshed
         self.needUpdate=tk.BooleanVar()
         self.needUpdate.trace('r',self.update)
+        
+        # selectionchanged can be used by the root window to determine when
+        # the DetailViewer needs to be loaded with a new object
+        self.selectionchanged=tk.BooleanVar()
+        self.selectionchanged.set(True)
 
         self.content = tk.Text(self, cursor="arrow", state="disabled", width=30, height=20)
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
@@ -27,7 +32,7 @@ class ObjectViewer(tk.LabelFrame):
         self.content['yscrollcommand']=self.scrollbar.set
 
         # arrange and display list elements
-        self.content.pack(side=tk.LEFT, fill=tk.Y)
+        self.content.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.content.update()
         self.scrollbar.pack(side=tk.RIGHT,fill=tk.Y)
 
@@ -58,6 +63,7 @@ class ObjectViewer(tk.LabelFrame):
             print "Calculation already running"
 
     def update(self, *args):
+        """Update the list of objects being displayed, based on the contents of self.calculation"""
         self.content["state"]= "normal"
         self.content.delete("1.0","end")
         self['text']="Objects"
@@ -77,7 +83,6 @@ class ObjectViewer(tk.LabelFrame):
             def toggle(e):
                 self.calculation['_expand_targets'] = not self.calculation['_expand_targets']
                 self.needUpdate.get()
-                print "toggle!"
 
             targetLabel = tk.Label(self.content,text="Targets", bg="#FFFFFF")
             targetLabel.bind("<Button-3>", toggle)
@@ -118,12 +123,11 @@ class ObjectViewer(tk.LabelFrame):
             widget["relief"]=tk.FLAT
         e.widget["relief"]="solid"
 
-
         if type(object) is not list: self.activeselection=[ object ]
         else: self.activeselection=object
 
         self.selectionchanged.get() # reading this variable triggers a refresh
-
+        
     def scrollUp(self, e):
         self.content.yview('scroll', -2, 'units')
 
@@ -133,7 +137,7 @@ class ObjectViewer(tk.LabelFrame):
 class DetailViewer(tk.LabelFrame):
     """Shows detailed properties of the currently selected object (as defined in
     and ObjectViewer)"""
-    def __init__(self, root, opts=''):
+    def __init__(self, root, opts='', **kwargs):
         # initialize variables
         self.root = root
         self.printAll = tk.IntVar()
@@ -142,11 +146,11 @@ class DetailViewer(tk.LabelFrame):
         self.currentElement= None # currently selected element within current object
 
         # Viewer GUI elements
-        tk.LabelFrame.__init__(self, root, text="Details")
+        tk.LabelFrame.__init__(self, root, text="Details", **kwargs)
         self.content = tk.Text(self,cursor="arrow",state="disabled", height=20)
         self.content.tag_config("error", foreground="red")
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
-        self.helptext = tk.Text(self, width=70, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
+        self.helptext = tk.Text(self.root, width=70, state="disabled", bg="#F0F0F0", wrap=tk.WORD)
 
         # bind scrollbar actions
         self.scrollbar.config(command = self.content.yview)
@@ -156,21 +160,17 @@ class DetailViewer(tk.LabelFrame):
         self.root.bind_class("scrollable", "<Button-5>", self.scrollDown)
 
         # arrange and display list elements
-        self.content.pack(side=tk.LEFT, fill=tk.Y)
+        self.content.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
         self.content.update()
 
-        # right click context menu
-        self.contextmenu = tk.Menu(self, tearoff=0)
-        self.contextmenu.add_command(label="Add option", state="disabled")
-        self.contextmenu.add_checkbutton(label="show all", variable=self.printAll)
-        self.content.bind("<Button-3>", lambda e : self.contextmenu.post(e.x_root, e.y_root))
-        self.content.bind("<Button-1>", lambda e : self.contextmenu.unpost())
+        # update when printAll variable is changed
         self.printAll.trace('w', lambda *x : self.load())
 
     def load(self,newObject=None):
+        """update current object if a new one is passed in. Then clear existing text and
+        replace it with whatever the current object says to write"""
         if newObject:
             self.currentObject = newObject
-            self.printAll.set(0)    # reset view to only show values changed from default
 
         self['text']="Details"
 
@@ -194,11 +194,14 @@ class DetailViewer(tk.LabelFrame):
 
     def populate(self, object):
         """Populate the view with information in displayText argument"""
+        # ask object to tell us how to display it
         displayText = object.display(self.printAll.get())
 
+        # if object provides string back, just print it to the content area
         if type(displayText)==str:
             self.content.insert("end", displayText)
 
+        # if object provides dictionary, iterate through key value pairs and organize using tk.Label objects
         if type(displayText)==dict:
             for key in displayText.keys():
                 frame = tk.Frame(self.content)
@@ -217,6 +220,8 @@ class DetailViewer(tk.LabelFrame):
                 self.content.window_create("end", window = frame)
                 self.content.insert("end", '\n')
 
+        # tuple is used to separate out options set at default values
+        # (<options dictionary>, <default options dictionary>)
         if type(displayText)==tuple:
             for key in displayText[0].keys():
                 frame = tk.Frame(self.content)
@@ -262,16 +267,12 @@ class DetailViewer(tk.LabelFrame):
         self.content.insert("end",'\n')
 
     def clear(self):
+        """Clear the current object and reload a blank page"""
         self.currentObject=None
         self.load()
 
-    def scrollUp(self, e):
-        self.content.yview('scroll', -2, 'units')
-
-    def scrollDown(self, e):
-        self.content.yview('scroll', 2, 'units')
-
     def showHelp(self, e, object, option):
+        """Update and display help window showing option documentation string"""
         self.helptext["state"]="normal"
         self.helptext.delete("1.0","end")
 
@@ -283,46 +284,88 @@ class DetailViewer(tk.LabelFrame):
 
         self.helptext.insert("end", helpmessage)
         self.helptext['height']=height
-        self.helptext.place(x=e.x, y=e.y_root-self.root.winfo_y())
+        self.helptext.place(x=e.x_root-self.root.winfo_x(), y=e.y_root-self.root.winfo_y())
         self.root.bind("<Motion>", lambda e : self.helptext.place_forget())
         self.root.bind("<Button>", lambda e : self.helptext.place_forget())
+        
+    def scrollUp(self, e):
+        self.content.yview('scroll', -2, 'units')
+
+    def scrollDown(self, e):
+        self.content.yview('scroll', 2, 'units')
 
 class ConsoleViewer(tk.LabelFrame):
     """Tries to emulate a terminal by displaying standard output"""
-    def __init__(self, root):
-        tk.LabelFrame.__init__(self, root, text="Console")
+    def __init__(self, root, **kwargs):
+        tk.LabelFrame.__init__(self, root, text="Console", **kwargs)
         
         self.console = tk.Text(self,
                             state=tk.DISABLED,
                             cursor="arrow",
                             fg="#FFFFFF",
-                            bg="#000000",
-                            height=20)
-        self.console.pack(fill=tk.BOTH)
-        self.stdout = sys.stdout
+                            bg="#000000")
+        self.console.pack(fill=tk.BOTH, expand=1)
+        
+        # console colors corresponding to ANSI escape sequences
+        self.console.tag_config("0", foreground="white", background="black")
+        #self.console.tag_config("1")  # make text bold
+        self.console.tag_config("44", background="blue")
+        self.console.tag_config("91", foreground="red")
+        self.console.tag_config("92", foreground="green")
+        self.console.tag_config("93", foreground="yellow")
+        self.console.tag_config("94", foreground="blue")
+        self.console.tag_config("95", foreground="purple")
 
+        getLogger("forcebalance").addHandler(ConsolePaneHandler(self))
+        getLogger("forcebalance").setLevel(INFO)
+        
+        # scroll to bottom of text when widget is resized
+        self.bind("<Configure>", lambda e: self.console.yview(tk.END))
 
     ## we implement write and flush so the console viewer
     #  can serve as a drop in replacement for sys.stdout
-    def write(self, input):
-        color = "normal"
-        self.console.tag_config("red", foreground="red")
-        self.console.tag_config("green", foreground="red")
+    def write(self, input, tags="0"):
         self.console['state']=tk.NORMAL
         
         # processing of input
         input = re.sub("\r","\n", input)
-        input = re.sub("\x1b\[.?;?[0-9]{1,2};?[0-9]{,2}m", "", input)
-        #input = re.split("(\x1b\[[0-9]{1,2};?[0-9]{,2}m)", input)
         
-        self.console.insert(tk.END, input, color)
+        self.console.insert(tk.END, input, tags)
         self.console.yview(tk.END)
         self.console['state']=tk.DISABLED
 
     def flush(self):
-        pass
+        pass    # does nothing since messages are sent to the console immediately on write
         
     def clear(self):
         self.console['state']=tk.NORMAL
         self.console.delete(1.0, tk.END)
         self.console['state']=tk.DISABLED
+        
+class ConsolePaneHandler(StreamHandler):
+    def __init__(self, console):
+        super(ConsolePaneHandler, self).__init__()
+        self.console = console
+        self.color = ["0"]
+    
+    def emit(self, record):
+        # split messages by looking for terminal escape sequences
+        message = re.split("(\x1b\[[01]?;?[0-9]{1,2};?[0-9]{,2}m)", record.getMessage())
+        
+        for section in message:
+            # if we get a new escape sequence, assign self.color to new color codes
+            # else write text using the current color codes
+            if section[0] == "\x1b":
+                self.color = tuple(section[2:-1].split(';'))
+            else:
+                self.console.write(section, tags=self.color)
+                
+        self.flush()
+        
+def _bindEventHandler(handler, **kwargs):
+    """Creates an event handler by taking a function that takes many arguments
+    and using kwargs to create a function that only takes in one argument"""
+    def f(e):
+        return handler(e, **kwargs)
+    return f
+

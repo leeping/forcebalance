@@ -6,7 +6,7 @@ from __init__ import ForceBalanceTestCase
 class TestParser(ForceBalanceTestCase):
     def test_parse_inputs_returns_tuple(self):
         """Check parse_inputs() returns type"""
-        output = forcebalance.parser.parse_inputs('studies/001_water_tutorial/very_simple.in')
+        output = forcebalance.parser.parse_inputs('test/files/very_simple.in')
         self.assertEqual(type(output), tuple,
         msg = "\nExpected parse_inputs() to return a tuple, but got a %s instead" % type(output).__name__)
         self.assertEqual(type(output[0]), dict,
@@ -31,11 +31,11 @@ class TestParser(ForceBalanceTestCase):
 
     def test_parse_inputs_yields_consistent_results(self):
         """Check parse_inputs() gives consistent results"""
-        output1 = forcebalance.parser.parse_inputs('studies/001_water_tutorial/very_simple.in')
-        output2 = forcebalance.parser.parse_inputs('studies/001_water_tutorial/very_simple.in')
+        output1 = forcebalance.parser.parse_inputs('test/files/very_simple.in')
+        output2 = forcebalance.parser.parse_inputs('test/files/very_simple.in')
         self.assertEqual(output1,output2)
 
-        os.chdir('studies/001_water_tutorial')
+        os.chdir('test/files')
 
         output3 = forcebalance.parser.parse_inputs('very_simple.in')
         output4 = forcebalance.parser.parse_inputs('very_simple.in')

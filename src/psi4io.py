@@ -7,17 +7,20 @@ modules for other programs because it's so simple.
 @date 01/2012
 """
 
-import os, shutil
+import os, sys, glob, shutil
 from re import match, sub, split, findall
 from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
 import numpy as np
 from forcebalance.leastsq import LeastSquares, CheckBasis
-from forcebalance.basereader import BaseReader
+from forcebalance import BaseReader
 from string import capitalize
 from forcebalance.finite_difference import in_fd, f1d2p, f12d3p, fdwrap
 from collections import defaultdict, OrderedDict
 import itertools
 from forcebalance.target import Target
+from forcebalance.nifty import queue_up_src_dest, getWorkQueue
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 ##Interaction type -> Parameter Dictionary.
 #pdict = {'Exponent':{0:'A', 1:'C'},
@@ -144,10 +147,8 @@ class THCDF_Psi4(LeastSquares):
         o.close()
 
     def indicate(self):
-        print "\rTarget: %-15s" % self.name, 
-        print "Molecules = %-30s" % str(self.Molecules),
         MAD = np.mean(np.abs(self.D))
-        print "Mean (Max) Error: %8.4f%% (%8.4f%%) Energies: DF %+.3e MP2 %+.3e Delta % .3e Objective = %.5e" % (100*MAD / self.MAQ, 100*np.max(np.abs(self.D)) / self.MAQ, self.DF_Energy, self.MP2_Energy, self.DF_Energy - self.MP2_Energy, self.objective)
+        logger.info("\rTarget: %-15s Molecules = %-30s %s" % (self.name, str(self.Molecules), "Mean (Max) Error: %8.4f%% (%8.4f%%) Energies: DF %+.3e MP2 %+.3e Delta % .3e Objective = %.5e" % (100*MAD / self.MAQ, 100*np.max(np.abs(self.D)) / self.MAQ, self.DF_Energy, self.MP2_Energy, self.DF_Energy - self.MP2_Energy, self.objective)))
         return
 
     def write_nested_destroy(self, fnm, linedestroy):
@@ -168,7 +169,7 @@ class THCDF_Psi4(LeastSquares):
     def driver(self):
         ## Actually run PSI4.
         if not in_fd() and CheckBasis():
-            print "Now checking for linear dependencies."
+            logger.info("Now checking for linear dependencies.\n")
             _exec("cp %s %s.bak" % (self.GBSfnm, self.GBSfnm), print_command=False)
             ln0 = self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save)
             o = open(".lindep.dat",'w')
@@ -189,10 +190,10 @@ class THCDF_Psi4(LeastSquares):
                 key = '.'.join([str(i) for i in LI.element,LI.amom,LI.basis_number[LI.element],LI.contraction_number])
                 if LI.isdata:
                     if key in LI_lines:
-                        print "Duplicate key found:"
-                        print key
-                        print LI_lines[key],
-                        print line,
+                        logger.info("Duplicate key found:\n")
+                        logger.info("%s\n" % key)
+                        logger.info(str(LI_lines[key]))
+                        logger.info(line)
                         warn_press_key("In %s, the LI_lines dictionary should not contain repeated keys!" % __file__)
                     LI_lines[key] = (line, LI.destroy)
             ## Now build a "Frankenstein" .gbs file composed of the original .gbs file but with data from the linindep.gbs file!
@@ -205,11 +206,11 @@ class THCDF_Psi4(LeastSquares):
                 key = '.'.join([str(i) for i in FK.element,FK.amom,FK.basis_number[FK.element],FK.contraction_number])
                 if FK.isdata and key in LI_lines:
                     if LI_lines[key][1]:
-                        print "Destroying line %i (originally %i):" % (ln, ln0[ln]), 
-                        print line,
+                        logger.info("Destroying line %i (originally %i): " % (ln, ln0[ln]))
+                        logger.info(line)
                         self.FF.linedestroy_this.append(ln)
                         for p_destroy in [i for i, fld in enumerate(self.FF.pfields) if any([subfld[0] == self.GBSfnm and subfld[1] == ln0[ln] for subfld in fld])]:
-                            print "Destroying parameter %i located at line %i (originally %i) with fields given by:" % (p_destroy, ln, ln0[ln]), self.FF.pfields[p_destroy]
+                            logger.info("Destroying parameter %i located at line %i (originally %i) with fields given by: %s" % (p_destroy, ln, ln0[ln], str(self.FF.pfields[p_destroy])))
                             self.FF.parmdestroy_this.append(p_destroy)
                     FK_lines.append(LI_lines[key][0])
                 else:
@@ -221,8 +222,8 @@ class THCDF_Psi4(LeastSquares):
             _exec("cp %s.bak %s" % (self.GBSfnm, self.GBSfnm), print_command=False)
             
             if len(list(itertools.chain(*(self.FF.linedestroy_save + [self.FF.linedestroy_this])))) > 0:
-                print "All lines removed:", self.FF.linedestroy_save + [self.FF.linedestroy_this]
-                print "All parms removed:", self.FF.parmdestroy_save + [self.FF.parmdestroy_this]
+                logger.info("All lines removed: " + self.FF.linedestroy_save + [self.FF.linedestroy_this] + '\n')
+                logger.info("All parms removed: " + self.FF.parmdestroy_save + [self.FF.parmdestroy_this] + '\n')
 
         self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save + [self.FF.linedestroy_this])
         _exec("psi4", print_command=False, outfnm="psi4.stdout")
@@ -301,6 +302,7 @@ class RDVR3_Psi4(Target):
         self.molecules = OrderedDict()
         self.callderivs = OrderedDict()
         self.factor = 1e6
+        self.bidirect = False
         for d in sorted(os.listdir(self.tgtdir)):
             if os.path.isdir(os.path.join(self.tgtdir,d)) and os.path.exists(os.path.join(self.tgtdir,d,'objective.dat')):
                 self.callderivs[d] = [True for i in range(forcefield.np)]
@@ -337,14 +339,77 @@ class RDVR3_Psi4(Target):
 
         return
 
+    def submit_jobs(self, mvals, AGrad=True, AHess=True):
+        # This routine is called by Objective.stage() will run before "get".
+        # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
+        #
+        self.tdir = os.getcwd()
+        wq = getWorkQueue()
+        if wq == None:
+            return
+
+        def submit_psi(this_apath, mname, these_mvals):
+            """ Create a grid file and a psi4 input file in the absolute path and submit it to the work queue. """
+            cwd = os.getcwd()
+            if not os.path.exists(this_apath) : os.makedirs(this_apath)
+            os.chdir(this_apath)
+            self.FF.make(these_mvals)
+            o = open('objective.dat','w')
+            for line in self.objfiles[d]:
+                s = line.split()
+                if len(s) > 2 and s[0] == 'path' and s[1] == '=':
+                    print >> o, "path = '%s'" % os.getcwd()
+                elif len(s) > 2 and s[0] == 'set' and s[1] == 'objective_path':
+                    print >> o, "opath = '%s'" % os.getcwd()
+                    print >> o, "set objective_path $opath"
+                else:
+                    print >> o, line,
+            o.close()
+            os.system("rm -f objective.out")
+            if wq == None:
+                logger.info("There is no Work Queue!!!\n")
+                sys.exit()
+            else:
+                input_files = [(os.path.join(this_apath, i), i) for i in glob.glob("*")]
+                # input_files += [(os.path.join(self.tgtdir,d,"build.dat"), "build.dat")]
+                input_files += [(os.path.join(os.path.split(__file__)[0],"data","run_psi_rdvr3_objective.sh"), "run_psi_rdvr3_objective.sh")]
+                logger.info("\r")
+                queue_up_src_dest(wq,"sh run_psi_rdvr3_objective.sh %s &> run_psi_rdvr3_objective.log" % mname,
+                                  input_files=input_files,
+                                  output_files=[(os.path.join(this_apath, i),i) for i in ["run_psi_rdvr3_objective.log", "output.dat"]], verbose=False)
+            os.chdir(cwd)
+
+        for d in self.objfiles:
+            logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
+            odir = os.path.join(os.getcwd(),d)
+            #if os.path.exists(odir):
+            #    shutil.rmtree(odir)
+            if not os.path.exists(odir): os.makedirs(odir)
+            apath = os.path.join(odir, "current")
+            submit_psi(apath, d, mvals)
+            for p in range(self.FF.np):
+                def subjob(mvals_,h):
+                    apath = os.path.join(odir, str(p), str(h))
+                    submit_psi(apath, d, mvals_)
+                    #logger.info("Will set up a job for %s, parameter %i\n" % (d, p))
+                    return 0.0
+                if self.callderivs[d][p]:
+                    if AHess:
+                        f12d3p(fdwrap(subjob, mvals, p, h=self.h), h = self.h, f0 = 0.0)
+                    elif AGrad:
+                        if self.bidirect:
+                            f12d3p(fdwrap(subjob, mvals, p, h=self.h), h = self.h, f0 = 0.0)
+                        else:
+                            f1d2p(fdwrap(subjob, mvals, p, h=self.h), h = self.h, f0 = 0.0)
+
     def driver(self, mvals, d):
         ## Create the force field file.
         pvals = self.FF.make(mvals)
         ## Actually run PSI4.
         odir = os.path.join(os.getcwd(),d)
-        if os.path.exists(odir):
-            shutil.rmtree(odir)
-        os.makedirs(odir)
+        #if os.path.exists(odir):
+        #    shutil.rmtree(odir)
+        if not os.path.exists(odir): os.makedirs(odir)
         os.chdir(odir)
         o = open('objective.dat','w')
         for line in self.objfiles[d]:
@@ -357,6 +422,7 @@ class RDVR3_Psi4(Target):
             else:
                 print >> o, line,
         o.close()
+        os.system("rm -f objective.out")
         _exec("psi4 objective.dat", print_command=False)
         answer = float(open('objective.out').readlines()[0].split()[1])*self.factor
         os.chdir('..')
@@ -384,14 +450,14 @@ class RDVR3_Psi4(Target):
         self.objd = OrderedDict()
         self.gradd = OrderedDict()
         self.hdiagd = OrderedDict()
-        bidirect = False
+        wq = getWorkQueue()
 
         def fdwrap2(func,mvals0,pidx,qidx,key=None,**kwargs):
             def func2(arg1,arg2):
                 mvals = list(mvals0)
                 mvals[pidx] += arg1
                 mvals[qidx] += arg2
-                print "\rfdwrap2:", func.__name__, "[%i] = % .1e , [%i] = % .1e" % (pidx, arg1, qidx, arg2), ' '*50,
+                logger.info("\rfdwrap2:" + func.__name__ + "[%i] = % .1e , [%i] = % .1e" % (pidx, arg1, qidx, arg2) + ' '*50)
                 if key != None:
                     return func(mvals,**kwargs)[key]
                 else:
@@ -412,29 +478,43 @@ class RDVR3_Psi4(Target):
             return fpp
 
         for d in self.objfiles:
-            print "\rNow working on", d, 50*' ','\r',
-            x = self.driver(mvals, d)
+            logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
+            if wq == None:
+                x = self.driver(mvals, d)
             grad  = np.zeros(n,dtype=float)
             hdiag = np.zeros(n,dtype=float)
             hess  = np.zeros((n,n),dtype=float)
+            apath = os.path.join(self.tdir, d, "current")
+            x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
             for p in range(self.FF.np):
                 if self.callderivs[d][p]:
+                    def reader(mvals_,h):
+                        apath = os.path.join(self.tdir, d, str(p), str(h))
+                        answer = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
+                        return answer
                     if AHess:
-                        grad[p], hdiag[p] = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
-                        hess[p,p] = hdiag[p]
-                        # for q in range(p):
-                        #     if self.callderivs[d][q]:
-                        #         if bidirect:
-                        #             hessentry = f2d5p(fdwrap2(self.driver, mvals, p, q, d=d), h = self.h)
-                        #         else:
-                        #             hessentry = f2d4p(fdwrap2(self.driver, mvals, p, q, d=d), h = self.h, f0 = x)
-                        #         hess[p,q] = hessentry
-                        #         hess[q,p] = hessentry
-                    elif AGrad:
-                        if bidirect:
-                            grad[p], _ = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                        if wq != None:
+                            apath = os.path.join(self.tdir, d, "current")
+                            x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
+                            grad[p], hdiag[p] = f12d3p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)
                         else:
-                            grad[p] = f1d2p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                            grad[p], hdiag[p] = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                        hess[p,p] = hdiag[p]
+                    elif AGrad:
+                        if self.bidirect:
+                            if wq != None:
+                                apath = os.path.join(self.tdir, d, "current")
+                                x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
+                                grad[p], _ = f12d3p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)
+                            else:
+                                grad[p], _ = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
+                        else:
+                            if wq != None:
+                                # Since the calculations are submitted as 3-point finite difference, this part of the code
+                                # actually only reads from half of the completed calculations.
+                                grad[p] = f1d2p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)
+                            else:
+                                grad[p] = f1d2p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
                             
             self.objd[d] = x
             self.gradd[d] = grad

@@ -6,61 +6,68 @@ import sys
 import inspect
 #from implemented import Implemented_Targets
 from numpy import argsort, array, diag, dot, eye, linalg, ones, reshape, sum, zeros, exp, log
-from collections import defaultdict
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
+import forcebalance
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import printcool_dictionary, createWorkQueue, getWorkQueue, wq_wait
-from forcebalance.baseclass import ForceBalanceBaseClass
 import datetime
 import traceback
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 try:
     from forcebalance.gmxio import AbInitio_GMX, Liquid_GMX
 except:
-    print traceback.format_exc()
-    print "Gromacs module import failed"
+    logger.warning(traceback.format_exc())
+    logger.warning("Gromacs module import failed\n")
 
 try:
     from forcebalance.gmxqpio import Monomer_QTPIE
 except:
-    print traceback.format_exc()
-    print "QTPIE Monomer module import failed"
+    logger.warning(traceback.format_exc())
+    logger.warning("QTPIE Monomer module import failed\n")
 
 try:
     from forcebalance.tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER, Liquid_TINKER
 except:
-    print traceback.format_exc()
-    print "Tinker module import failed"
+    logger.warning(traceback.format_exc())
+    logger.warning("Tinker module import failed\n")
 
 try:
     from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM
 except:
-    print traceback.format_exc()
-    print "OpenMM module import failed; check OpenMM package"
+    logger.warning(traceback.format_exc())
+    logger.warning("OpenMM module import failed; check OpenMM package\n")
 
 try:
     from forcebalance.abinitio_internal import AbInitio_Internal
 except:
-    print traceback.format_exc()
-    print "Internal energy fitting module import failed"
+    logger.warning(traceback.format_exc())
+    logger.warning("Internal energy fitting module import failed\n")
 
 try:
     from forcebalance.counterpoise import Counterpoise
 except:
-    print traceback.format_exc()
-    print "Counterpoise module import failed"
+    logger.warning(traceback.format_exc())
+    logger.warning("Counterpoise module import failed\n")
 
 try:
     from forcebalance.amberio import AbInitio_AMBER
 except:
-    print traceback.format_exc()
-    print "Amber module import failed"
+    logger.warning(traceback.format_exc())
+    logger.warning("Amber module import failed\n")
 
 try:
     from forcebalance.psi4io import THCDF_Psi4, RDVR3_Psi4
 except:
-    print traceback.format_exc()
-    print "PSI4 module import failed"
+    logger.warning(traceback.format_exc())
+    logger.warning("PSI4 module import failed\n")
+
+try:
+    from forcebalance.target import RemoteTarget
+except:
+    logger.warning(traceback.format_exc())
+    logger.warning("Remote Target import failed\n")
 
 ## The table of implemented Targets
 Implemented_Targets = {
@@ -81,12 +88,13 @@ Implemented_Targets = {
     'BINDINGENERGY_TINKER':BindingEnergy_TINKER,
     'MOMENTS_TINKER':Moments_TINKER,
     'MONOMER_QTPIE':Monomer_QTPIE,
+    'REMOTE_TARGET':RemoteTarget,
     }
 
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
 Letters = ['X','G','H']
 
-class Objective(ForceBalanceBaseClass):
+class Objective(forcebalance.BaseClass):
     """ Objective function.
     
     The objective function is a combination of contributions from the different
@@ -121,7 +129,8 @@ class Objective(ForceBalanceBaseClass):
         for opts in tgt_opts:
             if opts['type'] not in Implemented_Targets:
                 raise RuntimeError('The target type \x1b[1;91m%s\x1b[0m is not implemented!' % opts['type'])
-            Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
+            if opts["remote"]: Tgt = forcebalance.target.RemoteTarget(options, opts, forcefield)
+            else: Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
             self.Targets.append(Tgt)
             printcool_dictionary(Tgt.PrintOptionDict,"Setup for target %s :" % Tgt.name)
         if len(set([Tgt.name for Tgt in self.Targets])) != len([Tgt.name for Tgt in self.Targets]):
@@ -143,7 +152,7 @@ class Objective(ForceBalanceBaseClass):
         # Create the work queue here.
         if self.wq_port != 0:
             createWorkQueue(self.wq_port)
-            print('Work Queue is listening on %d' % self.wq_port)
+            logger.info('Work Queue is listening on %d\n' % self.wq_port)
 
         printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
 
@@ -211,6 +220,7 @@ class Objective(ForceBalanceBaseClass):
         PrintDict = OrderedDict()
         Total = 0.0
         Change = False
+        color = "\x1b[0m"
         for key, val in self.ObjDict.items():
             if key == 'Total' : continue
             color = "\x1b[94m"
@@ -315,17 +325,17 @@ class Penalty:
         self.ptyp = self.Pen_Names[User_Option.upper()]
         self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.FUSE, 4:self.FUSE_L0, 5: self.FUSE_BARRIER}
         if User_Option.upper() == 'L1':
-            print "L1 norm uses the hyperbolic penalty, make sure penalty_hyperbolic_b is set sufficiently small"
+            logger.info("L1 norm uses the hyperbolic penalty, make sure penalty_hyperbolic_b is set sufficiently small\n")
         elif self.ptyp == 1:
-            print "Using hyperbolic regularization (Laplacian prior) with strength %.1e (+), %.1e (x) and tightness %.1e" % (Factor_Add, Factor_Mult, Factor_B)
+            logger.info("Using hyperbolic regularization (Laplacian prior) with strength %.1e (+), %.1e (x) and tightness %.1e\n" % (Factor_Add, Factor_Mult, Factor_B))
         elif self.ptyp == 2:
-            print "Using parabolic regularization (Gaussian prior) with strength %.1e (+), %.1e (x)" % (Factor_Add, Factor_Mult)
+            logger.info("Using parabolic regularization (Gaussian prior) with strength %.1e (+), %.1e (x)\n" % (Factor_Add, Factor_Mult))
         elif self.ptyp == 3:
-            print "Using L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e" % Factor_Add
+            logger.info("Using L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e\n" % Factor_Add)
         elif self.ptyp == 4:
-            print "Using L0-L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e and switching distance %.1e" % (Factor_Add, Alpha)
+            logger.info("Using L0-L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e and switching distance %.1e\n" % (Factor_Add, Alpha))
         elif self.ptyp == 5:
-            print "Using L1 Fusion Penalty with Log Barrier (only relevant for basis set optimizations at the moment) with strength %.1e and barrier distance %.1e" % (Factor_Add, Alpha)
+            logger.info("Using L1 Fusion Penalty with Log Barrier (only relevant for basis set optimizations at the moment) with strength %.1e and barrier distance %.1e\n" % (Factor_Add, Alpha))
 
         ## Find exponential spacings.
         if self.ptyp in [3,4,5]:

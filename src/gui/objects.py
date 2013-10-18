@@ -5,6 +5,12 @@ import os
 """
 This file contains classes that interface with forcebalance and act as an intermediary
 between the GUI frontend and lower level calculation elements.
+
+Objects that need to be displayed should implement a display() function that returns
+a type that can be recognized by the widget. Generic display function that returns a
+string filled with an object's properties is provided by ForceBalanceObject, but
+more complex data structures like dictionaries provide information on structure that
+can be used by the widget in creating more complicated views.
 """
 
 class ForceBalanceObject(object):
@@ -83,20 +89,32 @@ class CalculationObject(ForceBalanceObject):
         return properties
 
     def run(self):
-        #options, tgt_opts = parse_inputs(input_file)
-        ## The force field component of the project
-        #forcefield  = FF(options)
-        ## The objective function
-        objective   = forcebalance.objective.Objective(self.opts, self.tgt_opts, self.properties['forcefield'].forcefield)
-        ## The optimizer component of the project
-        optimizer   = forcebalance.optimizer.Optimizer(self.opts, objective, self.properties['forcefield'].forcefield)
-        ## Actually run the optimizer.
-        optimizer.Run()
+        try:
+            #options, tgt_opts = parse_inputs(input_file)
+            ## The force field component of the project
+            #forcefield  = FF(options)
+            ## The objective function
+            objective   = forcebalance.objective.Objective(self.opts, self.tgt_opts, self.properties['forcefield'].forcefield)
+            ## The optimizer component of the project
+            optimizer   = forcebalance.optimizer.Optimizer(self.opts, objective, self.properties['forcefield'].forcefield)
+            ## Actually run the optimizer.
+            optimizer.Run()
+            
+            
+            resultopts = self.opts.copy()
+            resultopts.update({"ffdir" : "result"})
+            
+            # temporarily silence nifty and forcefield while reading the results forcefield
+            forcebalance.output.getLogger("forcebalance.forcefield").disabled = True
+            forcebalance.output.getLogger("forcebalance.nifty").propagate = True
+            self.properties['result'] = ForcefieldObject(resultopts)
+            forcebalance.output.getLogger("forcebalance.forcefield").disabled = False
+            forcebalance.output.getLogger("forcebalance.nifty").disabled = False
+        except:
+            import traceback
+            logger = forcebalance.output.getLogger("forcebalance")
+            logger.critical("Calculation failed\n%s" % traceback.format_exc())
         
-        resultopts = self.opts.copy()
-        resultopts.update({"ffdir" : "result"})
-        self.properties['result'] = ForcefieldObject(resultopts)
-
 # maybe the current implementation of TargetObject should be merged here
 # to keep all options in the same place?
 class OptionObject(ForceBalanceObject):

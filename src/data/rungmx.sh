@@ -11,11 +11,6 @@ export BAK=$HOME/temp/rungmx-backups
 # Disable GROMACS backup files
 export GMX_MAXBACKUP=-1
 
-if [[ $HOSTNAME =~ "leeping" ]] ; then
-    . /opt/intel/Compiler/11.1/072/bin/iccvars.sh intel64
-    export PATH=/home/leeping/opt/gromacs-4.5.5/bin:$PATH
-fi
-
 echo "#=======================#"
 echo "# ENVIRONMENT VARIABLES #"
 echo "#=======================#"
@@ -32,6 +27,9 @@ echo $@
 
 rm -f npt_result.p npt_result.p.bz2
 export PYTHONUNBUFFERED="y"
+# Unset OMP_NUM_THREADS otherwise gromacs will complain.
+unset OMP_NUM_THREADS
+unset MKL_NUM_THREADS
 time $@
 # Delete backup files that are older than one week.
 find $BAK/$PWD -type f -mtime +7 -exec rm {} \;

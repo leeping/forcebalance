@@ -16,9 +16,10 @@ from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 from multiprocessing import Pool
-try:
-    from simtk.unit import *
-except: pass
+from forcebalance.unit import *
+
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 def parse_interactions(input_file):
     """ Parse through the interactions input file.
@@ -36,7 +37,7 @@ def parse_interactions(input_file):
     SystemName = None
     SystemDict = {}
     
-    print "Reading interactions from file: %s" % input_file
+    logger.info("Reading interactions from file: %s\n" % input_file)
     section = "NONE"
     fobj = open(input_file).readlines()
     for ln, line in enumerate(fobj):
@@ -79,7 +80,7 @@ def parse_interactions(input_file):
                 Globals[key] = s[1]
             elif key == 'optimize':
                 if len(s) == 1 or s[1].lower() in ['y','yes','true']:
-                    print "Optimizing ALL systems by default"
+                    logger.info("Optimizing ALL systems by default\n")
                     Globals[key] = True
                 else:
                     Globals[key] = False
@@ -97,7 +98,7 @@ def parse_interactions(input_file):
             elif key == 'optimize':
                 if len(s) == 1 or s[1].lower() in ['y','yes','true']:
                     SystemDict[key] = True
-                    print "Optimizing system %s" % SystemName
+                    logger.info("Optimizing system %s\n" % SystemName)
                 else:
                     SystemDict[key] = False
             else:
@@ -143,11 +144,11 @@ class BindingEnergy(Target):
 
         self.set_option(tgt_opts,'cauchy','cauchy')
 
-        print "The energy denominator is:", self.energy_denom 
-        print "The RMSD denominator is:", self.rmsd_denom
+        logger.info("The energy denominator is: %s\n" % str(self.energy_denom)) 
+        logger.info("The RMSD denominator is: %s\n" % str(self.rmsd_denom))
 
         if self.cauchy:
-            print "Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )"
+            logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
 
     def indicate(self):
         printcool_dictionary(self.PrintDict,title="Interaction Energies (kcal/mol), Objective = % .5e\n %-20s %9s %9s %9s %11s" % 

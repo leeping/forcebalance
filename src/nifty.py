@@ -23,11 +23,15 @@ from numpy import array, diag, dot, eye, mat, mean, transpose
 from numpy.linalg import norm, svd
 import threading
 import pickle
-import time, datetime
+import time
 import subprocess
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
+
 import forcebalance
+from forcebalance.output import *
+logger = getLogger(__name__)
+
 # import IPython as ip # For debugging
 
 ## Boltzmann constant
@@ -42,17 +46,17 @@ bohrang = 0.529177249
 #=========================#
 #     I/O formatting      #
 #=========================#
-def pvec1d(vec1d, precision=1):
+def pvec1d(vec1d, precision=1, loglevel=INFO):
     """Printout of a 1-D vector.
 
     @param[in] vec1d a 1-D vector
     """
     v2a = array(vec1d)
     for i in range(v2a.shape[0]):
-        print "%% .%ie" % precision % v2a[i],
-    print
+        logger.log(loglevel, "%% .%ie " % precision % v2a[i])
+    logger.log(loglevel, '\n')
 
-def pmat2d(mat2d, precision=1):
+def pmat2d(mat2d, precision=1, loglevel=INFO):
     """Printout of a 2-D matrix.
 
     @param[in] mat2d a 2-D matrix
@@ -60,8 +64,8 @@ def pmat2d(mat2d, precision=1):
     m2a = array(mat2d)
     for i in range(m2a.shape[0]):
         for j in range(m2a.shape[1]):
-            print "%% .%ie" % precision % m2a[i][j],
-        print
+            logger.log(loglevel, "%% .%ie " % precision % m2a[i][j])
+        logger.log(loglevel, '\n')
 
 def encode(l): 	
     return [[len(list(group)),name] for name, group in itertools.groupby(l)]
@@ -95,21 +99,21 @@ def uncommadash(s):
             elif len(ws) == 2:
                 b = int(ws[1])
             else:
-                print "Dash-separated list cannot exceed length 2"
+                logger.warning("Dash-separated list cannot exceed length 2\n")
                 raise
             if a < 0 or b <= 0 or b <= a:
                 if a < 0 or b <= 0:
-                    print "Items in list cannot be zero or negative:", a, b
+                    logger.warning("Items in list cannot be zero or negative: %d %d\n" % (a, b))
                 else:
-                    print "Second number cannot be larger than first:", a, b
+                    logger.warning("Second number cannot be larger than first: %d %d\n" % (a, b))
                 raise
             newL = range(a,b)
             if any([i in L for i in newL]):
-                print "Duplicate entries found in list"
+                logger.warning("Duplicate entries found in list\n")
                 raise
             L += newL
         if sorted(L) != L:
-            print "List is out of order"
+            logger.warning("List is out of order\n")
             raise
     except:
         raise Exception('Invalid string for converting to list of numbers: %s' % s)
@@ -152,7 +156,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     bar = ''.join(["=" for i in range(width + 6)])
     bar = sym + bar + sym
     #bar = ''.join([sym for i in range(width + 8)])
-    print '\r'+bar
+    logger.info('\r'+bar + '\n')
     for line in text:
         if center:
             padleft = ' ' * ((width - newlen(line)) / 2)
@@ -161,23 +165,23 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
         padright = ' '* (width - newlen(line) - len(padleft))
         if ansi != None:
             ansi = str(ansi)
-            print "%s| \x1b[%sm%s" % (sym, ansi, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
+            logger.info("%s| \x1b[%sm%s " % (sym, ansi, padleft)+line+" %s\x1b[0m |%s\n" % (padright, sym))
         elif color != None:
             if color == 0 and bold:
-                print "%s| \x1b[1m%s" % (sym, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
+                logger.info("%s| \x1b[1m%s " % (sym, padleft) + line + " %s\x1b[0m |%s\n" % (padright, sym))
             elif color == 0:
-                print "%s| %s" % (sym, padleft),line,"%s |%s" % (padright, sym)
+                logger.info("%s| %s " % (sym, padleft)+line+" %s |%s\n" % (padright, sym))
             else:
-                print "%s| \x1b[%s9%im%s" % (sym, bold and "1;" or "", color, padleft),line,"%s\x1b[0m |%s" % (padright, sym)
+                logger.info("%s| \x1b[%s9%im%s " % (sym, bold and "1;" or "", color, padleft)+line+" %s\x1b[0m |%s\n" % (padright, sym))
             # if color == 3 or color == 7:
             #     print "%s\x1b[40m\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
             # else:
             #     print "%s\x1b[%s9%im%s" % (''.join([sym for i in range(3)]), bold and "1;" or "", color, padleft),line,"%s\x1b[0m%s" % (padright, ''.join([sym for i in range(3)]))
         else:
             warn_press_key("Inappropriate use of printcool")
-    print bar
+    logger.info(bar + '\n')
     botbar = ''.join([bottom for i in range(width + 8)])
-    return botbar
+    return botbar + '\n'
 
 def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidth=25,topwidth=50,center=True,leftpad=0):
     """See documentation for printcool; this is a nice way to print out keys/values in a dictionary.
@@ -195,10 +199,10 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
         #print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
         return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
     if isinstance(Dict, OrderedDict): 
-        print '\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None])
+        logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None]))
     else:
-        print '\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None])
-    print bar
+        logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None]))
+    logger.info("\n%s" % bar)
 
 #===============================#
 #| Math: Variable manipulation |#
@@ -242,7 +246,7 @@ def floatornan(word):
     if isfloat(word):
         return float(word)
     else:
-        print "Setting %s to % .1e" % big
+        logger.info("Setting %s to % .1e\n" % big)
         return big
 
 def col(vec):
@@ -343,7 +347,7 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     n_x = X.shape[0]
     n_fit = X.shape[1]
     if n_fit > n_x:
-        print "Argh? It seems like this problem is underdetermined!"
+        logger.warning("Argh? It seems like this problem is underdetermined!\n")
     # Build the weight matrix.
     if w != None:
         if len(w) != n_x:
@@ -415,11 +419,11 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     """
 
     # Create numpy copies of input arguments.
-    A_n = np.array(A_n)
+    A_n = array(A_n)
     if B_n is not None:
-        B_n = np.array(B_n)
+        B_n = array(B_n)
     else:
-        B_n = np.array(A_n)
+        B_n = array(A_n)
     # Get the length of the timeseries.
     N = A_n.size
     # Be sure A_n and B_n have the same dimensions.
@@ -438,7 +442,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     # Trap the case where this covariance is zero, and we cannot proceed.
     if(sigma2_AB == 0):
         if warn:
-            print 'Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency'
+            logger.warning('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency')
         return 1.0
     # Accumulate the integrated correlation time by computing the normalized correlation time at
     # increasing values of t.  Stop accumulating if the correlation function goes negative, since
@@ -470,7 +474,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
 try:
     from lxml import etree
 except: 
-    print "lxml module import failed (You can't use OpenMM or XML force fields)"
+    logger.warning("lxml module import failed (You can't use OpenMM or XML force fields)\n")
 ## Pickle uses 'flags' to pickle and unpickle different variable types.
 ## Here we use the letter 'x' to signify that the variable type is an XML file.
 XMLFILE='x'
@@ -486,7 +490,7 @@ class Pickler_LP(pickle.Pickler):
                 String = etree.tostring(obj)
                 ## The rest is copied from the Pickler class
                 if self.bin:
-                    print "self.bin is True, not sure what to do with myself"
+                    logger.error("self.bin is True, not sure what to do with myself\n")
                     raw_input()
                 else:
                     self.write(XMLFILE + repr(String) + '\n')
@@ -537,21 +541,37 @@ def lp_load(file):
 try:
     import work_queue
 except:
-    print "Work Queue library import fail (You can't queue up jobs using Work Queue)"
+    logger.warning("Work Queue library import fail (You can't queue up jobs using Work Queue)\n")
 
+# Global variable corresponding to the Work Queue object
+WORK_QUEUE = None
+
+# Global variable containing a mapping from target names to Work Queue task IDs
+WQIDS = defaultdict(list)
 
 def getWorkQueue():
-    return forcebalance.WORK_QUEUE
+    global WORK_QUEUE
+    return WORK_QUEUE
 
 def getWQIds():
-    return forcebalance.WQIDS
+    global WQIDS
+    return WQIDS
 
-def createWorkQueue(wq_port):
-    work_queue.set_debug_flag('all')
-    forcebalance.WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
-    forcebalance.WORK_QUEUE.specify_name('forcebalance')
-    forcebalance.WORK_QUEUE.specify_keepalive_timeout(8640000)
-    forcebalance.WORK_QUEUE.specify_keepalive_interval(8640000)
+def createWorkQueue(wq_port, debug=True):
+    global WORK_QUEUE
+    if debug:
+        work_queue.set_debug_flag('all')
+    WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
+    WORK_QUEUE.tasks_failed = 0 # Counter for tasks that fail at the application level
+    WORK_QUEUE.specify_name('forcebalance')
+    #WORK_QUEUE.specify_keepalive_timeout(8640000)
+    WORK_QUEUE.specify_keepalive_interval(8640000)
+
+def destroyWorkQueue():
+    # Convenience function to destroy the Work Queue objects.
+    global WORK_QUEUE, WQIDS
+    WORK_QUEUE = None
+    WQIDS = defaultdict(list)
 
 def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
@@ -562,23 +582,24 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     @param[in] input_files (list of files) A list of locations of the input files.
     @param[in] output_files (list of files) A list of locations of the output files.
     """
+    global WQIDS
     task = work_queue.Task(command)
     cwd = os.getcwd()
     for f in input_files:
         lf = os.path.join(cwd,f)
-        task.specify_input_file(lf,f)
+        task.specify_input_file(lf,f,cache=False)
     for f in output_files:
         lf = os.path.join(cwd,f)
-        task.specify_output_file(lf,f)
+        task.specify_output_file(lf,f,cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
     taskid = wq.submit(task)
     if verbose:
-        print "Submitting command '%s' to the Work Queue, taskid %i" % (command, taskid)
+        logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
     if tgt != None:
-        forcebalance.WQIDS[tgt.name].append(taskid)
+        WQIDS[tgt.name].append(taskid)
     else:
-        forcebalance.WQIDS["None"].append(taskid)
+        WQIDS["None"].append(taskid)
     
 def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=True):
     """ 
@@ -592,76 +613,99 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     @param[in] output_files (list of 2-tuples) A list of local and
     remote locations of the output files.
     """
+    global WQIDS
     task = work_queue.Task(command)
     for f in input_files:
         # print f[0], f[1]
-        task.specify_input_file(f[0],f[1])
+        task.specify_input_file(f[0],f[1],cache=False)
     for f in output_files:
         # print f[0], f[1]
-        task.specify_output_file(f[0],f[1])
+        task.specify_output_file(f[0],f[1],cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
     taskid = wq.submit(task)
     if verbose:
-        print "Submitting command '%s' to the Work Queue, taskid %i" % (command, taskid)
+        logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
     if tgt != None:
-        forcebalance.WQIDS[tgt.name].append(taskid)
+        WQIDS[tgt.name].append(taskid)
     else:
-        forcebalance.WQIDS["None"].append(taskid)
+        WQIDS["None"].append(taskid)
 
-def wq_wait1(wq, wait_time=10, verbose=False):
+def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
-    if verbose: print '---'
-    for sec in range(wait_time):
-        task = wq.wait(1)
+    global WQIDS
+    if verbose: logger.info('---\n')
+    if wait_intvl >= wait_time:
+        wait_time = wait_intvl
+        numwaits = 1
+    else:
+        numwaits = wait_time / wait_intvl
+    for sec in range(numwaits):
+        task = wq.wait(wait_intvl)
         if task:
             exectime = task.cmd_execution_time/1000000
             if verbose:
-                print 'A job has finished!'
-                print 'Job name = ', task.tag, 'command = ', task.command
-                print "status = ", task.status, 
-                print "return_status = ", task.return_status, 
-                print "result = ", task.result, 
-                print "host = ", task.hostname
-                print "execution time = ", exectime, 
-                print "total_bytes_transferred = ", task.total_bytes_transferred
+                logger.info('A job has finished!\n')
+                logger.info('Job name = ' + task.tag + 'command = ' + task.command + '\n')
+                logger.info("status = " + task.status + '\n') 
+                logger.info("return_status = " + task.return_status)
+                logger.info("result = " + task.result) 
+                logger.info("host = " + task.hostname + '\n')
+                logger.info("execution time = " + exectime) 
+                logger.info("total_bytes_transferred = " + task.total_bytes_transferred + '\n')
             if task.result != 0:
                 oldid = task.id
                 oldhost = task.hostname
                 tgtname = "None"
-                for tnm in forcebalance.WQIDS:
-                    if task.id in forcebalance.WQIDS[tnm]:
+                for tnm in WQIDS:
+                    if task.id in WQIDS[tnm]:
                         tgtname = tnm
-                        forcebalance.WQIDS[tnm].remove(task.id)
+                        WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
-                print "Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i" % (task.command, oldid, oldhost, exectime, taskid)
-                forcebalance.WQIDS[tgtname].append(taskid)
+                logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
+                WQIDS[tgtname].append(taskid)
+                wq.tasks_failed += 1
             else:
-                if exectime > 60: # Assume that we're only interested in printing jobs that last longer than a minute.
-                    print "Command '%s' (task %i) finished successfully on host %s (%i seconds)" % (task.command, task.id, task.hostname, exectime)
-                for tnm in forcebalance.WQIDS:
-                    if task.id in forcebalance.WQIDS[tnm]:
-                        forcebalance.WQIDS[tnm].remove(task.id)
+                if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
+                    logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
+                for tnm in WQIDS:
+                    if task.id in WQIDS[tnm]:
+                        WQIDS[tnm].remove(task.id)
                 del task
+        try:
+            # Full workers were added with CCTools 4.0.1
+            nbusy = wq.stats.workers_busy + wq.stats.workers_full
+        except:
+            nbusy = wq.stats.workers_busy
+
+        try:
+            Complete = wq.stats.total_tasks_complete - wq.tasks_failed
+            Total = wq.stats.total_tasks_dispatched - wq.tasks_failed
+        except:
+            logger.warning("wq object has no tasks_failed attribute, please use createWorkQueue() function.\n")
+            Complete = wq.stats.total_tasks_complete
+            Total = wq.stats.total_tasks_dispatched
+            
         if verbose:
-            print "Workers: %i init, %i ready, %i busy, %i total joined, %i total removed" \
-                % (wq.stats.workers_init, wq.stats.workers_ready, wq.stats.workers_busy, wq.stats.total_workers_joined, wq.stats.total_workers_removed)
-            print "Tasks: %i running, %i waiting, %i total dispatched, %i total complete" \
-                % (wq.stats.tasks_running,wq.stats.tasks_waiting,wq.stats.total_tasks_dispatched,wq.stats.total_tasks_complete)
-            print "Data: %i / %i kb sent/received" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024)
+            logger.info("Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n" \
+                % (wq.stats.workers_init, wq.stats.workers_ready, nbusy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))
+            logger.info("Tasks: %i running, %i waiting, %i total dispatched, %i total complete\n" \
+                % (wq.stats.tasks_running,wq.stats.tasks_waiting,Total,Complete))
+            logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
         else:
-            print "%s : %i/%i workers busy; %i/%i jobs complete\r" % (datetime.datetime.fromtimestamp(time.mktime(datetime.datetime.now().timetuple())).ctime(),
-                                                                      wq.stats.workers_busy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
-                                                                      wq.stats.total_tasks_complete, wq.stats.total_tasks_dispatched), 
+            logger.info("\r%s : %i/%i workers busy; %i/%i jobs complete\r" %\
+            (time.ctime(),
+             nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
+             Complete, Total)) 
             if time.time() - wq_wait1.t0 > 900:
                 wq_wait1.t0 = time.time()
-                print
+                logger.info('\n')
 wq_wait1.t0 = time.time()
 
-def wq_wait(wq, verbose=False):
+def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
     """ This function waits until the work queue is completely empty. """
     while not wq.empty():
-        wq_wait1(wq, verbose=verbose)
+        wq_wait1(wq, wait_time=wait_time, wait_intvl=wait_intvl, print_time=print_time, verbose=verbose)
 
 #=====================================#
 #| File and process management stuff |#
@@ -753,7 +797,7 @@ def which(fnm):
     except:
         return ''
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stderr = False, persist = False, expand_cr=False):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -766,7 +810,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     persist = Continue execution even if the command gives a nonzero return code.
     """
     # Dictionary of options to be passed to the Popen object.
-    cmd_options={'shell':(type(command) is str), 'stdin':None, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
+    cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
 
     # "write to file" : Function for writing some characters to the log and/or output files.
     def wtf(out):
@@ -781,23 +825,24 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         wtf.first = False
     wtf.first = True
 
-    if stdin: cmd_options['stdin'] = PIPE
+    # Preserve backwards compatibility; sometimes None gets passed to stdin.
+    if stdin == None: stdin = ""
 
     if print_command:
-        print "Executing process: \x1b[92m%-50s\x1b[0m%s%s%s" % (' '.join(command) if type(command) is list else command, 
+        logger.info("Executing process: \x1b[92m%-50s\x1b[0m%s%s%s\n" % (' '.join(command) if type(command) is list else command, 
                                                                " Output: %s" % outfnm if outfnm != None else "", 
                                                                " Append: %s" % logfnm if logfnm != None else "", 
-                                                               " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else "")
-        wtf("Executing process: %s%s\n" % (command, " Stdin: %s" % stdin.replace('\n','\\n') if stdin != None else ""))
+                                                               (" Stdin: %s" % stdin.replace('\n','\\n')) if stdin else ""))
+        wtf("Executing process: %s%s\n" % (command, (" Stdin: %s" % stdin.replace('\n','\\n')) if stdin else ""))
 
+    cmd_options.update(kwargs)
     p = subprocess.Popen(command, **cmd_options)
     
     stdout = ""
     stderr = ""
 
-    if p.stdin:
-        p.stdin.write(stdin)
-        p.stdin.close()
+    p.stdin.write(stdin)
+    p.stdin.close()
 
     while True:
         reads = [p.stdout.fileno(), p.stderr.fileno()]
@@ -821,12 +866,13 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     p.wait()
 
     if p.returncode != 0:
-        print "Received an error message:"
-        sys.stderr.write("\n==== Error Message ====\n")
-        sys.stderr.write(stderr)
-        sys.stderr.write("== End Error Message ==\n")
+        if stderr:
+            logger.warning("Received an error message:\n")
+            logger.warning("\n[====] \x1b[91mError Message\x1b[0m [====]\n")
+            logger.warning(stderr)
+            logger.warning("[====] \x1b[91mEnd o'Message\x1b[0m [====]\n")
         if persist:
-            print "%s gave a return code of %i (it may have crashed) -- carrying on" % (command, p.returncode)
+            logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
         else:
             # This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.
             # sys.stderr.write("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
@@ -838,14 +884,14 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
 
 def warn_press_key(warning, timeout=10):
     if type(warning) is str:
-        print warning
+        logger.warning(warning + '\n')
     elif type(warning) is list:
         for line in warning:
-            print line
+            logger.warning(line + '\n')
     else:
-        print "You're not supposed to pass me a variable of this type:", type(warning)
+        logger.warning("You're not supposed to pass me a variable of this type: " + str(type(warning)))
     if sys.stdin.isatty():
-        print "\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m" % timeout
+        logger.warning("\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m\n" % timeout)
         try: rlist, wlist, xlist = select([sys.stdin], [], [], timeout)
         except: pass
 
@@ -857,10 +903,10 @@ def warn_once(warning, warnhash = None):
         return
     warn_once.already.add(warnhash)
     if type(warning) is str:
-        print warning
+        logger.info(warning + '\n')
     elif type(warning) is list:
         for line in warning:
-            print line
+            logger.info(line + '\n')
 warn_once.already = set()
 
 #=========================================#
@@ -920,11 +966,11 @@ def multiopen(arg):
         elif all([type(l) == file or type(l) == list for l in arg]):
             fins = arg
         else:
-            print "What did you give this program as input?"
-            print arg
+            logger.info("What did you give this program as input?\n")
+            logger.info(str(arg) + '\n')
             exit(1)
     else:
-        print "What did you give this program as input?"
-        print arg
+        logger.info("What did you give this program as input?\n")
+        logger.info(str(arg) + '\n')
         exit(1)
     return fins

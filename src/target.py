@@ -6,13 +6,16 @@ import subprocess
 import shutil
 import numpy as np
 import time
-from forcebalance.baseclass import ForceBalanceBaseClass
 from collections import OrderedDict
+import tarfile
+import forcebalance
 from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from forcebalance.optimizer import Counter
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
-class Target(ForceBalanceBaseClass):
+class Target(forcebalance.BaseClass):
     
     """
     Base class for all fitting targets.
@@ -221,7 +224,7 @@ class Target(ForceBalanceBaseClass):
                         FileCount += 1
                     else:
                         # I could use the tarfile module here
-                        print "Backing up:", self.tempdir, 'to:', "backups/%s_%i.tar.bz2" % (self.name,FileCount)
+                        logger.info("Backing up: " + self.tempdir + ' to: ' + "backups/%s_%i.tar.bz2\n" % (self.name,FileCount))
                         subprocess.call(["tar","cjf",CandFile,self.name])
                         shutil.rmtree(self.name)
                         break
@@ -287,7 +290,7 @@ class Target(ForceBalanceBaseClass):
         
         """
         if self.sleepy > 0:
-            print "Sleeping for %i seconds as directed.." % self.sleepy
+            logger.info("Sleeping for %i seconds as directed...\n" % self.sleepy)
             time.sleep(self.sleepy)
         ## Directory of the current iteration; if not None, then the simulation runs under
         ## temp/target_name/iteration_number
@@ -387,5 +390,60 @@ class Target(ForceBalanceBaseClass):
         tlines += clines
         PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
         printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=False, leftpad=4, color=color)
+        
+class RemoteTarget(Target):
+    def __init__(self,options,tgt_opts,forcefield):
+        super(RemoteTarget, self).__init__(options,tgt_opts,forcefield)
+        
+        self.r_options = options.copy()
+        self.r_options["type"]="single"
+        
+        self.r_tgt_opts = tgt_opts.copy()
+        self.r_tgt_opts["remote"]=False
+        
+        tar = tarfile.open(name="temp/%s/target.tar.bz2" % self.name, mode='w:bz2')
+        tar.add("%s/targets/%s" % (self.root, self.name), arcname = "targets/%s" % self.name)
+        tar.close()
+        
+        self.remote_indicate = ""
+        
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        n=0
+        id_string = "%s_%i-%i" % (self.name, Counter(), n)
+        
+        while os.path.exists('%s.out' % id_string):
+            n+=1
+            id_string = "%s_%i-%i" % (self.name, Counter(), n)
+        
+        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
+        
+        forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
+        forcebalance.nifty.LinkFile(os.path.join(self.root,"temp", self.name, "target.tar.bz2"),"%s.tar.bz2" % self.name)
+        
+        wq = getWorkQueue()
+        
+        logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
+        # input:
+        #   forcebalance.p: pickled mvals, options, and forcefield
+        #   rtarget.py: remote target evaluation script
+        #   target.tar.bz2: tarred target
+        # output:
+        #   objective.p: pickled objective function dictionary
+        #   indicate.log: results of target.indicate() written to file
+        forcebalance.nifty.queue_up(wq, "python rtarget.py > %s.out 2>&1" % id_string,
+            ["forcebalance.p", "rtarget.py", "%s.tar.bz2" % self.name],
+            ['objective_%s.p' % id_string, 'indicate_%s.log' % id_string, '%s.out' % id_string],
+            tgt=self)
+            
+        self.id_string = id_string
+
+    def get(self,mvals,AGrad=False,AHess=False):
+        with open('indicate_%s.log' % self.id_string, 'r') as f:
+            self.remote_indicate = f.read()
+        with open('objective_%s.p' % self.id_string, 'r') as f:
+            return forcebalance.nifty.lp_load(f)
+        
+    def indicate(self):
+        logger.info(self.remote_indicate + '\n')
 
 

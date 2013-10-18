@@ -192,7 +192,7 @@ helpful discussions.
 
 - Arthur Vigil contributed the unit testing framework and many unit tests,
 significant improvements to the automatic documentation generation, 
-and various code improvements.
+logging of output, graphical user interface, and various code improvements.
 
 - Matt Welborn contributed the parallelization-over-snapshots
 functionality in the general force matching module.

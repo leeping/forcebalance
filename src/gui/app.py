@@ -8,20 +8,26 @@ class MainWindow(tk.Tk):
         tk.Tk.__init__(self)
 
         self.title("ForceBalance 1.1")
+        self.geometry("800x600")
 
         ## Window Components
+        # general view of selectable objects in calculation
         self.objectsPane = elements.ObjectViewer(self)
+        # more detailed properties relating to selected object(s)
         self.detailsPane = elements.DetailViewer(self)
-        self.consolePane = elements.ConsoleViewer(self)
-        sys.stdout = self.consolePane
-        self.objectsPane.grid(row=0, column=0)
-        self.detailsPane.grid(row=0, column=1)
-        self.consolePane.grid(row=1, columnspan=2, sticky=tk.W+tk.E+tk.N+tk.S)
+        # forcebalance output is routed to the console pane
+        self.consolePane = elements.ConsoleViewer(self, height = 500)
+        
+        self.showObjects = tk.IntVar()
+        self.showObjects.set(True)
+        
+        self.arrangeWindow()
         
         self._initialize_menu()
 
         # Application-wide event bindings
         self.objectsPane.selectionchanged.trace('r', self.updateDetailView)
+        self.showObjects.trace('w', self.arrangeWindow)
 
     def _initialize_menu(self):
         self.menubar = tk.Menu(self)
@@ -34,13 +40,20 @@ class MainWindow(tk.Tk):
         filemenu.add_command(label="Close", command=self.close)
         filemenu.add_command(label="Exit", command=sys.exit)
         self.menubar.add_cascade(label="File", menu=filemenu)
+        
+        optionsmenu = tk.Menu(self.menubar, tearoff=0)
+        optionsmenu.add_checkbutton(label="show object viewer", variable=self.showObjects)
+        optionsmenu.add_checkbutton(label="show default options", variable=self.detailsPane.printAll)
+        self.menubar.add_cascade(label="Options", menu=optionsmenu)
+        
+        self.menubar.add_command(label="Run", command=self.objectsPane.run, state="disabled")
 
         self['menu']=self.menubar
 
-        calculationmenu = tk.Menu(self.menubar, tearoff=0)
-        calculationmenu.add_command(label="Check", state="disabled")
-        calculationmenu.add_command(label="Run", command=self.objectsPane.run)
-        self.menubar.add_cascade(label="Calculation", menu=calculationmenu)
+        #calculationmenu = tk.Menu(self.menubar, tearoff=0)
+        #calculationmenu.add_command(label="Check", state="disabled")
+        #calculationmenu.add_command(label="Run", command=self.objectsPane.run)
+        #self.menubar.add_cascade(label="Calculation", menu=calculationmenu)
 
     def open(self):
         filters = [('Forcebalance input files', '*.in'),('Show all', '*')]
@@ -48,44 +61,33 @@ class MainWindow(tk.Tk):
         if inputfile:
             self.consolePane.clear()
             self.objectsPane.open(inputfile)
+            self.menubar.entryconfig(3, state=tk.NORMAL)
 
     def close(self):
         self.objectsPane.clear()
         self.detailsPane.clear()
+        self.menubar.entryconfig(3, state=tk.DISABLED)
+        
+    def arrangeWindow(self, *args):
+        self.objectsPane.grid_forget()
+        self.detailsPane.grid_forget()
+        self.consolePane.grid_forget()
+    
+        if self.showObjects.get():
+            self.consolePane.grid(row=1, columnspan=2, sticky=tk.W+tk.E+tk.N+tk.S)
+            self.objectsPane.grid(row=0, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
+            self.detailsPane.grid(row=0, column=1, sticky=tk.W+tk.E+tk.N+tk.S)
+            self.rowconfigure(0, weight=0)
+            self.rowconfigure(1, weight=1)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=1)            
+            
+        else:
+            self.consolePane.grid(sticky=tk.W+tk.E+tk.N+tk.S)
+            self.rowconfigure(0, weight=1)
+            self.rowconfigure(1, weight=0)
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=0)  
 
     def updateDetailView(self, *args):
         self.detailsPane.load(self.objectsPane.activeselection)
-
-    def scrollWidgetDown(self, event):
-        p = {'x': self.winfo_pointerx(), 'y':self.winfo_pointery()}
-
-        for widget in self.winfo_children():
-            widgetTop={'x':widget.winfo_rootx(), 'y':widget.winfo_rooty()}
-            widgetBottom={'x': widget.winfo_rootx() + widget.winfo_width(),\
-                          'y': widget.winfo_rooty() + widget.winfo_height()}
-
-            if p[tk.X] > widgetTop[tk.X] and\
-               p[tk.Y] > widgetTop[tk.Y] and\
-               p[tk.X] < widgetBottom[tk.X] and\
-               p[tk.Y] < widgetBottom[tk.Y]:
-                try: 
-                    widget.scrollDown(event)
-                    break
-                except: pass
-
-    def scrollWidgetUp(self, event):
-        p = {'x': self.winfo_pointerx(), 'y':self.winfo_pointery()}
-
-        for widget in self.winfo_children():
-            widgetTop={'x':widget.winfo_rootx(), 'y':widget.winfo_rooty()}
-            widgetBottom={'x': widget.winfo_rootx() + widget.winfo_width(),\
-                          'y': widget.winfo_rooty() + widget.winfo_height()}
-
-            if p[tk.X] > widgetTop[tk.X] and\
-               p[tk.Y] > widgetTop[tk.Y] and\
-               p[tk.X] < widgetBottom[tk.X] and\
-               p[tk.Y] < widgetBottom[tk.Y]:
-                try: 
-                    widget.scrollUp(event)
-                    break
-                except: pass

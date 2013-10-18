@@ -12,11 +12,13 @@ import os, pickle, re, sys
 import numpy as np
 from copy import deepcopy
 from numpy.linalg import eig, norm, solve
-from nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
-from finite_difference import f1d7p, f1d5p, fdwrap
+import forcebalance
+from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
+from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
-from baseclass import ForceBalanceBaseClass
+from forcebalance.output import getLogger, DEBUG
+logger = getLogger(__name__)
 
 # Global variable corresponding to the iteration number.
 ITERATION_NUMBER = 0
@@ -31,7 +33,7 @@ def GoodStep():
     global GOODSTEP
     return GOODSTEP
 
-class Optimizer(ForceBalanceBaseClass):
+class Optimizer(forcebalance.BaseClass):
     """ Optimizer class.  Contains several methods for numerical optimization.
 
     For various reasons, the optimizer depends on the force field and fitting
@@ -177,15 +179,14 @@ class Optimizer(ForceBalanceBaseClass):
         final_print = True
         if final_print:
             bar = printcool("Final optimization parameters:\n Paste to input file to restart",bold=True,color=4)
-            print "read_mvals"
+            logger.info("read_mvals\n")
             self.FF.print_map(xk)
-            print "/read_mvals"
+            logger.info("/read_mvals\n")
             bar = printcool("Final physical parameters:",bold=True,color=4)
             self.FF.print_map(self.FF.create_pvals(xk))
-            print bar
+            logger.info(bar)
             self.FF.make(xk,False,'result')
-            print
-            print "The final force field has been printed to the 'result' directory."
+            logger.info("\nThe final force field has been printed to the 'result' directory.\n")
             #bar = printcool("\x1b[1;45;93mCongratulations, ForceBalance has finished\x1b[0m\n\x1b[1;45;93mGive yourself a pat on the back!\x1b[0m")
             bar = printcool("Congratulations, ForceBalance has finished\nGive yourself a pat on the back!",ansi="1;44;93")
 
@@ -235,12 +236,12 @@ class Optimizer(ForceBalanceBaseClass):
         global GOODSTEP
         Best_Step = 1
         if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
-            print "Reading initial objective, gradient, Hessian from checkpoint file"
+            logger.info("Reading initial objective, gradient, Hessian from checkpoint file\n")
             xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
             X_best, xk_prev, trust = self.chk['x_best'], self.chk['xk_prev'], self.chk['trust']
         else:
             xk       = self.mvals0.copy()
-            print
+            logger.info('\n')
             data     = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H  = data['X'], data['G'], data['H']
             ehist    = np.array([X])
@@ -269,29 +270,29 @@ class Optimizer(ForceBalanceBaseClass):
                 self.writechk()
             stdfront = len(ehist) > self.hist and np.std(np.sort(ehist)[:self.hist]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
             stdfront *= 2
-            print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual")
-            print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality)
+            logger.info("%6s%12s%12s%12s%14s%12s%12s\n" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual"))
+            logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality))
             # Check the convergence criteria
             if ngr < self.conv_grd:
-                print "Convergence criterion reached for gradient norm (%.2e)" % self.conv_grd
+                logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.conv_grd)
                 break
             if ITERATION_NUMBER == self.maxstep:
-                print "Maximum number of optimization steps reached (%i)" % ITERATION_NUMBER
+                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION_NUMBER)
                 break
             if ndx < self.conv_stp and ITERATION_NUMBER > 0 and not restep:
-                print "Convergence criterion reached in step size (%.2e)" % self.conv_stp
+                logger.info("Convergence criterion reached in step size (%.2e)\n" % self.conv_stp)
                 break
             if stdfront < self.conv_obj and len(ehist) > self.hist and not restep: # Factor of two is so [0,1] stdev is normalized to 1
-                print "Convergence criterion reached for objective function (%.2e)" % self.conv_obj
+                logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.conv_obj)
                 break
             if self.print_grad:
                 bar = printcool("Total Gradient",color=4)
                 self.FF.print_map(vals=G,precision=8)
-                print bar
+                logger.info(bar)
             if self.print_hess:
                 bar = printcool("Total Hessian",color=4)
                 pmat2d(H,precision=8)
-                print bar
+                logger.info(bar)
             for key, val in self.Objective.ObjDict.items():
                 if Best_Step:
                     self.Objective.ObjDict_Last[key] = val
@@ -308,10 +309,10 @@ class Optimizer(ForceBalanceBaseClass):
                 dp = pk - old_pk
                 bar = printcool("Mathematical Parameters (Current + Step = Next)",color=5)
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_xk[i], '+' if dx[i] >= 0 else '-', abs(dx[i]), xk[i]) for i in range(len(xk))])
-                print bar
+                logger.info(bar)
                 bar = printcool("Physical Parameters (Current + Step = Next)",color=5)
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
-                print bar
+                logger.info(bar)
             # Evaluate the objective function and its derivatives.
             data        = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H = data['X'], data['G'], data['H']
@@ -324,13 +325,13 @@ class Optimizer(ForceBalanceBaseClass):
             try:
                 Quality = dX_actual / dX_expect
             except:
-                print "Warning: Step size of zero detected (i.e. wrong direction).  Try reducing the finite_difference_h parameter"
+                logger.warning("Warning: Step size of zero detected (i.e. wrong direction).  Try reducing the finite_difference_h parameter\n")
                 Quality = 1.0 # This is a step length of zero.
 
             if Quality <= 0.25 and X < (X_prev + self.err_tol) and self.trust0 > 0:
                 # If the step quality is bad, then we should decrease the trust radius.
                 trust = max(ndx*(1./(1+a)), self.mintrust)
-                print "Low quality step, reducing trust radius to % .4e" % trust
+                logger.info("Low quality step, reducing trust radius to % .4e\n" % trust)
             if Quality >= 0.75 and bump and self.trust0 > 0:
                 # If the step quality is good, then we should increase the trust radius.
                 # The 'a' factor is how much we should grow or shrink the trust radius each step
@@ -344,14 +345,14 @@ class Optimizer(ForceBalanceBaseClass):
                 GOODSTEP = 0
                 Reevaluate = True
                 trust = max(ndx*(1./(1+a)), self.mintrust)
-                print "Rejecting step and reducing trust radius to % .4e" % trust
+                logger.info("Rejecting step and reducing trust radius to % .4e\n" % trust)
                 if Rejects:
                     xk = xk_prev.copy()
                     if Reevaluate:
                         restep = True
                         color = "\x1b[91m"
-                        print "%6s%12s%12s%12s%14s%12s%12s" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual")
-                        print "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality)
+                        logger.info("%6s%12s%12s%12s%14s%12s%12s\n" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual"))
+                        logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality))
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
                         data        = self.Objective.Full(xk,Ord,verbose=True)
@@ -423,8 +424,8 @@ class Optimizer(ForceBalanceBaseClass):
         if Emin < self.eps:         # Mix in SD step if Hessian minimum eigenvalue is negative
             # Experiment.
             Adj = max(self.eps, 0.01*abs(Emin)) - Emin
-            print "Hessian has a small or negative eigenvalue (%.1e), mixing in some steepest descent (%.1e) to correct this." % (Emin, Adj)
-            print "Eigenvalues are:"   ###
+            logger.info("Hessian has a small or negative eigenvalue (%.1e), mixing in some steepest descent (%.1e) to correct this.\n" % (Emin, Adj))
+            logger.info("Eigenvalues are:\n")   ###
             pvec1d(Eig)                ###
             H += Adj*np.eye(H.shape[0])
 
@@ -493,20 +494,24 @@ class Optimizer(ForceBalanceBaseClass):
             G = np.delete(G, self.excision)
             H = np.delete(H, self.excision, axis=0)
             H = np.delete(H, self.excision, axis=1)
-            # print "Inverting Hessian:"                 ###
-            # print " G:"                                ###
-            # pvec1d(G,precision=5)                      ###
-            # print " H:"                                ###
-            # pmat2d(H,precision=5)                      ###
+            
+            logger.debug("Inverting Hessian:\n")                 ###
+            logger.debug(" G:\n")                                ###
+            pvec1d(G,precision=5, loglevel=DEBUG)                ###
+            logger.debug(" H:\n")                                ###
+            pmat2d(H,precision=5, loglevel=DEBUG)                ###
+            
             Hi = invert_svd(np.mat(H))
             dx = flat(-1 * Hi * col(G))
-            # print " dx:"                               ###
-            # pvec1d(dx,precision=5)                     ###
+            
+            logger.debug(" dx:\n")                               ###
+            pvec1d(dx,precision=5, loglevel=DEBUG)                     ###
             # dxa = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
             # dxa = flat(dxa)
             # print " dxa:"                              ###
             # pvec1d(dxa,precision=5)                    ###
-            print                                      ###
+            
+            logger.info('\n')                                      ###
             for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                 dx = np.insert(dx, i, 0)
             def para_solver(L):
@@ -514,15 +519,15 @@ class Optimizer(ForceBalanceBaseClass):
                 # HT = H + (L-1)**2*np.diag(np.diag(H))
                 # Attempt to use plain Levenberg
                 HT = H + (L-1)**2*np.eye(len(H))
-                # print "Inverting Scaled Hessian:"                       ###
-                # print " G:"                                             ###
-                # pvec1d(G,precision=5)                                   ###
-                # print " HT: (Scal = %.4f)" % (1+(L-1)**2)               ###
-                # pmat2d(HT,precision=5)                                  ###
+                logger.debug("Inverting Scaled Hessian:\n")                       ###
+                logger.debug(" G:\n")                                             ###
+                pvec1d(G,precision=5, loglevel=DEBUG)                                   ###
+                logger.debug(" HT: (Scal = %.4f)\n" % (1+(L-1)**2))               ###
+                pmat2d(HT,precision=5, loglevel=DEBUG)                                  ###
                 Hi = invert_svd(np.mat(HT))
                 dx = flat(-1 * Hi * col(G))
-                # print " dx:"                                            ###
-                # pvec1d(dx,precision=5)                                  ###
+                logger.debug(" dx:\n")                                            ###
+                pvec1d(dx,precision=5, loglevel=DEBUG)                                  ###
                 # dxa = -solve(HT, G)
                 # dxa = flat(dxa)
                 # print " dxa:"                                           ###
@@ -538,7 +543,7 @@ class Optimizer(ForceBalanceBaseClass):
     
         def trust_fun(L):
             N = norm(solver(L)[0])
-            #print "\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e" % (L, (L-1)**2, N, (N - trust)**2)
+            logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
             return (N - trust)**2
 
         def search_fun(L):
@@ -548,7 +553,7 @@ class Optimizer(ForceBalanceBaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            print "Searching! Hessian diagonal addition = %.4e, L = % .4e, length %.4e, result %.4e" % ((L-1)**2,L,norm(dx),Result)
+            logger.info("Searching! Hessian diagonal addition = %.4e, L = % .4e, length %.4e, result %.4e\n" % ((L-1)**2,L,norm(dx),Result))
             return Result
         
         if self.trust0 > 0: # This is the trust region code.
@@ -565,8 +570,8 @@ class Optimizer(ForceBalanceBaseClass):
                 ### LOpt = Result[0]
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
-                # print "\rLevenberg-Marquardt: %s step found (length %.3e), Hessian diagonal is scaled by % .8f" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2)
-                print "\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2)
+
+                logger.info("\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal\n" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2))
         else: # This is the nonlinear search code.
             # First obtain a step that is the same length as the provided trust radius.
             LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
@@ -605,7 +610,7 @@ class Optimizer(ForceBalanceBaseClass):
         from scipy import optimize
         def xwrap(func,verbose=True):
             def my_func(mvals):
-                if verbose: print
+                if verbose: logger.info('\n')
                 Answer = func(mvals,Order=0,verbose=verbose)['X']
                 dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
                 if Answer < my_func.x_best or my_func.x_best == None:
@@ -615,8 +620,8 @@ class Optimizer(ForceBalanceBaseClass):
                     color = "\x1b[91m"
                 if verbose:
                     if self.print_vals:
-                        print "k=", ' '.join(["% .4f" % i for i in mvals])
-                    print "X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (color,Answer,dx)
+                        logger.info("k=" + ' '.join(["% .4f" % i for i in mvals]) + '\n')
+                    logger.info("X2= %s%12.3e\x1b[0m d(X2)= %12.3e\n" % (color,Answer,dx))
                 if Answer != Answer:
                     return 1e10
                 else:
@@ -625,7 +630,7 @@ class Optimizer(ForceBalanceBaseClass):
             return my_func
         def gwrap(func,verbose=True):
             def my_gfunc(mvals):
-                if verbose: print
+                if verbose: logger.info('\n')
                 Output = func(mvals,Order=1,verbose=verbose)
                 Answer = Output['G']
                 Objective = Output['X']
@@ -637,9 +642,8 @@ class Optimizer(ForceBalanceBaseClass):
                     color = "\x1b[91m"
                 if verbose:
                     if self.print_vals:
-                        print "k=", ' '.join(["% .4f" % i for i in mvals])
-                    print "|Grad|= %12.3e X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (norm(Answer),color,Objective,dx)
-                    print
+                        logger.info("k=" + ' '.join(["% .4f" % i for i in mvals]) + '\n')
+                    logger.info("|Grad|= %12.3e X2= %s%12.3e\x1b[0m d(X2)= %12.3e\n\n" % (norm(Answer),color,Objective,dx))
                 return Answer
             my_gfunc.x_best = None
             return my_gfunc
@@ -697,21 +701,21 @@ class Optimizer(ForceBalanceBaseClass):
             newpop = pop[sorted[1]]
             # Individuals in this range are kept
             a = range(KeepNum)
-            print "Keeping:", a
+            logger.info("Keeping: " + str(a) + '\n')
             random.shuffle(a)
             for i in range(0, KeepNum, 2):
-                print "%i and %i reproducing to replace %i and %i" % (a[i],a[i+1],len(newpop)-i-2,len(newpop)-i-1)
+                logger.info("%i and %i reproducing to replace %i and %i\n" % (a[i],a[i+1],len(newpop)-i-2,len(newpop)-i-1))
                 newpop[-i-1], newpop[-i-2] = cross_over(newpop[a[i]],newpop[a[i+1]])
             b = range(KeepNum, len(newpop))
             random.shuffle(b)
             for i in b[:MutNum]:
-                print "Randomly mutating %i" % i
+                logger.info("Randomly mutating %i\n" % i)
                 newpop[i] = mutate(newpop[i])
             return newpop
             
         def xwrap(func,verbose=True):
             def my_func(mvals):
-                if verbose: print
+                if verbose: logger.info('\n')
                 Answer = func(mvals,Order=0,verbose=verbose)['X']
                 dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
                 if Answer < my_func.x_best or my_func.x_best == None:
@@ -720,8 +724,8 @@ class Optimizer(ForceBalanceBaseClass):
                 else:
                     color = "\x1b[91m"
                 if verbose:
-                    print "k=", ' '.join(["% .4f" % i for i in mvals])
-                    print "X2= %s%12.3e\x1b[0m d(X2)= %12.3e" % (color,Answer,dx)
+                    logger.info("k=" + ' '.join(["% .4f" % i for i in mvals]) + '\n')
+                    logger.info("X2= %s%12.3e\x1b[0m d(X2)= %12.3e\n" % (color,Answer,dx))
                 return Answer
             my_func.x_best = None
             return my_func
@@ -743,15 +747,15 @@ class Optimizer(ForceBalanceBaseClass):
             #print Population
             Fits = calculate_fitness(Population)
             Sorted = sort_by_fitness(Fits)
-            print Sorted
+            logger.info(str(Sorted))
             Best[0].append(Sorted[0][0])
             Best[1].append(Population[Sorted[1][0]])
-            print Best
+            logger.info(str(Best))
             if Gen == self.maxstep: break
             Population = generate_new_population(Sorted, Population)
             Gen += 1
 
-        print Best
+        logger.info(str(Best))
         return Population[Sorted[1][0]]
         
 
@@ -798,30 +802,30 @@ class Optimizer(ForceBalanceBaseClass):
         try:
             vals_in = [float(i) for i in self.scan_vals.split(":")]
         except:
-            print "Syntax error: in the input file please use scan_vals low:hi:nsteps"
+            logger.error("Syntax error: in the input file please use scan_vals low:hi:nsteps\n")
             sys.exit(1)
         if len(vals_in) != 3:
-            print "Syntax error: in the input file please use scan_vals low:hi:nsteps"
+            logger.error("Syntax error: in the input file please use scan_vals low:hi:nsteps\n")
             sys.exit(1)
         idx = [int(i) for i in self.idxnum]
         for j in self.idxname:
             idx += [self.FF.map[i] for i in self.FF.map if j in i]
         idx = set(idx)
         scanvals = np.linspace(vals_in[0],vals_in[1],vals_in[2])
-        print vals_in
-        print scanvals
+        logger.info(str(vals_in) + '\n')
+        logger.info(str(scanvals) + '\n')
         for pidx in idx:
             if MathPhys:
-                print "Scanning parameter %i (%s) in the mathematical space" % (pidx,self.FF.plist[pidx])
+                logger.info("Scanning parameter %i (%s) in the mathematical space\n" % (pidx,self.FF.plist[pidx]))
                 vals = self.mvals0.copy()
             else:
-                print "Scanning parameter %i (%s) in the physical space" % (pidx,self.FF.plist[pidx])
+                logger.info("Scanning parameter %i (%s) in the physical space\n" % (pidx,self.FF.plist[pidx]))
                 self.FF.use_pvals = True
                 vals = self.FF.pvals0.copy()
             for i in scanvals:
                 vals[pidx] = i
                 data        = self.Objective.Full(vals,Order=0)
-                print "Value = % .4e Objective = % .4e" % (i, data['X'])
+                logger.info("Value = % .4e Objective = % .4e\n" % (i, data['X']))
 
     def ScanMVals(self):
         """ Scan through the mathematical parameter space. @see Optimizer::ScanValues """
@@ -834,21 +838,21 @@ class Optimizer(ForceBalanceBaseClass):
     def SinglePoint(self):
         """ A single-point objective function computation. """
         data        = self.Objective.Full(self.mvals0,Order=0,verbose=True)
-        print "The objective function is:", data['X']
+        logger.info("The objective function is:" + str(data['X']) + '\n')
 
     def Gradient(self):
         """ A single-point gradient computation. """
         data        = self.Objective.Full(self.mvals0,Order=1)
-        print data['X']
-        print data['G']
-        print data['H']
+        logger.info(str(data['X']) + '\n')
+        logger.info(str(data['G']) + '\n')
+        logger.info(str(data['H']) + '\n')
 
     def Hessian(self):
         """ A single-point Hessian computation. """
         data        = self.Objective.Full(self.mvals0,Order=2)
-        print data['X']
-        print data['G']
-        print data['H']
+        logger.info(str(data['X']) + '\n')
+        logger.info(str(data['G']) + '\n')
+        logger.info(str(data['H']) + '\n')
 
     def FDCheckG(self):
         """ Finite-difference checker for the objective function gradient.
@@ -871,8 +875,8 @@ class Optimizer(ForceBalanceBaseClass):
             Q = (Adata[i] - Fdata[i])/Denom
             cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
             cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
-            print "\r    %-8i%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
-                  % (i, self.FF.plist[i][:20], Adata[i], Fdata[i], cD, D, cQ, Q)
+            logger.info("\r    %-8i%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m\n" \
+                  % (i, self.FF.plist[i][:20], Adata[i], Fdata[i], cD, D, cQ, Q))
 
     def FDCheckH(self):
         """ Finite-difference checker for the objective function Hessian.
@@ -911,8 +915,8 @@ class Optimizer(ForceBalanceBaseClass):
                 Q = (Adata[i,j] - Fdata[i,j])/Denom
                 cD = abs(D) > 0.5 and "\x1b[1;91m" or (abs(D) > 1e-2 and "\x1b[91m" or (abs(D) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
                 cQ = abs(Q) > 0.5 and "\x1b[1;91m" or (abs(Q) > 1e-2 and "\x1b[91m" or (abs(Q) > 1e-5 and "\x1b[93m" or "\x1b[92m"))
-                print "\r    %-8i%-20s%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m" \
-                      % (i, self.FF.plist[i][:20], self.FF.plist[j][:20], Adata[i,j], Fdata[i,j], cD, D, cQ, Q)
+                logger.info("\r    %-8i%-20s%-20s% 13.4e% 13.4e%s% 13.4e%s% 13.4e\x1b[0m\n" \
+                      % (i, self.FF.plist[i][:20], self.FF.plist[j][:20], Adata[i,j], Fdata[i,j], cD, D, cQ, Q))
 
     def readchk(self):
         """ Read the checkpoint file for the main optimizer. """
@@ -922,12 +926,12 @@ class Optimizer(ForceBalanceBaseClass):
             if os.path.exists(absfnm):
                 self.chk = pickle.load(open(absfnm))
             else:
-                print "\x1b[40m\x1b[1;92mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)"
+                logger.info("\x1b[40m\x1b[1;92mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)\n")
         return self.chk
 
     def writechk(self):
         """ Write the checkpoint file for the main optimizer. """
         if self.wchk_fnm != None:
-            print "Writing the checkpoint file %s" % self.wchk_fnm
+            logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
             with open(os.path.join(self.root,self.wchk_fnm),'w') as f: pickle.dump(self.chk,f)
         

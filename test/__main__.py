@@ -15,10 +15,12 @@ def getOptions():
     parser = argparse.ArgumentParser()
     parser.add_argument('-e', '--exclude', action='store_true', help="exclude specified modules from test loading")
     parser.add_argument('-p', '--pretend', action='store_true', help="load tests but don't actually run them")
+    parser.add_argument('--no-color', action='store_true', help="print test results in black and white (no extra formatting)")
     loglevel = parser.add_mutually_exclusive_group()
     loglevel.add_argument('-v', '--verbose', dest='loglevel', action='store_const', const=forcebalance.output.DEBUG, default=forcebalance.output.INFO)
     loglevel.add_argument('-q', '--quiet', dest='loglevel', action='store_const', const=forcebalance.output.WARNING, default=forcebalance.output.INFO)
-    parser.add_argument('--headless-config', type=argparse.FileType('r'))
+    parser.add_argument('--headless-config', type=argparse.FileType('r'), help="run tests in 'headless' mode, using the\
+    configuration from the config file provided")
     parser.add_argument('test_modules', metavar="MODULE", nargs='*', default=[], help="module to load tests from")
     
     options = vars(parser.parse_args())
@@ -28,7 +30,7 @@ def getOptions():
 
     if options['test_modules']:
         if options['exclude']:
-            options['test_modules']=[module[:-3] for module in sorted(os.listdir('test'))
+            options['test_modules']=[module[:-3] for module in sorted(os.listdir(os.path.dirname(__file__)))
                                 if re.match("^test_.*\.py$",module)
                                 and module[:-3] not in options['test_modules']]
     else:
@@ -47,11 +49,11 @@ def runHeadless(options):
 
     os.chdir(os.path.dirname(__file__) + "/..")
 
-    os.mkdir('/tmp/forcebalance')
+    if not os.path.exists('/tmp/forcebalance'): os.mkdir('/tmp/forcebalance')
     warningHandler = forcebalance.output.CleanFileHandler('/tmp/forcebalance/test.err','w')
     warningHandler.setLevel(forcebalance.output.WARNING)
     logfile = "/tmp/forcebalance/%s.log" % time.strftime('%m%d%y_%H%M%S')
-    debugHandler = CleanFileHandler(logfile,'w')
+    debugHandler = forcebalance.output.CleanFileHandler(logfile,'w')
     debugHandler.setLevel(forcebalance.output.DEBUG)
     
     forcebalance.output.getLogger("forcebalance.test").addHandler(warningHandler)
@@ -115,7 +117,10 @@ def runHeadless(options):
     shutil.rmtree('/tmp/forcebalance')
 
 def run(options):
-    forcebalance.output.getLogger("forcebalance.test").addHandler(forcebalance.output.RawStreamHandler(sys.stderr))
+    if options["no_color"]:
+        forcebalance.output.getLogger("forcebalance.test").addHandler(forcebalance.output.CleanStreamHandler(sys.stderr))
+    else:
+        forcebalance.output.getLogger("forcebalance.test").addHandler(forcebalance.output.RawStreamHandler(sys.stderr))
     runner=ForceBalanceTestRunner()
     runner.run(**options)
 
