@@ -51,7 +51,7 @@ import re
 import sys
 import itertools
 import traceback
-from nifty import printcool, printcool_dictionary, which
+from nifty import printcool, printcool_dictionary, which, isfloat
 from copy import deepcopy
 from collections import OrderedDict
 
@@ -417,11 +417,16 @@ def parse_inputs(input_file=None):
                     for word in s[1:]:
                         this_opt.setdefault(key,[]).append(word)
                 elif key in opts_types['ints']:
-                    this_opt[key] = int(s[1])
+                    if isfloat(s[1]):
+                        this_opt[key] = int(float(s[1]))
+                    else:
+                        this_opt[key] = int(s[1])
                 elif key in opts_types['bools']:
                     if len(s) == 1:
                         this_opt[key] = True
-                    elif s[1].upper() in ["0", "NO", "FALSE"]:
+                    elif s[1].upper() in ["0", "NO", "FALSE", "OFF"]:
+                        this_opt[key] = False
+                    elif isfloat(s[1]) and int(float(s[1])) == 0:
                         this_opt[key] = False
                     else:
                         this_opt[key] = True
@@ -439,6 +444,7 @@ def parse_inputs(input_file=None):
                 logger.error("Unrecognized section: %s\n" % section)
                 sys.exit(1)
         except:
+            traceback.print_exc()
             logger.error("Failed to read in this line! Check your input file.\n")
             logger.exception(line + '\n')
             sys.exit(1)
