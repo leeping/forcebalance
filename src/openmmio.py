@@ -363,11 +363,11 @@ class Liquid_OpenMM(Liquid):
         # I shall enable starting simulations for many different initial conditions.
         self.liquid_fnm = "liquid.pdb"
         self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.pdb"))
-        self.liquid_traj = None
+        self.liquid_mol = None
         self.gas_fnm = "gas.pdb"
         if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
-            self.liquid_traj = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
-            logger.info("Found collection of starting conformations, length %i!\n" % len(self.liquid_traj))
+            self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
+            logger.info("Found collection of starting conformations, length %i!\n" % len(self.liquid_mol))
         # Prefix to command string for launching NPT simulations.
         self.nptpfx += "bash runcuda.sh"
         # List of extra files to upload to Work Queue.
@@ -415,7 +415,7 @@ class AbInitio_OpenMM(AbInitio):
 
     def __init__(self,options,tgt_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
-        self.trajfnm = "all.gro"
+        self.coords = "all.gro"
         ## Initialize the SuperClass!
         super(AbInitio_OpenMM,self).__init__(options,tgt_opts,forcefield)
         try:
@@ -459,7 +459,7 @@ class AbInitio_OpenMM(AbInitio):
         # Generate OpenMM-compatible positions
         self.xyz_omms = []
         for I in range(self.ns):
-            xyz = self.traj.xyzs[I]
+            xyz = self.mol.xyzs[I]
             xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
             # An extra step with adding virtual particles
             mod = Modeller(pdb.topology, xyz_omm)
@@ -551,7 +551,7 @@ class Interaction_OpenMM(Interaction):
 
     def __init__(self,options,tgt_opts,forcefield):
         ## Name of the trajectory file containing snapshots.
-        self.trajfnm = "all.pdb"
+        self.coords = "all.pdb"
         ## Dictionary of simulation objects (dimer, fraga, fragb)
         self.simulations = OrderedDict()
         ## Initialize base class.
@@ -562,12 +562,12 @@ class Interaction_OpenMM(Interaction):
         cwd = os.getcwd()
         os.chdir(abstempdir)
         ## Set up three OpenMM System objects.
-        self.traj[0].write("dimer.pdb")
-        self.traj[0].atom_select(self.select1).write("fraga.pdb")
-        self.traj[0].atom_select(self.select2).write("fragb.pdb")
+        self.mol[0].write("dimer.pdb")
+        self.mol[0].atom_select(self.select1).write("fraga.pdb")
+        self.mol[0].atom_select(self.select2).write("fragb.pdb")
         # ## Write a single frame PDB if it doesn't exist already. Breaking my self-imposed rule of not editing the Target directory...
         # if not os.path.exists(os.path.join(self.root,self.tgtdir,"conf.pdb")):
-        #     self.traj[0].write(os.path.join(self.root,self.tgtdir,"conf.pdb"))
+        #     self.mol[0].write(os.path.join(self.root,self.tgtdir,"conf.pdb"))
         ## TODO: The following code should not be repeated everywhere.
         for pdbfnm in ["dimer.pdb", "fraga.pdb", "fragb.pdb"]:
             logger.info("Setting up Simulation object for %s\n" % pdbfnm)
@@ -615,11 +615,11 @@ class Interaction_OpenMM(Interaction):
         if mode not in ['dimer','fraga','fragb']:
             raise Exception('This function may only be called with three modes - dimer, fraga, fragb')
         if mode == 'dimer':
-            self.traj.write("shot.pdb")
+            self.mol.write("shot.pdb")
         elif mode == 'fraga':
-            self.traj.atom_select(self.select1).write("shot.pdb")
+            self.mol.atom_select(self.select1).write("shot.pdb")
         elif mode == 'fragb':
-            self.traj.atom_select(self.select2).write("shot.pdb")
+            self.mol.atom_select(self.select2).write("shot.pdb")
         thistraj = Molecule("shot.pdb")
         
         # Run OpenMM.

@@ -136,12 +136,12 @@ class AbInitio(Target):
         self.use_nft       = self.w_netforce > 0 or self.w_torque > 0
         ## Read in the trajectory file
         if self.ns == -1:
-            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))
-            self.ns = len(self.traj)
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))
+            self.ns = len(self.mol)
         else:
-            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))[:self.ns]
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
         ## The number of (atoms + drude particles + virtual sites)
-        self.nparticles  = len(self.traj.elem)
+        self.nparticles  = len(self.mol.elem)
         ## This is a default-dict containing a number of atom-wise lists, such as the
         ## residue number of each atom, the mass of each atom, and so on.
         self.AtomLists = defaultdict(list)
@@ -172,13 +172,13 @@ class AbInitio(Target):
         if any(['VSITE' in i for i in self.FF.map.keys()]) or self.have_vsite:
             logger.info("\rGenerating virtual site positions.%s" % (" "*30))
             pvals = self.FF.make(mvals)
-            self.traj.xyzs = self.engine.generate_vsite_positions()
+            self.mol.xyzs = self.engine.generate_vsite_positions()
         # prepare the distance matrix for esp computations
         if len(self.espxyz) > 0:
             invdists = []
             logger.info("\rPreparing the distance matrix... it will have %i * %i * %i = %i elements" % (self.ns, self.nesp, self.nparticles, self.ns * self.nesp * self.nparticles))
             sn = 0
-            for espset, xyz in zip(self.espxyz, self.traj.xyzs):
+            for espset, xyz in zip(self.espxyz, self.mol.xyzs):
                 logger.info("\rGenerating ESP distances for snapshot %i%s" % (sn, " "*50))
                 esparr = array(espset).reshape(-1,3)
                 # Create a matrix with Nesp rows and Natoms columns.
@@ -205,15 +205,15 @@ class AbInitio(Target):
         # of masses and blocking numbers.
         if not self.topology_flag:
             raise Exception('Cannot do net forces and torques for class %s because read_topology is not implemented' % self.__class__.__name__)
-
-        if self.force_map == 'molecule':
+        
+        if self.force_map == 'molecule' and 'MoleculeNumber' in self.AtomLists:
             Block = self.AtomLists['MoleculeNumber']
-        elif self.force_map == 'residue':
+        elif self.force_map == 'residue' and 'ResidueNumber' in self.AtomLists:
             Block = self.AtomLists['ResidueNumber']
-        elif self.force_map == 'chargegroup':
+        elif self.force_map == 'chargegroup' and 'ChargeGroupNumber' in self.AtomLists:
             Block = self.AtomLists['ChargeGroupNumber']
         else:
-            raise Exception('Please choose a valid force_map keyword: molecule, residue, chargegroup')
+            raise Exception('Please choose a valid force_map keyword: %s' % ', '.join(self.AtomLists.keys()))
 
         # Try to be intelligent here.  Before computing net forces and torques, first filter out all particles that are not atoms.
         if len(xyz) > self.fitatoms:
@@ -404,7 +404,7 @@ class AbInitio(Target):
         if self.use_nft:
             self.nftqm = []
             for i in range(len(self.fqm)):
-                self.nftqm.append(self.compute_netforce_torque(self.traj.xyzs[i], self.fqm[i]))
+                self.nftqm.append(self.compute_netforce_torque(self.mol.xyzs[i], self.fqm[i]))
             self.nftqm = array(self.nftqm)
             self.fref = hstack((self.fqm, self.nftqm))
         else:
@@ -442,7 +442,7 @@ class AbInitio(Target):
                 Nfts = []
                 for i in range(len(M)):
                     Fm  = M[i][1:]
-                    Nft = self.compute_netforce_torque(self.traj.xyzs[i], Fm)
+                    Nft = self.compute_netforce_torque(self.mol.xyzs[i], Fm)
                     Nfts.append(Nft)
                 Nfts = array(Nfts)
                 return hstack((M, Nfts))
@@ -457,7 +457,7 @@ class AbInitio(Target):
         if self.force:
             if self.use_nft:
                 Fm  = M[1:]
-                Nft = self.compute_netforce_torque(self.traj.xyzs[i], Fm)
+                Nft = self.compute_netforce_torque(self.mol.xyzs[i], Fm)
                 return hstack((M, Nft))
             else:
                 return M
@@ -770,10 +770,10 @@ class AbInitio(Target):
             # Write .xyz files which can be viewed in vmd.
             try:
                 # Only print forces on true atoms, and ignore virtual sites.
-                TrueAtoms = array([i for i in range(self.traj.na) if self.AtomLists['ParticleType'][i] == 'A'])
+                TrueAtoms = array([i for i in range(self.mol.na) if self.AtomLists['ParticleType'][i] == 'A'])
             except:
-                TrueAtoms = arange(self.traj.na)
-            QMTraj = self.traj[:].atom_select(TrueAtoms)
+                TrueAtoms = arange(self.mol.na)
+            QMTraj = self.mol[:].atom_select(TrueAtoms)
             Mforce_obj = QMTraj[:]
             Qforce_obj = QMTraj[:]
             Mforce_print = array(M_all_print[:,1:3*self.fitatoms+1])
@@ -1026,7 +1026,7 @@ class AbInitio(Target):
             #     dqPdqM.append(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0])
             # dqPdqM = mat(dqPdqM).T
             dqPdqM = mat([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(np)]).T
-        xyzs = array(self.traj.xyzs)
+        xyzs = array(self.mol.xyzs)
         espqvals = array(self.espval)
         espxyz   = array(self.espxyz)
 

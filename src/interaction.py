@@ -77,10 +77,10 @@ class Interaction(Target):
         self.e_err_pct = None
         ## Read in the trajectory file
         if self.ns == -1:
-            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))
-            self.ns = len(self.traj)
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))
+            self.ns = len(self.mol)
         else:
-            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))[:self.ns]
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
@@ -151,7 +151,7 @@ class Interaction(Target):
                                  (self.name, self.objective, "Label", "Calc.", "Ref.", "Delta", "Divisor", "Term"),keywidth=15)
         else:
             logger.info("Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)\n" % (self.name,self.objective))
-        # if len(self.RMSDDict) > 0:
+        # if len(self.RMSDDict) > 0:x
         #     printcool_dictionary(self.RMSDDict,title="Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s" % (self.rmsd_part, "System", "RMSD", "Term"), keywidth=45)
 
     def get(self, mvals, AGrad=False, AHess=False):

@@ -52,7 +52,7 @@ class Moments(Target):
         #======================================#
         ## The mdata.txt file that contains the moments.
         self.mfnm = os.path.join(self.tgtdir,"mdata.txt")
-        ##
+        ## Dictionary of reference multipole moments.
         self.ref_moments = OrderedDict()
         ## Read in the reference data
         self.read_reference_data()

@@ -946,6 +946,37 @@ class Molecule(object):
             rgs.append(np.sum([PeriodicTable[self.elem[i]]*np.dot(x,x) for i, x in enumerate(xyz1)])/M)
         return np.array(rgs)
             
+    def rigid_water(self):
+        """ If one atom is oxygen and the next two are hydrogen, make the water molecule rigid. """
+        self.require('elem', 'xyzs')
+        for i in range(len(self)):
+            for a in range(self.na-2):
+                if self.elem[a] == 'O' and self.elem[a+1] == 'H' and self.elem[a+2] == 'H':
+                    flex = M.xyzs[i]
+                    wat = flex[a:a+3]
+                    com = wat.mean(0)
+                    wat -= com
+                    o  = wat[0]
+                    h1 = wat[1]
+                    h2 = wat[2]
+                    r1 = h1 - o
+                    r2 = h2 - o
+                    r1 /= np.linalg.norm(r1)
+                    r2 /= np.linalg.norm(r2)
+                    # Obtain unit vectors.
+                    ex = r1 + r2
+                    ey = r1 - r2
+                    ex /= np.linalg.norm(ex)
+                    ey /= np.linalg.norm(ey)
+                    Bond = 0.9572
+                    Ang = np.pi * 104.52 / 2 / 180
+                    cosx = np.cos(Ang)
+                    cosy = np.sin(Ang)
+                    h1 = o + Bond*ex*cosx + Bond*ey*cosy
+                    h2 = o + Bond*ex*cosx - Bond*ey*cosy
+                    rig = np.array([o, h1, h2]) + com
+                    M.xyzs[i][a:a+3] = rig
+
 #        if center:
 #            xyz1 -= xyz1.mean(0)
 #        for index2, xyz2 in enumerate(self.xyzs):
@@ -1368,7 +1399,7 @@ class Molecule(object):
     #|         Reading functions         |#
     #=====================================#
 
-    def read_xyz(self, fnm):
+    def read_xyz(self, fnm, **kwargs):
         """ Parse a .xyz file which contains several xyz coordinates, and return their elements.
 
         @param[in] fnm The input file name
@@ -1414,7 +1445,7 @@ class Molecule(object):
                   'comms': comms}
         return Answer
 
-    def read_mdcrd(self, fnm):
+    def read_mdcrd(self, fnm, **kwargs):
         """ Parse an AMBER .mdcrd file.  This requires at least the number of atoms.
         This will FAIL for monatomic trajectories (but who the heck makes those?)
 
@@ -1447,7 +1478,7 @@ class Molecule(object):
             Answer['boxes'] = boxes
         return Answer
 
-    def read_qdata(self, fnm):
+    def read_qdata(self, fnm, **kwargs):
         xyzs     = []
         energies = []
         forces   = []
@@ -1483,7 +1514,7 @@ class Molecule(object):
             Answer['qm_espvals'] = espvals
         return Answer
 
-    def read_mol2(self, fnm):
+    def read_mol2(self, fnm, **kwargs):
         xyz      = []
         charge   = []
         atomname = []
@@ -1532,7 +1563,7 @@ class Molecule(object):
 
         return Answer
 
-    def read_dcd(self, fnm):
+    def read_dcd(self, fnm, **kwargs):
         xyzs = []
         boxes = []
         if _dcdlib.vmdplugin_init() != 0:
@@ -1560,7 +1591,7 @@ class Molecule(object):
                   'boxes' : boxes}
         return Answer
 
-    def read_com(self, fnm):
+    def read_com(self, fnm, **kwargs):
         """ Parse a Gaussian .com file and return a SINGLE-ELEMENT list of xyz coordinates (no multiple file support)
 
         @param[in] fnm The input file name
@@ -1603,7 +1634,7 @@ class Molecule(object):
                   'mult'   : mult}
         return Answer
 
-    def read_arc(self, fnm):
+    def read_arc(self, fnm, **kwargs):
         """ Read a TINKER .arc file.
 
         @param[in] fnm  The input file name
@@ -1673,7 +1704,7 @@ class Molecule(object):
                   'tinkersuf' : tinkersuf}
         return Answer
 
-    def read_gro(self, fnm):
+    def read_gro(self, fnm, **kwargs):
         """ Read a GROMACS .gro file.
 
         """
@@ -1752,7 +1783,7 @@ class Molecule(object):
                   'comms'    : comms}
         return Answer
 
-    def read_charmm(self, fnm):
+    def read_charmm(self, fnm, **kwargs):
         """ Read a CHARMM .cor (or .crd) file.
 
         """
@@ -1803,7 +1834,7 @@ class Molecule(object):
                   'comms'    : comms}
         return Answer
 
-    def read_qcin(self, fnm):
+    def read_qcin(self, fnm, **kwargs):
         """ Read a Q-Chem input file.
 
         These files can be very complicated, and I can't write a completely
@@ -1935,7 +1966,7 @@ class Molecule(object):
         return Answer
 
 
-    def read_pdb(self, fnm):
+    def read_pdb(self, fnm, **kwargs):
         """ Loads a PDB and returns a dictionary containing its data. """
 
         F1=file(fnm,'r')
@@ -2011,7 +2042,7 @@ class Molecule(object):
 
         return Answer
 
-    def read_qcesp(self, fnm):
+    def read_qcesp(self, fnm, **kwargs):
         espxyz = []
         espval = []
         for line in open(fnm):
@@ -2025,8 +2056,8 @@ class Molecule(object):
                   }
         return Answer
     
-    def read_qcout(self, fnm, maxopt=1):
-        """ Q-Chem output file reader, adapted for our parser. 
+    def read_qcout(self, fnm, errok = [], **kwargs):
+        """ Q-Chem output file reader, adapted forcd  our parser. 
     
         Q-Chem output files are very flexible and there's no way I can account for all of them.  Here's what
         I am able to account for:
@@ -2036,8 +2067,8 @@ class Molecule(object):
         - Energies
         - Forces
 
-        Calling with maxopt = 1 will result in a successful read (with warning) even when maximum optimization cycles are reached.
-        
+        Calling with errok will proceed with reading file even if the specified error messages are encountered.
+
         Note that each step in a geometry optimization counts as a frame.
     
         As with all Q-Chem output files, note that successive calculations can have different numbers of atoms.
@@ -2084,18 +2115,15 @@ class Molecule(object):
         fatal = 0
         for line in open(fnm):
             line = line.strip().expandtabs()
-            if "MAXIMUM OPTIMIZATION CYCLES REACHED" in line and maxopt == 1:
-                maxopt = 2
             if fatal and len(line.split()) > 0:
                 # Print the error message that comes after the "fatal error" line.
-                raise Exception('Calculation encountered a fatal error! (%s)' % line)
-            if 'fatal error' in line:
-                if maxopt == 2:
-                    warn("Maximum number of optimization cycles was reached.")
-                    # Discard one set of coordinates.
-                    xyzs = xyzs[:-1]
+                if line in errok:
+                    warn("Fatal error encountered (%s), proceeding because you asked for it" % line)
+                    fatal = 0
                 else:
-                    fatal = 1
+                    raise Exception('Calculation encountered a fatal error! (%s)' % line)
+            if 'Q-Chem fatal error' in line:
+                fatal = 1
             if XMode >= 1:
                 # Perfectionist here; matches integer, element, and three floating points
                 if re.match("^[0-9]+ +[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
@@ -2206,7 +2234,10 @@ class Molecule(object):
         if len(set(Floats['charge'])) != 1 or len(set(Floats['mult'])) != 1:
             raise Exception('Unexpected number of charges or multiplicities in parsing %s' % fnm)
         lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
-        if len(set(lens)) != 1:
+        # Catch the case of failed geometry optimizations.
+        if len(Answer['xyzs']) == len(Answer['qm_energies']) + 1:
+            Answer['xyzs'] = Answer['xyzs'][:-1]
+        elif len(set(lens)) != 1:
             raise Exception('The number of energies and coordinates in %s are not the same : %s' % (fnm, str(lens)))
         # The number of atoms should all be the same
         if len(set([len(i) for i in Answer['xyzs']])) != 1:

@@ -200,7 +200,7 @@ class THCDF_Psi4(LeastSquares):
             FK = GBS_Reader()
             FK_lines = []
             self.FF.linedestroy_this = []
-            self.FF.parmdestroy_this = []
+            self.FF.prmdestroy_this = []
             for ln, line in enumerate(open(self.GBSfnm).readlines()):
                 FK.feed(line)
                 key = '.'.join([str(i) for i in FK.element,FK.amom,FK.basis_number[FK.element],FK.contraction_number])
@@ -211,7 +211,7 @@ class THCDF_Psi4(LeastSquares):
                         self.FF.linedestroy_this.append(ln)
                         for p_destroy in [i for i, fld in enumerate(self.FF.pfields) if any([subfld[0] == self.GBSfnm and subfld[1] == ln0[ln] for subfld in fld])]:
                             logger.info("Destroying parameter %i located at line %i (originally %i) with fields given by: %s" % (p_destroy, ln, ln0[ln], str(self.FF.pfields[p_destroy])))
-                            self.FF.parmdestroy_this.append(p_destroy)
+                            self.FF.prmdestroy_this.append(p_destroy)
                     FK_lines.append(LI_lines[key][0])
                 else:
                     FK_lines.append(line)
@@ -223,7 +223,7 @@ class THCDF_Psi4(LeastSquares):
             
             if len(list(itertools.chain(*(self.FF.linedestroy_save + [self.FF.linedestroy_this])))) > 0:
                 logger.info("All lines removed: " + self.FF.linedestroy_save + [self.FF.linedestroy_this] + '\n')
-                logger.info("All parms removed: " + self.FF.parmdestroy_save + [self.FF.parmdestroy_this] + '\n')
+                logger.info("All prms removed: " + self.FF.prmdestroy_save + [self.FF.prmdestroy_this] + '\n')
 
         self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save + [self.FF.linedestroy_this])
         _exec("psi4", print_command=False, outfnm="psi4.stdout")

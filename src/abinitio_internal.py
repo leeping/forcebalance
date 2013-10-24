@@ -37,7 +37,7 @@ class AbInitio_Internal(AbInitio):
 
     def __init__(self,options,tgt_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
-        self.trajfnm = "all.gro"
+        self.coords = "all.gro"
         ## Initialize the SuperClass!
         super(AbInitio_Internal,self).__init__(options,tgt_opts,forcefield)
 
@@ -60,7 +60,7 @@ class AbInitio_Internal(AbInitio):
         facel = 1389.35410
 
         for I in range(self.ns):
-            xyz = self.traj.xyzs[I]
+            xyz = self.mol.xyzs[I]
             Bond_Energy = 0.0
             Angle_Energy = 0.0
             VdW_Energy = 0.0

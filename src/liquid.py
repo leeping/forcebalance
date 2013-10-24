@@ -231,9 +231,9 @@ class Liquid(Target):
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-            if self.liquid_traj != None:
-                self.liquid_conf.xyzs[0] = self.liquid_traj.xyzs[simnum%len(self.liquid_traj)]
-                self.liquid_conf.boxes[0] = self.liquid_traj.boxes[simnum%len(self.liquid_traj)]
+            if self.liquid_mol != None:
+                self.liquid_conf.xyzs[0] = self.liquid_mol.xyzs[simnum%len(self.liquid_mol)]
+                self.liquid_conf.boxes[0] = self.liquid_mol.boxes[simnum%len(self.liquid_mol)]
             self.liquid_conf.write(self.liquid_fnm)
             cmdstr = '%s python npt.py %s %i %.3f %.3f %.3f %.3f %s' % (self.nptpfx, self.engine, self.liquid_prod_steps, self.liquid_timestep,
                                                                         self.liquid_interval, temperature, pressure, ' '.join([i for i in self.nptsfx if i != None]))

@@ -122,8 +122,8 @@ class BindingEnergy(Target):
 
     def __init__(self,options,tgt_opts,forcefield):
         super(BindingEnergy,self).__init__(options,tgt_opts,forcefield)
-        self.set_option(None, None, 'masterfile', os.path.join(self.tgtdir,tgt_opts['masterfile']))
-        self.global_opts, self.sys_opts, self.inter_opts = parse_interactions(self.masterfile)
+        self.set_option(None, None, 'inter_txt', os.path.join(self.tgtdir,tgt_opts['inter_txt']))
+        self.global_opts, self.sys_opts, self.inter_opts = parse_interactions(self.inter_txt)
         # If the global option doesn't exist in the system / interaction, then it is copied over.
         for opt in self.global_opts:
             for sys in self.sys_opts:
