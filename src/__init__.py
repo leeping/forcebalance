@@ -106,4 +106,5 @@ class BaseReader(object):
         ptype = self.pdict.get(self.itype,{}).get(pfld,':%i.%i' % (self.ln,pfld))
         return self.itype+ptype+self.suffix
 
-# import parser, forcefield, optimizer, objective, output
+import parser, forcefield, optimizer, objective, output
+

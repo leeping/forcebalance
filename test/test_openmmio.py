@@ -64,3 +64,6 @@ class TestInteraction_OpenMM(ForceBalanceTestCase, TargetTests):
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""
         return super(TestInteraction_OpenMM,self).shortDescription() + " (Interaction_OpenMM)"
+
+if __name__ == '__main__':           
+    unittest.main()
