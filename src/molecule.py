@@ -998,13 +998,20 @@ class Molecule(object):
             self.Data[key] = NewMol.Data[key]
 
     def edit_qcrems(self, in_dict, subcalc = None):
+        """ Edit Q-Chem rem variables with a dictionary.  Pass a value of None to delete a rem variable. """
         if subcalc == None:
             for qcrem in self.qcrems:
                 for key, val in in_dict.items():
-                    qcrem[key] = val
+                    if val == None:
+                        qcrem.pop(key, None)
+                    else:
+                        qcrem[key] = val
         else:
             for key, val in in_dict.items():
-                self.qcrems[subcalc][key] = val
+                if val == None:
+                    self.qcrems[subcalc].pop(key, None)
+                else:
+                    self.qcrems[subcalc][key] = val
 
     def add_quantum(self, other):
         if type(other) is Molecule:
