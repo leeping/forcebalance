@@ -465,6 +465,7 @@ class TINKER(Engine):
         # This line actually runs TINKER
         o = self.calltinker("analyze %s.arc e" % (self.name))
         # Read data from stdout and stderr, and convert it to GROMACS units.
+        Borked = 0
         E = []
         for line in o:
             s = line.split()
