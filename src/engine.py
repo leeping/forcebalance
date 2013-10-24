@@ -9,7 +9,7 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, warn_once
+from forcebalance.nifty import *
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
@@ -24,25 +24,6 @@ class Engine(forcebalance.BaseClass):
     
     In ForceBalance an Engine represents a molecular dynamics code
     and the calculations that may be carried out with that code.
-
-    The Engine implements methods that execute operations such as:
-    - Input: trajectory object
-    -  Return: energy over trajectory
-    -  Return: energy and force over trajectory
-    -  Return: electrostatic potential over trajectory
-    - How about:
-    -  evaluate_snapshots(Molecule, Energy=True, Force=True, ESP=True)
-       where all information passed in belongs in the Molecule object. :)
-    -  Return a dictionary
-
-    - Input: molecular geometry, 
-    -  Return: optimized geometry
-    -  Return: vibrational modes at optimized geometry
-    -  Return: multipole moments at optimized geometry
-    -  evaluate_optimized(Molecule, Energy=True, Frequencies=True, Moments=True)
-
-    - Engine objects may be initialized using a molecule object and a
-      force field object.
 
     2. Purpose
 
@@ -59,40 +40,51 @@ class Engine(forcebalance.BaseClass):
     """
 
     def __init__(self, name="engine", **kwargs):
+        self.valkwd += ['mol', 'coords', 'name', 'target']
+        kwargs = {i:j for i,j in kwargs.items() if j != None and i in self.valkwd} 
         super(Engine, self).__init__(kwargs)
         self.name = name
-        if 'target' in kwargs:
-            self.target = kwargs['target']
-            self.root = self.target.root
-        else:
-            warn_once("Running without a target, using current directory.")
-            self.root = os.getcwd()
-        if hasattr(self,'target'):
-            self.srcdir = os.path.join(self.root, self.target.tgtdir)
-        else:
-            self.srcdir = self.root
         if 'verbose' in kwargs:
             self.verbose = verbose
         else:
             self.verbose = False
-        return
-
-    def prepare(self):
-        return
-
-    def postinit(self):
-        """ Perform post-initialization tasks. """
+        ## Engines can get properties from the Target that creates them.
+        if 'target' in kwargs:
+            self.target = kwargs['target']
+            self.root = self.target.root
+            self.srcdir = os.path.join(self.root, self.target.tgtdir)
+            self.tempdir = os.path.join(self.root, self.target.tempdir)
+        else:
+            warn_once("Running without a target, using current directory.")
+            self.root = os.getcwd()
+            self.srcdir = self.root
+            self.tempdir = self.root
+        #============================================#
+        #| Initialization consists of three stages: |#
+        #| 1) Setting up options                    |#
+        #| 2) Reading the source directory          |#
+        #| 3) Preparing the temp directory          |#
+        #============================================#
+        ## Step 1: Set up options, this shouldn't depend on any input data.
+        self.setopts(**kwargs)
+        cwd = os.getcwd()
+        ## Step 2: Read data from the source directory.
+        os.chdir(self.srcdir)
+        self.readsrc(**kwargs)
+        ## Step 3: Prepare the temporary directory.
+        os.chdir(self.tempdir)
+        self.prepare(**kwargs)
+        os.chdir(cwd)
+        ## Print out all engine options.
         if self.verbose:
             printcool_dictionary(OrderedDict([(i, self.__dict__[i]) for i in sorted(self.__dict__.keys())]), title="Attributes for engine %s" % self.__class__.__name__)
-        self.prepare()
+        return
 
-    @abc.abstractmethod
-    def evaluate_snapshots(self, M):
-        """ Evaluate properties over a collection of snapshots. """
-        raise NotImplementedError('This method is not implemented in the base class')
+    def setopts(self, **kwargs):
+        return
 
-    @abc.abstractmethod
-    def evaluate_optimized(self, M):
-        """ Evaluate properties on the optimized geometry. """
-        raise NotImplementedError('This method is not implemented in the base class')
+    def readsrc(self, **kwargs):
+        return
 
+    def prepare(self, **kwargs):
+        return

@@ -480,11 +480,18 @@ pbc		= no
 """
 
 class GMX(Engine):
+
     """ Derived from Engine object for carrying out general purpose GROMACS calculations. """
+
     def __init__(self, name="gmx", **kwargs):
-        kwargs = {i:j for i,j in kwargs.items() if j != None} 
+        ## Valid GROMACS-specific keywords.
+        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp']
         super(GMX,self).__init__(name=name, **kwargs)
-        
+
+    def setopts(self, **kwargs):
+
+        """ Called by __init__ ; Set GROMACS-specific options. """
+
         ## Disable some optimizations
         os.environ["GMX_MAXBACKUP"] = "-1"
         os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
@@ -509,8 +516,10 @@ class GMX(Engine):
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
             self.gmxpath = which('mdrun'+self.gmxsuffix)
 
-        cwd = os.getcwd()
-        os.chdir(self.srcdir)
+    def readsrc(self, **kwargs):
+
+        """ Called by __init__ ; read files from the source directory. """
+
         ## Attempt to determine file names of .gro, .top, and .mdp files
         self.top = onefile('top', kwargs['gmx_top'] if 'gmx_top' in kwargs else None)
         self.mdp = onefile('mdp', kwargs['gmx_mdp'] if 'gmx_mdp' in kwargs else None)
@@ -521,50 +530,28 @@ class GMX(Engine):
         else:
             grofile = onefile('gro')
             self.mol = Molecule(grofile)
-        os.chdir(cwd)
-        self.postinit()
 
-    def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
-        """ Call GROMACS; prepend the gmxpath to the call to the GROMACS program. """
-        ## Always, always remove backup files.
-        rm_gmx_baks(os.getcwd())
+    def prepare(self, **kwargs):
 
-        ## Call a GROMACS program as you would from the command line.
-        csplit = command.split()
-        prog = os.path.join(self.gmxpath, csplit[0])
-        csplit[0] = prog
-        return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
-
-    def prepare(self):
-
-        """ Prepare the calculation.  Write coordinates to the temp-directory.  Read the topology. """
-
-        ## First move into the temp directory if specified by the input arguments.
-        cwd = os.getcwd()
-        if hasattr(self,'target'):
-            dnm = os.path.join(self.root, self.target.tempdir)
-        else:
-            warn_once("Running in current directory (%s)." % os.getcwd())
-            dnm = os.getcwd()
-        os.chdir(dnm)
+        """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
         ## Link files into the temp directory because it's good for reproducibility.
-        LinkFile(os.path.join(self.srcdir, self.mdp), os.path.join(dnm, self.mdp), nosrcok=True)
-        LinkFile(os.path.join(self.srcdir, self.top), os.path.join(dnm, self.top), nosrcok=True)
+        LinkFile(os.path.join(self.srcdir, self.mdp), self.mdp, nosrcok=True)
+        LinkFile(os.path.join(self.srcdir, self.top), self.top, nosrcok=True)
 
         ## Write the appropriate coordinate files.
         if hasattr(self,'target'):
             # Create the force field in this directory if the force field object is provided.  
-            # This is because the .mdp and .top file can be force field files! :)
+            # This is because the .mdp and .top file can be force field files!
             FF = self.target.FF
             FF.make(np.zeros(FF.np, dtype=float))
             if hasattr(self.target,'shots'):
-                self.mol.write(os.path.join(dnm, "%s-all.gro" % self.name), select=range(self.target.shots))
+                self.mol.write("%s-all.gro" % self.name, select=range(self.target.shots))
             else:
-                self.mol.write(os.path.join(dnm, "%s-all.gro" % self.name))
+                self.mol.write("%s-all.gro" % self.name)
         else:
-            self.mol.write(os.path.join(dnm, "%s-all.gro" % self.name))
-        self.mol[0].write(os.path.join(dnm, "%s.gro" % self.name))
+            self.mol.write("%s-all.gro" % self.name)
+        self.mol[0].write("%s.gro" % self.name)
 
         ## Call grompp followed by gmxdump to read the trajectory
         self.callgmx("grompp -c %s.gro -p %s -f %s -o %s.tpr" % (self.name, self.top, self.mdp, self.name))
@@ -595,10 +582,17 @@ class GMX(Engine):
                 for i in range(ai[1]-ai[0]+1) : self.AtomLists['MoleculeNumber'].append(mn)
         os.unlink('mdout.mdp')
         os.unlink('%s.tpr' % self.name)
-        os.chdir(cwd)
-        if hasattr(self,'target'):
-            self.target.AtomLists = self.AtomLists
-            self.target.AtomMask = self.AtomMask
+
+    def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
+        """ Call GROMACS; prepend the gmxpath to the call to the GROMACS program. """
+        ## Always, always remove backup files.
+        rm_gmx_baks(os.getcwd())
+
+        ## Call a GROMACS program as you would from the command line.
+        csplit = command.split()
+        prog = os.path.join(self.gmxpath, csplit[0])
+        csplit[0] = prog
+        return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
 
     def energy_termnames(self):
         if not os.path.exists('%s.edr' % self.name):
@@ -629,6 +623,9 @@ class GMX(Engine):
 
         """ Computes the energy and force using GROMACS for a single snapshot. """
 
+        if hasattr(self,'target') and hasattr(self.target,'force'):
+            force = self.target.force
+
         ## Write the correct conformation.
         self.mol.write('%s.gro',select=[shot])
 
@@ -638,17 +635,21 @@ class GMX(Engine):
 
         ## Gather information
         self.callgmx("g_energy -xvg no -f %s.edr -o %s-energy.xvg" % (self.name, self.name), stdin='Potential')
-        self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-force.xvg -fp" % (self.name, self.name, self.name), stdin='System')
         E = [float(open("%s-energy.xvg" % self.name).readlines()[0].split()[1])]
-        ## When we read in the force, make sure that we only read in the forces on real atoms.
-        F = [float(j) for i, j in enumerate(open("%s-force.xvg" % self.name).readlines()[0].split()[1:]) if self.AtomMask[i/3]]
+        F = []
+        if force:
+            ## When we read in the force, make sure that we only read in the forces on real atoms.
+            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-force.xvg -fp" % (self.name, self.name, self.name), stdin='System')
+            F = [float(j) for i, j in enumerate(open("%s-force.xvg" % self.name).readlines()[0].split()[1:]) if self.AtomMask[i/3]]
         M = array(E + F)
-
         return M
 
-    def energy_force(self):
+    def energy_force(self, force=True):
 
         """ Computes the energy and force using GROMACS over a trajectory. """
+
+        if hasattr(self,'target') and hasattr(self.target,'force'):
+            force = self.target.force
 
         ## Call grompp followed by mdrun.
         self.callgmx("grompp -c %s.gro -p %s -f %s -o %s.tpr" % (self.name, self.top, self.mdp, self.name))
@@ -656,18 +657,22 @@ class GMX(Engine):
 
         ## Gather information
         self.callgmx("g_energy -xvg no -f %s.edr -o %s-energy.xvg" % (self.name, self.name), stdin='Potential')
-        self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-force.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-        M = []
         Efile = open("%s-energy.xvg" % self.name).readlines()
-        Ffile = open("%s-force.xvg" % self.name).readlines()
-        # Loop through the snapshots
-        for Eline, Fline in zip(Efile, Ffile):
-            # Compute the potential energy and append to list
-            Energy = [float(Eline.split()[1])]
-            # When we read in the force, make sure that we only read in the forces on real atoms.
-            Force = [float(j) for i, j in enumerate(Fline.split()[1:]) if self.AtomMask[i/3]]
-            M.append(array(Energy + Force))
-        return array(M)
+        if force:
+            M = []
+            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-force.xvg -fp" % (self.name, self.name, self.name), stdin='System')
+            Ffile = open("%s-force.xvg" % self.name).readlines()
+            # Loop through the snapshots
+            for Eline, Fline in zip(Efile, Ffile):
+                # Compute the potential energy and append to list
+                Energy = [float(Eline.split()[1])]
+                # When we read in the force, make sure that we only read in the forces on real atoms.
+                Force = [float(j) for i, j in enumerate(Fline.split()[1:]) if self.AtomMask[i/3]]
+                M.append(array(Energy + Force))
+            M = array(M)
+        else:
+            M = array([float(Eline.split()[1]) for Eline in Efile]).reshape(-1,1)
+        return M
 
     def interaction_energy(self, fraga, fragb):
 
@@ -726,9 +731,12 @@ class AbInitio_GMX(AbInitio):
         ## Build keyword dictionaries to pass to engine.
         engine_args = deepcopy(self.__dict__)
         engine_args.update(options)
+        del engine_args['name']
     
         ## Create engine object.
         self.engine = GMX(target=self, **engine_args)
+        self.AtomLists = self.engine.AtomLists
+        self.AtomMask = self.engine.AtomMask
         
     def read_topology(self):
         self.topology_flag = True
@@ -809,6 +817,7 @@ class Interaction_GMX(Interaction):
         ## Build keyword dictionaries to pass to engine.
         engine_args = deepcopy(self.__dict__)
         engine_args.update(options)
+        del engine_args['name']
     
         ## Create engine object.
         self.engine = GMX(target=self, **engine_args)

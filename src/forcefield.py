@@ -596,7 +596,7 @@ class FF(forcebalance.BaseClass):
                 evalcmd  = field.strip().split('=')[1]
                 self.assign_field(None,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
             
-    def make(self,vals,use_pvals=False,printdir=None,precision=12):
+    def make(self,vals=None,use_pvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.
         
         This big kahuna does a number of things:
@@ -615,6 +615,8 @@ class FF(forcebalance.BaseClass):
         and use physical parameters directly.
         
         """
+        if vals == None:
+            vals = zeros(self.np, dtype=float)
         if type(vals)==ndarray and vals.ndim != 1:
             raise Exception('Please only pass 1-D arrays')
         if len(vals) != self.np:

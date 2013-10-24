@@ -36,7 +36,7 @@ pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals dista
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
          'ANGLE'        : {'Atom':[1,2,3], 4:'K',5:'B'},   # Angle force constant and equilibrium angle
          'UREYBRAD'     : {'Atom':[1,2,3], 4:'K',5:'B'},   # Urey-Bradley force constant and equilibrium distance (Angstrom)
-         'MCHARGE'       : {'Atom':[1,2,3], 4:''},          # Atomic charge
+         'MCHARGE'      : {'Atom':[1,2,3], 4:''},          # Atomic charge
          'DIPOLE'       : {0:'X',1:'Y',2:'Z'},             # Dipole moment in local frame
          'QUADX'        : {0:'X'},                         # Quadrupole moment, X component
          'QUADY'        : {0:'X',1:'Y'},                   # Quadrupole moment, Y component
@@ -164,15 +164,18 @@ def write_key_with_prm(src, dest, prmfnm=None, ffobj=None):
     # This is a flag which tells us whether the "parameters" line has appeared
     prmflag = False
     outlines = []
-    for line in open(src):
-        if len(line.split()) > 1 and line.split()[0].lower() == 'parameters':
-            prmflag = True
-            # This is the case where "parameters" correctly corresponds to optimize.in
-            if line.split()[1] in prms: pass
-            else:
-                logger.info(line + '\n')
-                warn_press_key("The above line was found in %s, but we expected something like %s" % (src,prmfnm))
-        outlines.append(line)
+    if src and os.path.exists(src):
+        for line in open(src):
+            if len(line.split()) > 1 and line.split()[0].lower() == 'parameters':
+                prmflag = True
+                # This is the case where "parameters" correctly corresponds to optimize.in
+                if line.split()[1] in prms: pass
+                else:
+                    logger.info(line + '\n')
+                    warn_press_key("The above line was found in %s, but we expected something like %s" % (src,prmfnm))
+            outlines.append(line)
+    else:
+        outlines.append("digits 10")
     if not prmflag:
         logger.info("Adding parameter file %s to key file\n" % prmfnm)
         outlines.insert(0,"parameters %s\n" % prmfnm)
@@ -285,10 +288,17 @@ class Liquid_TINKER(Liquid):
                          tgt=self)
 
 class TINKER(Engine):
+
     """ Derived from Engine object for carrying out general purpose TINKER calculations. """
+
     def __init__(self, name="tinker", **kwargs):
-        kwargs = {i:j for i,j in kwargs.items() if j != None} 
+        ## Keyword args that aren't in this list are filtered out.
+        self.valkwd = ['tinker_key', 'tinkerpath']
         super(TINKER,self).__init__(name=name, **kwargs)
+
+    def setopts(self, **kwargs):
+        
+        """ Called by __init__ ; Set TINKER-specific options. """
 
         ## The directory containing TINKER executables (e.g. dynamic)
         if 'tinkerpath' in kwargs:
@@ -297,14 +307,15 @@ class TINKER(Engine):
                 warn_press_key("The 'dynamic' executable indicated by %s doesn't exist! (Check tinkerpath)" \
                                    % os.path.join(self.tinkerpath,"dynamic"))
         else:
-            warn_once("The 'tinkerpath' option was not specified; using default.")
+            warn_press_key("The 'tinkerpath' option was not specified; using default.")
             if which('mdrun') == '':
                 warn_press_key("Please add TINKER executables to the PATH or specify tinkerpath.")
             self.tinkerpath = which('dynamic')
-        cwd = os.getcwd()
-        os.chdir(self.srcdir)
-        
-        ## Autodetect TINKER .key file and determine coordinates.
+
+    def readsrc(self, **kwargs):
+
+        """ Called by __init__ ; read files from the source directory. """
+
         self.key = onefile('key', kwargs['tinker_key'] if 'tinker_key' in kwargs else None)
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
@@ -315,9 +326,8 @@ class TINKER(Engine):
                 self.mol = Molecule(kwargs['coords'])
         else:
             arcfile = onefile('arc')
+            if not arcfile: raise RuntimeError('Cannot determine which .arc file to use')
             self.mol = Molecule(arcfile)
-        os.chdir(cwd)
-        self.postinit()
 
     def calltinker(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -336,38 +346,25 @@ class TINKER(Engine):
                 break
         return o
 
-    def prepare(self):
+    def prepare(self, **kwargs):
 
-        """ Prepare the calculation.  Write coordinates to the temp-directory.  Read the topology. """
-
-        ## First move into the temp directory if specified by the input arguments.
-        cwd = os.getcwd()
-        if hasattr(self,'target'):
-            dnm = os.path.join(self.root, self.target.tempdir)
-        else:
-            warn_once("Running in current directory (%s)." % os.getcwd())
-            dnm = os.getcwd()
-        os.chdir(dnm)
+        """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
         self.rigid = False
-        
         ## Write the appropriate coordinate and key files.
         if hasattr(self,'target'):
             # Create the force field in this directory if the force field object is provided.  
-            # This is because the .key file could be a force field file! :)
+            # This is because the .key file could be a force field file!
             FF = self.target.FF
             FF.make(np.zeros(FF.np, dtype=float))
             if FF.rigid_water:
                 self.rigid = True
-            # if hasattr(self.target,'shots'):
-            #     self.mol.write(os.path.join(dnm, "%s-all.arc" % self.name), select=range(self.target.shots))
-            # else:
-            #     self.mol.write(os.path.join(dnm, "%s-all.arc" % self.name))
-            write_key_with_prm(os.path.join(self.srcdir, self.key), os.path.join(dnm, "%s.key" % self.name), ffobj=FF)
+            write_key_with_prm(os.path.join(self.srcdir, self.key), os.path.join("%s.key" % self.name), ffobj=FF)
+        elif self.key:
+            LinkFile(os.path.join(self.srcdir, self.key), os.path.join("%s.key" % self.name), nosrcok=True)
         else:
-            # self.mol.write(os.path.join(dnm, "%s-all.arc" % self.name))
-            LinkFile(os.path.join(self.srcdir, self.key), os.path.join(dnm, "%s.key" % self.name), nosrcok=True)
-        self.mol[0].write(os.path.join(dnm, "%s.xyz" % self.name), ftype="tinker")
+            raise RuntimeError('Need a .key file to continue')
+        self.mol[0].write(os.path.join("%s.xyz" % self.name), ftype="tinker")
 
         ## If the coordinates do not come with TINKER suffixes then throw an error.
         self.mol.require('tinkersuf')
@@ -413,13 +410,9 @@ class TINKER(Engine):
                     G.add_edge(a, b)
                 else: mode = 0
         # Use networkx to figure out a list of molecule numbers.
-        gs = np.array(nx.connected_component_subgraphs(G))
-        tmols = gs[np.argsort(np.array([min(g.nodes()) for g in gs]))]
+        gs = nx.connected_component_subgraphs(G)
+        tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
         self.AtomLists['MoleculeNumber'] = [[i+1 in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
-        os.chdir(cwd)
-        if hasattr(self,'target'):
-            self.target.AtomLists = self.AtomLists
-            self.target.AtomMask = self.AtomMask
 
     def optimize(self, crit=1e-4):
         if os.path.exists('%s.xyz_2' % self.name):
@@ -448,12 +441,15 @@ class TINKER(Engine):
         # units for consistency with existing code.
         E = []
         F = []
+        i = 0
         for line in o:
             s = line.split()
             if "Total Potential Energy" in line:
                 E = [float(s[4]) * 4.184]
             elif len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
-                F += [-1 * float(i) * 4.184 * 10 for i in s[2:5]]
+                if self.AtomMask[i]:
+                    F += [-1 * float(i) * 4.184 * 10 for i in s[2:5]]
+                i += 1
         M = np.array(E + F)
         return M
 
@@ -470,27 +466,8 @@ class TINKER(Engine):
         for line in o:
             s = line.split()
             if "Total Potential Energy" in line:
-<<<<<<< Updated upstream
                 E.append(float(s[4]) * 4.184)
         return np.array(E)
-=======
-                E.append([float(s[4]) * 4.184])
-            if "Unable" in line:
-                Borked = 1
-        if Borked:
-            for line in o.split('\n'):
-                print line
-            warn_press_key('TINKER may have encountered an error!')
-        M = Np.array(E)
-        return M
-
-    def energy_force_driver_all(self):
-        if self.force:
-            raise Exception('Trying to call unimplemented functionality.')
-        return self.energy_driver_all()
-
-class Vibration_TINKER(Vibration):
->>>>>>> Stashed changes
 
     def energy_force(self, force=True):
 
@@ -627,8 +604,11 @@ class Vibration_TINKER(Vibration):
         
         """ Calculate the interaction energy for two fragments. """
 
-        self.A = TINKER(name="A", mol=self.mol.atom_select(fraga), tinker_key="%s.key" % self.name)
-        self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name)
+        if not hasattr(self,'A'):
+            self.A = TINKER(name="A", mol=self.mol.atom_select(fraga), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
+        if not hasattr(self,'B'):
+            self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
+
         # Interaction energy needs to be in kcal/mol.
         return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
 
@@ -645,8 +625,11 @@ class AbInitio_TINKER(AbInitio):
         ## Build keyword dictionaries to pass to engine.
         engine_args = deepcopy(self.__dict__)
         engine_args.update(options)
+        del engine_args['name']
         ## Create engine object.
         self.engine = TINKER(target=self, **engine_args)
+        self.AtomLists = self.engine.AtomLists
+        self.AtomMask = self.engine.AtomMask
         ## all_at_once is not implemented.
         if self.force and self.all_at_once:
             warn_press_key("Force matching is turned on but TINKER can only do trajectory loops for energy-only jobs.")
@@ -671,13 +654,14 @@ class Vibration_TINKER(Vibration):
 
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
-        self.set_option(tgt_opts,'coords','coords',default="input.xyz")
+        self.set_option(tgt_opts,'coords',default="input.xyz")
         self.set_option(tgt_opts,'tinker_key',default="input.key")
         ## Initialize base class.
         super(Vibration_TINKER,self).__init__(options,tgt_opts,forcefield)
         ## Build keyword dictionaries to pass to engine.
         engine_args = deepcopy(self.__dict__)
         engine_args.update(options)
+        del engine_args['name']
         ## Create engine object.
         self.engine = TINKER(target=self, **engine_args)
         if self.FF.rigid_water:
@@ -693,13 +677,14 @@ class Moments_TINKER(Moments):
 
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
-        self.set_option(tgt_opts,'coords','coords',default="input.xyz")
+        self.set_option(tgt_opts,'coords',default="input.xyz")
         self.set_option(tgt_opts,'tinker_key',default="input.key")
         ## Initialize base class.
         super(Moments_TINKER,self).__init__(options,tgt_opts,forcefield)
         ## Build keyword dictionaries to pass to engine.
         engine_args = deepcopy(self.__dict__)
         engine_args.update(options)
+        del engine_args['name']
         ## Create engine object.
         self.engine = TINKER(target=self, **engine_args)
 
@@ -717,6 +702,7 @@ class BindingEnergy_TINKER(BindingEnergy):
         ## Build keyword dictionaries to pass to engine.
         engine_args = deepcopy(self.__dict__)
         engine_args.update(options)
+        del engine_args['name']
         ## Create engine objects.
         self.engines = OrderedDict()
         for sysname,sysopt in self.sys_opts.items():
@@ -725,7 +711,7 @@ class BindingEnergy_TINKER(BindingEnergy):
                 atomselect = np.array(uncommadash(sysopt['select']))
                 M = M.atom_select(atomselect)
             if self.FF.rigid_water: M.rigid_water()
-            self.engines[sysname] = TINKER(target=self, mol=M, name=sysname, tinker_key=os.path.join(sysopt['keyfile']))
+            self.engines[sysname] = TINKER(target=self, mol=M, name=sysname, tinker_key=os.path.join(sysopt['keyfile']), tinkerpath=options['tinkerpath'])
 
     def system_driver(self, sysname):
         opts = self.sys_opts[sysname]
@@ -744,6 +730,7 @@ class Interaction_TINKER(Interaction):
         ## Build keyword dictionaries to pass to engine.
         engine_args = deepcopy(self.__dict__)
         engine_args.update(options)
+        del engine_args['name']
         ## Create engine object.
         self.engine = TINKER(target=self, **engine_args)
 

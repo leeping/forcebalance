@@ -127,7 +127,8 @@ tgt_opts_types = {
                  "force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
                  "fragment1" : ('', 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
                  "fragment2" : ('', 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
-                 "openmm_cuda_precision" : ('', -10, 'Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
+                 "openmm_precision" : ('', -10, 'Precision of OpenMM calculation if using CUDA or OpenCL platform.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
+                 "openmm_platform" : ('CUDA', -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
                  "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
                  "inter_txt"             : ('interactions.txt', 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
                  },
@@ -136,6 +137,7 @@ tgt_opts_types = {
                  },
     'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
                  "coords"                : (None, -10, 'Coordinates for single point evaluation; if not provided, will search for a default.', 'Energy/force matching, ESP evaluations, interaction energies'),
+                 "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM systems but can also contain coordinates.', 'Targets that use OpenMM', 'OpenMM'),
                  "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
@@ -239,7 +241,7 @@ for t in tgt_opts_types:
     tgt_opts_defaults.update(subdict)
 
 ## Option maps for maintaining backward compatibility.
-bkwd = {"simtype" : "type", "masterfile" : "inter_txt"}
+bkwd = {"simtype" : "type", "masterfile" : "inter_txt", "openmm_cuda_precision" : "openmm_precision"}
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]
