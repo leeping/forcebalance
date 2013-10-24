@@ -51,7 +51,7 @@ import re
 import sys
 import itertools
 import traceback
-from nifty import printcool, printcool_dictionary, which
+from nifty import printcool, printcool_dictionary, which, isfloat
 from copy import deepcopy
 from collections import OrderedDict
 
@@ -129,9 +129,9 @@ tgt_opts_types = {
                  "fragment2" : ('', 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
                  "openmm_cuda_precision" : ('', -10, 'Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
                  "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
-                 "binding_txt"           : (None, 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
+                 "inter_txt"             : ('interactions.txt', 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
                  },
-    'allcaps' : {"type"   : (None, 200, 'The type of fitting target (Abinitio, BindingEnergy, Liquid, Moments, Vibration) ; must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
+    'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
                  },
     'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
@@ -239,7 +239,7 @@ for t in tgt_opts_types:
     tgt_opts_defaults.update(subdict)
 
 ## Option maps for maintaining backward compatibility.
-bkwd = {"simtype" : "type", "masterfile" : "binding_txt"}
+bkwd = {"simtype" : "type", "masterfile" : "inter_txt"}
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]
@@ -436,14 +436,23 @@ def parse_inputs(input_file=None):
                     for word in s[1:]:
                         this_opt.setdefault(key,[]).append(word)
                 elif key in opts_types['ints']:
-                    this_opt[key] = int(s[1])
+                    if isfloat(s[1]):
+                        this_opt[key] = int(float(s[1]))
+                    else:
+                        this_opt[key] = int(s[1])
                 elif key in opts_types['bools']:
                     if len(s) == 1:
                         this_opt[key] = True
-                    elif s[1].upper() in ["0", "NO", "FALSE"]:
+                    elif s[1].upper() in ["0", "NO", "FALSE", "OFF"]:
                         this_opt[key] = False
-                    else:
+                    elif isfloat(s[1]) and int(float(s[1])) == 0:
+                        this_opt[key] = False
+                    elif s[1].upper() in ["1", "YES", "TRUE", "ON"]:
                         this_opt[key] = True
+                    elif isfloat(s[1]) and int(float(s[1])) == 1:
+                        this_opt[key] = True
+                    else:
+                        raise RuntimeError('%s is a true/false option but you provided %s; to enable, provide ["1", "yes", "true", "on" or <no value>].  To disable, provide ["0", "no", "false", or "off"].' % (key, s[1]))
                 elif key in opts_types['floats']:
                     this_opt[key] = float(s[1])
                 elif key in opts_types['sections']:
@@ -458,6 +467,7 @@ def parse_inputs(input_file=None):
                 logger.error("Unrecognized section: %s\n" % section)
                 sys.exit(1)
         except:
+            traceback.print_exc()
             logger.error("Failed to read in this line! Check your input file.\n")
             logger.exception(line + '\n')
             sys.exit(1)

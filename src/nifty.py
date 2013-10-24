@@ -67,6 +67,13 @@ def pmat2d(mat2d, precision=1, loglevel=INFO):
             logger.log(loglevel, "%% .%ie " % precision % m2a[i][j])
         logger.log(loglevel, '\n')
 
+def grouper(iterable, n):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
+    args = [iter(iterable)] * n
+    lzip = [[j for j in i if j != None] for i in list(itertools.izip_longest(*args))]
+    return lzip
+
 def encode(l): 	
     return [[len(list(group)),name] for name, group in itertools.groupby(l)]
 
@@ -848,7 +855,7 @@ class LineChunker(object):
     def __exit__(self, *args, **kwargs):
         self.close()
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -856,7 +863,8 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     logfnm (optional) = Name of the log file name (appended if exists)
     stdin (optional) = A string to be passed to stdin, as if it were typed (use newline character to mimic Enter key)
     print_command = Whether to print the command.
-    copy_stderr = Whether to copy the stderr stream to the stdout stream; useful for GROMACS which prints out everything to stderr (argh.)
+    copy_stdout = Copy the stdout stream; can set to False in strange situations
+    copy_stderr = Copy the stderr stream to the stdout stream; useful for GROMACS which prints out everything to stderr (argh.)
     expand_cr = Whether to expand carriage returns into newlines (useful for GROMACS mdrun).
     persist = Continue execution even if the command gives a nonzero return code.
     """
@@ -904,8 +912,9 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     # These are functions that take chunks of lines (read) as inputs.
     def process_out(read):
         if print_to_screen: sys.stdout.write(read)
-        process_out.stdout += read
-        wtf(read)
+        if copy_stdout: 
+            process_out.stdout += read
+            wtf(read)
     process_out.stdout = ""
 
     def process_err(read):
@@ -925,12 +934,12 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             for fh in to_read:
                 if fh is p.stdout:
                     read = fh.read(1)
-                    out_chunker.push(read)
                     if not read: streams.remove(p.stdout)
+                    else: out_chunker.push(read)
                 elif fh is p.stderr:
                     read = fh.read(1)
-                    err_chunker.push(read)
                     if not read: streams.remove(p.stderr)
+                    else: err_chunker.push(read)
                 else:
                     raise RuntimeError
             if len(streams) == 0: break
@@ -952,7 +961,10 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             raise Exception("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
         
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
-    return process_out.stdout.split('\n')
+    Out = process_out.stdout.split('\n')
+    if Out[-1] == '':
+        Out = Out[:-1]
+    return Out
 
 def warn_press_key(warning, timeout=10):
     if type(warning) is str:

@@ -67,10 +67,24 @@ class Engine(forcebalance.BaseClass):
         else:
             warn_once("Running without a target, using current directory.")
             self.root = os.getcwd()
+        if hasattr(self,'target'):
+            self.srcdir = os.path.join(self.root, self.target.tgtdir)
+        else:
+            self.srcdir = self.root
+        if 'verbose' in kwargs:
+            self.verbose = verbose
+        else:
+            self.verbose = False
         return
 
-    def prepare():
+    def prepare(self):
         return
+
+    def postinit(self):
+        """ Perform post-initialization tasks. """
+        if self.verbose:
+            printcool_dictionary(OrderedDict([(i, self.__dict__[i]) for i in sorted(self.__dict__.keys())]), title="Attributes for engine %s" % self.__class__.__name__)
+        self.prepare()
 
     @abc.abstractmethod
     def evaluate_snapshots(self, M):

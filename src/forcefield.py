@@ -310,9 +310,9 @@ class FF(forcebalance.BaseClass):
         self.redirect = {}
         ## Destruction dictionary (experimental).
         self.linedestroy_save = []
-        self.parmdestroy_save = []
+        self.prmdestroy_save = []
         self.linedestroy_this = []
-        self.parmdestroy_this = []
+        self.prmdestroy_this = []
         ## Print the optimizer options.
         printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
 
@@ -363,8 +363,8 @@ class FF(forcebalance.BaseClass):
         Follow the rules in the ITP_Reader or Tinker_Reader derived
         class.  Read the documentation in the class documentation or
         the 'feed' method to learn more.  In all cases the parameter
-        is tagged using <tt> # PARM 3 </tt> (where # denotes a comment,
-        the word PARM stays the same, and 3 is the field number starting
+        is tagged using <tt> # PRM 3 </tt> (where # denotes a comment,
+        the word PRM stays the same, and 3 is the field number starting
         from zero.)
 
         --- If normal text : ---
@@ -443,11 +443,11 @@ class FF(forcebalance.BaseClass):
         more than the current line, it also depends on the section that
         we're in.
 
-        When 'PARM' or 'RPT' is encountered, we do several things:
+        When 'PRM' or 'RPT' is encountered, we do several things:
         - Build the parameter identifier and insert it into the map
         - Point to the file name, line number, and field where the parameter may be modified
         
-        Additionally, when 'PARM' is encountered:
+        Additionally, when 'PRM' is encountered:
         - Store the physical parameter value (this is permanent; it's the original value)
         - Increment the total number of parameters
 
@@ -467,11 +467,15 @@ class FF(forcebalance.BaseClass):
                 logger.warning(line + '\n')
                 warn_press_key("The force field parser got confused!  The traceback and line in question are printed above.")
             sline = self.Readers[ffname].Split(line)
-            if 'PARM' in sline:
-                pmark = (array(sline) == 'PARM').argmax() # The position of the 'PARM' word
+            pmark = None
+            if 'PRM' in sline:
+                pmark = (array(sline) == 'PRM').argmax() # The position of the parameterization keyword
+            elif 'PARM' in sline:
+                pmark = (array(sline) == 'PARM').argmax()
+            if pmark != None:
                 pflds = [int(i) for i in sline[pmark+1:]] # The integers that specify the parameter word positions
                 for pfld in pflds:
-                    # For each of the fields that are to be parameterized (indicated by PARM #),
+                    # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
                     # Add pid into the dictionary.
@@ -643,7 +647,7 @@ class FF(forcebalance.BaseClass):
         pvals = list(pvals)
         newffdata = deepcopy(self.ffdata)
         # The dictionary that takes parameter names to physical values.
-        PARM = {i:pvals[self.map[i]] for i in self.map}
+        PRM = {i:pvals[self.map[i]] for i in self.map}
 
         #======================================#
         #     Print the new force field.       #
@@ -663,7 +667,7 @@ class FF(forcebalance.BaseClass):
                 #if type(newffdata[fnm]) is etree._ElementTree:
                 if cmd != None:
                     try:
-                        wval = eval(cmd)
+                        wval = eval(cmd.replace("PARM","PRM"))
                     except:
                         logger.error(traceback.format_exc() + '\n')
                         raise Exception("The command %s (written in the force field file) cannot be evaluated!" % cmd)

@@ -397,8 +397,8 @@ class Optimizer(forcebalance.BaseClass):
             H_stor  = H.copy()
             xk_prev = xk.copy()
             X_prev  = X
-            if len(self.FF.parmdestroy_this) > 0:
-                self.FF.parmdestroy_save.append(self.FF.parmdestroy_this)
+            if len(self.FF.prmdestroy_this) > 0:
+                self.FF.prmdestroy_save.append(self.FF.prmdestroy_this)
                 self.FF.linedestroy_save.append(self.FF.linedestroy_this)
         
         bar = printcool("Final objective function value\nFull: % .6e  Un-penalized: % .6e" % (data['X'],data['X0']), '@', bold=True, color=2)
