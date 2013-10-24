@@ -470,8 +470,27 @@ class TINKER(Engine):
         for line in o:
             s = line.split()
             if "Total Potential Energy" in line:
+<<<<<<< Updated upstream
                 E.append(float(s[4]) * 4.184)
         return np.array(E)
+=======
+                E.append([float(s[4]) * 4.184])
+            if "Unable" in line:
+                Borked = 1
+        if Borked:
+            for line in o.split('\n'):
+                print line
+            warn_press_key('TINKER may have encountered an error!')
+        M = Np.array(E)
+        return M
+
+    def energy_force_driver_all(self):
+        if self.force:
+            raise Exception('Trying to call unimplemented functionality.')
+        return self.energy_driver_all()
+
+class Vibration_TINKER(Vibration):
+>>>>>>> Stashed changes
 
     def energy_force(self, force=True):
 
