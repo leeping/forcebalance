@@ -14,7 +14,7 @@ class TestOpenMM_vs_TINKER(ForceBalanceTestCase):
         self.logger.debug("\nBuilding options for target...\n")
         self.cwd = os.getcwd()
         os.chdir(os.path.join(os.getcwd(), "test", "openmm_vs_tinker"))
-        os.makedirs("temp")
+        if not os.path.exists("temp"): os.makedirs("temp")
         os.chdir("temp")
         os.system("ln -s ../prism.pdb")
         os.system("ln -s ../prism.key")
@@ -22,7 +22,7 @@ class TestOpenMM_vs_TINKER(ForceBalanceTestCase):
         os.system("ln -s ../water.prm")
         os.system("ln -s ../amoebawater.xml")
         os.chdir("..")
-        self.addCleanup(os.system, 'pwd; rm -rf temp')
+        self.addCleanup(os.system, 'rm -rf temp')
 
     def test_energy_force(self):
         """ Compare OpenMM vs. TINKER energy and forces with AMOEBA force field """
@@ -61,6 +61,7 @@ class TestOpenMM_vs_TINKER(ForceBalanceTestCase):
         self.assertAlmostEqual(RO, RT, msg="OpenMM and TINKER structures are different", delta=0.001)
 
     def test_interaction_energy(self):
+        """ Compare OpenMM vs. TINKER interaction energies with AMOEBA force field """
         printcool("Testing OpenMM vs. TINKER interaction energy with AMOEBA")
         os.chdir("temp")
         tinkerpath=which('testgrad')
@@ -76,6 +77,7 @@ class TestOpenMM_vs_TINKER(ForceBalanceTestCase):
         self.assertAlmostEqual(IO, IT, msg="OpenMM and TINKER interaction energies are different", delta=0.0001)
 
     def test_multipole_moments(self):
+        """ Compare OpenMM vs. TINKER multipole moments with AMOEBA force field """
         printcool("Testing OpenMM vs. TINKER multipole moments with AMOEBA")
         os.chdir("temp")
         tinkerpath=which('testgrad')
