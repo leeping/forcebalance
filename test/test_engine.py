@@ -92,11 +92,21 @@ class TestOpenMM_vs_TINKER(ForceBalanceTestCase):
         MT = T.multipole_moments(optimize=False)
         DT = np.array(MT['dipole'].values())
         QT = np.array(MT['quadrupole'].values())
+        MO1 = O.multipole_moments(optimize=True)
+        DO1 = np.array(MO1['dipole'].values())
+        QO1 = np.array(MO1['quadrupole'].values())
+        MT1 = T.multipole_moments(optimize=True)
+        DT1 = np.array(MT1['dipole'].values())
+        QT1 = np.array(MT1['quadrupole'].values())
         os.chdir("..")
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same dipole\n")
         self.assertNdArrayEqual(DO, DT, msg="OpenMM and TINKER dipoles are different", delta=0.001)
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same quadrupole\n")
         self.assertNdArrayEqual(QO, QT, msg="OpenMM and TINKER quadrupoles are different", delta=0.001)
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same dipole when geometries are optimized\n")
+        self.assertNdArrayEqual(DO1, DT1, msg="OpenMM and TINKER dipoles are different when geometries are optimized", delta=0.001)
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same quadrupole when geometries are optimized\n")
+        self.assertNdArrayEqual(QO1, QT1, msg="OpenMM and TINKER quadrupoles are different when geometries are optimized", delta=0.01)
 
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""

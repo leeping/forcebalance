@@ -590,10 +590,10 @@ class OpenMM(Engine):
 
     def update_simulation(self):
         """ Update the force field parameters in the simulation object. """
-        forcefield = ForceField(self.ffxml)
+        self.forcefield = ForceField(self.ffxml)
         mod = Modeller(self.pdb.topology, self.pdb.positions)
-        mod.addExtraParticles(forcefield)
-        self.system = forcefield.createSystem(mod.topology, **self.mmopts)
+        mod.addExtraParticles(self.forcefield)
+        self.system = self.forcefield.createSystem(mod.topology, **self.mmopts)
         UpdateSimulationParameters(self.system, self.simulation)
 
     def set_positions(self, shot=0):
@@ -630,6 +630,29 @@ class OpenMM(Engine):
     def normal_modes(self, optimize=True):
         raise NotImplementedError
 
+    def optimize(self, crit=1e-4):
+
+        """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD. """
+
+        # Get the previous geometry.
+        X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
+        # Minimize the energy.
+        self.simulation.minimizeEnergy(tolerance=crit*kilojoule/mole)
+        # Get the optimized geometry.
+        S = self.simulation.context.getState(getPositions=True, getEnergy=True)
+        X1 = np.array([j for i, j in enumerate(S.getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
+        E = S.getPotentialEnergy().value_in_unit(kilocalorie_per_mole)
+        # Align to original geometry.
+        M = deepcopy(self.mol[0])
+        M.xyzs = [X0, X1]
+        M.align(center=False)
+        X1 = M.xyzs[1]
+        # Set geometry in OpenMM, requires some hoops.
+        mod = Modeller(self.pdb.topology, [Vec3(i[0],i[1],i[2]) for i in X1]*angstrom)
+        mod.addExtraParticles(self.forcefield)
+        self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
+        return E, M.ref_rmsd(0)[1]
+
     def multipole_moments(self, optimize=True, polarizability=False):
 
         """ Return the system multipole moments, optionally optimizing the geometry first. """
@@ -642,8 +665,7 @@ class OpenMM(Engine):
 
         rmsd = 0.0
 
-        if optimize:
-            self.simulation.minimizeEnergy(tolerance=1e-4*kilojoule/mole)
+        if optimize: self.optimize()
         moments = get_multipoles(self.simulation)
         
         dipole_dict = OrderedDict(zip(['x','y','z'], moments[:3]))
@@ -655,21 +677,13 @@ class OpenMM(Engine):
 
     def energy_rmsd(self, optimize=True):
 
-        """ Calculate energy of the starting structure, with an optional energy minimization and RMSD calculation. """
+        """ Calculate energy of the 1st structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
 
         system = self.update_simulation()
-
+        self.set_positions()
         rmsd = 0.0
-        X0 = self.xyz_omms[0]
-        self.simulation.context.setPositions(X0)
-        if optimize:
-            self.simulation.minimizeEnergy(tolerance=1e-4*kilojoule/mole)
-            S = self.simulation.context.getState(getPositions=True, getEnergy=True)
-            E = S.getPotentialEnergy().value_in_unit(kilocalories_per_mole)
-            M0 = deepcopy(self.mol)
-            X1 = S.getPositions().value_in_unit(angstrom)
-            M0.xyzs.append(np.array([j for i, j in enumerate(X1) if self.AtomMask[i]]))
-            rmsd = M0.ref_rmsd(0)[1]
+        if optimize: 
+            E, rmsd = self.optimize()
         else:
             E = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilocalories_per_mole)
         return E, rmsd
