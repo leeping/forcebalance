@@ -32,12 +32,29 @@ try:
 except:
     pass
 
-def get_dipole(simulation,q=None,positions=None):
-    """Return the current dipole moment in Debye.
-    Note that this quantity is meaningless if the system carries a net charge."""
+def energy_components(Sim, verbose=False):
+    # Before using EnergyComponents, make sure each Force is set to a different group.
+    EnergyTerms = OrderedDict()
+    Potential = Sim.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+    Kinetic = Sim.context.getState(getEnergy=True).getKineticEnergy() / kilojoules_per_mole
+    for i in range(Sim.system.getNumForces()):
+        EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
+    EnergyTerms['Potential'] = Potential
+    EnergyTerms['Kinetic'] = Kinetic
+    EnergyTerms['Total'] = Potential+Kinetic
+    return EnergyTerms
+
+def get_multipoles(simulation,q=None,positions=None):
+    """Return the current multipole moments in Debye and Buckingham units. """
     dx = 0.0
     dy = 0.0
     dz = 0.0
+    qxx = 0.0
+    qxy = 0.0
+    qxz = 0.0
+    qyy = 0.0
+    qyz = 0.0
+    qzz = 0.0
     enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
     for i in simulation.system.getForces():
         if i.__class__.__name__ == "AmoebaMultipoleForce":
@@ -45,6 +62,12 @@ def get_dipole(simulation,q=None,positions=None):
             dx += mm[1]
             dy += mm[2]
             dz += mm[3]
+            qxx += mm[4]
+            qxy += mm[5]
+            qxz += mm[6]
+            qyy += mm[8]
+            qyz += mm[9]
+            qzz += mm[12]
         if i.__class__.__name__ == "NonbondedForce":
             # Get array of charges.
             if q == None:
@@ -52,14 +75,30 @@ def get_dipole(simulation,q=None,positions=None):
             # Get array of positions in nanometers.
             if positions == None:
                 positions = simulation.context.getState(getPositions=True).getPositions()
-            #x = np.array([j._value for j in positions])
             x = np.array(positions.value_in_unit(nanometer))
+            xx, xy, xz, yy, yz, zz = (x[:,i]*x[:,j] for i, j in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
             # Multiply charges by positions to get dipole moment.
             dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
             dx += dip[0]
             dy += dip[1]
             dz += dip[2]
-    return [dx,dy,dz]
+            qxx += enm_debye * 10 * np.sum(q*xx)
+            qxy += enm_debye * 10 * np.sum(q*xy)
+            qxz += enm_debye * 10 * np.sum(q*xz)
+            qyy += enm_debye * 10 * np.sum(q*yy)
+            qyz += enm_debye * 10 * np.sum(q*yz)
+            qzz += enm_debye * 10 * np.sum(q*zz)
+            tr = qxx+qyy+qzz
+            qxx -= tr/3
+            qyy -= tr/3
+            qzz -= tr/3
+    # This ordering has to do with the way TINKER prints it out.
+    return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
+
+def get_dipole(simulation,q=None,positions=None):
+    """Return the current dipole moment in Debye.
+    Note that this quantity is meaningless if the system carries a net charge."""
+    return get_multipoles(simulation, q=q, positions=positions)[:3]
 
 def ResetVirtualSites(positions, system):
     """Given a set of OpenMM-compatible positions and a System object,
@@ -410,7 +449,7 @@ class OpenMM(Engine):
     """ Derived from Engine object for carrying out general purpose OpenMM calculations. """
 
     def __init__(self, name="openmm", **kwargs):
-        self.valkwd = ['ffxml', 'pdb', 'platname', 'precision']
+        self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts']
         super(OpenMM,self).__init__(name=name, **kwargs)
 
     def setopts(self, platname="CUDA", precision="single", **kwargs):
@@ -419,33 +458,36 @@ class OpenMM(Engine):
 
         ## Target settings override.
         if hasattr(self,'target'):
-            platname = self.target.platname
-            precision = self.target.precision
+            self.platname = self.target.platname
+            self.precision = self.target.precision
+        else:
+            self.platname = platname
+            self.precision = precision
 
         valnames = [Platform.getPlatform(i).getName() for i in range(Platform.getNumPlatforms())]
-        if platname not in valnames:
-            warn_press_key("Platform %s does not exist (valid options are %s (case-sensitive))" % (platname, valnames))
-            platname = 'Reference'
-        precision = precision.lower()
+        if self.platname not in valnames:
+            warn_press_key("Platform %s does not exist (valid options are %s (case-sensitive))" % (self.platname, valnames))
+            self.platname = 'Reference'
+        self.precision = self.precision.lower()
         valprecs = ['single','mixed','double']
-        if precision not in valprecs:
+        if self.precision not in valprecs:
             raise RuntimeError("Please specify one of %s for precision" % valprecs)
         ## Set the simulation platform
-        logger.info("Setting Platform to %s\n" % platname)
-        self.platform = Platform.getPlatformByName(platname)
-        if platname == 'CUDA':
+        logger.info("Setting Platform to %s\n" % self.platname)
+        self.platform = Platform.getPlatformByName(self.platname)
+        if self.platname == 'CUDA':
             ## Set the device to the environment variable or zero otherwise
             device = os.environ.get('CUDA_DEVICE',"0")
             logger.info("Setting CUDA Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
-            logger.info("Setting CUDA Precision to %s\n" % precision)
-            self.platform.setPropertyDefaultValue("CudaPrecision", precision)
-        elif platname == 'OPENCL':
+            logger.info("Setting CUDA Precision to %s\n" % self.precision)
+            self.platform.setPropertyDefaultValue("CudaPrecision", self.precision)
+        elif self.platname == 'OPENCL':
             device = os.environ.get('OPENCL_DEVICE',"0")
             logger.info("Setting OpenCL Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
-            logger.info("Setting OpenCL Precision to %s\n" % precision)
-            self.platform.setPropertyDefaultValue("OpenCLPrecision", precision)
+            logger.info("Setting OpenCL Precision to %s\n" % self.precision)
+            self.platform.setPropertyDefaultValue("OpenCLPrecision", self.precision)
 
     def readsrc(self, **kwargs):
 
@@ -472,7 +514,7 @@ class OpenMM(Engine):
             for i in ["chain", "atomname", "resid", "resname", "elem"]:
                 self.mol.Data[i] = mpdb.Data[i]
 
-    def prepare(self, **kwargs):
+    def prepare(self, mmopts={}, **kwargs):
 
         """ Prepare the temp-directory. """
 
@@ -483,24 +525,22 @@ class OpenMM(Engine):
 
         if hasattr(self, 'target'):
             FF = self.target.FF
-            FF.make()
-            self.ffxml = self.target.FF.openmmxml
-        elif 'ffxml' in kwargs:
-            if not os.path.exists(kwargs['ffxml']): 
-                raise RuntimeError("%s doesn't exist" % kwargs['ffxml'])
-            self.ffxml = kwargs['ffxml']
-        elif onefile('xml'):
-            self.ffxml = onefile('xml')
+            self.ffxml = FF.openmmxml
+            forcefield = ForceField(os.path.join(self.root, FF.ffdir, FF.openmmxml))
         else:
-            raise RuntimeError('Force field XML file not found')
-
-        forcefield = ForceField(self.ffxml)
+            if 'ffxml' in kwargs:
+                if not os.path.exists(kwargs['ffxml']): 
+                    raise RuntimeError("%s doesn't exist" % kwargs['ffxml'])
+                self.ffxml = kwargs['ffxml']
+            elif onefile('xml'):
+                self.ffxml = onefile('xml')
+            forcefield = ForceField(self.ffxml)
             
         ## Create the simulation object within this class itself.
         mod = Modeller(self.pdb.topology, self.pdb.positions)
         mod.addExtraParticles(forcefield)
 
-        self.mmopts = {}
+        self.mmopts = mmopts
         if hasattr(self,'target'):
             FF = self.target.FF
             if FF.amoeba_pol == 'mutual':
@@ -508,8 +548,11 @@ class OpenMM(Engine):
             elif FF.amoeba_pol == 'direct':
                 self.mmopts['polarization'] = 'Direct'
             self.mmopts['rigidWater'] = FF.rigid_water
-                
+
         system = forcefield.createSystem(mod.topology, **self.mmopts)
+        # Set up for energy component analysis.
+        for i, j in enumerate(system.getForces()):
+            j.setForceGroup(i)
         # Create the simulation; we're not actually going to use the integrator
         integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
         SetAmoebaVirtualExclusions(system)
@@ -550,14 +593,16 @@ class OpenMM(Engine):
         forcefield = ForceField(self.ffxml)
         mod = Modeller(self.pdb.topology, self.pdb.positions)
         mod.addExtraParticles(forcefield)
-        newSystem = forcefield.createSystem(mod.topology, **self.mmopts)
-        UpdateSimulationParameters(newSystem, self.simulation)
-        return newSystem
+        self.system = forcefield.createSystem(mod.topology, **self.mmopts)
+        UpdateSimulationParameters(self.system, self.simulation)
+
+    def set_positions(self, shot=0):
+        self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot], self.system))
 
     def energy_force(self, force=True):
         """ Loop through the snapshots and compute the energies and forces using OpenMM. """
 
-        system = self.update_simulation()
+        self.update_simulation()
         M = []
         # Loop through the snapshots
         for I in range(len(self.mol)):
@@ -567,8 +612,7 @@ class OpenMM(Engine):
             #     simulation.context.applyConstraints(1e-8)
             # else:
             #     simulation.context.computeVirtualSites()
-            xyz_omm = self.xyz_omms[I]
-            self.simulation.context.setPositions(ResetVirtualSites(xyz_omm, system))
+            self.set_positions(I)
             Energy = self.simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
             Force1 = []
             if force:
@@ -584,13 +628,51 @@ class OpenMM(Engine):
         return self.energy_force(force=False).flatten()
 
     def normal_modes(self, optimize=True):
-        raise RuntimeError('Not implemented!')
+        raise NotImplementedError
 
-    def multipole_moments(self, optimize=True, polarizability=True):
-        raise RuntimeError('Not implemented!')
+    def multipole_moments(self, optimize=True, polarizability=False):
+
+        """ Return the system multipole moments, optionally optimizing the geometry first. """
+
+        system = self.update_simulation()
+        self.set_positions()
+
+        if polarizability:
+            raise NotImplementedError
+
+        rmsd = 0.0
+
+        if optimize:
+            self.simulation.minimizeEnergy(tolerance=1e-4*kilojoule/mole)
+        moments = get_multipoles(self.simulation)
+        
+        dipole_dict = OrderedDict(zip(['x','y','z'], moments[:3]))
+        quadrupole_dict = OrderedDict(zip(['xx','xy','yy','xz','yz','zz'], moments[3:10]))
+
+        calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
+
+        return calc_moments
 
     def energy_rmsd(self, optimize=True):
-        raise RuntimeError('Not implemented!')
+
+        """ Calculate energy of the starting structure, with an optional energy minimization and RMSD calculation. """
+
+        system = self.update_simulation()
+
+        rmsd = 0.0
+        X0 = self.xyz_omms[0]
+        self.simulation.context.setPositions(X0)
+        if optimize:
+            self.simulation.minimizeEnergy(tolerance=1e-4*kilojoule/mole)
+            S = self.simulation.context.getState(getPositions=True, getEnergy=True)
+            E = S.getPotentialEnergy().value_in_unit(kilocalories_per_mole)
+            M0 = deepcopy(self.mol)
+            X1 = S.getPositions().value_in_unit(angstrom)
+            M0.xyzs.append(np.array([j for i, j in enumerate(X1) if self.AtomMask[i]]))
+            rmsd = M0.ref_rmsd(0)[1]
+        else:
+            E = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilocalories_per_mole)
+        return E, rmsd
 
     def interaction_energy(self, fraga, fragb):
         
@@ -599,13 +681,26 @@ class OpenMM(Engine):
         if self.name == 'A' or self.name == 'B':
             raise RuntimeError("Don't name the engine A or B!")
 
-        if not hasattr(self,'A'):
-            self.A = OpenMM(name="A", mol=self.mol.atom_select(fraga), target=self.target)
-        if not hasattr(self,'B'):
-            self.B = OpenMM(name="B", mol=self.mol.atom_select(fragb), target=self.target)
+        # Create two subengines.
+        if hasattr(self,'target'):
+            if not hasattr(self,'A'):
+                self.A = OpenMM(name="A", mol=self.mol.atom_select(fraga), target=self.target)
+            if not hasattr(self,'B'):
+                self.B = OpenMM(name="B", mol=self.mol.atom_select(fragb), target=self.target)
+        else:
+            if not hasattr(self,'A'):
+                self.A = OpenMM(name="A", mol=self.mol.atom_select(fraga), platname=self.platname, \
+                                    precision=self.precision, ffxml=self.ffxml, mmopts=self.mmopts)
+            if not hasattr(self,'B'):
+                self.B = OpenMM(name="B", mol=self.mol.atom_select(fragb), platname=self.platname, \
+                                    precision=self.precision, ffxml=self.ffxml, mmopts=self.mmopts)
 
         # Interaction energy needs to be in kcal/mol.
-        return (self.energy() - self.A.energy() - self.B.energy())
+        D = self.energy() 
+        A = self.A.energy()
+        B = self.B.energy()
+
+        return (D - A - B) / 4.184
 
 class AbInitio_OpenMM(AbInitio):
 

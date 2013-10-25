@@ -62,9 +62,8 @@ class TestWaterTutorial(ForceBalanceTestCase):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
 
-
-        #self.assertEqual(EXPECTED_WATER_RESULTS,result,
-        #msg="\nCalculation results have changed from previously calculated values.\nIf this seems reasonable, update EXPECTED_WATER_RESULTS in test_system.py with these values")
+        self.assertNdArrayEqual(EXPECTED_WATER_RESULTS,result,
+        msg="\nCalculation results have changed from previously calculated values.\nIf this seems reasonable, update EXPECTED_WATER_RESULTS in test_system.py with these values")
 
         # Fail if calculation takes longer than previously to converge
         #self.assertGreaterEqual(ITERATIONS_TO_CONVERGE, Counter(), msg="\nCalculation took longer than expected to converge (%d iterations vs previous of %d)" %\

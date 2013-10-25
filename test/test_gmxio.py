@@ -33,3 +33,6 @@ class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests):
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""
         return super(TestAbInitio_GMX,self).shortDescription() + " (AbInitio_GMX)"
+
+if __name__ == '__main__':           
+    unittest.main()

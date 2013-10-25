@@ -615,8 +615,6 @@ class FF(forcebalance.BaseClass):
         and use physical parameters directly.
         
         """
-        if vals == None:
-            vals = zeros(self.np, dtype=float)
         if type(vals)==ndarray and vals.ndim != 1:
             raise Exception('Please only pass 1-D arrays')
         if len(vals) != self.np:

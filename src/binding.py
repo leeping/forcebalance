@@ -136,11 +136,11 @@ class BindingEnergy(Target):
             self.inter_opts[inter]['reference_physical'] = self.inter_opts[inter]['energy'] * eval(self.inter_opts[inter]['energy_unit'])
 
         if tgt_opts['energy_denom'] == 0.0:
-            self.set_option(None, None, 'energy_denom', val=std(array([val['reference_physical'].value_in_unit(kilocalories_per_mole) for val in self.inter_opts.values()])) * kilocalories_per_mole)
+            self.set_option(None, None, 'energy_denom', val=std(array([val['reference_physical'].value_in_unit(kilocalories_per_mole) for val in self.inter_opts.values()])))
         else:
-            self.set_option(None, None, 'energy_denom', val=tgt_opts['energy_denom'] * kilocalories_per_mole)
+            self.set_option(None, None, 'energy_denom', val=tgt_opts['energy_denom'])
 
-        self.set_option(None, None, 'rmsd_denom', val=tgt_opts['rmsd_denom'] * angstrom)
+        self.set_option(None, None, 'rmsd_denom', val=tgt_opts['rmsd_denom'])
 
         self.set_option(tgt_opts,'cauchy','cauchy')
 
@@ -173,8 +173,8 @@ class BindingEnergy(Target):
                 RMSDNrm_ = RMSD_ / self.rmsd_denom
                 w_ = self.sys_opts[sys_]['rmsd_weight'] if 'rmsd_weight' in self.sys_opts[sys_] else 1.0
                 VectorD_.append(sqrt(w_)*RMSDNrm_)
-                if not in_fd() and RMSD_ != 0.0 * angstrom:
-                    self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_ / angstrom, w_*RMSDNrm_**2)
+                if not in_fd() and RMSD_ != 0.0:
+                    self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_, w_*RMSDNrm_**2)
             VectorE_ = []
             for inter_ in self.inter_opts:
                 Calculated_ = eval(self.inter_opts[inter_]['equation'])
@@ -188,9 +188,7 @@ class BindingEnergy(Target):
                 w_ = self.inter_opts[inter_]['weight'] if 'weight' in self.inter_opts[inter_] else 1.0
                 VectorE_.append(sqrt(w_)*DeltaNrm_)
                 if not in_fd():
-                    self.PrintDict[inter_] = "% 9.3f % 9.3f % 9.3f % 12.5f" % (Calculated_ / kilocalories_per_mole, 
-                                                                                  Reference_ / kilocalories_per_mole, 
-                                                                                  Delta_ / kilocalories_per_mole, w_*DeltaNrm_**2)
+                    self.PrintDict[inter_] = "% 9.3f % 9.3f % 9.3f % 12.5f" % (Calculated_, Reference_, Delta_, w_*DeltaNrm_**2)
                 # print "%-20s" % inter_, "Calculated:", Calculated_, "Reference:", Reference_, "Delta:", Delta_, "DeltaNrm:", DeltaNrm_
             # The return value is an array of normalized interaction energy differences.
             if not in_fd():

@@ -27,7 +27,6 @@ from forcebalance.interaction import Interaction
 from forcebalance.finite_difference import in_fd
 from collections import OrderedDict
 from forcebalance.optimizer import GoodStep
-from forcebalance.unit import *
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -307,7 +306,7 @@ class TINKER(Engine):
                 warn_press_key("The 'dynamic' executable indicated by %s doesn't exist! (Check tinkerpath)" \
                                    % os.path.join(self.tinkerpath,"dynamic"))
         else:
-            warn_press_key("The 'tinkerpath' option was not specified; using default.")
+            warn_once("The 'tinkerpath' option was not specified; using default.")
             if which('mdrun') == '':
                 warn_press_key("Please add TINKER executables to the PATH or specify tinkerpath.")
             self.tinkerpath = which('dynamic')
@@ -359,9 +358,9 @@ class TINKER(Engine):
             FF.make(np.zeros(FF.np, dtype=float))
             if FF.rigid_water:
                 self.rigid = True
-            write_key_with_prm(os.path.join(self.srcdir, self.key), os.path.join("%s.key" % self.name), ffobj=FF)
+            write_key_with_prm(os.path.join(self.srcdir, self.key), "%s.key" % self.name, ffobj=FF)
         elif self.key:
-            LinkFile(os.path.join(self.srcdir, self.key), os.path.join("%s.key" % self.name), nosrcok=True)
+            LinkFile(os.path.join(self.srcdir, self.key), "%s.key" % self.name, nosrcok=True)
         else:
             raise RuntimeError('Need a .key file to continue')
         self.mol[0].write(os.path.join("%s.xyz" % self.name), ftype="tinker")
@@ -448,7 +447,7 @@ class TINKER(Engine):
                 E = [float(s[4]) * 4.184]
             elif len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
                 if self.AtomMask[i]:
-                    F += [-1 * float(i) * 4.184 * 10 for i in s[2:5]]
+                    F += [-1 * float(j) * 4.184 * 10 for j in s[2:5]]
                 i += 1
         M = np.array(E + F)
         return M
@@ -558,7 +557,7 @@ class TINKER(Engine):
             polarizability_dict = OrderedDict()
             for line in o:
                 s = line.split()
-                if "Molecular Polarizability Tensor" in line:
+                if "Total Polarizability Tensor" in line:
                     pn = ln
                 elif pn > 0 and ln == pn + 2:
                     polarizability_dict['xx'] = float(s[-3])
@@ -587,17 +586,21 @@ class TINKER(Engine):
         if optimize:
             self.optimize()
             o = self.calltinker("analyze %s.xyz_2 E" % self.name)
-            oo = self.calltinker("superpose %s.xyz %s.xyz_2 1 y u n 0" % (self.name, self.name))
-            for line in oo:
-                if "Root Mean Square Distance" in line:
-                    rmsd = float(line.split()[-1])
+            M1 = Molecule("%s.xyz" % self.name, ftype="tinker")
+            M2 = Molecule("%s.xyz_2" % self.name, ftype="tinker")
+            M1 += M2
+            rmsd = M1.ref_rmsd(0)[1]
+            # oo = self.calltinker("superpose %s.xyz %s.xyz_2 1 y u n 0" % (self.name, self.name))
+            # for line in oo:
+            #     if "Root Mean Square Distance" in line:
+            #         rmsd = float(line.split()[-1])
             os.system("rm %s.xyz_2" % self.name)
         else:
             o = self.calltinker("analyze %s.xyz E" % self.name)
         # Read the TINKER output. 
         for line in o:
             if "Total Potential Energy" in line:
-                return float(line.split()[-2].replace('D','e')) * kilocalories_per_mole, rmsd * angstrom
+                return float(line.split()[-2].replace('D','e')), rmsd
         warn_press_key("Total potential energy wasn't encountered for system %s!" % sysname)
 
     def interaction_energy(self, fraga, fragb):
