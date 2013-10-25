@@ -463,6 +463,8 @@ def diff(A, B, key):
     else:
         if type(A.Data[key]) is np.ndarray:
             return (A.Data[key] != B.Data[key]).any()
+        elif key == 'tinkersuf':
+            return [i.split() for i in A.Data[key]] != [i.split() for i in B.Data[key]]
         else:
             return A.Data[key] != B.Data[key]
 
@@ -642,7 +644,7 @@ class Molecule(object):
         for key in self.FrameKeys:
             Defined = True
             if L != -1 and len(self.Data[key]) != L:
-                raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two FrameKeys member variables.' % (key, klast))
+                self.repair(key, klast)
             L = len(self.Data[key])
             klast = key
         if not Defined:
@@ -660,7 +662,7 @@ class Molecule(object):
             for key in self.AtomKeys:
                 Defined = True
                 if L != -1 and len(self.Data[key]) != L:
-                    raise Exception('The keys %s and %s have different lengths (%i %i) - this isn\'t supposed to happen for two AtomKeys member variables.' % (key, klast, len(self.Data[key]), len(self.Data[klast])))
+                    self.repair(key, klast)
                 L = len(self.Data[key])
                 klast = key
             if Defined:
@@ -786,6 +788,22 @@ class Molecule(object):
             elif either(self, other, key):
                 raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
         return self
+
+    def repair(self, key, klast):
+        """ Attempt to repair trivial issues that would otherwise break the object. """
+        kthis = key if len(self.Data[key]) < len(self.Data[klast]) else klast
+        kother = klast if len(self.Data[key]) < len(self.Data[klast]) else key
+        diff = abs(len(self.Data[key]) - len(self.Data[klast]))
+        if kthis == 'comms':
+            # Append empty comments if necessary because this causes way too many crashes.
+            for i in range(diff): self.Data['comms'].append('')
+        elif kthis == 'boxes' and len(self.Data['boxes']) == 1:
+            # If we only have one box then we can fill in the rest of the trajectory.
+            for i in range(diff): self.Data['boxes'].append(self.Data['boxes'][-1])
+        else:
+            raise Exception('The keys %s and %s have different lengths (%i %i)'
+                            '- this isn\'t supposed to happen for two AtomKeys member variables.' \
+                                % (key, klast, len(self.Data[key]), len(self.Data[klast])))
 
     def append(self,other):
         self += other
@@ -1347,7 +1365,7 @@ class Molecule(object):
             xyzj -= xyzj.mean(0)
             tr, rt = get_rotate_translate(xyzj, xyzi)
             xyzj = np.dot(xyzj, rt) + tr
-            rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+            rmsd = np.sqrt(3*np.mean((xyzj - xyzi) ** 2))
             Vec[j] = rmsd
         return Vec
 

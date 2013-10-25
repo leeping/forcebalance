@@ -38,6 +38,7 @@ class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
         self.logger.debug("Setting up Interaction_TINKER target\n")
         self.target = forcebalance.tinkerio.Interaction_TINKER(self.options, self.tgt_opt, self.ff)
         self.addCleanup(os.system, 'rm -rf temp')
+
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""
         return super(TestInteraction_TINKER,self).shortDescription() + " (Interaction_TINKER)"

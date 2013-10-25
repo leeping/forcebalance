@@ -12,6 +12,7 @@ class TargetTests(object):
         self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
         self.options.update({'root': os.getcwd() + '/test/files'})
+        print os.getcwd(), self.options['root']
 
         os.chdir(self.options['root'])
 
