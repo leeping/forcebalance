@@ -75,19 +75,23 @@ def get_multipoles(simulation,q=None,positions=None):
             # Get array of positions in nanometers.
             if positions == None:
                 positions = simulation.context.getState(getPositions=True).getPositions()
+            mass = np.array([simulation.context.getSystem().getParticleMass(i).value_in_unit(dalton) \
+                                 for i in range(simulation.context.getSystem().getNumParticles())])
             x = np.array(positions.value_in_unit(nanometer))
+            com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
+            x -= com
             xx, xy, xz, yy, yz, zz = (x[:,i]*x[:,j] for i, j in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
             # Multiply charges by positions to get dipole moment.
             dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
             dx += dip[0]
             dy += dip[1]
             dz += dip[2]
-            qxx += enm_debye * 10 * np.sum(q*xx)
-            qxy += enm_debye * 10 * np.sum(q*xy)
-            qxz += enm_debye * 10 * np.sum(q*xz)
-            qyy += enm_debye * 10 * np.sum(q*yy)
-            qyz += enm_debye * 10 * np.sum(q*yz)
-            qzz += enm_debye * 10 * np.sum(q*zz)
+            qxx += enm_debye * 15 * np.sum(q*xx)
+            qxy += enm_debye * 15 * np.sum(q*xy)
+            qxz += enm_debye * 15 * np.sum(q*xz)
+            qyy += enm_debye * 15 * np.sum(q*yy)
+            qyz += enm_debye * 15 * np.sum(q*yz)
+            qzz += enm_debye * 15 * np.sum(q*zz)
             tr = qxx+qyy+qzz
             qxx -= tr/3
             qyy -= tr/3
@@ -473,20 +477,20 @@ class OpenMM(Engine):
         if self.precision not in valprecs:
             raise RuntimeError("Please specify one of %s for precision" % valprecs)
         ## Set the simulation platform
-        logger.info("Setting Platform to %s\n" % self.platname)
+        if self.verbose: logger.info("Setting Platform to %s\n" % self.platname)
         self.platform = Platform.getPlatformByName(self.platname)
         if self.platname == 'CUDA':
             ## Set the device to the environment variable or zero otherwise
             device = os.environ.get('CUDA_DEVICE',"0")
-            logger.info("Setting CUDA Device to %s\n" % device)
+            if self.verbose: logger.info("Setting CUDA Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
-            logger.info("Setting CUDA Precision to %s\n" % self.precision)
+            if self.verbose: logger.info("Setting CUDA Precision to %s\n" % self.precision)
             self.platform.setPropertyDefaultValue("CudaPrecision", self.precision)
         elif self.platname == 'OPENCL':
             device = os.environ.get('OPENCL_DEVICE',"0")
-            logger.info("Setting OpenCL Device to %s\n" % device)
+            if self.verbose: logger.info("Setting OpenCL Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
-            logger.info("Setting OpenCL Precision to %s\n" % self.precision)
+            if self.verbose: logger.info("Setting OpenCL Precision to %s\n" % self.precision)
             self.platform.setPropertyDefaultValue("OpenCLPrecision", self.precision)
 
     def readsrc(self, **kwargs):
@@ -627,13 +631,14 @@ class OpenMM(Engine):
     def energy(self):
         return self.energy_force(force=False).flatten()
 
-    def normal_modes(self, optimize=True):
-        raise NotImplementedError
+    def normal_modes(self, shot=0, optimize=True):
+        raise NotImplementedError("OpenMM cannot do normal mode analysis")
 
-    def optimize(self, crit=1e-4):
+    def optimize(self, shot=0, crit=1e-4):
 
         """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD. """
 
+        self.set_positions(shot)
         # Get the previous geometry.
         X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
         # Minimize the energy.
@@ -653,19 +658,18 @@ class OpenMM(Engine):
         self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
         return E, M.ref_rmsd(0)[1]
 
-    def multipole_moments(self, optimize=True, polarizability=False):
+    def multipole_moments(self, shot=0, optimize=True, polarizability=False):
 
-        """ Return the system multipole moments, optionally optimizing the geometry first. """
+        """ Return the multipole moments of the i-th snapshot in Debye and Buckingham units. """
 
-        system = self.update_simulation()
-        self.set_positions()
+        self.update_simulation()
 
         if polarizability:
-            raise NotImplementedError
+            raise NotImplementedError("Polarizability calculation is available in TINKER only.")
 
-        rmsd = 0.0
+        if optimize: self.optimize(shot)
+        else: self.set_positions(shot)
 
-        if optimize: self.optimize()
         moments = get_multipoles(self.simulation)
         
         dipole_dict = OrderedDict(zip(['x','y','z'], moments[:3]))
@@ -675,17 +679,19 @@ class OpenMM(Engine):
 
         return calc_moments
 
-    def energy_rmsd(self, optimize=True):
+    def energy_rmsd(self, shot=0, optimize=True):
 
         """ Calculate energy of the 1st structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
 
-        system = self.update_simulation()
-        self.set_positions()
+        self.update_simulation()
+
         rmsd = 0.0
         if optimize: 
-            E, rmsd = self.optimize()
+            E, rmsd = self.optimize(shot)
         else:
+            self.set_positions(shot)
             E = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilocalories_per_mole)
+
         return E, rmsd
 
     def interaction_energy(self, fraga, fragb):

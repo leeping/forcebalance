@@ -785,7 +785,7 @@ def MissingFileInspection(fnm):
     return answer
 
 def LinkFile(src, dest, nosrcok = False):
-    if src == dest: return
+    if os.path.abspath(src) == os.path.abspath(dest): return
     if os.path.exists(src):
         if os.path.exists(dest):
             if os.path.islink(dest): pass

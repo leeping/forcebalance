@@ -230,6 +230,7 @@ class Liquid(Target):
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            os.unlink(self.liquid_fnm)
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
             if self.liquid_mol != None:
                 self.liquid_conf.xyzs[0] = self.liquid_mol.xyzs[simnum%len(self.liquid_mol)]

@@ -412,21 +412,33 @@ class TINKER(Engine):
         gs = nx.connected_component_subgraphs(G)
         tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
         self.AtomLists['MoleculeNumber'] = [[i+1 in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
+        # Delete force field files.
+        if hasattr(self,'target'):
+            for f in FF.fnms:
+                os.unlink(f)
 
-    def optimize(self, crit=1e-4):
+    def optimize(self, shot=0, method="newton", crit=1e-4):
 
         """ Optimize the geometry and align the optimized geometry to the starting geometry. """
 
         if os.path.exists('%s.xyz_2' % self.name):
-            raise RuntimeError("Presence of %s.xyz_2 will ruin the workflow!" % self.name)
-        if self.rigid:
-            o = self.calltinker("optrigid %s.xyz %f" % (self.name, crit))
-        else:
-            o = self.calltinker("optimize %s.xyz %f" % (self.name, crit))
+            os.unlink('%s.xyz_2' % self.name)
+
+        self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
+
+        if method == "newton":
+            if self.rigid: optprog = "optrigid"
+            else: optprog = "optimize"
+        elif method == "bfgs":
+            if self.rigid: optprog = "minrigid"
+            else: optprog = "minimize"
+
+        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
         # Silently align the optimized geometry.
         M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
         M12.align(center=False)
         M12[1].write("%s.xyz_2" % self.name, ftype="tinker")
+        M12[1].write("%s-opt.xyz" % self.name, ftype="tinker")
         rmsd = M12.ref_rmsd(0)[1]
         cnvgd = 0
         mode = 0
@@ -434,6 +446,7 @@ class TINKER(Engine):
             s = line.split()
             if len(s) == 0: continue
             if "Optimally Conditioned Variable Metric Optimization" in line: mode = 1
+            if "Limited Memory BFGS Quasi-Newton Optimization" in line: mode = 1
             if mode == 1 and isint(s[0]): mode = 2
             if mode == 2:
                 if isint(s[0]): E = float(s[1])
@@ -441,8 +454,9 @@ class TINKER(Engine):
             if "Normal Termination" in line:
                 cnvgd = 1
         if not cnvgd:
-            logger.info(str(o) + '\n')
-            logger.info("The system %s did not converge in the geometry optimization - printout is above.\n" % sysname)
+            for line in o:
+                logger.info(str(line) + '\n')
+            logger.info("The minimization did not converge in the geometry optimization - printout is above.\n")
         return E, rmsd
 
     def energy_force_one(self, shot):
@@ -499,13 +513,14 @@ class TINKER(Engine):
             M.append(self.energy_force_one(i))
         return np.array(M)
 
-    def normal_modes(self, optimize=True):
+    def normal_modes(self, shot=0, optimize=True):
         # This line actually runs TINKER
         if optimize:
-            self.optimize(crit=1e-6)
+            self.optimize(shot, crit=1e-6)
             o = self.calltinker("vibrate %s.xyz_2 a" % (self.name))
         else:
-            warn_press_key("Asking for normal modes without geometry optimization?")
+            warn_once("Asking for normal modes without geometry optimization?")
+            self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
             o = self.calltinker("vibrate %s.xyz a" % (self.name))
         # Read the TINKER output.  The vibrational frequencies are ordered.
         # The six modes with frequencies closest to zero are ignored
@@ -534,12 +549,16 @@ class TINKER(Engine):
         os.system("rm -rf *.xyz_* *.[0-9][0-9][0-9]")
         return calc_eigvals, calc_eigvecs
 
-    def multipole_moments(self, optimize=True, polarizability=True):
+    def multipole_moments(self, shot=0, optimize=True, polarizability=False):
+
+        """ Return the multipole moments of the 1st snapshot in Debye and Buckingham units. """
+        
         # This line actually runs TINKER
         if optimize:
-            self.optimize(crit=1e-6)
+            self.optimize(shot, crit=1e-6)
             o = self.calltinker("analyze %s.xyz_2 M" % (self.name))
         else:
+            self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
             o = self.calltinker("analyze %s.xyz M" % (self.name))
         # Read the TINKER output.
         qn = -1
@@ -592,15 +611,15 @@ class TINKER(Engine):
         os.system("rm -rf *.xyz_* *.[0-9][0-9][0-9]")
         return calc_moments
 
-    def energy_rmsd(self, optimize=True):
+    def energy_rmsd(self, shot=0, optimize=True):
 
-        """ Calculate energy of the 1st structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
+        """ Calculate energy of the selected structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
 
         rmsd = 0.0
         # This line actually runs TINKER
         # xyzfnm = sysname+".xyz"
         if optimize:
-            E_, rmsd = self.optimize()
+            E_, rmsd = self.optimize(shot)
             o = self.calltinker("analyze %s.xyz_2 E" % self.name)
             #----
             # Two equivalent ways to get the RMSD, here for reference.

@@ -55,6 +55,7 @@ class ForceBalanceTestCase(unittest.TestCase):
                     if j==4: reason += "\n[...]"
                     continue
                 else: reason += "\nA[%s]\t%s =! %s\tB[%s]" % (index[0],A[index[0]],B[index[0]],index[0])
+            reason += '\n'
             if self.longMessage and msg:
                 reason += msg
             raise self.failureException(reason)
