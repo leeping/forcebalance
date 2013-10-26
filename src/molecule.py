@@ -342,12 +342,14 @@ def format_xyz_coord(element,xyz,tinker=False):
 
     """
     if tinker:
-        return "%-3s % 11.6f % 11.6f % 11.6f" % (element,xyz[0],xyz[1],xyz[2])
+        return "%-3s % 13.8f % 13.8f % 13.8f" % (element,xyz[0],xyz[1],xyz[2])
     else:
         return "%-5s % 15.10f % 15.10f % 15.10f" % (element,xyz[0],xyz[1],xyz[2])
 
 def format_gro_coord(resid, resname, aname, seqno, xyz):
     """ Print a line in accordance with .gro file format, with six decimal points of precision
+
+    Nine decimal points of precision are necessary to get forces below 1e-3 kJ/mol/nm.
 
     @param[in] resid The number of the residue that the atom belongs to
     @param[in] resname The name of the residue that the atom belongs to
@@ -356,7 +358,7 @@ def format_gro_coord(resid, resname, aname, seqno, xyz):
     @param[in] xyz A 3-element array containing x, y, z coordinates of that atom
     
     """
-    return "%5i%-5s%5s%5i % 10.6f % 10.6f % 10.6f" % (resid,resname,aname,seqno,xyz[0],xyz[1],xyz[2])
+    return "%5i%-5s%5s%5i % 13.9f % 13.9f % 13.9f" % (resid,resname,aname,seqno,xyz[0],xyz[1],xyz[2])
 
 def format_xyzgen_coord(element,xyzgen):
     """ Print a line consisting of (element, p, q, r, s, t, ...) where
@@ -376,9 +378,9 @@ def format_gro_box(box):
     
     """
     if box.alpha == 90.0 and box.beta == 90.0 and box.gamma == 90.0:
-        return ' '.join(["% 10.6f" % (i/10) for i in [box.a, box.b, box.c]])
+        return ' '.join(["% 13.9f" % (i/10) for i in [box.a, box.b, box.c]])
     else:
-        return ' '.join(["% 10.6f" % (i/10) for i in [box.A[0], box.B[1], box.C[2], box.A[1], box.A[2], box.B[0], box.B[2], box.C[0], box.C[1]]])
+        return ' '.join(["% 13.9f" % (i/10) for i in [box.A[0], box.B[1], box.C[2], box.A[1], box.A[2], box.B[0], box.B[2], box.C[0], box.C[1]]])
 
 def is_gro_coord(line):
     """ Determines whether a line contains GROMACS data or not
@@ -464,7 +466,8 @@ def diff(A, B, key):
         if type(A.Data[key]) is np.ndarray:
             return (A.Data[key] != B.Data[key]).any()
         elif key == 'tinkersuf':
-            return [i.split() for i in A.Data[key]] != [i.split() for i in B.Data[key]]
+            return [sorted([int(j) for j in i.split()]) for i in A.Data[key]] != \
+                [sorted([int(j) for j in i.split()]) for i in B.Data[key]]
         else:
             return A.Data[key] != B.Data[key]
 
@@ -748,6 +751,8 @@ class Molecule(object):
             if key == 'fnm' or key == 'ftype' and key in self.Data:
                 Sum.Data[key] = self.Data[key]
             elif diff(self, other, key):
+                for i, j in zip(self.Data[key], other.Data[key]):
+                    print i, j, i==j
                 raise Exception('The data member called %s is not the same for these two objects' % key)
             elif key in self.Data:
                 Sum.Data[key] = copy.deepcopy(self.Data[key])
@@ -773,6 +778,8 @@ class Molecule(object):
         for key in AtomVariableNames | MetaVariableNames:
             if key == 'fnm' or key == 'ftype': pass
             elif diff(self, other, key):
+                for i, j in zip(self.Data[key], other.Data[key]):
+                    print i, j, i==j
                 raise Exception('The data member called %s is not the same for these two objects' % key)
             # Information from the other class is added to this class (if said info doesn't exist.)
             elif key in other.Data:
@@ -1096,6 +1103,8 @@ class Molecule(object):
                     if len(s) > 1:
                         for i in range(1,len(s)):
                             s[i] = str(Map[int(s[i])])
+                    sn = [int(i) for i in s[1:]]
+                    s = [s[0]] + list(np.array(s[1:])[np.argsort(sn)])
                     NewSuf.append(''.join([whites[j]+s[j] for j in range(len(s))]))
                 New.Data['tinkersuf'] = NewSuf[:]
             else:
@@ -1154,18 +1163,19 @@ class Molecule(object):
         return New
 
     def align_by_moments(self):
-        """ Align molecules using the "moment of inertia."
-        Note that we're following the MSMBuilder convention 
-        of using all ones for the masses. """
+        """ Align molecules using the moment of inertia.  
+        Departs from MSMBuilder convention of 
+        using arithmetic mean for mass. """
+        coms  = self.center_of_mass()
         xyz1  = self.xyzs[0]
-        xyz1 -= xyz1.mean(0)
+        xyz1 -= coms[0]
         xyz1  = AlignToMoments(self.elem,xyz1)
         for index2, xyz2 in enumerate(self.xyzs):
-            xyz2 -= xyz2.mean(0)
+            xyz2 -= coms[index2]
             xyz2 = AlignToMoments(self.elem,xyz1,xyz2)
             self.xyzs[index2] = xyz2
 
-    def align(self, smooth = False, center = True, select=None):
+    def align(self, smooth = False, center = True, center_mass = False, select=None):
         """ Align molecules. 
         
         Has the option to create smooth trajectories 
@@ -1179,10 +1189,15 @@ class Molecule(object):
         """
         if isinstance(select, list):
             select = np.array(select)
+        if center and center_mass:
+            raise Exception('Specify center=True or center_mass=True but set the other one to False')
 
+        coms = self.center_of_mass()
         xyz1 = self.xyzs[0]
         if center:
             xyz1 -= xyz1.mean(0)
+        elif center_mass:
+            xyz1 = coms[0]
         for index2, xyz2 in enumerate(self.xyzs):
             if index2 == 0: continue
             xyz2 -= xyz2.mean(0)
@@ -1700,7 +1715,11 @@ class Molecule(object):
                         resid.append(thisresid)
                         whites      = re.split('[^ ]+',line)
                         if len(sline) > 5:
-                            tinkersuf.append(''.join([whites[j]+sline[j] for j in range(5,len(sline))]))
+                            s = sline[5:]
+                            if len(s) > 1:
+                                sn = [int(i) for i in s[1:]]
+                                s = [s[0]] + list(np.array(s[1:])[np.argsort(sn)])
+                            tinkersuf.append(''.join([whites[j]+s[j-5] for j in range(5,len(sline))]))
                         else:
                             tinkersuf.append('')
                     # LPW Make sure ..

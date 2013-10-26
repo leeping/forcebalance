@@ -21,6 +21,7 @@ from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
 from collections import OrderedDict
+import traceback
 #import IPython
 
 from forcebalance.output import getLogger
@@ -536,8 +537,8 @@ class GMX(Engine):
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
         ## Link files into the temp directory because it's good for reproducibility.
-        LinkFile(os.path.join(self.srcdir, self.mdp), self.mdp, nosrcok=True)
-        LinkFile(os.path.join(self.srcdir, self.top), self.top, nosrcok=True)
+        LinkFile(os.path.join(self.srcdir, self.mdp), "%s.mdp" % self.name, nosrcok=True)
+        LinkFile(os.path.join(self.srcdir, self.top), "%s.top" % self.name, nosrcok=True)
 
         ## Write the appropriate coordinate files.
         if hasattr(self,'target'):
@@ -554,7 +555,13 @@ class GMX(Engine):
         self.mol[0].write("%s.gro" % self.name)
 
         ## Call grompp followed by gmxdump to read the trajectory
-        self.callgmx("grompp -c %s.gro -p %s -f %s -o %s.tpr" % (self.name, self.top, self.mdp, self.name))
+        o = self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name), copy_stderr=True)
+        double = 0
+        for line in o:
+            if 'double precision' in line:
+                double = 1
+        if not double:
+            warn_once("Single-precision GROMACS detected - recommend that you use double precision build.")
         o = self.callgmx("gmxdump -s %s.tpr -sys" % self.name, copy_stderr=True)
         self.AtomMask = []
         self.AtomLists = defaultdict(list)
@@ -562,15 +569,18 @@ class GMX(Engine):
 
         ## Here we recognize the residues and charge groups.
         for line in o:
+            line = line.replace("=", "= ")
             if "ptype=" in line:
                 s = line.split()
                 ptype = s[s.index("ptype=")+1].replace(',','').lower()
                 resind = int(s[s.index("resind=")+1].replace(',','').lower())
                 mass = float(s[s.index("m=")+1].replace(',','').lower())
+                charge = float(s[s.index("q=")+1].replace(',','').lower())
                 # Gather data for residue number.
                 self.AtomMask.append(ptype=='atom')
                 self.AtomLists['ResidueNumber'].append(resind)
                 self.AtomLists['ParticleType'].append(ptype_dict[ptype])
+                self.AtomLists['Charge'].append(charge)
                 self.AtomLists['Mass'].append(mass)
             if "cgs[" in line:
                 ai = [int(i) for i in line.split("{")[1].split("}")[0].split("..")]
@@ -582,6 +592,10 @@ class GMX(Engine):
                 for i in range(ai[1]-ai[0]+1) : self.AtomLists['MoleculeNumber'].append(mn)
         os.unlink('mdout.mdp')
         os.unlink('%s.tpr' % self.name)
+        # Delete force field files.
+        if hasattr(self, 'target'):
+            for f in FF.fnms:
+                os.unlink(f)
 
     def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
         """ Call GROMACS; prepend the gmxpath to the call to the GROMACS program. """
@@ -591,7 +605,7 @@ class GMX(Engine):
         ## Call a GROMACS program as you would from the command line.
         csplit = command.split()
         prog = os.path.join(self.gmxpath, csplit[0])
-        csplit[0] = prog
+        csplit[0] = prog + self.gmxsuffix
         return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
 
     def energy_termnames(self):
@@ -619,6 +633,30 @@ class GMX(Engine):
                     except: pass
         return energyterms
 
+    def optimize(self, shot=0, crit=1e-4):
+        
+        """ Optimize the geometry and align the optimized geometry to the starting geometry. """
+
+        ## Write the correct conformation.
+        self.mol[shot].write("%s.gro" % self.name)
+
+        # Arguments for running minimization.
+        min_opts = {"integrator" : "l-bfgs", "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
+        edit_mdp("%s.mdp" % self.name, "%s-min.mdp" % self.name, dict(min_opts))
+
+        self.callgmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
+        self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
+        self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
+        self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
+        
+        E = float(open("%s-min-e.xvg" % self.name).readlines()[-1].split()[1])
+        M = Molecule("%s.gro" % self.name) + Molecule("%s-min.gro" % self.name)
+        M.align(center=False)
+        rmsd = M.ref_rmsd(0)[1]
+        M[1].write("%s-min.gro" % self.name)
+
+        return E / 4.184, rmsd
+
     def energy_force_one(self, shot):
 
         """ Computes the energy and force using GROMACS for a single snapshot. """
@@ -627,20 +665,20 @@ class GMX(Engine):
             force = self.target.force
 
         ## Write the correct conformation.
-        self.mol.write('%s.gro',select=[shot])
+        self.mol[shot].write("%s.gro" % self.name)
 
         ## Call grompp followed by mdrun.
-        self.callgmx("grompp -c %s.gro -p %s -f %s -o %s.tpr" % (self.name, self.top, self.mdp, self.name))
+        self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite" % self.name)
 
         ## Gather information
-        self.callgmx("g_energy -xvg no -f %s.edr -o %s-energy.xvg" % (self.name, self.name), stdin='Potential')
-        E = [float(open("%s-energy.xvg" % self.name).readlines()[0].split()[1])]
+        self.callgmx("g_energy -xvg no -f %s.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
+        E = [float(open("%s-e.xvg" % self.name).readlines()[0].split()[1])]
         F = []
         if force:
             ## When we read in the force, make sure that we only read in the forces on real atoms.
-            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-force.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-            F = [float(j) for i, j in enumerate(open("%s-force.xvg" % self.name).readlines()[0].split()[1:]) if self.AtomMask[i/3]]
+            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
+            F = [float(j) for i, j in enumerate(open("%s-f.xvg" % self.name).readlines()[0].split()[1:]) if self.AtomMask[i/3]]
         M = array(E + F)
         return M
 
@@ -652,16 +690,16 @@ class GMX(Engine):
             force = self.target.force
 
         ## Call grompp followed by mdrun.
-        self.callgmx("grompp -c %s.gro -p %s -f %s -o %s.tpr" % (self.name, self.top, self.mdp, self.name))
+        self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
 
         ## Gather information
-        self.callgmx("g_energy -xvg no -f %s.edr -o %s-energy.xvg" % (self.name, self.name), stdin='Potential')
-        Efile = open("%s-energy.xvg" % self.name).readlines()
+        self.callgmx("g_energy -xvg no -f %s.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
+        Efile = open("%s-e.xvg" % self.name).readlines()
         if force:
             M = []
-            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-force.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-            Ffile = open("%s-force.xvg" % self.name).readlines()
+            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
+            Ffile = open("%s-f.xvg" % self.name).readlines()
             # Loop through the snapshots
             for Eline, Fline in zip(Efile, Ffile):
                 # Compute the potential energy and append to list
@@ -674,6 +712,20 @@ class GMX(Engine):
             M = array([float(Eline.split()[1]) for Eline in Efile]).reshape(-1,1)
         return M
 
+    def energy_rmsd(self, shot, optimize=True):
+
+        """ Calculate energy of the 1st structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
+
+        if optimize: 
+            return self.optimize(shot)
+        else:
+            self.mol[shot].write("%s.gro" % self.name)
+            self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s-1.tpr" % (self.name, self.name, self.name, self.name))
+            self.callgmx("mdrun -deffnm %s-1 -nt 1 -rerunvsite" % (self.name, self.name))
+            self.callgmx("g_energy -xvg no -f %s-1.edr -o %s-1-e.xvg" % (self.name, self.name), stdin='Potential')
+            E = float(open("%s-1-e.xvg" % self.name).readlines()[0].split()[1])
+            return E, 0.0
+
     def interaction_energy(self, fraga, fragb):
 
         """ Computes the interaction energy between two fragments over a trajectory. """
@@ -682,36 +734,118 @@ class GMX(Engine):
         edit_ndx(None,'%s.ndx' % self.name, OrderedDict([('A',[i+1 for i in fraga]),('B',[i+1 for i in fragb])]))
 
         ## .mdp files for fully interacting and interaction-excluded systems.
-        imdp = '%s-i.mdp' % os.path.splitext(self.mdp)[0]
-        edit_mdp(self.mdp, imdp, {'xtc_grps':'A B', 'energygrps':'A B'})
-        xmdp = '%s-x.mdp' % os.path.splitext(self.mdp)[0]
-        edit_mdp(self.mdp, xmdp, {'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'})
+        edit_mdp('%s.mdp' % self.name, '%s-i.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B'})
+        edit_mdp('%s.mdp' % self.name, '%s-x.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'})
 
         ## Call grompp followed by mdrun for interacting system.
-        self.callgmx("grompp -c %s.gro -p %s -f %s -n %s.ndx -o %s-i.tpr" % (self.name, self.top, imdp, self.name, self.name))
+        self.callgmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
+                         (self.name, self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-i -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
-        self.callgmx("g_energy -f %s-i.edr -o %s-i-energy.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
+        self.callgmx("g_energy -f %s-i.edr -o %s-i-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
         I = []
-        for line in open('%s-i-energy.xvg' % self.name):
+        for line in open('%s-i-e.xvg' % self.name):
             I.append(sum([float(i) for i in line.split()[1:]]))
         I = array(I)
 
         ## Call grompp followed by mdrun for noninteracting system.
-        self.callgmx("grompp -c %s.gro -p %s -f %s -n %s.ndx -o %s-x.tpr" % (self.name, self.top, xmdp, self.name, self.name))
+        self.callgmx("grompp -c %s.gro -p %s.top -f %s-x.mdp -n %s.ndx -o %s-x.tpr" % \
+                         (self.name, self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-x -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
-        self.callgmx("g_energy -f %s-x.edr -o %s-x-energy.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
+        self.callgmx("g_energy -f %s-x.edr -o %s-x-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
         X = []
-        for line in open('%s-x-energy.xvg' % self.name):
+        for line in open('%s-x-e.xvg' % self.name):
             X.append(sum([float(i) for i in line.split()[1:]]))
         X = array(X)
 
-        return I - X
+        return (I - X) / 4.184 # kcal/mol
+
+    def multipole_moments(self, shot=0, optimize=True, polarizability=False):
+        
+        """ Return the multipole moments of the 1st snapshot in Debye and Buckingham units. """
+        
+        if polarizability:
+            raise NotImplementedError
+
+        if optimize: 
+            self.optimize(shot)
+            M = Molecule("%s-min.gro" % self.name)
+        else:
+            self.mol[shot].write("%s.gro" % self.name)
+            M = Molecule("%s.gro" % self.name)
+        
+        #-----
+        # g_dipoles uses a different reference point compared to TINKER
+        #-----
+        # self.callgmx("g_dipoles -s %s-d.tpr -f %s-d.gro -o %s-d.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
+        # Dips = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-d.xvg" % self.name)])[0]
+        #-----
+        
+        ea_debye = 4.803204255928332 # Conversion factor from e*nm to Debye
+        q = np.array(self.AtomLists['Charge'])
+        x = M.xyzs[0] - M.center_of_mass()[0]
+
+        xx, xy, xz, yy, yz, zz = (x[:,i]*x[:,j] for i, j in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
+        # Multiply charges by positions to get dipole moment.
+        dip = ea_debye * np.sum(x*q.reshape(-1,1),axis=0)
+        dx = dip[0]
+        dy = dip[1]
+        dz = dip[2]
+        qxx = 1.5 * ea_debye * np.sum(q*xx)
+        qxy = 1.5 * ea_debye * np.sum(q*xy)
+        qxz = 1.5 * ea_debye * np.sum(q*xz)
+        qyy = 1.5 * ea_debye * np.sum(q*yy)
+        qyz = 1.5 * ea_debye * np.sum(q*yz)
+        qzz = 1.5 * ea_debye * np.sum(q*zz)
+        tr = qxx+qyy+qzz
+        qxx -= tr/3
+        qyy -= tr/3
+        qzz -= tr/3
+
+        moments = [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
+        dipole_dict = OrderedDict(zip(['x','y','z'], moments[:3]))
+        quadrupole_dict = OrderedDict(zip(['xx','xy','yy','xz','yz','zz'], moments[3:10]))
+        calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
+        # This ordering has to do with the way TINKER prints it out.
+        return calc_moments
+
+    def normal_modes(self, shot=0, optimize=True):
+
+        edit_mdp('%s.mdp' % self.name, '%s-nm.mdp' % self.name, {'integrator':'nm'})
+
+        if optimize:
+            self.optimize(shot)
+            self.callgmx("grompp -c %s-min.gro -p %s.top -f %s-nm.mdp -o %s-nm.tpr" % (self.name, self.name, self.name, self.name))
+        else:
+            warn_once("Asking for normal modes without geometry optimization?")
+            self.mol[shot].write("%s.gro" % self.name)
+            self.callgmx("grompp -c %s.gro -p %s.top -f %s-nm.mdp -o %s-nm.tpr" % (self.name, self.name, self.name, self.name))
+
+        self.callgmx("mdrun -deffnm %s-nm -mtx %s-nm.mtx -v" % (self.name, self.name))
+        self.callgmx("g_nmeig -s %s-nm.tpr -f %s-nm.mtx -of %s-nm.xvg -v %s-nm.trr -last 10000 -xvg no" % \
+                         (self.name, self.name, self.name, self.name))
+        self.callgmx("trjconv -s %s-nm.tpr -f %s-nm.trr -o %s-nm.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
+        NM = Molecule("%s-nm.gro" % self.name, build_topology=False)
+        
+        calc_eigvals = np.array([float(line.split()[1]) for line in open("%s-nm.xvg" % self.name).readlines()])
+        calc_eigvecs = NM.xyzs[1:]
+        # Copied from tinkerio.py code
+        calc_eigvals = np.array(calc_eigvals)
+        calc_eigvecs = np.array(calc_eigvecs)
+        # Sort by frequency absolute value and discard the six that are closest to zero
+        calc_eigvecs = calc_eigvecs[np.argsort(np.abs(calc_eigvals))][6:]
+        calc_eigvals = calc_eigvals[np.argsort(np.abs(calc_eigvals))][6:]
+        # Sort again by frequency
+        calc_eigvecs = calc_eigvecs[np.argsort(calc_eigvals)]
+        calc_eigvals = calc_eigvals[np.argsort(calc_eigvals)]
+        for i in range(len(calc_eigvecs)):
+            calc_eigvecs[i] /= np.linalg.norm(calc_eigvecs[i])
+        return calc_eigvals, calc_eigvecs
 
     def generate_vsite_positions(self):
         ## Call grompp followed by mdrun.
-        self.callgmx("grompp -c %s.gro -p %s -f %s -o %s.tpr" % (self.name, self.top, self.mdp, self.name))
+        self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
-        self.callgmx("trjconv -f %s.trr -o %s-out.gro -ndec 6 -novel -noforce" % (self.name, self.name), stdin='System')
+        self.callgmx("trjconv -f %s.trr -o %s-out.gro -ndec 9 -novel -noforce" % (self.name, self.name), stdin='System')
         NewMol = Molecule("%s-out.gro" % self.name)
         return NewMol.xyzs
 
