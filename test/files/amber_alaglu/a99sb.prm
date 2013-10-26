@@ -15,7 +15,10 @@ radiussize              RADIUS
 epsilonrule             GEOMETRIC
 vdw-14-scale            2.0
 chg-14-scale            1.2
-electric                332.0522173
+# electric                332.0522173
+# LPW Modified to make electrostatic energies agree with GMX and OpenMM exactly
+# Original TINKER values might be more correct. TINKER is just easier to tweak.
+electric                332.0638391
 dielectric              1.0
 
 
@@ -176,57 +179,6 @@ angle         1   14    2      50.00     121.90
 angle         1   14   29      50.00     118.04
 angle         2   14   29      50.00     120.00
 angle        29   14   29      35.00     120.00
-
-
-      #####################################
-      ##                                 ##
-      ##  Improper Torsional Parameters  ##
-      ##                                 ##
-      #####################################
-
-
-imptors       1   14    2   24           10.500  180.0  2
-imptors       4   15    2   24           10.500  180.0  2
-imptors       9   15    2   24           10.500  180.0  2
-imptors      18   15    2   24           10.500  180.0  2
-imptors       1   25    2   25           10.500  180.0  2
-imptors       3    3    3    1            1.100  180.0  2
-imptors       3    3    3   22            1.100  180.0  2
-imptors       3    3    3   33            1.100  180.0  2
-imptors      11    3    3   33            1.100  180.0  2
-imptors      17    4    3   19            1.100  180.0  2
-imptors       3    9    3   33            1.100  180.0  2
-imptors       9   17    3   19            1.100  180.0  2
-imptors      15   17    3   19            1.100  180.0  2
-imptors      19   19    3   19           10.500  180.0  2
-imptors       4    3    4   33            1.100  180.0  2
-imptors       2    4    4    1            1.100  180.0  2
-imptors       2    4    4   33            1.100  180.0  2
-imptors      18    4    4   39            1.100  180.0  2
-imptors      15    6    5    1            1.100  180.0  2
-imptors      15    7    5    1            1.100  180.0  2
-imptors      16    7    5    1            1.100  180.0  2
-imptors       5   16    6   39            1.100  180.0  2
-imptors       5   15    7   39            1.100  180.0  2
-imptors      10   15    7   39            1.100  180.0  2
-imptors      15   15    8   40            1.100  180.0  2
-imptors      16   15    8   40            1.100  180.0  2
-imptors      15   16    8   40            1.100  180.0  2
-imptors       7    9   10    1            1.100  180.0  2
-imptors      16   18   12   40            1.100  180.0  2
-imptors      17   17   13   40            1.100  180.0  2
-imptors       2    1   14    1            1.000  180.0  2
-imptors       2    1   14   29            1.000  180.0  2
-imptors       2   29   14   29            1.000  180.0  2
-imptors       2    2   15   29            1.000  180.0  2
-imptors       2    3   15   29            1.000  180.0  2
-imptors       8    7   15   29            1.000  180.0  2
-imptors       5    8   15   29            1.000  180.0  2
-imptors       7   11   15   29            1.000  180.0  2
-imptors       4    2   18    1            1.000  180.0  2
-imptors      12    9   18    1            1.000  180.0  2
-imptors       1    3   19   29            1.000  180.0  2
-imptors       3   29   19   29            1.000  180.0  2
 
 
       ############################

@@ -16,7 +16,7 @@
 ;
 
 ; Include forcefield parameters
-#include "amber99sb.ff/forcefield.itp"
+#include "a99sb.itp"
 
 ; Include chain topologies
 #include "AceAlaNme.itp"

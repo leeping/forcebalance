@@ -7361,44 +7361,6 @@
   <Proper class1="" class2="C" class3="CB" class4="" periodicity1="2" phase1="3.14159265359" k1="12.552"/>
   <Proper class1="" class2="C" class3="CA" class4="" periodicity1="2" phase1="3.14159265359" k1="15.167"/>
   <Proper class1="" class2="C" class3="C" class4="" periodicity1="2" phase1="3.14159265359" k1="15.167"/>
-  <Improper class1="N" class2="C" class3="CT" class4="O" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="N" class2="C" class3="CT" class4="H" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="C" class2="CM" class3="H4" class4="O" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CA" class2="Br" class3="CA" class4="CA" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CM" class2="CM" class3="CT" class4="HA" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="C" class2="H5" class3="O" class4="OS" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="C" class2="H5" class3="O" class4="OH" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CA" class2="CA" class3="CA" class4="OH" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="C" class2="CA" class3="CA" class4="OH" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CA" class2="N2" class3="NA" class4="NC" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CA" class2="CB" class3="N2" class4="NC" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CA" class2="CM" class3="N2" class4="NC" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CM" class2="C" class3="CM" class4="CT" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CA" class2="CA" class3="CA" class4="CT" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="C*" class2="CB" class3="CT" class4="CW" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CC" class2="CT" class3="CW" class4="NA" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CC" class2="CT" class3="CW" class4="NB" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CC" class2="CT" class3="CV" class4="NA" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="C" class2="CT" class3="O" class4="OH" periodicity1="2" phase1="3.14159265359" k1="43.932"/>
-  <Improper class1="N*" class2="C" class3="CM" class4="CT" periodicity1="2" phase1="3.14159265359" k1="4.184"/>
-  <Improper class1="N*" class2="CB" class3="CK" class4="CT" periodicity1="2" phase1="3.14159265359" k1="4.184"/>
-  <Improper class1="CA" class2="" class3="" class4="H5" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CA" class2="" class3="" class4="H4" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CM" class2="" class3="" class4="HA" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CM" class2="" class3="" class4="H4" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CK" class2="" class3="" class4="H5" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CQ" class2="" class3="" class4="H5" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CV" class2="" class3="" class4="H4" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CR" class2="" class3="" class4="H5" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CW" class2="" class3="" class4="H4" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="CA" class2="" class3="" class4="HA" periodicity1="2" phase1="3.14159265359" k1="4.6024"/>
-  <Improper class1="N" class2="" class3="CT" class4="CT" periodicity1="2" phase1="3.14159265359" k1="4.184"/>
-  <Improper class1="CA" class2="" class3="N2" class4="N2" periodicity1="2" phase1="3.14159265359" k1="43.932"/>
-  <Improper class1="NA" class2="" class3="" class4="H" periodicity1="2" phase1="3.14159265359" k1="4.184"/>
-  <Improper class1="N2" class2="" class3="" class4="H" periodicity1="2" phase1="3.14159265359" k1="4.184"/>
-  <Improper class1="N" class2="" class3="" class4="H" periodicity1="2" phase1="3.14159265359" k1="4.184"/>
-  <Improper class1="C" class2="" class3="O2" class4="O2" periodicity1="2" phase1="3.14159265359" k1="43.932"/>
-  <Improper class1="C" class2="" class3="" class4="O" periodicity1="2" phase1="3.14159265359" k1="43.932"/>
  </PeriodicTorsionForce>
  <NonbondedForce coulomb14scale="0.833333" lj14scale="0.5">
   <Atom type="0" charge="-0.4157" sigma="0.324999852378" epsilon="0.71128"/>
