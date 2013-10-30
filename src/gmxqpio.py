@@ -58,7 +58,7 @@ def get_monomer_properties(print_stuff=0):
     x = np.array(x)
     q = np.array(q)
     a = np.array(a)
-    Dip = np.zeros(3,dtype=float)
+    Dip = np.zeros(3)
     QuadXX = 0.0
     QuadYY = 0.0
     QuadZZ = 0.0
@@ -220,7 +220,7 @@ class Monomer_QTPIE(Target):
         # Maybe the start of 'get', where the force field is created, can be put into 
         # some kind of common block.
         # Create the new force field!!
-        Answer = {'X':0.0, 'G':np.zeros(self.FF.np, dtype=float), 'H':np.zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         def get_momvals(mvals_):
             self.FF.make(mvals_)
             moments = get_monomer_properties()
@@ -228,8 +228,8 @@ class Monomer_QTPIE(Target):
             return self.unpack_moments(moments)
 
         NP = len(mvals)
-        G = np.zeros(NP,dtype=float)
-        H = np.zeros((NP,NP),dtype=float)
+        G = np.zeros(NP)
+        H = np.zeros((NP,NP))
         pvals = self.FF.make(mvals)
 
         calc_moments = get_monomer_properties()
@@ -238,7 +238,7 @@ class Monomer_QTPIE(Target):
         calc_momvals = self.unpack_moments(calc_moments)
 
         D = calc_momvals - ref_momvals
-        dV = np.zeros((self.FF.np,len(calc_momvals)),dtype=float)
+        dV = np.zeros((self.FF.np,len(calc_momvals)))
 
         if AGrad or AHess:
             for p in range(self.FF.np):

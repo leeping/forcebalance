@@ -231,7 +231,7 @@ class AbInitio(Target):
             frc = force[CrdBlock].reshape(-1,3)
             NetForce = np.sum(frc, axis=0)
             xyzb = xyz1[AtomBlock]
-            Torque = np.zeros(3, dtype=float)
+            Torque = np.zeros(3)
             for a in range(len(xyzb)):
                 R = xyzb[a] - com
                 F = frc[a]
@@ -601,53 +601,53 @@ class AbInitio(Target):
         dF_Q     = 0
         dN_Q     = 0
         dT_Q     = 0
-        Q = np.zeros(NCP1,dtype=float)
+        Q = np.zeros(NCP1)
         # Mean quantities
-        M0_M    = np.zeros(NCP1,dtype=float)
-        Q0_M    = np.zeros(NCP1,dtype=float)
-        M0_Q    = np.zeros(NCP1,dtype=float)
-        Q0_Q    = np.zeros(NCP1,dtype=float)
+        M0_M    = np.zeros(NCP1)
+        Q0_M    = np.zeros(NCP1)
+        M0_Q    = np.zeros(NCP1)
+        Q0_Q    = np.zeros(NCP1)
         if cv:
-            QQ_M    = np.zeros((NCP1,NCP1),dtype=float)
-            QQ_Q    = np.zeros((NCP1,NCP1),dtype=float)
+            QQ_M    = np.zeros((NCP1,NCP1))
+            QQ_Q    = np.zeros((NCP1,NCP1))
             #==============================================================#
             # Objective function polytensors: This is formed in a loop     #
             # over snapshots by taking the outer product (Q-M)(X)(Q-M),    #
             # multiplying by the Boltzmann weight, and then summing.       #
             #==============================================================#
-            SPiXi = np.zeros((NCP1,NCP1),dtype=float)
-            SRiXi = np.zeros((NCP1,NCP1),dtype=float)
+            SPiXi = np.zeros((NCP1,NCP1))
+            SRiXi = np.zeros((NCP1,NCP1))
         else:
             # Derivatives
-            M_p     = np.zeros((NP,NCP1),dtype=float)
-            M_pp    = np.zeros((NP,NCP1),dtype=float)
-            X0_M    = np.zeros(NCP1,dtype=float)
-            QQ_M    = np.zeros(NCP1,dtype=float)
-            X0_Q    = np.zeros(NCP1,dtype=float)
-            Q0_Q    = np.zeros(NCP1,dtype=float)
-            QQ_Q    = np.zeros(NCP1,dtype=float)
+            M_p     = np.zeros((NP,NCP1))
+            M_pp    = np.zeros((NP,NCP1))
+            X0_M    = np.zeros(NCP1)
+            QQ_M    = np.zeros(NCP1)
+            X0_Q    = np.zeros(NCP1)
+            Q0_Q    = np.zeros(NCP1)
+            QQ_Q    = np.zeros(NCP1)
             # Means of gradients
-            M0_M_p  = np.zeros((NP,NCP1),dtype=float)
-            M0_Q_p  = np.zeros((NP,NCP1),dtype=float)
-            M0_M_pp = np.zeros((NP,NCP1),dtype=float)
-            M0_Q_pp = np.zeros((NP,NCP1),dtype=float)
+            M0_M_p  = np.zeros((NP,NCP1))
+            M0_Q_p  = np.zeros((NP,NCP1))
+            M0_M_pp = np.zeros((NP,NCP1))
+            M0_Q_pp = np.zeros((NP,NCP1))
             # Objective functions
-            SPiXi = np.zeros(NCP1,dtype=float)
-            SRiXi = np.zeros(NCP1,dtype=float)
+            SPiXi = np.zeros(NCP1)
+            SRiXi = np.zeros(NCP1)
             if AGrad:
-                SPiXi_p = np.zeros((NP,NCP1),dtype=float)
-                SRiXi_p = np.zeros((NP,NCP1),dtype=float)
-                X2_M_p = np.zeros(NP,dtype=float)
-                X2_Q_p = np.zeros(NP,dtype=float)
+                SPiXi_p = np.zeros((NP,NCP1))
+                SRiXi_p = np.zeros((NP,NCP1))
+                X2_M_p = np.zeros(NP)
+                X2_Q_p = np.zeros(NP)
             if AHess:
-                SPiXi_pq = np.zeros((NP,NP,NCP1),dtype=float)
-                SRiXi_pq = np.zeros((NP,NP,NCP1),dtype=float)
-                X2_M_pq = np.zeros((NP,NP),dtype=float)
-                X2_Q_pq = np.zeros((NP,NP),dtype=float)
-            M_all = np.zeros((NS,NCP1),dtype=float)
+                SPiXi_pq = np.zeros((NP,NP,NCP1))
+                SRiXi_pq = np.zeros((NP,NP,NCP1))
+                X2_M_pq = np.zeros((NP,NP))
+                X2_Q_pq = np.zeros((NP,NP))
+            M_all = np.zeros((NS,NCP1))
             if AGrad and self.all_at_once:
-                dM_all = np.zeros((NS,NP,NCP1),dtype=float)
-                ddM_all = np.zeros((NS,NP,NCP1),dtype=float)
+                dM_all = np.zeros((NS,NP,NCP1))
+                ddM_all = np.zeros((NS,NP,NCP1))
         QBN = np.dot(self.qmboltz_wts[:NS],self.whamboltz_wts[:NS])
         #==============================================================#
         #             STEP 2: Loop through the snapshots.              #
@@ -804,7 +804,7 @@ class AbInitio(Target):
                 Mforce_obj.xyzs[i] = Mforce_print[i, :].reshape(-1,3)
                 Qforce_obj.xyzs[i] = Qforce_print[i, :].reshape(-1,3)
             if fat < self.qmatoms:
-                Fpad = np.zeros((self.qmatoms - fat, 3),dtype=float)
+                Fpad = np.zeros((self.qmatoms - fat, 3))
                 Mforce_obj.xyzs[i] = np.vstack((Mforce_obj.xyzs[i], Fpad))
                 Qforce_obj.xyzs[i] = np.vstack((Qforce_obj.xyzs[i], Fpad))
             if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
@@ -840,7 +840,7 @@ class AbInitio(Target):
             TWt = 0.0
         # Build the weight vector/matrix, so the force contribution is suppressed by 1/3N
         if cv:
-            WM      = np.zeros((NCP1,NCP1),dtype=float)
+            WM      = np.zeros((NCP1,NCP1))
             WM[0,0] = np.sqrt(EWt)
             start   = 1
             block   = 3*fat
@@ -859,7 +859,7 @@ class AbInitio(Target):
                 for i in range(start, end):
                     WM[i, i] = np.sqrt(TWt / block)
         else:
-            WM      = np.zeros(NCP1,dtype=float)
+            WM      = np.zeros(NCP1)
             WM[0] = np.sqrt(EWt)
             if self.force:
                 start   = 1
@@ -935,8 +935,8 @@ class AbInitio(Target):
         X2   = MBP * X2_M    + QBP * X2_Q
         if not cv:
             # Derivatives of the objective function
-            G = np.zeros(NP,dtype=float)
-            H = np.zeros((NP,NP),dtype=float)
+            G = np.zeros(NP)
+            H = np.zeros((NP,NP))
             for p in range(NP):
                 if not AGrad: continue
                 G[p] = MBP * X2_M_p[p] + QBP * X2_Q_p[p]
@@ -1040,8 +1040,8 @@ class AbInitio(Target):
                     ddVdqPdVS[p], dddVdqPdVS2[p] = f12d3p(fdwrap(self.build_invdist,mvals,p), h = self.h, f0 = self.invdists)
         X = 0
         D = 0
-        G = np.zeros(NP, dtype=float)
-        H = np.zeros((NP, NP), dtype=float)
+        G = np.zeros(NP)
+        H = np.zeros((NP, NP))
         for i in range(self.ns):
             P   = self.whamboltz_wts[i]
             Z  += P
@@ -1057,7 +1057,7 @@ class AbInitio(Target):
                     dVdqM[p,:] += flat(vsd[i] * col(getqatoms(mvals)))
                 G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
                 if AHess:
-                    d2VdqM2 = np.zeros(dVdqM.shape, dtype=float)
+                    d2VdqM2 = np.zeros(dVdqM.shape)
                     for p, vsd in dddVdqPdVS2.items():
                         d2VdqM2[p,:] += flat(vsd[i] * col(getqatoms(mvals)))
                     H      += np.array(P * 2 * (dVdqM * dVdqM.T + d2VdqM2 * col(desp))) / self.nesp
@@ -1091,7 +1091,7 @@ class AbInitio(Target):
         return Answer
 
     def get(self, mvals, AGrad=False, AHess=False):
-        Answer = {'X':0.0, 'G':np.zeros(self.FF.np, dtype=float), 'H':np.zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         tw = self.w_energy + self.w_force + self.w_netforce + self.w_torque + self.w_resp
         if tw > 0.0:
             w_ef = (self.w_energy + self.w_force + self.w_netforce + self.w_torque) / tw

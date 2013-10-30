@@ -962,7 +962,7 @@ def main():
     FDCheck = False
 
     def calc_rho(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b == None: b = np.ones(L)
         if 'r_' in kwargs:
             r_ = kwargs['r_']
         return bzavg(r_,b)
@@ -998,7 +998,7 @@ def main():
 
     ## Thermal expansion coefficient and bootstrap error estimation
     def calc_alpha(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b == None: b = np.ones(L)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         if 'v_' in kwargs:
@@ -1031,7 +1031,7 @@ def main():
     ## Isothermal compressibility
     bar_unit = 1.0*bar*nanometer**3/kilojoules_per_mole/item
     def calc_kappa(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b == None: b = np.ones(L)
         if 'v_' in kwargs:
             v_ = kwargs['v_']
         return bar_unit / kT * (bzavg(v_**2,b)-bzavg(v_,b)**2)/bzavg(v_,b)
@@ -1060,7 +1060,7 @@ def main():
 
     ## Isobaric heat capacity
     def calc_cp(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b == None: b = np.ones(L)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
@@ -1094,12 +1094,12 @@ def main():
     epsunit = 1.0*(debye**2) / nanometer**3 / BOLTZMANN_CONSTANT_kB / kelvin
     prefactor = epsunit/eps0/3
     def calc_eps0(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b == None: b = np.ones(L)
         if 'd_' in kwargs: # Dipole moment vector.
             d_ = kwargs['d_']
         if 'v_' in kwargs: # Volume.
             v_ = kwargs['v_']
-        b0 = np.ones(L,dtype=float)
+        b0 = np.ones(L)
         dx = d_[:,0]
         dy = d_[:,1]
         dz = d_[:,2]

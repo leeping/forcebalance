@@ -156,7 +156,7 @@ class Interaction(Target):
 
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
-        Answer = {'X':0.0, 'G':np.zeros(self.FF.np, dtype=float), 'H':np.zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         
         # If the weight is zero, turn all derivatives off.
         if (self.weight == 0.0):
@@ -172,7 +172,7 @@ class Interaction(Target):
         emm = callM(mvals)
 
         D = emm - self.eqm
-        dV = np.zeros((self.FF.np,len(emm)),dtype=float)
+        dV = np.zeros((self.FF.np,len(emm)))
 
         # Dump interaction energies to disk.
         np.savetxt('M.txt',emm)

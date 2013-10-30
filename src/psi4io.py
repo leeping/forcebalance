@@ -443,8 +443,8 @@ class RDVR3_Psi4(Target):
         Fac = 1000000
         n = len(mvals)
         X = 0.0
-        G = np.zeros(n,dtype=float)
-        H = np.zeros((n,n),dtype=float)
+        G = np.zeros(n)
+        H = np.zeros((n,n))
         pvals = self.FF.make(mvals)
         self.tdir = os.getcwd()
         self.objd = OrderedDict()
@@ -481,9 +481,9 @@ class RDVR3_Psi4(Target):
             logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
             if wq == None:
                 x = self.driver(mvals, d)
-            grad  = np.zeros(n,dtype=float)
-            hdiag = np.zeros(n,dtype=float)
-            hess  = np.zeros((n,n),dtype=float)
+            grad  = np.zeros(n)
+            hdiag = np.zeros(n)
+            hess  = np.zeros((n,n))
             apath = os.path.join(self.tdir, d, "current")
             x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
             for p in range(self.FF.np):

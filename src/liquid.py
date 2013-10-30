@@ -259,7 +259,7 @@ class Liquid(Target):
             Denom = getattr(self,expname+"_denom")
         else:
             # If the reference data doesn't exist then return nothing.
-            return 0.0, np.zeros(self.FF.np, dtype=float), np.zeros((self.FF.np,self.FF.np),dtype=float), None
+            return 0.0, np.zeros(self.FF.np), np.zeros((self.FF.np,self.FF.np)), None
             
         Sum = sum(Weights.values())
         for i in Weights:
@@ -277,13 +277,13 @@ class Liquid(Target):
             Denom /= 3 ** 0.5
         
         Objective = 0.0
-        Gradient = np.zeros(self.FF.np, dtype=float)
-        Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        Gradient = np.zeros(self.FF.np)
+        Hessian = np.zeros((self.FF.np,self.FF.np))
         Objs = {}
         GradMap = []
         avgCalc = 0.0
         avgExp  = 0.0
-        avgGrad = np.zeros(self.FF.np, dtype=float)
+        avgGrad = np.zeros(self.FF.np)
         for i, PT in enumerate(points):
             avgCalc += Weights[PT]*calc[PT]
             avgExp  += Weights[PT]*exp[PT]
@@ -482,7 +482,7 @@ class Liquid(Target):
         Shots = len(Energies[0])
         N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
-        U_kln = np.zeros([BSims,BSims,Shots], dtype = np.float64)
+        U_kln = np.zeros([BSims,BSims,Shots])
         for m, PT in enumerate(BPoints):
             T = PT[0]
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
@@ -501,13 +501,13 @@ class Liquid(Target):
             W1 = mbar.getWeights()
             logger.info("Done\n")
         elif len(BPoints) == 1:
-            W1 = np.ones((BPoints*Shots,BPoints),dtype=float)
+            W1 = np.ones((BPoints*Shots,BPoints))
             W1 /= BPoints*Shots
         
         def fill_weights(weights, phase_points, mbar_points, snapshots):
             """ Fill in the weight matrix with MBAR weights where MBAR was run, 
             and equal weights otherwise. """
-            new_weights = np.zeros([len(phase_points)*snapshots,len(phase_points)],dtype=np.float64)
+            new_weights = np.zeros([len(phase_points)*snapshots,len(phase_points)])
             for m, PT in enumerate(phase_points):
                 if PT in mbar_points:
                     mm = mbar_points.index(PT)
@@ -528,7 +528,7 @@ class Liquid(Target):
         if len(mBPoints) > 0:
             mBSims = len(mBPoints)
             mN_k = np.ones(mBSims)*mShots
-            mU_kln = np.zeros([mBSims,mBSims,mShots], dtype = np.float64)
+            mU_kln = np.zeros([mBSims,mBSims,mShots])
             for m, PT in enumerate(mBPoints):
                 T = PT[0]
                 beta = 1. / (kb * T)
@@ -540,7 +540,7 @@ class Liquid(Target):
                 mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
                 mW1 = mmbar.getWeights()
         elif len(mBPoints) == 1:
-            mW1 = np.ones((mBSims*mShots,mSims),dtype=float)
+            mW1 = np.ones((mBSims*mShots,mSims))
             mW1 /= mBSims*mShots
 
         mW2 = fill_weights(mW1, mPoints, mBPoints, mShots)
@@ -560,7 +560,7 @@ class Liquid(Target):
             H = E + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
-            C = weight_info(W, PT, np.ones(len(Points), dtype=np.float64)*Shots, verbose=True)
+            C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=True)
             Gbar = flat(np.mat(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
@@ -604,7 +604,7 @@ class Liquid(Target):
                     Hvap_calc[PT] += self.RefData['cvib_inter'][PT]
             else:
                 Hvap_calc[PT]  = 0.0
-                Hvap_grad[PT]  = np.zeros(self.FF.np,dtype=float)
+                Hvap_grad[PT]  = np.zeros(self.FF.np)
             ## Thermal expansion coefficient.
             Alpha_calc[PT] = 1e4 * (avg(H*V)-avg(H)*avg(V))/avg(V)/(kT*T)
             GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
@@ -658,8 +658,8 @@ class Liquid(Target):
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
 
-        Gradient = np.zeros(self.FF.np, dtype=float)
-        Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        Gradient = np.zeros(self.FF.np)
+        Hessian = np.zeros((self.FF.np,self.FF.np))
 
         if X_Rho == 0: self.w_rho = 0.0
         if X_Hvap == 0: self.w_hvap = 0.0

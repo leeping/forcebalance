@@ -78,7 +78,7 @@ class Moments(Target):
                 pass
             elif len(s) == 1 and self.na == -1:
                 self.na = int(s[0])
-                xyz = np.zeros((self.na, 3), dtype=float)
+                xyz = np.zeros((self.na, 3))
                 cn = ln + 1
             elif ln == cn:
                 pass
@@ -164,7 +164,7 @@ class Moments(Target):
 
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
-        Answer = {'X':0.0, 'G':np.zeros(self.FF.np, dtype=float), 'H':np.zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         def get_momvals(mvals_):
             self.FF.make(mvals_)
             moments = self.moments_driver()
@@ -177,7 +177,7 @@ class Moments(Target):
         calc_momvals = self.unpack_moments(calc_moments)
 
         D = calc_momvals - ref_momvals
-        dV = np.zeros((self.FF.np,len(calc_momvals)),dtype=float)
+        dV = np.zeros((self.FF.np,len(calc_momvals)))
 
         if AGrad or AHess:
             for p in range(self.FF.np):

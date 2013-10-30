@@ -351,8 +351,8 @@ class Penalty:
         NP = len(mvals)
         K0, K1, K2 = self.Pen_Tab[self.ptyp](mvals)
         XAdd = 0.0
-        GAdd = np.zeros(NP, dtype=float)
-        HAdd = np.zeros((NP, NP), dtype=float)
+        GAdd = np.zeros(NP)
+        HAdd = np.zeros((NP, NP))
         if self.fadd > 0.0:
             XAdd += K0 * self.fadd
             GAdd += K1 * self.fadd
@@ -414,8 +414,8 @@ class Penalty:
             Groups[key].append(p)
         pvals = self.FF.create_pvals(mvals)
         DC0 = 0.0
-        DC1 = np.zeros(self.FF.np, dtype=float)
-        DC2 = np.zeros(self.FF.np, dtype=float)
+        DC1 = np.zeros(self.FF.np)
+        DC2 = np.zeros(self.FF.np)
         for gnm, pidx in Groups.items():
             # The group of parameters for a particular element / angular momentum.
             pvals_grp = pvals[pidx]
@@ -455,8 +455,8 @@ class Penalty:
             Groups[key].append(p)
         pvals = self.FF.create_pvals(mvals)
         DC0 = 0.0
-        DC1 = np.zeros(self.FF.np, dtype=float)
-        DC2 = np.zeros(self.FF.np, dtype=float)
+        DC1 = np.zeros(self.FF.np)
+        DC2 = np.zeros(self.FF.np)
         for gnm, pidx in Groups.items():
             # The group of parameters for a particular element / angular momentum.
             pvals_grp = pvals[pidx]
@@ -498,8 +498,8 @@ class Penalty:
         pvals = self.FF.create_pvals(mvals)
         #print "pvals: ", pvals
         DC0 = 0.0
-        DC1 = np.zeros(self.FF.np, dtype=float)
-        DC2 = np.zeros((self.FF.np,self.FF.np), dtype=float)
+        DC1 = np.zeros(self.FF.np)
+        DC2 = np.zeros((self.FF.np,self.FF.np))
         for gnm, pidx in Groups.items():
             # The group of parameters for a particular element / angular momentum.
             pvals_grp = pvals[pidx]

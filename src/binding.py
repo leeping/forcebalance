@@ -156,7 +156,7 @@ class BindingEnergy(Target):
             printcool_dictionary(self.RMSDDict,title="Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s" % (self.rmsd_part, "System", "RMSD", "Term"), keywidth=45)
 
     def get(self, mvals, AGrad=False, AHess=False):
-        Answer = {'X':0.0, 'G':np.zeros(self.FF.np, dtype=float), 'H':np.zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         self.PrintDict = OrderedDict()
         self.RMSDDict = OrderedDict()
         #pool = Pool(processes=4)
@@ -205,7 +205,7 @@ class BindingEnergy(Target):
                     
         V = compute(mvals)
 
-        dV = np.zeros((self.FF.np,len(V)),dtype=float)
+        dV = np.zeros((self.FF.np,len(V)))
         if AGrad or AHess:
             for p in range(self.FF.np):
                 dV[p,:], _ = f12d3p(fdwrap(compute, mvals, p), h = self.h, f0 = V)

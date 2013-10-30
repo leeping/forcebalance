@@ -23,10 +23,7 @@ class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
                              'fragment2':'6-8',
                              'energy-upper':20.0})
 
-        try:
-            self.ff = forcebalance.forcefield.FF(self.options)
-        except:
-            self.skipTest("Unable to create forcefield from cl4.prm\n")
+        self.ff = forcebalance.forcefield.FF(self.options)
 
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
