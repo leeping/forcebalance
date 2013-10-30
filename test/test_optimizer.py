@@ -23,7 +23,7 @@ class TestOptimizer(ForceBalanceTestCase):
 
         self.forcefield  = forcebalance.forcefield.FF(self.options)
         self.objective   = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
-        self.optimizer   = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
+        try: self.optimizer   = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
         except: self.fail("\nCouldn't create optimizer")
 
     def tearDown(self):
