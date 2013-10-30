@@ -178,7 +178,7 @@ def write_key_with_prm(src, dest, prmfnm=None, ffobj=None):
     if not prmflag:
         logger.info("Adding parameter file %s to key file\n" % prmfnm)
         outlines.insert(0,"parameters %s\n" % prmfnm)
-    with open(dest,'w') as f: f.writelines(outlines)
+    with wopen(dest) as f: f.writelines(outlines)
 
 def modify_key(src, in_dict):
     """ Performs in-place modification of a TINKER .key file. 
@@ -229,7 +229,7 @@ def modify_key(src, in_dict):
                 outlines.append("%s %s\n" % (key, val))
             else:
                 outlines.append("%s\n" % (key))
-    with open(src,'w') as f: f.writelines(outlines)
+    with wopen(src) as f: f.writelines(outlines)
 
 class Liquid_TINKER(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
@@ -498,14 +498,10 @@ class TINKER(Engine):
                 E.append(float(s[4]) * 4.184)
         return np.array(E)
 
-    def energy_force(self, force=True):
+    def energy_force(self):
 
         """ Computes the energy and force using TINKER over a trajectory. """
 
-        if hasattr(self,'target') and hasattr(self.target,'force'):
-            force = self.target.force
-        if not force:
-            return self.energy().reshape(-1,1)
         M = []
         warn_once("Using testgrad to loop over %i energy/force calculations; will be slow." % len(self.mol))
         for i in range(len(self.mol)):
@@ -686,12 +682,7 @@ class AbInitio_TINKER(AbInitio):
     def read_topology(self):
         self.topology_flag = True
 
-    def energy_force_driver(self, shot):
-        return self.engine.energy_force_one(shot)
-
-    def energy_force_driver_all(self):
-        if self.force:
-            raise Exception('Trying to call unimplemented functionality.')
+    def energy_force(self):
         return self.engine.energy_force()
 
 class Vibration_TINKER(Vibration):
@@ -712,11 +703,6 @@ class Vibration_TINKER(Vibration):
         del engine_args['name']
         ## Create engine object.
         self.engine = TINKER(target=self, **engine_args)
-        if self.FF.rigid_water:
-            raise Exception('This class cannot be used with rigid water molecules.')
-
-    def vibration_driver(self):
-        return self.engine.normal_modes()
 
 class Moments_TINKER(Moments):
 

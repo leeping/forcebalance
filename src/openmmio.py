@@ -248,9 +248,9 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     
     ARGUMENTS
 
-    temperature (numpy.unit.Quantity compatible with kelvin) - the temperature
-    collision_rate (numpy.unit.Quantity compatible with 1/picoseconds) - the collision rate
-    timestep (numpy.unit.Quantity compatible with femtoseconds) - the integration timestep
+    temperature (Quantity compatible with kelvin) - the temperature
+    collision_rate (Quantity compatible with 1/picoseconds) - the collision rate
+    timestep (Quantity compatible with femtoseconds) - the integration timestep
     system (simtk.openmm.System) - system whose forces will be partitioned
     ninnersteps (int) - number of inner timesteps (default: 4)
 
@@ -293,8 +293,8 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     
     integrator.addGlobalVariable("dt_fast", timestep/float(ninnersteps)) # fast inner timestep
     integrator.addGlobalVariable("kT", kT) # thermal energy
-    integrator.addGlobalVariable("a", numpy.exp(-collision_rate*timestep)) # velocity mixing parameter
-    integrator.addGlobalVariable("b", numpy.sqrt((2/(collision_rate*timestep)) * numpy.tanh(collision_rate*timestep/2))) # timestep correction parameter
+    integrator.addGlobalVariable("a", np.exp(-collision_rate*timestep)) # velocity mixing parameter
+    integrator.addGlobalVariable("b", np.sqrt((2/(collision_rate*timestep)) * np.tanh(collision_rate*timestep/2))) # timestep correction parameter
     integrator.addPerDofVariable("sigma", 0) 
     integrator.addPerDofVariable("x1", 0) # position before application of constraints
 
@@ -530,7 +530,7 @@ class OpenMM(Engine):
         if hasattr(self, 'target'):
             FF = self.target.FF
             self.ffxml = FF.openmmxml
-            forcefield = ForceField(os.path.join(self.root, FF.ffdir, FF.openmmxml))
+            self.forcefield = ForceField(os.path.join(self.root, FF.ffdir, FF.openmmxml))
         else:
             if 'ffxml' in kwargs:
                 if not os.path.exists(kwargs['ffxml']): 
@@ -538,12 +538,8 @@ class OpenMM(Engine):
                 self.ffxml = kwargs['ffxml']
             elif onefile('xml'):
                 self.ffxml = onefile('xml')
-            forcefield = ForceField(self.ffxml)
+            self.forcefield = ForceField(self.ffxml)
             
-        ## Create the simulation object within this class itself.
-        mod = Modeller(self.pdb.topology, self.pdb.positions)
-        mod.addExtraParticles(forcefield)
-
         self.mmopts = mmopts
         if hasattr(self,'target'):
             FF = self.target.FF
@@ -553,14 +549,6 @@ class OpenMM(Engine):
                 self.mmopts['polarization'] = 'Direct'
             self.mmopts['rigidWater'] = FF.rigid_water
 
-        system = forcefield.createSystem(mod.topology, **self.mmopts)
-        # Set up for energy component analysis.
-        for i, j in enumerate(system.getForces()):
-            j.setForceGroup(i)
-        # Create the simulation; we're not actually going to use the integrator
-        integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-        SetAmoebaVirtualExclusions(system)
-        self.simulation = Simulation(mod.topology, system, integrator, self.platform)
         # Generate OpenMM-compatible positions
         self.xyz_omms = []
         for I in range(len(self.mol)):
@@ -568,7 +556,7 @@ class OpenMM(Engine):
             xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
             # An extra step with adding virtual particles
             mod = Modeller(self.pdb.topology, xyz_omm)
-            mod.addExtraParticles(forcefield)
+            mod.addExtraParticles(self.forcefield)
             # Set the positions using the trajectory
             self.xyz_omms.append(mod.getPositions())
 
@@ -591,9 +579,23 @@ class OpenMM(Engine):
         tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
         self.AtomLists['MoleculeNumber'] = [[i in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
+        self.create_simulation()
+
+    def create_simulation(self, timestep=1.0, integrator="Verlet", temperature=None, pressure=None, pbc=True, **kwargs):
+        # Create the simulation object.
+        mod = Modeller(self.pdb.topology, self.pdb.positions)
+        mod.addExtraParticles(self.forcefield)
+        self.system = self.forcefield.createSystem(mod.topology, **self.mmopts)
+        # Set up for energy component analysis.
+        for i, j in enumerate(self.system.getForces()):
+            j.setForceGroup(i)
+        integrator = VerletIntegrator(timestep*femtoseconds)
+        SetAmoebaVirtualExclusions(self.system)
+        self.simulation = Simulation(mod.topology, self.system, integrator, self.platform)
 
     def update_simulation(self):
-        """ Update the force field parameters in the simulation object. """
+        """ Update the force field parameters in the simulation object.  
+        This should be run when we write a new force field XML file. """
         self.forcefield = ForceField(self.ffxml)
         mod = Modeller(self.pdb.topology, self.pdb.positions)
         mod.addExtraParticles(self.forcefield)
@@ -601,6 +603,12 @@ class OpenMM(Engine):
         UpdateSimulationParameters(self.system, self.simulation)
 
     def set_positions(self, shot=0):
+        # Ideally the virtual site parameters would be copied but they're not.
+        # Instead we update the vsite positions manually.
+        # if self.FF.rigid_water:
+        #     simulation.context.applyConstraints(1e-8)
+        # else:
+        #     simulation.context.computeVirtualSites()
         self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot], self.system))
 
     def energy_force(self, force=True):
@@ -610,26 +618,25 @@ class OpenMM(Engine):
         M = []
         # Loop through the snapshots
         for I in range(len(self.mol)):
-            # Ideally the virtual site parameters would be copied but they're not.
-            # Instead we update the vsite positions manually.
-            # if self.FF.rigid_water:
-            #     simulation.context.applyConstraints(1e-8)
-            # else:
-            #     simulation.context.computeVirtualSites()
             self.set_positions(I)
             Energy = self.simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-            Force1 = []
-            if force:
-                # Compute the force and append to list
-                Force = list(np.array(self.simulation.context.getState(getForces=True).getForces() / kilojoules_per_mole * nanometer).flatten())
-                # Extract forces belonging to real atoms only
-                Force1 = list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]]))
+            # Compute the force and append to list
+            Force = list(np.array(self.simulation.context.getState(getForces=True).getForces() / kilojoules_per_mole * nanometer).flatten())
+            # Extract forces belonging to real atoms only
+            Force1 = list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]]))
             M.append(np.array([Energy] + Force1))
         M = np.array(M)
         return M
 
     def energy(self):
-        return self.energy_force(force=False).flatten()
+        self.update_simulation()
+        M = []
+        # Loop through the snapshots
+        for I in range(len(self.mol)):
+            self.set_positions(I)
+            Energy = self.simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
+            M.append(Energy)
+        return np.array(M)
 
     def normal_modes(self, shot=0, optimize=True):
         raise NotImplementedError("OpenMM cannot do normal mode analysis")
@@ -721,6 +728,31 @@ class OpenMM(Engine):
         B = self.B.energy()
 
         return (D - A - B) / 4.184
+
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, pbc=True, threads=None, **kwargs):
+        
+        """
+        Method for running a molecular dynamics simulation.  
+
+        Required arguments:
+        nsteps      = (int)   Number of total time steps
+        timestep    = (float) Time step in FEMTOSECONDS
+        temperature = (float) Temperature control (Kelvin)
+        pressure    = (float) Pressure control (atmospheres)
+        nequil      = (int)   Number of additional time steps at the beginning for equilibration
+        nsave       = (int)   Step interval for saving data
+        minimize    = (bool)  Perform an energy minimization prior to dynamics
+        pbc         = (bool)  Periodic boundary conditions; remove COM motion
+        threads     = (int)   Number of MPI-threads
+
+        Returns simulation data:
+        Rhos        = (array)     Density in kilogram m^-3
+        Potentials  = (array)     Potential energies
+        Kinetics    = (array)     Kinetic energies
+        Volumes     = (array)     Box volumes
+        Dips        = (3xN array) Dipole moments
+        EComps      = (dict)      Energy components
+        """
 
 class AbInitio_OpenMM(AbInitio):
 

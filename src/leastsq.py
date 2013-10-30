@@ -6,8 +6,8 @@
 
 import os
 import shutil
+import numpy as np
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, abs, max
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -50,7 +50,7 @@ class LeastSquares(Target):
 
     def indicate(self):
         #RMSD = sqrt(mean(self.D ** 2))
-        MAD = mean(abs(self.D))
+        MAD = np.mean(np.abs(self.D))
         logger.info( "\rTarget: %-15s MeanAbsErr/MeanExact: %.5e Objective = %.5e" % (self.name, MAD / self.MAQ, self.objective))
         return
 
@@ -82,9 +82,9 @@ class LeastSquares(Target):
         ## Dictionary for derivative terms
         dM = {}
         # Create the new force field!!
-        np = len(mvals)
-        G = zeros(np,dtype=float)
-        H = zeros((np,np),dtype=float)
+        NP = len(mvals)
+        G = np.zeros(NP,dtype=float)
+        H = np.zeros((NP,NP),dtype=float)
         pvals = self.FF.make(mvals)
         if float('Inf') in pvals:
             return {'X' : 1e10, 'G' : G, 'H' : H}
@@ -94,7 +94,7 @@ class LeastSquares(Target):
         Q = Ans[:,0]
         D = M - Q
 
-        self.MAQ = mean(abs(Q))
+        self.MAQ = np.mean(np.abs(Q))
 
         ns = len(M)
         # Wrapper to the driver, which returns just the part that changes.
@@ -107,24 +107,24 @@ class LeastSquares(Target):
         if AGrad:
             # Leaving comment here if we want to reintroduce second deriv someday.
             #     dM[p,:], ddM[p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
-            for p in range(np):
+            for p in range(NP):
                 if self.call_derivatives[p] == False: continue
                 dM_arr = f1d2p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
-                if max(abs(dM_arr)) == 0.0 and Counter() == 0:
+                if np.max(np.abs(dM_arr)) == 0.0 and Counter() == 0:
                     logger.info("\r Simulation %s will skip over parameter %i in subsequent steps\n" % (self.name, p))
                     self.call_derivatives[p] = False
                 else:
                     dM[p] = dM_arr.copy()
-	Objective = dot(W, D**2) * Fac
+	Objective = np.dot(W, D**2) * Fac
         if AGrad:
-            for p in range(np):
+            for p in range(NP):
                 if self.call_derivatives[p] == False: continue
-                G[p] = 2 * dot(W, D*dM[p])
+                G[p] = 2 * np.dot(W, D*dM[p])
                 if not AHess: continue
-                H[p, p] = 2 * dot(W, dM[p]**2)
+                H[p, p] = 2 * np.dot(W, dM[p]**2)
                 for q in range(p):
                     if self.call_derivatives[q] == False: continue
-                    GNP = 2 * dot(W, dM[p] * dM[q])
+                    GNP = 2 * np.dot(W, dM[p] * dM[q])
                     H[q,p] = GNP
                     H[p,q] = GNP
         G *= Fac

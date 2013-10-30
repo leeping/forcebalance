@@ -10,12 +10,12 @@ import os
 import re
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
-from numpy import array
 from forcebalance import BaseReader
 from forcebalance.engine import Engine
 from forcebalance.abinitio import AbInitio
 from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
+from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
@@ -27,13 +27,15 @@ import traceback
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
-def edit_mdp(fin, fout, options, verbose=False):
+def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
     """
     Create or edit a Gromacs MDP file.
-    @param[in] fin Input file name.
     @param[in] fout Output file name, can be the same as input file name.
     @param[in] options Dictionary containing mdp options. Existing options are replaced, new options are added at the end.
+    @param[in] fin Input file name.
+    @param[in] defaults Default options to add to the mdp only if they don't already exist.
     """
+    clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
     options = OrderedDict([(key.lower(), str(val)) for key, val in options.items()])
     # List of lines in the output file.
@@ -58,9 +60,14 @@ def edit_mdp(fin, fout, options, verbose=False):
             # Now split off the key and value fields at the equals sign.
             keyf, valf = data.split('=',1)
             key = keyf.strip().lower()
-            valen = len(valf)
+            haveopts.append(key)
             if key in options:
                 val = options[key]
+                val0 = valf.strip()
+                if key in clashes and val != val0:
+                    raise RuntimeError("write_mdp tried to set %s = %s but its original value was %s = %s" % (key, val, key, val0))
+                # Passing None as the value causes the option to be deleted
+                if val == None: continue
                 if len(val) < len(valf):
                     valf = ' ' + val + ' '*(len(valf) - len(val)-1)
                 else:
@@ -69,25 +76,29 @@ def edit_mdp(fin, fout, options, verbose=False):
                 if comms != None:
                     lout += [';',comms]
                 out.append(''.join(lout))
-                haveopts.append(key)
             else:
                 out.append(line)
     for key, val in options.items():
         if key not in haveopts:
+            haveopts.append(key)
             out.append("%-20s = %s" % (key, val))
-    file_out = open(fout,'w')
+    # Fill in some default options.
+    for key, val in defaults.items():
+        if key not in haveopts:
+            out.append("%-20s = %s" % (key, val))
+    file_out = wopen(fout) 
     for line in out:
         print >> file_out, line
     if verbose:
         printcool_dictionary(options, title="%s -> %s with options:" % (fin, fout))
     file_out.close()
 
-def edit_ndx(fin, fout, newgrps):
+def write_ndx(fout, grps, fin=None):
     """
     Create or edit a Gromacs ndx file.
-    @param[in] fin Input file name.
     @param[in] fout Output file name, can be the same as input file name.
-    @param[in] newgrps Dictionary containing key : atom selections.
+    @param[in] grps Dictionary containing key : atom selections.
+    @param[in] fin Input file name.
     """
     ndxgrps = OrderedDict()
     atoms = []
@@ -101,8 +112,8 @@ def edit_ndx(fin, fout, newgrps):
                 ndxgrps[grp] = []
             elif all([isint(i) for i in s]):
                 ndxgrps[grp] += [int(i) for i in s]
-    ndxgrps.update(newgrps)
-    outf = open(fout,"w")
+    ndxgrps.update(grps)
+    outf = wopen(fout)
     for name, nums in ndxgrps.items():
         print >> outf, '[ %s ]' % name
         for subl in list(grouper(nums, 15)):
@@ -372,28 +383,27 @@ class ITP_Reader(BaseReader):
                                                  'Charge'       : atype['chg'],
                                                  'ParticleType' : atype['ptp']}
         elif self.sec == 'nonbond_params':
-            atom = [s[0], s[1]]
+            atom = [int(s[0]), int(s[1])]
             self.itype = pftypes[self.nbtype]
         elif self.sec == 'atoms':
             # Ah, this is the atom name, not the atom number.
             # Maybe I should use the atom number.
-            atom = [s[0]]
+            atom = [int(s[0])]
             self.atomnames.append(s[4])
             self.itype = 'COUL'
             # Build dictionaries where the key is the residue name
             # and the value is a list of atom numbers, atom types, and atomic masses.
-            self.adict.setdefault(self.mol,[]).append(s[0])
+            self.adict.setdefault(self.mol,[]).append(int(s[0]))
             ffAtom = {'AtomType' : s[1], 'ResidueNumber' : int(s[2]), 'ResidueName' : s[3], 'AtomName' : s[4], 'ChargeGroupNumber' : int(s[5]), 'Charge' : float(s[6])}
             self.Molecules.setdefault(self.mol,[]).append(ffAtom)
         elif self.sec == 'polarization':
-            atom = [s[1]]
+            atom = [int(s[1])]
             self.itype = 'POL'
         elif self.sec == 'qtpie':
             # The atom involved is labeled by the atomic number.
-            atom = [s[0]]
+            atom = [int(s[0])]
             self.itype = 'QTPIE'
         elif self.sec == 'bonds':
-            # print self.adict
             atom = [self.adict[self.mol][int(i)-1] for i in s[:2]]
             self.itype = fdict[self.sec][int(s[2])]
         elif self.sec == 'bondtypes':
@@ -444,11 +454,11 @@ class ITP_Reader(BaseReader):
             # Enforce a canonical ordering of the atom labels in a parameter ID
             atom = atom[::-1]
         if self.mol == None:
-            self.suffix = ':' + ''.join(atom)
+            self.suffix = ':' + ''.join(["%s" % i for i in atom])
         elif self.sec == 'qtpie':
-            self.suffix = ':' + ''.join(atom)
+            self.suffix = ':' + '.'.join(["%s" % i for i in atom])
         else:
-            self.suffix = ':' + '-'.join([self.mol,''.join(atom)])
+            self.suffix = ':' + '-'.join([self.mol,'.'.join(["%s" % i for i in atom])])
         self.molatom = (self.mol, atom if type(atom) is list else [atom])
 
 def rm_gmx_baks(dir):
@@ -457,28 +467,6 @@ def rm_gmx_baks(dir):
         for file in files:
             if re.match('^#',file):
                 os.remove(file)
-
-# Default hard-coded .mdp file for energy and force matching.
-shot_mdp = """integrator	= md
-dt		= 0.001
-nsteps		= 0
-nstxout 	= 0
-nstfout		= 1
-nstenergy	= 1
-nstxtcout	= 0
-xtc_grps	= System
-energygrps	= System
-
-nstlist		= 0
-ns_type		= simple
-rlist		= 0.0
-vdwtype		= cut-off
-coulombtype	= cut-off
-rcoulomb	= 0.0
-rvdw		= 0.0
-constraints	= none
-pbc		= no
-"""
 
 class GMX(Engine):
 
@@ -526,7 +514,7 @@ class GMX(Engine):
         self.mdp = onefile('mdp', kwargs['gmx_mdp'] if 'gmx_mdp' in kwargs else None)
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
-        elif 'coords' in kwargs:
+        elif 'coords' in kwargs and os.path.exists(kwargs['coords']):
             self.mol = Molecule(kwargs['coords'])
         else:
             grofile = onefile('gro')
@@ -536,9 +524,16 @@ class GMX(Engine):
 
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
+        mdp_default = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"), ("nstxout", "0"), 
+                                   ("nstfout", "0"), ("nstenergy", "1"), ("nstxtcout", "0"), ("nstlist", "0"), 
+                                   ("ns_type", "simple"), ("rlist", "0.0"), ("coulombtype", "cut-off"), ("rcoulomb", "0.0"), 
+                                   ("vdwtype", "cut-off"), ("rvdw", "0.0"), ("constraints", "none"), ("pbc", "no")])
+        
         ## Link files into the temp directory because it's good for reproducibility.
-        LinkFile(os.path.join(self.srcdir, self.mdp), "%s.mdp" % self.name, nosrcok=True)
-        LinkFile(os.path.join(self.srcdir, self.top), "%s.top" % self.name, nosrcok=True)
+        if self.top != None:
+            LinkFile(os.path.join(self.srcdir, self.top), "%s.top" % self.name, nosrcok=True)
+        if self.mdp != None:
+            LinkFile(os.path.join(self.srcdir, self.mdp), "%s.mdp" % self.name, nosrcok=True)
 
         ## Write the appropriate coordinate files.
         if hasattr(self,'target'):
@@ -546,6 +541,19 @@ class GMX(Engine):
             # This is because the .mdp and .top file can be force field files!
             FF = self.target.FF
             FF.make(np.zeros(FF.np, dtype=float))
+            if not os.path.exists('%s.top' % self.name):
+                topfile = onefile('top')
+                if topfile != None:
+                    LinkFile(topfile, "%s.top" % self.name, nosrcok=True)
+            if not os.path.exists('%s.mdp' % self.name):
+                mdpfile = onefile('mdp')
+                if mdpfile != None:
+                    LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
+            # Sanity check; the force fields should be referenced by the .top file.
+            if os.path.exists("%s.top" % self.name):
+                if not any([any([fnm in line for fnm in FF.fnms]) for line in open("%s.top" % self.name)]):
+                    warn_press_key("None of the force field files %s are referenced in the .top file. "
+                                   "Are you referencing the files through C preprocessor directives?" % FF.fnms)
             if hasattr(self.target,'shots'):
                 self.mol.write("%s-all.gro" % self.name, select=range(self.target.shots))
             else:
@@ -554,6 +562,15 @@ class GMX(Engine):
             self.mol.write("%s-all.gro" % self.name)
         self.mol[0].write("%s.gro" % self.name)
 
+        ## At this point, we could have gotten a .mdp file from the
+        ## target folder or as part of the force field.  If it still
+        ## missing, then we may write a default.
+        if not os.path.exists('%s.top' % self.name):
+            raise RuntimeError("No .top file found, cannot continue.")
+        if not os.path.exists("%s.mdp" % self.name):
+            logger.warn("No .mdp file found, writing default.")
+            write_mdp("%s.mdp" % self.name, {}, fin=self.mdp, defaults=mdp_default)
+        
         ## Call grompp followed by gmxdump to read the trajectory
         o = self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name), copy_stderr=True)
         double = 0
@@ -590,6 +607,7 @@ class GMX(Engine):
                 ai = [int(i) for i in line.split("{")[1].split("}")[0].split("..")]
                 mn = int(line.split('[')[1].split(']')[0])
                 for i in range(ai[1]-ai[0]+1) : self.AtomLists['MoleculeNumber'].append(mn)
+        os.unlink('%s.gro' % self.name)
         os.unlink('mdout.mdp')
         os.unlink('%s.tpr' % self.name)
         # Delete force field files.
@@ -597,22 +615,45 @@ class GMX(Engine):
             for f in FF.fnms:
                 os.unlink(f)
 
+    def links(self):
+        if not os.path.exists('%s.top' % self.name):
+            topfile = onefile('top')
+            if topfile != None:
+                LinkFile(topfile, "%s.top" % self.name)
+            else:
+                raise RuntimeError("No .top file found, cannot continue.")
+        if not os.path.exists('%s.mdp' % self.name):
+            mdpfile = onefile('mdp')
+            if mdpfile != None:
+                LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
+            else:
+                raise RuntimeError("No .mdp file found, cannot continue.")
+
     def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
+
         """ Call GROMACS; prepend the gmxpath to the call to the GROMACS program. """
+
         ## Always, always remove backup files.
         rm_gmx_baks(os.getcwd())
-
+        ## Create symbolic links (mainly for the case of .top and .mdp
+        ## files which don't exist at object creation)
+        self.links()
         ## Call a GROMACS program as you would from the command line.
         csplit = command.split()
         prog = os.path.join(self.gmxpath, csplit[0])
         csplit[0] = prog + self.gmxsuffix
         return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
 
-    def energy_termnames(self):
-        if not os.path.exists('%s.edr' % self.name):
+    def energy_termnames(self, edrfile=None):
+
+        """ Get a list of energy term names from the .edr file by parsing a system call to g_energy. """
+
+        if edrfile == None:
+            edrfile = "%s.edr" % self.name
+        if not os.path.exists(edrfile):
             raise RuntimeError('Cannot determine energy term names without an .edr file')
         ## Figure out which energy terms need to be printed.
-        o = self.callgmx("g_energy -f %s.edr -xvg no" % (self.name), stdin="Total-Energy\n", copy_stdout=False, copy_stderr=True)
+        o = self.callgmx("g_energy -f %s -xvg no" % (edrfile), stdin="Total-Energy\n", copy_stdout=False, copy_stderr=True)
         parsemode = 0
         energyterms = OrderedDict()
         for line in o:
@@ -633,16 +674,20 @@ class GMX(Engine):
                     except: pass
         return energyterms
 
-    def optimize(self, shot=0, crit=1e-4):
+    def optimize(self, shot=0, crit=1e-4, **kwargs):
         
         """ Optimize the geometry and align the optimized geometry to the starting geometry. """
 
         ## Write the correct conformation.
         self.mol[shot].write("%s.gro" % self.name)
 
-        # Arguments for running minimization.
-        min_opts = {"integrator" : "l-bfgs", "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
-        edit_mdp("%s.mdp" % self.name, "%s-min.mdp" % self.name, dict(min_opts))
+        if "min_opts" in kwargs:
+            min_opts = kwargs["min_opts"]
+        else:
+            # Arguments for running minimization.
+            min_opts = {"integrator" : "l-bfgs", "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
+        
+        write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
 
         self.callgmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
@@ -650,71 +695,106 @@ class GMX(Engine):
         self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
         
         E = float(open("%s-min-e.xvg" % self.name).readlines()[-1].split()[1])
-        M = Molecule("%s.gro" % self.name) + Molecule("%s-min.gro" % self.name)
+        M = Molecule("%s.gro" % self.name, build_topology=False) + Molecule("%s-min.gro" % self.name, build_topology=False)
         M.align(center=False)
         rmsd = M.ref_rmsd(0)[1]
         M[1].write("%s-min.gro" % self.name)
 
         return E / 4.184, rmsd
 
-    def energy_force_one(self, shot):
+    def evaluate_(self, force=False, dipole=False, traj=None):
 
-        """ Computes the energy and force using GROMACS for a single snapshot. """
+        """ 
+        Utility function for computing energy, and (optionally) forces and dipoles using GROMACS. 
+        
+        Inputs:
+        force: Switch for calculating the force.
+        dipole: Switch for calculating the dipole.
+        traj: Trajectory file name.  If present, will loop over these snapshots.
+        Otherwise will do a single point evaluation at the current geometry.
 
-        if hasattr(self,'target') and hasattr(self.target,'force'):
-            force = self.target.force
+        Outputs:
+        Result: Dictionary containing energies, forces and/or dipoles.
+        """
+
+        shot_opts = OrderedDict([("nsteps", 0), ("nstxout", 0), ("nstxtcout", 0), ("nstenergy", 1)])
+        shot_opts["nstfout"] = 1 if force else 0
+        write_mdp("%s-1.mdp" % self.name, shot_opts, fin="%s.mdp" % self.name)
+
+        ## Call grompp followed by mdrun.
+        self.callgmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
+        self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite %s" % (self.name, "-rerun %s" % traj if traj else ''))
+
+        ## Gather information
+        Result = OrderedDict()
+
+        ## Calculate and record energy
+        self.callgmx("g_energy -xvg no -f %s.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
+        Efile = open("%s-e.xvg" % self.name).readlines()
+        Result["Energy"] = np.array([float(Eline.split()[1]) for Eline in Efile])
+
+        ## Calculate and record force
+        if force:
+            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
+            Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[i/3]] \
+                                            for line in open("%s-f.xvg" % self.name).readlines()])
+        ## Calculate and record dipole
+        if dipole:
+            self.callgmx("g_dipoles -s %s.tpr -f %s.gro -o %s-d.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
+            Result["Dipole"] = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-d.xvg" % self.name)])
+
+        return Result
+
+    def evaluate_snapshot(self, shot, force=False, dipole=False):
+
+        """ Evaluate variables (energies, force and/or dipole) using GROMACS for a single snapshot. """
 
         ## Write the correct conformation.
         self.mol[shot].write("%s.gro" % self.name)
+        return self.evaluate_(force, dipole)
 
-        ## Call grompp followed by mdrun.
-        self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite" % self.name)
+    def evaluate_trajectory(self, force=False, dipole=False, traj=None):
 
-        ## Gather information
-        self.callgmx("g_energy -xvg no -f %s.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
-        E = [float(open("%s-e.xvg" % self.name).readlines()[0].split()[1])]
-        F = []
-        if force:
-            ## When we read in the force, make sure that we only read in the forces on real atoms.
-            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-            F = [float(j) for i, j in enumerate(open("%s-f.xvg" % self.name).readlines()[0].split()[1:]) if self.AtomMask[i/3]]
-        M = array(E + F)
-        return M
+        """ Evaluate variables (energies, force and/or dipole) using GROMACS over a trajectory. """
 
-    def energy_force(self, force=True):
+        if traj == None:
+            traj = "%s-all.gro" % self.name
+        self.mol[0].write("%s.gro" % self.name)
+        return self.evaluate_(force, dipole, traj)
 
-        """ Computes the energy and force using GROMACS over a trajectory. """
+    def energy_one(self, shot):
 
-        if hasattr(self,'target') and hasattr(self.target,'force'):
-            force = self.target.force
+        """ Compute the energy using GROMACS for a snapshot. """
 
-        ## Call grompp followed by mdrun.
-        self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
+        return self.evaluate_snapshot(shot)["Energy"]
 
-        ## Gather information
-        self.callgmx("g_energy -xvg no -f %s.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
-        Efile = open("%s-e.xvg" % self.name).readlines()
-        if force:
-            M = []
-            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-            Ffile = open("%s-f.xvg" % self.name).readlines()
-            # Loop through the snapshots
-            for Eline, Fline in zip(Efile, Ffile):
-                # Compute the potential energy and append to list
-                Energy = [float(Eline.split()[1])]
-                # When we read in the force, make sure that we only read in the forces on real atoms.
-                Force = [float(j) for i, j in enumerate(Fline.split()[1:]) if self.AtomMask[i/3]]
-                M.append(array(Energy + Force))
-            M = array(M)
-        else:
-            M = array([float(Eline.split()[1]) for Eline in Efile]).reshape(-1,1)
-        return M
+    def energy_force_one(self, shot):
+
+        """ Compute the energy and force using GROMACS for a single snapshot; interfaces with AbInitio target. """
+
+        Result = self.evaluate_snapshot(shot, force=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+
+    def energy(self, traj=None):
+
+        """ Compute the energy using GROMACS over a trajectory. """
+
+        return self.evaluate_trajectory(traj=traj)["Energy"]
+
+    def energy_force(self, force=True, traj=None):
+
+        """ Compute the energy and force using GROMACS over a trajectory. """
+
+        Result = self.evaluate_trajectory(force=force, traj=traj)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+
+    def energy_dipole(self, traj=None):
+        Result = self.evaluate_trajectory(force=False, dipole=True, traj=traj)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
     def energy_rmsd(self, shot, optimize=True):
 
-        """ Calculate energy of the 1st structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
+        """ Calculate energy of the selected structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
 
         if optimize: 
             return self.optimize(shot)
@@ -730,12 +810,14 @@ class GMX(Engine):
 
         """ Computes the interaction energy between two fragments over a trajectory. """
 
+        self.mol[0].write("%s.gro" % self.name)
+
         ## Create an index file with the requisite groups.
-        edit_ndx(None,'%s.ndx' % self.name, OrderedDict([('A',[i+1 for i in fraga]),('B',[i+1 for i in fragb])]))
+        write_ndx('%s.ndx' % self.name, OrderedDict([('A',[i+1 for i in fraga]),('B',[i+1 for i in fragb])]))
 
         ## .mdp files for fully interacting and interaction-excluded systems.
-        edit_mdp('%s.mdp' % self.name, '%s-i.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B'})
-        edit_mdp('%s.mdp' % self.name, '%s-x.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'})
+        write_mdp('%s-i.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B'}, fin='%s.mdp' % self.name)
+        write_mdp('%s-x.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'}, fin='%s.mdp' % self.name)
 
         ## Call grompp followed by mdrun for interacting system.
         self.callgmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
@@ -745,7 +827,7 @@ class GMX(Engine):
         I = []
         for line in open('%s-i-e.xvg' % self.name):
             I.append(sum([float(i) for i in line.split()[1:]]))
-        I = array(I)
+        I = np.array(I)
 
         ## Call grompp followed by mdrun for noninteracting system.
         self.callgmx("grompp -c %s.gro -p %s.top -f %s-x.mdp -n %s.ndx -o %s-x.tpr" % \
@@ -755,7 +837,7 @@ class GMX(Engine):
         X = []
         for line in open('%s-x-e.xvg' % self.name):
             X.append(sum([float(i) for i in line.split()[1:]]))
-        X = array(X)
+        X = np.array(X)
 
         return (I - X) / 4.184 # kcal/mol
 
@@ -810,7 +892,7 @@ class GMX(Engine):
 
     def normal_modes(self, shot=0, optimize=True):
 
-        edit_mdp('%s.mdp' % self.name, '%s-nm.mdp' % self.name, {'integrator':'nm'})
+        write_mdp('%s-nm.mdp' % self.name, {'integrator':'nm'}, fin='%s.mdp' % self.name)
 
         if optimize:
             self.optimize(shot)
@@ -849,6 +931,154 @@ class GMX(Engine):
         NewMol = Molecule("%s-out.gro" % self.name)
         return NewMol.xyzs
 
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, pbc=True, threads=None, **kwargs):
+        
+        """
+        Method for running a molecular dynamics simulation.  
+
+        Required arguments:
+        nsteps      = (int)   Number of total time steps
+        timestep    = (float) Time step in FEMTOSECONDS
+        temperature = (float) Temperature control (Kelvin)
+        pressure    = (float) Pressure control (atmospheres)
+        nequil      = (int)   Number of additional time steps at the beginning for equilibration
+        nsave       = (int)   Step interval for saving data
+        minimize    = (bool)  Perform an energy minimization prior to dynamics
+        pbc         = (bool)  Periodic boundary conditions; remove COM motion
+        threads     = (int)   Number of MPI-threads
+
+        Returns simulation data:
+        Rhos        = (array)     Density in kilogram m^-3
+        Potentials  = (array)     Potential energies
+        Kinetics    = (array)     Kinetic energies
+        Volumes     = (array)     Box volumes
+        Dips        = (3xN array) Dipole moments
+        EComps      = (dict)      Energy components
+        """
+
+        # Set the number of threads.
+        if threads == None:
+            if "OMP_NUM_THREADS" in os.environ:
+                threads = int(os.environ["OMP_NUM_THREADS"])
+            else:
+                threads = 1
+                
+        # Molecular dynamics options.
+        md_opts = OrderedDict([("integrator", "md"), ("nsteps", nsteps), ("dt", timestep / 1000)])
+        # Default options if not user specified.
+        md_defs = OrderedDict()
+        eq_defs = OrderedDict()
+        if temperature != None:
+            md_opts["ref_t"] = temperature
+            md_opts["gen_temp"] = temperature
+            md_defs["tc_grps"] = "System"
+            md_defs["tcoupl"] = "v-rescale"
+            md_defs["tau_t"] = 1.0
+        md_opts["nstenergy"] = nsave
+        md_opts["nstcalcenergy"] = nsave
+        md_opts["nstxout"] = nsave
+        md_opts["nstvout"] = nsave
+        md_opts["nstfout"] = 0
+        md_opts["nstxtcout"] = 0
+        if pbc:
+            if minbox <= 10:
+                warn_press_key("Periodic box is set to less than 1.0 ")
+            elif minbox <= 21:
+                # Cutoff diameter should be at least one angstrom smaller than the box size
+                # Translates to 0.85 Angstrom for the SPC-216 water box
+                rlist = 0.05*(float(int(minbox - 1)))
+            else:
+                rlist = 1.0
+            md_opts["pbc"] = "xyz"
+            md_opts["comm_mode"] = "linear"
+            if pressure != None:
+                md_opts["ref_p"] = pressure
+                md_defs["pcoupl"] = "parrinello-rahman"
+                md_defs["tau_p"] = 1.5
+            md_defs["ns_type"] = "grid"
+            minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
+            md_defs["nstlist"] = 20
+            md_defs["rlist"] = "%.2f" % rlist
+            md_defs["coulombtype"] = "pme-switch"
+            md_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
+            md_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
+            md_defs["vdwtype"] = "switch"
+            md_defs["rvdw"] = "%.2f" % (rlist - 0.05)
+            md_defs["rvdw_switch"] = "%.2f" % (rlist - 0.1)
+            md_defs["DispCorr"] = "EnerPres"
+        else:
+            if pressure != None:
+                raise RuntimeError("To set a pressure, enable periodic boundary conditions.")
+            md_opts["pbc"] = "no"
+            md_opts["comm_mode"] = "None"
+            md_opts["nstcomm"] = 0
+            md_defs["ns_type"] = "simple"
+            md_defs["nstlist"] = 0
+            md_defs["rlist"] = "0.0"
+            md_defs["coulombtype"] = "cut-off"
+            md_defs["rcoulomb"] = "0.0"
+            md_defs["vdwtype"] = "switch"
+            md_defs["rvdw"] = "0.0"
+
+        # Minimize the energy.
+        if minimize:
+            min_opts = OrderedDict([("integrator", "steep"), ("emtol", 10.0), ("nsteps", 10000)])
+            self.optimize(min_opts=min_opts)
+            gro1="%s-min.gro" % self.name
+        else:
+            gro1="%s.gro" % self.name
+            self.mol[0].write(gro1)
+      
+        # Run equilibration.
+        if nequil > 0:
+            eq_opts = deepcopy(md_opts)
+            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstcalcenergy" : 0, "nstxout" : 0})
+            eq_defs = deepcopy(md_defs)
+            if "pcoupl" in eq_defs: eq_defs["pcoupl"] = "berendsen"
+            write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
+            self.callgmx("grompp -c %s -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (gro1, self.name, self.name, self.name))
+            self.callgmx("mdrun -v -deffnm %s-eq -nt %i -stepout %i" % (self.name, threads, nsave))
+            gro2="%s-eq.gro" % self.name
+        else:
+            gro2=gro1
+
+        # Run production.
+        write_mdp("%s-md.mdp" % self.name, md_opts, fin="%s.mdp" % self.name, defaults=md_defs)
+        self.callgmx("grompp -c %s -p %s.top -f %s-md.mdp -o %s-md.tpr" % (gro2, self.name, self.name, self.name))
+        self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave))
+
+        # Figure out dipoles - note we use g_dipoles and not the multipole_moments function.
+        self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
+        
+        # Figure out which energy terms need to be printed.
+        energyterms = self.energy_termnames(edrfile="%s-md.edr" % self.name)
+        ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
+        ekeep += ['Volume', 'Density']
+
+        # Perform energy component analysis and return properties.
+        self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(ekeep))
+        ecomp = OrderedDict()
+        Rhos = []
+        Volumes = []
+        Kinetics = []
+        Potentials = []
+        for line in open("%s-md-energy.xvg" % self.name):
+            s = [float(i) for i in line.split()]
+            for i in range(len(ekeep) - 2):
+                val = s[i+1]
+                if ekeep[i] in ecomp:
+                    ecomp[ekeep[i]].append(val)
+                else:
+                    ecomp[ekeep[i]] = [val]
+            Rhos.append(s[-1])
+            Volumes.append(s[-2])
+        Rhos = np.array(Rhos)
+        Volumes = np.array(Volumes)
+        Potentials = np.array(ecomp['Potential'])
+        Kinetics = np.array(ecomp['Kinetic-En.'])
+        Dips = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-md-dip.xvg" % self.name)])
+        return Rhos, Potentials, Kinetics, Volumes, Dips, OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
+
 class AbInitio_GMX(AbInitio):
     """ Subclass of AbInitio for force and energy matching using normal GROMACS.
     Implements the prepare_temp_directory and energy_force_driver methods."""
@@ -874,15 +1104,6 @@ class AbInitio_GMX(AbInitio):
         
     def read_topology(self):
         self.topology_flag = True
-
-    def energy_force_driver(self, shot):
-        """ Computes the energy and force using GROMACS for a single
-        snapshot.  This does not require GROMACS-X2. """
-        return self.engine.energy_force_one(shot)
-
-    def energy_force_driver_all(self):
-        """ Computes the energy and force using GROMACS for a trajectory.  This does not require GROMACS-X2. """
-        return self.engine.energy_force()
 
     def generate_vsite_positions(self):
         """ Call mdrun in order to update the virtual site positions. """
@@ -990,3 +1211,21 @@ class Interaction_GMX(Interaction):
         #         self.Diel_B = Diel_B
         #     self.Dielectric = Diel_D - Diel_A - Diel_B
         # M += self.Dielectric
+
+class Vibration_GMX(Vibration):
+
+    """Subclass of Target for vibrational frequency matching
+    using GROMACS.  Provides optimized geometry, vibrational frequencies (in cm-1),
+    and eigenvectors."""
+
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="conf.gro")
+        ## Initialize base class.
+        super(Vibration_GMX,self).__init__(options,tgt_opts,forcefield)
+        ## Build keyword dictionaries to pass to engine.
+        engine_args = deepcopy(self.__dict__)
+        engine_args.update(options)
+        del engine_args['name']
+        ## Create engine object.
+        self.engine = GMX(target=self, **engine_args)

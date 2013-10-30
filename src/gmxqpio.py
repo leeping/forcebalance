@@ -9,7 +9,7 @@
 import os
 from re import match, sub
 from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary, LinkFile
-import numpy as Np
+import numpy as np
 from forcebalance.molecule import Molecule
 from copy import deepcopy
 import itertools
@@ -55,10 +55,10 @@ def get_monomer_properties(print_stuff=0):
                     a.append([1e10,1e10,1e10])
         if "Computing the polarizability tensor" in line:
             mode = 1
-    x = Np.array(x)
-    q = Np.array(q)
-    a = Np.array(a)
-    Dip = Np.zeros(3,dtype=float)
+    x = np.array(x)
+    q = np.array(q)
+    a = np.array(a)
+    Dip = np.zeros(3,dtype=float)
     QuadXX = 0.0
     QuadYY = 0.0
     QuadZZ = 0.0
@@ -71,7 +71,7 @@ def get_monomer_properties(print_stuff=0):
         yy = x[i,1]*x[i,1]
         zz = x[i,2]*x[i,2]
         z  = x[i,2]
-        r2 = Np.dot(x[i,:],x[i,:])
+        r2 = np.dot(x[i,:],x[i,:])
         QuadXX += 0.5*q[i]*(2*xx - yy - zz) * 10 * nm_to_a0 / ea0_to_debye
         QuadYY += 0.5*q[i]*(2*yy - xx - zz) * 10 * nm_to_a0 / ea0_to_debye
         QuadZZ += 0.5*q[i]*(2*zz - xx - yy) * 10 * nm_to_a0 / ea0_to_debye
@@ -87,15 +87,15 @@ def get_monomer_properties(print_stuff=0):
     QuadXX0 =  2.51
     QuadYY0 = -2.63
     QuadZZ0 =  0.11
-    Quad0   = Np.sqrt((QuadXX0**2 + QuadYY0**2 + QuadZZ0**2)/3)
+    Quad0   = np.sqrt((QuadXX0**2 + QuadYY0**2 + QuadZZ0**2)/3)
     OctXXZ0 =  2.58
     OctYYZ0 = -1.24
     OctZZZ0 = -1.35
-    Oct0   = Np.sqrt((OctXXZ0**2 + OctYYZ0**2 + OctZZZ0**2)/3)
+    Oct0   = np.sqrt((OctXXZ0**2 + OctYYZ0**2 + OctZZZ0**2)/3)
     AlphaXX0 = 10.32
     AlphaYY0 =  9.56
     AlphaZZ0 =  9.91
-    Alpha0   = Np.sqrt((AlphaXX0**2 + AlphaYY0**2 + AlphaZZ0**2)/3)
+    Alpha0   = np.sqrt((AlphaXX0**2 + AlphaYY0**2 + AlphaZZ0**2)/3)
     Err_DipZ = ((DipZ-DipZ0)/DipZ0)**2
     Err_QuadXX = ((QuadXX-QuadXX0)/Quad0)**2
     Err_QuadYY = ((QuadYY-QuadYY0)/Quad0)**2
@@ -136,15 +136,15 @@ class Monomer_QTPIE(Target):
         # QuadXX0 =  2.51
         # QuadYY0 = -2.63
         # QuadZZ0 =  0.11
-        # Quad0   = Np.sqrt((QuadXX0**2 + QuadYY0**2 + QuadZZ0**2)/3)
+        # Quad0   = np.sqrt((QuadXX0**2 + QuadYY0**2 + QuadZZ0**2)/3)
         # OctXXZ0 =  2.58
         # OctYYZ0 = -1.24
         # OctZZZ0 = -1.35
-        # Oct0   = Np.sqrt((OctXXZ0**2 + OctYYZ0**2 + OctZZZ0**2)/3)
+        # Oct0   = np.sqrt((OctXXZ0**2 + OctYYZ0**2 + OctZZZ0**2)/3)
         # AlphaXX0 = 10.32
         # AlphaYY0 =  9.56
         # AlphaZZ0 =  9.91
-        # Alpha0   = Np.sqrt((AlphaXX0**2 + AlphaYY0**2 + AlphaZZ0**2)/3)
+        # Alpha0   = np.sqrt((AlphaXX0**2 + AlphaYY0**2 + AlphaZZ0**2)/3)
 
         self.ref_moments = OrderedDict()
         self.ref_moments['DipZ'] = 1.855
@@ -157,9 +157,9 @@ class Monomer_QTPIE(Target):
         self.ref_moments['AlphaXX'] = 10.32
         self.ref_moments['AlphaYY'] =  9.56
         self.ref_moments['AlphaZZ'] =  9.91
-        Quad0   = Np.sqrt((self.ref_moments['QuadXX']**2 + self.ref_moments['QuadYY']**2 + self.ref_moments['QuadZZ']**2))
-        Oct0   = Np.sqrt((self.ref_moments['OctXXZ']**2 + self.ref_moments['OctYYZ']**2 + self.ref_moments['OctZZZ']**2))
-        Alpha0   = Np.sqrt((self.ref_moments['AlphaXX']**2 + self.ref_moments['AlphaYY']**2 + self.ref_moments['AlphaZZ']**2))
+        Quad0   = np.sqrt((self.ref_moments['QuadXX']**2 + self.ref_moments['QuadYY']**2 + self.ref_moments['QuadZZ']**2))
+        Oct0   = np.sqrt((self.ref_moments['OctXXZ']**2 + self.ref_moments['OctYYZ']**2 + self.ref_moments['OctZZZ']**2))
+        Alpha0   = np.sqrt((self.ref_moments['AlphaXX']**2 + self.ref_moments['AlphaYY']**2 + self.ref_moments['AlphaZZ']**2))
         self.weights = OrderedDict()
         self.weights['DipZ'] = 1.0 / 1.855
         self.weights['QuadXX'] = 1.0 / Quad0
@@ -212,7 +212,7 @@ class Monomer_QTPIE(Target):
         LinkFile(os.path.join(self.root,self.tgtdir,"topol.top"),os.path.join(abstempdir,"topol.top"))
 
     def unpack_moments(self, moment_dict):
-        answer = Np.array([moment_dict[i]*self.weights[i] for i in moment_dict])
+        answer = np.array([moment_dict[i]*self.weights[i] for i in moment_dict])
         return answer
 
     def get(self, mvals, AGrad=False, AHess=False):
@@ -220,16 +220,16 @@ class Monomer_QTPIE(Target):
         # Maybe the start of 'get', where the force field is created, can be put into 
         # some kind of common block.
         # Create the new force field!!
-        Answer = {'X':0.0, 'G':Np.zeros(self.FF.np, dtype=float), 'H':Np.zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np, dtype=float), 'H':np.zeros((self.FF.np, self.FF.np), dtype=float)}
         def get_momvals(mvals_):
             self.FF.make(mvals_)
             moments = get_monomer_properties()
             # Unpack from dictionary.
             return self.unpack_moments(moments)
 
-        np = len(mvals)
-        G = Np.zeros(np,dtype=float)
-        H = Np.zeros((np,np),dtype=float)
+        NP = len(mvals)
+        G = np.zeros(NP,dtype=float)
+        H = np.zeros((NP,NP),dtype=float)
         pvals = self.FF.make(mvals)
 
         calc_moments = get_monomer_properties()
@@ -238,7 +238,7 @@ class Monomer_QTPIE(Target):
         calc_momvals = self.unpack_moments(calc_moments)
 
         D = calc_momvals - ref_momvals
-        dV = Np.zeros((self.FF.np,len(calc_momvals)),dtype=float)
+        dV = np.zeros((self.FF.np,len(calc_momvals)),dtype=float)
 
         if AGrad or AHess:
             for p in range(self.FF.np):

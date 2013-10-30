@@ -320,7 +320,7 @@ class Liquid(Target):
         GradMapPrint = [["#PhasePoint"] + self.FF.plist]
         for PT, g in zip(points,GradMap):
             GradMapPrint.append([' %8.2f %8.1f %3s' % PT] + ["% 9.3e" % i for i in g])
-        o = open('gradient_%s.dat' % name,'w')
+        o = wopen('gradient_%s.dat' % name)
         for line in GradMapPrint:
             print >> o, ' '.join(line)
         o.close()
@@ -335,7 +335,7 @@ class Liquid(Target):
         # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
         #
         # First dump the force field to a pickle file
-        with open('forcebalance.p','w') as f: lp_dump((self.FF,mvals,self.h,AGrad),f)
+        with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.h,AGrad),f)
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == 0 and self.manual:

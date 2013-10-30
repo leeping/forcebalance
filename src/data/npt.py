@@ -60,7 +60,7 @@ import numpy as np
 from copy import deepcopy
 from collections import namedtuple
 from forcebalance.forcefield import FF
-from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, statisticalInefficiency, which, _exec, isint
+from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, statisticalInefficiency, which, _exec, isint, wopen
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p, in_fd
 from forcebalance.molecule import Molecule
 
@@ -345,11 +345,11 @@ class Gromacs_MD(MDEngine):
         save_opts = {"nstxout" : nsteps, "nstenergy" : nsteps, "nstcalcenergy" : nsteps}
         # Minimize the energy.
         if minimize:
-            edit_mdp("%s.mdp" % phase, "%s-min.mdp" % phase, dict(min_opts[phase], **save_opts), verbose=True)
+            write_mdp("%s-min.mdp" % phase, dict(min_opts[phase], **save_opts), fin="%s.mdp" % phase, verbose=True)
             self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (phase, phase, phase, phase))
             self.callgmx("mdrun -v -deffnm %s-min" % phase)
         # Run equilibration.
-        edit_mdp("%s.mdp" % phase, "%s-eq.mdp" % phase, dict(eq_opts[phase], **save_opts), verbose=True)
+        write_mdp("%s-eq.mdp" % phase, dict(eq_opts[phase], **save_opts), fin="%s.mdp" % phase, verbose=True)
         if minimize:
             self.callgmx("grompp -maxwarn 1 -c %s-min.gro -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (phase, phase, phase, phase))
         else:
@@ -358,7 +358,7 @@ class Gromacs_MD(MDEngine):
         if int(eq_opts[phase]["nsteps"]) == 0:
             shutil.copy2("%s-min.gro" % phase, "%s-eq.gro" % phase)
         # Run production.
-        edit_mdp("%s.mdp" % phase, "%s-md.mdp" % phase, dict(md_opts[phase], **save_opts), verbose=True)
+        write_mdp("%s-md.mdp" % phase, dict(md_opts[phase], **save_opts), fin="%s.mdp" % phase, verbose=True)
         self.callgmx("grompp -maxwarn 1 -c %s-eq.gro -p %s.top -f %s-md.mdp -o %s-md.tpr" % (phase, phase, phase, phase))
         self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (phase, args.nt, nsteps), outfnm="%s-md.out" % phase, copy_stderr=True, expand_cr=True)
         # After production, run analysis.
@@ -424,7 +424,7 @@ class Gromacs_MD(MDEngine):
                      "gas" : dict({"integrator" : "md", "nsteps" : 0, "nstenergy" : 1}, **self.opts["gas"])}
         # Run over the snapshots.
         if in_fd(): verbose=False
-        edit_mdp("%s.mdp" % phase, "%s-shot.mdp" % phase, shot_opts[phase], verbose=verbose)
+        write_mdp("%s-shot.mdp" % phase, shot_opts[phase], fin="%s.mdp" % phase, verbose=verbose)
         self.callgmx("grompp -maxwarn 1 -c %s.gro -p %s.top -f %s-shot.mdp -o %s-shot.tpr" % (phase, phase, phase, phase), print_command=verbose, print_to_screen=verbose)
         self.callgmx("mdrun -v -deffnm %s-shot -rerun %s-md.trr -rerunvsite -nt %i" % (phase, phase, args.nt), print_command=verbose, print_to_screen=verbose)
         # Get potential energies.
@@ -652,7 +652,7 @@ class OpenMM_MD(MDEngine):
         Serialize = 0
         if Serialize:
             serial = XmlSerializer.serializeSystem(system)
-            with open('%s_system.xml' % phase,'w') as f: f.write(serial)
+            with wopen('%s_system.xml' % phase) as f: f.write(serial)
 
         kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
         # Determine number of degrees of freedom; the center of mass motion remover is also a constraint.
@@ -1125,7 +1125,7 @@ def main():
     ## Print the final force field.
     pvals = FF.make(mvals)
 
-    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
+    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
 
 if __name__ == "__main__":
     main()
