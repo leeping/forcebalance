@@ -1085,7 +1085,8 @@ class FF(forcebalance.BaseClass):
             logger.warning('The difference between the numpy multiplication and the manual multiplication is \x1b[1;91m%f\x1b[0m, '
                            'but it should be zero.\n' % np.max(np.abs(transmat1 - transmat)))
 
-        transmatNS = np.array(transmat1,copy=True)
+            transmat = np.array(transmat1, copy=True)
+        transmatNS = np.array(transmat,copy=True)
         self.excision = []
         for i in range(self.np):
             if abs(transmatNS[i, i]) < 1e-8:

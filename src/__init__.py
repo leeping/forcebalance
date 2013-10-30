@@ -24,12 +24,13 @@ from parser import tgt_opts_defaults, gen_opts_defaults
 class BaseClass(object):
     """ Provides some nifty functions that are common to all ForceBalance classes. """
 
-    PrintOptionDict  = OrderedDict()
 
     def __init__(self, options):
         self.verbose_options  = options['verbose_options'] if 'verbose_options' in options else False
         
     def set_option(self, in_dict, src_key, dest_key = None, val = None, default = None, forceprint=False):
+        if not hasattr(self, 'PrintOptionDict'):
+            self.PrintOptionDict  = OrderedDict()
         if dest_key == None:
             dest_key = src_key
         if val == None:
