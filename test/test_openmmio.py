@@ -19,10 +19,7 @@ class TestLiquid_OpenMM(ForceBalanceTestCase, TargetTests):
         self.tgt_opt.update({'type':'LIQUID_OPENMM',
             'name':'dms-liquid'})
 
-        try:
-            self.ff = forcebalance.forcefield.FF(self.options)
-        except:
-            self.skipTest("Unable to create forcefield from dms.xml\n")
+        self.ff = forcebalance.forcefield.FF(self.options)
 
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
@@ -49,10 +46,7 @@ class TestInteraction_OpenMM(ForceBalanceTestCase, TargetTests):
                             "fragment1" : "1-9",
                             "fragment2" : "10-18"})
 
-        try:
-            self.ff = forcebalance.forcefield.FF(self.options)
-        except:
-            self.skipTest("Unable to create forcefield from dms.xml\n")
+        self.ff = forcebalance.forcefield.FF(self.options)
 
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
