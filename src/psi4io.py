@@ -9,7 +9,7 @@ modules for other programs because it's so simple.
 
 import os, sys, glob, shutil
 from re import match, sub, split, findall
-from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
+from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary, wopen
 import numpy as np
 from forcebalance.leastsq import LeastSquares, CheckBasis
 from forcebalance import BaseReader
@@ -137,7 +137,7 @@ class THCDF_Psi4(LeastSquares):
 
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
-        o = open(os.path.join(abstempdir,"input.dat"),'w')
+        o = wopen(os.path.join(abstempdir,"input.dat"))
         for line in open(os.path.join(self.root,self.tgtdir,"input.dat")).readlines():
             s = line.split("#")[0].split()
             if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
@@ -155,7 +155,7 @@ class THCDF_Psi4(LeastSquares):
         ln0 = range(len(open(fnm).readlines()))
         for layer in linedestroy:
             f = open(fnm).readlines()
-            o = open('.tmp.gbs','w')
+            o = wopen('.tmp.gbs')
             newln = []
             for ln, line in enumerate(f):
                 if ln not in layer:
@@ -172,7 +172,7 @@ class THCDF_Psi4(LeastSquares):
             logger.info("Now checking for linear dependencies.\n")
             _exec("cp %s %s.bak" % (self.GBSfnm, self.GBSfnm), print_command=False)
             ln0 = self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save)
-            o = open(".lindep.dat",'w')
+            o = wopen(".lindep.dat")
             for line in open(self.DATfnm).readlines():
                 s = line.split("#")[0].split()
                 if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
@@ -215,7 +215,7 @@ class THCDF_Psi4(LeastSquares):
                     FK_lines.append(LI_lines[key][0])
                 else:
                     FK_lines.append(line)
-            o = open('franken.gbs','w')
+            o = wopen('franken.gbs')
             for line in FK_lines:
                 print >> o, line,
             o.close()
@@ -354,7 +354,7 @@ class RDVR3_Psi4(Target):
             if not os.path.exists(this_apath) : os.makedirs(this_apath)
             os.chdir(this_apath)
             self.FF.make(these_mvals)
-            o = open('objective.dat','w')
+            o = wopen('objective.dat')
             for line in self.objfiles[d]:
                 s = line.split()
                 if len(s) > 2 and s[0] == 'path' and s[1] == '=':
@@ -411,7 +411,7 @@ class RDVR3_Psi4(Target):
         #    shutil.rmtree(odir)
         if not os.path.exists(odir): os.makedirs(odir)
         os.chdir(odir)
-        o = open('objective.dat','w')
+        o = wopen('objective.dat')
         for line in self.objfiles[d]:
             s = line.split()
             if len(s) > 2 and s[0] == 'path' and s[1] == '=':

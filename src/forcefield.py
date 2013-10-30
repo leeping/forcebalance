@@ -95,13 +95,12 @@ we need more modules!
 
 import os
 import sys
+import numpy as np
 from re import match, sub, split
 import forcebalance
 from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io 
 from forcebalance.finite_difference import in_fd
-from numpy import argsort, arange, array, diag, exp, eye, log, mat, mean, ndarray, ones, vstack, zeros, sin, cos, pi, sqrt
-from numpy.linalg import norm
-from forcebalance.nifty import col, flat, invert_svd, isint, isfloat, kb, orthogonalize, pmat2d, printcool, row, warn_press_key, printcool_dictionary
+from forcebalance.nifty import *
 from string import count
 from copy import deepcopy
 try:
@@ -114,6 +113,7 @@ from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
 FF_Extensions = {"itp" : "gmx",
+                 "top" : "gmx",
                  "in"  : "qchem",
                  "prm" : "tinker",
                  "gen" : "custom",
@@ -210,19 +210,19 @@ class FF(forcebalance.BaseClass):
         ## File names of force fields
         self.set_option(options,'forcefield','fnms')
         ## Directory containing force fields, relative to project directory
-        self.set_option(options,'ffdir')
+        self.set_option(options,'ffdir', default='.')
         ## Priors given by the user :)
-        self.set_option(options,'priors')
+        self.set_option(options,'priors', default={})
         ## Whether to constrain the charges.
-        self.set_option(options,'constrain_charge')
+        self.set_option(options,'constrain_charge', default=False)
         ## Whether to constrain the charges.
-        self.set_option(options,'logarithmic_map')
+        self.set_option(options,'logarithmic_map', default=False)
         ## Switch for AMOEBA direct or mutual.
-        self.set_option(None, None, 'amoeba_pol', options['amoeba_polarization'].lower(), 'direct')
+        self.set_option(options, 'amoeba_polarization', 'amoeba_pol', default='direct')
         ## Switch for rigid water molecules
-        self.set_option(options, 'rigid_water')
+        self.set_option(options, 'rigid_water', default=False)
         ## Bypass the transformation and use physical parameters directly
-        self.set_option(options, 'use_pvals')
+        self.set_option(options, 'use_pvals', default=False)
         
         #======================================#
         #     Variables which are set here     #
@@ -292,7 +292,7 @@ class FF(forcebalance.BaseClass):
 
         # Set the initial values of parameter arrays.
         ## Initial value of physical parameters
-        self.pvals0 = array(self.pvals0)
+        self.pvals0 = np.array(self.pvals0)
 
         # Prepare various components of the class for first use.
         ## Creates plist from map.
@@ -465,13 +465,14 @@ class FF(forcebalance.BaseClass):
                 logger.warning(traceback.format_exc() + '\n')
                 logger.warning("The force field reader crashed when trying to read the following line:\n")
                 logger.warning(line + '\n')
+                traceback.print_exc()
                 warn_press_key("The force field parser got confused!  The traceback and line in question are printed above.")
             sline = self.Readers[ffname].Split(line)
             pmark = None
             if 'PRM' in sline:
-                pmark = (array(sline) == 'PRM').argmax() # The position of the parameterization keyword
+                pmark = (np.array(sline) == 'PRM').argmax() # The position of the parameterization keyword
             elif 'PARM' in sline:
-                pmark = (array(sline) == 'PARM').argmax()
+                pmark = (np.array(sline) == 'PARM').argmax()
             if pmark != None:
                 pflds = [int(i) for i in sline[pmark+1:]] # The integers that specify the parameter word positions
                 for pfld in pflds:
@@ -495,9 +496,9 @@ class FF(forcebalance.BaseClass):
                     self.assign_field(self.np,ffname,ln,pfld,1)
                     self.np += 1
             if "RPT" in sline:
-                parse = (array(sline)=='RPT').argmax()+1 # The position of the 'RPT' word
-                if max(array(sline)=='/RPT') > 0:
-                    stopparse = (array(sline)=='/RPT').argmax()
+                parse = (np.array(sline)=='RPT').argmax()+1 # The position of the 'RPT' word
+                if max(np.array(sline)=='/RPT') > 0:
+                    stopparse = (np.array(sline)=='/RPT').argmax()
                 else:
                     stopparse = len(sline)
                 while parse < stopparse:
@@ -525,9 +526,9 @@ class FF(forcebalance.BaseClass):
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
             if "EVAL" in sline:
-                parse = (array(sline)=='EVAL').argmax()+1 # The position of the 'EVAL' word
-                if max(array(sline)=='/EVAL') > 0:
-                    stopparse = (array(sline)=='/EVAL').argmax()
+                parse = (np.array(sline)=='EVAL').argmax()+1 # The position of the 'EVAL' word
+                if max(np.array(sline)=='/EVAL') > 0:
+                    stopparse = (np.array(sline)=='/EVAL').argmax()
                 else:
                     stopparse = len(sline)
                 while parse < stopparse:
@@ -615,10 +616,10 @@ class FF(forcebalance.BaseClass):
         and use physical parameters directly.
         
         """
-        if type(vals)==ndarray and vals.ndim != 1:
+        if type(vals)==np.ndarray and vals.ndim != 1:
             raise Exception('Please only pass 1-D arrays')
         if len(vals) != self.np:
-            raise Exception('Input parameter array (%i) not the required size (%i)' % (len(vals), self.np))
+            raise Exception('Input parameter np.array (%i) not the required size (%i)' % (len(vals), self.np))
         if use_pvals or self.use_pvals:
             logger.info("Using physical parameters directly!\r")
             pvals = vals.copy().flatten()
@@ -645,6 +646,7 @@ class FF(forcebalance.BaseClass):
                     return SciNot % number
 
         pvals = list(pvals)
+        # pvec1d(vals, precision=4)
         newffdata = deepcopy(self.ffdata)
         # The dictionary that takes parameter names to physical values.
         PRM = {i:pvals[self.map[i]] for i in self.map}
@@ -721,9 +723,9 @@ class FF(forcebalance.BaseClass):
         for fnm in newffdata:
             #if type(newffdata[fnm]) is etree._ElementTree:
             if self.ffdata_isxml[fnm]:
-                with open(os.path.join(absprintdir,fnm),'w') as f: newffdata[fnm].write(f)
+                with wopen(os.path.join(absprintdir,fnm)) as f: newffdata[fnm].write(f)
             else:
-                with open(os.path.join(absprintdir,fnm),'w') as f: f.writelines(newffdata[fnm])
+                with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
         return pvals
         
     def make_redirect(self,mvals):
@@ -749,14 +751,14 @@ class FF(forcebalance.BaseClass):
             # The group of parameters for a particular element / angular momentum.
             pvals_grp = pvals[pidx]
             # The order that the parameters come in.
-            Order = argsort(pvals_grp)
+            Order = np.argsort(pvals_grp)
             for p in range(len(Order) - 1):
                 # The pointers to the parameter indices.
                 pi = pidx[Order[p]]
                 pj = pidx[Order[p+1]]
                 # pvals[pi] is the SMALLER parameter.
                 # pvals[pj] is the LARGER parameter.
-                dp = log(pvals[pj]) - log(pvals[pi])
+                dp = np.log(pvals[pj]) - np.log(pvals[pi])
                 if dp < Thresh:
                     if pi in self.redirect:
                         pk = self.redirect[pi]
@@ -778,7 +780,7 @@ class FF(forcebalance.BaseClass):
             key = Data['Elem']+'_'+Data['AMom']
             Groups[key].append(p)
 
-        pvals = self.create_pvals(zeros(self.np,dtype=float))
+        pvals = self.create_pvals(np.zeros(self.np,dtype=float))
         logger.info("pvals:\n")
         logger.info(str(pvals) + '\n')
 
@@ -787,7 +789,7 @@ class FF(forcebalance.BaseClass):
             # The group of parameters for a particular element / angular momentum.
             pvals_grp = pvals[pidx]
             # The order that the parameters come in.
-            Order = argsort(pvals_grp)
+            Order = np.argsort(pvals_grp)
             spacs = []
             for p in range(len(Order) - 1):
                 # The pointers to the parameter indices.
@@ -795,10 +797,10 @@ class FF(forcebalance.BaseClass):
                 pj = pidx[Order[p+1]]
                 # pvals[pi] is the SMALLER parameter.
                 # pvals[pj] is the LARGER parameter.
-                dp = log(pvals[pj]) - log(pvals[pi])
+                dp = np.log(pvals[pj]) - np.log(pvals[pi])
                 spacs.append(dp)
             if len(spacs) > 0:
-                spacdict[gnm] = mean(array(spacs))
+                spacdict[gnm] = np.mean(np.array(spacs))
         return spacdict
         
     def create_pvals(self,mvals):
@@ -812,18 +814,16 @@ class FF(forcebalance.BaseClass):
         @return pvals The physical parameters
         
         """
-        #print "mvals = ", mvals, 
-        
         for p in self.redirect:
             mvals[p] = 0.0
         if self.logarithmic_map:
             try:
-                pvals = exp(mvals.flatten()) * self.pvals0
+                pvals = np.exp(mvals.flatten()) * self.pvals0
             except:
                 logger.exception(mvals + '\n')
                 raise Exception('What the hell did you do?')
         else:
-            pvals = flat(mat(self.tmI)*col(mvals)) + self.pvals0
+            pvals = flat(np.mat(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
         for i in range(self.np):
@@ -880,7 +880,7 @@ class FF(forcebalance.BaseClass):
             # The old, horrendously complicated rule
             # rsfactors[termtype] = exp(mean(log(abs(array(typevals[termtype]))+(abs(array(typevals[termtype]))==0))))
             # The newer, maximum rule (thanks Baba)
-            maxval = max(abs(array(typevals[termtype])))
+            maxval = max(abs(np.array(typevals[termtype])))
             # When all initial parameter values are zero, it could be a problem...
             if maxval == 0:
                 maxval += 1
@@ -900,7 +900,7 @@ class FF(forcebalance.BaseClass):
             logger.info(''.join(["   %-35s  : %.5e\n" % (i, rsfactors[i]) for i in rsfac_list]))
             logger.info(bar)
         ## The array of rescaling factors
-        self.rs = ones(len(self.pvals0))
+        self.rs = np.ones(len(self.pvals0))
         for pnum in range(len(self.pvals0)):
             for termtype in rsfac_list:
                 if termtype in self.plist[pnum]:
@@ -942,7 +942,7 @@ class FF(forcebalance.BaseClass):
         self.qid2   = []
         qnr    = 1
         concern= ['COUL','c0','charge']
-        qmat2 = eye(self.np,dtype=float)
+        qmat2 = np.eye(self.np)
 
         def insert_mat(qtrans2, qmap):
             # Write the qtrans2 block into qmat2.
@@ -957,13 +957,13 @@ class FF(forcebalance.BaseClass):
 
         def build_qtrans2(tq, qid, qmap):
             nq = len(qmap)
-            cons0 = ones((1,tq),dtype=float)
-            cons = zeros((cons0.shape[0], nq), dtype=float)
-            qtrans2 = eye(nq, dtype=float)
+            cons0 = np.ones((1,tq),dtype=float)
+            cons = np.zeros((cons0.shape[0], nq), dtype=float)
+            qtrans2 = np.eye(nq, dtype=float)
             for i in range(cons.shape[0]):
                 for j in range(cons.shape[1]):
                     cons[i][j] = sum([cons0[i][k-1] for k in qid[j]])
-                cons[i] /= norm(cons[i])
+                cons[i] /= np.linalg.norm(cons[i])
                 for j in range(i):
                     cons[i] = orthogonalize(cons[i], cons[j])
                 qtrans2[i,:] = 0
@@ -982,7 +982,7 @@ class FF(forcebalance.BaseClass):
                     Adict[k] = v
             nmol = 0
             for molname, molatoms in Adict.items():
-                mol_charge_count = zeros(self.np, dtype=float)
+                mol_charge_count = np.zeros(self.np, dtype=float)
                 tq = 0
                 qmap = []
                 qid = []
@@ -1032,10 +1032,10 @@ class FF(forcebalance.BaseClass):
                                     thisq.append(k.split('-')[-1])
                                     break
                         try:
-                            self.qid2.append(array([self.atomnames.index(k) for k in thisq]))
+                            self.qid2.append(np.array([self.atomnames.index(k) for k in thisq]))
                         except: pass
-                        nq = sum(array([count(self.plist[i], j) for j in concern]))
-                    self.qid.append(qnr+arange(nq))
+                        nq = sum(np.array([count(self.plist[i], j) for j in concern]))
+                    self.qid.append(qnr+np.arange(nq))
                     qnr += nq
             if len(self.qid2) == 0:
                 sys.stderr.write('Unable to match atom numbers up with atom names (minor issue, unless doing ESP fitting).  \nAre atom names implemented in the force field parser?\n')
@@ -1044,7 +1044,7 @@ class FF(forcebalance.BaseClass):
             tq = qnr - 1
             #Here is where we build the qtrans2 matrix.
             if len(self.qmap) > 0:
-                cons0 = ones((1,tq))
+                cons0 = np.ones((1,tq))
                 qtrans2 = build_qtrans2(tq, self.qid, self.qmap)
                 # Insert qtrans2 into qmat2.
                 if self.constrain_charge:
@@ -1056,7 +1056,7 @@ class FF(forcebalance.BaseClass):
             MultipoleAtoms = set([p.split('/')[-1] for p in self.plist if 'Multipole' in p])
             QuadrupoleGrps = [[i for i, p in enumerate(self.plist) if 'Multipole' in p and p.split('/')[-1] == A and p.split('/')[1] in ['q11','q22','q33']] for A in MultipoleAtoms]
             for Grp in QuadrupoleGrps:
-                qid = [array([i]) for i in range(3)]
+                qid = [np.array([i]) for i in range(3)]
                 tq = 3
                 qtrans2 = build_qtrans2(tq, qid, Grp)
                 logger.info("Making sure that quadrupoles are traceless (for parameter IDs %s)\n" % str(Grp))
@@ -1071,8 +1071,21 @@ class FF(forcebalance.BaseClass):
         #     print
         # print
 
-        transmat = mat(qmat2) * diag(self.rs)
-        transmatNS = array(transmat,copy=True)
+        # There is a bad bug here .. this matrix multiplication operation doesn't work!!
+        # Input matrices are qmat2 and self.rs (diagonal)
+        transmat = np.matrix(qmat2) * np.matrix(np.diag(self.rs))
+        transmat1 = np.zeros((self.np, self.np), dtype=float)
+        for i in range(self.np):
+            for k in range(self.np):
+                transmat1[i,k] = qmat2[i,k] * self.rs[k]
+
+        # This prints out the difference between the result of matrix multiplication
+        # and the manual multiplication.
+        if np.max(np.abs(transmat1 - transmat)) > 0.0:
+            print np.max(np.abs(transmat1 - transmat))
+            raise RuntimeError('The difference between the numpy multiplication and the manual multiplication should be zero.')
+
+        transmatNS = np.array(transmat,copy=True)
         self.excision = []
         for i in range(self.np):
             if abs(transmatNS[i, i]) < 1e-8:
@@ -1080,7 +1093,7 @@ class FF(forcebalance.BaseClass):
                 transmatNS[i, i] += 1
         self.excision = list(set(self.excision))
         for i in self.excision:
-            transmat[i, :] = zeros(self.np, dtype=float)
+            transmat[i, :] = np.zeros(self.np, dtype=float)
         self.tm = transmat
         self.tmI = transmat.T
         
@@ -1093,7 +1106,7 @@ class FF(forcebalance.BaseClass):
             for i in self.map:
                 self.plist[self.map[i]].append(i)
             for i in range(self.np):
-                self.plist[i] = ' '.join(self.plist[i])
+                self.plist[i] = ' '.join(sorted(self.plist[i]))
             
     def print_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""

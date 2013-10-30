@@ -177,6 +177,7 @@ tgt_opts_types = {
                  "mts_vvvr"         : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "minimize_energy"  : (1, 0, 'Minimize the energy of the system prior to running dynamics', 'Condensed phase property targets (advanced usage)', 'liquid_openmm', 'liquid_tinker'),
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
+                 "permute"          : (1, -180, 'Permute eigenvectors before fitting frequencies.', 'Vibrational frequency targets', 'vibration'),
                 },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid'),

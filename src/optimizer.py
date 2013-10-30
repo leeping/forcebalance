@@ -13,7 +13,7 @@ import numpy as np
 from copy import deepcopy
 from numpy.linalg import eig, norm, solve
 import forcebalance
-from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
+from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
@@ -188,7 +188,7 @@ class Optimizer(forcebalance.BaseClass):
             self.FF.make(xk,False,'result')
             logger.info("\nThe final force field has been printed to the 'result' directory.\n")
             #bar = printcool("\x1b[1;45;93mCongratulations, ForceBalance has finished\x1b[0m\n\x1b[1;45;93mGive yourself a pat on the back!\x1b[0m")
-            bar = printcool("Congratulations, ForceBalance has finished\nGive yourself a pat on the back!",ansi="1;44;93")
+            bar = printcool("Calculation Finished.\n---==( May the Force be with you! )==---",ansi="1;44;93")
 
         ## Write out stuff to checkpoint file
         self.writechk()
@@ -575,6 +575,9 @@ class Optimizer(forcebalance.BaseClass):
         else: # This is the nonlinear search code.
             # First obtain a step that is the same length as the provided trust radius.
             LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
+            dx, expect = solver(LOpt)
+            dxnorm = norm(dx)
+            logger.info("Starting search with step size %f\n" % dxnorm)
             bump = False
             Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             ### optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
@@ -933,5 +936,5 @@ class Optimizer(forcebalance.BaseClass):
         """ Write the checkpoint file for the main optimizer. """
         if self.wchk_fnm != None:
             logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
-            with open(os.path.join(self.root,self.wchk_fnm),'w') as f: pickle.dump(self.chk,f)
+            with wopen(os.path.join(self.root,self.wchk_fnm)) as f: pickle.dump(self.chk,f)
         

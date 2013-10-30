@@ -73,10 +73,12 @@ class TestAmber99SB(ForceBalanceTestCase):
             self.engines['TINKER'] = TINKER(coords="all.arc", tinker_key="alaglu.key", tinkerpath=tinkerpath)
         else: logger.warn("TINKER cannot be found, skipping TINKER tests.")
         # Set up OpenMM engine
+        openmm = False
         try:
             import simtk.openmm 
-            self.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="CUDA", precision="double")
+            openmm = True
         except: logger.warn("OpenMM cannot be imported, skipping OpenMM tests.")
+        if openmm: self.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="CUDA", precision="double")
         self.addCleanup(os.system, 'cd .. ; rm -rf temp')
 
     def test_energy_force(self):

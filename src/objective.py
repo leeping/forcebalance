@@ -5,7 +5,7 @@ ForceBalance objective function."""
 import sys
 import inspect
 #from implemented import Implemented_Targets
-from numpy import argsort, array, diag, dot, eye, linalg, ones, reshape, sum, zeros, exp, log
+import numpy as np
 from collections import defaultdict, OrderedDict
 import forcebalance
 from forcebalance.finite_difference import in_fd
@@ -16,7 +16,7 @@ from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
 try:
-    from forcebalance.gmxio import AbInitio_GMX, Liquid_GMX, Interaction_GMX
+    from forcebalance.gmxio import AbInitio_GMX, Liquid_GMX, Interaction_GMX, Vibration_GMX
 except:
     logger.warning(traceback.format_exc())
     logger.warning("Gromacs module import failed\n")
@@ -77,6 +77,7 @@ Implemented_Targets = {
     'ABINITIO_AMBER':AbInitio_AMBER,
     'ABINITIO_INTERNAL':AbInitio_Internal,
     'VIBRATION_TINKER':Vibration_TINKER,
+    'VIBRATION_GMX':Vibration_GMX,
     'LIQUID_OPENMM':Liquid_OpenMM,
     'LIQUID_TINKER':Liquid_TINKER, 
     'LIQUID_GMX':Liquid_GMX, 
@@ -144,7 +145,7 @@ class Objective(forcebalance.BaseClass):
                                options['penalty_alpha'])
         ## Obtain the denominator.
         if self.normalize_weights:
-            self.WTot = sum([i.weight for i in self.Targets])
+            self.WTot = np.sum([i.weight for i in self.Targets])
         else:
             self.WTot = 1.0
         self.ObjDict = OrderedDict()
@@ -160,7 +161,7 @@ class Objective(forcebalance.BaseClass):
         
     def Target_Terms(self, mvals, Order=0, verbose=False):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
-        Objective = {'X':0.0, 'G':zeros(self.FF.np), 'H':zeros((self.FF.np,self.FF.np))}
+        Objective = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         # Loop through the targets, stage the directories and submit the Work Queue processes.
         for Tgt in self.Targets:
             Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2)
@@ -347,21 +348,21 @@ class Penalty:
         X = Objective['X']
         G = Objective['G']
         H = Objective['H']
-        np = len(mvals)
+        NP = len(mvals)
         K0, K1, K2 = self.Pen_Tab[self.ptyp](mvals)
         XAdd = 0.0
-        GAdd = zeros(np, dtype=float)
-        HAdd = zeros((np, np), dtype=float)
+        GAdd = np.zeros(NP, dtype=float)
+        HAdd = np.zeros((NP, NP), dtype=float)
         if self.fadd > 0.0:
             XAdd += K0 * self.fadd
             GAdd += K1 * self.fadd
             HAdd += K2 * self.fadd
         if self.fmul > 0.0:
             XAdd += ( X*K0 ) * self.fmul
-            GAdd += array( G*K0 + X*K1 ) * self.fmul
-            GK1 = reshape(G, (1, -1))*reshape(K1, (-1, 1))
-            K1G = reshape(K1, (1, -1))*reshape(G, (-1, 1))
-            HAdd += array( H*K0+GK1+K1G+X*K2 ) * self.fmul
+            GAdd += np.array( G*K0 + X*K1 ) * self.fmul
+            GK1 = np.reshape(G, (1, -1))*np.reshape(K1, (-1, 1))
+            K1G = np.reshape(K1, (1, -1))*np.reshape(G, (-1, 1))
+            HAdd += np.array( H*K0+GK1+K1G+X*K2 ) * self.fmul
         return XAdd, GAdd, HAdd
 
     def L2_norm(self, mvals):
@@ -375,10 +376,10 @@ class Penalty:
         @return DC2 The Hessian (just a constant)
 
         """
-        mvals = array(mvals)
-        DC0 = dot(mvals, mvals)
-        DC1 = 2*array(mvals)
-        DC2 = 2*eye(len(mvals))
+        mvals = np.array(mvals)
+        DC0 = np.dot(mvals, mvals)
+        DC1 = 2*np.array(mvals)
+        DC2 = 2*np.eye(len(mvals))
         return DC0, DC1, DC2
 
     def HYP(self, mvals):
@@ -394,11 +395,11 @@ class Penalty:
         @return DC2 The Hessian
 
         """
-        mvals = array(mvals)
-        np = len(mvals)
-        DC0   = sum((mvals**2 + self.b**2)**0.5 - self.b)
+        mvals = np.array(mvals)
+        NP = len(mvals)
+        DC0   = np.sum((mvals**2 + self.b**2)**0.5 - self.b)
         DC1   = mvals*(mvals**2 + self.b**2)**-0.5
-        DC2   = diag(self.b**2*(mvals**2 + self.b**2)**-1.5)
+        DC2   = np.diag(self.b**2*(mvals**2 + self.b**2)**-1.5)
         return DC0, DC1, DC2
 
     def FUSE(self, mvals):
@@ -413,13 +414,13 @@ class Penalty:
             Groups[key].append(p)
         pvals = self.FF.create_pvals(mvals)
         DC0 = 0.0
-        DC1 = zeros(self.FF.np, dtype=float)
-        DC2 = zeros(self.FF.np, dtype=float)
+        DC1 = np.zeros(self.FF.np, dtype=float)
+        DC2 = np.zeros(self.FF.np, dtype=float)
         for gnm, pidx in Groups.items():
             # The group of parameters for a particular element / angular momentum.
             pvals_grp = pvals[pidx]
             # The order that the parameters come in.
-            Order = argsort(pvals_grp)
+            Order = np.argsort(pvals_grp)
             # The number of nearest neighbor pairs.
             #print Order
             for p in range(len(Order) - 1):
@@ -428,8 +429,8 @@ class Penalty:
                 pj = pidx[Order[p+1]]
                 # pvals[pi] is the SMALLER parameter.
                 # pvals[pj] is the LARGER parameter.
-                dp = log(pvals[pj]) - log(pvals[pi])
-                # dp = (log(pvals[pj]) - log(pvals[pi])) / self.spacings[gnm]
+                dp = np.log(pvals[pj]) - np.log(pvals[pi])
+                # dp = (np.log(pvals[pj]) - np.log(pvals[pi])) / self.spacings[gnm]
                 DC0     += (dp**2 + self.b**2)**0.5 - self.b
                 DC1[pi] -= dp*(dp**2 + self.b**2)**-0.5
                 DC1[pj] += dp*(dp**2 + self.b**2)**-0.5
@@ -440,7 +441,7 @@ class Penalty:
                 # DC2[pj] += self.b**2*(dp**2 + self.b**2)**-1.5
                 #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
                 #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
-        return DC0, DC1, diag(DC2)
+        return DC0, DC1, np.diag(DC2)
 
     def FUSE_BARRIER(self, mvals):
         Groups = defaultdict(list)
@@ -454,13 +455,13 @@ class Penalty:
             Groups[key].append(p)
         pvals = self.FF.create_pvals(mvals)
         DC0 = 0.0
-        DC1 = zeros(self.FF.np, dtype=float)
-        DC2 = zeros(self.FF.np, dtype=float)
+        DC1 = np.zeros(self.FF.np, dtype=float)
+        DC2 = np.zeros(self.FF.np, dtype=float)
         for gnm, pidx in Groups.items():
             # The group of parameters for a particular element / angular momentum.
             pvals_grp = pvals[pidx]
             # The order that the parameters come in.
-            Order = argsort(pvals_grp)
+            Order = np.argsort(pvals_grp)
             # The number of nearest neighbor pairs.
             #print Order
             for p in range(len(Order) - 1):
@@ -469,9 +470,9 @@ class Penalty:
                 pj = pidx[Order[p+1]]
                 # pvals[pi] is the SMALLER parameter.
                 # pvals[pj] is the LARGER parameter.
-                dp = log(pvals[pj]) - log(pvals[pi])
-                # dp = (log(pvals[pj]) - log(pvals[pi])) / self.spacings[gnm]
-                DC0     += (dp**2 + self.b**2)**0.5 - self.b - self.a*log(dp) + self.a*log(self.a)
+                dp = np.log(pvals[pj]) - np.log(pvals[pi])
+                # dp = (np.log(pvals[pj]) - np.log(pvals[pi])) / self.spacings[gnm]
+                DC0     += (dp**2 + self.b**2)**0.5 - self.b - self.a*np.log(dp) + self.a*np.log(self.a)
                 DC1[pi] -= dp*(dp**2 + self.b**2)**-0.5 - self.a/dp
                 DC1[pj] += dp*(dp**2 + self.b**2)**-0.5 - self.a/dp
                 # The second derivatives have off-diagonal terms,
@@ -481,7 +482,7 @@ class Penalty:
                 # DC2[pj] += self.b**2*(dp**2 + self.b**2)**-1.5 - self.a/dp**2
                 #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
                 #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
-        return DC0, DC1, diag(DC2)
+        return DC0, DC1, np.diag(DC2)
 
 
     def FUSE_L0(self, mvals):
@@ -497,13 +498,13 @@ class Penalty:
         pvals = self.FF.create_pvals(mvals)
         #print "pvals: ", pvals
         DC0 = 0.0
-        DC1 = zeros(self.FF.np, dtype=float)
-        DC2 = zeros((self.FF.np,self.FF.np), dtype=float)
+        DC1 = np.zeros(self.FF.np, dtype=float)
+        DC2 = np.zeros((self.FF.np,self.FF.np), dtype=float)
         for gnm, pidx in Groups.items():
             # The group of parameters for a particular element / angular momentum.
             pvals_grp = pvals[pidx]
             # The order that the parameters come in.
-            Order = argsort(pvals_grp)
+            Order = np.argsort(pvals_grp)
             # The number of nearest neighbor pairs.
             #print Order
             Contribs = []
@@ -514,13 +515,13 @@ class Penalty:
                 pj = pidx[Order[p+1]]
                 # pvals[pi] is the SMALLER parameter.
                 # pvals[pj] is the LARGER parameter.
-                dp = log(pvals[pj]) - log(pvals[pi])
-                # dp = (log(pvals[pj]) - log(pvals[pi])) / self.spacings[gnm]
+                dp = np.log(pvals[pj]) - np.log(pvals[pi])
+                # dp = (np.log(pvals[pj]) - np.log(pvals[pi])) / self.spacings[gnm]
                 dp2b2 = dp**2 + self.b**2
                 h   = self.a*((dp2b2)**0.5 - self.b)
                 hp  = self.a*(dp*(dp2b2)**-0.5)
                 hpp = self.a*(self.b**2*(dp2b2)**-1.5)
-                emh = exp(-1*h)
+                emh = np.exp(-1*h)
                 dps.append(dp)
                 Contribs.append((1.0 - emh))
                 DC0     += (1.0 - emh)

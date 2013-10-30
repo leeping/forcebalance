@@ -97,12 +97,12 @@
 #| must be a list along the frame axis,  |#
 #| and they must have the same length.   |#
 #=========================================#
-# xyzs       = List of numpy arrays of atomic xyz coordinates
+# xyzs       = List of arrays of atomic xyz coordinates
 # comms      = List of comment strings
 # boxes      = List of 3-element or 9-element arrays for periodic boxes
-# qm_forces  = List of numpy arrays of atomistic forces from QM calculations
-# qm_espxyzs = List of numpy arrays of xyz coordinates for ESP evaluation
-# qm_espvals = List of numpy arrays of ESP values
+# qm_forces  = List of arrays of atomistic forces from QM calculations
+# qm_espxyzs = List of arrays of xyz coordinates for ESP evaluation
+# qm_espvals = List of arrays of ESP values
 FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_interaction', 
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins'])
 #=========================================#
@@ -945,8 +945,12 @@ class Molecule(object):
             if fnm == None or fnm == sys.stdout:
                 outfile = sys.stdout
             elif append:
+                # Writing to symbolic links risks unintentionally overwriting the source file - 
+                # thus it is explicitly disallowed.
+                if os.path.islink(fnm): raise Exception("Writing to symbolic links is not allowed.")
                 outfile = open(fnm,'a')
             else:
+                if os.path.islink(fnm): raise Exception("Writing to symbolic links is not allowed.")
                 outfile = open(fnm,'w')
             for line in Answer:
                 print >> outfile,line

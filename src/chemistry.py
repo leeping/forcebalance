@@ -1,6 +1,6 @@
 from collections import defaultdict
 import re
-from numpy import abs
+import numpy as np
 
 # To look up a 2-tuple of (bond energy in kJ/mol / bond order in Angstrom):
 # Do BondEnergies[Elem1][Elem2][BO]
@@ -156,9 +156,9 @@ def LookupByMass(mass):
     Deviation = 1e10
     EMatch = None
     for e, m in PeriodicTable.items():
-        if abs(mass - m) < Deviation:
+        if np.abs(mass - m) < Deviation:
             EMatch = e
-            Deviation = abs(mass - m)
+            Deviation = np.abs(mass - m)
     return EMatch
 
 def BondStrengthByLength(A, B, length, artol = 0.33, bias=0.0): 
@@ -178,11 +178,11 @@ def BondStrengthByLength(A, B, length, artol = 0.33, bias=0.0):
     for BO, Vals in BondEnergies[A][B].items():
         S = Vals[0]
         L = Vals[1]
-        Devs[BO] = abs(length-L)
-        if abs(length-L) < Deviation:
+        Devs[BO] = np.abs(length-L)
+        if np.abs(length-L) < Deviation:
             BOMatch = BO
             Strength = S
-            Deviation = abs(length-L)
+            Deviation = np.abs(length-L)
     if len(Devs.items()) >= 2:
         Spac = Devs[1] + Devs[2]
         Frac1 = Devs[1]/Spac

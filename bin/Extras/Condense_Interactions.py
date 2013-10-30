@@ -38,12 +38,15 @@ bondtypes = OrderedDict()
 angletypes = OrderedDict()
 dihedraltypes = OrderedDict()
 master = {'bonds':(bondtypes, 2), 'angles':(angletypes, 3), 'dihedrals':(dihedraltypes, 4)}
+## When there are two possible angle minima, angles cannot be defined uniquely using angletypes.
+skips = []
 ## The current section in the ITP file
 sec = None
 for line in ffdata:
+    strip = line.strip()
     line = line.split(';')[0]
     s = line.split()
-    if re.match('^\[.*\]',line):
+    if re.match('^ *\[.*\]',line):
         # This regular expression determines which section we are in.
         sec = re.sub('[\[\] \n]','',line)
     if sec == 'atoms' and re.match('^ *[0-9]',line):
@@ -81,8 +84,17 @@ for line in ffdata:
         # If two interactions have the same atom types but the parameters are different, this script won't work.
         # The exception is the AMBER-style proper dihedral, which can be redundant up to the multiplicity.
         if key in idict and idict[key] != val:
-            raise Exception("Key %s already exists in idict with a different value" % key)
-        idict[key] = val
+            skips.append(strip)
+            sys.stderr.write("Key %s already exists in idict with a different value (%s -> %s)\n" % (key, idict[key], val))
+        else:
+            idict[key] = val
+
+# print atomtypes
+# print bondtypes
+# print angletypes
+# print dihedraltypes
+# print skips
+# sys.exit()
 
 ## Pass 2.  This time, we loop through the force field file, 
 Insert = True
@@ -90,9 +102,10 @@ dihe_nodup = []
 sec = None
 for line in ffdata:
     # Split line by words and keep whitespace for nice formatting.
+    strip = line.strip()
     s = line.split()
     w = re.findall('[ ]+',line)
-    if re.match('^\[.*\]',line.split(';')[0]):
+    if re.match('^ *\[.*\]',line.split(';')[0]):
         sec = re.sub('[\[\] \n]','',line.split(';')[0])
     if sec == 'moleculetype' and Insert:
         # Here is where we insert the 'interaction type' sections.
@@ -122,6 +135,9 @@ for line in ffdata:
             # Otherwise the interaction gets double-counted.
             if ans in dihe_nodup: continue
             dihe_nodup.append(ans)
-        print ''.join([w[j]+s[j] for j in range(nat)])+w[nat]+itype
+        if strip in skips:
+            print line,
+        else:
+            print ''.join([w[j]+s[j] for j in range(nat)])+w[nat]+itype
     else:
         print line,

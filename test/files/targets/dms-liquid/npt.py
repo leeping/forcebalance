@@ -63,7 +63,7 @@ from simtk.unit import *
 from simtk.openmm import *
 from simtk.openmm.app import *
 from forcebalance.forcefield import FF
-from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary
+from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, wopen
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p
 from forcebalance.molecule import Molecule
 from forcebalance.openmmio import *
@@ -470,7 +470,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     Serialize = 0
     if Serialize:
         serial = XmlSerializer.serializeSystem(system)
-        with open('system.xml','w') as f: f.write(serial)
+        with wopen('system.xml') as f: f.write(serial)
     #==========================================#
     # Computing a bunch of initial values here #
     #==========================================#
@@ -1137,7 +1137,7 @@ def main():
     ## Print the final force field.
     pvals = FF.make(mvals)
 
-    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
+    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Energies, Dips, G, [GDx, GDy, GDz], mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
 
 if __name__ == "__main__":
     main()

@@ -19,8 +19,6 @@ import os, sys, shutil
 from re import match, sub
 import numpy as np
 import itertools
-from numpy import array, diag, dot, eye, mat, mean, transpose
-from numpy.linalg import norm, svd
 import threading
 import pickle
 import time
@@ -51,7 +49,7 @@ def pvec1d(vec1d, precision=1, loglevel=INFO):
 
     @param[in] vec1d a 1-D vector
     """
-    v2a = array(vec1d)
+    v2a = np.array(vec1d)
     for i in range(v2a.shape[0]):
         logger.log(loglevel, "%% .%ie " % precision % v2a[i])
     logger.log(loglevel, '\n')
@@ -61,7 +59,7 @@ def pmat2d(mat2d, precision=1, loglevel=INFO):
 
     @param[in] mat2d a 2-D matrix
     """
-    m2a = array(mat2d)
+    m2a = np.array(mat2d)
     for i in range(m2a.shape[0]):
         for j in range(m2a.shape[1]):
             logger.log(loglevel, "%% .%ie " % precision % m2a[i][j])
@@ -266,7 +264,7 @@ def col(vec):
     Output:
     A column matrix
     """
-    return mat(array(vec).reshape(-1, 1))
+    return np.mat(np.array(vec).reshape(-1, 1))
 
 def row(vec):
     """Given any list, array, or matrix, return a 1-row matrix.
@@ -275,7 +273,7 @@ def row(vec):
 
     @return answer A row matrix
     """
-    return mat(array(vec).reshape(1, -1))
+    return np.mat(np.array(vec).reshape(1, -1))
 
 def flat(vec):
     """Given any list, array, or matrix, return a single-index array.
@@ -283,7 +281,7 @@ def flat(vec):
     @param[in] vec The data to be flattened
     @return answer The flattened data
     """
-    return array(vec).reshape(-1)
+    return np.array(vec).reshape(-1)
 
 #====================================#
 #| Math: Vectors and linear algebra |#
@@ -296,8 +294,8 @@ def orthogonalize(vec1, vec2):
     @param[in] vec2 The projector (component subtracted out from vec1 is parallel to this)
     @return answer A copy of vec1 but with the vec2-component projected out.
     """
-    v2u = vec2/norm(vec2)
-    return vec1 - v2u*dot(vec1, v2u)
+    v2u = vec2/np.linalg.norm(vec2)
+    return vec1 - v2u*np.dot(vec1, v2u)
 
 def invert_svd(X,thresh=1e-12):
     
@@ -310,16 +308,16 @@ def invert_svd(X,thresh=1e-12):
 
     """
 
-    u,s,vh = svd(X, full_matrices=0)
-    uh     = mat(transpose(u))
-    v      = mat(transpose(vh))
+    u,s,vh = np.linalg.svd(X, full_matrices=0)
+    uh     = np.mat(np.transpose(u))
+    v      = np.mat(np.transpose(vh))
     si     = s.copy()
     for i in range(s.shape[0]):
         if abs(s[i]) > thresh:
             si[i] = 1./s[i]
         else:
             si[i] = 0.0
-    si     = mat(diag(si))
+    si     = np.mat(np.diag(si))
     Xt     = v*si*uh
     return Xt
 
@@ -349,7 +347,7 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     @param[out] MPPI The Moore-Penrose pseudoinverse (multiply by Y to get least-squares coefficients, multiply by dY/dk to get derivatives of least-squares coefficients)
     """
     # X is a 'tall' matrix.
-    X = mat(x)
+    X = np.mat(x)
     Y = col(y)
     n_x = X.shape[0]
     n_fit = X.shape[1]
@@ -359,10 +357,10 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     if w != None:
         if len(w) != n_x:
             warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
-        w /= mean(w)
-        WH = mat(diag(w**0.5))
+        w /= np.mean(w)
+        WH = np.mat(np.diag(w**0.5))
     else:
-        WH = mat(eye(n_x))
+        WH = np.mat(np.eye(n_x))
     # Make the Moore-Penrose Pseudoinverse.
     # if n_fit == n_x:
     #     MPPI = np.linalg.inv(WH*X)
@@ -426,11 +424,11 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     """
 
     # Create numpy copies of input arguments.
-    A_n = array(A_n)
+    A_n = np.array(A_n)
     if B_n is not None:
-        B_n = array(B_n)
+        B_n = np.array(B_n)
     else:
-        B_n = array(A_n)
+        B_n = np.array(A_n)
     # Get the length of the timeseries.
     N = A_n.size
     # Be sure A_n and B_n have the same dimensions.
@@ -732,11 +730,11 @@ def onefile(ext, arg=None):
     if fnm == None:
         cwd = os.getcwd()
         ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
-        logger.info("Autodetecting .%s in %s\n" % (ext, cwd))
         if len(ls) != 1:
-            logger.warning("Cannot autodetect .%s file in %s (%i found)\n" % (ext, cwd, len(ls)))
+            logger.info("Found %i .%s files in %s\n" % (len(ls), ext, cwd))
         else:
             fnm = os.path.basename(ls[0])
+            logger.info("Autodetected .%s in %s\n" % (fnm, cwd))
     return fnm
 
 def GoInto(Dir):
@@ -783,6 +781,12 @@ def MissingFileInspection(fnm):
         if match(key, fnm):
             answer += "%s\n" % specific_dct[key]
     return answer
+
+def wopen(dest):
+    """ Never write to symbolic links. """
+    if os.path.islink(dest):
+        raise Exception("Tried to write to a symbolic link but that's against the rules; probably indicates a coding error.")
+    return open(dest,'w')
 
 def LinkFile(src, dest, nosrcok = False):
     if os.path.abspath(src) == os.path.abspath(dest): return
