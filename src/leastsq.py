@@ -83,8 +83,8 @@ class LeastSquares(Target):
         dM = {}
         # Create the new force field!!
         NP = len(mvals)
-        G = np.zeros(NP,dtype=float)
-        H = np.zeros((NP,NP),dtype=float)
+        G = np.zeros(NP)
+        H = np.zeros((NP,NP))
         pvals = self.FF.make(mvals)
         if float('Inf') in pvals:
             return {'X' : 1e10, 'G' : G, 'H' : H}

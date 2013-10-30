@@ -540,7 +540,7 @@ class GMX(Engine):
             # Create the force field in this directory if the force field object is provided.  
             # This is because the .mdp and .top file can be force field files!
             FF = self.target.FF
-            FF.make(np.zeros(FF.np, dtype=float))
+            FF.make(np.zeros(FF.np))
             if not os.path.exists('%s.top' % self.name):
                 topfile = onefile('top')
                 if topfile != None:

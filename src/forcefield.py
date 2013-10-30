@@ -210,19 +210,19 @@ class FF(forcebalance.BaseClass):
         ## File names of force fields
         self.set_option(options,'forcefield','fnms')
         ## Directory containing force fields, relative to project directory
-        self.set_option(options,'ffdir', default='.')
+        self.set_option(options,'ffdir')
         ## Priors given by the user :)
-        self.set_option(options,'priors', default={})
+        self.set_option(options,'priors')
         ## Whether to constrain the charges.
-        self.set_option(options,'constrain_charge', default=False)
+        self.set_option(options,'constrain_charge')
         ## Whether to constrain the charges.
-        self.set_option(options,'logarithmic_map', default=False)
+        self.set_option(options,'logarithmic_map')
         ## Switch for AMOEBA direct or mutual.
-        self.set_option(options, 'amoeba_polarization', 'amoeba_pol', default='direct')
+        self.set_option(options, 'amoeba_pol')
         ## Switch for rigid water molecules
-        self.set_option(options, 'rigid_water', default=False)
+        self.set_option(options, 'rigid_water')
         ## Bypass the transformation and use physical parameters directly
-        self.set_option(options, 'use_pvals', default=False)
+        self.set_option(options, 'use_pvals')
         
         #======================================#
         #     Variables which are set here     #
@@ -780,7 +780,7 @@ class FF(forcebalance.BaseClass):
             key = Data['Elem']+'_'+Data['AMom']
             Groups[key].append(p)
 
-        pvals = self.create_pvals(np.zeros(self.np,dtype=float))
+        pvals = self.create_pvals(np.zeros(self.np))
         logger.info("pvals:\n")
         logger.info(str(pvals) + '\n')
 
@@ -957,9 +957,9 @@ class FF(forcebalance.BaseClass):
 
         def build_qtrans2(tq, qid, qmap):
             nq = len(qmap)
-            cons0 = np.ones((1,tq),dtype=float)
-            cons = np.zeros((cons0.shape[0], nq), dtype=float)
-            qtrans2 = np.eye(nq, dtype=float)
+            cons0 = np.ones((1,tq))
+            cons = np.zeros((cons0.shape[0], nq))
+            qtrans2 = np.eye(nq)
             for i in range(cons.shape[0]):
                 for j in range(cons.shape[1]):
                     cons[i][j] = sum([cons0[i][k-1] for k in qid[j]])
@@ -982,7 +982,7 @@ class FF(forcebalance.BaseClass):
                     Adict[k] = v
             nmol = 0
             for molname, molatoms in Adict.items():
-                mol_charge_count = np.zeros(self.np, dtype=float)
+                mol_charge_count = np.zeros(self.np)
                 tq = 0
                 qmap = []
                 qid = []
@@ -1074,7 +1074,7 @@ class FF(forcebalance.BaseClass):
         # There is a bad bug here .. this matrix multiplication operation doesn't work!!
         # Input matrices are qmat2 and self.rs (diagonal)
         transmat = np.matrix(qmat2) * np.matrix(np.diag(self.rs))
-        transmat1 = np.zeros((self.np, self.np), dtype=float)
+        transmat1 = np.zeros((self.np, self.np))
         for i in range(self.np):
             for k in range(self.np):
                 transmat1[i,k] = qmat2[i,k] * self.rs[k]
@@ -1082,10 +1082,10 @@ class FF(forcebalance.BaseClass):
         # This prints out the difference between the result of matrix multiplication
         # and the manual multiplication.
         if np.max(np.abs(transmat1 - transmat)) > 0.0:
-            print np.max(np.abs(transmat1 - transmat))
-            raise RuntimeError('The difference between the numpy multiplication and the manual multiplication should be zero.')
+            logger.warning('The difference between the numpy multiplication and the manual multiplication is \x1b[1;91m%f\x1b[0m, '
+                           'but it should be zero.\n' % np.max(np.abs(transmat1 - transmat)))
 
-        transmatNS = np.array(transmat,copy=True)
+        transmatNS = np.array(transmat1,copy=True)
         self.excision = []
         for i in range(self.np):
             if abs(transmatNS[i, i]) < 1e-8:
@@ -1093,7 +1093,7 @@ class FF(forcebalance.BaseClass):
                 transmatNS[i, i] += 1
         self.excision = list(set(self.excision))
         for i in self.excision:
-            transmat[i, :] = np.zeros(self.np, dtype=float)
+            transmat[i, :] = np.zeros(self.np)
         self.tm = transmat
         self.tmI = transmat.T
         

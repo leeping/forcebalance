@@ -355,7 +355,7 @@ class TINKER(Engine):
             # Create the force field in this directory if the force field object is provided.  
             # This is because the .key file could be a force field file!
             FF = self.target.FF
-            FF.make(np.zeros(FF.np, dtype=float))
+            FF.make(np.zeros(FF.np))
             if FF.rigid_water:
                 self.rigid = True
             write_key_with_prm(os.path.join(self.srcdir, self.key), "%s.key" % self.name, ffobj=FF)

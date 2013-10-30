@@ -441,10 +441,10 @@ class Optimizer(forcebalance.BaseClass):
             class Hyper(object):
                 def __init__(self, HL, Penalty):
                     self.H = HL.copy()
-                    self.dx = 1e10 * np.ones(len(HL),dtype=float)
+                    self.dx = 1e10 * np.ones(len(HL))
                     self.Val = 0
-                    self.Grad = np.zeros(len(HL),dtype=float)
-                    self.Hess = np.zeros((len(HL),len(HL)),dtype=float)
+                    self.Grad = np.zeros(len(HL))
+                    self.Hess = np.zeros((len(HL),len(HL)))
                     self.Penalty = Penalty
                 def _compute(self, dx):
                     self.dx = dx.copy()
@@ -465,7 +465,7 @@ class Optimizer(forcebalance.BaseClass):
                         self._compute(dx)
                     return self.Hess
             def hyper_solver(L):
-                dx0 = np.zeros(len(xkd),dtype=float)
+                dx0 = np.zeros(len(xkd))
                 #dx0 = np.delete(dx0, self.excision)
                 # HL = H + (L-1)**2*np.diag(np.diag(H))
                 # Attempt to use plain Levenberg
@@ -867,7 +867,7 @@ class Optimizer(forcebalance.BaseClass):
         """
 
         Adata        = self.Objective.Full(self.mvals0,Order=1)['G']
-        Fdata        = np.zeros(self.FF.np,dtype=float)
+        Fdata        = np.zeros(self.FF.np)
         printcool("Checking first derivatives by finite difference!\n%-8s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
         for i in range(self.FF.np):
@@ -897,7 +897,7 @@ class Optimizer(forcebalance.BaseClass):
 
         """
         Adata        = self.Objective.Full(self.mvals0,Order=2)['H']
-        Fdata        = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        Fdata        = np.zeros((self.FF.np,self.FF.np))
         printcool("Checking second derivatives by finite difference!\n%-8s%-20s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter1 ID", "Parameter2 ID", "Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
 

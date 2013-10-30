@@ -24,18 +24,23 @@ from parser import tgt_opts_defaults, gen_opts_defaults
 class BaseClass(object):
     """ Provides some nifty functions that are common to all ForceBalance classes. """
 
+    PrintOptionDict  = OrderedDict()
+
     def __init__(self, options):
-        self.PrintOptionDict  = OrderedDict()
         self.verbose_options  = options['verbose_options'] if 'verbose_options' in options else False
         
     def set_option(self, in_dict, src_key, dest_key = None, val = None, default = None, forceprint=False):
         if dest_key == None:
             dest_key = src_key
         if val == None:
-            if default != None:
-                val = default
-            else:
+            if src_key in in_dict and in_dict[src_key] != None:
                 val = in_dict[src_key]
+            elif default != None:
+                val = default
+            elif src_key in gen_opts_defaults: 
+                val = gen_opts_defaults[src_key]
+            elif src_key in tgt_opts_defaults:
+                val = tgt_opts_defaults[src_key]
         if default == None:
             if src_key in gen_opts_defaults: 
                 default = gen_opts_defaults[src_key]
@@ -106,5 +111,5 @@ class BaseReader(object):
         ptype = self.pdict.get(self.itype,{}).get(pfld,':%i.%i' % (self.ln,pfld))
         return self.itype+ptype+self.suffix
 
-# import parser, forcefield, optimizer, objective, output
+import parser, forcefield, optimizer, objective, output
 

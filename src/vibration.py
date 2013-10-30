@@ -68,7 +68,7 @@ class Vibration(Target):
             s = line.split()
             if len(s) == 1 and self.na == -1:
                 self.na = int(s[0])
-                xyz = np.zeros((self.na, 3), dtype=float)
+                xyz = np.zeros((self.na, 3))
                 cn = ln + 1
             elif ln == cn:
                 pass
@@ -77,7 +77,7 @@ class Vibration(Target):
                 an += 1
             elif len(s) == 1:
                 self.ref_eigvals.append(float(s[0]))
-                self.ref_eigvecs.append(np.zeros((self.na, 3), dtype=float))
+                self.ref_eigvecs.append(np.zeros((self.na, 3)))
                 an = 0
             elif len(s) == 3:
                 self.ref_eigvecs[-1][an, :] = np.array([float(i) for i in s])
@@ -113,7 +113,7 @@ class Vibration(Target):
 
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
-        Answer = {'X':0.0, 'G':np.zeros(self.FF.np, dtype=float), 'H':np.zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         def get_eigvals(mvals_):
             self.FF.make(mvals_)
             eigvals, eigvecs = self.vibration_driver()
@@ -131,7 +131,7 @@ class Vibration(Target):
 
         calc_eigvals = get_eigvals(mvals)
         D = calc_eigvals - self.ref_eigvals
-        dV = np.zeros((self.FF.np,len(calc_eigvals)),dtype=float)
+        dV = np.zeros((self.FF.np,len(calc_eigvals)))
 
         if AGrad or AHess:
             for p in range(self.FF.np):

@@ -480,19 +480,19 @@ def either(A, B, key):
 #===========================#
 def EulerMatrix(T1,T2,T3):
     """ Constructs an Euler matrix from three Euler angles. """
-    DMat = np.mat(np.zeros((3,3),dtype = float))
+    DMat = np.mat(np.zeros((3,3)))
     DMat[0,0] = np.cos(T1)
     DMat[0,1] = np.sin(T1)
     DMat[1,0] = -np.sin(T1)
     DMat[1,1] = np.cos(T1)
     DMat[2,2] = 1
-    CMat = np.mat(np.zeros((3,3),dtype = float))
+    CMat = np.mat(np.zeros((3,3)))
     CMat[0,0] = 1
     CMat[1,1] = np.cos(T2)
     CMat[1,2] = np.sin(T2)
     CMat[2,1] = -np.sin(T2)
     CMat[2,2] = np.cos(T2)
-    BMat = np.mat(np.zeros((3,3),dtype = float))
+    BMat = np.mat(np.zeros((3,3)))
     BMat[0,0] = np.cos(T3)
     BMat[0,1] = np.sin(T3)
     BMat[1,0] = -np.sin(T3)
@@ -1343,7 +1343,7 @@ class Molecule(object):
     def all_pairwise_rmsd(self):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
         N = len(self)
-        Mat = np.zeros((N,N),dtype=float)
+        Mat = np.zeros((N,N))
         for i in range(N):
             xyzi = self.xyzs[i].copy()
             xyzi -= xyzi.mean(0)
@@ -1360,7 +1360,7 @@ class Molecule(object):
     def pathwise_rmsd(self):
         """ Find RMSD between frames along path. """
         N = len(self)
-        Vec = np.zeros(N-1 ,dtype=float)
+        Vec = np.zeros(N-1 )
         for i in range(N-1):
             xyzi = self.xyzs[i].copy()
             xyzi -= xyzi.mean(0)
@@ -1376,7 +1376,7 @@ class Molecule(object):
     def ref_rmsd(self, i):
         """ Find RMSD to a reference frame. """
         N = len(self)
-        Vec = np.zeros(N,dtype=float)
+        Vec = np.zeros(N)
         xyzi = self.xyzs[i].copy()
         xyzi -= xyzi.mean(0)
         for j in range(N):
