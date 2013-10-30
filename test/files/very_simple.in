@@ -2,6 +2,7 @@ $options
 jobtype newton                   # Indicates Newton-Raphson type optimization
 forcefield water.itp             # Specify names of force field files (files with tunable constants).  Try changing the PARM tags on the ITP file.
 penalty_additive 0.01            # Regularization prefactor.
+trust0 -0.1
 $end
 
 $target

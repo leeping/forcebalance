@@ -7,7 +7,6 @@
 import os
 import shutil
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, std
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 import re
@@ -16,7 +15,7 @@ from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 from multiprocessing import Pool
-from forcebalance.unit import *
+from simtk.unit import *
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -122,8 +121,8 @@ class BindingEnergy(Target):
 
     def __init__(self,options,tgt_opts,forcefield):
         super(BindingEnergy,self).__init__(options,tgt_opts,forcefield)
-        self.set_option(None, None, 'masterfile', os.path.join(self.tgtdir,tgt_opts['masterfile']))
-        self.global_opts, self.sys_opts, self.inter_opts = parse_interactions(self.masterfile)
+        self.set_option(None, None, 'inter_txt', os.path.join(self.tgtdir,tgt_opts['inter_txt']))
+        self.global_opts, self.sys_opts, self.inter_opts = parse_interactions(self.inter_txt)
         # If the global option doesn't exist in the system / interaction, then it is copied over.
         for opt in self.global_opts:
             for sys in self.sys_opts:
@@ -136,11 +135,11 @@ class BindingEnergy(Target):
             self.inter_opts[inter]['reference_physical'] = self.inter_opts[inter]['energy'] * eval(self.inter_opts[inter]['energy_unit'])
 
         if tgt_opts['energy_denom'] == 0.0:
-            self.set_option(None, None, 'energy_denom', val=std(array([val['reference_physical'].value_in_unit(kilocalories_per_mole) for val in self.inter_opts.values()])) * kilocalories_per_mole)
+            self.set_option(None, None, 'energy_denom', val=np.std(np.array([val['reference_physical'].value_in_unit(kilocalories_per_mole) for val in self.inter_opts.values()])))
         else:
-            self.set_option(None, None, 'energy_denom', val=tgt_opts['energy_denom'] * kilocalories_per_mole)
+            self.set_option(None, None, 'energy_denom', val=tgt_opts['energy_denom'])
 
-        self.set_option(None, None, 'rmsd_denom', val=tgt_opts['rmsd_denom'] * angstrom)
+        self.set_option(None, None, 'rmsd_denom', val=tgt_opts['rmsd_denom'])
 
         self.set_option(tgt_opts,'cauchy','cauchy')
 
@@ -157,7 +156,7 @@ class BindingEnergy(Target):
             printcool_dictionary(self.RMSDDict,title="Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s" % (self.rmsd_part, "System", "RMSD", "Term"), keywidth=45)
 
     def get(self, mvals, AGrad=False, AHess=False):
-        Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         self.PrintDict = OrderedDict()
         self.RMSDDict = OrderedDict()
         #pool = Pool(processes=4)
@@ -172,52 +171,50 @@ class BindingEnergy(Target):
                 exec("%s = Energy_" % sys_) in locals()
                 RMSDNrm_ = RMSD_ / self.rmsd_denom
                 w_ = self.sys_opts[sys_]['rmsd_weight'] if 'rmsd_weight' in self.sys_opts[sys_] else 1.0
-                VectorD_.append(sqrt(w_)*RMSDNrm_)
-                if not in_fd() and RMSD_ != 0.0 * angstrom:
-                    self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_ / angstrom, w_*RMSDNrm_**2)
+                VectorD_.append(np.sqrt(w_)*RMSDNrm_)
+                if not in_fd() and RMSD_ != 0.0:
+                    self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_, w_*RMSDNrm_**2)
             VectorE_ = []
             for inter_ in self.inter_opts:
                 Calculated_ = eval(self.inter_opts[inter_]['equation'])
                 Reference_ = self.inter_opts[inter_]['reference_physical']
                 Delta_ = Calculated_ - Reference_
                 if self.cauchy:
-                    Divisor_ = sqrt(self.energy_denom**2 + Reference_**2)
+                    Divisor_ = np.sqrt(self.energy_denom**2 + Reference_**2)
                 else:
                     Divisor_ = self.energy_denom
                 DeltaNrm_ = Delta_ / Divisor_
                 w_ = self.inter_opts[inter_]['weight'] if 'weight' in self.inter_opts[inter_] else 1.0
-                VectorE_.append(sqrt(w_)*DeltaNrm_)
+                VectorE_.append(np.sqrt(w_)*DeltaNrm_)
                 if not in_fd():
-                    self.PrintDict[inter_] = "% 9.3f % 9.3f % 9.3f % 12.5f" % (Calculated_ / kilocalories_per_mole, 
-                                                                                  Reference_ / kilocalories_per_mole, 
-                                                                                  Delta_ / kilocalories_per_mole, w_*DeltaNrm_**2)
+                    self.PrintDict[inter_] = "% 9.3f % 9.3f % 9.3f % 12.5f" % (Calculated_, Reference_, Delta_, w_*DeltaNrm_**2)
                 # print "%-20s" % inter_, "Calculated:", Calculated_, "Reference:", Reference_, "Delta:", Delta_, "DeltaNrm:", DeltaNrm_
             # The return value is an array of normalized interaction energy differences.
             if not in_fd():
-                self.rmsd_part = dot(array(VectorD_),array(VectorD_))
+                self.rmsd_part = np.dot(np.array(VectorD_),np.array(VectorD_))
                 if len(VectorE_) > 0:
-                    self.energy_part = dot(array(VectorE_),array(VectorE_))
+                    self.energy_part = np.dot(np.array(VectorE_),np.array(VectorE_))
                 else:
                     self.energy_part = 0.0
             if len(VectorE_) > 0 and len(VectorD_) > 0:
-                return array(VectorD_ + VectorE_)
+                return np.array(VectorD_ + VectorE_)
             elif len(VectorD_) > 0:
-                return array(VectorD_)
+                return np.array(VectorD_)
             elif len(VectorE_) > 0:
-                return array(VectorE_)
+                return np.array(VectorE_)
                     
         V = compute(mvals)
 
-        dV = zeros((self.FF.np,len(V)),dtype=float)
+        dV = np.zeros((self.FF.np,len(V)))
         if AGrad or AHess:
             for p in range(self.FF.np):
                 dV[p,:], _ = f12d3p(fdwrap(compute, mvals, p), h = self.h, f0 = V)
 
-        Answer['X'] = dot(V,V)
+        Answer['X'] = np.dot(V,V)
         for p in range(self.FF.np):
-            Answer['G'][p] = 2*dot(V, dV[p,:])
+            Answer['G'][p] = 2*np.dot(V, dV[p,:])
             for q in range(self.FF.np):
-                Answer['H'][p,q] = 2*dot(dV[p,:], dV[q,:])
+                Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:])
 
         if not in_fd():
             self.objective = Answer['X']

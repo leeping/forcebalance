@@ -52,11 +52,8 @@ class TestPenalty(ForceBalanceTestCase):
                 'forcefield': ['cc-pvdz-overlap-original.gbs']})
         os.chdir(self.options['root'])
 
-        try:
-            self.ff = forcebalance.forcefield.FF(self.options)
-            self.np=self.ff.np
-        except:
-            self.skipTest("Unable to create forcefield needed for penalty tests")
+        self.ff = forcebalance.forcefield.FF(self.options)
+        self.np=self.ff.np
 
         self.penalties = []
         for ptype in forcebalance.objective.Penalty.Pen_Names.keys():

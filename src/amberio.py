@@ -169,7 +169,7 @@ class AbInitio_AMBER(AbInitio):
 
     def __init__(self,options,tgt_opts,forcefield):
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
-        self.trajfnm = "all.gro"
+        self.coords = "all.gro"
         super(AbInitio_AMBER,self).__init__(options,tgt_opts,forcefield)
         ## all_at_once is not implemented.
         self.all_at_once = True
@@ -179,9 +179,9 @@ class AbInitio_AMBER(AbInitio):
         LinkFile(os.path.join(self.root,self.tgtdir,"force.mdin"),os.path.join(abstempdir,"force.mdin"))
         LinkFile(os.path.join(self.root,self.tgtdir,"stage.leap"),os.path.join(abstempdir,"stage.leap"))
         # I also need to write the trajectory
-        if 'boxes' in self.traj.Data.keys():
-            del self.traj.Data['boxes']
-        self.traj.write(os.path.join(abstempdir,"all.mdcrd"))
+        if 'boxes' in self.mol.Data.keys():
+            del self.mol.Data['boxes']
+        self.mol.write(os.path.join(abstempdir,"all.mdcrd"))
 
     def energy_force_driver_all_external_(self):
         ## Create the run input files (inpcrd, prmtop) from the force field file.  

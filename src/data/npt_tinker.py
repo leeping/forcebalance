@@ -51,7 +51,7 @@ import os
 import sys
 import numpy as np
 from forcebalance.forcefield import FF
-from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, _exec, warn_press_key
+from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, _exec, warn_press_key, wopen
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p
 from forcebalance.molecule import Molecule
 import argparse
@@ -733,7 +733,7 @@ def main():
     ## Print the final force field.
     pvals = FF.make(mvals)
 
-    with open(os.path.join('npt_result.p'),'w') as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
+    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
 
 if __name__ == "__main__":
     main()

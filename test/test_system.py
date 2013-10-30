@@ -9,8 +9,8 @@ from forcebalance.optimizer import Optimizer, Counter
 from collections import OrderedDict
 from numpy import array
 
-# expected results taken from previous runs. Update this if it changes and seems reasonable (updated 7/4/13)
-EXPECTED_WATER_RESULTS = array([ 0.0331140252438,  0.0331140252438 ,  0.0331140252438, -0.0459335989048, 0.0154885421532, -0.376560291581, 0.00258879537089, 0.0116944319809,  0.153008463995])
+# expected results taken from previous runs. Update this if it changes and seems reasonable (updated 10/24/13)
+EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
 
 # fail test if we take more than this many iterations to converge. Update this as necessary
 ITERATIONS_TO_CONVERGE = 5
@@ -62,13 +62,13 @@ class TestWaterTutorial(ForceBalanceTestCase):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
 
-
-        #self.assertEqual(EXPECTED_WATER_RESULTS,result,
-        #msg="\nCalculation results have changed from previously calculated values.\nIf this seems reasonable, update EXPECTED_WATER_RESULTS in test_system.py with these values")
+        self.assertNdArrayEqual(EXPECTED_WATER_RESULTS,result,delta=0.001,
+                                msg="\nCalculation results have changed from previously calculated values.\n"
+                                "If this seems reasonable, update EXPECTED_WATER_RESULTS in test_system.py with these values")
 
         # Fail if calculation takes longer than previously to converge
-        #self.assertGreaterEqual(ITERATIONS_TO_CONVERGE, Counter(), msg="\nCalculation took longer than expected to converge (%d iterations vs previous of %d)" %\
-        #(ITERATIONS_TO_CONVERGE, Counter()))
+        self.assertGreaterEqual(ITERATIONS_TO_CONVERGE, Counter(), msg="\nCalculation took longer than expected to converge (%d iterations vs previous of %d)" %\
+        (ITERATIONS_TO_CONVERGE, Counter()))
 
 class TestVoelzStudy(ForceBalanceTestCase):
     def setUp(self):

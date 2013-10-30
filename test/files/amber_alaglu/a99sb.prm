@@ -1,0 +1,303 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              AMBER-FF99SB
+
+vdwtype                 LENNARD-JONES
+radiusrule              ARITHMETIC
+radiustype              R-MIN
+radiussize              RADIUS
+epsilonrule             GEOMETRIC
+vdw-14-scale            2.0
+chg-14-scale            1.2
+# electric                332.0522173
+# LPW Modified to make electrostatic energies agree with GMX and OpenMM exactly
+# Original TINKER values might be more correct. TINKER is just easier to tweak.
+electric                332.0638391
+dielectric              1.0
+
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+V. Hornak, R. Abel, A. Okur, B. Strockbine, A. Roitberg and C. Simmerling,
+Comparison of Multiple Amber Force Fields and Development of Improved
+Protein Backbone Parameters, PROTEINS, 65, 712-725 (2006)  [PARM99SB]
+
+J. Wang, P. Cieplak and P. A. Kollman, "How Well Does a Restrained
+Electrostatic Potential (RESP) Model Perform in Calcluating Conformational
+Energies of Organic and Biological Molecules?", J. Comput. Chem., 21,
+1049-1074 (2000)  [PARM99]
+
+W. D. Cornell, P. Cieplak, C. I. Bayly, I. R. Gould, K. M. Merz, Jr.,
+D. M. Ferguson, D. C. Spellmeyer, T. Fox, J. W. Caldwell and P. A. Kollman,
+"A Second Generation Force Field for the Simulation of Proteins, Nucleic
+Acids, and Organic Molecules", J. Am. Chem. Soc., 117, 5179-5197 (1995)
+[PARM94]
+
+G. Moyna, H. J. Williams, R. J. Nachman and A. I. Scott, "Conformation in
+Solution and Dynamics of a Structurally Constrained Linear Insect Kinin
+Pentapeptide Analogue", Biopolymers, 49, 403-413 (1999)  [AIB charges]
+
+W. S. Ross and C. C. Hardin, "Ion-Induced Stabilization of the G-DNA
+Quadruplex: Free Energy Perturbation Studies", J. Am. Chem. Soc.,
+116, 6070-6080 (1994)  [Alkali Metal Ions]
+
+J. Aqvist, "Ion-Water Interaction Potentials Derived from Free Energy
+Perturbation Simulations", J. Phys. Chem., 94, 8021-8024 (1990)
+[Alkaline Earth Ions, radii adapted for Amber combining rule]
+
+Current parameter values are available from the Amber site, located
+at http://ambermd.org/
+
+
+      #############################
+      ##                         ##
+      ##  Atom Type Definitions  ##
+      ##                         ##
+      #############################
+
+
+   #####################################################
+   ##                                                 ##
+   ##  TINKER Atom Class Numbers to Amber Atom Types  ##
+   ##                                                 ##
+   ##    1  CT      11  CN      21  OW      31  HO    ##
+   ##    2  C       12  CK      22  OH      32  HS    ##
+   ##    3  CA      13  CQ      23  OS      33  HA    ##
+   ##    4  CM      14  N       24  O       34  HC    ##
+   ##    5  CC      15  NA      25  O2      35  H1    ##
+   ##    6  CV      16  NB      26  S       36  H2    ##
+   ##    7  CW      17  NC      27  SH      37  H3    ##
+   ##    8  CR      18  N*      28  P       38  HP    ##
+   ##    9  CB      19  N2      29  H       39  H4    ##
+   ##   10  C*      20  N3      30  HW      40  H5    ##
+   ##                                                 ##
+   #####################################################
+
+
+atom          7   14    N     "Alanine N"                    7    14.010    3
+atom          8    1    CT    "Alanine CA"                   6    12.010    4
+atom          9    2    C     "Alanine C"                    6    12.010    3
+atom         10   29    H     "Alanine HN"                   1     1.008    1
+atom         11   24    O     "Alanine O"                    8    16.000    1
+atom         12   35    H1    "Alanine HA"                   1     1.008    1
+atom         13    1    CT    "Alanine CB"                   6    12.010    4
+atom         14   34    HC    "Alanine HB"                   1     1.008    1
+atom        232   14    N     "Glutamic Acid N"              7    14.010    3
+atom        233    1    CT    "Glutamic Acid CA"             6    12.010    4
+atom        234    2    C     "Glutamic Acid C"              6    12.010    3
+atom        235   29    H     "Glutamic Acid HN"             1     1.008    1
+atom        236   24    O     "Glutamic Acid O"              8    16.000    1
+atom        237   35    H1    "Glutamic Acid HA"             1     1.008    1
+atom        238    1    CT    "Glutamic Acid CB"             6    12.010    4
+atom        239   34    HC    "Glutamic Acid HB"             1     1.008    1
+atom        240    1    CT    "Glutamic Acid CG"             6    12.010    4
+atom        241   34    HC    "Glutamic Acid HG"             1     1.008    1
+atom        242    2    C     "Glutamic Acid CD"             6    12.010    3
+atom        243   25    O2    "Glutamic Acid OE"             8    16.000    1
+atom        340    1    CT    "Acetyl CA"                    6    12.010    4
+atom        341   34    HC    "Acetyl HA"                    1     1.008    1
+atom        342    2    C     "Acetyl C"                     6    12.010    3
+atom        343   24    O     "Acetyl O"                     8    16.000    1
+atom        346   14    N     "N-MeAmide N"                  7    14.010    3
+atom        347   29    H     "N-MeAmide HN"                 1     1.008    1
+atom        348    1    CT    "N-MeAmide C"                  6    12.010    4
+atom        349   35    H1    "N-MeAmide HC"                 1     1.008    1
+
+
+      ################################
+      ##                            ##
+      ##  Van der Waals Parameters  ##
+      ##                            ##
+      ################################
+
+
+vdw           1               1.9080     0.1094
+vdw           2               1.9080     0.0860
+vdw          14               1.8240     0.1700
+vdw          24               1.6612     0.2100
+vdw          25               1.6612     0.2100
+vdw          29               0.6000     0.0157
+vdw          34               1.4870     0.0157
+vdw          35               1.3870     0.0157
+
+
+      ##################################
+      ##                              ##
+      ##  Bond Stretching Parameters  ##
+      ##                              ##
+      ##################################
+
+
+bond          1    1          310.00     1.5260
+bond          1    2          317.00     1.5220
+bond          1   14          337.00     1.4490
+bond          1   34          340.00     1.0900
+bond          1   35          340.00     1.0900
+bond          2   14          490.00     1.3350
+bond          2   24          570.00     1.2290
+bond          2   25          656.00     1.2500
+bond         14   29          434.00     1.0100
+
+
+      ################################
+      ##                            ##
+      ##  Angle Bending Parameters  ##
+      ##                            ##
+      ################################
+
+
+angle         1    1    1      40.00     109.50
+angle         1    1    2      63.00     111.10
+angle         1    1   14      80.00     109.70
+angle         1    1   34      50.00     109.50
+angle         1    1   35      50.00     109.50
+angle         2    1   14      63.00     110.10
+angle         2    1   34      50.00     109.50
+angle         2    1   35      50.00     109.50
+angle        14    1   35      50.00     109.50
+angle        34    1   34      35.00     109.50
+angle        35    1   35      35.00     109.50
+angle         1    2   14      70.00     116.60
+angle         1    2   24      80.00     120.40
+angle         1    2   25      70.00     117.00
+angle        14    2   24      80.00     122.90
+angle        24    2   24      80.00     126.00
+angle        25    2   25      80.00     126.00
+angle         1   14    1      50.00     118.00
+angle         1   14    2      50.00     121.90
+angle         1   14   29      50.00     118.04
+angle         2   14   29      50.00     120.00
+angle        29   14   29      35.00     120.00
+
+
+      ############################
+      ##                        ##
+      ##  Torsional Parameters  ##
+      ##                        ##
+      ############################
+
+
+torsion       1    1    1    1       0.200 180.0 1  0.250 180.0 2  0.180 0.0 3
+torsion       1    1    1    2            0.156    0.0  3
+torsion       1    1    1   14            0.156    0.0  3
+torsion       1    1    1   34            0.160    0.0  3
+torsion       1    1    1   35            0.156    0.0  3
+torsion       2    1    1    2            0.156    0.0  3
+torsion       2    1    1   14            0.156    0.0  3
+torsion       2    1    1   34            0.156    0.0  3
+torsion       2    1    1   35            0.156    0.0  3
+torsion      14    1    1   34            0.156    0.0  3
+torsion      14    1    1   35            0.156    0.0  3
+torsion      34    1    1   34            0.150    0.0  3
+torsion      34    1    1   35            0.156    0.0  3
+torsion      35    1    1   35            0.156    0.0  3
+torsion       1    1    2   14         0.200 0.0 1   0.200 0.0 2   0.400 0.0 3
+torsion       1    1    2   24            0.000    0.0  2
+torsion       1    1    2   25            0.000    0.0  2
+torsion      14    1    2   14     0.450 180.0 1  1.580 180.0 2  0.550 180.0 3
+torsion      14    1    2   24            0.000    0.0  2
+torsion      14    1    2   25            0.000    0.0  2
+torsion      34    1    2   14            0.000    0.0  2
+torsion      34    1    2   24            0.800    0.0  1      0.080  180.0  3
+torsion      34    1    2   25            0.000    0.0  2
+torsion      35    1    2   14            0.000    0.0  2
+torsion      35    1    2   24            0.800    0.0  1      0.080  180.0  3
+torsion      35    1    2   25            0.000    0.0  2
+torsion       1    1   14    1            0.000    0.0  2
+torsion       1    1   14    2         2.000 0.0 1   2.000 0.0 2   0.400 0.0 3
+torsion       1    1   14   29            0.000    0.0  2
+torsion       2    1   14    1            0.000    0.0  2
+torsion       2    1   14    2            0.270    0.0  2      0.420    0.0  3
+torsion       2    1   14   29            0.000    0.0  2
+torsion      35    1   14    1            0.000    0.0  2
+torsion      35    1   14    2            0.000    0.0  2
+torsion      35    1   14   29            0.000    0.0  2
+torsion       1    2   14    1            2.500  180.0  2
+torsion       1    2   14   29            2.500  180.0  2
+torsion      24    2   14    1            2.500  180.0  2
+torsion      24    2   14   29            2.000    0.0  1      2.500  180.0  2
+
+
+      ########################################
+      ##                                    ##
+      ##  Atomic Partial Charge Parameters  ##
+      ##                                    ##
+      ########################################
+
+
+charge        7              -0.4157
+charge        8               0.0337
+charge        9               0.5973
+charge       10               0.2719
+charge       11              -0.5679
+charge       12               0.0823
+charge       13              -0.1825
+charge       14               0.0603
+charge      232              -0.5163
+charge      233               0.0397
+charge      234               0.5366
+charge      235               0.2936
+charge      236              -0.5819
+charge      237               0.1105
+charge      238               0.0560
+charge      239              -0.0173
+charge      240               0.0136
+charge      241              -0.0425
+charge      242               0.8054
+charge      243              -0.8188
+charge      340              -0.3662
+charge      341               0.1123
+charge      342               0.5972
+charge      343              -0.5679
+charge      346              -0.4157
+charge      347               0.2719
+charge      348              -0.1490
+charge      349               0.0976
+
+
+      ########################################
+      ##                                    ##
+      ##  Biopolymer Atom Type Conversions  ##
+      ##                                    ##
+      ########################################
+
+
+biotype       7    N       "Alanine"                           7
+biotype       8    CA      "Alanine"                           8
+biotype       9    C       "Alanine"                           9
+biotype      10    HN      "Alanine"                          10
+biotype      11    O       "Alanine"                          11
+biotype      12    HA      "Alanine"                          12
+biotype      13    CB      "Alanine"                          13
+biotype      14    HB      "Alanine"                          14
+biotype     268    N       "Glutamic Acid"                   232
+biotype     269    CA      "Glutamic Acid"                   233
+biotype     270    C       "Glutamic Acid"                   234
+biotype     271    HN      "Glutamic Acid"                   235
+biotype     272    O       "Glutamic Acid"                   236
+biotype     273    HA      "Glutamic Acid"                   237
+biotype     274    CB      "Glutamic Acid"                   238
+biotype     275    HB      "Glutamic Acid"                   239
+biotype     276    CG      "Glutamic Acid"                   240
+biotype     277    HG      "Glutamic Acid"                   241
+biotype     278    CD      "Glutamic Acid"                   242
+biotype     279    OE      "Glutamic Acid"                   243
+biotype     767    CH3     "Acetyl N-Terminus"               340
+biotype     768    H       "Acetyl N-Terminus"               341
+biotype     769    C       "Acetyl N-Terminus"               342
+biotype     770    O       "Acetyl N-Terminus"               343
+biotype     777    N       "N-MeAmide C-Terminus"            346
+biotype     778    HN      "N-MeAmide C-Terminus"            347
+biotype     779    CH3     "N-MeAmide C-Terminus"            348
+biotype     780    H       "N-MeAmide C-Terminus"            349

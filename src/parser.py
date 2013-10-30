@@ -124,15 +124,23 @@ gen_opts_types = {
 ## Default fitting target options.
 tgt_opts_types = {
     'strings' : {"name"      : (None, 200, 'The name of the target, corresponding to the directory targets/name', 'All targets (important)'),
-                 "masterfile": ('interactions.txt', 0, 'The name of the master file containing interacting systems', 'Binding energy target', 'BindingEnergy'),
                  "force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
-                 "fragment1" : ('', 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
-                 "fragment2" : ('', 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
-                 "openmm_cuda_precision" : ('', -10, 'Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
+                 "fragment1" : (None, 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
+                 "fragment2" : (None, 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
+                 "openmm_precision" : (None, -10, 'Precision of OpenMM calculation if using CUDA or OpenCL platform.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
+                 "openmm_platform" : ('CUDA', -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
+                 "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
+                 "inter_txt"             : ('interactions.txt', 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
                  },
-    'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,'')
+    'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
+                 "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
                  },
-    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed')
+    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
+                 "coords"                : (None, -10, 'Coordinates for single point evaluation; if not provided, will search for a default.', 'Energy/force matching, ESP evaluations, interaction energies'),
+                 "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM systems but can also contain coordinates.', 'Targets that use OpenMM', 'OpenMM'),
+                 "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
+                 "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
+                 "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
@@ -169,6 +177,7 @@ tgt_opts_types = {
                  "mts_vvvr"         : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "minimize_energy"  : (1, 0, 'Minimize the energy of the system prior to running dynamics', 'Condensed phase property targets (advanced usage)', 'liquid_openmm', 'liquid_tinker'),
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
+                 "permute"          : (1, -180, 'Permute eigenvectors before fitting frequencies.', 'Vibrational frequency targets', 'vibration'),
                 },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid'),
@@ -203,6 +212,19 @@ tgt_opts_types = {
     'sections': {}
     }
 
+all_opts_names = list(itertools.chain(*[i.keys() for i in gen_opts_types.values()])) + list(itertools.chain(*[i.keys() for i in tgt_opts_types.values()]))
+## Check for uniqueness of option names.
+for i in all_opts_names:
+    iocc = []
+    for typ, dct in gen_opts_types.items():
+        if i in dct:
+            iocc.append("gen_opt_types %s" % typ)
+    for typ, dct in tgt_opts_types.items():
+        if i in dct:
+            iocc.append("gen_opt_types %s" % typ)
+    if len(iocc) != 1:
+        raise RuntimeError("CODING ERROR: ForceBalance option %s occurs in more than one place (%s)" % (i, str(iocc)))
+
 ## Default general options - basically a collapsed veresion of gen_opts_types.
 gen_opts_defaults = {}
 for t in gen_opts_types:
@@ -220,7 +242,7 @@ for t in tgt_opts_types:
     tgt_opts_defaults.update(subdict)
 
 ## Option maps for maintaining backward compatibility.
-bkwd = {"simtype" : "type"}
+bkwd = {"simtype" : "type", "masterfile" : "inter_txt", "openmm_cuda_precision" : "openmm_precision"}
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]
@@ -428,8 +450,12 @@ def parse_inputs(input_file=None):
                         this_opt[key] = False
                     elif isfloat(s[1]) and int(float(s[1])) == 0:
                         this_opt[key] = False
-                    else:
+                    elif s[1].upper() in ["1", "YES", "TRUE", "ON"]:
                         this_opt[key] = True
+                    elif isfloat(s[1]) and int(float(s[1])) == 1:
+                        this_opt[key] = True
+                    else:
+                        raise RuntimeError('%s is a true/false option but you provided %s; to enable, provide ["1", "yes", "true", "on" or <no value>].  To disable, provide ["0", "no", "false", or "off"].' % (key, s[1]))
                 elif key in opts_types['floats']:
                     this_opt[key] = float(s[1])
                 elif key in opts_types['sections']:

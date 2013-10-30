@@ -21,10 +21,8 @@ class TestOptimizer(ForceBalanceTestCase):
 
         self.options.update({'writechk':'checkfile.tmp'})
 
-        try: self.forcefield  = forcebalance.forcefield.FF(self.options)
-        except: self.skipTest("\nCouldn't create forcefield")
-        try: self.objective   = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
-        except: self.skipTest("\nCouldn't create objective function")
+        self.forcefield  = forcebalance.forcefield.FF(self.options)
+        self.objective   = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
         try: self.optimizer   = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
         except: self.fail("\nCouldn't create optimizer")
 

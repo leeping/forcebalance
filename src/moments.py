@@ -6,8 +6,8 @@
 
 import os
 import shutil
+import numpy as np
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -52,7 +52,7 @@ class Moments(Target):
         #======================================#
         ## The mdata.txt file that contains the moments.
         self.mfnm = os.path.join(self.tgtdir,"mdata.txt")
-        ##
+        ## Dictionary of reference multipole moments.
         self.ref_moments = OrderedDict()
         ## Read in the reference data
         self.read_reference_data()
@@ -78,12 +78,12 @@ class Moments(Target):
                 pass
             elif len(s) == 1 and self.na == -1:
                 self.na = int(s[0])
-                xyz = zeros((self.na, 3), dtype=float)
+                xyz = np.zeros((self.na, 3))
                 cn = ln + 1
             elif ln == cn:
                 pass
             elif an < self.na and len(s) == 4:
-                xyz[an, :] = array([float(i) for i in s[1:]])
+                xyz[an, :] = np.array([float(i) for i in s[1:]])
                 an += 1
             elif an == self.na and s[0].lower() == 'dipole':
                 dn = ln + 1
@@ -159,12 +159,12 @@ class Moments(Target):
         return
 
     def unpack_moments(self, moment_dict):
-        answer = array(list(itertools.chain(*[[dct[i]/self.denoms[ord] if self.denoms[ord] != 0.0 else 0.0 for i in dct] for ord,dct in moment_dict.items()])))
+        answer = np.array(list(itertools.chain(*[[dct[i]/self.denoms[ord] if self.denoms[ord] != 0.0 else 0.0 for i in dct] for ord,dct in moment_dict.items()])))
         return answer
 
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
-        Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         def get_momvals(mvals_):
             self.FF.make(mvals_)
             moments = self.moments_driver()
@@ -177,17 +177,17 @@ class Moments(Target):
         calc_momvals = self.unpack_moments(calc_moments)
 
         D = calc_momvals - ref_momvals
-        dV = zeros((self.FF.np,len(calc_momvals)),dtype=float)
+        dV = np.zeros((self.FF.np,len(calc_momvals)))
 
         if AGrad or AHess:
             for p in range(self.FF.np):
                 dV[p,:], _ = f12d3p(fdwrap(get_momvals, mvals, p), h = self.h, f0 = calc_momvals)
                 
-        Answer['X'] = dot(D,D)
+        Answer['X'] = np.dot(D,D)
         for p in range(self.FF.np):
-            Answer['G'][p] = 2*dot(D, dV[p,:])
+            Answer['G'][p] = 2*np.dot(D, dV[p,:])
             for q in range(self.FF.np):
-                Answer['H'][p,q] = 2*dot(dV[p,:], dV[q,:])
+                Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:])
 
         if not in_fd():
             self.FF.make(mvals)

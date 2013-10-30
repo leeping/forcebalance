@@ -13,7 +13,7 @@ import numpy as np
 from copy import deepcopy
 from numpy.linalg import eig, norm, solve
 import forcebalance
-from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
+from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
@@ -188,7 +188,7 @@ class Optimizer(forcebalance.BaseClass):
             self.FF.make(xk,False,'result')
             logger.info("\nThe final force field has been printed to the 'result' directory.\n")
             #bar = printcool("\x1b[1;45;93mCongratulations, ForceBalance has finished\x1b[0m\n\x1b[1;45;93mGive yourself a pat on the back!\x1b[0m")
-            bar = printcool("Congratulations, ForceBalance has finished\nGive yourself a pat on the back!",ansi="1;44;93")
+            bar = printcool("Calculation Finished.\n---==( May the Force be with you! )==---",ansi="1;44;93")
 
         ## Write out stuff to checkpoint file
         self.writechk()
@@ -397,8 +397,8 @@ class Optimizer(forcebalance.BaseClass):
             H_stor  = H.copy()
             xk_prev = xk.copy()
             X_prev  = X
-            if len(self.FF.parmdestroy_this) > 0:
-                self.FF.parmdestroy_save.append(self.FF.parmdestroy_this)
+            if len(self.FF.prmdestroy_this) > 0:
+                self.FF.prmdestroy_save.append(self.FF.prmdestroy_this)
                 self.FF.linedestroy_save.append(self.FF.linedestroy_this)
         
         bar = printcool("Final objective function value\nFull: % .6e  Un-penalized: % .6e" % (data['X'],data['X0']), '@', bold=True, color=2)
@@ -441,10 +441,10 @@ class Optimizer(forcebalance.BaseClass):
             class Hyper(object):
                 def __init__(self, HL, Penalty):
                     self.H = HL.copy()
-                    self.dx = 1e10 * np.ones(len(HL),dtype=float)
+                    self.dx = 1e10 * np.ones(len(HL))
                     self.Val = 0
-                    self.Grad = np.zeros(len(HL),dtype=float)
-                    self.Hess = np.zeros((len(HL),len(HL)),dtype=float)
+                    self.Grad = np.zeros(len(HL))
+                    self.Hess = np.zeros((len(HL),len(HL)))
                     self.Penalty = Penalty
                 def _compute(self, dx):
                     self.dx = dx.copy()
@@ -465,7 +465,7 @@ class Optimizer(forcebalance.BaseClass):
                         self._compute(dx)
                     return self.Hess
             def hyper_solver(L):
-                dx0 = np.zeros(len(xkd),dtype=float)
+                dx0 = np.zeros(len(xkd))
                 #dx0 = np.delete(dx0, self.excision)
                 # HL = H + (L-1)**2*np.diag(np.diag(H))
                 # Attempt to use plain Levenberg
@@ -575,6 +575,9 @@ class Optimizer(forcebalance.BaseClass):
         else: # This is the nonlinear search code.
             # First obtain a step that is the same length as the provided trust radius.
             LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
+            dx, expect = solver(LOpt)
+            dxnorm = norm(dx)
+            logger.info("Starting search with step size %f\n" % dxnorm)
             bump = False
             Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             ### optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
@@ -864,7 +867,7 @@ class Optimizer(forcebalance.BaseClass):
         """
 
         Adata        = self.Objective.Full(self.mvals0,Order=1)['G']
-        Fdata        = np.zeros(self.FF.np,dtype=float)
+        Fdata        = np.zeros(self.FF.np)
         printcool("Checking first derivatives by finite difference!\n%-8s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
         for i in range(self.FF.np):
@@ -894,7 +897,7 @@ class Optimizer(forcebalance.BaseClass):
 
         """
         Adata        = self.Objective.Full(self.mvals0,Order=2)['H']
-        Fdata        = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        Fdata        = np.zeros((self.FF.np,self.FF.np))
         printcool("Checking second derivatives by finite difference!\n%-8s%-20s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter1 ID", "Parameter2 ID", "Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
 
@@ -933,5 +936,5 @@ class Optimizer(forcebalance.BaseClass):
         """ Write the checkpoint file for the main optimizer. """
         if self.wchk_fnm != None:
             logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
-            with open(os.path.join(self.root,self.wchk_fnm),'w') as f: pickle.dump(self.chk,f)
+            with wopen(os.path.join(self.root,self.wchk_fnm)) as f: pickle.dump(self.chk,f)
         

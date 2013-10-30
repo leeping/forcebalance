@@ -6,8 +6,8 @@
 
 import os
 import shutil
+import numpy as np
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, uncommadash, printcool_dictionary
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -55,12 +55,12 @@ class Interaction(Target):
         self.set_option(tgt_opts,'fragment1','fragment1')
         if len(self.fragment1) == 0:
             raise Exception('You need to define the first fragment using the fragment1 keyword')
-        self.select1 = array(uncommadash(self.fragment1))
+        self.select1 = np.array(uncommadash(self.fragment1))
         ## Set fragment 2
         self.set_option(tgt_opts,'fragment2','fragment2')
         if len(self.fragment2) == 0:
             raise Exception('You need to define the second fragment using the fragment2 keyword')
-        self.select2 = array(uncommadash(self.fragment2))
+        self.select2 = np.array(uncommadash(self.fragment2))
         ## Set upper cutoff energy
         self.set_option(tgt_opts,'energy_upper','energy_upper')
         #======================================#
@@ -77,10 +77,10 @@ class Interaction(Target):
         self.e_err_pct = None
         ## Read in the trajectory file
         if self.ns == -1:
-            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))
-            self.ns = len(self.traj)
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))
+            self.ns = len(self.mol)
         else:
-            self.traj = Molecule(os.path.join(self.root,self.tgtdir,self.trajfnm))[:self.ns]
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
         ## Read in the reference data
         self.read_reference_data()
         ## Prepare the temporary directory
@@ -91,19 +91,19 @@ class Interaction(Target):
         denom = self.energy_denom * 4.184
         # Create the denominator.
         if self.cauchy:
-            self.divisor = sqrt(self.eqm**2 + denom**2)
+            self.divisor = np.sqrt(self.eqm**2 + denom**2)
             if self.attenuate:
                 raise Exception('attenuate and cauchy are mutually exclusive')
         elif self.attenuate:
             # Attenuate only large repulsions.
-            self.divisor = zeros(len(self.eqm))
+            self.divisor = np.zeros(len(self.eqm))
             for i in range(len(self.eqm)):
                 if self.eqm[i] < denom:
                     self.divisor[i] = denom
                 else:
-                    self.divisor[i] = sqrt(denom**2 + (self.eqm[i]-denom)**2)
+                    self.divisor[i] = np.sqrt(denom**2 + (self.eqm[i]-denom)**2)
         else:
-            self.divisor = ones(len(self.eqm)) * denom
+            self.divisor = np.ones(len(self.eqm)) * denom
         if self.cauchy:
             logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
         if self.energy_upper > 0:
@@ -111,7 +111,7 @@ class Interaction(Target):
             ecut = self.energy_upper * 4.184
             self.prefactor = 1.0 * (self.eqm < ecut)
         else:
-            self.prefactor = ones(len(self.eqm))
+            self.prefactor = np.ones(len(self.eqm))
 
     def read_reference_data(self):
         
@@ -133,7 +133,7 @@ class Interaction(Target):
                 break
         self.ns = len(self.eqm)
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
-        self.eqm = array(self.eqm)
+        self.eqm = np.array(self.eqm)
         self.eqm *= eqcgmx
 
     def prepare_temp_directory(self, options, tgt_opts):
@@ -151,12 +151,12 @@ class Interaction(Target):
                                  (self.name, self.objective, "Label", "Calc.", "Ref.", "Delta", "Divisor", "Term"),keywidth=15)
         else:
             logger.info("Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)\n" % (self.name,self.objective))
-        # if len(self.RMSDDict) > 0:
+        # if len(self.RMSDDict) > 0:x
         #     printcool_dictionary(self.RMSDDict,title="Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s" % (self.rmsd_part, "System", "RMSD", "Term"), keywidth=45)
 
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
-        Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         
         # If the weight is zero, turn all derivatives off.
         if (self.weight == 0.0):
@@ -172,11 +172,11 @@ class Interaction(Target):
         emm = callM(mvals)
 
         D = emm - self.eqm
-        dV = zeros((self.FF.np,len(emm)),dtype=float)
+        dV = np.zeros((self.FF.np,len(emm)))
 
         # Dump interaction energies to disk.
-        savetxt('M.txt',emm)
-        savetxt('Q.txt',self.eqm)
+        np.savetxt('M.txt',emm)
+        np.savetxt('Q.txt',self.eqm)
 
         # Do the finite difference derivative.
         if AGrad or AHess:
@@ -185,11 +185,11 @@ class Interaction(Target):
             # Create the force field one last time.
             pvals  = self.FF.make(mvals)
                 
-        Answer['X'] = dot(self.prefactor*D/self.divisor,D/self.divisor)
+        Answer['X'] = np.dot(self.prefactor*D/self.divisor,D/self.divisor)
         for p in range(self.FF.np):
-            Answer['G'][p] = 2*dot(self.prefactor*D/self.divisor, dV[p,:]/self.divisor)
+            Answer['G'][p] = 2*np.dot(self.prefactor*D/self.divisor, dV[p,:]/self.divisor)
             for q in range(self.FF.np):
-                Answer['H'][p,q] = 2*dot(self.prefactor*dV[p,:]/self.divisor, dV[q,:]/self.divisor)
+                Answer['H'][p,q] = 2*np.dot(self.prefactor*dV[p,:]/self.divisor, dV[q,:]/self.divisor)
 
         if not in_fd():
             self.emm = emm
