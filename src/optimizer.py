@@ -56,6 +56,7 @@ class Optimizer(forcebalance.BaseClass):
 
         ## A list of all the things we can ask the optimizer to do.
         self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
+                          'OPTIMIZE'          : self.NewtonRaphson, 
                           'NEWTON'            : self.NewtonRaphson, 
                           'NR'                : self.NewtonRaphson, 
                           'BFGS'              : self.BFGS,
@@ -63,6 +64,7 @@ class Optimizer(forcebalance.BaseClass):
                           'SIMPLEX'           : self.Simplex,
                           'ANNEAL'            : self.Anneal,
                           'GENETIC'           : self.GeneticAlgorithm,
+                          'CG'                : self.ConjugateGradient,
                           'CONJUGATEGRADIENT' : self.ConjugateGradient,
                           'SCAN_MVALS'        : self.ScanMVals,
                           'SCAN_PVALS'        : self.ScanPVals,
@@ -90,6 +92,9 @@ class Optimizer(forcebalance.BaseClass):
         self.set_option(options,'lm_guess','lmg')
         ## Step size for numerical finite difference
         self.set_option(options,'finite_difference_h','h')
+        self.set_option(options,'finite_difference_h','h0')
+        ## When the trust radius get smaller, the finite difference step might need to get smaller.
+        self.set_option(options,'finite_difference_factor','fdf')
         ## Number of steps to average over
         self.set_option(options,'objective_history','hist')
         ## Function value convergence threshold
@@ -194,6 +199,19 @@ class Optimizer(forcebalance.BaseClass):
         self.writechk()
 
         return xk
+
+    def adjh(self, trust):
+        # The finite difference step size should be at most 1% of the trust radius.
+        if self.h > self.fdf * trust:
+            self.h = self.fdf * trust
+            logger.info("Setting finite difference step to %.4e\n" % self.h)
+            for tgt in self.Objective.Targets:
+                tgt.h = self.fdf * trust
+        if self.h0 < self.fdf * trust:
+            self.h = self.h0
+            logger.info("Setting finite difference step to %.4e\n" % self.h)
+            for tgt in self.Objective.Targets:
+                tgt.h = self.h0
             
     def MainOptimizer(self,b_BFGS=0):
         """ The main ForceBalance adaptive trust-radius pseudo-Newton optimizer.  Tried and true in many situations. :)
@@ -240,13 +258,15 @@ class Optimizer(forcebalance.BaseClass):
             xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
             X_best, xk_prev, trust = self.chk['x_best'], self.chk['xk_prev'], self.chk['trust']
         else:
+            trust    = abs(self.trust0)
             xk       = self.mvals0.copy()
             logger.info('\n')
+            # The finite difference step size should be at most 1% of the trust radius.
+            self.adjh(trust)
             data     = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H  = data['X'], data['G'], data['H']
             ehist    = np.array([X])
             xk_prev  = xk.copy()
-            trust    = abs(self.trust0)
             X_best   = X
 
         X_prev   = X
@@ -314,6 +334,7 @@ class Optimizer(forcebalance.BaseClass):
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
                 logger.info(bar)
             # Evaluate the objective function and its derivatives.
+            self.adjh(trust)
             data        = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H = data['X'], data['G'], data['H']
             ndx = norm(dx)
@@ -338,7 +359,7 @@ class Optimizer(forcebalance.BaseClass):
                 # and the 'b' factor determines how closely we are tied down to the original value.
                 # Recommend values 0.5 and 0.5
                 trust += a*trust*np.exp(-b*(trust/self.trust0 - 1))
-            if X > (X_prev + self.err_tol):
+            if X > (X_prev + max(self.err_tol, self.conv_obj)):
                 Best_Step = 0
                 # Toggle switch for rejection (experimenting with no rejection)
                 Rejects = True
@@ -355,6 +376,7 @@ class Optimizer(forcebalance.BaseClass):
                         logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality))
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
+                        self.adjh(trust)
                         data        = self.Objective.Full(xk,Ord,verbose=True)
                         GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
@@ -610,46 +632,100 @@ class Optimizer(forcebalance.BaseClass):
         @param[in] Algorithm The optimization algorithm to use, for example 'powell', 'simplex' or 'anneal'
 
         """
+        def summarize(mvals):
+            if self.print_vals:
+                bar = printcool("Mathematical Parameters for lowest objective",color=5)
+                self.FF.print_map(vals=["% .4e" % i for i in mvals])
+                print bar
+            for Tgt in self.Objective.Targets:
+                Tgt.indicate()
+            self.Objective.Indicate()
+
         from scipy import optimize
         def xwrap(func,verbose=True):
             def my_func(mvals):
-                if verbose: logger.info('\n')
-                Answer = func(mvals,Order=0,verbose=verbose)['X']
+                global ITERATION_NUMBER
+                Answer = func(mvals,Order=0,verbose=False)['X']
                 dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
                 if Answer < my_func.x_best or my_func.x_best == None:
                     color = "\x1b[92m"
                     my_func.x_best = Answer
+                    my_func.prev_bad = False
+                    if verbose: 
+                        summarize(mvals)
+                        logger.info('\n')
+                        logger.info("%6s%12s%12s%14s%12s\n" \
+                                        % ("Step", "  |k|  ","  |dk|  ","    -=X2=-  ","Delta(X2)"))
+                        logger.info("%6i%12.3e%12.3e%s%14.5e\x1b[0m%12.3e\n" \
+                                        % (ITERATION_NUMBER, np.linalg.norm(mvals), \
+                                               np.linalg.norm(mvals-my_func.xk_prev), \
+                                               color, Answer, Answer - my_func.x_prev))
                 else:
-                    color = "\x1b[91m"
-                if verbose:
-                    if self.print_vals:
-                        logger.info("k=" + ' '.join(["% .4f" % i for i in mvals]) + '\n')
-                    logger.info("X2= %s%12.3e\x1b[0m d(X2)= %12.3e\n" % (color,Answer,dx))
+                    if verbose:
+                        color = "\x1b[91m"
+                        if not my_func.prev_bad:
+                            logger.info('\n')
+                            logger.info("%6s%12s%12s%14s%12s\n" \
+                                            % ("Step", "  |k|  ","  |dk|  ","    -=X2=-  ","Delta(X2)"))
+                        logger.info("\r%6i%12.3e%12.3e%s%14.5e\x1b[0m%12.3e\r" \
+                                        % (ITERATION_NUMBER, np.linalg.norm(mvals), \
+                                               np.linalg.norm(mvals-my_func.xk_prev), \
+                                               color, Answer, Answer - my_func.x_prev))
+                    my_func.prev_bad = True
+                my_func.xk_prev = mvals.copy()
+                my_func.x_prev = Answer
+                ITERATION_NUMBER += 1
                 if Answer != Answer:
                     return 1e10
                 else:
                     return Answer
+            my_func.prev_bad = False
+            my_func.xk_prev = self.mvals0.copy()
+            my_func.x_prev = 0.0
             my_func.x_best = None
             return my_func
+
         def gwrap(func,verbose=True):
-            def my_gfunc(mvals):
-                if verbose: logger.info('\n')
-                Output = func(mvals,Order=1,verbose=verbose)
+            def my_func(mvals):
+                global ITERATION_NUMBER
+                Output = func(mvals,Order=1,verbose=False)
                 Answer = Output['G']
                 Objective = Output['X']
-                dx = (my_gfunc.x_best - Objective) if my_gfunc.x_best != None else 0.0
-                if Objective < my_gfunc.x_best or my_gfunc.x_best == None:
+                dx = (my_func.x_best - Objective) if my_func.x_best != None else 0.0
+                if Objective < my_func.x_best or my_func.x_best == None:
                     color = "\x1b[92m"
-                    my_gfunc.x_best = Objective
+                    my_func.x_best = Objective
+                    my_func.prev_bad = False
+                    if verbose: 
+                        summarize(mvals)
+                        logger.info('\n')
+                        logger.info("%6s%12s%12s%12s%14s%12s\n" \
+                                        % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)"))
+                        logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e\n" \
+                                        % (ITERATION_NUMBER, np.linalg.norm(mvals), \
+                                               np.linalg.norm(mvals-my_func.xk_prev), \
+                                               np.linalg.norm(Answer)))
                 else:
-                    color = "\x1b[91m"
-                if verbose:
-                    if self.print_vals:
-                        logger.info("k=" + ' '.join(["% .4f" % i for i in mvals]) + '\n')
-                    logger.info("|Grad|= %12.3e X2= %s%12.3e\x1b[0m d(X2)= %12.3e\n\n" % (norm(Answer),color,Objective,dx))
+                    if verbose:
+                        color = "\x1b[91m"
+                        if not my_func.prev_bad:
+                            logger.info('\n')
+                            logger.info("%6s%12s%12s%12s%14s%12s\n" \
+                                            % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)"))
+                        logger.info("\r%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e\r" \
+                                        % (ITERATION_NUMBER, np.linalg.norm(mvals), \
+                                               np.linalg.norm(mvals-my_func.xk_prev), \
+                                               np.linalg.norm(Answer)))
+                    my_func.prev_bad = True
+                my_func.xk_prev = mvals.copy()
+                my_func.x_prev = Answer
+                ITERATION_NUMBER += 1
                 return Answer
-            my_gfunc.x_best = None
-            return my_gfunc
+            my_func.prev_bad = False
+            my_func.xk_prev = self.mvals0.copy()
+            my_func.x_prev = 0.0
+            my_func.x_best = None
+            return my_func
         if Algorithm == "powell":
             printcool("Minimizing Objective Function using Powell's Method" , ansi=1, bold=1)
             return optimize.fmin_powell(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep)
