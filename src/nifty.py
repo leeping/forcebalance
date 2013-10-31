@@ -725,16 +725,16 @@ def onefile(ext, arg=None):
         if os.path.exists(arg):
             fnm = os.path.basename(arg)
         else:
-            logger.warning("File specified by %s (%s) does not exist - will try to autodetect\n" % (ext, arg))
+            warn_once("File specified by %s (%s) does not exist - will try to autodetect" % (ext, arg))
 
     if fnm == None:
         cwd = os.getcwd()
         ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
         if len(ls) != 1:
-            logger.info("Found %i .%s files in %s\n" % (len(ls), ext, cwd))
+            warn_once("Found %i .%s files in %s" % (len(ls), ext, cwd), warnhash = "Found %i .%s files" % (len(ls), ext))
         else:
             fnm = os.path.basename(ls[0])
-            logger.info("Autodetected .%s in %s\n" % (fnm, cwd))
+            warn_once("Autodetected %s in %s" % (fnm, cwd), warnhash = "Autodetected %s" % fnm )
     return fnm
 
 def GoInto(Dir):

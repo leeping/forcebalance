@@ -105,6 +105,7 @@ gen_opts_types = {
                  "eig_lowerbound"         : (1e-4,  10, 'Minimum eigenvalue for applying steepest descent correction', 'Main Optimizer'),
                  "lm_guess"               : (1.0,    9, 'Guess value for bracketing line search in trust radius algorithm', 'Main Optimizer'),
                  "finite_difference_h"    : (1e-3,  50, 'Step size for finite difference derivatives in many functions', 'pretty much everywhere'),
+                 "finite_difference_factor" : (1.0, 40, 'Make sure that the finite difference step size does not exceed this multiple of the trust radius.', 'Main Optimizer'),
                  "penalty_additive"       : (0.0,   55, 'Factor for additive penalty function in objective function', 'Objective function, all penalty types'),
                  "penalty_multiplicative" : (0.0,   55, 'Factor for multiplicative penalty function in objective function', 'Objective function, all penalty types'),
                  "penalty_alpha"          : (1e-3,  53, 'Extra parameter for fusion penalty function.  Dictates position of log barrier or L1-L0 switch distance', 
