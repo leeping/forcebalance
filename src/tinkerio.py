@@ -416,6 +416,7 @@ class TINKER(Engine):
         if hasattr(self,'target'):
             for f in FF.fnms:
                 os.unlink(f)
+        os.unlink('%s.xyz' % self.name)
 
     def optimize(self, shot=0, method="newton", crit=1e-4):
 

@@ -96,6 +96,7 @@ we need more modules!
 import os
 import sys
 import numpy as np
+from numpy import sin, cos, tan, exp, log, sqrt, pi
 from re import match, sub, split
 import forcebalance
 from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io 
