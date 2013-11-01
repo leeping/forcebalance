@@ -946,11 +946,13 @@ class Molecule(object):
                 outfile = sys.stdout
             elif append:
                 # Writing to symbolic links risks unintentionally overwriting the source file - 
-                # thus it is explicitly disallowed.
-                if os.path.islink(fnm): raise Exception("Writing to symbolic links is not allowed.")
+                # thus we delete the link first.
+                if os.path.islink(fnm): 
+                    os.unlink(fnm)
                 outfile = open(fnm,'a')
             else:
-                if os.path.islink(fnm): raise Exception("Writing to symbolic links is not allowed.")
+                if os.path.islink(fnm): 
+                    os.unlink(fnm)
                 outfile = open(fnm,'w')
             for line in Answer:
                 print >> outfile,line
@@ -1442,8 +1444,14 @@ class Molecule(object):
     #=====================================#
     #|         Reading functions         |#
     #=====================================#
-
     def read_xyz(self, fnm, **kwargs):
+        """ .xyz files can be TINKER formatted which is why we have the try/except here. """
+        try:
+            return self.read_xyz0(fnm, **kwargs)
+        except:
+            return self.read_arc(fnm, **kwargs)
+            
+    def read_xyz0(self, fnm, **kwargs):
         """ Parse a .xyz file which contains several xyz coordinates, and return their elements.
 
         @param[in] fnm The input file name

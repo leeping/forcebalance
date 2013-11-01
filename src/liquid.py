@@ -126,12 +126,12 @@ class Liquid(Target):
         # List of extra files to upload to Work Queue.
         self.nptfiles = []
         # Suffix to command string for launching NPT simulations.
-        self.nptsfx = [("--minimize_energy" if self.minimize_energy else None), 
-                       ("--liquid_equ_steps %i" % self.liquid_equ_steps if self.liquid_equ_steps > 0 else None),
-                       ("--gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else None), 
-                       ("--gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else None), 
+        self.nptsfx = [("--minimize" if self.minimize_energy else None), 
+                       ("--liquid_nequil %i" % self.liquid_equ_steps if self.liquid_equ_steps > 0 else None),
+                       ("--gas_nequil %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else None), 
+                       ("--gas_nsteps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else None), 
                        ("--gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else None), 
-                       ("--gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
+                       ("--gas_intvl %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
 
@@ -144,7 +144,8 @@ class Liquid(Target):
         R = [[wrd.lower() for wrd in line] for line in R1 if any([len(wrd) for wrd in line]) > 0]
         global_opts = OrderedDict()
         found_headings = False
-        known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra','cvib_inter','cni','devib_intra','devib_inter']
+        known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
+                      'cvib_inter','cni','devib_intra','devib_inter']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
