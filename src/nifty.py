@@ -44,17 +44,17 @@ bohrang = 0.529177249
 #=========================#
 #     I/O formatting      #
 #=========================#
-def pvec1d(vec1d, precision=1, loglevel=INFO):
+def pvec1d(vec1d, precision=1, format="e", loglevel=INFO):
     """Printout of a 1-D vector.
 
     @param[in] vec1d a 1-D vector
     """
     v2a = np.array(vec1d)
     for i in range(v2a.shape[0]):
-        logger.log(loglevel, "%% .%ie " % precision % v2a[i])
+        logger.log(loglevel, "%% .%i%s " % (precision, format) % v2a[i])
     logger.log(loglevel, '\n')
 
-def pmat2d(mat2d, precision=1, loglevel=INFO):
+def pmat2d(mat2d, precision=1, format="e", loglevel=INFO):
     """Printout of a 2-D matrix.
 
     @param[in] mat2d a 2-D matrix
@@ -62,7 +62,7 @@ def pmat2d(mat2d, precision=1, loglevel=INFO):
     m2a = np.array(mat2d)
     for i in range(m2a.shape[0]):
         for j in range(m2a.shape[1]):
-            logger.log(loglevel, "%% .%ie " % precision % m2a[i][j])
+            logger.log(loglevel, "%% .%i%s " % (precision, format) % m2a[i][j])
         logger.log(loglevel, '\n')
 
 def grouper(iterable, n):
@@ -715,6 +715,18 @@ def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
 #=====================================#
 #| File and process management stuff |#
 #=====================================#
+# Back up a file.
+def bak(fnm):
+    oldfnm = fnm
+    if os.path.exists(oldfnm):
+        base, ext = os.path.splitext(fnm)
+        i = 1
+        while os.path.exists(fnm):
+            fnm = "%s_%i%s" % (base,i,ext)
+            i += 1
+        logger.info("Backing up %s -> %s\n" % (oldfnm, fnm))
+        shutil.move(oldfnm,fnm)
+
 # Search for exactly one file with a provided extension.
 # ext: File extension
 # arg: String name of an argument

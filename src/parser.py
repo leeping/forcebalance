@@ -132,6 +132,7 @@ tgt_opts_types = {
                  "openmm_platform" : ('CUDA', -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
                  "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
                  "inter_txt"             : ('interactions.txt', 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
+                 "reassign_modes"        : (None, -180, 'Reassign modes before fitting frequencies, using either linear assignment "permute" or maximum overlap "overlap".', 'Vibrational frequency targets', 'vibration'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
@@ -178,7 +179,6 @@ tgt_opts_types = {
                  "mts_vvvr"         : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "minimize_energy"  : (1, 0, 'Minimize the energy of the system prior to running dynamics', 'Condensed phase property targets (advanced usage)', 'liquid_openmm', 'liquid_tinker'),
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
-                 "permute"          : (1, -180, 'Permute eigenvectors before fitting frequencies.', 'Vibrational frequency targets', 'vibration'),
                 },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid'),
