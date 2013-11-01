@@ -50,6 +50,7 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
             # First split off the comments.
             if len(line) == 0:
                 out.append('')
+                continue
             s = line.split(';',1)
             data = s[0]
             comms = s[1] if len(s) > 1 else None
@@ -79,11 +80,13 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
             else:
                 out.append(line)
     for key, val in options.items():
+        key = key.lower()
         if key not in haveopts:
             haveopts.append(key)
             out.append("%-20s = %s" % (key, val))
     # Fill in some default options.
     for key, val in defaults.items():
+        key = key.lower()
         if key not in haveopts:
             out.append("%-20s = %s" % (key, val))
     file_out = wopen(fout) 
@@ -520,20 +523,52 @@ class GMX(Engine):
             grofile = onefile('gro')
             self.mol = Molecule(grofile)
 
-    def prepare(self, **kwargs):
+    def prepare(self, pbc=False, **kwargs):
 
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
-        mdp_default = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"), ("nstxout", "0"), 
-                                   ("nstfout", "0"), ("nstenergy", "1"), ("nstxtcout", "0"), ("nstlist", "0"), 
-                                   ("ns_type", "simple"), ("rlist", "0.0"), ("coulombtype", "cut-off"), ("rcoulomb", "0.0"), 
-                                   ("vdwtype", "cut-off"), ("rvdw", "0.0"), ("constraints", "none"), ("pbc", "no")])
+        self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
+                                     ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"), 
+                                     ("nstxtcout", "0"), ("constraints", "none")])
+        gmx_opts = OrderedDict([])
+        warnings = []
+        self.pbc = pbc
+        if pbc:
+            minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
+            if minbox <= 10:
+                warn_press_key("Periodic box is set to less than 1.0 ")
+            elif minbox <= 21:
+                # Cutoff diameter should be at least one angstrom smaller than the box size
+                # Translates to 0.85 Angstrom for the SPC-216 water box
+                rlist = 0.05*(float(int(minbox - 1)))
+            else:
+                rlist = 1.0
+            gmx_opts["pbc"] = "xyz"
+            self.gmx_defs["ns_type"] = "grid"
+            self.gmx_defs["nstlist"] = 20
+            self.gmx_defs["rlist"] = "%.2f" % rlist
+            self.gmx_defs["coulombtype"] = "pme-switch"
+            self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
+            self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
+            self.gmx_defs["vdwtype"] = "switch"
+            self.gmx_defs["rvdw"] = "%.2f" % (rlist - 0.05)
+            self.gmx_defs["rvdw_switch"] = "%.2f" % (rlist - 0.1)
+            self.gmx_defs["DispCorr"] = "EnerPres"
+        else:
+            gmx_opts["pbc"] = "no"
+            self.gmx_defs["ns_type"] = "simple"
+            self.gmx_defs["nstlist"] = 0
+            self.gmx_defs["rlist"] = "0.0"
+            self.gmx_defs["coulombtype"] = "cut-off"
+            self.gmx_defs["rcoulomb"] = "0.0"
+            self.gmx_defs["vdwtype"] = "switch"
+            self.gmx_defs["rvdw"] = "0.0"
         
-        ## Link files into the temp directory because it's good for reproducibility.
+        ## Link files into the temp directory.
         if self.top != None:
-            LinkFile(os.path.join(self.srcdir, self.top), "%s.top" % self.name, nosrcok=True)
+            LinkFile(os.path.join(self.srcdir, self.top), self.top, nosrcok=True)
         if self.mdp != None:
-            LinkFile(os.path.join(self.srcdir, self.mdp), "%s.mdp" % self.name, nosrcok=True)
+            LinkFile(os.path.join(self.srcdir, self.mdp), self.mdp, nosrcok=True)
 
         ## Write the appropriate coordinate files.
         if hasattr(self,'target'):
@@ -541,17 +576,13 @@ class GMX(Engine):
             # This is because the .mdp and .top file can be force field files!
             FF = self.target.FF
             FF.make(np.zeros(FF.np))
-            if not os.path.exists('%s.top' % self.name):
-                topfile = onefile('top')
-                if topfile != None:
-                    LinkFile(topfile, "%s.top" % self.name, nosrcok=True)
-            if not os.path.exists('%s.mdp' % self.name):
-                mdpfile = onefile('mdp')
-                if mdpfile != None:
-                    LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
+            if self.top == None or not os.path.exists(self.top):
+                self.top = onefile('top')
+            if self.mdp == None or not os.path.exists(self.mdp):
+                self.mdp = onefile('mdp')
             # Sanity check; the force fields should be referenced by the .top file.
-            if os.path.exists("%s.top" % self.name):
-                if not any([any([fnm in line for fnm in FF.fnms]) for line in open("%s.top" % self.name)]):
+            if os.path.exists(self.top):
+                if not any([any([fnm in line for fnm in FF.fnms]) for line in open(self.top)]):
                     warn_press_key("None of the force field files %s are referenced in the .top file. "
                                    "Are you referencing the files through C preprocessor directives?" % FF.fnms)
             if hasattr(self.target,'shots'):
@@ -565,20 +596,18 @@ class GMX(Engine):
         ## At this point, we could have gotten a .mdp file from the
         ## target folder or as part of the force field.  If it still
         ## missing, then we may write a default.
-        if not os.path.exists('%s.top' % self.name):
+        if self.top != None and os.path.exists(self.top):
+            LinkFile(self.top, '%s.top' % self.name)
+        else:
             raise RuntimeError("No .top file found, cannot continue.")
-        if not os.path.exists("%s.mdp" % self.name):
-            logger.warn("No .mdp file found, writing default.")
-            write_mdp("%s.mdp" % self.name, {}, fin=self.mdp, defaults=mdp_default)
-        
+        write_mdp("%s.mdp" % self.name, gmx_opts, fin=self.mdp, defaults=self.gmx_defs)
+
         ## Call grompp followed by gmxdump to read the trajectory
-        o = self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name), copy_stderr=True)
-        double = 0
+        o = self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name), warnings=warnings)
+        self.double = 0
         for line in o:
             if 'double precision' in line:
-                double = 1
-        if not double:
-            warn_once("Single-precision GROMACS detected - recommend that you use double precision build.")
+                self.double = 1
         o = self.callgmx("gmxdump -s %s.tpr -sys" % self.name, copy_stderr=True)
         self.AtomMask = []
         self.AtomLists = defaultdict(list)
@@ -607,7 +636,6 @@ class GMX(Engine):
                 ai = [int(i) for i in line.split("{")[1].split("}")[0].split("..")]
                 mn = int(line.split('[')[1].split(']')[0])
                 for i in range(ai[1]-ai[0]+1) : self.AtomLists['MoleculeNumber'].append(mn)
-        os.unlink('%s.gro' % self.name)
         os.unlink('mdout.mdp')
         os.unlink('%s.tpr' % self.name)
         # Delete force field files.
@@ -643,6 +671,46 @@ class GMX(Engine):
         prog = os.path.join(self.gmxpath, csplit[0])
         csplit[0] = prog + self.gmxsuffix
         return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
+
+    def warngmx(self, command, warnings=[], maxwarn=1, **kwargs):
+        
+        """ Call gromacs and allow for certain expected warnings. """
+
+        # Common warning lines:
+        # "You are generating velocities so I am assuming"
+        # "You are not using center of mass motion removal"
+        csplit = command.split()
+        if '-maxwarn' in csplit:
+            csplit[csplit.index('-maxwarn')+1] = '%i' % maxwarn
+        else:
+            csplit += ['-maxwarn', '%i' % maxwarn]
+        command = ' '.join(csplit)
+        o = self.callgmx(command, persist=True, copy_stderr=True, print_error=False, **kwargs)
+        warnthis = []
+        fatal = 0
+        warn = 0
+        for line in o:
+            if warn:
+                warnthis.append(line)
+            warn = 0
+            if 'Fatal error' in line:
+                fatal = 1
+            if 'WARNING' in line:
+                warn = 1
+        if fatal and all([any([a in w for a in warnings]) for w in warnthis]):
+            maxwarn = len(warnthis)
+            csplit = command.split()
+            if '-maxwarn' in csplit:
+                csplit[csplit.index('-maxwarn')+1] = '%i' % maxwarn
+            else:
+                csplit += ['-maxwarn', '%i' % maxwarn]
+            command = ' '.join(csplit)
+            o = self.callgmx(command, **kwargs)
+        elif fatal:
+            for line in o:
+                logger.error(line+'\n')
+            raise RuntimeError('grompp encountered a fatal error!')
+        return o
 
     def energy_termnames(self, edrfile=None):
 
@@ -689,7 +757,7 @@ class GMX(Engine):
         
         write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
 
-        self.callgmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
         self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
         self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
@@ -722,7 +790,7 @@ class GMX(Engine):
         write_mdp("%s-1.mdp" % self.name, shot_opts, fin="%s.mdp" % self.name)
 
         ## Call grompp followed by mdrun.
-        self.callgmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite %s" % (self.name, "-rerun %s" % traj if traj else ''))
 
         ## Gather information
@@ -740,7 +808,7 @@ class GMX(Engine):
                                             for line in open("%s-f.xvg" % self.name).readlines()])
         ## Calculate and record dipole
         if dipole:
-            self.callgmx("g_dipoles -s %s.tpr -f %s.gro -o %s-d.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
+            self.callgmx("g_dipoles -s %s.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
             Result["Dipole"] = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-d.xvg" % self.name)])
 
         return Result
@@ -758,7 +826,10 @@ class GMX(Engine):
         """ Evaluate variables (energies, force and/or dipole) using GROMACS over a trajectory. """
 
         if traj == None:
-            traj = "%s-all.gro" % self.name
+            if hasattr(self, 'mdtraj'):
+                traj = self.mdtraj
+            else:
+                traj = "%s-all.gro" % self.name
         self.mol[0].write("%s.gro" % self.name)
         return self.evaluate_(force, dipole, traj)
 
@@ -800,7 +871,7 @@ class GMX(Engine):
             return self.optimize(shot)
         else:
             self.mol[shot].write("%s.gro" % self.name)
-            self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s-1.tpr" % (self.name, self.name, self.name, self.name))
+            self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s-1.tpr" % (self.name, self.name, self.name, self.name))
             self.callgmx("mdrun -deffnm %s-1 -nt 1 -rerunvsite" % (self.name, self.name))
             self.callgmx("g_energy -xvg no -f %s-1.edr -o %s-1-e.xvg" % (self.name, self.name), stdin='Potential')
             E = float(open("%s-1-e.xvg" % self.name).readlines()[0].split()[1])
@@ -820,7 +891,7 @@ class GMX(Engine):
         write_mdp('%s-x.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'}, fin='%s.mdp' % self.name)
 
         ## Call grompp followed by mdrun for interacting system.
-        self.callgmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
                          (self.name, self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-i -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
         self.callgmx("g_energy -f %s-i.edr -o %s-i-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
@@ -830,7 +901,7 @@ class GMX(Engine):
         I = np.array(I)
 
         ## Call grompp followed by mdrun for noninteracting system.
-        self.callgmx("grompp -c %s.gro -p %s.top -f %s-x.mdp -n %s.ndx -o %s-x.tpr" % \
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s-x.mdp -n %s.ndx -o %s-x.tpr" % \
                          (self.name, self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-x -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
         self.callgmx("g_energy -f %s-x.edr -o %s-x-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
@@ -845,6 +916,9 @@ class GMX(Engine):
         
         """ Return the multipole moments of the 1st snapshot in Debye and Buckingham units. """
         
+        if not self.double:
+            warn_once("Single-precision GROMACS detected - recommend that you use double precision build.")
+
         if polarizability:
             raise NotImplementedError
 
@@ -892,15 +966,18 @@ class GMX(Engine):
 
     def normal_modes(self, shot=0, optimize=True):
 
+        if not self.double:
+            warn_once("Single-precision GROMACS detected - recommend that you use double precision build.")
+
         write_mdp('%s-nm.mdp' % self.name, {'integrator':'nm'}, fin='%s.mdp' % self.name)
 
         if optimize:
             self.optimize(shot)
-            self.callgmx("grompp -c %s-min.gro -p %s.top -f %s-nm.mdp -o %s-nm.tpr" % (self.name, self.name, self.name, self.name))
+            self.warngmx("grompp -c %s-min.gro -p %s.top -f %s-nm.mdp -o %s-nm.tpr" % (self.name, self.name, self.name, self.name))
         else:
             warn_once("Asking for normal modes without geometry optimization?")
             self.mol[shot].write("%s.gro" % self.name)
-            self.callgmx("grompp -c %s.gro -p %s.top -f %s-nm.mdp -o %s-nm.tpr" % (self.name, self.name, self.name, self.name))
+            self.warngmx("grompp -c %s.gro -p %s.top -f %s-nm.mdp -o %s-nm.tpr" % (self.name, self.name, self.name, self.name))
 
         self.callgmx("mdrun -deffnm %s-nm -mtx %s-nm.mtx -v" % (self.name, self.name))
         self.callgmx("g_nmeig -s %s-nm.tpr -f %s-nm.mtx -of %s-nm.xvg -v %s-nm.trr -last 10000 -xvg no" % \
@@ -925,13 +1002,13 @@ class GMX(Engine):
 
     def generate_vsite_positions(self):
         ## Call grompp followed by mdrun.
-        self.callgmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
         self.callgmx("trjconv -f %s.trr -o %s-out.gro -ndec 9 -novel -noforce" % (self.name, self.name), stdin='System')
         NewMol = Molecule("%s-out.gro" % self.name)
         return NewMol.xyzs
 
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, pbc=True, threads=None, **kwargs):
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, **kwargs):
         
         """
         Method for running a molecular dynamics simulation.  
@@ -944,7 +1021,6 @@ class GMX(Engine):
         nequil      = (int)   Number of additional time steps at the beginning for equilibration
         nsave       = (int)   Step interval for saving data
         minimize    = (bool)  Perform an energy minimization prior to dynamics
-        pbc         = (bool)  Periodic boundary conditions; remove COM motion
         threads     = (int)   Number of MPI-threads
 
         Returns simulation data:
@@ -955,6 +1031,8 @@ class GMX(Engine):
         Dips        = (3xN array) Dipole moments
         EComps      = (dict)      Energy components
         """
+
+        if verbose: logger.info("Molecular dynamics simulation with GROMACS engine.\n")
 
         # Set the number of threads.
         if threads == None:
@@ -967,63 +1045,37 @@ class GMX(Engine):
         md_opts = OrderedDict([("integrator", "md"), ("nsteps", nsteps), ("dt", timestep / 1000)])
         # Default options if not user specified.
         md_defs = OrderedDict()
-        eq_defs = OrderedDict()
+
+        warnings = []
         if temperature != None:
             md_opts["ref_t"] = temperature
             md_opts["gen_temp"] = temperature
             md_defs["tc_grps"] = "System"
             md_defs["tcoupl"] = "v-rescale"
             md_defs["tau_t"] = 1.0
+        if self.pbc:
+            md_opts["comm_mode"] = "linear"
+            if pressure != None:
+                md_opts["ref_p"] = pressure
+                md_defs["pcoupl"] = "parrinello-rahman"
+                md_defs["tau_p"] = 1.5
+        else:
+            md_opts["comm_mode"] = "None"
+            md_opts["nstcomm"] = 0
+
         md_opts["nstenergy"] = nsave
         md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
         md_opts["nstvout"] = nsave
         md_opts["nstfout"] = 0
         md_opts["nstxtcout"] = 0
-        if pbc:
-            if minbox <= 10:
-                warn_press_key("Periodic box is set to less than 1.0 ")
-            elif minbox <= 21:
-                # Cutoff diameter should be at least one angstrom smaller than the box size
-                # Translates to 0.85 Angstrom for the SPC-216 water box
-                rlist = 0.05*(float(int(minbox - 1)))
-            else:
-                rlist = 1.0
-            md_opts["pbc"] = "xyz"
-            md_opts["comm_mode"] = "linear"
-            if pressure != None:
-                md_opts["ref_p"] = pressure
-                md_defs["pcoupl"] = "parrinello-rahman"
-                md_defs["tau_p"] = 1.5
-            md_defs["ns_type"] = "grid"
-            minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
-            md_defs["nstlist"] = 20
-            md_defs["rlist"] = "%.2f" % rlist
-            md_defs["coulombtype"] = "pme-switch"
-            md_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
-            md_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
-            md_defs["vdwtype"] = "switch"
-            md_defs["rvdw"] = "%.2f" % (rlist - 0.05)
-            md_defs["rvdw_switch"] = "%.2f" % (rlist - 0.1)
-            md_defs["DispCorr"] = "EnerPres"
-        else:
-            if pressure != None:
-                raise RuntimeError("To set a pressure, enable periodic boundary conditions.")
-            md_opts["pbc"] = "no"
-            md_opts["comm_mode"] = "None"
-            md_opts["nstcomm"] = 0
-            md_defs["ns_type"] = "simple"
-            md_defs["nstlist"] = 0
-            md_defs["rlist"] = "0.0"
-            md_defs["coulombtype"] = "cut-off"
-            md_defs["rcoulomb"] = "0.0"
-            md_defs["vdwtype"] = "switch"
-            md_defs["rvdw"] = "0.0"
 
         # Minimize the energy.
         if minimize:
             min_opts = OrderedDict([("integrator", "steep"), ("emtol", 10.0), ("nsteps", 10000)])
+            if verbose: logger.info("Minimizing energy... ")
             self.optimize(min_opts=min_opts)
+            if verbose: logger.info("Done\n")
             gro1="%s-min.gro" % self.name
         else:
             gro1="%s.gro" % self.name
@@ -1031,22 +1083,27 @@ class GMX(Engine):
       
         # Run equilibration.
         if nequil > 0:
+            if verbose: logger.info("Equilibrating...\n")
             eq_opts = deepcopy(md_opts)
             eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstcalcenergy" : 0, "nstxout" : 0})
             eq_defs = deepcopy(md_defs)
             if "pcoupl" in eq_defs: eq_defs["pcoupl"] = "berendsen"
             write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
-            self.callgmx("grompp -c %s -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (gro1, self.name, self.name, self.name))
-            self.callgmx("mdrun -v -deffnm %s-eq -nt %i -stepout %i" % (self.name, threads, nsave))
+            self.warngmx("grompp -c %s -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (gro1, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
+            self.callgmx("mdrun -v -deffnm %s-eq -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
             gro2="%s-eq.gro" % self.name
         else:
             gro2=gro1
 
         # Run production.
+        if verbose: logger.info("Production run...\n")
         write_mdp("%s-md.mdp" % self.name, md_opts, fin="%s.mdp" % self.name, defaults=md_defs)
-        self.callgmx("grompp -c %s -p %s.top -f %s-md.mdp -o %s-md.tpr" % (gro2, self.name, self.name, self.name))
-        self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave))
+        self.warngmx("grompp -c %s -p %s.top -f %s-md.mdp -o %s-md.tpr" % (gro2, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
+        self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
 
+        self.mdtraj = '%s-md.trr' % self.name
+
+        if verbose: logger.info("Production run finished, calculating properties...\n")
         # Figure out dipoles - note we use g_dipoles and not the multipole_moments function.
         self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
         
@@ -1077,7 +1134,9 @@ class GMX(Engine):
         Potentials = np.array(ecomp['Potential'])
         Kinetics = np.array(ecomp['Kinetic-En.'])
         Dips = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-md-dip.xvg" % self.name)])
-        return Rhos, Potentials, Kinetics, Volumes, Dips, OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
+        Ecomps = OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
+        if verbose: logger.info("Finished!\n")
+        return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps
 
 class AbInitio_GMX(AbInitio):
     """ Subclass of AbInitio for force and energy matching using normal GROMACS.
@@ -1120,7 +1179,7 @@ class Liquid_GMX(Liquid):
         self.gas_fnm = "gas.gro"
         if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
             self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
-            print "Found collection of starting conformations, length %i!" % len(self.liquid_mol)
+            logger.info("Found collection of starting conformations, length %i!\n" % len(self.liquid_mol))
         if self.do_self_pol:
             warn_press_key("Self-polarization correction not implemented yet when using GMX")
         # Command prefix.

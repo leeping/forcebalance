@@ -205,7 +205,7 @@ class Optimizer(forcebalance.BaseClass):
                         bak(os.path.join('result', fnm))
             self.FF.make(xk,False,'result')
             logger.info("\nThe final force field has been written to the 'result' directory.\n")
-            bar = printcool("Calculation Finished.\n---==( May the Force be with you! )==---",ansi="1;44;93")
+            bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
         ## Write out stuff to checkpoint file
         self.writechk()

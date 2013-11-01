@@ -40,7 +40,7 @@ class Engine(forcebalance.BaseClass):
     """
 
     def __init__(self, name="engine", **kwargs):
-        self.valkwd += ['mol', 'coords', 'name', 'target']
+        self.valkwd += ['mol', 'coords', 'name', 'target', 'pbc']
         kwargs = {i:j for i,j in kwargs.items() if j != None and i in self.valkwd} 
         super(Engine, self).__init__(kwargs)
         self.name = name

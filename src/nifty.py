@@ -447,7 +447,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     # Trap the case where this covariance is zero, and we cannot proceed.
     if(sigma2_AB == 0):
         if warn:
-            logger.warning('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency')
+            logger.warning('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency\n')
         return 1.0
     # Accumulate the integrated correlation time by computing the normalized correlation time at
     # increasing values of t.  Stop accumulating if the correlation function goes negative, since
@@ -795,9 +795,10 @@ def MissingFileInspection(fnm):
     return answer
 
 def wopen(dest):
-    """ Never write to symbolic links. """
+    """ If trying to write to a symbolic link, remove it first. """
     if os.path.islink(dest):
-        raise Exception("Tried to write to a symbolic link but that's against the rules; probably indicates a coding error.")
+        logger.warn("Trying to write to a symbolic link %s, removing it first\n" % dest)
+        os.unlink(dest)
     return open(dest,'w')
 
 def LinkFile(src, dest, nosrcok = False):
@@ -871,7 +872,7 @@ class LineChunker(object):
     def __exit__(self, *args, **kwargs):
         self.close()
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, print_error=True, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -882,6 +883,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     copy_stdout = Copy the stdout stream; can set to False in strange situations
     copy_stderr = Copy the stderr stream to the stdout stream; useful for GROMACS which prints out everything to stderr (argh.)
     expand_cr = Whether to expand carriage returns into newlines (useful for GROMACS mdrun).
+    print_error = Whether to print error messages on a crash. Should be true most of the time.
     persist = Continue execution even if the command gives a nonzero return code.
     """
     # Dictionary of options to be passed to the Popen object.
@@ -963,13 +965,14 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     p.wait()
 
     if p.returncode != 0:
-        if process_err.stderr:
+        if process_err.stderr and print_error:
             logger.warning("Received an error message:\n")
             logger.warning("\n[====] \x1b[91mError Message\x1b[0m [====]\n")
             logger.warning(process_err.stderr)
             logger.warning("[====] \x1b[91mEnd o'Message\x1b[0m [====]\n")
         if persist:
-            logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
+            if print_error:
+                logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
         else:
             # This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.
             # sys.stderr.write("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
