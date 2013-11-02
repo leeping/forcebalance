@@ -586,8 +586,15 @@ class OpenMM(Engine):
             # An extra step with adding virtual particles
             mod = Modeller(self.pdb.topology, xyz_omm)
             mod.addExtraParticles(self.forcefield)
-            # Set the positions using the trajectory
-            self.xyz_omms.append(mod.getPositions())
+            if self.pbc:
+                # Obtain the periodic box
+                box_omm = [Vec3(*self.mol.boxes[I].A)*angstrom, 
+                           Vec3(*self.mol.boxes[I].B)*angstrom, 
+                           Vec3(*self.mol.boxes[I].C)*angstrom]
+            else:
+                box_omm = None
+            # Finally append it to list.
+            self.xyz_omms.append((mod.getPositions(), box_omm))
 
         ## Build a topology and atom lists.
         Top = self.pdb.getTopology()
@@ -678,7 +685,15 @@ class OpenMM(Engine):
         self.system = self.forcefield.createSystem(mod.topology, **self.mmopts)
         UpdateSimulationParameters(self.system, self.simulation)
 
-    def set_positions(self, shot=0):
+    def set_positions(self, shot=0, traj=None):
+        
+        """
+        Set the positions and periodic box vectors to one of the
+        stored coordinates.  
+
+        *** NOTE: If you run a MD simulation, then the coordinates are
+        overwritten by the MD trajectory. ***
+        """
         #----
         # Ideally the virtual site parameters would be copied but they're not.
         # Instead we update the vsite positions manually.
@@ -688,7 +703,9 @@ class OpenMM(Engine):
         # else:
         #     simulation.context.computeVirtualSites()
         #----
-        self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot], self.system))
+        self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
+        if self.pbc:
+            simulation.context.setPeriodicBoxVectors(*xyz_omms[shot][1])
 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
@@ -705,31 +722,75 @@ class OpenMM(Engine):
             mass += system.getParticleMass(i)
         return mass
 
-    def energy_force(self, force=True):
-        """ Loop through the snapshots and compute the energies and forces using OpenMM. """
-        self.update_simulation()
-        M = []
-        # Loop through the snapshots
-        for I in range(len(self.mol)):
-            self.set_positions(I)
-            Energy = self.simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-            # Compute the force and append to list
-            Force = list(np.array(self.simulation.context.getState(getForces=True).getForces() / kilojoules_per_mole * nanometer).flatten())
+    def evaluate_one_(self, force=False, dipole=False):
+        # Perform a single point calculation on the current geometry.
+        State = self.simulation.context.getState(getEnergy=True, getForces=force)
+        Result = {}
+        Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
+        if force: 
+            Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
-            Force1 = list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]]))
-            M.append(np.array([Energy] + Force1))
-        M = np.array(M)
-        return M
+            Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
+        if dipole: Result["Dipole"] = get_dipole(self.simulation)
+        return Result
+
+    def evaluate_(self, force=False, dipole=False, traj=False):
+
+        """ 
+        Utility function for computing energy, and (optionally) forces and dipoles using OpenMM. 
+        
+        Inputs:
+        force: Switch for calculating the force.
+        dipole: Switch for calculating the dipole.
+        traj: Trajectory (listing of coordinate and box 2-tuples).  If provide, will loop over these snapshots.
+        Otherwise will do a single point evaluation at the current geometry.
+
+        Outputs:
+        Result: Dictionary containing energies, forces and/or dipoles.
+        """
+
+        self.update_simulation()
+        # If trajectory flag set to False, perform a single-point calculation.
+        if not traj: return evaluate_one_(force, dipole)
+        Energies = []
+        Forces = []
+        Dipoles = []
+        for I in range(len(self.xyz_omms)):
+            self.set_positions(I)
+            R1 = self.evaluate_one_(force, dipole)
+            Energies.append(R1["Energy"])
+            if force: Forces.append(R1["Force"])
+            if dipole: Dipoles.append(R1["Dipole"])
+        # Compile it all into the dictionary object
+        Result = OrderedDict()
+        Result["Energy"] = np.array(Energies)
+        if force: Result["Force"] = np.array(Forces)
+        if dipole: Result["Dipole"] = np.array(Dipoles)
+        return Result
+
+    def energy_one(self, shot):
+        self.set_positions(shot)
+        return self.evaluate_()["Energy"]
+
+    def energy_force_one(self):
+        self.set_positions(shot)
+        Result = self.evaluate_(force=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
 
     def energy(self):
-        self.update_simulation()
-        M = []
-        # Loop through the snapshots
-        for I in range(len(self.mol)):
-            self.set_positions(I)
-            Energy = self.simulation.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-            M.append(Energy)
-        return np.array(M)
+        return self.evaluate_(traj=True)["Energy"]
+
+    def energy_force(self):
+        """ Loop through the snapshots and compute the energies and forces using OpenMM. """
+        Result = self.evaluate_(force=True, traj=True)
+        E = Result["Energy"].reshape(-1,1)
+        F = Result["Force"]
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+
+    def energy_dipole(self):
+        """ Loop through the snapshots and compute the energies and forces using OpenMM. """
+        Result = self.evaluate_(dipole=True, traj=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
     def normal_modes(self, shot=0, optimize=True):
         raise NotImplementedError("OpenMM cannot do normal mode analysis")
@@ -824,7 +885,7 @@ class OpenMM(Engine):
 
         return (D - A - B) / 4.184
 
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, writexyz=False, **kwargs):
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, writexyz=False, verbose=False, **kwargs):
         
         """
         Method for running a molecular dynamics simulation.  
@@ -864,11 +925,11 @@ class OpenMM(Engine):
 
         # Minimize the energy.
         if minimize:
-            logger.info("Minimizing the energy... (starting energy % .3f kJ/mol)" % 
-                        self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
+            if verbose: logger.info("Minimizing the energy... (starting energy % .3f kJ/mol)" % 
+                                    self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
             self.simulation.minimizeEnergy()
-            logger.info("Done (final energy % .3f kJ/mol)\n" % 
-                        self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
+            if verbose: logger.info("Done (final energy % .3f kJ/mol)\n" % 
+                                    self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
 
         # Serialize the system if we want.
         Serialize = 0
@@ -889,8 +950,7 @@ class OpenMM(Engine):
         # Initialize statistics.
         edecomp = OrderedDict()
         # Stored coordinates, box vectors
-        self.Traj = []
-        self.Boxes = []
+        self.xyz_omms = []
         # Densities, potential and kinetic energies, box volumes, dipole moments
         Rhos = []
         Potentials = []
@@ -904,11 +964,11 @@ class OpenMM(Engine):
         self.simulation.context.setVelocitiesToTemperature(temperature*kelvin)
         # Equilibrate.
         if iequil > 0: 
-            logger.info("Equilibrating...\n")
+            if verbose: logger.info("Equilibrating...\n")
             if self.pbc:
-                logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
+                if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
             else:
-                logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
+                if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
         for iteration in range(iequil):
             self.simulation.step(nsave)
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
@@ -923,18 +983,18 @@ class OpenMM(Engine):
                 density = 0.0 * kilogram / meter ** 3
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
             if self.pbc:
-                logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration, state.getTime() / picoseconds,
-                                                                         kinetic_temperature / kelvin, potential / kilojoules_per_mole,
-                                                                         volume / nanometers**3, density / (kilogram / meter**3)))
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration, state.getTime() / picoseconds,
+                                                                                     kinetic_temperature / kelvin, potential / kilojoules_per_mole,
+                                                                                     volume / nanometers**3, density / (kilogram / meter**3)))
             else:
-                logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration, state.getTime() / picoseconds,
-                                                           kinetic_temperature / kelvin, potential / kilojoules_per_mole))
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration, state.getTime() / picoseconds,
+                                                                       kinetic_temperature / kelvin, potential / kilojoules_per_mole))
         # Collect production data.
-        logger.info("Production...\n")
+        if verbose: logger.info("Production...\n")
         if self.pbc:
-            logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
+            if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
         else:
-            logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
+            if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
         if writexyz:
             self.simulation.reporters.append(DCDReporter('dynamics.dcd', nsteps))
         for iteration in range(isteps):
@@ -942,7 +1002,6 @@ class OpenMM(Engine):
             self.simulation.step(nsave)
             # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-            self.Traj.append(state.getPositions())
             kinetic = state.getKineticEnergy()
             potential = state.getPotentialEnergy()
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
@@ -954,7 +1013,7 @@ class OpenMM(Engine):
                 box_vectors = None
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            self.Boxes.append(box_vectors)
+            self.xyz_omms.append(state.getPositions(), box_vectors)
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -962,17 +1021,17 @@ class OpenMM(Engine):
                 else:
                     edecomp[comp] = [val]
             if self.pbc:
-                logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration, state.getTime() / picoseconds,
-                                                                 kinetic_temperature / kelvin, potential / kilojoules_per_mole,
-                                                                 volume / nanometers**3, density / (kilogram / meter**3)))
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration, state.getTime() / picoseconds,
+                                                                                     kinetic_temperature / kelvin, potential / kilojoules_per_mole,
+                                                                                     volume / nanometers**3, density / (kilogram / meter**3)))
             else:
-                logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration, state.getTime() / picoseconds,
-                                                   kinetic_temperature / kelvin, potential / kilojoules_per_mole))
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration, state.getTime() / picoseconds,
+                                                                       kinetic_temperature / kelvin, potential / kilojoules_per_mole))
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
             Kinetics.append(kinetic / kilojoules_per_mole)
             Volumes.append(volume / nanometer**3)
-            Dips.append(get_dipole(self.simulation,positions=self.Traj[-1]))
+            Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
         Rhos = np.array(Rhos)
         Potentials = np.array(Potentials)
         Kinetics = np.array(Kinetics)

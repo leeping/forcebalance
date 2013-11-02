@@ -28,6 +28,17 @@ from forcebalance.finite_difference import in_fd
 from collections import OrderedDict
 from forcebalance.optimizer import GoodStep
 
+# All TINKER force field parameter types, which should eventually go into pdict
+# at some point (for full compatibility).
+allp = ['atom', 'vdw', 'vdw14', 'vdwpr', 'hbond', 'bond', 'bond5', 'bond4',
+        'bond3', 'electneg', 'angle', 'angle5', 'angle4', 'angle3', 'anglef',
+        'strbnd', 'ureybrad', 'angang', 'opbend', 'opdist', 'improper', 'imptors',
+        'torsion', 'torsion5', 'torsion4', 'pitors', 'strtors', 'tortors', 'charge',
+        'dipole', 'dipole5', 'dipole4', 'dipole3', 'multipole', 'polarize', 'piatom',
+        'pibond', 'pibond5', 'pibond4', 'metal', 'biotype', 'mmffvdw', 'mmffbond',
+        'mmffbonder', 'mmffangle', 'mmffstrbnd', 'mmffopbend', 'mmfftorsion', 'mmffbci',
+        'mmffpbci', 'mmffequiv', 'mmffdefstbn', 'mmffcovrad', 'mmffprop', 'mmffarom']
+
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
@@ -52,8 +63,6 @@ pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals dista
                                                 # Ignored for now: stretch/bend coupling, out-of-plane bending,
                                                 # torsional parameters, pi-torsion, torsion-torsion
          }
-
-
 
 class Tinker_Reader(BaseReader):
     """Finite state machine for parsing TINKER force field files.
@@ -138,98 +147,125 @@ class Tinker_Reader(BaseReader):
             # types/classes involved in the interaction.
             self.suffix = '.'.join(self.atom)
 
-def write_key_with_prm(src, dest, prmfnm=None, ffobj=None):
-    """ Copies a TINKER .key file but changes the parameter keyword as
-    necessary to reflect the ForceBalance settings. """
+def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
+    """
+    Create or edit a TINKER .key file.
+    @param[in] fout Output file name, can be the same as input file name.
+    @param[in] options Dictionary containing .key options. Existing options are replaced, new options are added at the end.
+    Passing None causes options to be deleted.  To pass an option without an argument, use ''.
+    @param[in] fin Input file name.
+    @param[in] defaults Default options to add to the mdp only if they don't already exist.
+    @param[in] verbose Print out all modifications to the file.
+    @param[in] prmfnm TINKER parameter file name.
+    """
+    # Make sure that the keys are lowercase, and the values are all strings.
+    options = OrderedDict([(key.lower(), str(val)) for key, val in options.items()])
+    if 'parameters' in options and prmfnm != None:
+        raise RuntimeError("Please pass prmfnm or 'parameters':'filename.prm' in options but not both.")
+    elif 'parameters' in options:
+        prmfnm = options['parameters']
+    
+    if prmfnm != None:
+        # Account for both cases where the file name may end with .prm
+        prms = [prmfnm]
+        if prms[0].endswith('.prm'):
+            prms.append(prmfnm[:-4])
+    else:
+        prms = []
 
-    if src == dest:
-        raise Exception("This function shouldn't be used to modify a file in-place.")
-
-    if prmfnm == None and ffobj == None:
-        raise Exception('write_key_with_prm should be called with either a ForceField object or a parameter file name')
-    elif prmfnm == None:
-        if hasattr(ffobj, 'tinkerprm'):
-            prmfnm = ffobj.tinkerprm
-        else:
-            raise AttributeError('The TINKER parameter file name must be specified in the ForceBalance input file')
-    elif prmfnm != None and ffobj != None:
-        raise Exception('write_key_with_prm should be called with either a ForceField object or a parameter file name, but not both')
-        
-    # Account for both cases where the file name may end with .prm
-    prms = [prmfnm]
-    if prms[0].endswith('.prm'):
-        prms.append(prmfnm[:-4])
-
-    # This is a flag which tells us whether the "parameters" line has appeared
-    prmflag = False
-    outlines = []
-    if src and os.path.exists(src):
-        for line in open(src):
-            if len(line.split()) > 1 and line.split()[0].lower() == 'parameters':
-                prmflag = True
+    # Options that cause the program to crash if they are overwritten
+    clashes = []
+    # List of lines in the output file.
+    out = []
+    # List of options in the output file.
+    haveopts = []
+    skip = 0
+    prmflag = 0
+    if fin != None and os.path.isfile(fin):
+        for line0 in open(fin).readlines():
+            line1   = line0.replace('\n','').expandtabs()
+            line    = line0.strip().expandtabs()
+            s       = line.split()
+            if skip:
+                out.append(line1)
+                skip -= 1
+                continue
+            # Skip over these three cases:
+            # 1) Empty lines get appended to the output and skipped.
+            if len(line) == 0 or set(line).issubset([' ']):
+                out.append('')
+                continue
+            # 2) Lines that start with comments are skipped as well.
+            if line.startswith("#"):
+                out.append(line1)
+                continue
+            # 3) Lines that correspond to force field parameters are skipped
+            if s[0].lower() in allp:
+                out.append(line1)
+                # 4) For AMOEBA multipole parameters, skip four additional lines
+                if s[0].lower() == "multipole":
+                    skip = 4
+                continue
+            # Now split by the comment character.
+            s = line.split('#',1)
+            data = s[0]
+            comms = s[1] if len(s) > 1 else None
+            # Now split off the key and value fields at the space.
+            keyf, valf = data.split(' ',1)
+            key = keyf.strip().lower()
+            haveopts.append(key)
+            if key == 'parameters':
+                val0 = valf.strip()
                 # This is the case where "parameters" correctly corresponds to optimize.in
-                if line.split()[1] in prms: pass
+                prmflag = 1
+                if prmfnm == None or val0 in prms:
+                    out.append(line1)
+                    continue
                 else:
                     logger.info(line + '\n')
-                    warn_press_key("The above line was found in %s, but we expected something like %s" % (src,prmfnm))
-            outlines.append(line)
-    else:
-        outlines.append("digits 10")
-    if not prmflag:
-        logger.info("Adding parameter file %s to key file\n" % prmfnm)
-        outlines.insert(0,"parameters %s\n" % prmfnm)
-    with wopen(dest) as f: f.writelines(outlines)
-
-def modify_key(src, in_dict):
-    """ Performs in-place modification of a TINKER .key file. 
-
-    The input dictionary contains key:value pairs such as
-    "polarization direct".  If the key exists in the TINKER file, then
-    that line is modified such that it contains the value in the
-    dictionary.  Note that this "key" is not to be confused with the
-    .key extension in the TINKER file that we're modifying.
-
-    Sometimes keys like 'archive' do not have a value, in which case
-    the dictionary should contain a None value or a blank space.
-
-    If the key doesn't exist in the TINKER file, then the key:value pair
-    will be printed at the end.
-
-    @param[in] src Name of the TINKER file to be modified.
-    @param[in] in_dict Dictionary containing key-value pairs used to modify the TINKER file.
-
-    """
-
-    if os.path.isfile(src) and not os.path.islink(src):
-        fin = open(src).readlines()
-    else:
-        raise Exception("This function shouldn't be used to follow symbolic links, because I don't want to modify files in the target directory")
-    odict = OrderedDict([(key.lower(), val) for key, val in in_dict.items()])
-    flags = OrderedDict([(key, False) for key in odict.keys()])
-    outlines = []
-    for line in open(src).readlines():
-        s = line.split()
-        if len(s) == 0:
-            outlines.append(line)
-            continue
-        key = s[0].lower()
-        # Modify the line in-place if the key already exists.
-        if key in odict:
-            val = odict[key]
-            if val != None:
-                outlines.append("%s %s\n" % (key, val))
+                    warn_press_key("The above line was found in %s, but we expected something like 'parameters %s'; replacing." % (line,prmfnm))
+                    options['parameters'] = prmfnm
+            if key in options:
+                # This line replaces the line in the .key file with the value provided in the dictionary.
+                val = options[key]
+                val0 = valf.strip()
+                if key in clashes and val != val0:
+                    raise RuntimeError("write_key tried to set %s = %s but its original value was %s = %s" % (key, val, key, val0))
+                # Passing None as the value causes the option to be deleted
+                if val == None: continue
+                if len(val) < len(valf):
+                    valf = ' ' + val + ' '*(len(valf) - len(val)-1)
+                else:
+                    valf = ' ' + val + ' '
+                lout = [keyf, ' ', valf]
+                if comms != None:
+                    lout += ['#',comms]
+                out.append(''.join(lout))
             else:
-                outlines.append("%s\n" % (key))
-            flags[key] = True
-        else:
-            outlines.append(line)
-    for key, val in odict.items():
-        if not flags[key]:
-            if val != None:
-                outlines.append("%s %s\n" % (key, val))
-            else:
-                outlines.append("%s\n" % (key))
-    with wopen(src) as f: f.writelines(outlines)
+                out.append(line1)
+    # Options that don't already exist are written at the bottom.
+    for key, val in options.items():
+        key = key.lower()
+        if key not in haveopts:
+            haveopts.append(key)
+            out.append("%-20s %s" % (key, val))
+    # Fill in default options.
+    for key, val in defaults.items():
+        key = key.lower()
+        options[key] = val
+        if key not in haveopts:
+            haveopts.append(key)
+            out.append("%-20s %s" % (key, val))
+    # If parameters are not specified, they are printed at the top.
+    if not prmflag and prmfnm != None:
+        out.insert(0,"parameters %s" % prmfnm)
+    # Finally write the key file.
+    file_out = wopen(fout) 
+    for line in out:
+        print >> file_out, line
+    if verbose:
+        printcool_dictionary(options, title="%s -> %s with options:" % (fin, fout))
+    file_out.close()
 
 class Liquid_TINKER(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
@@ -246,12 +282,12 @@ class Liquid_TINKER(Liquid):
         LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
         LinkFile(os.path.join(options['tinkerpath'],"minimize"),os.path.join(abstempdir,"minimize"))
         LinkFile(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
-        write_key_with_prm(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"),ffobj=self.FF)
-        modify_key(os.path.join(abstempdir,"liquid.key"),{'archive':None,'save-box':None})
+        write_key(os.path.join(abstempdir,"liquid.key"), {'archive':None,'save-box':None}, 
+                  os.path.join(self.root,self.tgtdir,"liquid.key"), {}, prmfnm=self.FF.tinkerprm)
         # LinkFile(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
         LinkFile(os.path.join(self.root,self.tgtdir,"mono.xyz"),os.path.join(abstempdir,"mono.xyz"))
-        write_key_with_prm(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"),ffobj=self.FF)
-        modify_key(os.path.join(abstempdir,"mono.key"),{'archive':None})
+        write_key(os.path.join(abstempdir,"mono.key"), {'archive':None,'save-box':None}, 
+                  os.path.join(self.root,self.tgtdir,"mono.key"), {}, prmfnm=self.FF.tinkerprm)
         # LinkFile(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
         # LinkFile(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
@@ -358,7 +394,7 @@ class TINKER(Engine):
             FF.make(np.zeros(FF.np))
             if FF.rigid_water:
                 self.rigid = True
-            write_key_with_prm(os.path.join(self.srcdir, self.key), "%s.key" % self.name, ffobj=FF)
+            write_key("%s.key" % self.name, {'digits':'10'}, os.path.join(self.srcdir, self.key), {}, FF.tinkerprm)
         elif self.key:
             LinkFile(os.path.join(self.srcdir, self.key), "%s.key" % self.name, nosrcok=True)
         else:
@@ -416,7 +452,6 @@ class TINKER(Engine):
         if hasattr(self,'target'):
             for f in FF.fnms:
                 os.unlink(f)
-        os.unlink('%s.xyz' % self.name)
 
     def optimize(self, shot=0, method="newton", crit=1e-4):
 
@@ -439,7 +474,6 @@ class TINKER(Engine):
         M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
         M12.align(center=False)
         M12[1].write("%s.xyz_2" % self.name, ftype="tinker")
-        M12[1].write("%s-opt.xyz" % self.name, ftype="tinker")
         rmsd = M12.ref_rmsd(0)[1]
         cnvgd = 0
         mode = 0
@@ -464,9 +498,9 @@ class TINKER(Engine):
 
         """ Computes the energy and force using TINKER for one snapshot. """
 
-        self.mol.write("%s.arc" % self.name,select=[shot])
+        self.mol.write("%s.xyz" % self.name,select=[shot], ftype="tinker")
         # This line actually runs TINKER
-        o = self.calltinker("testgrad %s.arc y n n" % (self.name))
+        o = self.calltinker("testgrad %s.xyz y n n" % (self.name))
         # Read data from stdout and stderr, and convert it to GROMACS
         # units for consistency with existing code.
         E = []
@@ -487,9 +521,9 @@ class TINKER(Engine):
 
         """ Computes the energy using TINKER over a trajectory. """
 
-        self.mol.write("%s.arc" % self.name)
+        self.mol.write("%s.xyz" % self.name, ftype="tinker")
         # This line actually runs TINKER
-        o = self.calltinker("analyze %s.arc e" % (self.name))
+        o = self.calltinker("analyze %s.xyz e" % (self.name))
         # Read data from stdout and stderr, and convert it to GROMACS units.
         Borked = 0
         E = []
@@ -656,6 +690,107 @@ class TINKER(Engine):
 
         # Interaction energy needs to be in kcal/mol.
         return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
+
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, verbose=False, **kwargs):
+        
+        """
+        Method for running a molecular dynamics simulation.  
+
+        Required arguments:
+        nsteps      = (int)   Number of total time steps
+        timestep    = (float) Time step in FEMTOSECONDS
+        temperature = (float) Temperature control (Kelvin)
+        pressure    = (float) Pressure control (atmospheres)
+        nequil      = (int)   Number of additional time steps at the beginning for equilibration
+        nsave       = (int)   Step interval for saving and printing data
+        minimize    = (bool)  Perform an energy minimization prior to dynamics
+
+        Returns simulation data:
+        Rhos        = (array)     Density in kilogram m^-3
+        Potentials  = (array)     Potential energies
+        Kinetics    = (array)     Kinetic energies
+        Volumes     = (array)     Box volumes
+        Dips        = (3xN array) Dipole moments
+        EComps      = (dict)      Energy components
+        """
+
+        if minimize:
+            if verbose: logger.info("Minimizing the energy...")
+            self.optimize(crit=1)
+            os.system("mv %s.xyz_2 %s.xyz" % (self.name, self.name))
+            if verbose: logger.info("Done\n")
+
+        # Run equilibration.
+        if nequil > 0:
+            if verbose: logger.info("Running equilibration...\n")
+            if self.pbc and pressure:
+                self.calltinker("dynamic %s %i %f %f 4 %f %f" % (xin, nsteps, timestep, float(nsave*timestep)/1000, 
+                                                                 temperature, pressure), print_to_screen=verbose)
+            else:
+                self.calltinker("dynamic %s %i %f %f 2 %f" % (xin, nstep, timestep, float(nsave*timestep)/1000,
+                                                                  temperature), print_to_screen=verbose)
+            os.system("rm -f %s.arc %s.box" % (basename, basename))
+
+        # Run production.
+        if verbose: logger.info("Running production...\n")
+        if self.pbc and pressure:
+            odyn = self.calltinker("dynamic %s %i %f %f 4 %f %f" % (xin, nstep*npr, tstep, float(nstep*tstep/1000), 
+                                                                    temperature, pressure), print_to_screen=verbose)
+        else:
+            odyn = self.calltinker("dynamic %s %i %f %f 2 %f" % (xin, nstep*npr, tstep, float(nstep*tstep/1000), 
+                                                          temperature), print_to_screen=verbose)
+
+        # Gather information.
+        os.system("mv %s.arc %s-md.arc" % (self.name, self.name))
+        self.mdtraj = "%s-md.arc" % self.name
+        edyn = []
+        kdyn = []
+        for line in odyn:
+            if 'Current Potential' in line:
+                edyn.append(float(line.split()[2]))
+            if 'Current Kinetic' in line:
+                kdyn.append(float(line.split()[2]))
+
+        # Potential and kinetic energies converted to kJ/mol.
+        edyn = np.array(edyn) * 4.184
+        kdyn = np.array(kdyn) * 4.184
+    
+        if verbose: logger.info("Post-processing to get the dipole moments\n")
+        cmdstr = "analyze %s" % xain
+        oanl = self.calltinker("analyze %s.arc" % self.name, stdin="G,E", verbose=False)
+
+        # Read potential energy and dipole from file.
+        eanl = []
+        dip = []
+        mass = 0.0
+        for line in oanl:
+            if 'Total System Mass' in line:
+                mass = float(line.split()[-1])
+            if 'Total Potential Energy : ' in line:
+                eanl.append(float(line.split()[4]))
+            if 'Dipole X,Y,Z-Components :' in line:
+                dip.append([float(line.split()[i]) for i in range(-3,0)])
+
+        # Energies in kilojoules per mole
+        eanl = np.array(eanl) * 4.184
+        # Dipole moments in debye
+        dip = np.array(dip)
+        # Volume of simulation boxes in cubic nanometers
+        # Conversion factor derived from the following:
+        # In [22]: 1.0 * gram / mole / (1.0 * nanometer)**3 / AVOGADRO_CONSTANT_NA / (kilogram/meter**3)
+        # Out[22]: 1.6605387831627252
+        conv = 1.6605387831627252
+        if self.pbc:
+            box = [[float(i) for i in line.split()[1:4]] for line in open(xyz[:-3]+"box").readlines()]
+            vol = np.array([i[0]*i[1]*i[2] for i in box]) / 1000
+            rho = conv * mass / vol
+        else:
+            vol = None
+            rho = None
+
+        ecomp = None
+
+        return rho, edyn, kdyn, vol, dip, ecomp
 
 class AbInitio_TINKER(AbInitio):
 

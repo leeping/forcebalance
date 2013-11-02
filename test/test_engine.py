@@ -158,8 +158,8 @@ class TestAmber99SB(ForceBalanceTestCase):
                 d2 = np.array(Data[n2]['dipole'].values())
                 q1 = np.array(Data[n1]['quadrupole'].values())
                 q2 = np.array(Data[n2]['quadrupole'].values())
-                self.assertNdArrayEqual(d1, d2, delta=0.01, msg="%s and %s dipole moments are different at optimized geometry" % (n1, n2))
-                self.assertNdArrayEqual(q1, q2, delta=0.01, msg="%s and %s quadrupole moments are different at optimized geometry" % (n1, n2))
+                self.assertNdArrayEqual(d1, d2, delta=0.02, msg="%s and %s dipole moments are different at optimized geometry" % (n1, n2))
+                self.assertNdArrayEqual(q1, q2, delta=0.02, msg="%s and %s quadrupole moments are different at optimized geometry" % (n1, n2))
         
     def test_normal_modes(self):
         """ Compare GMX and TINKER normal modes """
