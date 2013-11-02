@@ -29,11 +29,12 @@ logger = getLogger(__name__)
 
 def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
     """
-    Create or edit a Gromacs MDP file.
+    Create or edit a Gromacs MDP file.  The MDP file contains GROMACS run parameters.
     @param[in] fout Output file name, can be the same as input file name.
     @param[in] options Dictionary containing mdp options. Existing options are replaced, new options are added at the end.
     @param[in] fin Input file name.
     @param[in] defaults Default options to add to the mdp only if they don't already exist.
+    @param[in] verbose Print out all modifications to the file.
     """
     clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
@@ -87,6 +88,7 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
     # Fill in some default options.
     for key, val in defaults.items():
         key = key.lower()
+        options[key] = val
         if key not in haveopts:
             out.append("%-20s = %s" % (key, val))
     file_out = wopen(fout) 
