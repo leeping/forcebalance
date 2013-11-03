@@ -826,7 +826,7 @@ class TINKER(Engine):
         self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
 
         # Interaction energy needs to be in kcal/mol.
-        return (self.energy() - self.A.energy() - self.B.energy())
+        return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
 
     def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, threads=1, verbose=False, **kwargs):
         
