@@ -149,10 +149,10 @@ tgt_opts_types = {
                  "sleepy"             : (0, -50, 'Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)', 'All targets (advanced usage)'),
                  "liquid_prod_steps"  : (20000, 0, 'Number of time steps for the liquid production run.', 'Condensed phase property targets', 'liquid'),
                  "liquid_equ_steps"   : (10000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),
-                 "gas_prod_steps"     : (0, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
-                 "gas_equ_steps"      : (0, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
+                 "gas_prod_steps"     : (-1, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
+                 "gas_equ_steps"      : (-1, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "writelevel"         : (1, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
-                 "mdrun_threads"      : (1, 0, 'Set the number of threads used by remote Gromacs processes', 'Condensed phase properties in GROMACS', 'Liquid_GMX'),
+                 "md_threads"         : (1, 0, 'Set the number of threads used by Gromacs or TINKER processes in MD simulations', 'Condensed phase properties in GROMACS and TINKER', 'Liquid_GMX, Liquod_TINKER'),
                  "save_traj"          : (0, -10, 'Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save', 'Condensed phase properties', 'Liquid'),
                  },
     'bools'   : {"whamboltz"        : (0, -100, 'Whether to use WHAM Boltzmann Weights', 'Ab initio targets with Boltzmann weights (advanced usage)', 'AbInitio'),
@@ -243,7 +243,10 @@ for t in tgt_opts_types:
     tgt_opts_defaults.update(subdict)
 
 ## Option maps for maintaining backward compatibility.
-bkwd = {"simtype" : "type", "masterfile" : "inter_txt", "openmm_cuda_precision" : "openmm_precision"}
+bkwd = {"simtype" : "type", 
+        "masterfile" : "inter_txt", 
+        "openmm_cuda_precision" : "openmm_precision",
+        "mdrun_threads" : "md_threads"}
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]

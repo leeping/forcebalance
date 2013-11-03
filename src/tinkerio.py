@@ -39,6 +39,13 @@ allp = ['atom', 'vdw', 'vdw14', 'vdwpr', 'hbond', 'bond', 'bond5', 'bond4',
         'mmffbonder', 'mmffangle', 'mmffstrbnd', 'mmffopbend', 'mmfftorsion', 'mmffbci',
         'mmffpbci', 'mmffequiv', 'mmffdefstbn', 'mmffcovrad', 'mmffprop', 'mmffarom']
 
+# All possible output from analyze's energy component breakdown.
+eckeys = ['Angle-Angle', 'Angle Bending', 'Atomic Multipoles', 'Bond Stretching', 'Charge-Charge', 
+          'Charge-Dipole', 'Dipole-Dipole', 'Extra Energy Terms', 'Geometric Restraints', 'Implicit Solvation', 
+          'Improper Dihedral', 'Improper Torsion', 'Metal Ligand Field', 'Out-of-Plane Bend', 'Out-of-Plane Distance', 
+          'Pi-Orbital Torsion', 'Polarization', 'Reaction Field', 'Stretch-Bend', 'Stretch-Torsion', 
+          'Torsional Angle', 'Torsion-Torsion', 'Urey-Bradley', 'Van der Waals']
+
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
@@ -147,7 +154,7 @@ class Tinker_Reader(BaseReader):
             # types/classes involved in the interaction.
             self.suffix = '.'.join(self.atom)
 
-def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
+def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, chk=[]):
     """
     Create or edit a TINKER .key file.
     @param[in] fout Output file name, can be the same as input file name.
@@ -157,9 +164,10 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
     @param[in] defaults Default options to add to the mdp only if they don't already exist.
     @param[in] verbose Print out all modifications to the file.
     @param[in] prmfnm TINKER parameter file name.
+    @param[in] chk Crash if the key file does NOT have these options by the end.
     """
     # Make sure that the keys are lowercase, and the values are all strings.
-    options = OrderedDict([(key.lower(), str(val)) for key, val in options.items()])
+    options = OrderedDict([(key.lower(), str(val) if val != None else None) for key, val in options.items()])
     if 'parameters' in options and prmfnm != None:
         raise RuntimeError("Please pass prmfnm or 'parameters':'filename.prm' in options but not both.")
     elif 'parameters' in options:
@@ -202,7 +210,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
             # 3) Lines that correspond to force field parameters are skipped
             if s[0].lower() in allp:
                 out.append(line1)
-                # 4) For AMOEBA multipole parameters, skip four additional lines
+                # 3a) For AMOEBA multipole parameters, skip four additional lines
                 if s[0].lower() == "multipole":
                     skip = 4
                 continue
@@ -211,11 +219,15 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
             data = s[0]
             comms = s[1] if len(s) > 1 else None
             # Now split off the key and value fields at the space.
-            keyf, valf = data.split(' ',1)
+            ds = data.split(' ',1)
+            keyf = ds[0]
+            valf = ds[1] if len(ds) > 1 else ''
             key = keyf.strip().lower()
             haveopts.append(key)
             if key == 'parameters':
                 val0 = valf.strip()
+                if val0 == '':
+                    warn_press_key("Expected a parameter file name but got none")
                 # This is the case where "parameters" correctly corresponds to optimize.in
                 prmflag = 1
                 if prmfnm == None or val0 in prms:
@@ -232,7 +244,8 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
                 if key in clashes and val != val0:
                     raise RuntimeError("write_key tried to set %s = %s but its original value was %s = %s" % (key, val, key, val0))
                 # Passing None as the value causes the option to be deleted
-                if val == None: continue
+                if val == None: 
+                    continue
                 if len(val) < len(valf):
                     valf = ' ' + val + ' '*(len(valf) - len(val)-1)
                 else:
@@ -246,6 +259,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
     # Options that don't already exist are written at the bottom.
     for key, val in options.items():
         key = key.lower()
+        if val == None: continue
         if key not in haveopts:
             haveopts.append(key)
             out.append("%-20s %s" % (key, val))
@@ -259,6 +273,13 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
     # If parameters are not specified, they are printed at the top.
     if not prmflag and prmfnm != None:
         out.insert(0,"parameters %s" % prmfnm)
+        options["parameters"] = prmfnm
+    elif not prmflag:
+        if not os.path.exists('%s.prm' % os.path.splitext(fout)[0]):
+            raise RuntimeError('No parameter file detected, this will cause TINKER to crash')
+    for i in chk:
+        if i not in haveopts:
+            raise RuntimeError('%s is expected to be in the .key file, but not found' % i)
     # Finally write the key file.
     file_out = wopen(fout) 
     for line in out:
@@ -270,65 +291,63 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None):
 class Liquid_TINKER(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
-        self.DynDict = OrderedDict()
-        self.DynDict_New = OrderedDict()
+        self.set_option(tgt_opts,'md_threads')
+        self.liquid_fnm = "liquid.xyz"
+        self.liquid_ftype = "tinker"
+        self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.xyz"))
+        self.liquid_mol = None
+        self.gas_fnm = "gas.xyz"
+        if os.path.exists(os.path.join(self.root, self.tgtdir,"all.arc")):
+            self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir,"all.arc"))
+            logger.info("Found collection of starting conformations, length %i!\n" % len(self.liquid_mol))
         if self.do_self_pol:
             warn_press_key("Self-polarization correction not implemented yet when using TINKER")
+        self.DynDict = OrderedDict()
+        self.DynDict_New = OrderedDict()
+        # Command prefix.
+        # self.nptpfx = 'sh rungmx.sh'
+        # Suffix to command string for launching NPT simulations.
+        self.nptsfx += ["--nt %i" % self.md_threads]
+        # List of extra files to upload to Work Queue.
+        self.nptfiles += ['liquid.xyz', 'liquid.key', 'gas.xyz', 'gas.key']
+        # MD engine argument supplied to command string for launching NPT simulations.
+        self.engine = "tinker"
+        # Send back the trajectory file.
+        if self.save_traj > 0:
+            self.extra_output = ['liquid-md.arc']
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        LinkFile(os.path.join(options['tinkerpath'],"dynamic"),os.path.join(abstempdir,"dynamic"))
-        LinkFile(os.path.join(options['tinkerpath'],"analyze"),os.path.join(abstempdir,"analyze"))
-        LinkFile(os.path.join(options['tinkerpath'],"minimize"),os.path.join(abstempdir,"minimize"))
         LinkFile(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
-        write_key(os.path.join(abstempdir,"liquid.key"), {'archive':None,'save-box':None}, 
-                  os.path.join(self.root,self.tgtdir,"liquid.key"), {}, prmfnm=self.FF.tinkerprm)
-        # LinkFile(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"mono.xyz"),os.path.join(abstempdir,"mono.xyz"))
-        write_key(os.path.join(abstempdir,"mono.key"), {'archive':None,'save-box':None}, 
-                  os.path.join(self.root,self.tgtdir,"mono.key"), {}, prmfnm=self.FF.tinkerprm)
-        # LinkFile(os.path.join(self.root,self.tgtdir,"mono.key"),os.path.join(abstempdir,"mono.key"))
-        LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
-        # LinkFile(os.path.join(self.root,self.tgtdir,"npt_tinker.py"),os.path.join(abstempdir,"npt_tinker.py"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"gas.xyz"),os.path.join(abstempdir,"gas.xyz"))
+        LinkFile(os.path.join(self.root,self.tgtdir,"gas.key"),os.path.join(abstempdir,"gas.key"))
+        LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
 
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
-        wq = getWorkQueue()
-        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
-            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            if wq == None:
-                logger.info("Running condensed phase simulation locally.\n")
-                logger.info("You may tail -f %s/npt_tinker.out in another terminal window\n" % os.getcwd())
-                if GoodStep() and (temperature, pressure) in self.DynDict_New:
-                    self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
-                if (temperature, pressure) in self.DynDict:
-                    dynsrc = self.DynDict[(temperature, pressure)]
-                    dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
-                    logger.info("Copying .dyn file: %s to %s\n" % (dynsrc, dyndest))
-                    shutil.copy2(dynsrc,dyndest)
-                cmdstr = 'python npt_tinker.py liquid.xyz %i %.3f %.3f %.3f %.3f %s --liquid_equ_steps %i &> npt_tinker.out' % \
-                    (self.liquid_prod_steps, self.liquid_timestep, self.liquid_interval, temperature, pressure, self.liquid_equ_steps,
-                     " --minimize_energy" if self.minimize_energy else "", 
-                     )
-                _exec(cmdstr)
-                self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
-            else:
-                # This part of the code has never been used before
-                # Still need to figure out where to specify TINKER location on each cluster
-                queue_up(wq,
-                         command = 'python npt_tinker.py liquid.xyz %.3f %.3f &> npt_tinker.out' % (temperature, pressure),
-                         input_files = ['liquid.xyz','liquid.key','mono.xyz','mono.key','forcebalance.p','npt_tinker.py'],
-                         output_files = ['npt_result.p.bz2', 'npt_tinker.py'] + self.FF.fnms,
-                         tgt=self)
+        if GoodStep() and (temperature, pressure) in self.DynDict_New:
+            self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
+        if (temperature, pressure) in self.DynDict:
+            dynsrc = self.DynDict[(temperature, pressure)]
+            dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
+            logger.info("Copying .dyn file: %s to %s\n" % (dynsrc, dyndest))
+            shutil.copy2(dynsrc,dyndest)
+            self.nptfiles.append(dyndest)
+        self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
+        super(Liquid_TINKER, self).npt_simulation(temperature, pressure, simnum)
+
+    def polarization_correction(self,mvals):
+        raise NotImplementedError('This method is not implemented yet')
 
 class TINKER(Engine):
 
-    """ Derived from Engine object for carrying out general purpose TINKER calculations. """
+    """ Engine for carrying out general purpose TINKER calculations. """
 
     def __init__(self, name="tinker", **kwargs):
         ## Keyword args that aren't in this list are filtered out.
-        self.valkwd = ['tinker_key', 'tinkerpath']
+        self.valkwd = ['tinker_key', 'tinkerpath', 'tinker_prm']
         super(TINKER,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -352,6 +371,7 @@ class TINKER(Engine):
         """ Called by __init__ ; read files from the source directory. """
 
         self.key = onefile('key', kwargs['tinker_key'] if 'tinker_key' in kwargs else None)
+        self.prm = onefile('prm', kwargs['tinker_prm'] if 'tinker_prm' in kwargs else None)
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
         elif 'coords' in kwargs:
@@ -369,6 +389,9 @@ class TINKER(Engine):
         """ Call TINKER; prepend the tinkerpath to calling the TINKER program. """
 
         csplit = command.split()
+        # Sometimes the engine changes dirs and the key goes missing, so we link it.
+        if "%s.key" % self.name in csplit and not os.path.exists("%s.key" % self.name):
+            LinkFile(self.abskey, "%s.key" % self.name)
         prog = os.path.join(self.tinkerpath, csplit[0])
         csplit[0] = prog
         o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
@@ -381,11 +404,17 @@ class TINKER(Engine):
                 break
         return o
 
-    def prepare(self, **kwargs):
+    def prepare(self, pbc=False, **kwargs):
 
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
         self.rigid = False
+
+        ## Attempt to set some TINKER options.
+        tk_chk = []
+        tk_opts = OrderedDict([("digits", "10"), ("archive", "")])
+        tk_defs = OrderedDict()
+
         ## Write the appropriate coordinate and key files.
         if hasattr(self,'target'):
             # Create the force field in this directory if the force field object is provided.  
@@ -393,12 +422,63 @@ class TINKER(Engine):
             FF = self.target.FF
             FF.make(np.zeros(FF.np))
             if FF.rigid_water:
+                tk_opts["rattle"] = "water"
                 self.rigid = True
-            write_key("%s.key" % self.name, {'digits':'10'}, os.path.join(self.srcdir, self.key), {}, FF.tinkerprm)
-        elif self.key:
-            LinkFile(os.path.join(self.srcdir, self.key), "%s.key" % self.name, nosrcok=True)
+            if FF.amoeba_pol == 'mutual':
+                tk_opts['polarization'] = 'mutual'
+                tk_opts['polar-eps'] = '1e-6'
+            elif FF.amoeba_pol == 'direct':
+                tk_opts['polarization'] = 'direct'
+            prmfnm = FF.tinkerprm
+        elif self.prm:
+            prmfnm = self.prm
         else:
-            raise RuntimeError('Need a .key file to continue')
+            prmfnm = None
+
+        # Periodic boundary conditions may come from the TINKER .key file.
+        keypbc = False
+        minbox = 1e10
+        if self.key:
+            for line in open(os.path.join(self.srcdir, self.key)).readlines():
+                s = line.split()
+                if len(s) > 0 and s[0].lower() == 'a-axis':
+                    keypbc = True
+                    minbox = float(s[1])
+                if len(s) > 0 and s[0].lower() == 'b-axis' and float(s[1]) < minbox:
+                    minbox = float(s[1])
+                if len(s) > 0 and s[0].lower() == 'c-axis' and float(s[1]) < minbox:
+                    minbox = float(s[1])
+            if keypbc and (not pbc):
+                warn_once("Deleting PBC options from the .key file.")
+                tk_opts['a-axis'] = None
+                tk_opts['b-axis'] = None
+                tk_opts['c-axis'] = None
+                tk_opts['alpha'] = None
+                tk_opts['beta'] = None
+                tk_opts['gamma'] = None
+        if (not keypbc) and pbc:
+            raise RuntimeError("Periodic boundary conditions require a-axis to be in the .key file.")
+        self.pbc = pbc
+        if pbc:
+            tk_opts['ewald'] = ''
+            if minbox <= 10:
+                warn_press_key("Periodic box is set to less than 10 Angstroms across")
+            # TINKER likes to use up to 7.0 Angstrom for PME cutoffs
+            rpme = 0.05*(float(int(minbox - 1))) if minbox <= 15 else 7.0
+            tk_defs['ewald-cutoff'] = "%f" % rpme
+            # TINKER likes to use up to 9.0 Angstrom for vdW cutoffs
+            rvdw = 0.05*(float(int(minbox - 1))) if minbox <= 19 else 9.0
+            tk_defs['vdw-cutoff'] = "%f" % rvdw
+        else:
+            tk_opts['ewald'] = None
+            tk_opts['ewald-cutoff'] = None
+            tk_opts['vdw-cutoff'] = None
+            # This seems to have no effect on the kinetic energy.
+            # tk_opts['remove-inertia'] = '0'
+
+        write_key("%s.key" % self.name, tk_opts, os.path.join(self.srcdir, self.key) if self.key else None, tk_defs, verbose=False, prmfnm=prmfnm)
+        self.abskey = os.path.abspath("%s.key")
+
         self.mol[0].write(os.path.join("%s.xyz" % self.name), ftype="tinker")
 
         ## If the coordinates do not come with TINKER suffixes then throw an error.
@@ -494,55 +574,110 @@ class TINKER(Engine):
             logger.info("The minimization did not converge in the geometry optimization - printout is above.\n")
         return E, rmsd
 
+    def evaluate_(self, xyzin, force=False, dipole=False):
+
+        """ 
+        Utility function for computing energy, and (optionally) forces and dipoles using TINKER. 
+        
+        Inputs:
+        xyzin: TINKER .xyz file name.
+        force: Switch for calculating the force.
+        dipole: Switch for calculating the dipole.
+
+        Outputs:
+        Result: Dictionary containing energies, forces and/or dipoles.
+        """
+
+        Result = OrderedDict()
+        # If we want the dipoles (or just energies), analyze is the way to go.
+        if dipole or (not force):
+            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="G,E", print_to_screen=False)
+            # Read potential energy and dipole from file.
+            eanl = []
+            dip = []
+            for line in oanl:
+                s = line.split()
+                if 'Total Potential Energy : ' in line:
+                    eanl.append(float(s[4]) * 4.184)
+                if dipole:
+                    if 'Dipole X,Y,Z-Components :' in line:
+                        dip.append([float(s[i]) for i in range(-3,0)])
+            Result["Energy"] = np.array(eanl)
+            Result["Dipole"] = np.array(dip)
+        # If we want forces, then we need to call testgrad.
+        if force:
+            E = []
+            F = []
+            M = Molecule(xyzin)
+            boxfile = os.path.split(xyzin)[0]+".box"
+            B = [[float(i) for i in line.split()[1:]] for line in open(boxfile).readlines()] if os.path.exists(boxfile) else None
+            if B != None and len(B) != len(M):
+                raise RuntimeError("Length of box file doesn't match trajectory file")
+            if len(M) > 10: warn_once("Using testgrad to loop over %i energy/force calculations; will be slow." % len(self.mol))
+            for I in range(len(M)):
+                F.append([])
+                M[I].write("%s-1.xyz" % self.name, ftype="tinker")
+                if B != None:
+                    write_key("%s-1.key" % self.name, OrderedDict([('a-axis', B[0]), ('b-axis', B[1]), ('c-axis', B[2]),
+                                                                   ('alpha', B[3]), ('beta', B[4]), ('gamma', B[5])]))
+                o = self.calltinker("testgrad %s-1.xyz -k %s%s y n n" % (self.name, self.name, "-1" if B != None else ""))
+                # Read data from stdout and stderr, and convert it to GROMACS
+                # units for consistency with existing code.
+                i = 0
+                for line in o:
+                    s = line.split()
+                    if "Total Potential Energy" in line:
+                        E.append(float(s[4]) * 4.184)
+                    if len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
+                        if self.AtomMask[i]:
+                            F[-1] += [-1 * float(j) * 4.184 * 10 for j in s[2:5]]
+                        i += 1
+            Result["Energy"] = np.array(E)
+            Result["Force"] = np.array(F)
+        return Result
+
     def energy_force_one(self, shot):
 
         """ Computes the energy and force using TINKER for one snapshot. """
 
-        self.mol.write("%s.xyz" % self.name,select=[shot], ftype="tinker")
-        # This line actually runs TINKER
-        o = self.calltinker("testgrad %s.xyz y n n" % (self.name))
-        # Read data from stdout and stderr, and convert it to GROMACS
-        # units for consistency with existing code.
-        E = []
-        F = []
-        i = 0
-        for line in o:
-            s = line.split()
-            if "Total Potential Energy" in line:
-                E = [float(s[4]) * 4.184]
-            elif len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
-                if self.AtomMask[i]:
-                    F += [-1 * float(j) * 4.184 * 10 for j in s[2:5]]
-                i += 1
-        M = np.array(E + F)
-        return M
+        self.mol[shot].write("%s.xyz" % self.name, ftype="tinker")
+        Result = self.evaluate_("%s.xyz" % self.name, force=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
 
     def energy(self):
 
         """ Computes the energy using TINKER over a trajectory. """
 
-        self.mol.write("%s.xyz" % self.name, ftype="tinker")
-        # This line actually runs TINKER
-        o = self.calltinker("analyze %s.xyz e" % (self.name))
-        # Read data from stdout and stderr, and convert it to GROMACS units.
-        Borked = 0
-        E = []
-        for line in o:
-            s = line.split()
-            if "Total Potential Energy" in line:
-                E.append(float(s[4]) * 4.184)
-        return np.array(E)
+        if hasattr(self, 'mdtraj') : 
+            x = self.mdtraj
+        else:
+            x = "%s.xyz" % self.name
+            self.mol.write(x, ftype="tinker")
+        return self.evaluate_(x)["Energy"]
 
     def energy_force(self):
 
         """ Computes the energy and force using TINKER over a trajectory. """
 
-        M = []
-        warn_once("Using testgrad to loop over %i energy/force calculations; will be slow." % len(self.mol))
-        for i in range(len(self.mol)):
-            logger.info("\r%i/%i\r" % (i+1, len(self.mol)))
-            M.append(self.energy_force_one(i))
-        return np.array(M)
+        if hasattr(self, 'mdtraj') : 
+            x = self.mdtraj
+        else:
+            x = "%s.xyz" % self.name
+            self.mol.write(x, ftype="tinker")
+        Result = self.evaluate_(x, force=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+
+    def energy_dipole(self):
+
+        """ Computes the energy and dipole using TINKER over a trajectory. """
+
+        if hasattr(self, 'mdtraj') : 
+            x = self.mdtraj
+        else:
+            x = "%s.xyz" % self.name
+            self.mol.write(x, ftype="tinker")
+        Result = self.evaluate_(x, dipole=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
     def normal_modes(self, shot=0, optimize=True):
         # This line actually runs TINKER
@@ -683,15 +818,13 @@ class TINKER(Engine):
         
         """ Calculate the interaction energy for two fragments. """
 
-        if not hasattr(self,'A'):
-            self.A = TINKER(name="A", mol=self.mol.atom_select(fraga), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
-        if not hasattr(self,'B'):
-            self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
+        self.A = TINKER(name="A", mol=self.mol.atom_select(fraga), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
+        self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
 
         # Interaction energy needs to be in kcal/mol.
         return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
 
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, verbose=False, **kwargs):
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, threads=1, verbose=False, **kwargs):
         
         """
         Method for running a molecular dynamics simulation.  
@@ -704,6 +837,7 @@ class TINKER(Engine):
         nequil      = (int)   Number of additional time steps at the beginning for equilibration
         nsave       = (int)   Step interval for saving and printing data
         minimize    = (bool)  Perform an energy minimization prior to dynamics
+        threads     = (int)   Specify how many OpenMP threads to use
 
         Returns simulation data:
         Rhos        = (array)     Density in kilogram m^-3
@@ -714,62 +848,127 @@ class TINKER(Engine):
         EComps      = (dict)      Energy components
         """
 
+        md_defs = OrderedDict()
+        md_opts = OrderedDict()
+        # Print out averages only at the end.
+        md_opts["printout"] = nsteps
+        md_opts["openmp-threads"] = threads
+        if self.pbc:
+            md_defs["integrator"] = "beeman"
+            if temperature:
+                md_defs["thermostat"] = "bussi"
+            else:
+                md_opts["thermostat"] = None
+            md_opts["vdw-correction"] = ''
+            md_opts["mpole-list"] = ''
+            if pressure: 
+                md_defs["barostat"] = "montecarlo"
+                md_opts["save-box"] = ''
+                if anisotropic:
+                    md_opts["aniso-pressure"] = ''
+        else:
+            if pressure:
+                warn_once("Pressure is ignored because pbc is set to False.")
+            # Use stochastic dynamics for the gas phase molecule.
+            # If we use the regular integrators it may miss
+            # six degrees of freedom in calculating the kinetic energy.
+            md_opts["integrator"] = "verlet"
+            if temperature:
+                md_opts["thermostat"] = "andersen"
+            else:
+                md_opts["thermostat"] = "None"
+            md_opts["barostat"] = None
+
+        eq_opts = deepcopy(md_opts)
+        if self.pbc and pressure:
+            eq_opts["barostat"] = "berendsen" # Good for equilibration, bad for everything else.
+
         if minimize:
             if verbose: logger.info("Minimizing the energy...")
-            self.optimize(crit=1)
+            self.optimize(method="bfgs", crit=1)
             os.system("mv %s.xyz_2 %s.xyz" % (self.name, self.name))
             if verbose: logger.info("Done\n")
 
         # Run equilibration.
         if nequil > 0:
-            if verbose: logger.info("Running equilibration...\n")
+            write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
+            if verbose: printcool("Running equilibration dynamics", color=0)
             if self.pbc and pressure:
-                self.calltinker("dynamic %s %i %f %f 4 %f %f" % (xin, nsteps, timestep, float(nsave*timestep)/1000, 
-                                                                 temperature, pressure), print_to_screen=verbose)
+                self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 
+                                                                          temperature, pressure), print_to_screen=verbose)
             else:
-                self.calltinker("dynamic %s %i %f %f 2 %f" % (xin, nstep, timestep, float(nsave*timestep)/1000,
-                                                                  temperature), print_to_screen=verbose)
-            os.system("rm -f %s.arc %s.box" % (basename, basename))
+                self.calltinker("dynamic %s -k %s-eq %i %f %f 2 %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,
+                                                                       temperature), print_to_screen=verbose)
+            os.system("rm -f %s.arc %s.box" % (self.name, self.name))
 
         # Run production.
-        if verbose: logger.info("Running production...\n")
+        if verbose: printcool("Running production dynamics", color=0)
+        write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
         if self.pbc and pressure:
-            odyn = self.calltinker("dynamic %s %i %f %f 4 %f %f" % (xin, nstep*npr, tstep, float(nstep*tstep/1000), 
-                                                                    temperature, pressure), print_to_screen=verbose)
+            odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
+                                                                             temperature, pressure), print_to_screen=verbose)
         else:
-            odyn = self.calltinker("dynamic %s %i %f %f 2 %f" % (xin, nstep*npr, tstep, float(nstep*tstep/1000), 
-                                                          temperature), print_to_screen=verbose)
-
+            odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 2 %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
+                                                                          temperature), print_to_screen=verbose)
+            
         # Gather information.
         os.system("mv %s.arc %s-md.arc" % (self.name, self.name))
+        if self.pbc: os.system("mv %s.box %s-md.box" % (self.name, self.name))
         self.mdtraj = "%s-md.arc" % self.name
         edyn = []
         kdyn = []
         for line in odyn:
+            s = line.split()
             if 'Current Potential' in line:
-                edyn.append(float(line.split()[2]))
+                edyn.append(float(s[2]))
             if 'Current Kinetic' in line:
-                kdyn.append(float(line.split()[2]))
+                kdyn.append(float(s[2]))
 
         # Potential and kinetic energies converted to kJ/mol.
         edyn = np.array(edyn) * 4.184
         kdyn = np.array(kdyn) * 4.184
     
         if verbose: logger.info("Post-processing to get the dipole moments\n")
-        cmdstr = "analyze %s" % xain
-        oanl = self.calltinker("analyze %s.arc" % self.name, stdin="G,E", verbose=False)
+        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E", print_to_screen=False)
 
         # Read potential energy and dipole from file.
         eanl = []
         dip = []
         mass = 0.0
-        for line in oanl:
+        ecomp = OrderedDict()
+        havekeys = set()
+        first_shot = True
+        for ln, line in enumerate(oanl):
+            strip = line.strip()
+            s = line.split()
             if 'Total System Mass' in line:
-                mass = float(line.split()[-1])
+                mass = float(s[-1])
             if 'Total Potential Energy : ' in line:
-                eanl.append(float(line.split()[4]))
+                eanl.append(float(s[4]))
             if 'Dipole X,Y,Z-Components :' in line:
-                dip.append([float(line.split()[i]) for i in range(-3,0)])
+                dip.append([float(s[i]) for i in range(-3,0)])
+            if first_shot:
+                for key in eckeys:
+                    if strip.startswith(key):
+                        if key in ecomp:
+                            ecomp[key].append(float(s[-2])*4.184)
+                        else:
+                            ecomp[key] = [float(s[-2])*4.184]
+                        if key in havekeys:
+                            first_shot = False
+                        havekeys.add(key)
+            else:
+                for key in havekeys:
+                    if strip.startswith(key):
+                        if key in ecomp:
+                            ecomp[key].append(float(s[-2])*4.184)
+                        else:
+                            ecomp[key] = [float(s[-2])*4.184]
+        for key in ecomp:
+            ecomp[key] = np.array(ecomp[key])
+        ecomp["Total Potential Energy"] = edyn
+        ecomp["Total Kinetic Energy"] = kdyn
+        ecomp["Total Energy"] = edyn+kdyn
 
         # Energies in kilojoules per mole
         eanl = np.array(eanl) * 4.184
@@ -781,14 +980,12 @@ class TINKER(Engine):
         # Out[22]: 1.6605387831627252
         conv = 1.6605387831627252
         if self.pbc:
-            box = [[float(i) for i in line.split()[1:4]] for line in open(xyz[:-3]+"box").readlines()]
+            box = [[float(i) for i in line.split()[1:4]] for line in open("%s-md.box" % self.name).readlines()]
             vol = np.array([i[0]*i[1]*i[2] for i in box]) / 1000
             rho = conv * mass / vol
         else:
             vol = None
             rho = None
-
-        ecomp = None
 
         return rho, edyn, kdyn, vol, dip, ecomp
 

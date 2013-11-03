@@ -61,9 +61,6 @@ from copy import deepcopy
 from collections import namedtuple
 from forcebalance.forcefield import FF
 from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, statisticalInefficiency, which, _exec, isint, wopen
-from forcebalance.openmmio import OpenMM
-from forcebalance.tinkerio import TINKER
-from forcebalance.gmxio import GMX
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p, in_fd
 from forcebalance.molecule import Molecule
 from forcebalance.output import getLogger
@@ -103,7 +100,7 @@ faststep         = 0.25                                                        #
 temperature      = args.temperature                                            # temperature in kelvin
 pressure         = args.pressure                                               # pressure in atmospheres
 
-if args.engine == "openmm":
+if args.engine.lower() == "openmm":
     try:
         from simtk.unit import *
         from simtk.openmm import *
@@ -112,29 +109,41 @@ if args.engine == "openmm":
     except:
         traceback.print_exc()
         raise Exception("Cannot import OpenMM modules")
-elif args.engine == "gromacs" or args.engine == "gmx":
+    Engine = OpenMM
+elif args.engine.lower() == "gromacs" or args.engine == "gmx":
     from forcebalance.gmxio import *
     if args.mts:
-        raise Exception("Selected multiple timestep integrator with GROMACS interface, but it is only usable with OpenMM interface")
+        raise Exception("Multiple timestep integrator is only usable with OpenMM interface")
     if args.force_cuda:
-        raise Exception("Selected CUDA platform with GROMACS interface, but it is only usable with OpenMM interface")
+        raise Exception("CUDA platform is only usable with OpenMM interface")
+    Engine = GMX
+elif args.engine.lower() == "tinker":
+    from forcebalance.tinkerio import *
+    if args.mts:
+        raise Exception("Multiple timestep integrator it is only usable with OpenMM interface")
+    if args.force_cuda:
+        raise Exception("CUDA platform is only usable with OpenMM interface")
+    Engine = TINKER
 else:
     raise Exception('Only OpenMM and GROMACS support implemented at this time.')
 
-printcool("ForceBalance condensed phase simulation using engine: %s" % args.engine, color=4, bold=True)
+printcool("ForceBalance condensed phase simulation using engine: %s" % args.engine.upper(), color=4, bold=True)
+
+liquid_snapshots = (args.liquid_nsteps * args.liquid_timestep / 1000) / args.liquid_intvl
+liquid_iframes = 1000 * args.liquid_intvl / args.liquid_timestep
+gas_snapshots = (args.gas_nsteps * args.gas_timestep / 1000) / args.gas_intvl
+gas_iframes = 1000 * args.gas_intvl / args.gas_timestep
 
 print "For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" \
-    % ((args.liquid_nsteps/(args.liquid_intvl/args.liquid_timestep)), 
-       (args.liquid_intvl/args.liquid_timestep), args.liquid_timestep)
+    % (liquid_snapshots, liquid_iframes, args.liquid_timestep)
 print "For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" \
-    % ((args.gas_nsteps/(args.gas_intvl/args.gas_timestep)), 
-       (args.gas_intvl/args.gas_timestep), args.gas_timestep)
-if args.liquid_nsteps/(args.liquid_intvl/args.liquid_timestep) < 2:
+    % (gas_snapshots, gas_iframes, args.gas_timestep)
+if liquid_snapshots < 2:
     raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' \
-                        % (2 * (args.liquid_intvl/args.liquid_timestep)))
-if args.gas_nsteps/(args.gas_intvl/args.gas_timestep) < 2:
+                        % (2000 * (args.liquid_intvl/args.liquid_timestep)))
+if gas_snapshots < 2:
     raise Exception('Please set the number of gas time steps so that you collect at least two snapshots (minimum %i)' \
-                        % (2 * (args.gas_intvl/args.gas_timestep)))
+                        % (2000 * (args.gas_intvl/args.gas_timestep)))
 
 #==================#
 #|   Subroutines  |#
@@ -376,16 +385,13 @@ def main():
     
     MDOpts["gas"] = OrderedDict([("nsteps", args.gas_nsteps), ("timestep", args.gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * args.gas_intvl / args.gas_timestep)),
-                                 ("nequil", args.gas_nequil), ("minimize", args.minimize), ("threads", args.nt)])
+                                 ("nequil", args.gas_nequil), ("minimize", args.minimize), ("threads", 1)])
 
     DoEDA = not (args.engine == "openmm" and args.mts)
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    EngineDict = {"openmm" : OpenMM, "gmx" : GMX, "gromacs" : GMX}
-    Engine = EngineDict[args.engine]
-
     # Create an instance of the MD Engine object.
     Liquid = Engine(name="liquid", **EngOpts["liquid"])
     Gas = Engine(name="gas", **EngOpts["gas"])
@@ -471,7 +477,7 @@ def main():
     GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
     # Print out the density and its derivative.
-    Sep = printcool("Density: % .4f +- % .4f kg/m^3, Analytic Derivative" % (Rho_avg, Rho_err))
+    Sep = printcool("Density: % .4f +- % .4f kg/m^3\nAnalytic Derivative:" % (Rho_avg, Rho_err))
     FF.print_map(vals=GRho)
     print Sep
 
@@ -505,7 +511,7 @@ def main():
 
     print "Box total energy:", np.mean(Energies)
     print "Monomer total energy:", np.mean(mEnergies)
-    Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol, Derivatives below" % (Hvap_avg, Hvap_err))
+    Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol\nAnalytic Derivative:" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
     print Sep
 
@@ -565,7 +571,7 @@ def main():
     Kappa_err = np.std(Kappaboot) * np.sqrt(statisticalInefficiency(V))
 
     ## Isothermal compressibility analytic derivative
-    Sep = printcool("Isothermal compressibility:    % .4e +- %.4e bar^-1\nAnalytic Derivative:" % (Kappa, Kappa_err))
+    Sep = printcool("Isothermal compressibility:  % .4e +- %.4e bar^-1\nAnalytic Derivative:" % (Kappa, Kappa_err))
     GKappa1 = +1 * Beta**2 * avg(V**2) * deprod(V) / avg(V)**2
     GKappa2 = -1 * Beta**2 * avg(V) * deprod(V**2) / avg(V)**2
     GKappa3 = +1 * Beta**2 * covde(V)
@@ -600,7 +606,7 @@ def main():
     GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
     GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
     GCp  = GCp1 + GCp2 + GCp3
-    Sep = printcool("Isobaric heat capacity:        % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
+    Sep = printcool("Isobaric heat capacity:  % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:
         GCp_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_cp, {'h_':H})

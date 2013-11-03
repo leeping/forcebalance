@@ -931,24 +931,23 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     def process_out(read):
         if print_to_screen: sys.stdout.write(read)
         if copy_stdout: 
-            process_out.stdout += read
+            process_out.stdout.append(read)
             wtf(read)
-    process_out.stdout = ""
+    process_out.stdout = []
 
     def process_err(read):
         if print_to_screen: sys.stderr.write(read)
-        process_err.stderr += read
+        process_err.stderr.append(read)
         if copy_stderr: 
-            process_out.stdout += read
+            process_out.stdout.append(read)
             wtf(read)
-    process_err.stderr = ""
+    process_err.stderr = []
     # This reads the streams one byte at a time, and passes it to the LineChunker
     # which splits it by either newline or carriage return.
     # If the stream has ended, then it is removed from the list.
     with LineChunker(process_out) as out_chunker, LineChunker(process_err) as err_chunker:
         while True:
             to_read, _, _ = select(streams, [], [])
-
             for fh in to_read:
                 if fh is p.stdout:
                     read = fh.read(1)
@@ -963,6 +962,9 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             if len(streams) == 0: break
 
     p.wait()
+
+    process_out.stdout = ''.join(process_out.stdout)
+    process_err.stderr = ''.join(process_err.stderr)
 
     if p.returncode != 0:
         if process_err.stderr and print_error:
