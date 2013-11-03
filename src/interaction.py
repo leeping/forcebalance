@@ -72,7 +72,6 @@ class Interaction(Target):
         self.label         = []
         ## The qdata.txt file that contains the QM energies and forces
         self.qfnm = os.path.join(self.tgtdir,"qdata.txt")
-        ## Qualitative Indicator: average energy error (in kJ/mol)
         self.e_err = 0.0
         self.e_err_pct = None
         ## Read in the trajectory file
@@ -87,8 +86,7 @@ class Interaction(Target):
         self.prepare_temp_directory(options,tgt_opts)
 
         logger.info("The energy denominator is: %s kcal/mol\n"  % str(self.energy_denom))
-        # Internally things are handled in kJ/mol.
-        denom = self.energy_denom * 4.184
+        denom = self.energy_denom
         # Create the denominator.
         if self.cauchy:
             self.divisor = np.sqrt(self.eqm**2 + denom**2)
@@ -108,7 +106,7 @@ class Interaction(Target):
             logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
         if self.energy_upper > 0:
             logger.info("Interactions more repulsive than %s will not be fitted\n" % str(self.energy_upper))
-            ecut = self.energy_upper * 4.184
+            ecut = self.energy_upper
             self.prefactor = 1.0 * (self.eqm < ecut)
         else:
             self.prefactor = np.ones(len(self.eqm))
@@ -118,7 +116,7 @@ class Interaction(Target):
         """ Read the reference ab initio data from a file such as qdata.txt.
 
         After reading in the information from qdata.txt, it is converted
-        into the GROMACS/OpenMM units (kJ/mol for energy, kJ/mol/nm force).
+        into kcal/mol.
 
         """
         # Parse the qdata.txt file
@@ -132,9 +130,9 @@ class Interaction(Target):
             if all(len(i) in [self.ns, 0] for i in [self.eqm]) and len(self.eqm) == self.ns:
                 break
         self.ns = len(self.eqm)
-        # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
+        # Turn everything into arrays, convert to kcal/mol
         self.eqm = np.array(self.eqm)
-        self.eqm *= eqcgmx
+        self.eqm *= (eqcgmx / 4.184)
 
     def prepare_temp_directory(self, options, tgt_opts):
         """ Prepare the temporary directory, by default does nothing """
@@ -146,7 +144,7 @@ class Interaction(Target):
             delta = (self.emm-self.eqm)
             deltanrm = self.prefactor*(delta/self.divisor)**2
             for i,label in enumerate(self.label):
-                PrintDict[label] = "% 9.3f % 9.3f % 9.3f % 9.3f % 11.5f" % (self.emm[i]/4.184, self.eqm[i]/4.184, delta[i]/4.184, self.divisor[i]/4.184, deltanrm[i])
+                PrintDict[label] = "% 9.3f % 9.3f % 9.3f % 9.3f % 11.5f" % (self.emm[i], self.eqm[i], delta[i], self.divisor[i], deltanrm[i])
             printcool_dictionary(PrintDict,title="Target: %s\nInteraction Energies (kcal/mol), Objective = % .5e\n %-10s %9s %9s %9s %9s %11s" % 
                                  (self.name, self.objective, "Label", "Calc.", "Ref.", "Delta", "Divisor", "Term"),keywidth=15)
         else:
