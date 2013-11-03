@@ -38,7 +38,7 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
     """
     clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
-    options = OrderedDict([(key.lower(), str(val)) for key, val in options.items()])
+    options = OrderedDict([(key.lower(), str(val) if val != None else None) for key, val in options.items()])
     # List of lines in the output file.
     out = []
     # List of options in the output file.
@@ -539,7 +539,7 @@ class GMX(Engine):
             minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
             if minbox <= 10:
                 warn_press_key("Periodic box is set to less than 1.0 ")
-            elif minbox <= 21:
+            if minbox <= 21:
                 # Cutoff diameter should be at least one angstrom smaller than the box size
                 # Translates to 0.85 Angstrom for the SPC-216 water box
                 rlist = 0.05*(float(int(minbox - 1)))
@@ -1174,7 +1174,7 @@ class Liquid_GMX(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_GMX,self).__init__(options,tgt_opts,forcefield)
         # Number of threads in mdrun
-        self.set_option(tgt_opts,'mdrun_threads')
+        self.set_option(tgt_opts,'md_threads')
         self.liquid_fnm = "liquid.gro"
         self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.gro"))
         self.liquid_mol = None
@@ -1187,7 +1187,7 @@ class Liquid_GMX(Liquid):
         # Command prefix.
         self.nptpfx = 'sh rungmx.sh'
          # Suffix to command string for launching NPT simulations.
-        self.nptsfx += ["--nt %i" % self.mdrun_threads]
+        self.nptsfx += ["--nt %i" % self.md_threads]
         # List of extra files to upload to Work Queue.
         self.nptfiles += ['rungmx.sh', 'liquid.top', 'liquid.mdp', 'gas.top', 'gas.mdp']
         # MD engine argument supplied to command string for launching NPT simulations.
@@ -1198,13 +1198,12 @@ class Liquid_GMX(Liquid):
 
     def prepare_temp_directory(self,options,tgt_opts):
         """ Prepare the temporary directory by copying in important files. """
-        os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
-        os.environ["GMX_NO_ALLVSALL"] = "TRUE"
         abstempdir = os.path.join(self.root,self.tempdir)
         if options['gmxpath'] == None or options['gmxsuffix'] == None:
             warn_press_key('Please set the options gmxpath and gmxsuffix in the input file!')
         if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
-            warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
+            warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % \
+                               os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
         # Link the necessary programs into the temporary directory
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
         LinkFile(os.path.join(os.path.split(__file__)[0],"data","rungmx.sh"),os.path.join(abstempdir,"rungmx.sh"))
@@ -1215,8 +1214,7 @@ class Liquid_GMX(Liquid):
             LinkFile(os.path.join(self.root,self.tgtdir,"%s.gro" % phase),os.path.join(abstempdir,"%s.gro" % phase))
 
     def polarization_correction(self,mvals):
-        # This needs to be implemented
-        return 0
+        raise NotImplementedError('This method is not implemented yet')
 
 class Interaction_GMX(Interaction):
     """ Subclass of Interaction for interaction energy matching using GROMACS. """

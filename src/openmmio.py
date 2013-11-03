@@ -557,8 +557,10 @@ class OpenMM(Engine):
                 if self.target.FF.amoeba_pol == 'mutual':
                     self.mmopts['mutualInducedTargetEpsilon'] = 1e-6
                 elif self.target.FF.amoeba_pol == 'direct':
-                    self.mmopts['polarization'] = 'Direct'
+                    self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.target.FF.rigid_water
+        elif self.AMOEBA:
+            self.mmopts['mutualInducedTargetEpsilon'] = 1e-6
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc

@@ -2,6 +2,7 @@ import unittest
 import os, sys
 import tarfile
 from __init__ import ForceBalanceTestCase
+from forcebalance.nifty import printcool_dictionary
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
@@ -11,6 +12,9 @@ from numpy import array
 
 # expected results taken from previous runs. Update this if it changes and seems reasonable (updated 10/24/13)
 EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
+
+# expected results taken from previous runs. Update this if it changes and seems reasonable (updated 11/02/13)
+EXPECTED_BROMINE_RESULTS = array([-2.3426e-01, -3.1603e-02])
 
 # fail test if we take more than this many iterations to converge. Update this as necessary
 ITERATIONS_TO_CONVERGE = 5
@@ -129,7 +133,7 @@ class TestBromineStudy(ForceBalanceTestCase):
         super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):
-        """Check liquid bromine study runs without errors"""
+        """Check liquid bromine study converges to expected results"""
         self.logger.debug("\nSetting input file to 'options.in'\n")
         input_file='optimize.in'
 
@@ -167,6 +171,10 @@ class TestBromineStudy(ForceBalanceTestCase):
 
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
+
+        self.assertNdArrayEqual(EXPECTED_BROMINE_RESULTS,result,delta=0.01,
+                                msg="\nCalculation results have changed from previously calculated values.\n"
+                                "If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values")
 
 if __name__ == '__main__':
     unittest.main()

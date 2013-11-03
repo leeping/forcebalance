@@ -61,8 +61,8 @@ class TestAmber99SB(ForceBalanceTestCase):
         os.chdir(os.path.join(os.getcwd(), "test", "files", "amber_alaglu"))
         if not os.path.exists("temp"): os.makedirs("temp")
         os.chdir("temp")
-        for i in ["topol.top", "shot.mdp", "a99sb.xml", "a99sb.prm", "all.gro", "all.arc", "alaglu.key", "AceGluNme.itp", "AceAlaNme.itp", "a99sb.itp"]:
-            os.system("ln -s ../%s" % i)
+        for i in ["topol.top", "shot.mdp", "a99sb.xml", "a99sb.prm", "all.gro", "all.arc", "AceGluNme.itp", "AceAlaNme.itp", "a99sb.itp"]:
+            os.system("ln -fs ../%s" % i)
         self.engines = OrderedDict()
         # Set up GMX engine
         if gmxpath != '':
@@ -254,6 +254,7 @@ class TestAmoebaWater6(ForceBalanceTestCase):
 
     def test_energy_rmsd(self):
         """ Compare OpenMM vs. TINKER optimized geometries with AMOEBA force field """
+        self.skipTest("Need to reduce dependence on the TINKER build")
         printcool("Testing OpenMM vs. TINKER optimized geometry with AMOEBA")
         os.chdir("temp")
         if not hasattr(self, 'T'):
@@ -290,6 +291,19 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         MT = self.T.multipole_moments(optimize=False)
         DT = np.array(MT['dipole'].values())
         QT = np.array(MT['quadrupole'].values())
+        os.chdir("..")
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same dipole\n")
+        self.assertNdArrayEqual(DO, DT, msg="OpenMM and TINKER dipoles are different", delta=0.001)
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same quadrupole\n")
+        self.assertNdArrayEqual(QO, QT, msg="OpenMM and TINKER quadrupoles are different", delta=0.001)
+
+    def test_multipole_moments_optimized(self):
+        """ Compare OpenMM vs. TINKER multipole moments with AMOEBA force field """
+        self.skipTest("Need to reduce dependence on the TINKER build")
+        printcool("Testing OpenMM vs. TINKER multipole moments with AMOEBA")
+        os.chdir("temp")
+        if not hasattr(self, 'T'):
+            self.skipTest("TINKER programs are not in the PATH.")
         MO1 = self.O.multipole_moments(optimize=True)
         DO1 = np.array(MO1['dipole'].values())
         QO1 = np.array(MO1['quadrupole'].values())
@@ -297,10 +311,6 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         DT1 = np.array(MT1['dipole'].values())
         QT1 = np.array(MT1['quadrupole'].values())
         os.chdir("..")
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same dipole\n")
-        self.assertNdArrayEqual(DO, DT, msg="OpenMM and TINKER dipoles are different", delta=0.001)
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same quadrupole\n")
-        self.assertNdArrayEqual(QO, QT, msg="OpenMM and TINKER quadrupoles are different", delta=0.001)
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same dipole when geometries are optimized\n")
         self.assertNdArrayEqual(DO1, DT1, msg="OpenMM and TINKER dipoles are different when geometries are optimized", delta=0.001)
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same quadrupole when geometries are optimized\n")

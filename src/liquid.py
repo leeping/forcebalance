@@ -127,9 +127,9 @@ class Liquid(Target):
         self.nptfiles = []
         # Suffix to command string for launching NPT simulations.
         self.nptsfx = [("--minimize" if self.minimize_energy else None), 
-                       ("--liquid_nequil %i" % self.liquid_equ_steps if self.liquid_equ_steps > 0 else None),
-                       ("--gas_nequil %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else None), 
-                       ("--gas_nsteps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else None), 
+                       ("--liquid_nequil %i" % self.liquid_equ_steps if self.liquid_equ_steps > -1 else None),
+                       ("--gas_nequil %i" % self.gas_equ_steps if self.gas_equ_steps > -1 else None), 
+                       ("--gas_nsteps %i" % self.gas_prod_steps if self.gas_prod_steps > -1 else None), 
                        ("--gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else None), 
                        ("--gas_intvl %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
         # List of trajectory files that may be deleted if self.save_traj == 1.
@@ -236,7 +236,7 @@ class Liquid(Target):
             if self.liquid_mol != None:
                 self.liquid_conf.xyzs[0] = self.liquid_mol.xyzs[simnum%len(self.liquid_mol)]
                 self.liquid_conf.boxes[0] = self.liquid_mol.boxes[simnum%len(self.liquid_mol)]
-            self.liquid_conf.write(self.liquid_fnm)
+            self.liquid_conf.write(self.liquid_fnm, ftype=self.liquid_ftype if hasattr(self, 'liquid_ftype') else None)
             cmdstr = '%s python npt.py %s %i %.3f %.3f %.3f %.3f %s' % (self.nptpfx, self.engine, self.liquid_prod_steps, self.liquid_timestep,
                                                                         self.liquid_interval, temperature, pressure, ' '.join([i for i in self.nptsfx if i != None]))
             if wq == None:
@@ -249,8 +249,30 @@ class Liquid(Target):
                          output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output,
                          tgt=self)
 
-    def indicate(self):
-        # Somehow the "indicator" functionality made its way into "get".  No matter.
+    def indicate(self): 
+        AGrad = hasattr(self, 'Gp')
+        PrintDict = OrderedDict()
+        def print_item(key, heading, physunit):
+            if self.Xp[key] > 0:
+                printcool_dictionary(self.Pp[key], title='%s %s%s\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % 
+                                     (self.name, heading, " (%s) " % physunit if physunit else ""), bold=True, color=4, keywidth=15)
+                bar = printcool("%s objective function: % .3f%s" % (heading, self.Xp[key], ", Derivative:" if AGrad else ""))
+                if AGrad:
+                    self.FF.print_map(vals=self.Gp[key])
+                    logger.info(bar)
+                PrintDict[heading] = "% 10.5f % 8.3f % 14.5e" % (self.Xp[key], self.Wp[key], self.Xp[key]*self.Wp[key])
+
+        print_item("Rho", "Density", "kg m^-3")
+        print_item("Hvap", "Enthalpy of Vaporization", "kJ mol^-1")
+        print_item("Alpha", "Thermal Expansion Coefficient", "10^-4 K^-1")
+        print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
+        print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
+        print_item("Eps0", "Dielectric Constant", None)
+
+        PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
+
+        Title = "%s Condensed Phase Properties:\n %-20s %40s" % (self.name, "Property Name", "Residual x Weight = Contribution")
+        printcool_dictionary(PrintDict,color=4,title=Title,keywidth=31)
         return
 
     def objective_term(self, points, expname, calc, err, grad, name="Quantity", SubAverage=False):
@@ -683,64 +705,17 @@ class Liquid(Target):
         if AHess:
             Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0
 
-        PrintDict = OrderedDict()
-        if X_Rho > 0:
-            printcool_dictionary(RhoPrint, title='%s Density (kg m^-3) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Density objective function: % .3f%s" % (X_Rho, ", Derivative:" if AGrad else ""))
+        if not in_fd():
+            self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha, 
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0}
+            self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3, 
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6}
+            self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint, 
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print}
             if AGrad:
-                self.FF.print_map(vals=G_Rho)
-                logger.info(bar)
-            PrintDict['Density'] = "% 10.5f % 8.3f % 14.5e" % (X_Rho, w_1, X_Rho*w_1)
-
-        if X_Hvap > 0:
-            printcool_dictionary(HvapPrint, title='%s Enthalpy of Vaporization (kJ mol^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("H_vap objective function: % .3f%s" % (X_Hvap, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Hvap)
-                logger.info(bar)
-                
-            PrintDict['Enthalpy of Vaporization'] = "% 10.5f % 8.3f % 14.5e" % (X_Hvap, w_2, X_Hvap*w_2)
-
-        if X_Alpha > 0:
-            printcool_dictionary(AlphaPrint,title='%s Thermal Expansion Coefficient (10^-4 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Thermal Expansion objective function: % .3f%s" % (X_Alpha, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Alpha)
-                logger.info(bar)
-
-            PrintDict['Thermal Expansion Coefficient'] = "% 10.5f % 8.3f % 14.5e" % (X_Alpha, w_3, X_Alpha*w_3)
-
-        if X_Kappa > 0:
-            printcool_dictionary(KappaPrint,title='%s Isothermal Compressibility (10^-6 bar^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Compressibility objective function: % .3f%s" % (X_Kappa, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Kappa)
-                logger.info(bar)
-                
-            PrintDict['Isothermal Compressibility'] = "% 10.5f % 8.3f % 14.5e" % (X_Kappa, w_4, X_Kappa*w_4)
-
-        if X_Cp > 0:
-            printcool_dictionary(CpPrint,   title='%s Isobaric Heat Capacity (cal mol^-1 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Heat Capacity objective function: % .3f%s" % (X_Cp, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Cp)
-                logger.info(bar)
-
-            PrintDict['Isobaric Heat Capacity'] = "% 10.5f % 8.3f % 14.5e" % (X_Cp, w_5, X_Cp*w_5)
-
-        if X_Eps0 > 0:
-            printcool_dictionary(Eps0Print,   title='%s Dielectric Constant\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Dielectric Constant objective function: % .3f%s" % (X_Eps0, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Eps0)
-                logger.info(bar)
-
-            PrintDict['Dielectric Constant'] = "% 10.5f % 8.3f % 14.5e" % (X_Eps0, w_6, X_Eps0*w_6)
-
-        PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",Objective)
-
-        Title = "%s Condensed Phase Properties:\n %-20s %40s" % (self.name, "Property Name", "Residual x Weight = Contribution")
-        printcool_dictionary(PrintDict,color=4,title=Title,keywidth=31)
+                self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha, 
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0}
+            self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         return Answer
