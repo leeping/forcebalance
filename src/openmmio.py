@@ -413,10 +413,6 @@ class Liquid_OpenMM(Liquid):
         self.nptpfx += "bash runcuda.sh"
         # List of extra files to upload to Work Queue.
         self.nptfiles += ['runcuda.sh']
-        # Suffix to command string for launching NPT simulations.
-        self.nptsfx += [("--force_cuda" if self.force_cuda else None),
-                        ("--anisotropic" if self.anisotropic_box else None),
-                        ("--mts_vvvr" if self.mts_vvvr else None)]
         # MD engine argument supplied to command string for launching NPT simulations.
         self.engine = "openmm"
 

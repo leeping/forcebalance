@@ -24,6 +24,16 @@ from parser import tgt_opts_defaults, gen_opts_defaults
 class BaseClass(object):
     """ Provides some nifty functions that are common to all ForceBalance classes. """
 
+    def __setattr__(self, key, value):
+        if not hasattr(self, 'OptionDict'):
+            super(BaseClass,self).__setattr__('OptionDict', OrderedDict())
+        if not hasattr(self, 'OptionKeys'):
+            super(BaseClass,self).__setattr__('OptionKeys', set())
+        ## These attributes return a list of attribute names defined in this class, that belong in the chosen category.
+        ## For example: self.FrameKeys should return set(['xyzs','boxes']) if xyzs and boxes exist in self.Data
+        if key in self.OptionKeys:
+            self.OptionDict[key] = value
+        return super(BaseClass,self).__setattr__(key, value)
 
     def __init__(self, options):
         self.verbose_options  = options['verbose_options'] if 'verbose_options' in options else False
@@ -50,7 +60,8 @@ class BaseClass(object):
             else: default = None
         if ((val != default or (hasattr(self, 'verbose_options') and self.verbose_options)) and dest_key != 'root') or forceprint:
             self.PrintOptionDict[dest_key] = val
-        return super(BaseClass,self).__setattr__(dest_key, val)
+        self.OptionKeys.add(dest_key)
+        return self.__setattr__(dest_key, val)
 
 class BaseReader(object):
     """ The 'reader' class.  It serves two main functions:

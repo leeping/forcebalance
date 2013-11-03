@@ -292,6 +292,7 @@ class Liquid_TINKER(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
         self.set_option(tgt_opts,'md_threads')
+        self.set_option(options,'tinkerpath')
         self.liquid_fnm = "liquid.xyz"
         self.liquid_ftype = "tinker"
         self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.xyz"))
@@ -306,8 +307,6 @@ class Liquid_TINKER(Liquid):
         self.DynDict_New = OrderedDict()
         # Command prefix.
         # self.nptpfx = 'sh rungmx.sh'
-        # Suffix to command string for launching NPT simulations.
-        self.nptsfx += ["--nt %i" % self.md_threads]
         # List of extra files to upload to Work Queue.
         self.nptfiles += ['liquid.xyz', 'liquid.key', 'gas.xyz', 'gas.key']
         # MD engine argument supplied to command string for launching NPT simulations.
@@ -426,7 +425,7 @@ class TINKER(Engine):
                 self.rigid = True
             if FF.amoeba_pol == 'mutual':
                 tk_opts['polarization'] = 'mutual'
-                tk_opts['polar-eps'] = '1e-6'
+                tk_defs['polar-eps'] = '1e-6'
             elif FF.amoeba_pol == 'direct':
                 tk_opts['polarization'] = 'direct'
             prmfnm = FF.tinkerprm
@@ -525,9 +524,14 @@ class TINKER(Engine):
                     G.add_edge(a, b)
                 else: mode = 0
         # Use networkx to figure out a list of molecule numbers.
-        gs = nx.connected_component_subgraphs(G)
-        tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
-        self.AtomLists['MoleculeNumber'] = [[i+1 in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
+        if len(G.nodes()) > 0:
+            # The following code only works in TINKER 6.2
+            gs = nx.connected_component_subgraphs(G)
+            tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
+            self.AtomLists['MoleculeNumber'] = [[i+1 in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
+        else:
+            grouped = [i.L() for i in self.mol.molecules]
+            self.AtomLists['MoleculeNumber'] = [[i in g for g in grouped].index(1) for i in range(self.mol.na)]
         # Delete force field files.
         if hasattr(self,'target'):
             for f in FF.fnms:
@@ -822,7 +826,7 @@ class TINKER(Engine):
         self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
 
         # Interaction energy needs to be in kcal/mol.
-        return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
+        return (self.energy() - self.A.energy() - self.B.energy())
 
     def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, threads=1, verbose=False, **kwargs):
         
@@ -851,37 +855,36 @@ class TINKER(Engine):
         md_defs = OrderedDict()
         md_opts = OrderedDict()
         # Print out averages only at the end.
-        md_opts["printout"] = nsteps
+        md_opts["printout"] = nsave
         md_opts["openmp-threads"] = threads
-        if self.pbc:
+        # Langevin dynamics for temperature control.
+        if temperature:
+            md_defs["integrator"] = "stochastic"
+        else:
             md_defs["integrator"] = "beeman"
-            if temperature:
-                md_defs["thermostat"] = "bussi"
-            else:
-                md_opts["thermostat"] = None
+            md_opts["thermostat"] = None
+        # Periodic boundary conditions.
+        if self.pbc:
             md_opts["vdw-correction"] = ''
             md_opts["mpole-list"] = ''
-            if pressure: 
-                md_defs["barostat"] = "montecarlo"
-                md_opts["save-box"] = ''
+            if temperature and pressure: 
+                md_defs["integrator"] = "nose-hoover"
+                md_defs["thermostat"] = "nose-hoover"
+                md_defs["barostat"] = "nose-hoover"
+                # md_defs["barostat"] = "montecarlo"
+                # md_defs["volume-trial"] = "10"
+                # md_opts["save-box"] = ''
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
+            elif pressure:
+                warn_once("Pressure is ignored because temperature is turned off.")
         else:
             if pressure:
                 warn_once("Pressure is ignored because pbc is set to False.")
             # Use stochastic dynamics for the gas phase molecule.
             # If we use the regular integrators it may miss
             # six degrees of freedom in calculating the kinetic energy.
-            md_opts["integrator"] = "verlet"
-            if temperature:
-                md_opts["thermostat"] = "andersen"
-            else:
-                md_opts["thermostat"] = "None"
             md_opts["barostat"] = None
-
-        eq_opts = deepcopy(md_opts)
-        if self.pbc and pressure:
-            eq_opts["barostat"] = "berendsen" # Good for equilibration, bad for everything else.
 
         if minimize:
             if verbose: logger.info("Minimizing the energy...")
@@ -891,7 +894,7 @@ class TINKER(Engine):
 
         # Run equilibration.
         if nequil > 0:
-            write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
+            write_key("%s-eq.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
             if verbose: printcool("Running equilibration dynamics", color=0)
             if self.pbc and pressure:
                 self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 

@@ -175,8 +175,8 @@ tgt_opts_types = {
                  "manual"           : (0, -150, 'Give the user a chance to fill in condensed phase stuff on the zeroth step', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "hvap_subaverage"  : (0, -150, 'Don\'t target the average enthalpy of vaporization and allow it to freely float (experimental)', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "force_cuda"       : (0, -150, 'Force the external npt.py script to crash if CUDA Platform not available', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
-                 "anisotropic_box"  : (0, -150, 'Enable anisotropic box scaling (e.g. for crystals or two-phase simulations) in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
-                 "mts_vvvr"         : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
+                 "anisotropic_box"  : (0, -150, 'Enable anisotropic box scaling (e.g. for crystals or two-phase simulations) in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm, liquid_tinker'),
+                 "mts_integrator"   : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "minimize_energy"  : (1, 0, 'Minimize the energy of the system prior to running dynamics', 'Condensed phase property targets (advanced usage)', 'liquid_openmm', 'liquid_tinker'),
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
                 },
@@ -246,7 +246,8 @@ for t in tgt_opts_types:
 bkwd = {"simtype" : "type", 
         "masterfile" : "inter_txt", 
         "openmm_cuda_precision" : "openmm_precision",
-        "mdrun_threads" : "md_threads"}
+        "mdrun_threads" : "md_threads",
+        "mts_vvvr" : "mts_integrator"}
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]

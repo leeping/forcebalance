@@ -125,13 +125,6 @@ class Liquid(Target):
         self.nptpfx = ""
         # List of extra files to upload to Work Queue.
         self.nptfiles = []
-        # Suffix to command string for launching NPT simulations.
-        self.nptsfx = [("--minimize" if self.minimize_energy else None), 
-                       ("--liquid_nequil %i" % self.liquid_equ_steps if self.liquid_equ_steps > -1 else None),
-                       ("--gas_nequil %i" % self.gas_equ_steps if self.gas_equ_steps > -1 else None), 
-                       ("--gas_nsteps %i" % self.gas_prod_steps if self.gas_prod_steps > -1 else None), 
-                       ("--gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else None), 
-                       ("--gas_intvl %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
 
@@ -237,8 +230,7 @@ class Liquid(Target):
                 self.liquid_conf.xyzs[0] = self.liquid_mol.xyzs[simnum%len(self.liquid_mol)]
                 self.liquid_conf.boxes[0] = self.liquid_mol.boxes[simnum%len(self.liquid_mol)]
             self.liquid_conf.write(self.liquid_fnm, ftype=self.liquid_ftype if hasattr(self, 'liquid_ftype') else None)
-            cmdstr = '%s python npt.py %s %i %.3f %.3f %.3f %.3f %s' % (self.nptpfx, self.engine, self.liquid_prod_steps, self.liquid_timestep,
-                                                                        self.liquid_interval, temperature, pressure, ' '.join([i for i in self.nptsfx if i != None]))
+            cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engine, temperature, pressure)
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
@@ -358,7 +350,7 @@ class Liquid(Target):
         # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
         #
         # First dump the force field to a pickle file
-        with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.h,AGrad),f)
+        with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict,AGrad),f)
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == 0 and self.manual:

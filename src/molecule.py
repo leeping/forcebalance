@@ -2420,7 +2420,15 @@ class Molecule(object):
             self.require('elem','xyzs','resname','resid','boxes')
 
         if 'atomname' not in self.Data:
-            atomname = ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
+            count = 0
+            resid = -1
+            atomname = []
+            for i in range(self.na):
+                if self.resid[i] != resid:
+                    count = 0
+                count += 1
+                resid = self.resid[i]
+                atomname.append("%s%i" % (self.elem[i], count))
         else:
             atomname = self.atomname
 

@@ -58,7 +58,7 @@ import argparse
 import traceback
 import numpy as np
 from copy import deepcopy
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from forcebalance.forcefield import FF
 from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, statisticalInefficiency, which, _exec, isint, wopen
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p, in_fd
@@ -70,80 +70,36 @@ logger = getLogger(__name__)
 #| Global, user-tunable variables (simulation settings) |#
 #========================================================#
 
-# TODO: Strip out PDB and XML file arguments.
-# TODO: Strip out all units.
-
 parser = argparse.ArgumentParser()
-parser.add_argument('engine', help='MD program that we are using; choose "openmm" or "gromacs"')
-parser.add_argument('liquid_nsteps', type=int, help='Number of time steps for the liquid production simulation')
-parser.add_argument('liquid_timestep', type=float, help='Length of the time step for the liquid simulation, in femtoseconds')
-parser.add_argument('liquid_intvl', type=float, help='Time interval for saving the liquid coordinates, in picoseconds')
+parser.add_argument('engine', help='MD program that we are using; choose "openmm", "tinker" or "gromacs"')
 parser.add_argument('temperature',type=float, help='Temperature (K)')
 parser.add_argument('pressure',type=float, help='Pressure (Atm)')
 
-# Other optional arguments
-parser.add_argument('--liquid_nequil', type=int, help='Number of time steps used for equilibration', default=100000)
-parser.add_argument('--gas_nsteps', type=int, help='Number of time steps for the gas-phase production simulation', default=1000000)
-parser.add_argument('--gas_timestep', type=float, help='Time step for the gas-phase simulation, in femtoseconds', default=0.5)
-parser.add_argument('--gas_nequil', type=int, help='Number of time steps for the gas-phase equilibration simulation', default=100000)
-parser.add_argument('--gas_intvl', type=float, help='Time interval for saving the gas-phase coordinates, in picoseconds', default=0.1)
-parser.add_argument('--anisotropic', action='store_true', help='Enable anisotropic scaling of periodic box (useful for crystals)')
-parser.add_argument('--mts', action='store_true', help='Enable multiple timestep integrator (OpenMM)')
-parser.add_argument('--nt', type=int, help='Number of threads when executing GROMACS', default=1)
-parser.add_argument('--force_cuda', action='store_true', help='Exit if CUDA platform is not available (OpenMM)')
-parser.add_argument('--gmxpath', type=str, help='Specify the location of GROMACS executables', default="")
-parser.add_argument('--minimize', action='store_true', help='Minimize the energy of the system prior to running dynamics')
-
 args = parser.parse_args()
 
-faststep         = 0.25                                                        # "fast" timestep (for MTS integrator, if used)
-temperature      = args.temperature                                            # temperature in kelvin
-pressure         = args.pressure                                               # pressure in atmospheres
+faststep         = 0.25                    # "fast" timestep (for MTS integrator, if used)
+temperature      = args.temperature        # temperature in kelvin
+pressure         = args.pressure           # pressure in atmospheres
+engname          = args.engine.lower()     # Name of the engine
 
-if args.engine.lower() == "openmm":
+if engname == "openmm":
     try:
         from simtk.unit import *
         from simtk.openmm import *
         from simtk.openmm.app import *
-        from forcebalance.openmmio import *
     except:
         traceback.print_exc()
         raise Exception("Cannot import OpenMM modules")
+    from forcebalance.openmmio import *
     Engine = OpenMM
-elif args.engine.lower() == "gromacs" or args.engine == "gmx":
+elif engname == "gromacs" or engname == "gmx":
     from forcebalance.gmxio import *
-    if args.mts:
-        raise Exception("Multiple timestep integrator is only usable with OpenMM interface")
-    if args.force_cuda:
-        raise Exception("CUDA platform is only usable with OpenMM interface")
     Engine = GMX
-elif args.engine.lower() == "tinker":
+elif engname == "tinker":
     from forcebalance.tinkerio import *
-    if args.mts:
-        raise Exception("Multiple timestep integrator it is only usable with OpenMM interface")
-    if args.force_cuda:
-        raise Exception("CUDA platform is only usable with OpenMM interface")
     Engine = TINKER
 else:
-    raise Exception('Only OpenMM and GROMACS support implemented at this time.')
-
-printcool("ForceBalance condensed phase simulation using engine: %s" % args.engine.upper(), color=4, bold=True)
-
-liquid_snapshots = (args.liquid_nsteps * args.liquid_timestep / 1000) / args.liquid_intvl
-liquid_iframes = 1000 * args.liquid_intvl / args.liquid_timestep
-gas_snapshots = (args.gas_nsteps * args.gas_timestep / 1000) / args.gas_intvl
-gas_iframes = 1000 * args.gas_intvl / args.gas_timestep
-
-print "For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" \
-    % (liquid_snapshots, liquid_iframes, args.liquid_timestep)
-print "For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps" \
-    % (gas_snapshots, gas_iframes, args.gas_timestep)
-if liquid_snapshots < 2:
-    raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' \
-                        % (2000 * (args.liquid_intvl/args.liquid_timestep)))
-if gas_snapshots < 2:
-    raise Exception('Please set the number of gas time steps so that you collect at least two snapshots (minimum %i)' \
-                        % (2000 * (args.gas_intvl/args.gas_timestep)))
+    raise Exception('OpenMM, GROMACS, and TINKER are supported at this time.')
 
 #==================#
 #|   Subroutines  |#
@@ -219,7 +175,7 @@ def energy_derivatives(engine, FF, mvals, h, length, AGrad=True, dipole=False):
 
     ED0      = energy_driver(mvals)
     for i in range(FF.np):
-        print i, FF.plist[i] + " "*30 + "\r",
+        logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
         EDG, _   = f12d3p(fdwrap(energy_driver,mvals,i),h,f0=ED0)
         if dipole:
             G[i,:]   = EDG[:,0]
@@ -261,7 +217,7 @@ def property_derivatives(engine, FF, mvals, h, kT, property_driver, property_kwa
     if 'h_' in property_kwargs:
         H0 = property_kwargs['h_'].copy()
     for i in range(FF.np):
-        print FF.plist[i] + " "*30
+        logger.info("%s\n" % (FF.plist[i] + " "*30))
         ED1      = fdwrap(energy_driver,mvals,i)(h)
         E1       = ED1[:,0]
         D1       = ED1[:,1:]
@@ -274,7 +230,7 @@ def property_derivatives(engine, FF, mvals, h, kT, property_driver, property_kwa
         S = -1*np.dot(b,np.log(b))
         InfoContent = np.exp(S)
         if InfoContent / len(E0) < 0.1:
-            print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
+            logger.warn("Warning: Effective number of snapshots: % .1f (out of %i)\n" % (InfoContent, len(E0)))
         P1 = property_driver(b=b,**property_kwargs)
         EDM1      = fdwrap(energy_driver,mvals,i)(-h)
         EM1       = EDM1[:,0]
@@ -288,7 +244,7 @@ def property_derivatives(engine, FF, mvals, h, kT, property_driver, property_kwa
         S = -1*np.dot(b,np.log(b))
         InfoContent = np.exp(S)
         if InfoContent / len(E0) < 0.1:
-            print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
+            logger.warn("Warning: Effective number of snapshots: % .1f (out of %i)\n" % (InfoContent, len(E0)))
         PM1 = property_driver(b=b,**property_kwargs)
         G[i] = (P1-PM1)/(2*h)
     if 'h_' in property_kwargs:
@@ -320,7 +276,62 @@ def main():
     file.
 
     """
-    
+
+    printcool("ForceBalance condensed phase simulation using engine: %s" % engname.upper(), color=4, bold=True)
+
+    #----
+    # Load the ForceBalance pickle file which contains:
+    #----
+    # - Force field object
+    # - Optimization parameters
+    # - Options from the Target object that launched this simulation
+    # - Switch for whether to evaluate analytic derivatives.
+    FF,mvals,TgtOptions,AGrad = lp_load(open('forcebalance.p'))
+    # Write the force field file.
+    FF.make(mvals)
+
+    #----
+    # Load the options that are set in the ForceBalance input file.
+    #----
+    # Finite difference step size
+    h = TgtOptions['h']
+    # MD options; time step (fs), production steps, equilibration steps, interval for saving data (ps)
+    liquid_timestep = TgtOptions['liquid_timestep']
+    liquid_nsteps = TgtOptions['liquid_prod_steps']
+    liquid_nequil = TgtOptions['liquid_equ_steps']
+    liquid_intvl = TgtOptions['liquid_interval']
+    gas_timestep = TgtOptions['gas_timestep']
+    gas_nsteps = TgtOptions['gas_prod_steps']
+    gas_nequil = TgtOptions['gas_equ_steps']
+    gas_intvl = TgtOptions['gas_interval']
+
+    # Number of threads, multiple timestep integrator, anisotropic box etc.
+    threads = TgtOptions.get('md_threads', 1)
+    mts = TgtOptions.get('mts_integrator', 0)
+    force_cuda = TgtOptions.get('force_cuda', 0)
+    anisotropic = TgtOptions.get('anisotropic_box', 0)
+    minimize = TgtOptions.get('minimize_energy', 1)
+
+    # Print all options.
+    printcool_dictionary(TgtOptions, title="Options from ForceBalance")
+    liquid_snapshots = (liquid_nsteps * liquid_timestep / 1000) / liquid_intvl
+    liquid_iframes = 1000 * liquid_intvl / liquid_timestep
+    gas_snapshots = (gas_nsteps * gas_timestep / 1000) / gas_intvl
+    gas_iframes = 1000 * gas_intvl / gas_timestep
+    logger.info("For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
+        % (liquid_snapshots, liquid_iframes, liquid_timestep))
+    if liquid_snapshots < 2:
+        raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' \
+                            % (2000 * (liquid_intvl/liquid_timestep)))
+    logger.info("For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
+        % (gas_snapshots, gas_iframes, gas_timestep))
+    if gas_snapshots < 2:
+        raise Exception('Please set the number of gas time steps so that you collect at least two snapshots (minimum %i)' \
+                            % (2000 * (gas_intvl/gas_timestep)))
+
+    #----
+    # Loading coordinates
+    #----
     # Find either a coordinate file that matches the pattern "liquid.gro|xyz|pdb"
     # or a single coordinate file that contains multiple molecules.
     allfnms = [i for i in os.listdir('.') if (os.path.isfile(i) and any([i.endswith(j) for j in ".gro", ".pdb", ".xyz"]))]
@@ -345,61 +356,78 @@ def main():
             raise IOError('Cannot determine the gas coordinate file.')
         gasfnm = allfnms[nas.index(True)]
     MG = Molecule(gasfnm)
-    
-    # The number of molecules can be determined here.
+    # Determine the number of molecules in the condensed phase coordinate file.
     NMol = len(ML.molecules)
 
-    # Load the force field in from the ForceBalance pickle.
-    FF,mvals,h,AGrad = lp_load(open('forcebalance.p'))
-    FF.make(mvals)
-
-    ## Setting of options.
-    ## Engine options
+    #----
+    # Setting up MD simulations
+    #----
     EngOpts = OrderedDict()
     EngOpts["liquid"] = OrderedDict([("coords", liqfnm), ("mol", ML), ("pbc", True)])
     EngOpts["gas"] = OrderedDict([("coords", gasfnm), ("mol", MG), ("pbc", False)])
     GenOpts = OrderedDict()
-    if args.engine == "openmm":
+    if engname == "openmm":
+        # OpenMM-specific options
         GenOpts["ffxml"] = FF.openmmxml
-    elif args.engine == "gromacs":
+        EngOpts["liquid"]["openmm_platform"] = 'CUDA'
+        EngOpts["gas"]["openmm_platform"] = 'Reference'
+        if force_cuda:
+            try: Platform.getPlatformByName('CUDA')
+            except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
+        if threads > 1: logger.warn("Setting the number of threads will have no effect on OpenMM engine.\n")
+    elif engname == "gromacs":
+        # Gromacs-specific options
+        GenOpts["gmxpath"] = TgtOptions["gmxpath"]
+        GenOpts["gmxsuffix"] = TgtOptions["gmxsuffix"]
         EngOpts["liquid"]["gmx_top"] = os.path.splitext(liqfnm)[0] + ".top"
         EngOpts["liquid"]["gmx_mdp"] = os.path.splitext(liqfnm)[0] + ".mdp"
         EngOpts["gas"]["gmx_top"] = os.path.splitext(gasfnm)[0] + ".top"
         EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gasfnm)[0] + ".mdp"
-        if args.gmxpath != '': GenOpts["gmxpath"] = args.gmxpath
-    elif args.engine == "tinker":
+        if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
+        if mts: logger.warn("Gromacs not configured for multiple timestep integrator.")
+        if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")
+    elif engname == "tinker":
+        # Tinker-specific options
+        GenOpts["tinkerpath"] = TgtOptions["tinkerpath"]
         EngOpts["liquid"]["tinker_key"] = os.path.splitext(liqfnm)[0] + ".key"
         EngOpts["gas"]["tinker_key"] = os.path.splitext(gasfnm)[0] + ".key"
         GenOpts["tinkerprm"] = FF.tinkerprm
+        if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
+        if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
     EngOpts["liquid"].update(GenOpts)
     EngOpts["gas"].update(GenOpts)
     for i in EngOpts:
         printcool_dictionary(EngOpts[i], "Engine options for %s" % i)
-    ## Molecular dynamics options
-    MDOpts = OrderedDict()
-    MDOpts["liquid"] = OrderedDict([("nsteps", args.liquid_nsteps), ("timestep", args.liquid_timestep),
-                                    ("temperature", temperature), ("pressure", pressure),
-                                    ("nequil", args.liquid_nequil), ("minimize", args.minimize),
-                                    ("nsave", int(1000 * args.liquid_intvl / args.liquid_timestep)),
-                                    ("threads", args.nt), ("verbose", True)])
-    
-    MDOpts["gas"] = OrderedDict([("nsteps", args.gas_nsteps), ("timestep", args.gas_timestep),
-                                 ("temperature", temperature), ("nsave", int(1000 * args.gas_intvl / args.gas_timestep)),
-                                 ("nequil", args.gas_nequil), ("minimize", args.minimize), ("threads", 1)])
 
-    DoEDA = not (args.engine == "openmm" and args.mts)
+    # Set up MD options
+    MDOpts = OrderedDict()
+    MDOpts["liquid"] = OrderedDict([("nsteps", liquid_nsteps), ("timestep", liquid_timestep),
+                                    ("temperature", temperature), ("pressure", pressure),
+                                    ("nequil", liquid_nequil), ("minimize", minimize),
+                                    ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
+                                    ("verbose", True), ("threads", threads), 
+                                    ("anisotropic", anisotropic), ("mts", mts)])
+    MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
+                                 ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
+                                 ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1)])
+
+    # Energy components analysis disabled for OpenMM MTS
+    # because it uses force groups
+    DoEDA = not (engname == "openmm" and mts)
+    if not DoEDA: logger.warn("OpenMM with MTS integrator; disabling energy components analysis.\n")
+
+    # Create instances of the MD Engine objects.
+    Liquid = Engine(name="liquid", **EngOpts["liquid"])
+    Gas = Engine(name="gas", **EngOpts["gas"])
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
     #=================================================================#
-    # Create an instance of the MD Engine object.
-    Liquid = Engine(name="liquid", **EngOpts["liquid"])
-    Gas = Engine(name="gas", **EngOpts["gas"])
+
+    printcool("Condensed phase molecular dynamics", color=4, bold=True)
 
     # This line runs the condensed phase simulation.
-    printcool("Condensed phase molecular dynamics", color=4, bold=True)
-    Rhos, Potentials, Kinetics, Volumes, Dips, EDA = \
-        Liquid.molecular_dynamics(**MDOpts["liquid"])
+    Rhos, Potentials, Kinetics, Volumes, Dips, EDA = Liquid.molecular_dynamics(**MDOpts["liquid"])
 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -443,14 +471,14 @@ def main():
     #============================================#
     #  Compute the potential energy derivatives. #
     #============================================#
-    print "Calculating potential energy derivatives with finite difference step size:", h
+    logger.info("Calculating potential energy derivatives with finite difference step size: %f\n" % h)
     # Switch for whether to compute the derivatives two different ways for consistency.
     FDCheck = False
 
     # Create a double-precision simulation object if desired (seems unnecessary).
     DoublePrecisionDerivatives = False
-    if args.engine == "openmm" and DoublePrecisionDerivatives and AGrad:
-        print "Creating Double Precision Simulation for parameter derivatives"
+    if engname == "openmm" and DoublePrecisionDerivatives and AGrad:
+        logger.info("Creating Double Precision Simulation for parameter derivatives\n")
         Liquid = Engine(name="liquid", openmm_precision="double", **EngOpts["liquid"])
         Gas = Engine(name="gas", openmm_precision="double", **EngOpts["gas"])
 
@@ -460,32 +488,19 @@ def main():
     printcool("Gas phase energy derivatives", color=4, bold=True)
     mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, len(mEnergies), AGrad, dipole=False)
 
+    #==============================================#
+    #  Condensed phase properties and derivatives. #
+    #==============================================#
+
+    #----
+    # Density
+    #----
     # Build the first density derivative.
     GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / L - np.mean(Rhos) * np.mean(G, axis=1))
-
-    # The enthalpy of vaporization in kJ/mol.
-    Hvap_avg = mEne_avg - Ene_avg / NMol + kT - np.mean(pV) / NMol
-    Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
-
-    # Build the first Hvap derivative.
-    GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
-    GHvap /= NMol
-    GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
-    GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
-
     # Print out the density and its derivative.
     Sep = printcool("Density: % .4f +- % .4f kg/m^3\nAnalytic Derivative:" % (Rho_avg, Rho_err))
     FF.print_map(vals=GRho)
-    print Sep
-
-    H = Energies + pV
-    # Print out the liquid enthalpy.
-    print "Liquid enthalpy: % .4f kJ/mol, stdev % .4f ; (% .4f from energy, % .4f from pV)" % (np.mean(H), np.std(H), np.mean(Energies), np.mean(pV))
-    V = np.array(Volumes)
-    numboots = 1000
+    logger.info(Sep)
 
     def calc_rho(b = None, **kwargs):
         if b == None: b = np.ones(L,dtype=float)
@@ -509,11 +524,32 @@ def main():
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GRho, GRho1)]
         FF.print_map(vals=absfrac)
 
-    print "Box total energy:", np.mean(Energies)
-    print "Monomer total energy:", np.mean(mEnergies)
+    #----
+    # Enthalpy of vaporization
+    #----
+    H = Energies + pV
+    V = np.array(Volumes)
+
+    # Print out the liquid enthalpy.
+    logger.info("Liquid enthalpy: % .4f kJ/mol, stdev % .4f ; (% .4f from energy, % .4f from pV)\n" % 
+                (np.mean(H), np.std(H), np.mean(Energies), np.mean(pV)))
+    numboots = 1000
+
+    # The enthalpy of vaporization in kJ/mol.
+    Hvap_avg = mEne_avg - Ene_avg / NMol + kT - np.mean(pV) / NMol
+    Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
+
+    # Build the first Hvap derivative.
+    GHvap = np.mean(G,axis=1)
+    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
+    GHvap /= NMol
+    GHvap -= np.mean(mG,axis=1)
+    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
+    GHvap *= -1
+    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
+
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol\nAnalytic Derivative:" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
-    print Sep
 
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
@@ -524,7 +560,9 @@ def main():
     def avg(vec):
         return np.mean(vec)
 
-    ## Thermal expansion coefficient and bootstrap error estimation
+    #----
+    # Thermal expansion coefficient
+    #----
     def calc_alpha(b = None, **kwargs):
         if b == None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
@@ -540,7 +578,7 @@ def main():
     Alphaboot = np.array(Alphaboot)
     Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(H))])
 
-    ## Thermal expansion coefficient analytic derivative
+    # Thermal expansion coefficient analytic derivative
     GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
     GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
     GAlpha3 = deprod(V)/avg(V) - Gbar
@@ -556,7 +594,9 @@ def main():
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GAlpha, GAlpha_fd)]
         FF.print_map(vals=absfrac)
 
-    ## Isothermal compressibility
+    #----
+    # Isothermal compressibility
+    #----
     def calc_kappa(b=None, **kwargs):
         if b == None: b = np.ones(L,dtype=float)
         if 'v_' in kwargs:
@@ -570,7 +610,7 @@ def main():
     Kappaboot = np.array(Kappaboot)
     Kappa_err = np.std(Kappaboot) * np.sqrt(statisticalInefficiency(V))
 
-    ## Isothermal compressibility analytic derivative
+    # Isothermal compressibility analytic derivative
     Sep = printcool("Isothermal compressibility:  % .4e +- %.4e bar^-1\nAnalytic Derivative:" % (Kappa, Kappa_err))
     GKappa1 = +1 * Beta**2 * avg(V**2) * deprod(V) / avg(V)**2
     GKappa2 = -1 * Beta**2 * avg(V) * deprod(V**2) / avg(V)**2
@@ -585,7 +625,9 @@ def main():
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GKappa, GKappa_fd)]
         FF.print_map(vals=absfrac)
 
-    ## Isobaric heat capacity
+    #----
+    # Isobaric heat capacity
+    #----
     def calc_cp(b=None, **kwargs):
         if b == None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
@@ -601,7 +643,7 @@ def main():
     Cpboot = np.array(Cpboot)
     Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(H))
 
-    ## Isobaric heat capacity analytic derivative
+    # Isobaric heat capacity analytic derivative
     GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
     GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
     GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
@@ -616,7 +658,9 @@ def main():
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GCp,GCp_fd)]
         FF.print_map(vals=absfrac)
 
-    ## Dielectric constant
+    #----
+    # Dielectric constant
+    #----
     def calc_eps0(b=None, **kwargs):
         if b == None: b = np.ones(L,dtype=float)
         if 'd_' in kwargs: # Dipole moment vector.
@@ -639,7 +683,7 @@ def main():
     Eps0boot = np.array(Eps0boot)
     Eps0_err = np.std(Eps0boot)*np.sqrt(np.mean([statisticalInefficiency(Dips[:,0]),statisticalInefficiency(Dips[:,1]),statisticalInefficiency(Dips[:,2])]))
  
-    ## Dielectric constant analytic derivative
+    # Dielectric constant analytic derivative
     Dx = Dips[:,0]
     Dy = Dips[:,1]
     Dz = Dips[:,2]
@@ -658,9 +702,10 @@ def main():
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GEps0,GEps0_fd)]
         FF.print_map(vals=absfrac)
 
-    ## Print the final force field.
+    logger.info("Writing final force field.\n")
     pvals = FF.make(mvals)
 
+    logger.info("Writing all simulation data to disk.\n")
     with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
 
 if __name__ == "__main__":
