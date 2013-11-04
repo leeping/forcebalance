@@ -178,8 +178,8 @@ class Optimizer(forcebalance.BaseClass):
         ## In these situations, don't do anything
         print_parameters = True
         if xk == None: 
-            logger.info("Results will be printed using initial parameters\n")
-            xk = self.mvals0.copy()
+            # logger.info("Results will be printed using initial parameters\n")
+            # xk = self.mvals0.copy()
             print_parameters = False
 
         ## Check derivatives by finite difference after the optimization is over (for good measure)
@@ -189,23 +189,21 @@ class Optimizer(forcebalance.BaseClass):
             self.FDCheckG()
 
         ## Print out final answer
-        final_print = True
-        if final_print:
-            if print_parameters:
-                bar = printcool("Final optimization parameters:\n Paste to input file to restart",bold=True,color=4)
-                logger.info("read_mvals\n")
-                self.FF.print_map(xk)
-                logger.info("/read_mvals\n")
-                bar = printcool("Final physical parameters:",bold=True,color=4)
-                self.FF.print_map(self.FF.create_pvals(xk))
-                logger.info(bar)
-            if self.backup:
-                for fnm in self.FF.fnms:
-                    if os.path.exists(os.path.join('result', fnm)):
-                        bak(os.path.join('result', fnm))
-            self.FF.make(xk,False,'result')
+        if print_parameters:
+            bar = printcool("Final optimization parameters:\n Paste to input file to restart",bold=True,color=4)
+            logger.info("read_mvals\n")
+            self.FF.print_map(xk)
+            logger.info("/read_mvals\n")
+            bar = printcool("Final physical parameters:",bold=True,color=4)
+            self.FF.print_map(self.FF.create_pvals(xk))
+            logger.info(bar)
+            self.FF.make(xk,printdir='result')
             logger.info("\nThe final force field has been written to the 'result' directory.\n")
-            bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
+        if self.backup:
+            for fnm in self.FF.fnms:
+                if os.path.exists(os.path.join('result', fnm)):
+                    bak(os.path.join('result', fnm))
+        bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
         ## Write out stuff to checkpoint file
         self.writechk()

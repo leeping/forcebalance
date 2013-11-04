@@ -77,14 +77,14 @@ priors                    OrderedDict([('VDWS', 5.0), ('VDWT', 0.5), ('VDWD', 1.
 ----------------------------------------------------------
 The energy denominator is: 1.0 kcal/mol
 Interactions more repulsive than 20.0 will not be fitted
-Found 0 .prm files in /home/leeping/src/forcebalance/studies/Future/ccl4/targets/CJ-mecl-wat
+Found 0 .prm files in /home/leeping/src/forcebalance/studies/Future/ccl4/targets/ccl4-h2o-ix
 #========================================================#
-#| [92m           Setup for target CJ-mecl-wat :           [0m |#
+#| [92m           Setup for target ccl4-h2o-ix :           [0m |#
 #========================================================#
-name                      CJ-mecl-wat 
+name                      ccl4-h2o-ix 
 type                      INTERACTION_TINKER 
 h                         0.0001 
-tgtdir                    targets/CJ-mecl-wat 
+tgtdir                    targets/ccl4-h2o-ix 
 attenuate                 True 
 fragment1                 1-5 
 fragment2                 6-8 
@@ -152,9 +152,9 @@ Running condensed phase simulation locally.
 You may tail -f /home/leeping/src/forcebalance/studies/Future/ccl4/temp/ccl4-liquid/iter_0000/298.15K-1.0atm/npt.out in another terminal window
 Executing process: [92m python npt.py tinker 298.150 1.000               [0m Output: npt.out
 Running without a target, using current directory.
-Autodetected cl4.prm in /home/leeping/src/forcebalance/studies/Future/ccl4/temp/CJ-mecl-wat/iter_0000
+Autodetected cl4.prm in /home/leeping/src/forcebalance/studies/Future/ccl4/temp/ccl4-h2o-ix/iter_0000
 #=====================================================================#
-#| [92m                       Target: CJ-mecl-wat                       [0m |#
+#| [92m                       Target: ccl4-h2o-ix                       [0m |#
 #| [92m    Interaction Energies (kcal/mol), Objective =  2.67437e+00    [0m |#
 #| [92m  Label          Calc.      Ref.     Delta   Divisor        Term [0m |#
 #=====================================================================#
@@ -223,7 +223,7 @@ Total                                                  4.16609e+00
 #| [94m                  Objective Function Breakdown                  [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
 #====================================================================#
-CJ-mecl-wat                    2.67437      1.000 [94m     2.67437e+00[0m 
+ccl4-h2o-ix                    2.67437      1.000 [94m     2.67437e+00[0m 
 ccl4-liquid                    4.16609      1.000 [94m     4.16609e+00[0m 
 Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
 Total                                             [94m     6.84046e+00[0m 
@@ -256,7 +256,7 @@ Running condensed phase simulation locally.
 You may tail -f /home/leeping/src/forcebalance/studies/Future/ccl4/temp/ccl4-liquid/iter_0001/298.15K-1.0atm/npt.out in another terminal window
 Executing process: [92m python npt.py tinker 298.150 1.000               [0m Output: npt.out
 #=====================================================================#
-#| [92m                       Target: CJ-mecl-wat                       [0m |#
+#| [92m                       Target: ccl4-h2o-ix                       [0m |#
 #| [92m    Interaction Energies (kcal/mol), Objective =  6.55953e-01    [0m |#
 #| [92m  Label          Calc.      Ref.     Delta   Divisor        Term [0m |#
 #=====================================================================#
@@ -325,7 +325,7 @@ Total                                                  9.71358e-01
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-CJ-mecl-wat                    0.65595      1.000 [92m     6.55953e-01[0m ( -2.018e+00 ) 
+ccl4-h2o-ix                    0.65595      1.000 [92m     6.55953e-01[0m ( -2.018e+00 ) 
 ccl4-liquid                    0.97136      1.000 [92m     9.71358e-01[0m ( -3.195e+00 ) 
 Regularization                 0.00010      1.000 [91m     1.00000e-04[0m ( +1.000e-04 ) 
 Total                                             [92m     1.62741e+00[0m ( -5.213e+00 ) 
@@ -357,7 +357,7 @@ Running condensed phase simulation locally.
 You may tail -f /home/leeping/src/forcebalance/studies/Future/ccl4/temp/ccl4-liquid/iter_0002/298.15K-1.0atm/npt.out in another terminal window
 Executing process: [92m python npt.py tinker 298.150 1.000               [0m Output: npt.out
 #=====================================================================#
-#| [92m                       Target: CJ-mecl-wat                       [0m |#
+#| [92m                       Target: ccl4-h2o-ix                       [0m |#
 #| [92m    Interaction Energies (kcal/mol), Objective =  4.22270e-01    [0m |#
 #| [92m  Label          Calc.      Ref.     Delta   Divisor        Term [0m |#
 #=====================================================================#
@@ -426,7 +426,7 @@ Total                                                  8.62753e-02
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-CJ-mecl-wat                    0.42227      1.000 [92m     4.22270e-01[0m ( -2.337e-01 ) 
+ccl4-h2o-ix                    0.42227      1.000 [92m     4.22270e-01[0m ( -2.337e-01 ) 
 ccl4-liquid                    0.08628      1.000 [92m     8.62753e-02[0m ( -8.851e-01 ) 
 Regularization                 0.00026      1.000 [91m     2.56622e-04[0m ( +1.566e-04 ) 
 Total                                             [92m     5.08802e-01[0m ( -1.119e+00 ) 
@@ -458,7 +458,7 @@ Running condensed phase simulation locally.
 You may tail -f /home/leeping/src/forcebalance/studies/Future/ccl4/temp/ccl4-liquid/iter_0003/298.15K-1.0atm/npt.out in another terminal window
 Executing process: [92m python npt.py tinker 298.150 1.000               [0m Output: npt.out
 #=====================================================================#
-#| [92m                       Target: CJ-mecl-wat                       [0m |#
+#| [92m                       Target: ccl4-h2o-ix                       [0m |#
 #| [92m    Interaction Energies (kcal/mol), Objective =  4.12282e-01    [0m |#
 #| [92m  Label          Calc.      Ref.     Delta   Divisor        Term [0m |#
 #=====================================================================#
@@ -527,7 +527,7 @@ Total                                                  8.56734e-02
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-CJ-mecl-wat                    0.41228      1.000 [92m     4.12282e-01[0m ( -9.987e-03 ) 
+ccl4-h2o-ix                    0.41228      1.000 [92m     4.12282e-01[0m ( -9.987e-03 ) 
 ccl4-liquid                    0.08567      1.000 [92m     8.56734e-02[0m ( -6.019e-04 ) 
 Regularization                 0.00022      1.000 [92m     2.24799e-04[0m ( -3.182e-05 ) 
 Total                                             [92m     4.98180e-01[0m ( -1.062e-02 ) 

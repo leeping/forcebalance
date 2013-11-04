@@ -50,7 +50,7 @@ convergence_step 1e-2
 $end
 
 $target
-name CJ-mecl-wat 
+name ccl4-h2o-ix
 type Interaction_TINKER
 
 weight 1.0
