@@ -452,7 +452,7 @@ class Liquid(Target):
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if os.path.exists('./%s/npt_result.p.bz2' % label):
-                _exec('bunzip2 ./%s/npt_result.p.bz2' % label)
+                _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
             elif os.path.exists('./%s/npt_result.p' % label): pass
             else:
                 logger.warning('In %s :\n' % os.getcwd())
