@@ -2506,7 +2506,20 @@ class Molecule(object):
             self.require_resid()
         else:
             self.require('xyzs','resname','resid')
-        ATOMS = self.atomname if 'atomname' in self.Data else ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
+
+        if 'atomname' not in self.Data:
+            count = 0
+            resid = -1
+            ATOMS = []
+            for i in range(self.na):
+                if self.resid[i] != resid:
+                    count = 0
+                count += 1
+                resid = self.resid[i]
+                ATOMS.append("%s%i" % (self.elem[i], count))
+        else:
+            ATOMS = self.atomname
+        
         CHAIN = self.chain if 'chain' in self.Data else [1 for i in range(self.na)]
         RESNAMES = self.resname
         RESNUMS = self.resid

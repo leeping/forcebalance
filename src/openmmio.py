@@ -461,7 +461,7 @@ class OpenMM(Engine):
         """
 
         ## Create the OpenMM PDB object.
-        pdb1 = "%s-1.pdb" % os.path.splitext(self.mol.fnm)[0]
+        pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
         self.mol[0].write(pdb1)
         self.pdb = PDBFile(pdb1)
         
@@ -494,8 +494,6 @@ class OpenMM(Engine):
                 elif self.target.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.target.FF.rigid_water
-        elif self.AMOEBA:
-            self.mmopts.setdefault('mutualInducedTargetEpsilon', 1e-6)
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
@@ -935,7 +933,7 @@ class OpenMM(Engine):
             if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
         else:
             if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
-        if writexyz:
+        if save_traj:
             self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsteps))
         for iteration in range(isteps):
             # Propagate dynamics.
