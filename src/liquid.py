@@ -249,10 +249,10 @@ class Liquid(Target):
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
-                _exec(cmdstr, outfnm='npt.out')
+                _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
                 queue_up(wq, command = cmdstr+' &> npt.out',
-                         input_files = self.nptfiles + ['npt.py', self.liquid_coords, self.gas_coords, 'forcebalance.p'],
+                         input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
                          output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):

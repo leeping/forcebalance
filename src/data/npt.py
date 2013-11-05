@@ -347,10 +347,11 @@ def main():
     EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
     GenOpts = OrderedDict()
     if engname == "openmm":
-        GenOpts["mmopts"] = {}
         # OpenMM-specific options
+        # mmopts is a dictionary that gets passed to forcefield.createSystem()
+        GenOpts["mmopts"] = {}
+        GenOpts["mmopts"].setdefault('rigidWater', FF.rigid_water)
         GenOpts["ffxml"] = FF.openmmxml
-        GenOpts["rigid_water"] = FF.rigid_water
         EngOpts["liquid"]["openmm_platform"] = 'CUDA'
         EngOpts["gas"]["openmm_platform"] = 'Reference'
         # The force field object tells us if we're using direct polarization
