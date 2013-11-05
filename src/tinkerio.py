@@ -967,7 +967,7 @@ class Liquid_TINKER(Liquid):
         super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
         # Error checking.
         for i in self.nptfiles:
-            if not os.path.exists(self.root, self.tgtdir, i):
+            if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
                 raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
         # Send back the trajectory file.
         if self.save_traj > 0:

@@ -16,7 +16,7 @@ from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
 try:
-    from forcebalance.gmxio import AbInitio_GMX, Liquid_GMX, Interaction_GMX, Vibration_GMX
+    from forcebalance.gmxio import AbInitio_GMX, BindingEnergy_GMX, Liquid_GMX, Interaction_GMX, Moments_GMX, Vibration_GMX
 except:
     logger.warning(traceback.format_exc())
     logger.warning("Gromacs module import failed\n")
@@ -28,7 +28,7 @@ except:
     logger.warning("Tinker module import failed\n")
 
 try:
-    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM
+    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM
 except:
     logger.warning(traceback.format_exc())
     logger.warning("OpenMM module import failed; check OpenMM package\n")
@@ -82,7 +82,11 @@ Implemented_Targets = {
     'INTERACTION_TINKER':Interaction_TINKER,
     'INTERACTION_OPENMM':Interaction_OpenMM,
     'BINDINGENERGY_TINKER':BindingEnergy_TINKER,
+    'BINDINGENERGY_GMX':BindingEnergy_GMX,
+    'BINDINGENERGY_OPENMM':BindingEnergy_OpenMM,
     'MOMENTS_TINKER':Moments_TINKER,
+    'MOMENTS_GMX':Moments_GMX,
+    'MOMENTS_OpenMM':Moments_OpenMM,
     'REMOTE_TARGET':RemoteTarget,
     }
 
