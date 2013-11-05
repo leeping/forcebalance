@@ -21,7 +21,7 @@ try:
 except: pass
 from pymbar import pymbar
 import itertools
-from collections import defaultdict, namedtuple
+from collections import defaultdict, namedtuple, OrderedDict
 from forcebalance.optimizer import Counter, GoodStep
 import csv
 
@@ -48,11 +48,9 @@ def weight_info(W, PT, N_k, verbose=True):
 class Liquid(Target):
     
     """ Subclass of Target for liquid property matching."""
-    
+
     def __init__(self,options,tgt_opts,forcefield):
-        """ Create an instance of the class. """
-        
-        # Initialize the SuperClass!
+        # Initialize base class
         super(Liquid,self).__init__(options,tgt_opts,forcefield)
         # Fractional weight of the density
         self.set_option(tgt_opts,'w_rho',forceprint=True)
@@ -102,13 +100,32 @@ class Liquid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
-        
+        # Read in liquid starting coordinates.
+        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)): 
+            raise RuntimeError("%s doesn't exist; please provide liquid_coords option" % self.liquid_coords)
+        self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.liquid_coords))
+        # Read in gas starting coordinates.
+        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.gas_coords)): 
+            raise RuntimeError("%s doesn't exist; please provide gas_coords option" % self.gas_coords)
+        self.gas_mol = Molecule(os.path.join(self.root, self.tgtdir, self.gas_coords))
+        # List of trajectory files that may be deleted if self.save_traj == 1.
+        self.last_traj = []
+        # Extra files to be copied back at the end of a run.
+        self.extra_output = []
         ## Read the reference data
         self.read_data()
-        ## Prepare the temporary directory
-        self.prepare_temp_directory(options,tgt_opts)
-        ## Extra platform-dependent data to send back
-        self.extra_output = []
+        # Extra files to be linked into the temp-directory.
+        self.nptfiles += [self.liquid_coords, self.gas_coords]
+        # Scripts to be copied from the ForceBalance installation directory.
+        self.scripts += ['npt.py']
+        # Prepare the temporary directory.
+        self.prepare_temp_directory()
+        # Build keyword dictionary to pass to engine.
+        self.gas_engine_args.update(self.OptionDict)
+        self.gas_engine_args.update(options)
+        del self.gas_engine_args['name']
+        # Create engine object for gas molecule to do the polarization correction.
+        self.gas_engine = self.engine_(target=self, mol=self.gas_mol, **self.gas_engine_args)
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
@@ -117,16 +134,18 @@ class Liquid(Target):
         np.seterr(under='ignore')
         ## Saved force field mvals for all iterations
         self.SavedMVal = {}
-        ## Saved trajectories for all iterations and all temperatures :)
+        ## Saved trajectories for all iterations and all temperatures
         self.SavedTraj = defaultdict(dict)
         ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
-        # Prefix to command string for launching NPT simulations.
-        self.nptpfx = ""
-        # List of extra files to upload to Work Queue.
-        self.nptfiles = []
-        # List of trajectory files that may be deleted if self.save_traj == 1.
-        self.last_traj = []
+
+    def prepare_temp_directory(self):
+        """ Prepare the temporary directory by copying in important files. """
+        abstempdir = os.path.join(self.root,self.tempdir)
+        for f in self.nptfiles:
+            LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+        for f in self.scripts:
+            LinkFile(os.path.join(os.path.split(__file__)[0],"data",f),os.path.join(abstempdir,f))
 
     def read_data(self):
         # Read the 'data.csv' file. The file should contain guidelines.
@@ -204,7 +223,7 @@ class Liquid(Target):
                 else:
                     # If there is only one data point, then the denominator is just the single
                     # data point itself.
-                    default_denoms[head+"_denom"] = np.sqrt(dat[0])
+                    default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
             self.PhasePoints = self.RefData[head].keys()
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
@@ -224,22 +243,33 @@ class Liquid(Target):
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            os.unlink(self.liquid_fnm)
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-            if self.liquid_mol != None:
-                self.liquid_conf.xyzs[0] = self.liquid_mol.xyzs[simnum%len(self.liquid_mol)]
-                self.liquid_conf.boxes[0] = self.liquid_mol.boxes[simnum%len(self.liquid_mol)]
-            self.liquid_conf.write(self.liquid_fnm, ftype=self.liquid_ftype if hasattr(self, 'liquid_ftype') else None)
-            cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engine, temperature, pressure)
+            self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, outfnm='npt.out')
             else:
                 queue_up(wq, command = cmdstr+' &> npt.out',
-                         input_files = self.nptfiles + ['npt.py', self.liquid_fnm, self.gas_fnm, 'forcebalance.p'],
-                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output,
-                         tgt=self)
+                         input_files = self.nptfiles + ['npt.py', self.liquid_coords, self.gas_coords, 'forcebalance.p'],
+                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
+
+    def polarization_correction(self,mvals):
+        d = self.gas_engine.get_multipole_moments(optimize=True)['dipole']
+        if not in_fd():
+            logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
+        # Taken from the original OpenMM interface code, this is how we calculate the conversion factor.
+        # dd2 = ((np.linalg.norm(d)-self.self_pol_mu0)*debye)**2
+        # eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
+        # epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*np.pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
+        # In [2]: eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
+        # In [7]: 1.0 * debye ** 2 / (1.0 * angstrom**3*4*np.pi*eps0) / (kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
+        # Out[7]: 60.240179789402056
+        convert = 60.240179789402056
+        dd2 = (np.linalg.norm(d)-self.self_pol_mu0)**2
+        epol = 0.5*convert*dd2/self.self_pol_alpha
+        return epol
 
     def indicate(self): 
         AGrad = hasattr(self, 'Gp')
@@ -711,14 +741,3 @@ class Liquid(Target):
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         return Answer
-
-    @abc.abstractmethod
-    def polarization_correction(self,mvals):
-
-        """ 
-        
-        Return the self-polarization correction as described in Berendsen et al., JPC 1987.
-
-        """
-        
-        raise NotImplementedError('This method is not implemented in the base class')

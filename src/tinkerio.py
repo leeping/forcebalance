@@ -288,58 +288,6 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
         printcool_dictionary(options, title="%s -> %s with options:" % (fin, fout))
     file_out.close()
 
-class Liquid_TINKER(Liquid):
-    def __init__(self,options,tgt_opts,forcefield):
-        super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
-        self.set_option(tgt_opts,'md_threads')
-        self.set_option(options,'tinkerpath')
-        self.liquid_fnm = "liquid.xyz"
-        self.liquid_ftype = "tinker"
-        self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.xyz"))
-        self.liquid_mol = None
-        self.gas_fnm = "gas.xyz"
-        if os.path.exists(os.path.join(self.root, self.tgtdir,"all.arc")):
-            self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir,"all.arc"))
-            logger.info("Found collection of starting conformations, length %i!\n" % len(self.liquid_mol))
-        if self.do_self_pol:
-            warn_press_key("Self-polarization correction not implemented yet when using TINKER")
-        self.DynDict = OrderedDict()
-        self.DynDict_New = OrderedDict()
-        # Command prefix.
-        # self.nptpfx = 'sh rungmx.sh'
-        # List of extra files to upload to Work Queue.
-        self.nptfiles += ['liquid.xyz', 'liquid.key', 'gas.xyz', 'gas.key']
-        # MD engine argument supplied to command string for launching NPT simulations.
-        self.engine = "tinker"
-        # Send back the trajectory file.
-        if self.save_traj > 0:
-            self.extra_output = ['liquid-md.arc']
-
-    def prepare_temp_directory(self,options,tgt_opts):
-        """ Prepare the temporary directory by copying in important files. """
-        abstempdir = os.path.join(self.root,self.tempdir)
-        LinkFile(os.path.join(self.root,self.tgtdir,"liquid.xyz"),os.path.join(abstempdir,"liquid.xyz"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"liquid.key"),os.path.join(abstempdir,"liquid.key"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"gas.xyz"),os.path.join(abstempdir,"gas.xyz"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"gas.key"),os.path.join(abstempdir,"gas.key"))
-        LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
-
-    def npt_simulation(self, temperature, pressure, simnum):
-        """ Submit a NPT simulation to the Work Queue. """
-        if GoodStep() and (temperature, pressure) in self.DynDict_New:
-            self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
-        if (temperature, pressure) in self.DynDict:
-            dynsrc = self.DynDict[(temperature, pressure)]
-            dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
-            logger.info("Copying .dyn file: %s to %s\n" % (dynsrc, dyndest))
-            shutil.copy2(dynsrc,dyndest)
-            self.nptfiles.append(dyndest)
-        self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
-        super(Liquid_TINKER, self).npt_simulation(temperature, pressure, simnum)
-
-    def polarization_correction(self,mvals):
-        raise NotImplementedError('This method is not implemented yet')
-
 class TINKER(Engine):
 
     """ Engine for carrying out general purpose TINKER calculations. """
@@ -623,7 +571,7 @@ class TINKER(Engine):
                 M[I].write("%s-1.xyz" % self.name, ftype="tinker")
                 if B != None:
                     write_key("%s-1.key" % self.name, OrderedDict([('a-axis', B[0]), ('b-axis', B[1]), ('c-axis', B[2]),
-                                                                   ('alpha', B[3]), ('beta', B[4]), ('gamma', B[5])]))
+                                                                   ('alpha', B[3]), ('beta', B[4]), ('gamma', B[5])]), fin="%s.key" % self.name)
                 o = self.calltinker("testgrad %s-1.xyz -k %s%s y n n" % (self.name, self.name, "-1" if B != None else ""))
                 # Read data from stdout and stderr, and convert it to GROMACS
                 # units for consistency with existing code.
@@ -992,118 +940,99 @@ class TINKER(Engine):
 
         return rho, edyn, kdyn, vol, dip, ecomp
 
+class Liquid_TINKER(Liquid):
+    """ Condensed phase property matching using TINKER. """
+    def __init__(self,options,tgt_opts,forcefield):
+        # Number of threads in running "dynamic".
+        self.set_option(tgt_opts,'md_threads')
+        # Number of threads in running "dynamic".
+        self.set_option(options,'tinkerpath')
+        # Name of the liquid coordinate file.
+        self.set_option(tgt_opts,'liquid_coords',default='liquid.xyz',forceprint=True)
+        # Name of the gas coordinate file.
+        self.set_option(tgt_opts,'gas_coords',default='gas.xyz',forceprint=True)
+        # Class for creating engine object.
+        self.engine_ = TINKER
+        # Name of the engine to pass to npt.py.
+        self.engname = "tinker"
+        # Command prefix.
+        self.nptpfx = ""
+        # Extra files to be linked into the temp-directory.
+        self.nptfiles = ['%s.key' % os.path.splitext(f)[0] for f in [self.liquid_coords, self.gas_coords]]
+        # Set some options for the polarization correction calculation.
+        self.gas_engine_args = {'tinker_key' : '%s.key' % os.path.splitext(self.gas_coords)[0]}
+        # Scripts to be copied from the ForceBalance installation directory.
+        self.scripts = []
+        # Initialize the base class.
+        super(Liquid_TINKER,self).__init__(options,tgt_opts,forcefield)
+        # Error checking.
+        for i in self.nptfiles:
+            if not os.path.exists(self.root, self.tgtdir, i):
+                raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+        # Send back the trajectory file.
+        if self.save_traj > 0:
+            self.extra_output = ['liquid-md.arc']
+        # Dictionary of .dyn files used to restart simulations.
+        self.DynDict = OrderedDict()
+        self.DynDict_New = OrderedDict()
+
+    def npt_simulation(self, temperature, pressure, simnum):
+        """ Submit a NPT simulation to the Work Queue. """
+        if GoodStep() and (temperature, pressure) in self.DynDict_New:
+            self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
+        if (temperature, pressure) in self.DynDict:
+            dynsrc = self.DynDict[(temperature, pressure)]
+            dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
+            logger.info("Copying .dyn file: %s to %s\n" % (dynsrc, dyndest))
+            shutil.copy2(dynsrc,dyndest)
+            self.nptfiles.append(dyndest)
+        self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
+        super(Liquid_TINKER, self).npt_simulation(temperature, pressure, simnum)
+
 class AbInitio_TINKER(AbInitio):
-
-    """Subclass of Target for force and energy matching using TINKER. """
-
+    """ Subclass of Target for force and energy matching using TINKER. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="all.arc")
         self.set_option(tgt_opts,'tinker_key',default="shot.key")
+        self.engine_ = TINKER
         ## Initialize base class.
         super(AbInitio_TINKER,self).__init__(options,tgt_opts,forcefield)
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-        ## Create engine object.
-        self.engine = TINKER(target=self, **engine_args)
-        self.AtomLists = self.engine.AtomLists
-        self.AtomMask = self.engine.AtomMask
-        ## all_at_once is not implemented.
-        if self.force and self.all_at_once:
-            warn_press_key("Force matching is turned on but TINKER can only do trajectory loops for energy-only jobs.")
-            self.all_at_once = False
-
-    def read_topology(self):
-        self.topology_flag = True
-
-    def energy_force(self):
-        return self.engine.energy_force()
-
-class Vibration_TINKER(Vibration):
-
-    """Subclass of Target for vibrational frequency matching
-    using TINKER.  Provides optimized geometry, vibrational frequencies (in cm-1),
-    and eigenvectors."""
-
-    def __init__(self,options,tgt_opts,forcefield):
-        ## Default file names for coordinates and key file.
-        self.set_option(tgt_opts,'coords',default="input.xyz")
-        self.set_option(tgt_opts,'tinker_key',default="input.key")
-        ## Initialize base class.
-        super(Vibration_TINKER,self).__init__(options,tgt_opts,forcefield)
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-        ## Create engine object.
-        self.engine = TINKER(target=self, **engine_args)
-
-class Moments_TINKER(Moments):
-
-    """Subclass of Target for multipole moment matching
-    using TINKER."""
-
-    def __init__(self,options,tgt_opts,forcefield):
-        ## Default file names for coordinates and key file.
-        self.set_option(tgt_opts,'coords',default="input.xyz")
-        self.set_option(tgt_opts,'tinker_key',default="input.key")
-        ## Initialize base class.
-        super(Moments_TINKER,self).__init__(options,tgt_opts,forcefield)
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-        ## Create engine object.
-        self.engine = TINKER(target=self, **engine_args)
-
-    def moments_driver(self):
-        return self.engine.multipole_moments(polarizability='polarizability' in self.ref_moments)
 
 class BindingEnergy_TINKER(BindingEnergy):
-
-    """Subclass of BindingEnergy for binding energy matching
-    using TINKER.  """
-
+    """ Binding energy matching using TINKER. """
     def __init__(self,options,tgt_opts,forcefield):
+        self.engine_ = TINKER
         ## Initialize base class.
         super(BindingEnergy_TINKER,self).__init__(options,tgt_opts,forcefield)
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-        ## Create engine objects.
-        self.engines = OrderedDict()
-        for sysname,sysopt in self.sys_opts.items():
-            M = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']),ftype="tinker")
-            if 'select' in sysopt:
-                atomselect = np.array(uncommadash(sysopt['select']))
-                M = M.atom_select(atomselect)
-            if self.FF.rigid_water: M.rigid_water()
-            self.engines[sysname] = TINKER(target=self, mol=M, name=sysname, tinker_key=os.path.join(sysopt['keyfile']), tinkerpath=options['tinkerpath'])
 
-    def system_driver(self, sysname):
-        opts = self.sys_opts[sysname]
-        return self.engines[sysname].energy_rmsd(optimize = (opts['optimize'] if 'optimize' in opts else False))
-    
 class Interaction_TINKER(Interaction):
-
-    """Subclass of Target for interaction matching using TINKER. """
-
+    """ Subclass of Target for interaction matching using TINKER. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="all.arc")
         self.set_option(tgt_opts,'tinker_key',default="shot.key")
+        self.engine_ = TINKER
         ## Initialize base class.
         super(Interaction_TINKER,self).__init__(options,tgt_opts,forcefield)
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-        ## Create engine object.
-        self.engine = TINKER(target=self, **engine_args)
 
-    def interaction_driver_all(self,dielectric=False):
-        # Compute the energies for the dimer
-        return self.engine.interaction_energy(self.select1, self.select2)
+class Moments_TINKER(Moments):
+    """ Subclass of Target for multipole moment matching using TINKER. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="input.xyz")
+        self.set_option(tgt_opts,'tinker_key',default="input.key")
+        self.engine_ = TINKER
+        ## Initialize base class.
+        super(Moments_TINKER,self).__init__(options,tgt_opts,forcefield)
+
+class Vibration_TINKER(Vibration):
+    """ Vibrational frequency matching using TINKER. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="input.xyz")
+        self.set_option(tgt_opts,'tinker_key',default="input.key")
+        self.engine_ = TINKER
+        ## Initialize base class.
+        super(Vibration_TINKER,self).__init__(options,tgt_opts,forcefield)
+

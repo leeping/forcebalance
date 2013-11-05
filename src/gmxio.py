@@ -13,8 +13,10 @@ from forcebalance.nifty import _exec
 from forcebalance import BaseReader
 from forcebalance.engine import Engine
 from forcebalance.abinitio import AbInitio
+from forcebalance.binding import BindingEnergy
 from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
+from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
 from copy import deepcopy
@@ -583,7 +585,7 @@ class GMX(Engine):
             if self.mdp == None or not os.path.exists(self.mdp):
                 self.mdp = onefile('mdp')
             # Sanity check; the force fields should be referenced by the .top file.
-            if os.path.exists(self.top):
+            if self.top != None and os.path.exists(self.top):
                 if not any([any([fnm in line for fnm in FF.fnms]) for line in open(self.top)]):
                     warn_press_key("None of the force field files %s are referenced in the .top file. "
                                    "Are you referencing the files through C preprocessor directives?" % FF.fnms)
@@ -1140,151 +1142,87 @@ class GMX(Engine):
         if verbose: logger.info("Finished!\n")
         return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps
 
-class AbInitio_GMX(AbInitio):
-    """ Subclass of AbInitio for force and energy matching using normal GROMACS.
-    Implements the prepare_temp_directory and energy_force_driver methods."""
-
-    def __init__(self,options,tgt_opts,forcefield):
-        ## Default file names for coordinates, top and mdp files.
-        self.set_option(tgt_opts,'coords',default="all.gro")
-        self.set_option(tgt_opts,'gmx_top',default="topol.top")
-        self.set_option(tgt_opts,'gmx_mdp',default="shot.mdp")
-
-        ## Initialize base class.
-        super(AbInitio_GMX,self).__init__(options,tgt_opts,forcefield)
-
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-    
-        ## Create engine object.
-        self.engine = GMX(target=self, **engine_args)
-        self.AtomLists = self.engine.AtomLists
-        self.AtomMask = self.engine.AtomMask
-        
-    def read_topology(self):
-        self.topology_flag = True
-
-    def generate_vsite_positions(self):
-        """ Call mdrun in order to update the virtual site positions. """
-        self.engine.generate_vsite_positions()
-
 class Liquid_GMX(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
-        super(Liquid_GMX,self).__init__(options,tgt_opts,forcefield)
-        # Number of threads in mdrun
+        # Path to GROMACS executables.
         self.set_option(options,'gmxpath')
+        # Suffix for GROMACS executables.
         self.set_option(options,'gmxsuffix')
+        # Number of threads for mdrun.
         self.set_option(tgt_opts,'md_threads')
-        self.liquid_fnm = "liquid.gro"
-        self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.gro"))
-        self.liquid_mol = None
-        self.gas_fnm = "gas.gro"
-        if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
-            self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
-            logger.info("Found collection of starting conformations, length %i!\n" % len(self.liquid_mol))
-        if self.do_self_pol:
-            warn_press_key("Self-polarization correction not implemented yet when using GMX")
+        # Name of the liquid coordinate file.
+        self.set_option(tgt_opts,'liquid_coords',default='liquid.gro',forceprint=True)
+        # Name of the gas coordinate file.
+        self.set_option(tgt_opts,'gas_coords',default='gas.gro',forceprint=True)
+        # Class for creating engine object.
+        self.engine_ = GMX
+        # Name of the engine to pass to npt.py.
+        self.engname = "gromacs"
         # Command prefix.
-        self.nptpfx = 'sh rungmx.sh'
-        # List of extra files to upload to Work Queue.
-        self.nptfiles += ['rungmx.sh', 'liquid.top', 'liquid.mdp', 'gas.top', 'gas.mdp']
-        # MD engine argument supplied to command string for launching NPT simulations.
-        self.engine = "gromacs"
+        self.nptpfx = "bash rungmx.sh"
+        # Extra files to be linked into the temp-directory.
+        self.nptfiles = ['%s.mdp' % os.path.splitext(f)[0] for f in [self.liquid_coords, self.gas_coords]]
+        self.nptfiles += ['%s.top' % os.path.splitext(f)[0] for f in [self.liquid_coords, self.gas_coords]]
+        # Set some options for the polarization correction calculation.
+        self.gas_engine_args = {'gmx_top' : '%s.top' % os.path.splitext(self.gas_coords)[0],
+                                'gmx_mdp' : '%s.mdp' % os.path.splitext(self.gas_coords)[0]}
+        # Scripts to be copied from the ForceBalance installation directory.
+        self.scripts = ['rungmx.sh']
+        # Initialize the base class.
+        super(Liquid_GMX,self).__init__(options,tgt_opts,forcefield)
+        # Error checking.
+        for i in self.nptfiles:
+            if not os.path.exists(self.root, self.tgtdir, i):
+                raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
         # Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output = ['liquid-md.trr']
 
-    def prepare_temp_directory(self,options,tgt_opts):
-        """ Prepare the temporary directory by copying in important files. """
-        abstempdir = os.path.join(self.root,self.tempdir)
-        if options['gmxpath'] == None or options['gmxsuffix'] == None:
-            warn_press_key('Please set the options gmxpath and gmxsuffix in the input file!')
-        if not os.path.exists(os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix'])):
-            warn_press_key('The mdrun executable pointed to by %s doesn\'t exist! (Check gmxpath and gmxsuffix)' % \
-                               os.path.join(options['gmxpath'],"mdrun"+options['gmxsuffix']))
-        # Link the necessary programs into the temporary directory
-        LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
-        LinkFile(os.path.join(os.path.split(__file__)[0],"data","rungmx.sh"),os.path.join(abstempdir,"rungmx.sh"))
-        # Link the run files
-        for phase in ["liquid","gas"]:
-            LinkFile(os.path.join(self.root,self.tgtdir,"%s.mdp" % phase),os.path.join(abstempdir,"%s.mdp" % phase))
-            LinkFile(os.path.join(self.root,self.tgtdir,"%s.top" % phase),os.path.join(abstempdir,"%s.top" % phase))
-            LinkFile(os.path.join(self.root,self.tgtdir,"%s.gro" % phase),os.path.join(abstempdir,"%s.gro" % phase))
-
-    def polarization_correction(self,mvals):
-        raise NotImplementedError('This method is not implemented yet')
-
-class Interaction_GMX(Interaction):
-    """ Subclass of Interaction for interaction energy matching using GROMACS. """
-
+class AbInitio_GMX(AbInitio):
+    """ Subclass of AbInitio for force and energy matching using GROMACS. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates, top and mdp files.
         self.set_option(tgt_opts,'coords',default="all.gro")
         self.set_option(tgt_opts,'gmx_top',default="topol.top")
         self.set_option(tgt_opts,'gmx_mdp',default="shot.mdp")
+        self.engine_ = GMX
+        ## Initialize base class.
+        super(AbInitio_GMX,self).__init__(options,tgt_opts,forcefield)
 
+class BindingEnergy_GMX(BindingEnergy):
+    """ Binding energy matching using Gromacs. """
+    def __init__(self,options,tgt_opts,forcefield):
+        self.engine_ = GMX
+        ## Initialize base class.
+        super(BindingEnergy_GMX,self).__init__(options,tgt_opts,forcefield)
+
+class Interaction_GMX(Interaction):
+    """ Interaction energy matching using GROMACS. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates, top and mdp files.
+        self.set_option(tgt_opts,'coords',default="all.gro")
+        self.set_option(tgt_opts,'gmx_top',default="topol.top")
+        self.set_option(tgt_opts,'gmx_mdp',default="shot.mdp")
+        self.engine_ = GMX
         ## Initialize base class.
         super(Interaction_GMX,self).__init__(options,tgt_opts,forcefield)
 
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-    
-        ## Create engine object.
-        self.engine = GMX(target=self, **engine_args)
-    
-    def interaction_driver(self, shot):
-        """ Computes the energy and force using GROMACS for a single
-        snapshot.  This does not require GROMACS-X2. """
-        raise NotImplementedError('Per-snapshot interaction energies not implemented, consider using all-at-once')
-
-    def interaction_driver_all(self, dielectric=False):
-        """ Computes the energy and force using GROMACS for a trajectory.  This does not require GROMACS-X2. """
-        return self.engine.interaction_energy(self.select1, self.select2)
-        ## Now we have the MM interaction energy.
-        ## We need the COSMO component of the interaction energy now...
-        # if dielectric:
-        #     traj_dimer = deepcopy(self.mol)
-        #     traj_dimer.add_quantum("qtemp_D.in")
-        #     traj_dimer.write("qchem_dimer.in",ftype="qcin")
-        #     traj_monoA = deepcopy(self.mol)
-        #     traj_monoA.add_quantum("qtemp_A.in")
-        #     traj_monoA.write("qchem_monoA.in",ftype="qcin")
-        #     traj_monoB = deepcopy(self.mol)
-        #     traj_monoB.add_quantum("qtemp_B.in")
-        #     traj_monoB.write("qchem_monoB.in",ftype="qcin")
-        #     wq = getWorkQueue()
-        #     if wq == None:
-        #         warn_press_key("To proceed past this point, a Work Queue must be present")
-        #     print "Computing the dielectric energy"
-        #     Diel_D = QChem_Dielectric_Energy("qchem_dimer.in",wq)
-        #     Diel_A = QChem_Dielectric_Energy("qchem_monoA.in",wq)
-        #     # The dielectric energy for a water molecule should never change.
-        #     if hasattr(self,"Diel_B"):
-        #         Diel_B = self.Diel_B
-        #     else:
-        #         Diel_B = QChem_Dielectric_Energy("qchem_monoB.in",self.wq)
-        #         self.Diel_B = Diel_B
-        #     self.Dielectric = Diel_D - Diel_A - Diel_B
-        # M += self.Dielectric
-
-class Vibration_GMX(Vibration):
-
-    """Subclass of Target for vibrational frequency matching
-    using GROMACS.  Provides optimized geometry, vibrational frequencies (in cm-1),
-    and eigenvectors."""
-
+class Moments_GMX(Moments):
+    """ Multipole moment matching using GROMACS. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="conf.gro")
+        self.set_option(tgt_opts,'gmx_top',default="topol.top")
+        self.set_option(tgt_opts,'gmx_mdp',default="shot.mdp")
+        self.engine_ = GMX
+        ## Initialize base class.
+        super(Moments_GMX,self).__init__(options,tgt_opts,forcefield)
+    
+class Vibration_GMX(Vibration):
+    """ Vibrational frequency matching using GROMACS. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="conf.gro")
+        self.engine_ = GMX
         ## Initialize base class.
         super(Vibration_GMX,self).__init__(options,tgt_opts,forcefield)
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-        ## Create engine object.
-        self.engine = GMX(target=self, **engine_args)

@@ -162,7 +162,8 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     bar = sym + bar + sym
     #bar = ''.join([sym for i in range(width + 8)])
     logger.info('\r'+bar + '\n')
-    for line in text:
+    for ln, line in enumerate(text):
+        if type(center) is list: center = center[ln]
         if center:
             padleft = ' ' * ((width - newlen(line)) / 2)
         else:

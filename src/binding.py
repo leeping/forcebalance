@@ -6,6 +6,7 @@
 
 import os
 import shutil
+import numpy as np
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
@@ -15,7 +16,6 @@ from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import OrderedDict
 from multiprocessing import Pool
-from simtk.unit import *
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -132,22 +132,45 @@ class BindingEnergy(Target):
                 if opt not in self.inter_opts[inter]:
                     self.inter_opts[inter][opt] = self.global_opts[opt]
         for inter in self.inter_opts:
-            self.inter_opts[inter]['reference_physical'] = self.inter_opts[inter]['energy'] * eval(self.inter_opts[inter]['energy_unit'])
+            if 'energy_unit' in self.inter_opts[inter] and self.inter_opts[inter]['energy_unit'].lower() not in ['kilocalorie_per_mole', 'kilocalories_per_mole']:
+                raise RuntimeError('Usage of physical units is has been removed, please provide all binding energies in kcal/mole')
+            self.inter_opts[inter]['reference_physical'] = self.inter_opts[inter]['energy']
 
         if tgt_opts['energy_denom'] == 0.0:
-            self.set_option(None, None, 'energy_denom', val=np.std(np.array([val['reference_physical'].value_in_unit(kilocalories_per_mole) for val in self.inter_opts.values()])))
+            self.set_option(None, None, 'energy_denom', val=np.std(np.array([val['reference_physical'] for val in self.inter_opts.values()])))
         else:
             self.set_option(None, None, 'energy_denom', val=tgt_opts['energy_denom'])
 
         self.set_option(None, None, 'rmsd_denom', val=tgt_opts['rmsd_denom'])
 
-        self.set_option(tgt_opts,'cauchy','cauchy')
+        self.set_option(tgt_opts,'cauchy')
+        self.set_option(tgt_opts,'attenuate')
 
         logger.info("The energy denominator is: %s\n" % str(self.energy_denom)) 
         logger.info("The RMSD denominator is: %s\n" % str(self.rmsd_denom))
 
         if self.cauchy:
-            logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
+            logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( denom**2 + reference**2 )\n")
+            if self.attenuate:
+                raise Exception('attenuate and cauchy are mutually exclusive')
+        elif self.attenuate:
+            logger.info("Repulsive interactions beyond energy_denom will be scaled by 1.0 / ( denom**2 + (reference-denom)**2 )\n")
+        ## Build keyword dictionaries to pass to engine.
+        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        del engine_args['name']
+        ## Create engine objects.
+        self.engines = OrderedDict()
+        for sysname,sysopt in self.sys_opts.items():
+            M = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']))
+            if 'select' in sysopt:
+                atomselect = np.array(uncommadash(sysopt['select']))
+                M = M.atom_select(atomselect)
+            if self.FF.rigid_water: M.rigid_water()
+            self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, tinker_key=os.path.join(sysopt['keyfile']), **engine_args)
+
+    def system_driver(self, sysname):
+        opts = self.sys_opts[sysname]
+        return self.engines[sysname].energy_rmsd(optimize = (opts['optimize'] if 'optimize' in opts else False))
 
     def indicate(self):
         printcool_dictionary(self.PrintDict,title="Interaction Energies (kcal/mol), Objective = % .5e\n %-20s %9s %9s %9s %11s" % 
@@ -179,10 +202,16 @@ class BindingEnergy(Target):
                 Calculated_ = eval(self.inter_opts[inter_]['equation'])
                 Reference_ = self.inter_opts[inter_]['reference_physical']
                 Delta_ = Calculated_ - Reference_
+                Denom_ = self.energy_denom
                 if self.cauchy:
-                    Divisor_ = np.sqrt(self.energy_denom**2 + Reference_**2)
+                    Divisor_ = np.sqrt(Denom_**2 + Reference_**2)
+                elif self.attenuate:
+                    if Reference_ < Denom_:
+                        Divisor_ = Denom_
+                    else:
+                        Divisor_ = np.sqrt(Denom_**2 + (Reference_-Denom_)**2)
                 else:
-                    Divisor_ = self.energy_denom
+                    Divisor_ = Denom_
                 DeltaNrm_ = Delta_ / Divisor_
                 w_ = self.inter_opts[inter_]['weight'] if 'weight' in self.inter_opts[inter_] else 1.0
                 VectorE_.append(np.sqrt(w_)*DeltaNrm_)

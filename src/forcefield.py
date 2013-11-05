@@ -219,9 +219,9 @@ class FF(forcebalance.BaseClass):
         ## Whether to constrain the charges.
         self.set_option(options,'logarithmic_map')
         ## Switch for AMOEBA direct or mutual.
-        self.set_option(options, 'amoeba_pol')
+        self.set_option(options, 'amoeba_pol', forceprint=True)
         ## Switch for rigid water molecules
-        self.set_option(options, 'rigid_water')
+        self.set_option(options, 'rigid_water', forceprint=True)
         ## Bypass the transformation and use physical parameters directly
         self.set_option(options, 'use_pvals')
         

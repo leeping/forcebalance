@@ -70,7 +70,7 @@ gen_opts_types = {
                  "readchk"      : (None, -50, 'Name of the restart file we read from', 'Restart jobtype "newton" with "writechk" set'),
                  "writechk"     : (None, -50, 'Name of the restart file we write to (can be same as readchk)', 'Main optimizer'),
                  "ffdir"        : ('forcefield', 100, 'Directory containing force fields, relative to project directory', 'All'),
-                 "amoeba_polarization"        : ('direct', 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_pol"   : ('direct', 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
                  },
     'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.', 
                                    'All (important); choose "single", "gradient", "hessian", "newton" (Main Optimizer), "bfgs", "powell", "simplex", "anneal", "genetic", "conjugategradient", "scan_mvals", "scan_pvals", "fdcheck[gh]"'),
@@ -133,6 +133,8 @@ tgt_opts_types = {
                  "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
                  "inter_txt"             : ('interactions.txt', 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
                  "reassign_modes"        : (None, -180, 'Reassign modes before fitting frequencies, using either linear assignment "permute" or maximum overlap "overlap".', 'Vibrational frequency targets', 'vibration'),
+                 "liquid_coords"         : (None, 0, 'Provide file name for condensed phase coordinates.', 'Condensed phase properties', 'Liquid'),
+                 "gas_coords"            : (None, 0, 'Provide file name for gas phase coordinates.', 'Condensed phase properties', 'Liquid'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
@@ -247,7 +249,8 @@ bkwd = {"simtype" : "type",
         "masterfile" : "inter_txt", 
         "openmm_cuda_precision" : "openmm_precision",
         "mdrun_threads" : "md_threads",
-        "mts_vvvr" : "mts_integrator"}
+        "mts_vvvr" : "mts_integrator",
+        "amoeba_polarization" : "amoeba_pol"}
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]
