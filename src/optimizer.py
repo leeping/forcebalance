@@ -173,14 +173,14 @@ class Optimizer(forcebalance.BaseClass):
         """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
 
         xk = self.OptTab[self.jobtype]()
-        
-        ## Sometimes the optimizer doesn't return anything (i.e. in the case of a single point calculation)
-        ## In these situations, don't do anything
+
+        ## Don't print a "result" force field if it's the same as the input.
         print_parameters = True
-        if xk == None: 
-            # logger.info("Results will be printed using initial parameters\n")
-            # xk = self.mvals0.copy()
+        if xk == None and (self.mvals0 == np.zeros(self.FF.np)).all(): 
+            logger.info("Parameter file same as original; will not be printed to 'results' folder.\n")
             print_parameters = False
+        elif xk == None:
+            xk = self.mvals0
 
         ## Check derivatives by finite difference after the optimization is over (for good measure)
         check_after = False
@@ -197,16 +197,18 @@ class Optimizer(forcebalance.BaseClass):
             bar = printcool("Final physical parameters:",bold=True,color=4)
             self.FF.print_map(self.FF.create_pvals(xk))
             logger.info(bar)
+            if self.backup:
+                for fnm in self.FF.fnms:
+                    if os.path.exists(os.path.join('result', fnm)):
+                        bak(os.path.join('result', fnm))
             self.FF.make(xk,printdir='result')
             logger.info("\nThe final force field has been written to the 'result' directory.\n")
-        if self.backup:
-            for fnm in self.FF.fnms:
-                if os.path.exists(os.path.join('result', fnm)):
-                    bak(os.path.join('result', fnm))
-        bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
         ## Write out stuff to checkpoint file
         self.writechk()
+
+        ## Print out final message
+        bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
         return xk
 
@@ -933,7 +935,7 @@ class Optimizer(forcebalance.BaseClass):
     def SinglePoint(self):
         """ A single-point objective function computation. """
         data        = self.Objective.Full(self.mvals0,Order=0,verbose=True)
-        printcool("Objective function: %.8f" % data['X'])
+        printcool("Objective Function Single Point: %.8f" % data['X'])
 
     def Gradient(self):
         """ A single-point gradient computation. """

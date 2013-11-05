@@ -300,10 +300,12 @@ def main():
     liquid_nsteps = TgtOptions['liquid_prod_steps']
     liquid_nequil = TgtOptions['liquid_equ_steps']
     liquid_intvl = TgtOptions['liquid_interval']
+    liquid_fnm = TgtOptions['liquid_coords']
     gas_timestep = TgtOptions['gas_timestep']
     gas_nsteps = TgtOptions['gas_prod_steps']
     gas_nequil = TgtOptions['gas_equ_steps']
     gas_intvl = TgtOptions['gas_interval']
+    gas_fnm = TgtOptions['gas_coords']
 
     # Number of threads, multiple timestep integrator, anisotropic box etc.
     threads = TgtOptions.get('md_threads', 1)
@@ -332,30 +334,8 @@ def main():
     #----
     # Loading coordinates
     #----
-    # Find either a coordinate file that matches the pattern "liquid.gro|xyz|pdb"
-    # or a single coordinate file that contains multiple molecules.
-    allfnms = [i for i in os.listdir('.') if (os.path.isfile(i) and any([i.endswith(j) for j in ".gro", ".pdb", ".xyz"]))]
-    liqfnms = ["liquid.gro", "liquid.xyz", "liquid.pdb"]
-    if sum([os.path.exists(i) for i in liqfnms]) == 1:
-        liqfnm = liqfnms[[os.path.exists(i) for i in liqfnms].index(True)]
-    else:
-        nas = [len(Molecule(i).molecules) > 1 for i in allfnms]
-        if sum(nas) > 1:
-            raise IOError('Cannot determine the liquid coordinate file.')
-        liqfnm = allfnms[nas.index(True)]
-    ML = Molecule(liqfnm)
-
-    # Find either a coordinate file that matches the pattern "gas.gro|xyz|pdb"
-    # or a single coordinate file that contains one molecules.
-    gasfnms = ["gas.gro", "gas.xyz", "gas.pdb"]
-    if sum([os.path.exists(i) for i in gasfnms]) == 1:
-        gasfnm = gasfnms[[os.path.exists(i) for i in gasfnms].index(True)]
-    else:
-        nas = [len(Molecule(i).molecules) == 1 for i in allfnms]
-        if sum(nas) > 1:
-            raise IOError('Cannot determine the gas coordinate file.')
-        gasfnm = allfnms[nas.index(True)]
-    MG = Molecule(gasfnm)
+    ML = Molecule(liquid_fnm)
+    MG = Molecule(gas_fnm)
     # Determine the number of molecules in the condensed phase coordinate file.
     NMol = len(ML.molecules)
 
@@ -363,14 +343,22 @@ def main():
     # Setting up MD simulations
     #----
     EngOpts = OrderedDict()
-    EngOpts["liquid"] = OrderedDict([("coords", liqfnm), ("mol", ML), ("pbc", True)])
-    EngOpts["gas"] = OrderedDict([("coords", gasfnm), ("mol", MG), ("pbc", False)])
+    EngOpts["liquid"] = OrderedDict([("coords", liquid_fnm), ("mol", ML), ("pbc", True)])
+    EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
     GenOpts = OrderedDict()
     if engname == "openmm":
+        GenOpts["mmopts"] = {}
         # OpenMM-specific options
         GenOpts["ffxml"] = FF.openmmxml
+        GenOpts["rigid_water"] = FF.rigid_water
         EngOpts["liquid"]["openmm_platform"] = 'CUDA'
         EngOpts["gas"]["openmm_platform"] = 'Reference'
+        # The force field object tells us if we're using direct polarization
+        if FF.amoeba_pol == 'mutual':
+            GenOpts["mmopts"].setdefault('polarization', 'mutual')
+            GenOpts["mmopts"].setdefault('mutualInducedTargetEpsilon', 1e-6)
+        elif FF.amoeba_pol == 'direct':
+            GenOpts["mmopts"].setdefault('polarization', 'direct')
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
@@ -379,18 +367,18 @@ def main():
         # Gromacs-specific options
         GenOpts["gmxpath"] = TgtOptions["gmxpath"]
         GenOpts["gmxsuffix"] = TgtOptions["gmxsuffix"]
-        EngOpts["liquid"]["gmx_top"] = os.path.splitext(liqfnm)[0] + ".top"
-        EngOpts["liquid"]["gmx_mdp"] = os.path.splitext(liqfnm)[0] + ".mdp"
-        EngOpts["gas"]["gmx_top"] = os.path.splitext(gasfnm)[0] + ".top"
-        EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gasfnm)[0] + ".mdp"
+        EngOpts["liquid"]["gmx_top"] = os.path.splitext(liquid_fnm)[0] + ".top"
+        EngOpts["liquid"]["gmx_mdp"] = os.path.splitext(liquid_fnm)[0] + ".mdp"
+        EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
+        EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gas_fnm)[0] + ".mdp"
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
         if mts: logger.warn("Gromacs not configured for multiple timestep integrator.")
         if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")
     elif engname == "tinker":
         # Tinker-specific options
         GenOpts["tinkerpath"] = TgtOptions["tinkerpath"]
-        EngOpts["liquid"]["tinker_key"] = os.path.splitext(liqfnm)[0] + ".key"
-        EngOpts["gas"]["tinker_key"] = os.path.splitext(gasfnm)[0] + ".key"
+        EngOpts["liquid"]["tinker_key"] = os.path.splitext(liquid_fnm)[0] + ".key"
+        EngOpts["gas"]["tinker_key"] = os.path.splitext(gas_fnm)[0] + ".key"
         GenOpts["tinkerprm"] = FF.tinkerprm
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
         if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
@@ -405,8 +393,8 @@ def main():
                                     ("temperature", temperature), ("pressure", pressure),
                                     ("nequil", liquid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
-                                    ("verbose", True), ("threads", threads), 
-                                    ("anisotropic", anisotropic), ("mts", mts)])
+                                    ("verbose", True), (save_traj, TgtOptions['save_traj']), 
+                                    ("threads", threads), ("anisotropic", anisotropic), ("mts", mts)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
                                  ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1)])

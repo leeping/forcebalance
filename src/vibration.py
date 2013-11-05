@@ -53,9 +53,11 @@ class Vibration(Target):
         self.vfnm = os.path.join(self.tgtdir,"vdata.txt")
         ## Read in the reference data
         self.read_reference_data()
-        ## Prepare the temporary directory
-        self.prepare_temp_directory(options,tgt_opts)
-
+        ## Build keyword dictionaries to pass to engine.
+        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        del engine_args['name']
+        ## Create engine object.
+        self.engine = self.engine_(target=self, **engine_args)
         if self.FF.rigid_water:
             raise Exception('This class cannot be used with rigid water molecules.')
 
@@ -99,10 +101,6 @@ class Vibration(Target):
             v2 /= np.linalg.norm(v2)
         return
 
-    def prepare_temp_directory(self, options, tgt_opts):
-        """ Prepare the temporary directory, by default does nothing """
-        return
-        
     def indicate(self):
         """ Print qualitative indicator. """
         # if self.reassign == 'overlap' : count_assignment(self.c2r)

@@ -142,25 +142,22 @@ class AbInitio(Target):
             self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
         ## The number of (atoms + drude particles + virtual sites)
         self.nparticles  = len(self.mol.elem)
-        ## This is a default-dict containing a number of atom-wise lists, such as the
-        ## residue number of each atom, the mass of each atom, and so on.
-        self.AtomLists = defaultdict(list)
-        ## Read in the topology
-        self.read_topology()
+        ## Build keyword dictionaries to pass to engine.
+        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        del engine_args['name']
+        ## Create engine object.
+        self.engine = self.engine_(target=self, mol=self.mol, **engine_args)
+        ## Lists of atoms to do net force/torque fitting and excluding virtual sites.
+        self.AtomLists = self.engine.AtomLists
+        self.AtomMask = self.engine.AtomMask
         ## Read in the reference data
         self.read_reference_data()
-        ## Prepare the temporary directory
-        self.prepare_temp_directory(options,tgt_opts)
         ## The below two options are related to whether we want to rebuild virtual site positions.
         ## Rebuild the distance matrix if virtual site positions have changed
         self.new_vsites = True
         ## Save the mvals from the last time we updated the vsites.
         self.save_vmvals = {}
         self.set_option(None, 'shots', val=self.ns)
-
-    def read_topology(self):
-        # Arthur: Document this.
-        self.topology_flag = False
 
     def build_invdist(self, mvals):
         for i in range(self.FF.np):
@@ -196,8 +193,6 @@ class AbInitio(Target):
         # to an array of (3 * (n_forces + n_torques)) net forces and torques.
         # This code is rather slow.  It requires the system to have a list
         # of masses and blocking numbers.
-        if not self.topology_flag:
-            raise Exception('Cannot do net forces and torques for class %s because read_topology is not implemented' % self.__class__.__name__)
         
         if self.force_map == 'molecule' and 'MoleculeNumber' in self.AtomLists:
             Block = self.AtomLists['MoleculeNumber']
@@ -403,10 +398,6 @@ class AbInitio(Target):
         else:
             self.fref = self.fqm
 
-    def prepare_temp_directory(self, options, tgt_opts):
-        """ Prepare the temporary directory, by default does nothing """
-        return
-        
     def indicate(self):
         Headings = ["Physical Variable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference"]
         Data = OrderedDict([])
@@ -553,11 +544,13 @@ class AbInitio(Target):
         #======================================#
         #   Copied from the old ForTune code   #
         #======================================#
-        fat  = self.fitatoms
-        NC   = 3*fat
-        NCP1 = 3*fat+1
+        nat  = self.fitatoms
+        nnf  = self.nnf
+        ntq  = self.ntq
+        NC   = 3*nat
+        NCP1 = 3*nat+1
         if self.use_nft:
-            NCP1 += 3*(self.nnf + self.ntq)
+            NCP1 += 3*(nnf + ntq)
         NP   = self.FF.np
         NS   = self.ns
         #==============================================================#
@@ -690,22 +683,25 @@ class AbInitio(Target):
             if not cv:
                 X     = M-Q
             # Increment the average values.
+            a = 1
             if self.force:
-                dfrcarray = np.mean(np.array([np.linalg.norm(M[1+3*j:1+3*j+3] - Q[1+3*j:1+3*j+3]) for j in range(fat)]))
-                qfrcarray = np.mean(np.array([np.linalg.norm(Q[1+3*j:1+3*j+3]) for j in range(fat)]))
+                dfrcarray = np.mean(np.array([np.linalg.norm(M[a+3*j:a+3*j+3] - Q[a+3*j:a+3*j+3]) for j in range(nat)]))
+                qfrcarray = np.mean(np.array([np.linalg.norm(Q[a+3*j:a+3*j+3]) for j in range(nat)]))
                 dF_M    += P*dfrcarray
                 dF_Q    += R*dfrcarray
                 qF_M    += P*qfrcarray
                 qF_Q    += R*qfrcarray
+                a       += 3*nat
                 if self.use_nft:
-                    dnfrcarray = np.mean(np.array([np.linalg.norm(M[1+3*fat+3*j:1+3*fat+3*j+3] - Q[1+3*fat+3*j:1+3*fat+3*j+3]) for j in range(self.nnf)]))
-                    qnfrcarray = np.mean(np.array([np.linalg.norm(Q[1+3*fat+3*j:1+3*fat+3*j+3]) for j in range(self.nnf)]))
+                    dnfrcarray = np.mean(np.array([np.linalg.norm(M[a+3*j:a+3*j+3] - Q[a+3*j:a+3*j+3]) for j in range(nnf)]))
+                    qnfrcarray = np.mean(np.array([np.linalg.norm(Q[a+3*j:a+3*j+3]) for j in range(nnf)]))
                     dN_M    += P*dnfrcarray
                     dN_Q    += R*dnfrcarray
                     qN_M    += P*qnfrcarray
                     qN_Q    += R*qnfrcarray
-                    dtrqarray = np.mean(np.array([np.linalg.norm(M[1+3*fat+3*self.nnf+3*j:1+3*fat+3*self.nnf+3*j+3] - Q[1+3*fat+3*self.nnf+3*j:1+3*fat+3*self.nnf+3*j+3]) for j in range(self.ntq)]))
-                    qtrqarray = np.mean(np.array([np.linalg.norm(Q[1+3*fat+3*self.nnf+3*j:1+3*fat+3*self.nnf+3*j+3]) for j in range(self.ntq)]))
+                    a       += 3*nnf
+                    dtrqarray = np.mean(np.array([np.linalg.norm(M[a+3*j:a+3*j+3] - Q[a+3*j:a+3*j+3]) for j in range(ntq)]))
+                    qtrqarray = np.mean(np.array([np.linalg.norm(Q[a+3*j:a+3*j+3]) for j in range(ntq)]))
                     dT_M    += P*dtrqarray
                     dT_Q    += R*dtrqarray
                     qT_M    += P*qtrqarray
@@ -794,8 +790,8 @@ class AbInitio(Target):
             QMTraj = self.mol[:].atom_select(TrueAtoms)
             Mforce_obj = QMTraj[:]
             Qforce_obj = QMTraj[:]
-            Mforce_print = np.array(M_all_print[:,1:3*fat+1])
-            Qforce_print = np.array(Q_all_print[:,1:3*fat+1])
+            Mforce_print = np.array(M_all_print[:,1:3*nat+1])
+            Qforce_print = np.array(Q_all_print[:,1:3*nat+1])
             Dforce_norm = np.array([np.linalg.norm(Mforce_print[i,:] - Qforce_print[i,:]) for i in range(NS)])
             MaxComp = np.max(np.abs(np.vstack((Mforce_print,Qforce_print)).flatten()))
             Mforce_print /= MaxComp
@@ -803,8 +799,8 @@ class AbInitio(Target):
             for i in range(NS):
                 Mforce_obj.xyzs[i] = Mforce_print[i, :].reshape(-1,3)
                 Qforce_obj.xyzs[i] = Qforce_print[i, :].reshape(-1,3)
-            if fat < self.qmatoms:
-                Fpad = np.zeros((self.qmatoms - fat, 3))
+            if nat < self.qmatoms:
+                Fpad = np.zeros((self.qmatoms - nat, 3))
                 Mforce_obj.xyzs[i] = np.vstack((Mforce_obj.xyzs[i], Fpad))
                 Qforce_obj.xyzs[i] = np.vstack((Qforce_obj.xyzs[i], Fpad))
             if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
@@ -843,18 +839,18 @@ class AbInitio(Target):
             WM      = np.zeros((NCP1,NCP1))
             WM[0,0] = np.sqrt(EWt)
             start   = 1
-            block   = 3*fat
+            block   = 3*nat
             end     = start + block
             for i in range(start, end):
                 WM[i, i] = np.sqrt(FWt / block)
             if self.use_nft:
                 start   = end
-                block   = 3*self.nnf
+                block   = 3*nnf
                 end     = start + block
                 for i in range(start, end):
                     WM[i, i] = np.sqrt(NWt / block)
                 start   = end
-                block   = 3*self.ntq
+                block   = 3*ntq
                 end     = start + block
                 for i in range(start, end):
                     WM[i, i] = np.sqrt(TWt / block)
@@ -863,16 +859,16 @@ class AbInitio(Target):
             WM[0] = np.sqrt(EWt)
             if self.force:
                 start   = 1
-                block   = 3*fat
+                block   = 3*nat
                 end     = start + block
                 WM[start:end] = np.sqrt(FWt / block)
                 if self.use_nft:
                     start   = end
-                    block   = 3*self.nnf
+                    block   = 3*nnf
                     end     = start + block
                     WM[start:end] = np.sqrt(NWt / block)
                     start   = end
-                    block   = 3*self.ntq
+                    block   = 3*ntq
                     end     = start + block
                     WM[start:end] = np.sqrt(TWt / block)
         if cv:

@@ -56,8 +56,11 @@ class Moments(Target):
         self.ref_moments = OrderedDict()
         ## Read in the reference data
         self.read_reference_data()
-        ## Prepare the temporary directory
-        self.prepare_temp_directory(options,tgt_opts)
+        ## Build keyword dictionaries to pass to engine.
+        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        del engine_args['name']
+        ## Create engine object.
+        self.engine = self.engine_(target=self, **engine_args)
 
     def read_reference_data(self):
         """ Read the reference data from a file. """
@@ -127,10 +130,6 @@ class Moments(Target):
 
         return
 
-    def prepare_temp_directory(self, options, tgt_opts):
-        """ Prepare the temporary directory. """
-        return
-        
     def indicate(self):
         """ Print qualitative indicator. """
         logger.info("\rTarget: %-15s\n" % self.name)
@@ -167,13 +166,13 @@ class Moments(Target):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         def get_momvals(mvals_):
             self.FF.make(mvals_)
-            moments = self.moments_driver()
+            moments = self.engine.multipole_moments(polarizability='polarizability' in self.ref_moments)
             # Unpack from dictionary.
             return self.unpack_moments(moments)
 
         self.FF.make(mvals)
         ref_momvals = self.unpack_moments(self.ref_moments)
-        calc_moments = self.moments_driver()
+        calc_moments = self.engine.multipole_moments(polarizability='polarizability' in self.ref_moments)
         calc_momvals = self.unpack_moments(calc_moments)
 
         D = calc_momvals - ref_momvals

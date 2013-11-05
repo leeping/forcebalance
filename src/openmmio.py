@@ -7,8 +7,10 @@
 import os
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
+from forcebalance.binding import BindingEnergy
 from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
+from forcebalance.moments import Moments
 import networkx as nx
 import numpy as np
 import sys
@@ -380,70 +382,6 @@ class OpenMM_Reader(BaseReader):
             logger.info("Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
             return "/".join([InteractionType, parameter])
 
-class Liquid_OpenMM(Liquid):
-    def __init__(self,options,tgt_opts,forcefield):
-        super(Liquid_OpenMM,self).__init__(options,tgt_opts,forcefield)
-        # Time interval (in ps) for writing coordinates
-        self.set_option(tgt_opts,'force_cuda',forceprint=True)
-        # Enable multiple timestep integrator
-        self.set_option(tgt_opts,'mts_vvvr',forceprint=True)
-        # Set up for polarization correction
-        if self.do_self_pol:
-            self.mpdb = PDBFile(os.path.join(self.root,self.tgtdir,"gas.pdb"))
-            forcefield = ForceField(os.path.join(self.root,options['ffdir'],self.FF.openmmxml))
-            mod = Modeller(self.mpdb.topology, self.mpdb.positions)
-            mod.addExtraParticles(forcefield)
-            system = forcefield.createSystem(mod.topology,rigidWater=self.FF.rigid_water)
-            SetAmoebaVirtualExclusions(system)
-            # Create the simulation; we're not actually going to use the integrator
-            integrator = LangevinIntegrator(300*kelvin, 1/picosecond, 0.002*picoseconds)
-            # Create a Reference platform (this will be faster than CUDA since it's small)
-            self.platform = Platform.getPlatformByName('Reference')
-            # Create the simulation object
-            self.msim = Simulation(mod.topology, system, integrator, self.platform)
-        # I shall enable starting simulations for many different initial conditions.
-        self.liquid_fnm = "liquid.pdb"
-        self.liquid_conf = Molecule(os.path.join(self.root, self.tgtdir,"liquid.pdb"))
-        self.liquid_mol = None
-        self.gas_fnm = "gas.pdb"
-        if os.path.exists(os.path.join(self.root, self.tgtdir,"all.gro")):
-            self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir,"all.gro"))
-            logger.info("Found collection of starting conformations, length %i!\n" % len(self.liquid_mol))
-        # Prefix to command string for launching NPT simulations.
-        self.nptpfx += "bash runcuda.sh"
-        # List of extra files to upload to Work Queue.
-        self.nptfiles += ['runcuda.sh']
-        # MD engine argument supplied to command string for launching NPT simulations.
-        self.engine = "openmm"
-
-    def prepare_temp_directory(self,options,tgt_opts):
-        """ Prepare the temporary directory by copying in important files. """
-        abstempdir = os.path.join(self.root,self.tempdir)
-        # The liquid.pdb file is not written here.
-        LinkFile(os.path.join(self.root,self.tgtdir,"gas.pdb"),os.path.join(abstempdir,"gas.pdb"))
-        LinkFile(os.path.join(os.path.split(__file__)[0],"data","runcuda.sh"),os.path.join(abstempdir,"runcuda.sh"))
-        LinkFile(os.path.join(os.path.split(__file__)[0],"data","npt.py"),os.path.join(abstempdir,"npt.py"))
-
-    def polarization_correction(self,mvals):
-        self.FF.make(mvals)
-        ff = ForceField(self.FF.openmmxml)
-        mod = Modeller(self.mpdb.topology, self.mpdb.positions)
-        mod.addExtraParticles(ff)
-        system = ff.createSystem(mod.topology, rigidWater=self.FF.rigid_water)
-        # SetAmoebaVirtualExclusions(system)
-        UpdateSimulationParameters(system, self.msim)
-        self.msim.context.setPositions(mod.getPositions())
-        self.msim.minimizeEnergy()
-        pos = self.msim.context.getState(getPositions=True).getPositions()
-        pos = ResetVirtualSites(pos, system)
-        d = get_dipole(self.msim, positions=pos)
-        if not in_fd():
-            logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
-        dd2 = ((np.linalg.norm(d)-self.self_pol_mu0)*debye)**2
-        eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
-        epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*np.pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
-        return epol
-
 class OpenMM(Engine):
 
     """ Derived from Engine object for carrying out general purpose OpenMM calculations. """
@@ -542,7 +480,7 @@ class OpenMM(Engine):
             self.forcefield = ForceField(self.ffxml)
 
         ## OpenMM options for setting up the System.
-        self.mmopts = mmopts
+        self.mmopts = dict(mmopts)
 
         ## Are we using AMOEBA?
         self.AMOEBA = any(['Amoeba' in f.__class__.__name__ for f in self.forcefield._forces])
@@ -551,29 +489,30 @@ class OpenMM(Engine):
         if hasattr(self,'target'):
             if self.AMOEBA:
                 if self.target.FF.amoeba_pol == 'mutual':
-                    self.mmopts['mutualInducedTargetEpsilon'] = 1e-6
+                    self.mmopts['polarization'] = 'mutual'
+                    self.mmopts.setdefault('mutualInducedTargetEpsilon', 1e-6)
                 elif self.target.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.target.FF.rigid_water
         elif self.AMOEBA:
-            self.mmopts['mutualInducedTargetEpsilon'] = 1e-6
+            self.mmopts.setdefault('mutualInducedTargetEpsilon', 1e-6)
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
         if pbc:
-            self.mmopts['nonbondedMethod'] = PME
+            self.mmopts.setdefault('nonbondedMethod', PME)
             if self.AMOEBA:
-                self.mmopts['nonbondedCutoff'] = 0.7*nanometer
-                self.mmopts['vdwCutoff'] = 0.85
-                self.mmopts['aEwald'] = 5.4459052
-                self.mmopts['pmeGridDimensions'] = [24,24,24]
+                self.mmopts.setdefault('nonbondedCutoff', 0.7*nanometer)
+                self.mmopts.setdefault('vdwCutoff', 0.85)
+                self.mmopts.setdefault('aEwald', 5.4459052)
+                self.mmopts.setdefault('pmeGridDimensions', [24,24,24])
             else:
-                self.mmopts['nonbondedCutoff'] = 0.85*nanometer
-                self.mmopts['useSwitchingFunction'] = True
-                self.mmopts['switchingDistance'] = 0.75*nanometer
-            self.mmopts['useDispersionCorrection'] = True
+                self.mmopts.setdefault('nonbondedCutoff', 0.85*nanometer)
+                self.mmopts.setdefault('useSwitchingFunction', True)
+                self.mmopts.setdefault('switchingDistance', 0.75*nanometer)
+            self.mmopts.setdefault('useDispersionCorrection', True)
         else:
-            self.mmopts['nonbondedMethod'] = NoCutoff
+            self.mmopts.setdefault('nonbondedMethod', NoCutoff)
             self.mmopts['removeCMMotion'] = False
 
         ## Generate OpenMM-compatible positions
@@ -586,9 +525,11 @@ class OpenMM(Engine):
             mod.addExtraParticles(self.forcefield)
             if self.pbc:
                 # Obtain the periodic box
-                box_omm = [Vec3(*self.mol.boxes[I].A)*angstrom, 
-                           Vec3(*self.mol.boxes[I].B)*angstrom, 
-                           Vec3(*self.mol.boxes[I].C)*angstrom]
+                if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
+                    raise RuntimeError('OpenMM cannot handle nonorthogonal boxes.')
+                box_omm = [Vec3(self.mol.boxes[I].a, 0, 0)*angstrom, 
+                           Vec3(0, self.mol.boxes[I].b, 0)*angstrom, 
+                           Vec3(0, 0, self.mol.boxes[I].c)*angstrom]
             else:
                 box_omm = None
             # Finally append it to list.
@@ -626,6 +567,7 @@ class OpenMM(Engine):
         ## Create the system object.
         mod = Modeller(self.pdb.topology, self.pdb.positions)
         mod.addExtraParticles(self.forcefield)
+        # printcool_dictionary(self.mmopts, title="OpenMM system options for Engine %s" % self.name)
         self.system = self.forcefield.createSystem(mod.topology, **self.mmopts)
 
         ## Determine the integrator.
@@ -648,7 +590,7 @@ class OpenMM(Engine):
                                                          temperature*kelvin, nbarostat)
             else:
                 barostat = MonteCarloBarostat(pressure*atmospheres, temperature*kelvin, nbarostat)
-        if self.pbc and pressure: system.addForce(barostat)
+        if self.pbc and pressure: self.system.addForce(barostat)
         elif pressure: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
@@ -663,10 +605,10 @@ class OpenMM(Engine):
         self.simulation = Simulation(mod.topology, self.system, integrator, self.platform)
         
         ## Print platform properties.
-        logger.info("I'm using the platform %s\n" % self.simulation.context.getPlatform().getName())
-        printcool_dictionary({i:self.simulation.context.getPlatform().getPropertyValue(self.simulation.context,i) \
-                                  for i in self.simulation.context.getPlatform().getPropertyNames()}, \
-                                 title="Platform %s has properties:" % self.simulation.context.getPlatform().getName())
+        # logger.info("I'm using the platform %s\n" % self.simulation.context.getPlatform().getName())
+        # printcool_dictionary({i:self.simulation.context.getPlatform().getPropertyValue(self.simulation.context,i) \
+        #                           for i in self.simulation.context.getPlatform().getPropertyNames()}, \
+        #                          title="Platform %s has properties:" % self.simulation.context.getPlatform().getName())
 
     def update_simulation(self, **kwargs):
 
@@ -703,7 +645,7 @@ class OpenMM(Engine):
         #----
         self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
         if self.pbc:
-            simulation.context.setPeriodicBoxVectors(*xyz_omms[shot][1])
+            self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
@@ -883,7 +825,7 @@ class OpenMM(Engine):
 
         return (D - A - B) / 4.184
 
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, writexyz=False, verbose=False, **kwargs):
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, save_traj=False, verbose=False, **kwargs):
         
         """
         Method for running a molecular dynamics simulation.  
@@ -994,7 +936,7 @@ class OpenMM(Engine):
         else:
             if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
         if writexyz:
-            self.simulation.reporters.append(DCDReporter('dynamics.dcd', nsteps))
+            self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsteps))
         for iteration in range(isteps):
             # Propagate dynamics.
             self.simulation.step(nsave)
@@ -1011,7 +953,7 @@ class OpenMM(Engine):
                 box_vectors = None
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            self.xyz_omms.append(state.getPositions(), box_vectors)
+            self.xyz_omms.append([state.getPositions(), box_vectors])
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1038,50 +980,75 @@ class OpenMM(Engine):
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
         return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps
 
+class Liquid_OpenMM(Liquid):
+    """ Condensed phase property matching using OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        # Time interval (in ps) for writing coordinates
+        self.set_option(tgt_opts,'force_cuda',forceprint=True)
+        # Enable multiple timestep integrator
+        self.set_option(tgt_opts,'mts_integrator',forceprint=True)
+        # OpenMM precision
+        self.set_option(tgt_opts,'openmm_precision','precision',default="mixed")
+        # OpenMM platform
+        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA")
+        # Name of the liquid coordinate file.
+        self.set_option(tgt_opts,'liquid_coords',default='liquid.pdb',forceprint=True)
+        # Name of the gas coordinate file.
+        self.set_option(tgt_opts,'gas_coords',default='gas.pdb',forceprint=True)
+        # Class for creating engine object.
+        self.engine_ = OpenMM
+        # Name of the engine to pass to npt.py.
+        self.engname = "openmm"
+        # Command prefix.
+        self.nptpfx = "bash runcuda.sh"
+        # Extra files to be linked into the temp-directory.
+        self.nptfiles = []
+        # Set some options for the polarization correction calculation.
+        self.gas_engine_args = {}
+        # Scripts to be copied from the ForceBalance installation directory.
+        self.scripts = ['runcuda.sh']
+        # Initialize the base class.
+        super(Liquid_OpenMM,self).__init__(options,tgt_opts,forcefield)
+        # Send back the trajectory file.
+        if self.save_traj > 0:
+            self.extra_output = ['liquid-md.dcd']
+
 class AbInitio_OpenMM(AbInitio):
-
-    """Subclass of AbInitio for force and energy matching
-    using OpenMM.  Implements the prepare and energy_force_driver
-    methods.  The get method is in the superclass.  """
-
+    """ Force and energy matching using OpenMM. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'pdb',default="conf.pdb")
         self.set_option(tgt_opts,'coords',default="all.gro")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double")
         self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA")
+        self.engine_ = OpenMM
         ## Initialize base class.
         super(AbInitio_OpenMM,self).__init__(options,tgt_opts,forcefield)
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-        ## Create engine object.
-        self.engine = OpenMM(target=self, **engine_args)
-        self.AtomLists = self.engine.AtomLists
-        self.AtomMask = self.engine.AtomMask
 
-    def energy_force_driver_all(self):
-        return self.engine.energy_force()
+class BindingEnergy_OpenMM(BindingEnergy):
+    """ Binding energy matching using OpenMM. """
+
+    def __init__(self,options,tgt_opts,forcefield):
+        self.engine_ = OpenMM
+        ## Initialize base class.
+        super(BindingEnergy_OpenMM,self).__init__(options,tgt_opts,forcefield)
 
 class Interaction_OpenMM(Interaction):
-
-    """Subclass of Target for interaction matching using OpenMM. """
-
+    """ Interaction matching using OpenMM. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="all.pdb")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double")
         self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA")
+        self.engine_ = OpenMM
         ## Initialize base class.
         super(Interaction_OpenMM,self).__init__(options,tgt_opts,forcefield)
-        ## Build keyword dictionaries to pass to engine.
-        engine_args = deepcopy(self.__dict__)
-        engine_args.update(options)
-        del engine_args['name']
-        ## Create engine object.
-        self.engine = OpenMM(target=self, **engine_args)
 
-    def interaction_driver_all(self,dielectric=False):
-        return self.engine.interaction_energy(self.select1, self.select2)
-
+class Moments_OpenMM(Moments):
+    """ Multipole moment matching using OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.engine_ = OpenMM
+        ## Initialize base class.
+        super(Moments_OpenMM,self).__init__(options,tgt_opts,forcefield)

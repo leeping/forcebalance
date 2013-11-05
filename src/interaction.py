@@ -80,11 +80,12 @@ class Interaction(Target):
             self.ns = len(self.mol)
         else:
             self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
+        ## Build keyword dictionaries to pass to engine.
+        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        del engine_args['name']
+        self.engine = self.engine_(target=self, mol=self.mol, **engine_args)
         ## Read in the reference data
         self.read_reference_data()
-        ## Prepare the temporary directory
-        self.prepare_temp_directory(options,tgt_opts)
-
         logger.info("The energy denominator is: %s kcal/mol\n"  % str(self.energy_denom))
         denom = self.energy_denom
         # Create the denominator.
@@ -134,10 +135,6 @@ class Interaction(Target):
         self.eqm = np.array(self.eqm)
         self.eqm *= (eqcgmx / 4.184)
 
-    def prepare_temp_directory(self, options, tgt_opts):
-        """ Prepare the temporary directory, by default does nothing """
-        return
-        
     def indicate(self):
         if len(self.label) == self.ns:
             PrintDict = OrderedDict()
@@ -164,7 +161,7 @@ class Interaction(Target):
         def callM(mvals_, dielectric=False):
             logger.info("\r")
             pvals = self.FF.make(mvals_)
-            return self.interaction_driver_all(dielectric)
+            return self.engine.interaction_energy(self.select1, self.select2)
 
         logger.info("Executing\r")
         emm = callM(mvals)

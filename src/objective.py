@@ -22,12 +22,6 @@ except:
     logger.warning("Gromacs module import failed\n")
 
 try:
-    from forcebalance.gmxqpio import Monomer_QTPIE
-except:
-    logger.warning(traceback.format_exc())
-    logger.warning("QTPIE Monomer module import failed\n")
-
-try:
     from forcebalance.tinkerio import AbInitio_TINKER, Vibration_TINKER, BindingEnergy_TINKER, Moments_TINKER, Interaction_TINKER, Liquid_TINKER
 except:
     logger.warning(traceback.format_exc())
@@ -89,7 +83,6 @@ Implemented_Targets = {
     'INTERACTION_OPENMM':Interaction_OpenMM,
     'BINDINGENERGY_TINKER':BindingEnergy_TINKER,
     'MOMENTS_TINKER':Moments_TINKER,
-    'MONOMER_QTPIE':Monomer_QTPIE,
     'REMOTE_TARGET':RemoteTarget,
     }
 

@@ -353,7 +353,7 @@ class Target(forcebalance.BaseClass):
         @param footnote Optional footnote line, which will be printed at the bottom.
         
         """
-        tline="Target: %s Type: %s Objective = %.5e" % (self.name, self.__class__.__name__, self.objective)
+        tline="Target: %s  Type: %s  Objective = %.5e" % (self.name, self.__class__.__name__, self.objective)
         nc = len(headings)
         if banner != None:
             tlines = [banner, tline]
@@ -380,8 +380,8 @@ class Target(forcebalance.BaseClass):
                 cwidths[n+1] = max(cwidths[n+1], len(str(f)))
         for i in range(1, len(cwidths)):
             cwidths[i] += 2
-        if cwidths[0] < 25:
-            cwidths[0] = 25
+        if cwidths[0] < 15:
+            cwidths[0] = 15
         cblocks = [['' for i in range(max(crows) - len(cname.split('\n')))] + cname.split('\n') for cnum, cname in enumerate(headings)]
         # The formatting line consisting of variable column widths
         fline = ' '.join("%%%s%is" % (("-" if i==0 else ""), j) for i, j in enumerate(cwidths))
@@ -389,7 +389,7 @@ class Target(forcebalance.BaseClass):
         clines = [fline % (tuple(cblocks[j][i] for j in range(nc))) for i in range(max(crows))]
         tlines += clines
         PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
-        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=False, leftpad=4, color=color)
+        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=[i==0 for i in range(len(tlines))], leftpad=4, color=color)
         
 class RemoteTarget(Target):
     def __init__(self,options,tgt_opts,forcefield):
