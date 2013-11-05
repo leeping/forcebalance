@@ -397,6 +397,8 @@ class AbInitio(Target):
             self.fref = np.hstack((self.fqm, self.nftqm))
         else:
             self.fref = self.fqm
+            self.nnf = 0
+            self.ntq = 0
 
     def indicate(self):
         Headings = ["Physical Variable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference"]
