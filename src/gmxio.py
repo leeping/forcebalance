@@ -1113,7 +1113,7 @@ class GMX(Engine):
         # Figure out which energy terms need to be printed.
         energyterms = self.energy_termnames(edrfile="%s-md.edr" % self.name)
         ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
-        ekeep += ['Volume', 'Density']
+        ekeep += ['Temperature', 'Volume', 'Density']
 
         # Perform energy component analysis and return properties.
         self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(ekeep))

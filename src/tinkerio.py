@@ -868,16 +868,20 @@ class TINKER(Engine):
         self.mdtraj = "%s-md.arc" % self.name
         edyn = []
         kdyn = []
+        temps = []
         for line in odyn:
             s = line.split()
             if 'Current Potential' in line:
                 edyn.append(float(s[2]))
             if 'Current Kinetic' in line:
                 kdyn.append(float(s[2]))
+            if s[0] == 'Temperature' and s[2] == 'Kelvin':
+                temps.append(float(s[1]))
 
         # Potential and kinetic energies converted to kJ/mol.
         edyn = np.array(edyn) * 4.184
         kdyn = np.array(kdyn) * 4.184
+        temps = np.array(temps)
     
         if verbose: logger.info("Post-processing to get the dipole moments\n")
         oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E", print_to_screen=False)
@@ -917,8 +921,9 @@ class TINKER(Engine):
                             ecomp[key] = [float(s[-2])*4.184]
         for key in ecomp:
             ecomp[key] = np.array(ecomp[key])
-        ecomp["Total Potential Energy"] = edyn
-        ecomp["Total Kinetic Energy"] = kdyn
+        ecomp["Potential Energy"] = edyn
+        ecomp["Kinetic Energy"] = kdyn
+        ecomp["Temperature"] = temps
         ecomp["Total Energy"] = edyn+kdyn
 
         # Energies in kilojoules per mole
