@@ -398,7 +398,7 @@ def main():
                                     ("threads", threads), ("anisotropic", anisotropic), ("mts", mts)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
-                                 ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1)])
+                                 ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1), ("mts", mts)])
 
     # Energy components analysis disabled for OpenMM MTS because it uses force groups
     if (engname == "openmm" and mts): logger.warn("OpenMM with MTS integrator; energy components analysis will be disabled.\n")

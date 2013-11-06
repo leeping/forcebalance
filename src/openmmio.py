@@ -37,14 +37,9 @@ except:
 def energy_components(Sim, verbose=False):
     # Before using EnergyComponents, make sure each Force is set to a different group.
     EnergyTerms = OrderedDict()
-    Potential = Sim.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
-    Kinetic = Sim.context.getState(getEnergy=True).getKineticEnergy() / kilojoules_per_mole
     if type(Sim.integrator) in [LangevinIntegrator, VerletIntegrator]:
         for i in range(Sim.system.getNumForces()):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
-    EnergyTerms['Potential'] = Potential
-    EnergyTerms['Kinetic'] = Kinetic
-    EnergyTerms['Total'] = Potential+Kinetic
     return EnergyTerms
 
 def get_multipoles(simulation,q=None,positions=None):
@@ -575,7 +570,7 @@ class OpenMM(Engine):
             ## If temperature control is turned on, then run Langevin dynamics.
             if mts:
                 integrator = MTSVVVRIntegrator(temperature*kelvin, collision/picosecond,
-                                               timestep*femtosecond, system, ninnersteps=int(timestep/faststep))
+                                               timestep*femtosecond, self.system, ninnersteps=int(timestep/faststep))
             else:
                 integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
         else:
