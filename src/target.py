@@ -9,7 +9,7 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds
+from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
@@ -56,7 +56,7 @@ class Target(forcebalance.BaseClass):
     AGrad, AHess = Boolean switches for computing analytic gradients and Hessians
 
     Outputs:
-    Answer       = {'X': Number, 'G': numpy.array(np), 'H': numpy.array((np,np)) }
+    Answer       = {'X': Number, 'G': array(NP), 'H': array((NP,NP)) }
     'X'          = The objective function itself
     'G'          = The gradient, elements not computed analytically are zero
     'H'          = The Hessian, elements not computed analytically are zero
@@ -353,7 +353,7 @@ class Target(forcebalance.BaseClass):
         @param footnote Optional footnote line, which will be printed at the bottom.
         
         """
-        tline="Target: %s Type: %s Objective = %.5e" % (self.name, self.__class__.__name__, self.objective)
+        tline="Target: %s  Type: %s  Objective = %.5e" % (self.name, self.__class__.__name__, self.objective)
         nc = len(headings)
         if banner != None:
             tlines = [banner, tline]
@@ -373,15 +373,15 @@ class Target(forcebalance.BaseClass):
                 cwidths[cnum] = max(cwidths[cnum], len(l))
         # Then look at the row names to stretch out the first column width...
         for k in data.keys():
-            cwidths[0] = max(cwidths[0], len(k))
+            cwidths[0] = max(cwidths[0], len(str(k)))
         # Then look at the data values to stretch out the other column widths.
         for v in data.values():
             for n, f in enumerate(v):
                 cwidths[n+1] = max(cwidths[n+1], len(str(f)))
         for i in range(1, len(cwidths)):
             cwidths[i] += 2
-        if cwidths[0] < 25:
-            cwidths[0] = 25
+        if cwidths[0] < 15:
+            cwidths[0] = 15
         cblocks = [['' for i in range(max(crows) - len(cname.split('\n')))] + cname.split('\n') for cnum, cname in enumerate(headings)]
         # The formatting line consisting of variable column widths
         fline = ' '.join("%%%s%is" % (("-" if i==0 else ""), j) for i, j in enumerate(cwidths))
@@ -389,7 +389,7 @@ class Target(forcebalance.BaseClass):
         clines = [fline % (tuple(cblocks[j][i] for j in range(nc))) for i in range(max(crows))]
         tlines += clines
         PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
-        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=False, leftpad=4, color=color)
+        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=[i==0 for i in range(len(tlines))], leftpad=4, color=color)
         
 class RemoteTarget(Target):
     def __init__(self,options,tgt_opts,forcefield):
@@ -415,7 +415,7 @@ class RemoteTarget(Target):
             n+=1
             id_string = "%s_%i-%i" % (self.name, Counter(), n)
         
-        with open('forcebalance.p','w') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
+        with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
         forcebalance.nifty.LinkFile(os.path.join(self.root,"temp", self.name, "target.tar.bz2"),"%s.tar.bz2" % self.name)

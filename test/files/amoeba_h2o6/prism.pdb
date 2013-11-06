@@ -1,0 +1,40 @@
+HEADER    TINKER Water Hexamer
+COMPND
+SOURCE
+HETATM    1  O   HOH     1      -1.502  -0.191   1.435
+HETATM    2  H1  HOH     1      -0.601  -0.597   1.554
+HETATM    3  H2  HOH     1      -2.007  -0.422   2.220
+HETATM    4  O   HOH     2      -1.745  -0.382  -1.309
+HETATM    5  H1  HOH     2      -1.889  -0.480  -0.348
+HETATM    6  H2  HOH     2      -2.517  -0.767  -1.734
+HETATM    7  O   HOH     3      -0.560   2.018  -0.122
+HETATM    8  H1  HOH     3      -0.948   1.534   0.625
+HETATM    9  H2  HOH     3      -0.990   1.593  -0.877
+HETATM   10  O   HOH     4       0.965  -1.166   1.440
+HETATM   11  H1  HOH     4       0.980  -1.522   0.528
+HETATM   12  H2  HOH     4       1.542  -0.394   1.344
+HETATM   13  O   HOH     5       0.975  -1.402  -1.336
+HETATM   14  H1  HOH     5       0.065  -1.119  -1.523
+HETATM   15  H2  HOH     5       1.471  -0.571  -1.278
+HETATM   16  O   HOH     6       2.002   1.058  -0.125
+HETATM   17  H1  HOH     6       1.142   1.532  -0.140
+HETATM   18  H2  HOH     6       2.675   1.735  -0.238
+CONECT    1    2    3
+CONECT    2    1
+CONECT    3    1
+CONECT    4    5    6
+CONECT    5    4
+CONECT    6    4
+CONECT    7    8    9
+CONECT    8    7
+CONECT    9    7
+CONECT   10   11   12
+CONECT   11   10
+CONECT   12   10
+CONECT   13   14   15
+CONECT   14   13
+CONECT   15   13
+CONECT   16   17   18
+CONECT   17   16
+CONECT   18   16
+END

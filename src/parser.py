@@ -70,7 +70,7 @@ gen_opts_types = {
                  "readchk"      : (None, -50, 'Name of the restart file we read from', 'Restart jobtype "newton" with "writechk" set'),
                  "writechk"     : (None, -50, 'Name of the restart file we write to (can be same as readchk)', 'Main optimizer'),
                  "ffdir"        : ('forcefield', 100, 'Directory containing force fields, relative to project directory', 'All'),
-                 "amoeba_polarization"        : ('direct', 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_pol"   : ('direct', 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
                  },
     'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.', 
                                    'All (important); choose "single", "gradient", "hessian", "newton" (Main Optimizer), "bfgs", "powell", "simplex", "anneal", "genetic", "conjugategradient", "scan_mvals", "scan_pvals", "fdcheck[gh]"'),
@@ -105,6 +105,7 @@ gen_opts_types = {
                  "eig_lowerbound"         : (1e-4,  10, 'Minimum eigenvalue for applying steepest descent correction', 'Main Optimizer'),
                  "lm_guess"               : (1.0,    9, 'Guess value for bracketing line search in trust radius algorithm', 'Main Optimizer'),
                  "finite_difference_h"    : (1e-3,  50, 'Step size for finite difference derivatives in many functions', 'pretty much everywhere'),
+                 "finite_difference_factor" : (1.0, 40, 'Make sure that the finite difference step size does not exceed this multiple of the trust radius.', 'Main Optimizer'),
                  "penalty_additive"       : (0.0,   55, 'Factor for additive penalty function in objective function', 'Objective function, all penalty types'),
                  "penalty_multiplicative" : (0.0,   55, 'Factor for multiplicative penalty function in objective function', 'Objective function, all penalty types'),
                  "penalty_alpha"          : (1e-3,  53, 'Extra parameter for fusion penalty function.  Dictates position of log barrier or L1-L0 switch distance', 
@@ -124,25 +125,36 @@ gen_opts_types = {
 ## Default fitting target options.
 tgt_opts_types = {
     'strings' : {"name"      : (None, 200, 'The name of the target, corresponding to the directory targets/name', 'All targets (important)'),
-                 "masterfile": ('interactions.txt', 0, 'The name of the master file containing interacting systems', 'Binding energy target', 'BindingEnergy'),
                  "force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
-                 "fragment1" : ('', 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
-                 "fragment2" : ('', 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
-                 "openmm_cuda_precision" : ('', -10, 'Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
+                 "fragment1" : (None, 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
+                 "fragment2" : (None, 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
+                 "openmm_precision" : (None, -10, 'Precision of OpenMM calculation if using CUDA or OpenCL platform.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
+                 "openmm_platform" : ('CUDA', -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
+                 "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
+                 "inter_txt"             : ('interactions.txt', 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
+                 "reassign_modes"        : (None, -180, 'Reassign modes before fitting frequencies, using either linear assignment "permute" or maximum overlap "overlap".', 'Vibrational frequency targets', 'vibration'),
+                 "liquid_coords"         : (None, 0, 'Provide file name for condensed phase coordinates.', 'Condensed phase properties', 'Liquid'),
+                 "gas_coords"            : (None, 0, 'Provide file name for gas phase coordinates.', 'Condensed phase properties', 'Liquid'),
                  },
-    'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,'')
+    'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
+                 "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
                  },
-    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed')
+    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
+                 "coords"                : (None, -10, 'Coordinates for single point evaluation; if not provided, will search for a default.', 'Energy/force matching, ESP evaluations, interaction energies'),
+                 "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM systems but can also contain coordinates.', 'Targets that use OpenMM', 'OpenMM'),
+                 "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
+                 "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
+                 "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
                  "sleepy"             : (0, -50, 'Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)', 'All targets (advanced usage)'),
-                 "liquid_prod_steps"  : (20000, 0, 'Number of time steps for the liquid production run.', 'Condensed phase property targets', 'liquid'),
-                 "liquid_equ_steps"   : (10000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),
-                 "gas_prod_steps"     : (0, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
-                 "gas_equ_steps"      : (0, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
+                 "liquid_prod_steps"  : (10000, 0, 'Number of time steps for the liquid production run.', 'Condensed phase property targets', 'liquid'),
+                 "liquid_equ_steps"   : (1000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),
+                 "gas_prod_steps"     : (10000, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
+                 "gas_equ_steps"      : (1000, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "writelevel"         : (1, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
-                 "mdrun_threads"      : (1, 0, 'Set the number of threads used by remote Gromacs processes', 'Condensed phase properties in GROMACS', 'Liquid_GMX'),
+                 "md_threads"         : (1, 0, 'Set the number of threads used by Gromacs or TINKER processes in MD simulations', 'Condensed phase properties in GROMACS and TINKER', 'Liquid_GMX, Liquod_TINKER'),
                  "save_traj"          : (0, -10, 'Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save', 'Condensed phase properties', 'Liquid'),
                  },
     'bools'   : {"whamboltz"        : (0, -100, 'Whether to use WHAM Boltzmann Weights', 'Ab initio targets with Boltzmann weights (advanced usage)', 'AbInitio'),
@@ -165,8 +177,8 @@ tgt_opts_types = {
                  "manual"           : (0, -150, 'Give the user a chance to fill in condensed phase stuff on the zeroth step', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "hvap_subaverage"  : (0, -150, 'Don\'t target the average enthalpy of vaporization and allow it to freely float (experimental)', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "force_cuda"       : (0, -150, 'Force the external npt.py script to crash if CUDA Platform not available', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
-                 "anisotropic_box"  : (0, -150, 'Enable anisotropic box scaling (e.g. for crystals or two-phase simulations) in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
-                 "mts_vvvr"         : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
+                 "anisotropic_box"  : (0, -150, 'Enable anisotropic box scaling (e.g. for crystals or two-phase simulations) in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm, liquid_tinker'),
+                 "mts_integrator"   : (0, -150, 'Enable multiple-timestep integrator in external npt.py script', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "minimize_energy"  : (1, 0, 'Minimize the energy of the system prior to running dynamics', 'Condensed phase property targets (advanced usage)', 'liquid_openmm', 'liquid_tinker'),
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
                 },
@@ -193,15 +205,28 @@ tgt_opts_types = {
                  "dipole_denom"   : (1.0, 0, 'Dipole normalization (Debye) ; set to 0 if a zero weight is desired', 'Monomer property targets', 'monomer'),
                  "quadrupole_denom"   : (1.0, 0, 'Quadrupole normalization (Buckingham) ; set to 0 if a zero weight is desired', 'Monomer property targets', 'monomer'),
                  "polarizability_denom"   : (1.0, 0, 'Dipole polarizability tensor normalization (cubic Angstrom) ; set to 0 if a zero weight is desired', 'Monomer property targets with polarizability', 'monomer'),
-                 "liquid_timestep"  : (0.5, 0, 'Time step size for the liquid simulation.', 'Condensed phase property targets', 'liquid'),
-                 "liquid_interval"  : (0.05, 0, 'Time interval for saving coordinates for the liquid production run.', 'Condensed phase property targets', 'liquid'),
-                 "gas_timestep"  : (0.0, 0, 'Time step size for the gas simulation (if zero, use default in external script.).', 'Condensed phase property targets', 'liquid'),
-                 "gas_interval"  : (0.0, 0, 'Time interval for saving coordinates for the gas production run (if zero, use default in external script.)', 'Condensed phase property targets', 'liquid'),
+                 "liquid_timestep"  : (1.0, 0, 'Time step size for the liquid simulation.', 'Condensed phase property targets', 'liquid'),
+                 "liquid_interval"  : (0.1, 0, 'Time interval for saving coordinates for the liquid production run.', 'Condensed phase property targets', 'liquid'),
+                 "gas_timestep"  : (1.0, 0, 'Time step size for the gas simulation (if zero, use default in external script.).', 'Condensed phase property targets', 'liquid'),
+                 "gas_interval"  : (0.1, 0, 'Time interval for saving coordinates for the gas production run (if zero, use default in external script.)', 'Condensed phase property targets', 'liquid'),
                  "self_pol_mu0"  : (0.0, -150, 'Gas-phase dipole parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  },
     'sections': {}
     }
+
+all_opts_names = list(itertools.chain(*[i.keys() for i in gen_opts_types.values()])) + list(itertools.chain(*[i.keys() for i in tgt_opts_types.values()]))
+## Check for uniqueness of option names.
+for i in all_opts_names:
+    iocc = []
+    for typ, dct in gen_opts_types.items():
+        if i in dct:
+            iocc.append("gen_opt_types %s" % typ)
+    for typ, dct in tgt_opts_types.items():
+        if i in dct:
+            iocc.append("gen_opt_types %s" % typ)
+    if len(iocc) != 1:
+        raise RuntimeError("CODING ERROR: ForceBalance option %s occurs in more than one place (%s)" % (i, str(iocc)))
 
 ## Default general options - basically a collapsed veresion of gen_opts_types.
 gen_opts_defaults = {}
@@ -220,7 +245,12 @@ for t in tgt_opts_types:
     tgt_opts_defaults.update(subdict)
 
 ## Option maps for maintaining backward compatibility.
-bkwd = {"simtype" : "type"}
+bkwd = {"simtype" : "type", 
+        "masterfile" : "inter_txt", 
+        "openmm_cuda_precision" : "openmm_precision",
+        "mdrun_threads" : "md_threads",
+        "mts_vvvr" : "mts_integrator",
+        "amoeba_polarization" : "amoeba_pol"}
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]
@@ -428,8 +458,12 @@ def parse_inputs(input_file=None):
                         this_opt[key] = False
                     elif isfloat(s[1]) and int(float(s[1])) == 0:
                         this_opt[key] = False
-                    else:
+                    elif s[1].upper() in ["1", "YES", "TRUE", "ON"]:
                         this_opt[key] = True
+                    elif isfloat(s[1]) and int(float(s[1])) == 1:
+                        this_opt[key] = True
+                    else:
+                        raise RuntimeError('%s is a true/false option but you provided %s; to enable, provide ["1", "yes", "true", "on" or <no value>].  To disable, provide ["0", "no", "false", or "off"].' % (key, s[1]))
                 elif key in opts_types['floats']:
                     this_opt[key] = float(s[1])
                 elif key in opts_types['sections']:

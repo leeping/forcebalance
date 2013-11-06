@@ -9,7 +9,7 @@ modules for other programs because it's so simple.
 
 import os, sys, glob, shutil
 from re import match, sub, split, findall
-from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary
+from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary, wopen
 import numpy as np
 from forcebalance.leastsq import LeastSquares, CheckBasis
 from forcebalance import BaseReader
@@ -137,7 +137,7 @@ class THCDF_Psi4(LeastSquares):
 
     def prepare_temp_directory(self, options, tgt_opts):
         abstempdir = os.path.join(self.root,self.tempdir)
-        o = open(os.path.join(abstempdir,"input.dat"),'w')
+        o = wopen(os.path.join(abstempdir,"input.dat"))
         for line in open(os.path.join(self.root,self.tgtdir,"input.dat")).readlines():
             s = line.split("#")[0].split()
             if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
@@ -155,7 +155,7 @@ class THCDF_Psi4(LeastSquares):
         ln0 = range(len(open(fnm).readlines()))
         for layer in linedestroy:
             f = open(fnm).readlines()
-            o = open('.tmp.gbs','w')
+            o = wopen('.tmp.gbs')
             newln = []
             for ln, line in enumerate(f):
                 if ln not in layer:
@@ -172,7 +172,7 @@ class THCDF_Psi4(LeastSquares):
             logger.info("Now checking for linear dependencies.\n")
             _exec("cp %s %s.bak" % (self.GBSfnm, self.GBSfnm), print_command=False)
             ln0 = self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save)
-            o = open(".lindep.dat",'w')
+            o = wopen(".lindep.dat")
             for line in open(self.DATfnm).readlines():
                 s = line.split("#")[0].split()
                 if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
@@ -200,7 +200,7 @@ class THCDF_Psi4(LeastSquares):
             FK = GBS_Reader()
             FK_lines = []
             self.FF.linedestroy_this = []
-            self.FF.parmdestroy_this = []
+            self.FF.prmdestroy_this = []
             for ln, line in enumerate(open(self.GBSfnm).readlines()):
                 FK.feed(line)
                 key = '.'.join([str(i) for i in FK.element,FK.amom,FK.basis_number[FK.element],FK.contraction_number])
@@ -211,11 +211,11 @@ class THCDF_Psi4(LeastSquares):
                         self.FF.linedestroy_this.append(ln)
                         for p_destroy in [i for i, fld in enumerate(self.FF.pfields) if any([subfld[0] == self.GBSfnm and subfld[1] == ln0[ln] for subfld in fld])]:
                             logger.info("Destroying parameter %i located at line %i (originally %i) with fields given by: %s" % (p_destroy, ln, ln0[ln], str(self.FF.pfields[p_destroy])))
-                            self.FF.parmdestroy_this.append(p_destroy)
+                            self.FF.prmdestroy_this.append(p_destroy)
                     FK_lines.append(LI_lines[key][0])
                 else:
                     FK_lines.append(line)
-            o = open('franken.gbs','w')
+            o = wopen('franken.gbs')
             for line in FK_lines:
                 print >> o, line,
             o.close()
@@ -223,7 +223,7 @@ class THCDF_Psi4(LeastSquares):
             
             if len(list(itertools.chain(*(self.FF.linedestroy_save + [self.FF.linedestroy_this])))) > 0:
                 logger.info("All lines removed: " + self.FF.linedestroy_save + [self.FF.linedestroy_this] + '\n')
-                logger.info("All parms removed: " + self.FF.parmdestroy_save + [self.FF.parmdestroy_this] + '\n')
+                logger.info("All prms removed: " + self.FF.prmdestroy_save + [self.FF.prmdestroy_this] + '\n')
 
         self.write_nested_destroy(self.GBSfnm, self.FF.linedestroy_save + [self.FF.linedestroy_this])
         _exec("psi4", print_command=False, outfnm="psi4.stdout")
@@ -354,7 +354,7 @@ class RDVR3_Psi4(Target):
             if not os.path.exists(this_apath) : os.makedirs(this_apath)
             os.chdir(this_apath)
             self.FF.make(these_mvals)
-            o = open('objective.dat','w')
+            o = wopen('objective.dat')
             for line in self.objfiles[d]:
                 s = line.split()
                 if len(s) > 2 and s[0] == 'path' and s[1] == '=':
@@ -411,7 +411,7 @@ class RDVR3_Psi4(Target):
         #    shutil.rmtree(odir)
         if not os.path.exists(odir): os.makedirs(odir)
         os.chdir(odir)
-        o = open('objective.dat','w')
+        o = wopen('objective.dat')
         for line in self.objfiles[d]:
             s = line.split()
             if len(s) > 2 and s[0] == 'path' and s[1] == '=':
@@ -443,8 +443,8 @@ class RDVR3_Psi4(Target):
         Fac = 1000000
         n = len(mvals)
         X = 0.0
-        G = np.zeros(n,dtype=float)
-        H = np.zeros((n,n),dtype=float)
+        G = np.zeros(n)
+        H = np.zeros((n,n))
         pvals = self.FF.make(mvals)
         self.tdir = os.getcwd()
         self.objd = OrderedDict()
@@ -481,9 +481,9 @@ class RDVR3_Psi4(Target):
             logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
             if wq == None:
                 x = self.driver(mvals, d)
-            grad  = np.zeros(n,dtype=float)
-            hdiag = np.zeros(n,dtype=float)
-            hess  = np.zeros((n,n),dtype=float)
+            grad  = np.zeros(n)
+            hdiag = np.zeros(n)
+            hess  = np.zeros((n,n))
             apath = os.path.join(self.tdir, d, "current")
             x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
             for p in range(self.FF.np):

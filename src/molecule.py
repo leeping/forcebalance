@@ -97,12 +97,12 @@
 #| must be a list along the frame axis,  |#
 #| and they must have the same length.   |#
 #=========================================#
-# xyzs       = List of numpy arrays of atomic xyz coordinates
+# xyzs       = List of arrays of atomic xyz coordinates
 # comms      = List of comment strings
 # boxes      = List of 3-element or 9-element arrays for periodic boxes
-# qm_forces  = List of numpy arrays of atomistic forces from QM calculations
-# qm_espxyzs = List of numpy arrays of xyz coordinates for ESP evaluation
-# qm_espvals = List of numpy arrays of ESP values
+# qm_forces  = List of arrays of atomistic forces from QM calculations
+# qm_espxyzs = List of arrays of xyz coordinates for ESP evaluation
+# qm_espvals = List of arrays of ESP values
 FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_interaction', 
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins'])
 #=========================================#
@@ -342,12 +342,14 @@ def format_xyz_coord(element,xyz,tinker=False):
 
     """
     if tinker:
-        return "%-3s % 11.6f % 11.6f % 11.6f" % (element,xyz[0],xyz[1],xyz[2])
+        return "%-3s % 13.8f % 13.8f % 13.8f" % (element,xyz[0],xyz[1],xyz[2])
     else:
         return "%-5s % 15.10f % 15.10f % 15.10f" % (element,xyz[0],xyz[1],xyz[2])
 
 def format_gro_coord(resid, resname, aname, seqno, xyz):
     """ Print a line in accordance with .gro file format, with six decimal points of precision
+
+    Nine decimal points of precision are necessary to get forces below 1e-3 kJ/mol/nm.
 
     @param[in] resid The number of the residue that the atom belongs to
     @param[in] resname The name of the residue that the atom belongs to
@@ -356,7 +358,7 @@ def format_gro_coord(resid, resname, aname, seqno, xyz):
     @param[in] xyz A 3-element array containing x, y, z coordinates of that atom
     
     """
-    return "%5i%-5s%5s%5i % 10.6f % 10.6f % 10.6f" % (resid,resname,aname,seqno,xyz[0],xyz[1],xyz[2])
+    return "%5i%-5s%5s%5i % 13.9f % 13.9f % 13.9f" % (resid,resname,aname,seqno,xyz[0],xyz[1],xyz[2])
 
 def format_xyzgen_coord(element,xyzgen):
     """ Print a line consisting of (element, p, q, r, s, t, ...) where
@@ -376,9 +378,9 @@ def format_gro_box(box):
     
     """
     if box.alpha == 90.0 and box.beta == 90.0 and box.gamma == 90.0:
-        return ' '.join(["% 10.6f" % (i/10) for i in [box.a, box.b, box.c]])
+        return ' '.join(["% 13.9f" % (i/10) for i in [box.a, box.b, box.c]])
     else:
-        return ' '.join(["% 10.6f" % (i/10) for i in [box.A[0], box.B[1], box.C[2], box.A[1], box.A[2], box.B[0], box.B[2], box.C[0], box.C[1]]])
+        return ' '.join(["% 13.9f" % (i/10) for i in [box.A[0], box.B[1], box.C[2], box.A[1], box.A[2], box.B[0], box.B[2], box.C[0], box.C[1]]])
 
 def is_gro_coord(line):
     """ Determines whether a line contains GROMACS data or not
@@ -463,6 +465,9 @@ def diff(A, B, key):
     else:
         if type(A.Data[key]) is np.ndarray:
             return (A.Data[key] != B.Data[key]).any()
+        elif key == 'tinkersuf':
+            return [sorted([int(j) for j in i.split()]) for i in A.Data[key]] != \
+                [sorted([int(j) for j in i.split()]) for i in B.Data[key]]
         else:
             return A.Data[key] != B.Data[key]
 
@@ -475,19 +480,19 @@ def either(A, B, key):
 #===========================#
 def EulerMatrix(T1,T2,T3):
     """ Constructs an Euler matrix from three Euler angles. """
-    DMat = np.mat(np.zeros((3,3),dtype = float))
+    DMat = np.mat(np.zeros((3,3)))
     DMat[0,0] = np.cos(T1)
     DMat[0,1] = np.sin(T1)
     DMat[1,0] = -np.sin(T1)
     DMat[1,1] = np.cos(T1)
     DMat[2,2] = 1
-    CMat = np.mat(np.zeros((3,3),dtype = float))
+    CMat = np.mat(np.zeros((3,3)))
     CMat[0,0] = 1
     CMat[1,1] = np.cos(T2)
     CMat[1,2] = np.sin(T2)
     CMat[2,1] = -np.sin(T2)
     CMat[2,2] = np.cos(T2)
-    BMat = np.mat(np.zeros((3,3),dtype = float))
+    BMat = np.mat(np.zeros((3,3)))
     BMat[0,0] = np.cos(T3)
     BMat[0,1] = np.sin(T3)
     BMat[1,0] = -np.sin(T3)
@@ -642,7 +647,7 @@ class Molecule(object):
         for key in self.FrameKeys:
             Defined = True
             if L != -1 and len(self.Data[key]) != L:
-                raise Exception('The keys %s and %s have different lengths - this isn\'t supposed to happen for two FrameKeys member variables.' % (key, klast))
+                self.repair(key, klast)
             L = len(self.Data[key])
             klast = key
         if not Defined:
@@ -660,7 +665,7 @@ class Molecule(object):
             for key in self.AtomKeys:
                 Defined = True
                 if L != -1 and len(self.Data[key]) != L:
-                    raise Exception('The keys %s and %s have different lengths (%i %i) - this isn\'t supposed to happen for two AtomKeys member variables.' % (key, klast, len(self.Data[key]), len(self.Data[klast])))
+                    self.repair(key, klast)
                 L = len(self.Data[key])
                 klast = key
             if Defined:
@@ -746,6 +751,8 @@ class Molecule(object):
             if key == 'fnm' or key == 'ftype' and key in self.Data:
                 Sum.Data[key] = self.Data[key]
             elif diff(self, other, key):
+                for i, j in zip(self.Data[key], other.Data[key]):
+                    print i, j, i==j
                 raise Exception('The data member called %s is not the same for these two objects' % key)
             elif key in self.Data:
                 Sum.Data[key] = copy.deepcopy(self.Data[key])
@@ -771,6 +778,8 @@ class Molecule(object):
         for key in AtomVariableNames | MetaVariableNames:
             if key == 'fnm' or key == 'ftype': pass
             elif diff(self, other, key):
+                for i, j in zip(self.Data[key], other.Data[key]):
+                    print i, j, i==j
                 raise Exception('The data member called %s is not the same for these two objects' % key)
             # Information from the other class is added to this class (if said info doesn't exist.)
             elif key in other.Data:
@@ -786,6 +795,22 @@ class Molecule(object):
             elif either(self, other, key):
                 raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
         return self
+
+    def repair(self, key, klast):
+        """ Attempt to repair trivial issues that would otherwise break the object. """
+        kthis = key if len(self.Data[key]) < len(self.Data[klast]) else klast
+        kother = klast if len(self.Data[key]) < len(self.Data[klast]) else key
+        diff = abs(len(self.Data[key]) - len(self.Data[klast]))
+        if kthis == 'comms':
+            # Append empty comments if necessary because this causes way too many crashes.
+            for i in range(diff): self.Data['comms'].append('')
+        elif kthis == 'boxes' and len(self.Data['boxes']) == 1:
+            # If we only have one box then we can fill in the rest of the trajectory.
+            for i in range(diff): self.Data['boxes'].append(self.Data['boxes'][-1])
+        else:
+            raise Exception('The keys %s and %s have different lengths (%i %i)'
+                            '- this isn\'t supposed to happen for two AtomKeys member variables.' \
+                                % (key, klast, len(self.Data[key]), len(self.Data[klast])))
 
     def append(self,other):
         self += other
@@ -920,8 +945,14 @@ class Molecule(object):
             if fnm == None or fnm == sys.stdout:
                 outfile = sys.stdout
             elif append:
+                # Writing to symbolic links risks unintentionally overwriting the source file - 
+                # thus we delete the link first.
+                if os.path.islink(fnm): 
+                    os.unlink(fnm)
                 outfile = open(fnm,'a')
             else:
+                if os.path.islink(fnm): 
+                    os.unlink(fnm)
                 outfile = open(fnm,'w')
             for line in Answer:
                 print >> outfile,line
@@ -946,6 +977,37 @@ class Molecule(object):
             rgs.append(np.sum([PeriodicTable[self.elem[i]]*np.dot(x,x) for i, x in enumerate(xyz1)])/M)
         return np.array(rgs)
             
+    def rigid_water(self):
+        """ If one atom is oxygen and the next two are hydrogen, make the water molecule rigid. """
+        self.require('elem', 'xyzs')
+        for i in range(len(self)):
+            for a in range(self.na-2):
+                if self.elem[a] == 'O' and self.elem[a+1] == 'H' and self.elem[a+2] == 'H':
+                    flex = M.xyzs[i]
+                    wat = flex[a:a+3]
+                    com = wat.mean(0)
+                    wat -= com
+                    o  = wat[0]
+                    h1 = wat[1]
+                    h2 = wat[2]
+                    r1 = h1 - o
+                    r2 = h2 - o
+                    r1 /= np.linalg.norm(r1)
+                    r2 /= np.linalg.norm(r2)
+                    # Obtain unit vectors.
+                    ex = r1 + r2
+                    ey = r1 - r2
+                    ex /= np.linalg.norm(ex)
+                    ey /= np.linalg.norm(ey)
+                    Bond = 0.9572
+                    Ang = np.pi * 104.52 / 2 / 180
+                    cosx = np.cos(Ang)
+                    cosy = np.sin(Ang)
+                    h1 = o + Bond*ex*cosx + Bond*ey*cosy
+                    h2 = o + Bond*ex*cosx - Bond*ey*cosy
+                    rig = np.array([o, h1, h2]) + com
+                    M.xyzs[i][a:a+3] = rig
+
 #        if center:
 #            xyz1 -= xyz1.mean(0)
 #        for index2, xyz2 in enumerate(self.xyzs):
@@ -1047,6 +1109,8 @@ class Molecule(object):
                     if len(s) > 1:
                         for i in range(1,len(s)):
                             s[i] = str(Map[int(s[i])])
+                    sn = [int(i) for i in s[1:]]
+                    s = [s[0]] + list(np.array(s[1:])[np.argsort(sn)])
                     NewSuf.append(''.join([whites[j]+s[j] for j in range(len(s))]))
                 New.Data['tinkersuf'] = NewSuf[:]
             else:
@@ -1105,18 +1169,19 @@ class Molecule(object):
         return New
 
     def align_by_moments(self):
-        """ Align molecules using the "moment of inertia."
-        Note that we're following the MSMBuilder convention 
-        of using all ones for the masses. """
+        """ Align molecules using the moment of inertia.  
+        Departs from MSMBuilder convention of 
+        using arithmetic mean for mass. """
+        coms  = self.center_of_mass()
         xyz1  = self.xyzs[0]
-        xyz1 -= xyz1.mean(0)
+        xyz1 -= coms[0]
         xyz1  = AlignToMoments(self.elem,xyz1)
         for index2, xyz2 in enumerate(self.xyzs):
-            xyz2 -= xyz2.mean(0)
+            xyz2 -= coms[index2]
             xyz2 = AlignToMoments(self.elem,xyz1,xyz2)
             self.xyzs[index2] = xyz2
 
-    def align(self, smooth = False, center = True, select=None):
+    def align(self, smooth = False, center = True, center_mass = False, select=None):
         """ Align molecules. 
         
         Has the option to create smooth trajectories 
@@ -1130,10 +1195,15 @@ class Molecule(object):
         """
         if isinstance(select, list):
             select = np.array(select)
+        if center and center_mass:
+            raise Exception('Specify center=True or center_mass=True but set the other one to False')
 
+        coms = self.center_of_mass()
         xyz1 = self.xyzs[0]
         if center:
             xyz1 -= xyz1.mean(0)
+        elif center_mass:
+            xyz1 = coms[0]
         for index2, xyz2 in enumerate(self.xyzs):
             if index2 == 0: continue
             xyz2 -= xyz2.mean(0)
@@ -1275,7 +1345,7 @@ class Molecule(object):
     def all_pairwise_rmsd(self):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
         N = len(self)
-        Mat = np.zeros((N,N),dtype=float)
+        Mat = np.zeros((N,N))
         for i in range(N):
             xyzi = self.xyzs[i].copy()
             xyzi -= xyzi.mean(0)
@@ -1292,7 +1362,7 @@ class Molecule(object):
     def pathwise_rmsd(self):
         """ Find RMSD between frames along path. """
         N = len(self)
-        Vec = np.zeros(N-1 ,dtype=float)
+        Vec = np.zeros(N-1 )
         for i in range(N-1):
             xyzi = self.xyzs[i].copy()
             xyzi -= xyzi.mean(0)
@@ -1308,7 +1378,7 @@ class Molecule(object):
     def ref_rmsd(self, i):
         """ Find RMSD to a reference frame. """
         N = len(self)
-        Vec = np.zeros(N,dtype=float)
+        Vec = np.zeros(N)
         xyzi = self.xyzs[i].copy()
         xyzi -= xyzi.mean(0)
         for j in range(N):
@@ -1316,7 +1386,7 @@ class Molecule(object):
             xyzj -= xyzj.mean(0)
             tr, rt = get_rotate_translate(xyzj, xyzi)
             xyzj = np.dot(xyzj, rt) + tr
-            rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+            rmsd = np.sqrt(3*np.mean((xyzj - xyzi) ** 2))
             Vec[j] = rmsd
         return Vec
 
@@ -1374,8 +1444,14 @@ class Molecule(object):
     #=====================================#
     #|         Reading functions         |#
     #=====================================#
-
     def read_xyz(self, fnm, **kwargs):
+        """ .xyz files can be TINKER formatted which is why we have the try/except here. """
+        try:
+            return self.read_xyz0(fnm, **kwargs)
+        except:
+            return self.read_arc(fnm, **kwargs)
+            
+    def read_xyz0(self, fnm, **kwargs):
         """ Parse a .xyz file which contains several xyz coordinates, and return their elements.
 
         @param[in] fnm The input file name
@@ -1651,7 +1727,11 @@ class Molecule(object):
                         resid.append(thisresid)
                         whites      = re.split('[^ ]+',line)
                         if len(sline) > 5:
-                            tinkersuf.append(''.join([whites[j]+sline[j] for j in range(5,len(sline))]))
+                            s = sline[5:]
+                            if len(s) > 1:
+                                sn = [int(i) for i in s[1:]]
+                                s = [s[0]] + list(np.array(s[1:])[np.argsort(sn)])
+                            tinkersuf.append(''.join([whites[j]+s[j-5] for j in range(5,len(sline))]))
                         else:
                             tinkersuf.append('')
                     # LPW Make sure ..
@@ -2340,7 +2420,15 @@ class Molecule(object):
             self.require('elem','xyzs','resname','resid','boxes')
 
         if 'atomname' not in self.Data:
-            atomname = ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
+            count = 0
+            resid = -1
+            atomname = []
+            for i in range(self.na):
+                if self.resid[i] != resid:
+                    count = 0
+                count += 1
+                resid = self.resid[i]
+                atomname.append("%s%i" % (self.elem[i], count))
         else:
             atomname = self.atomname
 
@@ -2418,7 +2506,20 @@ class Molecule(object):
             self.require_resid()
         else:
             self.require('xyzs','resname','resid')
-        ATOMS = self.atomname if 'atomname' in self.Data else ["%s%i" % (self.elem[i], i+1) for i in range(self.na)]
+
+        if 'atomname' not in self.Data:
+            count = 0
+            resid = -1
+            ATOMS = []
+            for i in range(self.na):
+                if self.resid[i] != resid:
+                    count = 0
+                count += 1
+                resid = self.resid[i]
+                ATOMS.append("%s%i" % (self.elem[i], count))
+        else:
+            ATOMS = self.atomname
+        
         CHAIN = self.chain if 'chain' in self.Data else [1 for i in range(self.na)]
         RESNAMES = self.resname
         RESNUMS = self.resid
