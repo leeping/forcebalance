@@ -400,10 +400,8 @@ def main():
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
                                  ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1)])
 
-    # Energy components analysis disabled for OpenMM MTS
-    # because it uses force groups
-    DoEDA = not (engname == "openmm" and mts)
-    if not DoEDA: logger.warn("OpenMM with MTS integrator; disabling energy components analysis.\n")
+    # Energy components analysis disabled for OpenMM MTS because it uses force groups
+    if (engname == "openmm" and mts): logger.warn("OpenMM with MTS integrator; energy components analysis will be disabled.\n")
 
     # Create instances of the MD Engine objects.
     Liquid = Engine(name="liquid", **EngOpts["liquid"])
@@ -441,7 +439,7 @@ def main():
     pV = atm_unit * pressure * Volumes
     pV_avg, pV_err = mean_stderr(pV)
     Rho_avg, Rho_err = mean_stderr(Rhos)
-    if DoEDA: PrintEDA(EDA, NMol)
+    PrintEDA(EDA, NMol)
 
     #==============================================#
     # Now run the simulation for just the monomer. #
@@ -455,7 +453,7 @@ def main():
 
     mEnergies = mPotentials + mKinetics
     mEne_avg, mEne_err = mean_stderr(mEnergies)
-    if DoEDA: PrintEDA(mEDA, 1)
+    PrintEDA(mEDA, 1)
 
     #============================================#
     #  Compute the potential energy derivatives. #

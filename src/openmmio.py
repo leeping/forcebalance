@@ -39,8 +39,9 @@ def energy_components(Sim, verbose=False):
     EnergyTerms = OrderedDict()
     Potential = Sim.context.getState(getEnergy=True).getPotentialEnergy() / kilojoules_per_mole
     Kinetic = Sim.context.getState(getEnergy=True).getKineticEnergy() / kilojoules_per_mole
-    for i in range(Sim.system.getNumForces()):
-        EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
+    if type(Sim.integrator) in [LangevinIntegrator, VerletIntegrator]:
+        for i in range(Sim.system.getNumForces()):
+            EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     EnergyTerms['Potential'] = Potential
     EnergyTerms['Kinetic'] = Kinetic
     EnergyTerms['Total'] = Potential+Kinetic
@@ -464,6 +465,7 @@ class OpenMM(Engine):
         pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
         self.mol[0].write(pdb1)
         self.pdb = PDBFile(pdb1)
+        os.unlink(pdb1)
         
         ## Create the OpenMM ForceField object.
         if hasattr(self, 'target'):
@@ -895,6 +897,7 @@ class OpenMM(Engine):
         Kinetics = []
         Volumes = []
         Dips = []
+        Temps = []
         #========================#
         # Now run the simulation #
         #========================#
@@ -965,6 +968,7 @@ class OpenMM(Engine):
             else:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration, state.getTime() / picoseconds,
                                                                        kinetic_temperature / kelvin, potential / kilojoules_per_mole))
+            Temps.append(kinetic_temperature / kelvin)
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
             Kinetics.append(kinetic / kilojoules_per_mole)
@@ -976,6 +980,10 @@ class OpenMM(Engine):
         Volumes = np.array(Volumes)
         Dips = np.array(Dips)
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
+        Ecomps["Potential Energy"] = np.array(Potentials)
+        Ecomps["Kinetic Energy"] = np.array(Kinetics)
+        Ecomps["Temperature"] = np.array(Temps)
+        Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
         return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps
 
 class Liquid_OpenMM(Liquid):
