@@ -6,8 +6,8 @@
 
 import os
 import shutil
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
-from numpy import append, array, diag, dot, exp, log, mat, mean, ones, outer, sqrt, where, zeros, linalg, savetxt, hstack
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, pvec1d, pmat2d
+import numpy as np
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -15,10 +15,16 @@ import subprocess
 from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from _assign import Assign
+from collections import OrderedDict
 #from _increment import Vibration_Build
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
+
+def count_assignment(assignment, verbose=True):
+    for i in range(len(assignment)):
+        if sum(assignment==i) != 1 and verbose:
+            logger.info("Vibrational mode %i is assigned %i times\n" % (i+1, sum(assignment==i)))
 
 class Vibration(Target):
 
@@ -38,6 +44,7 @@ class Vibration(Target):
         # Options that are given by the parser #
         #======================================#
         self.set_option(tgt_opts,'wavenumber_tol','denom')
+        self.set_option(tgt_opts,'reassign_modes','reassign')
         
         #======================================#
         #     Variables which are set here     #
@@ -46,8 +53,13 @@ class Vibration(Target):
         self.vfnm = os.path.join(self.tgtdir,"vdata.txt")
         ## Read in the reference data
         self.read_reference_data()
-        ## Prepare the temporary directory
-        self.prepare_temp_directory(options,tgt_opts)
+        ## Build keyword dictionaries to pass to engine.
+        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        del engine_args['name']
+        ## Create engine object.
+        self.engine = self.engine_(target=self, **engine_args)
+        if self.FF.rigid_water:
+            raise Exception('This class cannot be used with rigid water molecules.')
 
     def read_reference_data(self):
         """ Read the reference vibrational data from a file. """
@@ -63,19 +75,19 @@ class Vibration(Target):
             s = line.split()
             if len(s) == 1 and self.na == -1:
                 self.na = int(s[0])
-                xyz = zeros((self.na, 3), dtype=float)
+                xyz = np.zeros((self.na, 3))
                 cn = ln + 1
             elif ln == cn:
                 pass
             elif an < self.na and len(s) == 4:
-                xyz[an, :] = array([float(i) for i in s[1:]])
+                xyz[an, :] = np.array([float(i) for i in s[1:]])
                 an += 1
             elif len(s) == 1:
                 self.ref_eigvals.append(float(s[0]))
-                self.ref_eigvecs.append(zeros((self.na, 3), dtype=float))
+                self.ref_eigvecs.append(np.zeros((self.na, 3)))
                 an = 0
             elif len(s) == 3:
-                self.ref_eigvecs[-1][an, :] = array([float(i) for i in s])
+                self.ref_eigvecs[-1][an, :] = np.array([float(i) for i in s])
                 an += 1
             elif len(s) == 0:
                 pass
@@ -83,54 +95,99 @@ class Vibration(Target):
                 logger.info(line + '\n')
                 raise Exception("This line doesn't comply with our vibration file format!")
             ln += 1
-        self.ref_eigvals = array(self.ref_eigvals)
-        self.ref_eigvecs = array(self.ref_eigvecs)
-
+        self.ref_eigvals = np.array(self.ref_eigvals)
+        self.ref_eigvecs = np.array(self.ref_eigvecs)
+        for v2 in self.ref_eigvecs:
+            v2 /= np.linalg.norm(v2)
         return
 
-    def prepare_temp_directory(self, options, tgt_opts):
-        """ Prepare the temporary directory, by default does nothing """
-        return
-        
     def indicate(self):
         """ Print qualitative indicator. """
-        logger.info("\rTarget: %-15s " % self.name)
-        logger.info("Frequencies (wavenumbers), Reference: " + str(self.ref_eigvals))
-        logger.info("Calculated: " + str(self.calc_eigvals))
-        logger.info("Objective = %.5e\n" % self.objective)
+        # if self.reassign == 'overlap' : count_assignment(self.c2r)
+        banner = "Frequencies (wavenumbers)"
+        headings = ["Mode #", "Reference", "Calculated", "Difference", "Ref(dot)Calc"]
+        data = OrderedDict([(i, [self.ref_eigvals[i], self.calc_eigvals[i], self.calc_eigvals[i] - self.ref_eigvals[i], "%.4f" % self.overlaps[i]]) for i in range(len(self.ref_eigvals))])
+        self.printcool_table(data, headings, banner)
         return
+
+    def vibration_driver(self):
+        if hasattr(self, 'engine') and hasattr(self.engine, 'normal_modes'):
+            return self.engine.normal_modes()
+        else:
+            raise NotImplementedError('Normal mode calculation not supported, try using a different engine')
+
+
+    def process_vectors(self, vecs, verbose=False, check=False):
+        """ Return a set of normal and mass-weighted eigenvectors such that their outer product is the identity. """
+        mw = np.array(self.engine.AtomLists['Mass'])
+        vecs_mw = vecs.copy()
+        for i in range(len(mw)):
+            vecs_mw[:, i, :] *= mw[i]
+        rnrms = np.array([np.dot(v1.flatten(), v2.flatten()) for v1, v2 in zip(vecs, vecs_mw)])
+        vecs_nrm = vecs.copy()
+        for i in range(len(rnrms)):
+            vecs_nrm[i, :, :] /= np.sqrt(rnrms[i])
+        vecs_nrm_mw = vecs_nrm.copy()
+        for i in range(len(mw)):
+            vecs_nrm_mw[:, i, :] *= mw[i]
+        if verbose:
+            pmat2d(np.array([[np.dot(v1.flatten(), v2.flatten()) for v1 in vecs_nrm] for v2 in vecs_nrm_mw]), precision=3, format="f")
+            logger.info('\n')
+        if check:
+            for i, v1 in enumerate(vecs_nrm):
+                for j, v2 in enumerate(vecs_nrm_mw):
+                    if np.abs(np.dot(v1.flatten(), v2.flatten()) - float(i==j)) > 1e-1:
+                        logger.warn("In modes %i %i, orthonormality violated by %f\n" % (i, j, np.dot(v1.flatten(), v2.flatten()) - float(i==j)))
+        return vecs_nrm, vecs_nrm_mw
 
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
-        Answer = {'X':0.0, 'G':zeros(self.FF.np, dtype=float), 'H':zeros((self.FF.np, self.FF.np), dtype=float)}
+        Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
+
+        if not hasattr(self, 'ref_eigvecs_nrm'):
+            self.ref_eigvecs_nrm, self.ref_eigvecs_nrm_mw = self.process_vectors(self.ref_eigvecs)
+        
         def get_eigvals(mvals_):
             self.FF.make(mvals_)
             eigvals, eigvecs = self.vibration_driver()
-            # Put reference eigenvectors in the rows and calculated eigenvectors in the columns.
-            # Square the dot product (pointing in opposite direction is still the same eigenvector)
-            # Convert to integer for the "Assign" subroutine, subtract from a million.
-            a = array([[int(1e6*(1.0-min(1.0,dot(v1.flatten(),v2.flatten())**2))) for v2 in self.ref_eigvecs] for v1 in eigvecs])
-            # In the matrix that we constructed, these are the column numbers (reference mode numbers) 
-            # that are mapped to the row numbers (calculated mode numbers)
-            c2r = Assign(a)
-            return eigvals[c2r]
+            eigvecs_nrm, eigvecs_nrm_mw = self.process_vectors(eigvecs)
+            if self.reassign in ['permute', 'overlap']:
+                a = np.array([[int(1e6*(1.0-np.dot(v1.flatten(),v2.flatten())**2)) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])
+                # In the matrix that we constructed, these are the column numbers (reference mode numbers) 
+                # that are mapped to the row numbers (calculated mode numbers)
+                if self.reassign == 'permute':
+                    c2r = Assign(a)
+                    eigvals = eigvals[c2r]
+                elif self.reassign == 'overlap':
+                    c2r = np.argmin(a, axis=0)
+                    eigvals_p = []
+                    for j in c2r:
+                        eigvals_p.append(eigvals[j])
+                    eigvals = np.array(eigvals_p)
+            if not in_fd():
+                if self.reassign == 'permute':
+                    eigvecs_nrm_mw = eigvecs_nrm_mw[c2r]
+                elif self.reassign == 'overlap':
+                    self.c2r = c2r
+                    eigvecs_nrm_mw_p = []
+                    for j in c2r:
+                        eigvecs_nrm_mw_p.append(eigvecs_nrm_mw[j])
+                    eigvecs_nrm_mw = np.array(eigvecs_nrm_mw_p)
+                self.overlaps = np.array([np.abs(np.dot(v1.flatten(),v2.flatten())) for v1, v2 in zip(self.ref_eigvecs_nrm, eigvecs_nrm_mw)])
+            return eigvals
 
         calc_eigvals = get_eigvals(mvals)
         D = calc_eigvals - self.ref_eigvals
-        dV = zeros((self.FF.np,len(calc_eigvals)),dtype=float)
-
+        dV = np.zeros((self.FF.np,len(calc_eigvals)))
         if AGrad or AHess:
             for p in range(self.FF.np):
                 dV[p,:], _ = f12d3p(fdwrap(get_eigvals, mvals, p), h = self.h, f0 = calc_eigvals)
-                
-        Answer['X'] = dot(D,D) / self.denom**2
+        Answer['X'] = np.dot(D,D) / self.denom**2
         for p in range(self.FF.np):
-            Answer['G'][p] = 2*dot(D, dV[p,:]) / self.denom**2
+            Answer['G'][p] = 2*np.dot(D, dV[p,:]) / self.denom**2
             for q in range(self.FF.np):
-                Answer['H'][p,q] = 2*dot(dV[p,:], dV[q,:]) / self.denom**2
-
+                Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:]) / self.denom**2
         if not in_fd():
             self.calc_eigvals = calc_eigvals
             self.objective = Answer['X']
-
         return Answer

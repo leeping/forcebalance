@@ -19,8 +19,6 @@ import os, sys, shutil
 from re import match, sub
 import numpy as np
 import itertools
-from numpy import array, diag, dot, eye, mat, mean, transpose
-from numpy.linalg import norm, svd
 import threading
 import pickle
 import time
@@ -46,25 +44,25 @@ bohrang = 0.529177249
 #=========================#
 #     I/O formatting      #
 #=========================#
-def pvec1d(vec1d, precision=1, loglevel=INFO):
+def pvec1d(vec1d, precision=1, format="e", loglevel=INFO):
     """Printout of a 1-D vector.
 
     @param[in] vec1d a 1-D vector
     """
-    v2a = array(vec1d)
+    v2a = np.array(vec1d)
     for i in range(v2a.shape[0]):
-        logger.log(loglevel, "%% .%ie " % precision % v2a[i])
+        logger.log(loglevel, "%% .%i%s " % (precision, format) % v2a[i])
     logger.log(loglevel, '\n')
 
-def pmat2d(mat2d, precision=1, loglevel=INFO):
+def pmat2d(mat2d, precision=1, format="e", loglevel=INFO):
     """Printout of a 2-D matrix.
 
     @param[in] mat2d a 2-D matrix
     """
-    m2a = array(mat2d)
+    m2a = np.array(mat2d)
     for i in range(m2a.shape[0]):
         for j in range(m2a.shape[1]):
-            logger.log(loglevel, "%% .%ie " % precision % m2a[i][j])
+            logger.log(loglevel, "%% .%i%s " % (precision, format) % m2a[i][j])
         logger.log(loglevel, '\n')
 
 def grouper(iterable, n):
@@ -164,7 +162,8 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     bar = sym + bar + sym
     #bar = ''.join([sym for i in range(width + 8)])
     logger.info('\r'+bar + '\n')
-    for line in text:
+    for ln, line in enumerate(text):
+        if type(center) is list: center = center[ln]
         if center:
             padleft = ' ' * ((width - newlen(line)) / 2)
         else:
@@ -266,7 +265,7 @@ def col(vec):
     Output:
     A column matrix
     """
-    return mat(array(vec).reshape(-1, 1))
+    return np.mat(np.array(vec).reshape(-1, 1))
 
 def row(vec):
     """Given any list, array, or matrix, return a 1-row matrix.
@@ -275,7 +274,7 @@ def row(vec):
 
     @return answer A row matrix
     """
-    return mat(array(vec).reshape(1, -1))
+    return np.mat(np.array(vec).reshape(1, -1))
 
 def flat(vec):
     """Given any list, array, or matrix, return a single-index array.
@@ -283,7 +282,7 @@ def flat(vec):
     @param[in] vec The data to be flattened
     @return answer The flattened data
     """
-    return array(vec).reshape(-1)
+    return np.array(vec).reshape(-1)
 
 #====================================#
 #| Math: Vectors and linear algebra |#
@@ -296,8 +295,8 @@ def orthogonalize(vec1, vec2):
     @param[in] vec2 The projector (component subtracted out from vec1 is parallel to this)
     @return answer A copy of vec1 but with the vec2-component projected out.
     """
-    v2u = vec2/norm(vec2)
-    return vec1 - v2u*dot(vec1, v2u)
+    v2u = vec2/np.linalg.norm(vec2)
+    return vec1 - v2u*np.dot(vec1, v2u)
 
 def invert_svd(X,thresh=1e-12):
     
@@ -310,16 +309,16 @@ def invert_svd(X,thresh=1e-12):
 
     """
 
-    u,s,vh = svd(X, full_matrices=0)
-    uh     = mat(transpose(u))
-    v      = mat(transpose(vh))
+    u,s,vh = np.linalg.svd(X, full_matrices=0)
+    uh     = np.mat(np.transpose(u))
+    v      = np.mat(np.transpose(vh))
     si     = s.copy()
     for i in range(s.shape[0]):
         if abs(s[i]) > thresh:
             si[i] = 1./s[i]
         else:
             si[i] = 0.0
-    si     = mat(diag(si))
+    si     = np.mat(np.diag(si))
     Xt     = v*si*uh
     return Xt
 
@@ -349,7 +348,7 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     @param[out] MPPI The Moore-Penrose pseudoinverse (multiply by Y to get least-squares coefficients, multiply by dY/dk to get derivatives of least-squares coefficients)
     """
     # X is a 'tall' matrix.
-    X = mat(x)
+    X = np.mat(x)
     Y = col(y)
     n_x = X.shape[0]
     n_fit = X.shape[1]
@@ -359,10 +358,10 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     if w != None:
         if len(w) != n_x:
             warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
-        w /= mean(w)
-        WH = mat(diag(w**0.5))
+        w /= np.mean(w)
+        WH = np.mat(np.diag(w**0.5))
     else:
-        WH = mat(eye(n_x))
+        WH = np.mat(np.eye(n_x))
     # Make the Moore-Penrose Pseudoinverse.
     # if n_fit == n_x:
     #     MPPI = np.linalg.inv(WH*X)
@@ -426,11 +425,11 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     """
 
     # Create numpy copies of input arguments.
-    A_n = array(A_n)
+    A_n = np.array(A_n)
     if B_n is not None:
-        B_n = array(B_n)
+        B_n = np.array(B_n)
     else:
-        B_n = array(A_n)
+        B_n = np.array(A_n)
     # Get the length of the timeseries.
     N = A_n.size
     # Be sure A_n and B_n have the same dimensions.
@@ -449,7 +448,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     # Trap the case where this covariance is zero, and we cannot proceed.
     if(sigma2_AB == 0):
         if warn:
-            logger.warning('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency')
+            logger.warning('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency\n')
         return 1.0
     # Accumulate the integrated correlation time by computing the normalized correlation time at
     # increasing values of t.  Stop accumulating if the correlation function goes negative, since
@@ -717,6 +716,18 @@ def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
 #=====================================#
 #| File and process management stuff |#
 #=====================================#
+# Back up a file.
+def bak(fnm):
+    oldfnm = fnm
+    if os.path.exists(oldfnm):
+        base, ext = os.path.splitext(fnm)
+        i = 1
+        while os.path.exists(fnm):
+            fnm = "%s_%i%s" % (base,i,ext)
+            i += 1
+        logger.info("Backing up %s -> %s\n" % (oldfnm, fnm))
+        shutil.move(oldfnm,fnm)
+
 # Search for exactly one file with a provided extension.
 # ext: File extension
 # arg: String name of an argument
@@ -727,16 +738,16 @@ def onefile(ext, arg=None):
         if os.path.exists(arg):
             fnm = os.path.basename(arg)
         else:
-            logger.warning("File specified by %s (%s) does not exist - will try to autodetect\n" % (ext, arg))
+            warn_once("File specified by %s (%s) does not exist - will try to autodetect" % (ext, arg))
 
     if fnm == None:
         cwd = os.getcwd()
         ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
-        logger.info("Autodetecting .%s in %s\n" % (ext, cwd))
         if len(ls) != 1:
-            logger.warning("Cannot autodetect .%s file in %s (%i found)\n" % (ext, cwd, len(ls)))
+            warn_once("Found %i .%s files in %s" % (len(ls), ext, cwd), warnhash = "Found %i .%s files" % (len(ls), ext))
         else:
             fnm = os.path.basename(ls[0])
+            warn_once("Autodetected %s in %s" % (fnm, cwd), warnhash = "Autodetected %s" % fnm )
     return fnm
 
 def GoInto(Dir):
@@ -784,8 +795,15 @@ def MissingFileInspection(fnm):
             answer += "%s\n" % specific_dct[key]
     return answer
 
+def wopen(dest):
+    """ If trying to write to a symbolic link, remove it first. """
+    if os.path.islink(dest):
+        logger.warn("Trying to write to a symbolic link %s, removing it first\n" % dest)
+        os.unlink(dest)
+    return open(dest,'w')
+
 def LinkFile(src, dest, nosrcok = False):
-    if src == dest: return
+    if os.path.abspath(src) == os.path.abspath(dest): return
     if os.path.exists(src):
         if os.path.exists(dest):
             if os.path.islink(dest): pass
@@ -855,7 +873,7 @@ class LineChunker(object):
     def __exit__(self, *args, **kwargs):
         self.close()
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, **kwargs):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, print_error=True, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -866,6 +884,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     copy_stdout = Copy the stdout stream; can set to False in strange situations
     copy_stderr = Copy the stderr stream to the stdout stream; useful for GROMACS which prints out everything to stderr (argh.)
     expand_cr = Whether to expand carriage returns into newlines (useful for GROMACS mdrun).
+    print_error = Whether to print error messages on a crash. Should be true most of the time.
     persist = Continue execution even if the command gives a nonzero return code.
     """
     # Dictionary of options to be passed to the Popen object.
@@ -913,47 +932,50 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     def process_out(read):
         if print_to_screen: sys.stdout.write(read)
         if copy_stdout: 
-            process_out.stdout += read
+            process_out.stdout.append(read)
             wtf(read)
-    process_out.stdout = ""
+    process_out.stdout = []
 
     def process_err(read):
         if print_to_screen: sys.stderr.write(read)
-        process_err.stderr += read
+        process_err.stderr.append(read)
         if copy_stderr: 
-            process_out.stdout += read
+            process_out.stdout.append(read)
             wtf(read)
-    process_err.stderr = ""
+    process_err.stderr = []
     # This reads the streams one byte at a time, and passes it to the LineChunker
     # which splits it by either newline or carriage return.
     # If the stream has ended, then it is removed from the list.
     with LineChunker(process_out) as out_chunker, LineChunker(process_err) as err_chunker:
         while True:
             to_read, _, _ = select(streams, [], [])
-
             for fh in to_read:
                 if fh is p.stdout:
                     read = fh.read(1)
-                    out_chunker.push(read)
                     if not read: streams.remove(p.stdout)
+                    else: out_chunker.push(read)
                 elif fh is p.stderr:
                     read = fh.read(1)
-                    err_chunker.push(read)
                     if not read: streams.remove(p.stderr)
+                    else: err_chunker.push(read)
                 else:
                     raise RuntimeError
             if len(streams) == 0: break
 
     p.wait()
 
+    process_out.stdout = ''.join(process_out.stdout)
+    process_err.stderr = ''.join(process_err.stderr)
+
     if p.returncode != 0:
-        if process_err.stderr:
+        if process_err.stderr and print_error:
             logger.warning("Received an error message:\n")
             logger.warning("\n[====] \x1b[91mError Message\x1b[0m [====]\n")
             logger.warning(process_err.stderr)
             logger.warning("[====] \x1b[91mEnd o'Message\x1b[0m [====]\n")
         if persist:
-            logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
+            if print_error:
+                logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
         else:
             # This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.
             # sys.stderr.write("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
@@ -961,7 +983,10 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             raise Exception("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
         
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
-    return process_out.stdout.split('\n')
+    Out = process_out.stdout.split('\n')
+    if Out[-1] == '':
+        Out = Out[:-1]
+    return Out
 
 def warn_press_key(warning, timeout=10):
     if type(warning) is str:

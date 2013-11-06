@@ -13,7 +13,7 @@ import numpy as np
 from copy import deepcopy
 from numpy.linalg import eig, norm, solve
 import forcebalance
-from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd
+from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
@@ -56,13 +56,17 @@ class Optimizer(forcebalance.BaseClass):
 
         ## A list of all the things we can ask the optimizer to do.
         self.OptTab    = {'NEWTONRAPHSON'     : self.NewtonRaphson, 
+                          'OPTIMIZE'          : self.NewtonRaphson, 
                           'NEWTON'            : self.NewtonRaphson, 
                           'NR'                : self.NewtonRaphson, 
                           'BFGS'              : self.BFGS,
                           'POWELL'            : self.Powell,
                           'SIMPLEX'           : self.Simplex,
                           'ANNEAL'            : self.Anneal,
+                          'BASIN'             : self.BasinHopping,
+                          'BASINHOPPING'      : self.BasinHopping,
                           'GENETIC'           : self.GeneticAlgorithm,
+                          'CG'                : self.ConjugateGradient,
                           'CONJUGATEGRADIENT' : self.ConjugateGradient,
                           'SCAN_MVALS'        : self.ScanMVals,
                           'SCAN_PVALS'        : self.ScanPVals,
@@ -90,6 +94,9 @@ class Optimizer(forcebalance.BaseClass):
         self.set_option(options,'lm_guess','lmg')
         ## Step size for numerical finite difference
         self.set_option(options,'finite_difference_h','h')
+        self.set_option(options,'finite_difference_h','h0')
+        ## When the trust radius get smaller, the finite difference step might need to get smaller.
+        self.set_option(options,'finite_difference_factor','fdf')
         ## Number of steps to average over
         self.set_option(options,'objective_history','hist')
         ## Function value convergence threshold
@@ -124,10 +131,12 @@ class Optimizer(forcebalance.BaseClass):
         self.set_option(options,'print_parameters','print_vals')
         ## Error tolerance (if objective function rises by less than this, then the optimizer will forge ahead!)
         self.set_option(options,'error_tolerance','err_tol')
-        ## Search tolerance (The nonlinear search will stop if the change is below this threshold)
+        ## Search tolerance (The line search will stop if the change is below this threshold)
         self.set_option(options,'search_tolerance','search_tol')
         self.set_option(options,'read_mvals')
         self.set_option(options,'read_pvals')
+        ## Whether to make backup files
+        self.set_option(options, 'backup')
         
         #======================================#
         #     Variables which are set here     #
@@ -164,10 +173,14 @@ class Optimizer(forcebalance.BaseClass):
         """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
 
         xk = self.OptTab[self.jobtype]()
-        
-        ## Sometimes the optimizer doesn't return anything (i.e. in the case of a single point calculation)
-        ## In these situations, don't do anything
-        if xk == None: return
+
+        ## Don't print a "result" force field if it's the same as the input.
+        print_parameters = True
+        if xk == None and (self.mvals0 == np.zeros(self.FF.np)).all(): 
+            logger.info("Parameter file same as original; will not be printed to 'results' folder.\n")
+            print_parameters = False
+        elif xk == None:
+            xk = self.mvals0
 
         ## Check derivatives by finite difference after the optimization is over (for good measure)
         check_after = False
@@ -176,8 +189,7 @@ class Optimizer(forcebalance.BaseClass):
             self.FDCheckG()
 
         ## Print out final answer
-        final_print = True
-        if final_print:
+        if print_parameters:
             bar = printcool("Final optimization parameters:\n Paste to input file to restart",bold=True,color=4)
             logger.info("read_mvals\n")
             self.FF.print_map(xk)
@@ -185,15 +197,29 @@ class Optimizer(forcebalance.BaseClass):
             bar = printcool("Final physical parameters:",bold=True,color=4)
             self.FF.print_map(self.FF.create_pvals(xk))
             logger.info(bar)
-            self.FF.make(xk,False,'result')
-            logger.info("\nThe final force field has been printed to the 'result' directory.\n")
-            #bar = printcool("\x1b[1;45;93mCongratulations, ForceBalance has finished\x1b[0m\n\x1b[1;45;93mGive yourself a pat on the back!\x1b[0m")
-            bar = printcool("Congratulations, ForceBalance has finished\nGive yourself a pat on the back!",ansi="1;44;93")
+            if self.backup:
+                for fnm in self.FF.fnms:
+                    if os.path.exists(os.path.join('result', fnm)):
+                        bak(os.path.join('result', fnm))
+            self.FF.make(xk,printdir='result')
+            logger.info("\nThe final force field has been written to the 'result' directory.\n")
 
         ## Write out stuff to checkpoint file
         self.writechk()
 
+        ## Print out final message
+        bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
+
         return xk
+
+    def adjh(self, trust):
+        # The finite difference step size should be at most 1% of the trust radius.
+        h = min(self.fdf*trust, self.h0)
+        if h != self.h:
+            logger.info("Setting finite difference step to %.4e\n" % h)
+            self.h = h
+            for tgt in self.Objective.Targets:
+                tgt.h = h
             
     def MainOptimizer(self,b_BFGS=0):
         """ The main ForceBalance adaptive trust-radius pseudo-Newton optimizer.  Tried and true in many situations. :)
@@ -240,13 +266,15 @@ class Optimizer(forcebalance.BaseClass):
             xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
             X_best, xk_prev, trust = self.chk['x_best'], self.chk['xk_prev'], self.chk['trust']
         else:
+            trust    = abs(self.trust0)
             xk       = self.mvals0.copy()
             logger.info('\n')
+            # The finite difference step size should be at most 1% of the trust radius.
+            self.adjh(trust)
             data     = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H  = data['X'], data['G'], data['H']
             ehist    = np.array([X])
             xk_prev  = xk.copy()
-            trust    = abs(self.trust0)
             X_best   = X
 
         X_prev   = X
@@ -314,6 +342,7 @@ class Optimizer(forcebalance.BaseClass):
                 self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
                 logger.info(bar)
             # Evaluate the objective function and its derivatives.
+            self.adjh(trust)
             data        = self.Objective.Full(xk,Ord,verbose=True)
             X, G, H = data['X'], data['G'], data['H']
             ndx = norm(dx)
@@ -338,7 +367,7 @@ class Optimizer(forcebalance.BaseClass):
                 # and the 'b' factor determines how closely we are tied down to the original value.
                 # Recommend values 0.5 and 0.5
                 trust += a*trust*np.exp(-b*(trust/self.trust0 - 1))
-            if X > (X_prev + self.err_tol):
+            if X > (X_prev + max(self.err_tol, self.conv_obj)):
                 Best_Step = 0
                 # Toggle switch for rejection (experimenting with no rejection)
                 Rejects = True
@@ -355,6 +384,7 @@ class Optimizer(forcebalance.BaseClass):
                         logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality))
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
+                        self.adjh(trust)
                         data        = self.Objective.Full(xk,Ord,verbose=True)
                         GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
@@ -397,8 +427,8 @@ class Optimizer(forcebalance.BaseClass):
             H_stor  = H.copy()
             xk_prev = xk.copy()
             X_prev  = X
-            if len(self.FF.parmdestroy_this) > 0:
-                self.FF.parmdestroy_save.append(self.FF.parmdestroy_this)
+            if len(self.FF.prmdestroy_this) > 0:
+                self.FF.prmdestroy_save.append(self.FF.prmdestroy_this)
                 self.FF.linedestroy_save.append(self.FF.linedestroy_this)
         
         bar = printcool("Final objective function value\nFull: % .6e  Un-penalized: % .6e" % (data['X'],data['X0']), '@', bold=True, color=2)
@@ -441,10 +471,10 @@ class Optimizer(forcebalance.BaseClass):
             class Hyper(object):
                 def __init__(self, HL, Penalty):
                     self.H = HL.copy()
-                    self.dx = 1e10 * np.ones(len(HL),dtype=float)
+                    self.dx = 1e10 * np.ones(len(HL))
                     self.Val = 0
-                    self.Grad = np.zeros(len(HL),dtype=float)
-                    self.Hess = np.zeros((len(HL),len(HL)),dtype=float)
+                    self.Grad = np.zeros(len(HL))
+                    self.Hess = np.zeros((len(HL),len(HL)))
                     self.Penalty = Penalty
                 def _compute(self, dx):
                     self.dx = dx.copy()
@@ -465,7 +495,7 @@ class Optimizer(forcebalance.BaseClass):
                         self._compute(dx)
                     return self.Hess
             def hyper_solver(L):
-                dx0 = np.zeros(len(xkd),dtype=float)
+                dx0 = np.zeros(len(xkd))
                 #dx0 = np.delete(dx0, self.excision)
                 # HL = H + (L-1)**2*np.diag(np.diag(H))
                 # Attempt to use plain Levenberg
@@ -546,6 +576,11 @@ class Optimizer(forcebalance.BaseClass):
             logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
             return (N - trust)**2
 
+        def h_fun(L):
+            N = norm(solver(L)[0])
+            logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
+            return (N - self.h)**2
+
         def search_fun(L):
             # Evaluate ONLY the objective function.  Most useful when
             # the objective is cheap, but the derivative is expensive.
@@ -572,11 +607,20 @@ class Optimizer(forcebalance.BaseClass):
                 dxnorm = norm(dx)
 
                 logger.info("\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal\n" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2))
-        else: # This is the nonlinear search code.
+        else: # This is the search code.
             # First obtain a step that is the same length as the provided trust radius.
             LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
+            dx, expect = solver(LOpt)
+            dxnorm = norm(dx)
+            logger.info("Starting search with step size %f\n" % dxnorm)
             bump = False
             Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
+            if Result[1] > 0:
+                LOpt = optimize.brent(h_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
+                dx, expect = solver(LOpt)
+                dxnorm = norm(dx)
+                logger.info("Restarting search with step size %f\n" % dxnorm)
+                Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             ### optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
             ### Result = optimize.fmin_powell(search_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
             dx, _ = solver(Result[0])
@@ -608,45 +652,74 @@ class Optimizer(forcebalance.BaseClass):
 
         """
         from scipy import optimize
+
+        self.prev_bad = False
+        self.xk_prev = self.mvals0.copy()
+        self.x_prev = 0.0
+        self.x_best = None
+        
+        def wrap(fin, Order=0, verbose=True):
+            def fout(mvals):
+                def print_heading():
+                    logger.info('\n')
+                    if Order: logger.info("%9s%9s%12s%12s%14s%12s\n" % ("Eval(G)", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)"))
+                    else: logger.info("%9s%9s%12s%14s%12s\n" % ("Eval(X)", "  |k|  ","  |dk|  ","    -=X2=-  ","Delta(X2)"))
+
+                def print_results(color, newline=True):
+                    if newline: head = '' ; foot = '\n'
+                    else: head = '\r' ; foot = '\r'
+                    if Order: logger.info(head + "%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e" % \
+                                              (fout.evals, np.linalg.norm(mvals), np.linalg.norm(mvals-self.xk_prev), np.linalg.norm(G), color, X, X - self.x_prev) + foot)
+                    else: logger.info(head + "%6i%12.3e%12.3e%s%14.5e\x1b[0m%12.3e" % \
+                                          (fout.evals, np.linalg.norm(mvals), np.linalg.norm(mvals-self.xk_prev), color, X, X - self.x_prev) + foot)
+
+                Result = fin(mvals,Order=Order,verbose=False)
+                fout.evals += 1
+                X, G, H = [Result[i] for i in ['X','G','H']]
+                dx = (self.x_best - X) if self.x_best != None else 0.0
+                if X < self.x_best or self.x_best == None:
+                    color = "\x1b[92m"
+                    self.x_best = X
+                    self.prev_bad = False
+                    if verbose: 
+                        if self.print_vals:
+                            logger.info('\n')
+                            bar = printcool("Mathematical Parameters for minimum:",color=5)
+                            self.FF.print_map(vals=["% .4e" % i for i in mvals])
+                            logger.info(bar+'\n')
+                        for Tgt in self.Objective.Targets:
+                            Tgt.indicate()
+                        self.Objective.Indicate()
+                        print_heading()
+                        print_results(color)
+                else:
+                    if verbose:
+                        color = "\x1b[91m"
+                        if Order:
+                            print_heading()
+                            print_results(color)
+                        else:
+                            if not self.prev_bad: print_heading()
+                            print_results(color, newline=False)
+                    self.prev_bad = True
+                self.xk_prev = mvals.copy()
+                self.x_prev = X
+                if Order == 1:
+                    return G
+                else:
+                    if X != X:
+                        return 1e10
+                    else:
+                        return X
+            fout.evals = 0
+            return fout
+
         def xwrap(func,verbose=True):
-            def my_func(mvals):
-                if verbose: logger.info('\n')
-                Answer = func(mvals,Order=0,verbose=verbose)['X']
-                dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
-                if Answer < my_func.x_best or my_func.x_best == None:
-                    color = "\x1b[92m"
-                    my_func.x_best = Answer
-                else:
-                    color = "\x1b[91m"
-                if verbose:
-                    if self.print_vals:
-                        logger.info("k=" + ' '.join(["% .4f" % i for i in mvals]) + '\n')
-                    logger.info("X2= %s%12.3e\x1b[0m d(X2)= %12.3e\n" % (color,Answer,dx))
-                if Answer != Answer:
-                    return 1e10
-                else:
-                    return Answer
-            my_func.x_best = None
-            return my_func
+            return wrap(func, Order=0, verbose=verbose)
+        
         def gwrap(func,verbose=True):
-            def my_gfunc(mvals):
-                if verbose: logger.info('\n')
-                Output = func(mvals,Order=1,verbose=verbose)
-                Answer = Output['G']
-                Objective = Output['X']
-                dx = (my_gfunc.x_best - Objective) if my_gfunc.x_best != None else 0.0
-                if Objective < my_gfunc.x_best or my_gfunc.x_best == None:
-                    color = "\x1b[92m"
-                    my_gfunc.x_best = Objective
-                else:
-                    color = "\x1b[91m"
-                if verbose:
-                    if self.print_vals:
-                        logger.info("k=" + ' '.join(["% .4f" % i for i in mvals]) + '\n')
-                    logger.info("|Grad|= %12.3e X2= %s%12.3e\x1b[0m d(X2)= %12.3e\n\n" % (norm(Answer),color,Objective,dx))
-                return Answer
-            my_gfunc.x_best = None
-            return my_gfunc
+            return wrap(func, Order=1, verbose=verbose)
+
         if Algorithm == "powell":
             printcool("Minimizing Objective Function using Powell's Method" , ansi=1, bold=1)
             return optimize.fmin_powell(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep)
@@ -655,7 +728,27 @@ class Optimizer(forcebalance.BaseClass):
             return optimize.fmin(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep,maxfun=self.maxstep*10)
         elif Algorithm == "anneal":
             printcool("Minimizing Objective Function using Simulated Annealing" , ansi=1, bold=1)
-            return optimize.anneal(xwrap(self.Objective.Full),self.mvals0,lower=-1*self.trust0*np.ones(self.np),upper=self.trust0*np.ones(self.np),schedule='boltzmann')
+            xmin, Jmin, T, feval, iters, accept, status = optimize.anneal(xwrap(self.Objective.Full), self.mvals0, lower=self.mvals0-1*self.trust0*np.ones(self.np),
+                                                                          upper=self.mvals0+self.trust0*np.ones(self.np),schedule='boltzmann', full_output=True)
+            scodes = {0 : "Points no longer changing.",
+                      1 : "Cooled to final temperature.",
+                      2 : "Maximum function evaluations reached.",
+                      3 : "Maximum cooling iterations reached.",
+                      4 : "Maximum accepted query locations reached.",
+                      5 : "Final point not the minimum amongst encountered points."}
+            logger.info("Simulated annealing info:\n")
+            logger.info("Status: %s \n" % scodes[status])
+            logger.info("Function evaluations: %i" % feval)
+            logger.info("Cooling iterations:   %i" % iters)
+            logger.info("Tests accepted:       %i" % iters)
+            return xmin
+        elif Algorithm == "basinhopping":
+            printcool("Minimizing Objective Function using Basin Hopping" , ansi=1, bold=1)
+            T = xwrap(self.Objective.Full)(self.mvals0)
+            Result = optimize.basinhopping(xwrap(self.Objective.Full), self.mvals0, niter=self.maxstep, T=T, stepsize=self.trust0, interval=20,
+                                           minimizer_kwargs={'method':'nelder-mead','options':{'xtol': self.conv_stp,'ftol':self.conv_obj}}, disp=True)
+            logger.info(Result.message + "\n")
+            return Result.x
         elif Algorithm == "cg":
             printcool("Minimizing Objective Function using Conjugate Gradient" , ansi=1, bold=1)
             return optimize.fmin_cg(xwrap(self.Objective.Full,verbose=False),self.mvals0,fprime=gwrap(self.Objective.Full),gtol=self.conv_grd)
@@ -772,8 +865,12 @@ class Optimizer(forcebalance.BaseClass):
         return self.ScipyOptimizer(Algorithm="anneal")
 
     def ConjugateGradient(self):
-        """ Use SciPy's built-in simulated annealing algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
+        """ Use SciPy's built-in conjugate gradient algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
         return self.ScipyOptimizer(Algorithm="cg")
+
+    def BasinHopping(self):
+        """ Use SciPy's built-in basin hopping algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
+        return self.ScipyOptimizer(Algorithm="basinhopping")
 
     def Scan_Values(self,MathPhys=1):
         """ Scan through parameter values.
@@ -838,21 +935,25 @@ class Optimizer(forcebalance.BaseClass):
     def SinglePoint(self):
         """ A single-point objective function computation. """
         data        = self.Objective.Full(self.mvals0,Order=0,verbose=True)
-        logger.info("The objective function is:" + str(data['X']) + '\n')
+        printcool("Objective Function Single Point: %.8f" % data['X'])
 
     def Gradient(self):
         """ A single-point gradient computation. """
         data        = self.Objective.Full(self.mvals0,Order=1)
-        logger.info(str(data['X']) + '\n')
-        logger.info(str(data['G']) + '\n')
-        logger.info(str(data['H']) + '\n')
+        printcool("Objective function: %.8f\nGradient below" % data['X'])
+        self.FF.print_map(vals=data['G'],precision=8)
+        logger.info(bar)
 
     def Hessian(self):
         """ A single-point Hessian computation. """
         data        = self.Objective.Full(self.mvals0,Order=2)
-        logger.info(str(data['X']) + '\n')
-        logger.info(str(data['G']) + '\n')
-        logger.info(str(data['H']) + '\n')
+        printcool("Objective function: %.8f\nGradient below" % data['X'])
+        self.FF.print_map(vals=data['G'],precision=8)
+        logger.info(bar)
+        print bar
+        printcool("Hessian matrix:")
+        pmat2d(data['H'], precision=8)
+        print bar
 
     def FDCheckG(self):
         """ Finite-difference checker for the objective function gradient.
@@ -864,7 +965,7 @@ class Optimizer(forcebalance.BaseClass):
         """
 
         Adata        = self.Objective.Full(self.mvals0,Order=1)['G']
-        Fdata        = np.zeros(self.FF.np,dtype=float)
+        Fdata        = np.zeros(self.FF.np)
         printcool("Checking first derivatives by finite difference!\n%-8s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter ID","Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
         for i in range(self.FF.np):
@@ -894,7 +995,7 @@ class Optimizer(forcebalance.BaseClass):
 
         """
         Adata        = self.Objective.Full(self.mvals0,Order=2)['H']
-        Fdata        = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        Fdata        = np.zeros((self.FF.np,self.FF.np))
         printcool("Checking second derivatives by finite difference!\n%-8s%-20s%-20s%13s%13s%13s%13s" \
                   % ("Index", "Parameter1 ID", "Parameter2 ID", "Analytic","Numerical","Difference","Fractional"),bold=1,color=5)
 
@@ -933,5 +1034,5 @@ class Optimizer(forcebalance.BaseClass):
         """ Write the checkpoint file for the main optimizer. """
         if self.wchk_fnm != None:
             logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
-            with open(os.path.join(self.root,self.wchk_fnm),'w') as f: pickle.dump(self.chk,f)
+            with wopen(os.path.join(self.root,self.wchk_fnm)) as f: pickle.dump(self.chk,f)
         

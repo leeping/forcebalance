@@ -17,10 +17,7 @@ class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests):
         self.tgt_opt.update({'type':'ABINITIO_GMX',
             'name':'cluster-02'})
 
-        try:
-            self.ff = forcebalance.forcefield.FF(self.options)
-        except:
-            self.skipTest("Unable to create forcefield from water.itp\n")
+        self.ff = forcebalance.forcefield.FF(self.options)
 
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
@@ -33,3 +30,6 @@ class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests):
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""
         return super(TestAbInitio_GMX,self).shortDescription() + " (AbInitio_GMX)"
+
+if __name__ == '__main__':           
+    unittest.main()

@@ -23,7 +23,8 @@ import os
 import sys
 from re import match
 from forcebalance.target import Target
-from numpy import array, dot, exp, linalg, mean, ones, zeros
+from nifty import *
+import numpy as np
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
@@ -76,7 +77,7 @@ class Counterpoise(Target):
                     elem.append(sline[0])
                 an += 1
                 if an == self.na:
-                    xyzs.append(array(xyz))
+                    xyzs.append(np.array(xyz))
                     sn += 1
                     if sn == self.ns:
                         break
@@ -89,7 +90,7 @@ class Counterpoise(Target):
         """ Load in the counterpoise data, which is easy; the file
         consists of floating point numbers separated by newlines.  """
         logger.info("Loading CP Data!\n")
-        return array([float(i.strip()) for i in open(fnm).readlines()])[:self.ns]
+        return np.array([float(i.strip()) for i in open(fnm).readlines()])[:self.ns]
 
     def get(self,mvals,AGrad=False,AHess=False):
         """Gets the objective function for fitting the counterpoise correction.
@@ -130,7 +131,7 @@ class Counterpoise(Target):
                 for j in range(i+1,self.na):
                     # Compute the distance between 2 atoms
                     # and the names of the elements involved
-                    dx = linalg.norm(xyz[i,:]-xyz[j,:])
+                    dx = np.linalg.norm(xyz[i,:]-xyz[j,:])
                     ai = self.elem[i]
                     aj = self.elem[j]
                     aiaj = ai < aj and "%s%s" % (ai,aj) or "%s%s" % (aj,ai)
@@ -139,7 +140,7 @@ class Counterpoise(Target):
                         # Look up the parameter values.  This might be something like 'CPGAUSSBLiCl'.
                         A, B, C = [self.FF.pvals[self.FF.map[k+aiaj]] for k in pidlist]
                         # Actually compute the interaction.
-                        cpmm_i += A * exp (-B * (dx - C)**2)
+                        cpmm_i += A * np.exp (-B * (dx - C)**2)
                     # This is repeated for different interaction types...
                     pidlist = ['CPGEXPA', 'CPGEXPB', 'CPGEXPG', 'CPGEXPX']
                     if all([k+aiaj in self.FF.map for k in pidlist]):
@@ -147,28 +148,28 @@ class Counterpoise(Target):
                         a  = 2*A*(X0-B)
                         b  = A*(X0**2-B**2)+G
                         if dx < X0:
-                            cpmm_i += exp(-a*dx+b)
+                            cpmm_i += np.exp(-a*dx+b)
                         else:
-                            cpmm_i += exp(-A*(dx-B)**2+G)
+                            cpmm_i += np.exp(-A*(dx-B)**2+G)
                     pidlist = ['CPEXPGA1','CPEXPGB','CPEXPGX0','CPEXPGA2']
                     if all([k+aiaj in self.FF.map for k in pidlist]):
                         A1, B, X0, A2 = [self.FF.pvals[self.FF.map[k+aiaj]] for k in pidlist]
                         B2 = 2 * A2 * X0 - A1
                         G  = B - A2 * X0**2
                         if dx < X0:
-                            cpmm_i += exp(-A1*dx+B)
+                            cpmm_i += np.exp(-A1*dx+B)
                         else:
-                            cpmm_i += exp(-A2*dx**2 + B2*dx + G)
+                            cpmm_i += np.exp(-A2*dx**2 + B2*dx + G)
             cpmm.append(cpmm_i)
-        cpmm = array(cpmm)
+        cpmm = np.array(cpmm)
         cpmm -= cpmm[-1] # This prevents craziness from happening
         # Write the results to a file for plotting
-        with open('results','w') as f: f.writelines(["% .4f % .4f\n" % (cpmm[i],self.cpqm[i]) for i in range(len(cpmm))])
+        with wopen('results') as f: f.writelines(["% .4f % .4f\n" % (cpmm[i],self.cpqm[i]) for i in range(len(cpmm))])
         # Compute the difference between MM and QM counterpoise corrections
         dcp  = cpmm - self.cpqm
         # Build the final answer and return it
-        Answer = {'X': dot(dcp,dcp),
-                  'G': zeros(self.FF.np),
-                  'H': zeros((self.FF.np,self.FF.np))
+        Answer = {'X': np.dot(dcp,dcp),
+                  'G': np.zeros(self.FF.np),
+                  'H': np.zeros((self.FF.np,self.FF.np))
                   }
         return Answer

@@ -1,6 +1,7 @@
 import forcebalance
 import forcebalance.objective
 import forcebalance.nifty
+from forcebalance.nifty import wopen
 import tarfile
 import os
 import forcebalance.output
@@ -29,7 +30,7 @@ Tgt.submit_jobs(mvals, AGrad = True, AHess = True)
 
 Ans = Tgt.sget(mvals, AGrad=True, AHess=True)
 
-with open('objective_%s.p' % id_string, 'w') as f:
+with wopen('objective_%s.p' % id_string) as f:
     forcebalance.nifty.lp_dump(Ans, f)        # or some other method of storing resulting objective
 
 # also run target.indicate()

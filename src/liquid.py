@@ -21,7 +21,7 @@ try:
 except: pass
 from pymbar import pymbar
 import itertools
-from collections import defaultdict, namedtuple
+from collections import defaultdict, namedtuple, OrderedDict
 from forcebalance.optimizer import Counter, GoodStep
 import csv
 
@@ -48,11 +48,9 @@ def weight_info(W, PT, N_k, verbose=True):
 class Liquid(Target):
     
     """ Subclass of Target for liquid property matching."""
-    
+
     def __init__(self,options,tgt_opts,forcefield):
-        """ Create an instance of the class. """
-        
-        # Initialize the SuperClass!
+        # Initialize base class
         super(Liquid,self).__init__(options,tgt_opts,forcefield)
         # Fractional weight of the density
         self.set_option(tgt_opts,'w_rho',forceprint=True)
@@ -102,13 +100,32 @@ class Liquid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
-        
+        # Read in liquid starting coordinates.
+        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)): 
+            raise RuntimeError("%s doesn't exist; please provide liquid_coords option" % self.liquid_coords)
+        self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.liquid_coords))
+        # Read in gas starting coordinates.
+        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.gas_coords)): 
+            raise RuntimeError("%s doesn't exist; please provide gas_coords option" % self.gas_coords)
+        self.gas_mol = Molecule(os.path.join(self.root, self.tgtdir, self.gas_coords))
+        # List of trajectory files that may be deleted if self.save_traj == 1.
+        self.last_traj = []
+        # Extra files to be copied back at the end of a run.
+        self.extra_output = []
         ## Read the reference data
         self.read_data()
-        ## Prepare the temporary directory
-        self.prepare_temp_directory(options,tgt_opts)
-        ## Extra platform-dependent data to send back
-        self.extra_output = []
+        # Extra files to be linked into the temp-directory.
+        self.nptfiles += [self.liquid_coords, self.gas_coords]
+        # Scripts to be copied from the ForceBalance installation directory.
+        self.scripts += ['npt.py']
+        # Prepare the temporary directory.
+        self.prepare_temp_directory()
+        # Build keyword dictionary to pass to engine.
+        self.gas_engine_args.update(self.OptionDict)
+        self.gas_engine_args.update(options)
+        del self.gas_engine_args['name']
+        # Create engine object for gas molecule to do the polarization correction.
+        self.gas_engine = self.engine_(target=self, mol=self.gas_mol, **self.gas_engine_args)
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
@@ -117,23 +134,18 @@ class Liquid(Target):
         np.seterr(under='ignore')
         ## Saved force field mvals for all iterations
         self.SavedMVal = {}
-        ## Saved trajectories for all iterations and all temperatures :)
+        ## Saved trajectories for all iterations and all temperatures
         self.SavedTraj = defaultdict(dict)
         ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
-        # Prefix to command string for launching NPT simulations.
-        self.nptpfx = ""
-        # List of extra files to upload to Work Queue.
-        self.nptfiles = []
-        # Suffix to command string for launching NPT simulations.
-        self.nptsfx = [("--minimize_energy" if self.minimize_energy else None), 
-                       ("--liquid_equ_steps %i" % self.liquid_equ_steps if self.liquid_equ_steps > 0 else None),
-                       ("--gas_equ_steps %i" % self.gas_equ_steps if self.gas_equ_steps > 0 else None), 
-                       ("--gas_prod_steps %i" % self.gas_prod_steps if self.gas_prod_steps > 0 else None), 
-                       ("--gas_timestep %f" % self.gas_timestep if self.gas_timestep > 0.0 else None), 
-                       ("--gas_interval %f" % self.gas_interval if self.gas_interval > 0.0 else None)]
-        # List of trajectory files that may be deleted if self.save_traj == 1.
-        self.last_traj = []
+
+    def prepare_temp_directory(self):
+        """ Prepare the temporary directory by copying in important files. """
+        abstempdir = os.path.join(self.root,self.tempdir)
+        for f in self.nptfiles:
+            LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+        for f in self.scripts:
+            LinkFile(os.path.join(os.path.split(__file__)[0],"data",f),os.path.join(abstempdir,f))
 
     def read_data(self):
         # Read the 'data.csv' file. The file should contain guidelines.
@@ -144,7 +156,8 @@ class Liquid(Target):
         R = [[wrd.lower() for wrd in line] for line in R1 if any([len(wrd) for wrd in line]) > 0]
         global_opts = OrderedDict()
         found_headings = False
-        known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra','cvib_inter','cni','devib_intra','devib_inter']
+        known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
+                      'cvib_inter','cni','devib_intra','devib_inter']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -210,7 +223,7 @@ class Liquid(Target):
                 else:
                     # If there is only one data point, then the denominator is just the single
                     # data point itself.
-                    default_denoms[head+"_denom"] = np.sqrt(dat[0])
+                    default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
             self.PhasePoints = self.RefData[head].keys()
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
@@ -231,24 +244,57 @@ class Liquid(Target):
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-            if self.liquid_traj != None:
-                self.liquid_conf.xyzs[0] = self.liquid_traj.xyzs[simnum%len(self.liquid_traj)]
-                self.liquid_conf.boxes[0] = self.liquid_traj.boxes[simnum%len(self.liquid_traj)]
-            self.liquid_conf.write(self.liquid_fnm)
-            cmdstr = '%s python npt.py %s %i %.3f %.3f %.3f %.3f %s' % (self.nptpfx, self.engine, self.liquid_prod_steps, self.liquid_timestep,
-                                                                        self.liquid_interval, temperature, pressure, ' '.join([i for i in self.nptsfx if i != None]))
+            self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
-                _exec(cmdstr, outfnm='npt.out')
+                _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
                 queue_up(wq, command = cmdstr+' &> npt.out',
-                         input_files = self.nptfiles + ['npt.py', self.liquid_fnm, self.gas_fnm, 'forcebalance.p'],
-                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output,
-                         tgt=self)
+                         input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
+                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
 
-    def indicate(self):
-        # Somehow the "indicator" functionality made its way into "get".  No matter.
+    def polarization_correction(self,mvals):
+        d = self.gas_engine.get_multipole_moments(optimize=True)['dipole']
+        if not in_fd():
+            logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
+        # Taken from the original OpenMM interface code, this is how we calculate the conversion factor.
+        # dd2 = ((np.linalg.norm(d)-self.self_pol_mu0)*debye)**2
+        # eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
+        # epol = 0.5*dd2/(self.self_pol_alpha*angstrom**3*4*np.pi*eps0)/(kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
+        # In [2]: eps0 = 8.854187817620e-12 * coulomb**2 / newton / meter**2
+        # In [7]: 1.0 * debye ** 2 / (1.0 * angstrom**3*4*np.pi*eps0) / (kilojoule_per_mole/AVOGADRO_CONSTANT_NA)
+        # Out[7]: 60.240179789402056
+        convert = 60.240179789402056
+        dd2 = (np.linalg.norm(d)-self.self_pol_mu0)**2
+        epol = 0.5*convert*dd2/self.self_pol_alpha
+        return epol
+
+    def indicate(self): 
+        AGrad = hasattr(self, 'Gp')
+        PrintDict = OrderedDict()
+        def print_item(key, heading, physunit):
+            if self.Xp[key] > 0:
+                printcool_dictionary(self.Pp[key], title='%s %s%s\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % 
+                                     (self.name, heading, " (%s) " % physunit if physunit else ""), bold=True, color=4, keywidth=15)
+                bar = printcool("%s objective function: % .3f%s" % (heading, self.Xp[key], ", Derivative:" if AGrad else ""))
+                if AGrad:
+                    self.FF.print_map(vals=self.Gp[key])
+                    logger.info(bar)
+                PrintDict[heading] = "% 10.5f % 8.3f % 14.5e" % (self.Xp[key], self.Wp[key], self.Xp[key]*self.Wp[key])
+
+        print_item("Rho", "Density", "kg m^-3")
+        print_item("Hvap", "Enthalpy of Vaporization", "kJ mol^-1")
+        print_item("Alpha", "Thermal Expansion Coefficient", "10^-4 K^-1")
+        print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
+        print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
+        print_item("Eps0", "Dielectric Constant", None)
+
+        PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
+
+        Title = "%s Condensed Phase Properties:\n %-20s %40s" % (self.name, "Property Name", "Residual x Weight = Contribution")
+        printcool_dictionary(PrintDict,color=4,title=Title,keywidth=31)
         return
 
     def objective_term(self, points, expname, calc, err, grad, name="Quantity", SubAverage=False):
@@ -258,7 +304,7 @@ class Liquid(Target):
             Denom = getattr(self,expname+"_denom")
         else:
             # If the reference data doesn't exist then return nothing.
-            return 0.0, np.zeros(self.FF.np, dtype=float), np.zeros((self.FF.np,self.FF.np),dtype=float), None
+            return 0.0, np.zeros(self.FF.np), np.zeros((self.FF.np,self.FF.np)), None
             
         Sum = sum(Weights.values())
         for i in Weights:
@@ -276,13 +322,13 @@ class Liquid(Target):
             Denom /= 3 ** 0.5
         
         Objective = 0.0
-        Gradient = np.zeros(self.FF.np, dtype=float)
-        Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        Gradient = np.zeros(self.FF.np)
+        Hessian = np.zeros((self.FF.np,self.FF.np))
         Objs = {}
         GradMap = []
         avgCalc = 0.0
         avgExp  = 0.0
-        avgGrad = np.zeros(self.FF.np, dtype=float)
+        avgGrad = np.zeros(self.FF.np)
         for i, PT in enumerate(points):
             avgCalc += Weights[PT]*calc[PT]
             avgExp  += Weights[PT]*exp[PT]
@@ -319,7 +365,7 @@ class Liquid(Target):
         GradMapPrint = [["#PhasePoint"] + self.FF.plist]
         for PT, g in zip(points,GradMap):
             GradMapPrint.append([' %8.2f %8.1f %3s' % PT] + ["% 9.3e" % i for i in g])
-        o = open('gradient_%s.dat' % name,'w')
+        o = wopen('gradient_%s.dat' % name)
         for line in GradMapPrint:
             print >> o, ' '.join(line)
         o.close()
@@ -334,7 +380,7 @@ class Liquid(Target):
         # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
         #
         # First dump the force field to a pickle file
-        with open('forcebalance.p','w') as f: lp_dump((self.FF,mvals,self.h,AGrad),f)
+        with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict,AGrad),f)
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == 0 and self.manual:
@@ -406,7 +452,7 @@ class Liquid(Target):
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if os.path.exists('./%s/npt_result.p.bz2' % label):
-                _exec('bunzip2 ./%s/npt_result.p.bz2' % label)
+                _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
             elif os.path.exists('./%s/npt_result.p' % label): pass
             else:
                 logger.warning('In %s :\n' % os.getcwd())
@@ -481,7 +527,7 @@ class Liquid(Target):
         Shots = len(Energies[0])
         N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
-        U_kln = np.zeros([BSims,BSims,Shots], dtype = np.float64)
+        U_kln = np.zeros([BSims,BSims,Shots])
         for m, PT in enumerate(BPoints):
             T = PT[0]
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
@@ -500,13 +546,13 @@ class Liquid(Target):
             W1 = mbar.getWeights()
             logger.info("Done\n")
         elif len(BPoints) == 1:
-            W1 = np.ones((BPoints*Shots,BPoints),dtype=float)
+            W1 = np.ones((BPoints*Shots,BPoints))
             W1 /= BPoints*Shots
         
         def fill_weights(weights, phase_points, mbar_points, snapshots):
             """ Fill in the weight matrix with MBAR weights where MBAR was run, 
             and equal weights otherwise. """
-            new_weights = np.zeros([len(phase_points)*snapshots,len(phase_points)],dtype=np.float64)
+            new_weights = np.zeros([len(phase_points)*snapshots,len(phase_points)])
             for m, PT in enumerate(phase_points):
                 if PT in mbar_points:
                     mm = mbar_points.index(PT)
@@ -527,7 +573,7 @@ class Liquid(Target):
         if len(mBPoints) > 0:
             mBSims = len(mBPoints)
             mN_k = np.ones(mBSims)*mShots
-            mU_kln = np.zeros([mBSims,mBSims,mShots], dtype = np.float64)
+            mU_kln = np.zeros([mBSims,mBSims,mShots])
             for m, PT in enumerate(mBPoints):
                 T = PT[0]
                 beta = 1. / (kb * T)
@@ -539,7 +585,7 @@ class Liquid(Target):
                 mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
                 mW1 = mmbar.getWeights()
         elif len(mBPoints) == 1:
-            mW1 = np.ones((mBSims*mShots,mSims),dtype=float)
+            mW1 = np.ones((mBSims*mShots,mSims))
             mW1 /= mBSims*mShots
 
         mW2 = fill_weights(mW1, mPoints, mBPoints, mShots)
@@ -559,7 +605,7 @@ class Liquid(Target):
             H = E + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
-            C = weight_info(W, PT, np.ones(len(Points), dtype=np.float64)*Shots, verbose=True)
+            C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=True)
             Gbar = flat(np.mat(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
@@ -603,7 +649,7 @@ class Liquid(Target):
                     Hvap_calc[PT] += self.RefData['cvib_inter'][PT]
             else:
                 Hvap_calc[PT]  = 0.0
-                Hvap_grad[PT]  = np.zeros(self.FF.np,dtype=float)
+                Hvap_grad[PT]  = np.zeros(self.FF.np)
             ## Thermal expansion coefficient.
             Alpha_calc[PT] = 1e4 * (avg(H*V)-avg(H)*avg(V))/avg(V)/(kT*T)
             GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
@@ -657,8 +703,8 @@ class Liquid(Target):
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
 
-        Gradient = np.zeros(self.FF.np, dtype=float)
-        Hessian = np.zeros((self.FF.np,self.FF.np),dtype=float)
+        Gradient = np.zeros(self.FF.np)
+        Hessian = np.zeros((self.FF.np,self.FF.np))
 
         if X_Rho == 0: self.w_rho = 0.0
         if X_Hvap == 0: self.w_hvap = 0.0
@@ -681,75 +727,17 @@ class Liquid(Target):
         if AHess:
             Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0
 
-        PrintDict = OrderedDict()
-        if X_Rho > 0:
-            printcool_dictionary(RhoPrint, title='%s Density (kg m^-3) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Density objective function: % .3f%s" % (X_Rho, ", Derivative:" if AGrad else ""))
+        if not in_fd():
+            self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha, 
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0}
+            self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3, 
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6}
+            self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint, 
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print}
             if AGrad:
-                self.FF.print_map(vals=G_Rho)
-                logger.info(bar)
-            PrintDict['Density'] = "% 10.5f % 8.3f % 14.5e" % (X_Rho, w_1, X_Rho*w_1)
-
-        if X_Hvap > 0:
-            printcool_dictionary(HvapPrint, title='%s Enthalpy of Vaporization (kJ mol^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("H_vap objective function: % .3f%s" % (X_Hvap, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Hvap)
-                logger.info(bar)
-                
-            PrintDict['Enthalpy of Vaporization'] = "% 10.5f % 8.3f % 14.5e" % (X_Hvap, w_2, X_Hvap*w_2)
-
-        if X_Alpha > 0:
-            printcool_dictionary(AlphaPrint,title='%s Thermal Expansion Coefficient (10^-4 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Thermal Expansion objective function: % .3f%s" % (X_Alpha, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Alpha)
-                logger.info(bar)
-
-            PrintDict['Thermal Expansion Coefficient'] = "% 10.5f % 8.3f % 14.5e" % (X_Alpha, w_3, X_Alpha*w_3)
-
-        if X_Kappa > 0:
-            printcool_dictionary(KappaPrint,title='%s Isothermal Compressibility (10^-6 bar^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Compressibility objective function: % .3f%s" % (X_Kappa, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Kappa)
-                logger.info(bar)
-                
-            PrintDict['Isothermal Compressibility'] = "% 10.5f % 8.3f % 14.5e" % (X_Kappa, w_4, X_Kappa*w_4)
-
-        if X_Cp > 0:
-            printcool_dictionary(CpPrint,   title='%s Isobaric Heat Capacity (cal mol^-1 K^-1) \nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Heat Capacity objective function: % .3f%s" % (X_Cp, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Cp)
-                logger.info(bar)
-
-            PrintDict['Isobaric Heat Capacity'] = "% 10.5f % 8.3f % 14.5e" % (X_Cp, w_5, X_Cp*w_5)
-
-        if X_Eps0 > 0:
-            printcool_dictionary(Eps0Print,   title='%s Dielectric Constant\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % self.name,bold=True,color=4,keywidth=15)
-            bar = printcool("Dielectric Constant objective function: % .3f%s" % (X_Eps0, ", Derivative:" if AGrad else ""))
-            if AGrad:
-                self.FF.print_map(vals=G_Eps0)
-                logger.info(bar)
-
-            PrintDict['Dielectric Constant'] = "% 10.5f % 8.3f % 14.5e" % (X_Eps0, w_6, X_Eps0*w_6)
-
-        PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",Objective)
-
-        Title = "%s Condensed Phase Properties:\n %-20s %40s" % (self.name, "Property Name", "Residual x Weight = Contribution")
-        printcool_dictionary(PrintDict,color=4,title=Title,keywidth=31)
+                self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha, 
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0}
+            self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         return Answer
-
-    @abc.abstractmethod
-    def polarization_correction(self,mvals):
-
-        """ 
-        
-        Return the self-polarization correction as described in Berendsen et al., JPC 1987.
-
-        """
-        
-        raise NotImplementedError('This method is not implemented in the base class')
