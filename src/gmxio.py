@@ -390,7 +390,7 @@ class ITP_Reader(BaseReader):
                                                  'Charge'       : atype['chg'],
                                                  'ParticleType' : atype['ptp']}
         elif self.sec == 'nonbond_params':
-            atom = [int(s[0]), int(s[1])]
+            atom = [s[0], s[1]]
             self.itype = pftypes[self.nbtype]
         elif self.sec == 'atoms':
             # Ah, this is the atom name, not the atom number.
@@ -1068,7 +1068,6 @@ class GMX(Engine):
             md_opts["nstcomm"] = 0
 
         md_opts["nstenergy"] = nsave
-        md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
         md_opts["nstvout"] = nsave
         md_opts["nstfout"] = 0
@@ -1089,9 +1088,9 @@ class GMX(Engine):
         if nequil > 0:
             if verbose: logger.info("Equilibrating...\n")
             eq_opts = deepcopy(md_opts)
-            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstcalcenergy" : 0, "nstxout" : 0})
+            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0})
             eq_defs = deepcopy(md_defs)
-            if "pcoupl" in eq_defs: eq_defs["pcoupl"] = "berendsen"
+            if "pcoupl" in eq_defs: eq_opts["pcoupl"] = "berendsen"
             write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
             self.warngmx("grompp -c %s -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (gro1, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
             self.callgmx("mdrun -v -deffnm %s-eq -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
