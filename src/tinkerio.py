@@ -875,7 +875,7 @@ class TINKER(Engine):
                 edyn.append(float(s[2]))
             if 'Current Kinetic' in line:
                 kdyn.append(float(s[2]))
-            if s[0] == 'Temperature' and s[2] == 'Kelvin':
+            if len(s) > 0 and s[0] == 'Temperature' and s[2] == 'Kelvin':
                 temps.append(float(s[1]))
 
         # Potential and kinetic energies converted to kJ/mol.
