@@ -252,11 +252,10 @@ class Optimizer(forcebalance.BaseClass):
             warn_press_key("Condensed phase targets detected - may not converge with current choice of convergence_objective (%.e)\nRecommended range is 1e-2 - 1e-1 for this option." % self.conv_obj)
         # Parameters for the adaptive trust radius
         a = self.adapt_fac  # Default value is 0.5, decrease to make more conservative.  Zero to turn off all adaptive.
-        b = self.adapt_damp # Default value is 0.5, increase to make more conservative
+        b = self.adapt_damp # Default value is 0.5, increase to make more conservative.
         printcool( "Main Optimizer\n%s Mode%s" % ("BFGS" if b_BFGS else "Newton-Raphson", " (Static Radius)" if a == 0.0 else " (Adaptive Radius)"), ansi=1, bold=1)
         # First, set a bunch of starting values
         Ord         = 1 if b_BFGS else 2
-        #Ord         = 2
         global ITERATION_NUMBER
         ITERATION_NUMBER = 0
         global GOODSTEP
@@ -285,10 +284,10 @@ class Optimizer(forcebalance.BaseClass):
         nxk = norm(xk)
         ngr = norm(G)
 
+        ThreQual = 0.25
         Quality  = 0.0
         restep = False
         GOODSTEP = 1
-        Ord         = 1 if b_BFGS else 2
 
         while 1: # Loop until convergence is reached.
             ## Put data into the checkpoint file
@@ -296,21 +295,22 @@ class Optimizer(forcebalance.BaseClass):
                         'x_best': X_best,'xk_prev': xk_prev, 'trust': trust}
             if self.wchk_step:
                 self.writechk()
+            # Factor of two is so [0,1] stdev is normalized to 1
             stdfront = len(ehist) > self.hist and np.std(np.sort(ehist)[:self.hist]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
             stdfront *= 2
             logger.info("%6s%12s%12s%12s%14s%12s%12s\n" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual"))
             logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality))
             # Check the convergence criteria
-            if ngr < self.conv_grd:
+            if ngr < self.conv_grd and Quality > ThreQual:
                 logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.conv_grd)
                 break
             if ITERATION_NUMBER == self.maxstep:
                 logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION_NUMBER)
                 break
-            if ndx < self.conv_stp and ITERATION_NUMBER > 0 and not restep:
+            if ndx < self.conv_stp and Quality > ThreQual and ITERATION_NUMBER > 0 and not restep:
                 logger.info("Convergence criterion reached in step size (%.2e)\n" % self.conv_stp)
                 break
-            if stdfront < self.conv_obj and len(ehist) > self.hist and not restep: # Factor of two is so [0,1] stdev is normalized to 1
+            if stdfront < self.conv_obj and Quality > ThreQual and len(ehist) > self.hist and not restep:
                 logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.conv_obj)
                 break
             if self.print_grad:
@@ -357,7 +357,7 @@ class Optimizer(forcebalance.BaseClass):
                 logger.warning("Warning: Step size of zero detected (i.e. wrong direction).  Try reducing the finite_difference_h parameter\n")
                 Quality = 1.0 # This is a step length of zero.
 
-            if Quality <= 0.25 and X < (X_prev + self.err_tol) and self.trust0 > 0:
+            if Quality <= ThreQual and X < (X_prev + self.err_tol) and self.trust0 > 0:
                 # If the step quality is bad, then we should decrease the trust radius.
                 trust = max(ndx*(1./(1+a)), self.mintrust)
                 logger.info("Low quality step, reducing trust radius to % .4e\n" % trust)
