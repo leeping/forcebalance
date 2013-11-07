@@ -131,22 +131,22 @@ tgt_opts_types = {
                  "fragment1" : (None, 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
                  "fragment2" : (None, 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
                  "openmm_precision" : (None, -10, 'Precision of OpenMM calculation if using CUDA or OpenCL platform.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
-                 "openmm_platform" : ('CUDA', -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
+                 "openmm_platform" : (None, -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
                  "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
                  "inter_txt"             : ('interactions.txt', 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
                  "reassign_modes"        : (None, -180, 'Reassign modes before fitting frequencies, using either linear assignment "permute" or maximum overlap "overlap".', 'Vibrational frequency targets', 'vibration'),
                  "liquid_coords"         : (None, 0, 'Provide file name for condensed phase coordinates.', 'Condensed phase properties', 'Liquid'),
                  "gas_coords"            : (None, 0, 'Provide file name for gas phase coordinates.', 'Condensed phase properties', 'Liquid'),
-                 },
-    'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
-                 "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
-                 },
-    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
                  "coords"                : (None, -10, 'Coordinates for single point evaluation; if not provided, will search for a default.', 'Energy/force matching, ESP evaluations, interaction energies'),
                  "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM systems but can also contain coordinates.', 'Targets that use OpenMM', 'OpenMM'),
                  "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
+                 },
+    'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
+                 "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
+                 },
+    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
@@ -155,7 +155,7 @@ tgt_opts_types = {
                  "liquid_equ_steps"   : (1000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),
                  "gas_prod_steps"     : (10000, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "gas_equ_steps"      : (1000, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
-                 "writelevel"         : (1, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
+                 "writelevel"         : (0, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
                  "md_threads"         : (1, 0, 'Set the number of threads used by Gromacs or TINKER processes in MD simulations', 'Condensed phase properties in GROMACS and TINKER', 'Liquid_GMX, Liquod_TINKER'),
                  "save_traj"          : (0, -10, 'Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save', 'Condensed phase properties', 'Liquid'),
                  },
@@ -481,9 +481,9 @@ def parse_inputs(input_file=None):
                 logger.error("Unrecognized section: %s\n" % section)
                 sys.exit(1)
         except:
-            traceback.print_exc()
+            # traceback.print_exc()
             logger.error("Failed to read in this line! Check your input file.\n")
-            logger.exception(line + '\n')
+            logger.exception('\x1b[91m' + line + '\x1b[0m\n')
             sys.exit(1)
     if section == "SIMULATION" or section == "TARGET":
         tgt_opts.append(this_tgt_opt)

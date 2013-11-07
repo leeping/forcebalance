@@ -6,7 +6,7 @@
 
 import os
 import shutil
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once
 import numpy as np
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
@@ -203,19 +203,34 @@ class AbInitio(Target):
         else:
             raise Exception('Please choose a valid force_map keyword: %s' % ', '.join(self.AtomLists.keys()))
 
-        # Try to be intelligent here.  Before computing net forces and torques, first filter out all particles that are not atoms.
-        if len(xyz) > self.fitatoms:
-            xyz1 = np.array([xyz[i] for i in range(len(xyz)) if self.AtomLists['ParticleType'][i] == 'A'])
-        else:
-            xyz1 = xyz.copy()
+        nft = self.fitatoms
+        # Number of particles that the force is acting on
+        nfp = force.reshape(-1,3).shape[0]
+        # Number of particles in the XYZ coordinates
+        nxp = xyz.shape[0]
+        # Number of particles in self.AtomLists
+        npr = len(self.AtomMask)
+        # Number of true atoms
+        nat = sum(self.AtomMask)
 
-        if len(Block) > self.fitatoms:
-            Block = [Block[i] for i in range(len(Block)) if self.AtomLists['ParticleType'][i] == 'A']
+        mask = np.array([i for i in range(npr) if self.AtomMask[i]])
+        
+        if nfp not in [npr, nat]:
+            raise RuntimeError('Force contains %i particles but expected %i or %i' % (nfp, npr, nat))
+        elif nfp == nat:
+            frc1 = force.reshape(-1,3)[:nft].flatten()
+        elif nfp == npr:
+            frc1 = force.reshape(-1,3)[mask][:nft].flatten()
 
-        if len(self.AtomLists['Mass']) > self.fitatoms:
-            Mass = np.array([self.AtomLists['Mass'][i] for i in range(len(xyz)) if self.AtomLists['ParticleType'][i] == 'A'])
-        else:
-            Mass = np.array(self.AtomLists['Mass'])
+        if nxp not in [npr, nat]:
+            raise RuntimeError('Coordinates contains %i particles but expected %i or %i' % (nfp, npr, nat))
+        elif nxp == nat:
+            xyz1 = xyz[:nft]
+        elif nxp == npr:
+            xyz1 = xyz[mask][:nft]
+
+        Block = list(np.array(Block)[mask])[:nft]
+        Mass = np.array(self.AtomLists['Mass'])[mask][:nft]
 
         NetForces = []
         Torques = []
@@ -223,7 +238,7 @@ class AbInitio(Target):
             AtomBlock = np.array([i for i in range(len(Block)) if Block[i] == b])
             CrdBlock = np.array(list(itertools.chain(*[range(3*i, 3*i+3) for i in AtomBlock])))
             com = np.sum(xyz1[AtomBlock]*np.outer(Mass[AtomBlock],np.ones(3)), axis=0) / np.sum(Mass[AtomBlock])
-            frc = force[CrdBlock].reshape(-1,3)
+            frc = frc1[CrdBlock].reshape(-1,3)
             NetForce = np.sum(frc, axis=0)
             xyzb = xyz1[AtomBlock]
             Torque = np.zeros(3)
@@ -401,23 +416,27 @@ class AbInitio(Target):
             self.ntq = 0
 
     def indicate(self):
-        Headings = ["Physical Variable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference"]
+        Headings = ["Observable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference", "Weight"]
         Data = OrderedDict([])
         if self.energy:
             Data['Energy (kJ/mol)'] = ["%8.4f" % self.e_err,
                                        "%8.4f" % self.e_ref,
-                                       "%.4f%%" % (self.e_err_pct*100)]
+                                       "%.4f%%" % (self.e_err_pct*100),
+                                       "%.3f" % self.w_energy]
         if self.force:
             Data['Gradient (kJ/mol/A)'] = ["%8.4f" % (self.f_err/10),
                                            "%8.4f" % (self.f_ref/10),
-                                           "%.4f%%" % (self.f_err_pct*100)]
+                                           "%.4f%%" % (self.f_err_pct*100),
+                                           "%.3f" % self.w_force]
             if self.use_nft:
                 Data['Net Force (kJ/mol/A)'] = ["%8.4f" % (self.nf_err/10),
                                                 "%8.4f" % (self.nf_ref/10),
-                                                "%.4f%%" % (self.nf_err_pct*100)]
+                                                "%.4f%%" % (self.nf_err_pct*100),
+                                                "%.3f" % self.w_netforce]
                 Data['Torque (kJ/mol/rad)'] = ["%8.4f" % self.tq_err,
                                                "%8.4f" % self.tq_ref,
-                                               "%.4f%%" % (self.tq_err_pct*100)]
+                                               "%.4f%%" % (self.tq_err_pct*100),
+                                               "%.3f" % self.w_torque]
         self.printcool_table(data=Data, headings=Headings, color=0)
 
     def energy_all(self):
@@ -782,14 +801,9 @@ class AbInitio(Target):
         EnergyComparison = np.hstack((col(Q_all_print[:,0]),col(M_all_print[:,0])))
         if self.writelevel > 0:
             np.savetxt('QM-vs-MM-energies.txt',EnergyComparison)
-        if self.force:
+        if self.force and self.writelevel > 1:
             # Write .xyz files which can be viewed in vmd.
-            try:
-                # Only print forces on true atoms, and ignore virtual sites.
-                TrueAtoms = np.array([i for i in range(self.mol.na) if self.AtomLists['ParticleType'][i] == 'A'])
-            except:
-                TrueAtoms = np.arange(self.mol.na)
-            QMTraj = self.mol[:].atom_select(TrueAtoms)
+            QMTraj = self.mol[:]
             Mforce_obj = QMTraj[:]
             Qforce_obj = QMTraj[:]
             Mforce_print = np.array(M_all_print[:,1:3*nat+1])
@@ -806,6 +820,8 @@ class AbInitio(Target):
                 Mforce_obj.xyzs[i] = np.vstack((Mforce_obj.xyzs[i], Fpad))
                 Qforce_obj.xyzs[i] = np.vstack((Qforce_obj.xyzs[i], Fpad))
             if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
+                print Mforce_obj.na
+                print Mforce_obj.xyzs[0].shape[0]
                 warn_once('\x1b[91mThe printing of forces is not set up correctly.  Not printing forces.  Please report this issue.\x1b[0m')
             else:
                 if self.writelevel > 1:
@@ -814,8 +830,6 @@ class AbInitio(Target):
                     Mforce_obj.write('MMforce.xyz')
                     Qforce_obj.elem = ['H' for i in range(Qforce_obj.na)]
                     Qforce_obj.write('QMforce.xyz')
-                #np.savetxt('Dforce_norm.dat', Dforce_norm)
-                if self.writelevel > 0:
                     np.savetxt('Dforce_norm.dat', Dforce_norm)
 
 

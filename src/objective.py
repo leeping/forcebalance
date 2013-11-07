@@ -86,7 +86,7 @@ Implemented_Targets = {
     'BINDINGENERGY_OPENMM':BindingEnergy_OpenMM,
     'MOMENTS_TINKER':Moments_TINKER,
     'MOMENTS_GMX':Moments_GMX,
-    'MOMENTS_OpenMM':Moments_OpenMM,
+    'MOMENTS_OPENMM':Moments_OpenMM,
     'REMOTE_TARGET':RemoteTarget,
     }
 

@@ -531,22 +531,17 @@ class OpenMM(Engine):
             self.xyz_omms.append((mod.getPositions(), box_omm))
 
         ## Build a topology and atom lists.
-        Top = self.pdb.getTopology()
+        Top = mod.getTopology()
         Atoms = list(Top.atoms())
         Bonds = [(a.index, b.index) for a, b in list(Top.bonds())]
+
+        # vss = [(i, [system.getVirtualSite(i).getParticle(j) for j in range(system.getVirtualSite(i).getNumParticles())]) \
+        #            for i in range(system.getNumParticles()) if system.isVirtualSite(i)]
         self.AtomMask = []
         self.AtomLists = defaultdict(list)
         self.AtomLists['Mass'] = [a.element.mass.value_in_unit(dalton) if a.element != None else 0 for a in Atoms]
         self.AtomLists['ParticleType'] = ['A' if m >= 1.0 else 'D' for m in self.AtomLists['Mass']]
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
-        G = nx.Graph()
-        for a in Atoms:
-            G.add_node(a.index)
-        for a, b in Bonds:
-            G.add_edge(a, b)
-        gs = nx.connected_component_subgraphs(G)
-        tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
-        self.AtomLists['MoleculeNumber'] = [[i in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
 
     def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, **kwargs):
@@ -733,12 +728,15 @@ class OpenMM(Engine):
     def optimize(self, shot=0, crit=1e-4):
 
         """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD. """
+        
+        steps = 5
         self.update_simulation()
         self.set_positions(shot)
         # Get the previous geometry.
         X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
-        # Minimize the energy.
-        self.simulation.minimizeEnergy(tolerance=crit*kilojoule/mole)
+        # Minimize the energy.  Optimizer works best in "steps".
+        for logc in np.linspace(0, np.log10(1e-4), steps):
+            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole)
         # Get the optimized geometry.
         S = self.simulation.context.getState(getPositions=True, getEnergy=True)
         X1 = np.array([j for i, j in enumerate(S.getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
@@ -1020,8 +1018,8 @@ class AbInitio_OpenMM(AbInitio):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'pdb',default="conf.pdb")
         self.set_option(tgt_opts,'coords',default="all.gro")
-        self.set_option(tgt_opts,'openmm_precision','precision',default="double")
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
         self.engine_ = OpenMM
         ## Initialize base class.
         super(AbInitio_OpenMM,self).__init__(options,tgt_opts,forcefield)
@@ -1031,6 +1029,8 @@ class BindingEnergy_OpenMM(BindingEnergy):
 
     def __init__(self,options,tgt_opts,forcefield):
         self.engine_ = OpenMM
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
         ## Initialize base class.
         super(BindingEnergy_OpenMM,self).__init__(options,tgt_opts,forcefield)
 
@@ -1039,8 +1039,8 @@ class Interaction_OpenMM(Interaction):
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="all.pdb")
-        self.set_option(tgt_opts,'openmm_precision','precision',default="double")
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
         self.engine_ = OpenMM
         ## Initialize base class.
         super(Interaction_OpenMM,self).__init__(options,tgt_opts,forcefield)
@@ -1050,6 +1050,8 @@ class Moments_OpenMM(Moments):
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
         self.engine_ = OpenMM
         ## Initialize base class.
         super(Moments_OpenMM,self).__init__(options,tgt_opts,forcefield)
