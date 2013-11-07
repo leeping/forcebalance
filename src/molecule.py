@@ -253,6 +253,25 @@ splitter = re.compile(r'(\s+|\S+)')
 # Container for Bravais lattice vector.  Three cell lengths, three angles, three vectors, volume, and TINKER trig functions.
 Box = namedtuple('Box',['a','b','c','alpha','beta','gamma','A','B','C','V'])
 radian = 180. / np.pi
+def CubicLattice(a):
+    """ This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification. """
+    b = a
+    c = a
+    alpha = 90
+    beta = 90
+    gamma = 90
+    alph = alpha*np.pi/180
+    bet  = beta*np.pi/180
+    gamm = gamma*np.pi/180
+    v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
+    Mat = np.mat([[a, b*cos(gamm), c*cos(bet)],
+                  [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
+                  [0, 0, c*v/sin(gamm)]])
+    L1 = Mat*np.mat([[1],[0],[0]])
+    L2 = Mat*np.mat([[0],[1],[0]])
+    L3 = Mat*np.mat([[0],[0],[1]])
+    return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
+
 def BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma):
     """ This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification. """
     alph = alpha*np.pi/180
@@ -983,7 +1002,7 @@ class Molecule(object):
         for i in range(len(self)):
             for a in range(self.na-2):
                 if self.elem[a] == 'O' and self.elem[a+1] == 'H' and self.elem[a+2] == 'H':
-                    flex = M.xyzs[i]
+                    flex = self.xyzs[i]
                     wat = flex[a:a+3]
                     com = wat.mean(0)
                     wat -= com
@@ -1006,7 +1025,7 @@ class Molecule(object):
                     h1 = o + Bond*ex*cosx + Bond*ey*cosy
                     h2 = o + Bond*ex*cosx - Bond*ey*cosy
                     rig = np.array([o, h1, h2]) + com
-                    M.xyzs[i][a:a+3] = rig
+                    self.xyzs[i][a:a+3] = rig
 
 #        if center:
 #            xyz1 -= xyz1.mean(0)
