@@ -648,18 +648,18 @@ class AbInitio(Target):
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
         if self.all_at_once:
-            logger.info("\rExecuting\r")
+            logger.debug("\rExecuting\r")
             M_all = self.energy_force_transform()
             if not cv and (AGrad or AHess):
                 def callM(mvals_):
-                    logger.info("\r")
+                    logger.debug("\r")
                     pvals = self.FF.make(mvals_)
                     return self.energy_force_transform()
                 for p in range(NP):
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
         for i in range(NS):
             if i % 100 == 0:
-                logger.info("\rIncrementing quantities for snapshot %i\r" % i)
+                logger.debug("\rIncrementing quantities for snapshot %i\r" % i)
             # Build Boltzmann weights and increment partition function.
             P   = self.whamboltz_wts[i]
             Z  += P
@@ -679,7 +679,7 @@ class AbInitio(Target):
                 M = M_all[i]
             else:
                 if i % 100 == 0:
-                    logger.info("Shot %i\r" % i)
+                    logger.debug("Shot %i\r" % i)
                 M = self.energy_force_transform_one(i)
                 M_all[i,:] = M.copy()
             if not cv:
@@ -739,7 +739,7 @@ class AbInitio(Target):
                     else:
                         def callM(mvals_):
                             if i % 100 == 0:
-                                logger.info("\r")
+                                logger.debug("\r")
                             pvals = self.FF.make(mvals_)
                             return self.energy_force_transform_one(i)
                         M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
@@ -824,7 +824,7 @@ class AbInitio(Target):
         # In the case of no covariance, this is just a diagonal matrix #
         # with the RMSD energy in [0,0] and the RMS gradient in [n, n] #
         #==============================================================#
-        logger.info("Done with snapshots, building objective function now\r")
+        logger.debug("Done with snapshots, building objective function now\r")
         if (self.w_energy > 0.0 or self.w_force > 0.0 or self.w_netforce > 0.0 or self.w_torque > 0.0):
             wtot    = self.w_energy + self.w_force + self.w_netforce + self.w_torque
             EWt     = self.w_energy / wtot
@@ -1006,7 +1006,7 @@ class AbInitio(Target):
         Y = 0
         def getqatoms(mvals_):
             """ This function takes the mathematical parameter values and returns the charges on the ATOMS (fancy mapping going on) """
-            logger.info("\r")
+            logger.debug("\r")
             # Need to update the positions of atoms, if there are virtual sites.
             pvals = self.FF.create_pvals(mvals_)
             qvals = [pvals[i] for i in self.FF.qmap]

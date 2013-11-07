@@ -82,6 +82,7 @@ gen_opts_types = {
     'ints'    : {"maxstep"      : (100, 50, 'Maximum number of steps in an optimization', 'Main Optimizer'),
                  "objective_history"  : (2, 20, 'Number of good optimization steps to average over when checking the objective convergence criterion', 'Main Optimizer (jobtype "newton")'),
                  "wq_port"   : (0, 0, 'The port number to use for Work Queue', 'Targets that use Work Queue (advanced usage)'),
+                 "criteria"   : (1, 160, 'The number of convergence criteria that must be met for main optimizer to converge', 'Main Optimizer'),
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
@@ -96,16 +97,17 @@ gen_opts_types = {
                  "rigid_water"      : (0, -150, 'Perform calculations using rigid water molecules.', 'Currently used in AMOEBA parameterization (advanced usage)', ['OPENMM','TINKER']),
                  "use_pvals"        : (0, -150, 'Bypass the transformation matrix and use the physical parameters directly', 'Creating the force field; advanced usage, be careful.'),
                  "asynchronous"     : (0, 0, 'Execute Work Queue tasks and local calculations asynchronously for improved speed', 'Targets that use Work Queue (advanced usage)'),
+                 "reevaluate"       : (None, 0, 'Re-evaluate the objective function and gradients when the step is rejected (for noisy objective functions).', 'Main Optimizer'),
                  },
     'floats'  : {"trust0"                 : (1e-1, 100, 'Levenberg-Marquardt trust radius; set to negative for nonlinear search', 'Main Optimizer'),
                  "mintrust"               : (0.0,   10, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)', 'Main Optimizer'),
                  "convergence_objective"  : (1e-4, 100, 'Convergence criterion of objective function (in MainOptimizer this is the stdev of X2 over [objective_history] steps)', 'Main Optimizer'),
-                 "convergence_gradient"   : (1e-4, 100, 'Convergence criterion of gradient norm', 'Main Optimizer'),
+                 "convergence_gradient"   : (1e-3, 100, 'Convergence criterion of gradient norm', 'Main Optimizer'),
                  "convergence_step"       : (1e-4, 100, 'Convergence criterion of step size (just needs to fall below this threshold)', 'Main Optimizer'),
                  "eig_lowerbound"         : (1e-4,  10, 'Minimum eigenvalue for applying steepest descent correction', 'Main Optimizer'),
                  "lm_guess"               : (1.0,    9, 'Guess value for bracketing line search in trust radius algorithm', 'Main Optimizer'),
                  "finite_difference_h"    : (1e-3,  50, 'Step size for finite difference derivatives in many functions', 'pretty much everywhere'),
-                 "finite_difference_factor" : (1.0, 40, 'Make sure that the finite difference step size does not exceed this multiple of the trust radius.', 'Main Optimizer'),
+                 "finite_difference_factor" : (0.1, 40, 'Make sure that the finite difference step size does not exceed this multiple of the trust radius.', 'Main Optimizer'),
                  "penalty_additive"       : (0.0,   55, 'Factor for additive penalty function in objective function', 'Objective function, all penalty types'),
                  "penalty_multiplicative" : (0.0,   55, 'Factor for multiplicative penalty function in objective function', 'Objective function, all penalty types'),
                  "penalty_alpha"          : (1e-3,  53, 'Extra parameter for fusion penalty function.  Dictates position of log barrier or L1-L0 switch distance', 
@@ -408,6 +410,7 @@ def parse_inputs(input_file=None):
     # First load in all of the default options.
     options = deepcopy(gen_opts_defaults) # deepcopy to make sure options doesn't make changes to gen_opts_defaults
     options['root'] = os.getcwd()
+    options['input_file'] = input_file
     tgt_opts = []
     this_tgt_opt = deepcopy(tgt_opts_defaults)
     # Give back a bunch of default options if input file isn't specified.

@@ -17,7 +17,7 @@ from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, 
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
-from forcebalance.output import getLogger, DEBUG
+from forcebalance.output import getLogger, DEBUG, CleanStreamHandler
 logger = getLogger(__name__)
 
 # Global variable corresponding to the iteration number.
@@ -60,6 +60,7 @@ class Optimizer(forcebalance.BaseClass):
                           'NEWTON'            : self.NewtonRaphson, 
                           'NR'                : self.NewtonRaphson, 
                           'BFGS'              : self.BFGS,
+                          'SCIPY_BFGS'        : self.Scipy_BFGS,
                           'POWELL'            : self.Powell,
                           'SIMPLEX'           : self.Simplex,
                           'ANNEAL'            : self.Anneal,
@@ -68,6 +69,8 @@ class Optimizer(forcebalance.BaseClass):
                           'GENETIC'           : self.GeneticAlgorithm,
                           'CG'                : self.ConjugateGradient,
                           'CONJUGATEGRADIENT' : self.ConjugateGradient,
+                          'TNC'               : self.TruncatedNewton,
+                          'NCG'               : self.NewtonCG,
                           'SCAN_MVALS'        : self.ScanMVals,
                           'SCAN_PVALS'        : self.ScanPVals,
                           'SINGLE'            : self.SinglePoint,
@@ -100,11 +103,11 @@ class Optimizer(forcebalance.BaseClass):
         ## Number of steps to average over
         self.set_option(options,'objective_history','hist')
         ## Function value convergence threshold
-        self.set_option(options,'convergence_objective','conv_obj')
+        self.set_option(options,'convergence_objective')
         ## Step size convergence threshold
-        self.set_option(options,'convergence_step','conv_stp')
+        self.set_option(options,'convergence_step')
         ## Gradient convergence threshold
-        self.set_option(options,'convergence_gradient','conv_grd')
+        self.set_option(options,'convergence_gradient')
         ## Maximum number of optimization steps
         self.set_option(options,'maxstep','maxstep')
         ## For scan[mp]vals: The parameter index to scan over
@@ -131,12 +134,20 @@ class Optimizer(forcebalance.BaseClass):
         self.set_option(options,'print_parameters','print_vals')
         ## Error tolerance (if objective function rises by less than this, then the optimizer will forge ahead!)
         self.set_option(options,'error_tolerance','err_tol')
-        ## Search tolerance (The line search will stop if the change is below this threshold)
+        ## Search tolerance (The Hessian diagonal search will stop if the change is below this threshold)
         self.set_option(options,'search_tolerance','search_tol')
         self.set_option(options,'read_mvals')
         self.set_option(options,'read_pvals')
         ## Whether to make backup files
         self.set_option(options, 'backup')
+        ## Name of the original input file
+        self.set_option(options, 'input_file')
+        ## Number of convergence criteria that must be met
+        self.set_option(options, 'criteria')
+        ## Only backup the "mvals" input file once per calculation.
+        self.mvals_bak = 1
+        ## Print a special message on failure.
+        self.failmsg = 0
         
         #======================================#
         #     Variables which are set here     #
@@ -147,6 +158,8 @@ class Optimizer(forcebalance.BaseClass):
         self.bhyp      = Objective.Penalty.ptyp != 2
         ## The force field itself
         self.FF        = FF
+        ## Re-evaluate the objective function when an optimization step is rejected
+        self.set_option(options, 'reevaluate', default=any(['liquid' in tgt.type.lower() for tgt in self.Objective.Targets]), forceprint=True)
         
         #======================================#
         #    Variables from the force field    #
@@ -168,7 +181,47 @@ class Optimizer(forcebalance.BaseClass):
         printcool_dictionary(self.PrintOptionDict, title="Setup for optimizer")
         ## Load the checkpoint file.
         self.readchk()
-        
+
+    def save_mvals_to_input(self, mvals):
+        """ Write a new input file (%s_save.in) containing the current mathematical parameters. """
+        ## Determine the output file name.
+        base, ext = os.path.splitext(self.input_file)
+        if not base.endswith(".sav"):
+            outfnm = base+".sav"
+        else:
+            outfnm = base+ext
+        ## Clone the input file to the output, 
+        if self.input_file != None and os.path.exists(self.input_file):
+            fin = open(self.input_file).readlines()
+            have_mvals = 0
+            in_mvals = 0
+            in_options = 0
+            if os.path.exists(outfnm) and self.mvals_bak: 
+                bak(outfnm, dest='backups')
+            self.mvals_bak = 0
+            fout = open(outfnm, 'w')
+            for line in fin:
+                line1 = line.split("#")[0].strip().lower()
+                if line1.startswith("$options"):
+                    in_options = 1
+                if in_options and line1.startswith("$end"):
+                    if not have_mvals:
+                        print >> fout, "read_mvals"
+                        print >> fout, self.FF.sprint_map(mvals, precision=8)
+                        print >> fout, "/read_mvals"
+                        have_mvals = 1
+                    in_options = 0
+                if line1.startswith("/read_mvals"):
+                    in_mvals = 0
+                if in_mvals: continue
+                print >> fout, line,
+                if line1.startswith("read_mvals"):
+                    if have_mvals: raise RuntimeError("Encountered more than one read_mvals section")
+                    have_mvals = 1
+                    in_mvals = 1
+                    print >> fout, self.FF.sprint_map(mvals, precision=8)
+        return outfnm
+            
     def Run(self):
         """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
 
@@ -190,11 +243,9 @@ class Optimizer(forcebalance.BaseClass):
 
         ## Print out final answer
         if print_parameters:
-            bar = printcool("Final optimization parameters:\n Paste to input file to restart",bold=True,color=4)
-            logger.info("read_mvals\n")
+            bar = printcool("Final optimization parameters:",color=4)
             self.FF.print_map(xk)
-            logger.info("/read_mvals\n")
-            bar = printcool("Final physical parameters:",bold=True,color=4)
+            bar = printcool("Final physical parameters:",color=4)
             self.FF.print_map(self.FF.create_pvals(xk))
             logger.info(bar)
             if self.backup:
@@ -202,13 +253,23 @@ class Optimizer(forcebalance.BaseClass):
                     if os.path.exists(os.path.join('result', fnm)):
                         bak(os.path.join('result', fnm))
             self.FF.make(xk,printdir='result')
-            logger.info("\nThe final force field has been written to the 'result' directory.\n")
+            # logger.info("The force field has been written to the 'result' directory.\n")
+            outfnm = self.save_mvals_to_input(xk)
+            # logger.info("Input file with optimization parameters saved to %s.\n" % outfnm)
+            printcool("The force field has been written to the 'result' directory.\n"
+                      "Input file with optimization parameters saved to %s." % outfnm, color=0)
+                      # "To reload these parameters, use %s as the input\n"
+                      # "file without changing the '%s' directory." % 
+                      # (outfnm, outfnm, self.FF.ffdir), color=0, center=False, sym2='-')
 
         ## Write out stuff to checkpoint file
         self.writechk()
 
         ## Print out final message
-        bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
+        if self.failmsg:
+            bar = printcool("It is hard to fail, but it is worse\nnever to have tried to succeed.",ansi="40;91")
+        else:
+            bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
         return xk
 
@@ -222,19 +283,17 @@ class Optimizer(forcebalance.BaseClass):
                 tgt.h = h
             
     def MainOptimizer(self,b_BFGS=0):
-        """ The main ForceBalance adaptive trust-radius pseudo-Newton optimizer.  Tried and true in many situations. :)
+        """ 
+
+        The main ForceBalance adaptive trust-radius pseudo-Newton
+        optimizer.  Tried and true in many situations. :)
 
         Usually this function is called with the BFGS or NewtonRaphson
         method.  The NewtonRaphson method is consistently the best
         method I have, because I always provide at least an
         approximate Hessian to the objective function.  The BFGS
-        method is vestigial and currently does not work.
-
-        BFGS is a pseudo-Newton method in the sense that it builds an
-        approximate Hessian matrix from the gradient information in previous
-        steps; Newton-Raphson requires the actual Hessian matrix.
-        However, the algorithms are similar in that they both compute the
-        step by inverting the Hessian and multiplying by the gradient.
+        method works well, but if gradients are cheap the SciPy_BFGS
+        method also works nicely.
 
         The method adaptively changes the step size.  If the step is
         sufficiently good (i.e. the objective function goes down by a
@@ -248,71 +307,184 @@ class Optimizer(forcebalance.BaseClass):
         @param[in] b_BFGS Switch to use BFGS (True) or Newton-Raphson (False)
 
         """
-        if any(['liquid' in tgt.name.lower() for tgt in self.Objective.Targets]) and self.conv_obj < 1e-3:
-            warn_press_key("Condensed phase targets detected - may not converge with current choice of convergence_objective (%.e)\nRecommended range is 1e-2 - 1e-1 for this option." % self.conv_obj)
-        # Parameters for the adaptive trust radius
-        a = self.adapt_fac  # Default value is 0.5, decrease to make more conservative.  Zero to turn off all adaptive.
-        b = self.adapt_damp # Default value is 0.5, increase to make more conservative.
-        printcool( "Main Optimizer\n%s Mode%s" % ("BFGS" if b_BFGS else "Newton-Raphson", " (Static Radius)" if a == 0.0 else " (Adaptive Radius)"), ansi=1, bold=1)
-        # First, set a bunch of starting values
+
+        if self.trust0 < 0.0:
+            detail = "(Hessian Diagonal Search)"
+        elif self.adapt_fac != 0.0:
+            detail = "(Adaptive Trust Radius)"
+        else:
+            detail = "(Trust Radius)"
+        printcool("Main Optimizer \n%s Method %s\n\n"
+                  "\x1b[0mConvergence criteria (%i of 3 needed):\n"
+                  "\x1b[0mObjective Function  : %.3e\n"
+                  "\x1b[0mNorm of Gradient    : %.3e\n"
+                  "\x1b[0mParameter step size : %.3e" % 
+                  ("BFGS" if b_BFGS else "Newton-Raphson", detail, self.criteria,
+                   self.convergence_objective, self.convergence_gradient, 
+                   self.convergence_step), ansi=1, bold=1)
+
+        # Print a warning if optimization is unlikely to converge
+        if any(['liquid' in tgt.type.lower() for tgt in self.Objective.Targets]) and self.convergence_objective < 1e-3:
+            warn_press_key("Condensed phase targets detected - may not converge with current choice of"
+                           " convergence_objective (%.e)\nRecommended range is 1e-2 - 1e-1 for this option." % self.convergence_objective)
+
+        #========================#
+        #| Initialize variables |#
+        #========================#
+        # Order of derivatives
         Ord         = 1 if b_BFGS else 2
+        # Iteration number counter.
         global ITERATION_NUMBER
         ITERATION_NUMBER = 0
+        # Indicates if the optimization step was "good" (i.e. not rejected).
         global GOODSTEP
-        Best_Step = 1
-        if all(i in self.chk for i in ['xk','X','G','H','ehist','x_best','xk_prev','trust']):
-            logger.info("Reading initial objective, gradient, Hessian from checkpoint file\n")
-            xk, X, G, H, ehist     = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H'], self.chk['ehist']
-            X_best, xk_prev, trust = self.chk['x_best'], self.chk['xk_prev'], self.chk['trust']
-        else:
-            trust    = abs(self.trust0)
-            xk       = self.mvals0.copy()
-            logger.info('\n')
-            # The finite difference step size should be at most 1% of the trust radius.
-            self.adjh(trust)
-            data     = self.Objective.Full(xk,Ord,verbose=True)
-            X, G, H  = data['X'], data['G'], data['H']
-            ehist    = np.array([X])
-            xk_prev  = xk.copy()
-            X_best   = X
-
-        X_prev   = X
-        G_prev   = G.copy()
-        H_stor   = H.copy()
-        ndx    = 0.0
-        color  = "\x1b[1m"
-        nxk = norm(xk)
-        ngr = norm(G)
-
-        ThreQual = 0.25
-        Quality  = 0.0
-        restep = False
         GOODSTEP = 1
+        # Indicates if the optimization is currently at the lowest value of the objective function so far.
+        Best_Step = 1
+        # Objective function history.
+        X_hist    = np.array([])
+        # Trust radius.
+        trust     = abs(self.trust0)
+        # Current value of the parameters.
+        xk        = self.mvals0.copy()
+        # The current optimization step.
+        dx        = np.zeros(self.FF.np)
+        # Length of the current optimization step.
+        ndx       = 0.0
+        # Color indicating the quality of the optimization step.
+        color     = "\x1b[1m"
+        # Ratio of actual objective function change to expected change.
+        Quality   = 0.0
+        # Threshold for "low quality step" which decreases trust radius.
+        ThreLQ = 0.25
+        # Threshold for "high quality step" which increases trust radius.
+        ThreHQ = 0.75
+        printcool("Color Key for Objective Function -=X2=-\n\x1b[1mBold\x1b[0m = Initial step\n"
+                  "\x1b[92mGreen = Found lowest value of objective function\x1b[0m\n"
+                  "\x1b[91mRed = Objective function rises, step rejected\x1b[0m\n"
+                  "\x1b[0mNo color = Not at the lowest value", bold=0, color=0, center=[True, False, False, False, False])
 
-        while 1: # Loop until convergence is reached.
-            ## Put data into the checkpoint file
-            self.chk = {'xk': xk, 'X' : X, 'G' : G, 'H': H, 'ehist': ehist,
-                        'x_best': X_best,'xk_prev': xk_prev, 'trust': trust}
-            if self.wchk_step:
-                self.writechk()
-            # Factor of two is so [0,1] stdev is normalized to 1
-            stdfront = len(ehist) > self.hist and np.std(np.sort(ehist)[:self.hist]) or (len(ehist) > 0 and np.std(ehist) or 0.0)
-            stdfront *= 2
+        def print_progress(itn, nx, nd, ng, clr, x, std, qual):
+            # Step number, norm of parameter vector / step / gradient, objective function value, change from previous steps, step quality.
+            logger.info("\n")
             logger.info("%6s%12s%12s%12s%14s%12s%12s\n" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual"))
-            logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality))
-            # Check the convergence criteria
-            if ngr < self.conv_grd and Quality > ThreQual:
-                logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.conv_grd)
-                break
-            if ITERATION_NUMBER == self.maxstep:
-                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION_NUMBER)
-                break
-            if ndx < self.conv_stp and Quality > ThreQual and ITERATION_NUMBER > 0 and not restep:
-                logger.info("Convergence criterion reached in step size (%.2e)\n" % self.conv_stp)
-                break
-            if stdfront < self.conv_obj and Quality > ThreQual and len(ehist) > self.hist and not restep:
-                logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.conv_obj)
-                break
+            logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n\n" % (itn, nx, nd, ng, clr, x, std, qual))
+
+        #=====================================#
+        #|       Nonlinear Iterations        |#
+        #| Loop until convergence is reached |#
+        #=====================================#
+        while 1:
+            #================================#
+            #| Evaluate objective function. |#
+            #================================#
+            if len(self.chk.keys()) > 0 and ITERATION_NUMBER == 0:
+                printcool("Iteration %i: Reading initial objective, gradient, Hessian from checkpoint file" % (ITERATION_NUMBER), color=4, bold=0)
+                logger.info("Reading initial objective, gradient, Hessian from checkpoint file\n")
+                xk, X, G, H   = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H']
+                X_hist, trust = self.chk['X_hist'], self.chk['trust']
+            else:
+                self.adjh(trust)
+                printcool("Iteration %i: Evaluating objective function\nand derivatives through %s order" % (ITERATION_NUMBER, "first" if Ord == 1 else "second"), color=4, bold=0)
+                data        = self.Objective.Full(xk,Ord,verbose=True)
+                X, G, H = data['X'], data['G'], data['H']
+            trustprint = ''
+            #================================#
+            #|   Assess optimization step.  |#
+            #================================#
+            if ITERATION_NUMBER > 0:
+                dX_actual = X - X_prev
+                Best_Step = X < np.min(X_hist)
+                try:
+                    Quality = dX_actual / dX_expect
+                except:
+                    # This should only be encountered in the Hessian diagonal search code (i.e. trust0 < 0).
+                    logger.warning("Warning: Step size of zero detected (i.e. wrong direction). "
+                                   "Try reducing the finite_difference_h parameter\n")
+                    Quality = 0.0
+                if X > (X_prev + max(self.err_tol, self.convergence_objective)):
+                    #================================#
+                    #|        Reject step if        |#
+                    #|  objective function rises.   |#
+                    #================================#
+                    GOODSTEP = 0
+                    print_progress(ITERATION_NUMBER, nxk, ndx, ngd, "\x1b[91m", X, stdfront, Quality)
+                    xk = xk_prev.copy()
+                    if self.reevaluate:
+                        #================================#
+                        #|  Re-evaluate the objective   |#
+                        #|  function and gradients at   |#
+                        #|   the previous parameters.   |#
+                        #================================#
+                        printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
+                        ITERATION_NUMBER += 1
+                        self.adjh(trust)
+                        data        = self.Objective.Full(xk,Ord,verbose=True)
+                        GOODSTEP = 1
+                        X, G, H = data['X'], data['G'], data['H']
+                        ndx = 0
+                        nxk = norm(xk)
+                        ngd = norm(G)
+                        Quality = 0.0
+                        color = "\x1b[0m"
+                    else:
+                        #================================#
+                        #| Go back to the start of loop |#
+                        #|    and take a reduced step.  |#
+                        #================================#
+                        printcool("Objective function rises!\nTaking another step from previous point..",color=1)
+                        X = X_prev
+                        G = G_prev.copy()
+                        H = H_stor.copy()
+                        data = deepcopy(datastor)
+                    trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
+                    trustprint = "Reducing trust radius to % .4e\n" % trust
+                else:
+                    GOODSTEP = 1
+                    #================================#
+                    #|   Adjust step size based on  |#
+                    #|         step quality.        |#
+                    #================================#
+                    if Quality <= ThreLQ and self.trust0 > 0:
+                        trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
+                        trustprint = "Low quality step, reducing trust radius to % .4e\n" % trust
+                    elif Quality >= ThreHQ and bump and self.trust0 > 0:
+                        trust += self.adapt_fac*trust*np.exp(-1*self.adapt_damp*(trust/self.trust0 - 1))
+                        trustprint = "Increasing trust radius to % .4e\n" % trust
+                    color = "\x1b[92m" if Best_Step else "\x1b[0m"
+                    #================================#
+                    #|  Hessian update for BFGS.    |#
+                    #================================#
+                    if b_BFGS:
+                        Hnew = H_stor.copy()
+                        Dx   = col(xk - xk_prev)
+                        Dy   = col(G  - G_prev)
+                        Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
+                        Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
+                        Hnew += Mat1-Mat2
+                        H = Hnew.copy()
+                        data['H'] = H.copy()
+                    # (Experimental): Deleting lines in the parameter file
+                    if len(self.FF.prmdestroy_this) > 0:
+                        self.FF.prmdestroy_save.append(self.FF.prmdestroy_this)
+                        self.FF.linedestroy_save.append(self.FF.linedestroy_this) 
+            # Update objective function history.
+            X_hist = np.append(X_hist, X)
+            # Take the stdev over the previous (hist) values.
+            # Multiply by 2, so when hist=2 this is simply the difference.
+            stdfront = np.std(X_hist[-self.hist:]) if len(X_hist) > self.hist else np.std(X_hist)
+            stdfront *= 2
+            #================================#
+            #| Print optimization progress. |#
+            #================================#
+            nxk = norm(xk)
+            ngd = norm(G)
+            if GOODSTEP:
+                print_progress(ITERATION_NUMBER, nxk, ndx, ngd, color, X, stdfront, Quality)
+            #================================#
+            #|   Print objective function,  |#
+            #|     gradient and Hessian.    |#
+            #================================#
             if self.print_grad:
                 bar = printcool("Total Gradient",color=4)
                 self.FF.print_map(vals=G,precision=8)
@@ -324,116 +496,76 @@ class Optimizer(forcebalance.BaseClass):
             for key, val in self.Objective.ObjDict.items():
                 if Best_Step:
                     self.Objective.ObjDict_Last[key] = val
-            restep = False
-            dx, dX_expect, bump = self.step(xk, data, trust)
-            old_pk = self.FF.create_pvals(xk)
-            old_xk = xk.copy()
-            # Increment the iteration counter.
-            ITERATION_NUMBER += 1
-            # Take a step in the parameter space.
-            xk += dx
-            if self.print_vals:
-                pk = self.FF.create_pvals(xk)
-                dp = pk - old_pk
-                bar = printcool("Mathematical Parameters (Current + Step = Next)",color=5)
-                self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_xk[i], '+' if dx[i] >= 0 else '-', abs(dx[i]), xk[i]) for i in range(len(xk))])
-                logger.info(bar)
-                bar = printcool("Physical Parameters (Current + Step = Next)",color=5)
-                self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (old_pk[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
-                logger.info(bar)
-            # Evaluate the objective function and its derivatives.
-            self.adjh(trust)
-            data        = self.Objective.Full(xk,Ord,verbose=True)
-            X, G, H = data['X'], data['G'], data['H']
-            ndx = norm(dx)
-            nxk = norm(xk)
-            ngr = norm(G)
-            drc = abs(flat(dx)).argmax()
-
-            dX_actual = X - X_prev
-            try:
-                Quality = dX_actual / dX_expect
-            except:
-                logger.warning("Warning: Step size of zero detected (i.e. wrong direction).  Try reducing the finite_difference_h parameter\n")
-                Quality = 1.0 # This is a step length of zero.
-
-            if Quality <= ThreQual and X < (X_prev + self.err_tol) and self.trust0 > 0:
-                # If the step quality is bad, then we should decrease the trust radius.
-                trust = max(ndx*(1./(1+a)), self.mintrust)
-                logger.info("Low quality step, reducing trust radius to % .4e\n" % trust)
-            if Quality >= 0.75 and bump and self.trust0 > 0:
-                # If the step quality is good, then we should increase the trust radius.
-                # The 'a' factor is how much we should grow or shrink the trust radius each step
-                # and the 'b' factor determines how closely we are tied down to the original value.
-                # Recommend values 0.5 and 0.5
-                trust += a*trust*np.exp(-b*(trust/self.trust0 - 1))
-            if X > (X_prev + max(self.err_tol, self.conv_obj)):
-                Best_Step = 0
-                # Toggle switch for rejection (experimenting with no rejection)
-                Rejects = True
-                GOODSTEP = 0
-                Reevaluate = True
-                trust = max(ndx*(1./(1+a)), self.mintrust)
-                logger.info("Rejecting step and reducing trust radius to % .4e\n" % trust)
-                if Rejects:
-                    xk = xk_prev.copy()
-                    if Reevaluate:
-                        restep = True
-                        color = "\x1b[91m"
-                        logger.info("%6s%12s%12s%12s%14s%12s%12s\n" % ("Step", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)", "StepQual"))
-                        logger.info("%6i%12.3e%12.3e%12.3e%s%14.5e\x1b[0m%12.3e% 11.3f\n\n" % (ITERATION_NUMBER, nxk, ndx, ngr, color, X, stdfront, Quality))
-                        printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
-                        ITERATION_NUMBER += 1
-                        self.adjh(trust)
-                        data        = self.Objective.Full(xk,Ord,verbose=True)
-                        GOODSTEP = 1
-                        X, G, H = data['X'], data['G'], data['H']
-                        X_prev = X
-                        dx *= 0
-                        ndx = norm(dx)
-                        nxk = norm(xk)
-                        ngr = norm(G)
-                        Quality = 0.0
-                        color = "\x1b[0m"
-                    else:
-                        color = "\x1b[91m"
-                        G = G_prev.copy()
-                        H = H_stor.copy()
-                        data = deepcopy(datastor)
-                    continue
-            else:
-                GOODSTEP = 1
-                if X > X_best:
-                    Best_Step = 0
-                    color = "\x1b[95m"
-                else:
-                    Best_Step = 1
-                    color = "\x1b[92m"
-                    X_best = X
-                ehist = np.append(ehist, X)
-            # Hessian update for BFGS.
-            if b_BFGS:
-                Hnew = H_stor.copy()
-                Dx   = col(xk - xk_prev)
-                Dy   = col(G  - G_prev)
-                Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
-                Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
-                Hnew += Mat1-Mat2
-                H = Hnew.copy()
-                data['H'] = H.copy()
-
-            datastor= deepcopy(data)
+            #================================#
+            #|  Check convergence criteria. |#
+            #================================#
+            ncrit = 0
+            if ngd < self.convergence_gradient and Best_Step:
+                logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
+                ncrit += 1
+            if ITERATION_NUMBER == self.maxstep:
+                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION_NUMBER)
+                break
+            if ndx < self.convergence_step and Quality > ThreLQ and Best_Step:
+                logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
+                ncrit += 1
+            if stdfront < self.convergence_objective and Quality > ThreLQ and len(X_hist) >= self.hist and Best_Step:
+                logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.convergence_objective)
+                ncrit += 1
+            if ncrit >= self.criteria: break
+            #================================#
+            #| Save optimization variables  |#
+            #| before taking the next step. |#
+            #================================#
+            # Previous data from objective function call.
+            datastor = deepcopy(data)
+            # Previous objective function and derivatives
+            X_prev  = X
             G_prev  = G.copy()
             H_stor  = H.copy()
+            # Previous optimization variables
             xk_prev = xk.copy()
-            X_prev  = X
-            if len(self.FF.prmdestroy_this) > 0:
-                self.FF.prmdestroy_save.append(self.FF.prmdestroy_this)
-                self.FF.linedestroy_save.append(self.FF.linedestroy_this)
-        
-        bar = printcool("Final objective function value\nFull: % .6e  Un-penalized: % .6e" % (data['X'],data['X0']), '@', bold=True, color=2)
-        return xk
+            # Previous physical parameters
+            pk_prev = self.FF.create_pvals(xk)
+            #================================#
+            #| Calculate optimization step. |#
+            #|  Increase iteration number.  |#
+            #================================#
+            logger.info(trustprint)
+            logger.info("Calculating nonlinear optimization step\n")
+            # Calculate the optimization step.
+            dx, dX_expect, bump = self.step(xk, data, trust)
+            # Increment the parameters.
+            xk += dx
+            ndx = norm(dx)
+            # Increment the iteration counter.
+            ITERATION_NUMBER += 1
+            # The search code benefits from knowing the step size here.
+            if self.trust0 < 0:
+                trust = ndx
+            # Print parameter values.
+            if self.print_vals:
+                pk = self.FF.create_pvals(xk)
+                dp = pk - pk_prev
+                bar = printcool("Mathematical Parameters (Current + Step = Next)",color=5)
+                self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (xk_prev[i], '+' if dx[i] >= 0 else '-', abs(dx[i]), xk[i]) for i in range(len(xk))])
+                logger.info(bar)
+                bar = printcool("Physical Parameters (Current + Step = Next)",color=5)
+                self.FF.print_map(vals=["% .4e %s %.4e = % .4e" % (pk_prev[i], '+' if dp[i] >= 0 else '-', abs(dp[i]), pk[i]) for i in range(len(pk))])
+                logger.info(bar)
+            # Write checkpoint file.
+            self.chk = {'xk': xk, 'X' : X, 'G' : G, 'H': H, 'X_hist': X_hist, 'trust': trust}
+            if self.wchk_step:
+                self.writechk()           
+            outfnm = self.save_mvals_to_input(xk)
+            logger.info("Input file with saved parameters: %s\n" % outfnm)
 
+        cnvgd = ncrit >= self.criteria
+        bar = printcool("\x1b[0m%s\x1b[0m\nFinal objective function value\nFull: % .6e  Un-penalized: % .6e" % 
+                        ("\x1b[1mOptimization Converged" if cnvgd else "\x1b[1;91mConvergence Failure",
+                         data['X'],data['X0']), color=2)
+        self.failmsg = not cnvgd
+        return xk
 
     def step(self, xk, data, trust):
         """ Computes the next step in the parameter space.  There are lots of tricks here that I will document later.
@@ -455,8 +587,8 @@ class Optimizer(forcebalance.BaseClass):
             # Experiment.
             Adj = max(self.eps, 0.01*abs(Emin)) - Emin
             logger.info("Hessian has a small or negative eigenvalue (%.1e), mixing in some steepest descent (%.1e) to correct this.\n" % (Emin, Adj))
-            logger.info("Eigenvalues are:\n")   ###
-            pvec1d(Eig)                ###
+            logger.info("Eigenvalues are:\n")
+            pvec1d(Eig)
             H += Adj*np.eye(H.shape[0])
 
         if self.bhyp:
@@ -496,11 +628,7 @@ class Optimizer(forcebalance.BaseClass):
                     return self.Hess
             def hyper_solver(L):
                 dx0 = np.zeros(len(xkd))
-                #dx0 = np.delete(dx0, self.excision)
-                # HL = H + (L-1)**2*np.diag(np.diag(H))
-                # Attempt to use plain Levenberg
                 HL = H + (L-1)**2*np.eye(len(H))
-
                 HYP = Hyper(HL, self.Objective.Penalty)
                 try:
                     Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
@@ -510,7 +638,6 @@ class Optimizer(forcebalance.BaseClass):
                     Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xkd,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
                 except:
                     Opt2 = optimize.fmin(HYP.compute_val,-xkd,full_output=True,disp=0)
-                #Opt2 = optimize.fmin(HYP.compute_val,-xkd,full_output=True,disp=0)
                 dx1, sol1 = Opt1[0], Opt1[1]
                 dx2, sol2 = Opt2[0], Opt2[1]
                 dxb, sol = (dx1, sol1) if sol1 <= sol2 else (dx2, sol2)
@@ -525,44 +652,35 @@ class Optimizer(forcebalance.BaseClass):
             H = np.delete(H, self.excision, axis=0)
             H = np.delete(H, self.excision, axis=1)
             
-            logger.debug("Inverting Hessian:\n")                 ###
-            logger.debug(" G:\n")                                ###
-            pvec1d(G,precision=5, loglevel=DEBUG)                ###
-            logger.debug(" H:\n")                                ###
-            pmat2d(H,precision=5, loglevel=DEBUG)                ###
+            logger.debug("Inverting Hessian:\n")
+            logger.debug(" G:\n")
+            pvec1d(G,precision=5, loglevel=DEBUG)
+            logger.debug(" H:\n")
+            pmat2d(H,precision=5, loglevel=DEBUG)
             
             Hi = invert_svd(np.mat(H))
             dx = flat(-1 * Hi * col(G))
             
-            logger.debug(" dx:\n")                               ###
-            pvec1d(dx,precision=5, loglevel=DEBUG)                     ###
-            # dxa = -solve(H, G)          # Take Newton Raphson Step ; use -1*G if want steepest descent.
-            # dxa = flat(dxa)
-            # print " dxa:"                              ###
-            # pvec1d(dxa,precision=5)                    ###
+            logger.debug(" dx:\n")
+            pvec1d(dx,precision=5, loglevel=DEBUG)
             
-            logger.info('\n')                                      ###
             for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                 dx = np.insert(dx, i, 0)
+
             def para_solver(L):
                 # Levenberg-Marquardt
                 # HT = H + (L-1)**2*np.diag(np.diag(H))
                 # Attempt to use plain Levenberg
                 HT = H + (L-1)**2*np.eye(len(H))
-                logger.debug("Inverting Scaled Hessian:\n")                       ###
-                logger.debug(" G:\n")                                             ###
-                pvec1d(G,precision=5, loglevel=DEBUG)                                   ###
-                logger.debug(" HT: (Scal = %.4f)\n" % (1+(L-1)**2))               ###
-                pmat2d(HT,precision=5, loglevel=DEBUG)                                  ###
+                logger.debug("Inverting Scaled Hessian:\n")
+                logger.debug(" G:\n")
+                pvec1d(G,precision=5, loglevel=DEBUG)
+                logger.debug(" HT: (Scal = %.4f)\n" % (1+(L-1)**2))
+                pmat2d(HT,precision=5, loglevel=DEBUG)
                 Hi = invert_svd(np.mat(HT))
                 dx = flat(-1 * Hi * col(G))
-                logger.debug(" dx:\n")                                            ###
-                pvec1d(dx,precision=5, loglevel=DEBUG)                                  ###
-                # dxa = -solve(HT, G)
-                # dxa = flat(dxa)
-                # print " dxa:"                                           ###
-                # pvec1d(dxa,precision=5)                                 ###
-                # print                                                   ###
+                logger.debug(" dx:\n")
+                pvec1d(dx,precision=5, loglevel=DEBUG)
                 sol = flat(0.5*row(dx)*np.mat(H)*col(dx))[0] + np.dot(dx,G)
                 for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                     dx = np.insert(dx, i, 0)
@@ -588,7 +706,7 @@ class Optimizer(forcebalance.BaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            logger.info("Searching! Hessian diagonal addition = %.4e, L = % .4e, length %.4e, result %.4e\n" % ((L-1)**2,L,norm(dx),Result))
+            logger.info("Searching! Diagonal addition = %.4e, L = % .4e, length %.4e, result % .4e\n" % ((L-1)**2,L,norm(dx),Result))
             return Result
         
         if self.trust0 > 0: # This is the trust region code.
@@ -605,26 +723,29 @@ class Optimizer(forcebalance.BaseClass):
                 ### LOpt = Result[0]
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
-
-                logger.info("\rLevenberg-Marquardt: %s step found (length %.3e), % .8f added to Hessian diagonal\n" % ('hyperbolic-regularized' if self.bhyp else 'Newton-Raphson', dxnorm, (LOpt-1)**2))
+                logger.info("Trust-radius step found (length %.4e), % .4e added to Hessian diagonal\n" % (dxnorm, (LOpt-1)**2))
+            else:
+                logger.info("Newton-Raphson step found (length %.4e)\n" % (dxnorm))
+                
         else: # This is the search code.
             # First obtain a step that is the same length as the provided trust radius.
             LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
             dx, expect = solver(LOpt)
             dxnorm = norm(dx)
-            logger.info("Starting search with step size %f\n" % dxnorm)
+            logger.info("Starting Hessian diagonal search with step size %.4e\n" % dxnorm)
             bump = False
             Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             if Result[1] > 0:
                 LOpt = optimize.brent(h_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
                 dx, expect = solver(LOpt)
                 dxnorm = norm(dx)
-                logger.info("Restarting search with step size %f\n" % dxnorm)
+                logger.info("Restarting search with step size %.4e\n" % dxnorm)
                 Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             ### optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
             ### Result = optimize.fmin_powell(search_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
             dx, _ = solver(Result[0])
             expect = Result[1]
+            logger.info("Optimization step found (length %.4e)\n" % np.linalg.norm(dx))
 
         ## Decide which parameters to redirect.
         ## Currently not used.
@@ -658,11 +779,12 @@ class Optimizer(forcebalance.BaseClass):
         self.x_prev = 0.0
         self.x_best = None
         
-        def wrap(fin, Order=0, verbose=True):
+        def wrap(fin, Order=0, callback=True, fg=False):
             def fout(mvals):
                 def print_heading():
                     logger.info('\n')
-                    if Order: logger.info("%9s%9s%12s%12s%14s%12s\n" % ("Eval(G)", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)"))
+                    if Order == 2: logger.info("%9s%9s%12s%12s%14s%12s\n" % ("Eval(H)", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)"))
+                    elif Order == 1: logger.info("%9s%9s%12s%12s%14s%12s\n" % ("Eval(G)", "  |k|  ","  |dk|  "," |grad| ","    -=X2=-  ","Delta(X2)"))
                     else: logger.info("%9s%9s%12s%14s%12s\n" % ("Eval(X)", "  |k|  ","  |dk|  ","    -=X2=-  ","Delta(X2)"))
 
                 def print_results(color, newline=True):
@@ -672,28 +794,25 @@ class Optimizer(forcebalance.BaseClass):
                                               (fout.evals, np.linalg.norm(mvals), np.linalg.norm(mvals-self.xk_prev), np.linalg.norm(G), color, X, X - self.x_prev) + foot)
                     else: logger.info(head + "%6i%12.3e%12.3e%s%14.5e\x1b[0m%12.3e" % \
                                           (fout.evals, np.linalg.norm(mvals), np.linalg.norm(mvals-self.xk_prev), color, X, X - self.x_prev) + foot)
-
                 Result = fin(mvals,Order=Order,verbose=False)
                 fout.evals += 1
                 X, G, H = [Result[i] for i in ['X','G','H']]
-                dx = (self.x_best - X) if self.x_best != None else 0.0
-                if X < self.x_best or self.x_best == None:
-                    color = "\x1b[92m"
-                    self.x_best = X
-                    self.prev_bad = False
-                    if verbose: 
+                if callback:
+                    if X <= self.x_best or self.x_best == None:
+                        color = "\x1b[92m"
+                        self.x_best = X
+                        self.prev_bad = False
                         if self.print_vals:
                             logger.info('\n')
-                            bar = printcool("Mathematical Parameters for minimum:",color=5)
+                            bar = printcool("Current Mathematical Parameters:",color=5)
                             self.FF.print_map(vals=["% .4e" % i for i in mvals])
-                            logger.info(bar+'\n')
                         for Tgt in self.Objective.Targets:
                             Tgt.indicate()
                         self.Objective.Indicate()
                         print_heading()
                         print_results(color)
-                else:
-                    if verbose:
+                    else:
+                        self.prev_bad = True
                         color = "\x1b[91m"
                         if Order:
                             print_heading()
@@ -701,11 +820,18 @@ class Optimizer(forcebalance.BaseClass):
                         else:
                             if not self.prev_bad: print_heading()
                             print_results(color, newline=False)
-                    self.prev_bad = True
-                self.xk_prev = mvals.copy()
-                self.x_prev = X
-                if Order == 1:
-                    return G
+                    if Order:
+                        if np.linalg.norm(self.xk_prev - mvals) > 0.0:
+                            self.adjh(np.linalg.norm(self.xk_prev - mvals))
+                    self.xk_prev = mvals.copy()
+                    self.x_prev = X
+                if Order == 2:
+                    return H
+                elif Order == 1:
+                    if fg:
+                        return X, G
+                    else:
+                        return G
                 else:
                     if X != X:
                         return 1e10
@@ -714,18 +840,24 @@ class Optimizer(forcebalance.BaseClass):
             fout.evals = 0
             return fout
 
-        def xwrap(func,verbose=True):
-            return wrap(func, Order=0, verbose=verbose)
+        def xwrap(func,callback=True):
+            return wrap(func, Order=0, callback=callback)
         
-        def gwrap(func,verbose=True):
-            return wrap(func, Order=1, verbose=verbose)
+        def fgwrap(func,callback=True):
+            return wrap(func, Order=1, callback=callback, fg=True)
+
+        def gwrap(func,callback=True):
+            return wrap(func, Order=1, callback=callback)
+
+        def hwrap(func,callback=True):
+            return wrap(func, Order=2, callback=callback)
 
         if Algorithm == "powell":
-            printcool("Minimizing Objective Function using Powell's Method" , ansi=1, bold=1)
-            return optimize.fmin_powell(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep)
+            printcool("Minimizing Objective Function using\nPowell's Conjugate Direction Method" , ansi=1, bold=1)
+            return optimize.fmin_powell(xwrap(self.Objective.Full),self.mvals0,ftol=self.convergence_objective,xtol=self.convergence_step,maxiter=self.maxstep)
         elif Algorithm == "simplex":
-            printcool("Minimizing Objective Function using Simplex Method" , ansi=1, bold=1)
-            return optimize.fmin(xwrap(self.Objective.Full),self.mvals0,ftol=self.conv_obj,xtol=self.conv_stp,maxiter=self.maxstep,maxfun=self.maxstep*10)
+            printcool("Minimizing Objective Function using\nNelder-Mead Simplex Method" , ansi=1, bold=1)
+            return optimize.fmin(xwrap(self.Objective.Full),self.mvals0,ftol=self.convergence_objective,xtol=self.convergence_step,maxiter=self.maxstep,maxfun=self.maxstep*10)
         elif Algorithm == "anneal":
             printcool("Minimizing Objective Function using Simulated Annealing" , ansi=1, bold=1)
             xmin, Jmin, T, feval, iters, accept, status = optimize.anneal(xwrap(self.Objective.Full), self.mvals0, lower=self.mvals0-1*self.trust0*np.ones(self.np),
@@ -743,15 +875,28 @@ class Optimizer(forcebalance.BaseClass):
             logger.info("Tests accepted:       %i" % iters)
             return xmin
         elif Algorithm == "basinhopping":
-            printcool("Minimizing Objective Function using Basin Hopping" , ansi=1, bold=1)
+            printcool("Minimizing Objective Function using Basin Hopping Method" , ansi=1, bold=1)
             T = xwrap(self.Objective.Full)(self.mvals0)
             Result = optimize.basinhopping(xwrap(self.Objective.Full), self.mvals0, niter=self.maxstep, T=T, stepsize=self.trust0, interval=20,
-                                           minimizer_kwargs={'method':'nelder-mead','options':{'xtol': self.conv_stp,'ftol':self.conv_obj}}, disp=True)
+                                           minimizer_kwargs={'method':'nelder-mead','options':{'xtol': self.convergence_step,'ftol':self.convergence_objective}}, disp=True)
             logger.info(Result.message + "\n")
             return Result.x
         elif Algorithm == "cg":
-            printcool("Minimizing Objective Function using Conjugate Gradient" , ansi=1, bold=1)
-            return optimize.fmin_cg(xwrap(self.Objective.Full,verbose=False),self.mvals0,fprime=gwrap(self.Objective.Full),gtol=self.conv_grd)
+            printcool("Minimizing Objective Function using\nPolak-Ribiere Conjugate Gradient Method" , ansi=1, bold=1)
+            return optimize.fmin_cg(xwrap(self.Objective.Full,callback=False),self.mvals0,fprime=gwrap(self.Objective.Full),gtol=self.convergence_gradient)
+        elif Algorithm == "tnc":
+            printcool("Minimizing Objective Function using\nTruncated Newton Algorithm (Unconfirmed)" , ansi=1, bold=1)
+            Result = optimize.fmin_tnc(fgwrap(self.Objective.Full,callback=False),self.mvals0,
+                                       maxfun=self.maxstep,ftol=self.convergence_objective,pgtol=self.convergence_gradient,xtol=self.convergence_objective)
+            return Result.x
+        elif Algorithm == "ncg":
+            printcool("Minimizing Objective Function using\nNewton-CG Algorithm" , ansi=1, bold=1)
+            Result = optimize.fmin_ncg(xwrap(self.Objective.Full,callback=False),self.mvals0,fprime=gwrap(self.Objective.Full,callback=False),
+                                       fhess=hwrap(self.Objective.Full),avextol=self.convergence_objective,maxiter=self.maxstep,disp=True)
+            return Result
+        elif Algorithm == "bfgs":
+            printcool("Minimizing Objective Function using\nBFGS Quasi-Newton Method" , ansi=1, bold=1)
+            return optimize.fmin_bfgs(xwrap(self.Objective.Full,callback=False),self.mvals0,fprime=gwrap(self.Objective.Full),gtol=self.convergence_gradient)
 
     def GeneticAlgorithm(self):
         
@@ -868,9 +1013,21 @@ class Optimizer(forcebalance.BaseClass):
         """ Use SciPy's built-in conjugate gradient algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
         return self.ScipyOptimizer(Algorithm="cg")
 
+    def Scipy_BFGS(self):
+        """ Use SciPy's built-in BFGS algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
+        return self.ScipyOptimizer(Algorithm="bfgs")
+
     def BasinHopping(self):
         """ Use SciPy's built-in basin hopping algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
         return self.ScipyOptimizer(Algorithm="basinhopping")
+
+    def TruncatedNewton(self):
+        """ Use SciPy's built-in truncated Newton (fmin_tnc) algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
+        return self.ScipyOptimizer(Algorithm="tnc")
+
+    def NewtonCG(self):
+        """ Use SciPy's built-in Newton-CG (fmin_ncg) algorithm to optimize the parameters. @see Optimizer::ScipyOptimizer """
+        return self.ScipyOptimizer(Algorithm="ncg")
 
     def Scan_Values(self,MathPhys=1):
         """ Scan through parameter values.

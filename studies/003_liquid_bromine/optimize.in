@@ -38,7 +38,7 @@ finite_difference_h 0.001
 # (float) Factor for multiplicative penalty function in objective function
 penalty_additive 1.0
 
-trust0 0.25
+trust0 1.0
 mintrust 0.05
 error_tolerance 1.0
 adaptive_factor 0.2

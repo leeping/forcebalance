@@ -72,5 +72,6 @@ class CleanFileHandler(FileHandler):
 # set up package level logger that by default prints to sys.stdout
 setLoggerClass(ForceBalanceLogger)
 logger=getLogger('forcebalance')
-setLoggerClass(Logger)  # module level loggers should use the default logger object
+# module level loggers should use the default logger object
+setLoggerClass(Logger)
 logger.setLevel(INFO)
