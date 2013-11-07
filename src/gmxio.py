@@ -565,7 +565,7 @@ class GMX(Engine):
             self.gmx_defs["rlist"] = "0.0"
             self.gmx_defs["coulombtype"] = "cut-off"
             self.gmx_defs["rcoulomb"] = "0.0"
-            self.gmx_defs["vdwtype"] = "switch"
+            self.gmx_defs["vdwtype"] = "cut-off"
             self.gmx_defs["rvdw"] = "0.0"
         
         ## Link files into the temp directory.
