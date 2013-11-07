@@ -503,9 +503,6 @@ class Optimizer(forcebalance.BaseClass):
             if ngd < self.convergence_gradient and Best_Step:
                 logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
                 ncrit += 1
-            if ITERATION_NUMBER == self.maxstep:
-                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION_NUMBER)
-                break
             if ndx < self.convergence_step and Quality > ThreLQ and Best_Step:
                 logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
                 ncrit += 1
@@ -559,6 +556,10 @@ class Optimizer(forcebalance.BaseClass):
                 self.writechk()           
             outfnm = self.save_mvals_to_input(xk)
             logger.info("Input file with saved parameters: %s\n" % outfnm)
+            # Check for whether the maximum number of optimization cycles is reached.
+            if ITERATION_NUMBER == self.maxstep:
+                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION_NUMBER)
+                break
 
         cnvgd = ncrit >= self.criteria
         bar = printcool("\x1b[0m%s\x1b[0m\nFinal objective function value\nFull: % .6e  Un-penalized: % .6e" % 
