@@ -126,7 +126,7 @@ def uncommadash(s):
             
 #list(itertools.chain(*[range(*(int(w.split('-')[0])-1, int(w.split('-')[1]) if len(w.split('-')) == 2 else int(w.split('-')[0])))  for w in Mao.split(',')]))
 
-def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,center=True):
+def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,center=True,sym2="="):
     """Cool-looking printout for slick formatting of output.
 
     @param[in] text The string that the printout is based upon.  This function
@@ -158,13 +158,14 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
         return len(sub("\x1b\[[0-9;]*m","",line))
     text = text.split('\n')
     width = max(minwidth,max([newlen(line) for line in text]))
-    bar = ''.join(["=" for i in range(width + 6)])
+    bar = ''.join([sym2 for i in range(width + 6)])
     bar = sym + bar + sym
     #bar = ''.join([sym for i in range(width + 8)])
     logger.info('\r'+bar + '\n')
     for ln, line in enumerate(text):
-        if type(center) is list: center = center[ln]
-        if center:
+        if type(center) is list: c1 = center[ln]
+        else: c1 = center
+        if c1:
             padleft = ' ' * ((width - newlen(line)) / 2)
         else:
             padleft = ''
@@ -717,16 +718,22 @@ def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
 #| File and process management stuff |#
 #=====================================#
 # Back up a file.
-def bak(fnm):
-    oldfnm = fnm
-    if os.path.exists(oldfnm):
+def bak(path, dest=None):
+    oldf = path
+    if os.path.exists(path):
+        dnm, fnm = os.path.split(path)
         base, ext = os.path.splitext(fnm)
+        if dest == None:
+            dest = dnm
+        if not os.path.isdir(dest): os.makedirs(dest)
         i = 1
-        while os.path.exists(fnm):
+        while True:
             fnm = "%s_%i%s" % (base,i,ext)
+            newf = os.path.join(dest, fnm)
+            if not os.path.exists(newf): break
             i += 1
-        logger.info("Backing up %s -> %s\n" % (oldfnm, fnm))
-        shutil.move(oldfnm,fnm)
+        logger.info("Backing up %s -> %s\n" % (oldf, newf))
+        shutil.move(oldf,newf)
 
 # Search for exactly one file with a provided extension.
 # ext: File extension

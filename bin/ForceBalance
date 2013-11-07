@@ -69,7 +69,7 @@ then
   echo "Backing up the output file.."
   echo "Use -f option to force overwrite"
   mkdir -p backups
-  bnum=0
+  bnum=1
   while [[ -e backups/${filename}_$bnum.$outext || -e backups/${filename}_$bnum.err ]] ; do
       bnum=$(( bnum + 1 ))
   done

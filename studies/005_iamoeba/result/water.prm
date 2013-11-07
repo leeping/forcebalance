@@ -1,0 +1,143 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              AMOEBA-WATER
+
+bond-cubic              -2.55
+bond-quartic            3.793125
+angle-cubic             -0.014
+angle-quartic           0.000056
+angle-pentic            -0.0000007
+angle-sextic            0.000000022
+vdwtype                 BUFFERED-14-7
+radiusrule              CUBIC-MEAN
+radiustype              R-MIN
+radiussize              DIAMETER
+epsilonrule             HHG
+dielectric              1.0
+polarization            DIRECT
+polar-sor               0.75
+vdw-13-scale            0.0
+vdw-14-scale            1.0
+vdw-15-scale            1.0
+mpole-12-scale          0.0
+mpole-13-scale          0.0
+mpole-14-scale          0.4
+mpole-15-scale          0.8
+polar-12-scale          0.0
+polar-13-scale          0.0
+polar-14-scale          1.0
+polar-15-scale          1.0
+polar-14-intra          0.5
+direct-11-scale         0.0
+direct-12-scale         1.0
+direct-13-scale         1.0
+direct-14-scale         1.0
+mutual-11-scale         1.0
+mutual-12-scale         1.0
+mutual-13-scale         1.0
+mutual-14-scale         1.0
+
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+P. Ren and J. W. Ponder, "A Polarizable Atomic Multipole Water Model
+for Molecular Mechanics Simulation", J. Phys. Chem. B, 107, 5933-5947
+(2003)
+
+Y. Kong, "Multipole Electrostatic Methods for Protein Modeling with
+Reaction Field Treatment", Ph.D. thesis, DBBS Program in Molecular
+Biophysics, Washington University, St. Louis, August, 1997  [available
+online from http://dasher.wustl.edu/ponder/]
+
+
+      #############################
+      ##                         ##
+      ##  Atom Type Definitions  ##
+      ##                         ##
+      #############################
+
+
+atom          1    1    O     "AMOEBA Water O"               8    15.995    2
+atom          2    2    H     "AMOEBA Water H"               1     1.008    1
+
+
+      ################################
+      ##                            ##
+      ##  Van der Waals Parameters  ##
+      ##                            ##
+      ################################
+
+
+ vdw           1         3.645297000000e+00     1.968164435946e-01                         # EVAL 2 PARM["Vdw/sigma/73"]*10 3 PARM["Vdw/epsilon/73"]/4.184
+vdw           2                  0.000       0.0000
+
+      ##################################
+      ##                              ##
+      ##  Bond Stretching Parameters  ##
+      ##                              ##
+      ##################################
+
+
+ bond          1    2         5.576298279159e+02     9.584047000000e-01        # EVAL 3 PARM["Bond/k/73.74"]/418.4 4 PARM["Bond/length/73.74"]*10
+
+
+      ################################
+      ##                            ##
+      ##  Angle Bending Parameters  ##
+      ##                            ##
+      ################################
+
+
+ angle         2    1    2      4.989629410465e+01     1.064826000000e+02      # EVAL 4 PARM["Angle/k/74.73.74"]*784.6095 5 PARM["Angle/angle1/74.73.74"]
+
+
+      ###############################
+      ##                           ##
+      ##  Urey-Bradley Parameters  ##
+      ##                           ##
+      ###############################
+
+
+ ureybrad      2    1    2     -1.030817399618e+01     1.535676676685e+00      # EVAL 4 PARM["UreyBradley/k/74.73.74"]/418.4 5 sqrt(2*PARM['Bond/length/73.74']**2*(1-cos(pi*PARM['Angle/angle1/74.73.74']/180)))*10
+
+
+      ###################################
+      ##                               ##
+      ##  Atomic Multipole Parameters  ##
+      ##                               ##
+      ###################################
+
+
+ multipole     1   -2   -2         -5.940240000000e-01                                     # EVAL 4 PARM["Multipole/c0/380.-381.-381"]
+                                   0.00000               0.00000    8.847737967508e-02    # EVAL 2 PARM["Multipole/d3/380.-381.-381"]*18.897261
+                                   2.261820095758e-01                                     # EVAL 0 PARM["Multipole/q11/380.-381.-381"]*1071.3194
+                                   0.00000              -3.224361537318e-01               # EVAL 1 PARM["Multipole/q22/380.-381.-381"]*1071.3194
+                                   0.00000               0.00000    9.625414415604e-02    # EVAL 2 (-PARM["Multipole/q11/380.-381.-381"]-PARM["Multipole/q22/380.-381.-381"])*1071.3194
+
+ multipole     2    1    2          2.970120000000e-01                                     # EVAL 4 PARM["Multipole/c0/380.-381.-381"]*-0.5
+                                  -9.390511686462e-02    0.00000   -1.256044813725e-01    # EVAL 0 PARM["Multipole/d1/381.380.381"]*18.897261 2 PARM["Multipole/d3/381.380.381"]*18.897261
+                                   1.875400051568e-01                                     # EVAL 0 PARM["Multipole/q11/381.380.381"]*1071.3194
+                                   0.00000               2.173827565356e-02               # EVAL 1 PARM["Multipole/q22/381.380.381"]*1071.3194
+                                  -3.634650291242e-02    0.00000   -2.092782808104e-01    # EVAL 0 PARM["Multipole/q31/381.380.381"]*1071.3194 2 (-PARM['Multipole/q11/381.380.381']-PARM['Multipole/q22/381.380.381'])*1071.3194
+
+
+      ########################################
+      ##                                    ##
+      ##  Dipole Polarizability Parameters  ##
+      ##                                    ##
+      ########################################
+
+
+ polarize      1        8.063631227791e-01      2.361640000000e-01       2                              # EVAL 2 PARM['GPol/glob']*(1+PARM['GPol/oext']**2)/(3+PARM['GPol/oext']**2) 3 PARM["Polarize/thole/380"]
+ polarize      2        5.048434386104e-01      2.361640000000e-01       1                              # EVAL 2 PARM['GPol/glob']/(3+PARM['GPol/oext']**2) 3 PARM["Polarize/thole/380"]

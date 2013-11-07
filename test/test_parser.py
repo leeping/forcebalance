@@ -22,6 +22,7 @@ class TestParser(ForceBalanceTestCase):
 
         defaults = forcebalance.parser.gen_opts_defaults
         defaults.update({'root':os.getcwd()})
+        defaults.update({'input_file':None})
         target_defaults = forcebalance.parser.tgt_opts_defaults
 
         self.assertEqual(output[0], defaults,

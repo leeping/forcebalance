@@ -219,9 +219,9 @@ class FF(forcebalance.BaseClass):
         ## Whether to constrain the charges.
         self.set_option(options,'logarithmic_map')
         ## Switch for AMOEBA direct or mutual.
-        self.set_option(options, 'amoeba_pol', forceprint=True)
+        self.set_option(options, 'amoeba_pol')
         ## Switch for rigid water molecules
-        self.set_option(options, 'rigid_water', forceprint=True)
+        self.set_option(options, 'rigid_water')
         ## Bypass the transformation and use physical parameters directly
         self.set_option(options, 'use_pvals')
         
@@ -1116,6 +1116,13 @@ class FF(forcebalance.BaseClass):
             vals = self.pvals0
         logger.info('\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i.split()[0] for i in self.plist]))
         logger.info('\n')
+
+    def sprint_map(self,vals = None,precision=4):
+        """Prints out the (physical or mathematical) parameter indices, IDs and values to a string."""
+        if vals == None:
+            vals = self.pvals0
+        out = '\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i.split()[0] for i in self.plist])
+        return out
         
     def assign_p0(self,idx,val):
         """ Assign physical parameter values to the 'pvals0' array.

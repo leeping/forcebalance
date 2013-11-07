@@ -1,0 +1,2207 @@
+#======================================================================#
+#| [1m             Welcome to ForceBalance version 1.2! =D              [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m               Author: Lee-Ping Wang, Arthur Vigil                [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: single.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: amoebawater.xml
+Minor warning: Parameter ID GPol/glob doesn't contain any atom types, redundancies are possible
+Minor warning: Parameter ID GPol/oext doesn't contain any atom types, redundancies are possible
+Reading force field from file: water.prm
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  2.3299e+05 ] : Bond/k/73.74
+   1 [  9.5720e-02 ] : Bond/length/73.74
+   2 [  1.0850e+02 ] : Angle/angle1/74.73.74
+   3 [  6.2069e-02 ] : Angle/k/74.73.74
+   4 [  4.6024e-01 ] : Vdw/epsilon/73
+   5 [  3.4050e-01 ] : Vdw/sigma/73
+   6 [ -5.1966e-01 ] : Multipole/c0/380.-381.-381
+   7 [  7.5561e-03 ] : Multipole/d3/380.-381.-381
+   8 [  3.5403e-04 ] : Multipole/q11/380.-381.-381
+   9 [ -3.9026e-04 ] : Multipole/q22/380.-381.-381
+  10 [ -2.0421e-03 ] : Multipole/d1/381.380.381
+  11 [ -3.0788e-03 ] : Multipole/d3/381.380.381
+  12 [ -3.4285e-05 ] : Multipole/q11/381.380.381
+  13 [ -1.0024e-04 ] : Multipole/q22/381.380.381
+  14 [ -1.8949e-06 ] : Multipole/q31/381.380.381
+  15 [  3.9000e-01 ] : Polarize/thole/380
+  16 [ -3.1798e+03 ] : UreyBradley/k/74.73.74
+  17 [  1.4700e+00 ] : GPol/glob
+  18 [  8.3000e-01 ] : GPol/oext
+-----------------------------------------------------------
+#========================================================#
+#| [91m    Rescaling Factors (Lower Takes Precedence):     [0m |#
+#========================================================#
+   Bond/length                          : 1.00000e-02
+   GPol/oext                            : 2.00000e-01
+   UreyBradley/k                        : 1.00000e+04
+   Angle/k                              : 5.00000e-02
+   Multipole/c0                         : 5.19660e-01
+   Bond/k                               : 2.00000e+04
+   Vdw/epsilon                          : 4.60240e-01
+   Vdw/sigma                            : 3.00000e-02
+   Multipole/q22                        : 3.90257e-04
+   Angle/angle1                         : 5.00000e+00
+   GPol/glob                            : 1.00000e-01
+   Multipole/q11                        : 3.54031e-04
+   Polarize/thole                       : 2.00000e-01
+   Multipole/q31                        : 1.89486e-06
+   Multipole/d1                         : 2.04209e-03
+   Multipole/d3                         : 7.55612e-03
+   Bond/length                          : 1.00000e-02
+   Bond/k                               : 2.00000e+04
+   Angle/angle1                         : 5.00000e+00
+   Angle/k                              : 5.00000e-02
+   UreyBradley/k                        : 1.00000e+04
+   Vdw/sigma                            : 3.00000e-02
+   Vdw/epsilon/73                       : 3.00000e-01
+   Multipole/c                          : 4.00000e-01
+   Multipole/d                          : 5.00000e-03
+   Multipole/q                          : 2.00000e-04
+   Polarize/thole                       : 2.00000e-01
+   GPol/glob                            : 1.00000e-01
+   GPol/oext                            : 2.00000e-01
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['amoebawater.xml', 'water.prm'] 
+priors                    OrderedDict([('Bond/length', 0.01), ('Bond/k', 20000.0), ('Angle/angle1', 5.0), ('Angle/k', 0.05), ('UreyBradley/k', 10000.0), ('Vdw/sigma', 0.03), ('Vdw/epsilon/73', 0.3), ('Multipole/c', 0.4), ('Multipole/d', 0.005), ('Multipole/q', 0.0002), ('Polarize/thole', 0.2), ('GPol/glob', 0.1), ('GPol/oext', 0.2)]) 
+amoeba_pol                direct 
+rigid_water               0 
+----------------------------------------------------------
+#========================================================#
+#| [92m             Setup for target Liquid :              [0m |#
+#========================================================#
+force_cuda                0 
+mts_integrator            0 
+liquid_coords             liquid.pdb 
+gas_coords                mono.pdb 
+name                      Liquid 
+type                      LIQUID_OPENMM 
+weight                    5.0 
+tgtdir                    targets/Liquid 
+w_rho                     1.0 
+w_hvap                    1.0 
+w_alpha                   1.0 
+w_kappa                   1.0 
+w_cp                      1.0 
+w_eps0                    1.0 
+liquid_equ_steps          1000000 
+liquid_prod_steps         8000000 
+gas_equ_steps             1000000 
+gas_prod_steps            8000000 
+liquid_timestep           0.5 
+liquid_interval           0.1 
+gas_timestep              0.5 
+gas_interval              0.1 
+minimize_energy           1 
+self_pol_mu0              0.0 
+self_pol_alpha            0.0 
+anisotropic_box           0 
+rho_denom                 2.0 
+hvap_denom                5.0 
+alpha_denom               1.0 
+kappa_denom               10.0 
+cp_denom                  2.0 
+eps0_denom                10.0 
+use_cvib_intra            True 
+use_cvib_inter            True 
+use_cni                   True 
+----------------------------------------------------------
+Found 0 .prm files in /home/leeping/src/forcebalance/studies/005_iamoeba/targets/Monomer_Moments
+Deleting PBC options from the .key file.
+#========================================================#
+#| [92m         Setup for target Monomer_Moments :         [0m |#
+#========================================================#
+name                      Monomer_Moments 
+type                      MOMENTS_TINKER 
+tgtdir                    targets/Monomer_Moments 
+dipole_denom              0.2 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-02 :            [0m |#
+#========================================================#
+name                      cluster-02 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-02 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-03 :            [0m |#
+#========================================================#
+name                      cluster-03 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-03 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-04 :            [0m |#
+#========================================================#
+name                      cluster-04 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-04 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-05 :            [0m |#
+#========================================================#
+name                      cluster-05 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-05 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-06 :            [0m |#
+#========================================================#
+name                      cluster-06 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-06 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2408 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-07 :            [0m |#
+#========================================================#
+name                      cluster-07 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-07 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-08 :            [0m |#
+#========================================================#
+name                      cluster-08 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-08 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2402 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-09 :            [0m |#
+#========================================================#
+name                      cluster-09 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-09 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-10 :            [0m |#
+#========================================================#
+name                      cluster-10 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-10 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-11 :            [0m |#
+#========================================================#
+name                      cluster-11 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-11 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2405 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-12 :            [0m |#
+#========================================================#
+name                      cluster-12 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-12 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-13 :            [0m |#
+#========================================================#
+name                      cluster-13 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-13 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-14 :            [0m |#
+#========================================================#
+name                      cluster-14 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-14 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     2401 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-15 :            [0m |#
+#========================================================#
+name                      cluster-15 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-15 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     1801 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-16 :            [0m |#
+#========================================================#
+name                      cluster-16 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-16 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     1805 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-17 :            [0m |#
+#========================================================#
+name                      cluster-17 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-17 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     1797 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-18 :            [0m |#
+#========================================================#
+name                      cluster-18 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-18 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     1748 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-19 :            [0m |#
+#========================================================#
+name                      cluster-19 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-19 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     1800 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-20 :            [0m |#
+#========================================================#
+name                      cluster-20 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-20 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     604 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-21 :            [0m |#
+#========================================================#
+name                      cluster-21 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-21 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     601 
+----------------------------------------------------------
+#========================================================#
+#| [92m           Setup for target cluster-22 :            [0m |#
+#========================================================#
+name                      cluster-22 
+type                      ABINITIO_OPENMM 
+weight                    0.5 
+tgtdir                    targets/cluster-22 
+w_netforce                1.0 
+w_torque                  1.0 
+shots                     600 
+----------------------------------------------------------
+Reading interactions from file: targets/DimerMin/interactions.txt
+Optimizing system monomer_opt
+Optimizing system dimer
+The energy denominator is: 1.0
+The RMSD denominator is: 0.1
+#========================================================#
+#| [92m            Setup for target DimerMin :             [0m |#
+#========================================================#
+name                      DimerMin 
+type                      BINDINGENERGY_TINKER 
+tgtdir                    targets/DimerMin 
+inter_txt                 targets/DimerMin/interactions.txt 
+energy_denom              1.0 
+rmsd_denom                0.1 
+----------------------------------------------------------
+Reading interactions from file: targets/Interactions_CCSDT/interactions.txt
+Optimizing system monomer_opt
+Optimizing system trimer
+Optimizing system tetramer
+Optimizing system pentamer
+Optimizing system hexamer01
+Optimizing system hexamer02
+Optimizing system hexamer03
+Optimizing system hexamer04
+Optimizing system hexamer05
+Optimizing system hexamer06
+Optimizing system hexamer07
+Optimizing system hexamer08
+The energy denominator is: 10.0
+The RMSD denominator is: 2.0
+#========================================================#
+#| [92m       Setup for target Interactions_CCSDT :        [0m |#
+#========================================================#
+name                      Interactions_CCSDT 
+type                      BINDINGENERGY_TINKER 
+tgtdir                    targets/Interactions_CCSDT 
+inter_txt                 targets/Interactions_CCSDT/interactions.txt 
+energy_denom              10.0 
+rmsd_denom                2.0 
+----------------------------------------------------------
+Reading interactions from file: targets/Interactions_MP2/interactions.txt
+Optimizing ALL systems by default
+The energy denominator is: 100.0
+The RMSD denominator is: 2.0
+#========================================================#
+#| [92m        Setup for target Interactions_MP2 :         [0m |#
+#========================================================#
+name                      Interactions_MP2 
+type                      BINDINGENERGY_TINKER 
+tgtdir                    targets/Interactions_MP2 
+inter_txt                 targets/Interactions_MP2/interactions.txt 
+energy_denom              100.0 
+rmsd_denom                2.0 
+----------------------------------------------------------
+#========================================================#
+#| [92m        Setup for target Monomer_Vibration :        [0m |#
+#========================================================#
+name                      Monomer_Vibration 
+type                      VIBRATION_TINKER 
+tgtdir                    targets/Monomer_Vibration 
+denom                     30.0 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e-03 (+), 0.0e+00 (x)
+Work Queue is listening on 9236
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          0.001 
+normalize_weights         False 
+wq_port                   9236 
+asynchronous              True 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   SINGLE 
+trust0                    0.15 
+mintrust                  0.05 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+print_hess                True 
+err_tol                   0.5 
+read_mvals                [0.016314, 0.012047, -0.40348, 0.030494, 1.2108, 0.80099, -0.18591, -0.57482, -0.71453, 0.44643, -0.58543, -0.71359, 1.0467, 0.60266, -0.16016, -0.76918, -0.11331, 3.4605, -0.28589] 
+----------------------------------------------------------
+Submitting command 'bash runcuda.sh python npt.py openmm 249.150 1.000 &> npt.out' to the Work Queue, taskid 1
+Submitting command 'bash runcuda.sh python npt.py openmm 253.150 1.000 &> npt.out' to the Work Queue, taskid 2
+Submitting command 'bash runcuda.sh python npt.py openmm 257.150 1.000 &> npt.out' to the Work Queue, taskid 3
+Submitting command 'bash runcuda.sh python npt.py openmm 261.150 1.000 &> npt.out' to the Work Queue, taskid 4
+Submitting command 'bash runcuda.sh python npt.py openmm 265.150 1.000 &> npt.out' to the Work Queue, taskid 5
+Submitting command 'bash runcuda.sh python npt.py openmm 269.150 1.000 &> npt.out' to the Work Queue, taskid 6
+Submitting command 'bash runcuda.sh python npt.py openmm 273.150 1.000 &> npt.out' to the Work Queue, taskid 7
+Submitting command 'bash runcuda.sh python npt.py openmm 277.150 1.000 &> npt.out' to the Work Queue, taskid 8
+Submitting command 'bash runcuda.sh python npt.py openmm 281.150 1.000 &> npt.out' to the Work Queue, taskid 9
+Submitting command 'bash runcuda.sh python npt.py openmm 285.150 1.000 &> npt.out' to the Work Queue, taskid 10
+Submitting command 'bash runcuda.sh python npt.py openmm 289.150 1.000 &> npt.out' to the Work Queue, taskid 11
+Submitting command 'bash runcuda.sh python npt.py openmm 293.150 1.000 &> npt.out' to the Work Queue, taskid 12
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 1.000 &> npt.out' to the Work Queue, taskid 13
+Submitting command 'bash runcuda.sh python npt.py openmm 301.150 1.000 &> npt.out' to the Work Queue, taskid 14
+Submitting command 'bash runcuda.sh python npt.py openmm 305.150 1.000 &> npt.out' to the Work Queue, taskid 15
+Submitting command 'bash runcuda.sh python npt.py openmm 309.150 1.000 &> npt.out' to the Work Queue, taskid 16
+Submitting command 'bash runcuda.sh python npt.py openmm 313.150 1.000 &> npt.out' to the Work Queue, taskid 17
+Submitting command 'bash runcuda.sh python npt.py openmm 317.150 1.000 &> npt.out' to the Work Queue, taskid 18
+Submitting command 'bash runcuda.sh python npt.py openmm 321.150 1.000 &> npt.out' to the Work Queue, taskid 19
+Submitting command 'bash runcuda.sh python npt.py openmm 325.150 1.000 &> npt.out' to the Work Queue, taskid 20
+Submitting command 'bash runcuda.sh python npt.py openmm 329.150 1.000 &> npt.out' to the Work Queue, taskid 21
+Submitting command 'bash runcuda.sh python npt.py openmm 333.150 1.000 &> npt.out' to the Work Queue, taskid 22
+Submitting command 'bash runcuda.sh python npt.py openmm 337.150 1.000 &> npt.out' to the Work Queue, taskid 23
+Submitting command 'bash runcuda.sh python npt.py openmm 341.150 1.000 &> npt.out' to the Work Queue, taskid 24
+Submitting command 'bash runcuda.sh python npt.py openmm 345.150 1.000 &> npt.out' to the Work Queue, taskid 25
+Submitting command 'bash runcuda.sh python npt.py openmm 349.150 1.000 &> npt.out' to the Work Queue, taskid 26
+Submitting command 'bash runcuda.sh python npt.py openmm 353.150 1.000 &> npt.out' to the Work Queue, taskid 27
+Submitting command 'bash runcuda.sh python npt.py openmm 357.150 1.000 &> npt.out' to the Work Queue, taskid 28
+Submitting command 'bash runcuda.sh python npt.py openmm 361.150 1.000 &> npt.out' to the Work Queue, taskid 29
+Submitting command 'bash runcuda.sh python npt.py openmm 365.150 1.000 &> npt.out' to the Work Queue, taskid 30
+Submitting command 'bash runcuda.sh python npt.py openmm 369.150 1.000 &> npt.out' to the Work Queue, taskid 31
+Submitting command 'bash runcuda.sh python npt.py openmm 373.150 1.000 &> npt.out' to the Work Queue, taskid 32
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 19.738 &> npt.out' to the Work Queue, taskid 33
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 49.346 &> npt.out' to the Work Queue, taskid 34
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 98.692 &> npt.out' to the Work Queue, taskid 35
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 246.731 &> npt.out' to the Work Queue, taskid 36
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 493.462 &> npt.out' to the Work Queue, taskid 37
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 740.192 &> npt.out' to the Work Queue, taskid 38
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 986.923 &> npt.out' to the Work Queue, taskid 39
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 1973.847 &> npt.out' to the Work Queue, taskid 40
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 3947.693 &> npt.out' to the Work Queue, taskid 41
+Submitting command 'bash runcuda.sh python npt.py openmm 298.150 7895.386 &> npt.out' to the Work Queue, taskid 42
+Target: Monomer_Moments
+#=====================================================================#
+#| [92m    Moments and/or Polarizabilities, Objective =  1.84009e-01    [0m |#
+#| [92m  Component                Calc.      Ref.     Delta        Term [0m |#
+#=====================================================================#
+dipole-z                      1.861     1.855     0.006      0.00091 
+quadrupole-xx                 2.587     2.630    -0.043      0.00188 
+quadrupole-yy                -2.178    -2.500     0.322      0.10363 
+quadrupole-zz                -0.409    -0.130    -0.279      0.07759 
+-----------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-02  Type: AbInitio_OpenMM  Objective = 8.27353e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            1.8348        9.0149     20.3534% 
+    Gradient (kJ/mol/A)       24.7206       76.0022     32.5261% 
+    Net Force (kJ/mol/A)       7.3099       21.2729     34.3627% 
+    Torque (kJ/mol/rad)        3.7172       12.2231     30.4113% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-03  Type: AbInitio_OpenMM  Objective = 7.76322e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            2.4239       13.5359     17.9073% 
+    Gradient (kJ/mol/A)       22.9184       78.3111     29.2658% 
+    Net Force (kJ/mol/A)       8.3802       24.9484     33.5901% 
+    Torque (kJ/mol/rad)        4.6784       15.0699     31.0450% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-04  Type: AbInitio_OpenMM  Objective = 7.49174e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            3.0173       17.7761     16.9737% 
+    Gradient (kJ/mol/A)       22.4149       80.8905     27.7102% 
+    Net Force (kJ/mol/A)       8.7231       26.4979     32.9201% 
+    Torque (kJ/mol/rad)        5.2386       16.8063     31.1708% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-05  Type: AbInitio_OpenMM  Objective = 7.47353e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            3.5660       21.3964     16.6663% 
+    Gradient (kJ/mol/A)       21.9114       81.6120     26.8482% 
+    Net Force (kJ/mol/A)       9.1024       27.6920     32.8702% 
+    Torque (kJ/mol/rad)        5.7844       18.3808     31.4700% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-06  Type: AbInitio_OpenMM  Objective = 7.31322e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            4.1863       27.0253     15.4903% 
+    Gradient (kJ/mol/A)       21.7828       82.2815     26.4736% 
+    Net Force (kJ/mol/A)       9.2769       28.4514     32.6061% 
+    Torque (kJ/mol/rad)        6.1114       19.2686     31.7170% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-07  Type: AbInitio_OpenMM  Objective = 7.37878e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            4.5803       29.1568     15.7091% 
+    Gradient (kJ/mol/A)       21.9012       83.3373     26.2802% 
+    Net Force (kJ/mol/A)       9.4128       29.0609     32.3900% 
+    Torque (kJ/mol/rad)        6.3629       20.0056     31.8056% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-08  Type: AbInitio_OpenMM  Objective = 7.27013e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            5.0737       35.0308     14.4834% 
+    Gradient (kJ/mol/A)       21.7303       83.8407     25.9186% 
+    Net Force (kJ/mol/A)       9.6236       29.7999     32.2941% 
+    Torque (kJ/mol/rad)        6.6352       20.7019     32.0513% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-09  Type: AbInitio_OpenMM  Objective = 7.18589e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            5.5677       38.6786     14.3947% 
+    Gradient (kJ/mol/A)       21.8897       85.1564     25.7053% 
+    Net Force (kJ/mol/A)       9.5672       29.8301     32.0724% 
+    Torque (kJ/mol/rad)        6.8069       21.3821     31.8346% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-10  Type: AbInitio_OpenMM  Objective = 7.23350e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            5.9797       41.8575     14.2859% 
+    Gradient (kJ/mol/A)       21.8991       85.3973     25.6438% 
+    Net Force (kJ/mol/A)       9.7813       30.4655     32.1063% 
+    Torque (kJ/mol/rad)        6.9900       21.7563     32.1286% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-11  Type: AbInitio_OpenMM  Objective = 7.17267e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            6.5400       46.9517     13.9293% 
+    Gradient (kJ/mol/A)       21.8485       85.8294     25.4558% 
+    Net Force (kJ/mol/A)       9.8831       30.8369     32.0497% 
+    Torque (kJ/mol/rad)        7.1963       22.4081     32.1145% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-12  Type: AbInitio_OpenMM  Objective = 7.17614e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            6.6893       49.9641     13.3883% 
+    Gradient (kJ/mol/A)       21.9556       85.9897     25.5328% 
+    Net Force (kJ/mol/A)       9.9035       31.0234     31.9227% 
+    Torque (kJ/mol/rad)        7.2925       22.6596     32.1828% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-13  Type: AbInitio_OpenMM  Objective = 7.15599e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            7.0595       53.2030     13.2690% 
+    Gradient (kJ/mol/A)       22.1765       87.0132     25.4864% 
+    Net Force (kJ/mol/A)      10.0347       31.6190     31.7364% 
+    Torque (kJ/mol/rad)        7.4260       22.9480     32.3599% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-14  Type: AbInitio_OpenMM  Objective = 7.14392e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            7.3256       56.4511     12.9770% 
+    Gradient (kJ/mol/A)       22.0774       87.1822     25.3233% 
+    Net Force (kJ/mol/A)      10.0414       31.3637     32.0161% 
+    Torque (kJ/mol/rad)        7.4485       23.0828     32.2686% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-15  Type: AbInitio_OpenMM  Objective = 6.96070e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            7.6586       61.8297     12.3865% 
+    Gradient (kJ/mol/A)       21.0926       77.9718     27.0516% 
+    Net Force (kJ/mol/A)       9.7895       32.0021     30.5903% 
+    Torque (kJ/mol/rad)        7.5228       23.6797     31.7691% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-16  Type: AbInitio_OpenMM  Objective = 6.93716e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            8.3151       70.4713     11.7993% 
+    Gradient (kJ/mol/A)       21.2545       78.3008     27.1447% 
+    Net Force (kJ/mol/A)       9.7423       32.1778     30.2764% 
+    Torque (kJ/mol/rad)        7.6281       23.8284     32.0128% 
+--------------------------------------------------------------------------
+
+#========================================================================#
+#|  Target: cluster-17  Type: AbInitio_OpenMM  Objective = 6.96621e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            8.9610       74.7341     11.9905% 
+    Gradient (kJ/mol/A)       21.4049       78.7958     27.1650% 
+    Net Force (kJ/mol/A)       9.8358       32.0941     30.6467% 
+    Torque (kJ/mol/rad)        7.5971       23.9032     31.7826% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-18  Type: AbInitio_OpenMM  Objective = 6.95740e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            9.0278       74.1175     12.1804% 
+    Gradient (kJ/mol/A)       21.5566       79.7547     27.0286% 
+    Net Force (kJ/mol/A)       9.9129       32.4592     30.5396% 
+    Torque (kJ/mol/rad)        7.7159       24.3502     31.6872% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-19  Type: AbInitio_OpenMM  Objective = 7.01583e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)            9.2340       78.2371     11.8026% 
+    Gradient (kJ/mol/A)       21.6027       79.3407     27.2278% 
+    Net Force (kJ/mol/A)      10.0051       32.7299     30.5686% 
+    Torque (kJ/mol/rad)        7.8425       24.5590     31.9332% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-20  Type: AbInitio_OpenMM  Objective = 7.11764e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)           10.9326       74.6841     14.6385% 
+    Gradient (kJ/mol/A)       25.4193      121.0110     21.0058% 
+    Net Force (kJ/mol/A)      10.2206       30.7664     33.2199% 
+    Torque (kJ/mol/rad)        7.8994       24.6216     32.0832% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-21  Type: AbInitio_OpenMM  Objective = 7.32571e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)           10.1192       67.7058     14.9458% 
+    Gradient (kJ/mol/A)       25.6373      122.2439     20.9723% 
+    Net Force (kJ/mol/A)      10.5811       31.1697     33.9468% 
+    Torque (kJ/mol/rad)        8.0874       25.1696     32.1314% 
+--------------------------------------------------------------------------
+#========================================================================#
+#|  Target: cluster-22  Type: AbInitio_OpenMM  Objective = 7.33957e-02  |#
+#|                            Difference   Denominator     Percent      |#
+#|     Physical Variable      (Calc-Ref)     RMS (Ref)   Difference     |#
+#========================================================================#
+    Energy (kJ/mol)           10.3140       65.2679     15.8026% 
+    Gradient (kJ/mol/A)       25.4145      121.2534     20.9598% 
+    Net Force (kJ/mol/A)      10.3447       30.8508     33.5313% 
+    Torque (kJ/mol/rad)        8.0450       24.9215     32.2812% 
+--------------------------------------------------------------------------
+#=====================================================================#
+#| [92m    Interaction Energies (kcal/mol), Objective =  1.15951e-02    [0m |#
+#| [92m  Interaction              Calc.      Ref.     Delta        Term [0m |#
+#=====================================================================#
+Dimer                        -5.092    -4.985    -0.108      0.01160 
+-----------------------------------------------------------------------
+#=====================================================================#
+#| [92m Geometry Optimized Systems (Angstrom), Objective = 1.88206e-01  [0m |#
+#| [92m  System                                        RMSD        Term [0m |#
+#=====================================================================#
+monomer_opt                                       0.011      0.00000 
+dimer                                             0.043      0.18821 
+-----------------------------------------------------------------------
+#=====================================================================#
+#| [92m    Interaction Energies (kcal/mol), Objective =  1.31748e-01    [0m |#
+#| [92m  Interaction              Calc.      Ref.     Delta        Term [0m |#
+#=====================================================================#
+Smith1                       -5.015    -4.968    -0.047      0.00002 
+Smith2                       -4.471    -4.453    -0.018      0.00000 
+Smith3                       -4.466    -4.418    -0.047      0.00002 
+Smith4                       -3.563    -4.250     0.687      0.00472 
+Smith5                       -2.977    -3.998     1.021      0.01042 
+Smith6                       -2.819    -3.957     1.138      0.01295 
+Smith7                       -2.740    -3.256     0.517      0.00267 
+Smith8                       -1.334    -1.300    -0.034      0.00001 
+Smith9                       -3.397    -3.047    -0.350      0.00123 
+Smith10                      -2.804    -2.182    -0.622      0.00387 
+Trimer                      -15.055   -15.742     0.687      0.00472 
+Tetramer                    -26.840   -27.400     0.561      0.00315 
+Pentamer                    -35.105   -35.933     0.829      0.00687 
+Prism                       -44.668   -45.920     1.252      0.01567 
+Cage                        -44.475   -45.670     1.195      0.01428 
+Bag                         -43.242   -44.300     1.058      0.01119 
+CyclicChair                 -43.388   -44.120     0.732      0.00536 
+Book1                       -44.179   -45.200     1.021      0.01043 
+Book2                       -43.635   -44.900     1.265      0.01600 
+CyclicBoat1                 -42.462   -43.130     0.668      0.00446 
+CyclicBoat2                 -42.462   -43.070     0.608      0.00370 
+-----------------------------------------------------------------------
+#=====================================================================#
+#| [92m Geometry Optimized Systems (Angstrom), Objective = 5.54135e-02  [0m |#
+#| [92m  System                                        RMSD        Term [0m |#
+#=====================================================================#
+monomer_opt                                       0.011      0.00000 
+trimer                                            0.052      0.00067 
+tetramer                                          0.113      0.00318 
+pentamer                                          0.125      0.00391 
+hexamer01                                         0.081      0.00164 
+hexamer02                                         0.093      0.00218 
+hexamer03                                         0.151      0.00571 
+hexamer04                                         0.099      0.00245 
+hexamer05                                         0.109      0.00297 
+hexamer06                                         0.120      0.00358 
+hexamer07                                         0.282      0.01984 
+hexamer08                                         0.193      0.00928 
+-----------------------------------------------------------------------
+#=====================================================================#
+#| [92m    Interaction Energies (kcal/mol), Objective =  2.09051e-01    [0m |#
+#| [92m  Interaction              Calc.      Ref.     Delta        Term [0m |#
+#=====================================================================#
+Octamer_S4                  -70.631   -72.700     2.069      0.00043 
+Octamer_D2d                 -70.600   -72.700     2.100      0.00044 
+11-mer_434                  -98.830  -105.718     6.888      0.00475 
+11-mer_515                  -98.728  -105.182     6.454      0.00417 
+11-mer_551                  -98.797  -104.920     6.123      0.00375 
+11-mer_443                  -99.204  -104.760     5.556      0.00309 
+11-mer_4412                 -98.227  -103.971     5.744      0.00330 
+16-mer_boat-a              -157.893  -170.800    12.907      0.01666 
+16-mer_boat-b              -157.935  -170.630    12.695      0.01612 
+16-mer_antiboat            -157.034  -170.540    13.506      0.01824 
+16-mer_abab                -157.752  -171.050    13.298      0.01768 
+16-mer_aabb                -157.726  -170.510    12.784      0.01634 
+17-mer_sphere              -168.208  -182.540    14.332      0.02054 
+17-mer_5525                -167.129  -181.830    14.701      0.02161 
+20-mer_Dodecahedron        -191.724  -200.100     8.376      0.00702 
+20-mer_FusedCubes          -201.518  -212.100    10.582      0.01120 
+20-mer_FaceSharingPrisms   -199.634  -215.200    15.566      0.02423 
+20-mer_EdgeSharingPrisms   -204.138  -218.100    13.962      0.01949 
+-----------------------------------------------------------------------
+#=====================================================================#
+#| [92m Geometry Optimized Systems (Angstrom), Objective = 3.69534e-02  [0m |#
+#| [92m  System                                        RMSD        Term [0m |#
+#=====================================================================#
+monomer_opt                                       0.011      0.00000 
+octamer_s4                                        0.056      0.00079 
+octamer_d2d                                       0.074      0.00135 
+n11_434                                           0.082      0.00167 
+n11_515                                           0.103      0.00265 
+n11_551                                           0.098      0.00240 
+n11_443                                           0.089      0.00196 
+n11_4412                                          0.109      0.00300 
+n16_boat                                          0.082      0.00169 
+n16_boat3                                         0.103      0.00264 
+n16_tip3p                                         0.096      0.00232 
+n16_abab                                          0.074      0.00136 
+n16_aabb                                          0.086      0.00185 
+n17_sphere                                        0.099      0.00243 
+n17_5525                                          0.100      0.00248 
+n20_dodecahedron_c1                               0.090      0.00203 
+n20_fused_cubes_c2                                0.087      0.00189 
+n20_facesharing_pentagonal_prisms_c1              0.087      0.00189 
+n20_edgesharing_pentagonal_prisms_c1              0.101      0.00255 
+-----------------------------------------------------------------------
+#================================================================================#
+#|                          Frequencies (wavenumbers)                           |#
+#|  Target: Monomer_Vibration  Type: Vibration_TINKER  Objective = 1.04148e-03  |#
+#|     Mode #            Reference   Calculated   Difference   Ref(dot)Calc     |#
+#================================================================================#
+    0                    1594.0     1593.242       -0.758         0.9997 
+    1                    3656.0     3655.483       -0.517         0.9997 
+    2                    3755.0     3755.309        0.309         0.9998 
+----------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Command 'bash runcuda.sh python npt.py openmm 277.150 1.000 &> npt.out' (task 8) finished successfully on host cn106.local (39248 seconds)
+
+
+Command 'bash runcuda.sh python npt.py openmm 373.150 1.000 &> npt.out' (task 32) finished successfully on host c442-302.stampede.tacc.utexas.edu (41126 seconds)
+
+Command 'bash runcuda.sh python npt.py openmm 369.150 1.000 &> npt.out' (task 31) finished successfully on host c442-202.stampede.tacc.utexas.edu (41415 seconds)
+Command 'bash runcuda.sh python npt.py openmm 361.150 1.000 &> npt.out' (task 29) finished successfully on host c442-104.stampede.tacc.utexas.edu (41445 seconds)
+Command 'bash runcuda.sh python npt.py openmm 365.150 1.000 &> npt.out' (task 30) finished successfully on host c442-301.stampede.tacc.utexas.edu (41895 seconds)
+Command 'bash runcuda.sh python npt.py openmm 357.150 1.000 &> npt.out' (task 28) finished successfully on host c442-303.stampede.tacc.utexas.edu (41950 seconds)
+
+Command 'bash runcuda.sh python npt.py openmm 349.150 1.000 &> npt.out' (task 26) finished successfully on host c442-103.stampede.tacc.utexas.edu (42224 seconds)
+Command 'bash runcuda.sh python npt.py openmm 353.150 1.000 &> npt.out' (task 27) finished successfully on host c442-201.stampede.tacc.utexas.edu (42279 seconds)
+Command 'bash runcuda.sh python npt.py openmm 345.150 1.000 &> npt.out' (task 25) finished successfully on host c442-901.stampede.tacc.utexas.edu (42408 seconds)
+Command 'bash runcuda.sh python npt.py openmm 341.150 1.000 &> npt.out' (task 24) finished successfully on host c442-804.stampede.tacc.utexas.edu (42670 seconds)
+Command 'bash runcuda.sh python npt.py openmm 337.150 1.000 &> npt.out' (task 23) finished successfully on host c442-801.stampede.tacc.utexas.edu (42830 seconds)
+Command 'bash runcuda.sh python npt.py openmm 333.150 1.000 &> npt.out' (task 22) finished successfully on host c442-802.stampede.tacc.utexas.edu (42926 seconds)
+Command 'bash runcuda.sh python npt.py openmm 329.150 1.000 &> npt.out' (task 21) finished successfully on host c442-703.stampede.tacc.utexas.edu (43013 seconds)
+
+Command 'bash runcuda.sh python npt.py openmm 313.150 1.000 &> npt.out' (task 17) finished successfully on host c443-902.stampede.tacc.utexas.edu (43179 seconds)
+Command 'bash runcuda.sh python npt.py openmm 325.150 1.000 &> npt.out' (task 20) finished successfully on host c442-603.stampede.tacc.utexas.edu (43186 seconds)
+Command 'bash runcuda.sh python npt.py openmm 321.150 1.000 &> npt.out' (task 19) finished successfully on host c442-402.stampede.tacc.utexas.edu (43316 seconds)
+Command 'bash runcuda.sh python npt.py openmm 317.150 1.000 &> npt.out' (task 18) finished successfully on host c443-304.stampede.tacc.utexas.edu (43355 seconds)
+Command 'bash runcuda.sh python npt.py openmm 301.150 1.000 &> npt.out' (task 14) finished successfully on host c443-303.stampede.tacc.utexas.edu (43558 seconds)
+Command 'bash runcuda.sh python npt.py openmm 289.150 1.000 &> npt.out' (task 11) finished successfully on host c443-001.stampede.tacc.utexas.edu (43629 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 49.346 &> npt.out' (task 34) finished successfully on host c442-502.stampede.tacc.utexas.edu (43659 seconds)
+Command 'bash runcuda.sh python npt.py openmm 309.150 1.000 &> npt.out' (task 16) finished successfully on host c442-803.stampede.tacc.utexas.edu (43737 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 1.000 &> npt.out' (task 13) finished successfully on host c443-703.stampede.tacc.utexas.edu (43803 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 3947.693 &> npt.out' (task 41) finished successfully on host c444-603.stampede.tacc.utexas.edu (43810 seconds)
+
+Command 'bash runcuda.sh python npt.py openmm 298.150 98.692 &> npt.out' (task 35) finished successfully on host c442-501.stampede.tacc.utexas.edu (43891 seconds)
+Command 'bash runcuda.sh python npt.py openmm 293.150 1.000 &> npt.out' (task 12) finished successfully on host c443-302.stampede.tacc.utexas.edu (43971 seconds)
+Command 'bash runcuda.sh python npt.py openmm 305.150 1.000 &> npt.out' (task 15) finished successfully on host c443-702.stampede.tacc.utexas.edu (43992 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 19.738 &> npt.out' (task 33) finished successfully on host c442-304.stampede.tacc.utexas.edu (43980 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 246.731 &> npt.out' (task 36) finished successfully on host c442-503.stampede.tacc.utexas.edu (44002 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 7895.386 &> npt.out' (task 42) finished successfully on host c442-403.stampede.tacc.utexas.edu (44004 seconds)
+Command 'bash runcuda.sh python npt.py openmm 253.150 1.000 &> npt.out' (task 2) finished successfully on host cn108.local (44653 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 493.462 &> npt.out' (task 37) finished successfully on host c444-601.stampede.tacc.utexas.edu (44569 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 986.923 &> npt.out' (task 39) finished successfully on host c444-602.stampede.tacc.utexas.edu (44648 seconds)
+Command 'bash runcuda.sh python npt.py openmm 249.150 1.000 &> npt.out' (task 1) finished successfully on host cn109.local (44817 seconds)
+Command 'bash runcuda.sh python npt.py openmm 298.150 1973.847 &> npt.out' (task 40) finished successfully on host c443-904.stampede.tacc.utexas.edu (44739 seconds)
+
+Command 'bash runcuda.sh python npt.py openmm 298.150 740.192 &> npt.out' (task 38) finished successfully on host c443-903.stampede.tacc.utexas.edu (44834 seconds)
+Command 'bash runcuda.sh python npt.py openmm 257.150 1.000 &> npt.out' (task 3) finished successfully on host cn107.local (44984 seconds)
+Command 'bash runcuda.sh python npt.py openmm 285.150 1.000 &> npt.out' (task 10) finished successfully on host cn109.local (45476 seconds)
+Command 'bash runcuda.sh python npt.py openmm 269.150 1.000 &> npt.out' (task 6) finished successfully on host cn106.local (45498 seconds)
+Command 'bash runcuda.sh python npt.py openmm 281.150 1.000 &> npt.out' (task 9) finished successfully on host cn107.local (45585 seconds)
+Command 'bash runcuda.sh python npt.py openmm 265.150 1.000 &> npt.out' (task 5) finished successfully on host cn108.local (45589 seconds)
+Command 'bash runcuda.sh python npt.py openmm 261.150 1.000 &> npt.out' (task 4) finished successfully on host cn110.local (45618 seconds)
+Command 'bash runcuda.sh python npt.py openmm 273.150 1.000 &> npt.out' (task 7) finished successfully on host cn110.local (45644 seconds)
+Reading information from ./249.15K-1.0atm/npt_result.p
+Reading information from ./253.15K-1.0atm/npt_result.p
+Reading information from ./257.15K-1.0atm/npt_result.p
+Reading information from ./261.15K-1.0atm/npt_result.p
+Reading information from ./265.15K-1.0atm/npt_result.p
+Reading information from ./269.15K-1.0atm/npt_result.p
+Reading information from ./273.15K-1.0atm/npt_result.p
+Reading information from ./277.15K-1.0atm/npt_result.p
+Reading information from ./281.15K-1.0atm/npt_result.p
+Reading information from ./285.15K-1.0atm/npt_result.p
+Reading information from ./289.15K-1.0atm/npt_result.p
+Reading information from ./293.15K-1.0atm/npt_result.p
+Reading information from ./298.15K-1.0atm/npt_result.p
+Reading information from ./301.15K-1.0atm/npt_result.p
+Reading information from ./305.15K-1.0atm/npt_result.p
+Reading information from ./309.15K-1.0atm/npt_result.p
+Reading information from ./313.15K-1.0atm/npt_result.p
+Reading information from ./317.15K-1.0atm/npt_result.p
+Reading information from ./321.15K-1.0atm/npt_result.p
+Reading information from ./325.15K-1.0atm/npt_result.p
+Reading information from ./329.15K-1.0atm/npt_result.p
+Reading information from ./333.15K-1.0atm/npt_result.p
+Reading information from ./337.15K-1.0atm/npt_result.p
+Reading information from ./341.15K-1.0atm/npt_result.p
+Reading information from ./345.15K-1.0atm/npt_result.p
+Reading information from ./349.15K-1.0atm/npt_result.p
+Reading information from ./353.15K-1.0atm/npt_result.p
+Reading information from ./357.15K-1.0atm/npt_result.p
+Reading information from ./361.15K-1.0atm/npt_result.p
+Reading information from ./365.15K-1.0atm/npt_result.p
+Reading information from ./369.15K-1.0atm/npt_result.p
+Reading information from ./373.15K-1.0atm/npt_result.p
+Reading information from ./298.15K-20.0bar/npt_result.p
+Reading information from ./298.15K-50.0bar/npt_result.p
+Reading information from ./298.15K-100.0bar/npt_result.p
+Reading information from ./298.15K-250.0bar/npt_result.p
+Reading information from ./298.15K-500.0bar/npt_result.p
+Reading information from ./298.15K-750.0bar/npt_result.p
+Reading information from ./298.15K-1000.0bar/npt_result.p
+Reading information from ./298.15K-2000.0bar/npt_result.p
+Reading information from ./298.15K-4000.0bar/npt_result.p
+Reading information from ./298.15K-8000.0bar/npt_result.p
+Running MBAR analysis on 42 states...
+Using embedded C++ helper code.
+K = 42, L = 42, N_max = 40000, total samples = 1680000
+There are 42 states with samples.
+N_k = 
+[ 40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.
+  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.
+  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.  40000.
+  40000.  40000.  40000.  40000.  40000.  40000.]
+Initializing free energies to zero.
+Initial dimensionless free energies with method zeros
+f_k = 
+[ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.
+  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+Determining dimensionless free energies by Newton-Raphson iteration.
+self consistent iteration gradient norm is 7.2052e+10, Newton-Raphson gradient norm is 2.7695e+12
+Choosing self-consistent iteration on iteration 0
+current f_k for states with samples =
+[    0.        35.0016    64.9871    92.9505   119.4669   144.838    169.2599   192.862    215.7278
+   237.9137   259.4617   280.4056   305.7798   320.5938   339.8873   358.6765   376.9818   394.8221
+   412.2154   429.1785   445.7275   461.8775   477.643    493.0376   508.0745   522.766    537.124
+   551.1597   564.8839   578.307    591.4388   604.2887   309.0226   314.1415   322.6568   348.0163
+   389.2767   429.5978   469.6703   629.6927   949.4284  1496.5814]
+relative max_delta = 1.000000e+00
+self consistent iteration gradient norm is 8.7583e+10, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 1
+current f_k for states with samples =
+[    0.        37.4149    69.5614    99.3942   127.5054   154.2487   179.857    204.4842   228.2337
+   251.1784   273.3728   294.8612   320.7878   335.873    355.4683   374.502    393.0057   411.0082
+   428.5354   445.6106   462.2544   478.4858   494.3218   509.7781   524.8694   539.6092   554.0103
+   568.0848   581.844    595.2987   608.4591   621.335    323.9646   328.9779   337.3157   362.1898
+   403.1917   443.7628   484.0907   644.4359   961.4542  1507.3225]
+relative max_delta = 1.130898e-02
+self consistent iteration gradient norm is 1.0268e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 2
+current f_k for states with samples =
+[    0.        39.3386    72.8297   103.7915   132.9873   160.7467   187.2728   212.7162   237.1944
+   260.7998   283.6057   305.6706   332.2821   347.7615   367.8616   387.3721   406.3186   424.7242
+   442.6106   459.999    476.9108   493.3676   509.391    525.0021   540.2208   555.0659   569.5545
+   583.7021   597.523    611.0304   624.2361   637.1515   335.4527   340.4563   348.7798   373.6366
+   414.7232   455.4491   495.8909   655.9815   971.6541  1515.5844]
+relative max_delta = 1.043592e-02
+self consistent iteration gradient norm is  1.173e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 3
+current f_k for states with samples =
+[    0.        40.9927    75.6247   107.4411   137.4176   165.9265   193.1759   219.3117   244.4446
+   268.6615   292.0321   314.6139   341.8064   357.6023   378.0917   397.9605   417.2422   435.9674
+   454.1644   471.8583   489.0719   505.8256   522.1377   538.0252   553.5037   568.5883   583.2936
+   597.6341   611.6242   625.2781   638.6096   651.6323   344.9718   349.9674   358.2776   383.0979
+   424.1427   464.8515   505.2884   665.2488   980.4745  1522.3487]
+relative max_delta = 9.512128e-03
+self consistent iteration gradient norm is 1.3331e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 4
+current f_k for states with samples =
+[    0.        42.445     78.1241   110.6927   141.3123   170.4204   198.2483   224.9468   250.6259
+   275.3691   299.2419   322.2974   350.0359   366.1332   386.9935   407.1998   426.7892   445.7966
+   464.2549   482.1937   499.6396   516.6166   533.1461   549.2475   564.938    580.2333   595.1475
+   609.6936   623.8833   637.7281   651.2386   664.4257   353.1946   358.1799   366.4736   391.2485
+   432.229    472.8875   513.2882   673.1924   988.3673  1528.1186]
+relative max_delta = 8.372016e-03
+self consistent iteration gradient norm is 1.5523e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 5
+current f_k for states with samples =
+[    0.        43.7137    80.3914   113.6679   144.8675   174.4953   202.8154   229.9906   256.1327
+   281.3242   305.6283   329.0952   357.3153   373.6824   394.8792   415.3965   435.2735   454.5482
+   473.2562   491.4296   509.0969   526.2837   543.0125   559.3034   575.1747   590.643    605.7234
+   620.4297   634.7746   648.7695   662.425    675.7512   360.4679   365.4436   373.7218   398.4534
+   439.3731   479.9867   520.3581   680.2456   995.4775  1533.1736]
+relative max_delta = 7.386952e-03
+self consistent iteration gradient norm is 1.8598e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 6
+current f_k for states with samples =
+[    0.        44.7797    82.4459   116.4099   148.1605   178.2673   207.0289   234.6241   261.1707
+   286.7518   311.4294   335.2518   363.8893   380.4918   401.9853   422.7807   442.9191   462.4405
+   481.3818   499.7761   517.6529   535.038    551.9544   568.4229   584.4621   600.0889   615.3189
+   630.1663   644.6444   658.7651   672.5395   685.9777   367.0366   372.004    380.2686   404.9626
+   445.8303   486.4054   526.7507   686.6172  1001.9347  1537.6835]
+relative max_delta = 6.650623e-03
+self consistent iteration gradient norm is 2.1796e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 7
+current f_k for states with samples =
+[    0.        45.6157    84.2818   118.9275   151.216    181.7818   210.9562   238.9351   265.845
+   291.7722   316.7791   340.9132   369.9145   386.7219   408.4745   429.5151   449.887    469.6316
+   488.7868   507.386    525.4587   543.0304   560.1242   576.7605   592.9579   608.7332   624.1023
+   639.0796   653.6786   667.9115   681.79     695.3246   373.057    378.0169   386.2695   410.9299
+   451.7513   492.2919   532.613    692.4461  1007.8354  1541.7448]
+relative max_delta = 6.062538e-03
+self consistent iteration gradient norm is 2.3907e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 8
+current f_k for states with samples =
+[    0.        46.2367    85.895    121.2263   154.0472   185.0611   214.632    242.9724   270.218
+   296.4603   321.7638   346.1763   375.4998   392.4877   414.4682   435.7248   456.3035   476.2473
+   495.595    514.3803   532.6323   550.3765   567.6354   584.4291   600.7756   616.6916   632.1924
+   647.2922   662.0044   676.3413   690.3149   703.9358   378.6379   383.5911   391.8327   416.4627
+   457.2422   497.751    538.0486   697.8398  1013.2189  1545.4445]
+relative max_delta = 5.571994e-03
+self consistent iteration gradient norm is 2.4625e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 9
+current f_k for states with samples =
+[    0.        46.6983    87.3028   123.3238   156.6752   188.1311   218.0884   246.7765   274.3403
+   300.8767   326.4529   351.1185   380.7326   397.8823   420.0662   441.5152   462.2781   482.3999
+   501.9199   520.8722   539.286    557.1866   574.5961   591.5343   608.019    624.0661   639.6904
+   654.9057   669.7248   684.1597   698.2221   711.9228   383.8667   388.8137   397.0453   421.6478
+   462.389    502.8676   543.1413   702.874   1018.0855  1548.8746]
+relative max_delta = 5.156639e-03
+self consistent iteration gradient norm is 2.4323e+11, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 10
+current f_k for states with samples =
+[    0.        47.0582    88.5328   125.2442   159.1239   191.0181   221.3549   250.3812   278.2519
+   305.0689   330.9021   355.8027   385.6828   402.9792   425.347    446.9696   467.8985   488.1802
+   507.8553   526.9579   545.5173   563.5588   581.1044   598.1738   614.7842   630.9515   646.6898
+   662.0123   676.9311   691.4576   705.6029   719.3777   388.8132   393.7545   401.977    426.5542
+   467.2593   507.7075   547.9548   707.6019  1022.4528  1552.1257]
+relative max_delta = 4.803039e-03
+self consistent iteration gradient norm is 2.3462e+11, Newton-Raphson gradient norm is 2.7502e+12
+Choosing self-consistent iteration for lower gradient on iteration 11
+current f_k for states with samples =
+[    0.        47.3586    89.6057   127.0083   161.4128   193.7421   224.4532   253.8111   281.9807
+   309.0693   335.1492   360.2728   390.4008   407.8324   430.3682   452.1489   473.2286   493.6556
+   513.4712   532.7099   551.401    569.5698   587.2383   604.4261   621.1503   637.4266   653.2687
+   668.6893   683.6998   698.3109   712.5329   726.376    393.5279   398.464    406.678    431.2313
+   471.9007   512.3165   552.5336   712.0618  1026.396   1555.2659]
+relative max_delta = 4.499753e-03
+self consistent iteration gradient norm is 2.2392e+11, Newton-Raphson gradient norm is 2.5616e+12
+Choosing self-consistent iteration for lower gradient on iteration 12
+current f_k for states with samples =
+[    0.        47.6276    90.533    128.6298   163.5558   196.3171   227.398    257.0823   285.5452
+   312.899    339.2186   364.5569   394.9202   412.478    435.1694   457.0953   478.3132   498.8733
+   518.8173   538.1801   556.9912   575.2758   593.0559   610.351    627.1784   643.5533   659.4895
+   674.9991   690.0931   704.7813   719.0735   732.979    398.0441   402.9753   411.1813   435.7116
+   476.3448   516.7261   556.909    716.2892  1030.0127  1558.338 ]
+relative max_delta = 4.237148e-03
+self consistent iteration gradient norm is 2.1324e+11, Newton-Raphson gradient norm is 1.7493e+12
+Choosing self-consistent iteration for lower gradient on iteration 13
+current f_k for states with samples =
+[    0.        47.8828    91.3252   130.1162   165.562    198.7524   230.1997   260.2059   288.9574
+   316.572    343.1263   368.6735   399.2629   416.9402   439.7771   461.8379   483.1837   503.8664
+   523.9286   543.4055   562.3266   580.7172   598.5994   615.9924   632.9136   649.3782   665.3997
+   680.9901   696.1598   710.9182   725.2741   739.2361   402.3838   407.3103   415.5086   440.0164
+   480.6132   520.9582   561.1044   720.3167  1033.3817  1561.3602]
+relative max_delta = 4.007526e-03
+self consistent iteration gradient norm is 2.0313e+11, Newton-Raphson gradient norm is 9.2889e+11
+Choosing self-consistent iteration for lower gradient on iteration 14
+current f_k for states with samples =
+[    0.        48.132     92.0005   131.472    167.4387   201.0548   232.866    263.1905   292.2266
+   320.0984   346.884    372.6362   403.4447   421.2362   444.2107   466.3979   487.8629   508.6596
+   528.8315   548.414    567.4368   585.9251   603.901    621.3838   638.3909   654.9373   671.0366
+   686.7005   701.939    716.761    731.1747   745.1881   406.5628   411.4848   419.6756   444.1613
+   484.7215   525.0296   565.1375   724.1719  1036.5551  1564.337 ]
+relative max_delta = 3.804791e-03
+self consistent iteration gradient norm is 1.9326e+11, Newton-Raphson gradient norm is 4.3766e+11
+Choosing self-consistent iteration for lower gradient on iteration 15
+current f_k for states with samples =
+[    0.        48.377     92.5835   132.7026   169.1928   203.2313   235.4038   266.0443   295.3618
+   323.4875   350.5017   376.4559   407.4786   425.3803   448.4859   470.7923   492.3692   513.2726
+   533.547    553.2279   572.3452   590.9241   608.9867   626.5525   643.6385   660.2601   676.4306
+   692.1615   707.4628   722.3428   736.8091   750.869    410.5939   415.5115   423.6951   448.1592
+   488.6831   528.9542   569.0237   727.8777  1039.5655  1567.2657]
+relative max_delta = 3.624711e-03
+self consistent iteration gradient norm is 1.8331e+11, Newton-Raphson gradient norm is 2.3709e+11
+Choosing self-consistent iteration for lower gradient on iteration 16
+current f_k for states with samples =
+[    0.        48.6179    93.099    133.8147   170.8313   205.2891   237.8199   268.7745   298.3711
+   326.7481   353.9886   380.1428   411.3758   429.3844   452.6161   475.036    496.7186   517.7224
+   538.0929   557.866    577.0717   595.7351   613.8785   631.5212   648.6804   665.3713   681.6073
+   697.3998   712.7585   727.6914   742.2057   756.308    414.4885   419.4018   427.5783   452.0212
+   492.5097   532.7444   572.7763   731.4524  1042.4312  1570.1418]
+relative max_delta = 3.464000e-03
+self consistent iteration gradient norm is 1.7332e+11, Newton-Raphson gradient norm is 1.5156e+11
+Newton-Raphson used on iteration 17
+current f_k for states with samples =
+[    0.        52.7246   101.1965   153.1045   205.604    255.5906   303.617    349.9051   394.455
+   437.2401   478.2605   517.3974   563.3981   589.4711   622.7329   654.6178   685.3979   715.2363
+   744.2253   772.4151   799.8326   826.4913   852.3991   877.5607   901.9786   925.6527   948.5781
+   970.7424   992.1209  1012.6716  1032.3314  1051.0222   566.3009   570.8834   578.5098   601.3072
+   639.0493   676.5051   713.6875   859.1562  1118.2011  1651.2742]
+relative max_delta = 1.784768e-01
+self consistent iteration gradient norm is  8.668e+10, Newton-Raphson gradient norm is 2.7536e+12
+Choosing self-consistent iteration for lower gradient on iteration 18
+current f_k for states with samples =
+[    0.        55.6281   109.2164   160.9669   211.0098   259.4357   306.3086   351.6685   395.5273
+   437.8615   478.6087   517.6578   563.7579   589.8628   623.1445   655.0927   685.9559   715.8555
+   744.8631   773.0285   800.3902   826.9789   852.8189   877.9279   902.3151   925.9779   948.8959
+   971.025    992.2931  1012.5902  1031.6945  1049.1258   566.7387   571.4434   579.2703   602.6388
+   641.138    678.9037   715.9386   859.2471  1125.5574  1652.1053]
+relative max_delta = 4.854326e-03
+self consistent iteration gradient norm is  6.472e+10, Newton-Raphson gradient norm is 1.9066e+10
+Newton-Raphson used on iteration 19
+current f_k for states with samples =
+[    0.        55.5725   108.6911   159.3104   207.4277   253.155    296.7064   338.3341   378.2581
+   416.623    453.4815   488.7431   530.0574   553.4064   583.652    613.2267   642.1198   670.2871
+   697.7074   724.3731   750.2795   775.4167   799.7624   823.2702   845.8534   867.3652   887.6032
+   906.4053   923.8689   940.397    956.3658   971.9749   533.027    537.7131   545.5071   568.7581
+   607.0344   644.9722   683.3654   833.7319  1117.5403  1649.8332]
+relative max_delta = 4.676288e-02
+self consistent iteration gradient norm is 8.2768e+09, Newton-Raphson gradient norm is 1.2088e+10
+Choosing self-consistent iteration for lower gradient on iteration 20
+current f_k for states with samples =
+[    0.        55.4908   108.4298   158.8948   206.9733   252.7887   296.4904   338.2315   378.1433
+   416.3328   452.9032   487.9536   529.7569   553.8349   584.8738   614.8184   643.7829   671.8496
+   699.073    725.4872   751.1091   775.9385   799.955    823.1131   845.3372   866.5241   886.5743
+   905.4601   923.2626   940.1176   956.1454   971.431    532.7401   537.4484   545.2817   568.6797
+   607.3575   645.6837   683.7131   833.1966  1117.4511  1649.8116]
+relative max_delta = 1.008049e-03
+self consistent iteration gradient norm is   5.44e+09, Newton-Raphson gradient norm is 1.0062e+08
+Newton-Raphson used on iteration 21
+current f_k for states with samples =
+[    0.        55.375    108.2145   158.67     206.8836   252.9858   297.0892   339.2826   379.6439
+   418.2487   455.1859   490.5571   532.712    556.9714   588.181    618.144    646.8893   674.4311
+   700.7868   725.9892   750.0922   773.1697   795.3044   816.5657   836.9924   856.5971   875.3785
+   893.346    910.5443   927.0279   942.8319   957.9779   535.6987   540.4131   548.2576   571.6978
+   610.4643   648.8714   686.9345   836.2169  1122.7986  1658.6616]
+relative max_delta = 8.110815e-03
+self consistent iteration gradient norm is 3.1222e+07, Newton-Raphson gradient norm is 5.9395e+05
+Newton-Raphson used on iteration 22
+current f_k for states with samples =
+[    0.        55.3786   108.216    158.6657   206.8774   252.983    297.0888   339.2841   379.6578
+   418.2989   455.2904   490.7107   532.8907   557.1343   588.2743   618.1173   646.7232   674.1459
+   700.4335   725.6317   749.7874   772.9468   795.1524   816.442    836.8523   856.4197   875.1765
+   893.1518   910.3754   926.8758   942.6805   957.8178   535.8772   540.5912   548.4351   571.8724
+   610.6321   649.0344   687.1007   836.4041  1123.5901  1662.0968]
+relative max_delta = 2.066827e-03
+self consistent iteration gradient norm is 5.2855e+05, Newton-Raphson gradient norm is      56138
+Newton-Raphson used on iteration 23
+current f_k for states with samples =
+[    0.        55.3786   108.216    158.6657   206.8774   252.983    297.0888   339.284    379.6574
+   418.2988   455.2911   490.7117   532.8912   557.134    588.2727   618.1136   646.7165   674.1364
+   700.4225   725.6218   749.7797   772.9398   795.1441   816.4332   836.8447   856.4125   875.1688
+   893.1443   910.3682   926.8685   942.6732   957.8105   535.8777   540.5917   548.4357   571.8732
+   610.6334   649.0359   687.1024   836.4056  1123.6042  1664.3043]
+relative max_delta = 1.326340e-03
+self consistent iteration gradient norm is      52940, Newton-Raphson gradient norm is     1189.1
+Newton-Raphson used on iteration 24
+current f_k for states with samples =
+[    0.        55.3786   108.216    158.6657   206.8774   252.983    297.0888   339.284    379.6574
+   418.2988   455.2911   490.7117   532.8912   557.134    588.2727   618.1136   646.7165   674.1364
+   700.4225   725.6218   749.7797   772.9398   795.1441   816.4332   836.8447   856.4125   875.1688
+   893.1443   910.3682   926.8685   942.6732   957.8105   535.8777   540.5917   548.4357   571.8732
+   610.6334   649.0359   687.1024   836.4056  1123.6042  1665.7795]
+relative max_delta = 8.856212e-04
+self consistent iteration gradient norm is     1124.2, Newton-Raphson gradient norm is 0.00030365
+Newton-Raphson used on iteration 25
+current f_k for states with samples =
+[    0.        55.3786   108.216    158.6657   206.8774   252.983    297.0888   339.284    379.6574
+   418.2988   455.2911   490.7117   532.8912   557.134    588.2727   618.1136   646.7165   674.1364
+   700.4225   725.6218   749.7797   772.9398   795.1441   816.4332   836.8447   856.4125   875.1688
+   893.1443   910.3682   926.8685   942.6732   957.8105   535.8777   540.5917   548.4357   571.8732
+   610.6334   649.0359   687.1024   836.4056  1123.6042  1666.056 ]
+relative max_delta = 1.659503e-04
+self consistent iteration gradient norm is 0.00028706, Newton-Raphson gradient norm is 9.7179e-15
+Newton-Raphson used on iteration 26
+current f_k for states with samples =
+[    0.        55.3786   108.216    158.6657   206.8774   252.983    297.0888   339.284    379.6574
+   418.2988   455.2911   490.7117   532.8912   557.134    588.2727   618.1136   646.7165   674.1364
+   700.4225   725.6218   749.7797   772.9398   795.1441   816.4332   836.8447   856.4125   875.1688
+   893.1443   910.3682   926.8685   942.6732   957.8105   535.8777   540.5917   548.4357   571.8732
+   610.6334   649.0359   687.1024   836.4056  1123.6042  1666.0561]
+relative max_delta = 8.371578e-08
+self consistent iteration gradient norm is 8.9496e-15, Newton-Raphson gradient norm is 7.8545e-15
+Newton-Raphson used on iteration 27
+current f_k for states with samples =
+[    0.        55.3786   108.216    158.6657   206.8774   252.983    297.0888   339.284    379.6574
+   418.2988   455.2911   490.7117   532.8912   557.134    588.2727   618.1136   646.7165   674.1364
+   700.4225   725.6218   749.7797   772.9398   795.1441   816.4332   836.8447   856.4125   875.1688
+   893.1443   910.3682   926.8685   942.6732   957.8105   535.8777   540.5917   548.4357   571.8732
+   610.6334   649.0359   687.1024   836.4056  1123.6042  1666.0561]
+relative max_delta = 2.086690e-13
+Converged to tolerance of 2.086690e-13 in 28 iterations.
+Of 28 iterations, 9 were Newton-Raphson iterations and 19 were self-consistent iterations
+Recomputing all free energies and log weights for storage
+Final dimensionless free energies
+f_k = 
+[    0.        55.3786   108.216    158.6657   206.8774   252.983    297.0888   339.284    379.6574
+   418.2988   455.2911   490.7117   532.8912   557.134    588.2727   618.1136   646.7165   674.1364
+   700.4225   725.6218   749.7797   772.9398   795.1441   816.4332   836.8447   856.4125   875.1688
+   893.1443   910.3682   926.8685   942.6732   957.8105   535.8777   540.5917   548.4357   571.8732
+   610.6334   649.0359   687.1024   836.4056  1123.6042  1666.0561]
+MBAR initialization complete.
+Done
+MBAR Results for Phase Point (249.15, 1.0, 'atm'), Box, Contributions:
+[  5.1434e-01   3.0195e-01   1.2537e-01   4.4762e-02   1.0801e-02   2.3048e-03   4.2089e-04
+   4.1626e-05   4.5363e-06   2.9072e-06   5.1095e-09   2.4190e-10   4.9695e-13   3.0433e-13
+   1.0094e-17   1.6309e-19   4.2605e-22   5.0549e-24   1.4804e-28   2.1341e-30   2.0739e-35
+   1.0626e-39   3.8163e-41   1.7432e-40   5.4300e-43   1.5880e-55   2.9451e-50   1.2221e-62
+   1.8889e-66   1.1515e-67   5.1431e-78   2.5923e-80   1.3265e-13   3.4536e-13   2.8004e-13
+   4.5046e-13   2.9233e-13   7.1145e-10   4.0143e-13   5.2896e-13   9.6414e-19   2.9047e-34]
+InfoContent:  94482.22 snapshots (5.62 %)
+Adding -0.003 to enthalpy of vaporization at (249.15, 1.0, 'atm')
+Adding  3.540 to enthalpy of vaporization at (249.15, 1.0, 'atm')
+Adding -4.320 to enthalpy of vaporization at (249.15, 1.0, 'atm')
+Adding -5.948 to the heat capacity
+Adding -2.733 to the heat capacity
+MBAR Results for Phase Point (253.15, 1.0, 'atm'), Box, Contributions:
+[  2.9752e-01   3.0301e-01   2.1897e-01   1.1887e-01   4.4326e-02   1.3425e-02   3.2781e-03
+   5.0501e-04   5.9291e-05   2.3712e-05   2.5671e-07   1.6967e-08   9.8289e-11   5.7128e-11
+   8.7420e-15   1.8763e-16   1.0130e-18   1.9093e-20   1.5657e-24   3.1810e-26   8.5206e-31
+   1.0085e-34   4.5613e-36   1.7668e-35   8.6717e-38   2.2765e-49   1.7518e-44   4.6986e-56
+   1.2241e-59   8.8066e-61   1.6344e-70   1.1701e-72   3.5571e-11   7.4781e-11   6.8146e-11
+   8.4512e-11   6.7762e-11   3.2609e-08   9.4001e-11   1.0527e-10   3.2490e-16   6.3785e-32]
+InfoContent:  147699.99 snapshots (8.79 %)
+Adding -0.004 to enthalpy of vaporization at (253.15, 1.0, 'atm')
+Adding  3.540 to enthalpy of vaporization at (253.15, 1.0, 'atm')
+Adding -4.275 to enthalpy of vaporization at (253.15, 1.0, 'atm')
+Adding -5.946 to the heat capacity
+Adding -2.688 to the heat capacity
+MBAR Results for Phase Point (257.15, 1.0, 'atm'), Box, Contributions:
+[  1.3119e-01   2.1979e-01   2.5744e-01   2.0571e-01   1.1586e-01   4.9557e-02   1.6022e-02
+   3.7053e-03   5.7363e-04   1.4314e-04   6.3086e-06   5.3185e-07   8.0576e-09   4.2584e-09
+   2.8473e-12   7.9106e-14   8.5645e-16   2.5025e-17   5.5775e-21   1.5764e-22   1.1378e-26
+   3.0158e-30   1.6878e-31   5.5667e-31   4.2086e-33   9.3244e-44   3.0510e-39   4.9795e-50
+   2.1524e-53   1.8169e-54   1.3419e-63   1.3483e-65   3.9049e-09   6.6289e-09   6.7140e-09
+   6.7744e-09   6.4100e-09   6.7582e-07   8.7028e-09   8.1522e-09   4.1444e-14   7.1839e-30]
+InfoContent:  177682.51 snapshots (10.58 %)
+Adding -0.005 to enthalpy of vaporization at (257.15, 1.0, 'atm')
+Adding  3.540 to enthalpy of vaporization at (257.15, 1.0, 'atm')
+Adding -4.230 to enthalpy of vaporization at (257.15, 1.0, 'atm')
+Adding -5.945 to the heat capacity
+Adding -2.644 to the heat capacity
+MBAR Results for Phase Point (261.15, 1.0, 'atm'), Box, Contributions:
+[  4.3584e-02   1.1468e-01   2.0810e-01   2.4052e-01   1.9936e-01   1.1958e-01   5.2105e-02
+   1.7247e-02   3.8412e-03   8.8436e-04   8.7655e-05   8.9036e-06   3.0957e-07   1.4368e-07
+   3.8444e-10   1.3480e-11   2.8273e-13   1.2455e-14   7.3490e-18   2.8422e-19   5.4216e-23
+   3.1217e-26   2.1215e-27   5.9792e-27   6.8015e-29   1.2004e-38   1.7078e-34   1.6015e-44
+   1.1313e-47   1.1145e-48   3.1442e-57   4.3818e-59   1.9407e-07   2.7103e-07   2.9721e-07
+   2.6521e-07   2.7514e-07   7.2530e-06   3.5318e-07   2.6852e-07   2.1569e-12   4.7566e-28]
+InfoContent:  190868.03 snapshots (11.36 %)
+Adding -0.005 to enthalpy of vaporization at (261.15, 1.0, 'atm')
+Adding  3.540 to enthalpy of vaporization at (261.15, 1.0, 'atm')
+Adding -4.186 to enthalpy of vaporization at (261.15, 1.0, 'atm')
+Adding -5.943 to the heat capacity
+Adding -2.6 to the heat capacity
+MBAR Results for Phase Point (265.15, 1.0, 'atm'), Box, Contributions:
+[  1.0939e-02   4.4064e-02   1.1976e-01   1.9800e-01   2.3547e-01   1.9704e-01   1.1777e-01
+   5.3940e-02   1.7241e-02   4.8134e-03   7.7490e-04   9.6497e-05   6.3611e-06   2.5749e-06
+   2.3845e-08   1.0334e-09   4.0219e-11   2.5830e-12   3.9463e-15   2.0424e-16   1.0133e-19
+   1.2298e-22   9.9484e-24   2.4018e-23   4.0113e-25   5.3433e-34   3.3722e-30   1.7208e-39
+   1.9584e-42   2.2397e-43   2.3217e-51   4.4346e-53   4.8636e-06   5.8202e-06   6.6191e-06
+   5.7757e-06   5.9850e-06   4.6237e-05   7.0325e-06   4.1494e-06   4.9693e-11   1.7488e-26]
+InfoContent:  197235.78 snapshots (11.74 %)
+Adding -0.006 to enthalpy of vaporization at (265.15, 1.0, 'atm')
+Adding  3.541 to enthalpy of vaporization at (265.15, 1.0, 'atm')
+Adding -4.143 to enthalpy of vaporization at (265.15, 1.0, 'atm')
+Adding -5.941 to the heat capacity
+Adding -2.557 to the heat capacity
+MBAR Results for Phase Point (269.15, 1.0, 'atm'), Box, Contributions:
+[  2.0789e-03   1.2931e-02   5.0450e-02   1.1840e-01   1.9779e-01   2.2985e-01   1.9042e-01
+   1.1900e-01   5.3363e-02   1.9535e-02   4.6259e-03   7.5884e-04   7.8410e-05   2.8608e-05
+   7.4717e-07   3.9704e-08   2.7029e-09   2.4234e-10   9.4234e-13   6.3303e-14   8.0572e-17
+   1.9990e-19   1.8851e-20   3.9036e-20   9.3260e-22   8.9188e-30   2.5412e-26   6.7022e-35
+   1.2122e-37   1.6014e-38   5.8778e-46   1.5205e-47   6.7937e-05   7.3685e-05   8.2738e-05
+   7.6534e-05   7.2980e-05   2.0484e-04   7.6598e-05   3.3226e-05   5.4558e-10   3.3152e-25]
+InfoContent:  201928.31 snapshots (12.02 %)
+Adding -0.008 to enthalpy of vaporization at (269.15, 1.0, 'atm')
+Adding  3.541 to enthalpy of vaporization at (269.15, 1.0, 'atm')
+Adding -4.101 to enthalpy of vaporization at (269.15, 1.0, 'atm')
+Adding -5.938 to the heat capacity
+Adding -2.515 to the heat capacity
+MBAR Results for Phase Point (273.15, 1.0, 'atm'), Box, Contributions:
+[  2.9964e-04   2.9706e-03   1.5676e-02   5.2058e-02   1.2033e-01   1.9324e-01   2.2307e-01
+   1.8986e-01   1.1724e-01   5.6773e-02   1.8909e-02   4.3100e-03   6.2320e-04   2.1726e-04
+   1.2822e-05   8.5062e-07   9.3124e-08   1.1007e-08   1.0742e-10   8.9965e-12   2.8984e-14
+   1.4228e-16   1.5312e-17   2.7184e-17   9.0310e-19   5.9204e-26   7.7316e-23   1.0040e-30
+   2.8480e-33   4.3254e-34   5.4277e-41   1.8788e-42   5.7283e-04   5.9332e-04   6.3740e-04
+   6.3959e-04   5.4181e-04   7.6618e-04   5.0100e-04   1.5275e-04   3.0314e-09   3.1810e-24]
+InfoContent:  206957.88 snapshots (12.32 %)
+Adding -0.009 to enthalpy of vaporization at (273.15, 1.0, 'atm')
+Adding  3.541 to enthalpy of vaporization at (273.15, 1.0, 'atm')
+Adding -4.059 to enthalpy of vaporization at (273.15, 1.0, 'atm')
+Adding -5.936 to the heat capacity
+Adding -2.473 to the heat capacity
+MBAR Results for Phase Point (277.15, 1.0, 'atm'), Box, Contributions:
+[  3.3028e-05   5.2938e-04   3.5655e-03   1.6833e-02   5.3317e-02   1.1802e-01   1.9026e-01
+   2.1996e-01   1.8472e-01   1.1740e-01   5.3082e-02   1.6924e-02   3.3033e-03   1.1708e-03
+   1.2972e-04   1.1312e-05   1.7885e-06   2.5930e-07   6.2284e-09   6.2000e-10   4.9598e-12
+   4.6434e-14   5.5850e-15   8.4823e-15   3.7955e-16   1.6345e-22   9.9057e-20   6.0539e-27
+   2.6590e-29   4.6198e-30   1.9168e-36   8.7688e-38   3.0926e-03   3.1534e-03   3.2466e-03
+   3.4100e-03   2.6156e-03   2.6577e-03   2.1202e-03   4.5118e-04   9.0695e-09   1.5637e-23]
+InfoContent:  214141.12 snapshots (12.75 %)
+Adding -0.011 to enthalpy of vaporization at (277.15, 1.0, 'atm')
+Adding  3.541 to enthalpy of vaporization at (277.15, 1.0, 'atm')
+Adding -4.018 to enthalpy of vaporization at (277.15, 1.0, 'atm')
+Adding -5.933 to the heat capacity
+Adding -2.433 to the heat capacity
+MBAR Results for Phase Point (281.15, 1.0, 'atm'), Box, Contributions:
+[  2.8085e-06   7.0432e-05   5.9096e-04   4.0218e-03   1.7392e-02   5.3098e-02   1.1948e-01
+   1.8552e-01   2.0986e-01   1.7352e-01   1.0386e-01   4.5410e-02   1.1987e-02   4.5933e-03
+   8.3692e-04   1.0270e-04   2.1197e-05   3.5144e-06   1.9729e-07   2.2369e-08   4.2730e-10
+   7.3085e-12   9.6362e-13   1.2466e-12   7.2370e-14   1.9684e-19   5.5887e-17   1.5421e-23
+   1.0357e-25   2.0475e-26   2.7213e-32   1.6243e-33   1.1248e-02   1.1386e-02   1.1483e-02
+   1.1923e-02   8.6895e-03   7.7747e-03   6.1657e-03   9.5026e-04   1.6140e-08   4.0800e-23]
+InfoContent:  230506.61 snapshots (13.72 %)
+Adding -0.013 to enthalpy of vaporization at (281.15, 1.0, 'atm')
+Adding  3.541 to enthalpy of vaporization at (281.15, 1.0, 'atm')
+Adding -3.977 to enthalpy of vaporization at (281.15, 1.0, 'atm')
+Adding -5.93 to the heat capacity
+Adding -2.393 to the heat capacity
+MBAR Results for Phase Point (285.15, 1.0, 'atm'), Box, Contributions:
+[  1.8157e-07   6.6956e-06   7.1426e-05   7.1676e-04   4.2927e-03   1.7875e-02   5.6160e-02
+   1.1481e-01   1.7334e-01   1.8524e-01   1.4501e-01   8.4980e-02   3.0799e-02   1.3552e-02
+   3.7224e-03   6.7405e-04   1.7249e-04   3.2000e-05   3.6894e-06   4.7088e-07   1.9758e-08
+   5.8714e-10   8.3464e-11   9.1415e-11   6.5751e-12   1.0884e-16   1.4571e-14   1.7498e-20
+   1.7742e-22   3.9654e-23   1.6380e-28   1.2586e-29   2.8883e-02   2.9025e-02   2.9168e-02
+   2.8791e-02   2.0835e-02   1.7408e-02   1.2931e-02   1.5069e-03   2.0197e-08   5.9907e-23]
+InfoContent:  267975.12 snapshots (15.95 %)
+Adding -0.015 to enthalpy of vaporization at (285.15, 1.0, 'atm')
+Adding  3.541 to enthalpy of vaporization at (285.15, 1.0, 'atm')
+Adding -3.938 to enthalpy of vaporization at (285.15, 1.0, 'atm')
+Adding -5.928 to the heat capacity
+Adding -2.353 to the heat capacity
+MBAR Results for Phase Point (289.15, 1.0, 'atm'), Box, Contributions:
+[  8.5818e-09   4.4016e-07   6.2682e-06   9.5531e-05   8.4477e-04   4.5231e-03   1.9977e-02
+   5.2562e-02   1.0493e-01   1.4443e-01   1.4782e-01   1.1450e-01   5.8176e-02   3.0965e-02
+   1.2178e-02   3.2781e-03   1.0415e-03   2.2976e-04   4.3763e-05   6.5518e-06   5.2197e-07
+   2.5480e-08   3.8590e-09   3.5512e-09   2.9852e-10   2.8991e-14   1.8348e-12   9.3004e-18
+   1.4051e-19   3.5199e-20   4.3901e-25   4.2802e-26   5.4649e-02   5.4622e-02   5.4753e-02
+   5.1062e-02   3.7545e-02   2.9435e-02   2.0470e-02   1.8441e-03   2.1830e-08   5.4393e-23]
+InfoContent:  335056.48 snapshots (19.94 %)
+Adding -0.018 to enthalpy of vaporization at (289.15, 1.0, 'atm')
+Adding  3.541 to enthalpy of vaporization at (289.15, 1.0, 'atm')
+Adding -3.899 to enthalpy of vaporization at (289.15, 1.0, 'atm')
+Adding -5.924 to the heat capacity
+Adding -2.315 to the heat capacity
+MBAR Results for Phase Point (293.15, 1.0, 'atm'), Box, Contributions:
+[  2.8567e-10   1.9703e-08   3.9536e-07   9.4508e-06   1.4255e-04   8.5429e-04   5.4107e-03
+   1.7957e-02   4.7011e-02   8.3585e-02   1.1292e-01   1.1527e-01   8.3981e-02   5.6206e-02
+   3.0739e-02   1.2036e-02   4.8213e-03   1.3716e-03   3.5046e-04   6.5994e-05   8.3705e-06
+   6.3360e-07   1.0180e-07   7.8062e-08   7.1242e-09   3.8945e-12   1.1634e-10   2.4344e-15
+   5.4022e-17   1.4984e-17   5.4872e-22   6.6821e-23   7.9505e-02   7.9264e-02   7.8569e-02
+   7.0450e-02   5.2873e-02   3.8959e-02   2.5801e-02   1.8404e-03   2.2583e-08   3.6752e-23]
+InfoContent:  419601.46 snapshots (24.98 %)
+Adding -0.021 to enthalpy of vaporization at (293.15, 1.0, 'atm')
+Adding  3.541 to enthalpy of vaporization at (293.15, 1.0, 'atm')
+Adding -3.860 to enthalpy of vaporization at (293.15, 1.0, 'atm')
+Adding -5.921 to the heat capacity
+Adding -2.277 to the heat capacity
+MBAR Results for Phase Point (298.15, 1.0, 'atm'), Box, Contributions:
+[  2.4151e-12   2.3645e-10   7.7378e-09   3.3829e-07   1.2888e-05   6.9212e-05   7.2844e-04
+   3.1619e-03   1.1499e-02   2.8805e-02   5.6613e-02   8.2111e-02   9.6060e-02   8.8259e-02
+   7.0637e-02   4.2149e-02   2.2545e-02   9.0732e-03   2.9272e-03   7.7108e-04   1.4580e-04
+   1.7725e-05   3.1026e-06   1.8774e-06   1.6837e-07   7.3191e-10   8.4627e-09   1.0279e-12
+   3.6043e-14   1.1060e-14   1.4974e-18   2.3477e-19   9.3117e-02   9.2340e-02   8.9349e-02
+   7.8604e-02   6.0457e-02   4.2011e-02   2.6969e-02   1.5624e-03   2.1791e-08   2.3650e-23]
+InfoContent:  478619.09 snapshots (28.49 %)
+Adding -0.025 to enthalpy of vaporization at (298.15, 1.0, 'atm')
+Adding  3.542 to enthalpy of vaporization at (298.15, 1.0, 'atm')
+Adding -3.813 to enthalpy of vaporization at (298.15, 1.0, 'atm')
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (301.15, 1.0, 'atm'), Box, Contributions:
+[  1.0429e-13   1.2562e-11   5.6331e-10   3.6001e-08   2.6378e-06   1.2071e-05   1.8073e-04
+   9.1398e-04   4.0182e-03   1.2669e-02   3.1879e-02   5.7260e-02   8.9078e-02   9.9348e-02
+   9.8101e-02   7.3473e-02   4.6352e-02   2.2593e-02   8.3082e-03   2.6523e-03   6.0953e-04
+   9.5216e-05   1.7848e-05   9.3866e-06   7.9074e-07   1.0947e-08   7.0867e-08   2.4799e-11
+   1.1279e-12   3.6045e-13   1.0468e-16   1.8800e-17   8.8260e-02   8.6948e-02   8.2788e-02
+   7.2723e-02   5.6891e-02   3.8728e-02   2.4743e-02   1.3436e-03   2.0543e-08   2.0807e-23]
+InfoContent:  460603.99 snapshots (27.42 %)
+Adding -0.028 to enthalpy of vaporization at (301.15, 1.0, 'atm')
+Adding  3.542 to enthalpy of vaporization at (301.15, 1.0, 'atm')
+Adding -3.785 to enthalpy of vaporization at (301.15, 1.0, 'atm')
+Adding -5.914 to the heat capacity
+Adding -2.203 to the heat capacity
+MBAR Results for Phase Point (305.15, 1.0, 'atm'), Box, Contributions:
+[  1.1484e-15   1.8251e-13   1.2639e-11   1.3594e-09   2.4861e-07   8.8261e-07   2.2770e-05
+   1.4122e-04   7.8361e-04   3.4978e-03   1.2644e-02   3.0107e-02   6.7440e-02   9.6665e-02
+   1.2344e-01   1.2196e-01   9.4993e-02   5.8318e-02   2.5969e-02   1.0424e-02   3.0687e-03
+   6.4931e-04   1.3754e-04   6.1288e-05   4.8431e-06   2.5396e-07   7.4683e-07   1.0842e-09
+   6.8387e-11   2.2385e-11   1.7491e-14   3.6818e-15   6.9226e-02   6.7509e-02   6.2782e-02
+   5.5404e-02   4.4539e-02   2.9950e-02   1.9236e-02   1.0215e-03   1.7473e-08   1.7017e-23]
+InfoContent:  394052.72 snapshots (23.46 %)
+Adding -0.032 to enthalpy of vaporization at (305.15, 1.0, 'atm')
+Adding  3.542 to enthalpy of vaporization at (305.15, 1.0, 'atm')
+Adding -3.749 to enthalpy of vaporization at (305.15, 1.0, 'atm')
+Adding -5.91 to the heat capacity
+Adding -2.168 to the heat capacity
+MBAR Results for Phase Point (309.15, 1.0, 'atm'), Box, Contributions:
+[  8.8858e-18   1.8672e-15   2.0145e-13   3.6840e-11   1.6857e-08   4.6294e-08   2.2615e-06
+   1.7625e-05   1.1781e-04   7.8623e-04   4.2402e-03   1.3217e-02   4.1408e-02   7.5288e-02
+   1.2140e-01   1.5443e-01   1.4761e-01   1.1205e-01   6.1782e-02   3.0431e-02   1.1440e-02
+   3.1909e-03   7.9416e-04   3.1639e-04   2.7915e-05   3.6692e-06   4.8691e-06   2.9351e-08
+   2.5032e-09   8.0804e-10   1.6354e-12   3.9105e-13   4.4267e-02   4.2913e-02   3.8634e-02
+   3.4546e-02   2.8572e-02   1.9226e-02   1.2586e-02   6.9990e-04   1.2018e-08   1.0823e-23]
+InfoContent:  325209.56 snapshots (19.36 %)
+Adding -0.037 to enthalpy of vaporization at (309.15, 1.0, 'atm')
+Adding  3.542 to enthalpy of vaporization at (309.15, 1.0, 'atm')
+Adding -3.713 to enthalpy of vaporization at (309.15, 1.0, 'atm')
+Adding -5.906 to the heat capacity
+Adding -2.133 to the heat capacity
+MBAR Results for Phase Point (313.15, 1.0, 'atm'), Box, Contributions:
+[  4.9109e-20   1.3677e-17   2.3057e-15   7.2019e-13   8.0870e-10   1.7457e-09   1.7665e-07
+   1.8293e-06   1.3692e-05   1.4453e-04   1.1969e-03   4.8093e-03   2.0391e-02   4.6649e-02
+   9.3200e-02   1.4993e-01   1.7540e-01   1.6364e-01   1.1363e-01   6.8014e-02   3.2405e-02
+   1.1685e-02   3.5303e-03   1.3584e-03   1.6600e-04   3.5328e-05   2.2448e-05   5.1961e-07
+   5.8334e-08   1.8004e-08   8.9812e-11   2.3451e-11   2.2909e-02   2.2262e-02   1.9082e-02
+   1.7463e-02   1.4754e-02   1.0020e-02   6.8620e-03   4.2927e-04   6.0311e-09   4.8005e-24]
+InfoContent:  280570.34 snapshots (16.70 %)
+Adding -0.043 to enthalpy of vaporization at (313.15, 1.0, 'atm')
+Adding  3.542 to enthalpy of vaporization at (313.15, 1.0, 'atm')
+Adding -3.677 to enthalpy of vaporization at (313.15, 1.0, 'atm')
+Adding -5.902 to the heat capacity
+Adding -2.098 to the heat capacity
+MBAR Results for Phase Point (317.15, 1.0, 'atm'), Box, Contributions:
+[  1.9704e-22   7.2864e-20   1.9176e-17   1.0228e-14   2.7489e-11   4.7580e-11   1.0712e-08
+   1.5794e-07   1.2245e-06   2.1525e-05   2.7769e-04   1.4292e-03   7.9413e-03   2.3003e-02
+   5.6124e-02   1.1274e-01   1.6125e-01   1.8537e-01   1.6360e-01   1.1920e-01   7.0983e-02
+   3.2650e-02   1.2217e-02   4.9007e-03   8.9663e-04   2.4214e-04   9.1377e-05   6.2833e-06
+   9.0459e-07   2.6453e-07   3.0424e-09   8.2706e-10   9.5582e-03   9.3829e-03   7.5122e-03
+   7.0755e-03   6.0152e-03   4.1487e-03   3.1261e-03   2.3126e-04   2.1155e-09   1.4382e-24]
+InfoContent:  259526.69 snapshots (15.45 %)
+Adding -0.049 to enthalpy of vaporization at (317.15, 1.0, 'atm')
+Adding  3.542 to enthalpy of vaporization at (317.15, 1.0, 'atm')
+Adding -3.642 to enthalpy of vaporization at (317.15, 1.0, 'atm')
+Adding -5.898 to the heat capacity
+Adding -2.064 to the heat capacity
+MBAR Results for Phase Point (321.15, 1.0, 'atm'), Box, Contributions:
+[  5.8209e-25   2.8608e-22   1.1714e-19   1.0625e-16   6.6699e-13   9.4276e-13   4.9526e-10
+   1.0974e-08   8.3390e-08   2.5414e-06   5.1299e-05   3.4066e-04   2.4108e-03   9.0752e-03
+   2.6662e-02   6.6379e-02   1.1607e-01   1.6552e-01   1.8601e-01   1.6591e-01   1.2184e-01
+   7.0797e-02   3.3076e-02   1.4674e-02   3.9131e-03   1.2427e-03   3.8544e-04   5.3641e-05
+   9.6747e-06   2.7363e-06   6.6684e-08   1.7909e-08   3.2108e-03   3.1933e-03   2.3468e-03
+   2.2696e-03   1.9017e-03   1.3416e-03   1.2063e-03   1.0360e-04   5.1557e-10   2.9012e-25]
+InfoContent:  252620.08 snapshots (15.04 %)
+Adding -0.056 to enthalpy of vaporization at (321.15, 1.0, 'atm')
+Adding  3.542 to enthalpy of vaporization at (321.15, 1.0, 'atm')
+Adding -3.608 to enthalpy of vaporization at (321.15, 1.0, 'atm')
+Adding -5.893 to the heat capacity
+Adding -2.031 to the heat capacity
+MBAR Results for Phase Point (325.15, 1.0, 'atm'), Box, Contributions:
+[  1.2844e-27   8.3901e-25   5.3187e-22   8.1471e-19   1.1681e-14   1.3695e-14   1.7225e-11
+   5.8888e-10   4.2827e-09   2.3210e-07   7.3514e-06   6.3980e-05   5.6439e-04   2.8898e-03
+   1.0053e-02   3.0930e-02   6.6243e-02   1.1798e-01   1.6858e-01   1.8480e-01   1.6608e-01
+   1.2093e-01   7.0519e-02   3.6048e-02   1.3259e-02   4.9210e-03   1.5767e-03   3.3342e-04
+   7.3913e-05   2.1066e-05   9.9053e-07   2.5118e-07   8.7055e-04   8.7555e-04   5.7954e-04
+   5.7076e-04   4.6060e-04   3.3629e-04   4.0150e-04   3.6172e-05   8.8414e-11   3.9779e-26]
+InfoContent:  252413.85 snapshots (15.02 %)
+Adding -0.064 to enthalpy of vaporization at (325.15, 1.0, 'atm')
+Adding  3.543 to enthalpy of vaporization at (325.15, 1.0, 'atm')
+Adding -3.574 to enthalpy of vaporization at (325.15, 1.0, 'atm')
+Adding -5.889 to the heat capacity
+Adding -1.999 to the heat capacity
+MBAR Results for Phase Point (329.15, 1.0, 'atm'), Box, Contributions:
+[  2.1491e-30   1.8644e-27   1.8185e-24   4.6623e-21   1.4963e-16   1.4740e-16   4.4791e-13
+   2.3742e-11   1.6505e-10   1.6081e-08   8.0501e-07   9.3182e-06   1.0128e-04   7.4852e-04
+   3.0283e-03   1.1510e-02   3.0337e-02   6.7761e-02   1.2315e-01   1.6582e-01   1.8209e-01
+   1.6493e-01   1.1947e-01   7.2355e-02   3.4843e-02   1.5275e-02   5.5651e-03   1.5595e-03
+   4.1889e-04   1.2543e-04   1.0397e-05   2.4463e-06   1.9111e-04   1.9453e-04   1.1239e-04
+   1.1180e-04   8.4999e-05   6.5371e-05   1.1562e-04   9.4165e-06   1.0899e-11   3.7629e-27]
+InfoContent:  254934.31 snapshots (15.17 %)
+Adding -0.072 to enthalpy of vaporization at (329.15, 1.0, 'atm')
+Adding  3.543 to enthalpy of vaporization at (329.15, 1.0, 'atm')
+Adding -3.541 to enthalpy of vaporization at (329.15, 1.0, 'atm')
+Adding -5.884 to the heat capacity
+Adding -1.967 to the heat capacity
+MBAR Results for Phase Point (333.15, 1.0, 'atm'), Box, Contributions:
+[  2.7677e-33   3.1839e-30   4.7455e-27   2.0156e-23   1.4219e-18   1.1895e-18   8.7117e-15
+   7.1086e-13   4.7729e-12   8.3575e-10   6.6989e-08   1.0390e-06   1.3886e-05   1.5826e-04
+   7.3764e-04   3.4415e-03   1.1256e-02   3.1560e-02   7.3373e-02   1.2067e-01   1.6228e-01
+   1.8152e-01   1.6236e-01   1.1863e-01   7.1927e-02   3.7590e-02   1.6141e-02   5.6670e-03
+   1.8267e-03   5.9173e-04   7.9777e-05   1.7934e-05   3.3906e-05   3.5446e-05   1.6943e-05
+   1.6981e-05   1.1939e-05   9.8920e-06   2.8083e-05   1.7923e-06   9.8888e-13   2.4975e-28]
+InfoContent:  258096.80 snapshots (15.36 %)
+Adding -0.081 to enthalpy of vaporization at (333.15, 1.0, 'atm')
+Adding  3.543 to enthalpy of vaporization at (333.15, 1.0, 'atm')
+Adding -3.509 to enthalpy of vaporization at (333.15, 1.0, 'atm')
+Adding -5.879 to the heat capacity
+Adding -1.936 to the heat capacity
+MBAR Results for Phase Point (337.15, 1.0, 'atm'), Box, Contributions:
+[  2.7857e-36   4.2405e-33   9.5862e-30   6.6718e-26   1.0173e-20   7.2918e-21   1.2747e-16
+   1.5820e-14   1.0408e-13   3.2496e-11   4.2427e-09   8.8050e-08   1.4538e-06   2.7344e-05
+   1.4950e-04   8.2993e-04   3.4091e-03   1.1992e-02   3.6070e-02   7.1696e-02   1.1861e-01
+   1.6263e-01   1.7878e-01   1.5915e-01   1.1867e-01   7.4271e-02   3.8117e-02   1.6431e-02
+   6.3146e-03   2.2571e-03   4.6005e-04   1.0608e-04   4.8202e-06   5.3483e-06   1.9666e-06
+   1.9953e-06   1.2793e-06   1.1696e-06   5.5218e-06   2.4889e-07   6.7540e-14   1.1843e-29]
+InfoContent:  261202.97 snapshots (15.55 %)
+Adding -0.091 to enthalpy of vaporization at (337.15, 1.0, 'atm')
+Adding  3.543 to enthalpy of vaporization at (337.15, 1.0, 'atm')
+Adding -3.476 to enthalpy of vaporization at (337.15, 1.0, 'atm')
+Adding -5.873 to the heat capacity
+Adding -1.905 to the heat capacity
+MBAR Results for Phase Point (341.15, 1.0, 'atm'), Box, Contributions:
+[  2.2248e-39   4.4695e-36   1.5206e-32   1.7148e-28   5.5619e-23   3.4420e-23   1.4163e-18
+   2.6378e-16   1.7256e-15   9.4903e-13   2.0559e-10   5.6611e-09   1.1641e-07   3.8609e-06
+   2.6483e-05   1.6173e-04   8.4826e-04   3.7430e-03   1.4775e-02   3.5016e-02   7.1634e-02
+   1.1948e-01   1.6106e-01   1.7526e-01   1.5904e-01   1.1936e-01   7.3595e-02   3.8681e-02
+   1.7662e-02   7.0961e-03   2.0412e-03   5.2260e-04   5.4257e-07   6.6592e-07   1.7463e-07
+   1.8118e-07   1.0494e-07   1.0821e-07   8.4846e-07   2.5388e-08   3.5359e-15   4.0857e-31]
+InfoContent:  264356.65 snapshots (15.74 %)
+Adding -0.103 to enthalpy of vaporization at (341.15, 1.0, 'atm')
+Adding  3.544 to enthalpy of vaporization at (341.15, 1.0, 'atm')
+Adding -3.445 to enthalpy of vaporization at (341.15, 1.0, 'atm')
+Adding -5.868 to the heat capacity
+Adding -1.875 to the heat capacity
+MBAR Results for Phase Point (345.15, 1.0, 'atm'), Box, Contributions:
+[  1.4289e-42   3.7767e-39   1.9185e-35   3.4658e-31   2.3554e-25   1.2666e-25   1.2068e-20
+   3.3287e-18   2.1951e-17   2.0956e-14   7.6637e-12   2.7652e-10   7.1399e-09   4.4399e-07
+   4.2765e-06   2.5445e-05   1.7470e-04   9.6506e-04   5.0660e-03   1.4141e-02   3.5921e-02
+   7.2378e-02   1.1971e-01   1.5893e-01   1.7503e-01   1.5765e-01   1.1703e-01   7.4620e-02
+   4.0457e-02   1.8646e-02   7.1146e-03   2.1423e-03   4.7792e-08   6.7226e-08   1.1826e-08
+   1.2703e-08   6.6083e-09   7.8170e-09   9.9694e-08   1.9201e-09   1.4352e-16   1.0425e-32]
+InfoContent:  267488.41 snapshots (15.92 %)
+Adding -0.115 to enthalpy of vaporization at (345.15, 1.0, 'atm')
+Adding  3.544 to enthalpy of vaporization at (345.15, 1.0, 'atm')
+Adding -3.414 to enthalpy of vaporization at (345.15, 1.0, 'atm')
+Adding -5.863 to the heat capacity
+Adding -1.846 to the heat capacity
+MBAR Results for Phase Point (349.15, 1.0, 'atm'), Box, Contributions:
+[  7.4628e-46   2.5863e-42   1.9460e-38   5.5689e-34   7.8148e-28   3.6725e-28   7.9612e-23
+   3.2116e-20   2.1607e-19   3.5256e-16   2.2075e-13   1.0294e-11   3.3609e-10   4.1231e-08
+   6.2312e-07   3.2220e-06   3.0090e-05   2.0579e-04   1.4505e-03   4.7483e-03   1.4982e-02
+   3.6319e-02   7.3951e-02   1.1917e-01   1.5920e-01   1.7229e-01   1.5422e-01   1.1857e-01
+   7.6491e-02   4.1244e-02   1.9868e-02   7.2644e-03   3.2663e-09   5.3817e-09   6.1045e-10
+   6.8730e-10   3.2000e-10   4.3912e-10   8.8675e-09   1.0869e-10   4.5438e-18   1.9954e-34]
+InfoContent:  269915.47 snapshots (16.07 %)
+Adding -0.128 to enthalpy of vaporization at (349.15, 1.0, 'atm')
+Adding  3.544 to enthalpy of vaporization at (349.15, 1.0, 'atm')
+Adding -3.383 to enthalpy of vaporization at (349.15, 1.0, 'atm')
+Adding -5.857 to the heat capacity
+Adding -1.817 to the heat capacity
+MBAR Results for Phase Point (353.15, 1.0, 'atm'), Box, Contributions:
+[  3.2022e-49   1.4497e-45   1.6028e-41   7.1867e-37   2.0530e-30   8.4737e-31   4.1048e-25
+   2.3940e-22   1.6604e-21   4.5576e-18   4.9356e-15   2.9350e-13   1.2180e-11   3.0572e-09
+   7.7347e-08   3.2712e-07   4.3835e-06   3.6180e-05   3.4410e-04   1.3327e-03   5.1959e-03
+   1.5182e-02   3.8319e-02   7.4322e-02   1.2024e-01   1.5655e-01   1.6929e-01   1.5606e-01
+   1.2022e-01   7.7085e-02   4.5362e-02   2.0463e-02   1.7258e-10   3.3597e-10   2.4085e-11
+   2.8721e-11   1.1946e-11   1.9130e-11   5.9596e-10   4.6484e-12   1.1272e-19   2.9033e-36]
+InfoContent:  270486.08 snapshots (16.10 %)
+Adding -0.142 to enthalpy of vaporization at (353.15, 1.0, 'atm')
+Adding  3.544 to enthalpy of vaporization at (353.15, 1.0, 'atm')
+Adding -3.353 to enthalpy of vaporization at (353.15, 1.0, 'atm')
+Adding -5.851 to the heat capacity
+Adding -1.788 to the heat capacity
+MBAR Results for Phase Point (357.15, 1.0, 'atm'), Box, Contributions:
+[  1.1401e-52   6.7169e-49   1.0826e-44   7.5245e-40   4.3150e-33   1.5714e-33   1.6707e-27
+   1.3937e-24   1.0054e-23   4.5706e-20   8.6111e-17   6.4542e-15   3.4149e-13   1.7911e-10
+   7.7265e-09   2.6536e-08   5.4222e-07   5.2145e-06   6.6965e-05   3.1377e-04   1.4965e-03
+   5.3278e-03   1.6855e-02   3.8812e-02   7.5822e-02   1.1879e-01   1.5569e-01   1.7142e-01
+   1.5828e-01   1.2223e-01   8.6395e-02   4.8498e-02   7.0539e-12   1.6221e-11   7.3017e-13
+   9.2983e-13   3.4518e-13   6.4635e-13   3.0368e-11   1.5166e-13   2.2045e-21   3.2518e-38]
+InfoContent:  266965.17 snapshots (15.89 %)
+Adding -0.158 to enthalpy of vaporization at (357.15, 1.0, 'atm')
+Adding  3.545 to enthalpy of vaporization at (357.15, 1.0, 'atm')
+Adding -3.323 to enthalpy of vaporization at (357.15, 1.0, 'atm')
+Adding -5.845 to the heat capacity
+Adding -1.761 to the heat capacity
+MBAR Results for Phase Point (361.15, 1.0, 'atm'), Box, Contributions:
+[  3.3998e-56   2.5961e-52   6.0517e-48   6.4536e-43   7.3289e-36   2.3645e-36   5.4203e-30
+   6.4035e-27   4.8407e-26   3.5904e-22   1.1792e-18   1.1031e-16   7.4517e-15   8.2315e-12
+   6.0117e-10   1.7148e-09   5.6397e-08   6.1228e-07   1.0588e-05   6.1994e-05   3.5732e-04
+   1.5826e-03   6.3703e-03   1.7073e-02   4.0133e-02   7.5602e-02   1.2078e-01   1.5850e-01
+   1.7606e-01   1.6546e-01   1.3977e-01   9.8239e-02   2.2384e-13   6.0484e-13   1.7126e-14
+   2.3426e-14   7.7607e-15   1.6978e-14   1.1805e-12   3.8103e-15   3.4284e-23   2.8377e-40]
+InfoContent:  254895.42 snapshots (15.17 %)
+Adding -0.175 to enthalpy of vaporization at (361.15, 1.0, 'atm')
+Adding  3.545 to enthalpy of vaporization at (361.15, 1.0, 'atm')
+Adding -3.294 to enthalpy of vaporization at (361.15, 1.0, 'atm')
+Adding -5.839 to the heat capacity
+Adding -1.734 to the heat capacity
+MBAR Results for Phase Point (365.15, 1.0, 'atm'), Box, Contributions:
+[  8.5698e-60   8.4464e-56   2.8261e-51   4.5779e-46   1.0158e-38   2.9143e-39   1.4158e-32
+   2.3470e-29   1.8709e-28   2.2315e-24   1.2762e-20   1.4780e-18   1.2747e-16   2.9596e-13
+   3.6013e-11   8.8109e-11   4.8407e-09   5.8307e-08   1.3504e-06   1.0259e-05   7.0627e-05
+   4.0054e-04   2.0847e-03   6.3527e-03   1.7914e-02   4.0564e-02   7.9749e-02   1.2456e-01
+   1.6706e-01   1.9291e-01   1.9530e-01   1.7302e-01   5.5459e-15   1.7478e-14   3.1330e-16
+   4.6211e-16   1.3666e-16   3.4839e-16   3.5298e-14   7.4432e-17   4.2912e-25   1.9520e-42]
+InfoContent:  228768.44 snapshots (13.62 %)
+Adding -0.194 to enthalpy of vaporization at (365.15, 1.0, 'atm')
+Adding  3.545 to enthalpy of vaporization at (365.15, 1.0, 'atm')
+Adding -3.265 to enthalpy of vaporization at (365.15, 1.0, 'atm')
+Adding -5.832 to the heat capacity
+Adding -1.707 to the heat capacity
+MBAR Results for Phase Point (369.15, 1.0, 'atm'), Box, Contributions:
+[  1.8441e-63   2.3362e-59   1.1135e-54   2.7136e-49   1.1613e-41   2.9730e-42   3.0096e-35
+   6.9402e-32   5.8648e-31   1.1095e-26   1.1008e-22   1.5679e-20   1.7246e-18   8.3452e-15
+   1.6629e-12   3.6028e-12   3.3679e-10   4.4951e-09   1.3844e-07   1.4193e-06   1.1545e-05
+   8.6520e-05   5.9001e-04   2.0052e-03   6.7603e-03   1.8458e-02   4.5313e-02   8.4122e-02
+   1.3688e-01   1.9607e-01   2.3980e-01   2.6990e-01   1.0814e-16   3.9430e-16   4.5141e-18
+   7.1956e-18   1.9011e-18   5.6275e-18   8.1991e-16   1.1424e-18   4.3909e-27   1.0714e-44]
+InfoContent:  186186.66 snapshots (11.08 %)
+Adding -0.214 to enthalpy of vaporization at (369.15, 1.0, 'atm')
+Adding  3.546 to enthalpy of vaporization at (369.15, 1.0, 'atm')
+Adding -3.237 to enthalpy of vaporization at (369.15, 1.0, 'atm')
+Adding -5.826 to the heat capacity
+Adding -1.681 to the heat capacity
+MBAR Results for Phase Point (373.15, 1.0, 'atm'), Box, Contributions:
+[  3.4240e-67   5.5521e-63   3.7424e-58   1.3594e-52   1.1075e-44   2.5384e-45   5.2682e-38
+   1.6762e-34   1.5081e-33   4.4670e-29   7.6446e-25   1.3321e-22   1.8650e-20   1.8576e-16
+   5.9657e-14   1.1767e-13   1.8792e-11   2.8077e-10   1.1406e-08   1.6400e-07   1.5593e-06
+   1.5872e-05   1.4294e-04   5.3768e-04   2.1562e-03   7.1666e-03   2.2433e-02   4.9419e-02
+   9.8245e-02   1.7626e-01   2.6380e-01   3.7983e-01   1.6763e-18   7.0153e-18   5.1807e-20
+   8.9331e-20   2.1107e-20   7.2257e-20   1.4970e-17   1.3939e-20   3.7392e-29   4.7542e-47]
+InfoContent:  132186.74 snapshots (7.87 %)
+Adding -0.235 to enthalpy of vaporization at (373.15, 1.0, 'atm')
+Adding  3.546 to enthalpy of vaporization at (373.15, 1.0, 'atm')
+Adding -3.209 to enthalpy of vaporization at (373.15, 1.0, 'atm')
+Adding -5.819 to the heat capacity
+Adding -1.655 to the heat capacity
+MBAR Results for Phase Point (298.15, 20.0, 'bar'), Box, Contributions:
+[  2.4892e-12   2.2943e-10   7.8408e-09   3.3712e-07   1.2635e-05   6.9467e-05   7.2739e-04
+   3.1677e-03   1.1491e-02   2.8685e-02   5.6143e-02   8.1288e-02   9.4856e-02   8.7155e-02
+   6.9573e-02   4.1630e-02   2.2250e-02   8.9650e-03   2.8805e-03   7.5968e-04   1.4360e-04
+   1.7681e-05   3.0340e-06   1.9305e-06   1.5543e-07   7.0141e-10   8.1497e-09   1.0149e-12
+   3.4140e-14   1.0646e-14   1.3860e-18   2.1032e-19   9.2252e-02   9.1623e-02   8.9206e-02
+   7.9584e-02   6.2550e-02   4.4292e-02   2.8907e-02   1.7641e-03   2.7189e-08   3.5076e-23]
+InfoContent:  485157.37 snapshots (28.88 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 50.0, 'bar'), Box, Contributions:
+[  2.6018e-12   2.1853e-10   7.9884e-09   3.3606e-07   1.2229e-05   6.9867e-05   7.2546e-04
+   3.1755e-03   1.1469e-02   2.8481e-02   5.5371e-02   7.9938e-02   9.2916e-02   8.5386e-02
+   6.7885e-02   4.0799e-02   2.1786e-02   8.7933e-03   2.8069e-03   7.4169e-04   1.4021e-04
+   1.7618e-05   2.9367e-06   2.0270e-06   1.3641e-07   6.5519e-10   7.6587e-09   9.9313e-13
+   3.1301e-14   1.0012e-14   1.2227e-18   1.7598e-19   9.0835e-02   9.0429e-02   8.8899e-02
+   8.1057e-02   6.5892e-02   4.8055e-02   3.2182e-02   2.1306e-03   3.8416e-08   6.5080e-23]
+InfoContent:  493912.64 snapshots (29.40 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 100.0, 'bar'), Box, Contributions:
+[  2.7738e-12   2.0094e-10   8.1917e-09   3.3667e-07   1.1546e-05   7.0527e-05   7.2154e-04
+   3.1840e-03   1.1410e-02   2.8098e-02   5.4004e-02   7.7555e-02   8.9587e-02   8.2366e-02
+   6.5056e-02   3.9384e-02   2.1015e-02   8.5046e-03   2.6848e-03   7.1178e-04   1.3481e-04
+   1.7534e-05   2.8040e-06   2.2230e-06   1.0854e-07   5.8392e-10   6.8562e-09   9.5358e-13
+   2.7026e-14   8.9943e-15   9.8323e-19   1.2915e-19   8.8337e-02   8.8272e-02   8.8160e-02
+   8.3286e-02   7.1532e-02   5.4755e-02   3.8242e-02   2.8946e-03   6.7616e-08   1.8004e-22]
+InfoContent:  504157.58 snapshots (30.01 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 250.0, 'bar'), Box, Contributions:
+[  3.1153e-12   1.5256e-10   8.4731e-09   3.5789e-07   9.5817e-06   7.2532e-05   7.0435e-04
+   3.1711e-03   1.1064e-02   2.6618e-02   4.9341e-02   6.9531e-02   7.8963e-02   7.2839e-02
+   5.6471e-02   3.4922e-02   1.8718e-02   7.6108e-03   2.3228e-03   6.2217e-04   1.2001e-04
+   1.7385e-05   2.6003e-06   3.0861e-06   5.0741e-08   4.1663e-10   4.6522e-09   8.1140e-13
+   1.7319e-14   6.1823e-15   4.7626e-19   4.6689e-20   7.9861e-02   8.0625e-02   8.4213e-02
+   8.7979e-02   8.8369e-02   7.7765e-02   6.1227e-02   6.8351e-03   3.4091e-07   3.4744e-21]
+InfoContent:  503598.78 snapshots (29.98 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 500.0, 'bar'), Box, Contributions:
+[  2.9166e-12   8.8268e-11   7.9186e-09   4.4778e-07   7.1284e-06   7.6358e-05   6.5585e-04
+   2.9950e-03   9.9948e-03   2.3048e-02   4.0040e-02   5.4276e-02   6.0048e-02   5.6056e-02
+   4.2174e-02   2.6996e-02   1.4860e-02   6.0297e-03   1.7424e-03   4.7548e-04   9.7522e-05
+   1.7357e-05   2.6244e-06   5.2848e-06   1.2222e-08   2.8343e-10   1.9941e-09   5.2663e-13
+   8.3011e-15   2.6144e-15   1.1137e-19   6.4682e-21   6.3141e-02   6.4768e-02   7.2217e-02
+   8.7854e-02   1.1185e-01   1.2183e-01   1.1512e-01   2.3616e-02   3.9468e-06   3.5844e-19]
+InfoContent:  426454.73 snapshots (25.38 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 750.0, 'bar'), Box, Contributions:
+[  1.9924e-12   4.6220e-11   6.3985e-09   5.4771e-07   5.8468e-06   8.0655e-05   5.8063e-04
+   2.6108e-03   8.4378e-03   1.8367e-02   2.9775e-02   3.8801e-02   4.1679e-02   3.9770e-02
+   2.8885e-02   1.9155e-02   1.0980e-02   4.4344e-03   1.2155e-03   3.4356e-04   7.4649e-05
+   1.7142e-05   2.5329e-06   7.4286e-06   3.4140e-09   2.7590e-10   6.5084e-10   2.6718e-13
+   3.6712e-15   8.0041e-16   1.9302e-20   6.5483e-22   4.5245e-02   4.7284e-02   5.5556e-02
+   7.7698e-02   1.2244e-01   1.6145e-01   1.7996e-01   6.5117e-02   3.4302e-05   2.6045e-17]
+InfoContent:  317251.76 snapshots (18.88 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 1000.0, 'bar'), Box, Contributions:
+[  1.0343e-12   2.2698e-11   4.4251e-09   5.7319e-07   5.1621e-06   8.2587e-05   4.8325e-04
+   2.0647e-03   6.5774e-03   1.3271e-02   1.9998e-02   2.5278e-02   2.6147e-02   2.5793e-02
+   1.7881e-02   1.2320e-02   7.3646e-03   2.9939e-03   7.7656e-04   2.3765e-04   5.1401e-05
+   1.5656e-05   1.9993e-06   7.9447e-06   1.6121e-09   3.1336e-10   1.6028e-10   1.0338e-13
+   1.3166e-15   1.7907e-16   2.5626e-21   5.2145e-23   2.9046e-02   3.1145e-02   3.8004e-02
+   6.0680e-02   1.1617e-01   1.8179e-01   2.3571e-01   1.4588e-01   2.2876e-04   1.3629e-15]
+InfoContent:  223799.33 snapshots (13.32 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 2000.0, 'bar'), Box, Contributions:
+[  3.8281e-14   9.1412e-13   1.6110e-10   7.7829e-08   1.3699e-06   2.5573e-05   9.2648e-05
+   2.8174e-04   9.3651e-04   1.1550e-03   1.3224e-03   1.7253e-03   1.4405e-03   1.7857e-03
+   8.9034e-04   7.2032e-04   4.3982e-04   2.2752e-04   6.1655e-05   2.7067e-05   2.2356e-06
+   1.6992e-06   6.3238e-08   6.4921e-07   1.5815e-10   1.0280e-10   2.4357e-13   1.9942e-16
+   1.5425e-18   3.2979e-20   2.8338e-25   4.3851e-27   1.6098e-03   2.0704e-03   2.5908e-03
+   6.7156e-03   2.4325e-02   6.6925e-02   1.4497e-01   6.9352e-01   4.6133e-02   5.7945e-10]
+InfoContent:  70153.39 snapshots (4.18 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 4000.0, 'bar'), Box, Contributions:
+[  6.0511e-20   5.2263e-17   9.8669e-17   8.6480e-14   2.4415e-11   1.5769e-09   2.5045e-09
+   9.6663e-08   2.4954e-07   1.1003e-08   1.5543e-08   3.4072e-08   2.7315e-08   2.3244e-07
+   6.1605e-09   5.5986e-09   1.4397e-09   1.3237e-09   5.8487e-09   1.5084e-10   4.8395e-13
+   7.8243e-13   6.1103e-15   5.9873e-14   1.7642e-15   2.6780e-16   1.4150e-18   2.5709e-25
+   7.7747e-29   1.5531e-29   8.4283e-35   9.0730e-37   8.0365e-08   2.9958e-08   5.4042e-08
+   7.1461e-07   1.3927e-05   4.1244e-05   3.2897e-04   4.6015e-02   9.5130e-01   2.2962e-03]
+InfoContent:  43645.84 snapshots (2.60 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+MBAR Results for Phase Point (298.15, 8000.0, 'bar'), Box, Contributions:
+[  2.4653e-45   4.4813e-38   1.6964e-40   4.3845e-38   1.8783e-33   5.5217e-28   8.0616e-31
+   6.9523e-27   3.1379e-26   7.4870e-31   5.9207e-30   9.0858e-29   1.9867e-28   9.1339e-26
+   4.3937e-31   4.8739e-31   1.6935e-32   1.0124e-32   4.1204e-30   9.7332e-34   2.1018e-38
+   4.2436e-39   9.5275e-40   7.9170e-39   9.0801e-39   2.6299e-41   9.8803e-43   5.2928e-53
+   1.6474e-57   5.5372e-60   2.1838e-64   2.2627e-66   1.8906e-27   1.7670e-29   1.4174e-28
+   4.1493e-25   6.5231e-21   8.0528e-21   1.9799e-18   4.8329e-12   2.2962e-03   9.9770e-01]
+InfoContent:  40167.72 snapshots (2.39 %)
+Adding -5.917 to the heat capacity
+Adding -2.231 to the heat capacity
+Weights have been renormalized to 1.0
+Physical quantity Density uses denominator =  2.0000
+Weights have been renormalized to 1.0
+Physical quantity H_vap uses denominator =  5.0000
+Weights have been renormalized to 1.0
+Physical quantity Thermal Expansion uses denominator =  1.0000
+Weights have been renormalized to 1.0
+Physical quantity Compressibility uses denominator =  10.0000
+Weights have been renormalized to 1.0
+Physical quantity Heat Capacity uses denominator =  2.0000
+Weights have been renormalized to 1.0
+Physical quantity Dielectric Constant uses denominator =  10.0000
+#==========================================================================================#
+#| [1;94m                              Liquid Density (kg m^-3)                                [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      249.15      1.0 atm   990.497      989.788 +- 0.921    -0.709   0.00000   0.00000 
+      253.15      1.0 atm   993.547      992.978 +- 0.638    -0.569   0.02864   0.00232 
+      257.15      1.0 atm   995.816      995.373 +- 0.441    -0.443   0.02864   0.00140 
+      261.15      1.0 atm   997.476      997.227 +- 0.349    -0.249   0.02864   0.00045 
+      265.15      1.0 atm   998.647      998.626 +- 0.313    -0.021   0.02864   0.00000 
+      269.15      1.0 atm   999.414      999.583 +- 0.287     0.169   0.02864   0.00020 
+      273.15      1.0 atm   999.840     1000.125 +- 0.255     0.285   0.02864   0.00058 
+      277.15      1.0 atm   999.972     1000.315 +- 0.221     0.343   0.02864   0.00084 
+      281.15      1.0 atm   999.848     1000.273 +- 0.191     0.425   0.02864   0.00129 
+      285.15      1.0 atm   999.497     1000.042 +- 0.160     0.545   0.02864   0.00213 
+      289.15      1.0 atm   998.943      999.572 +- 0.130     0.629   0.02864   0.00283 
+      293.15      1.0 atm   998.204      998.886 +- 0.111     0.682   0.02864   0.00333 
+      298.15      1.0 atm   997.045      997.824 +- 0.104     0.779   0.02864   0.00434 
+      301.15      1.0 atm   996.234      997.072 +- 0.103     0.838   0.02864   0.00503 
+      305.15      1.0 atm   995.026      995.899 +- 0.104     0.873   0.02864   0.00546 
+      309.15      1.0 atm   993.684      994.520 +- 0.111     0.836   0.02864   0.00500 
+      313.15      1.0 atm   992.216      992.952 +- 0.119     0.736   0.02864   0.00388 
+      317.15      1.0 atm   990.628      991.227 +- 0.121     0.599   0.02864   0.00257 
+      321.15      1.0 atm   988.927      989.373 +- 0.119     0.446   0.02864   0.00143 
+      325.15      1.0 atm   987.119      987.417 +- 0.117     0.298   0.02864   0.00063 
+      329.15      1.0 atm   985.208      985.386 +- 0.116     0.178   0.02864   0.00023 
+      333.15      1.0 atm   983.199      983.298 +- 0.115     0.099   0.02864   0.00007 
+      337.15      1.0 atm   981.095      981.143 +- 0.113     0.048   0.02864   0.00002 
+      341.15      1.0 atm   978.900      978.906 +- 0.109     0.006   0.02864   0.00000 
+      345.15      1.0 atm   976.617      976.580 +- 0.106    -0.037   0.02864   0.00001 
+      349.15      1.0 atm   974.249      974.158 +- 0.104    -0.091   0.02864   0.00006 
+      353.15      1.0 atm   971.798      971.620 +- 0.103    -0.178   0.02864   0.00023 
+      357.15      1.0 atm   969.266      968.956 +- 0.106    -0.310   0.02864   0.00069 
+      361.15      1.0 atm   966.655      966.164 +- 0.113    -0.491   0.02864   0.00173 
+      365.15      1.0 atm   963.966      963.259 +- 0.124    -0.707   0.02864   0.00358 
+      369.15      1.0 atm   961.202      960.260 +- 0.139    -0.942   0.02864   0.00635 
+      373.15      1.0 atm   958.364      957.194 +- 0.157    -1.170   0.02864   0.00980 
+      298.15     20.0 bar   997.902      998.605 +- 0.104     0.703   0.02864   0.00354 
+      298.15     50.0 bar   999.246      999.833 +- 0.103     0.587   0.02864   0.00247 
+      298.15    100.0 bar  1001.467     1001.867 +- 0.102     0.400   0.02864   0.00114 
+      298.15    250.0 bar  1007.993     1007.858 +- 0.100    -0.135   0.01145   0.00005 
+      298.15    500.0 bar  1018.439     1017.492 +- 0.102    -0.947   0.00573   0.00128 
+      298.15    750.0 bar  1028.385     1026.706 +- 0.111    -1.679   0.00381   0.00268 
+      298.15   1000.0 bar  1037.872     1035.516 +- 0.125    -2.356   0.00286   0.00397 
+      298.15   2000.0 bar  1071.908     1066.770 +- 0.206    -5.138   0.00143   0.00945 
+      298.15   4000.0 bar  1126.580     1118.438 +- 0.233    -8.142   0.00072   0.01186 
+      298.15   8000.0 bar  1206.748     1193.893 +- 0.192   -12.855   0.00034   0.01420 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m         Density objective function:  0.117         [0m |#
+#========================================================#
+#==========================================================================================#
+#| [1;94m                     Liquid Enthalpy of Vaporization (kJ mol^-1)                      [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      249.15      1.0 atm    46.103       47.677 +- 0.065     1.574   0.00000   0.00000 
+      253.15      1.0 atm    45.919       47.441 +- 0.053     1.522   0.03226   0.00299 
+      257.15      1.0 atm    45.740       47.215 +- 0.046     1.475   0.03226   0.00281 
+      261.15      1.0 atm    45.565       47.008 +- 0.045     1.443   0.03226   0.00269 
+      265.15      1.0 atm    45.393       46.819 +- 0.047     1.426   0.03226   0.00262 
+      269.15      1.0 atm    45.223       46.636 +- 0.047     1.413   0.03226   0.00258 
+      273.15      1.0 atm    45.053       46.452 +- 0.046     1.399   0.03226   0.00253 
+      277.15      1.0 atm    44.884       46.261 +- 0.044     1.377   0.03226   0.00245 
+      281.15      1.0 atm    44.714       46.072 +- 0.042     1.358   0.03226   0.00238 
+      285.15      1.0 atm    44.544       45.884 +- 0.039     1.340   0.03226   0.00232 
+      289.15      1.0 atm    44.374       45.697 +- 0.036     1.323   0.03226   0.00226 
+      293.15      1.0 atm    44.203       45.512 +- 0.034     1.309   0.03226   0.00221 
+      298.15      1.0 atm    43.989       45.286 +- 0.033     1.297   0.03226   0.00217 
+      301.15      1.0 atm    43.861       45.151 +- 0.033     1.290   0.03226   0.00215 
+      305.15      1.0 atm    43.689       44.971 +- 0.034     1.282   0.03226   0.00212 
+      309.15      1.0 atm    43.517       44.794 +- 0.037     1.277   0.03226   0.00210 
+      313.15      1.0 atm    43.345       44.619 +- 0.041     1.274   0.03226   0.00209 
+      317.15      1.0 atm    43.172       44.443 +- 0.044     1.271   0.03226   0.00208 
+      321.15      1.0 atm    42.999       44.265 +- 0.046     1.266   0.03226   0.00207 
+      325.15      1.0 atm    42.826       44.086 +- 0.048     1.260   0.03226   0.00205 
+      329.15      1.0 atm    42.652       43.906 +- 0.049     1.254   0.03226   0.00203 
+      333.15      1.0 atm    42.476       43.726 +- 0.049     1.250   0.03226   0.00202 
+      337.15      1.0 atm    42.300       43.548 +- 0.049     1.248   0.03226   0.00201 
+      341.15      1.0 atm    42.123       43.369 +- 0.048     1.246   0.03226   0.00200 
+      345.15      1.0 atm    41.943       43.189 +- 0.048     1.246   0.03226   0.00200 
+      349.15      1.0 atm    41.762       43.008 +- 0.048     1.246   0.03226   0.00200 
+      353.15      1.0 atm    41.580       42.823 +- 0.049     1.243   0.03226   0.00199 
+      357.15      1.0 atm    41.396       42.636 +- 0.051     1.240   0.03226   0.00199 
+      361.15      1.0 atm    41.210       42.446 +- 0.054     1.236   0.03226   0.00197 
+      365.15      1.0 atm    41.024       42.253 +- 0.060     1.229   0.03226   0.00195 
+      369.15      1.0 atm    40.837       42.062 +- 0.068     1.225   0.03226   0.00194 
+      373.15      1.0 atm    40.652       41.872 +- 0.079     1.220   0.03226   0.00192 
+      298.15     20.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15     50.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15    100.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15    250.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15    500.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15    750.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15   1000.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15   2000.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15   4000.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+      298.15   8000.0 bar    43.989        0.000 +- 0.000   -43.989   0.00000   0.00000 
+--------------------------------------------------------------------------------------------
+#=========================================================#
+#| [92m Enthalpy of Vaporization objective function:  0.068 [0m |#
+#=========================================================#
+#==========================================================================================#
+#| [1;94m                  Liquid Thermal Expansion Coefficient (10^-4 K^-1)                   [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      249.15      1.0 atm    -8.877       -9.309 +- 2.150    -0.432   0.00000   0.00000 
+      253.15      1.0 atm    -6.606       -6.949 +- 1.481    -0.343   0.02864   0.00336 
+      257.15      1.0 atm    -4.874       -5.271 +- 1.004    -0.397   0.02864   0.00452 
+      261.15      1.0 atm    -3.506       -4.073 +- 0.765    -0.567   0.02864   0.00920 
+      265.15      1.0 atm    -2.395       -2.940 +- 0.658    -0.545   0.02864   0.00851 
+      269.15      1.0 atm    -1.469       -1.869 +- 0.592    -0.400   0.02864   0.00457 
+      273.15      1.0 atm    -0.680       -0.881 +- 0.532    -0.201   0.02864   0.00116 
+      277.15      1.0 atm     0.003       -0.142 +- 0.475    -0.145   0.02864   0.00060 
+      281.15      1.0 atm     0.604        0.327 +- 0.420    -0.277   0.02864   0.00220 
+      285.15      1.0 atm     1.141        0.864 +- 0.358    -0.277   0.02864   0.00220 
+      289.15      1.0 atm     1.626        1.483 +- 0.298    -0.143   0.02864   0.00059 
+      293.15      1.0 atm     2.068        1.923 +- 0.263    -0.145   0.02864   0.00060 
+      298.15      1.0 atm     2.572        2.354 +- 0.248    -0.218   0.02864   0.00135 
+      301.15      1.0 atm     2.853        2.693 +- 0.243    -0.160   0.02864   0.00073 
+      305.15      1.0 atm     3.206        3.215 +- 0.243     0.009   0.02864   0.00000 
+      309.15      1.0 atm     3.539        3.723 +- 0.257     0.184   0.02864   0.00097 
+      313.15      1.0 atm     3.853        4.165 +- 0.278     0.312   0.02864   0.00278 
+      317.15      1.0 atm     4.152        4.532 +- 0.293     0.380   0.02864   0.00414 
+      321.15      1.0 atm     4.438        4.836 +- 0.299     0.398   0.02864   0.00454 
+      325.15      1.0 atm     4.712        5.069 +- 0.300     0.357   0.02864   0.00366 
+      329.15      1.0 atm     4.975        5.237 +- 0.298     0.262   0.02864   0.00197 
+      333.15      1.0 atm     5.231        5.402 +- 0.295     0.171   0.02864   0.00083 
+      337.15      1.0 atm     5.478        5.609 +- 0.292     0.131   0.02864   0.00049 
+      341.15      1.0 atm     5.719        5.841 +- 0.286     0.122   0.02864   0.00043 
+      345.15      1.0 atm     5.954        6.088 +- 0.281     0.134   0.02864   0.00051 
+      349.15      1.0 atm     6.185        6.375 +- 0.279     0.190   0.02864   0.00103 
+      353.15      1.0 atm     6.411        6.709 +- 0.279     0.298   0.02864   0.00255 
+      357.15      1.0 atm     6.633        7.063 +- 0.283     0.430   0.02864   0.00530 
+      361.15      1.0 atm     6.853        7.397 +- 0.292     0.544   0.02864   0.00849 
+      365.15      1.0 atm     7.071        7.689 +- 0.313     0.618   0.02864   0.01094 
+      369.15      1.0 atm     7.287        7.932 +- 0.347     0.645   0.02864   0.01193 
+      373.15      1.0 atm     7.501        8.072 +- 0.393     0.571   0.02864   0.00934 
+      298.15     20.0 bar     2.594        2.361 +- 0.247    -0.233   0.02864   0.00155 
+      298.15     50.0 bar     2.627        2.373 +- 0.246    -0.254   0.02864   0.00184 
+      298.15    100.0 bar     2.682        2.396 +- 0.243    -0.286   0.02864   0.00235 
+      298.15    250.0 bar     2.840        2.487 +- 0.238    -0.353   0.01145   0.00143 
+      298.15    500.0 bar     3.086        2.710 +- 0.240    -0.376   0.00573   0.00081 
+      298.15    750.0 bar     3.307        2.959 +- 0.261    -0.348   0.00381   0.00046 
+      298.15   1000.0 bar     3.502        3.147 +- 0.294    -0.355   0.00286   0.00036 
+      298.15   2000.0 bar     4.044        3.426 +- 0.505    -0.618   0.00143   0.00055 
+      298.15   4000.0 bar     4.407        4.311 +- 0.639    -0.096   0.00072   0.00001 
+      298.15   8000.0 bar     4.300        3.911 +- 0.449    -0.389   0.00034   0.00005 
+--------------------------------------------------------------------------------------------
+#==============================================================#
+#| [92m Thermal Expansion Coefficient objective function:  0.119 [0m |#
+#==============================================================#
+#==========================================================================================#
+#| [1;94m                  Liquid Isothermal Compressibility (10^-6 bar^-1)                    [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      249.15      1.0 atm    67.985       56.200 +- 4.214   -11.785   0.00000   0.00000 
+      253.15      1.0 atm    63.996       51.536 +- 2.877   -12.460   0.02864   0.04446 
+      257.15      1.0 atm    60.783       48.813 +- 1.907   -11.970   0.02864   0.04103 
+      261.15      1.0 atm    58.116       47.542 +- 1.451   -10.574   0.02864   0.03202 
+      265.15      1.0 atm    55.851       46.795 +- 1.300    -9.056   0.02864   0.02348 
+      269.15      1.0 atm    53.893       45.827 +- 1.189    -8.066   0.02864   0.01863 
+      273.15      1.0 atm    52.176       44.532 +- 1.030    -7.644   0.02864   0.01673 
+      277.15      1.0 atm    50.653       43.363 +- 0.865    -7.290   0.02864   0.01522 
+      281.15      1.0 atm    49.288       42.622 +- 0.725    -6.666   0.02864   0.01272 
+      285.15      1.0 atm    48.056       42.192 +- 0.592    -5.864   0.02864   0.00985 
+      289.15      1.0 atm    46.934       41.891 +- 0.473    -5.043   0.02864   0.00728 
+      293.15      1.0 atm    45.892       41.613 +- 0.401    -4.279   0.02864   0.00524 
+      298.15      1.0 atm    45.247       41.338 +- 0.374    -3.909   0.02864   0.00438 
+      301.15      1.0 atm    44.943       41.274 +- 0.369    -3.669   0.02864   0.00386 
+      305.15      1.0 atm    44.622       41.279 +- 0.375    -3.343   0.02864   0.00320 
+      309.15      1.0 atm    44.390       41.288 +- 0.398    -3.102   0.02864   0.00276 
+      313.15      1.0 atm    44.239       41.264 +- 0.422    -2.975   0.02864   0.00254 
+      317.15      1.0 atm    44.162       41.283 +- 0.428    -2.879   0.02864   0.00237 
+      321.15      1.0 atm    44.153       41.397 +- 0.423    -2.756   0.02864   0.00218 
+      325.15      1.0 atm    44.209       41.553 +- 0.420    -2.656   0.02864   0.00202 
+      329.15      1.0 atm    44.324       41.768 +- 0.419    -2.556   0.02864   0.00187 
+      333.15      1.0 atm    44.496       42.139 +- 0.415    -2.357   0.02864   0.00159 
+      337.15      1.0 atm    44.723       42.659 +- 0.406    -2.064   0.02864   0.00122 
+      341.15      1.0 atm    45.003       43.214 +- 0.394    -1.789   0.02864   0.00092 
+      345.15      1.0 atm    45.333       43.746 +- 0.383    -1.587   0.02864   0.00072 
+      349.15      1.0 atm    45.714       44.306 +- 0.377    -1.408   0.02864   0.00057 
+      353.15      1.0 atm    46.143       44.957 +- 0.379    -1.186   0.02864   0.00040 
+      357.15      1.0 atm    46.621       45.675 +- 0.390    -0.946   0.02864   0.00026 
+      361.15      1.0 atm    47.148       46.378 +- 0.415    -0.770   0.02864   0.00017 
+      365.15      1.0 atm    47.722       47.046 +- 0.455    -0.676   0.02864   0.00013 
+      369.15      1.0 atm    48.346       47.751 +- 0.513    -0.595   0.02864   0.00010 
+      373.15      1.0 atm    49.019       48.469 +- 0.583    -0.550   0.02864   0.00009 
+      298.15     20.0 bar    45.026       41.168 +- 0.372    -3.858   0.02864   0.00426 
+      298.15     50.0 bar    44.682       40.900 +- 0.369    -3.782   0.02864   0.00410 
+      298.15    100.0 bar    44.119       40.456 +- 0.364    -3.663   0.02864   0.00384 
+      298.15    250.0 bar    42.503       39.144 +- 0.351    -3.359   0.01145   0.00129 
+      298.15    500.0 bar    40.019       37.074 +- 0.344    -2.945   0.00573   0.00050 
+      298.15    750.0 bar    37.768       35.151 +- 0.360    -2.617   0.00381   0.00026 
+      298.15   1000.0 bar    35.723       33.290 +- 0.392    -2.433   0.00286   0.00017 
+      298.15   2000.0 bar    29.215       26.739 +- 0.554    -2.476   0.00143   0.00009 
+      298.15   4000.0 bar    21.371       20.473 +- 0.514    -0.898   0.00072   0.00001 
+      298.15   8000.0 bar    14.050       13.515 +- 0.300    -0.535   0.00034   0.00000 
+--------------------------------------------------------------------------------------------
+#===========================================================#
+#| [92m Isothermal Compressibility objective function:  0.273 [0m |#
+#===========================================================#
+#==========================================================================================#
+#| [1;94m                   Liquid Isobaric Heat Capacity (cal mol^-1 K^-1)                    [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      249.15      1.0 atm    19.177       22.057 +- 1.752     2.880   0.00000   0.00000 
+      253.15      1.0 atm    18.777       22.084 +- 1.281     3.307   0.02864   0.07828 
+      257.15      1.0 atm    18.532       21.124 +- 0.946     2.592   0.02864   0.04809 
+      261.15      1.0 atm    18.380       19.927 +- 0.765     1.547   0.02864   0.01714 
+      265.15      1.0 atm    18.280       19.052 +- 0.667     0.772   0.02864   0.00427 
+      269.15      1.0 atm    18.210       18.953 +- 0.611     0.743   0.02864   0.00395 
+      273.15      1.0 atm    18.157       19.372 +- 0.584     1.215   0.02864   0.01057 
+      277.15      1.0 atm    18.115       19.487 +- 0.560     1.372   0.02864   0.01347 
+      281.15      1.0 atm    18.080       19.292 +- 0.519     1.212   0.02864   0.01052 
+      285.15      1.0 atm    18.052       19.213 +- 0.454     1.161   0.02864   0.00966 
+      289.15      1.0 atm    18.030       19.169 +- 0.386     1.139   0.02864   0.00929 
+      293.15      1.0 atm    18.015       19.009 +- 0.344     0.994   0.02864   0.00708 
+      298.15      1.0 atm    18.002       18.772 +- 0.327     0.770   0.02864   0.00424 
+      301.15      1.0 atm    17.998       18.707 +- 0.321     0.709   0.02864   0.00360 
+      305.15      1.0 atm    17.995       18.618 +- 0.318     0.623   0.02864   0.00278 
+      309.15      1.0 atm    17.995       18.430 +- 0.331     0.435   0.02864   0.00135 
+      313.15      1.0 atm    17.996       18.342 +- 0.354     0.346   0.02864   0.00086 
+      317.15      1.0 atm    17.999       18.435 +- 0.371     0.436   0.02864   0.00136 
+      321.15      1.0 atm    18.002       18.502 +- 0.382     0.500   0.02864   0.00179 
+      325.15      1.0 atm    18.006       18.504 +- 0.387     0.498   0.02864   0.00177 
+      329.15      1.0 atm    18.011       18.498 +- 0.386     0.487   0.02864   0.00170 
+      333.15      1.0 atm    18.018       18.422 +- 0.383     0.404   0.02864   0.00117 
+      337.15      1.0 atm    18.026       18.301 +- 0.379     0.275   0.02864   0.00054 
+      341.15      1.0 atm    18.035       18.261 +- 0.372     0.226   0.02864   0.00036 
+      345.15      1.0 atm    18.046       18.337 +- 0.367     0.291   0.02864   0.00061 
+      349.15      1.0 atm    18.058       18.438 +- 0.365     0.380   0.02864   0.00103 
+      353.15      1.0 atm    18.071       18.517 +- 0.367     0.446   0.02864   0.00142 
+      357.15      1.0 atm    18.086       18.611 +- 0.371     0.525   0.02864   0.00197 
+      361.15      1.0 atm    18.101       18.684 +- 0.380     0.583   0.02864   0.00243 
+      365.15      1.0 atm    18.117       18.661 +- 0.400     0.544   0.02864   0.00212 
+      369.15      1.0 atm    18.134       18.537 +- 0.437     0.403   0.02864   0.00116 
+      373.15      1.0 atm    18.151       18.208 +- 0.490     0.057   0.02864   0.00002 
+      298.15     20.0 bar    17.980       18.747 +- 0.326     0.767   0.02864   0.00421 
+      298.15     50.0 bar    17.944       18.709 +- 0.324     0.765   0.02864   0.00419 
+      298.15    100.0 bar    17.885       18.649 +- 0.320     0.764   0.02864   0.00418 
+      298.15    250.0 bar    17.720       18.488 +- 0.313     0.768   0.01145   0.00169 
+      298.15    500.0 bar    17.483       18.285 +- 0.318     0.802   0.00573   0.00092 
+      298.15    750.0 bar    17.286       18.168 +- 0.353     0.882   0.00381   0.00074 
+      298.15   1000.0 bar    17.123       18.120 +- 0.408     0.997   0.00286   0.00071 
+      298.15   2000.0 bar    16.703       18.046 +- 0.800     1.343   0.00143   0.00065 
+      298.15   4000.0 bar    16.375       16.469 +- 0.981     0.094   0.00072   0.00000 
+      298.15   8000.0 bar    16.195       15.904 +- 0.849    -0.291   0.00034   0.00001 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m Isobaric Heat Capacity objective function:  0.262  [0m |#
+#========================================================#
+#==========================================================================================#
+#| [1;94m                              Liquid Dielectric Constant                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      249.15      1.0 atm    98.650      103.374 +- 8.082     4.724   0.00000   0.00000 
+      253.15      1.0 atm    96.580      105.322 +- 6.945     8.742   0.02864   0.02188 
+      257.15      1.0 atm    94.683      102.591 +- 5.779     7.908   0.02864   0.01791 
+      261.15      1.0 atm    92.898       97.845 +- 4.584     4.947   0.02864   0.00701 
+      265.15      1.0 atm    91.186       93.994 +- 3.666     2.808   0.02864   0.00226 
+      269.15      1.0 atm    89.525       91.753 +- 3.177     2.228   0.02864   0.00142 
+      273.15      1.0 atm    87.903       90.297 +- 2.911     2.394   0.02864   0.00164 
+      277.15      1.0 atm    86.311       88.973 +- 2.666     2.662   0.02864   0.00203 
+      281.15      1.0 atm    84.749       88.118 +- 2.408     3.369   0.02864   0.00325 
+      285.15      1.0 atm    83.213       87.704 +- 2.088     4.491   0.02864   0.00578 
+      289.15      1.0 atm    81.705       86.893 +- 1.710     5.188   0.02864   0.00771 
+      293.15      1.0 atm    80.223       85.371 +- 1.416     5.148   0.02864   0.00759 
+      298.15      1.0 atm    78.409       83.160 +- 1.263     4.751   0.02864   0.00646 
+      301.15      1.0 atm    77.339       81.900 +- 1.230     4.561   0.02864   0.00596 
+      305.15      1.0 atm    75.935       80.291 +- 1.229     4.356   0.02864   0.00543 
+      309.15      1.0 atm    74.556       78.721 +- 1.282     4.165   0.02864   0.00497 
+      313.15      1.0 atm    73.200       77.174 +- 1.327     3.974   0.02864   0.00452 
+      317.15      1.0 atm    71.869       75.701 +- 1.312     3.832   0.02864   0.00421 
+      321.15      1.0 atm    70.560       74.400 +- 1.257     3.840   0.02864   0.00422 
+      325.15      1.0 atm    69.275       73.242 +- 1.203     3.967   0.02864   0.00451 
+      329.15      1.0 atm    68.012       72.030 +- 1.153     4.018   0.02864   0.00462 
+      333.15      1.0 atm    66.772       70.613 +- 1.089     3.841   0.02864   0.00422 
+      337.15      1.0 atm    65.555       69.063 +- 1.003     3.508   0.02864   0.00352 
+      341.15      1.0 atm    64.359       67.584 +- 0.915     3.225   0.02864   0.00298 
+      345.15      1.0 atm    63.184       66.321 +- 0.846     3.137   0.02864   0.00282 
+      349.15      1.0 atm    62.030       65.294 +- 0.799     3.264   0.02864   0.00305 
+      353.15      1.0 atm    60.897       64.418 +- 0.763     3.521   0.02864   0.00355 
+      357.15      1.0 atm    59.784       63.567 +- 0.733     3.783   0.02864   0.00410 
+      361.15      1.0 atm    58.691       62.629 +- 0.719     3.938   0.02864   0.00444 
+      365.15      1.0 atm    57.617       61.556 +- 0.738     3.939   0.02864   0.00444 
+      369.15      1.0 atm    56.561       60.377 +- 0.798     3.816   0.02864   0.00417 
+      373.15      1.0 atm    55.522       59.152 +- 0.895     3.630   0.02864   0.00377 
+      298.15     20.0 bar    78.479       83.245 +- 1.260     4.766   0.02864   0.00650 
+      298.15     50.0 bar    78.591       83.382 +- 1.256     4.791   0.02864   0.00657 
+      298.15    100.0 bar    78.776       83.616 +- 1.252     4.840   0.02864   0.00671 
+      298.15    250.0 bar    79.323       84.363 +- 1.260     5.040   0.01145   0.00291 
+      298.15    500.0 bar    80.209       85.739 +- 1.369     5.530   0.00573   0.00175 
+      298.15    750.0 bar    81.067       87.132 +- 1.585     6.065   0.00381   0.00140 
+      298.15   1000.0 bar    81.900       88.237 +- 1.829     6.337   0.00286   0.00115 
+      298.15   2000.0 bar    85.015       88.035 +- 3.210     3.020   0.00143   0.00013 
+      298.15   4000.0 bar    90.545       93.760 +- 4.893     3.215   0.00072   0.00007 
+      298.15   8000.0 bar   100.184       98.769 +- 4.401    -1.415   0.00034   0.00001 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m   Dielectric Constant objective function:  0.192   [0m |#
+#========================================================#
+#====================================================================#
+#| [94m               Liquid Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+Density                            0.11713    0.167    1.95223e-02 
+Enthalpy of Vaporization           0.06848    0.167    1.14134e-02 
+Thermal Expansion Coefficient      0.11892    0.167    1.98202e-02 
+Isothermal Compressibility         0.27251    0.167    4.54178e-02 
+Isobaric Heat Capacity             0.26193    0.167    4.36542e-02 
+Dielectric Constant                0.19165    0.167    3.19421e-02 
+Total                                                  1.71770e-01 
+----------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+Liquid                         0.17177      5.000 [94m     8.58850e-01[0m 
+Monomer_Moments                0.18401      1.000 [94m     1.84009e-01[0m 
+cluster-02                     0.08274      0.500 [94m     4.13676e-02[0m 
+cluster-03                     0.07763      0.500 [94m     3.88161e-02[0m 
+cluster-04                     0.07492      0.500 [94m     3.74587e-02[0m 
+cluster-05                     0.07474      0.500 [94m     3.73676e-02[0m 
+cluster-06                     0.07313      0.500 [94m     3.65661e-02[0m 
+cluster-07                     0.07379      0.500 [94m     3.68939e-02[0m 
+cluster-08                     0.07270      0.500 [94m     3.63507e-02[0m 
+cluster-09                     0.07186      0.500 [94m     3.59295e-02[0m 
+cluster-10                     0.07234      0.500 [94m     3.61675e-02[0m 
+cluster-11                     0.07173      0.500 [94m     3.58634e-02[0m 
+cluster-12                     0.07176      0.500 [94m     3.58807e-02[0m 
+cluster-13                     0.07156      0.500 [94m     3.57799e-02[0m 
+cluster-14                     0.07144      0.500 [94m     3.57196e-02[0m 
+cluster-15                     0.06961      0.500 [94m     3.48035e-02[0m 
+cluster-16                     0.06937      0.500 [94m     3.46858e-02[0m 
+cluster-17                     0.06966      0.500 [94m     3.48311e-02[0m 
+cluster-18                     0.06957      0.500 [94m     3.47870e-02[0m 
+cluster-19                     0.07016      0.500 [94m     3.50791e-02[0m 
+cluster-20                     0.07118      0.500 [94m     3.55882e-02[0m 
+cluster-21                     0.07326      0.500 [94m     3.66286e-02[0m 
+cluster-22                     0.07340      0.500 [94m     3.66978e-02[0m 
+DimerMin                       0.19980      1.000 [94m     1.99802e-01[0m 
+Interactions_CCSDT             0.18716      1.000 [94m     1.87162e-01[0m 
+Interactions_MP2               0.24600      1.000 [94m     2.46005e-01[0m 
+Monomer_Vibration              0.00104      1.000 [94m     1.04148e-03[0m 
+Regularization                 0.01834      1.000 [94m     1.83442e-02[0m 
+Total                                             [94m     2.45847e+00[0m 
+----------------------------------------------------------------------
+#========================================================#
+#| [92m    Objective Function Single Point: 2.45847458     [0m |#
+#========================================================#
+#========================================================#
+#| [1;94m           Final optimization parameters:           [0m |#
+#| [1;94m           Paste to input file to restart           [0m |#
+#========================================================#
+read_mvals
+   0 [  1.6314e-02 ] : Bond/k/73.74
+   1 [  1.2047e-02 ] : Bond/length/73.74
+   2 [ -4.0348e-01 ] : Angle/angle1/74.73.74
+   3 [  3.0494e-02 ] : Angle/k/74.73.74
+   4 [  1.2108e+00 ] : Vdw/epsilon/73
+   5 [  8.0099e-01 ] : Vdw/sigma/73
+   6 [ -1.8591e-01 ] : Multipole/c0/380.-381.-381
+   7 [ -5.7482e-01 ] : Multipole/d3/380.-381.-381
+   8 [ -7.1453e-01 ] : Multipole/q11/380.-381.-381
+   9 [  4.4643e-01 ] : Multipole/q22/380.-381.-381
+  10 [ -5.8543e-01 ] : Multipole/d1/381.380.381
+  11 [ -7.1359e-01 ] : Multipole/d3/381.380.381
+  12 [  1.0467e+00 ] : Multipole/q11/381.380.381
+  13 [  6.0266e-01 ] : Multipole/q22/381.380.381
+  14 [ -1.6016e-01 ] : Multipole/q31/381.380.381
+  15 [ -7.6918e-01 ] : Polarize/thole/380
+  16 [ -1.1331e-01 ] : UreyBradley/k/74.73.74
+  17 [  3.4605e+00 ] : GPol/glob
+  18 [ -2.8589e-01 ] : GPol/oext
+/read_mvals
+#========================================================#
+#| [1;94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  2.3331e+05 ] : Bond/k/73.74
+   1 [  9.5840e-02 ] : Bond/length/73.74
+   2 [  1.0648e+02 ] : Angle/angle1/74.73.74
+   3 [  6.3594e-02 ] : Angle/k/74.73.74
+   4 [  8.2348e-01 ] : Vdw/epsilon/73
+   5 [  3.6453e-01 ] : Vdw/sigma/73
+   6 [ -5.9402e-01 ] : Multipole/c0/380.-381.-381
+   7 [  4.6820e-03 ] : Multipole/d3/380.-381.-381
+   8 [  2.1112e-04 ] : Multipole/q11/380.-381.-381
+   9 [ -3.0097e-04 ] : Multipole/q22/380.-381.-381
+  10 [ -4.9692e-03 ] : Multipole/d1/381.380.381
+  11 [ -6.6467e-03 ] : Multipole/d3/381.380.381
+  12 [  1.7506e-04 ] : Multipole/q11/381.380.381
+  13 [  2.0291e-05 ] : Multipole/q22/381.380.381
+  14 [ -3.3927e-05 ] : Multipole/q31/381.380.381
+  15 [  2.3616e-01 ] : Polarize/thole/380
+  16 [ -4.3129e+03 ] : UreyBradley/k/74.73.74
+  17 [  1.8160e+00 ] : GPol/glob
+  18 [  7.7282e-01 ] : GPol/oext
+----------------------------------------------------------
+Backing up result/amoebawater.xml -> result/amoebawater_11.xml
+Backing up result/water.prm -> result/water_11.prm
+
+The final force field has been written to the 'result' directory.
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#

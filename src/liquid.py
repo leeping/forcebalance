@@ -387,7 +387,7 @@ class Liquid(Target):
             warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
-        if Counter() > 0 and (Counter == 1 or GoodStep()) and self.save_traj < 2:
+        if Counter() > 0 and GoodStep() and self.save_traj < 2:
             for fn in self.last_traj:
                 if os.path.exists(fn):
                     os.remove(fn)
@@ -441,6 +441,8 @@ class Liquid(Target):
         @return Answer Contribution to the objective function
         
         """
+
+        mbar_verbose = False
 
         Answer = {}
 
@@ -542,7 +544,7 @@ class Liquid(Target):
         W1 = None
         if len(BPoints) > 1:
             logger.info("Running MBAR analysis on %i states...\n" % len(BPoints))
-            mbar = pymbar.MBAR(U_kln, N_k, verbose=True, relative_tolerance=5.0e-8)
+            mbar = pymbar.MBAR(U_kln, N_k, verbose=mbar_verbose, relative_tolerance=5.0e-8)
             W1 = mbar.getWeights()
             logger.info("Done\n")
         elif len(BPoints) == 1:
@@ -605,7 +607,7 @@ class Liquid(Target):
             H = E + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
-            C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=True)
+            C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
             Gbar = flat(np.mat(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
@@ -635,17 +637,17 @@ class Liquid(Target):
                 if hasattr(self,'use_cni') and self.use_cni:
                     if not ('cni' in self.RefData and self.RefData['cni'][PT]):
                         raise RuntimeError('Asked for a nonideality correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
-                    logger.info("Adding % .3f to enthalpy of vaporization at " % self.RefData['cni'][PT] + str(PT) + '\n')
+                    logger.debug("Adding % .3f to enthalpy of vaporization at " % self.RefData['cni'][PT] + str(PT) + '\n')
                     Hvap_calc[PT] += self.RefData['cni'][PT]
                 if hasattr(self,'use_cvib_intra') and self.use_cvib_intra:
                     if not ('cvib_intra' in self.RefData and self.RefData['cvib_intra'][PT]):
                         raise RuntimeError('Asked for a quantum intramolecular vibrational correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
-                    logger.info("Adding % .3f to enthalpy of vaporization at " % self.RefData['cvib_intra'][PT] + str(PT) + '\n')
+                    logger.debug("Adding % .3f to enthalpy of vaporization at " % self.RefData['cvib_intra'][PT] + str(PT) + '\n')
                     Hvap_calc[PT] += self.RefData['cvib_intra'][PT]
                 if hasattr(self,'use_cvib_inter') and self.use_cvib_inter:
                     if not ('cvib_inter' in self.RefData and self.RefData['cvib_inter'][PT]):
                         raise RuntimeError('Asked for a quantum intermolecular vibrational correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
-                    logger.info("Adding % .3f to enthalpy of vaporization at " % self.RefData['cvib_inter'][PT] + str(PT) + '\n')
+                    logger.debug("Adding % .3f to enthalpy of vaporization at " % self.RefData['cvib_inter'][PT] + str(PT) + '\n')
                     Hvap_calc[PT] += self.RefData['cvib_inter'][PT]
             else:
                 Hvap_calc[PT]  = 0.0
@@ -667,10 +669,10 @@ class Liquid(Target):
             ## Isobaric heat capacity.
             Cp_calc[PT] = 1000/(4.184*NMol*kT*T) * (avg(H**2) - avg(H)**2)
             if hasattr(self,'use_cvib_intra') and self.use_cvib_intra:
-                logger.info("Adding " + str(self.RefData['devib_intra'][PT]) + " to the heat capacity\n")
+                logger.debug("Adding " + str(self.RefData['devib_intra'][PT]) + " to the heat capacity\n")
                 Cp_calc[PT] += self.RefData['devib_intra'][PT]
             if hasattr(self,'use_cvib_inter') and self.use_cvib_inter:
-                logger.info("Adding " + str(self.RefData['devib_inter'][PT]) + " to the heat capacity\n")
+                logger.debug("Adding " + str(self.RefData['devib_inter'][PT]) + " to the heat capacity\n")
                 Cp_calc[PT] += self.RefData['devib_inter'][PT]
             GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
             GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
