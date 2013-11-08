@@ -220,6 +220,8 @@ class FF(forcebalance.BaseClass):
         self.set_option(options,'logarithmic_map')
         ## Switch for AMOEBA direct or mutual.
         self.set_option(options, 'amoeba_pol')
+        ## AMOEBA mutual dipole convergence tolerance.
+        self.set_option(options, 'amoeba_eps')
         ## Switch for rigid water molecules
         self.set_option(options, 'rigid_water')
         ## Bypass the transformation and use physical parameters directly

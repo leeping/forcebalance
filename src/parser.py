@@ -70,7 +70,7 @@ gen_opts_types = {
                  "readchk"      : (None, -50, 'Name of the restart file we read from', 'Restart jobtype "newton" with "writechk" set'),
                  "writechk"     : (None, -50, 'Name of the restart file we write to (can be same as readchk)', 'Main optimizer'),
                  "ffdir"        : ('forcefield', 100, 'Directory containing force fields, relative to project directory', 'All'),
-                 "amoeba_pol"   : ('direct', 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
                  },
     'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.', 
                                    'All (important); choose "single", "gradient", "hessian", "newton" (Main Optimizer), "bfgs", "powell", "simplex", "anneal", "genetic", "conjugategradient", "scan_mvals", "scan_pvals", "fdcheck[gh]"'),
@@ -116,7 +116,8 @@ gen_opts_types = {
                  "adaptive_factor"        : (0.25,  10, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.', 'Main Optimizer'),
                  "adaptive_damping"       : (0.5,   10, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.', 'Main Optimizer'),
                  "error_tolerance"        : (0.0,   10, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.', 'Main Optimizer'),
-                 "search_tolerance"       : (1e-4, -10, 'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.', 'Main Optimizer with negative mintrust; advanced usage')
+                 "search_tolerance"       : (1e-4, -10, 'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.', 'Main Optimizer with negative mintrust; advanced usage'),
+                 "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
                  },
     'sections': {"read_mvals" : (None, 100, 'Paste mathematical parameters into the input file for them to be read in directly', 'Restarting an optimization'),
                  "read_pvals" : (None, 100, 'Paste physical parameters into the input file for them to be read in directly', 'Restarting an optimization (recommend use_mvals instead)'),

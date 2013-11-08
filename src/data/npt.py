@@ -287,8 +287,7 @@ def main():
     # - Options from the Target object that launched this simulation
     # - Switch for whether to evaluate analytic derivatives.
     FF,mvals,TgtOptions,AGrad = lp_load(open('forcebalance.p'))
-    # Write the force field file.
-    FF.make(mvals)
+    FF.ffdir = '.'
 
     #----
     # Load the options that are set in the ForceBalance input file.
@@ -345,21 +344,11 @@ def main():
     EngOpts = OrderedDict()
     EngOpts["liquid"] = OrderedDict([("coords", liquid_fnm), ("mol", ML), ("pbc", True)])
     EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
-    GenOpts = OrderedDict()
+    GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":
         # OpenMM-specific options
-        # mmopts is a dictionary that gets passed to forcefield.createSystem()
-        GenOpts["mmopts"] = {}
-        GenOpts["mmopts"].setdefault('rigidWater', FF.rigid_water)
-        GenOpts["ffxml"] = FF.openmmxml
         EngOpts["liquid"]["openmm_platform"] = 'CUDA'
         EngOpts["gas"]["openmm_platform"] = 'Reference'
-        # The force field object tells us if we're using direct polarization
-        if FF.amoeba_pol == 'mutual':
-            GenOpts["mmopts"].setdefault('polarization', 'mutual')
-            GenOpts["mmopts"].setdefault('mutualInducedTargetEpsilon', 1e-6)
-        elif FF.amoeba_pol == 'direct':
-            GenOpts["mmopts"].setdefault('polarization', 'direct')
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
@@ -380,7 +369,6 @@ def main():
         GenOpts["tinkerpath"] = TgtOptions["tinkerpath"]
         EngOpts["liquid"]["tinker_key"] = os.path.splitext(liquid_fnm)[0] + ".key"
         EngOpts["gas"]["tinker_key"] = os.path.splitext(gas_fnm)[0] + ".key"
-        GenOpts["tinkerprm"] = FF.tinkerprm
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
         if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
     EngOpts["liquid"].update(GenOpts)
@@ -406,6 +394,9 @@ def main():
     # Create instances of the MD Engine objects.
     Liquid = Engine(name="liquid", **EngOpts["liquid"])
     Gas = Engine(name="gas", **EngOpts["gas"])
+
+    # Write the force field file.
+    FF.make(mvals)
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
