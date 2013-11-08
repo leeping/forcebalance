@@ -362,21 +362,23 @@ class TINKER(Engine):
         tk_opts = OrderedDict([("digits", "10"), ("archive", "")])
         tk_defs = OrderedDict()
 
-        ## Write the appropriate coordinate and key files.
-        if hasattr(self,'target'):
-            # Create the force field in this directory if the force field object is provided.  
-            # This is because the .key file could be a force field file!
-            FF = self.target.FF
-            FF.make(np.zeros(FF.np))
-            if FF.rigid_water:
+        if hasattr(self,'FF'):
+            self.FF.make(np.zeros(self.FF.np))
+            if self.FF.rigid_water:
                 tk_opts["rattle"] = "water"
                 self.rigid = True
-            if FF.amoeba_pol == 'mutual':
+            if self.FF.amoeba_pol == None:
+                raise RuntimeError('You must specify amoeba_pol if there are any AMOEBA forces.')
+            elif self.FF.amoeba_pol == 'mutual':
                 tk_opts['polarization'] = 'mutual'
-                tk_defs['polar-eps'] = '1e-6'
-            elif FF.amoeba_pol == 'direct':
+                if self.FF.amoeba_eps != None:
+                    tk_opts['polar-eps'] = str(self.FF.amoeba_eps)
+                else:
+                    tk_defs['polar-eps'] = '1e-6'
+            elif self.FF.amoeba_pol == 'direct':
                 tk_opts['polarization'] = 'direct'
-            prmfnm = FF.tinkerprm
+            self.prm = self.FF.tinkerprm
+            prmfnm = self.FF.tinkerprm
         elif self.prm:
             prmfnm = self.prm
         else:
@@ -480,9 +482,8 @@ class TINKER(Engine):
         else:
             grouped = [i.L() for i in self.mol.molecules]
             self.AtomLists['MoleculeNumber'] = [[i in g for g in grouped].index(1) for i in range(self.mol.na)]
-        # Delete force field files.
-        if hasattr(self,'target'):
-            for f in FF.fnms:
+        if hasattr(self,'FF'):
+            for f in self.FF.fnms: 
                 os.unlink(f)
 
     def optimize(self, shot=0, method="newton", crit=1e-4):
