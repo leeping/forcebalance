@@ -40,7 +40,7 @@ class Engine(forcebalance.BaseClass):
     """
 
     def __init__(self, name="engine", **kwargs):
-        self.valkwd += ['mol', 'coords', 'name', 'target', 'pbc']
+        self.valkwd += ['mol', 'coords', 'name', 'target', 'pbc', 'FF']
         kwargs = {i:j for i,j in kwargs.items() if j != None and i in self.valkwd} 
         super(Engine, self).__init__(kwargs)
         self.name = name
@@ -59,6 +59,10 @@ class Engine(forcebalance.BaseClass):
             self.root = os.getcwd()
             self.srcdir = self.root
             self.tempdir = self.root
+        if 'FF' in kwargs:
+            self.FF = kwargs['FF']
+        if hasattr(self,'target') and not hasattr(self,'FF'):
+            self.FF = self.target.FF
         #============================================#
         #| Initialization consists of three stages: |#
         #| 1) Setting up options                    |#

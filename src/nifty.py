@@ -720,6 +720,7 @@ def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
 # Back up a file.
 def bak(path, dest=None):
     oldf = path
+    newf = None
     if os.path.exists(path):
         dnm, fnm = os.path.split(path)
         base, ext = os.path.splitext(fnm)
@@ -734,6 +735,7 @@ def bak(path, dest=None):
             i += 1
         logger.info("Backing up %s -> %s\n" % (oldf, newf))
         shutil.move(oldf,newf)
+    return newf
 
 # Search for exactly one file with a provided extension.
 # ext: File extension

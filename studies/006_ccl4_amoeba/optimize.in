@@ -43,9 +43,13 @@ priors
    VDWD                                 : 1.0
 /priors
 
+criteria 2
 convergence_objective 1e-1
 convergence_gradient 1e-2
 convergence_step 1e-2
+
+amoeba_pol mutual
+amoeba_eps 1e-5
 
 $end
 

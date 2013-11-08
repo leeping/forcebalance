@@ -48,6 +48,7 @@ print_hessian
 
 # Charge constraints are taken care of using "evals".
 constrain_charge false
+amoeba_pol direct
 
 priors
    Bond/length     : 1.0e-02

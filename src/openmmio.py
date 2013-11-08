@@ -463,10 +463,10 @@ class OpenMM(Engine):
         os.unlink(pdb1)
         
         ## Create the OpenMM ForceField object.
-        if hasattr(self, 'target'):
-            FF = self.target.FF
-            self.ffxml = FF.openmmxml
-            self.forcefield = ForceField(os.path.join(self.root, FF.ffdir, FF.openmmxml))
+
+        if hasattr(self, 'FF'):
+            self.ffxml = self.FF.openmmxml
+            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.openmmxml))
         else:
             if 'ffxml' in kwargs:
                 if not os.path.exists(kwargs['ffxml']): 
@@ -483,14 +483,16 @@ class OpenMM(Engine):
         self.AMOEBA = any(['Amoeba' in f.__class__.__name__ for f in self.forcefield._forces])
 
         ## Set system options from ForceBalance force field options.
-        if hasattr(self,'target'):
+        if hasattr(self,'FF'):
             if self.AMOEBA:
-                if self.target.FF.amoeba_pol == 'mutual':
+                if self.FF.amoeba_pol == None:
+                    raise RuntimeError('You must specify amoeba_pol if there are any AMOEBA forces.')
+                if self.FF.amoeba_pol == 'mutual':
                     self.mmopts['polarization'] = 'mutual'
-                    self.mmopts.setdefault('mutualInducedTargetEpsilon', 1e-6)
-                elif self.target.FF.amoeba_pol == 'direct':
+                    self.mmopts.setdefault('mutualInducedTargetEpsilon', self.FF.amoeba_eps if self.FF.amoeba_eps != None else 1e-6)
+                elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
-            self.mmopts['rigidWater'] = self.target.FF.rigid_water
+            self.mmopts['rigidWater'] = self.FF.rigid_water
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
@@ -729,7 +731,7 @@ class OpenMM(Engine):
 
         """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD. """
         
-        steps = 5
+        steps = 3
         self.update_simulation()
         self.set_positions(shot)
         # Get the previous geometry.
