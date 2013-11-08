@@ -93,6 +93,8 @@ class Optimizer(forcebalance.BaseClass):
         self.set_option(options,'mintrust','mintrust')
         ## Lower bound on Hessian eigenvalue (below this, we add in steepest descent)
         self.set_option(options,'eig_lowerbound','eps')
+        ## Lower bound on step size (will fail below this)
+        self.set_option(options,'step_lowerbound')
         ## Guess value for Brent
         self.set_option(options,'lm_guess','lmg')
         ## Step size for numerical finite difference
@@ -108,6 +110,8 @@ class Optimizer(forcebalance.BaseClass):
         self.set_option(options,'convergence_step')
         ## Gradient convergence threshold
         self.set_option(options,'convergence_gradient')
+        ## Allow convergence on low quality steps
+        self.set_option(options,'converge_lowq')
         ## Maximum number of optimization steps
         self.set_option(options,'maxstep','maxstep')
         ## For scan[mp]vals: The parameter index to scan over
@@ -267,7 +271,7 @@ class Optimizer(forcebalance.BaseClass):
 
         ## Print out final message
         if self.failmsg:
-            bar = printcool("It is hard to fail, but it is worse\nnever to have tried to succeed.",ansi="40;91")
+            bar = printcool("It is hard to fail, but it is worse\nnever to have tried to succeed.",ansi="40;97")
         else:
             bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
@@ -503,10 +507,10 @@ class Optimizer(forcebalance.BaseClass):
             if ngd < self.convergence_gradient and Best_Step:
                 logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
                 ncrit += 1
-            if ndx < self.convergence_step and Quality > ThreLQ and Best_Step:
+            if ndx < self.convergence_step and (self.converge_lowq or Quality > ThreLQ) and Best_Step:
                 logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
                 ncrit += 1
-            if stdfront < self.convergence_objective and Quality > ThreLQ and len(X_hist) >= self.hist and Best_Step:
+            if stdfront < self.convergence_objective and (self.converge_lowq or Quality > ThreLQ) and len(X_hist) >= self.hist and Best_Step:
                 logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.convergence_objective)
                 ncrit += 1
             if ncrit >= self.criteria: break
@@ -559,6 +563,10 @@ class Optimizer(forcebalance.BaseClass):
             # Check for whether the maximum number of optimization cycles is reached.
             if ITERATION_NUMBER == self.maxstep:
                 logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION_NUMBER)
+                break
+            # Check for whether the step size is too small to continue.
+            if ndx < self.step_lowerbound:
+                logger.info("Step size is too small to continue (%.3e < %.3e)\n" % (ndx, self.step_lowerbound))
                 break
 
         cnvgd = ncrit >= self.criteria
