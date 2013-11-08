@@ -586,7 +586,7 @@ class GMX(Engine):
                 self.mdp = onefile('mdp')
             # Sanity check; the force fields should be referenced by the .top file.
             if self.top != None and os.path.exists(self.top):
-                if not any([any([fnm in line for fnm in FF.fnms]) for line in open(self.top)]):
+                if self.top not in FF.fnms and (not any([any([fnm in line for fnm in FF.fnms]) for line in open(self.top)])):
                     warn_press_key("None of the force field files %s are referenced in the .top file. "
                                    "Are you referencing the files through C preprocessor directives?" % FF.fnms)
             if hasattr(self.target,'shots'):
