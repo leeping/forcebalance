@@ -95,7 +95,7 @@ class Liquid(Target):
         # Enable anisotropic periodic box
         self.set_option(tgt_opts,'anisotropic_box',forceprint=True)
         # Whether to save trajectories (0 = never, 1 = delete after good step, 2 = keep all)
-        self.set_option(tgt_opts,'save_traj')       
+        self.set_option(tgt_opts,'save_traj')
 
         #======================================#
         #     Variables which are set here     #

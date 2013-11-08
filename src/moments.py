@@ -166,13 +166,13 @@ class Moments(Target):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         def get_momvals(mvals_):
             self.FF.make(mvals_)
-            moments = self.engine.multipole_moments(polarizability='polarizability' in self.ref_moments)
+            moments = self.engine.multipole_moments(polarizability='polarizability' in self.ref_moments, optimize=self.optimize_geometry)
             # Unpack from dictionary.
             return self.unpack_moments(moments)
 
         self.FF.make(mvals)
         ref_momvals = self.unpack_moments(self.ref_moments)
-        calc_moments = self.engine.multipole_moments(polarizability='polarizability' in self.ref_moments)
+        calc_moments = self.engine.multipole_moments(polarizability='polarizability' in self.ref_moments, optimize=self.optimize_geometry)
         calc_momvals = self.unpack_moments(calc_moments)
 
         D = calc_momvals - ref_momvals
