@@ -13,7 +13,8 @@ class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
         self.options.update({
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
-                'forcefield': ['cl4.prm']})
+                'forcefield': ['cl4.prm'],
+                'amoeba_pol': 'direct'})
 
         self.tgt_opt.update({'type':'Interaction_TINKER',
                              'name':'ccl4-h2o-1',
