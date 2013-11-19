@@ -471,13 +471,26 @@ class FF(forcebalance.BaseClass):
                 traceback.print_exc()
                 warn_press_key("The force field parser got confused!  The traceback and line in question are printed above.")
             sline = self.Readers[ffname].Split(line)
-            pmark = None
-            if 'PRM' in sline:
-                pmark = (np.array(sline) == 'PRM').argmax() # The position of the parameterization keyword
-            elif 'PARM' in sline:
-                pmark = (np.array(sline) == 'PARM').argmax()
+            
+            kwds = list(itertools.chain(*[[i, "/%s" % i] for i in ['PRM', 'PARM', 'RPT', 'EVAL']]))
+            marks = OrderedDict()
+            for k in kwds:
+                if sline.count(k) > 1:
+                    logger.error(line)
+                    logger.error("The above line contains multiple occurrences of the keyword %s" % k)
+                    raise RuntimeError
+                elif sline.count(k) == 1:
+                    marks[k] = (np.array(sline) == k).argmax()
+            marks['END'] = len(sline)
+
+            pmark = marks.get('PRM',None)
+            if pmark == None: pmark = marks.get('PARM',None)
+            rmark = marks.get('RPT',None)
+            emark = marks.get('EVAL',None)
+            
             if pmark != None:
-                pflds = [int(i) for i in sline[pmark+1:]] # The integers that specify the parameter word positions
+                pstop = min([i for i in marks.values() if i > pmark])
+                pflds = [int(i) for i in sline[pmark+1:pstop]] # The integers that specify the parameter word positions
                 for pfld in pflds:
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
@@ -498,12 +511,9 @@ class FF(forcebalance.BaseClass):
                     self.assign_p0(self.np,float(sline[pfld]))
                     self.assign_field(self.np,ffname,ln,pfld,1)
                     self.np += 1
-            if "RPT" in sline:
-                parse = (np.array(sline)=='RPT').argmax()+1 # The position of the 'RPT' word
-                if max(np.array(sline)=='/RPT') > 0:
-                    stopparse = (np.array(sline)=='/RPT').argmax()
-                else:
-                    stopparse = len(sline)
+            if rmark != None:
+                parse = rmark + 1
+                stopparse = min([i for i in marks.values() if i > rmark])
                 while parse < stopparse:
                     # Between RPT and /RPT, the words occur in pairs.
                     # First is a number corresponding to the field that contains the dependent parameter.
@@ -528,12 +538,9 @@ class FF(forcebalance.BaseClass):
                     self.patoms[prep].append(self.Readers[ffname].molatom)
                     self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
-            if "EVAL" in sline:
-                parse = (np.array(sline)=='EVAL').argmax()+1 # The position of the 'EVAL' word
-                if max(np.array(sline)=='/EVAL') > 0:
-                    stopparse = (np.array(sline)=='/EVAL').argmax()
-                else:
-                    stopparse = len(sline)
+            if emark != None:
+                parse = emark + 1
+                stopparse = min([i for i in marks.values() if i > emark])
                 while parse < stopparse:
                     # Between EVAL and /EVAL, the words occur in pairs.
                     # First is a number corresponding to the field that contains the dependent parameter.
@@ -712,7 +719,7 @@ class FF(forcebalance.BaseClass):
                             whites[fld+1] = whites[fld+1][:-Shave]
                     sline[fld] = newrd
                     # Replace the line in the new force field.
-                    newffdata[fnm][ln] = ''.join([(whites[j] if len(whites[j]) > 0 else ' ')+sline[j] for j in range(len(sline))])+'\n'
+                    newffdata[fnm][ln] = ''.join([(whites[j] if (len(whites[j]) > 0 or j == 0) else ' ')+sline[j] for j in range(len(sline))])+'\n'
 
         if printdir != None:
             absprintdir = os.path.join(self.root,printdir)

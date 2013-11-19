@@ -72,6 +72,16 @@ class CleanFileHandler(FileHandler):
 # set up package level logger that by default prints to sys.stdout
 setLoggerClass(ForceBalanceLogger)
 logger=getLogger('forcebalance')
-# module level loggers should use the default logger object
-setLoggerClass(Logger)
 logger.setLevel(INFO)
+
+class ModLogger(Logger):
+    def error(self, msg, *args, **kwargs):
+        for hdlr in (self.parent.handlers if self.propagate else self.handlers):
+            hdlr.savestream = hdlr.stream
+            hdlr.stream = sys.stderr
+        super(ModLogger, self).error(msg, *args, **kwargs)
+        for hdlr in (self.parent.handlers if self.propagate else self.handlers):
+            hdlr.stream = hdlr.savestream
+
+# module level loggers should use the default logger object
+setLoggerClass(ModLogger)

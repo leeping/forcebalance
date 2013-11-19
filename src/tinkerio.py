@@ -11,6 +11,7 @@ import os, shutil
 from re import match, sub
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
+import time
 import numpy as np
 import networkx as nx
 from copy import deepcopy
@@ -346,8 +347,9 @@ class TINKER(Engine):
             # Catch exceptions since TINKER does not have exit status.
             if "TINKER is Unable to Continue" in line:
                 for l in o:
-                    logger.info("%s\n" % l)
-                warn_press_key("TINKER may have crashed! (See above output)")
+                    logger.error("%s\n" % l)
+                time.sleep(1)
+                raise RuntimeError("TINKER may have crashed! (See above output)")
                 break
         return o
 
@@ -822,7 +824,7 @@ class TINKER(Engine):
                 md_defs["barostat"] = "nose-hoover"
                 # md_defs["barostat"] = "montecarlo"
                 # md_defs["volume-trial"] = "10"
-                # md_opts["save-box"] = ''
+                md_opts["save-box"] = ''
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
             elif pressure:
