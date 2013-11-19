@@ -472,7 +472,7 @@ class FF(forcebalance.BaseClass):
                 warn_press_key("The force field parser got confused!  The traceback and line in question are printed above.")
             sline = self.Readers[ffname].Split(line)
             
-            kwds = list(itertools.chain(*[[i, "/%s" % i] for i in ['PRM', 'RPT', 'EVAL']]))
+            kwds = list(itertools.chain(*[[i, "/%s" % i] for i in ['PRM', 'PARM', 'RPT', 'EVAL']]))
             marks = OrderedDict()
             for k in kwds:
                 if sline.count(k) > 1:
