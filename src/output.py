@@ -75,11 +75,11 @@ logger=getLogger('forcebalance')
 logger.setLevel(INFO)
 
 class ModLogger(Logger):
-    def error(self, msg):
+    def error(self, msg, *args, **kwargs):
         for hdlr in (self.parent.handlers if self.propagate else self.handlers):
             hdlr.savestream = hdlr.stream
             hdlr.stream = sys.stderr
-        super(ModLogger, self).error(msg)
+        super(ModLogger, self).error(msg, *args, **kwargs)
         for hdlr in (self.parent.handlers if self.propagate else self.handlers):
             hdlr.stream = hdlr.savestream
 

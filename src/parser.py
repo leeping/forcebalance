@@ -484,15 +484,15 @@ def parse_inputs(input_file=None):
                           % (key, section))
                     logger.error("Perhaps this option actually belongs in %s section?\n" \
                           % (section == "OPTIONS" and "a TARGET" or "the OPTIONS"))
-                    sys.exit(1)
+                    raise RuntimeError
             elif section not in mainsections:
                 logger.error("Unrecognized section: %s\n" % section)
-                sys.exit(1)
+                raise RuntimeError
         except:
             # traceback.print_exc()
-            logger.error("Failed to read in this line! Check your input file.\n")
+            logger.exception("Failed to read in this line! Check your input file.\n")
             logger.exception('\x1b[91m' + line + '\x1b[0m\n')
-            sys.exit(1)
+            raise RuntimeError
     if section == "SIMULATION" or section == "TARGET":
         tgt_opts.append(this_tgt_opt)
     if not options['verbose_options']:
