@@ -414,6 +414,8 @@ class Optimizer(forcebalance.BaseClass):
                     GOODSTEP = 0
                     print_progress(ITERATION_NUMBER, nxk, ndx, ngd, "\x1b[91m", X, stdfront, Quality)
                     xk = xk_prev.copy()
+                    trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
+                    trustprint = "Reducing trust radius to % .4e\n" % trust
                     if self.reevaluate:
                         #================================#
                         #|  Re-evaluate the objective   |#
@@ -441,8 +443,6 @@ class Optimizer(forcebalance.BaseClass):
                         G = G_prev.copy()
                         H = H_stor.copy()
                         data = deepcopy(datastor)
-                    trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
-                    trustprint = "Reducing trust radius to % .4e\n" % trust
                 else:
                     GOODSTEP = 1
                     #================================#
