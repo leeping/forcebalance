@@ -193,7 +193,10 @@ class AbInitio(Target):
         # to an array of (3 * (n_forces + n_torques)) net forces and torques.
         # This code is rather slow.  It requires the system to have a list
         # of masses and blocking numbers.
-        
+       
+        kwds = {"MoleculeNumber" : "molecule",
+                "ResidueNumber" : "residue",
+                "ChargeGroupNumber" : "chargegroup"}
         if self.force_map == 'molecule' and 'MoleculeNumber' in self.AtomLists:
             Block = self.AtomLists['MoleculeNumber']
         elif self.force_map == 'residue' and 'ResidueNumber' in self.AtomLists:
@@ -201,7 +204,7 @@ class AbInitio(Target):
         elif self.force_map == 'chargegroup' and 'ChargeGroupNumber' in self.AtomLists:
             Block = self.AtomLists['ChargeGroupNumber']
         else:
-            raise Exception('Please choose a valid force_map keyword: %s' % ', '.join(self.AtomLists.keys()))
+            raise Exception('force_map keyword "%s" is invalid. Please choose from: %s' % (self.force_map, ', '.join(['"%s"' % kwds[k] for k in self.AtomLists.keys() if k in kwds])))
 
         nft = self.fitatoms
         # Number of particles that the force is acting on
