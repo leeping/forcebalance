@@ -1066,10 +1066,10 @@ class Optimizer(forcebalance.BaseClass):
             vals_in = [float(i) for i in self.scan_vals.split(":")]
         except:
             logger.error("Syntax error: in the input file please use scan_vals low:hi:nsteps\n")
-            sys.exit(1)
+            raise RuntimeError
         if len(vals_in) != 3:
             logger.error("Syntax error: in the input file please use scan_vals low:hi:nsteps\n")
-            sys.exit(1)
+            raise RuntimeError
         idx = [int(i) for i in self.idxnum]
         for j in self.idxname:
             idx += [self.FF.map[i] for i in self.FF.map if j in i]

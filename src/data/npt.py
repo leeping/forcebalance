@@ -296,13 +296,13 @@ def main():
     h = TgtOptions['h']
     # MD options; time step (fs), production steps, equilibration steps, interval for saving data (ps)
     liquid_timestep = TgtOptions['liquid_timestep']
-    liquid_nsteps = TgtOptions['liquid_prod_steps']
-    liquid_nequil = TgtOptions['liquid_equ_steps']
+    liquid_nsteps = TgtOptions['liquid_md_steps']
+    liquid_nequil = TgtOptions['liquid_eq_steps']
     liquid_intvl = TgtOptions['liquid_interval']
     liquid_fnm = TgtOptions['liquid_coords']
     gas_timestep = TgtOptions['gas_timestep']
-    gas_nsteps = TgtOptions['gas_prod_steps']
-    gas_nequil = TgtOptions['gas_equ_steps']
+    gas_nsteps = TgtOptions['gas_md_steps']
+    gas_nequil = TgtOptions['gas_eq_steps']
     gas_intvl = TgtOptions['gas_interval']
     gas_fnm = TgtOptions['gas_coords']
 

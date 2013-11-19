@@ -154,10 +154,10 @@ tgt_opts_types = {
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
                  "sleepy"             : (0, -50, 'Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)', 'All targets (advanced usage)'),
-                 "liquid_prod_steps"  : (10000, 0, 'Number of time steps for the liquid production run.', 'Condensed phase property targets', 'liquid'),
-                 "liquid_equ_steps"   : (1000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),
-                 "gas_prod_steps"     : (10000, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
-                 "gas_equ_steps"      : (1000, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
+                 "liquid_md_steps"    : (10000, 0, 'Number of time steps for the liquid production run.', 'Condensed phase property targets', 'liquid'),
+                 "liquid_eq_steps"    : (1000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),
+                 "gas_md_steps"       : (10000, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
+                 "gas_eq_steps"       : (1000, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "writelevel"         : (0, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
                  "md_threads"         : (1, 0, 'Set the number of threads used by Gromacs or TINKER processes in MD simulations', 'Condensed phase properties in GROMACS and TINKER', 'Liquid_GMX, Liquod_TINKER'),
                  "save_traj"          : (0, -10, 'Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save', 'Condensed phase properties', 'Liquid'),
@@ -255,7 +255,12 @@ bkwd = {"simtype" : "type",
         "openmm_cuda_precision" : "openmm_precision",
         "mdrun_threads" : "md_threads",
         "mts_vvvr" : "mts_integrator",
-        "amoeba_polarization" : "amoeba_pol"}
+        "amoeba_polarization" : "amoeba_pol",
+        "liquid_prod_steps" : "liquid_md_steps",
+        "gas_prod_steps" : "gas_md_steps",
+        "liquid_equ_steps" : "liquid_eq_steps",
+        "gas_equ_steps" : "gas_eq_steps",
+        }
 
 ## Listing of sections in the input file.
 mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]
@@ -479,15 +484,15 @@ def parse_inputs(input_file=None):
                           % (key, section))
                     logger.error("Perhaps this option actually belongs in %s section?\n" \
                           % (section == "OPTIONS" and "a TARGET" or "the OPTIONS"))
-                    sys.exit(1)
+                    raise RuntimeError
             elif section not in mainsections:
                 logger.error("Unrecognized section: %s\n" % section)
-                sys.exit(1)
+                raise RuntimeError
         except:
             # traceback.print_exc()
-            logger.error("Failed to read in this line! Check your input file.\n")
+            logger.exception("Failed to read in this line! Check your input file.\n")
             logger.exception('\x1b[91m' + line + '\x1b[0m\n')
-            sys.exit(1)
+            raise RuntimeError
     if section == "SIMULATION" or section == "TARGET":
         tgt_opts.append(this_tgt_opt)
     if not options['verbose_options']:
