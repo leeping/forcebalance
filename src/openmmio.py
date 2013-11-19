@@ -130,6 +130,26 @@ def ResetVirtualSites(positions, system):
         return newpos
     else: return positions
 
+def GetVirtualSiteParameters(system):
+    """Return an array of all virtual site parameters in the system.  Used for comparison purposes."""
+    vsprm = []
+    for i in range(system.getNumParticles()):
+        if system.isVirtualSite(i):
+            vs = system.getVirtualSite(i)
+            vstype = vs.__class__.__name__
+            if vstype == 'TwoParticleAverageSite':
+                vsprm.append(_openmm.TwoParticleAverageSite_getWeight(vs, 0))
+                vsprm.append(_openmm.TwoParticleAverageSite_getWeight(vs, 1))
+            elif vstype == 'ThreeParticleAverageSite':
+                vsprm.append(_openmm.ThreeParticleAverageSite_getWeight(vs, 0))
+                vsprm.append(_openmm.ThreeParticleAverageSite_getWeight(vs, 1))
+                vsprm.append(_openmm.ThreeParticleAverageSite_getWeight(vs, 2))
+            elif vstype == 'OutOfPlaneSite':
+                vsprm.append(_openmm.OutOfPlaneSite_getWeight12(vs))
+                vsprm.append(_openmm.OutOfPlaneSite_getWeight13(vs))
+                vsprm.append(_openmm.OutOfPlaneSite_getWeightCross(vs))
+    return np.array(vsprm)
+
 def CopyAmoebaBondParameters(src,dest):
     dest.setAmoebaGlobalBondCubic(src.getAmoebaGlobalBondCubic())
     dest.setAmoebaGlobalBondQuartic(src.getAmoebaGlobalBondQuartic())
@@ -416,7 +436,7 @@ class OpenMM(Engine):
             self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
             if self.verbose: logger.info("Setting CUDA Precision to %s\n" % self.precision)
             self.platform.setPropertyDefaultValue("CudaPrecision", self.precision)
-        elif self.platname == 'OPENCL':
+        elif self.platname == 'OpenCL':
             device = os.environ.get('OPENCL_DEVICE',"0")
             if self.verbose: logger.info("Setting OpenCL Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
@@ -490,6 +510,7 @@ class OpenMM(Engine):
                 if self.FF.amoeba_pol == 'mutual':
                     self.mmopts['polarization'] = 'mutual'
                     self.mmopts.setdefault('mutualInducedTargetEpsilon', self.FF.amoeba_eps if self.FF.amoeba_eps != None else 1e-6)
+                    self.mmopts.setdefault('mutualInducedMaxIterations', 500)
                 elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.FF.rigid_water
@@ -554,14 +575,6 @@ class OpenMM(Engine):
         integrator and type of pressure control.
         """
 
-        if hasattr(self, 'simulation'): return
-
-        ## Create the system object.
-        mod = Modeller(self.pdb.topology, self.pdb.positions)
-        mod.addExtraParticles(self.forcefield)
-        # printcool_dictionary(self.mmopts, title="OpenMM system options for Engine %s" % self.name)
-        self.system = self.forcefield.createSystem(mod.topology, **self.mmopts)
-
         ## Determine the integrator.
         if temperature:
             ## If temperature control is turned on, then run Langevin dynamics.
@@ -594,7 +607,7 @@ class OpenMM(Engine):
         SetAmoebaVirtualExclusions(self.system)
         
         ## Finally create the simulation object.
-        self.simulation = Simulation(mod.topology, self.system, integrator, self.platform)
+        self.simulation = Simulation(self.mod.topology, self.system, integrator, self.platform)
         
         ## Print platform properties.
         # logger.info("I'm using the platform %s\n" % self.simulation.context.getPlatform().getName())
@@ -609,13 +622,25 @@ class OpenMM(Engine):
         parameters in the existing simulation object.  This should be
         run when we write a new force field XML file.
         """
-
-        self.create_simulation(**kwargs)
         self.forcefield = ForceField(self.ffxml)
-        mod = Modeller(self.pdb.topology, self.pdb.positions)
-        mod.addExtraParticles(self.forcefield)
-        self.system = self.forcefield.createSystem(mod.topology, **self.mmopts)
-        UpdateSimulationParameters(self.system, self.simulation)
+        self.mod = Modeller(self.pdb.topology, self.pdb.positions)
+        self.mod.addExtraParticles(self.forcefield)
+        self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
+
+        #----
+        # If the virtual site parameters have changed,
+        # the simulation object must be remade.
+        #----
+        vsprm = GetVirtualSiteParameters(self.system)
+        if hasattr(self,'vsprm') and len(self.vsprm) > 0 and np.max(np.abs(vsprm - self.vsprm)) != 0.0:
+            if hasattr(self, 'simulation'): 
+                delattr(self, 'simulation')
+        self.vsprm = vsprm.copy()
+
+        if hasattr(self, 'simulation'):
+            UpdateSimulationParameters(self.system, self.simulation)
+        else:
+            self.create_simulation(**kwargs)
 
     def set_positions(self, shot=0, traj=None):
         
@@ -731,13 +756,13 @@ class OpenMM(Engine):
 
         """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD. """
         
-        steps = 3
+        steps = int(max(1, -1*np.log10(crit)))
         self.update_simulation()
         self.set_positions(shot)
         # Get the previous geometry.
         X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
         # Minimize the energy.  Optimizer works best in "steps".
-        for logc in np.linspace(0, np.log10(1e-4), steps):
+        for logc in np.linspace(0, np.log10(crit), steps):
             self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole)
         # Get the optimized geometry.
         S = self.simulation.context.getState(getPositions=True, getEnergy=True)
@@ -781,9 +806,14 @@ class OpenMM(Engine):
 
         self.update_simulation()
 
+        if self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']:
+            crit = 1e-4
+        else:
+            crit = 1e-6
+
         rmsd = 0.0
         if optimize: 
-            E, rmsd = self.optimize(shot)
+            E, rmsd = self.optimize(shot, crit=crit)
         else:
             self.set_positions(shot)
             E = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilocalories_per_mole)
