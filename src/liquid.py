@@ -69,13 +69,13 @@ class Liquid(Target):
         # Don't target the average enthalpy of vaporization and allow it to freely float (experimental)
         self.set_option(tgt_opts,'hvap_subaverage')
         # Number of time steps in the liquid "equilibration" run
-        self.set_option(tgt_opts,'liquid_equ_steps',forceprint=True)
+        self.set_option(tgt_opts,'liquid_eq_steps',forceprint=True)
         # Number of time steps in the liquid "production" run
-        self.set_option(tgt_opts,'liquid_prod_steps',forceprint=True)
+        self.set_option(tgt_opts,'liquid_md_steps',forceprint=True)
         # Number of time steps in the gas "equilibration" run
-        self.set_option(tgt_opts,'gas_equ_steps',forceprint=False)
+        self.set_option(tgt_opts,'gas_eq_steps',forceprint=False)
         # Number of time steps in the gas "production" run
-        self.set_option(tgt_opts,'gas_prod_steps',forceprint=False)
+        self.set_option(tgt_opts,'gas_md_steps',forceprint=False)
         # Time step length (in fs) for the liquid production run
         self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
