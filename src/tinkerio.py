@@ -363,9 +363,15 @@ class TINKER(Engine):
         tk_chk = []
         tk_opts = OrderedDict([("digits", "10"), ("archive", "")])
         tk_defs = OrderedDict()
+        
+        prmtmp = False
 
         if hasattr(self,'FF'):
-            self.FF.make(np.zeros(self.FF.np))
+            if not os.path.exists(self.FF.tinkerprm):
+                # If the parameter files don't already exist, create them for the purpose of
+                # preparing the engine, but then delete them afterward.
+                prmtmp = True
+                self.FF.make(np.zeros(self.FF.np))
             if self.FF.rigid_water:
                 tk_opts["rattle"] = "water"
                 self.rigid = True
@@ -484,7 +490,7 @@ class TINKER(Engine):
         else:
             grouped = [i.L() for i in self.mol.molecules]
             self.AtomLists['MoleculeNumber'] = [[i in g for g in grouped].index(1) for i in range(self.mol.na)]
-        if hasattr(self,'FF'):
+        if prmtmp:
             for f in self.FF.fnms: 
                 os.unlink(f)
 
@@ -809,7 +815,7 @@ class TINKER(Engine):
         md_opts["printout"] = nsave
         md_opts["openmp-threads"] = threads
         # Langevin dynamics for temperature control.
-        if temperature:
+        if temperature != None:
             md_defs["integrator"] = "stochastic"
         else:
             md_defs["integrator"] = "beeman"
@@ -818,7 +824,7 @@ class TINKER(Engine):
         if self.pbc:
             md_opts["vdw-correction"] = ''
             md_opts["mpole-list"] = ''
-            if temperature and pressure: 
+            if temperature != None and pressure != None: 
                 md_defs["integrator"] = "nose-hoover"
                 md_defs["thermostat"] = "nose-hoover"
                 md_defs["barostat"] = "nose-hoover"
@@ -827,10 +833,10 @@ class TINKER(Engine):
                 md_opts["save-box"] = ''
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
-            elif pressure:
+            elif pressure != None:
                 warn_once("Pressure is ignored because temperature is turned off.")
         else:
-            if pressure:
+            if pressure != None:
                 warn_once("Pressure is ignored because pbc is set to False.")
             # Use stochastic dynamics for the gas phase molecule.
             # If we use the regular integrators it may miss
@@ -847,7 +853,7 @@ class TINKER(Engine):
         if nequil > 0:
             write_key("%s-eq.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
             if verbose: printcool("Running equilibration dynamics", color=0)
-            if self.pbc and pressure:
+            if self.pbc and pressure != None:
                 self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 
                                                                           temperature, pressure), print_to_screen=verbose)
             else:
@@ -858,7 +864,7 @@ class TINKER(Engine):
         # Run production.
         if verbose: printcool("Running production dynamics", color=0)
         write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
-        if self.pbc and pressure:
+        if self.pbc and pressure != None:
             odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
                                                                              temperature, pressure), print_to_screen=verbose)
         else:

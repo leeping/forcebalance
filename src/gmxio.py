@@ -574,11 +574,17 @@ class GMX(Engine):
         if self.mdp != None:
             LinkFile(os.path.join(self.srcdir, self.mdp), self.mdp, nosrcok=True)
 
+        itptmp = False
+
         ## Write the appropriate coordinate files.
         if hasattr(self,'FF'):
             # Create the force field in this directory if the force field object is provided.  
             # This is because the .mdp and .top file can be force field files!
-            self.FF.make(np.zeros(self.FF.np))
+            if not all([os.path.exists(f) for f in self.FF.fnms]):
+                # If the parameter files don't already exist, create them for the purpose of
+                # preparing the engine, but then delete them afterward.
+                itptmp = True
+                self.FF.make(np.zeros(self.FF.np))
             if self.top == None or not os.path.exists(self.top):
                 self.top = onefile('top')
             if self.mdp == None or not os.path.exists(self.mdp):
@@ -641,7 +647,7 @@ class GMX(Engine):
                 for i in range(ai[1]-ai[0]+1) : self.AtomLists['MoleculeNumber'].append(mn)
         os.unlink('mdout.mdp')
         os.unlink('%s.tpr' % self.name)
-        if hasattr(self,'FF'):
+        if hasattr(self,'FF') and itptmp:
             for f in self.FF.fnms: 
                 os.unlink(f)
 
