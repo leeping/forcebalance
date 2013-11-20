@@ -385,10 +385,11 @@ def main():
                                     ("nequil", liquid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
                                     ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
-                                    ("threads", threads), ("anisotropic", anisotropic), ("mts", mts)])
+                                    ("threads", threads), ("anisotropic", anisotropic), 
+                                    ("mts", mts), ("faststep", faststep)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
-                                 ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1), ("mts", mts)])
+                                 ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1), ("mts", mts), ("faststep", faststep)])
 
     # Energy components analysis disabled for OpenMM MTS because it uses force groups
     if (engname == "openmm" and mts): logger.warn("OpenMM with MTS integrator; energy components analysis will be disabled.\n")

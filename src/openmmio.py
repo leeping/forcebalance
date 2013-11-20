@@ -510,7 +510,7 @@ class OpenMM(Engine):
                 if self.FF.amoeba_pol == 'mutual':
                     self.mmopts['polarization'] = 'mutual'
                     self.mmopts.setdefault('mutualInducedTargetEpsilon', self.FF.amoeba_eps if self.FF.amoeba_eps != None else 1e-6)
-                    self.mmopts.setdefault('mutualInducedMaxIterations', 500)
+                    self.mmopts['mutualInducedMaxIterations'] = 500
                 elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.FF.rigid_water
