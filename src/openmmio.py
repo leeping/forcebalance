@@ -589,14 +589,14 @@ class OpenMM(Engine):
             integrator = VerletIntegrator(timestep*femtoseconds)
 
         ## Add the barostat.
-        if pressure:
+        if pressure != None:
             if anisotropic:
                 barostat = MonteCarloAnisotropicBarostat([pressure, pressure, pressure]*atmospheres,
                                                          temperature*kelvin, nbarostat)
             else:
                 barostat = MonteCarloBarostat(pressure*atmospheres, temperature*kelvin, nbarostat)
-        if self.pbc and pressure: self.system.addForce(barostat)
-        elif pressure: warn_once("Pressure is ignored because pbc is set to False.")
+        if self.pbc and pressure != None: self.system.addForce(barostat)
+        elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
         if not mts:
@@ -935,8 +935,9 @@ class OpenMM(Engine):
                 if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
             else:
                 if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
-        for iteration in range(iequil):
-            self.simulation.step(nsave)
+        for iteration in range(-1, iequil):
+            if iteration >= 0:
+                self.simulation.step(nsave)
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
             kinetic = state.getKineticEnergy()
             potential = state.getPotentialEnergy()
@@ -949,11 +950,11 @@ class OpenMM(Engine):
                 density = 0.0 * kilogram / meter ** 3
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
             if self.pbc:
-                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration, state.getTime() / picoseconds,
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                                      kinetic_temperature / kelvin, potential / kilojoules_per_mole,
                                                                                      volume / nanometers**3, density / (kilogram / meter**3)))
             else:
-                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration, state.getTime() / picoseconds,
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                        kinetic_temperature / kelvin, potential / kilojoules_per_mole))
         # Collect production data.
         if verbose: logger.info("Production...\n")
@@ -963,9 +964,9 @@ class OpenMM(Engine):
             if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
         if save_traj:
             self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsteps))
-        for iteration in range(isteps):
+        for iteration in range(-1, isteps):
             # Propagate dynamics.
-            self.simulation.step(nsave)
+            if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
             kinetic = state.getKineticEnergy()
@@ -987,11 +988,11 @@ class OpenMM(Engine):
                 else:
                     edecomp[comp] = [val]
             if self.pbc:
-                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration, state.getTime() / picoseconds,
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                                      kinetic_temperature / kelvin, potential / kilojoules_per_mole,
                                                                                      volume / nanometers**3, density / (kilogram / meter**3)))
             else:
-                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration, state.getTime() / picoseconds,
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                        kinetic_temperature / kelvin, potential / kilojoules_per_mole))
             Temps.append(kinetic_temperature / kelvin)
             Rhos.append(density.value_in_unit(kilogram / meter**3))

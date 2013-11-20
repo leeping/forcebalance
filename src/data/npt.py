@@ -288,6 +288,8 @@ def main():
     # - Switch for whether to evaluate analytic derivatives.
     FF,mvals,TgtOptions,AGrad = lp_load(open('forcebalance.p'))
     FF.ffdir = '.'
+    # Write the force field file.
+    FF.make(mvals)
 
     #----
     # Load the options that are set in the ForceBalance input file.
@@ -394,9 +396,6 @@ def main():
     # Create instances of the MD Engine objects.
     Liquid = Engine(name="liquid", **EngOpts["liquid"])
     Gas = Engine(name="gas", **EngOpts["gas"])
-
-    # Write the force field file.
-    FF.make(mvals)
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
