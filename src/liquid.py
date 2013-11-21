@@ -121,11 +121,12 @@ class Liquid(Target):
         # Prepare the temporary directory.
         self.prepare_temp_directory()
         # Build keyword dictionary to pass to engine.
-        self.gas_engine_args.update(self.OptionDict)
-        self.gas_engine_args.update(options)
-        del self.gas_engine_args['name']
-        # Create engine object for gas molecule to do the polarization correction.
-        self.gas_engine = self.engine_(target=self, mol=self.gas_mol, **self.gas_engine_args)
+        if self.do_self_pol:
+            self.gas_engine_args.update(self.OptionDict)
+            self.gas_engine_args.update(options)
+            del self.gas_engine_args['name']
+            # Create engine object for gas molecule to do the polarization correction.
+            self.gas_engine = self.engine_(target=self, mol=self.gas_mol, name="selfpol", **self.gas_engine_args)
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
