@@ -1,0 +1,83 @@
+# This is documentation for the ForceBalance condensed phase reference data file,,,,,,,,,,,,,,,,,,,
+"# Lines beginning with octothorpe are comments, empty lines are ignored",,,,,,,,,,,,,,,,,,,
+"# A line can either be a comment, a global parameter, a single line with column headings, or a data line (after the column heading line)",,,,,,,,,,,,,,,,,,,
+# This file should be saved as .xlsx (to preserve formatting) but exported to .csv for ForceBalance to use.,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+"# Global parameters are defined here; they have ""Global"" in the first column.",,,,,,,,,,,,,,,,,,,
+# rho_denom : least squares denominator for the density objective function,,,,,,,,,,,,,,,,,,,
+"# Note: w_rho, w_hvap etc. is set in the input file.  This is because it's considered an adjustable option rather than a property of the data set.",,,,,,,,,,,,,,,,,,,
+# The overall prefactor for an observable is w_obs / obs_denom^2 ,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+Global,rho_denom,2.000,,,,,,,,,,,,,,,,,
+Global,hvap_denom,5.000,,,,,,,,,,,,,,,,,
+Global,alpha_denom,1.000,,,,,,,,,,,,,,,,,
+Global,kappa_denom,10.000,,,,,,,,,,,,,,,,,
+Global,cp_denom,2.000,,,,,,,,,,,,,,,,,
+Global,eps0_denom,10.000,,,,,,,,,,,,,,,,,
+Global,use_cvib_intra,TRUE,,,,,,,,,,,,,,,,,
+Global,use_cvib_inter,TRUE,,,,,,,,,,,,,,,,,
+Global,use_cni,TRUE,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+"# Before entering the data, there must be one line with column headings.",,,,,,,,,,,,,,,,,,,
+# Allowed column headings are: (not case sensitive),,,,,,,,,,,,,,,,,,,
+# T : Temperature in Kelvin,,,,,,,,,,,,,,,,,,,
+# P : Pressure in specified unit (append atm or bar), default is atm,,,,,,,,,,,,,,,,,,
+# MBAR : Include this state in multistate Bennett acceptance ratio calculation (more extreme states are not included),,,,,,,,,,,,,,,,,,,
+# Rho : Density in kg m^-3,,,,,,,,,,,,,,,,,,,
+# Hvap : Enthalpy of vaporization in kJ/mol.  Note: simulating liquid at 1 atm is an acceptable approximation for the vapor pressure.,,,,,,,,,,,,,,,,,,,
+# Alpha : Thermal expansion coefficient in 10^-4 K^-1.,,,,,,,,,,,,,,,,,,,
+# Kappa: Isothermal compressibility in 10^-6 bar^-1.,,,,,,,,,,,,,,,,,,,
+# Cp: Isobaric heat capacity in kJ/mol K^-1.,,,,,,,,,,,,,,,,,,,
+# Eps0: Static dielectric constant.,,,,,,,,,,,,,,,,,,,
+# Rho_wt : Weight to use for this phase point. Analogous for Hvap etc. If column is missing then all weights are 1.,,,,,,,,,,,,,,,,,,,
+# Cvib_intra : To be ADDED to the calculated enthalpy of vaporization ; energy difference due to intramolecular vibrational frequency shifts in going from gas to liquid,,,,,,,,,,,,,,,,,,,
+# Cvib_inter : To be ADDED to the calculated enthalpy of vaporization ; energy difference due to intermolecular vibrational frequency shifts in going from gas to liquid,,,,,,,,,,,,,,,,,,,
+# Cni : To be ADDED to the calculated enthalpy of vaporization ; accounts for the nonideality of the gas phase (more relevant close to critical point),,,,,,,,,,,,,,,,,,,
+# dEvib : To be ADDED to the calculated heat capacity.  Note that these values are slightly different from the TIP4P-Ew paper for some reason.,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,
+T,P,MBAR,Rho,Rho_wt,Hvap,Hvap_wt,Cvib_intra,Cvib_inter,Cni,Alpha,Alpha_wt,Kappa,Kappa_wt,Cp,Cp_wt,dEvib_intra,dEvib_inter,Eps0,Eps0_wt
+249.15,1.0 atm,TRUE,990.497,0.0,46.103,0.0,3.540,-4.320,-0.003,-8.877,0.0,67.985,0.0,19.177,0.0,-5.948,-2.733,98.650,0.0
+253.15,1.0 atm,TRUE,993.547,1.0,45.919,1.0,3.540,-4.275,-0.004,-6.606,1.0,63.996,1.0,18.777,1.0,-5.946,-2.688,96.580,1.0
+257.15,1.0 atm,TRUE,995.816,1.0,45.740,1.0,3.540,-4.230,-0.005,-4.874,1.0,60.783,1.0,18.532,1.0,-5.945,-2.644,94.683,1.0
+261.15,1.0 atm,TRUE,997.476,1.0,45.565,1.0,3.540,-4.186,-0.005,-3.506,1.0,58.116,1.0,18.380,1.0,-5.943,-2.600,92.898,1.0
+265.15,1.0 atm,TRUE,998.647,1.0,45.393,1.0,3.541,-4.143,-0.006,-2.395,1.0,55.851,1.0,18.280,1.0,-5.941,-2.557,91.186,1.0
+269.15,1.0 atm,TRUE,999.414,1.0,45.223,1.0,3.541,-4.101,-0.008,-1.469,1.0,53.893,1.0,18.210,1.0,-5.938,-2.515,89.525,1.0
+273.15,1.0 atm,TRUE,999.840,1.0,45.053,1.0,3.541,-4.059,-0.009,-0.680,1.0,52.176,1.0,18.157,1.0,-5.936,-2.473,87.903,1.0
+277.15,1.0 atm,TRUE,999.972,1.0,44.884,1.0,3.541,-4.018,-0.011,0.003,1.0,50.653,1.0,18.115,1.0,-5.933,-2.433,86.311,1.0
+281.15,1.0 atm,TRUE,999.848,1.0,44.714,1.0,3.541,-3.977,-0.013,0.604,1.0,49.288,1.0,18.080,1.0,-5.930,-2.393,84.749,1.0
+285.15,1.0 atm,TRUE,999.497,1.0,44.544,1.0,3.541,-3.938,-0.015,1.141,1.0,48.056,1.0,18.052,1.0,-5.928,-2.353,83.213,1.0
+289.15,1.0 atm,TRUE,998.943,1.0,44.374,1.0,3.541,-3.899,-0.018,1.626,1.0,46.934,1.0,18.030,1.0,-5.924,-2.315,81.705,1.0
+293.15,1.0 atm,TRUE,998.204,1.0,44.203,1.0,3.541,-3.860,-0.021,2.068,1.0,45.892,1.0,18.015,1.0,-5.921,-2.277,80.223,1.0
+298.15,1.0 atm,TRUE,997.045,1.0,43.989,1.0,3.542,-3.813,-0.025,2.572,1.0,45.247,1.0,18.002,1.0,-5.917,-2.231,78.409,1.0
+301.15,1.0 atm,TRUE,996.234,1.0,43.861,1.0,3.542,-3.785,-0.028,2.853,1.0,44.943,1.0,17.998,1.0,-5.914,-2.203,77.339,1.0
+305.15,1.0 atm,TRUE,995.026,1.0,43.689,1.0,3.542,-3.749,-0.032,3.206,1.0,44.622,1.0,17.995,1.0,-5.910,-2.168,75.935,1.0
+309.15,1.0 atm,TRUE,993.684,1.0,43.517,1.0,3.542,-3.713,-0.037,3.539,1.0,44.390,1.0,17.995,1.0,-5.906,-2.133,74.556,1.0
+313.15,1.0 atm,TRUE,992.216,1.0,43.345,1.0,3.542,-3.677,-0.043,3.853,1.0,44.239,1.0,17.996,1.0,-5.902,-2.098,73.200,1.0
+317.15,1.0 atm,TRUE,990.628,1.0,43.172,1.0,3.542,-3.642,-0.049,4.152,1.0,44.162,1.0,17.999,1.0,-5.898,-2.064,71.869,1.0
+321.15,1.0 atm,TRUE,988.927,1.0,42.999,1.0,3.542,-3.608,-0.056,4.438,1.0,44.153,1.0,18.002,1.0,-5.893,-2.031,70.560,1.0
+325.15,1.0 atm,TRUE,987.119,1.0,42.826,1.0,3.543,-3.574,-0.064,4.712,1.0,44.209,1.0,18.006,1.0,-5.889,-1.999,69.275,1.0
+329.15,1.0 atm,TRUE,985.208,1.0,42.652,1.0,3.543,-3.541,-0.072,4.975,1.0,44.324,1.0,18.011,1.0,-5.884,-1.967,68.012,1.0
+333.15,1.0 atm,TRUE,983.199,1.0,42.476,1.0,3.543,-3.509,-0.081,5.231,1.0,44.496,1.0,18.018,1.0,-5.879,-1.936,66.772,1.0
+337.15,1.0 atm,TRUE,981.095,1.0,42.300,1.0,3.543,-3.476,-0.091,5.478,1.0,44.723,1.0,18.026,1.0,-5.873,-1.905,65.555,1.0
+341.15,1.0 atm,TRUE,978.900,1.0,42.123,1.0,3.544,-3.445,-0.103,5.719,1.0,45.003,1.0,18.035,1.0,-5.868,-1.875,64.359,1.0
+345.15,1.0 atm,TRUE,976.617,1.0,41.943,1.0,3.544,-3.414,-0.115,5.954,1.0,45.333,1.0,18.046,1.0,-5.863,-1.846,63.184,1.0
+349.15,1.0 atm,TRUE,974.249,1.0,41.762,1.0,3.544,-3.383,-0.128,6.185,1.0,45.714,1.0,18.058,1.0,-5.857,-1.817,62.030,1.0
+353.15,1.0 atm,TRUE,971.798,1.0,41.580,1.0,3.544,-3.353,-0.142,6.411,1.0,46.143,1.0,18.071,1.0,-5.851,-1.788,60.897,1.0
+357.15,1.0 atm,TRUE,969.266,1.0,41.396,1.0,3.545,-3.323,-0.158,6.633,1.0,46.621,1.0,18.086,1.0,-5.845,-1.761,59.784,1.0
+361.15,1.0 atm,TRUE,966.655,1.0,41.210,1.0,3.545,-3.294,-0.175,6.853,1.0,47.148,1.0,18.101,1.0,-5.839,-1.734,58.691,1.0
+365.15,1.0 atm,TRUE,963.966,1.0,41.024,1.0,3.545,-3.265,-0.194,7.071,1.0,47.722,1.0,18.117,1.0,-5.832,-1.707,57.617,1.0
+369.15,1.0 atm,TRUE,961.202,1.0,40.837,1.0,3.546,-3.237,-0.214,7.287,1.0,48.346,1.0,18.134,1.0,-5.826,-1.681,56.561,1.0
+373.15,1.0 atm,TRUE,958.364,1.0,40.652,1.0,3.546,-3.209,-0.235,7.501,1.0,49.019,1.0,18.151,1.0,-5.819,-1.655,55.522,1.0
+# Pressure dependence data.  At very high pressures the weight is reduced because larger deviations from experiment are expected.,,,,,,,,,,,,,,,,,,,
+# In later versions of the condensed phase parameterization, the pressures are linearly spaced and given weights of one.,,,,,,,,,,,,,,,,,,,
+# The enthalpy of vaporization calculation is meaningless so it is given a weight of zero.,,,,,,,,,,,,,,,,,,,
+298.15,20.0 bar,TRUE,997.902,1.0,43.989,0.0,3.542,-3.813,-0.025,2.594,1.0,45.026,1.0,17.980,1.0,-5.917,-2.231,78.479,1.0
+298.15,50.0 bar,TRUE,999.246,1.0,43.989,0.0,3.542,-3.813,-0.025,2.627,1.0,44.682,1.0,17.944,1.0,-5.917,-2.231,78.591,1.0
+298.15,100.0 bar,TRUE,1001.467,1.0,43.989,0.0,3.542,-3.813,-0.025,2.682,1.0,44.119,1.0,17.885,1.0,-5.917,-2.231,78.776,1.0
+298.15,250.0 bar,TRUE,1007.993,0.4,43.989,0.0,3.542,-3.813,-0.025,2.840,0.4,42.503,0.4,17.720,0.4,-5.917,-2.231,79.323,0.4
+298.15,500.0 bar,TRUE,1018.439,0.2,43.989,0.0,3.542,-3.813,-0.025,3.086,0.2,40.019,0.2,17.483,0.2,-5.917,-2.231,80.209,0.2
+298.15,750.0 bar,TRUE,1028.385,0.133,43.989,0.0,3.542,-3.813,-0.025,3.307,0.133,37.768,0.133,17.286,0.133,-5.917,-2.231,81.067,0.133
+298.15,1000.0 bar,TRUE,1037.872,0.1,43.989,0.0,3.542,-3.813,-0.025,3.502,0.1,35.723,0.1,17.123,0.1,-5.917,-2.231,81.900,0.1
+298.15,2000.0 bar,TRUE,1071.908,0.05,43.989,0.0,3.542,-3.813,-0.025,4.044,0.05,29.215,0.05,16.703,0.05,-5.917,-2.231,85.015,0.05
+298.15,4000.0 bar,TRUE,1126.580,0.025,43.989,0.0,3.542,-3.813,-0.025,4.407,0.025,21.371,0.025,16.375,0.025,-5.917,-2.231,90.545,0.025
+298.15,8000.0 bar,TRUE,1206.748,0.012,43.989,0.0,3.542,-3.813,-0.025,4.300,0.012,14.050,0.012,16.195,0.012,-5.917,-2.231,100.184,0.012
