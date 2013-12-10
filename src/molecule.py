@@ -103,7 +103,7 @@
 # qm_forces  = List of arrays of atomistic forces from QM calculations
 # qm_espxyzs = List of arrays of xyz coordinates for ESP evaluation
 # qm_espvals = List of arrays of ESP values
-FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_forces', 'qm_energies', 'qm_interaction', 
+FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_forces', 'qm_energies', 'qm_interaction', 
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
@@ -1175,7 +1175,7 @@ class Molecule(object):
                         for i in range(1,len(s)):
                             s[i] = str(int(s[i]) + self.na)
                     NewSuf.append(''.join([whites[j]+s[j] for j in range(len(s))]))
-                New.Data[key] = deepcopy(self.Data[key]) + NewSuf
+                New.Data[key] = copy.deepcopy(self.Data[key]) + NewSuf
             else:
                 if type(self.Data[key]) is np.ndarray:
                     New.Data[key] = np.concatenate((self.Data[key], other.Data[key]))
@@ -2175,7 +2175,8 @@ class Molecule(object):
         matrix_match = {'analytical_grad'  :'Full Analytical Gradient',
                         'gradient_scf'     :'Gradient of SCF Energy',
                         'gradient_mp2'     :'Gradient of MP2 Energy',
-                        'gradient_dualbas' :'Gradient of the Dual-Basis Energy'
+                        'gradient_dualbas' :'Gradient of the Dual-Basis Energy',
+                        'hessian_scf'      :'Hessian of the SCF Energy'
                         }
         qcrem    = OrderedDict()
 
@@ -2183,7 +2184,7 @@ class Molecule(object):
         Mats      = {}
         Floats    = {}
         for key, val in matrix_match.items():
-            Mats[key] = matblank.copy()
+            Mats[key] = copy.deepcopy(matblank)
         for key, val in float_match.items():
             Floats[key] = []
     
@@ -2278,12 +2279,15 @@ class Molecule(object):
         # We start with the most reliable heading and work our way down.
         if len(Mats['analytical_grad']['All']) > 0:
             Answer['qm_forces'] = Mats['analytical_grad']['All']
-        if len(Mats['gradient_mp2']['All']) > 0:
+        elif len(Mats['gradient_mp2']['All']) > 0:
             Answer['qm_forces'] = Mats['gradient_mp2']['All']
         elif len(Mats['gradient_dualbas']['All']) > 0:
             Answer['qm_forces'] = Mats['gradient_dualbas']['All']
         elif len(Mats['gradient_scf']['All']) > 0:
             Answer['qm_forces'] = Mats['gradient_scf']['All']
+
+        if len(Mats['hessian_scf']['All']) > 0:
+            Answer['qm_hessians'] = Mats['hessian_scf']['All']
         #else:
         #    raise Exception('There are no forces in %s' % fnm)
         # Also work our way down with the energies.

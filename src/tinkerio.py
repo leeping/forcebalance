@@ -375,9 +375,7 @@ class TINKER(Engine):
             if self.FF.rigid_water:
                 tk_opts["rattle"] = "water"
                 self.rigid = True
-            if self.FF.amoeba_pol == None:
-                raise RuntimeError('You must specify amoeba_pol if there are any AMOEBA forces.')
-            elif self.FF.amoeba_pol == 'mutual':
+            if self.FF.amoeba_pol == 'mutual':
                 tk_opts['polarization'] = 'mutual'
                 if self.FF.amoeba_eps != None:
                     tk_opts['polar-eps'] = str(self.FF.amoeba_eps)
@@ -385,6 +383,8 @@ class TINKER(Engine):
                     tk_defs['polar-eps'] = '1e-6'
             elif self.FF.amoeba_pol == 'direct':
                 tk_opts['polarization'] = 'direct'
+            else:
+                warn_press_key("Using TINKER without explicitly specifying AMOEBA settings. Are you sure?")
             self.prm = self.FF.tinkerprm
             prmfnm = self.FF.tinkerprm
         elif self.prm:
@@ -426,6 +426,10 @@ class TINKER(Engine):
             # TINKER likes to use up to 9.0 Angstrom for vdW cutoffs
             rvdw = 0.05*(float(int(minbox - 1))) if minbox <= 19 else 9.0
             tk_defs['vdw-cutoff'] = "%f" % rvdw
+            if (minbox*0.5 - rpme) > 2.5 and (minbox*0.5 - rvdw) > 2.5:
+                tk_defs['neighbor-list'] = ''
+            elif (minbox*0.5 - rpme) > 2.5:
+                tk_defs['mpole-list'] = ''
         else:
             tk_opts['ewald'] = None
             tk_opts['ewald-cutoff'] = None
@@ -823,7 +827,6 @@ class TINKER(Engine):
         # Periodic boundary conditions.
         if self.pbc:
             md_opts["vdw-correction"] = ''
-            md_opts["mpole-list"] = ''
             if temperature != None and pressure != None: 
                 md_defs["integrator"] = "nose-hoover"
                 md_defs["thermostat"] = "nose-hoover"
