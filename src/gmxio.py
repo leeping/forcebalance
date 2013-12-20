@@ -63,7 +63,7 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
                 continue
             # Now split off the key and value fields at the equals sign.
             keyf, valf = data.split('=',1)
-            key = keyf.strip().lower()
+            key = keyf.strip().lower().replace('-','_')
             haveopts.append(key)
             if key in options:
                 val = options[key]
