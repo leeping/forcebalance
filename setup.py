@@ -228,7 +228,11 @@ def doClean():
     print "Removing the directory tree prior to install: %s" % forcebalance_dir
     os.system("rm -f %s/../forcebalance-*.egg-info" % forcebalance_dir)
     if os.path.exists(forcebalance_dir):
-        shutil.rmtree(forcebalance_dir)
+        # Seems to encounter an error here that I don't understand. Perhaps removing twice will do the trick.
+        try:
+            shutil.rmtree(forcebalance_dir)
+        except:
+            shutil.rmtree(forcebalance_dir)
     
 def main():
     # if len(os.path.split(__file__)[0]) > 0:
