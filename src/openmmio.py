@@ -297,10 +297,10 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     for i in system.getForces():
         if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
             # Slow force.
-            logger.info(i.__class__.__name__ + "is a Slow Force\n")
+            logger.info(i.__class__.__name__ + " is a Slow Force\n")
             i.setForceGroup(1)
         else:
-            logger.info(i.__class__.__name__ + "is a Fast Force\n")
+            logger.info(i.__class__.__name__ + " is a Fast Force\n")
             # Fast force.
             i.setForceGroup(0)
 
@@ -963,7 +963,8 @@ class OpenMM(Engine):
         else:
             if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
         if save_traj:
-            self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsteps))
+            self.simulation.reporters.append(DCDReporter('%s-md.pdb' % self.name, nsteps))
+            self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave))
         for iteration in range(-1, isteps):
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
@@ -1043,7 +1044,7 @@ class Liquid_OpenMM(Liquid):
         super(Liquid_OpenMM,self).__init__(options,tgt_opts,forcefield)
         # Send back the trajectory file.
         if self.save_traj > 0:
-            self.extra_output = ['liquid-md.dcd']
+            self.extra_output = ['liquid-md.pdb', 'liquid-md.dcd']
 
 class AbInitio_OpenMM(AbInitio):
     """ Force and energy matching using OpenMM. """
