@@ -106,6 +106,10 @@ if [ $errlines -ne 0 ] || [ $exitstat -ne 0 ] ; then
     tail -50 $error
     echo
     echo "$program may not have finished successfully, see error above or look in $error."
+    if [ `find . -name npt.out | wc -l` -gt 0 ] ; then
+        find . -name npt.out | sort
+        echo "Error messages may also appear in the above files."
+    fi
     echo "If error does not make sense, please contact me (Lee-Ping)."
 elif [ $nerr -ne 0 ] ; then
     echo "Look in $error for more (possibly relevant) printout."
