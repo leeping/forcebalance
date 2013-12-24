@@ -198,7 +198,7 @@ def buildKeywordDictionary(args):
 
     """
 
-    if not args.dirty: doClean()
+    if args.clean: doClean()
     setupKeywords["packages"].append("forcebalance.unit")
     if args.test:
         setupKeywords["packages"].append("forcebalance.test")
@@ -227,12 +227,7 @@ def doClean():
     #raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % forcebalance_dir)
     print "Removing the directory tree prior to install: %s" % forcebalance_dir
     os.system("rm -f %s/../forcebalance-*.egg-info" % forcebalance_dir)
-    if os.path.exists(forcebalance_dir):
-        # Seems to encounter an error here that I don't understand. Perhaps removing twice will do the trick.
-        try:
-            shutil.rmtree(forcebalance_dir)
-        except:
-            shutil.rmtree(forcebalance_dir)
+    os.system("rm -rf %s" % forcebalance_dir)
     
 def main():
     # if len(os.path.split(__file__)[0]) > 0:
@@ -240,7 +235,7 @@ def main():
 
     ## Install options
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dirty', action='store_true', help="don't remove previously installed forcebalance installation first")
+    parser.add_argument('-c', '--clean', action='store_true', help="remove previously installed forcebalance installation first")
     parser.add_argument('-t', '--test', action='store_true', help='install forcebalance test suite')
     parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)
