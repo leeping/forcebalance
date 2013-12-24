@@ -63,7 +63,7 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
                 continue
             # Now split off the key and value fields at the equals sign.
             keyf, valf = data.split('=',1)
-            key = keyf.strip().lower()
+            key = keyf.strip().lower().replace('-','_')
             haveopts.append(key)
             if key in options:
                 val = options[key]
@@ -501,16 +501,23 @@ class GMX(Engine):
             self.gmxsuffix = ''
 
         ## The directory containing GROMACS executables (e.g. mdrun)
+        havegmx = False
         if 'gmxpath' in kwargs:
             self.gmxpath = kwargs['gmxpath']
             if not os.path.exists(os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix)):
                 warn_press_key("The mdrun executable indicated by %s doesn't exist! (Check gmxpath and gmxsuffix)" \
                                    % os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix))
-        else:
+            else:
+                havegmx = True
+
+        if not havegmx:
             warn_once("The 'gmxpath' option was not specified; using default.")
             if which('mdrun'+self.gmxsuffix) == '':
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
-            self.gmxpath = which('mdrun'+self.gmxsuffix)
+                raise RuntimeError("Cannot find the GROMACS executables!")
+            else:
+                self.gmxpath = which('mdrun'+self.gmxsuffix)
+                havegmx = True
 
     def readsrc(self, **kwargs):
 
