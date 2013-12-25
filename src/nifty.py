@@ -266,7 +266,7 @@ def col(vec):
     Output:
     A column matrix
     """
-    return np.mat(np.array(vec).reshape(-1, 1))
+    return np.matrix(np.array(vec).reshape(-1, 1))
 
 def row(vec):
     """Given any list, array, or matrix, return a 1-row matrix.
@@ -275,7 +275,7 @@ def row(vec):
 
     @return answer A row matrix
     """
-    return np.mat(np.array(vec).reshape(1, -1))
+    return np.matrix(np.array(vec).reshape(1, -1))
 
 def flat(vec):
     """Given any list, array, or matrix, return a single-index array.
@@ -311,15 +311,15 @@ def invert_svd(X,thresh=1e-12):
     """
 
     u,s,vh = np.linalg.svd(X, full_matrices=0)
-    uh     = np.mat(np.transpose(u))
-    v      = np.mat(np.transpose(vh))
+    uh     = np.matrix(np.transpose(u))
+    v      = np.matrix(np.transpose(vh))
     si     = s.copy()
     for i in range(s.shape[0]):
         if abs(s[i]) > thresh:
             si[i] = 1./s[i]
         else:
             si[i] = 0.0
-    si     = np.mat(np.diag(si))
+    si     = np.matrix(np.diag(si))
     Xt     = v*si*uh
     return Xt
 
@@ -349,7 +349,7 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     @param[out] MPPI The Moore-Penrose pseudoinverse (multiply by Y to get least-squares coefficients, multiply by dY/dk to get derivatives of least-squares coefficients)
     """
     # X is a 'tall' matrix.
-    X = np.mat(x)
+    X = np.matrix(x)
     Y = col(y)
     n_x = X.shape[0]
     n_fit = X.shape[1]
@@ -360,9 +360,9 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
         if len(w) != n_x:
             warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
         w /= np.mean(w)
-        WH = np.mat(np.diag(w**0.5))
+        WH = np.matrix(np.diag(w**0.5))
     else:
-        WH = np.mat(np.eye(n_x))
+        WH = np.matrix(np.eye(n_x))
     # Make the Moore-Penrose Pseudoinverse.
     # if n_fit == n_x:
     #     MPPI = np.linalg.inv(WH*X)

@@ -831,8 +831,6 @@ class TINKER(Engine):
                 md_defs["integrator"] = "nose-hoover"
                 md_defs["thermostat"] = "nose-hoover"
                 md_defs["barostat"] = "nose-hoover"
-                # md_defs["barostat"] = "montecarlo"
-                # md_defs["volume-trial"] = "10"
                 md_opts["save-box"] = ''
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
@@ -846,6 +844,12 @@ class TINKER(Engine):
             # six degrees of freedom in calculating the kinetic energy.
             md_opts["barostat"] = None
 
+        eq_opts = deepcopy(md_opts)
+        if self.pbc and temperature != None and pressure != None: 
+            eq_opts["integrator"] = "beeman"
+            eq_opts["thermostat"] = "bussi"
+            eq_opts["barostat"] = "berendsen"
+
         if minimize:
             if verbose: logger.info("Minimizing the energy...")
             self.optimize(method="bfgs", crit=1)
@@ -854,7 +858,7 @@ class TINKER(Engine):
 
         # Run equilibration.
         if nequil > 0:
-            write_key("%s-eq.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
+            write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
             if verbose: printcool("Running equilibration dynamics", color=0)
             if self.pbc and pressure != None:
                 self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 

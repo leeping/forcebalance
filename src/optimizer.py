@@ -11,7 +11,6 @@ contained inside.
 import os, pickle, re, sys
 import numpy as np
 from copy import deepcopy
-from numpy.linalg import eig, norm, solve
 import forcebalance
 from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
@@ -429,8 +428,8 @@ class Optimizer(forcebalance.BaseClass):
                         GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
                         ndx = 0
-                        nxk = norm(xk)
-                        ngd = norm(G)
+                        nxk = np.linalg.norm(xk)
+                        ngd = np.linalg.norm(G)
                         Quality = 0.0
                         color = "\x1b[0m"
                     else:
@@ -481,8 +480,8 @@ class Optimizer(forcebalance.BaseClass):
             #================================#
             #| Print optimization progress. |#
             #================================#
-            nxk = norm(xk)
-            ngd = norm(G)
+            nxk = np.linalg.norm(xk)
+            ngd = np.linalg.norm(G)
             if GOODSTEP:
                 print_progress(ITERATION_NUMBER, nxk, ndx, ngd, color, X, stdfront, Quality)
             #================================#
@@ -538,7 +537,7 @@ class Optimizer(forcebalance.BaseClass):
             dx, dX_expect, bump = self.step(xk, data, trust)
             # Increment the parameters.
             xk += dx
-            ndx = norm(dx)
+            ndx = np.linalg.norm(dx)
             # Increment the iteration counter.
             ITERATION_NUMBER += 1
             # The search code benefits from knowing the step size here.
@@ -590,7 +589,7 @@ class Optimizer(forcebalance.BaseClass):
         H1 = H.copy()
         H1 = np.delete(H1, self.excision, axis=0)
         H1 = np.delete(H1, self.excision, axis=1)
-        Eig = eig(H1)[0]            # Diagonalize Hessian
+        Eig = np.linalg.eig(H1)[0]            # Diagonalize Hessian
         Emin = min(Eig)
         if Emin < self.eps:         # Mix in SD step if Hessian minimum eigenvalue is negative
             # Experiment.
@@ -619,20 +618,20 @@ class Optimizer(forcebalance.BaseClass):
                     self.Penalty = Penalty
                 def _compute(self, dx):
                     self.dx = dx.copy()
-                    Tmp = np.mat(self.H)*col(dx)
+                    Tmp = np.matrix(self.H)*col(dx)
                     Reg_Term   = self.Penalty.compute(xkd+flat(dx), Obj0)
                     self.Val   = (X + np.dot(dx, G) + 0.5*row(dx)*Tmp + Reg_Term[0] - data['X'])[0,0]
                     self.Grad  = flat(col(G) + Tmp) + Reg_Term[1]
                 def compute_val(self, dx):
-                    if norm(dx - self.dx) > 1e-8:
+                    if np.linalg.norm(dx - self.dx) > 1e-8:
                         self._compute(dx)
                     return self.Val
                 def compute_grad(self, dx):
-                    if norm(dx - self.dx) > 1e-8:
+                    if np.linalg.norm(dx - self.dx) > 1e-8:
                         self._compute(dx)
                     return self.Grad
                 def compute_hess(self, dx):
-                    if norm(dx - self.dx) > 1e-8:
+                    if np.linalg.norm(dx - self.dx) > 1e-8:
                         self._compute(dx)
                     return self.Hess
             def hyper_solver(L):
@@ -667,7 +666,7 @@ class Optimizer(forcebalance.BaseClass):
             logger.debug(" H:\n")
             pmat2d(H,precision=5, loglevel=DEBUG)
             
-            Hi = invert_svd(np.mat(H))
+            Hi = invert_svd(np.matrix(H))
             dx = flat(-1 * Hi * col(G))
             
             logger.debug(" dx:\n")
@@ -686,11 +685,11 @@ class Optimizer(forcebalance.BaseClass):
                 pvec1d(G,precision=5, loglevel=DEBUG)
                 logger.debug(" HT: (Scal = %.4f)\n" % (1+(L-1)**2))
                 pmat2d(HT,precision=5, loglevel=DEBUG)
-                Hi = invert_svd(np.mat(HT))
+                Hi = invert_svd(np.matrix(HT))
                 dx = flat(-1 * Hi * col(G))
                 logger.debug(" dx:\n")
                 pvec1d(dx,precision=5, loglevel=DEBUG)
-                sol = flat(0.5*row(dx)*np.mat(H)*col(dx))[0] + np.dot(dx,G)
+                sol = flat(0.5*row(dx)*np.matrix(H)*col(dx))[0] + np.dot(dx,G)
                 for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                     dx = np.insert(dx, i, 0)
                 return dx, sol
@@ -699,12 +698,12 @@ class Optimizer(forcebalance.BaseClass):
             return hyper_solver(L) if self.bhyp else para_solver(L)
     
         def trust_fun(L):
-            N = norm(solver(L)[0])
+            N = np.linalg.norm(solver(L)[0])
             logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
             return (N - trust)**2
 
         def h_fun(L):
-            N = norm(solver(L)[0])
+            N = np.linalg.norm(solver(L)[0])
             logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
             return (N - self.h)**2
 
@@ -715,13 +714,13 @@ class Optimizer(forcebalance.BaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            logger.info("Searching! Diagonal addition = %.4e, L = % .4e, length %.4e, result % .4e\n" % ((L-1)**2,L,norm(dx),Result))
+            logger.info("Searching! Diagonal addition = %.4e, L = % .4e, length %.4e, result % .4e\n" % ((L-1)**2,L,np.linalg.norm(dx),Result))
             return Result
         
         if self.trust0 > 0: # This is the trust region code.
             bump = False
             dx, expect = solver(1)
-            dxnorm = norm(dx)
+            dxnorm = np.linalg.norm(dx)
             if dxnorm > trust:
                 bump = True
                 # Tried a few optimizers here, seems like Brent works well.
@@ -731,7 +730,7 @@ class Optimizer(forcebalance.BaseClass):
                 ### Result = optimize.fmin_powell(trust_fun,3,xtol=self.search_tol,ftol=self.search_tol,full_output=1,disp=0)
                 ### LOpt = Result[0]
                 dx, expect = solver(LOpt)
-                dxnorm = norm(dx)
+                dxnorm = np.linalg.norm(dx)
                 logger.info("Trust-radius step found (length %.4e), % .4e added to Hessian diagonal\n" % (dxnorm, (LOpt-1)**2))
             else:
                 logger.info("Newton-Raphson step found (length %.4e)\n" % (dxnorm))
@@ -740,14 +739,14 @@ class Optimizer(forcebalance.BaseClass):
             # First obtain a step that is the same length as the provided trust radius.
             LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
             dx, expect = solver(LOpt)
-            dxnorm = norm(dx)
+            dxnorm = np.linalg.norm(dx)
             logger.info("Starting Hessian diagonal search with step size %.4e\n" % dxnorm)
             bump = False
             Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             if Result[1] > 0:
                 LOpt = optimize.brent(h_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
                 dx, expect = solver(LOpt)
-                dxnorm = norm(dx)
+                dxnorm = np.linalg.norm(dx)
                 logger.info("Restarting search with step size %.4e\n" % dxnorm)
                 Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             ### optimize.fmin(search_fun,0,xtol=1e-8,ftol=data['X']*0.1,full_output=1,disp=0)
