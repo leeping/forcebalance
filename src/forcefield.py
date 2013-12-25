@@ -833,7 +833,7 @@ class FF(forcebalance.BaseClass):
                 logger.exception(mvals + '\n')
                 raise Exception('What the hell did you do?')
         else:
-            pvals = flat(np.mat(self.tmI)*col(mvals)) + self.pvals0
+            pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
         for i in range(self.np):

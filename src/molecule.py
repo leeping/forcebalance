@@ -264,12 +264,12 @@ def CubicLattice(a):
     bet  = beta*np.pi/180
     gamm = gamma*np.pi/180
     v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
-    Mat = np.mat([[a, b*cos(gamm), c*cos(bet)],
+    Mat = np.matrix([[a, b*cos(gamm), c*cos(bet)],
                   [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
                   [0, 0, c*v/sin(gamm)]])
-    L1 = Mat*np.mat([[1],[0],[0]])
-    L2 = Mat*np.mat([[0],[1],[0]])
-    L3 = Mat*np.mat([[0],[0],[1]])
+    L1 = Mat*np.matrix([[1],[0],[0]])
+    L2 = Mat*np.matrix([[0],[1],[0]])
+    L3 = Mat*np.matrix([[0],[0],[1]])
     return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
 
 def BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma):
@@ -278,12 +278,12 @@ def BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma):
     bet  = beta*np.pi/180
     gamm = gamma*np.pi/180
     v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
-    Mat = np.mat([[a, b*cos(gamm), c*cos(bet)],
+    Mat = np.matrix([[a, b*cos(gamm), c*cos(bet)],
                   [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
                   [0, 0, c*v/sin(gamm)]])
-    L1 = Mat*np.mat([[1],[0],[0]])
-    L2 = Mat*np.mat([[0],[1],[0]])
-    L3 = Mat*np.mat([[0],[0],[1]])
+    L1 = Mat*np.matrix([[1],[0],[0]])
+    L2 = Mat*np.matrix([[0],[1],[0]])
+    L3 = Mat*np.matrix([[0],[0],[1]])
     return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
 
 def BuildLatticeFromVectors(v1, v2, v3):
@@ -298,12 +298,12 @@ def BuildLatticeFromVectors(v1, v2, v3):
     bet  = beta*np.pi/180
     gamm = gamma*np.pi/180
     v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
-    Mat = np.mat([[a, b*cos(gamm), c*cos(bet)],
+    Mat = np.matrix([[a, b*cos(gamm), c*cos(bet)],
                   [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
                   [0, 0, c*v/sin(gamm)]])
-    L1 = Mat*np.mat([[1],[0],[0]])
-    L2 = Mat*np.mat([[0],[1],[0]])
-    L3 = Mat*np.mat([[0],[0],[1]])
+    L1 = Mat*np.matrix([[1],[0],[0]])
+    L2 = Mat*np.matrix([[0],[1],[0]])
+    L3 = Mat*np.matrix([[0],[0],[1]])
     return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
 
 #===========================#
@@ -499,26 +499,26 @@ def either(A, B, key):
 #===========================#
 def EulerMatrix(T1,T2,T3):
     """ Constructs an Euler matrix from three Euler angles. """
-    DMat = np.mat(np.zeros((3,3)))
+    DMat = np.matrix(np.zeros((3,3)))
     DMat[0,0] = np.cos(T1)
     DMat[0,1] = np.sin(T1)
     DMat[1,0] = -np.sin(T1)
     DMat[1,1] = np.cos(T1)
     DMat[2,2] = 1
-    CMat = np.mat(np.zeros((3,3)))
+    CMat = np.matrix(np.zeros((3,3)))
     CMat[0,0] = 1
     CMat[1,1] = np.cos(T2)
     CMat[1,2] = np.sin(T2)
     CMat[2,1] = -np.sin(T2)
     CMat[2,2] = np.cos(T2)
-    BMat = np.mat(np.zeros((3,3)))
+    BMat = np.matrix(np.zeros((3,3)))
     BMat[0,0] = np.cos(T3)
     BMat[0,1] = np.sin(T3)
     BMat[1,0] = -np.sin(T3)
     BMat[1,1] = np.cos(T3)
     BMat[2,2] = 1
     EMat = BMat*CMat*DMat
-    return np.mat(EMat)
+    return np.matrix(EMat)
 
 def ComputeOverlap(theta,elem,xyz1,xyz2):
     """ 
@@ -526,7 +526,7 @@ def ComputeOverlap(theta,elem,xyz1,xyz2):
     fictitious density.  Good for fine-tuning alignment but gets stuck
     in local minima.
     """
-    xyz2R = np.array(EulerMatrix(theta[0],theta[1],theta[2])*np.mat(xyz2.T)).T
+    xyz2R = np.array(EulerMatrix(theta[0],theta[1],theta[2])*np.matrix(xyz2.T)).T
     Obj = 0.0
     elem = np.array(elem)
     for i in set(elem):
@@ -545,7 +545,7 @@ def AlignToDensity(elem,xyz1,xyz2,binary=False):
     grid = np.pi*np.array(list(itertools.product([0,1],[0,1],[0,1])))
     ovlp = np.array([ComputeOverlap(e, elem, xyz1, xyz2) for e in grid]) # Mao
     t1 = grid[np.argmin(ovlp)]
-    xyz2R = (np.array(EulerMatrix(t1[0],t1[1],t1[2])*np.mat(xyz2.T)).T).copy()
+    xyz2R = (np.array(EulerMatrix(t1[0],t1[1],t1[2])*np.matrix(xyz2.T)).T).copy()
     return xyz2R
 
 def AlignToMoments(elem,xyz1,xyz2=None):
@@ -568,7 +568,7 @@ def AlignToMoments(elem,xyz1,xyz2=None):
         if np.abs(determ + 1.0) > Thresh:
             print "in AlignToMoments, determinant is % .3f" % determ
         BB[:,2] *= -1
-    xyzr = np.array(np.mat(BB).T * np.mat(xyz).T).T.copy()
+    xyzr = np.array(np.matrix(BB).T * np.matrix(xyz).T).T.copy()
     if xyz2 != None:
         xyzrr = AlignToDensity(elem,xyz1,xyzr,binary=True)
         return xyzrr

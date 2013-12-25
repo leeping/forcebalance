@@ -908,7 +908,7 @@ class AbInitio(Target):
             for i in range(1,NCP1):
                 Ci[0,i] = 0.0;
                 Ci[i,0] = 0.0;
-            WCiW = np.array(np.mat(WM) * np.mat(Ci) * np.mat(WM)) # Weighted covariance matrix.
+            WCiW = np.array(np.matrix(WM) * np.matrix(Ci) * np.matrix(WM)) # Weighted covariance matrix.
         else:
             # Here we're just using the variance.
             QBP  = self.qmboltz
@@ -1041,7 +1041,7 @@ class AbInitio(Target):
             #     print "Now working on parameter number", i
             #     dqPdqM.append(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0])
             # dqPdqM = mat(dqPdqM).T
-            dqPdqM = np.mat([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(NP)]).T
+            dqPdqM = np.matrix([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)
         espxyz   = np.array(self.espxyz)
@@ -1060,7 +1060,7 @@ class AbInitio(Target):
         for i in range(self.ns):
             P   = self.whamboltz_wts[i]
             Z  += P
-            dVdqP   = np.mat(self.invdists[i])
+            dVdqP   = np.matrix(self.invdists[i])
             espqval = espqvals[i]
             espmval = dVdqP * col(getqatoms(mvals))
             desp    = flat(espmval) - espqval

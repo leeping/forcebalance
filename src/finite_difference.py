@@ -110,6 +110,11 @@ def f12d3p(f, h, f0 = None):
     fpp = (fm1-2*f0+f1)/(h*h)
     return fp, fpp
 
+def f2var(f, h):
+    """ A finite difference stencil for a function of two variables. """
+    fpp, fpm, fmp, fmm = [f(i*h, j*h) for i, j in [(1,1), (1,-1), (-1,1), (-1,-1)]]
+    return (fpp-fpm-fmp+fmm)/(4*h**2)
+
 def in_fd():
     """ Invoking this function from anywhere will tell us whether we're being called by a finite-difference function.
     This is mainly useful for deciding when to update the 'qualitative indicators' and when not to. """
