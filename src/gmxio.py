@@ -774,7 +774,7 @@ class GMX(Engine):
         write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
 
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s-min -nt 24" % self.name)
+        self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
         self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
         self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
         
@@ -807,7 +807,7 @@ class GMX(Engine):
 
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s -nt 24 -rerunvsite %s" % (self.name, "-rerun %s" % traj if traj else ''))
+        self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite %s" % (self.name, "-rerun %s" % traj if traj else ''))
 
         ## Gather information
         Result = OrderedDict()
@@ -888,7 +888,7 @@ class GMX(Engine):
         else:
             self.mol[shot].write("%s.gro" % self.name)
             self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s-1.tpr" % (self.name, self.name, self.name, self.name))
-            self.callgmx("mdrun -deffnm %s-1 -nt 24 -rerunvsite" % (self.name, self.name))
+            self.callgmx("mdrun -deffnm %s-1 -nt 1 -rerunvsite" % (self.name, self.name))
             self.callgmx("g_energy -xvg no -f %s-1.edr -o %s-1-e.xvg" % (self.name, self.name), stdin='Potential')
             E = float(open("%s-1-e.xvg" % self.name).readlines()[0].split()[1])
             return E, 0.0
@@ -909,7 +909,7 @@ class GMX(Engine):
         ## Call grompp followed by mdrun for interacting system.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
                          (self.name, self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s-i -nt 24 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
+        self.callgmx("mdrun -deffnm %s-i -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
         self.callgmx("g_energy -f %s-i.edr -o %s-i-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
         I = []
         for line in open('%s-i-e.xvg' % self.name):
@@ -919,7 +919,7 @@ class GMX(Engine):
         ## Call grompp followed by mdrun for noninteracting system.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-x.mdp -n %s.ndx -o %s-x.tpr" % \
                          (self.name, self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s-x -nt 24 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
+        self.callgmx("mdrun -deffnm %s-x -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
         self.callgmx("g_energy -f %s-x.edr -o %s-x-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
         X = []
         for line in open('%s-x-e.xvg' % self.name):
@@ -1019,7 +1019,7 @@ class GMX(Engine):
     def generate_vsite_positions(self):
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s -nt 24 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
+        self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
         self.callgmx("trjconv -f %s.trr -o %s-out.gro -ndec 9 -novel -noforce" % (self.name, self.name), stdin='System')
         NewMol = Molecule("%s-out.gro" % self.name)
         return NewMol.xyzs
