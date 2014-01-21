@@ -203,7 +203,7 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
     def magic_string(str):
         # This cryptic command returns a string with the number of characters specified as a variable. :P
         # Useful for printing nice-looking dictionaries, i guess.
-        #print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
+        # print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
         return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
     if isinstance(Dict, OrderedDict): 
         logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None]))
@@ -359,7 +359,7 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     if w != None:
         if len(w) != n_x:
             warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
-        w /= np.mean(w)
+        w /= np.mean(w, axis = 0)
         WH = np.mat(np.diag(w**0.5))
     else:
         WH = np.mat(np.eye(n_x))
@@ -432,22 +432,26 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     else:
         B_n = np.array(A_n)
     # Get the length of the timeseries.
-    N = A_n.size
+    N = A_n.shape[0]
     # Be sure A_n and B_n have the same dimensions.
     if(A_n.shape != B_n.shape):
         raise ParameterError('A_n and B_n must have same dimensions.')
     # Initialize statistical inefficiency estimate with uncorrelated value.
     g = 1.0
     # Compute mean of each timeseries.
-    mu_A = A_n.mean()
-    mu_B = B_n.mean()
+    mu_A = A_n.mean(axis = 0)
+    mu_B = B_n.mean(axis = 0)
     # Make temporary copies of fluctuation from mean.
     dA_n = A_n.astype(np.float64) - mu_A
     dB_n = B_n.astype(np.float64) - mu_B
     # Compute estimator of covariance of (A,B) using estimator that will ensure C(0) = 1.
-    sigma2_AB = (dA_n * dB_n).mean() # standard estimator to ensure C(0) = 1
+    sigma2_AB = (dA_n * dB_n).mean(axis = 0) # standard estimator to ensure C(0) = 1
     # Trap the case where this covariance is zero, and we cannot proceed.
-    if(sigma2_AB == 0):
+    if ('ndarray' in str(type(sigma2_AB))):
+        if any(x == 0 for x in sigma2_AB):
+            logger.warning('Covariance of one carbon node is zero -- cannot compute statistical inefficiency\n')
+            return 1.0
+    elif (sigma2_AB == 0):
         if warn:
             logger.warning('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency\n')
         return 1.0
@@ -462,7 +466,10 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
         C = sum( dA_n[0:(N-t)]*dB_n[t:N] + dB_n[0:(N-t)]*dA_n[t:N] ) / (2.0 * float(N-t) * sigma2_AB)
         # Terminate if the correlation function has crossed zero and we've computed the correlation
         # function at least out to 'mintime'.
-        if (C <= 0.0) and (t > mintime):
+        if ('ndarray' in str(type(C))):
+            if any(x <= 0 for x in C) and (t > mintime):
+                break
+        elif (C <= 0.0) and (t > mintime):
             break
         # Accumulate contribution to the statistical inefficiency.
         g += 2.0 * C * (1.0 - float(t)/float(N)) * float(increment)
@@ -471,7 +478,11 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
         # Increase the interval if "fast mode" is on.
         if fast: increment += 1
     # g must be at least unity
-    if (g < 1.0): g = 1.0
+    if ('ndarray' in str(type(C))):
+        if any(x < .01 for x in g):
+            g[np.absolute(g) < .01] = .01
+    elif (g < 1.0):
+        g = 1.0
     # Return the computed statistical inefficiency.
     return g
 
@@ -638,7 +649,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
     else:
         WQIDS["None"].append(taskid)
 
-def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
+def wq_wait1(wq, wait_time=10, wait_intvl=300, print_time=60, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
     global WQIDS
     if verbose: logger.info('---\n')
