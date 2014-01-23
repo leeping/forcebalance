@@ -475,7 +475,6 @@ class OpenMM(Engine):
         Simulation object yet, because that may depend on MD
         integrator parameters, thermostat, barostat etc.
         """
-
         ## Create the OpenMM PDB object.
         pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
         self.mol[0].write(pdb1)
@@ -567,7 +566,7 @@ class OpenMM(Engine):
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
 
-    def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, **kwargs):
+    def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_beads=0, **kwargs):
 
         """
         Create simulation object.  Note that this also takes in some
@@ -575,16 +574,28 @@ class OpenMM(Engine):
         integrator and type of pressure control.
         """
 
+        # Divisor for the temperature (RPMD sets it to nonzero.)
+        self.tdiv = 1
+
         ## Determine the integrator.
         if temperature:
             ## If temperature control is turned on, then run Langevin dynamics.
             if mts:
+                if rpmd_beads > 0:
+                    raise RuntimeError("No multiple timestep integrator without temperature control.")
                 integrator = MTSVVVRIntegrator(temperature*kelvin, collision/picosecond,
                                                timestep*femtosecond, self.system, ninnersteps=int(timestep/faststep))
             else:
-                integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                if rpmd_beads > 0:
+                    logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
+                    self.tdiv = rpmd_beads
+                    integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                else:
+                    integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
         else:
             ## If no temperature control, default to the Verlet integrator.
+            if rpmd_beads > 0:
+                raise RuntimeError("No RPMD integrator without temperature control.")
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
 
@@ -939,7 +950,7 @@ class OpenMM(Engine):
             if iteration >= 0:
                 self.simulation.step(nsave)
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-            kinetic = state.getKineticEnergy()
+            kinetic = state.getKineticEnergy()/self.tdiv
             potential = state.getPotentialEnergy()
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
@@ -970,7 +981,7 @@ class OpenMM(Engine):
             if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-            kinetic = state.getKineticEnergy()
+            kinetic = state.getKineticEnergy()/self.tdiv
             potential = state.getPotentialEnergy()
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
@@ -1020,6 +1031,8 @@ class Liquid_OpenMM(Liquid):
         self.set_option(tgt_opts,'force_cuda',forceprint=True)
         # Enable multiple timestep integrator
         self.set_option(tgt_opts,'mts_integrator',forceprint=True)
+        # Enable ring polymer MD
+        self.set_option(options,'rpmd_beads',forceprint=True)
         # OpenMM precision
         self.set_option(tgt_opts,'openmm_precision','precision',default="mixed")
         # OpenMM platform
