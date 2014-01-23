@@ -1079,6 +1079,7 @@ class GMX(Engine):
             md_opts["nstcomm"] = 0
 
         md_opts["nstenergy"] = nsave
+        md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
         md_opts["nstvout"] = nsave
         md_opts["nstfout"] = 0
