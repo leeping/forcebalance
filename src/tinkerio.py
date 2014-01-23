@@ -351,6 +351,10 @@ class TINKER(Engine):
                 time.sleep(1)
                 raise RuntimeError("TINKER may have crashed! (See above output)")
                 break
+        for line in o:
+            if 'D+' in line:
+                logger.info(line+'\n')
+                warn_press_key("TINKER returned a very large floating point number! (See above line; will give error on parse)")
         return o
 
     def prepare(self, pbc=False, **kwargs):

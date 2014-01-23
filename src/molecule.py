@@ -767,7 +767,7 @@ class Molecule(object):
         for key in AtomVariableNames | MetaVariableNames:
             # Because a molecule object can only have one 'file name' or 'file type' attribute,
             # we only keep the original one.  This isn't perfect, but that's okay.
-            if key == 'fnm' or key == 'ftype' and key in self.Data:
+            if key in ['fnm', 'ftype', 'bonds'] and key in self.Data:
                 Sum.Data[key] = self.Data[key]
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
@@ -795,7 +795,7 @@ class Molecule(object):
             raise TypeError('A Molecule instance can only be added to another Molecule instance')
         # Create the sum of the two classes by copying the first class.
         for key in AtomVariableNames | MetaVariableNames:
-            if key == 'fnm' or key == 'ftype': pass
+            if key in ['fnm', 'ftype', 'bonds']: pass
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
                     print i, j, i==j
