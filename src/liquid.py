@@ -257,6 +257,7 @@ class Liquid(Target):
                          output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
+        self.FF.make(mvals)
         d = self.gas_engine.multipole_moments(optimize=True)['dipole']
         if not in_fd():
             logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
