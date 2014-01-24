@@ -997,6 +997,7 @@ class Liquid_TINKER(Liquid):
         # Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output = ['liquid-md.arc']
+        self.extra_output = ['liquid.dyn']
         # Dictionary of .dyn files used to restart simulations.
         self.DynDict = OrderedDict()
         self.DynDict_New = OrderedDict()
