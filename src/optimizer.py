@@ -164,6 +164,8 @@ class Optimizer(forcebalance.BaseClass):
         self.FF        = FF
         ## Re-evaluate the objective function when an optimization step is rejected
         self.set_option(options, 'reevaluate', default=any(['liquid' in tgt.type.lower() for tgt in self.Objective.Targets]), forceprint=True)
+        self.bakdir    = os.path.join(os.path.splitext(options['input_file'])[0]+'.bak')
+        self.resdir    = os.path.join('result',os.path.splitext(options['input_file'])[0])
         
         #======================================#
         #    Variables from the force field    #
@@ -201,7 +203,7 @@ class Optimizer(forcebalance.BaseClass):
             in_mvals = 0
             in_options = 0
             if os.path.exists(outfnm) and self.mvals_bak: 
-                bak(outfnm, dest='backups')
+                bak(outfnm, dest=self.bakdir)
             self.mvals_bak = 0
             fout = open(outfnm, 'w')
             for line in fin:
@@ -234,7 +236,7 @@ class Optimizer(forcebalance.BaseClass):
         ## Don't print a "result" force field if it's the same as the input.
         print_parameters = True
         if xk == None and (self.mvals0 == np.zeros(self.FF.np)).all(): 
-            logger.info("Parameter file same as original; will not be printed to 'results' folder.\n")
+            logger.info("Parameter file same as original; will not be printed to results folder.\n")
             print_parameters = False
         elif xk == None:
             xk = self.mvals0
@@ -254,14 +256,14 @@ class Optimizer(forcebalance.BaseClass):
             logger.info(bar)
             if self.backup:
                 for fnm in self.FF.fnms:
-                    if os.path.exists(os.path.join('result', fnm)):
-                        bak(os.path.join('result', fnm))
-            self.FF.make(xk,printdir='result')
-            # logger.info("The force field has been written to the 'result' directory.\n")
+                    if os.path.exists(os.path.join(self.resdir, fnm)):
+                        bak(os.path.join(self.resdir, fnm))
+            self.FF.make(xk,printdir=self.resdir)
+            # logger.info("The force field has been written to the '%s' directory.\n" % self.resdir)
             outfnm = self.save_mvals_to_input(xk)
             # logger.info("Input file with optimization parameters saved to %s.\n" % outfnm)
-            printcool("The force field has been written to the 'result' directory.\n"
-                      "Input file with optimization parameters saved to %s." % outfnm, color=0)
+            printcool("The force field has been written to the %s directory.\n"
+                      "Input file with optimization parameters saved to %s." % (self.resdir, outfnm), color=0)
                       # "To reload these parameters, use %s as the input\n"
                       # "file without changing the '%s' directory." % 
                       # (outfnm, outfnm, self.FF.ffdir), color=0, center=False, sym2='-')
@@ -412,7 +414,7 @@ class Optimizer(forcebalance.BaseClass):
                     #|  objective function rises.   |#
                     #================================#
                     GOODSTEP = 0
-                    print_progress(ITERATION_NUMBER, nxk, ndx, ngd, "\x1b[91m", X, stdfront, Quality)
+                    print_progress(ITERATION_NUMBER, nxk, ndx, ngd, "\x1b[91m", X, X-X_prev, Quality)
                     xk = xk_prev.copy()
                     trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
                     trustprint = "Reducing trust radius to % .4e\n" % trust
@@ -484,7 +486,7 @@ class Optimizer(forcebalance.BaseClass):
             nxk = norm(xk)
             ngd = norm(G)
             if GOODSTEP:
-                print_progress(ITERATION_NUMBER, nxk, ndx, ngd, color, X, stdfront, Quality)
+                print_progress(ITERATION_NUMBER, nxk, ndx, ngd, color, X, -1*stdfront, Quality)
             #================================#
             #|   Print objective function,  |#
             #|     gradient and Hessian.    |#
