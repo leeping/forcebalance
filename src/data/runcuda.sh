@@ -2,6 +2,8 @@
 
 # This wrapper script is for running CUDA jobs (hint hint, OpenMM) on clusters.
 
+COMMAND=$@
+
 # Load my environment variables. :)
 . ~/.bashrc
 # Make sure the Cuda environment is turned on
@@ -112,11 +114,11 @@ echo "#=======================#"
 echo "# STARTING CALCULATION! #"
 echo "#=======================#"
 echo
-echo $@
+echo $COMMAND
 
 rm -f npt_result.p npt_result.p.bz2
 export PYTHONUNBUFFERED="y"
-time $@
+time $COMMAND
 # Delete backup files that are older than one week.
 find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD
