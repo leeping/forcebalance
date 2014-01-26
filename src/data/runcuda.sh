@@ -5,6 +5,8 @@
 COMMAND=$@
 
 # Load my environment variables. :)
+. /etc/profile
+. /etc/bashrc
 . ~/.bashrc
 # Make sure the Cuda environment is turned on
 
@@ -41,6 +43,7 @@ elif [[ $HOSTNAME =~ "kid" ]] ; then
 elif [[ $HOSTNAME =~ "icme-gpu" || $HOSTNAME =~ "node0" ]] ; then
     module load cuda50/toolkit/5.0.35
     export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda50/toolkit/5.0.35/bin/nvcc
+    sleep $(( CUDA_DEVICE * 30 ))
 elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
     module load gcc
