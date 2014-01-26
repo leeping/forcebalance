@@ -833,7 +833,7 @@ class FF(forcebalance.BaseClass):
                 logger.exception(mvals + '\n')
                 raise Exception('What the hell did you do?')
         else:
-            pvals = flat(np.mat(self.tmI)*col(mvals)) + self.pvals0
+            pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
         for i in range(self.np):
@@ -1091,7 +1091,9 @@ class FF(forcebalance.BaseClass):
 
         # This prints out the difference between the result of matrix multiplication
         # and the manual multiplication.
-        if np.max(np.abs(transmat1 - transmat)) > 0.0:
+        #print transmat1
+        #print transmat
+        if len(transmat) > 0 and np.max(np.abs(transmat1 - transmat)) > 0.0:
             logger.warning('The difference between the numpy multiplication and the manual multiplication is \x1b[1;91m%f\x1b[0m, '
                            'but it should be zero.\n' % np.max(np.abs(transmat1 - transmat)))
 
