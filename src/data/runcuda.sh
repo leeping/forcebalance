@@ -43,7 +43,6 @@ elif [[ $HOSTNAME =~ "kid" ]] ; then
 elif [[ $HOSTNAME =~ "icme-gpu" || $HOSTNAME =~ "node0" ]] ; then
     module load cuda50/toolkit/5.0.35
     export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda50/toolkit/5.0.35/bin/nvcc
-    sleep $(( CUDA_DEVICE * 20 ))
 elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
     module load gcc
@@ -91,6 +90,12 @@ elif [[ `env | grep -i tacc | wc -l` -gt 0 ]] ; then
     export CUDA_CACHE_PATH=$SCRATCH/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=`which nvcc`
     export BAK=$SCRATCH/runcuda-backups
+fi
+
+if [[ x$CUDA_DEVICE != x ]] ; then
+    sleep $(( CUDA_DEVICE * 30 ))
+elif [[ x$PBS_JOBID != x ]] ; then
+    sleep $(( PBS_JOBID * 30 ))
 fi
 
 echo "#=======================#"
