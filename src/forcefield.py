@@ -597,8 +597,7 @@ class FF(forcebalance.BaseClass):
                 if src in self.map:
                     self.map[dest] = self.map[src]
                 else:
-                    warn_press_key(["Warning: You wanted to copy parameter from %s to %s, " % (src, dest), 
-                                    "but the source parameter does not seem to exist!"])
+                    warn_press_key("Warning: You wanted to copy parameter from %s to %s, but the source parameter does not seem to exist!" % (src, dest))
                 self.assign_field(self.map[dest],ffname,fflist.index(e),dest.split('/')[1],1)
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
@@ -679,6 +678,9 @@ class FF(forcebalance.BaseClass):
                 #if type(newffdata[fnm]) is etree._ElementTree:
                 if cmd != None:
                     try:
+                        # Bobby Tables, anyone?
+                        if any([i in cmd for i in "system", "subprocess", "import"]):
+                            warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
                         wval = eval(cmd.replace("PARM","PRM"))
                     except:
                         logger.error(traceback.format_exc() + '\n')

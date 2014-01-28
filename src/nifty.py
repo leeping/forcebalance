@@ -998,16 +998,12 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     return Out
 
 def warn_press_key(warning, timeout=10):
-    if type(warning) is str:
-        logger.warning(warning + '\n')
-    elif type(warning) is list:
-        for line in warning:
-            logger.warning(line + '\n')
-    else:
-        logger.warning("You're not supposed to pass me a variable of this type: " + str(type(warning)))
+    logger.warning(warning + '\n')
     if sys.stdin.isatty():
         logger.warning("\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m\n" % timeout)
-        try: rlist, wlist, xlist = select([sys.stdin], [], [], timeout)
+        try: 
+            rlist, wlist, xlist = select([sys.stdin], [], [], timeout)
+            sys.stdin.readline()
         except: pass
 
 def warn_once(warning, warnhash = None):
