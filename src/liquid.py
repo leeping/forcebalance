@@ -258,7 +258,8 @@ class Liquid(Target):
 
     def polarization_correction(self,mvals):
         self.FF.make(mvals)
-        d = self.gas_engine.multipole_moments(optimize=True)['dipole']
+        ddict = self.gas_engine.multipole_moments(optimize=True)['dipole']
+        d = np.array(ddict.values())
         if not in_fd():
             logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
         # Taken from the original OpenMM interface code, this is how we calculate the conversion factor.
@@ -335,6 +336,7 @@ class Liquid(Target):
             avgCalc += Weights[PT]*calc[PT]
             avgExp  += Weights[PT]*exp[PT]
             avgGrad += Weights[PT]*grad[PT]
+
         for i, PT in enumerate(points):
             if SubAverage:
                 G = grad[PT]-avgGrad
