@@ -5,6 +5,8 @@
 COMMAND=$@
 
 # Load my environment variables. :)
+. /etc/profile
+. /etc/bashrc
 . ~/.bashrc
 # Make sure the Cuda environment is turned on
 
@@ -88,6 +90,12 @@ elif [[ `env | grep -i tacc | wc -l` -gt 0 ]] ; then
     export CUDA_CACHE_PATH=$SCRATCH/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=`which nvcc`
     export BAK=$SCRATCH/runcuda-backups
+fi
+
+if [[ x$CUDA_DEVICE != x ]] ; then
+    sleep $(( CUDA_DEVICE * 30 ))
+elif [[ x$PBS_JOBID != x ]] ; then
+    sleep $(( PBS_JOBID * 30 ))
 fi
 
 echo "#=======================#"
