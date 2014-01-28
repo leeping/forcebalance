@@ -17,7 +17,8 @@ class TargetTests(object):
 
     def test_get_function(self):
         """Check target get() function output"""
-        os.chdir('temp/%s' % self.tgt_opt['name'])
+        # os.chdir('temp/%s' % self.tgt_opt['name'])
+        os.chdir(self.target.tempdir)
 
         self.logger.debug("Evaluating objective function for target...\n")
         objective = self.target.get(self.mvals)

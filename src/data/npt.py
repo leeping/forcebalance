@@ -350,8 +350,8 @@ def main():
     GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":
         # OpenMM-specific options
-        EngOpts["liquid"]["openmm_platform"] = 'CUDA'
-        EngOpts["gas"]["openmm_platform"] = 'Reference'
+        EngOpts["liquid"]["platname"] = 'CUDA'
+        EngOpts["gas"]["platname"] = 'Reference'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
