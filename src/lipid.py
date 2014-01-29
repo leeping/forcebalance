@@ -378,24 +378,15 @@ class Lipid(Target):
             
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
         delt = {PT : r for PT, r in zip(points,Delta)}
-        print 'print out check'
-        print 'delt'
-        print delt
-        print 'Weights'
-        print Weights
-        print 'objs'
-        print Objs
 	if expname == 'scd': 
-            print 'print_out info'
-            print exp[PT]
-            print calc[PT]
-            print err[PT]
-            z_scd = ' '.join('%9.3f    %9.3f +- %-7.3f \n' % F for F in zip(exp[PT], calc[PT], flat(err[PT])))
-            print 'zscd:'
-            print z_scd
-            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"0 0 +- 0 0 %9.5f %9.5f" % (Weights[PT], Objs[PT]))])
+            w = np.empty(len(exp[PT]))
+            w.fill(Weights[PT])
+            o = np.empty(len(exp[PT]))
+            o.fill(Objs[PT])
+            z_scd = ' '.join('%9.3f    %9.3f +- %-7.3f %7.3f %9.5f %9.5f\n' % F for F in zip(exp[PT], calc[PT], flat(err[PT], delt[PT],  w, o)))
+            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT, "%s" % (z_scd))])
         else:
-            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"%9.3f    %9.3f +- %-7.3f % 7.3f % 9.5f % 9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
+            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT, "%9.3f    %9.3f +- %-7.3f %7.3f %9.5f %9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
 
         return Objective, Gradient, Hessian, print_out
 
