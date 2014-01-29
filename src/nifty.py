@@ -480,7 +480,7 @@ def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=Tr
     n_row = A_n.shape[0]
     n_col = A_n.shape[-1]
     mD_sI = np.zeros((n_row, n_col))
-    for col in n_col:
+    for col in range(n_col):
         if B_n is None:
             multiD_sI[:,col] = statisticalInefficiency(A_n[:,col], B_n, fast, mintime, warn)
         else:
