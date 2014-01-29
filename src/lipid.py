@@ -378,7 +378,7 @@ class Lipid(Target):
             
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
         delt = {PT : r for PT, r in zip(points,Delta)}
-	if expname == 'scd': 
+        if expname == 'scd': 
             w = np.empty(len(exp[PT]))
             w.fill(Weights[PT])
             o = np.empty(len(exp[PT]))
@@ -505,8 +505,8 @@ class Lipid(Target):
         GDx = np.hstack(tuple(gd[0] for gd in GDips))
         GDy = np.hstack(tuple(gd[1] for gd in GDips))
         GDz = np.hstack(tuple(gd[2] for gd in GDips))
-	A  = np.array(list(itertools.chain(*list(Als))))
-	S  = np.array(list(itertools.chain(*list(Scds))))
+        A  = np.array(list(itertools.chain(*list(Als))))
+        S  = np.array(list(itertools.chain(*list(Scds))))
 
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
@@ -684,8 +684,8 @@ class Lipid(Target):
         w_4 = self.w_kappa / w_tot
         w_5 = self.w_cp / w_tot
         w_6 = self.w_eps0 / w_tot
-	w_7 = self.w_al / w_tot
-	w_8 = self.w_scd / w_tot
+        w_7 = self.w_al / w_tot
+        w_8 = self.w_scd / w_tot
 
         Objective    = w_1 * X_Rho + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Al + w_8 * X_Scd
         if AGrad:
