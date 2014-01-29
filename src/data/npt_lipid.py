@@ -431,8 +431,6 @@ def main():
     #----
     # Density
     #----
-    print 'npt density: '
-    print 'G: ', G
     # Build the first density derivative.
     GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / L - np.mean(Rhos) * np.mean(G, axis=1))
     # Print out the density and its derivative.
@@ -624,8 +622,6 @@ def main():
     # Average area per lipid
     #----
     Al_avg, Al_err = mean_stderr(Als)
-    print 'npt al: '
-    print 'G: ', G
     # Build the first A_l derivative.
     GAl = mBeta * (flat(np.mat(G) * col(Als)) / L - np.mean(Als) * np.mean(G, axis=1))
     # Print out A_l and its derivative.
@@ -645,18 +641,10 @@ def main():
     # Deuterium Order Parameter
     #----
     Scd_avg, Scd_err = mean_stderr(Scds)
-    print 'npt scd: '
-    print 'G: ', G
-    print Scds
-    print 'g1'
-    print ((np.mat(G) * Scds) / L)
-    print 'g2'
-    print (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0))
     GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
-    print 'gscd'
-    print GScd
+    print 'npt_lipid scd_grad', GScd
     # Print out S_cd and its derivative.
-    scd_avgerr = ' '.join('%.4f +- %.4f, ' % F for F in zip(Scd_avg, Scd_err))
+    scd_avgerr = ' '.join('%.4f +- %.4f \n' % F for F in zip(Scd_avg, Scd_err))
     Sep = printcool("Deuterium order parameter: %s \nAnalytic Derivative:" % scd_avgerr)
     FF.print_map(vals=GScd)
     logger.info(Sep)
