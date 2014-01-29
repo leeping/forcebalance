@@ -15,7 +15,7 @@ from forcebalance.engine import Engine
 from forcebalance.abinitio import AbInitio
 from forcebalance.binding import BindingEnergy
 from forcebalance.liquid import Liquid
-from forcebalance.liquid import Lipid
+from forcebalance.lipid import Lipid
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
