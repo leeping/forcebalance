@@ -380,9 +380,10 @@ class Lipid(Target):
         delt = {PT : r for PT, r in zip(points,Delta)}
         if expname == 'scd': 
             for PT in calc:
-		    w = np.empty(len(exp[PT]))
-		    w.fill(Weights[PT])
-		    o = np.empty(len(exp[PT]))
+                    n_nodes = len(exp[PT])
+		    w = np.empty(n_nodes)
+		    w.fill(Weights[PT] / n_nodes)
+		    o = np.empty(n_nodes)
 		    o.fill(Objs[PT])
 		    z_scd = ' '.join('%9.6f    %9.6f +- %-7.6f %7.6f %9.6f %9.6f\n' % F for F in zip(exp[PT], calc[PT], flat(err[PT]), delt[PT], w, o))
 		    print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT, "%s" % (z_scd))])
