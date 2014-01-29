@@ -1187,6 +1187,7 @@ class GMX(Engine):
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
         Xs = np.array(Xs)
         Ys = np.array(Ys)
+        Als = (Xs * Ys) / 64
         if verbose: logger.info("Finished!\n")
         with wopen(os.path.join('md_prop_arrs.p')) as f: lp_dump((Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps, Als, Scds), f)
         return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps, Als, Scds
