@@ -107,7 +107,10 @@ else:
 
 def mean_stderr(ts):
     """ Get mean and standard deviation of a time series. """
-    return np.mean(ts, axis = 0), np.std(ts, axis = 0)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
+    if ts.ndim == 1:
+        return np.mean(ts, axis = 0), np.std(ts, axis = 0)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
+    else:
+        return np.mean(ts, axis = 0), np.std(ts, axis = 0)*np.sqrt(multiD_statisticalInefficiency(ts, warn=False)/len(ts))
 
 def bzavg(obs,boltz):
     """ Get the Boltzmann average of an observable. """
@@ -642,7 +645,6 @@ def main():
     #----
     Scd_avg, Scd_err = mean_stderr(Scds)
     GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
-    print 'npt_lipid scd_grad', GScd
     # Print out S_cd and its derivative.
     scd_avgerr = ' '.join('%.4f +- %.4f \n' % F for F in zip(Scd_avg, Scd_err))
     Sep = printcool("Deuterium order parameter: %s \nAnalytic Derivative:" % scd_avgerr)

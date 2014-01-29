@@ -424,7 +424,6 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     tau, where tau is the correlation time).  We enforce g >= 1.0.
 
     """
-
     # Create numpy copies of input arguments.
     A_n = np.array(A_n)
     if B_n is not None:
@@ -439,19 +438,15 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     # Initialize statistical inefficiency estimate with uncorrelated value.
     g = 1.0
     # Compute mean of each timeseries.
-    mu_A = A_n.mean(axis = 0)
-    mu_B = B_n.mean(axis = 0)
+    mu_A = A_n.mean()
+    mu_B = B_n.mean()
     # Make temporary copies of fluctuation from mean.
     dA_n = A_n.astype(np.float64) - mu_A
     dB_n = B_n.astype(np.float64) - mu_B
     # Compute estimator of covariance of (A,B) using estimator that will ensure C(0) = 1.
-    sigma2_AB = (dA_n * dB_n).mean(axis = 0) # standard estimator to ensure C(0) = 1
+    sigma2_AB = (dA_n * dB_n).mean() # standard estimator to ensure C(0) = 1
     # Trap the case where this covariance is zero, and we cannot proceed.
-    if ('ndarray' in str(type(sigma2_AB))):
-        if any(x == 0 for x in sigma2_AB):
-            logger.warning('Covariance of one carbon node is zero -- cannot compute statistical inefficiency\n')
-            return 1.0
-    elif (sigma2_AB == 0):
+    if (sigma2_AB == 0):
         if warn:
             logger.warning('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency\n')
         return 1.0
@@ -466,10 +461,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
         C = sum( dA_n[0:(N-t)]*dB_n[t:N] + dB_n[0:(N-t)]*dA_n[t:N] ) / (2.0 * float(N-t) * sigma2_AB)
         # Terminate if the correlation function has crossed zero and we've computed the correlation
         # function at least out to 'mintime'.
-        if ('ndarray' in str(type(C))):
-            if any(x <= 0 for x in C) and (t > mintime):
-                break
-        elif (C <= 0.0) and (t > mintime):
+        if (C <= 0.0) and (t > mintime):
             break
         # Accumulate contribution to the statistical inefficiency.
         g += 2.0 * C * (1.0 - float(t)/float(N)) * float(increment)
@@ -478,13 +470,22 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
         # Increase the interval if "fast mode" is on.
         if fast: increment += 1
     # g must be at least unity
-    if ('ndarray' in str(type(C))):
-        if any(x < .01 for x in g):
-            g[np.absolute(g) < .01] = .01
-    elif (g < 1.0):
+    if (g < 1.0):
         g = 1.0
     # Return the computed statistical inefficiency.
     return g
+
+# Slices a 2D array of data by column.  The new array is fed into the statisticalInefficiency function.
+def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
+    n_row = A_n.shape[0]
+    n_col = A_n.shape[-1]
+    mD_sI = np.zeros((n_row, n_col))
+    for col in n_col:
+        if B_n is None:
+            multiD_sI[:,col] = statisticalInefficiency(A_n[:,col], B_n, fast, mintime, warn)
+        else:
+            multiD_sI[:,col] = statisticalInefficiency(A_n[:,col], B_n[:,col], fast, mintime, warn)
+    return multiD_sI
 
 #==============================#
 #|      XML Pickle stuff      |#
