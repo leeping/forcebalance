@@ -1113,7 +1113,7 @@ class GMX(Engine):
         if nequil > 0:
             if verbose: logger.info("Equilibrating...\n")
             eq_opts = deepcopy(md_opts)
-            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0, "ref_p" : "1.0 1.0", "ref_t" : "293.15 293.15"})
+            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0, "ref_p" : "%s %s" % (pressure, pressure), "ref_t" : "%s %s" %(temperature, temperature)})
             eq_defs = deepcopy(md_defs)
             if "pcoupl" in eq_defs: eq_opts["pcoupl"] = "berendsen"
             write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
@@ -1125,7 +1125,7 @@ class GMX(Engine):
 
         # Run production.
         if verbose: logger.info("Production run...\n")
-        md_opts.update({"ref_p" : "1.0 1.0", "ref_t" : "293.15 293.15"})
+        md_opts.update({"ref_p" : "%s %s" % (pressure, pressure), "ref_t" : "%s %s" % (temperature, temperature)})
         write_mdp("%s-md.mdp" % self.name, md_opts, fin="%s.mdp" % self.name, defaults=md_defs)
         self.warngmx("grompp -c %s -p %s.top -f %s-md.mdp -o %s-md.tpr" % (gro2, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
         self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
