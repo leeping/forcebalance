@@ -194,7 +194,7 @@ class Lipid(Target):
                         elif val.lower() == 'false':
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = False
                         elif head == 'scd':
-                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = map(float, val.split())
+                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = np.array(map(float, val.split()))
                 except:
                     logger.error(line + '\n')
                     raise Exception('Encountered an error reading this line!')
@@ -214,7 +214,7 @@ class Lipid(Target):
                     self.RefData[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
                 wts = np.array(self.RefData[head+"_wt"].values())
                 dat = np.array(self.RefData[head].values())
-                # S_cd specifices an array of averages (one for each tail node).  Find avg over axis 0.
+                # S_cd specifies an array of averages (one for each tail node).  Find avg over axis 0.
                 avg = np.average(dat, weights=wts, axis=0)
                 if len(wts) > 1:
                     # If there is more than one data point, then the default denominator is the
@@ -344,6 +344,8 @@ class Lipid(Target):
             else:
                 G = grad[PT]
                 Delta = calc[PT] - exp[PT]
+            if hasattr(Delta, "__len__"):
+                Delta = np.average(Delta)
             if LeastSquares:
                 # Least-squares objective function.
                 ThisObj = Weights[PT] * Delta ** 2 / Denom**2
@@ -376,7 +378,25 @@ class Lipid(Target):
             
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
         delt = {PT : r for PT, r in zip(points,Delta)}
-        print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"%9.3f    %9.3f +- %-7.3f % 7.3f % 9.5f % 9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
+        print 'print out check'
+        print 'delt'
+        print delt
+        print 'Weights'
+        print Weights
+        print 'objs'
+        print Objs
+	if expname == 'scd': 
+            print 'print_out info'
+            print exp[PT]
+            print calc[PT]
+            print err[PT]
+            z_scd = ' '.join('%9.3f    %9.3f +- %-7.3f \n' % F for F in zip(exp[PT], calc[PT], flat(err[PT])))
+            print 'zscd:'
+            print z_scd
+            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"0 0 +- 0 0 %9.5f %9.5f" % (Weights[PT], Objs[PT]))])
+        else:
+            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"%9.3f    %9.3f +- %-7.3f % 7.3f % 9.5f % 9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
+
         return Objective, Gradient, Hessian, print_out
 
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
@@ -636,14 +656,8 @@ class Lipid(Target):
             Al_calc[PT]   = np.dot(W,A)
             Al_grad[PT]   = mBeta*(flat(np.mat(G)*col(W*A)) - np.dot(W,A)*Gbar)
             ## Deuterium order parameter
-            print '-- lipid.py scd stuff --'
-            print 'W', W
-            print 'S', S
-            Scd_calc[PT]   = S * W[:, np.newaxis]
-            print 'scd_calc', Scd_calc 
-	    print 'G', G
-            Scd_grad[PT]   = mBeta * ((np.mat(G) * (S * W[:, np.newaxis])) - (np.mat(np.average(G, axis = 1)).T * np.average(S, axis = 0))) 
-            print 'scd_grad', Scd_grad 
+            Scd_calc[PT]   = np.dot(W,S)
+            Scd_grad[PT]   = mBeta * (flat(np.average(np.mat(G) * (S * W[:, np.newaxis]), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
             ## Estimation of errors.
             Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             Alpha_std[PT]   = np.sqrt(sum(C**2 * np.array(Alpha_errs)**2)) * 1e4
@@ -651,7 +665,6 @@ class Lipid(Target):
             Cp_std[PT]   = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
             Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
             Al_std[PT]    = np.sqrt(sum(C**2 * np.array(Al_errs)**2))
-	    print 'scd std', C, Scd_errs
             Scd_std[PT]    = np.sqrt(sum(np.mat(C**2) * np.array(Scd_errs)**2))
 
         # Get contributions to the objective function
