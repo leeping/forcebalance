@@ -202,21 +202,21 @@ try: _dcdlib = CDLL("_dcdlib.so")
 except:
     try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
     except: 
-        if "nanoreactor" not in __name__: warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+        warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
 
 #============================#
 #| PDB read/write functions |#
 #============================#
 try: from PDB import *
 except: 
-    if "nanoreactor" not in __name__: warn('The pdb module cannot be miported (Cannot read/write PDB files)')
+    warn('The pdb module cannot be miported (Cannot read/write PDB files)')
 
 #=============================#
 #| Mol2 read/write functions |#
 #=============================#
 try: import Mol2
 except: 
-    if "nanoreactor" not in __name__: warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
+    warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
 
 #==============================#
 #| OpenMM interface functions |#
@@ -226,7 +226,7 @@ try:
     from simtk.openmm import *
     from simtk.openmm.app import *
 except: 
-    if "nanoreactor" not in __name__: warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+    warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
     
 #===========================#
 #| Convenience subroutines |#

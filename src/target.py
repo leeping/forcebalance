@@ -129,7 +129,7 @@ class Target(forcebalance.BaseClass):
         self.set_option(None, None, 'tgtdir', os.path.join(tgtdir,self.name))
         ## Temporary (working) directory; it is temp/(target_name)
         ## Used for storing temporary variables that don't change through the course of the optimization
-        if 'input_file' in options:
+        if 'input_file' in options and options['input_file'] != None:
             self.tempbase    = os.path.splitext(options['input_file'])[0]+'.tmp'
         else:
             self.tempbase    = "temp"
