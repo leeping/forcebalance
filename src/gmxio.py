@@ -24,6 +24,7 @@ from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
 from collections import OrderedDict
 import traceback
+import random
 #import IPython
 
 from forcebalance.output import getLogger
@@ -40,7 +41,7 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
     """
     clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
-    options = OrderedDict([(key.lower(), str(val) if val != None else None) for key, val in options.items()])
+    options = OrderedDict([(key.lower().replace('-','_'), str(val) if val != None else None) for key, val in options.items()])
     # List of lines in the output file.
     out = []
     # List of options in the output file.
@@ -83,13 +84,13 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
             else:
                 out.append(line)
     for key, val in options.items():
-        key = key.lower()
+        key = key.lower().replace('-','_')
         if key not in haveopts:
             haveopts.append(key)
             out.append("%-20s = %s" % (key, val))
     # Fill in some default options.
     for key, val in defaults.items():
-        key = key.lower()
+        key = key.lower().replace('-','_')
         options[key] = val
         if key not in haveopts:
             out.append("%-20s = %s" % (key, val))
@@ -1064,7 +1065,7 @@ class GMX(Engine):
         warnings = []
         if temperature != None:
             md_opts["ref_t"] = temperature
-            md_opts["gen_temp"] = temperature
+            md_opts["gen_vel"] = "no"
             md_defs["tc_grps"] = "System"
             md_defs["tcoupl"] = "v-rescale"
             md_defs["tau_t"] = 1.0
@@ -1100,7 +1101,8 @@ class GMX(Engine):
         if nequil > 0:
             if verbose: logger.info("Equilibrating...\n")
             eq_opts = deepcopy(md_opts)
-            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0})
+            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0,
+                            "gen-vel": "yes", "gen-temp" : temperature, "gen-seed" : random.randrange(100000,999999)})
             eq_defs = deepcopy(md_defs)
             if "pcoupl" in eq_defs: eq_opts["pcoupl"] = "berendsen"
             write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)

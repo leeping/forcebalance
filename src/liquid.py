@@ -84,6 +84,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'gas_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'gas_interval',forceprint=True)
+        # Adjust simulation length in response to simulation uncertainty
+        self.set_option(tgt_opts,'adapt_errors',forceprint=True)
         # Minimize the energy prior to running any dynamics
         self.set_option(tgt_opts,'minimize_energy',forceprint=True)
         # Isolated dipole (debye) for analytic self-polarization correction.
@@ -133,12 +135,13 @@ class Liquid(Target):
         # Put stuff here that I'm not sure about. :)
         np.set_printoptions(precision=4, linewidth=100)
         np.seterr(under='ignore')
-        ## Saved force field mvals for all iterations
-        self.SavedMVal = {}
         ## Saved trajectories for all iterations and all temperatures
         self.SavedTraj = defaultdict(dict)
         ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
+        ## Saved results for all iterations
+        # self.SavedMVals = []
+        self.AllResults = defaultdict(lambda:defaultdict(list))
 
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
@@ -446,7 +449,7 @@ class Liquid(Target):
         
         """
 
-        mbar_verbose = False
+        mbar_verbose = True
 
         Answer = {}
 
@@ -492,19 +495,43 @@ class Liquid(Target):
         else:
             NMol = list(set(NMols))[0]
     
-        R  = np.array(list(itertools.chain(*list(Rhos))))
-        V  = np.array(list(itertools.chain(*list(Vols))))
-        E  = np.array(list(itertools.chain(*list(Energies))))
-        Dx = np.array(list(itertools.chain(*list(d[:,0] for d in Dips))))
-        Dy = np.array(list(itertools.chain(*list(d[:,1] for d in Dips))))
-        Dz = np.array(list(itertools.chain(*list(d[:,2] for d in Dips))))
-        G  = np.hstack(tuple(Grads))
-        GDx = np.hstack(tuple(gd[0] for gd in GDips))
-        GDy = np.hstack(tuple(gd[1] for gd in GDips))
-        GDz = np.hstack(tuple(gd[2] for gd in GDips))
         if len(mPoints) > 0:
             mE = np.array(list(itertools.chain(*list([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))))
             mG = np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+        
+        if not self.adapt_errors:
+            self.AllResults = defaultdict(lambda:defaultdict(list))
+
+        self.AllResults[tuple(mvals)]['R'].append(np.array(list(itertools.chain(*list(Rhos)))))
+        self.AllResults[tuple(mvals)]['V'].append(np.array(list(itertools.chain(*list(Vols)))))
+        self.AllResults[tuple(mvals)]['E'].append(np.array(list(itertools.chain(*list(Energies)))))
+        self.AllResults[tuple(mvals)]['Dx'].append(list(itertools.chain(*list(d[:,0] for d in Dips))))
+        self.AllResults[tuple(mvals)]['Dy'].append(list(itertools.chain(*list(d[:,1] for d in Dips))))
+        self.AllResults[tuple(mvals)]['Dz'].append(list(itertools.chain(*list(d[:,2] for d in Dips))))
+        self.AllResults[tuple(mvals)]['G'].append(np.hstack(tuple(Grads)))
+        self.AllResults[tuple(mvals)]['GDx'].append(np.hstack(tuple(gd[0] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['GDy'].append(np.hstack(tuple(gd[1] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['GDz'].append(np.hstack(tuple(gd[2] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['L'].append(len(Energies[0]))
+        self.AllResults[tuple(mvals)]['Steps'].append(self.liquid_md_steps)
+
+        # Number of data sets belonging to this value of the parameters.
+        Nrpt = len(self.AllResults[tuple(mvals)]['R'])
+        sumsteps = sum(self.AllResults[tuple(mvals)]['Steps'])
+        if self.liquid_md_steps != sumsteps:
+            printcool("This objective function evaluation combines %i datasets\n" \
+                          "Increasing simulation length: %i -> %i steps" % \
+                          (Nrpt, self.liquid_md_steps, sumsteps), color=6)
+            if self.liquid_md_steps * 2 != sumsteps:
+                raise RuntimeError("Spoo!")
+            self.liquid_eq_steps *= 2
+            self.liquid_md_steps *= 2
+            self.gas_eq_steps *= 2
+            self.gas_md_steps *= 2
+        
+        R, V, E, Dx, Dy, Dz, G, GDx, GDy, GDz = \
+            (np.concatenate(self.AllResults[tuple(mvals)][i], axis=-1) for i in \
+                 ['R', 'V', 'E', 'Dx', 'Dy', 'Dz', 'G', 'GDx', 'GDy', 'GDz'])
 
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
@@ -530,7 +557,7 @@ class Liquid(Target):
 
         # Run MBAR using the total energies. Required for estimates that use the kinetic energy.
         BSims = len(BPoints)
-        Shots = len(Energies[0])
+        Shots = sum(self.AllResults[tuple(mvals)]['L'])
         N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([BSims,BSims,Shots])

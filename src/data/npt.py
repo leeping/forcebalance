@@ -388,7 +388,7 @@ def main():
                                     ("nequil", liquid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
                                     ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
-                                    ("threads", threads), ("anisotropic", anisotropic), 
+                                    ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", 5),
                                     ("mts", mts), ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),

@@ -35,5 +35,6 @@ Global,use_cni,FALSE,,,,
 # Cni : To be ADDED to the calculated enthalpy of vaporization ; accounts for the nonideality of the gas phase (more relevant close to critical point),,,,,,
 # dEvib : To be ADDED to the calculated heat capacity.  Note that these values are slightly different from the TIP4P-Ew paper for some reason.,,,,,,
 ,,,,,,
-T,P,MBAR,Rho,Rho_wt,Hvap,Hvap_wt
+T,P,MBAR,Rho,Rho_wt,Hvap,Hvap_wt,Alpha,Alpha_wt
 298.15,1.0 atm,FALSE,3102.8,1,29.96,1
+#298.15,1.0 atm,FALSE,3102.8,1,29.96,1,11.0,1
