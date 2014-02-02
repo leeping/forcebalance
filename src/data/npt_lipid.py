@@ -647,9 +647,6 @@ def main():
     Scd_err = flat(Scd_e)
     GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
     # Print out S_cd and its derivative.
-    print 'scd nptl data'
-    print 'sa', Scd_avg
-    print 'se', Scd_err
     scd_avgerr = ' '.join('%.4f +- %.4f \n' % F for F in zip(Scd_avg, Scd_err))
     Sep = printcool("Deuterium order parameter: %s \nAnalytic Derivative:" % scd_avgerr)
     FF.print_map(vals=GScd)
