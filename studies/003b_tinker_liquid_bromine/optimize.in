@@ -29,6 +29,8 @@ convergence_objective 0.5
 # (float) Convergence criterion of gradient norm
 convergence_gradient 0.01
 
+criteria 2
+
 # (float) Minimum eigenvalue for applying steepest descent correction in the MainOptimizer
 eig_lowerbound 0.01
 
