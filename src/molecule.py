@@ -1364,7 +1364,7 @@ class Molecule(object):
     def all_pairwise_rmsd(self):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
         N = len(self)
-        Mat = np.zeros((N,N))
+        Mat = np.zeros((N,N),dtype=float)
         for i in range(N):
             xyzi = self.xyzs[i].copy()
             xyzi -= xyzi.mean(0)
@@ -1381,7 +1381,7 @@ class Molecule(object):
     def pathwise_rmsd(self):
         """ Find RMSD between frames along path. """
         N = len(self)
-        Vec = np.zeros(N-1 )
+        Vec = np.zeros(N-1, dtype=float)
         for i in range(N-1):
             xyzi = self.xyzs[i].copy()
             xyzi -= xyzi.mean(0)
