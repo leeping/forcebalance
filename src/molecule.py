@@ -2448,6 +2448,9 @@ class Molecule(object):
         for I in select:
             xyz = self.xyzs[I]
             out.append("%6i  %s" % (self.na, self.comms[I]))
+            if 'boxes' in self.Data:
+                b = self.boxes[I]
+                out.append(" %11.6f %11.6f %11.6f %11.6f %11.6f %11.6f" % (b.a, b.b, b.c, b.alpha, b.beta, b.gamma))
             for i in range(self.na):
                 out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.tinkersuf[i] if 'tinkersuf' in self.Data else ''))
         return out

@@ -437,8 +437,9 @@ class TINKER(Engine):
                 tk_opts['alpha'] = None
                 tk_opts['beta'] = None
                 tk_opts['gamma'] = None
-        if (not keypbc) and pbc:
-            raise RuntimeError("Periodic boundary conditions require a-axis to be in the .key file.")
+        if pbc:
+            if (not keypbc) and 'boxes' not in self.mol.Data:
+                raise RuntimeError("Periodic boundary conditions require either (1) a-axis to be in the .key file or (b) boxes to be in the coordinate file.")
         self.pbc = pbc
         if pbc:
             tk_opts['ewald'] = ''
@@ -541,7 +542,8 @@ class TINKER(Engine):
         o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
         # Silently align the optimized geometry.
         M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
-        M12.align(center=False)
+        if not self.pbc:
+            M12.align(center=False)
         M12[1].write("%s.xyz_2" % self.name, ftype="tinker")
         rmsd = M12.ref_rmsd(0)[1]
         cnvgd = 0
@@ -848,9 +850,9 @@ class TINKER(Engine):
         if self.pbc:
             md_opts["vdw-correction"] = ''
             if temperature != None and pressure != None: 
-                md_defs["integrator"] = "nose-hoover"
-                md_defs["thermostat"] = "nose-hoover"
-                md_defs["barostat"] = "nose-hoover"
+                md_defs["integrator"] = "beeman"
+                md_defs["thermostat"] = "bussi"
+                md_defs["barostat"] = "montecarlo"
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
             elif pressure != None:
