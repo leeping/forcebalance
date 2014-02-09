@@ -170,13 +170,13 @@ def buildKeywordDictionary(args):
     setupKeywords["license"]           = "GPL 3.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
-    setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
+    setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/*.bash") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
     setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
     setupKeywords["package_dir"]       = {"forcebalance"         : "src",
                                           "forcebalance/pymbar"  : "ext/pymbar"
                                           }
     setupKeywords["package_data"]      = {
-        "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/*.py","data/*.sh","data/uffparms.in","data/oplsaa.ff/*"]
+        "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/*.py","data/*.sh","data/*.bash","data/uffparms.in","data/oplsaa.ff/*"]
                                          }
     setupKeywords["data_files"]        = []
     setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE, CONTACT]
