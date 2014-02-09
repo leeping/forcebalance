@@ -291,9 +291,9 @@ def BuildLatticeFromVectors(v1, v2, v3):
     a = np.linalg.norm(v1)
     b = np.linalg.norm(v2)
     c = np.linalg.norm(v3)
-    alpha = arccos(np.linalg.dot(v2, v3) / np.linalg.norm(v2) / np.linalg.norm(v3)) * radian
-    beta  = arccos(np.linalg.dot(v1, v3) / np.linalg.norm(v1) / np.linalg.norm(v3)) * radian
-    gamma = arccos(np.linalg.dot(v1, v2) / np.linalg.norm(v1) / np.linalg.norm(v2)) * radian
+    alpha = arccos(np.dot(v2, v3) / np.linalg.norm(v2) / np.linalg.norm(v3)) * radian
+    beta  = arccos(np.dot(v1, v3) / np.linalg.norm(v1) / np.linalg.norm(v3)) * radian
+    gamma = arccos(np.dot(v1, v2) / np.linalg.norm(v1) / np.linalg.norm(v2)) * radian
     alph = alpha*np.pi/180
     bet  = beta*np.pi/180
     gamm = gamma*np.pi/180
@@ -926,7 +926,7 @@ class Molecule(object):
             # for i in range(len(self.comms)):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
-            if 'networkx' in sys.modules and build_topology and self.na > 0:
+            if 'networkx' in sys.modules and hasattr(self, 'elem') and build_topology and self.na > 0:
                 if self.na > 10000:
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
                 self.topology = self.build_topology()
@@ -1666,8 +1666,8 @@ class Molecule(object):
                 frame += 1
             elif result == -1:
                 break
-            npa    = np.array(xyzvec)
-            xyz    = np.asfarray(npa)
+            #npa    = np.array(xyzvec)
+            xyz    = np.asfarray(xyzvec)
             xyzs.append(xyz.reshape(-1, 3))
             boxes.append(BuildLatticeFromLengthsAngles(ts.A, ts.B, ts.C, 90.0, 90.0, 90.0))
         _dcdlib.close_file_read(dcd)
