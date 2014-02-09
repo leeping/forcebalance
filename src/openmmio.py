@@ -782,7 +782,7 @@ class OpenMM(Engine):
         # Align to original geometry.
         M = deepcopy(self.mol[0])
         M.xyzs = [X0, X1]
-        if not M.pbc:
+        if not self.pbc:
             M.align(center=False)
         X1 = M.xyzs[1]
         # Set geometry in OpenMM, requires some hoops.
