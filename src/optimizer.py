@@ -429,9 +429,9 @@ class Optimizer(forcebalance.BaseClass):
                         #|  function and gradients at   |#
                         #|   the previous parameters.   |#
                         #================================#
-                        Best_Start = ITERATION_NUMBER
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
+                        Best_Start = ITERATION_NUMBER
                         Best_Step = 1
                         self.adjh(trust)
                         X_hist = np.append(X_hist, X)

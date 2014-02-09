@@ -782,7 +782,8 @@ class OpenMM(Engine):
         # Align to original geometry.
         M = deepcopy(self.mol[0])
         M.xyzs = [X0, X1]
-        M.align(center=False)
+        if not self.pbc:
+            M.align(center=False)
         X1 = M.xyzs[1]
         # Set geometry in OpenMM, requires some hoops.
         mod = Modeller(self.pdb.topology, [Vec3(i[0],i[1],i[2]) for i in X1]*angstrom)

@@ -15,7 +15,7 @@ penalty_type L2
 jobtype newton
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
-forcefield bro.itp
+forcefield bro.prm
 
 # (int) Maximum number of steps in an optimization
 maxstep 100
@@ -54,12 +54,15 @@ $end
 
 $target
 name LiquidBromine
-type Liquid_GMX
+type Liquid_TINKER
 weight 1.0
-liquid_prod_steps     50000
-liquid_timestep         2.0
+liquid_equ_steps      10000
+liquid_prod_steps    100000
+liquid_timestep         1.0
 liquid_interval         0.1
+gas_equ_steps         20000
 gas_prod_steps       200000
 gas_timestep            0.5
 gas_interval            0.1
+adapt_errors
 $end
