@@ -9,7 +9,7 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen
+from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
@@ -116,11 +116,9 @@ class Target(forcebalance.BaseClass):
         ## Whether to make backup files
         self.set_option(options, 'backup')
         ## Directory to read data from.
-        self.set_option(options, 'read', 'rd')
+        self.set_option(tgt_opts, 'read', 'rd')
         ## Flag indicating whether this target is a readable type.
         self.readable = False
-        ## Files that are required for reading data, set by the target.
-        self.req_pattern = []
                                                                  
         #======================================#
         #     Variables which are set here     #
@@ -260,6 +258,12 @@ class Target(forcebalance.BaseClass):
         
         raise NotImplementedError('The get method is not implemented in the Target base class')
 
+    def check_files(self, there):
+
+        """ Check this directory for the presence of readable files when the 'read' option is set. """
+
+        raise NotImplementedError('In order to read data from files, the Target must have a method to check for these files.')
+
     def read(self,mvals,AGrad=False,AHess=False):
 
         """ 
@@ -276,13 +280,15 @@ class Target(forcebalance.BaseClass):
         Essentially a wrapper around the "get" function.
 
         """
-
+        
+        if Counter() > 0:
+            raise RuntimeError("Iteration counter must be zero in order to read data from disk (it is %s)" % Counter())
         if not self.readable:
             raise RuntimeError("Target %s is not able to read data from disk" % self.name)
         if self.rd == None:
             raise RuntimeError("The directory for reading is not set")
         # Current directory. Move back into here after reading data.
-        here = os.path.abspath()
+        here = os.getcwd()
         # Absolute path for the directory to read data from.
         if os.path.isabs(self.rd):
             absrd = self.rd
@@ -291,24 +297,21 @@ class Target(forcebalance.BaseClass):
         # Check for directory existence.
         if not os.path.exists(absrd):
             raise RuntimeError("Provided path %s does not exist" % self.rd)
-        # Check for presence of readable files.
-        def check_files(ard):
-            return all([i in os.listdir(ard) for i in self.req_pattern])
         # Figure out which directory to go into.
         s = os.path.split(self.rd)
         have_data = 0
         if s[-1].startswith('iter_'):
             # Case 1: User has provided a specific directory to read from.
             there = absrd
-            if not check_files(there):
+            if not self.check_files(there):
                 raise RuntimeError("Provided path %s does not contain remote target output" % self.rd)
             have_data = 1
         elif s[-1] == self.name:
             # Case 2: User has provided the target name.
             iterints = [int(d.replace('iter_','')) for d in os.listdir(absrd) if os.path.isdir(os.path.join(absrd, d))]
             for i in sorted(iterints)[::-1]:
-                there = os.path.join(absrd, 'iter_%04i' % i, f)
-                if check_files(there):
+                there = os.path.join(absrd, 'iter_%04i' % i)
+                if self.check_files(there):
                     have_data = 1
                     break
         else:
@@ -317,15 +320,15 @@ class Target(forcebalance.BaseClass):
                 raise RuntimeError("Target directory %s does not exist in %s" % (self.name, self.rd))
             iterints = [int(d.replace('iter_','')) for d in os.listdir(os.path.join(absrd, self.name)) if os.path.isdir(os.path.join(absrd, self.name, d))]
             for i in sorted(iterints)[::-1]:
-                there = os.path.join(absrd, self.name, 'iter_%04i' % i, f)
-                if check_files(there):
+                there = os.path.join(absrd, self.name, 'iter_%04i' % i)
+                if self.check_files(there):
                     have_data = 1
                     break
         if not have_data:
             raise RuntimeError("Did not find data to read in %s" % self.rd)
         os.chdir(there)
         logger.info("Target %s will read data from disk at %s\n" % (self.name, there))
-        Answer = self.get(self,mvals,AGrad=AGrad,AHess=AHess)
+        Answer = self.get(mvals,AGrad,AHess)
         os.chdir(here)
         return Answer
         
@@ -482,7 +485,6 @@ class RemoteTarget(Target):
         super(RemoteTarget, self).__init__(options,tgt_opts,forcefield)
         
         self.readable = True
-        self.req_pattern = ["objective_", "indicate_"]
         
         self.r_options = options.copy()
         self.r_options["type"]="single"
@@ -490,11 +492,21 @@ class RemoteTarget(Target):
         self.r_tgt_opts = tgt_opts.copy()
         self.r_tgt_opts["remote"]=False
         
-        tar = tarfile.open(name="%s/%s/target.tar.bz2" % (self.tempdir, self.name), mode='w:bz2')
+        tar = tarfile.open(name="%s/target.tar.bz2" % (self.tempdir), mode='w:bz2', dereference=True)
         tar.add("%s/targets/%s" % (self.root, self.name), arcname = "targets/%s" % self.name)
         tar.close()
         
         self.remote_indicate = ""
+
+    def check_files(self, there):
+        # File identification is a bit tricky because they are tagged with iteration numbers from the previous run.
+        there = os.path.abspath(there)
+        if all([any([i in j for j in os.listdir(there)]) for i in ["objective_", "indicate_"]]):
+            for f in os.listdir(there):
+                if "objective_" in f:
+                    self.id_string = f[10:][:-2]
+            return True
+        return False
 
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         n=0
@@ -507,7 +519,7 @@ class RemoteTarget(Target):
         with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
-        forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, self.name, "target.tar.bz2"),"%s.tar.bz2" % self.name)
+        forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, "target.tar.bz2"),"%s.tar.bz2" % self.name)
         
         wq = getWorkQueue()
         
@@ -527,6 +539,10 @@ class RemoteTarget(Target):
         self.id_string = id_string
 
     def get(self,mvals,AGrad=False,AHess=False):
+        unpack = forcebalance.nifty.lp_load(open('forcebalance.p'))
+        mvals1 = unpack[0]
+        if (mvals1 != mvals).any():
+            warn_press_key("mvals from forcebalance.p does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
         with open('indicate_%s.log' % self.id_string, 'r') as f:
             self.remote_indicate = f.read()
         with open('objective_%s.p' % self.id_string, 'r') as f:
