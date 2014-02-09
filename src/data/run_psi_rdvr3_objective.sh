@@ -12,7 +12,7 @@ echo "# ENVIRONMENT VARIABLES #"
 echo "#=======================#"
 echo
 
-set
+env
 
 echo
 echo "#=======================#"

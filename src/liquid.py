@@ -73,9 +73,9 @@ class Liquid(Target):
         # Number of time steps in the liquid "production" run
         self.set_option(tgt_opts,'liquid_md_steps',forceprint=True)
         # Number of time steps in the gas "equilibration" run
-        self.set_option(tgt_opts,'gas_eq_steps',forceprint=False)
+        self.set_option(tgt_opts,'gas_eq_steps',forceprint=True)
         # Number of time steps in the gas "production" run
-        self.set_option(tgt_opts,'gas_md_steps',forceprint=False)
+        self.set_option(tgt_opts,'gas_md_steps',forceprint=True)
         # Time step length (in fs) for the liquid production run
         self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
@@ -84,6 +84,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'gas_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'gas_interval',forceprint=True)
+        # Adjust simulation length in response to simulation uncertainty
+        self.set_option(tgt_opts,'adapt_errors',forceprint=True)
         # Minimize the energy prior to running any dynamics
         self.set_option(tgt_opts,'minimize_energy',forceprint=True)
         # Isolated dipole (debye) for analytic self-polarization correction.
@@ -133,12 +135,13 @@ class Liquid(Target):
         # Put stuff here that I'm not sure about. :)
         np.set_printoptions(precision=4, linewidth=100)
         np.seterr(under='ignore')
-        ## Saved force field mvals for all iterations
-        self.SavedMVal = {}
         ## Saved trajectories for all iterations and all temperatures
         self.SavedTraj = defaultdict(dict)
         ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
+        ## Saved results for all iterations
+        # self.SavedMVals = []
+        self.AllResults = defaultdict(lambda:defaultdict(list))
 
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
@@ -446,7 +449,7 @@ class Liquid(Target):
         
         """
 
-        mbar_verbose = False
+        mbar_verbose = True
 
         Answer = {}
 
@@ -492,19 +495,46 @@ class Liquid(Target):
         else:
             NMol = list(set(NMols))[0]
     
-        R  = np.array(list(itertools.chain(*list(Rhos))))
-        V  = np.array(list(itertools.chain(*list(Vols))))
-        E  = np.array(list(itertools.chain(*list(Energies))))
-        Dx = np.array(list(itertools.chain(*list(d[:,0] for d in Dips))))
-        Dy = np.array(list(itertools.chain(*list(d[:,1] for d in Dips))))
-        Dz = np.array(list(itertools.chain(*list(d[:,2] for d in Dips))))
-        G  = np.hstack(tuple(Grads))
-        GDx = np.hstack(tuple(gd[0] for gd in GDips))
-        GDy = np.hstack(tuple(gd[1] for gd in GDips))
-        GDz = np.hstack(tuple(gd[2] for gd in GDips))
+        if not self.adapt_errors:
+            self.AllResults = defaultdict(lambda:defaultdict(list))
+
+        self.AllResults[tuple(mvals)]['E'].append(np.array(Energies))
+        self.AllResults[tuple(mvals)]['V'].append(np.array(Vols))
+        self.AllResults[tuple(mvals)]['R'].append(np.array(Rhos).flatten())
+        self.AllResults[tuple(mvals)]['Dx'].append(np.array([d[:,0] for d in Dips]).flatten())
+        self.AllResults[tuple(mvals)]['Dy'].append(np.array([d[:,1] for d in Dips]).flatten())
+        self.AllResults[tuple(mvals)]['Dz'].append(np.array([d[:,2] for d in Dips]).flatten())
+        self.AllResults[tuple(mvals)]['G'].append(np.hstack(tuple(Grads)))
+        self.AllResults[tuple(mvals)]['GDx'].append(np.hstack(tuple(gd[0] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['GDy'].append(np.hstack(tuple(gd[1] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['GDz'].append(np.hstack(tuple(gd[2] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['L'].append(len(Energies[0]))
+        self.AllResults[tuple(mvals)]['Steps'].append(self.liquid_md_steps)
+
         if len(mPoints) > 0:
-            mE = np.array(list(itertools.chain(*list([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))))
-            mG = np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+            self.AllResults[tuple(mvals)]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
+            self.AllResults[tuple(mvals)]['mG'].append(np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints])))
+
+        # Number of data sets belonging to this value of the parameters.
+        Nrpt = len(self.AllResults[tuple(mvals)]['R'])
+        sumsteps = sum(self.AllResults[tuple(mvals)]['Steps'])
+        if self.liquid_md_steps != sumsteps:
+            printcool("This objective function evaluation combines %i datasets\n" \
+                          "Increasing simulation length: %i -> %i steps" % \
+                          (Nrpt, self.liquid_md_steps, sumsteps), color=6)
+            if self.liquid_md_steps * 2 != sumsteps:
+                raise RuntimeError("Spoo!")
+            self.liquid_eq_steps *= 2
+            self.liquid_md_steps *= 2
+            self.gas_eq_steps *= 2
+            self.gas_md_steps *= 2
+        
+        E, V, R, Dx, Dy, Dz, G, GDx, GDy, GDz = \
+            (np.concatenate(self.AllResults[tuple(mvals)][i], axis=-1) for i in \
+                 ['E', 'V', 'R', 'Dx', 'Dy', 'Dz', 'G', 'GDx', 'GDy', 'GDz'])
+
+        if len(mPoints) > 0:
+            mE, mG = (np.concatenate(self.AllResults[tuple(mvals)][i], axis=-1) for i in ['mE', 'mG'])
 
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
@@ -530,7 +560,7 @@ class Liquid(Target):
 
         # Run MBAR using the total energies. Required for estimates that use the kinetic energy.
         BSims = len(BPoints)
-        Shots = len(Energies[0])
+        Shots = len(E[0])
         N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([BSims,BSims,Shots])
@@ -543,7 +573,7 @@ class Liquid(Target):
                 # Note that because the Boltzmann factors are computed from the conditions at simulation "m",
                 # the pV terms must be rescaled to the pressure at simulation "m".
                 kk = Points.index(BPoints[k])
-                U_kln[k, m, :]   = Energies[kk] + P*Vols[kk]*pvkj
+                U_kln[k, m, :]   = E[kk] + P*V[kk]*pvkj
                 U_kln[k, m, :]  *= beta
         W1 = None
         if len(BPoints) > 1:
@@ -575,7 +605,7 @@ class Liquid(Target):
 
         # Run MBAR on the monomers.  This is barely necessary.
         mW1 = None
-        mShots = len(mEnergies[0])
+        mShots = len(mE[0])
         if len(mBPoints) > 0:
             mBSims = len(mBPoints)
             mN_k = np.ones(mBSims)*mShots
@@ -585,9 +615,9 @@ class Liquid(Target):
                 beta = 1. / (kb * T)
                 for k in range(mBSims):
                     kk = Points.index(mBPoints[k])
-                    mU_kln[k, m, :]  = mEnergies[kk]
+                    mU_kln[k, m, :]  = mE[kk]
                     mU_kln[k, m, :] *= beta
-            if np.abs(np.std(mEnergies)) > 1e-6 and mBSims > 1:
+            if np.abs(np.std(mE)) > 1e-6 and mBSims > 1:
                 mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
                 mW1 = mmbar.getWeights()
         elif len(mBPoints) == 1:
@@ -603,6 +633,11 @@ class Liquid(Target):
             if AGrad:
                 self.FF.print_map(vals=GEPol)
                 logger.info(bar)
+
+        # Arrays must be flattened now for calculation of properties.
+        E = E.flatten()
+        V = V.flatten()
+        if len(mPoints) > 0: mE = mE.flatten()
             
         for i, PT in enumerate(Points):
             T = PT[0]
