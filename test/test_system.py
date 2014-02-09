@@ -28,7 +28,7 @@ class TestWaterTutorial(ForceBalanceTestCase):
         targets.close()
 
     def tearDown(self):
-        os.system('rm -rf results targets backups temp')
+        os.system('rm -rf results *.bak *.tmp')
         super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):
@@ -80,7 +80,7 @@ class TestVoelzStudy(ForceBalanceTestCase):
         os.chdir('studies/009_voelz_nspe')
 
     def tearDown(self):
-        os.system('rm -rf results backups temp')
+        os.system('rm -rf results *.bak *.tmp')
         super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):
@@ -129,7 +129,60 @@ class TestBromineStudy(ForceBalanceTestCase):
         os.chdir('studies/003_liquid_bromine')
 
     def tearDown(self):
-        os.system('rm -rf results backups temp')
+        os.system('rm -rf results *.bak *.tmp')
+        super(ForceBalanceTestCase,self).tearDown()
+
+    def runTest(self):
+        """Check liquid bromine study converges to expected results"""
+        self.logger.debug("\nSetting input file to 'options.in'\n")
+        input_file='optimize.in'
+
+        ## The general options and target options that come from parsing the input file
+        self.logger.debug("Parsing inputs...\n")
+        options, tgt_opts = parse_inputs(input_file)
+        self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
+
+        self.assertEqual(dict,type(options), msg="\nParser gave incorrect type for options")
+        self.assertEqual(list,type(tgt_opts), msg="\nParser gave incorrect type for tgt_opts")
+        for target in tgt_opts:
+            self.assertEqual(dict, type(target), msg="\nParser gave incorrect type for target dict")
+
+        ## The force field component of the project
+        self.logger.debug("Creating forcefield using loaded options: ")
+        forcefield  = FF(options)
+        self.logger.debug(str(forcefield) + "\n")
+        self.assertEqual(FF, type(forcefield), msg="\nExpected forcebalance forcefield object")
+
+        ## The objective function
+        self.logger.debug("Creating object using loaded options and forcefield: ")
+        objective   = Objective(options, tgt_opts, forcefield)
+        self.logger.debug(str(objective) + "\n")
+        self.assertEqual(Objective, type(objective), msg="\nExpected forcebalance objective object")
+
+        ## The optimizer component of the project
+        self.logger.debug("Creating optimizer: ")
+        optimizer   = Optimizer(options, objective, forcefield)
+        self.logger.debug(str(optimizer) + "\n")
+        self.assertEqual(Optimizer, type(optimizer), msg="\nExpected forcebalance optimizer object")
+
+        ## Actually run the optimizer.
+        self.logger.debug("Done setting up! Running optimizer...\n")
+        result = optimizer.Run()
+
+        self.logger.debug("\nOptimizer finished. Final results:\n")
+        self.logger.debug(str(result) + '\n')
+
+        self.assertNdArrayEqual(EXPECTED_BROMINE_RESULTS,result,delta=0.02,
+                                msg="\nCalculation results have changed from previously calculated values.\n"
+                                "If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values")
+
+class TestThermoBromineStudy(ForceBalanceTestCase):
+    def setUp(self):
+        super(ForceBalanceTestCase,self).setUp()
+        os.chdir('studies/004_thermo_liquid_bromine')
+
+    def tearDown(self):
+        os.system('rm -rf results *.bak *.tmp')
         super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):

@@ -27,7 +27,7 @@ class TestOptimizer(ForceBalanceTestCase):
         except: self.fail("\nCouldn't create optimizer")
 
     def tearDown(self):
-        os.system('rm -rf results targets backups temp checkfile.tmp')
+        os.system('rm -rf result *.bak *.tmp')
         super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):
