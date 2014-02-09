@@ -468,7 +468,7 @@ class Liquid(Target):
         if (mvals1 != mvals).any():
             warn_press_key("mvals from forcebalance.p does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
-        mbar_verbose = True
+        mbar_verbose = False
 
         Answer = {}
 
