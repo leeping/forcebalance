@@ -172,7 +172,7 @@ class TestBromineStudy(ForceBalanceTestCase):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
 
-        self.assertNdArrayEqual(EXPECTED_BROMINE_RESULTS,result,delta=0.01,
+        self.assertNdArrayEqual(EXPECTED_BROMINE_RESULTS,result,delta=0.02,
                                 msg="\nCalculation results have changed from previously calculated values.\n"
                                 "If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values")
 
