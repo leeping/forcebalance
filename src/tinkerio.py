@@ -850,9 +850,9 @@ class TINKER(Engine):
         if self.pbc:
             md_opts["vdw-correction"] = ''
             if temperature != None and pressure != None: 
-                md_defs["integrator"] = "nose-hoover"
-                md_defs["thermostat"] = "nose-hoover"
-                md_defs["barostat"] = "nose-hoover"
+                md_defs["integrator"] = "beeman"
+                md_defs["thermostat"] = "bussi"
+                md_defs["barostat"] = "montecarlo"
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
             elif pressure != None:
