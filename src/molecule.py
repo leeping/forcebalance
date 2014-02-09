@@ -291,9 +291,9 @@ def BuildLatticeFromVectors(v1, v2, v3):
     a = np.linalg.norm(v1)
     b = np.linalg.norm(v2)
     c = np.linalg.norm(v3)
-    alpha = arccos(np.linalg.dot(v2, v3) / np.linalg.norm(v2) / np.linalg.norm(v3)) * radian
-    beta  = arccos(np.linalg.dot(v1, v3) / np.linalg.norm(v1) / np.linalg.norm(v3)) * radian
-    gamma = arccos(np.linalg.dot(v1, v2) / np.linalg.norm(v1) / np.linalg.norm(v2)) * radian
+    alpha = arccos(np.dot(v2, v3) / np.linalg.norm(v2) / np.linalg.norm(v3)) * radian
+    beta  = arccos(np.dot(v1, v3) / np.linalg.norm(v1) / np.linalg.norm(v3)) * radian
+    gamma = arccos(np.dot(v1, v2) / np.linalg.norm(v1) / np.linalg.norm(v2)) * radian
     alph = alpha*np.pi/180
     bet  = beta*np.pi/180
     gamm = gamma*np.pi/180
@@ -785,7 +785,14 @@ class Molecule(object):
                     raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
                 Sum.Data[key] = list(self.Data[key] + other.Data[key])
             elif either(self, other, key):
-                raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).')
+                # TINKER 6.3 compatibility - catch the specific case that one has a periodic box and the other doesn't.
+                if key == 'boxes':
+                    if key in self.Data:
+                        other.Data['boxes'] = [self.Data['boxes'][0] for i in range(len(other))]
+                    elif key in other.Data:
+                        self.Data['boxes'] = [other.Data['boxes'][0] for i in range(len(self))]
+                else:
+                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).')
         return Sum
  
     def __iadd__(self,other):
@@ -812,7 +819,14 @@ class Molecule(object):
                     raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
                 self.Data[key] += other.Data[key]
             elif either(self, other, key):
-                raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
+                # TINKER 6.3 compatibility - catch the specific case that one has a periodic box and the other doesn't.
+                if key == 'boxes':
+                    if key in self.Data:
+                        other.Data['boxes'] = [self.Data['boxes'][0] for i in range(len(other))]
+                    elif key in other.Data:
+                        self.Data['boxes'] = [other.Data['boxes'][0] for i in range(len(self))]
+                else:
+                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
         return self
 
     def repair(self, key, klast):
@@ -912,7 +926,7 @@ class Molecule(object):
             # for i in range(len(self.comms)):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
-            if 'networkx' in sys.modules and build_topology and self.na > 0:
+            if 'networkx' in sys.modules and hasattr(self, 'elem') and build_topology and self.na > 0:
                 if self.na > 10000:
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
                 self.topology = self.build_topology()
@@ -1652,8 +1666,8 @@ class Molecule(object):
                 frame += 1
             elif result == -1:
                 break
-            npa    = np.array(xyzvec)
-            xyz    = np.asfarray(npa)
+            #npa    = np.array(xyzvec)
+            xyz    = np.asfarray(xyzvec)
             xyzs.append(xyz.reshape(-1, 3))
             boxes.append(BuildLatticeFromLengthsAngles(ts.A, ts.B, ts.C, 90.0, 90.0, 90.0))
         _dcdlib.close_file_read(dcd)
@@ -1710,6 +1724,7 @@ class Molecule(object):
 
         @param[in] fnm  The input file name
         @return xyzs    A list for the  XYZ coordinates.
+        @return boxes   A list of periodic boxes (newer .arc files have these)
         @return resid   The residue ID numbers.  These are not easy to get!
         @return elem    A list of chemical elements in the XYZ file
         @return comms   A single-element list for the comment.
@@ -1717,6 +1732,7 @@ class Molecule(object):
 
         """
         tinkersuf   = []
+        boxes = []
         xyzs  = []
         xyz   = []
         resid = []
@@ -1740,7 +1756,10 @@ class Molecule(object):
                 comms.append(' '.join(sline[1:]))
                 title = False
             elif len(sline) >= 5:
-                if isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]): # A line of data better look like this
+                if len(sline) == 6 and isfloat(sline[1]) and all([isfloat(i) for i in sline]): # Newer .arc files have a .box line.
+                    a, b, c, alpha, beta, gamma = (float(i) for i in sline[:6])
+                    boxes.append(BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma))
+                elif isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]): # A line of data better look like this
                     if nframes == 0:
                         elem.append(elem_from_atomname(sline[1]))
                         resid.append(thisresid)
@@ -1777,6 +1796,7 @@ class Molecule(object):
                   'elem'   : elem,
                   'comms'  : comms,
                   'tinkersuf' : tinkersuf}
+        if len(boxes) > 0: Answer['boxes'] = boxes
         return Answer
 
     def read_gro(self, fnm, **kwargs):
@@ -2428,6 +2448,9 @@ class Molecule(object):
         for I in select:
             xyz = self.xyzs[I]
             out.append("%6i  %s" % (self.na, self.comms[I]))
+            if 'boxes' in self.Data:
+                b = self.boxes[I]
+                out.append(" %11.6f %11.6f %11.6f %11.6f %11.6f %11.6f" % (b.a, b.b, b.c, b.alpha, b.beta, b.gamma))
             for i in range(self.na):
                 out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.tinkersuf[i] if 'tinkersuf' in self.Data else ''))
         return out
