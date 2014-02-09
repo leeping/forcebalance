@@ -147,7 +147,7 @@ tgt_opts_types = {
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_ndx"               : (None, -10, 'Gromacs .ndx files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
-                 "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo')
+                 "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),
                  "read"                  : (None, 50, 'Provide a temporary directory ".tmp" to read data from a previous calculation on the initial iteration (for instance, to restart an aborted run).', 'Liquid and Remote targets', 'Liquid, Remote'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
