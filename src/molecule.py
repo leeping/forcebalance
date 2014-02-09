@@ -785,7 +785,14 @@ class Molecule(object):
                     raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
                 Sum.Data[key] = list(self.Data[key] + other.Data[key])
             elif either(self, other, key):
-                raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).')
+                # TINKER 6.3 compatibility - catch the specific case that one has a periodic box and the other doesn't.
+                if key == 'boxes':
+                    if key in self.Data:
+                        other.Data['boxes'] = [self.Data['boxes'][0] for i in range(len(other))]
+                    elif key in other.Data:
+                        self.Data['boxes'] = [other.Data['boxes'][0] for i in range(len(self))]
+                else:
+                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).')
         return Sum
  
     def __iadd__(self,other):
@@ -812,7 +819,14 @@ class Molecule(object):
                     raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
                 self.Data[key] += other.Data[key]
             elif either(self, other, key):
-                raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
+                # TINKER 6.3 compatibility - catch the specific case that one has a periodic box and the other doesn't.
+                if key == 'boxes':
+                    if key in self.Data:
+                        other.Data['boxes'] = [self.Data['boxes'][0] for i in range(len(other))]
+                    elif key in other.Data:
+                        self.Data['boxes'] = [other.Data['boxes'][0] for i in range(len(self))]
+                else:
+                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
         return self
 
     def repair(self, key, klast):
@@ -1710,6 +1724,7 @@ class Molecule(object):
 
         @param[in] fnm  The input file name
         @return xyzs    A list for the  XYZ coordinates.
+        @return boxes   A list of periodic boxes (newer .arc files have these)
         @return resid   The residue ID numbers.  These are not easy to get!
         @return elem    A list of chemical elements in the XYZ file
         @return comms   A single-element list for the comment.
@@ -1717,6 +1732,7 @@ class Molecule(object):
 
         """
         tinkersuf   = []
+        boxes = []
         xyzs  = []
         xyz   = []
         resid = []
@@ -1740,7 +1756,10 @@ class Molecule(object):
                 comms.append(' '.join(sline[1:]))
                 title = False
             elif len(sline) >= 5:
-                if isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]): # A line of data better look like this
+                if len(sline) == 6 and isfloat(sline[1]) and all([isfloat(i) for i in sline]): # Newer .arc files have a .box line.
+                    a, b, c, alpha, beta, gamma = (float(i) for i in sline[:6])
+                    boxes.append(BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma))
+                elif isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]): # A line of data better look like this
                     if nframes == 0:
                         elem.append(elem_from_atomname(sline[1]))
                         resid.append(thisresid)
@@ -1777,6 +1796,7 @@ class Molecule(object):
                   'elem'   : elem,
                   'comms'  : comms,
                   'tinkersuf' : tinkersuf}
+        if len(boxes) > 0: Answer['boxes'] = boxes
         return Answer
 
     def read_gro(self, fnm, **kwargs):

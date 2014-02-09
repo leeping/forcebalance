@@ -115,6 +115,12 @@ class Target(forcebalance.BaseClass):
         self.set_option(options, 'finite_difference_h', 'h')
         ## Whether to make backup files
         self.set_option(options, 'backup')
+        ## Directory to read data from.
+        self.set_option(options, 'read', 'rd')
+        ## Flag indicating whether this target is a readable type.
+        self.readable = False
+        ## Files that are required for reading data, set by the target.
+        self.req_pattern = []
                                                                  
         #======================================#
         #     Variables which are set here     #
@@ -254,10 +260,79 @@ class Target(forcebalance.BaseClass):
         
         raise NotImplementedError('The get method is not implemented in the Target base class')
 
+    def read(self,mvals,AGrad=False,AHess=False):
+
+        """ 
+
+        Read data from disk for the initial optimization step if the
+        user has provided the directory to the "read" option.  
+
+        Useful for restarting an aborted run with partially completed
+        calculations.
+
+        Only usable with certain targets (Remote, Liquid at the time
+        of writing this.)
+
+        Essentially a wrapper around the "get" function.
+
+        """
+
+        if not self.readable:
+            raise RuntimeError("Target %s is not able to read data from disk" % self.name)
+        if self.rd == None:
+            raise RuntimeError("The directory for reading is not set")
+        # Current directory. Move back into here after reading data.
+        here = os.path.abspath()
+        # Absolute path for the directory to read data from.
+        if os.path.isabs(self.rd):
+            absrd = self.rd
+        else:
+            absrd = os.path.join(self.root, self.rd)
+        # Check for directory existence.
+        if not os.path.exists(absrd):
+            raise RuntimeError("Provided path %s does not exist" % self.rd)
+        # Check for presence of readable files.
+        def check_files(ard):
+            return all([i in os.listdir(ard) for i in self.req_pattern])
+        # Figure out which directory to go into.
+        s = os.path.split(self.rd)
+        have_data = 0
+        if s[-1].startswith('iter_'):
+            # Case 1: User has provided a specific directory to read from.
+            there = absrd
+            if not check_files(there):
+                raise RuntimeError("Provided path %s does not contain remote target output" % self.rd)
+            have_data = 1
+        elif s[-1] == self.name:
+            # Case 2: User has provided the target name.
+            iterints = [int(d.replace('iter_','')) for d in os.listdir(absrd) if os.path.isdir(os.path.join(absrd, d))]
+            for i in sorted(iterints)[::-1]:
+                there = os.path.join(absrd, 'iter_%04i' % i, f)
+                if check_files(there):
+                    have_data = 1
+                    break
+        else:
+            # Case 3: User has provided something else (must contain the target name in the next directory down.)
+            if not os.path.exists(os.path.join(absrd, self.name)):
+                raise RuntimeError("Target directory %s does not exist in %s" % (self.name, self.rd))
+            iterints = [int(d.replace('iter_','')) for d in os.listdir(os.path.join(absrd, self.name)) if os.path.isdir(os.path.join(absrd, self.name, d))]
+            for i in sorted(iterints)[::-1]:
+                there = os.path.join(absrd, self.name, 'iter_%04i' % i, f)
+                if check_files(there):
+                    have_data = 1
+                    break
+        if not have_data:
+            raise RuntimeError("Did not find data to read in %s" % self.rd)
+        os.chdir(there)
+        logger.info("Target %s will read data from disk at %s\n" % (self.name, there))
+        Answer = self.get(self,mvals,AGrad=AGrad,AHess=AHess)
+        os.chdir(here)
+        return Answer
+        
     def sget(self, mvals, AGrad=False, AHess=False, customdir=None):
         """ 
 
-        Stages the directory for the target, and then calls 'get'.
+        Create the directory for the target, and then calls 'get'.
         The 'get' method should not worry about the directory that it's running in.
         
         """
@@ -269,6 +344,8 @@ class Target(forcebalance.BaseClass):
         absgetdir = os.path.join(self.root,self.tempdir)
         if Counter() is not None:
             # Not expecting more than ten thousand iterations
+            if Counter() > 10000:
+                raise RuntimeError('Cannot handle more than 10000 iterations due to current directory structure.  Consider revising code.')
             iterdir = "iter_%04i" % Counter()
             absgetdir = os.path.join(absgetdir,iterdir)
         if customdir is not None:
@@ -280,7 +357,11 @@ class Target(forcebalance.BaseClass):
         self.link_from_tempdir(absgetdir)
         self.rundir = absgetdir.replace(self.root+'/','')
 
-        Answer = self.get(mvals, AGrad, AHess)
+        if self.rd != None and Counter() == 0:
+            Answer = self.read(mvals, AGrad, AHess)
+        else:
+            Answer = self.get(mvals, AGrad, AHess)
+
         os.chdir(cwd)
         
         return Answer
@@ -316,8 +397,7 @@ class Target(forcebalance.BaseClass):
         os.chdir(absgetdir)
         self.link_from_tempdir(absgetdir)
         self.rundir = absgetdir.replace(self.root+'/','')
-        self.submit_jobs(mvals, AGrad, AHess)
-
+        if self.rd == None or Counter() > 0: self.submit_jobs(mvals, AGrad, AHess)
         os.chdir(cwd)
         
         return
@@ -401,6 +481,9 @@ class RemoteTarget(Target):
     def __init__(self,options,tgt_opts,forcefield):
         super(RemoteTarget, self).__init__(options,tgt_opts,forcefield)
         
+        self.readable = True
+        self.req_pattern = ["objective_", "indicate_"]
+        
         self.r_options = options.copy()
         self.r_options["type"]="single"
         
@@ -412,7 +495,7 @@ class RemoteTarget(Target):
         tar.close()
         
         self.remote_indicate = ""
-        
+
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         n=0
         id_string = "%s_%i-%i" % (self.name, Counter(), n)

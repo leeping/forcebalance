@@ -102,6 +102,8 @@ class Liquid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        # This target can read data from disk.
+        self.readable = True
         # Read in liquid starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)): 
             raise RuntimeError("%s doesn't exist; please provide liquid_coords option" % self.liquid_coords)
@@ -233,6 +235,7 @@ class Liquid(Target):
             # printcool_dictionary(self.RefData[head],head)
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
+        self.req_pattern = self.Labels
         logger.debug("global_opts:\n%s\n" % str(global_opts))
         logger.debug("default_denoms:\n%s\n" % str(default_denoms))
         for opt in global_opts:
