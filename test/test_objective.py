@@ -30,6 +30,7 @@ class TestImplemented(ForceBalanceTestCase):
                 if type(object) == abc.ABCMeta:
                     implemented = [i for i in forcebalance.objective.Implemented_Targets.itervalues()]
                     # list of documented exceptions
+                    # Basically, platform-independent targets are excluded.
                     exclude = ['Target',
                                'AbInitio',
                                'Interaction',
@@ -38,6 +39,7 @@ class TestImplemented(ForceBalanceTestCase):
                                'BindingEnergy',
                                'LeastSquares',
                                'Vibration',
+                               'Thermo',
                                'Moments']
                     if object not in implemented and object.__name__ not in exclude:
                         self.fail("Unknown class '%s' not listed in Implemented_Targets" % object.__name__)
