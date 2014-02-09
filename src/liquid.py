@@ -235,7 +235,6 @@ class Liquid(Target):
             # printcool_dictionary(self.RefData[head],head)
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
-        self.req_pattern = self.Labels
         logger.debug("global_opts:\n%s\n" % str(global_opts))
         logger.debug("default_denoms:\n%s\n" % str(default_denoms))
         for opt in global_opts:
@@ -244,6 +243,17 @@ class Liquid(Target):
                 self.set_option(global_opts,opt,default=default_denoms[opt])
             else:
                 self.set_option(global_opts,opt)
+
+    def check_files(self, there):
+        there = os.path.abspath(there)
+        if all([i in os.listdir(there) for i in self.Labels]):
+            for d in os.listdir(there):
+                if d in self.Labels:
+                    if os.path.exists(os.path.join(there, d, 'npt_result.p')):
+                        return 1
+                    elif os.path.exists(os.path.join(there, d, 'npt_result.p.bz2')):
+                        return 1
+        return 0
 
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
@@ -452,6 +462,11 @@ class Liquid(Target):
         @return Answer Contribution to the objective function
         
         """
+        
+        unpack = forcebalance.nifty.lp_load(open('forcebalance.p'))
+        mvals1 = unpack[1]
+        if (mvals1 != mvals).any():
+            warn_press_key("mvals from forcebalance.p does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
         mbar_verbose = True
 
@@ -538,16 +553,10 @@ class Liquid(Target):
         E, V, R, Dx, Dy, Dz = \
             (np.hstack(tuple(self.AllResults[tuple(mvals)][i])) for i in \
                  ['E', 'V', 'R', 'Dx', 'Dy', 'Dz'])
-        # for i in self.AllResults[tuple(mvals)]['G']:
-        #     print i[0, 0, :]
+
         G, GDx, GDy, GDz = \
             (np.hstack((np.concatenate(tuple(self.AllResults[tuple(mvals)][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
 
-        # All temperatures, first parameter
-        # print G[0, :]
-        print E.shape
-        print G.shape
-        
         if len(mPoints) > 0:
             mE = np.hstack(tuple(self.AllResults[tuple(mvals)]['mE']))
             mG = np.hstack((np.concatenate(tuple(self.AllResults[tuple(mvals)]['mG']), axis=2)))
@@ -617,7 +626,6 @@ class Liquid(Target):
             return new_weights
         
         W2 = fill_weights(W1, Points, BPoints, Shots)
-        print W2.shape
 
         if len(mPoints) > 0:
             # Run MBAR on the monomers.  This is barely necessary.
