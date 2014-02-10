@@ -409,7 +409,13 @@ def main():
     printcool("Condensed phase molecular dynamics", color=4, bold=True)
 
     # This line runs the condensed phase simulation.
-    Rhos, Potentials, Kinetics, Volumes, Dips, EDA = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    Rhos = prop_return['Rhos']
+    Potentials = prop_return['Potentials']
+    Kinetics = prop_return['Kinetics']
+    Volumes = prop_return['Volumes']
+    Dips = prop_return['Dips']
+    EDA = prop_return['Ecomps']
 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -443,8 +449,10 @@ def main():
     # Run the OpenMM simulation, gather information.
 
     printcool("Gas phase molecular dynamics", color=4, bold=True)
-    _, mPotentials, mKinetics, __, ___, mEDA = \
-        Gas.molecular_dynamics(**MDOpts["gas"])
+    mprop_return = Gas.molecular_dynamics(**MDOpts["gas"])
+    mPotentials = mprop_return['Potentials']
+    mKinetics = mprop_return['Kinetics']
+    mEDA = mprop_return['Ecomps']
 
     mEnergies = mPotentials + mKinetics
     mEne_avg, mEne_err = mean_stderr(mEnergies)

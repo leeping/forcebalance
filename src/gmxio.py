@@ -902,11 +902,11 @@ class GMX(Engine):
         self.mol[0].write("%s.gro" % self.name)
 
         ## Create an index file with the requisite groups.
-        self.write_ndx('%s.ndx' % self.name, OrderedDict([('A',[i+1 for i in fraga]),('B',[i+1 for i in fragb])]))
+        write_ndx('%s.ndx' % self.name, OrderedDict([('A',[i+1 for i in fraga]),('B',[i+1 for i in fragb])]))
 
         ## .mdp files for fully interacting and interaction-excluded systems.
-        self.write_mdp('%s-i.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B'}, fin='%s.mdp' % self.name)
-        self.write_mdp('%s-x.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'}, fin='%s.mdp' % self.name)
+        write_mdp('%s-i.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B'}, fin='%s.mdp' % self.name)
+        write_mdp('%s-x.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'}, fin='%s.mdp' % self.name)
 
         ## Call grompp followed by mdrun for interacting system.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
@@ -1190,8 +1190,11 @@ class GMX(Engine):
         Xs = np.array(Xs)
         Ys = np.array(Ys)
         Als = (Xs * Ys) / 64
+        # Initialized property dictionary.
+        prop_return = OrderedDict()
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'Als': Als, 'Scds': Scds})
         if verbose: logger.info("Finished!\n")
-        return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps, Als, Scds
+        return prop_return
 
 class Liquid_GMX(Liquid):
     def __init__(self,options,tgt_opts,forcefield):

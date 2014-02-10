@@ -1023,7 +1023,10 @@ class OpenMM(Engine):
         Ecomps["Kinetic Energy"] = np.array(Kinetics)
         Ecomps["Temperature"] = np.array(Temps)
         Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
-        return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps
+        # Initialized property dictionary.
+        prop_return = OrderedDict()
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        return prop_return
 
 class Liquid_OpenMM(Liquid):
     """ Condensed phase property matching using OpenMM. """
