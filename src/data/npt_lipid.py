@@ -383,7 +383,15 @@ def main():
     printcool("Condensed phase molecular dynamics", color=4, bold=True)
 
     # This line runs the condensed phase simulation.
-    Rhos, Potentials, Kinetics, Volumes, Dips, EDA, Als, Scds = Lipid.molecular_dynamics(**MDOpts["lipid"])
+    prop_return = Lipid.molecular_dynamics(**MDOpts["lipid"])
+    Rhos = prop_return['Rhos']
+    Potentials = prop_return['Potentials']
+    Kinetics = prop_return['Kinetics']
+    Volumes = prop_return['Volumes']
+    Dips = prop_return['Dips']
+    EDA = prop_return['Ecomps']
+    Als = prop_return['Als']
+    Scds = prop_return['Scds']
 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
