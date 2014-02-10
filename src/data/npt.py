@@ -311,6 +311,7 @@ def main():
     # Number of threads, multiple timestep integrator, anisotropic box etc.
     threads = TgtOptions.get('md_threads', 1)
     mts = TgtOptions.get('mts_integrator', 0)
+    rpmd_beads = TgtOptions.get('rpmd_beads', 0)
     force_cuda = TgtOptions.get('force_cuda', 0)
     anisotropic = TgtOptions.get('anisotropic_box', 0)
     minimize = TgtOptions.get('minimize_energy', 1)
@@ -349,8 +350,8 @@ def main():
     GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":
         # OpenMM-specific options
-        EngOpts["liquid"]["openmm_platform"] = 'CUDA'
-        EngOpts["gas"]["openmm_platform"] = 'Reference'
+        EngOpts["liquid"]["platname"] = 'CUDA'
+        EngOpts["gas"]["platname"] = 'Reference'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
@@ -364,6 +365,7 @@ def main():
         EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
         EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gas_fnm)[0] + ".mdp"
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
+        if rpmd_beads > 0: raise RuntimeError("Gromacs cannot handle RPMD.")
         if mts: logger.warn("Gromacs not configured for multiple timestep integrator.")
         if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")
     elif engname == "tinker":
@@ -372,6 +374,7 @@ def main():
         EngOpts["liquid"]["tinker_key"] = os.path.splitext(liquid_fnm)[0] + ".key"
         EngOpts["gas"]["tinker_key"] = os.path.splitext(gas_fnm)[0] + ".key"
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
+        if rpmd_beads > 0: raise RuntimeError("TINKER cannot handle RPMD.")
         if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
     EngOpts["liquid"].update(GenOpts)
     EngOpts["gas"].update(GenOpts)
@@ -385,11 +388,12 @@ def main():
                                     ("nequil", liquid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
                                     ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
-                                    ("threads", threads), ("anisotropic", anisotropic), 
-                                    ("mts", mts), ("faststep", faststep)])
+                                    ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", 10),
+                                    ("mts", mts), ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
-                                 ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1), ("mts", mts), ("faststep", faststep)])
+                                 ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1), ("mts", mts),
+                                 ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
 
     # Energy components analysis disabled for OpenMM MTS because it uses force groups
     if (engname == "openmm" and mts): logger.warn("OpenMM with MTS integrator; energy components analysis will be disabled.\n")

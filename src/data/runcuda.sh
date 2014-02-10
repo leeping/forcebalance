@@ -2,7 +2,11 @@
 
 # This wrapper script is for running CUDA jobs (hint hint, OpenMM) on clusters.
 
+COMMAND=$@
+
 # Load my environment variables. :)
+. /etc/profile
+. /etc/bashrc
 . ~/.bashrc
 # Make sure the Cuda environment is turned on
 
@@ -47,7 +51,7 @@ elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     export OPENMM_CUDA_COMPILER=/share/apps/cuda/4.1/cuda/bin/nvcc
     export BAK=$SCRATCH/runcuda-backups
 elif [[ $HOSTNAME =~ "not0rious" ]] ; then
-    module load openmm
+    module load cuda/5.5
 elif [[ $HOSTNAME =~ "ls4" ]] ; then
     module unload intel
     module load gcc
@@ -88,12 +92,18 @@ elif [[ `env | grep -i tacc | wc -l` -gt 0 ]] ; then
     export BAK=$SCRATCH/runcuda-backups
 fi
 
+if [[ x$CUDA_DEVICE != x ]] ; then
+    sleep $(( CUDA_DEVICE * 30 ))
+elif [[ x$PBS_JOBID != x ]] ; then
+    sleep $(( PBS_JOBID * 30 ))
+fi
+
 echo "#=======================#"
 echo "# ENVIRONMENT VARIABLES #"
 echo "#=======================#"
 echo
 
-set
+env
 
 echo
 echo "#=======================#"
@@ -112,11 +122,11 @@ echo "#=======================#"
 echo "# STARTING CALCULATION! #"
 echo "#=======================#"
 echo
-echo $@
+echo $COMMAND
 
 rm -f npt_result.p npt_result.p.bz2
 export PYTHONUNBUFFERED="y"
-time $@
+time $COMMAND
 # Delete backup files that are older than one week.
 find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD

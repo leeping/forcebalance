@@ -129,7 +129,12 @@ class Target(forcebalance.BaseClass):
         self.set_option(None, None, 'tgtdir', os.path.join(tgtdir,self.name))
         ## Temporary (working) directory; it is temp/(target_name)
         ## Used for storing temporary variables that don't change through the course of the optimization
-        self.tempdir     = os.path.join('temp',self.name)
+        if 'input_file' in options and options['input_file'] != None:
+            self.tempbase    = os.path.splitext(options['input_file'])[0]+'.tmp'
+        else:
+            self.tempbase    = "temp"
+        self.tempdir     = os.path.join(self.tempbase, self.name)
+        ## self.tempdir     = os.path.join('temp',self.name)
         ## The directory in which the simulation is running - this can be updated.
         self.rundir      = self.tempdir
         ## Need the forcefield (here for now)
@@ -213,18 +218,19 @@ class Target(forcebalance.BaseClass):
         cwd = os.getcwd()
         abstempdir = os.path.join(self.root,self.tempdir)
         if self.backup:
-            if not os.path.exists(os.path.join(self.root,'backups')):
-                os.makedirs(os.path.join(self.root,'backups'))
+            bakdir = os.path.join(os.path.splitext(self.tempbase)[0]+'.bak')
+            if not os.path.exists(bakdir):
+                os.makedirs(bakdir)
             if os.path.exists(abstempdir):
-                os.chdir(os.path.join(self.root,"temp"))
+                os.chdir(self.tempbase)
                 FileCount = 0
                 while True:
-                    CandFile = os.path.join(self.root,'backups',"%s_%i.tar.bz2" % (self.name,FileCount))
+                    CandFile = os.path.join(self.root,bakdir,"%s_%i.tar.bz2" % (self.name,FileCount))
                     if os.path.exists(CandFile):
                         FileCount += 1
                     else:
                         # I could use the tarfile module here
-                        logger.info("Backing up: " + self.tempdir + ' to: ' + "backups/%s_%i.tar.bz2\n" % (self.name,FileCount))
+                        logger.info("Backing up: " + self.tempdir + ' to: ' + "%s/%s_%i.tar.bz2\n" % (bakdir,self.name,FileCount))
                         subprocess.call(["tar","cjf",CandFile,self.name])
                         shutil.rmtree(self.name)
                         break
@@ -401,7 +407,7 @@ class RemoteTarget(Target):
         self.r_tgt_opts = tgt_opts.copy()
         self.r_tgt_opts["remote"]=False
         
-        tar = tarfile.open(name="temp/%s/target.tar.bz2" % self.name, mode='w:bz2')
+        tar = tarfile.open(name="%s/%s/target.tar.bz2" % (self.tempdir, self.name), mode='w:bz2')
         tar.add("%s/targets/%s" % (self.root, self.name), arcname = "targets/%s" % self.name)
         tar.close()
         
@@ -418,7 +424,7 @@ class RemoteTarget(Target):
         with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
-        forcebalance.nifty.LinkFile(os.path.join(self.root,"temp", self.name, "target.tar.bz2"),"%s.tar.bz2" % self.name)
+        forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, self.name, "target.tar.bz2"),"%s.tar.bz2" % self.name)
         
         wq = getWorkQueue()
         

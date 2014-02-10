@@ -25,6 +25,7 @@ from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
 from collections import OrderedDict
 import traceback
+import random
 #import IPython
 
 from forcebalance.output import getLogger
@@ -41,7 +42,7 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
     """
     clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
-    options = OrderedDict([(key.lower(), str(val) if val != None else None) for key, val in options.items()])
+    options = OrderedDict([(key.lower().replace('-','_'), str(val) if val != None else None) for key, val in options.items()])
     # List of lines in the output file.
     out = []
     # List of options in the output file.
@@ -84,13 +85,13 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
             else:
                 out.append(line)
     for key, val in options.items():
-        key = key.lower()
+        key = key.lower().replace('-','_')
         if key not in haveopts:
             haveopts.append(key)
             out.append("%-20s = %s" % (key, val))
     # Fill in some default options.
     for key, val in defaults.items():
-        key = key.lower()
+        key = key.lower().replace('-','_')
         options[key] = val
         if key not in haveopts:
             out.append("%-20s = %s" % (key, val))
@@ -1078,7 +1079,7 @@ class GMX(Engine):
         warnings = []
         if temperature != None:
             md_opts["ref_t"] = temperature
-            md_opts["gen_temp"] = temperature
+            md_opts["gen_vel"] = "no"
             md_defs["tc_grps"] = "System"
             md_defs["tcoupl"] = "v-rescale"
             md_defs["tau_t"] = 1.0
@@ -1093,6 +1094,7 @@ class GMX(Engine):
             md_opts["nstcomm"] = 0
 
         md_opts["nstenergy"] = nsave
+        md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
         md_opts["nstvout"] = nsave
         md_opts["nstfout"] = 0
@@ -1113,7 +1115,10 @@ class GMX(Engine):
         if nequil > 0:
             if verbose: logger.info("Equilibrating...\n")
             eq_opts = deepcopy(md_opts)
-            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0, "ref_p" : "%s %s" % (pressure, pressure), "ref_t" : "%s %s" %(temperature, temperature)})
+            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0,
+                            "gen-vel": "yes", "gen-temp" : temperature, "gen-seed" : random.randrange(100000,999999)})
+            if "pcoupltype" in eq_defs and eq_opts["pcoupltype"] == "semiisotropic":
+                eq_opts.update({"ref_p" : "%s %s" % (pressure, pressure), "ref_t" : "%s %s" %(temperature, temperature)})
             eq_defs = deepcopy(md_defs)
             if "pcoupl" in eq_defs: eq_opts["pcoupl"] = "berendsen"
             write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
@@ -1125,7 +1130,8 @@ class GMX(Engine):
 
         # Run production.
         if verbose: logger.info("Production run...\n")
-        md_opts.update({"ref_p" : "%s %s" % (pressure, pressure), "ref_t" : "%s %s" % (temperature, temperature)})
+        if "pcoupltype" in eq_defs and eq_opts["pcoupltype"] == "semiisotropic":
+            md_opts.update({"ref_p" : "%s %s" % (pressure, pressure), "ref_t" : "%s %s" % (temperature, temperature)})
         write_mdp("%s-md.mdp" % self.name, md_opts, fin="%s.mdp" % self.name, defaults=md_defs)
         self.warngmx("grompp -c %s -p %s.top -f %s-md.mdp -o %s-md.tpr" % (gro2, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
         self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
@@ -1151,7 +1157,6 @@ class GMX(Engine):
         for i in range(0, n_snap + 1):
             sn1[i].extend(sn2[i])
         Scds = np.array(sn1)
- 
         
         # Figure out which energy terms need to be printed.
         energyterms = self.energy_termnames(edrfile="%s-md.edr" % self.name)
@@ -1189,7 +1194,6 @@ class GMX(Engine):
         Ys = np.array(Ys)
         Als = (Xs * Ys) / 64
         if verbose: logger.info("Finished!\n")
-        with wopen(os.path.join('md_prop_arrs.p')) as f: lp_dump((Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps, Als, Scds), f)
         return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps, Als, Scds
 
 class Liquid_GMX(Liquid):
