@@ -893,7 +893,7 @@ class LineChunker(object):
     def __exit__(self, *args, **kwargs):
         self.close()
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, print_error=True, **kwargs):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, print_error=True, rbytes=1, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -906,7 +906,9 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     expand_cr = Whether to expand carriage returns into newlines (useful for GROMACS mdrun).
     print_error = Whether to print error messages on a crash. Should be true most of the time.
     persist = Continue execution even if the command gives a nonzero return code.
+    rbytes = Number of bytes to read from stdout and stderr streams at a time.  GMX requires rbytes = 1 otherwise streams are interleaved.  Higher values for speed.
     """
+
     # Dictionary of options to be passed to the Popen object.
     cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
 
@@ -971,11 +973,11 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             to_read, _, _ = select(streams, [], [])
             for fh in to_read:
                 if fh is p.stdout:
-                    read = fh.read(1)
+                    read = fh.read(rbytes)
                     if not read: streams.remove(p.stdout)
                     else: out_chunker.push(read)
                 elif fh is p.stderr:
-                    read = fh.read(1)
+                    read = fh.read(rbytes)
                     if not read: streams.remove(p.stderr)
                     else: err_chunker.push(read)
                 else:

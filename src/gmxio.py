@@ -781,7 +781,8 @@ class GMX(Engine):
         
         E = float(open("%s-min-e.xvg" % self.name).readlines()[-1].split()[1])
         M = Molecule("%s.gro" % self.name, build_topology=False) + Molecule("%s-min.gro" % self.name, build_topology=False)
-        M.align(center=False)
+        if not self.pbc:
+            M.align(center=False)
         rmsd = M.ref_rmsd(0)[1]
         M[1].write("%s-min.gro" % self.name)
 
