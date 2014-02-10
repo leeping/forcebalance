@@ -16,9 +16,10 @@ mvals, AGrad, AHess, id_string, options, tgt_opts, forcefield = forcebalance.nif
 f.close()
 
 options['root'] = os.getcwd()
+forcefield.root = os.getcwd()
 
 # set up forcefield
-forcefield.make(mvals)
+forcefield.make(mvals, printdir="forcefield")
 
 # set up and evaluate target
 tar = tarfile.open("%s.tar.bz2" % tgt_opts["name"], "r")

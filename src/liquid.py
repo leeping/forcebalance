@@ -102,6 +102,8 @@ class Liquid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        # This target can read data from disk.
+        self.readable = True
         # Read in liquid starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)): 
             raise RuntimeError("%s doesn't exist; please provide liquid_coords option" % self.liquid_coords)
@@ -241,6 +243,17 @@ class Liquid(Target):
                 self.set_option(global_opts,opt,default=default_denoms[opt])
             else:
                 self.set_option(global_opts,opt)
+
+    def check_files(self, there):
+        there = os.path.abspath(there)
+        if all([i in os.listdir(there) for i in self.Labels]):
+            for d in os.listdir(there):
+                if d in self.Labels:
+                    if os.path.exists(os.path.join(there, d, 'npt_result.p')):
+                        return 1
+                    elif os.path.exists(os.path.join(there, d, 'npt_result.p.bz2')):
+                        return 1
+        return 0
 
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
@@ -387,6 +400,7 @@ class Liquid(Target):
         # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
         #
         # First dump the force field to a pickle file
+        printcool("Target: %s - launching MD simulations\nTime steps: %i (eq) + %i (md)" % (self.name, self.liquid_eq_steps, self.liquid_md_steps), color=0)
         with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict,AGrad),f)
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
@@ -448,8 +462,13 @@ class Liquid(Target):
         @return Answer Contribution to the objective function
         
         """
+        
+        unpack = forcebalance.nifty.lp_load(open('forcebalance.p'))
+        mvals1 = unpack[1]
+        if (mvals1 != mvals).any():
+            warn_press_key("mvals from forcebalance.p does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
-        mbar_verbose = True
+        mbar_verbose = False
 
         Answer = {}
 
@@ -500,20 +519,20 @@ class Liquid(Target):
 
         self.AllResults[tuple(mvals)]['E'].append(np.array(Energies))
         self.AllResults[tuple(mvals)]['V'].append(np.array(Vols))
-        self.AllResults[tuple(mvals)]['R'].append(np.array(Rhos).flatten())
-        self.AllResults[tuple(mvals)]['Dx'].append(np.array([d[:,0] for d in Dips]).flatten())
-        self.AllResults[tuple(mvals)]['Dy'].append(np.array([d[:,1] for d in Dips]).flatten())
-        self.AllResults[tuple(mvals)]['Dz'].append(np.array([d[:,2] for d in Dips]).flatten())
-        self.AllResults[tuple(mvals)]['G'].append(np.hstack(tuple(Grads)))
-        self.AllResults[tuple(mvals)]['GDx'].append(np.hstack(tuple(gd[0] for gd in GDips)))
-        self.AllResults[tuple(mvals)]['GDy'].append(np.hstack(tuple(gd[1] for gd in GDips)))
-        self.AllResults[tuple(mvals)]['GDz'].append(np.hstack(tuple(gd[2] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['R'].append(np.array(Rhos))
+        self.AllResults[tuple(mvals)]['Dx'].append(np.array([d[:,0] for d in Dips]))
+        self.AllResults[tuple(mvals)]['Dy'].append(np.array([d[:,1] for d in Dips]))
+        self.AllResults[tuple(mvals)]['Dz'].append(np.array([d[:,2] for d in Dips]))
+        self.AllResults[tuple(mvals)]['G'].append(np.array(Grads))
+        self.AllResults[tuple(mvals)]['GDx'].append(np.array([gd[0] for gd in GDips]))
+        self.AllResults[tuple(mvals)]['GDy'].append(np.array([gd[1] for gd in GDips]))
+        self.AllResults[tuple(mvals)]['GDz'].append(np.array([gd[2] for gd in GDips]))
         self.AllResults[tuple(mvals)]['L'].append(len(Energies[0]))
         self.AllResults[tuple(mvals)]['Steps'].append(self.liquid_md_steps)
 
         if len(mPoints) > 0:
             self.AllResults[tuple(mvals)]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
-            self.AllResults[tuple(mvals)]['mG'].append(np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints])))
+            self.AllResults[tuple(mvals)]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
 
         # Number of data sets belonging to this value of the parameters.
         Nrpt = len(self.AllResults[tuple(mvals)]['R'])
@@ -528,14 +547,19 @@ class Liquid(Target):
             self.liquid_md_steps *= 2
             self.gas_eq_steps *= 2
             self.gas_md_steps *= 2
-        
-        E, V, R, Dx, Dy, Dz, G, GDx, GDy, GDz = \
-            (np.concatenate(self.AllResults[tuple(mvals)][i], axis=-1) for i in \
-                 ['E', 'V', 'R', 'Dx', 'Dy', 'Dz', 'G', 'GDx', 'GDy', 'GDz'])
+
+
+        # Concatenate along the data-set axis (more than 1 element  if we've returned to these parameters.)
+        E, V, R, Dx, Dy, Dz = \
+            (np.hstack(tuple(self.AllResults[tuple(mvals)][i])) for i in \
+                 ['E', 'V', 'R', 'Dx', 'Dy', 'Dz'])
+
+        G, GDx, GDy, GDz = \
+            (np.hstack((np.concatenate(tuple(self.AllResults[tuple(mvals)][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
 
         if len(mPoints) > 0:
-            mE, mG = (np.concatenate(self.AllResults[tuple(mvals)][i], axis=-1) for i in ['mE', 'mG'])
-
+            mE = np.hstack(tuple(self.AllResults[tuple(mvals)]['mE']))
+            mG = np.hstack((np.concatenate(tuple(self.AllResults[tuple(mvals)]['mG']), axis=2)))
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
         Rho_std  = OrderedDict([])
@@ -603,28 +627,28 @@ class Liquid(Target):
         
         W2 = fill_weights(W1, Points, BPoints, Shots)
 
-        # Run MBAR on the monomers.  This is barely necessary.
-        mW1 = None
-        mShots = len(mE[0])
-        if len(mBPoints) > 0:
-            mBSims = len(mBPoints)
-            mN_k = np.ones(mBSims)*mShots
-            mU_kln = np.zeros([mBSims,mBSims,mShots])
-            for m, PT in enumerate(mBPoints):
-                T = PT[0]
-                beta = 1. / (kb * T)
-                for k in range(mBSims):
-                    kk = Points.index(mBPoints[k])
-                    mU_kln[k, m, :]  = mE[kk]
-                    mU_kln[k, m, :] *= beta
-            if np.abs(np.std(mE)) > 1e-6 and mBSims > 1:
-                mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
-                mW1 = mmbar.getWeights()
-        elif len(mBPoints) == 1:
-            mW1 = np.ones((mBSims*mShots,mSims))
-            mW1 /= mBSims*mShots
-
-        mW2 = fill_weights(mW1, mPoints, mBPoints, mShots)
+        if len(mPoints) > 0:
+            # Run MBAR on the monomers.  This is barely necessary.
+            mW1 = None
+            mShots = len(mE[0])
+            if len(mBPoints) > 0:
+                mBSims = len(mBPoints)
+                mN_k = np.ones(mBSims)*mShots
+                mU_kln = np.zeros([mBSims,mBSims,mShots])
+                for m, PT in enumerate(mBPoints):
+                    T = PT[0]
+                    beta = 1. / (kb * T)
+                    for k in range(mBSims):
+                        kk = Points.index(mBPoints[k])
+                        mU_kln[k, m, :]  = mE[kk]
+                        mU_kln[k, m, :] *= beta
+                if np.abs(np.std(mE)) > 1e-6 and mBSims > 1:
+                    mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
+                    mW1 = mmbar.getWeights()
+            elif len(mBPoints) == 1:
+                mW1 = np.ones((mBSims*mShots,mSims))
+                mW1 /= mBSims*mShots
+            mW2 = fill_weights(mW1, mPoints, mBPoints, mShots)
          
         if self.do_self_pol:
             EPol = self.polarization_correction(mvals)
@@ -637,6 +661,10 @@ class Liquid(Target):
         # Arrays must be flattened now for calculation of properties.
         E = E.flatten()
         V = V.flatten()
+        R = R.flatten()
+        Dx = Dx.flatten()
+        Dy = Dy.flatten()
+        Dz = Dz.flatten()
         if len(mPoints) > 0: mE = mE.flatten()
             
         for i, PT in enumerate(Points):

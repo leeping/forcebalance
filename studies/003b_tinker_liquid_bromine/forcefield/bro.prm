@@ -1,0 +1,15 @@
+group-molecule
+
+vdwtype                 LENNARD-JONES
+radiusrule              GEOMETRIC
+radiustype              SIGMA
+radiussize              DIAMETER
+epsilonrule             GEOMETRIC
+dielectric              1.0
+
+atom             1   Br    "Bromine"        35     79.904     1
+
+bond             1    1            660.00       2.2800
+
+vdw              1                  3.670       0.5895   ; PRM 2 3
+
