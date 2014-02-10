@@ -569,7 +569,6 @@ def createWorkQueue(wq_port, debug=True):
     if debug:
         work_queue.set_debug_flag('all')
     WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
-    WORK_QUEUE.tasks_failed = 0 # Counter for tasks that fail at the application level
     WORK_QUEUE.specify_name('forcebalance')
     #WORK_QUEUE.specify_keepalive_timeout(8640000)
     WORK_QUEUE.specify_keepalive_interval(8640000)
@@ -671,7 +670,6 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                 taskid = wq.submit(task)
                 logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
-                wq.tasks_failed += 1
             else:
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
                     logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
@@ -685,13 +683,8 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
         except:
             nbusy = wq.stats.workers_busy
 
-        try:
-            Complete = wq.stats.total_tasks_complete - wq.tasks_failed
-            Total = wq.stats.total_tasks_dispatched - wq.tasks_failed
-        except:
-            logger.warning("wq object has no tasks_failed attribute, please use createWorkQueue() function.\n")
-            Complete = wq.stats.total_tasks_complete
-            Total = wq.stats.total_tasks_dispatched
+        Complete = wq.stats.total_tasks_complete
+        Total = wq.stats.total_tasks_dispatched
             
         if verbose:
             logger.info("Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n" \
@@ -1005,7 +998,8 @@ def warn_press_key(warning, timeout=10):
         logger.warning("\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m\n" % timeout)
         try: 
             rlist, wlist, xlist = select([sys.stdin], [], [], timeout)
-            sys.stdin.readline()
+            if rlist:
+                sys.stdin.readline()
         except: pass
 
 def warn_once(warning, warnhash = None):
