@@ -163,6 +163,8 @@ class Optimizer(forcebalance.BaseClass):
         self.FF        = FF
         ## Re-evaluate the objective function when an optimization step is rejected
         self.set_option(options, 'reevaluate', default=any(['liquid' or 'lipid' in tgt.type.lower() for tgt in self.Objective.Targets]), forceprint=True)
+        self.bakdir    = os.path.join(os.path.splitext(options['input_file'])[0]+'.bak')
+        self.resdir    = os.path.join('result',os.path.splitext(options['input_file'])[0])
         
         #======================================#
         #    Variables from the force field    #
@@ -200,7 +202,7 @@ class Optimizer(forcebalance.BaseClass):
             in_mvals = 0
             in_options = 0
             if os.path.exists(outfnm) and self.mvals_bak: 
-                bak(outfnm, dest='backups')
+                bak(outfnm, dest=self.bakdir)
             self.mvals_bak = 0
             fout = open(outfnm, 'w')
             for line in fin:
@@ -233,7 +235,7 @@ class Optimizer(forcebalance.BaseClass):
         ## Don't print a "result" force field if it's the same as the input.
         print_parameters = True
         if xk == None and (self.mvals0 == np.zeros(self.FF.np)).all(): 
-            logger.info("Parameter file same as original; will not be printed to 'results' folder.\n")
+            logger.info("Parameter file same as original; will not be printed to results folder.\n")
             print_parameters = False
         elif xk == None:
             xk = self.mvals0
@@ -253,14 +255,14 @@ class Optimizer(forcebalance.BaseClass):
             logger.info(bar)
             if self.backup:
                 for fnm in self.FF.fnms:
-                    if os.path.exists(os.path.join('result', fnm)):
-                        bak(os.path.join('result', fnm))
-            self.FF.make(xk,printdir='result')
-            # logger.info("The force field has been written to the 'result' directory.\n")
+                    if os.path.exists(os.path.join(self.resdir, fnm)):
+                        bak(os.path.join(self.resdir, fnm))
+            self.FF.make(xk,printdir=self.resdir)
+            # logger.info("The force field has been written to the '%s' directory.\n" % self.resdir)
             outfnm = self.save_mvals_to_input(xk)
             # logger.info("Input file with optimization parameters saved to %s.\n" % outfnm)
-            printcool("The force field has been written to the 'result' directory.\n"
-                      "Input file with optimization parameters saved to %s." % outfnm, color=0)
+            printcool("The force field has been written to the %s directory.\n"
+                      "Input file with optimization parameters saved to %s." % (self.resdir, outfnm), color=0)
                       # "To reload these parameters, use %s as the input\n"
                       # "file without changing the '%s' directory." % 
                       # (outfnm, outfnm, self.FF.ffdir), color=0, center=False, sym2='-')
@@ -326,8 +328,11 @@ class Optimizer(forcebalance.BaseClass):
                    self.convergence_objective, self.convergence_gradient, 
                    self.convergence_step), ansi=1, bold=1)
 
+        # Optimization contains uncertainty.
+        Uncertainty = any(['liquid' or 'lipid' in tgt.type.lower() for tgt in self.Objective.Targets])
+
         # Print a warning if optimization is unlikely to converge
-        if any(['liquid' or 'lipid' in tgt.type.lower() for tgt in self.Objective.Targets]) and self.convergence_objective < 1e-3:
+        if Uncertainty and self.convergence_objective < 1e-3:
             warn_press_key("Condensed phase targets detected - may not converge with current choice of"
                            " convergence_objective (%.e)\nRecommended range is 1e-2 - 1e-1 for this option." % self.convergence_objective)
 
@@ -363,9 +368,12 @@ class Optimizer(forcebalance.BaseClass):
         # Threshold for "high quality step" which increases trust radius.
         ThreHQ = 0.75
         printcool("Color Key for Objective Function -=X2=-\n\x1b[1mBold\x1b[0m = Initial step\n"
-                  "\x1b[92mGreen = Found lowest value of objective function\x1b[0m\n"
+                  "\x1b[92mGreen = Current lowest value of objective function%s\x1b[0m\n"
                   "\x1b[91mRed = Objective function rises, step rejected\x1b[0m\n"
-                  "\x1b[0mNo color = Not at the lowest value", bold=0, color=0, center=[True, False, False, False, False])
+                  "\x1b[0mNo color = Not at the lowest value" % " (best estimate)" if Uncertainty else "", \
+                      bold=0, color=0, center=[True, False, False, False, False])
+        # Optimization steps before this one are ineligible for consideration for "best step".
+        Best_Start = 0
 
         def print_progress(itn, nx, nd, ng, clr, x, std, qual):
             # Step number, norm of parameter vector / step / gradient, objective function value, change from previous steps, step quality.
@@ -397,7 +405,7 @@ class Optimizer(forcebalance.BaseClass):
             #================================#
             if ITERATION_NUMBER > 0:
                 dX_actual = X - X_prev
-                Best_Step = X < np.min(X_hist)
+                Best_Step = X < np.min(X_hist[Best_Start:])
                 try:
                     Quality = dX_actual / dX_expect
                 except:
@@ -411,7 +419,7 @@ class Optimizer(forcebalance.BaseClass):
                     #|  objective function rises.   |#
                     #================================#
                     GOODSTEP = 0
-                    print_progress(ITERATION_NUMBER, nxk, ndx, ngd, "\x1b[91m", X, stdfront, Quality)
+                    print_progress(ITERATION_NUMBER, nxk, ndx, ngd, "\x1b[91m", X, X-X_prev, Quality)
                     xk = xk_prev.copy()
                     trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
                     trustprint = "Reducing trust radius to % .4e\n" % trust
@@ -421,9 +429,12 @@ class Optimizer(forcebalance.BaseClass):
                         #|  function and gradients at   |#
                         #|   the previous parameters.   |#
                         #================================#
+                        Best_Start = ITERATION_NUMBER
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
+                        Best_Step = 1
                         self.adjh(trust)
+                        X_hist = np.append(X_hist, X)
                         data        = self.Objective.Full(xk,Ord,verbose=True)
                         GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
@@ -431,7 +442,7 @@ class Optimizer(forcebalance.BaseClass):
                         nxk = np.linalg.norm(xk)
                         ngd = np.linalg.norm(G)
                         Quality = 0.0
-                        color = "\x1b[0m"
+                        color = "\x1b[92m"
                     else:
                         #================================#
                         #| Go back to the start of loop |#
@@ -483,7 +494,7 @@ class Optimizer(forcebalance.BaseClass):
             nxk = np.linalg.norm(xk)
             ngd = np.linalg.norm(G)
             if GOODSTEP:
-                print_progress(ITERATION_NUMBER, nxk, ndx, ngd, color, X, stdfront, Quality)
+                print_progress(ITERATION_NUMBER, nxk, ndx, ngd, color, X, -1*stdfront, Quality)
             #================================#
             #|   Print objective function,  |#
             #|     gradient and Hessian.    |#
@@ -1105,20 +1116,19 @@ class Optimizer(forcebalance.BaseClass):
     def Gradient(self):
         """ A single-point gradient computation. """
         data        = self.Objective.Full(self.mvals0,Order=1)
-        printcool("Objective function: %.8f\nGradient below" % data['X'])
+        bar = printcool("Objective function: %.8f\nGradient below" % data['X'])
         self.FF.print_map(vals=data['G'],precision=8)
         logger.info(bar)
 
     def Hessian(self):
         """ A single-point Hessian computation. """
         data        = self.Objective.Full(self.mvals0,Order=2)
-        printcool("Objective function: %.8f\nGradient below" % data['X'])
+        bar = printcool("Objective function: %.8f\nGradient below" % data['X'])
         self.FF.print_map(vals=data['G'],precision=8)
         logger.info(bar)
-        print bar
         printcool("Hessian matrix:")
         pmat2d(data['H'], precision=8)
-        print bar
+        logger.info(bar)
 
     def FDCheckG(self):
         """ Finite-difference checker for the objective function gradient.

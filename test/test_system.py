@@ -13,8 +13,8 @@ from numpy import array
 # expected results taken from previous runs. Update this if it changes and seems reasonable (updated 10/24/13)
 EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
 
-# expected results taken from previous runs. Update this if it changes and seems reasonable (updated 11/02/13)
-EXPECTED_BROMINE_RESULTS = array([-2.3426e-01, -3.1603e-02])
+# expected results taken from previous runs. Update this if it changes and seems reasonable (updated 01/24/14)
+EXPECTED_BROMINE_RESULTS = array([-0.305718, -0.12497])
 
 # fail test if we take more than this many iterations to converge. Update this as necessary
 ITERATIONS_TO_CONVERGE = 5

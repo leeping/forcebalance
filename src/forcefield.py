@@ -597,8 +597,7 @@ class FF(forcebalance.BaseClass):
                 if src in self.map:
                     self.map[dest] = self.map[src]
                 else:
-                    warn_press_key(["Warning: You wanted to copy parameter from %s to %s, " % (src, dest), 
-                                    "but the source parameter does not seem to exist!"])
+                    warn_press_key("Warning: You wanted to copy parameter from %s to %s, but the source parameter does not seem to exist!" % (src, dest))
                 self.assign_field(self.map[dest],ffname,fflist.index(e),dest.split('/')[1],1)
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
@@ -679,6 +678,9 @@ class FF(forcebalance.BaseClass):
                 #if type(newffdata[fnm]) is etree._ElementTree:
                 if cmd != None:
                     try:
+                        # Bobby Tables, anyone?
+                        if any([x in cmd for x in "system", "subprocess", "import"]):
+                            warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
                         wval = eval(cmd.replace("PARM","PRM"))
                     except:
                         logger.error(traceback.format_exc() + '\n')
@@ -833,7 +835,7 @@ class FF(forcebalance.BaseClass):
                 logger.exception(mvals + '\n')
                 raise Exception('What the hell did you do?')
         else:
-            pvals = flat(np.mat(self.tmI)*col(mvals)) + self.pvals0
+            pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
         for i in range(self.np):
@@ -1091,7 +1093,9 @@ class FF(forcebalance.BaseClass):
 
         # This prints out the difference between the result of matrix multiplication
         # and the manual multiplication.
-        if np.max(np.abs(transmat1 - transmat)) > 0.0:
+        #print transmat1
+        #print transmat
+        if len(transmat) > 0 and np.max(np.abs(transmat1 - transmat)) > 0.0:
             logger.warning('The difference between the numpy multiplication and the manual multiplication is \x1b[1;91m%f\x1b[0m, '
                            'but it should be zero.\n' % np.max(np.abs(transmat1 - transmat)))
 

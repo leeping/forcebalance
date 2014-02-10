@@ -73,9 +73,9 @@ class Liquid(Target):
         # Number of time steps in the liquid "production" run
         self.set_option(tgt_opts,'liquid_md_steps',forceprint=True)
         # Number of time steps in the gas "equilibration" run
-        self.set_option(tgt_opts,'gas_eq_steps',forceprint=False)
+        self.set_option(tgt_opts,'gas_eq_steps',forceprint=True)
         # Number of time steps in the gas "production" run
-        self.set_option(tgt_opts,'gas_md_steps',forceprint=False)
+        self.set_option(tgt_opts,'gas_md_steps',forceprint=True)
         # Time step length (in fs) for the liquid production run
         self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
@@ -84,6 +84,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'gas_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'gas_interval',forceprint=True)
+        # Adjust simulation length in response to simulation uncertainty
+        self.set_option(tgt_opts,'adapt_errors',forceprint=True)
         # Minimize the energy prior to running any dynamics
         self.set_option(tgt_opts,'minimize_energy',forceprint=True)
         # Isolated dipole (debye) for analytic self-polarization correction.
@@ -133,12 +135,13 @@ class Liquid(Target):
         # Put stuff here that I'm not sure about. :)
         np.set_printoptions(precision=4, linewidth=100)
         np.seterr(under='ignore')
-        ## Saved force field mvals for all iterations
-        self.SavedMVal = {}
         ## Saved trajectories for all iterations and all temperatures
         self.SavedTraj = defaultdict(dict)
         ## Evaluated energies for all trajectories (i.e. all iterations and all temperatures), using all mvals
         self.MBarEnergy = defaultdict(lambda:defaultdict(dict))
+        ## Saved results for all iterations
+        # self.SavedMVals = []
+        self.AllResults = defaultdict(lambda:defaultdict(list))
 
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
@@ -257,7 +260,9 @@ class Liquid(Target):
                          output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
-        d = self.gas_engine.get_multipole_moments(optimize=True)['dipole']
+        self.FF.make(mvals)
+        ddict = self.gas_engine.multipole_moments(optimize=True)['dipole']
+        d = np.array(ddict.values())
         if not in_fd():
             logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
         # Taken from the original OpenMM interface code, this is how we calculate the conversion factor.
@@ -334,6 +339,7 @@ class Liquid(Target):
             avgCalc += Weights[PT]*calc[PT]
             avgExp  += Weights[PT]*exp[PT]
             avgGrad += Weights[PT]*grad[PT]
+
         for i, PT in enumerate(points):
             if SubAverage:
                 G = grad[PT]-avgGrad
@@ -443,7 +449,7 @@ class Liquid(Target):
         
         """
 
-        mbar_verbose = False
+        mbar_verbose = True
 
         Answer = {}
 
@@ -489,19 +495,46 @@ class Liquid(Target):
         else:
             NMol = list(set(NMols))[0]
     
-        R  = np.array(list(itertools.chain(*list(Rhos))))
-        V  = np.array(list(itertools.chain(*list(Vols))))
-        E  = np.array(list(itertools.chain(*list(Energies))))
-        Dx = np.array(list(itertools.chain(*list(d[:,0] for d in Dips))))
-        Dy = np.array(list(itertools.chain(*list(d[:,1] for d in Dips))))
-        Dz = np.array(list(itertools.chain(*list(d[:,2] for d in Dips))))
-        G  = np.hstack(tuple(Grads))
-        GDx = np.hstack(tuple(gd[0] for gd in GDips))
-        GDy = np.hstack(tuple(gd[1] for gd in GDips))
-        GDz = np.hstack(tuple(gd[2] for gd in GDips))
+        if not self.adapt_errors:
+            self.AllResults = defaultdict(lambda:defaultdict(list))
+
+        self.AllResults[tuple(mvals)]['E'].append(np.array(Energies))
+        self.AllResults[tuple(mvals)]['V'].append(np.array(Vols))
+        self.AllResults[tuple(mvals)]['R'].append(np.array(Rhos).flatten())
+        self.AllResults[tuple(mvals)]['Dx'].append(np.array([d[:,0] for d in Dips]).flatten())
+        self.AllResults[tuple(mvals)]['Dy'].append(np.array([d[:,1] for d in Dips]).flatten())
+        self.AllResults[tuple(mvals)]['Dz'].append(np.array([d[:,2] for d in Dips]).flatten())
+        self.AllResults[tuple(mvals)]['G'].append(np.hstack(tuple(Grads)))
+        self.AllResults[tuple(mvals)]['GDx'].append(np.hstack(tuple(gd[0] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['GDy'].append(np.hstack(tuple(gd[1] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['GDz'].append(np.hstack(tuple(gd[2] for gd in GDips)))
+        self.AllResults[tuple(mvals)]['L'].append(len(Energies[0]))
+        self.AllResults[tuple(mvals)]['Steps'].append(self.liquid_md_steps)
+
         if len(mPoints) > 0:
-            mE = np.array(list(itertools.chain(*list([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))))
-            mG = np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+            self.AllResults[tuple(mvals)]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
+            self.AllResults[tuple(mvals)]['mG'].append(np.hstack(tuple([i for pt, i in zip(Points,mGrads) if pt in mPoints])))
+
+        # Number of data sets belonging to this value of the parameters.
+        Nrpt = len(self.AllResults[tuple(mvals)]['R'])
+        sumsteps = sum(self.AllResults[tuple(mvals)]['Steps'])
+        if self.liquid_md_steps != sumsteps:
+            printcool("This objective function evaluation combines %i datasets\n" \
+                          "Increasing simulation length: %i -> %i steps" % \
+                          (Nrpt, self.liquid_md_steps, sumsteps), color=6)
+            if self.liquid_md_steps * 2 != sumsteps:
+                raise RuntimeError("Spoo!")
+            self.liquid_eq_steps *= 2
+            self.liquid_md_steps *= 2
+            self.gas_eq_steps *= 2
+            self.gas_md_steps *= 2
+        
+        E, V, R, Dx, Dy, Dz, G, GDx, GDy, GDz = \
+            (np.concatenate(self.AllResults[tuple(mvals)][i], axis=-1) for i in \
+                 ['E', 'V', 'R', 'Dx', 'Dy', 'Dz', 'G', 'GDx', 'GDy', 'GDz'])
+
+        if len(mPoints) > 0:
+            mE, mG = (np.concatenate(self.AllResults[tuple(mvals)][i], axis=-1) for i in ['mE', 'mG'])
 
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
@@ -527,7 +560,7 @@ class Liquid(Target):
 
         # Run MBAR using the total energies. Required for estimates that use the kinetic energy.
         BSims = len(BPoints)
-        Shots = len(Energies[0])
+        Shots = len(E[0])
         N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([BSims,BSims,Shots])
@@ -540,7 +573,7 @@ class Liquid(Target):
                 # Note that because the Boltzmann factors are computed from the conditions at simulation "m",
                 # the pV terms must be rescaled to the pressure at simulation "m".
                 kk = Points.index(BPoints[k])
-                U_kln[k, m, :]   = Energies[kk] + P*Vols[kk]*pvkj
+                U_kln[k, m, :]   = E[kk] + P*V[kk]*pvkj
                 U_kln[k, m, :]  *= beta
         W1 = None
         if len(BPoints) > 1:
@@ -572,7 +605,7 @@ class Liquid(Target):
 
         # Run MBAR on the monomers.  This is barely necessary.
         mW1 = None
-        mShots = len(mEnergies[0])
+        mShots = len(mE[0])
         if len(mBPoints) > 0:
             mBSims = len(mBPoints)
             mN_k = np.ones(mBSims)*mShots
@@ -582,9 +615,9 @@ class Liquid(Target):
                 beta = 1. / (kb * T)
                 for k in range(mBSims):
                     kk = Points.index(mBPoints[k])
-                    mU_kln[k, m, :]  = mEnergies[kk]
+                    mU_kln[k, m, :]  = mE[kk]
                     mU_kln[k, m, :] *= beta
-            if np.abs(np.std(mEnergies)) > 1e-6 and mBSims > 1:
+            if np.abs(np.std(mE)) > 1e-6 and mBSims > 1:
                 mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
                 mW1 = mmbar.getWeights()
         elif len(mBPoints) == 1:
@@ -600,6 +633,11 @@ class Liquid(Target):
             if AGrad:
                 self.FF.print_map(vals=GEPol)
                 logger.info(bar)
+
+        # Arrays must be flattened now for calculation of properties.
+        E = E.flatten()
+        V = V.flatten()
+        if len(mPoints) > 0: mE = mE.flatten()
             
         for i, PT in enumerate(Points):
             T = PT[0]
@@ -609,7 +647,7 @@ class Liquid(Target):
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
             C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
-            Gbar = flat(np.mat(G)*col(W))
+            Gbar = flat(np.matrix(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
             kT    = kb*T
@@ -617,21 +655,21 @@ class Liquid(Target):
             def avg(vec):
                 return np.dot(W,vec)
             def covde(vec):
-                return flat(np.mat(G)*col(W*vec)) - avg(vec)*Gbar
+                return flat(np.matrix(G)*col(W*vec)) - avg(vec)*Gbar
             def deprod(vec):
-                return flat(np.mat(G)*col(W*vec))
+                return flat(np.matrix(G)*col(W*vec))
             ## Density.
             Rho_calc[PT]   = np.dot(W,R)
-            Rho_grad[PT]   = mBeta*(flat(np.mat(G)*col(W*R)) - np.dot(W,R)*Gbar)
+            Rho_grad[PT]   = mBeta*(flat(np.matrix(G)*col(W*R)) - np.dot(W,R)*Gbar)
             ## Enthalpy of vaporization.
             if PT in mPoints:
                 ii = mPoints.index(PT)
                 mW = flat(mW2[:,ii])
-                mGbar = flat(np.mat(mG)*col(mW))
+                mGbar = flat(np.matrix(mG)*col(mW))
                 Hvap_calc[PT]  = np.dot(mW,mE) - np.dot(W,E)/NMol + kb*T - np.dot(W, PV)/NMol
-                Hvap_grad[PT]  = mGbar + mBeta*(flat(np.mat(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
-                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.mat(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
-                Hvap_grad[PT] -= (mBeta*(flat(np.mat(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                Hvap_grad[PT]  = mGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
+                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
+                Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
                 if self.do_self_pol:
                     Hvap_calc[PT] -= EPol
                     Hvap_grad[PT] -= GEPol
@@ -683,9 +721,9 @@ class Liquid(Target):
             prefactor = 30.348705333964077
             D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
             Eps0_calc[PT] = 1.0 + prefactor*(D2/avg(V))/T
-            GD2  = 2*(flat(np.mat(GDx)*col(W*Dx)) - avg(Dx)*flat(np.mat(GDx)*col(W))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-            GD2 += 2*(flat(np.mat(GDy)*col(W*Dy)) - avg(Dy)*flat(np.mat(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-            GD2 += 2*(flat(np.mat(GDz)*col(W*Dz)) - avg(Dz)*flat(np.mat(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+            GD2  = 2*(flat(np.matrix(GDx)*col(W*Dx)) - avg(Dx)*flat(np.matrix(GDx)*col(W))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+            GD2 += 2*(flat(np.matrix(GDy)*col(W*Dy)) - avg(Dy)*flat(np.matrix(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+            GD2 += 2*(flat(np.matrix(GDz)*col(W*Dz)) - avg(Dz)*flat(np.matrix(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
             Eps0_grad[PT] = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
             ## Estimation of errors.
             Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
