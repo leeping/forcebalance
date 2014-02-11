@@ -566,7 +566,7 @@ class OpenMM(Engine):
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
 
-    def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_beads=0, **kwargs):
+    def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_beads=[], **kwargs):
 
         """
         Create simulation object.  Note that this also takes in some
@@ -581,20 +581,54 @@ class OpenMM(Engine):
         if temperature:
             ## If temperature control is turned on, then run Langevin dynamics.
             if mts:
-                if rpmd_beads > 0:
+                if len(rpmd_beads) > 0:
                     raise RuntimeError("No multiple timestep integrator without temperature control.")
                 integrator = MTSVVVRIntegrator(temperature*kelvin, collision/picosecond,
                                                timestep*femtosecond, self.system, ninnersteps=int(timestep/faststep))
             else:
-                if rpmd_beads > 0:
-                    logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
-                    self.tdiv = rpmd_beads
-                    integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                if len(rpmd_beads) > 0:
+                    self.tdiv = rpmd_beads[0]
+                    if len(rpmd_beads) == 1:
+                        logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads[0])
+                        integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                    elif len(rpmd_beads) == 2:
+                        contract = False
+                        for frc in self.system.getForces():
+                            if any([isinstance(frc, fc) for fc in [NonbondedForce, AmoebaMultipoleForce, AmoebaVdwForce, CustomNonbondedForce]]):
+                                contract = True
+                                frc.setForceGroup(1)
+                        if contract:
+                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i).\n" % (rpmd_beads[0], rpmd_beads[1]))
+                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_beads[1]})
+                        else:
+                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (rpmd_beads[0]))
+                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                    elif len(rpmd_beads) == 3:
+                        contract = False
+                        contract_recip = False
+                        for frc in self.system.getForces():
+                            if any([isinstance(frc, fc) for fc in [NonbondedForce, AmoebaMultipoleForce, AmoebaVdwForce, CustomNonbondedForce]]):
+                                contract = True
+                                frc.setForceGroup(1)
+                                if isinstance(frc, NonbondedForce):
+                                    contract_recip = True
+                                    frc.setReciprocalSpaceForceGroup(2)
+                        if contract_recip:
+                            logger.info("Creating RPMD integrator with %i beads (NB/Recip forces contracted to %i/%i).\n" % (rpmd_beads[0], rpmd_beads[1], rpmd_beads[2]))
+                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_beads[1], 2:rpmd_beads[2]})
+                        elif contract:
+                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i, no Recip).\n" % (rpmd_beads[0], rpmd_beads[1]))
+                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_beads[1]})
+                        else:
+                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (rpmd_beads[0]))
+                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                    else:
+                        raise RuntimeError("Please provide a list of length 1, 2, or 3 to rpmd_beads")
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
         else:
             ## If no temperature control, default to the Verlet integrator.
-            if rpmd_beads > 0:
+            if len(rpmd_beads) > 0:
                 raise RuntimeError("No RPMD integrator without temperature control.")
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
@@ -610,13 +644,13 @@ class OpenMM(Engine):
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
-        if not mts:
+        if not mts and len(rpmd_beads) == 0:
             for i, j in enumerate(self.system.getForces()):
                 j.setForceGroup(i)
 
         ## If virtual particles are used with AMOEBA...
         SetAmoebaVirtualExclusions(self.system)
-        
+
         ## Finally create the simulation object.
         self.simulation = Simulation(self.mod.topology, self.system, integrator, self.platform)
         

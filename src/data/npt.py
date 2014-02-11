@@ -311,7 +311,7 @@ def main():
     # Number of threads, multiple timestep integrator, anisotropic box etc.
     threads = TgtOptions.get('md_threads', 1)
     mts = TgtOptions.get('mts_integrator', 0)
-    rpmd_beads = TgtOptions.get('rpmd_beads', 0)
+    rpmd_beads = TgtOptions.get('rpmd_beads', [])
     force_cuda = TgtOptions.get('force_cuda', 0)
     anisotropic = TgtOptions.get('anisotropic_box', 0)
     minimize = TgtOptions.get('minimize_energy', 1)
@@ -365,7 +365,7 @@ def main():
         EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
         EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gas_fnm)[0] + ".mdp"
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
-        if rpmd_beads > 0: raise RuntimeError("Gromacs cannot handle RPMD.")
+        if len(rpmd_beads) > 0: raise RuntimeError("Gromacs cannot handle RPMD.")
         if mts: logger.warn("Gromacs not configured for multiple timestep integrator.")
         if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")
     elif engname == "tinker":
@@ -374,7 +374,7 @@ def main():
         EngOpts["liquid"]["tinker_key"] = os.path.splitext(liquid_fnm)[0] + ".key"
         EngOpts["gas"]["tinker_key"] = os.path.splitext(gas_fnm)[0] + ".key"
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
-        if rpmd_beads > 0: raise RuntimeError("TINKER cannot handle RPMD.")
+        if len(rpmd_beads) > 0: raise RuntimeError("TINKER cannot handle RPMD.")
         if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
     EngOpts["liquid"].update(GenOpts)
     EngOpts["gas"].update(GenOpts)

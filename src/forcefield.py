@@ -223,7 +223,7 @@ class FF(forcebalance.BaseClass):
         ## AMOEBA mutual dipole convergence tolerance.
         self.set_option(options, 'amoeba_eps')
         ## Switch for rigid water molecules
-        self.set_option(options, 'rigid_water')
+        self.set_option(options, 'rigid_water', forceprint=True)
         ## Bypass the transformation and use physical parameters directly
         self.set_option(options, 'use_pvals')
         
