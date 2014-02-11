@@ -1037,7 +1037,7 @@ class GMX(Engine):
             Scd.append(Scd_snap)
         return Scd
 
-    def calc_scd(self, timestep):
+    def calc_scd(self, nsteps, timestep):
         # Find deuterium order parameter via g_order.
         # Create index files for each lipid tail.
         sn1_ndx = ['a C15', 'a C17', 'a C18', 'a C19', 'a C20', 'a C21', 'a C22', 'a C23', 'a C24', 'a C25', 'a C26', 'a C27', 'a C28', 'a C29', 'a C30', 'a C31', 'del 0-5', 'q', '']
@@ -1164,7 +1164,7 @@ class GMX(Engine):
 
         # Calculate deuterium order parameter for bilayer optimization.
         if bilayer:
-            Scds = calc_scd(timestep)
+            Scds = self.calc_scd(nsteps, timestep)
             al_vars = ['Box-Y', 'Box-X']
             self.callgmx("g_energy -f %s-md.edr -o %s-md-energy-xy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(al_vars))
             Xs = []
