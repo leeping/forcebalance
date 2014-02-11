@@ -980,8 +980,9 @@ class TINKER(Engine):
         else:
             vol = None
             rho = None
-
-        return rho, edyn, kdyn, vol, dip, ecomp
+        prop_return = OrderedDict()
+        prop_return.update({'Rhos': rho, 'Potentials': edyn, 'Kinetics': kdyn, 'Volumes': vol, 'Dips': dip, 'Ecomps': ecomp})
+        return prop_return
 
 class Liquid_TINKER(Liquid):
     """ Condensed phase property matching using TINKER. """

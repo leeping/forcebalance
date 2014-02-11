@@ -162,7 +162,7 @@ class Optimizer(forcebalance.BaseClass):
         ## The force field itself
         self.FF        = FF
         ## Re-evaluate the objective function when an optimization step is rejected
-        self.set_option(options, 'reevaluate', default=any(['liquid' in tgt.type.lower() for tgt in self.Objective.Targets]), forceprint=True)
+        self.set_option(options, 'reevaluate', default=any(['liquid' or 'lipid' in tgt.type.lower() for tgt in self.Objective.Targets]), forceprint=True)
         self.bakdir    = os.path.join(os.path.splitext(options['input_file'])[0]+'.bak')
         self.resdir    = os.path.join('result',os.path.splitext(options['input_file'])[0])
         
@@ -329,7 +329,7 @@ class Optimizer(forcebalance.BaseClass):
                    self.convergence_step), ansi=1, bold=1)
 
         # Optimization contains uncertainty.
-        Uncertainty = any(['liquid' in tgt.type.lower() for tgt in self.Objective.Targets])
+        Uncertainty = any(['liquid' or 'lipid' in tgt.type.lower() for tgt in self.Objective.Targets])
 
         # Print a warning if optimization is unlikely to converge
         if Uncertainty and self.convergence_objective < 1e-3:

@@ -203,7 +203,7 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
     def magic_string(str):
         # This cryptic command returns a string with the number of characters specified as a variable. :P
         # Useful for printing nice-looking dictionaries, i guess.
-        #print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
+        # print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
         return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
     if isinstance(Dict, OrderedDict): 
         logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None]))
@@ -424,7 +424,6 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     tau, where tau is the correlation time).  We enforce g >= 1.0.
 
     """
-
     # Create numpy copies of input arguments.
     A_n = np.array(A_n)
     if B_n is not None:
@@ -432,7 +431,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     else:
         B_n = np.array(A_n)
     # Get the length of the timeseries.
-    N = A_n.size
+    N = A_n.shape[0]
     # Be sure A_n and B_n have the same dimensions.
     if(A_n.shape != B_n.shape):
         raise ParameterError('A_n and B_n must have same dimensions.')
@@ -474,6 +473,18 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     if (g < 1.0): g = 1.0
     # Return the computed statistical inefficiency.
     return g
+
+# Slices a 2D array of data by column.  The new array is fed into the statisticalInefficiency function.
+def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
+    n_row = A_n.shape[0]
+    n_col = A_n.shape[-1]
+    multiD_sI = np.zeros((n_row, n_col))
+    for col in range(n_col):
+        if B_n is None:
+            multiD_sI[:,col] = statisticalInefficiency(A_n[:,col], B_n, fast, mintime, warn)
+        else:
+            multiD_sI[:,col] = statisticalInefficiency(A_n[:,col], B_n[:,col], fast, mintime, warn)
+    return multiD_sI
 
 #==============================#
 #|      XML Pickle stuff      |#

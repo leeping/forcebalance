@@ -107,7 +107,10 @@ else:
 
 def mean_stderr(ts):
     """ Get mean and standard deviation of a time series. """
-    return np.mean(ts), np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
+    if ts.ndim == 1:
+        return np.mean(ts, axis = 0), np.std(ts, axis = 0)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
+    else:
+        return np.mean(ts, axis = 0), np.std(ts, axis = 0)*np.sqrt(multiD_statisticalInefficiency(ts, warn=False)/len(ts))
 
 def bzavg(obs,boltz):
     """ Get the Boltzmann average of an observable. """
@@ -151,7 +154,6 @@ def energy_derivatives(engine, FF, mvals, h, length, AGrad=True, dipole=False):
 
     @param[in] mvals Mathematical parameter values
     @param[in] h Finite difference step size
-    @param[in] phase The phase (liquid, gas) to perform the calculation on
     @param[in] AGrad Switch to turn derivatives on or off; if off, return all zeros
     @param[in] dipole Switch for dipole derivatives.
     @return G First derivative of the energies in a N_param x N_coord array
@@ -196,7 +198,6 @@ def property_derivatives(engine, FF, mvals, h, kT, property_driver, property_kwa
 
     @param[in] mvals Mathematical parameter values
     @param[in] h Finite difference step size
-    @param[in] phase The phase (liquid, gas) to perform the calculation on
     @param[in] property_driver The function that calculates the property
     @param[in] property_driver A dictionary of arguments that goes into calculating the property
     @param[in] AGrad Switch to turn derivatives on or off; if off, return all zeros
@@ -256,7 +257,7 @@ def property_derivatives(engine, FF, mvals, h, kT, property_driver, property_kwa
 def main():
 
     """
-    Usage: (runcuda.sh) npt.py <openmm|gromacs|tinker> <liquid_nsteps> <liquid_timestep (fs)> <liquid_intvl (ps> <temperature> <pressure>
+    Usage: (runcuda.sh) npt.py <openmm|gromacs|tinker> <lipid_nsteps> <lipid_timestep (fs)> <lipid_intvl (ps> <temperature> <pressure>
 
     This program is meant to be called automatically by ForceBalance on
     a GPU cluster (specifically, subroutines in openmmio.py).  It is
@@ -297,47 +298,33 @@ def main():
     # Finite difference step size
     h = TgtOptions['h']
     # MD options; time step (fs), production steps, equilibration steps, interval for saving data (ps)
-    liquid_timestep = TgtOptions['liquid_timestep']
-    liquid_nsteps = TgtOptions['liquid_md_steps']
-    liquid_nequil = TgtOptions['liquid_eq_steps']
-    liquid_intvl = TgtOptions['liquid_interval']
-    liquid_fnm = TgtOptions['liquid_coords']
-    gas_timestep = TgtOptions['gas_timestep']
-    gas_nsteps = TgtOptions['gas_md_steps']
-    gas_nequil = TgtOptions['gas_eq_steps']
-    gas_intvl = TgtOptions['gas_interval']
-    gas_fnm = TgtOptions['gas_coords']
+    lipid_timestep = TgtOptions['lipid_timestep']
+    lipid_nsteps = TgtOptions['lipid_md_steps']
+    lipid_nequil = TgtOptions['lipid_eq_steps']
+    lipid_intvl = TgtOptions['lipid_interval']
+    lipid_fnm = TgtOptions['lipid_coords']
 
     # Number of threads, multiple timestep integrator, anisotropic box etc.
     threads = TgtOptions.get('md_threads', 1)
     mts = TgtOptions.get('mts_integrator', 0)
-    rpmd_beads = TgtOptions.get('rpmd_beads', 0)
     force_cuda = TgtOptions.get('force_cuda', 0)
     anisotropic = TgtOptions.get('anisotropic_box', 0)
     minimize = TgtOptions.get('minimize_energy', 1)
 
     # Print all options.
     printcool_dictionary(TgtOptions, title="Options from ForceBalance")
-    liquid_snapshots = (liquid_nsteps * liquid_timestep / 1000) / liquid_intvl
-    liquid_iframes = 1000 * liquid_intvl / liquid_timestep
-    gas_snapshots = (gas_nsteps * gas_timestep / 1000) / gas_intvl
-    gas_iframes = 1000 * gas_intvl / gas_timestep
+    lipid_snapshots = (lipid_nsteps * lipid_timestep / 1000) / lipid_intvl
+    lipid_iframes = 1000 * lipid_intvl / lipid_timestep
     logger.info("For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
-        % (liquid_snapshots, liquid_iframes, liquid_timestep))
-    if liquid_snapshots < 2:
-        raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (liquid_intvl/liquid_timestep)))
-    logger.info("For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
-        % (gas_snapshots, gas_iframes, gas_timestep))
-    if gas_snapshots < 2:
-        raise Exception('Please set the number of gas time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (gas_intvl/gas_timestep)))
+        % (lipid_snapshots, lipid_iframes, lipid_timestep))
+    if lipid_snapshots < 2:
+        raise Exception('Please set the number of lipid time steps so that you collect at least two snapshots (minimum %i)' \
+                            % (2000 * (lipid_intvl/lipid_timestep)))
 
     #----
     # Loading coordinates
     #----
-    ML = Molecule(liquid_fnm)
-    MG = Molecule(gas_fnm)
+    ML = Molecule(lipid_fnm)
     # Determine the number of molecules in the condensed phase coordinate file.
     NMol = len(ML.molecules)
 
@@ -345,13 +332,11 @@ def main():
     # Setting up MD simulations
     #----
     EngOpts = OrderedDict()
-    EngOpts["liquid"] = OrderedDict([("coords", liquid_fnm), ("mol", ML), ("pbc", True)])
-    EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
+    EngOpts["lipid"] = OrderedDict([("coords", lipid_fnm), ("mol", ML), ("pbc", True)])
     GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":
         # OpenMM-specific options
-        EngOpts["liquid"]["platname"] = 'CUDA'
-        EngOpts["gas"]["platname"] = 'Reference'
+        EngOpts["lipid"]["openmm_platform"] = 'CUDA'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
@@ -360,47 +345,36 @@ def main():
         # Gromacs-specific options
         GenOpts["gmxpath"] = TgtOptions["gmxpath"]
         GenOpts["gmxsuffix"] = TgtOptions["gmxsuffix"]
-        EngOpts["liquid"]["gmx_top"] = os.path.splitext(liquid_fnm)[0] + ".top"
-        EngOpts["liquid"]["gmx_mdp"] = os.path.splitext(liquid_fnm)[0] + ".mdp"
-        EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
-        EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gas_fnm)[0] + ".mdp"
+        EngOpts["lipid"]["gmx_top"] = os.path.splitext(lipid_fnm)[0] + ".top"
+        EngOpts["lipid"]["gmx_mdp"] = os.path.splitext(lipid_fnm)[0] + ".mdp"
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
-        if rpmd_beads > 0: raise RuntimeError("Gromacs cannot handle RPMD.")
         if mts: logger.warn("Gromacs not configured for multiple timestep integrator.")
         if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")
     elif engname == "tinker":
         # Tinker-specific options
         GenOpts["tinkerpath"] = TgtOptions["tinkerpath"]
-        EngOpts["liquid"]["tinker_key"] = os.path.splitext(liquid_fnm)[0] + ".key"
-        EngOpts["gas"]["tinker_key"] = os.path.splitext(gas_fnm)[0] + ".key"
+        EngOpts["lipid"]["tinker_key"] = os.path.splitext(lipid_fnm)[0] + ".key"
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
-        if rpmd_beads > 0: raise RuntimeError("TINKER cannot handle RPMD.")
         if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
-    EngOpts["liquid"].update(GenOpts)
-    EngOpts["gas"].update(GenOpts)
+    EngOpts["lipid"].update(GenOpts)
     for i in EngOpts:
         printcool_dictionary(EngOpts[i], "Engine options for %s" % i)
 
     # Set up MD options
     MDOpts = OrderedDict()
-    MDOpts["liquid"] = OrderedDict([("nsteps", liquid_nsteps), ("timestep", liquid_timestep),
-                                    ("temperature", temperature), ("pressure", pressure),
-                                    ("nequil", liquid_nequil), ("minimize", minimize),
-                                    ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
+    MDOpts["lipid"] = OrderedDict([("nsteps", lipid_nsteps), ("timestep", lipid_timestep),
+                                    ("temperature", "%s %s" % (temperature, temperature)), ("pressure", "%s %s" % (pressure, pressure)),
+                                    ("nequil", lipid_nequil), ("minimize", minimize),
+                                    ("nsave", int(1000 * lipid_intvl / lipid_timestep)),
                                     ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
-                                    ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", 10),
-                                    ("mts", mts), ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
-    MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
-                                 ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
-                                 ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1), ("mts", mts),
-                                 ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
+                                    ("threads", threads), ("anisotropic", anisotropic), 
+                                    ("mts", mts), ("faststep", faststep), ("bilayer", True)])
 
     # Energy components analysis disabled for OpenMM MTS because it uses force groups
     if (engname == "openmm" and mts): logger.warn("OpenMM with MTS integrator; energy components analysis will be disabled.\n")
 
     # Create instances of the MD Engine objects.
-    Liquid = Engine(name="liquid", **EngOpts["liquid"])
-    Gas = Engine(name="gas", **EngOpts["gas"])
+    Lipid = Engine(name="lipid", **EngOpts["lipid"])
 
     #=================================================================#
     # Run the simulation for the full system and analyze the results. #
@@ -409,13 +383,15 @@ def main():
     printcool("Condensed phase molecular dynamics", color=4, bold=True)
 
     # This line runs the condensed phase simulation.
-    prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    prop_return = Lipid.molecular_dynamics(**MDOpts["lipid"])
     Rhos = prop_return['Rhos']
     Potentials = prop_return['Potentials']
     Kinetics = prop_return['Kinetics']
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
+    Als = prop_return['Als']
+    Scds = prop_return['Scds']
 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -442,22 +418,6 @@ def main():
     Rho_avg, Rho_err = mean_stderr(Rhos)
     PrintEDA(EDA, NMol)
 
-    #==============================================#
-    # Now run the simulation for just the monomer. #
-    #==============================================#
-
-    # Run the OpenMM simulation, gather information.
-
-    printcool("Gas phase molecular dynamics", color=4, bold=True)
-    mprop_return = Gas.molecular_dynamics(**MDOpts["gas"])
-    mPotentials = mprop_return['Potentials']
-    mKinetics = mprop_return['Kinetics']
-    mEDA = mprop_return['Ecomps']
-
-    mEnergies = mPotentials + mKinetics
-    mEne_avg, mEne_err = mean_stderr(mEnergies)
-    PrintEDA(mEDA, 1)
-
     #============================================#
     #  Compute the potential energy derivatives. #
     #============================================#
@@ -469,14 +429,11 @@ def main():
     DoublePrecisionDerivatives = False
     if engname == "openmm" and DoublePrecisionDerivatives and AGrad:
         logger.info("Creating Double Precision Simulation for parameter derivatives\n")
-        Liquid = Engine(name="liquid", openmm_precision="double", **EngOpts["liquid"])
-        Gas = Engine(name="gas", openmm_precision="double", **EngOpts["gas"])
+        Lipid = Engine(name="lipid", openmm_precision="double", **EngOpts["lipid"])
 
     # Compute the energy and dipole derivatives.
     printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True)
-    G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, len(Energies), AGrad, dipole=True)
-    printcool("Gas phase energy derivatives", color=4, bold=True)
-    mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, len(mEnergies), AGrad, dipole=False)
+    G, GDx, GDy, GDz = energy_derivatives(Lipid, FF, mvals, h, len(Energies), AGrad, dipole=True)
 
     #==============================================#
     #  Condensed phase properties and derivatives. #
@@ -508,38 +465,17 @@ def main():
 
     if FDCheck:
         Sep = printcool("Numerical Derivative:")
-        GRho1 = property_derivatives(Liquid, FF, mvals, h, kT, calc_rho, {'r_':Rhos})
+        GRho1 = property_derivatives(Lipid, FF, mvals, h, kT, calc_rho, {'r_':Rhos})
         FF.print_map(vals=GRho1)
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GRho, GRho1)]
         FF.print_map(vals=absfrac)
 
     #----
-    # Enthalpy of vaporization
+    # Enthalpy of vaporization.  Removed.
     #----
     H = Energies + pV
     V = np.array(Volumes)
-
-    # Print out the liquid enthalpy.
-    logger.info("Liquid enthalpy: % .4f kJ/mol, stdev % .4f ; (% .4f from energy, % .4f from pV)\n" % 
-                (np.mean(H), np.std(H), np.mean(Energies), np.mean(pV)))
-    numboots = 1000
-
-    # The enthalpy of vaporization in kJ/mol.
-    Hvap_avg = mEne_avg - Ene_avg / NMol + kT - np.mean(pV) / NMol
-    Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
-
-    # Build the first Hvap derivative.
-    GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
-    GHvap /= NMol
-    GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
-    GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
-
-    Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol\nAnalytic Derivative:" % (Hvap_avg, Hvap_err))
-    FF.print_map(vals=GHvap)
 
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
@@ -562,6 +498,7 @@ def main():
         return 1/(kT*T) * (bzavg(h_*v_,b)-bzavg(h_,b)*bzavg(v_,b))/bzavg(v_,b)
     Alpha = calc_alpha(None, **{'h_':H, 'v_':V})
     Alphaboot = []
+    numboots = 1000
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
         Alphaboot.append(calc_alpha(None, **{'h_':H[boot], 'v_':V[boot]}))
@@ -577,7 +514,7 @@ def main():
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
-        GAlpha_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_alpha, {'h_':H,'v_':V})
+        GAlpha_fd = property_derivatives(Lipid, FF, mvals, h, kT, calc_alpha, {'h_':H,'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GAlpha_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -608,7 +545,7 @@ def main():
     GKappa  = bar_unit*(GKappa1 + GKappa2 + GKappa3)
     FF.print_map(vals=GKappa)
     if FDCheck:
-        GKappa_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_kappa, {'v_':V})
+        GKappa_fd = property_derivatives(Lipid, FF, mvals, h, kT, calc_kappa, {'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GKappa_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -641,7 +578,7 @@ def main():
     Sep = printcool("Isobaric heat capacity:  % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:
-        GCp_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_cp, {'h_':H})
+        GCp_fd = property_derivatives(Lipid, FF, mvals, h, kT, calc_cp, {'h_':H})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GCp_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -685,18 +622,57 @@ def main():
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)
     if FDCheck:
-        GEps0_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_eps0, {'d_':Dips,'v_':V})
+        GEps0_fd = property_derivatives(Lipid, FF, mvals, h, kT, calc_eps0, {'d_':Dips,'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GEps0_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GEps0,GEps0_fd)]
         FF.print_map(vals=absfrac)
 
+    #----
+    # Average area per lipid
+    #----
+    Al_avg, Al_err = mean_stderr(Als)
+    # Build the first A_l derivative.
+    GAl = mBeta * (flat(np.mat(G) * col(Als)) / L - np.mean(Als) * np.mean(G, axis=1))
+    # Print out A_l and its derivative.
+    Sep = printcool("Average Area per Lipid: % .4f +- % .4f nm^2\nAnalytic Derivative:" % (Al_avg, Al_err))
+    FF.print_map(vals=GAl)
+    logger.info(Sep)
+
+    def calc_al(b = None, **kwargs):
+        if b == None: b = np.ones(L,dtype=float)
+        if 'a_' in kwargs:
+            a_ = kwargs['a_']
+        return bzavg(a_,b)
+
+    # calc_al(None, **{'a_': Als})
+
+    #----
+    # Deuterium Order Parameter
+    #----
+    Scd_avg, Scd_e = mean_stderr(Scds)
+    Scd_err = flat(Scd_e)
+    GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
+    # Print out S_cd and its derivative.
+    scd_avgerr = ' '.join('%.4f +- %.4f \n' % F for F in zip(Scd_avg, Scd_err))
+    Sep = printcool("Deuterium order parameter: %s \nAnalytic Derivative:" % scd_avgerr)
+    FF.print_map(vals=GScd)
+    logger.info(Sep)
+
+    def calc_scd(b = None, **kwargs):
+        if b == None: b = np.ones(L,dtype=float)
+        if 's_' in kwargs:
+            s_ = kwargs['s_']
+        return bzavg(s_,b)
+
+    # calc_scd(None, **{'s_': Scds})
+
     logger.info("Writing final force field.\n")
     pvals = FF.make(mvals)
 
     logger.info("Writing all simulation data to disk.\n")
-    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
+    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], Rho_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Als, Al_err, Scds, Scd_err),f)
 
 if __name__ == "__main__":
     main()

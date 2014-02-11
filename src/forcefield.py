@@ -679,7 +679,7 @@ class FF(forcebalance.BaseClass):
                 if cmd != None:
                     try:
                         # Bobby Tables, anyone?
-                        if any([i in cmd for i in "system", "subprocess", "import"]):
+                        if any([x in cmd for x in "system", "subprocess", "import"]):
                             warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
                         wval = eval(cmd.replace("PARM","PRM"))
                     except:
