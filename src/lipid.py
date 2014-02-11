@@ -379,9 +379,9 @@ class Lipid(Target):
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
         delt = {PT : r for PT, r in zip(points,Delta)}
         if expname == 'scd': 
-            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT, '\n %s' % (' '.join('\t \t \t %9.6f    %9.6f +- %-7.6f %7.6f \n' % F for F in zip(exp[PT], calc[PT], flat(err[PT]), delt[PT])))) for PT in calc])
+            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT, '\n %s' % (' '.join('\t \t \t %9.6f    %9.6f +- %-7.6f % 7.6f \n' % F for F in zip(exp[PT], calc[PT], flat(err[PT]), delt[PT])))) for PT in calc])
         else:
-            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT, "%9.3f    %9.3f +- %-7.3f %7.3f %9.5f %9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
+            print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT, "%9.3f    %9.3f +- %-7.3f % 7.3f % 9.5f % 9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
 
         return Objective, Gradient, Hessian, print_out
 
