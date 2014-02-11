@@ -35,6 +35,7 @@ class TestImplemented(ForceBalanceTestCase):
                                'Interaction',
                                'Interaction_GMX',
                                'Liquid',
+                               'Lipid',
                                'BindingEnergy',
                                'LeastSquares',
                                'Vibration',
