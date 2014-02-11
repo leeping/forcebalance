@@ -1037,7 +1037,25 @@ class GMX(Engine):
             Scd.append(Scd_snap)
         return Scd
 
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, **kwargs):
+    def calc_scd(self, timestep):
+        # Find deuterium order parameter via g_order.
+        # Create index files for each lipid tail.
+        sn1_ndx = ['a C15', 'a C17', 'a C18', 'a C19', 'a C20', 'a C21', 'a C22', 'a C23', 'a C24', 'a C25', 'a C26', 'a C27', 'a C28', 'a C29', 'a C30', 'a C31', 'del 0-5', 'q', '']
+        sn2_ndx = ['a C34', 'a C36', 'a C37', 'a C38', 'a C39', 'a C40', 'a C41', 'a C42', 'a C43', 'a C44', 'a C45', 'a C46', 'a C47', 'a C48', 'a C49', 'a C50', 'del 0-5', 'q', '']
+        self.callgmx("make_ndx -f %s-md.tpr -o %s-sn1.ndx" % (self.name, self.name), stdin="\n".join(sn1_ndx))
+        self.callgmx("make_ndx -f %s-md.tpr -o %s-sn2.ndx" % (self.name, self.name), stdin="\n".join(sn2_ndx))
+        
+        # Loop over g_order for each frame.
+        # Adjust nsteps to account for nstxout = 1000.
+        n_snap = int((nsteps / 1000) * timestep)
+        sn1 = self.scd_persnap('sn1', timestep, n_snap)
+        sn2 = self.scd_persnap('sn2', timestep, n_snap)
+        for i in range(0, n_snap + 1):
+            sn1[i].extend(sn2[i])
+        Scds = np.array(sn1)
+        return Scds
+
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, bilayer=False, **kwargs):
         
         """
         Method for running a molecular dynamics simulation.  
@@ -1139,26 +1157,28 @@ class GMX(Engine):
         # Figure out dipoles - note we use g_dipoles and not the multipole_moments function.
         self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
 
-        # Find deuterium order parameter via g_order.
-        # Create index files for each lipid tail.
-        sn1_ndx = ['a C15', 'a C17', 'a C18', 'a C19', 'a C20', 'a C21', 'a C22', 'a C23', 'a C24', 'a C25', 'a C26', 'a C27', 'a C28', 'a C29', 'a C30', 'a C31', 'del 0-5', 'q', '']
-        sn2_ndx = ['a C34', 'a C36', 'a C37', 'a C38', 'a C39', 'a C40', 'a C41', 'a C42', 'a C43', 'a C44', 'a C45', 'a C46', 'a C47', 'a C48', 'a C49', 'a C50', 'del 0-5', 'q', '']
-        self.callgmx("make_ndx -f %s-md.tpr -o %s-sn1.ndx" % (self.name, self.name), stdin="\n".join(sn1_ndx))
-        self.callgmx("make_ndx -f %s-md.tpr -o %s-sn2.ndx" % (self.name, self.name), stdin="\n".join(sn2_ndx))
-        
-        # Loop over g_order for each frame.
-        # Adjust nsteps to account for nstxout = 1000.
-        n_snap = int((nsteps / 1000) * timestep)
-        sn1 = self.scd_persnap('sn1', timestep, n_snap)
-        sn2 = self.scd_persnap('sn2', timestep, n_snap)
-        for i in range(0, n_snap + 1):
-            sn1[i].extend(sn2[i])
-        Scds = np.array(sn1)
-        
         # Figure out which energy terms need to be printed.
         energyterms = self.energy_termnames(edrfile="%s-md.edr" % self.name)
         ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
-        ekeep += ['Temperature', 'Box-Y', 'Box-X', 'Volume', 'Density']
+        ekeep += ['Temperature', 'Volume', 'Density']
+
+        # Calculate deuterium order parameter for bilayer optimization.
+        if bilayer:
+            Scds = calc_scd(timestep)
+            al_vars = ['Box-Y', 'Box-X']
+            self.callgmx("g_energy -f %s-md.edr -o %s-md-energy-xy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(al_vars))
+            Xs = []
+            Ys = []
+            for line in open("%s-md-energy-xy.xvg" % self.name):
+                s = [float(i) for i in line.split()]
+                Xs.append(s[-1])
+                Ys.append(s[-2])
+            Xs = np.array(Xs)
+            Ys = np.array(Ys)
+            Als = (Xs * Ys) / 64
+        else:
+            Scds = 0
+            Als = 0
 
         # Perform energy component analysis and return properties.
         self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(ekeep))
@@ -1167,8 +1187,6 @@ class GMX(Engine):
         Volumes = []
         Kinetics = []
         Potentials = []
-        Xs = []
-        Ys = []
         for line in open("%s-md-energy.xvg" % self.name):
             s = [float(i) for i in line.split()]
             for i in range(len(ekeep) - 2):
@@ -1179,17 +1197,12 @@ class GMX(Engine):
                     ecomp[ekeep[i]] = [val]
             Rhos.append(s[-1])
             Volumes.append(s[-2])
-            Xs.append(s[-3])
-            Ys.append(s[-4])
         Rhos = np.array(Rhos)
         Volumes = np.array(Volumes)
         Potentials = np.array(ecomp['Potential'])
         Kinetics = np.array(ecomp['Kinetic-En.'])
         Dips = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-md-dip.xvg" % self.name)])
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
-        Xs = np.array(Xs)
-        Ys = np.array(Ys)
-        Als = (Xs * Ys) / 64
         # Initialized property dictionary.
         prop_return = OrderedDict()
         prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'Als': Als, 'Scds': Scds})
