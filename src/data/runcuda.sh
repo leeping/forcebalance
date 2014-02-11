@@ -51,7 +51,7 @@ elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     export OPENMM_CUDA_COMPILER=/share/apps/cuda/4.1/cuda/bin/nvcc
     export BAK=$SCRATCH/runcuda-backups
 elif [[ $HOSTNAME =~ "not0rious" ]] ; then
-    module load openmm
+    module load cuda/5.5
 elif [[ $HOSTNAME =~ "ls4" ]] ; then
     module unload intel
     module load gcc
@@ -103,7 +103,7 @@ echo "# ENVIRONMENT VARIABLES #"
 echo "#=======================#"
 echo
 
-set
+env
 
 echo
 echo "#=======================#"

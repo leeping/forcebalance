@@ -161,8 +161,9 @@ class Optimizer(forcebalance.BaseClass):
         self.bhyp      = Objective.Penalty.ptyp != 2
         ## The force field itself
         self.FF        = FF
-        ## Re-evaluate the objective function when an optimization step is rejected
-        self.set_option(options, 'reevaluate', default=any(['liquid' in tgt.type.lower() for tgt in self.Objective.Targets]), forceprint=True)
+        ## Target types which introduce uncertainty into the objective function.
+        ## Will re-evaluate the objective function when an optimization step is rejected
+        self.uncert    = any([any([i in tgt.type.lower() for i in ['liquid', 'lipid', 'thermo']]) for tgt in self.Objective.Targets])
         self.bakdir    = os.path.join(os.path.splitext(options['input_file'])[0]+'.bak')
         self.resdir    = os.path.join('result',os.path.splitext(options['input_file'])[0])
         
@@ -329,7 +330,7 @@ class Optimizer(forcebalance.BaseClass):
                    self.convergence_step), ansi=1, bold=1)
 
         # Print a warning if optimization is unlikely to converge
-        if any(['liquid' in tgt.type.lower() for tgt in self.Objective.Targets]) and self.convergence_objective < 1e-3:
+        if self.uncert and self.convergence_objective < 1e-3:
             warn_press_key("Condensed phase targets detected - may not converge with current choice of"
                            " convergence_objective (%.e)\nRecommended range is 1e-2 - 1e-1 for this option." % self.convergence_objective)
 
@@ -364,10 +365,13 @@ class Optimizer(forcebalance.BaseClass):
         ThreLQ = 0.25
         # Threshold for "high quality step" which increases trust radius.
         ThreHQ = 0.75
-        printcool("Color Key for Objective Function -=X2=-\n\x1b[1mBold\x1b[0m = Initial step\n"
-                  "\x1b[92mGreen = Found lowest value of objective function\x1b[0m\n"
-                  "\x1b[91mRed = Objective function rises, step rejected\x1b[0m\n"
-                  "\x1b[0mNo color = Not at the lowest value", bold=0, color=0, center=[True, False, False, False, False])
+        printcool("Color Key for Objective Function -=X2=-\n\x1b[1mBold\x1b[0m = Initial step\n" \
+                      "\x1b[92mGreen = Current lowest value of objective function%s\x1b[0m\n" \
+                      "\x1b[91mRed = Objective function rises, step rejected\x1b[0m\n" \
+                      "\x1b[0mNo color = Not at the lowest value" % (" (best estimate)" if self.uncert else ""), \
+                      bold=0, color=0, center=[True, False, False, False, False])
+        # Optimization steps before this one are ineligible for consideration for "best step".
+        Best_Start = 0
 
         def print_progress(itn, nx, nd, ng, clr, x, std, qual):
             # Step number, norm of parameter vector / step / gradient, objective function value, change from previous steps, step quality.
@@ -399,7 +403,7 @@ class Optimizer(forcebalance.BaseClass):
             #================================#
             if ITERATION_NUMBER > 0:
                 dX_actual = X - X_prev
-                Best_Step = X < np.min(X_hist)
+                Best_Step = X < np.min(X_hist[Best_Start:])
                 try:
                     Quality = dX_actual / dX_expect
                 except:
@@ -417,7 +421,7 @@ class Optimizer(forcebalance.BaseClass):
                     xk = xk_prev.copy()
                     trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
                     trustprint = "Reducing trust radius to % .4e\n" % trust
-                    if self.reevaluate:
+                    if self.uncert:
                         #================================#
                         #|  Re-evaluate the objective   |#
                         #|  function and gradients at   |#
@@ -425,7 +429,10 @@ class Optimizer(forcebalance.BaseClass):
                         #================================#
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
                         ITERATION_NUMBER += 1
+                        Best_Start = ITERATION_NUMBER
+                        Best_Step = 1
                         self.adjh(trust)
+                        X_hist = np.append(X_hist, X)
                         data        = self.Objective.Full(xk,Ord,verbose=True)
                         GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
@@ -433,7 +440,7 @@ class Optimizer(forcebalance.BaseClass):
                         nxk = np.linalg.norm(xk)
                         ngd = np.linalg.norm(G)
                         Quality = 0.0
-                        color = "\x1b[0m"
+                        color = "\x1b[92m"
                     else:
                         #================================#
                         #| Go back to the start of loop |#
@@ -1107,20 +1114,19 @@ class Optimizer(forcebalance.BaseClass):
     def Gradient(self):
         """ A single-point gradient computation. """
         data        = self.Objective.Full(self.mvals0,Order=1)
-        printcool("Objective function: %.8f\nGradient below" % data['X'])
+        bar = printcool("Objective function: %.8f\nGradient below" % data['X'])
         self.FF.print_map(vals=data['G'],precision=8)
         logger.info(bar)
 
     def Hessian(self):
         """ A single-point Hessian computation. """
         data        = self.Objective.Full(self.mvals0,Order=2)
-        printcool("Objective function: %.8f\nGradient below" % data['X'])
+        bar = printcool("Objective function: %.8f\nGradient below" % data['X'])
         self.FF.print_map(vals=data['G'],precision=8)
         logger.info(bar)
-        print bar
         printcool("Hessian matrix:")
         pmat2d(data['H'], precision=8)
-        print bar
+        logger.info(bar)
 
     def FDCheckG(self):
         """ Finite-difference checker for the objective function gradient.

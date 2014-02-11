@@ -203,7 +203,7 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
     def magic_string(str):
         # This cryptic command returns a string with the number of characters specified as a variable. :P
         # Useful for printing nice-looking dictionaries, i guess.
-        #print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
+        # print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
         return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
     if isinstance(Dict, OrderedDict): 
         logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None]))
@@ -424,7 +424,6 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     tau, where tau is the correlation time).  We enforce g >= 1.0.
 
     """
-
     # Create numpy copies of input arguments.
     A_n = np.array(A_n)
     if B_n is not None:
@@ -432,7 +431,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     else:
         B_n = np.array(A_n)
     # Get the length of the timeseries.
-    N = A_n.size
+    N = A_n.shape[0]
     # Be sure A_n and B_n have the same dimensions.
     if(A_n.shape != B_n.shape):
         raise ParameterError('A_n and B_n must have same dimensions.')
@@ -474,6 +473,18 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     if (g < 1.0): g = 1.0
     # Return the computed statistical inefficiency.
     return g
+
+# Slices a 2D array of data by column.  The new array is fed into the statisticalInefficiency function.
+def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
+    n_row = A_n.shape[0]
+    n_col = A_n.shape[-1]
+    multiD_sI = np.zeros((n_row, n_col))
+    for col in range(n_col):
+        if B_n is None:
+            multiD_sI[:,col] = statisticalInefficiency(A_n[:,col], B_n, fast, mintime, warn)
+        else:
+            multiD_sI[:,col] = statisticalInefficiency(A_n[:,col], B_n[:,col], fast, mintime, warn)
+    return multiD_sI
 
 #==============================#
 #|      XML Pickle stuff      |#
@@ -569,7 +580,6 @@ def createWorkQueue(wq_port, debug=True):
     if debug:
         work_queue.set_debug_flag('all')
     WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
-    WORK_QUEUE.tasks_failed = 0 # Counter for tasks that fail at the application level
     WORK_QUEUE.specify_name('forcebalance')
     #WORK_QUEUE.specify_keepalive_timeout(8640000)
     WORK_QUEUE.specify_keepalive_interval(8640000)
@@ -671,7 +681,6 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                 taskid = wq.submit(task)
                 logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
-                wq.tasks_failed += 1
             else:
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
                     logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
@@ -685,13 +694,8 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
         except:
             nbusy = wq.stats.workers_busy
 
-        try:
-            Complete = wq.stats.total_tasks_complete - wq.tasks_failed
-            Total = wq.stats.total_tasks_dispatched - wq.tasks_failed
-        except:
-            logger.warning("wq object has no tasks_failed attribute, please use createWorkQueue() function.\n")
-            Complete = wq.stats.total_tasks_complete
-            Total = wq.stats.total_tasks_dispatched
+        Complete = wq.stats.total_tasks_complete
+        Total = wq.stats.total_tasks_dispatched
             
         if verbose:
             logger.info("Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n" \
@@ -882,7 +886,7 @@ class LineChunker(object):
     def __exit__(self, *args, **kwargs):
         self.close()
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, print_error=True, **kwargs):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, print_error=True, rbytes=1, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -895,7 +899,9 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     expand_cr = Whether to expand carriage returns into newlines (useful for GROMACS mdrun).
     print_error = Whether to print error messages on a crash. Should be true most of the time.
     persist = Continue execution even if the command gives a nonzero return code.
+    rbytes = Number of bytes to read from stdout and stderr streams at a time.  GMX requires rbytes = 1 otherwise streams are interleaved.  Higher values for speed.
     """
+
     # Dictionary of options to be passed to the Popen object.
     cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
 
@@ -960,11 +966,11 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             to_read, _, _ = select(streams, [], [])
             for fh in to_read:
                 if fh is p.stdout:
-                    read = fh.read(1)
+                    read = fh.read(rbytes)
                     if not read: streams.remove(p.stdout)
                     else: out_chunker.push(read)
                 elif fh is p.stderr:
-                    read = fh.read(1)
+                    read = fh.read(rbytes)
                     if not read: streams.remove(p.stderr)
                     else: err_chunker.push(read)
                 else:
@@ -998,16 +1004,13 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     return Out
 
 def warn_press_key(warning, timeout=10):
-    if type(warning) is str:
-        logger.warning(warning + '\n')
-    elif type(warning) is list:
-        for line in warning:
-            logger.warning(line + '\n')
-    else:
-        logger.warning("You're not supposed to pass me a variable of this type: " + str(type(warning)))
+    logger.warning(warning + '\n')
     if sys.stdin.isatty():
         logger.warning("\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m\n" % timeout)
-        try: rlist, wlist, xlist = select([sys.stdin], [], [], timeout)
+        try: 
+            rlist, wlist, xlist = select([sys.stdin], [], [], timeout)
+            if rlist:
+                sys.stdin.readline()
         except: pass
 
 def warn_once(warning, warnhash = None):

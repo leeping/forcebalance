@@ -22,7 +22,7 @@ from forcebalance.abinitio import AbInitio
 from forcebalance.vibration import Vibration
 from forcebalance.moments import Moments
 from forcebalance.liquid import Liquid
-from forcebalance.molecule import Molecule
+from forcebalance.molecule import Molecule, BuildLatticeFromLengthsAngles
 from forcebalance.binding import BindingEnergy
 from forcebalance.interaction import Interaction
 from forcebalance.finite_difference import in_fd
@@ -296,6 +296,7 @@ class TINKER(Engine):
     def __init__(self, name="tinker", **kwargs):
         ## Keyword args that aren't in this list are filtered out.
         self.valkwd = ['tinker_key', 'tinkerpath', 'tinker_prm']
+        self.warn_vn = False
         super(TINKER,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -342,7 +343,23 @@ class TINKER(Engine):
             LinkFile(self.abskey, "%s.key" % self.name)
         prog = os.path.join(self.tinkerpath, csplit[0])
         csplit[0] = prog
-        o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
+        o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
+        # Determine the TINKER version number.
+        for line in o[:10]:
+            if "Version" in line:
+                vw = line.split()[2]
+                if len(vw.split('.')) <= 2:
+                    vn = float(vw)
+                else:
+                    vn = float(vw.split('.')[:2])
+                vn_need = 6.3
+                try:
+                    if vn < vn_need:
+                        if self.warn_vn: 
+                            warn_press_key("ForceBalance requires TINKER %.1f - unexpected behavior with older versions!" % vn_need)
+                        self.warn_vn = True
+                except:
+                    raise RuntimeError("Unable to determine TINKER version number!")
         for line in o[-10:]:
             # Catch exceptions since TINKER does not have exit status.
             if "TINKER is Unable to Continue" in line:
@@ -360,6 +377,9 @@ class TINKER(Engine):
     def prepare(self, pbc=False, **kwargs):
 
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
+
+        # Call TINKER but do nothing to figure out the version number.
+        o = self.calltinker("dynamic", persist=1, print_error=False)
 
         self.rigid = False
 
@@ -417,8 +437,9 @@ class TINKER(Engine):
                 tk_opts['alpha'] = None
                 tk_opts['beta'] = None
                 tk_opts['gamma'] = None
-        if (not keypbc) and pbc:
-            raise RuntimeError("Periodic boundary conditions require a-axis to be in the .key file.")
+        if pbc:
+            if (not keypbc) and 'boxes' not in self.mol.Data:
+                raise RuntimeError("Periodic boundary conditions require either (1) a-axis to be in the .key file or (b) boxes to be in the coordinate file.")
         self.pbc = pbc
         if pbc:
             tk_opts['ewald'] = ''
@@ -450,7 +471,7 @@ class TINKER(Engine):
         self.mol.require('tinkersuf')
 
         ## Call analyze to read information needed to build the atom lists.
-        o = self.calltinker("analyze %s.xyz P,C" % (self.name))
+        o = self.calltinker("analyze %s.xyz P,C" % (self.name), stdin="ALL")
 
         ## Parse the output of analyze.
         mode = 0
@@ -521,7 +542,8 @@ class TINKER(Engine):
         o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
         # Silently align the optimized geometry.
         M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
-        M12.align(center=False)
+        if not self.pbc:
+            M12.align(center=False)
         M12[1].write("%s.xyz_2" % self.name, ftype="tinker")
         rmsd = M12.ref_rmsd(0)[1]
         cnvgd = 0
@@ -560,7 +582,7 @@ class TINKER(Engine):
         Result = OrderedDict()
         # If we want the dipoles (or just energies), analyze is the way to go.
         if dipole or (not force):
-            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="G,E", print_to_screen=False)
+            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="G,E,M", print_to_screen=False)
             # Read potential energy and dipole from file.
             eanl = []
             dip = []
@@ -577,30 +599,26 @@ class TINKER(Engine):
         if force:
             E = []
             F = []
-            M = Molecule(xyzin)
-            boxfile = os.path.split(xyzin)[0]+".box"
-            B = [[float(i) for i in line.split()[1:]] for line in open(boxfile).readlines()] if os.path.exists(boxfile) else None
-            if B != None and len(B) != len(M):
-                raise RuntimeError("Length of box file doesn't match trajectory file")
-            if len(M) > 10: warn_once("Using testgrad to loop over %i energy/force calculations; will be slow." % len(self.mol))
-            for I in range(len(M)):
-                F.append([])
-                M[I].write("%s-1.xyz" % self.name, ftype="tinker")
-                if B != None:
-                    write_key("%s-1.key" % self.name, OrderedDict([('a-axis', B[0]), ('b-axis', B[1]), ('c-axis', B[2]),
-                                                                   ('alpha', B[3]), ('beta', B[4]), ('gamma', B[5])]), fin="%s.key" % self.name)
-                o = self.calltinker("testgrad %s-1.xyz -k %s%s y n n" % (self.name, self.name, "-1" if B != None else ""))
-                # Read data from stdout and stderr, and convert it to GROMACS
-                # units for consistency with existing code.
-                i = 0
-                for line in o:
-                    s = line.split()
-                    if "Total Potential Energy" in line:
-                        E.append(float(s[4]) * 4.184)
-                    if len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
-                        if self.AtomMask[i]:
-                            F[-1] += [-1 * float(j) * 4.184 * 10 for j in s[2:5]]
-                        i += 1
+            Fi = []
+            o = self.calltinker("testgrad %s -k %s y n n" % (xyzin, self.name))
+            i = 0
+            ReadFrc = 0
+            for line in o:
+                s = line.split()
+                if "Total Potential Energy" in line:
+                    E.append(float(s[4]) * 4.184)
+                if "Cartesian Gradient Breakdown over Individual Atoms" in line:
+                    ReadFrc = 1
+                if ReadFrc and len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
+                    ReadFrc = 2
+                    if self.AtomMask[i]:
+                        Fi += [-1 * float(j) * 4.184 * 10 for j in s[2:5]]
+                    i += 1
+                if ReadFrc == 2 and len(s) < 6:
+                    ReadFrc = 0
+                    F.append(Fi)
+                    Fi = []
+                    i = 0
             Result["Energy"] = np.array(E)
             Result["Force"] = np.array(F)
         return Result
@@ -832,10 +850,9 @@ class TINKER(Engine):
         if self.pbc:
             md_opts["vdw-correction"] = ''
             if temperature != None and pressure != None: 
-                md_defs["integrator"] = "nose-hoover"
-                md_defs["thermostat"] = "nose-hoover"
-                md_defs["barostat"] = "nose-hoover"
-                md_opts["save-box"] = ''
+                md_defs["integrator"] = "beeman"
+                md_defs["thermostat"] = "bussi"
+                md_defs["barostat"] = "montecarlo"
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
             elif pressure != None:
@@ -870,7 +887,7 @@ class TINKER(Engine):
             else:
                 self.calltinker("dynamic %s -k %s-eq %i %f %f 2 %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,
                                                                        temperature), print_to_screen=verbose)
-            os.system("rm -f %s.arc %s.box" % (self.name, self.name))
+            os.system("rm -f %s.arc" % (self.name))
 
         # Run production.
         if verbose: printcool("Running production dynamics", color=0)
@@ -884,7 +901,6 @@ class TINKER(Engine):
             
         # Gather information.
         os.system("mv %s.arc %s-md.arc" % (self.name, self.name))
-        if self.pbc: os.system("mv %s.box %s-md.box" % (self.name, self.name))
         self.mdtraj = "%s-md.arc" % self.name
         edyn = []
         kdyn = []
@@ -904,7 +920,7 @@ class TINKER(Engine):
         temps = np.array(temps)
     
         if verbose: logger.info("Post-processing to get the dipole moments\n")
-        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E", print_to_screen=False)
+        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E,M", print_to_screen=False)
 
         # Read potential energy and dipole from file.
         eanl = []
@@ -956,14 +972,17 @@ class TINKER(Engine):
         # Out[22]: 1.6605387831627252
         conv = 1.6605387831627252
         if self.pbc:
-            box = [[float(i) for i in line.split()[1:4]] for line in open("%s-md.box" % self.name).readlines()]
-            vol = np.array([i[0]*i[1]*i[2] for i in box]) / 1000
+            vol = np.array([BuildLatticeFromLengthsAngles(*[float(j) for j in line.split()]).V \
+                                for line in open("%s-md.arc" % self.name).readlines() \
+                                if (len(line.split()) == 6 and isfloat(line.split()[1]) \
+                                        and all([isfloat(i) for i in line.split()[:6]]))]) / 1000
             rho = conv * mass / vol
         else:
             vol = None
             rho = None
-
-        return rho, edyn, kdyn, vol, dip, ecomp
+        prop_return = OrderedDict()
+        prop_return.update({'Rhos': rho, 'Potentials': edyn, 'Kinetics': kdyn, 'Volumes': vol, 'Dips': dip, 'Ecomps': ecomp})
+        return prop_return
 
 class Liquid_TINKER(Liquid):
     """ Condensed phase property matching using TINKER. """
@@ -995,9 +1014,9 @@ class Liquid_TINKER(Liquid):
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
                 raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
         # Send back the trajectory file.
-        if self.save_traj > 0:
-            self.extra_output = ['liquid-md.arc']
         self.extra_output = ['liquid.dyn']
+        if self.save_traj > 0:
+            self.extra_output += ['liquid-md.arc']
         # Dictionary of .dyn files used to restart simulations.
         self.DynDict = OrderedDict()
         self.DynDict_New = OrderedDict()
@@ -1014,6 +1033,7 @@ class Liquid_TINKER(Liquid):
             self.nptfiles.append(dyndest)
         self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
         super(Liquid_TINKER, self).npt_simulation(temperature, pressure, simnum)
+        self.last_traj = [i for i in self.last_traj if '.dyn' not in i]
 
 class AbInitio_TINKER(AbInitio):
     """ Subclass of Target for force and energy matching using TINKER. """
