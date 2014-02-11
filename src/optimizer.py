@@ -161,8 +161,9 @@ class Optimizer(forcebalance.BaseClass):
         self.bhyp      = Objective.Penalty.ptyp != 2
         ## The force field itself
         self.FF        = FF
-        ## Re-evaluate the objective function when an optimization step is rejected
-        self.set_option(options, 'reevaluate', default=any([('liquid' in tgt.type.lower() or 'thermo' in tgt.type.lower()) for tgt in self.Objective.Targets]), forceprint=True)
+        ## Target types which introduce uncertainty into the objective function.
+        ## Will re-evaluate the objective function when an optimization step is rejected
+        self.uncert    = any([any([i in tgt.type.lower() for i in ['liquid', 'lipid', 'thermo']]) for tgt in self.Objective.Targets])
         self.bakdir    = os.path.join(os.path.splitext(options['input_file'])[0]+'.bak')
         self.resdir    = os.path.join('result',os.path.splitext(options['input_file'])[0])
         
@@ -328,11 +329,8 @@ class Optimizer(forcebalance.BaseClass):
                    self.convergence_objective, self.convergence_gradient, 
                    self.convergence_step), ansi=1, bold=1)
 
-        # Optimization contains uncertainty.
-        Uncertainty = any([('liquid' in tgt.type.lower() or 'thermo' in tgt.type.lower()) for tgt in self.Objective.Targets])
-
         # Print a warning if optimization is unlikely to converge
-        if Uncertainty and self.convergence_objective < 1e-3:
+        if self.uncert and self.convergence_objective < 1e-3:
             warn_press_key("Condensed phase targets detected - may not converge with current choice of"
                            " convergence_objective (%.e)\nRecommended range is 1e-2 - 1e-1 for this option." % self.convergence_objective)
 
@@ -367,10 +365,10 @@ class Optimizer(forcebalance.BaseClass):
         ThreLQ = 0.25
         # Threshold for "high quality step" which increases trust radius.
         ThreHQ = 0.75
-        printcool("Color Key for Objective Function -=X2=-\n\x1b[1mBold\x1b[0m = Initial step\n"
-                  "\x1b[92mGreen = Current lowest value of objective function%s\x1b[0m\n"
-                  "\x1b[91mRed = Objective function rises, step rejected\x1b[0m\n"
-                  "\x1b[0mNo color = Not at the lowest value" % " (best estimate)" if Uncertainty else "", \
+        printcool("Color Key for Objective Function -=X2=-\n\x1b[1mBold\x1b[0m = Initial step\n" \
+                      "\x1b[92mGreen = Current lowest value of objective function%s\x1b[0m\n" \
+                      "\x1b[91mRed = Objective function rises, step rejected\x1b[0m\n" \
+                      "\x1b[0mNo color = Not at the lowest value" % (" (best estimate)" if self.uncert else ""), \
                       bold=0, color=0, center=[True, False, False, False, False])
         # Optimization steps before this one are ineligible for consideration for "best step".
         Best_Start = 0
@@ -423,7 +421,7 @@ class Optimizer(forcebalance.BaseClass):
                     xk = xk_prev.copy()
                     trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
                     trustprint = "Reducing trust radius to % .4e\n" % trust
-                    if self.reevaluate:
+                    if self.uncert:
                         #================================#
                         #|  Re-evaluate the objective   |#
                         #|  function and gradients at   |#

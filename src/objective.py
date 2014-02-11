@@ -16,7 +16,7 @@ from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
 try:
-    from forcebalance.gmxio import AbInitio_GMX, BindingEnergy_GMX, Liquid_GMX, Interaction_GMX, Moments_GMX, Vibration_GMX, Thermo_GMX
+    from forcebalance.gmxio import AbInitio_GMX, BindingEnergy_GMX, Liquid_GMX, Lipid_GMX, Interaction_GMX, Moments_GMX, Vibration_GMX, Thermo_GMX
 except:
     logger.warning(traceback.format_exc())
     logger.warning("Gromacs module import failed\n")
@@ -76,6 +76,7 @@ Implemented_Targets = {
     'LIQUID_OPENMM':Liquid_OpenMM,
     'LIQUID_TINKER':Liquid_TINKER, 
     'LIQUID_GMX':Liquid_GMX, 
+    'LIPID_GMX':Lipid_GMX, 
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'RDVR3_PSI4':RDVR3_Psi4,

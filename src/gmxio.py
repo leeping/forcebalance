@@ -15,6 +15,7 @@ from forcebalance.engine import Engine
 from forcebalance.abinitio import AbInitio
 from forcebalance.binding import BindingEnergy
 from forcebalance.liquid import Liquid
+from forcebalance.lipid import Lipid
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
@@ -1026,7 +1027,36 @@ class GMX(Engine):
         NewMol = Molecule("%s-out.gro" % self.name)
         return NewMol.xyzs
 
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, **kwargs):
+    def scd_persnap(self, ndx, timestep, final_frame):
+        Scd = []
+        for snap in range(0, final_frame + 1):
+            self.callgmx("g_order -s %s-md.tpr -f %s-md.trr -n %s-%s.ndx -od %s-%s.xvg -b %i -e %i -xvg no" % (self.name, self.name, self.name, ndx, self.name, ndx, snap, snap))
+            Scd_snap = []
+            for line in open("%s-%s.xvg" % (self.name, ndx)):
+                s = [float(i) for i in line.split()]
+                Scd_snap.append(s[-1])
+            Scd.append(Scd_snap)
+        return Scd
+
+    def calc_scd(self, timestep):
+        # Find deuterium order parameter via g_order.
+        # Create index files for each lipid tail.
+        sn1_ndx = ['a C15', 'a C17', 'a C18', 'a C19', 'a C20', 'a C21', 'a C22', 'a C23', 'a C24', 'a C25', 'a C26', 'a C27', 'a C28', 'a C29', 'a C30', 'a C31', 'del 0-5', 'q', '']
+        sn2_ndx = ['a C34', 'a C36', 'a C37', 'a C38', 'a C39', 'a C40', 'a C41', 'a C42', 'a C43', 'a C44', 'a C45', 'a C46', 'a C47', 'a C48', 'a C49', 'a C50', 'del 0-5', 'q', '']
+        self.callgmx("make_ndx -f %s-md.tpr -o %s-sn1.ndx" % (self.name, self.name), stdin="\n".join(sn1_ndx))
+        self.callgmx("make_ndx -f %s-md.tpr -o %s-sn2.ndx" % (self.name, self.name), stdin="\n".join(sn2_ndx))
+        
+        # Loop over g_order for each frame.
+        # Adjust nsteps to account for nstxout = 1000.
+        n_snap = int((nsteps / 1000) * timestep)
+        sn1 = self.scd_persnap('sn1', timestep, n_snap)
+        sn2 = self.scd_persnap('sn2', timestep, n_snap)
+        for i in range(0, n_snap + 1):
+            sn1[i].extend(sn2[i])
+        Scds = np.array(sn1)
+        return Scds
+
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, bilayer=False, **kwargs):
         
         """
         Method for running a molecular dynamics simulation.  
@@ -1048,6 +1078,8 @@ class GMX(Engine):
         Volumes     = (array)     Box volumes
         Dips        = (3xN array) Dipole moments
         EComps      = (dict)      Energy components
+        Als         = (array)     Average area per lipid in nm^2
+        Scds        = (Nx28 array) Deuterium order parameter
         """
 
         if verbose: logger.info("Molecular dynamics simulation with GROMACS engine.\n")
@@ -1125,11 +1157,29 @@ class GMX(Engine):
         if verbose: logger.info("Production run finished, calculating properties...\n")
         # Figure out dipoles - note we use g_dipoles and not the multipole_moments function.
         self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
-        
+
         # Figure out which energy terms need to be printed.
         energyterms = self.energy_termnames(edrfile="%s-md.edr" % self.name)
         ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
         ekeep += ['Temperature', 'Volume', 'Density']
+
+        # Calculate deuterium order parameter for bilayer optimization.
+        if bilayer:
+            Scds = calc_scd(timestep)
+            al_vars = ['Box-Y', 'Box-X']
+            self.callgmx("g_energy -f %s-md.edr -o %s-md-energy-xy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(al_vars))
+            Xs = []
+            Ys = []
+            for line in open("%s-md-energy-xy.xvg" % self.name):
+                s = [float(i) for i in line.split()]
+                Xs.append(s[-1])
+                Ys.append(s[-2])
+            Xs = np.array(Xs)
+            Ys = np.array(Ys)
+            Als = (Xs * Ys) / 64
+        else:
+            Scds = 0
+            Als = 0
 
         # Perform energy component analysis and return properties.
         self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(ekeep))
@@ -1154,8 +1204,11 @@ class GMX(Engine):
         Kinetics = np.array(ecomp['Kinetic-En.'])
         Dips = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-md-dip.xvg" % self.name)])
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
+        # Initialized property dictionary.
+        prop_return = OrderedDict()
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'Als': Als, 'Scds': Scds})
         if verbose: logger.info("Finished!\n")
-        return Rhos, Potentials, Kinetics, Volumes, Dips, Ecomps
+        return prop_return
 
     def md(self, nsteps=0, nequil=0, verbose=False, deffnm=None, **kwargs):
         
@@ -1290,6 +1343,37 @@ class Liquid_GMX(Liquid):
         if self.save_traj > 0:
             self.extra_output = ['liquid-md.trr']
 
+class Lipid_GMX(Lipid):
+    def __init__(self,options,tgt_opts,forcefield):
+        # Path to GROMACS executables.
+        self.set_option(options,'gmxpath')
+        # Suffix for GROMACS executables.
+        self.set_option(options,'gmxsuffix')
+        # Number of threads for mdrun.
+        self.set_option(tgt_opts,'md_threads')
+        # Name of the lipid coordinate file.
+        self.set_option(tgt_opts,'lipid_coords',default='lipid.gro',forceprint=True)
+        # Class for creating engine object.
+        self.engine_ = GMX
+        # Name of the engine to pass to npt.py.
+        self.engname = "gromacs"
+        # Command prefix.
+        self.nptpfx = "bash rungmx.sh"
+        # Extra files to be linked into the temp-directory.
+        self.nptfiles = ['%s.mdp' % os.path.splitext(f)[0] for f in [self.lipid_coords]]
+        self.nptfiles += ['%s.top' % os.path.splitext(f)[0] for f in [self.lipid_coords]]
+        # Scripts to be copied from the ForceBalance installation directory.
+        self.scripts = ['rungmx.sh']
+        # Initialize the base class.
+        super(Lipid_GMX,self).__init__(options,tgt_opts,forcefield)
+        # Error checking.
+        for i in self.nptfiles:
+            if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
+                raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+        # Send back the trajectory file.
+        if self.save_traj > 0:
+            self.extra_output = ['lipid-md.trr']
+ 
 class AbInitio_GMX(AbInitio):
     """ Subclass of AbInitio for force and energy matching using GROMACS. """
     def __init__(self,options,tgt_opts,forcefield):
