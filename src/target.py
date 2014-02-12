@@ -117,6 +117,7 @@ class Target(forcebalance.BaseClass):
         self.set_option(options, 'backup')
         ## Directory to read data from.
         self.set_option(tgt_opts, 'read', 'rd')
+        if self.rd != None: self.rd = self.rd.strip("/")
         ## Flag indicating whether this target is a readable type.
         self.readable = False
                                                                  
@@ -284,7 +285,7 @@ class Target(forcebalance.BaseClass):
         if Counter() > 0:
             raise RuntimeError("Iteration counter must be zero in order to read data from disk (it is %s)" % Counter())
         if not self.readable:
-            raise RuntimeError("Target %s is not able to read data from disk" % self.name)
+            raise RuntimeError("Target %s is not able to read data from disk (either Liquid type or 'remote' keyword supported only)" % self.name)
         if self.rd == None:
             raise RuntimeError("The directory for reading is not set")
         # Current directory. Move back into here after reading data.
@@ -497,6 +498,9 @@ class RemoteTarget(Target):
         tar.close()
         
         self.remote_indicate = ""
+
+        if options['wq_port'] == 0:
+            raise RuntimeError("Please set the Work Queue port to use Remote Targets.")
 
     def check_files(self, there):
         # File identification is a bit tricky because they are tagged with iteration numbers from the previous run.
