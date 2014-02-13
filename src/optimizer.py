@@ -223,9 +223,12 @@ class Optimizer(forcebalance.BaseClass):
         for T in self.Objective.Targets:
             if T.maxrd() == maxrd: 
                 T.rd = T.tempdir
-                tmvals = np.loadtxt(os.path.join(T.absrd(), 'mvals.txt'))
-                if np.max(np.abs(tmvals - self.mvals0) > 1e-4):
-                    warn_press_key("mvals.txt in %s does not match loaded parameters.\nSave file : %s\Parameters : %s\n" % (T.absrd(), tmvals, self.mvals0))
+                if os.path.exists(os.path.join(T.absrd(), 'mvals.txt')):
+                    tmvals = np.loadtxt(os.path.join(T.absrd(), 'mvals.txt'))
+                    if np.max(np.abs(tmvals - self.mvals0) > 1e-4):
+                        warn_press_key("mvals.txt in %s does not match loaded parameters.\nSave file : %s\Parameters : %s\n" % (T.absrd(), tmvals, self.mvals0))
+                else:
+                    warn_press_key("mvals.txt does not exist in %s." % (T.absrd()))
         global ITERINIT
         ITERINIT = maxrd
 
