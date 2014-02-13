@@ -100,6 +100,7 @@ gen_opts_types = {
                  "use_pvals"        : (0, -150, 'Bypass the transformation matrix and use the physical parameters directly', 'Creating the force field; advanced usage, be careful.'),
                  "asynchronous"     : (0, 0, 'Execute Work Queue tasks and local calculations asynchronously for improved speed', 'Targets that use Work Queue (advanced usage)'),
                  "reevaluate"       : (None, 0, 'Re-evaluate the objective function and gradients when the step is rejected (for noisy objective functions).', 'Main Optimizer'),
+                 "continue"         : (0, 140, 'Continue the current run from where we left off (supports mid-iteration recovery).', 'Main Optimizer'),
                  },
     'floats'  : {"trust0"                 : (1e-1, 100, 'Levenberg-Marquardt trust radius; set to negative for nonlinear search', 'Main Optimizer'),
                  "mintrust"               : (0.0,   10, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)', 'Main Optimizer'),
