@@ -765,7 +765,7 @@ class GMX(Engine):
 
         ## Write the correct conformation.
         self.mol[shot].write("%s.gro" % self.name)
-
+           
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
         else:
@@ -773,8 +773,10 @@ class GMX(Engine):
             min_opts = {"integrator" : "l-bfgs", "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
         
         write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
-
-        self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
+        if shot == 0:
+            self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
+        else:
+            self.warngmx("grompp -c %s-lf.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
         self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
         self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
@@ -1040,7 +1042,7 @@ class GMX(Engine):
             Scd.append(Scd_snap)
         return Scd
 
-    def calc_scd(self, nsteps, step_interval, timestep):
+    def calc_scd(self, n_snap, timestep):
         # Find deuterium order parameter via g_order.
         # Create index files for each lipid tail.
         sn1_ndx = ['a C15', 'a C17', 'a C18', 'a C19', 'a C20', 'a C21', 'a C22', 'a C23', 'a C24', 'a C25', 'a C26', 'a C27', 'a C28', 'a C29', 'a C30', 'a C31', 'del 0-5', 'q', '']
@@ -1050,19 +1052,12 @@ class GMX(Engine):
         
         # Loop over g_order for each frame.
         # Adjust nsteps to account for nstxout = 1000.
-        n_snap = n_snaps(nsteps, nsave, timestep)
         sn1 = self.scd_persnap('sn1', timestep, n_snap)
         sn2 = self.scd_persnap('sn2', timestep, n_snap)
         for i in range(0, n_snap + 1):
             sn1[i].extend(sn2[i])
         Scds = np.array(sn1)
         return Scds
-
-    def last_frame(self, trj, nsteps, step_interval, timestep):
-        n_snap = n_snaps(nsteps, nsave, timestep)
-        self.callgmx("trjconv -f %s-md.trr -s %s-md.tpr -b %s -e %s -o %s-lf.gro" % (self.name, self.name, n_snap, n_snap, self.name))
-        lf = "%s-lf.gro" % self.name
-        return lf
 
     def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, bilayer=False, **kwargs):
         
@@ -1173,7 +1168,8 @@ class GMX(Engine):
 
         # Calculate deuterium order parameter for bilayer optimization.
         if bilayer:
-            Scds = self.calc_scd(nsteps, timestep)
+            n_snap = n_snaps(nsteps, nsave, timestep)
+            Scds = self.calc_scd(n_snap, timestep)
             al_vars = ['Box-Y', 'Box-X']
             self.callgmx("g_energy -f %s-md.edr -o %s-md-energy-xy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(al_vars))
             Xs = []
@@ -1185,6 +1181,7 @@ class GMX(Engine):
             Xs = np.array(Xs)
             Ys = np.array(Ys)
             Als = (Xs * Ys) / 64
+            self.callgmx("trjconv -f %s-md.trr -s %s-md.tpr -b %s -e %s -o %s-lf.gro" % (self.name, self.name, n_snap, n_snap, self.name), stdin="System")
         else:
             Scds = 0
             Als = 0
@@ -1284,6 +1281,11 @@ class Lipid_GMX(Lipid):
         # Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output = ['lipid-md.trr']
+        # Send back last frame of production trajectory.
+        self.extra_output = ['lipid-md-lf.gro']
+        # Dictionary of last frames.
+        self.LfDict = OrderedDict()
+        self.LfDict_New = OrderedDict()
  
 class AbInitio_GMX(AbInitio):
     """ Subclass of AbInitio for force and energy matching using GROMACS. """
