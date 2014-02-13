@@ -9,9 +9,9 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row,col,printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key
-from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p
-from forcebalance.optimizer import Counter
+from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key
+from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd_srch
+from forcebalance.optimizer import Counter, First
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
@@ -118,8 +118,6 @@ class Target(forcebalance.BaseClass):
         ## Directory to read data from.
         self.set_option(tgt_opts, 'read', 'rd')
         if self.rd != None: self.rd = self.rd.strip("/")
-        ## Flag indicating whether this target is a readable type.
-        self.readable = False
                                                                  
         #======================================#
         #     Variables which are set here     #
@@ -150,16 +148,24 @@ class Target(forcebalance.BaseClass):
         self.gct         = 0
         ## Counts how often the Hessian was computed
         self.hct         = 0
-        
-        #======================================#
-        #          UNDER DEVELOPMENT           #
-        #======================================#
+        ## Whether to read indicate.log from file when restarting an aborted run.
+        self.read_indicate    = True
+        ## Whether to write indicate.log at every iteration (true for all but remote.)
+        self.write_indicate   = True
+        ## Whether to read objective.p from file when restarting an aborted run.
+        self.read_objective       = True
+        ## Whether to write objective.p at every iteration (true for all but remote.)
+        self.write_objective      = True
         # Create a new temp directory.
-        self.refresh_temp_directory()
+        if not options['continue']: 
+            self.refresh_temp_directory()
+        else:
+            if not os.path.exists(os.path.join(self.root,self.tempdir)):
+                os.makedirs(os.path.join(self.root,self.tempdir))
 
     def get_X(self,mvals=None):
         """Computes the objective function contribution without any parametric derivatives"""
-        Ans = self.sget(mvals,0,0)
+        Ans = self.meta_get(mvals,0,0)
         self.xct += 1
         if Ans['X'] != Ans['X']:
             return {'X':1e10, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
@@ -175,7 +181,7 @@ class Target(forcebalance.BaseClass):
         the gradient elements and diagonal Hessian elements at the same time
         using central difference if 'fdhessdiag' is turned on.
         """
-        Ans = self.sget(mvals,1,0)
+        Ans = self.meta_get(mvals,1,0)
         for i in range(self.FF.np):
             if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
                 if self.fdhessdiag:
@@ -197,7 +203,7 @@ class Target(forcebalance.BaseClass):
         Hessian elements by finite difference.  Forward finite difference is used
         throughout for the sake of speed.
         """
-        Ans = self.sget(mvals,1,1)
+        Ans = self.meta_get(mvals,1,1)
         if self.fdhess:
             for i in range(self.FF.np):
                 if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
@@ -263,7 +269,10 @@ class Target(forcebalance.BaseClass):
 
         """ Check this directory for the presence of readable files when the 'read' option is set. """
 
-        raise NotImplementedError('In order to read data from files, the Target must have a method to check for these files.')
+        there = os.path.abspath(there)
+        if all([any([i == j for j in os.listdir(there)]) for i in ["objective.p", "indicate.log"]]):
+            return True
+        return False
 
     def read(self,mvals,AGrad=False,AHess=False):
 
@@ -272,71 +281,128 @@ class Target(forcebalance.BaseClass):
         Read data from disk for the initial optimization step if the
         user has provided the directory to the "read" option.  
 
-        Useful for restarting an aborted run with partially completed
-        calculations.
+        """
+        mvals1 = np.loadtxt('mvals.txt')
 
-        Only usable with certain targets (Remote, Liquid at the time
-        of writing this.)
+        if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+            warn_press_key("mvals from mvals.txt does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+        
+        with open('objective.p') as f:
+            return forcebalance.nifty.lp_load(f)
 
-        Essentially a wrapper around the "get" function.
+    def absrd(self):
 
+        """ 
+        Supply the correct directory specified by user's "read" option.
         """
         
-        if Counter() > 0:
-            raise RuntimeError("Iteration counter must be zero in order to read data from disk (it is %s)" % Counter())
-        if not self.readable:
-            raise RuntimeError("Target %s is not able to read data from disk (either Liquid type or 'remote' keyword supported only)" % self.name)
+        if Counter() > First():
+            raise RuntimeError("Iteration number of this run must be %s to read data from disk (it is %s)" % (First(), Counter()))
         if self.rd == None:
             raise RuntimeError("The directory for reading is not set")
+
         # Current directory. Move back into here after reading data.
         here = os.getcwd()
         # Absolute path for the directory to read data from.
         if os.path.isabs(self.rd):
-            absrd = self.rd
+            abs_rd = self.rd
         else:
-            absrd = os.path.join(self.root, self.rd)
+            abs_rd = os.path.join(self.root, self.rd)
         # Check for directory existence.
-        if not os.path.exists(absrd):
+        if not os.path.exists(abs_rd):
             raise RuntimeError("Provided path %s does not exist" % self.rd)
         # Figure out which directory to go into.
         s = os.path.split(self.rd)
         have_data = 0
         if s[-1].startswith('iter_'):
             # Case 1: User has provided a specific directory to read from.
-            there = absrd
+            there = abs_rd
             if not self.check_files(there):
                 raise RuntimeError("Provided path %s does not contain remote target output" % self.rd)
             have_data = 1
         elif s[-1] == self.name:
             # Case 2: User has provided the target name.
-            iterints = [int(d.replace('iter_','')) for d in os.listdir(absrd) if os.path.isdir(os.path.join(absrd, d))]
+            iterints = [int(d.replace('iter_','')) for d in os.listdir(abs_rd) if os.path.isdir(os.path.join(abs_rd, d))]
             for i in sorted(iterints)[::-1]:
-                there = os.path.join(absrd, 'iter_%04i' % i)
+                there = os.path.join(abs_rd, 'iter_%04i' % i)
                 if self.check_files(there):
                     have_data = 1
                     break
         else:
             # Case 3: User has provided something else (must contain the target name in the next directory down.)
-            if not os.path.exists(os.path.join(absrd, self.name)):
+            if not os.path.exists(os.path.join(abs_rd, self.name)):
                 raise RuntimeError("Target directory %s does not exist in %s" % (self.name, self.rd))
-            iterints = [int(d.replace('iter_','')) for d in os.listdir(os.path.join(absrd, self.name)) if os.path.isdir(os.path.join(absrd, self.name, d))]
+            iterints = [int(d.replace('iter_','')) for d in os.listdir(os.path.join(abs_rd, self.name)) if os.path.isdir(os.path.join(abs_rd, self.name, d))]
             for i in sorted(iterints)[::-1]:
-                there = os.path.join(absrd, self.name, 'iter_%04i' % i)
+                there = os.path.join(abs_rd, self.name, 'iter_%04i' % i)
                 if self.check_files(there):
                     have_data = 1
                     break
         if not have_data:
             raise RuntimeError("Did not find data to read in %s" % self.rd)
-        os.chdir(there)
-        logger.info("Target %s will read data from disk at %s\n" % (self.name, there))
-        Answer = self.get(mvals,AGrad,AHess)
-        os.chdir(here)
-        return Answer
+        return there
+
+    def maxrd(self):
+
+        """ Supply the latest existing temp-directory containing valid data. """
         
-    def sget(self, mvals, AGrad=False, AHess=False, customdir=None):
+        abs_rd = os.path.join(self.root, self.tempdir)
+
+        iterints = [int(d.replace('iter_','')) for d in os.listdir(abs_rd) if os.path.isdir(os.path.join(abs_rd, d))]
+        for i in sorted(iterints)[::-1]:
+            there = os.path.join(abs_rd, 'iter_%04i' % i)
+            if self.check_files(there):
+                return i
+
+        return -1
+
+    def meta_indicate(self):
+
         """ 
 
+        Wrap around the indicate function, so it can print to screen and
+        also to a file.  If reading from checkpoint file, don't call
+        the indicate() function, instead just print the file contents
+        to the screen.
+        
+        """
+        # Using the module level logger
+        logger = getLogger(__name__)
+        if self.rd != None and Counter() == First() and self.read_indicate:
+            # Move into the directory for reading data, 
+            cwd = os.getcwd()
+            os.chdir(self.absrd())
+            logger.info(open('indicate.log').read())
+            os.chdir(cwd)
+        else:
+            if self.write_indicate:
+                # Go into the directory where the job is running
+                cwd = os.getcwd()
+                os.chdir(os.path.join(self.root, self.rundir))
+                # If indicate.log already exists then we've made some kind of mistake.
+                if os.path.exists('indicate.log'):
+                    raise RuntimeError('indicate.log should not exist yet in this directory: %s' % os.getcwd())
+                # Add a handler for printing to screen and file
+                logger = getLogger("forcebalance")
+                hdlr = forcebalance.output.RawFileHandler('indicate.log')
+                logger.addHandler(hdlr)
+            # Execute the indicate function
+            self.indicate()
+            if self.write_indicate:
+                # Remove the handler (return to normal printout)
+                logger.removeHandler(hdlr)
+                # Return to the module level logger
+                logger = getLogger(__name__)
+                # The module level logger now prints the indicator
+                logger.info(open('indicate.log').read())
+                # Go back to the directory where we were
+                os.chdir(cwd)
+        
+    def meta_get(self, mvals, AGrad=False, AHess=False, customdir=None):
+        """ 
+        Wrapper around the get function.  
         Create the directory for the target, and then calls 'get'.
+        If we are reading existing data, go into the appropriate read directory and call read() instead.
         The 'get' method should not worry about the directory that it's running in.
         
         """
@@ -360,11 +426,24 @@ class Target(forcebalance.BaseClass):
         os.chdir(absgetdir)
         self.link_from_tempdir(absgetdir)
         self.rundir = absgetdir.replace(self.root+'/','')
-
-        if self.rd != None and Counter() == 0:
+        ## Read existing information from disk (i.e. when recovering an aborted run)
+        if self.rd != None and Counter() == First() and self.read_objective:
+            os.chdir(self.absrd())
+            logger.info("Reading objective function information from %s\n" % os.getcwd())
             Answer = self.read(mvals, AGrad, AHess)
+            os.chdir(absgetdir)
         else:
+            ## Evaluate the objective function.
             Answer = self.get(mvals, AGrad, AHess)
+            if self.write_objective:
+                with wopen('objective.p') as f:
+                    forcebalance.nifty.lp_dump(Answer, f)
+
+        ## Save the force field files to this directory, so that it
+        ## reflects the objective function and properties that were
+        ## printed out.
+        if not in_fd_srch(): 
+            self.FF.make(mvals)
 
         os.chdir(cwd)
         
@@ -390,18 +469,22 @@ class Target(forcebalance.BaseClass):
         
         absgetdir = os.path.join(self.root,self.tempdir)
         if Counter() is not None:
-            # Not expecting more than ten thousand iterations
+            ## Not expecting more than ten thousand iterations
             iterdir = "iter_%04i" % Counter()
             absgetdir = os.path.join(absgetdir,iterdir)
         if customdir is not None:
             absgetdir = os.path.join(absgetdir,customdir)
-
+        ## Go into the directory where get() will be executed.
         if not os.path.exists(absgetdir):
             os.makedirs(absgetdir)
         os.chdir(absgetdir)
         self.link_from_tempdir(absgetdir)
+        ## Write mathematical parameters to file; will be used to checkpoint calculation.
+        if not in_fd_srch():
+            np.savetxt('mvals.txt', mvals)
         self.rundir = absgetdir.replace(self.root+'/','')
-        if self.rd == None or Counter() > 0: self.submit_jobs(mvals, AGrad, AHess)
+        ## Submit jobs to the Work Queue.
+        if self.rd == None or Counter() > First(): self.submit_jobs(mvals, AGrad, AHess)
         os.chdir(cwd)
         
         return
@@ -485,8 +568,6 @@ class RemoteTarget(Target):
     def __init__(self,options,tgt_opts,forcefield):
         super(RemoteTarget, self).__init__(options,tgt_opts,forcefield)
         
-        self.readable = True
-        
         self.r_options = options.copy()
         self.r_options["type"]="single"
         
@@ -502,28 +583,20 @@ class RemoteTarget(Target):
         if options['wq_port'] == 0:
             raise RuntimeError("Please set the Work Queue port to use Remote Targets.")
 
-    def check_files(self, there):
-        # File identification is a bit tricky because they are tagged with iteration numbers from the previous run.
-        there = os.path.abspath(there)
-        if all([any([i in j for j in os.listdir(there)]) for i in ["objective_", "indicate_"]]):
-            for f in os.listdir(there):
-                if "objective_" in f:
-                    self.id_string = f[10:][:-2]
-            return True
-        return False
+        # Remote target will read objective.p and indicate.log at the same time,
+        # and it uses a different mechanism because it does this at every iteration (not just the 0th).
+        self.read_indicate = False
+        self.write_indicate = False
+        self.write_objective = False
 
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
-        n=0
-        id_string = "%s_%i-%i" % (self.name, Counter(), n)
-        
-        while os.path.exists('%s.out' % id_string):
-            n+=1
-            id_string = "%s_%i-%i" % (self.name, Counter(), n)
-        
+
+        id_string = "%s_iter%04i" % (self.name, Counter())
+
         with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
-        forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, "target.tar.bz2"),"%s.tar.bz2" % self.name)
+        forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, "target.tar.bz2"),"target.tar.bz2")
         
         wq = getWorkQueue()
         
@@ -535,24 +608,21 @@ class RemoteTarget(Target):
         # output:
         #   objective.p: pickled objective function dictionary
         #   indicate.log: results of target.indicate() written to file
-        forcebalance.nifty.queue_up(wq, "python rtarget.py > %s.out 2>&1" % id_string,
-            ["forcebalance.p", "rtarget.py", "%s.tar.bz2" % self.name],
-            ['objective_%s.p' % id_string, 'indicate_%s.log' % id_string, '%s.out' % id_string],
+        forcebalance.nifty.queue_up(wq, "python rtarget.py > rtarget.out 2>&1",
+            ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
+            ['objective.p', 'indicate.log', 'rtarget.out'],
             tgt=self)
-            
-        self.id_string = id_string
+
+    def read(self,mvals,AGrad=False,AHess=False):
+        return self.get(mvals, AGrad, AHess)
 
     def get(self,mvals,AGrad=False,AHess=False):
-        unpack = forcebalance.nifty.lp_load(open('forcebalance.p'))
-        mvals1 = unpack[0]
-        if (mvals1 != mvals).any():
-            warn_press_key("mvals from forcebalance.p does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
-        with open('indicate_%s.log' % self.id_string, 'r') as f:
+        with open('indicate.log', 'r') as f:
             self.remote_indicate = f.read()
-        with open('objective_%s.p' % self.id_string, 'r') as f:
+        with open('objective.p', 'r') as f:
             return forcebalance.nifty.lp_load(f)
         
     def indicate(self):
-        logger.info(self.remote_indicate + '\n')
+        logger.info(self.remote_indicate)
 
 
