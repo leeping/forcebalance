@@ -1,0 +1,7 @@
+#include "bro.itp"
+
+[ system ]
+Gas-phase Bromine
+
+[ molecules ]
+BRO 1
