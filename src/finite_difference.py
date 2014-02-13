@@ -121,6 +121,12 @@ def in_fd():
 
     return any([i in [j[2] for j in traceback.extract_stack()] for i in ['f1d2p','f12d3p','f1d5p','f12d7p','f1d7p']])
 
+def in_fd_srch():
+    """ Invoking this function from anywhere will tell us whether we're being called by a finite-difference function.
+    This is mainly useful for deciding when to update the 'qualitative indicators' and when not to. """
+
+    return any([i in [j[2] for j in traceback.extract_stack()] for i in ['f1d2p','f12d3p','f1d5p','f12d7p','f1d7p','search_fun']])
+
 def fdwrap(func,mvals0,pidx,key=None,**kwargs):
     """
     A function wrapper for finite difference designed for

@@ -189,7 +189,6 @@ class Moments(Target):
                 Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:])
 
         if not in_fd():
-            self.FF.make(mvals)
             self.calc_moments = calc_moments
             self.objective = Answer['X']
 

@@ -4,7 +4,7 @@
 
 Executable  script for starting ForceBalance. """
 
-import sys, re
+import os, sys, re
 import argparse
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
@@ -14,7 +14,7 @@ from forcebalance.nifty import printcool
 import numpy
 numpy.seterr(all='raise')
 
-def Run_ForceBalance(input_file, debug=False):
+def Run_ForceBalance(input_file, debug=False, continue_=False):
     """ Create instances of ForceBalance components and run the optimizer.
 
     The triumvirate, trifecta, or trinity of components are:
@@ -31,6 +31,8 @@ def Run_ForceBalance(input_file, debug=False):
     try:
         ## The general options and target options that come from parsing the input file
         options, tgt_opts = parse_inputs(input_file)
+        ## Set the continue_ option.
+        if continue_: options['continue'] = True
         ## The force field component of the project
         forcefield  = FF(options)
         ## The objective function
@@ -56,7 +58,7 @@ def process(word, color):
     return Answer
 
 def main():
-    printcool("Welcome to ForceBalance version 1.2! =D\nForce Field Optimization System\nAuthors: Lee-Ping Wang\nArthur Vigil\nErik Brandt\n", ansi="1", bold=True, minwidth=64)
+    printcool("Welcome to ForceBalance version 1.2! =D\nForce Field Optimization System\nAuthors: Lee-Ping Wang\nArthur Vigil\nKeri McKiernan\nErik Brandt\n", ansi="1", bold=True, minwidth=64)
     logostr = """
                           ,'+++                                        
                        ,++++++.      .:,,.                              
@@ -142,12 +144,14 @@ def main():
         print newline
 
     parser = argparse.ArgumentParser(description="Force Field Optimization System")
-    parser.add_argument("-d", "--debug", action="store_true", help="run interactive debugger on program crash")
+    parser.add_argument("-c", "--continue", action="store_true", help="Continue from a previous run")
+    parser.add_argument("-d", "--debug", action="store_true", help="Run interactive debugger on program crash")
     parser.add_argument("input", help="Forcebalance input file")
     
     args = parser.parse_args()
+    continue_ = getattr(args, 'continue')
 
-    Run_ForceBalance(args.input, debug=args.debug)
+    Run_ForceBalance(args.input, debug=args.debug, continue_=continue_)
 
 if __name__ == "__main__":
     main()
