@@ -1,0 +1,8 @@
+Subdirectory 1 corresponds to the state point (298.15 K, 1 bar).
+
+The sim1.* files correspond to liquid.* in the original liquid bromine
+study.
+
+The sim2.* files correspond to gas.* in the original liquid bromine
+study.
+
