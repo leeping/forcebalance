@@ -12,6 +12,7 @@ import os, pickle, re, sys
 import numpy as np
 from copy import deepcopy
 import forcebalance
+from forcebalance.parser import parse_inputs
 from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
@@ -20,13 +21,20 @@ from forcebalance.output import getLogger, DEBUG, CleanStreamHandler
 logger = getLogger(__name__)
 
 # Global variable corresponding to the iteration number.
-ITERATION_NUMBER = 0
+ITERATION = 0
 # Global variable corresponding to whether the optimization took a good step.
 GOODSTEP = 0
+# The starting iteration number.
+# Usually zero, unless we are continuing a previous run.
+ITERINIT = 0
 
 def Counter():
-    global ITERATION_NUMBER
-    return ITERATION_NUMBER
+    global ITERATION
+    return ITERATION
+
+def First():
+    global ITERINIT
+    return ITERINIT
 
 def GoodStep():
     global GOODSTEP
@@ -151,7 +159,7 @@ class Optimizer(forcebalance.BaseClass):
         self.mvals_bak = 1
         ## Print a special message on failure.
         self.failmsg = 0
-        
+
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -175,6 +183,7 @@ class Optimizer(forcebalance.BaseClass):
 
         ## Number of parameters
         self.np        = FF.np
+
         ## The original parameter values
         if options['read_mvals'] != None:
             self.mvals0    = np.array(options['read_mvals'])
@@ -183,10 +192,42 @@ class Optimizer(forcebalance.BaseClass):
         else:
             self.mvals0    = np.zeros(self.FF.np)
 
+        ## Continue a previous run.
+        if options['continue']: self.recover()
+
         ## Print the optimizer options.
         printcool_dictionary(self.PrintOptionDict, title="Setup for optimizer")
         ## Load the checkpoint file.
         self.readchk()
+
+    def recover(self):
+        ## Determine the save file name.
+        base, ext = os.path.splitext(self.input_file)
+        if not base.endswith(".sav"):
+            savfnm = base+".sav"
+        else:
+            savfnm = base+ext
+        ## Parse the save file for mvals, if exist.
+        if os.path.exists(savfnm):
+            soptions, stgt_opts = parse_inputs(savfnm)
+            if soptions['read_mvals'] and np.max(np.abs(self.mvals0)) != 0.0:
+                warn_press_key("Save file read_mvals will overwrite input file.\nInput file: %s\nSave file : %s\n" % (self.mvals0, soptions['read_mvals']))
+            self.mvals0 = np.array(soptions['read_mvals'])
+
+        maxrd = max([T.maxrd() for T in self.Objective.Targets])
+        if maxrd < 0: return
+        printcool("Continuing optimization from iteration %i\nThese targets will load data from disk:\n%s" % \
+                      (maxrd, '\n'.join([T.name for T in self.Objective.Targets if T.maxrd() == maxrd])), color=4)
+        ## If data exists in the temp-dir corresponding to the highest
+        ## iteration number, read the data.
+        for T in self.Objective.Targets:
+            if T.maxrd() == maxrd: 
+                T.rd = T.tempdir
+                tmvals = np.loadtxt(os.path.join(T.absrd(), 'mvals.txt'))
+                if np.max(np.abs(tmvals - self.mvals0) > 1e-4):
+                    warn_press_key("mvals.txt in %s does not match loaded parameters.\nSave file : %s\Parameters : %s\n" % (T.absrd(), tmvals, self.mvals0))
+        global ITERINIT
+        ITERINIT = maxrd
 
     def save_mvals_to_input(self, mvals):
         """ Write a new input file (%s_save.in) containing the current mathematical parameters. """
@@ -340,8 +381,8 @@ class Optimizer(forcebalance.BaseClass):
         # Order of derivatives
         Ord         = 1 if b_BFGS else 2
         # Iteration number counter.
-        global ITERATION_NUMBER
-        ITERATION_NUMBER = 0
+        global ITERATION, ITERINIT
+        ITERATION = ITERINIT
         # Indicates if the optimization step was "good" (i.e. not rejected).
         global GOODSTEP
         GOODSTEP = 1
@@ -387,21 +428,21 @@ class Optimizer(forcebalance.BaseClass):
             #================================#
             #| Evaluate objective function. |#
             #================================#
-            if len(self.chk.keys()) > 0 and ITERATION_NUMBER == 0:
-                printcool("Iteration %i: Reading initial objective, gradient, Hessian from checkpoint file" % (ITERATION_NUMBER), color=4, bold=0)
+            if len(self.chk.keys()) > 0 and ITERATION == ITERINIT:
+                printcool("Iteration %i: Reading initial objective, gradient, Hessian from checkpoint file" % (ITERATION), color=4, bold=0)
                 logger.info("Reading initial objective, gradient, Hessian from checkpoint file\n")
                 xk, X, G, H   = self.chk['xk'], self.chk['X'], self.chk['G'], self.chk['H']
                 X_hist, trust = self.chk['X_hist'], self.chk['trust']
             else:
                 self.adjh(trust)
-                printcool("Iteration %i: Evaluating objective function\nand derivatives through %s order" % (ITERATION_NUMBER, "first" if Ord == 1 else "second"), color=4, bold=0)
+                printcool("Iteration %i: Evaluating objective function\nand derivatives through %s order" % (ITERATION, "first" if Ord == 1 else "second"), color=4, bold=0)
                 data        = self.Objective.Full(xk,Ord,verbose=True)
                 X, G, H = data['X'], data['G'], data['H']
             trustprint = ''
             #================================#
             #|   Assess optimization step.  |#
             #================================#
-            if ITERATION_NUMBER > 0:
+            if ITERATION > ITERINIT:
                 dX_actual = X - X_prev
                 Best_Step = X < np.min(X_hist[Best_Start:])
                 try:
@@ -417,7 +458,7 @@ class Optimizer(forcebalance.BaseClass):
                     #|  objective function rises.   |#
                     #================================#
                     GOODSTEP = 0
-                    print_progress(ITERATION_NUMBER, nxk, ndx, ngd, "\x1b[91m", X, X-X_prev, Quality)
+                    print_progress(ITERATION, nxk, ndx, ngd, "\x1b[91m", X, X-X_prev, Quality)
                     xk = xk_prev.copy()
                     trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
                     trustprint = "Reducing trust radius to % .4e\n" % trust
@@ -428,8 +469,8 @@ class Optimizer(forcebalance.BaseClass):
                         #|   the previous parameters.   |#
                         #================================#
                         printcool("Objective function rises!\nRe-evaluating at the previous point..",color=1)
-                        ITERATION_NUMBER += 1
-                        Best_Start = ITERATION_NUMBER
+                        ITERATION += 1
+                        Best_Start = ITERATION - ITERINIT
                         Best_Step = 1
                         self.adjh(trust)
                         X_hist = np.append(X_hist, X)
@@ -492,7 +533,7 @@ class Optimizer(forcebalance.BaseClass):
             nxk = np.linalg.norm(xk)
             ngd = np.linalg.norm(G)
             if GOODSTEP:
-                print_progress(ITERATION_NUMBER, nxk, ndx, ngd, color, X, -1*stdfront, Quality)
+                print_progress(ITERATION, nxk, ndx, ngd, color, X, -1*stdfront, Quality)
             #================================#
             #|   Print objective function,  |#
             #|     gradient and Hessian.    |#
@@ -548,7 +589,7 @@ class Optimizer(forcebalance.BaseClass):
             xk += dx
             ndx = np.linalg.norm(dx)
             # Increment the iteration counter.
-            ITERATION_NUMBER += 1
+            ITERATION += 1
             # The search code benefits from knowing the step size here.
             if self.trust0 < 0:
                 trust = ndx
@@ -569,8 +610,8 @@ class Optimizer(forcebalance.BaseClass):
             outfnm = self.save_mvals_to_input(xk)
             logger.info("Input file with saved parameters: %s\n" % outfnm)
             # Check for whether the maximum number of optimization cycles is reached.
-            if ITERATION_NUMBER == self.maxstep:
-                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION_NUMBER)
+            if ITERATION == self.maxstep:
+                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION)
                 break
             # Check for whether the step size is too small to continue.
             if ndx < self.step_lowerbound:
@@ -824,7 +865,7 @@ class Optimizer(forcebalance.BaseClass):
                             bar = printcool("Current Mathematical Parameters:",color=5)
                             self.FF.print_map(vals=["% .4e" % i for i in mvals])
                         for Tgt in self.Objective.Targets:
-                            Tgt.indicate()
+                            Tgt.meta_indicate()
                         self.Objective.Indicate()
                         print_heading()
                         print_results(color)

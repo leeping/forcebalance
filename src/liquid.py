@@ -22,7 +22,7 @@ except: pass
 from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple, OrderedDict
-from forcebalance.optimizer import Counter, GoodStep
+from forcebalance.optimizer import Counter, First, GoodStep
 import csv
 
 from forcebalance.output import getLogger
@@ -102,8 +102,6 @@ class Liquid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
-        # This target can read data from disk.
-        self.readable = True
         # Read in liquid starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)): 
             raise RuntimeError("%s doesn't exist; please provide liquid_coords option" % self.liquid_coords)
@@ -131,6 +129,10 @@ class Liquid(Target):
             del self.gas_engine_args['name']
             # Create engine object for gas molecule to do the polarization correction.
             self.gas_engine = self.engine_(target=self, mol=self.gas_mol, name="selfpol", **self.gas_engine_args)
+        # Don't read indicate.log when calling meta_indicate()
+        self.read_indicate = False
+        # Don't read objective.p when calling meta_get()
+        self.read_objective = False
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
@@ -246,14 +248,18 @@ class Liquid(Target):
 
     def check_files(self, there):
         there = os.path.abspath(there)
+        havepts = 0
         if all([i in os.listdir(there) for i in self.Labels]):
             for d in os.listdir(there):
                 if d in self.Labels:
                     if os.path.exists(os.path.join(there, d, 'npt_result.p')):
-                        return 1
+                        havepts += 1
                     elif os.path.exists(os.path.join(there, d, 'npt_result.p.bz2')):
-                        return 1
-        return 0
+                        havepts += 1
+        if (float(havepts)/len(self.Labels)) > 0.75:
+            return 1
+        else:
+            return 0
 
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
@@ -404,11 +410,11 @@ class Liquid(Target):
         with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict,AGrad),f)
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
-        if Counter() == 0 and self.manual:
+        if Counter() == First() and self.manual:
             warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
-        if Counter() > 0 and GoodStep() and self.save_traj < 2:
+        if Counter() > First() and GoodStep() and self.save_traj < 2:
             for fn in self.last_traj:
                 if os.path.exists(fn):
                     os.remove(fn)
@@ -424,10 +430,10 @@ class Liquid(Target):
                 P *= 1.0 / 1.01325
             if not os.path.exists(label):
                 os.makedirs(label)
-                os.chdir(label)
-                self.npt_simulation(T,P,snum)
-                os.chdir('..')
-                snum += 1
+            os.chdir(label)
+            self.npt_simulation(T,P,snum)
+            os.chdir('..')
+            snum += 1
 
     def get(self, mvals, AGrad=True, AHess=True):
         
@@ -810,3 +816,4 @@ class Liquid(Target):
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         return Answer
+
