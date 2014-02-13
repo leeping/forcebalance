@@ -16,7 +16,7 @@ from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
 try:
-    from forcebalance.gmxio import AbInitio_GMX, BindingEnergy_GMX, Liquid_GMX, Interaction_GMX, Moments_GMX, Vibration_GMX, Thermo_GMX
+    from forcebalance.gmxio import AbInitio_GMX, BindingEnergy_GMX, Liquid_GMX, Lipid_GMX, Interaction_GMX, Moments_GMX, Vibration_GMX, Thermo_GMX
 except:
     logger.warning(traceback.format_exc())
     logger.warning("Gromacs module import failed\n")
@@ -76,6 +76,7 @@ Implemented_Targets = {
     'LIQUID_OPENMM':Liquid_OpenMM,
     'LIQUID_TINKER':Liquid_TINKER, 
     'LIQUID_GMX':Liquid_GMX, 
+    'LIPID_GMX':Lipid_GMX, 
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'RDVR3_PSI4':RDVR3_Psi4,
@@ -180,7 +181,7 @@ class Objective(forcebalance.BaseClass):
                         Ans = Funcs[Order](mvals)
                         # Print out the qualitative indicators
                         if verbose:
-                            Tgt.indicate()
+                            Tgt.meta_indicate()
                         # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
                         if not in_fd():
                             self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
@@ -203,7 +204,7 @@ class Objective(forcebalance.BaseClass):
                 Ans = Funcs[Order](mvals)
                 # Print out the qualitative indicators
                 if verbose:
-                    Tgt.indicate()
+                    Tgt.meta_indicate()
                 # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
                 if not in_fd():
                     self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}

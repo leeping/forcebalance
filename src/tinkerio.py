@@ -366,7 +366,7 @@ class TINKER(Engine):
                 for l in o:
                     logger.error("%s\n" % l)
                 time.sleep(1)
-                raise RuntimeError("TINKER may have crashed! (See above output)")
+                raise RuntimeError("TINKER may have crashed! (See above output)\nThe command was: %s\nThe directory was: %s" % (' '.join(csplit), os.getcwd()))
                 break
         for line in o:
             if 'D+' in line:
@@ -980,8 +980,9 @@ class TINKER(Engine):
         else:
             vol = None
             rho = None
-
-        return rho, edyn, kdyn, vol, dip, ecomp
+        prop_return = OrderedDict()
+        prop_return.update({'Rhos': rho, 'Potentials': edyn, 'Kinetics': kdyn, 'Volumes': vol, 'Dips': dip, 'Ecomps': ecomp})
+        return prop_return
 
 class Liquid_TINKER(Liquid):
     """ Condensed phase property matching using TINKER. """
