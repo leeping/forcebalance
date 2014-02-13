@@ -1026,6 +1026,9 @@ class GMX(Engine):
         NewMol = Molecule("%s-out.gro" % self.name)
         return NewMol.xyzs
 
+    def n_snaps(nsteps, step_interval, timestep):
+        return int((nsteps / step_interval) * timestep)
+
     def scd_persnap(self, ndx, timestep, final_frame):
         Scd = []
         for snap in range(0, final_frame + 1):
@@ -1037,7 +1040,7 @@ class GMX(Engine):
             Scd.append(Scd_snap)
         return Scd
 
-    def calc_scd(self, nsteps, timestep):
+    def calc_scd(self, nsteps, step_interval, timestep):
         # Find deuterium order parameter via g_order.
         # Create index files for each lipid tail.
         sn1_ndx = ['a C15', 'a C17', 'a C18', 'a C19', 'a C20', 'a C21', 'a C22', 'a C23', 'a C24', 'a C25', 'a C26', 'a C27', 'a C28', 'a C29', 'a C30', 'a C31', 'del 0-5', 'q', '']
@@ -1047,13 +1050,19 @@ class GMX(Engine):
         
         # Loop over g_order for each frame.
         # Adjust nsteps to account for nstxout = 1000.
-        n_snap = int((nsteps / 1000) * timestep)
+        n_snap = n_snaps(nsteps, nsave, timestep)
         sn1 = self.scd_persnap('sn1', timestep, n_snap)
         sn2 = self.scd_persnap('sn2', timestep, n_snap)
         for i in range(0, n_snap + 1):
             sn1[i].extend(sn2[i])
         Scds = np.array(sn1)
         return Scds
+
+    def last_frame(self, trj, nsteps, step_interval, timestep):
+        n_snap = n_snaps(nsteps, nsave, timestep)
+        self.callgmx("trjconv -f %s-md.trr -s %s-md.tpr -b %s -e %s -o %s-lf.gro" % (self.name, self.name, n_snap, n_snap, self.name))
+        lf = "%s-lf.gro" % self.name
+        return lf
 
     def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, bilayer=False, **kwargs):
         
@@ -1134,9 +1143,11 @@ class GMX(Engine):
         if nequil > 0:
             if verbose: logger.info("Equilibrating...\n")
             eq_opts = deepcopy(md_opts)
+            print 'debug: ', temperature
             eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0,
                             "gen-vel": "yes", "gen-temp" : temperature, "gen-seed" : random.randrange(100000,999999)})
             eq_defs = deepcopy(md_defs)
+            print 'eq: ', eq_defs
             if "pcoupl" in eq_defs: eq_opts["pcoupl"] = "berendsen"
             write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
             self.warngmx("grompp -c %s -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (gro1, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
