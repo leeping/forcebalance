@@ -245,6 +245,21 @@ class Lipid(Target):
             else:
                 self.set_option(global_opts,opt)
 
+    def check_files(self, there):
+        there = os.path.abspath(there)
+        havepts = 0
+        if all([i in os.listdir(there) for i in self.Labels]):
+            for d in os.listdir(there):
+                if d in self.Labels:
+                    if os.path.exists(os.path.join(there, d, 'npt_result.p')):
+                        havepts += 1
+                    elif os.path.exists(os.path.join(there, d, 'npt_result.p.bz2')):
+                        havepts += 1
+        if (float(havepts)/len(self.Labels)) > 0.75:
+            return 1
+        else:
+            return 0
+
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
