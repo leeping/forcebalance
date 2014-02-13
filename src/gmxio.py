@@ -1143,11 +1143,9 @@ class GMX(Engine):
         if nequil > 0:
             if verbose: logger.info("Equilibrating...\n")
             eq_opts = deepcopy(md_opts)
-            print 'debug: ', temperature
             eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0,
                             "gen-vel": "yes", "gen-temp" : temperature, "gen-seed" : random.randrange(100000,999999)})
             eq_defs = deepcopy(md_defs)
-            print 'eq: ', eq_defs
             if "pcoupl" in eq_defs: eq_opts["pcoupl"] = "berendsen"
             write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
             self.warngmx("grompp -c %s -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (gro1, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
