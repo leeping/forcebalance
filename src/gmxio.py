@@ -20,6 +20,7 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
+from forcebalance.optimizer import GoodStep
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
@@ -776,7 +777,7 @@ class GMX(Engine):
         if shot == 0:
             self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         else:
-            self.warngmx("grompp -c %s-lf.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
+            self.warngmx("grompp -c %s-md.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
         self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
         self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
@@ -1181,7 +1182,6 @@ class GMX(Engine):
             Xs = np.array(Xs)
             Ys = np.array(Ys)
             Als = (Xs * Ys) / 64
-            self.callgmx("trjconv -f %s-md.trr -s %s-md.tpr -b %s -e %s -o %s-lf.gro" % (self.name, self.name, n_snap, n_snap, self.name), stdin="System")
         else:
             Scds = 0
             Als = 0
@@ -1278,14 +1278,28 @@ class Lipid_GMX(Lipid):
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
                 raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+        # Send back last frame of production trajectory.
+        self.extra_output = ['lipid-md.gro']
         # Send back the trajectory file.
         if self.save_traj > 0:
-            self.extra_output = ['lipid-md.trr']
-        # Send back last frame of production trajectory.
-        self.extra_output = ['lipid-md-lf.gro']
+            self.extra_output += ['lipid-md.trr']
         # Dictionary of last frames.
         self.LfDict = OrderedDict()
         self.LfDict_New = OrderedDict()
+
+    def npt_simulation(self, temperature, pressure, simnum):
+            """ Submit a NPT simulation to the Work Queue. """
+            if GoodStep() and (temperature, pressure) in self.LfDict_New:
+                self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
+            if (temperature, pressure) in self.LfDict:
+                lfsrc = self.LfDict[(temperature, pressure)]
+                lfdest = os.path.join(os.getcwd(), 'lipid-md.gro')
+                logger.info("Copying previous iteration final geometry .gro file: %s to %s\n" % (lfsrc, lfdest))
+                shutil.copy2(lfsrc,lfdest)
+                self.nptfiles.append(lfdest)
+            self.LfDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'lipid-md.gro')
+            super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
+            self.last_traj = [i for i in self.last_traj if '.gro' not in i]
  
 class AbInitio_GMX(AbInitio):
     """ Subclass of AbInitio for force and energy matching using GROMACS. """
