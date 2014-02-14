@@ -1028,7 +1028,7 @@ class GMX(Engine):
         NewMol = Molecule("%s-out.gro" % self.name)
         return NewMol.xyzs
 
-    def n_snaps(nsteps, step_interval, timestep):
+    def n_snaps(self, nsteps, step_interval, timestep):
         return int((nsteps / step_interval) * timestep)
 
     def scd_persnap(self, ndx, timestep, final_frame):
@@ -1168,7 +1168,7 @@ class GMX(Engine):
 
         # Calculate deuterium order parameter for bilayer optimization.
         if bilayer:
-            n_snap = n_snaps(nsteps, nsave, timestep)
+            n_snap = self.n_snaps(nsteps, 1000, timestep)
             Scds = self.calc_scd(n_snap, timestep)
             al_vars = ['Box-Y', 'Box-X']
             self.callgmx("g_energy -f %s-md.edr -o %s-md-energy-xy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(al_vars))
