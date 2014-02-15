@@ -290,7 +290,7 @@ class Target(forcebalance.BaseClass):
         with open('objective.p') as f:
             return forcebalance.nifty.lp_load(f)
 
-    def absrd(self):
+    def absrd(self, inum=None):
 
         """ 
         Supply the correct directory specified by user's "read" option.
@@ -340,6 +340,9 @@ class Target(forcebalance.BaseClass):
                     break
         if not have_data:
             raise RuntimeError("Did not find data to read in %s" % self.rd)
+
+        if inum != None:
+            there = os.path.join(os.path.split(there)[0],'iter_%04i' % inum)
         return there
 
     def maxrd(self):

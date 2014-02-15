@@ -132,7 +132,7 @@ class Liquid(Target):
         # Don't read indicate.log when calling meta_indicate()
         self.read_indicate = False
         # Don't read objective.p when calling meta_get()
-        self.read_objective = False
+        # self.read_objective = False
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
@@ -435,6 +435,83 @@ class Liquid(Target):
             os.chdir('..')
             snum += 1
 
+    def read(self, mvals, AGrad=True, AHess=True):
+        
+        """
+        Read in time series for all previous iterations.
+        """
+
+        unpack = forcebalance.nifty.lp_load(open('forcebalance.p'))
+        mvals1 = unpack[1]
+        if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+            warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+
+        for dn in range(Counter()-1, -1, -1):
+            cwd = os.getcwd()
+            os.chdir(self.absrd(inum=dn))
+            mprev = np.loadtxt('mvals.txt')
+            Results = {}
+            Points = []  # These are the phase points for which data exists.
+            mPoints = [] # These are the phase points to use for enthalpy of vaporization; if we're scanning pressure then set hvap_wt for higher pressures to zero.
+            tt = 0
+            logger.info('Reading liquid data from %s\n' % os.getcwd())
+            for label, PT in zip(self.Labels, self.PhasePoints):
+                if os.path.exists('./%s/npt_result.p.bz2' % label):
+                    _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
+                if os.path.exists('./%s/npt_result.p' % label):
+                    Points.append(PT)
+                    Results[tt] = lp_load(open('./%s/npt_result.p' % label))
+                    if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mPoints]:
+                        mPoints.append(PT)
+                    tt += 1
+                else:
+                    logger.warning('In %s :\n' % os.getcwd())
+                    logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it\n' % label)
+                    pass
+            if len(Points) == 0:
+                raise Exception('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!')
+    
+            # Assign variable names to all the stuff in npt_result.p
+            Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
+                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+            # Determine the number of molecules
+            if len(set(NMols)) != 1:
+                logger.error(str(NMols))
+                raise Exception('The above list should only contain one number - the number of molecules')
+            else:
+                NMol = list(set(NMols))[0]
+        
+            if not self.adapt_errors:
+                self.AllResults = defaultdict(lambda:defaultdict(list))
+
+            astrm = astr(mprev)
+            if len(Points) != len(self.Labels):
+                logger.info("Data sets is not full, will not use for concatenation.\n")
+                astrm += "_"*(dn+1)
+        
+            self.AllResults[astrm]['Pts'].append(Points)
+            self.AllResults[astrm]['mPts'].append(mPoints)
+            self.AllResults[astrm]['E'].append(np.array(Energies))
+            self.AllResults[astrm]['V'].append(np.array(Vols))
+            self.AllResults[astrm]['R'].append(np.array(Rhos))
+            self.AllResults[astrm]['Dx'].append(np.array([d[:,0] for d in Dips]))
+            self.AllResults[astrm]['Dy'].append(np.array([d[:,1] for d in Dips]))
+            self.AllResults[astrm]['Dz'].append(np.array([d[:,2] for d in Dips]))
+            self.AllResults[astrm]['G'].append(np.array(Grads))
+            self.AllResults[astrm]['GDx'].append(np.array([gd[0] for gd in GDips]))
+            self.AllResults[astrm]['GDy'].append(np.array([gd[1] for gd in GDips]))
+            self.AllResults[astrm]['GDz'].append(np.array([gd[2] for gd in GDips]))
+            self.AllResults[astrm]['L'].append(len(Energies[0]))
+            self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
+    
+            if len(mPoints) > 0:
+                self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
+                self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+
+            os.chdir(cwd)
+
+        return self.get(mvals, AGrad, AHess)
+
     def get(self, mvals, AGrad=True, AHess=True):
         
         """
@@ -471,8 +548,8 @@ class Liquid(Target):
         
         unpack = forcebalance.nifty.lp_load(open('forcebalance.p'))
         mvals1 = unpack[1]
-        if (mvals1 != mvals).any():
-            warn_press_key("mvals from forcebalance.p does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+        if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+            warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
         mbar_verbose = False
 
@@ -487,10 +564,6 @@ class Liquid(Target):
         for label, PT in zip(self.Labels, self.PhasePoints):
             if os.path.exists('./%s/npt_result.p.bz2' % label):
                 _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
-            elif os.path.exists('./%s/npt_result.p' % label): pass
-            else:
-                logger.warning('In %s :\n' % os.getcwd())
-                logger.warning('The file ./%s/npt_result.p.bz2 does not exist so we cannot unzip it\n' % label)
             if os.path.exists('./%s/npt_result.p' % label):
                 logger.info('Reading information from ./%s/npt_result.p\n' % label)
                 Points.append(PT)
@@ -503,10 +576,9 @@ class Liquid(Target):
                         mBPoints.append(PT)
                 tt += 1
             else:
+                logger.warning('In %s :\n' % os.getcwd())
                 logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it\n' % label)
                 pass
-                # for obs in self.RefData:
-                #     del self.RefData[obs][PT]
         if len(Points) == 0:
             raise Exception('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!')
 
@@ -523,26 +595,32 @@ class Liquid(Target):
         if not self.adapt_errors:
             self.AllResults = defaultdict(lambda:defaultdict(list))
 
-        self.AllResults[tuple(mvals)]['E'].append(np.array(Energies))
-        self.AllResults[tuple(mvals)]['V'].append(np.array(Vols))
-        self.AllResults[tuple(mvals)]['R'].append(np.array(Rhos))
-        self.AllResults[tuple(mvals)]['Dx'].append(np.array([d[:,0] for d in Dips]))
-        self.AllResults[tuple(mvals)]['Dy'].append(np.array([d[:,1] for d in Dips]))
-        self.AllResults[tuple(mvals)]['Dz'].append(np.array([d[:,2] for d in Dips]))
-        self.AllResults[tuple(mvals)]['G'].append(np.array(Grads))
-        self.AllResults[tuple(mvals)]['GDx'].append(np.array([gd[0] for gd in GDips]))
-        self.AllResults[tuple(mvals)]['GDy'].append(np.array([gd[1] for gd in GDips]))
-        self.AllResults[tuple(mvals)]['GDz'].append(np.array([gd[2] for gd in GDips]))
-        self.AllResults[tuple(mvals)]['L'].append(len(Energies[0]))
-        self.AllResults[tuple(mvals)]['Steps'].append(self.liquid_md_steps)
+        astrm = astr(mvals)
+        if len(Points) != len(self.Labels):
+            logger.info("Data sets is not full, will not use for concatenation.")
+            astrm += "_"*(Counter()+1)
+        self.AllResults[astrm]['Pts'].append(Points)
+        self.AllResults[astrm]['mPts'].append(Points)
+        self.AllResults[astrm]['E'].append(np.array(Energies))
+        self.AllResults[astrm]['V'].append(np.array(Vols))
+        self.AllResults[astrm]['R'].append(np.array(Rhos))
+        self.AllResults[astrm]['Dx'].append(np.array([d[:,0] for d in Dips]))
+        self.AllResults[astrm]['Dy'].append(np.array([d[:,1] for d in Dips]))
+        self.AllResults[astrm]['Dz'].append(np.array([d[:,2] for d in Dips]))
+        self.AllResults[astrm]['G'].append(np.array(Grads))
+        self.AllResults[astrm]['GDx'].append(np.array([gd[0] for gd in GDips]))
+        self.AllResults[astrm]['GDy'].append(np.array([gd[1] for gd in GDips]))
+        self.AllResults[astrm]['GDz'].append(np.array([gd[2] for gd in GDips]))
+        self.AllResults[astrm]['L'].append(len(Energies[0]))
+        self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
 
         if len(mPoints) > 0:
-            self.AllResults[tuple(mvals)]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
-            self.AllResults[tuple(mvals)]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+            self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
+            self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
 
         # Number of data sets belonging to this value of the parameters.
-        Nrpt = len(self.AllResults[tuple(mvals)]['R'])
-        sumsteps = sum(self.AllResults[tuple(mvals)]['Steps'])
+        Nrpt = len(self.AllResults[astrm]['R'])
+        sumsteps = sum(self.AllResults[astrm]['Steps'])
         if self.liquid_md_steps != sumsteps:
             printcool("This objective function evaluation combines %i datasets\n" \
                           "Increasing simulation length: %i -> %i steps" % \
@@ -554,18 +632,17 @@ class Liquid(Target):
             self.gas_eq_steps *= 2
             self.gas_md_steps *= 2
 
-
         # Concatenate along the data-set axis (more than 1 element  if we've returned to these parameters.)
         E, V, R, Dx, Dy, Dz = \
-            (np.hstack(tuple(self.AllResults[tuple(mvals)][i])) for i in \
+            (np.hstack(tuple(self.AllResults[astrm][i])) for i in \
                  ['E', 'V', 'R', 'Dx', 'Dy', 'Dz'])
 
         G, GDx, GDy, GDz = \
-            (np.hstack((np.concatenate(tuple(self.AllResults[tuple(mvals)][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
+            (np.hstack((np.concatenate(tuple(self.AllResults[astrm][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
 
         if len(mPoints) > 0:
-            mE = np.hstack(tuple(self.AllResults[tuple(mvals)]['mE']))
-            mG = np.hstack((np.concatenate(tuple(self.AllResults[tuple(mvals)]['mG']), axis=2)))
+            mE = np.hstack(tuple(self.AllResults[astrm]['mE']))
+            mG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['mG']), axis=2)))
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
         Rho_std  = OrderedDict([])

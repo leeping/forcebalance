@@ -477,6 +477,17 @@ class Optimizer(forcebalance.BaseClass):
                         Best_Step = 1
                         self.adjh(trust)
                         X_hist = np.append(X_hist, X)
+                        # Write checkpoint file.
+                        # (Lines copied from below for a good step.)
+                        self.chk = {'xk': xk, 'X' : X, 'G' : G, 'H': H, 'X_hist': X_hist, 'trust': trust}
+                        if self.wchk_step:
+                            self.writechk()           
+                        outfnm = self.save_mvals_to_input(xk)
+                        logger.info("Input file with saved parameters: %s\n" % outfnm)
+                        # Check for whether the maximum number of optimization cycles is reached.
+                        if ITERATION == self.maxstep:
+                            logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION)
+                            break
                         data        = self.Objective.Full(xk,Ord,verbose=True)
                         GOODSTEP = 1
                         X, G, H = data['X'], data['G'], data['H']
