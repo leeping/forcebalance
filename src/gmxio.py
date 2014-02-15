@@ -1295,7 +1295,7 @@ class Lipid_GMX(Lipid):
                 self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
             if (temperature, pressure) in self.LfDict:
                 lfsrc = self.LfDict[(temperature, pressure)]
-                lfdest = os.path.join(os.getcwd(), '%s-prevf.gro' % self.name)
+                lfdest = os.path.join(os.getcwd(), 'lipid-prevf.gro')
                 logger.info("Copying previous iteration final geometry .gro file: %s to %s\n" % (lfsrc, lfdest))
                 shutil.copy2(lfsrc,lfdest)
                 self.nptfiles.append(lfdest)
