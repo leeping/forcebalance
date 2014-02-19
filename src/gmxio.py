@@ -611,7 +611,7 @@ class GMX(Engine):
             self.mol.write("%s-all.gro" % self.name, select=range(self.target.shots))
         else:
             self.mol.write("%s-all.gro" % self.name)
-        self.mol[0].write("%s.gro" % self.name)
+        self.mol[0].write('%s.gro' % self.name)
 
         ## At this point, we could have gotten a .mdp file from the
         ## target folder or as part of the force field.  If it still
@@ -766,7 +766,9 @@ class GMX(Engine):
         """ Optimize the geometry and align the optimized geometry to the starting geometry. """
 
         ## Write the correct conformation.
-        self.mol[shot].write("%s.gro" % self.name)
+        last_geo_path = os.path.join(os.getcwd(), "%s.gro" % self.name)
+        if not os.path.exists(last_geo_path):
+            self.mol[shot].write("%s.gro" % self.name)
            
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
@@ -1363,7 +1365,7 @@ class Liquid_GMX(Liquid):
                 shutil.copy2(lfsrc,lfdest)
                 self.nptfiles.append(lfdest)
             self.LfDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid-md.gro')
-            super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
+            super(Liquid_GMX, self).npt_simulation(temperature, pressure, simnum)
             self.last_traj = [i for i in self.last_traj if '.gro' not in i]
 
 class Lipid_GMX(Lipid):
