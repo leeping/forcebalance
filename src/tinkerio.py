@@ -366,7 +366,7 @@ class TINKER(Engine):
                 for l in o:
                     logger.error("%s\n" % l)
                 time.sleep(1)
-                raise RuntimeError("TINKER may have crashed! (See above output)")
+                raise RuntimeError("TINKER may have crashed! (See above output)\nThe command was: %s\nThe directory was: %s" % (' '.join(csplit), os.getcwd()))
                 break
         for line in o:
             if 'D+' in line:

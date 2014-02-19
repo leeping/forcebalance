@@ -1,0 +1,32 @@
+comm_mode	= none
+integrator	= md
+nsteps          = 100000
+dt              = 0.002
+nstxout 	= 50
+nstvout		= 0
+nstfout		= 0
+nstlog		= 0
+nstenergy	= 50
+nstxtcout       = 50
+xtc_grps        = System
+energygrps      = System
+
+nstlist		= 10
+ns_type		= grid
+rlist		= 0.9
+vdwtype		= cut-off
+coulombtype	= cut-off
+rcoulomb	= 0.9
+rvdw		= 0.9
+rvdw_switch     = 0.9
+constraints	= all-bonds
+pbc		= xyz
+
+tcoupl		= v-rescale
+tc_grps		= System
+ref_t		= 298.0
+tau_t		= 1.0
+
+gen_vel 	= yes
+gen_temp	= 298.0
+gen_seed        = 123456

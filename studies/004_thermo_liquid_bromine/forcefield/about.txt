@@ -1,0 +1,2 @@
+bro.orig.itp came from OPLS-AA (I think)
+bro.itp has the parameters thrown off in order to demonstrate ForceBalance.
