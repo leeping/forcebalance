@@ -6,7 +6,7 @@
 @date 12/2011
 """
 
-import os
+import os, sys
 import re
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
@@ -20,7 +20,11 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
+<<<<<<< HEAD
 from forcebalance.optimizer import GoodStep
+=======
+from forcebalance.thermo import Thermo
+>>>>>>> 9aeac8a86aeae1cf2203ff9d9f684bece17d63aa
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
@@ -484,7 +488,7 @@ class GMX(Engine):
 
     def __init__(self, name="gmx", **kwargs):
         ## Valid GROMACS-specific keywords.
-        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp']
+        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx']
         super(GMX,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -1217,6 +1221,103 @@ class GMX(Engine):
         if verbose: logger.info("Finished!\n")
         return prop_return
 
+    def md(self, nsteps=0, nequil=0, verbose=False, deffnm=None, **kwargs):
+        
+        """
+        Method for running a molecular dynamics simulation.  A little different than molecular_dynamics (for thermo.py)
+
+        Required arguments:
+
+        nsteps = (int) Number of total time steps
+        
+        nequil = (int) Number of additional time steps at the beginning
+        for equilibration
+
+        verbose = (bool) Be loud and noisy
+
+        deffnm = (string) default names for simulation output files
+        
+        The simulation data is written to the working directory.
+                
+        """
+
+        if verbose:
+            logger.info("Molecular dynamics simulation with GROMACS engine.\n")
+
+        # Molecular dynamics options.
+        md_opts = OrderedDict()
+        # Default options 
+        md_defs = OrderedDict(**kwargs)
+
+        if nsteps > 0:
+            md_opts["nsteps"] =  nsteps
+            
+        warnings = []
+
+        if "gmx_ndx" in kwargs:
+            ndx_flag = "-n " + kwargs["gmx_ndx"]
+        else:
+            ndx_flag = ""
+            
+        gro1 = "%s.gro" % self.name
+      
+        # Run equilibration.
+        if nequil > 0:
+            if verbose:
+                logger.info("Equilibrating...\n")
+            eq_opts = deepcopy(md_opts)
+            eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0})
+            eq_defs = deepcopy(md_defs)
+            write_mdp("%s-eq.mdp" % self.name,
+                      eq_opts,
+                      fin='%s.mdp' % self.name,
+                      defaults=eq_defs)
+
+            self.warngmx(("grompp " +
+                          "-c %s " % gro1 +
+                          "-f %s-eq.mdp " % self.name +
+                          "-p %s.top " % self.name +
+                          "%s " % ndx_flag +
+                          "-o %s-eq.tpr" % self.name),
+                          warnings=warnings,
+                          print_command=verbose)
+            self.callgmx(("mdrun -v " +
+                          "-deffnm %s-eq" % self.name),
+                          print_command=verbose,
+                          print_to_screen=verbose)
+            
+            gro2 = "%s-eq.gro" % self.name
+        else:
+            gro2 = gro1
+            
+        self.mdtraj = '%s-md.trr' % self.name
+        self.mdene  = '%s-md.edr' % self.name
+         
+        # Run production.
+        if verbose:
+            logger.info("Production run...\n")
+        write_mdp("%s-md.mdp" % self.name,
+                  md_opts,
+                  fin="%s.mdp" % self.name,
+                  defaults=md_defs)
+        self.warngmx(("grompp " +
+                      "-c %s " % gro2 + 
+                      "-f %s-md.mdp " % self.name +
+                      "-p %s.top " % self.name +
+                      "%s " % ndx_flag +
+                      "-o %s-md.tpr" % self.name),
+                      warnings=warnings,
+                      print_command=verbose)
+        self.callgmx(("mdrun -v " +
+                      "-deffnm %s-md " % self.name),
+                      print_command=verbose,
+                      print_to_screen=verbose)
+
+        self.mdtraj = '%s-md.trr' % self.name
+        
+        if verbose:
+            logger.info("Production run finished...\n")                
+
 class Liquid_GMX(Liquid):
     def __init__(self,options,tgt_opts,forcefield):
         # Path to GROMACS executables.
@@ -1351,3 +1452,20 @@ class Vibration_GMX(Vibration):
         self.engine_ = GMX
         ## Initialize base class.
         super(Vibration_GMX,self).__init__(options,tgt_opts,forcefield)
+
+class Thermo_GMX(Thermo):
+    """ Thermodynamical property matching using GROMACS. """
+    def __init__(self,options,tgt_opts,forcefield):
+        # Path to GROMACS executables.
+        self.set_option(options,'gmxpath')
+        # Suffix for GROMACS executables.
+        self.set_option(options,'gmxsuffix')
+        self.engine_ = GMX
+        # Name of the engine to pass to scripts.
+        self.engname = "gromacs"
+        # Command prefix.
+        self.mdpfx = "bash gmxprefix.bash"
+        # Scripts to be copied from the ForceBalance installation directory.
+        self.scripts = ['gmxprefix.bash', 'md_chain.py']
+        ## Initialize base class.
+        super(Thermo_GMX,self).__init__(options,tgt_opts,forcefield)
