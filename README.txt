@@ -2,7 +2,7 @@
 #|  ForceBalance  |#
 #==================#
 
-If you're reading this, you are probably looking for help. :D
+If you're reading this, you are probably looking for help. :)
 
 The ForceBalance project website is located at
 https://simtk.org/home/forcebalance
