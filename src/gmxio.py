@@ -776,11 +776,7 @@ class GMX(Engine):
 
         write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
 
-        last_geo_path = os.path.join(os.getcwd(), '%s-prevf.gro' % self.name)
-        if os.path.exists(last_geo_path):
-            self.warngmx("grompp -c %s-prevf.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
-        else:
-            self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
         self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
         self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
@@ -1393,7 +1389,7 @@ class Lipid_GMX(Lipid):
                 self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
             if (temperature, pressure) in self.LfDict:
                 lfsrc = self.LfDict[(temperature, pressure)]
-                lfdest = os.path.join(os.getcwd(), 'lipid-prevf.gro')
+                lfdest = os.path.join(os.getcwd(), 'lipid.gro')
                 logger.info("Copying previous iteration final geometry .gro file: %s to %s\n" % (lfsrc, lfdest))
                 shutil.copy2(lfsrc,lfdest)
                 self.nptfiles.append(lfdest)
