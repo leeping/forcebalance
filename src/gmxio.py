@@ -1343,9 +1343,28 @@ class Liquid_GMX(Liquid):
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
                 raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+        # Send back last frame of production trajectory.
+        self.extra_output = ['liquid-md.gro']
         # Send back the trajectory file.
         if self.save_traj > 0:
-            self.extra_output = ['liquid-md.trr']
+            self.extra_output += ['liquid-md.trr']
+        # Dictionary of last frames.
+        self.LfDict = OrderedDict()
+        self.LfDict_New = OrderedDict()
+
+    def npt_simulation(self, temperature, pressure, simnum):
+            """ Submit a NPT simulation to the Work Queue. """
+            if GoodStep() and (temperature, pressure) in self.LfDict_New:
+                self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
+            if (temperature, pressure) in self.LfDict:
+                lfsrc = self.LfDict[(temperature, pressure)]
+                lfdest = os.path.join(os.getcwd(), 'liquid.gro')
+                logger.info("Copying previous iteration final geometry .gro file: %s to %s\n" % (lfsrc, lfdest))
+                shutil.copy2(lfsrc,lfdest)
+                self.nptfiles.append(lfdest)
+            self.LfDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid-md.gro')
+            super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
+            self.last_traj = [i for i in self.last_traj if '.gro' not in i]
 
 class Lipid_GMX(Lipid):
     def __init__(self,options,tgt_opts,forcefield):
