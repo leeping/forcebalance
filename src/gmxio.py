@@ -20,11 +20,8 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
-<<<<<<< HEAD
 from forcebalance.optimizer import GoodStep
-=======
 from forcebalance.thermo import Thermo
->>>>>>> 9aeac8a86aeae1cf2203ff9d9f684bece17d63aa
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
