@@ -54,6 +54,10 @@ def pvec1d(vec1d, precision=1, format="e", loglevel=INFO):
         logger.log(loglevel, "%% .%i%s " % (precision, format) % v2a[i])
     logger.log(loglevel, '\n')
 
+def astr(vec1d, precision=4):
+    """ Write an array to a string so we can use it to key a dictionary. """
+    return ' '.join([("%% .%ie " % (precision) % i) for i in vec1d])
+
 def pmat2d(mat2d, precision=1, format="e", loglevel=INFO):
     """Printout of a 2-D matrix.
 
