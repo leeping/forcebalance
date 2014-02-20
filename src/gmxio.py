@@ -20,6 +20,7 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
+from forcebalance.optimizer import GoodStep
 from forcebalance.thermo import Thermo
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
@@ -610,7 +611,7 @@ class GMX(Engine):
             self.mol.write("%s-all.gro" % self.name, select=range(self.target.shots))
         else:
             self.mol.write("%s-all.gro" % self.name)
-        self.mol[0].write("%s.gro" % self.name)
+        self.mol[0].write('%s.gro' % self.name)
 
         ## At this point, we could have gotten a .mdp file from the
         ## target folder or as part of the force field.  If it still
@@ -766,13 +767,13 @@ class GMX(Engine):
 
         ## Write the correct conformation.
         self.mol[shot].write("%s.gro" % self.name)
-
+           
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
         else:
             # Arguments for running minimization.
             min_opts = {"integrator" : "l-bfgs", "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
-        
+
         write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
 
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
@@ -1027,6 +1028,9 @@ class GMX(Engine):
         NewMol = Molecule("%s-out.gro" % self.name)
         return NewMol.xyzs
 
+    def n_snaps(self, nsteps, step_interval, timestep):
+        return int((nsteps / step_interval) * timestep)
+
     def scd_persnap(self, ndx, timestep, final_frame):
         Scd = []
         for snap in range(0, final_frame + 1):
@@ -1038,7 +1042,7 @@ class GMX(Engine):
             Scd.append(Scd_snap)
         return Scd
 
-    def calc_scd(self, timestep):
+    def calc_scd(self, n_snap, timestep):
         # Find deuterium order parameter via g_order.
         # Create index files for each lipid tail.
         sn1_ndx = ['a C15', 'a C17', 'a C18', 'a C19', 'a C20', 'a C21', 'a C22', 'a C23', 'a C24', 'a C25', 'a C26', 'a C27', 'a C28', 'a C29', 'a C30', 'a C31', 'del 0-5', 'q', '']
@@ -1048,7 +1052,6 @@ class GMX(Engine):
         
         # Loop over g_order for each frame.
         # Adjust nsteps to account for nstxout = 1000.
-        n_snap = int((nsteps / 1000) * timestep)
         sn1 = self.scd_persnap('sn1', timestep, n_snap)
         sn2 = self.scd_persnap('sn2', timestep, n_snap)
         for i in range(0, n_snap + 1):
@@ -1165,7 +1168,8 @@ class GMX(Engine):
 
         # Calculate deuterium order parameter for bilayer optimization.
         if bilayer:
-            Scds = calc_scd(timestep)
+            n_snap = self.n_snaps(nsteps, 1000, timestep)
+            Scds = self.calc_scd(n_snap, timestep)
             al_vars = ['Box-Y', 'Box-X']
             self.callgmx("g_energy -f %s-md.edr -o %s-md-energy-xy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(al_vars))
             Xs = []
@@ -1370,9 +1374,28 @@ class Lipid_GMX(Lipid):
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
                 raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+        # Send back last frame of production trajectory.
+        self.extra_output = ['lipid-md.gro']
         # Send back the trajectory file.
         if self.save_traj > 0:
-            self.extra_output = ['lipid-md.trr']
+            self.extra_output += ['lipid-md.trr']
+        # Dictionary of last frames.
+        self.LfDict = OrderedDict()
+        self.LfDict_New = OrderedDict()
+
+    def npt_simulation(self, temperature, pressure, simnum):
+            """ Submit a NPT simulation to the Work Queue. """
+            if GoodStep() and (temperature, pressure) in self.LfDict_New:
+                self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
+            if (temperature, pressure) in self.LfDict:
+                lfsrc = self.LfDict[(temperature, pressure)]
+                lfdest = os.path.join(os.getcwd(), 'lipid.gro')
+                logger.info("Copying previous iteration final geometry .gro file: %s to %s\n" % (lfsrc, lfdest))
+                shutil.copy2(lfsrc,lfdest)
+                self.nptfiles.append(lfdest)
+            self.LfDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'lipid-md.gro')
+            super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
+            self.last_traj = [i for i in self.last_traj if '.gro' not in i]
  
 class AbInitio_GMX(AbInitio):
     """ Subclass of AbInitio for force and energy matching using GROMACS. """

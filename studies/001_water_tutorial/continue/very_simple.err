@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/home/leeping/local/bin/ForceBalance.py", line 43, in Run_ForceBalance
+    optimizer.Run()
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/optimizer.py", line 272, in Run
+    xk = self.OptTab[self.jobtype]()
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/optimizer.py", line 814, in NewtonRaphson
+    return self.MainOptimizer(b_BFGS=0)
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/optimizer.py", line 436, in MainOptimizer
+    data        = self.Objective.Full(xk,Ord,verbose=True)
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/objective.py", line 258, in Full
+    Objective = self.Target_Terms(mvals, Order, verbose)
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/objective.py", line 203, in Target_Terms
+    Ans = Funcs[Order](mvals)
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/target.py", line 202, in get_H
+    Ans = self.meta_get(mvals,1,1)
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/target.py", line 436, in meta_get
+    Answer = self.get(mvals, AGrad, AHess)
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/abinitio.py", line 1118, in get
+    Answer_EF = self.get_energy_force(mvals, AGrad, AHess)
+  File "/home/leeping/local/lib/python2.7/site-packages/forcebalance/abinitio.py", line 712, in get_energy_force
+    dfrcarray = np.mean(np.array([np.linalg.norm(M[a+3*j:a+3*j+3] - Q[a+3*j:a+3*j+3]) for j in range(nat)]))
+  File "/home/leeping/local/lib/python2.7/site-packages/numpy/linalg/linalg.py", line 2056, in norm
+    return sqrt(add.reduce((x.conj() * x).real, axis=None))
+KeyboardInterrupt

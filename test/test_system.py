@@ -186,7 +186,7 @@ class TestThermoBromineStudy(ForceBalanceTestCase):
         super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):
-        """Check liquid bromine study converges to expected results"""
+        """Check liquid bromine study (Thermo target) converges to expected results"""
         self.logger.debug("\nSetting input file to 'options.in'\n")
         input_file='optimize.in'
 
