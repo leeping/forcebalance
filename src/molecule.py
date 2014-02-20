@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated October 1, 2013                      |#
+#|                 Last updated February 20, 2014                     |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -193,40 +193,41 @@ def elem_from_atomname(atomname):
     """ Given an atom name, attempt to get the element in most cases. """
     return re.search('[A-Z][a-z]*',atomname).group(0)
 
-#============================#
-#| DCD read/write functions |#
-#============================#
-# Try to load _dcdlib.so either from a directory in the LD_LIBRARY_PATH
-# or from the same directory as this module.
-try: _dcdlib = CDLL("_dcdlib.so")
-except:
-    try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
+if __name__ == "forcebalance":
+    #============================#
+    #| DCD read/write functions |#
+    #============================#
+    # Try to load _dcdlib.so either from a directory in the LD_LIBRARY_PATH
+    # or from the same directory as this module.
+    try: _dcdlib = CDLL("_dcdlib.so")
+    except:
+        try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
+        except: 
+            warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+    
+    #============================#
+    #| PDB read/write functions |#
+    #============================#
+    try: from PDB import *
     except: 
-        warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
-
-#============================#
-#| PDB read/write functions |#
-#============================#
-try: from PDB import *
-except: 
-    warn('The pdb module cannot be miported (Cannot read/write PDB files)')
-
-#=============================#
-#| Mol2 read/write functions |#
-#=============================#
-try: import Mol2
-except: 
-    warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
-
-#==============================#
-#| OpenMM interface functions |#
-#==============================#
-try: 
-    from simtk.unit import *
-    from simtk.openmm import *
-    from simtk.openmm.app import *
-except: 
-    warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+        warn('The pdb module cannot be miported (Cannot read/write PDB files)')
+    
+    #=============================#
+    #| Mol2 read/write functions |#
+    #=============================#
+    try: import Mol2
+    except: 
+        warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
+    
+    #==============================#
+    #| OpenMM interface functions |#
+    #==============================#
+    try: 
+        from simtk.unit import *
+        from simtk.openmm import *
+        from simtk.openmm.app import *
+    except: 
+        warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
     
 #===========================#
 #| Convenience subroutines |#
@@ -888,6 +889,7 @@ class Molecule(object):
                           'g96'     : 'gromacs',
                           'gmx'     : 'gromacs',
                           'in'      : 'qcin',
+                          'qcin'    : 'qcin',
                           'com'     : 'gaussian',
                           'out'     : 'qcout',
                           'esp'     : 'qcesp',
@@ -956,7 +958,7 @@ class Molecule(object):
     #     Answer = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)
     #     return Answer
 
-    def write(self,fnm=None,ftype=None,append=False,select=None):
+    def write(self,fnm=None,ftype=None,append=False,select=None,**kwargs):
         if fnm == None and ftype == None:
             raise Exception("Output file name and file type are not specified.")
         elif ftype == None:
@@ -972,7 +974,7 @@ class Molecule(object):
             select = [select]
         if select == None:
             select = range(len(self))
-        Answer = self.Write_Tab[self.Funnel[ftype.lower()]](select)
+        Answer = self.Write_Tab[self.Funnel[ftype.lower()]](select,**kwargs)
         ## Any method that returns text will give us a list of lines, which we then write to the file.
         if Answer != None:
             if fnm == None or fnm == sys.stdout:
@@ -1348,6 +1350,55 @@ class Molecule(object):
             bonds[jj].append(ii)
             G.add_edge(ii, jj)
         return G
+
+    def find_angles(self):
+
+        """ Return a list of 3-tuples corresponding to all of the
+        angles in the system.  Verified for lysine and tryptophan
+        dipeptide when comparing to TINKER's analyze program. """
+
+        if not hasattr(self, 'topology'):
+            raise RuntimeError("Need to have built a topology to find angles")
+
+        angidx = []
+        # Iterate over separate molecules
+        for mol in self.molecules:
+            # Iterate over atoms in the molecule
+            for a2 in mol.nodes():
+                # Find all bonded neighbors to this atom
+                friends = sorted(list(nx.all_neighbors(mol, a2)))
+                if len(friends) < 2: continue
+                # Double loop over bonded neighbors
+                for i, a1 in enumerate(friends):
+                    for a3 in friends[i+1:]:
+                        # Add bonded atoms in the correct order
+                        angidx.append((a1, a2, a3))
+        return angidx
+
+    def find_dihedrals(self):
+        
+        """ Return a list of 4-tuples corresponding to all of the
+        dihedral angles in the system.  Verified for alanine and
+        tryptophan dipeptide when comparing to TINKER's analyze
+        program. """
+        
+        if not hasattr(self, 'topology'):
+            raise RuntimeError("Need to have built a topology to find dihedrals")
+
+        dihidx = []
+        # Iterate over separate molecules
+        for mol in self.molecules:
+            # Iterate over bonds in the molecule
+            for edge in mol.edges():
+                # Determine correct ordering of atoms (middle atoms are ordered by convention)
+                a2 = edge[0] if edge[0] < edge[1] else edge[1]
+                a3 = edge[1] if edge[0] < edge[1] else edge[0]
+                for a1 in sorted(list(nx.all_neighbors(mol, a2))):
+                    if a1 != a3:
+                        for a4 in sorted(list(nx.all_neighbors(mol, a3))):
+                            if a4 != a2:
+                                dihidx.append((a1, a2, a3, a4))
+        return dihidx
 
     def measure_dihedrals(self, i, j, k, l):
         """ Return a series of dihedral angles, given four atom indices numbered from zero. """
@@ -2360,9 +2411,13 @@ class Molecule(object):
     #|         Writing functions         |#
     #=====================================#
 
-    def write_qcin(self, select):
+    def write_qcin(self, select, **kwargs):
         self.require('qctemplate','qcrems','charge','mult')
         out = []
+        if 'read' in kwargs:
+            read = kwargs['read']
+        else:
+            read = False
         for I in select:
             remidx = 0
             molecule_printed = False
@@ -2382,7 +2437,9 @@ class Molecule(object):
                     if SectName == 'molecule':
                         if molecule_printed == False:
                             molecule_printed = True
-                            if self.na > 0:
+                            if read:
+                                out.append("read")
+                            elif self.na > 0:
                                 out.append("%i %i" % (self.charge, self.mult))
                                 an = 0
                                 for e, x in zip(self.elem, self.xyzs[I]):
@@ -2406,7 +2463,7 @@ class Molecule(object):
                 out.append('')
         return out
 
-    def write_xyz(self, select):
+    def write_xyz(self, select, **kwargs):
         self.require('elem','xyzs')
         out = []
         for I in select:
@@ -2417,7 +2474,7 @@ class Molecule(object):
                 out.append(format_xyz_coord(self.elem[i],xyz[i]))
         return out
 
-    def write_molproq(self, select):
+    def write_molproq(self, select, **kwargs):
         self.require('xyzs','partial_charge')
         out = []
         for I in select:
@@ -2429,7 +2486,7 @@ class Molecule(object):
                 out.append("% 15.10f % 15.10f % 15.10f % 15.10f   0" % (xyz[i,0],xyz[i,1],xyz[i,2],self.partial_charge[i]))
         return out
 
-    def write_mdcrd(self, select):
+    def write_mdcrd(self, select, **kwargs):
         self.require('xyzs')
         # In mdcrd files, there is only one comment line
         out = ['mdcrd file generated using ForceBalance'] 
@@ -2440,7 +2497,7 @@ class Molecule(object):
                 out.append(''.join(["%8.3f" % i for i in [self.boxes[I].a, self.boxes[I].b, self.boxes[I].c]]))
         return out
 
-    def write_arc(self, select):
+    def write_arc(self, select, **kwargs):
         self.require('elem','xyzs')
         out = []
         if 'tinkersuf' not in self.Data:
@@ -2455,7 +2512,7 @@ class Molecule(object):
                 out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.tinkersuf[i] if 'tinkersuf' in self.Data else ''))
         return out
 
-    def write_gro(self, select):
+    def write_gro(self, select, **kwargs):
         out = []
         if sys.stdin.isatty():
             self.require('elem','xyzs')
@@ -2490,7 +2547,7 @@ class Molecule(object):
             out.append(format_gro_box(self.boxes[I]))
         return out
 
-    def write_dcd(self, select):
+    def write_dcd(self, select, **kwargs):
         if _dcdlib.vmdplugin_init() != 0:
             raise IOError("Unable to init DCD plugin")
         natoms    = c_int(self.na)
@@ -2510,7 +2567,7 @@ class Molecule(object):
         _dcdlib.close_file_write(dcd)
         dcd = None
 
-    def write_pdb(self, select):
+    def write_pdb(self, select, **kwargs):
         """Save to a PDB. Copied wholesale from MSMBuilder.
         COLUMNS  TYPE   FIELD  DEFINITION
         ---------------------------------------------
@@ -2649,7 +2706,7 @@ class Molecule(object):
             out += connects
         return out
         
-    def write_qdata(self, select):
+    def write_qdata(self, select, **kwargs):
         """ Text quantum data format. """
         #self.require('xyzs','qm_energies','qm_forces')
         out = []
