@@ -265,8 +265,10 @@ class Lipid(Target):
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-            self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output if '.gro' not in i]
+            prev_iter_ICs = os.path.join(os.getcwd(), "lipid.gro")
+            if not os.path.exists(prev_iter_ICs):
+                self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
             cmdstr = '%s python npt_lipid.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
