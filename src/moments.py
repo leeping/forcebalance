@@ -179,13 +179,13 @@ class Moments(Target):
         dV = np.zeros((self.FF.np,len(calc_momvals)))
 
         if AGrad or AHess:
-            for p in range(self.FF.np):
+            for p in self.pgrad:
                 dV[p,:], _ = f12d3p(fdwrap(get_momvals, mvals, p), h = self.h, f0 = calc_momvals)
                 
         Answer['X'] = np.dot(D,D)
-        for p in range(self.FF.np):
+        for p in self.pgrad:
             Answer['G'][p] = 2*np.dot(D, dV[p,:])
-            for q in range(self.FF.np):
+            for q in self.pgrad:
                 Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:])
 
         if not in_fd():
