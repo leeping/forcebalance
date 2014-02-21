@@ -18,7 +18,7 @@ def mean_stderr(ts):
       np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
 
 # method energy_derivatives
-def energy_derivatives(engine, FF, mvals, h, length, AGrad=True):
+def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True):
     """Compute the first derivatives of a set of snapshot energies with respect
     to the force field parameters. The function calls the finite
     difference subroutine on the energy_driver subroutine also in this
@@ -56,7 +56,7 @@ def energy_derivatives(engine, FF, mvals, h, length, AGrad=True):
 
     ED0 = energy_driver(mvals)
         
-    for i in range(FF.np):
+    for i in pgrad:
         logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
         EDG, _   = f12d3p(fdwrap(energy_driver, mvals, i), h, f0=ED0)
 
@@ -133,7 +133,7 @@ class Quantity_Density(Quantity):
         
         self.name = name if name is not None else "density"
 
-    def extract(self, engines, FF, mvals, h, AGrad=True):         
+    def extract(self, engines, FF, mvals, h, pgrad, AGrad=True):         
         #==========================================#
         #  Physical constants and local variables. #
         #==========================================#
@@ -182,7 +182,7 @@ class Quantity_Density(Quantity):
                      "with finite difference step size: %f\n" % h))
         printcool("Initializing array to length %i" % len(Energy),
                   color=4, bold=True)    
-        G = energy_derivatives(engines[0], FF, mvals, h, len(Energy), AGrad)
+        G = energy_derivatives(engines[0], FF, mvals, h, pgrad, len(Energy), AGrad)
         
         #=======================================#
         #  Quantity properties and derivatives. #
@@ -203,7 +203,7 @@ class Quantity_H_vap(Quantity):
         
         self.name = name if name is not None else "H_vap"
 
-    def extract(self, engines, FF, mvals, h, AGrad=True): 
+    def extract(self, engines, FF, mvals, h, pgrad, AGrad=True): 
         #==========================================#
         #  Physical constants and local variables. #
         #==========================================#
@@ -273,8 +273,8 @@ class Quantity_H_vap(Quantity):
         printcool("Initializing arrays to lengths %d" % len(Energy),
                   color=4, bold=True)
         
-        G  = energy_derivatives(engines[0], FF, mvals, h, len(Energy), AGrad)
-        Gm = energy_derivatives(engines[1], FF, mvals, h, len(mEnergy), AGrad)
+        G  = energy_derivatives(engines[0], FF, mvals, h, pgrad, len(Energy), AGrad)
+        Gm = energy_derivatives(engines[1], FF, mvals, h, pgrad, len(mEnergy), AGrad)
                 
         #=======================================#
         #  Quantity properties and derivatives. #

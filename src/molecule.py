@@ -193,7 +193,7 @@ def elem_from_atomname(atomname):
     """ Given an atom name, attempt to get the element in most cases. """
     return re.search('[A-Z][a-z]*',atomname).group(0)
 
-if __name__ == "forcebalance":
+if "forcebalance" in __name__:
     #============================#
     #| DCD read/write functions |#
     #============================#

@@ -160,7 +160,7 @@ class AbInitio(Target):
         self.set_option(None, 'shots', val=self.ns)
 
     def build_invdist(self, mvals):
-        for i in range(self.FF.np):
+        for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:
                 if i in self.save_vmvals and mvals[i] != self.save_vmvals[i]:
                     self.new_vsites = True
@@ -182,7 +182,7 @@ class AbInitio(Target):
                 DistMat = np.array([[np.linalg.norm(i - j) for j in xyz] for i in esparr])
                 invdists.append(1. / (DistMat / bohrang))
                 sn += 1
-        for i in range(self.FF.np):
+        for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:
                 self.save_vmvals[i] = mvals[i]
         self.new_vsites = False
@@ -677,7 +677,7 @@ class AbInitio(Target):
                     logger.debug("\r")
                     pvals = self.FF.make(mvals_)
                     return self.energy_force_transform()
-                for p in range(NP):
+                for p in self.pgrad:
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
         for i in range(NS):
             if i % 100 == 0:
@@ -753,7 +753,7 @@ class AbInitio(Target):
             #   This is only implemented for the case without covariance.  #
             #==============================================================#
             if not cv:
-                for p in range(NP):
+                for p in self.pgrad:
                     if not AGrad: continue
                     if self.all_at_once:
                         M_p[p] = dM_all[i, p]
@@ -784,6 +784,7 @@ class AbInitio(Target):
                     SPiXi_pq[p,p] += P * Xi_pq
                     SRiXi_pq[p,p] += R * Xi_pq
                     for q in range(p):
+                        if q not in self.pgrad: continue
                         Xi_pq          = 2 * M_p[p] * M_p[q]
                         SPiXi_pq[p,q] += P * Xi_pq
                         SRiXi_pq[p,q] += R * Xi_pq
@@ -930,7 +931,7 @@ class AbInitio(Target):
         else:
             X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
             X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute)
-            for p in range(NP):
+            for p in self.pgrad:
                 if not AGrad: continue
                 X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1,subtract_mean = not self.absolute)
                 X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1,subtract_mean = not self.absolute)
@@ -938,6 +939,7 @@ class AbInitio(Target):
                 X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1,subtract_mean = not self.absolute)
                 X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1,subtract_mean = not self.absolute)
                 for q in range(p):
+                    if q not in self.pgrad: continue
                     X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1,subtract_mean = not self.absolute)
                     X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1,subtract_mean = not self.absolute)
                     # Get the other half of the Hessian matrix.
@@ -952,11 +954,11 @@ class AbInitio(Target):
             # Derivatives of the objective function
             G = np.zeros(NP)
             H = np.zeros((NP,NP))
-            for p in range(NP):
+            for p in self.pgrad:
                 if not AGrad: continue
                 G[p] = MBP * X2_M_p[p] + QBP * X2_Q_p[p]
                 if not AHess: continue
-                for q in range(NP):
+                for q in self.pgrad:
                     H[p,q] = MBP * X2_M_pq[p,q] + QBP * X2_Q_pq[p,q]
         # Energy error in kJ/mol
         if not self.absolute:
@@ -1041,7 +1043,7 @@ class AbInitio(Target):
             #     print "Now working on parameter number", i
             #     dqPdqM.append(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0])
             # dqPdqM = mat(dqPdqM).T
-            dqPdqM = np.matrix([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(NP)]).T
+            dqPdqM = np.matrix([(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] if i in self.pgrad else 0.0) for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)
         espxyz   = np.array(self.espxyz)
@@ -1050,7 +1052,7 @@ class AbInitio(Target):
         # Second derivative of the inverse distance matrix with respect to the virtual site position
         dddVdqPdVS2 = {}
         if AGrad:
-            for p in range(NP):
+            for p in self.pgrad:
                 if 'VSITE' in self.FF.plist[p]:
                     ddVdqPdVS[p], dddVdqPdVS2[p] = f12d3p(fdwrap(self.build_invdist,mvals,p), h = self.h, f0 = self.invdists)
         X = 0

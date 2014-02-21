@@ -5,3 +5,5 @@ test.log
 temp
 backups
 result
+active_grad.txt
+active_hess.txt

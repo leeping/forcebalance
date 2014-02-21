@@ -735,7 +735,7 @@ class Liquid(Target):
          
         if self.do_self_pol:
             EPol = self.polarization_correction(mvals)
-            GEPol = np.array([f12d3p(fdwrap(self.polarization_correction, mvals, p), h = self.h, f0 = EPol)[0] for p in range(self.FF.np)])
+            GEPol = np.array([(f12d3p(fdwrap(self.polarization_correction, mvals, p), h = self.h, f0 = EPol)[0] if p in self.pgrad else 0.0) for p in range(self.FF.np)])
             bar = printcool("Self-polarization correction to \nenthalpy of vaporization is % .3f kJ/mol%s" % (EPol, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=GEPol)
