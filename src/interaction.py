@@ -175,15 +175,15 @@ class Interaction(Target):
 
         # Do the finite difference derivative.
         if AGrad or AHess:
-            for p in range(self.FF.np):
+            for p in self.pgrad:
                 dV[p,:], _ = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = emm)
             # Create the force field one last time.
             pvals  = self.FF.make(mvals)
                 
         Answer['X'] = np.dot(self.prefactor*D/self.divisor,D/self.divisor)
-        for p in range(self.FF.np):
+        for p in self.pgrad:
             Answer['G'][p] = 2*np.dot(self.prefactor*D/self.divisor, dV[p,:]/self.divisor)
-            for q in range(self.FF.np):
+            for q in self.pgrad:
                 Answer['H'][p,q] = 2*np.dot(self.prefactor*dV[p,:]/self.divisor, dV[q,:]/self.divisor)
 
         if not in_fd():

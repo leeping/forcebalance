@@ -94,6 +94,7 @@ def main():
     #----
     # Finite difference step size
     h = TgtOptions['h']
+    pgrad = TgtOptions['pgrad']
     
     engines = []
     ## Setup and carry out simulations in chain
@@ -155,7 +156,7 @@ def main():
             
         Quantity = getattr(dm, objstr)(engname, args.temperature, args.pressure)
             
-        Q, Qerr, Qgrad = Quantity.extract(engines, FF, mvals, h, AGrad)
+        Q, Qerr, Qgrad = Quantity.extract(engines, FF, mvals, h, pgrad, AGrad)
                     
         results.setdefault("values", []).append(Q)
         results.setdefault("errors", []).append(Qerr)

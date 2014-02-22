@@ -31,6 +31,7 @@ Tgt.read_objective = False
 Tgt.read_indicate = False
 Tgt.write_objective = False
 Tgt.write_indicate = False
+Tgt.read_0grads()
 Tgt.submit_jobs(mvals, AGrad = True, AHess = True)
 
 Ans = Tgt.meta_get(mvals, AGrad=True, AHess=True)
