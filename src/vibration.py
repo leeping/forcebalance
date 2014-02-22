@@ -180,12 +180,12 @@ class Vibration(Target):
         D = calc_eigvals - self.ref_eigvals
         dV = np.zeros((self.FF.np,len(calc_eigvals)))
         if AGrad or AHess:
-            for p in range(self.FF.np):
+            for p in self.pgrad:
                 dV[p,:], _ = f12d3p(fdwrap(get_eigvals, mvals, p), h = self.h, f0 = calc_eigvals)
         Answer['X'] = np.dot(D,D) / self.denom**2
-        for p in range(self.FF.np):
+        for p in self.pgrad:
             Answer['G'][p] = 2*np.dot(D, dV[p,:]) / self.denom**2
-            for q in range(self.FF.np):
+            for q in self.pgrad:
                 Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:]) / self.denom**2
         if not in_fd():
             self.calc_eigvals = calc_eigvals

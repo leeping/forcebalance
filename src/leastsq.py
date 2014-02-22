@@ -35,18 +35,6 @@ class LeastSquares(Target):
     
     def __init__(self,options,tgt_opts,forcefield):
         super(LeastSquares,self).__init__(options,tgt_opts,forcefield)
-        
-        #======================================#
-        # Options that are given by the parser #
-        #======================================#
-        
-        ## Number of snapshots
-        self.set_option(tgt_opts,'shots','ns')
-        #======================================#
-        #     Variables which are set here     #
-        #======================================#
-        ## Which parameters are differentiated?
-        self.call_derivatives = [True for i in range(forcefield.np)]
 
     def indicate(self):
         #RMSD = sqrt(mean(self.D ** 2))
@@ -107,23 +95,24 @@ class LeastSquares(Target):
         if AGrad:
             # Leaving comment here if we want to reintroduce second deriv someday.
             #     dM[p,:], ddM[p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
-            for p in range(NP):
-                if self.call_derivatives[p] == False: continue
+            xgrad = []
+            for p in self.pgrad:
                 dM_arr = f1d2p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                 if np.max(np.abs(dM_arr)) == 0.0 and Counter() == First():
                     logger.info("\r Simulation %s will skip over parameter %i in subsequent steps\n" % (self.name, p))
-                    self.call_derivatives[p] = False
+                    xgrad.append(p)
                 else:
                     dM[p] = dM_arr.copy()
+            for p in xgrad:
+                self.pgrad.remove(p)
 	Objective = np.dot(W, D**2) * Fac
         if AGrad:
-            for p in range(NP):
-                if self.call_derivatives[p] == False: continue
+            for p in self.pgrad:
                 G[p] = 2 * np.dot(W, D*dM[p])
                 if not AHess: continue
                 H[p, p] = 2 * np.dot(W, dM[p]**2)
                 for q in range(p):
-                    if self.call_derivatives[q] == False: continue
+                    if q not in self.pgrad: continue
                     GNP = 2 * np.dot(W, dM[p] * dM[q])
                     H[q,p] = GNP
                     H[p,q] = GNP
