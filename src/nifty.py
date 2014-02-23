@@ -692,10 +692,14 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                     if task.id in WQIDS[tnm]:
                         WQIDS[tnm].remove(task.id)
                 del task
-        try:
+        if hasattr(wq.stats, 'workers_full'):
             # Full workers were added with CCTools 4.0.1
-            nbusy = wq.stats.workers_busy + wq.stats.workers_full
-        except:
+            # But deprecated with CCTools 4.1 (so if they're equal we don't add them.)
+            if wq.stats.workers_busy == wq.stats.workers_full:
+                nbusy = wq.stats.workers_busy
+            else:
+                nbusy = wq.stats.workers_busy + wq.stats.workers_full
+        else:
             nbusy = wq.stats.workers_busy
 
         Complete = wq.stats.total_tasks_complete
@@ -709,9 +713,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
             logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
         else:
             logger.info("\r%s : %i/%i workers busy; %i/%i jobs complete\r" %\
-            (time.ctime(),
-             nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
-             Complete, Total)) 
+            (time.ctime(), nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed), Complete, Total))
             if time.time() - wq_wait1.t0 > 900:
                 wq_wait1.t0 = time.time()
                 logger.info('\n')
