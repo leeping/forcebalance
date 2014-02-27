@@ -118,7 +118,9 @@ class Target(forcebalance.BaseClass):
         ## Directory to read data from.
         self.set_option(tgt_opts, 'read', 'rd')
         if self.rd != None: self.rd = self.rd.strip("/")
-                                                                 
+        ## Dictionary of whether to call the derivatives.
+        self.pgrad = range(forcefield.np)
+
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -171,6 +173,66 @@ class Target(forcebalance.BaseClass):
             return {'X':1e10, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         return Ans
 
+    def read_0grads(self):
+        
+        """ Read a file from the target directory containing names of
+        parameters that don't contribute to the gradient. 
+
+        *Note* that we are checking the derivatives of the objective
+        function, and not the derivatives of the quantities that go
+        into building the objective function.  However, it is the
+        quantities that we actually differentiate.  Since there is a
+        simple chain rule relationship, the parameters that do/don't
+        contribute to the objective function/quantities are the same.
+
+        However, property gradients do contribute to objective
+        function Hessian elements, so we cannot use the same mechanism
+        for excluding the calculation of property Hessians.  This is
+        mostly fine since we rarely if ever calculate an explicit
+        property Hessian. """
+        
+        zero_prm = os.path.join(self.root, self.tgtdir, 'zero_grad.txt')
+        # If the 'zero parameters' text file exists, then we load
+        # the parameter names from the file for exclusion.
+        if os.path.exists(zero_prm):
+            for ln, line in enumerate(open(zero_prm).readlines()):
+                pid = line.strip()
+                # If a parameter name exists in the map, then
+                # the derivative is switched off for this target.
+                if pid in self.FF.map and self.FF.map[pid] in self.pgrad:
+                    self.pgrad.remove(self.FF.map[pid])
+        self.OptionDict['pgrad'] = self.pgrad
+
+    def write_0grads(self, Ans):
+
+        """ Write a file to the target directory containing names of
+        parameters that don't contribute to the gradient. """
+
+        zero_prm = os.path.join(self.root, self.tgtdir, 'zero_grad.txt')
+        if os.path.exists(zero_prm):
+            zero_pids = [i.strip() for i in open(zero_prm).readlines()]
+        else:
+            zero_pids = []
+        for i in range(self.FF.np):
+            # Check whether this parameter number has a nonzero gradient.
+            if Ans['G'][i] == 0.0:
+                # Write parameter names corresponding to this parameter number.
+                for pid in self.FF.map:
+                    if self.FF.map[pid] == i and pid not in zero_pids:
+                        zero_pids.append(pid)
+            # If a parameter number has a nonzero gradient, then the parameter
+            # names associated with this parameter number are removed from the list.
+            # (Not sure if this will ever happen.)
+            if Ans['G'][i] != 0.0:
+                for pid in self.FF.map:
+                    if self.FF.map[pid] == i and pid in zero_pids:
+                        zero_pids.remove(pid)
+        if len(zero_pids) > 0:
+            fout = open(zero_prm, 'w')
+            for pid in zero_pids:
+                print >> fout, pid
+            fout.close()
+
     def get_G(self,mvals=None):
         """Computes the objective function contribution and its gradient.
 
@@ -180,15 +242,23 @@ class Target(forcebalance.BaseClass):
         if the 'fdgrad' switch is turned on.  Alternately we can compute
         the gradient elements and diagonal Hessian elements at the same time
         using central difference if 'fdhessdiag' is turned on.
+
+        In this function we also record which parameters cause a
+        nonzero change in the objective function contribution.
+        Parameters which do not change the objective function will
+        not be differentiated in subsequent calculations.  This is
+        recorded in a text file in the targets directory.
+
         """
         Ans = self.meta_get(mvals,1,0)
-        for i in range(self.FF.np):
+        for i in self.pgrad:
             if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
                 if self.fdhessdiag:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
                 elif self.fdgrad:
                     Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
         self.gct += 1
+        self.write_0grads(Ans)
         return Ans
 
     def get_H(self,mvals=None):
@@ -205,18 +275,19 @@ class Target(forcebalance.BaseClass):
         """
         Ans = self.meta_get(mvals,1,1)
         if self.fdhess:
-            for i in range(self.FF.np):
+            for i in self.pgrad:
                 if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
                     Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
-            for i in range(self.FF.np):
+            for i in self.pgrad:
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
                     FDSlice = f1d2p(fdwrap_H(self,mvals,i),self.h,f0 = Ans['G'])
                     Ans['H'][i,:] = FDSlice
                     Ans['H'][:,i] = FDSlice
         elif self.fdhessdiag:
-            for i in range(self.FF.np):
+            for i in self.pgrad:
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h, f0 = Ans['X'])
+        self.write_0grads(Ans)
         self.hct += 1
         return Ans
     
@@ -485,6 +556,8 @@ class Target(forcebalance.BaseClass):
         ## Write mathematical parameters to file; will be used to checkpoint calculation.
         if not in_fd_srch():
             np.savetxt('mvals.txt', mvals)
+        ## Read in file that specifies which derivatives may be skipped.
+        self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
         if self.rd == None or Counter() > First(): self.submit_jobs(mvals, AGrad, AHess)
