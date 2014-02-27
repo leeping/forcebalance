@@ -112,14 +112,17 @@ class THCDF_Psi4(LeastSquares):
             elif MolSection and len(s) >= 4 and match("^[A-Za-z]+$",s[0]) and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
                 ElemList.append(capitalize(s[0]))
         self.Elements = set(ElemList)
-        for p in range(self.FF.np):
+        xgrad = []
+        for p in self.pgrad:
             Pelem = []
             for pid in self.FF.plist[p].split():
                 # Extract the chemical element.
                 Pelem.append(pid.split(':')[1].split(',')[0].split('=')[1])
             Pelem = set(Pelem)
             if len(self.Elements.intersection(Pelem)) == 0:
-                self.call_derivatives[p] = False
+                xgrad.append(p)
+        for p in xgrad:
+            self.pgrad.remove(p)
         ## Psi4 basis set file
         gbslist = [i for i in self.FF.fnms if os.path.splitext(i)[1] == '.gbs']
         if len(gbslist) != 1:

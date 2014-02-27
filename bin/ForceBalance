@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This is a wrapper script around the main ForceBalance.py script.
-# Run: "ForceBalance [-b] [-f] job.in [job.out]"
+# Run: "ForceBalance [--continue] [-b] [-f] job.in [job.out]"
 #
 # If the output filename is not specified, it will be automatically created.
 #
@@ -57,11 +57,13 @@ if [ $# -eq $minargs ] ; then
     output=$filename".out" 
     outext="out"
     error=$filename".err" 
+    bakdir=$filename".bak" 
 else
     output=$(basename "$2")
     filename="${output%.*}"
     outext="${output##*.}"
     error=$filename".err"
+    bakdir=$filename".bak" 
 fi
 
 if [[ $continue == 1 ]] ; then
@@ -76,15 +78,15 @@ if [[ $continue == 1 ]] ; then
       error=${filename}_$bnum.err
   fi
 elif [ -e $output ] && [ $force -eq 0 ] ; then
-  echo "Backing up the output file.."
+  echo "Backing up the output file to $bakdir .."
   echo "Use -f option to force overwrite"
-  mkdir -p backups
+  mkdir -p $bakdir
   bnum=1
-  while [[ -e backups/${filename}_$bnum.$outext || -e backups/${filename}_$bnum.err ]] ; do
+  while [[ -e $bakdir/${filename}_$bnum.$outext || -e $bakdir/${filename}_$bnum.err ]] ; do
       bnum=$(( bnum + 1 ))
   done
-  cp $output backups/${filename}_$bnum.$outext
-  cp $error backups/${filename}_$bnum.err
+  cp $output $bakdir/${filename}_$bnum.$outext
+  cp $error $bakdir/${filename}_$bnum.err
 fi
 
 echo "Output will be written to $output"

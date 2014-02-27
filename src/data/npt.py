@@ -140,7 +140,7 @@ def PrintEDA(EDA, N):
 #|            and properties                 |#
 #=============================================#
 
-def energy_derivatives(engine, FF, mvals, h, length, AGrad=True, dipole=False):
+def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True, dipole=False):
 
     """
     Compute the first and second derivatives of a set of snapshot
@@ -174,7 +174,7 @@ def energy_derivatives(engine, FF, mvals, h, length, AGrad=True, dipole=False):
             return engine.energy()
 
     ED0      = energy_driver(mvals)
-    for i in range(FF.np):
+    for i in pgrad:
         logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
         EDG, _   = f12d3p(fdwrap(energy_driver,mvals,i),h,f0=ED0)
         if dipole:
@@ -186,7 +186,7 @@ def energy_derivatives(engine, FF, mvals, h, length, AGrad=True, dipole=False):
             G[i,:]   = EDG[:]
     return G, GDx, GDy, GDz
 
-def property_derivatives(engine, FF, mvals, h, kT, property_driver, property_kwargs, AGrad=True):
+def property_derivatives(engine, FF, mvals, h, pgrad, kT, property_driver, property_kwargs, AGrad=True):
 
     """ 
     Function for double-checking property derivatives.  This function is called to perform
@@ -216,7 +216,7 @@ def property_derivatives(engine, FF, mvals, h, kT, property_driver, property_kwa
     P0       = property_driver(None, **property_kwargs)
     if 'h_' in property_kwargs:
         H0 = property_kwargs['h_'].copy()
-    for i in range(FF.np):
+    for i in pgrad:
         logger.info("%s\n" % (FF.plist[i] + " "*30))
         ED1      = fdwrap(energy_driver,mvals,i)(h)
         E1       = ED1[:,0]
@@ -296,6 +296,7 @@ def main():
     #----
     # Finite difference step size
     h = TgtOptions['h']
+    pgrad = TgtOptions['pgrad']
     # MD options; time step (fs), production steps, equilibration steps, interval for saving data (ps)
     liquid_timestep = TgtOptions['liquid_timestep']
     liquid_nsteps = TgtOptions['liquid_md_steps']
@@ -474,9 +475,9 @@ def main():
 
     # Compute the energy and dipole derivatives.
     printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True)
-    G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, len(Energies), AGrad, dipole=True)
+    G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
     printcool("Gas phase energy derivatives", color=4, bold=True)
-    mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, len(mEnergies), AGrad, dipole=False)
+    mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad, dipole=False)
 
     #==============================================#
     #  Condensed phase properties and derivatives. #
@@ -508,7 +509,7 @@ def main():
 
     if FDCheck:
         Sep = printcool("Numerical Derivative:")
-        GRho1 = property_derivatives(Liquid, FF, mvals, h, kT, calc_rho, {'r_':Rhos})
+        GRho1 = property_derivatives(Liquid, FF, mvals, h, pgrad, kT, calc_rho, {'r_':Rhos})
         FF.print_map(vals=GRho1)
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GRho, GRho1)]
@@ -577,7 +578,7 @@ def main():
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
-        GAlpha_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_alpha, {'h_':H,'v_':V})
+        GAlpha_fd = property_derivatives(Liquid, FF, mvals, h, pgrad, kT, calc_alpha, {'h_':H,'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GAlpha_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -608,7 +609,7 @@ def main():
     GKappa  = bar_unit*(GKappa1 + GKappa2 + GKappa3)
     FF.print_map(vals=GKappa)
     if FDCheck:
-        GKappa_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_kappa, {'v_':V})
+        GKappa_fd = property_derivatives(Liquid, FF, mvals, h, pgrad, kT, calc_kappa, {'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GKappa_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -641,7 +642,7 @@ def main():
     Sep = printcool("Isobaric heat capacity:  % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:
-        GCp_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_cp, {'h_':H})
+        GCp_fd = property_derivatives(Liquid, FF, mvals, h, pgrad, kT, calc_cp, {'h_':H})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GCp_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
@@ -685,7 +686,7 @@ def main():
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)
     if FDCheck:
-        GEps0_fd = property_derivatives(Liquid, FF, mvals, h, kT, calc_eps0, {'d_':Dips,'v_':V})
+        GEps0_fd = property_derivatives(Liquid, FF, mvals, h, pgrad, kT, calc_eps0, {'d_':Dips,'v_':V})
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GEps0_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
