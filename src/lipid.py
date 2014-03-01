@@ -437,11 +437,10 @@ class Lipid(Target):
                 if 'n_ic' in self.RefData:
                     n_uniq_ic = int(self.RefData['n_ic'][pt])
                     for trj in range(n_uniq_ic):
-                        if not os.path.exists("trj_%i" % trj):
-                            os.makedirs("trj_%i" % trj)
-			    print 'trj', trj
-			    print 'path', os.cwd
-                            os.chdir("trj_$i" % trj)
+                        rel_trj = "trj_%i" % trj
+                        if not os.path.exists(rel_trj):
+                            os.makedirs(rel_trj)
+                            os.chdir(rel_trj)
                             self.lipid_mol = self.lipid_mols[pt][trj]
                             self.npt_simulation(T,P,snum)
                             os.chdir('..')
