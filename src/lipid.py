@@ -152,11 +152,6 @@ class Lipid(Target):
         abstempdir = os.path.join(self.root,self.tempdir)
         for f in self.nptfiles:
             LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
-            # if f == 'IC':
-            #     for tp in self.RefData['n_ic']:
-            #         ic_dirs = self.RefData['n_ic'][tp]
-            #         for ic in ic_dirs:
-            #             
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0],"data",f),os.path.join(abstempdir,f))
 
@@ -433,6 +428,10 @@ class Lipid(Target):
                 os.makedirs(label)
                 os.chdir(label)
                 if 'n_ic' in self.RefData:
+                    n_uniq_ic = int(self.RefData['n_ic'][pt])
+                    for trj in range(n_uniq_ic):
+                        if not os.path.exists("trj_%i" % trj):
+                            os.makedirs("trj_%i" % trj)
                     self.lipid_mol = self.lipid_mols[pt]
                 self.npt_simulation(T,P,snum)
                 os.chdir('..')
