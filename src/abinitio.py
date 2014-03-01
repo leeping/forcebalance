@@ -790,7 +790,7 @@ class AbInitio(Target):
                         M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                     # The [0] indicates that we are fitting the RMS force and not the RMSD
                     # (without the covariance, subtracting a mean force doesn't make sense.)
-                    if M_p[p] == 0: continue
+                    if all(M_p[p] == 0): continue
                     M0_M_p[p][0]  += P * M_p[p][0]
                     M0_Q_p[p][0]  += R * M_p[p][0]
                     #M0_M_pp[p][0] += P * M_pp[p][0]
@@ -808,7 +808,7 @@ class AbInitio(Target):
                     SPiXi_pq[p,p] += P * Xi_pq
                     SRiXi_pq[p,p] += R * Xi_pq
                     for q in range(p):
-                        if M_p[q] == 0: continue
+                        if all(M_p[q] == 0): continue
                         if q not in self.pgrad: continue
                         Xi_pq          = 2 * M_p[p] * M_p[q]
                         SPiXi_pq[p,q] += P * Xi_pq
