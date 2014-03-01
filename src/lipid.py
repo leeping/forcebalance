@@ -434,9 +434,7 @@ class Lipid(Target):
                 os.chdir(label)
                 if 'n_ic' in self.RefData:
                     self.lipid_mol = self.lipid_mols[pt]
-                    self.npt_simulation(T,P,snum)
-                else:
-                    self.npt_simulation(T,P,snum)
+                self.npt_simulation(T,P,snum)
                 os.chdir('..')
                 snum += 1
 
