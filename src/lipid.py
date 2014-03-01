@@ -113,8 +113,15 @@ class Lipid(Target):
                 pt_label = "IC/%sK-%s%s" % (pt[0], pt[1], pt[2])
                 if not os.path.exists(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords)):
                     raise RuntimeError("Initial condition files don't exist; please provide IC directory")
-                # Create molecule objects for each IC, and save them to a dictionary, indexed by T and P.
-                self.lipid_mols[pt] = Molecule(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords))
+                # Create molecule object for each IC.
+                all_ic = Molecule(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords))
+                self.lipid_mols[pt] = []
+                n_uniq_ic = int(self.RefData['n_ic'][pt])
+                # Index ICs by pressure and temperature in a dictionary.
+                for ic in range(n_uniq_ic):
+                    self.lipid_mols[pt].append(all_ic[ic])
+                if n_uniq_ic != len(self.lipid_mols[pt]):
+                    raise RuntimeError("Number of frames in initial conditions .gro file does not match the number of parallel simulations requested in data.csv")
                 # Linked IC folder into the temp-directory.
                 self.nptfiles += ["IC"]
         else:
@@ -432,10 +439,16 @@ class Lipid(Target):
                     for trj in range(n_uniq_ic):
                         if not os.path.exists("trj_%i" % trj):
                             os.makedirs("trj_%i" % trj)
-                    self.lipid_mol = self.lipid_mols[pt]
-                self.npt_simulation(T,P,snum)
-                os.chdir('..')
-                snum += 1
+			    print 'trj', trj
+			    print 'path', os.cwd
+                            os.chdir("trj_$i" % trj)
+                            self.lipid_mol = self.lipid_mols[pt][trj]
+                            self.npt_simulation(T,P,snum)
+                            os.chdir('..')
+                else:
+                    self.npt_simulation(T,P,snum)
+                    os.chdir('..')
+                    snum += 1
 
     def get(self, mvals, AGrad=True, AHess=True):
         
