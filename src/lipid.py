@@ -100,18 +100,29 @@ class Lipid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
-        # Read in lipid starting coordinates.
-        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.lipid_coords)): 
-            raise RuntimeError("%s doesn't exist; please provide lipid_coords option" % self.lipid_coords)
-        self.lipid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.lipid_coords))
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
         # Extra files to be copied back at the end of a run.
         self.extra_output = []
-        ## Read the reference data
+        # Read the reference data
         self.read_data()
-        # Extra files to be linked into the temp-directory.
-        self.nptfiles += [self.lipid_coords]
+        # Read in lipid starting coordinates.
+        if "n_ic" in self.RefData:
+            self.lipid_mols = OrderedDict()
+            for pt in self.PhasePoints:
+                pt_label = "IC/%sK-%s%s" % (pt[0], pt[1], pt[2])
+                if not os.path.exists(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords)):
+                    raise RuntimeError("Initial condition files don't exist; please provide IC directory")
+                # Create molecule objects for each IC, and save them to a dictionary, indexed by T and P.
+                self.lipid_mols[pt] = Molecule(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords))
+                # Linked IC folder into the temp-directory.
+                self.nptfiles += ["IC"]
+        else:
+            if not os.path.exists(os.path.join(self.root, self.tgtdir, self.lipid_coords)): 
+                raise RuntimeError("%s doesn't exist; please provide lipid_coords option" % self.lipid_coords)
+            self.lipid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.lipid_coords))
+            # Extra files to be linked into the temp-directory.
+            self.nptfiles += [self.lipid_coords]
         # Scripts to be copied from the ForceBalance installation directory.
         self.scripts += ['npt_lipid.py']
         # Prepare the temporary directory.
@@ -141,6 +152,11 @@ class Lipid(Target):
         abstempdir = os.path.join(self.root,self.tempdir)
         for f in self.nptfiles:
             LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+            # if f == 'IC':
+            #     for tp in self.RefData['n_ic']:
+            #         ic_dirs = self.RefData['n_ic'][tp]
+            #         for ic in ic_dirs:
+            #             
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0],"data",f),os.path.join(abstempdir,f))
 
@@ -188,7 +204,7 @@ class Lipid(Target):
                     for head, val in zip(headings,line):
                         if head == 't' or head == 'p' : continue
                         if isfloat(val):
-                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = float(val)
+                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = float(val.strip())
                         elif val.lower() == 'true':
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = True
                         elif val.lower() == 'false':
@@ -249,7 +265,12 @@ class Lipid(Target):
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-            self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            if 'n_ic' in self.RefData:
+                for tp in self.RefData['n_ic']:
+                    self.lipid_mol = self.lipid_mols[tp]
+                    self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            else:
+                self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
             cmdstr = '%s python npt_lipid.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
