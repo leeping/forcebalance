@@ -265,12 +265,7 @@ class Lipid(Target):
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-            if 'n_ic' in self.RefData:
-                for tp in self.RefData['n_ic']:
-                    self.lipid_mol = self.lipid_mols[tp]
-                    self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
-            else:
-                self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
             cmdstr = '%s python npt_lipid.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
@@ -437,7 +432,11 @@ class Lipid(Target):
             if not os.path.exists(label):
                 os.makedirs(label)
                 os.chdir(label)
-                self.npt_simulation(T,P,snum)
+                if 'n_ic' in self.RefData:
+                    self.lipid_mol = self.lipid_mols[pt]
+                    self.npt_simulation(T,P,snum)
+                else:
+                    self.npt_simulation(T,P,snum)
                 os.chdir('..')
                 snum += 1
 
