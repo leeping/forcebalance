@@ -100,11 +100,17 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'run_internal','run_internal')
         ## Whether we have virtual sites (set at the global option level)
         self.set_option(options,'have_vsite','have_vsite')
+        ## Attenuate the weights as a function of energy
+        self.set_option(tgt_opts,'attenuate','attenuate')
+        ## What is the energy denominator? (Valid for 'attenuate')
+        self.set_option(tgt_opts,'energy_denom','energy_denom')
+        ## Set upper cutoff energy
+        self.set_option(tgt_opts,'energy_upper','energy_upper')
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## WHAM Boltzmann weights
-        self.whamboltz_wts = []
+        self.boltz_wts = []
         ## QM Boltzmann weights
         self.qmboltz_wts   = []
         ## Reference (QM) energies
@@ -370,7 +376,9 @@ class AbInitio(Target):
             self.emd0 = np.array(self.emd0)
             self.emd0 -= np.mean(self.emd0)
         if self.whamboltz == True:
-            self.whamboltz_wts = np.array([float(i.strip()) for i in open(os.path.join(self.root,self.tgtdir,"wham-weights.txt")).readlines()])
+            if self.attenuate:
+                raise RuntimeError('whamboltz and attenuate are mutually exclusive')
+            self.boltz_wts = np.array([float(i.strip()) for i in open(os.path.join(self.root,self.tgtdir,"wham-weights.txt")).readlines()])
             #   This is a constant pre-multiplier in front of every snapshot.
             bar = printcool("Using WHAM MM Boltzmann weights.", color=4)
             if os.path.exists(os.path.join(self.root,self.tgtdir,"wham-master.txt")):
@@ -381,14 +389,29 @@ class AbInitio(Target):
                 for line in whaminfo:
                     sline = line.split()
                     genshots = int(sline[2])
-                    weight = np.sum(self.whamboltz_wts[shotcounter:shotcounter+genshots])/np.sum(self.whamboltz_wts)
+                    weight = np.sum(self.boltz_wts[shotcounter:shotcounter+genshots])/np.sum(self.boltz_wts)
                     logger.info(" %s, %i snapshots, weight %.3e\n" % (sline[0], genshots, weight))
                     shotcounter += genshots
             else:
                 logger.info("Oops... WHAM files don't exist?\n")
             logger.info(bar)
+        elif self.attenuate:
+            # Attenuate energies by an amount proportional to their
+            # value above the minimum.
+            eqm1 = self.eqm - np.min(self.eqm)
+            denom = self.energy_denom * 4.184 # kcal/mol to kJ/mol
+            upper = self.energy_upper * 4.184 # kcal/mol to kJ/mol
+            self.boltz_wts = np.ones(self.ns)
+            for i in range(self.ns):
+                if eqm1[i] > upper:
+                    self.boltz_wts[i] = 0.0
+                elif eqm1[i] < denom:
+                    self.boltz_wts[i] = 1.0 / denom
+                else:
+                    self.boltz_wts[i] = 1.0 / np.sqrt(denom**2 + (eqm1[i]-denom)**2)
         else:
-            self.whamboltz_wts = np.ones(self.ns)
+            self.boltz_wts = np.ones(self.ns)
+        
         if self.qmboltz > 0:
             # LPW I haven't revised this section yet
             # Do I need to?
@@ -665,7 +688,7 @@ class AbInitio(Target):
             if AGrad and self.all_at_once:
                 dM_all = np.zeros((NS,NP,NCP1))
                 ddM_all = np.zeros((NS,NP,NCP1))
-        QBN = np.dot(self.qmboltz_wts[:NS],self.whamboltz_wts[:NS])
+        QBN = np.dot(self.qmboltz_wts[:NS],self.boltz_wts[:NS])
         #==============================================================#
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
@@ -683,9 +706,9 @@ class AbInitio(Target):
             if i % 100 == 0:
                 logger.debug("\rIncrementing quantities for snapshot %i\r" % i)
             # Build Boltzmann weights and increment partition function.
-            P   = self.whamboltz_wts[i]
+            P   = self.boltz_wts[i]
             Z  += P
-            R   = self.qmboltz_wts[i]*self.whamboltz_wts[i] / QBN
+            R   = self.qmboltz_wts[i]*self.boltz_wts[i] / QBN
             Y  += R
             # Recall reference (QM) data
             Q[0] = self.eqm[i]
@@ -767,6 +790,7 @@ class AbInitio(Target):
                         M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                     # The [0] indicates that we are fitting the RMS force and not the RMSD
                     # (without the covariance, subtracting a mean force doesn't make sense.)
+                    if M_p[p] == 0: continue
                     M0_M_p[p][0]  += P * M_p[p][0]
                     M0_Q_p[p][0]  += R * M_p[p][0]
                     #M0_M_pp[p][0] += P * M_pp[p][0]
@@ -784,6 +808,7 @@ class AbInitio(Target):
                     SPiXi_pq[p,p] += P * Xi_pq
                     SRiXi_pq[p,p] += R * Xi_pq
                     for q in range(p):
+                        if M_p[q] == 0: continue
                         if q not in self.pgrad: continue
                         Xi_pq          = 2 * M_p[p] * M_p[q]
                         SPiXi_pq[p,q] += P * Xi_pq
@@ -802,9 +827,11 @@ class AbInitio(Target):
         if self.writelevel > 1:
             np.savetxt('M.txt',M_all_print)
             np.savetxt('Q.txt',Q_all_print)
-        EnergyComparison = np.hstack((col(Q_all_print[:,0]),col(M_all_print[:,0])))
         if self.writelevel > 0:
+            EnergyComparison = np.hstack((col(Q_all_print[:,0]),col(M_all_print[:,0])))
             np.savetxt('QM-vs-MM-energies.txt',EnergyComparison)
+            WeightComparison = np.hstack((col(Q_all_print[:,0]),col(self.boltz_wts)))
+            np.savetxt('QM-vs-Wts.txt',WeightComparison)
         if self.force and self.writelevel > 1:
             # Write .xyz files which can be viewed in vmd.
             QMTraj = self.mol[:]
@@ -967,10 +994,19 @@ class AbInitio(Target):
         else:
             E0_M = 0.0
             E0_Q = 0.0
+
         if cv:
             dE     = MBP * np.sqrt(SPiXi[0,0]/Z + E0_M) + QBP * np.sqrt(SRiXi[0,0]/Y + E0_Q)
         else:
             dE     = MBP * np.sqrt(SPiXi[0]/Z + E0_M) + QBP * np.sqrt(SRiXi[0]/Y + E0_Q)
+
+        if self.writelevel > 0:
+            dE_print = (col(M_all_print[:,0]) - col(Q_all_print[:,0])) - (E0_M - E0_Q)
+            print dE_print.shape
+            print self.boltz_wts.shape
+            ErrsvsWts = np.hstack((dE_print, col(self.boltz_wts)))
+            np.savetxt('Errs-vs-Wts.txt',ErrsvsWts)
+
         # Fractional energy error.
         dEfrac = MBP * np.sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * np.sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
         # Absolute and Fractional force error.
@@ -1060,7 +1096,7 @@ class AbInitio(Target):
         G = np.zeros(NP)
         H = np.zeros((NP, NP))
         for i in range(self.ns):
-            P   = self.whamboltz_wts[i]
+            P   = self.boltz_wts[i]
             Z  += P
             dVdqP   = np.matrix(self.invdists[i])
             espqval = espqvals[i]

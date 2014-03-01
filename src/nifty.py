@@ -15,8 +15,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 """
 
 from select import select
-import os, sys, shutil
-from re import match, sub
+import os, sys, re, shutil, errno
 import numpy as np
 import itertools
 import threading
@@ -127,7 +126,26 @@ def uncommadash(s):
     except:
         raise Exception('Invalid string for converting to list of numbers: %s' % s)
     return L
-            
+
+def extract_int(arr, avgthre, limthre, label="value", verbose=True):
+    """ Get the representative integer value from an array.
+    Sanity check: Make sure the value does not go through big excursions.
+    The integer value is the rounded value of the average.
+    thresh = A threshold to make sure we're not dealing with 
+    fluctuations that are too large. """
+    average = np.mean(arr)
+    maximum = np.max(arr)
+    minimum = np.min(arr)
+    rounded = round(average)
+    passed = True
+    if abs(average - rounded) > avgthre:
+        if verbose: print "Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre)
+        passed = False                                                                                        
+    if abs(maximum - minimum) > limthre:
+        if verbose: print "Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre)
+        passed = False
+    return int(rounded), passed
+
 #list(itertools.chain(*[range(*(int(w.split('-')[0])-1, int(w.split('-')[1]) if len(w.split('-')) == 2 else int(w.split('-')[0])))  for w in Mao.split(',')]))
 
 def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,center=True,sym2="="):
@@ -159,7 +177,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     @return bar The bottom bar is returned for the user to print later, e.g. to mark off a 'section'    
     """
     def newlen(l):
-        return len(sub("\x1b\[[0-9;]*m","",line))
+        return len(re.sub("\x1b\[[0-9;]*m","",line))
     text = text.split('\n')
     width = max(minwidth,max([newlen(line) for line in text]))
     bar = ''.join([sym2 for i in range(width + 6)])
@@ -225,7 +243,7 @@ def isint(word):
     @return answer Boolean which specifies whether the string is an integer (only +/- sign followed by digits)
     
     """
-    return match('^[-+]?[0-9]+$',word)
+    return re.match('^[-+]?[0-9]+$',word)
 
 def isfloat(word):
     """Matches ANY number; it can be a decimal, scientific notation, what have you
@@ -235,7 +253,7 @@ def isfloat(word):
     @return answer Boolean which specifies whether the string is any number
     
     """
-    return match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
+    return re.match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
 
 def isdecimal(word):
     """Matches things with a decimal only; see isint and isfloat.
@@ -594,7 +612,7 @@ def destroyWorkQueue():
     WORK_QUEUE = None
     WQIDS = defaultdict(list)
 
-def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
+def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
     """ 
     Submit a job to the Work Queue.
 
@@ -613,7 +631,8 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
         lf = os.path.join(cwd,f)
         task.specify_output_file(lf,f,cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-    task.specify_tag(command)
+    if tag == None: tag = command
+    task.specify_tag(tag)
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
@@ -622,7 +641,7 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     else:
         WQIDS["None"].append(taskid)
     
-def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=True):
+def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
     """ 
     Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly
     specify where the input files come from, and where the output files go to.
@@ -643,7 +662,8 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
         # print f[0], f[1]
         task.specify_output_file(f[0],f[1],cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-    task.specify_tag(command)
+    if tag == None: tag = command
+    task.specify_tag(tag)
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
@@ -808,7 +828,7 @@ def MissingFileInspection(fnm):
     for key in specific_dct:
         if answer == "":
             answer += "\n"
-        if match(key, fnm):
+        if re.match(key, fnm):
             answer += "%s\n" % specific_dct[key]
     return answer
 
