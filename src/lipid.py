@@ -117,11 +117,11 @@ class Lipid(Target):
                 all_ic = Molecule(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords))
                 self.lipid_mols[pt] = []
                 n_uniq_ic = int(self.RefData['n_ic'][pt])
+                if n_uniq_ic > len(all_ic):
+                    raise RuntimeError("Number of frames in initial conditions .gro file does not match the number of parallel simulations requested in data.csv")
                 # Index ICs by pressure and temperature in a dictionary.
                 for ic in range(n_uniq_ic):
                     self.lipid_mols[pt].append(all_ic[ic])
-                if n_uniq_ic != len(self.lipid_mols[pt]):
-                    raise RuntimeError("Number of frames in initial conditions .gro file does not match the number of parallel simulations requested in data.csv")
                 # Linked IC folder into the temp-directory.
                 self.nptfiles += ["IC"]
         else:
@@ -444,6 +444,13 @@ class Lipid(Target):
                             self.lipid_mol = self.lipid_mols[pt][trj]
                             self.npt_simulation(T,P,snum)
                             os.chdir('..')
+                        ## Maybe useful: LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+                        if trj == 0:
+                            concat_trj = Molecule(os.path.join(self.root, self.tgtdir, label, rel_trj, self.lipid_coords))
+                        else:
+                            concat_trj = .append(os.path.join(self.root, self.tgtdir, label, rel_trj, self.lipid_coords))                      
+                    os.chdir('..')
+                    self.concat_parallel_sims()
                 else:
                     self.npt_simulation(T,P,snum)
                     os.chdir('..')
