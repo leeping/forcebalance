@@ -118,7 +118,7 @@ class Lipid(Target):
                 self.lipid_mols[pt] = []
                 n_uniq_ic = int(self.RefData['n_ic'][pt])
                 if n_uniq_ic > len(all_ic):
-                    raise RuntimeError("Number of frames in initial conditions .gro file does not match the number of parallel simulations requested in data.csv")
+                    raise RuntimeError("Number of frames in initial conditions .gro file is less than the number of parallel simulations requested in data.csv")
                 # Index ICs by pressure and temperature in a dictionary.
                 for ic in range(n_uniq_ic):
                     self.lipid_mols[pt].append(all_ic[ic])
@@ -438,19 +438,22 @@ class Lipid(Target):
                     n_uniq_ic = int(self.RefData['n_ic'][pt])
                     for trj in range(n_uniq_ic):
                         rel_trj = "trj_%i" % trj
+                        # Create directories for each parallel simulation.
                         if not os.path.exists(rel_trj):
                             os.makedirs(rel_trj)
                             os.chdir(rel_trj)
+                            # Pull each simulation molecule from the lipid_mols dictionary.
                             self.lipid_mol = self.lipid_mols[pt][trj]
                             self.npt_simulation(T,P,snum)
                             os.chdir('..')
-                        ## Maybe useful: LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+                        # Concatenate final simulation trajectories.  This is not correct yet.  I need to check if the simulations have finished.
                         if trj == 0:
                             concat_trj = Molecule(os.path.join(self.root, self.tgtdir, label, rel_trj, self.lipid_coords))
                         else:
-                            concat_trj = .append(os.path.join(self.root, self.tgtdir, label, rel_trj, self.lipid_coords))                      
+                            concat_trj += Molecule(os.path.join(self.root, self.tgtdir, label, rel_trj, self.lipid_coords))                      
                     os.chdir('..')
-                    self.concat_parallel_sims()
+                    # Save molecule to one gro file.
+                    concat_trj.write('%s-md.gro' % self.name)
                 else:
                     self.npt_simulation(T,P,snum)
                     os.chdir('..')
