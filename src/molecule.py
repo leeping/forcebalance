@@ -644,8 +644,9 @@ class Molecule(object):
     in the other, are added to the sum, and (2) Appendable or per-frame fields
     (i.e. coordinates) are concatenated together.
 
-    - Slice trajectories using reasonable Python language.  That is to say,
-    MyMolecule[1:10] returns a new Molecule object that contains frames 2 through 10.
+    - Slice trajectories using reasonable Python language.  That is to
+    say, MyMolecule[1:10] returns a new Molecule object that contains
+    frames 1 through 9 (inclusive and numbered starting from zero.)
     
     Next step: Read in Q-Chem output data using this too!
 
