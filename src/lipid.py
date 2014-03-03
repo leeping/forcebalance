@@ -240,13 +240,16 @@ class Lipid(Target):
                     # If there is more than one data point, then the default denominator is the
                     # standard deviation of the experimental values.
                     if head == 'scd':
-                        default_denoms[head+"_denom"] = np.sqrt((np.dot(wts, (dat-avg)**2)/wts.sum()).sum())
+                        default_denoms[head+"_denom"] = np.average(np.sqrt(np.dot(wts, (dat-avg)**2)/wts.sum()))
                     else:
                         default_denoms[head+"_denom"] = np.sqrt(np.dot(wts, (dat-avg)**2)/wts.sum())
                 else:
                     # If there is only one data point, then the denominator is just the single
                     # data point itself.
-                    default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
+                    if head == 'scd':
+                        default_denoms[head+"_denom"] = np.average(np.sqrt(np.abs(dat[0])))
+                    else:
+                        default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
             self.PhasePoints = self.RefData[head].keys()
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
