@@ -130,7 +130,7 @@ AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tink
 # qctemplate = The Q-Chem template file, not including the coordinates or rem variables
 # charge     = The net charge of the molecule
 # mult       = The spin multiplicity of the molecule
-MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult', 'bonds'])
+MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds'])
 # Variable names relevant to quantum calculations explicitly
 QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost'])
 # Superset of all variable names.
@@ -142,7 +142,7 @@ import numpy as np
 from numpy import sin, cos, arcsin, arccos
 import imp
 import itertools
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict, namedtuple, Counter
 from ctypes import *
 from warnings import warn
 
@@ -794,7 +794,7 @@ class Molecule(object):
                     elif key in other.Data:
                         self.Data['boxes'] = [other.Data['boxes'][0] for i in range(len(self))]
                 else:
-                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).')
+                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
         return Sum
  
     def __iadd__(self,other):
@@ -2204,7 +2204,7 @@ class Molecule(object):
         return Answer
     
     def read_qcout(self, fnm, errok = [], **kwargs):
-        """ Q-Chem output file reader, adapted forcd  our parser. 
+        """ Q-Chem output file reader, adapted for our parser. 
     
         Q-Chem output files are very flexible and there's no way I can account for all of them.  Here's what
         I am able to account for:
@@ -2221,7 +2221,8 @@ class Molecule(object):
         As with all Q-Chem output files, note that successive calculations can have different numbers of atoms.
     
         """
-    
+
+        Answer   = {}
         xyzs     = []
         xyz      = []
         elem     = []
@@ -2259,14 +2260,23 @@ class Molecule(object):
             Mats[key] = copy.deepcopy(matblank)
         for key, val in float_match.items():
             Floats[key] = []
+
+        ## Intrinsic reaction coordinate stuff
+        Fwd = True
+        RPLine = False
+        Irc = {'FwdX' : [], 'FwdE' : [], 'FwdQ' : [], 'FwdSz' : [], 
+               'BakX' : [], 'BakE' : [], 'BakQ' : [], 'BakSz' : []}
     
+        Answer['qcerr'] = ''
         fatal = 0
         for line in open(fnm):
             line = line.strip().expandtabs()
+            if 'total processes killed' in line:
+                Answer['qcerr'] = 'killed'
             if fatal and len(line.split()) > 0:
                 # Print the error message that comes after the "fatal error" line.
                 if line in errok:
-                    warn("Fatal error encountered (%s), proceeding because you asked for it" % line)
+                    Answer['qcerr'] = line.strip()
                     fatal = 0
                 else:
                     raise Exception('Calculation encountered a fatal error! (%s)' % line)
@@ -2308,6 +2318,36 @@ class Molecule(object):
             for key, val in float_match.items():
                 if re.match(val[0].lower(), line.lower()):
                     Floats[key].append(float(line.split()[val[1]]))
+            ## Intrinsic reaction coordinate stuff
+            if "Reaction path following." in line:
+                RPLine = True
+                if Fwd:
+                    Irc['FwdX'].append(xyzs[-1])
+                else:
+                    Irc['BakX'].append(xyzs[-1])
+            elif RPLine:
+                RPLine = False
+                if Fwd:
+                    Irc['FwdE'].append(float(line.split()[3]))
+                    Irc['FwdQ'].append(mkchg[-1])
+                    Irc['FwdSz'].append(mkspn[-1])
+                else:
+                    Irc['BakE'].append(float(line.split()[3]))
+                    Irc['BakQ'].append(mkchg[-1])
+                    Irc['BakSz'].append(mkspn[-1])
+            if "GEOMETRY OPTIMIZATION" in line:
+                if Fwd:
+                    Irc['FwdX'].append(xyzs[-1])
+                    Irc['FwdE'].append(energy_scf[-1])
+                    Irc['FwdQ'].append(mkchg[-1])
+                    Irc['FwdSz'].append(mkspn[-1])
+                else:
+                    Irc['BakX'].append(xyzs[-1])
+                    Irc['BakE'].append(energy_scf[-1])
+                    Irc['BakQ'].append(mkchg[-1])
+                    Irc['BakSz'].append(mkspn[-1])
+            if "IRC -- convergence criterion reached." in line or "OPTIMIZATION CONVERGED" in line:
+                Fwd = False
             if re.match(".*Convergence criterion met$".lower(), line.lower()):
                 conv.append(1)
                 energy_scf.append(Floats['energy_scfThis'][-1])
@@ -2318,6 +2358,7 @@ class Molecule(object):
             elif re.match(".*Convergence failure$".lower(), line.lower()):
                 conv.append(0)
                 Floats['energy_scfThis'] = []
+                energy_scf.append(0.0)
             for key, val in matrix_match.items():
                 if Mats[key]["Mode"] >= 1:
                     if re.match("^[0-9]+( +[0-9]+)+$",line):
@@ -2338,14 +2379,17 @@ class Molecule(object):
             Floats['mult'] = [0]
 
         # Copy out the coordinate lists; Q-Chem output cannot be trusted to get the chemical elements
-        Answer = {'xyzs':xyzs, 'elem':elem}
+        Answer['xyzs'] = xyzs
+        Answer['elem'] = elem
         # Read the output file as an input file to get a Q-Chem template.
         Aux = self.read_qcin(fnm)
-        for i in ['qctemplate', 'qcrems', 'elem', 'qm_ghost']:
+        for i in ['qctemplate', 'qcrems', 'elem', 'qm_ghost', 'charge', 'mult']:
             if i in Aux: Answer[i] = Aux[i]
         # Copy out the charge and multiplicity
-        Answer['charge'] = int(Floats['charge'][0])
-        Answer['mult']   = int(Floats['mult'][0]) + 1
+        if len(Floats['charge']) > 0:
+            Answer['charge'] = int(Floats['charge'][0])
+        if len(Floats['mult']) > 0:
+            Answer['mult']   = int(Floats['mult'][0]) + 1
         # Copy out the energies and forces
         # Q-Chem can print out gradients with several different headings.
         # We start with the most reliable heading and work our way down.
@@ -2373,38 +2417,53 @@ class Molecule(object):
             if 'correlation' in Answer['qcrems'][0] and Answer['qcrems'][0]['correlation'].lower() in ['mp2', 'rimp2', 'ccsd', 'ccsd(t)']:
                 raise Exception("Q-Chem was called with a post-HF theory but we only got the SCF energy")
             Answer['qm_energies'] = energy_scf
-        else:
+        elif 'SCF failed to converge' not in errok:
             raise Exception('There are no energies in %s' % fnm)
     
         #### Sanity checks
         # We currently don't have a graceful way of dealing with SCF convergence failures in the output file.
         # For instance, a failed calculation will have elem / xyz but no forces. :/
-        if 0 in conv:
+        if 0 in conv and 'SCF failed to converge' not in errok:
             raise Exception('SCF convergence failure encountered in parsing %s' % fnm)
-        # The molecule should have only one charge and one multiplicity
-        if len(set(Floats['charge'])) != 1 or len(set(Floats['mult'])) != 1:
-            raise Exception('Unexpected number of charges or multiplicities in parsing %s' % fnm)
-        lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
-        # Catch the case of failed geometry optimizations.
-        if len(Answer['xyzs']) == len(Answer['qm_energies']) + 1:
-            Answer['xyzs'] = Answer['xyzs'][:-1]
-        elif len(set(lens)) != 1:
-            raise Exception('The number of energies and coordinates in %s are not the same : %s' % (fnm, str(lens)))
+        elif (0 not in conv):
+            # The molecule should have only one charge and one multiplicity
+            if len(set(Floats['charge'])) != 1 or len(set(Floats['mult'])) != 1:
+                raise Exception('Unexpected number of charges or multiplicities in parsing %s' % fnm)
+
+        # If we have any QM energies (not the case if SCF convergence failure)
+        if 'qm_energies' in Answer:
+            lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
+            # Catch the case of failed geometry optimizations.
+            if len(Answer['xyzs']) == len(Answer['qm_energies']) + 1:
+                Answer['xyzs'] = Answer['xyzs'][:-1]
+            elif len(set(lens)) != 1:
+                raise Exception('The number of energies and coordinates in %s are not the same : %s' % (fnm, str(lens)))
+
         # The number of atoms should all be the same
-        if len(set([len(i) for i in Answer['xyzs']])) != 1:
+        if len(set([len(i) for i in Answer['xyzs']])) > 1:
             raise Exception('The numbers of atoms across frames in %s are not all the same' % (fnm))
 
         if 'qm_forces' in Answer:
             for i, frc in enumerate(Answer['qm_forces']):
                 Answer['qm_forces'][i] = frc.T
+            for i in np.where(np.array(conv) == 0)[0]:
+                Answer['qm_forces'].insert(i, Answer['qm_forces'][0]*0.0)
             if len(Answer['qm_forces']) != len(Answer['qm_energies']):
                 warn("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
                 del Answer['qm_forces']
         # A strange peculiarity; Q-Chem sometimes prints out the final Mulliken charges a second time, after the geometry optimization.
         if mkchg != []:
-            Answer['qm_mulliken_charges'] = list(np.array(mkchg[:len(Answer['qm_energies'])]))
+            Answer['qm_mulliken_charges'] = list(np.array(mkchg))
+            for i in np.where(np.array(conv) == 0)[0]:
+                Answer['qm_mulliken_charges'].insert(i, np.array([0.0 for i in mkchg[-1]]))
+            Answer['qm_mulliken_charges'] = Answer['qm_mulliken_charges'][:len(Answer['qm_energies'])]
         if mkspn != []:
-            Answer['qm_mulliken_spins'] = list(np.array(mkspn[:len(Answer['qm_energies'])]))
+            Answer['qm_mulliken_spins'] = list(np.array(mkspn))
+            for i in np.where(np.array(conv) == 0)[0]:
+                Answer['qm_mulliken_spins'].insert(i, np.array([0.0 for i in mkspn[-1]]))
+            Answer['qm_mulliken_spins'] = Answer['qm_mulliken_spins'][:len(Answer['qm_energies'])]
+        
+        Answer['Irc'] = Irc
 
         return Answer
     
