@@ -307,6 +307,27 @@ def flat(vec):
     """
     return np.array(vec).reshape(-1)
 
+def monotonic(arr, start, end):
+    # Make sure an array is monotonically decreasing from the start to the end.
+    a0 = arr[start]
+    i0 = start
+    if end > start:
+        i = start+1
+        while i < end:
+            if arr[i] < a0:
+                arr[i0:i+1] = np.linspace(a0, arr[i], i-i0+1)
+                a0 = arr[i]
+                i0 = i
+            i += 1
+    if end < start:
+        i = start-1
+        while i >= end:
+            if arr[i] < a0:
+                arr[i:i0+1] = np.linspace(arr[i], a0, i0-i+1)
+                a0 = arr[i]
+                i0 = i
+            i -= 1
+
 #====================================#
 #| Math: Vectors and linear algebra |#
 #====================================#
@@ -713,12 +734,9 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                         WQIDS[tnm].remove(task.id)
                 del task
         if hasattr(wq.stats, 'workers_full'):
-            # Full workers were added with CCTools 4.0.1
+            # Full workers statistic was added with CCTools 4.0
             # But deprecated with CCTools 4.1 (so if they're equal we don't add them.)
-            if wq.stats.workers_busy == wq.stats.workers_full:
-                nbusy = wq.stats.workers_busy
-            else:
-                nbusy = wq.stats.workers_busy + wq.stats.workers_full
+            nbusy = wq.stats.workers_busy + wq.stats.workers_full
         else:
             nbusy = wq.stats.workers_busy
 
@@ -993,11 +1011,15 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             for fh in to_read:
                 if fh is p.stdout:
                     read = fh.read(rbytes)
-                    if not read: streams.remove(p.stdout)
+                    if not read: 
+                        streams.remove(p.stdout)
+                        p.stdout.close()
                     else: out_chunker.push(read)
                 elif fh is p.stderr:
                     read = fh.read(rbytes)
-                    if not read: streams.remove(p.stderr)
+                    if not read: 
+                        streams.remove(p.stderr)
+                        p.stderr.close()
                     else: err_chunker.push(read)
                 else:
                     raise RuntimeError
