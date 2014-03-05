@@ -107,23 +107,23 @@ class Lipid(Target):
         # Read the reference data
         self.read_data()
         # Read in lipid starting coordinates.
-        if "n_ic" in self.RefData:
-            self.lipid_mols = OrderedDict()
+        if 'n_ic' in self.RefData:
+            self.LfDict = OrderedDict()
             for pt in self.PhasePoints:
                 pt_label = "IC/%sK-%s%s" % (pt[0], pt[1], pt[2])
                 if not os.path.exists(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords)):
                     raise RuntimeError("Initial condition files don't exist; please provide IC directory")
                 # Create molecule object for each IC.
                 all_ic = Molecule(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords))
-                self.lipid_mols[pt] = []
+                self.LfDict[pt] = []
                 n_uniq_ic = int(self.RefData['n_ic'][pt])
                 if n_uniq_ic > len(all_ic):
                     raise RuntimeError("Number of frames in initial conditions .gro file is less than the number of parallel simulations requested in data.csv")
                 # Index ICs by pressure and temperature in a dictionary.
                 for ic in range(n_uniq_ic):
-                    self.lipid_mols[pt].append(all_ic[ic])
-                # Linked IC folder into the temp-directory.
-                self.nptfiles += ["IC"]
+                    self.LfDict[pt].append(all_ic[ic])
+           # Linked IC folder into the temp-directory.
+           self.nptfiles += ["IC"]
         else:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, self.lipid_coords)): 
                 raise RuntimeError("%s doesn't exist; please provide lipid_coords option" % self.lipid_coords)
@@ -255,6 +255,8 @@ class Lipid(Target):
             # printcool_dictionary(self.RefData[head],head)
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
+        print '**check0', self.Labels
+        print '**check1', self.PhasePoints
         logger.debug("global_opts:\n%s\n" % str(global_opts))
         logger.debug("default_denoms:\n%s\n" % str(default_denoms))
         for opt in global_opts:
@@ -445,18 +447,11 @@ class Lipid(Target):
                         if not os.path.exists(rel_trj):
                             os.makedirs(rel_trj)
                             os.chdir(rel_trj)
-                            # Pull each simulation molecule from the lipid_mols dictionary.
-                            self.lipid_mol = self.lipid_mols[pt][trj]
+                            # Pull each simulation molecule from the LfDict dictionary.
+                            self.lipid_mol = self.LfDict[pt][trj]
                             self.npt_simulation(T,P,snum)
-                            os.chdir('..')
-                        # Concatenate final simulation trajectories.  This is not correct yet.  I need to check if the simulations have finished.
-                        if trj == 0:
-                            concat_trj = Molecule(os.path.join(self.root, self.tgtdir, label, rel_trj, self.lipid_coords))
-                        else:
-                            concat_trj += Molecule(os.path.join(self.root, self.tgtdir, label, rel_trj, self.lipid_coords))                      
                     os.chdir('..')
-                    # Save molecule to one gro file.
-                    concat_trj.write('%s-md.gro' % self.name)
+                    snum += 1
                 else:
                     self.npt_simulation(T,P,snum)
                     os.chdir('..')
