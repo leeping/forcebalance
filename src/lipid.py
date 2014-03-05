@@ -500,6 +500,21 @@ class Lipid(Target):
         BPoints = [] # These are the phase points for which we are doing MBAR for the condensed phase.
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
+            if 'n_ic' in self.RefData:
+                n_uniq_ic = self.RefData['n_ic'][PT]
+                for ic in range(n_uniq_ic):
+                    if os.path.exists('./%s/trj_%s/npt_result.p.bz2' % (label, ic)):
+                        # Read in each each parallel simulation's data, and concatenate the property time series.
+                        ts = lp_load(open('./%s/trj_%s/npt_result.p.bz2' % (label, ic)))
+                        if ic == 0:
+                            ts_concat = ts
+                        else:
+                            for series in ts:
+                                if type(series).__module__ == 'numpy':
+                                    ts_concat[series] = np.append(ts_concat[series], ts[series])
+                        # Write concatendated time series to a pickle file.
+                        if ic == len(n_uniq_ic):
+                            with wopen('./%s/npt_result.p') as f: lp_dump(f)
             if os.path.exists('./%s/npt_result.p.bz2' % label):
                 _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
             elif os.path.exists('./%s/npt_result.p' % label): pass
