@@ -1404,18 +1404,31 @@ class Lipid_GMX(Lipid):
 
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """
-            if GoodStep() and (temperature, pressure) in self.LfDict_New:
-                self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
-            if (temperature, pressure) in self.LfDict:
-                lfsrc = self.LfDict[(temperature, pressure)]
-                lfdest = os.path.join(os.getcwd(), 'lipid.gro')
-                logger.info("Copying previous iteration final geometry .gro file: %s to %s\n" % (lfsrc, lfdest))
-                shutil.copy2(lfsrc,lfdest)
-                self.nptfiles.append(lfdest)
-            self.LfDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'lipid-md.gro')
-            super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
+            if "n_ic" in self.RefData:
+                # I feel like this is a bit of a hacky way to get the pressure unit.
+                # It assumes that all phasepoint keys are of the same unit.  This may be a reasonable assumption.
+		p_u = self.PhasePoints.keys()[0][2]
+                if GoodStep() and (temperature, pressure) in self.LfDict_New:
+                    if len(self.LfDict_New[(temperature, pressure)]) == int(self.RefData['n_ic'][(temperature, pressure, p_u)]):
+                        self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
+                        super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
+                if not (temperature, pressure) in self.LfDict_New:
+                     self.LfDict_New[(temperature, pressure)] = [Molecule(os.path.join(os.getcwd(),'lipid-md.gro'))]
+                else:
+                     self.LfDict_New[(temperature, pressure)].append(Molecule(os.path.join(os.getcwd(),'lipid-md.gro')))
+            else:
+                if GoodStep() and (temperature, pressure) in self.LfDict_New:
+                    self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
+                if (temperature, pressure) in self.LfDict:
+                    lfsrc = self.LfDict[(temperature, pressure)]
+                    lfdest = os.path.join(os.getcwd(), 'lipid.gro')
+                    logger.info("Copying previous iteration final geometry .gro file: %s to %s\n" % (lfsrc, lfdest))
+                    shutil.copy2(lfsrc,lfdest)
+                    self.nptfiles.append(lfdest)
+                self.LfDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'lipid-md.gro')
+                super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
             self.last_traj = [i for i in self.last_traj if '.gro' not in i]
- 
+
 class AbInitio_GMX(AbInitio):
     """ Subclass of AbInitio for force and energy matching using GROMACS. """
     def __init__(self,options,tgt_opts,forcefield):
