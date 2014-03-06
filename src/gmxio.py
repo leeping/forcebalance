@@ -1401,27 +1401,33 @@ class Lipid_GMX(Lipid):
         # Dictionary of last frames.
         self.LfDict = OrderedDict()
         self.LfDict_New = OrderedDict()
-	print '??1'
 
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """
             if "n_ic" in self.RefData:
-                # I feel like this is a bit of a hacky way to get the pressure unit.
-                # It assumes that all phasepoint keys are of the same unit.  This may be a reasonable assumption.
+                # p_u assumes that all phasepoint keys are of the same unit.  This may be a reasonable assumption.
 		p_u = self.PhasePoints[0][2]
                 td_vals = (temperature, pressure, p_u)
-		print 'npts', self.lipid_mols
-                if GoodStep() and td_vals in self.lipid_mols:
-		    print 'npts1', self.lipid_mols, 'tp', temperature, pressure
-                    if len(self.lipid_mols[td_vals]) == int(self.RefData['n_ic'][td_vals]):
-		        print 'npts2', self.lipid_mols
-                        self.lipid_mols[td_vals] = self.lipid_mols[td_vals]
-                        super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
-			print 'will this work?', self.lipid_mols
+		print '**0', self.lipid_mols
                 if not td_vals in self.lipid_mols:
-                     self.lipid_mols[td_vals] = [Molecule(os.path.join(os.getcwd(),'lipid-md.gro'))]
+		    print '**1', self.lipid_mols
+		    print '**1 new', self.lipid_mols_new
+		    print '**11', td_vals, os.getcwd()
+                    self.lipid_mols_new[td_vals] = [Molecule(os.path.join(os.getcwd(),'lipid-md.gro'))]
                 else:
-                     self.lipid_mols[td_vals].append(Molecule(os.path.join(os.getcwd(),'lipid-md.gro')))
+                    if GoodStep() and len(self.lipid_mols[td_vals]) == int(self.RefData['n_ic'][td_vals]):
+		        print '**2', self.lipid_mols
+		        print '**2 new', self.lipid_mols_new
+		    	print '**22', td_vals, os.getcwd()
+                        if td_vals in self.lipid_mols_new:
+                            self.lipid_mols[td_vals] = self.lipid_mols_new[td_vals]
+                        super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
+		    	print 'will this work?', self.lipid_mols
+                    else:
+			print '**3', self.lipid_mols
+		        print '**3 new', self.lipid_mols_new
+			print '**33', td_vals, os.getcwd()
+                        self.lipid_mols_new[td_vals].append(Molecule(os.path.join(os.getcwd(),'lipid-md.gro')))
             else:
                 if GoodStep() and (temperature, pressure) in self.LfDict_New:
                     self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
