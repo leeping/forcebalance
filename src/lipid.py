@@ -441,6 +441,8 @@ class Lipid(Target):
                 if 'n_ic' in self.RefData:
                     n_uniq_ic = int(self.RefData['n_ic'][pt])
                     for trj in range(n_uniq_ic):
+                        if trj == 0:
+                            self.lipid_mols_new = OrderedDict()
                         rel_trj = "trj_%i" % trj
                         # Create directories for each parallel simulation.
                         if not os.path.exists(rel_trj):
@@ -451,6 +453,7 @@ class Lipid(Target):
 			    print 'keys', pt, trj
                             self.lipid_mol = self.lipid_mols[pt][trj]
                             self.npt_simulation(T,P,snum)
+                        os.chdir('..')
                     os.chdir('..')
                     snum += 1
                 else:
@@ -502,21 +505,21 @@ class Lipid(Target):
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if 'n_ic' in self.RefData:
-                n_uniq_ic = self.RefData['n_ic'][PT]
+                n_uniq_ic = int(self.RefData['n_ic'][PT])
                 for ic in range(n_uniq_ic):
                     if os.path.exists('./%s/trj_%s/npt_result.p.bz2' % (label, ic)):
+                        _exec('bunzip2 ./%s/trj_%s/npt_result.p.bz2' % (label, ic), print_command=False)
                         # Read in each each parallel simulation's data, and concatenate each property time series.
-                        ts = lp_load(open('./%s/trj_%s/npt_result.p.bz2' % (label, ic)))
+                        ts = lp_load(open('./%s/trj_%s/npt_result.p' % (label, ic)))
                         if ic == 0:
                             ts_concat = ts
                         else:
-                            for series in ts:
-                                if type(series).__module__ == 'numpy':
-                                    ts_concat[series] = np.append(ts_concat[series], ts[series])
+                            for trj_data in range(len(ts)):
+                                if type(trj_data).__module__ == 'numpy':
+                                    ts_concat[trj_data] = np.append(ts_concat[trj_data], ts[trj_data])
                         # Write concatendated time series to a pickle file.
-                        if ic == len(n_uniq_ic):
+                        if ic == (int(n_uniq_ic) - 1):
                             with wopen('./%s/npt_result.p') as f: lp_dump(f)
-                self.lipid_mols = OrderedDict()
             if os.path.exists('./%s/npt_result.p.bz2' % label):
                 _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
             elif os.path.exists('./%s/npt_result.p' % label): pass
