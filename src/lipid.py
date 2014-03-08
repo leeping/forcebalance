@@ -519,7 +519,7 @@ class Lipid(Target):
                                     ts_concat[trj_data] = np.append(ts_concat[trj_data], ts[trj_data])
                         # Write concatendated time series to a pickle file.
                         if ic == (int(n_uniq_ic) - 1):
-                            with wopen('./%s/npt_result.p') as f: lp_dump(f)
+                            with wopen('./%s/npt_result.p' % label) as f: lp_dump(ts_concat, f)
             if os.path.exists('./%s/npt_result.p.bz2' % label):
                 _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
             elif os.path.exists('./%s/npt_result.p' % label): pass
