@@ -449,8 +449,6 @@ class Lipid(Target):
                             os.makedirs(rel_trj)
                             os.chdir(rel_trj)
                             # Pull each simulation molecule from the lipid_mols dictionary.
-			    print 'lfdict', self.lipid_mols
-			    print 'keys', pt, trj
                             self.lipid_mol = self.lipid_mols[pt][trj]
                             self.npt_simulation(T,P,snum)
                         os.chdir('..')
