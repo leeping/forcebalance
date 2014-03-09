@@ -1267,17 +1267,40 @@ class Molecule(object):
         maxs = np.max(self.xyzs[sn],axis=0)
         # Grid size in Angstrom.  This number is optimized for speed in a 15,000 atom system (united atom pentadecane).
         gsz = 6.0
+        toppbc = False
+        if hasattr(self, 'boxes'): 
+            toppbc = True
+            xmin = 0.0
+            ymin = 0.0
+            zmin = 0.0
+            xmax = self.boxes[sn].a
+            ymax = self.boxes[sn].b
+            zmax = self.boxes[sn].c
+            if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
+                print "Warning: Topology building will not work with broken molecules in nonorthogonal cells."
+                toppbc = False
+        else:
+            xmin = mins[0]
+            ymin = mins[1]
+            zmin = mins[2]
+            xmax = maxs[0]
+            ymax = maxs[1]
+            zmax = maxs[2]
+        gszx = (xmax-xmin)/int((xmax-xmin)/gsz)
+        gszy = (ymax-ymin)/int((ymax-ymin)/gsz)
+        gszz = (zmax-zmin)/int((zmax-zmin)/gsz)
         # Run algorithm to determine bonds.
         # Decide if we want to use the grid algorithm.
         use_grid = np.max(maxs - mins) > 2.0*gsz
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.
-            xgrd = np.arange(mins[0]-gsz, maxs[0], 2*gsz)
-            ygrd = np.arange(mins[1]-gsz, maxs[1], 2*gsz)
-            zgrd = np.arange(mins[2]-gsz, maxs[2], 2*gsz)
+            xgrd = np.arange(xmin, xmax, gszx)
+            ygrd = np.arange(ymin, ymax, gszy)
+            zgrd = np.arange(zmin, zmax, gszz)
             # 2) Grid cells are denoted by a three-index tuple.
             gidx = list(itertools.product(range(len(xgrd)), range(len(ygrd)), range(len(zgrd))))
+            # print gidx
             # 3) Build a dictionary which maps a grid cell to itself plus its neighboring grid cells.
             # Two grid cells are defined to be neighbors if the differences between their x, y, z indices are at most 1.
             gngh = OrderedDict()
@@ -1289,8 +1312,13 @@ class Molecule(object):
                 ai = np.array(i)
                 for j in n27:
                     nj = ai+j
-                    if np.all(nj >= amin) and np.all(nj <= amax):
-                        gngh[i].append(tuple(nj))
+                    for k in range(3):
+                        mod = amax[k]-amin[k]+1
+                        if nj[k] < amin[k]:
+                            nj[k] += mod
+                        elif nj[k] > amax[k]:
+                            nj[k] -= mod
+                    gngh[i].append(tuple(nj))
             # 4) Loop over the atoms and assign each to a grid cell.
             # Note: I think this step becomes the bottleneck if we choose very small grid sizes.
             gasn = OrderedDict([(i, []) for i in gidx])
@@ -1299,13 +1327,22 @@ class Molecule(object):
                 yidx = -1
                 zidx = -1
                 for j in xgrd:
-                    if self.xyzs[sn][i][0] < j: break
+                    xi = self.xyzs[sn][i][0]
+                    if toppbc and xi < 0: xi += xmax
+                    if toppbc and xi > xmax: xi -= xmax
+                    if xi < j: break
                     xidx += 1
                 for j in ygrd:
-                    if self.xyzs[sn][i][1] < j: break
+                    yi = self.xyzs[sn][i][1]
+                    if toppbc and yi < 0: yi += ymax
+                    if toppbc and yi > ymax: yi -= ymax
+                    if yi < j: break
                     yidx += 1
                 for j in zgrd:
-                    if self.xyzs[sn][i][2] < j: break
+                    zi = self.xyzs[sn][i][2]
+                    if toppbc and zi < 0: zi += zmax
+                    if toppbc and zi > zmax: zi -= zmax
+                    if zi < j: break
                     zidx += 1
                 gasn[(xidx,yidx,zidx)].append(i)
             # 5) Create list of 2-tuples corresponding to combinations of atomic indices.
@@ -1325,11 +1362,16 @@ class Molecule(object):
         BT1 = R[AtomIterator[:,1]]
         BondThresh = (BT0+BT1) * Fac
         BondThresh = (BondThresh > mindist) * BondThresh + (BondThresh < mindist) * mindist
-        try:
-            dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
-        except:
+        if 'forcebalance.contact' in sys.modules:
+            if hasattr(self, 'boxes'):
+                dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
+            else:
+                dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
+        else:
             # Inefficient implementation if importing contact doesn't work.
-            print "Warning: Using inefficient distance algorithm because 'contact' module was not imported successfully."
+            print "Warning: Using inefficient distance algorithm because 'contact' module was not imported."
+            if hasattr(self, 'boxes'):
+                print "No minimum image convention available (import 'contact' if you need it)."
             dxij = [np.array(list(itertools.chain(*[[np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i in range(j+1,self.na)] for j in range(self.na)])))]
 
         # Create a NetworkX graph object.

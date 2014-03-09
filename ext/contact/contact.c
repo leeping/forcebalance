@@ -31,6 +31,45 @@ void atomic_contact(const float *xyzlist, const int *contacts, int num_contacts,
   }
 }
 
+inline float sqeuclidean3_rect_image(const float a[], const float b[], const float box[]) {
+    float dx, dy, dz;
+    dx = (a[0] - b[0]);
+    dy = (a[1] - b[1]);
+    dz = (a[2] - b[2]);
+    if (dx < -0.5*box[0]) {dx = dx + box[0];}
+    if (dy < -0.5*box[1]) {dy = dy + box[1];}
+    if (dz < -0.5*box[2]) {dz = dz + box[2];}
+    if (dx >= 0.5*box[0]) {dx = dx - box[0];}
+    if (dy >= 0.5*box[1]) {dy = dy - box[1];}
+    if (dz >= 0.5*box[2]) {dz = dz - box[2];}
+  //Calculate the dot product between length-three vectors b and c
+    return dx*dx + dy*dy + dz*dz;
+}
+
+void atomic_contact_rect_image(const float *xyzlist, const float *box, 
+                               const int *contacts, int num_contacts,
+                               int traj_length, int num_atoms, float *results) {
+  // For each length-2 row of contacts, compute the distance between the atoms with indices
+  // in the first and second entries (uses minimum image convention for rectangular cells)
+  int i, j;
+  const int* atom_ind;
+  const float *frame, *atom1, *atom2;
+  float *results_ptr;
+  
+#pragma omp parallel for default(none) shared(results, xyzlist, box, contacts, num_contacts, num_atoms, traj_length) private(j, atom_ind, frame, atom1, atom2, results_ptr)
+  for (i = 0; i < traj_length; i++) {
+    frame = (const float*) xyzlist + num_atoms * 3 * i;
+    results_ptr = results + num_contacts * i;
+    atom_ind = contacts;
+    for (j = 0; j < num_contacts; j++, results_ptr++, atom_ind = atom_ind + 2) {
+      //indices of the two atoms
+      atom1 = frame + *(atom_ind) * 3;
+      atom2 = frame + *(atom_ind + 1) * 3;
+      *results_ptr = sqrt(sqeuclidean3_rect_image(atom1, atom2, box));
+    }
+  }
+}
+
 void closest_contact(const float *xyzlist, const int *residues,
                             const int num_residues, const int residue_width,
                             const int* atoms_per_residue, 
