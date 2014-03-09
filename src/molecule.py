@@ -930,7 +930,7 @@ class Molecule(object):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
             if 'networkx' in sys.modules and hasattr(self, 'elem') and build_topology and self.na > 0:
-                if self.na > 10000:
+                if self.na > 100000:
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
                 self.topology = self.build_topology()
                 self.molecules = nx.connected_component_subgraphs(self.topology)
