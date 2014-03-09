@@ -139,9 +139,9 @@ class Objective(forcebalance.BaseClass):
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.
-        self.Penalty = Penalty(options['penalty_type'],forcefield,options['penalty_additive'],
-                               options['penalty_multiplicative'],options['penalty_hyperbolic_b'],
-                               options['penalty_alpha'])
+        self.Penalty = Penalty(self.penalty_type,forcefield,self.penalty_additive,
+                               self.penalty_multiplicative,self.penalty_hyperbolic_b,
+                               self.penalty_alpha)
         ## Obtain the denominator.
         if self.normalize_weights:
             self.WTot = np.sum([i.weight for i in self.Targets])
