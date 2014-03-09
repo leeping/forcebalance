@@ -112,6 +112,7 @@ class Lipid(Target):
             self.nptfiles += ["IC"]
             # Store last frames in a dictionary.
             self.lipid_mols = OrderedDict()
+            self.lipid_mols_new = OrderedDict()
             for pt in self.PhasePoints:
                 pt_label = "IC/%sK-%s%s" % (pt[0], pt[1], pt[2])
                 if not os.path.exists(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords)):
@@ -441,8 +442,6 @@ class Lipid(Target):
                 if 'n_ic' in self.RefData:
                     n_uniq_ic = int(self.RefData['n_ic'][pt])
                     for trj in range(n_uniq_ic):
-                        if trj == 0:
-                            self.lipid_mols_new = OrderedDict()
                         rel_trj = "trj_%i" % trj
                         # Create directories for each parallel simulation.
                         if not os.path.exists(rel_trj):
