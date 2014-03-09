@@ -1269,13 +1269,14 @@ class Molecule(object):
         gsz = 6.0
         toppbc = False
         if hasattr(self, 'boxes'): 
-            toppbc = True
             xmin = 0.0
             ymin = 0.0
             zmin = 0.0
             xmax = self.boxes[sn].a
             ymax = self.boxes[sn].b
             zmax = self.boxes[sn].c
+            if xmax > gsz and ymax > gsz and zmax > gsz:
+                toppbc = True
             if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
                 print "Warning: Topology building will not work with broken molecules in nonorthogonal cells."
                 toppbc = False
@@ -1286,12 +1287,19 @@ class Molecule(object):
             xmax = maxs[0]
             ymax = maxs[1]
             zmax = maxs[2]
-        gszx = (xmax-xmin)/int((xmax-xmin)/gsz)
-        gszy = (ymax-ymin)/int((ymax-ymin)/gsz)
-        gszz = (zmax-zmin)/int((zmax-zmin)/gsz)
+
+        if toppbc:
+            gszx = (xmax-xmin)/int((xmax-xmin)/gsz)
+            gszy = (ymax-ymin)/int((ymax-ymin)/gsz)
+            gszz = (zmax-zmin)/int((zmax-zmin)/gsz)
+        else:
+            gszx = gsz
+            gszy = gsz
+            gszz = gsz
+
         # Run algorithm to determine bonds.
         # Decide if we want to use the grid algorithm.
-        use_grid = np.max(maxs - mins) > 2.0*gsz
+        use_grid = toppbc or (np.max([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.

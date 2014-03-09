@@ -91,5 +91,24 @@ class TestPDBMolecule(ForceBalanceTestCase):
         self.assertEqual(len(self.molecule.Data['resid']), len(molecule.Data['resid']),
                         msg = "\nTopology build yields different number of residues")
 
+class TestLipidGRO(ForceBalanceTestCase):
+    def __init__(self, methodName='runTest'):
+        super(TestLipidGRO,self).__init__(methodName)
+        self.source = 'lipid.gro'
+
+    def setUp(self):
+        super(TestLipidGRO,self).setUp()
+        os.chdir('test/files')
+        try: self.molecule = forcebalance.molecule.Molecule(self.source)
+        except IOError:
+            self.skipTest("Input pdb file test/files/%s doesn't exist" % self.source)
+        except:
+            self.fail("\nUnable to open gro file")
+
+    def test_lipid_molecules(self):
+        """Check for the correct number of molecules in a rectangular cell with broken molecules"""
+        self.logger.debug("\nTrying to read lipid conformation... ")
+        self.assertEqual(len(self.molecule.molecules), 3783, msg = "\nIncorrect number of molecules for lipid structure")
+
 if __name__ == '__main__':
     unittest.main()
