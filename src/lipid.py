@@ -110,7 +110,7 @@ class Lipid(Target):
         if 'n_ic' in self.RefData:
             # Linked IC folder into the temp-directory.
             self.nptfiles += ["IC"]
-            # Store last frames in a dictionary.
+            # Store IC frames in a dictionary.
             self.lipid_mols = OrderedDict()
             self.lipid_mols_new = OrderedDict()
             for pt in self.PhasePoints:
@@ -451,12 +451,10 @@ class Lipid(Target):
                             self.lipid_mol = self.lipid_mols[pt][trj]
                             self.npt_simulation(T,P,snum)
                         os.chdir('..')
-                    os.chdir('..')
-                    snum += 1
                 else:
                     self.npt_simulation(T,P,snum)
-                    os.chdir('..')
-                    snum += 1
+                os.chdir('..')
+                snum += 1
 
     def get(self, mvals, AGrad=True, AHess=True):
         
