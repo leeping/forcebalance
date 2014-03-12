@@ -216,6 +216,9 @@ class Optimizer(forcebalance.BaseClass):
 
         maxrd = max([T.maxrd() for T in self.Objective.Targets])
         if maxrd < 0: return
+        ## This will be invoked if we quit RIGHT at the start of an iteration
+        if len(set([T.maxrd() for T in self.Objective.Targets])) == 1:
+            maxrd += 1
         printcool("Continuing optimization from iteration %i\nThese targets will load data from disk:\n%s" % \
                       (maxrd, '\n'.join([T.name for T in self.Objective.Targets if T.maxrd() == maxrd])), color=4)
         ## If data exists in the temp-dir corresponding to the highest
