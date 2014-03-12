@@ -1439,7 +1439,7 @@ class Molecule(object):
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
                 xyzj = np.dot(xyzj, rt) + tr
-                rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+                rmsd = np.sqrt(3*np.mean((xyzj - xyzi) ** 2))
                 Mat[i,j] = rmsd
                 Mat[j,i] = rmsd
         return Mat
@@ -1456,7 +1456,7 @@ class Molecule(object):
             xyzj -= xyzj.mean(0)
             tr, rt = get_rotate_translate(xyzj, xyzi)
             xyzj = np.dot(xyzj, rt) + tr
-            rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+            rmsd = np.sqrt(3*np.mean((xyzj - xyzi) ** 2))
             Vec[i] = rmsd
         return Vec
 
@@ -2262,15 +2262,24 @@ class Molecule(object):
             Floats[key] = []
 
         ## Intrinsic reaction coordinate stuff
-        Fwd = True
+        IRCDir = 0
         RPLine = False
-        Irc = {'FwdX' : [], 'FwdE' : [], 'FwdQ' : [], 'FwdSz' : [], 
-               'BakX' : [], 'BakE' : [], 'BakQ' : [], 'BakSz' : []}
+        #---- Intrinsic reaction coordinate data.
+        # stat: Status, X : Coordinates, E : Energies, Q : Charges, Sz: Spin-Z
+        # Explanation of Status:
+        # -1 : IRC calculation does not exist in this direction.
+        #  0 : IRC calculation finished successfully.
+        #  1 : IRC calculation did not finish but we can start a geometry optimization from the final point.
+        #  2 : IRC calculation failed in this direction (i.e. set to 2 once we encounter first_irc_step).
+        # Two dictionaries of coordinates, energies, Mulliken Charges and Spin Populations.
+        IRCData = [OrderedDict([('stat', -1), ('X', []), ('E', []), ('Q', []), ('Sz', [])]) for i in range(2)]
     
         Answer['qcerr'] = ''
         fatal = 0
         for line in open(fnm):
             line = line.strip().expandtabs()
+            if 'Welcome to Q-Chem' in line:
+                Answer['qcerr'] = ''
             if 'total processes killed' in line:
                 Answer['qcerr'] = 'killed'
             if fatal and len(line.split()) > 0:
@@ -2318,36 +2327,37 @@ class Molecule(object):
             for key, val in float_match.items():
                 if re.match(val[0].lower(), line.lower()):
                     Floats[key].append(float(line.split()[val[1]]))
-            ## Intrinsic reaction coordinate stuff
+            #----- Begin Intrinsic reaction coordinate stuff
+            if line.startswith('IRC') and IRCData[IRCDir]['stat'] == -1:
+                IRCData[IRCDir]['stat'] = 2
             if "Reaction path following." in line:
                 RPLine = True
-                if Fwd:
-                    Irc['FwdX'].append(xyzs[-1])
-                else:
-                    Irc['BakX'].append(xyzs[-1])
+                IRCData[IRCDir]['X'].append(xyzs[-1])
+            ## Assumes the IRC energy comes right after the coordinates.
             elif RPLine:
                 RPLine = False
-                if Fwd:
-                    Irc['FwdE'].append(float(line.split()[3]))
-                    Irc['FwdQ'].append(mkchg[-1])
-                    Irc['FwdSz'].append(mkspn[-1])
-                else:
-                    Irc['BakE'].append(float(line.split()[3]))
-                    Irc['BakQ'].append(mkchg[-1])
-                    Irc['BakSz'].append(mkspn[-1])
+                IRCData[IRCDir]['E'].append(float(line.split()[3]))
+                IRCData[IRCDir]['Q'].append(mkchg[-1])
+                IRCData[IRCDir]['Sz'].append(mkspn[-1])
+            ## Geometry optimization info can also get appended to IRC data.
+            ## This is because my qchem.py script recovers IRC jobs
+            ## that have failed from SCF convergence failures with geometry optimizations.
             if "GEOMETRY OPTIMIZATION" in line:
-                if Fwd:
-                    Irc['FwdX'].append(xyzs[-1])
-                    Irc['FwdE'].append(energy_scf[-1])
-                    Irc['FwdQ'].append(mkchg[-1])
-                    Irc['FwdSz'].append(mkspn[-1])
-                else:
-                    Irc['BakX'].append(xyzs[-1])
-                    Irc['BakE'].append(energy_scf[-1])
-                    Irc['BakQ'].append(mkchg[-1])
-                    Irc['BakSz'].append(mkspn[-1])
+                IRCData[IRCDir]['X'].append(xyzs[-1])
+                IRCData[IRCDir]['E'].append(energy_scf[-1])
+                IRCData[IRCDir]['Q'].append(mkchg[-1])
+                IRCData[IRCDir]['Sz'].append(mkspn[-1])
+            # Determine whether we are in the forward or the backward part of the IRC.
             if "IRC -- convergence criterion reached." in line or "OPTIMIZATION CONVERGED" in line:
-                Fwd = False
+                IRCData[IRCDir]['stat'] = 0
+                IRCDir = 1
+            if "MAXIMUM OPTIMIZATION CYCLES REACHED" in line:
+                IRCData[IRCDir]['stat'] = 1
+            # Output file indicates whether we can start a geometry optimization from this point.
+            if "geom opt from this point" in line:
+                IRCData[IRCDir]['stat'] = 1
+                IRCDir = 1
+            #----- End IRC stuff
             if re.match(".*Convergence criterion met$".lower(), line.lower()):
                 conv.append(1)
                 energy_scf.append(Floats['energy_scfThis'][-1])
@@ -2463,7 +2473,7 @@ class Molecule(object):
                 Answer['qm_mulliken_spins'].insert(i, np.array([0.0 for i in mkspn[-1]]))
             Answer['qm_mulliken_spins'] = Answer['qm_mulliken_spins'][:len(Answer['qm_energies'])]
         
-        Answer['Irc'] = Irc
+        Answer['Irc'] = IRCData
 
         return Answer
     
@@ -2485,7 +2495,6 @@ class Molecule(object):
             if 'qm_extchgs' in self.Data:
                 extchg = self.qm_extchgs[I]
                 out.append('$external_charges')
-                print extchg.shape
                 for i in range(len(extchg)):
                     out.append("% 15.10f % 15.10f % 15.10f %15.10f" % (extchg[i,0],extchg[i,1],extchg[i,2],extchg[i,3]))
                 out.append('$end')
