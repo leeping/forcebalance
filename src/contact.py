@@ -6,7 +6,7 @@ import numpy as np
 import _contact_wrap
 import warnings
 
-def atom_distances(xyzlist, atom_contacts):
+def atom_distances(xyzlist, atom_contacts, box=None):
     '''
     For each frame in xyzlist, compute the (euclidean) distance between
     pairs of atoms whos indices are given in contacts.
@@ -16,6 +16,8 @@ def atom_distances(xyzlist, atom_contacts):
     
     contacts should be a num_contacts x 2 array where each row
     gives the indices of 2 atoms whos distance you care to monitor.
+
+    box should be a 3-element array containing the a, b, and c lattice lengths.
     
     Returns: traj_length x num_contacts array of euclidean distances
     
@@ -52,8 +54,19 @@ def atom_distances(xyzlist, atom_contacts):
         atom_contacts = np.copy(atom_contacts)
     
     results = np.zeros((traj_length, num_contacts), dtype=np.float32)
-    
-    _contact_wrap.atomic_contact_wrap(xyzlist, atom_contacts, results)
+
+    if box == None:
+        _contact_wrap.atomic_contact_wrap(xyzlist, atom_contacts, results)
+    else:
+        if box.shape != (3,):
+            raise ValueError('box must be a 3-element array')
+        if box.dtype != np.float32:
+            box = np.float32(box)
+        # make sure contiguous
+        if not box.flags.contiguous:
+            warnings.warn("box is not contiguous: copying", RuntimeWarning)
+            box = np.copy(box)
+        _contact_wrap.atomic_contact_rect_image_wrap(xyzlist, box, atom_contacts, results)
     
     return results
 

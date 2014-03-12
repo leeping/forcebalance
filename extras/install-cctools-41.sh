@@ -2,7 +2,7 @@
 
 # Download latest version from website.
 echo "Downloading source."
-cctools="cctools-4.1.1"
+cctools="cctools-4.1.2"
 cctools_src="$cctools-source"
 rm -rf $cctools_src $cctools_src.tar*
 wget http://www3.nd.edu/~ccl/software/files/$cctools_src.tar.gz
@@ -66,6 +66,15 @@ make && make install && cd work_queue && make install
 cd $prefix/
 rm -f cctools
 ln -s $cctools cctools
+cd cctools/bin
+for i in wq_submit_workers.common sge_submit_workers torque_submit_workers slurm_submit_workers ; do 
+    if [ -f $HOME/etc/work_queue/$i ] ; then
+        echo "Replacing $i with LP's custom version"
+        mv $i $i.bak
+        ln -s $HOME/etc/work_queue/$i .
+    fi
+done
+cd ../..
 
 # Install Python module.
 rm -rf $pypath/lib/python2.7/site-packages/work_queue.pyc
