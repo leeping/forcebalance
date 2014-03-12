@@ -1407,15 +1407,15 @@ class Lipid_GMX(Lipid):
             if "n_ic" in self.RefData:
                 # p_u assumes that all phasepoint pressure keys are of the same unit.  This may be a reasonable assumption.
                 p_u = self.PhasePoints[0][2]
-                td_vals = (temperature, pressure, p_u)
-                if not td_vals in self.lipid_mols_new:
-                    self.lipid_mols_new[td_vals] = [os.path.join(os.getcwd(),'lipid-md.gro')]
+                PT_vals = (temperature, pressure, p_u)
+                if not PT_vals in self.lipid_mols_new:
+                    self.lipid_mols_new[PT_vals] = [os.path.join(os.getcwd(),'lipid-md.gro')]
                 else:
-                    self.lipid_mols_new[td_vals].append(os.path.join(os.getcwd(),'lipid-md.gro'))
+                    self.lipid_mols_new[PT_vals].append(os.path.join(os.getcwd(),'lipid-md.gro'))
                 super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
-                if len(self.lipid_mols_new[td_vals]) == int(self.RefData['n_ic'][td_vals]):
-                    self.lipid_mols[td_vals] = [Molecule(lf) for lf in self.lipid_mols_new[td_vals]]
-                    self.lipid_mols_new.pop(td_vals)
+                if GoodStep() and len(self.lipid_mols_new[PT_vals]) == int(self.RefData['n_ic'][PT_vals]):
+                    self.lipid_mols[PT_vals] = self.lipid_mols_new[PT_vals]
+                    self.lipid_mols_new.pop(PT_vals)
             else:
                 if GoodStep() and (temperature, pressure) in self.LfDict_New:
                     self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
