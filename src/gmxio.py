@@ -524,7 +524,6 @@ class GMX(Engine):
                 havegmx = True
 
     def readsrc(self, **kwargs):
-
         """ Called by __init__ ; read files from the source directory. """
 
         ## Attempt to determine file names of .gro, .top, and .mdp files
@@ -539,7 +538,6 @@ class GMX(Engine):
             self.mol = Molecule(grofile)
 
     def prepare(self, pbc=False, **kwargs):
-
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
         self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
