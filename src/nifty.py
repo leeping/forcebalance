@@ -606,21 +606,12 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     global WQIDS
     task = work_queue.Task(command)
     cwd = os.getcwd()
-    print 'nifty queue_up'
-    print task
-    print cwd
     for f in input_files:
         lf = os.path.join(cwd,f)
         task.specify_input_file(lf,f,cache=False)
-	print 'in f'
-	print f
-	print lf
     for f in output_files:
         lf = os.path.join(cwd,f)
         task.specify_output_file(lf,f,cache=False)
-	print 'out f'
-	print f
-	print lf
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     task.specify_tag(command)
     taskid = wq.submit(task)
