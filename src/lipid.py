@@ -269,6 +269,9 @@ class Lipid(Target):
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
+        print 'lipid - queue stuff', self.nptfiles
+        print '------'
+        print self.scripts
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
@@ -449,6 +452,7 @@ class Lipid(Target):
                             os.chdir(rel_trj)
                             # Pull each simulation molecule from the lipid_mols dictionary.
                             self.lipid_mol = self.lipid_mols[pt][trj]
+                            self.lipid_mol.write(self.lipid_coords)
                             self.npt_simulation(T,P,snum)
                         os.chdir('..')
                 else:
