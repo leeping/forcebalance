@@ -269,9 +269,6 @@ class Lipid(Target):
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
-        print 'lipid - queue stuff', self.nptfiles
-        print '------'
-        print self.scripts
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
@@ -453,6 +450,8 @@ class Lipid(Target):
                             # Pull each simulation molecule from the lipid_mols dictionary.
                             self.lipid_mol = self.lipid_mols[pt][trj]
                             self.lipid_mol.write(self.lipid_coords)
+                            if not self.lipid_coords in self.nptfiles:
+                                self.nptfiles += [self.lipid_coords]
                             self.npt_simulation(T,P,snum)
                         os.chdir('..')
                 else:
@@ -512,11 +511,9 @@ class Lipid(Target):
                         # Read in each each parallel simulation's data, and concatenate each property time series.
                         ts = lp_load(open('./%s/trj_%s/npt_result.p' % (label, ic)))
                         if ic == 0:
-                            ts_concat = ts
+                            ts_concat = list(ts)
                         else:
-                            for trj_data in range(len(ts)):
-                                if type(trj_data).__module__ == 'numpy':
-                                    ts_concat[trj_data] = np.append(ts_concat[trj_data], ts[trj_data])
+                            ts_concat = [np.append(ts_concat[d_arr], ts[d_arr]) for d_arr in range(len(ts)) if isinstance(ts[d_arr], np.ndarray)]
                         # Write concatendated time series to a pickle file.
                         if ic == (int(n_uniq_ic) - 1):
                             with wopen('./%s/npt_result.p' % label) as f: lp_dump(ts_concat, f)
