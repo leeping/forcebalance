@@ -513,7 +513,7 @@ class Lipid(Target):
                         if ic == 0:
                             ts_concat = list(ts)
                         else:
-                            ts_concat = [np.append(ts_concat[d_arr], ts[d_arr]) for d_arr in range(len(ts)) if isinstance(ts[d_arr], np.ndarray)]
+                            ts_concat = [np.append(ts_concat[d_arr], ts[d_arr]) if isinstance(ts[d_arr], np.ndarray) else ts_concat[d_arr] for d_arr in range(len(ts))]
                         # Write concatendated time series to a pickle file.
                         if ic == (int(n_uniq_ic) - 1):
                             with wopen('./%s/npt_result.p' % label) as f: lp_dump(ts_concat, f)
