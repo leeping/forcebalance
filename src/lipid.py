@@ -471,7 +471,7 @@ class Lipid(Target):
         In order to reproduce experimentally known data, we need to
         run a simulation and compare the simulation result to
         experiment.  The main challenge here is that the simulations
-        are computationally intensive (i.e. they require energy and
+            are computationally intensive (i.e. they require energy and
         force evaluations), and furthermore the results are noisy.  We
         need to run the simulations automatically and remotely
         (i.e. on clusters) and a good way to calculate the derivatives
@@ -503,7 +503,8 @@ class Lipid(Target):
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if 'n_ic' in self.RefData:
-                self.lipid_mols[PT] = [Molecule(last_frame) for last_frame in self.lipid_mols[PT]]
+                if GoodStep():
+                    self.lipid_mols[PT] = [Molecule(last_frame) for last_frame in self.lipid_mols[PT]]
                 n_uniq_ic = int(self.RefData['n_ic'][PT])
                 for ic in range(n_uniq_ic):
                     if os.path.exists('./%s/trj_%s/npt_result.p.bz2' % (label, ic)):
@@ -513,8 +514,16 @@ class Lipid(Target):
                         if ic == 0:
                             ts_concat = list(ts)
                         else:
-                            ts_concat = [np.append(ts_concat[d_arr], ts[d_arr]) if isinstance(ts[d_arr], np.ndarray) else ts_concat[d_arr] for d_arr in range(len(ts))]
-                        # Write concatendated time series to a pickle file.
+                            for d_arr in range(len(ts)):
+                                if isinstance(ts[d_arr], np.ndarray):
+                                    # Gradients need a unique append format.
+                                    if d_arr == 5:
+                                        ts_concat[d_arr] = np.append(ts_concat[d_arr], ts[d_arr], axis = 1)
+                                    else:
+                                        ts_concat[d_arr] = np.append(ts_concat[d_arr], ts[d_arr], axis = 0)
+                                if isinstance(ts_concat[d_arr], list):
+                                    ts_concat[d_arr] = [np.append(ts_concat[d_arr][i], ts[d_arr][i], axis = 1) for i in range(len(ts_concat[d_arr]))]
+                        # Write concatenated time series to a pickle file.
                         if ic == (int(n_uniq_ic) - 1):
                             with wopen('./%s/npt_result.p' % label) as f: lp_dump(ts_concat, f)
             if os.path.exists('./%s/npt_result.p.bz2' % label):
@@ -587,6 +596,7 @@ class Lipid(Target):
         # Run MBAR using the total energies. Required for estimates that use the kinetic energy.
         BSims = len(BPoints)
         Shots = len(Energies[0])
+        Shots_m = [len(i) for i in Energies]
         N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([BSims,BSims,Shots])
