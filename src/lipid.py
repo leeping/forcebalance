@@ -471,7 +471,7 @@ class Lipid(Target):
         In order to reproduce experimentally known data, we need to
         run a simulation and compare the simulation result to
         experiment.  The main challenge here is that the simulations
-            are computationally intensive (i.e. they require energy and
+        are computationally intensive (i.e. they require energy and
         force evaluations), and furthermore the results are noisy.  We
         need to run the simulations automatically and remotely
         (i.e. on clusters) and a good way to calculate the derivatives
