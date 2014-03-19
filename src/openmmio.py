@@ -1002,7 +1002,7 @@ class OpenMM(Engine):
             else:
                 kinetic = state.getKineticEnergy()
                 potential = state.getPotentialEnergy()
-#####
+#####Energy Estimator
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
