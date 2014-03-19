@@ -1002,7 +1002,7 @@ class OpenMM(Engine):
                 for i in range(self.tdiv):
                     ii=(i+1)%self.tdiv
                     deltabead=np.array(pimdstate[i].getPositions())-np.array(pimdstate[ii].getPositions())
-                    kinetic=kinetic-((deltabead*deltabead).sum(axis=1))*np.array([getParticleMass(j) for j in range (system.getNumParticles())])*(kB**2*integrator.getTemperature()**2*self.tdiv)/(2.0*hbar**2)
+                    kinetic=kinetic-np.sum(((deltabead*deltabead).sum(axis=1))*np.array([getParticleMass(j) for j in range (system.getNumParticles())]))*(kB**2*integrator.getTemperature()**2*self.tdiv)/(2.0*hbar**2)
             else:
                 kinetic = state.getKineticEnergy()
                 potential = state.getPotentialEnergy()
