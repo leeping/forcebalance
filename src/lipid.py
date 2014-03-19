@@ -22,7 +22,7 @@ except: pass
 from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple, OrderedDict
-from forcebalance.optimizer import Counter, GoodStep
+from forcebalance.optimizer import Counter, First, GoodStep
 import csv
 
 from forcebalance.output import getLogger
@@ -123,6 +123,10 @@ class Lipid(Target):
             del self.gas_engine_args['name']
             # Create engine object for gas molecule to do the polarization correction.
             self.gas_engine = self.engine_(target=self, mol=self.gas_mol, name="selfpol", **self.gas_engine_args)
+        # Don't read indicate.log when calling meta_indicate()
+        self.read_indicate = False
+        # Don't read objective.p when calling meta_get()
+        self.read_objective = False
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
@@ -241,13 +245,30 @@ class Lipid(Target):
             else:
                 self.set_option(global_opts,opt)
 
+    def check_files(self, there):
+        there = os.path.abspath(there)
+        havepts = 0
+        if all([i in os.listdir(there) for i in self.Labels]):
+            for d in os.listdir(there):
+                if d in self.Labels:
+                    if os.path.exists(os.path.join(there, d, 'npt_result.p')):
+                        havepts += 1
+                    elif os.path.exists(os.path.join(there, d, 'npt_result.p.bz2')):
+                        havepts += 1
+        if (float(havepts)/len(self.Labels)) > 0.75:
+            return 1
+        else:
+            return 0
+
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
         if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-            self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output if '.gro' not in i]
+            prev_iter_ICs = os.path.join(os.getcwd(), "lipid.gro")
+            if not os.path.exists(prev_iter_ICs):
+                self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
             cmdstr = '%s python npt_lipid.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
@@ -393,11 +414,11 @@ class Lipid(Target):
         with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict,AGrad),f)
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
-        if Counter() == 0 and self.manual:
-            warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
+        if Counter() == First() and self.manual:
+            warn_press_key("Now's our chance to fill the temp directory up with data!\n(Considering using 'read' or 'continue' for better checkpointing)", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
-        if Counter() > 0 and GoodStep() and self.save_traj < 2:
+        if Counter() > First() and GoodStep() and self.save_traj < 2:
             for fn in self.last_traj:
                 if os.path.exists(fn):
                     os.remove(fn)
@@ -575,7 +596,7 @@ class Lipid(Target):
 
         if self.do_self_pol:
             EPol = self.polarization_correction(mvals)
-            GEPol = np.array([f12d3p(fdwrap(self.polarization_correction, mvals, p), h = self.h, f0 = EPol)[0] for p in range(self.FF.np)])
+            GEPol = np.array([(f12d3p(fdwrap(self.polarization_correction, mvals, p), h = self.h, f0 = EPol)[0] if p in self.pgrad else 0.0) for p in range(self.FF.np)])
             bar = printcool("Self-polarization correction to \nenthalpy of vaporization is % .3f kJ/mol%s" % (EPol, ", Derivative:" if AGrad else ""))
             if AGrad:
                 self.FF.print_map(vals=GEPol)

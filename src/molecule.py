@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated October 1, 2013                      |#
+#|                 Last updated February 20, 2014                     |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -130,7 +130,7 @@ AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tink
 # qctemplate = The Q-Chem template file, not including the coordinates or rem variables
 # charge     = The net charge of the molecule
 # mult       = The spin multiplicity of the molecule
-MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult', 'bonds'])
+MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds'])
 # Variable names relevant to quantum calculations explicitly
 QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost'])
 # Superset of all variable names.
@@ -142,7 +142,7 @@ import numpy as np
 from numpy import sin, cos, arcsin, arccos
 import imp
 import itertools
-from collections import OrderedDict, namedtuple
+from collections import OrderedDict, namedtuple, Counter
 from ctypes import *
 from warnings import warn
 
@@ -193,40 +193,41 @@ def elem_from_atomname(atomname):
     """ Given an atom name, attempt to get the element in most cases. """
     return re.search('[A-Z][a-z]*',atomname).group(0)
 
-#============================#
-#| DCD read/write functions |#
-#============================#
-# Try to load _dcdlib.so either from a directory in the LD_LIBRARY_PATH
-# or from the same directory as this module.
-try: _dcdlib = CDLL("_dcdlib.so")
-except:
-    try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
+if "forcebalance" in __name__:
+    #============================#
+    #| DCD read/write functions |#
+    #============================#
+    # Try to load _dcdlib.so either from a directory in the LD_LIBRARY_PATH
+    # or from the same directory as this module.
+    try: _dcdlib = CDLL("_dcdlib.so")
+    except:
+        try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
+        except: 
+            warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+    
+    #============================#
+    #| PDB read/write functions |#
+    #============================#
+    try: from PDB import *
     except: 
-        warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
-
-#============================#
-#| PDB read/write functions |#
-#============================#
-try: from PDB import *
-except: 
-    warn('The pdb module cannot be miported (Cannot read/write PDB files)')
-
-#=============================#
-#| Mol2 read/write functions |#
-#=============================#
-try: import Mol2
-except: 
-    warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
-
-#==============================#
-#| OpenMM interface functions |#
-#==============================#
-try: 
-    from simtk.unit import *
-    from simtk.openmm import *
-    from simtk.openmm.app import *
-except: 
-    warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+        warn('The pdb module cannot be miported (Cannot read/write PDB files)')
+    
+    #=============================#
+    #| Mol2 read/write functions |#
+    #=============================#
+    try: import Mol2
+    except: 
+        warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
+    
+    #==============================#
+    #| OpenMM interface functions |#
+    #==============================#
+    try: 
+        from simtk.unit import *
+        from simtk.openmm import *
+        from simtk.openmm.app import *
+    except: 
+        warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
     
 #===========================#
 #| Convenience subroutines |#
@@ -643,8 +644,9 @@ class Molecule(object):
     in the other, are added to the sum, and (2) Appendable or per-frame fields
     (i.e. coordinates) are concatenated together.
 
-    - Slice trajectories using reasonable Python language.  That is to say,
-    MyMolecule[1:10] returns a new Molecule object that contains frames 2 through 10.
+    - Slice trajectories using reasonable Python language.  That is to
+    say, MyMolecule[1:10] returns a new Molecule object that contains
+    frames 1 through 9 (inclusive and numbered starting from zero.)
     
     Next step: Read in Q-Chem output data using this too!
 
@@ -792,7 +794,7 @@ class Molecule(object):
                     elif key in other.Data:
                         self.Data['boxes'] = [other.Data['boxes'][0] for i in range(len(self))]
                 else:
-                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).')
+                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
         return Sum
  
     def __iadd__(self,other):
@@ -888,6 +890,7 @@ class Molecule(object):
                           'g96'     : 'gromacs',
                           'gmx'     : 'gromacs',
                           'in'      : 'qcin',
+                          'qcin'    : 'qcin',
                           'com'     : 'gaussian',
                           'out'     : 'qcout',
                           'esp'     : 'qcesp',
@@ -927,7 +930,7 @@ class Molecule(object):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
             if 'networkx' in sys.modules and hasattr(self, 'elem') and build_topology and self.na > 0:
-                if self.na > 10000:
+                if self.na > 100000:
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
                 self.topology = self.build_topology()
                 self.molecules = nx.connected_component_subgraphs(self.topology)
@@ -956,7 +959,7 @@ class Molecule(object):
     #     Answer = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)
     #     return Answer
 
-    def write(self,fnm=None,ftype=None,append=False,select=None):
+    def write(self,fnm=None,ftype=None,append=False,select=None,**kwargs):
         if fnm == None and ftype == None:
             raise Exception("Output file name and file type are not specified.")
         elif ftype == None:
@@ -972,7 +975,7 @@ class Molecule(object):
             select = [select]
         if select == None:
             select = range(len(self))
-        Answer = self.Write_Tab[self.Funnel[ftype.lower()]](select)
+        Answer = self.Write_Tab[self.Funnel[ftype.lower()]](select,**kwargs)
         ## Any method that returns text will give us a list of lines, which we then write to the file.
         if Answer != None:
             if fnm == None or fnm == sys.stdout:
@@ -1265,17 +1268,48 @@ class Molecule(object):
         maxs = np.max(self.xyzs[sn],axis=0)
         # Grid size in Angstrom.  This number is optimized for speed in a 15,000 atom system (united atom pentadecane).
         gsz = 6.0
+        toppbc = False
+        if hasattr(self, 'boxes'): 
+            xmin = 0.0
+            ymin = 0.0
+            zmin = 0.0
+            xmax = self.boxes[sn].a
+            ymax = self.boxes[sn].b
+            zmax = self.boxes[sn].c
+            if xmax > gsz and ymax > gsz and zmax > gsz:
+                toppbc = True
+            if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
+                print "Warning: Topology building will not work with broken molecules in nonorthogonal cells."
+                toppbc = False
+        else:
+            xmin = mins[0]
+            ymin = mins[1]
+            zmin = mins[2]
+            xmax = maxs[0]
+            ymax = maxs[1]
+            zmax = maxs[2]
+
+        if toppbc:
+            gszx = (xmax-xmin)/int((xmax-xmin)/gsz)
+            gszy = (ymax-ymin)/int((ymax-ymin)/gsz)
+            gszz = (zmax-zmin)/int((zmax-zmin)/gsz)
+        else:
+            gszx = gsz
+            gszy = gsz
+            gszz = gsz
+
         # Run algorithm to determine bonds.
         # Decide if we want to use the grid algorithm.
-        use_grid = np.max(maxs - mins) > 2.0*gsz
+        use_grid = toppbc or (np.max([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.
-            xgrd = np.arange(mins[0]-gsz, maxs[0], 2*gsz)
-            ygrd = np.arange(mins[1]-gsz, maxs[1], 2*gsz)
-            zgrd = np.arange(mins[2]-gsz, maxs[2], 2*gsz)
+            xgrd = np.arange(xmin, xmax, gszx)
+            ygrd = np.arange(ymin, ymax, gszy)
+            zgrd = np.arange(zmin, zmax, gszz)
             # 2) Grid cells are denoted by a three-index tuple.
             gidx = list(itertools.product(range(len(xgrd)), range(len(ygrd)), range(len(zgrd))))
+            # print gidx
             # 3) Build a dictionary which maps a grid cell to itself plus its neighboring grid cells.
             # Two grid cells are defined to be neighbors if the differences between their x, y, z indices are at most 1.
             gngh = OrderedDict()
@@ -1287,8 +1321,13 @@ class Molecule(object):
                 ai = np.array(i)
                 for j in n27:
                     nj = ai+j
-                    if np.all(nj >= amin) and np.all(nj <= amax):
-                        gngh[i].append(tuple(nj))
+                    for k in range(3):
+                        mod = amax[k]-amin[k]+1
+                        if nj[k] < amin[k]:
+                            nj[k] += mod
+                        elif nj[k] > amax[k]:
+                            nj[k] -= mod
+                    gngh[i].append(tuple(nj))
             # 4) Loop over the atoms and assign each to a grid cell.
             # Note: I think this step becomes the bottleneck if we choose very small grid sizes.
             gasn = OrderedDict([(i, []) for i in gidx])
@@ -1297,13 +1336,22 @@ class Molecule(object):
                 yidx = -1
                 zidx = -1
                 for j in xgrd:
-                    if self.xyzs[sn][i][0] < j: break
+                    xi = self.xyzs[sn][i][0]
+                    if toppbc and xi < 0: xi += xmax
+                    if toppbc and xi > xmax: xi -= xmax
+                    if xi < j: break
                     xidx += 1
                 for j in ygrd:
-                    if self.xyzs[sn][i][1] < j: break
+                    yi = self.xyzs[sn][i][1]
+                    if toppbc and yi < 0: yi += ymax
+                    if toppbc and yi > ymax: yi -= ymax
+                    if yi < j: break
                     yidx += 1
                 for j in zgrd:
-                    if self.xyzs[sn][i][2] < j: break
+                    zi = self.xyzs[sn][i][2]
+                    if toppbc and zi < 0: zi += zmax
+                    if toppbc and zi > zmax: zi -= zmax
+                    if zi < j: break
                     zidx += 1
                 gasn[(xidx,yidx,zidx)].append(i)
             # 5) Create list of 2-tuples corresponding to combinations of atomic indices.
@@ -1323,11 +1371,16 @@ class Molecule(object):
         BT1 = R[AtomIterator[:,1]]
         BondThresh = (BT0+BT1) * Fac
         BondThresh = (BondThresh > mindist) * BondThresh + (BondThresh < mindist) * mindist
-        try:
-            dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
-        except:
+        if 'forcebalance.contact' in sys.modules:
+            if hasattr(self, 'boxes'):
+                dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
+            else:
+                dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
+        else:
             # Inefficient implementation if importing contact doesn't work.
-            print "Warning: Using inefficient distance algorithm because 'contact' module was not imported successfully."
+            print "Warning: Using inefficient distance algorithm because 'contact' module was not imported."
+            if hasattr(self, 'boxes'):
+                print "No minimum image convention available (import 'contact' if you need it)."
             dxij = [np.array(list(itertools.chain(*[[np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i in range(j+1,self.na)] for j in range(self.na)])))]
 
         # Create a NetworkX graph object.
@@ -1348,6 +1401,55 @@ class Molecule(object):
             bonds[jj].append(ii)
             G.add_edge(ii, jj)
         return G
+
+    def find_angles(self):
+
+        """ Return a list of 3-tuples corresponding to all of the
+        angles in the system.  Verified for lysine and tryptophan
+        dipeptide when comparing to TINKER's analyze program. """
+
+        if not hasattr(self, 'topology'):
+            raise RuntimeError("Need to have built a topology to find angles")
+
+        angidx = []
+        # Iterate over separate molecules
+        for mol in self.molecules:
+            # Iterate over atoms in the molecule
+            for a2 in mol.nodes():
+                # Find all bonded neighbors to this atom
+                friends = sorted(list(nx.all_neighbors(mol, a2)))
+                if len(friends) < 2: continue
+                # Double loop over bonded neighbors
+                for i, a1 in enumerate(friends):
+                    for a3 in friends[i+1:]:
+                        # Add bonded atoms in the correct order
+                        angidx.append((a1, a2, a3))
+        return angidx
+
+    def find_dihedrals(self):
+        
+        """ Return a list of 4-tuples corresponding to all of the
+        dihedral angles in the system.  Verified for alanine and
+        tryptophan dipeptide when comparing to TINKER's analyze
+        program. """
+        
+        if not hasattr(self, 'topology'):
+            raise RuntimeError("Need to have built a topology to find dihedrals")
+
+        dihidx = []
+        # Iterate over separate molecules
+        for mol in self.molecules:
+            # Iterate over bonds in the molecule
+            for edge in mol.edges():
+                # Determine correct ordering of atoms (middle atoms are ordered by convention)
+                a2 = edge[0] if edge[0] < edge[1] else edge[1]
+                a3 = edge[1] if edge[0] < edge[1] else edge[0]
+                for a1 in sorted(list(nx.all_neighbors(mol, a2))):
+                    if a1 != a3:
+                        for a4 in sorted(list(nx.all_neighbors(mol, a3))):
+                            if a4 != a2:
+                                dihidx.append((a1, a2, a3, a4))
+        return dihidx
 
     def measure_dihedrals(self, i, j, k, l):
         """ Return a series of dihedral angles, given four atom indices numbered from zero. """
@@ -1387,7 +1489,7 @@ class Molecule(object):
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
                 xyzj = np.dot(xyzj, rt) + tr
-                rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+                rmsd = np.sqrt(3*np.mean((xyzj - xyzi) ** 2))
                 Mat[i,j] = rmsd
                 Mat[j,i] = rmsd
         return Mat
@@ -1404,7 +1506,7 @@ class Molecule(object):
             xyzj -= xyzj.mean(0)
             tr, rt = get_rotate_translate(xyzj, xyzi)
             xyzj = np.dot(xyzj, rt) + tr
-            rmsd = np.sqrt(np.mean((xyzj - xyzi) ** 2))
+            rmsd = np.sqrt(3*np.mean((xyzj - xyzi) ** 2))
             Vec[i] = rmsd
         return Vec
 
@@ -2152,7 +2254,7 @@ class Molecule(object):
         return Answer
     
     def read_qcout(self, fnm, errok = [], **kwargs):
-        """ Q-Chem output file reader, adapted forcd  our parser. 
+        """ Q-Chem output file reader, adapted for our parser. 
     
         Q-Chem output files are very flexible and there's no way I can account for all of them.  Here's what
         I am able to account for:
@@ -2169,7 +2271,8 @@ class Molecule(object):
         As with all Q-Chem output files, note that successive calculations can have different numbers of atoms.
     
         """
-    
+
+        Answer   = {}
         xyzs     = []
         xyz      = []
         elem     = []
@@ -2207,14 +2310,32 @@ class Molecule(object):
             Mats[key] = copy.deepcopy(matblank)
         for key, val in float_match.items():
             Floats[key] = []
+
+        ## Intrinsic reaction coordinate stuff
+        IRCDir = 0
+        RPLine = False
+        #---- Intrinsic reaction coordinate data.
+        # stat: Status, X : Coordinates, E : Energies, Q : Charges, Sz: Spin-Z
+        # Explanation of Status:
+        # -1 : IRC calculation does not exist in this direction.
+        #  0 : IRC calculation finished successfully.
+        #  1 : IRC calculation did not finish but we can start a geometry optimization from the final point.
+        #  2 : IRC calculation failed in this direction (i.e. set to 2 once we encounter first_irc_step).
+        # Two dictionaries of coordinates, energies, Mulliken Charges and Spin Populations.
+        IRCData = [OrderedDict([('stat', -1), ('X', []), ('E', []), ('Q', []), ('Sz', [])]) for i in range(2)]
     
+        Answer['qcerr'] = ''
         fatal = 0
         for line in open(fnm):
             line = line.strip().expandtabs()
+            if 'Welcome to Q-Chem' in line:
+                Answer['qcerr'] = ''
+            if 'total processes killed' in line:
+                Answer['qcerr'] = 'killed'
             if fatal and len(line.split()) > 0:
                 # Print the error message that comes after the "fatal error" line.
                 if line in errok:
-                    warn("Fatal error encountered (%s), proceeding because you asked for it" % line)
+                    Answer['qcerr'] = line.strip()
                     fatal = 0
                 else:
                     raise Exception('Calculation encountered a fatal error! (%s)' % line)
@@ -2256,6 +2377,37 @@ class Molecule(object):
             for key, val in float_match.items():
                 if re.match(val[0].lower(), line.lower()):
                     Floats[key].append(float(line.split()[val[1]]))
+            #----- Begin Intrinsic reaction coordinate stuff
+            if line.startswith('IRC') and IRCData[IRCDir]['stat'] == -1:
+                IRCData[IRCDir]['stat'] = 2
+            if "Reaction path following." in line:
+                RPLine = True
+                IRCData[IRCDir]['X'].append(xyzs[-1])
+            ## Assumes the IRC energy comes right after the coordinates.
+            elif RPLine:
+                RPLine = False
+                IRCData[IRCDir]['E'].append(float(line.split()[3]))
+                IRCData[IRCDir]['Q'].append(mkchg[-1])
+                IRCData[IRCDir]['Sz'].append(mkspn[-1])
+            ## Geometry optimization info can also get appended to IRC data.
+            ## This is because my qchem.py script recovers IRC jobs
+            ## that have failed from SCF convergence failures with geometry optimizations.
+            if "GEOMETRY OPTIMIZATION" in line:
+                IRCData[IRCDir]['X'].append(xyzs[-1])
+                IRCData[IRCDir]['E'].append(energy_scf[-1])
+                IRCData[IRCDir]['Q'].append(mkchg[-1])
+                IRCData[IRCDir]['Sz'].append(mkspn[-1])
+            # Determine whether we are in the forward or the backward part of the IRC.
+            if "IRC -- convergence criterion reached." in line or "OPTIMIZATION CONVERGED" in line:
+                IRCData[IRCDir]['stat'] = 0
+                IRCDir = 1
+            if "MAXIMUM OPTIMIZATION CYCLES REACHED" in line:
+                IRCData[IRCDir]['stat'] = 1
+            # Output file indicates whether we can start a geometry optimization from this point.
+            if "geom opt from this point" in line:
+                IRCData[IRCDir]['stat'] = 1
+                IRCDir = 1
+            #----- End IRC stuff
             if re.match(".*Convergence criterion met$".lower(), line.lower()):
                 conv.append(1)
                 energy_scf.append(Floats['energy_scfThis'][-1])
@@ -2266,6 +2418,7 @@ class Molecule(object):
             elif re.match(".*Convergence failure$".lower(), line.lower()):
                 conv.append(0)
                 Floats['energy_scfThis'] = []
+                energy_scf.append(0.0)
             for key, val in matrix_match.items():
                 if Mats[key]["Mode"] >= 1:
                     if re.match("^[0-9]+( +[0-9]+)+$",line):
@@ -2286,14 +2439,17 @@ class Molecule(object):
             Floats['mult'] = [0]
 
         # Copy out the coordinate lists; Q-Chem output cannot be trusted to get the chemical elements
-        Answer = {'xyzs':xyzs, 'elem':elem}
+        Answer['xyzs'] = xyzs
+        Answer['elem'] = elem
         # Read the output file as an input file to get a Q-Chem template.
         Aux = self.read_qcin(fnm)
-        for i in ['qctemplate', 'qcrems', 'elem', 'qm_ghost']:
+        for i in ['qctemplate', 'qcrems', 'elem', 'qm_ghost', 'charge', 'mult']:
             if i in Aux: Answer[i] = Aux[i]
         # Copy out the charge and multiplicity
-        Answer['charge'] = int(Floats['charge'][0])
-        Answer['mult']   = int(Floats['mult'][0]) + 1
+        if len(Floats['charge']) > 0:
+            Answer['charge'] = int(Floats['charge'][0])
+        if len(Floats['mult']) > 0:
+            Answer['mult']   = int(Floats['mult'][0]) + 1
         # Copy out the energies and forces
         # Q-Chem can print out gradients with several different headings.
         # We start with the most reliable heading and work our way down.
@@ -2321,38 +2477,53 @@ class Molecule(object):
             if 'correlation' in Answer['qcrems'][0] and Answer['qcrems'][0]['correlation'].lower() in ['mp2', 'rimp2', 'ccsd', 'ccsd(t)']:
                 raise Exception("Q-Chem was called with a post-HF theory but we only got the SCF energy")
             Answer['qm_energies'] = energy_scf
-        else:
+        elif 'SCF failed to converge' not in errok:
             raise Exception('There are no energies in %s' % fnm)
     
         #### Sanity checks
         # We currently don't have a graceful way of dealing with SCF convergence failures in the output file.
         # For instance, a failed calculation will have elem / xyz but no forces. :/
-        if 0 in conv:
+        if 0 in conv and 'SCF failed to converge' not in errok:
             raise Exception('SCF convergence failure encountered in parsing %s' % fnm)
-        # The molecule should have only one charge and one multiplicity
-        if len(set(Floats['charge'])) != 1 or len(set(Floats['mult'])) != 1:
-            raise Exception('Unexpected number of charges or multiplicities in parsing %s' % fnm)
-        lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
-        # Catch the case of failed geometry optimizations.
-        if len(Answer['xyzs']) == len(Answer['qm_energies']) + 1:
-            Answer['xyzs'] = Answer['xyzs'][:-1]
-        elif len(set(lens)) != 1:
-            raise Exception('The number of energies and coordinates in %s are not the same : %s' % (fnm, str(lens)))
+        elif (0 not in conv):
+            # The molecule should have only one charge and one multiplicity
+            if len(set(Floats['charge'])) != 1 or len(set(Floats['mult'])) != 1:
+                raise Exception('Unexpected number of charges or multiplicities in parsing %s' % fnm)
+
+        # If we have any QM energies (not the case if SCF convergence failure)
+        if 'qm_energies' in Answer:
+            lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
+            # Catch the case of failed geometry optimizations.
+            if len(Answer['xyzs']) == len(Answer['qm_energies']) + 1:
+                Answer['xyzs'] = Answer['xyzs'][:-1]
+            elif len(set(lens)) != 1:
+                raise Exception('The number of energies and coordinates in %s are not the same : %s' % (fnm, str(lens)))
+
         # The number of atoms should all be the same
-        if len(set([len(i) for i in Answer['xyzs']])) != 1:
+        if len(set([len(i) for i in Answer['xyzs']])) > 1:
             raise Exception('The numbers of atoms across frames in %s are not all the same' % (fnm))
 
         if 'qm_forces' in Answer:
             for i, frc in enumerate(Answer['qm_forces']):
                 Answer['qm_forces'][i] = frc.T
+            for i in np.where(np.array(conv) == 0)[0]:
+                Answer['qm_forces'].insert(i, Answer['qm_forces'][0]*0.0)
             if len(Answer['qm_forces']) != len(Answer['qm_energies']):
                 warn("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
                 del Answer['qm_forces']
         # A strange peculiarity; Q-Chem sometimes prints out the final Mulliken charges a second time, after the geometry optimization.
         if mkchg != []:
-            Answer['qm_mulliken_charges'] = list(np.array(mkchg[:len(Answer['qm_energies'])]))
+            Answer['qm_mulliken_charges'] = list(np.array(mkchg))
+            for i in np.where(np.array(conv) == 0)[0]:
+                Answer['qm_mulliken_charges'].insert(i, np.array([0.0 for i in mkchg[-1]]))
+            Answer['qm_mulliken_charges'] = Answer['qm_mulliken_charges'][:len(Answer['qm_energies'])]
         if mkspn != []:
-            Answer['qm_mulliken_spins'] = list(np.array(mkspn[:len(Answer['qm_energies'])]))
+            Answer['qm_mulliken_spins'] = list(np.array(mkspn))
+            for i in np.where(np.array(conv) == 0)[0]:
+                Answer['qm_mulliken_spins'].insert(i, np.array([0.0 for i in mkspn[-1]]))
+            Answer['qm_mulliken_spins'] = Answer['qm_mulliken_spins'][:len(Answer['qm_energies'])]
+        
+        Answer['Irc'] = IRCData
 
         return Answer
     
@@ -2360,9 +2531,13 @@ class Molecule(object):
     #|         Writing functions         |#
     #=====================================#
 
-    def write_qcin(self, select):
+    def write_qcin(self, select, **kwargs):
         self.require('qctemplate','qcrems','charge','mult')
         out = []
+        if 'read' in kwargs:
+            read = kwargs['read']
+        else:
+            read = False
         for I in select:
             remidx = 0
             molecule_printed = False
@@ -2370,7 +2545,6 @@ class Molecule(object):
             if 'qm_extchgs' in self.Data:
                 extchg = self.qm_extchgs[I]
                 out.append('$external_charges')
-                print extchg.shape
                 for i in range(len(extchg)):
                     out.append("% 15.10f % 15.10f % 15.10f %15.10f" % (extchg[i,0],extchg[i,1],extchg[i,2],extchg[i,3]))
                 out.append('$end')
@@ -2382,7 +2556,9 @@ class Molecule(object):
                     if SectName == 'molecule':
                         if molecule_printed == False:
                             molecule_printed = True
-                            if self.na > 0:
+                            if read:
+                                out.append("read")
+                            elif self.na > 0:
                                 out.append("%i %i" % (self.charge, self.mult))
                                 an = 0
                                 for e, x in zip(self.elem, self.xyzs[I]):
@@ -2406,7 +2582,7 @@ class Molecule(object):
                 out.append('')
         return out
 
-    def write_xyz(self, select):
+    def write_xyz(self, select, **kwargs):
         self.require('elem','xyzs')
         out = []
         for I in select:
@@ -2417,7 +2593,7 @@ class Molecule(object):
                 out.append(format_xyz_coord(self.elem[i],xyz[i]))
         return out
 
-    def write_molproq(self, select):
+    def write_molproq(self, select, **kwargs):
         self.require('xyzs','partial_charge')
         out = []
         for I in select:
@@ -2429,7 +2605,7 @@ class Molecule(object):
                 out.append("% 15.10f % 15.10f % 15.10f % 15.10f   0" % (xyz[i,0],xyz[i,1],xyz[i,2],self.partial_charge[i]))
         return out
 
-    def write_mdcrd(self, select):
+    def write_mdcrd(self, select, **kwargs):
         self.require('xyzs')
         # In mdcrd files, there is only one comment line
         out = ['mdcrd file generated using ForceBalance'] 
@@ -2440,7 +2616,7 @@ class Molecule(object):
                 out.append(''.join(["%8.3f" % i for i in [self.boxes[I].a, self.boxes[I].b, self.boxes[I].c]]))
         return out
 
-    def write_arc(self, select):
+    def write_arc(self, select, **kwargs):
         self.require('elem','xyzs')
         out = []
         if 'tinkersuf' not in self.Data:
@@ -2455,7 +2631,7 @@ class Molecule(object):
                 out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.tinkersuf[i] if 'tinkersuf' in self.Data else ''))
         return out
 
-    def write_gro(self, select):
+    def write_gro(self, select, **kwargs):
         out = []
         if sys.stdin.isatty():
             self.require('elem','xyzs')
@@ -2490,7 +2666,7 @@ class Molecule(object):
             out.append(format_gro_box(self.boxes[I]))
         return out
 
-    def write_dcd(self, select):
+    def write_dcd(self, select, **kwargs):
         if _dcdlib.vmdplugin_init() != 0:
             raise IOError("Unable to init DCD plugin")
         natoms    = c_int(self.na)
@@ -2510,7 +2686,7 @@ class Molecule(object):
         _dcdlib.close_file_write(dcd)
         dcd = None
 
-    def write_pdb(self, select):
+    def write_pdb(self, select, **kwargs):
         """Save to a PDB. Copied wholesale from MSMBuilder.
         COLUMNS  TYPE   FIELD  DEFINITION
         ---------------------------------------------
@@ -2649,7 +2825,7 @@ class Molecule(object):
             out += connects
         return out
         
-    def write_qdata(self, select):
+    def write_qdata(self, select, **kwargs):
         """ Text quantum data format. """
         #self.require('xyzs','qm_energies','qm_forces')
         out = []

@@ -33,6 +33,7 @@ export PYTHONUNBUFFERED="y"
 unset OMP_NUM_THREADS
 unset MKL_NUM_THREADS
 time $COMMAND
+exitstat=$?
 # Delete backup files that are older than one week.
 find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD
@@ -41,3 +42,4 @@ cp * $BAK/$PWD
 rm -f npt_result.p.bz2
 bzip2 npt_result.p
 
+exit $exitstat

@@ -15,8 +15,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 """
 
 from select import select
-import os, sys, shutil
-from re import match, sub
+import os, sys, re, shutil, errno
 import numpy as np
 import itertools
 import threading
@@ -53,6 +52,10 @@ def pvec1d(vec1d, precision=1, format="e", loglevel=INFO):
     for i in range(v2a.shape[0]):
         logger.log(loglevel, "%% .%i%s " % (precision, format) % v2a[i])
     logger.log(loglevel, '\n')
+
+def astr(vec1d, precision=4):
+    """ Write an array to a string so we can use it to key a dictionary. """
+    return ' '.join([("%% .%ie " % (precision) % i) for i in vec1d])
 
 def pmat2d(mat2d, precision=1, format="e", loglevel=INFO):
     """Printout of a 2-D matrix.
@@ -123,7 +126,26 @@ def uncommadash(s):
     except:
         raise Exception('Invalid string for converting to list of numbers: %s' % s)
     return L
-            
+
+def extract_int(arr, avgthre, limthre, label="value", verbose=True):
+    """ Get the representative integer value from an array.
+    Sanity check: Make sure the value does not go through big excursions.
+    The integer value is the rounded value of the average.
+    thresh = A threshold to make sure we're not dealing with 
+    fluctuations that are too large. """
+    average = np.mean(arr)
+    maximum = np.max(arr)
+    minimum = np.min(arr)
+    rounded = round(average)
+    passed = True
+    if abs(average - rounded) > avgthre:
+        if verbose: print "Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre)
+        passed = False                                                                                        
+    if abs(maximum - minimum) > limthre:
+        if verbose: print "Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre)
+        passed = False
+    return int(rounded), passed
+
 #list(itertools.chain(*[range(*(int(w.split('-')[0])-1, int(w.split('-')[1]) if len(w.split('-')) == 2 else int(w.split('-')[0])))  for w in Mao.split(',')]))
 
 def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,center=True,sym2="="):
@@ -155,7 +177,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     @return bar The bottom bar is returned for the user to print later, e.g. to mark off a 'section'    
     """
     def newlen(l):
-        return len(sub("\x1b\[[0-9;]*m","",line))
+        return len(re.sub("\x1b\[[0-9;]*m","",line))
     text = text.split('\n')
     width = max(minwidth,max([newlen(line) for line in text]))
     bar = ''.join([sym2 for i in range(width + 6)])
@@ -221,7 +243,7 @@ def isint(word):
     @return answer Boolean which specifies whether the string is an integer (only +/- sign followed by digits)
     
     """
-    return match('^[-+]?[0-9]+$',word)
+    return re.match('^[-+]?[0-9]+$',word)
 
 def isfloat(word):
     """Matches ANY number; it can be a decimal, scientific notation, what have you
@@ -231,7 +253,7 @@ def isfloat(word):
     @return answer Boolean which specifies whether the string is any number
     
     """
-    return match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
+    return re.match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
 
 def isdecimal(word):
     """Matches things with a decimal only; see isint and isfloat.
@@ -284,6 +306,27 @@ def flat(vec):
     @return answer The flattened data
     """
     return np.array(vec).reshape(-1)
+
+def monotonic(arr, start, end):
+    # Make sure an array is monotonically decreasing from the start to the end.
+    a0 = arr[start]
+    i0 = start
+    if end > start:
+        i = start+1
+        while i < end:
+            if arr[i] < a0:
+                arr[i0:i+1] = np.linspace(a0, arr[i], i-i0+1)
+                a0 = arr[i]
+                i0 = i
+            i += 1
+    if end < start:
+        i = start-1
+        while i >= end:
+            if arr[i] < a0:
+                arr[i:i0+1] = np.linspace(arr[i], a0, i0-i+1)
+                a0 = arr[i]
+                i0 = i
+            i -= 1
 
 #====================================#
 #| Math: Vectors and linear algebra |#
@@ -590,7 +633,7 @@ def destroyWorkQueue():
     WORK_QUEUE = None
     WQIDS = defaultdict(list)
 
-def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
+def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
     """ 
     Submit a job to the Work Queue.
 
@@ -609,7 +652,8 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
         lf = os.path.join(cwd,f)
         task.specify_output_file(lf,f,cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-    task.specify_tag(command)
+    if tag == None: tag = command
+    task.specify_tag(tag)
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
@@ -618,7 +662,7 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
     else:
         WQIDS["None"].append(taskid)
     
-def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=True):
+def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
     """ 
     Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly
     specify where the input files come from, and where the output files go to.
@@ -639,7 +683,8 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
         # print f[0], f[1]
         task.specify_output_file(f[0],f[1],cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-    task.specify_tag(command)
+    if tag == None: tag = command
+    task.specify_tag(tag)
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
@@ -688,10 +733,11 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                     if task.id in WQIDS[tnm]:
                         WQIDS[tnm].remove(task.id)
                 del task
-        try:
-            # Full workers were added with CCTools 4.0.1
+        if hasattr(wq.stats, 'workers_full'):
+            # Full workers statistic was added with CCTools 4.0
+            # But deprecated with CCTools 4.1 (so if they're equal we don't add them.)
             nbusy = wq.stats.workers_busy + wq.stats.workers_full
-        except:
+        else:
             nbusy = wq.stats.workers_busy
 
         Complete = wq.stats.total_tasks_complete
@@ -705,9 +751,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
             logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
         else:
             logger.info("\r%s : %i/%i workers busy; %i/%i jobs complete\r" %\
-            (time.ctime(),
-             nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed),
-             Complete, Total)) 
+            (time.ctime(), nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed), Complete, Total))
             if time.time() - wq_wait1.t0 > 900:
                 wq_wait1.t0 = time.time()
                 logger.info('\n')
@@ -804,7 +848,7 @@ def MissingFileInspection(fnm):
     for key in specific_dct:
         if answer == "":
             answer += "\n"
-        if match(key, fnm):
+        if re.match(key, fnm):
             answer += "%s\n" % specific_dct[key]
     return answer
 
@@ -967,11 +1011,15 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             for fh in to_read:
                 if fh is p.stdout:
                     read = fh.read(rbytes)
-                    if not read: streams.remove(p.stdout)
+                    if not read: 
+                        streams.remove(p.stdout)
+                        p.stdout.close()
                     else: out_chunker.push(read)
                 elif fh is p.stderr:
                     read = fh.read(rbytes)
-                    if not read: streams.remove(p.stderr)
+                    if not read: 
+                        streams.remove(p.stderr)
+                        p.stderr.close()
                     else: err_chunker.push(read)
                 else:
                     raise RuntimeError

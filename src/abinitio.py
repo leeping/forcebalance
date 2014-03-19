@@ -100,11 +100,17 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'run_internal','run_internal')
         ## Whether we have virtual sites (set at the global option level)
         self.set_option(options,'have_vsite','have_vsite')
+        ## Attenuate the weights as a function of energy
+        self.set_option(tgt_opts,'attenuate','attenuate')
+        ## What is the energy denominator? (Valid for 'attenuate')
+        self.set_option(tgt_opts,'energy_denom','energy_denom')
+        ## Set upper cutoff energy
+        self.set_option(tgt_opts,'energy_upper','energy_upper')
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## WHAM Boltzmann weights
-        self.whamboltz_wts = []
+        self.boltz_wts = []
         ## QM Boltzmann weights
         self.qmboltz_wts   = []
         ## Reference (QM) energies
@@ -160,7 +166,7 @@ class AbInitio(Target):
         self.set_option(None, 'shots', val=self.ns)
 
     def build_invdist(self, mvals):
-        for i in range(self.FF.np):
+        for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:
                 if i in self.save_vmvals and mvals[i] != self.save_vmvals[i]:
                     self.new_vsites = True
@@ -182,7 +188,7 @@ class AbInitio(Target):
                 DistMat = np.array([[np.linalg.norm(i - j) for j in xyz] for i in esparr])
                 invdists.append(1. / (DistMat / bohrang))
                 sn += 1
-        for i in range(self.FF.np):
+        for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:
                 self.save_vmvals[i] = mvals[i]
         self.new_vsites = False
@@ -370,7 +376,9 @@ class AbInitio(Target):
             self.emd0 = np.array(self.emd0)
             self.emd0 -= np.mean(self.emd0)
         if self.whamboltz == True:
-            self.whamboltz_wts = np.array([float(i.strip()) for i in open(os.path.join(self.root,self.tgtdir,"wham-weights.txt")).readlines()])
+            if self.attenuate:
+                raise RuntimeError('whamboltz and attenuate are mutually exclusive')
+            self.boltz_wts = np.array([float(i.strip()) for i in open(os.path.join(self.root,self.tgtdir,"wham-weights.txt")).readlines()])
             #   This is a constant pre-multiplier in front of every snapshot.
             bar = printcool("Using WHAM MM Boltzmann weights.", color=4)
             if os.path.exists(os.path.join(self.root,self.tgtdir,"wham-master.txt")):
@@ -381,14 +389,29 @@ class AbInitio(Target):
                 for line in whaminfo:
                     sline = line.split()
                     genshots = int(sline[2])
-                    weight = np.sum(self.whamboltz_wts[shotcounter:shotcounter+genshots])/np.sum(self.whamboltz_wts)
+                    weight = np.sum(self.boltz_wts[shotcounter:shotcounter+genshots])/np.sum(self.boltz_wts)
                     logger.info(" %s, %i snapshots, weight %.3e\n" % (sline[0], genshots, weight))
                     shotcounter += genshots
             else:
                 logger.info("Oops... WHAM files don't exist?\n")
             logger.info(bar)
+        elif self.attenuate:
+            # Attenuate energies by an amount proportional to their
+            # value above the minimum.
+            eqm1 = self.eqm - np.min(self.eqm)
+            denom = self.energy_denom * 4.184 # kcal/mol to kJ/mol
+            upper = self.energy_upper * 4.184 # kcal/mol to kJ/mol
+            self.boltz_wts = np.ones(self.ns)
+            for i in range(self.ns):
+                if eqm1[i] > upper:
+                    self.boltz_wts[i] = 0.0
+                elif eqm1[i] < denom:
+                    self.boltz_wts[i] = 1.0 / denom
+                else:
+                    self.boltz_wts[i] = 1.0 / np.sqrt(denom**2 + (eqm1[i]-denom)**2)
         else:
-            self.whamboltz_wts = np.ones(self.ns)
+            self.boltz_wts = np.ones(self.ns)
+        
         if self.qmboltz > 0:
             # LPW I haven't revised this section yet
             # Do I need to?
@@ -665,7 +688,7 @@ class AbInitio(Target):
             if AGrad and self.all_at_once:
                 dM_all = np.zeros((NS,NP,NCP1))
                 ddM_all = np.zeros((NS,NP,NCP1))
-        QBN = np.dot(self.qmboltz_wts[:NS],self.whamboltz_wts[:NS])
+        QBN = np.dot(self.qmboltz_wts[:NS],self.boltz_wts[:NS])
         #==============================================================#
         #             STEP 2: Loop through the snapshots.              #
         #==============================================================#
@@ -677,15 +700,15 @@ class AbInitio(Target):
                     logger.debug("\r")
                     pvals = self.FF.make(mvals_)
                     return self.energy_force_transform()
-                for p in range(NP):
+                for p in self.pgrad:
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
         for i in range(NS):
             if i % 100 == 0:
                 logger.debug("\rIncrementing quantities for snapshot %i\r" % i)
             # Build Boltzmann weights and increment partition function.
-            P   = self.whamboltz_wts[i]
+            P   = self.boltz_wts[i]
             Z  += P
-            R   = self.qmboltz_wts[i]*self.whamboltz_wts[i] / QBN
+            R   = self.qmboltz_wts[i]*self.boltz_wts[i] / QBN
             Y  += R
             # Recall reference (QM) data
             Q[0] = self.eqm[i]
@@ -753,7 +776,7 @@ class AbInitio(Target):
             #   This is only implemented for the case without covariance.  #
             #==============================================================#
             if not cv:
-                for p in range(NP):
+                for p in self.pgrad:
                     if not AGrad: continue
                     if self.all_at_once:
                         M_p[p] = dM_all[i, p]
@@ -767,6 +790,7 @@ class AbInitio(Target):
                         M_p[p],M_pp[p] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
                     # The [0] indicates that we are fitting the RMS force and not the RMSD
                     # (without the covariance, subtracting a mean force doesn't make sense.)
+                    if all(M_p[p] == 0): continue
                     M0_M_p[p][0]  += P * M_p[p][0]
                     M0_Q_p[p][0]  += R * M_p[p][0]
                     #M0_M_pp[p][0] += P * M_pp[p][0]
@@ -784,6 +808,8 @@ class AbInitio(Target):
                     SPiXi_pq[p,p] += P * Xi_pq
                     SRiXi_pq[p,p] += R * Xi_pq
                     for q in range(p):
+                        if all(M_p[q] == 0): continue
+                        if q not in self.pgrad: continue
                         Xi_pq          = 2 * M_p[p] * M_p[q]
                         SPiXi_pq[p,q] += P * Xi_pq
                         SRiXi_pq[p,q] += R * Xi_pq
@@ -801,9 +827,11 @@ class AbInitio(Target):
         if self.writelevel > 1:
             np.savetxt('M.txt',M_all_print)
             np.savetxt('Q.txt',Q_all_print)
-        EnergyComparison = np.hstack((col(Q_all_print[:,0]),col(M_all_print[:,0])))
         if self.writelevel > 0:
+            EnergyComparison = np.hstack((col(Q_all_print[:,0]),col(M_all_print[:,0])))
             np.savetxt('QM-vs-MM-energies.txt',EnergyComparison)
+            WeightComparison = np.hstack((col(Q_all_print[:,0]),col(self.boltz_wts)))
+            np.savetxt('QM-vs-Wts.txt',WeightComparison)
         if self.force and self.writelevel > 1:
             # Write .xyz files which can be viewed in vmd.
             QMTraj = self.mol[:]
@@ -930,7 +958,7 @@ class AbInitio(Target):
         else:
             X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
             X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute)
-            for p in range(NP):
+            for p in self.pgrad:
                 if not AGrad: continue
                 X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1,subtract_mean = not self.absolute)
                 X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1,subtract_mean = not self.absolute)
@@ -938,6 +966,7 @@ class AbInitio(Target):
                 X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1,subtract_mean = not self.absolute)
                 X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1,subtract_mean = not self.absolute)
                 for q in range(p):
+                    if q not in self.pgrad: continue
                     X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1,subtract_mean = not self.absolute)
                     X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1,subtract_mean = not self.absolute)
                     # Get the other half of the Hessian matrix.
@@ -952,11 +981,11 @@ class AbInitio(Target):
             # Derivatives of the objective function
             G = np.zeros(NP)
             H = np.zeros((NP,NP))
-            for p in range(NP):
+            for p in self.pgrad:
                 if not AGrad: continue
                 G[p] = MBP * X2_M_p[p] + QBP * X2_Q_p[p]
                 if not AHess: continue
-                for q in range(NP):
+                for q in self.pgrad:
                     H[p,q] = MBP * X2_M_pq[p,q] + QBP * X2_Q_pq[p,q]
         # Energy error in kJ/mol
         if not self.absolute:
@@ -965,10 +994,19 @@ class AbInitio(Target):
         else:
             E0_M = 0.0
             E0_Q = 0.0
+
         if cv:
             dE     = MBP * np.sqrt(SPiXi[0,0]/Z + E0_M) + QBP * np.sqrt(SRiXi[0,0]/Y + E0_Q)
         else:
             dE     = MBP * np.sqrt(SPiXi[0]/Z + E0_M) + QBP * np.sqrt(SRiXi[0]/Y + E0_Q)
+
+        if self.writelevel > 0:
+            dE_print = (col(M_all_print[:,0]) - col(Q_all_print[:,0])) - (E0_M - E0_Q)
+            print dE_print.shape
+            print self.boltz_wts.shape
+            ErrsvsWts = np.hstack((dE_print, col(self.boltz_wts)))
+            np.savetxt('Errs-vs-Wts.txt',ErrsvsWts)
+
         # Fractional energy error.
         dEfrac = MBP * np.sqrt((SPiXi[0]/Z + E0_M) / (QQ_M[0]/Z - Q0_M[0]**2/Z/Z)) + QBP * np.sqrt((SRiXi[0]/Y + E0_Q) / (QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
         # Absolute and Fractional force error.
@@ -1041,7 +1079,7 @@ class AbInitio(Target):
             #     print "Now working on parameter number", i
             #     dqPdqM.append(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0])
             # dqPdqM = mat(dqPdqM).T
-            dqPdqM = np.matrix([f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] for i in range(NP)]).T
+            dqPdqM = np.matrix([(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] if i in self.pgrad else 0.0) for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)
         espxyz   = np.array(self.espxyz)
@@ -1050,7 +1088,7 @@ class AbInitio(Target):
         # Second derivative of the inverse distance matrix with respect to the virtual site position
         dddVdqPdVS2 = {}
         if AGrad:
-            for p in range(NP):
+            for p in self.pgrad:
                 if 'VSITE' in self.FF.plist[p]:
                     ddVdqPdVS[p], dddVdqPdVS2[p] = f12d3p(fdwrap(self.build_invdist,mvals,p), h = self.h, f0 = self.invdists)
         X = 0
@@ -1058,7 +1096,7 @@ class AbInitio(Target):
         G = np.zeros(NP)
         H = np.zeros((NP, NP))
         for i in range(self.ns):
-            P   = self.whamboltz_wts[i]
+            P   = self.boltz_wts[i]
             Z  += P
             dVdqP   = np.matrix(self.invdists[i])
             espqval = espqvals[i]

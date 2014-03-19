@@ -53,7 +53,13 @@ logger = getLogger(__name__)
 pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
          'ANGLE'        : {'Atom':[1,2,3], 4:'K',5:'B'},   # Angle force constant and equilibrium angle
+         'STRBND'       : {'Atom':[1,2,3], 4:'K1',5:'K2'}, # Two stretch-bend force constants (usually same)
+         'OPBEND'       : {'Atom':[1,2,3,4], 5:'K'},       # Out-of-plane bending force constant
          'UREYBRAD'     : {'Atom':[1,2,3], 4:'K',5:'B'},   # Urey-Bradley force constant and equilibrium distance (Angstrom)
+         'TORSION'      : ({'Atom':[1,2,3,4], 5:'1K', 6:'1B', 
+                            8:'2K', 9:'2B', 11:'3K', 12:'3B'}), # Torsional force constants and equilibrium phi-angles
+         'PITORS'       : {'Atom':[1,2], 3:'K'},           # Pi-torsion force constants (usually 6.85 ..)
+         # Note torsion-torsion (CMAP) not implemented at this time.
          'MCHARGE'      : {'Atom':[1,2,3], 4:''},          # Atomic charge
          'DIPOLE'       : {0:'X',1:'Y',2:'Z'},             # Dipole moment in local frame
          'QUADX'        : {0:'X'},                         # Quadrupole moment, X component
@@ -366,7 +372,7 @@ class TINKER(Engine):
                 for l in o:
                     logger.error("%s\n" % l)
                 time.sleep(1)
-                raise RuntimeError("TINKER may have crashed! (See above output)")
+                raise RuntimeError("TINKER may have crashed! (See above output)\nThe command was: %s\nThe directory was: %s" % (' '.join(csplit), os.getcwd()))
                 break
         for line in o:
             if 'D+' in line:
