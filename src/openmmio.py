@@ -985,8 +985,24 @@ class OpenMM(Engine):
             if iteration >= 0:
                 self.simulation.step(nsave)
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-            kinetic = state.getKineticEnergy()/self.tdiv
-            potential = state.getPotentialEnergy()
+#####
+            if self.tdiv>=2:
+                hbar=0.0635078*kilojoule*picosecond/mole
+                pimdstate=["?"]*self.tdiv
+                kinetic=0.0*kilojoule/mole
+                potential=0.0*kilojoule/mole
+                for i in range(self.tdiv):
+                    pimdstate[i]=integrator.getstate(i,getEnergy=True,getPositions=True,group=-1)
+                    potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv
+                    kinetic=kinetic+pimdstate[i].getKineticEnergy()/self.tdiv
+                for i in range(self.tdiv):
+                    ii=(i+1)%self.tdiv
+                    deltabead=np.array(pimdstate[i].getPositions())-np.array(pimdstate[ii].getPositions())
+                    kinetic=kinetic-((deltabead*deltabead).sum(axis=1))*np.array(getParticleMass(j) for j in range system.getNumParticles())*(kB**2*integrator.getTemperature()**2*self.tdiv)/(2.0*hbar**2)
+            else:
+                kinetic = state.getKineticEnergy()
+                potential = state.getPotentialEnergy()
+#####
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
