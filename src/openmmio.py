@@ -209,9 +209,16 @@ def CopyNonbondedParameters(src, dest):
     for i in range(src.getNumExceptions()):
         dest.setExceptionParameters(i,*src.getExceptionParameters(i))
 
-##def CopyCustomBondParameters(src, dest):
-##
-
+def CopyCustomBondParameters(src, dest):
+    dest.setEnergyFuncion(src.getEnergyFunction())
+    for i in range(getNumGlobalParameters()):
+        dest.setGlobalParameterName(i,*src.GlobalParameterName(i))
+    for i in range(getNumGlobalParameters()):
+        dest.setGlobalParameterDefaultValue(i,*src.getGlobalParameterDefaultValue(i))
+    for i in range(getNumPerBondParameters()):
+        dest.setPerBondParameterName(i,*src.getPerBondParameterName(i))
+    for i in range(getNumPerBondParameters()):
+        dest.setBondParameters(i,*src.getBondParameter(i))
 def do_nothing(src, dest):
     return
 
@@ -229,7 +236,7 @@ def CopySystemParameters(src,dest):
                'HarmonicAngleForce':CopyHarmonicAngleParameters,
                'PeriodicTorsionForce':CopyPeriodicTorsionParameters,
                'NonbondedForce':CopyNonbondedParameters,
-##               'CustomBondForce':CopyCustomBondParameters,
+               'CustomBondForce':CopyCustomBondParameters,
                'CMMotionRemover':do_nothing}
     for i in range(src.getNumForces()):
         nm = src.getForce(i).__class__.__name__
