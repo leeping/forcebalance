@@ -210,15 +210,15 @@ def CopyNonbondedParameters(src, dest):
         dest.setExceptionParameters(i,*src.getExceptionParameters(i))
 
 def CopyCustomBondParameters(src, dest):
-    dest.setEnergyFuncion(src.getEnergyFunction())
-    for i in range(getNumGlobalParameters()):
+    dest.setEnergyFunction(src.getEnergyFunction())
+    for i in range(src.getNumGlobalParameters()):
         dest.setGlobalParameterName(i,*src.GlobalParameterName(i))
-    for i in range(getNumGlobalParameters()):
+    for i in range(src.getNumGlobalParameters()):
         dest.setGlobalParameterDefaultValue(i,*src.getGlobalParameterDefaultValue(i))
-    for i in range(getNumPerBondParameters()):
+    for i in range(src.getNumPerBondParameters()):
         dest.setPerBondParameterName(i,*src.getPerBondParameterName(i))
-    for i in range(getNumPerBondParameters()):
-        dest.setBondParameters(i,*src.getBondParameter(i))
+    for i in range(src.getNumPerBondParameters()):
+        dest.setBondParameters(i,*src.getBondParameters(i))
 def do_nothing(src, dest):
     return
 
