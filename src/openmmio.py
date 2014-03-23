@@ -897,7 +897,7 @@ class OpenMM(Engine):
             logger.warning('Deleting the simulation object and re-creating for MD\n')
             delattr(self, 'simulation')
 
-        self.update_simulation(timestep=timestep, temperature=temperature, pressure=pressure, **kwargs)
+        self.update_simulation(timestep=timestep, temperature=temperature, pressure=pressure, anisotropic=anisotropic, **kwargs)
         self.set_positions()
 
         # Minimize the energy.
