@@ -584,7 +584,6 @@ class OpenMM(Engine):
         options pertinent to system setup, including the type of MD
         integrator and type of pressure control.
         """
-
         # Divisor for the temperature (RPMD sets it to nonzero.)
         self.tdiv = 1
 
@@ -598,10 +597,10 @@ class OpenMM(Engine):
                                                timestep*femtosecond, self.system, ninnersteps=int(timestep/faststep))
             else:
                 if len(rpmd_beads) > 0:
-                    self.tdiv = rpmd_beads[0]
+                    self.tdiv = int(rpmd_beads[0])
                     if len(rpmd_beads) == 1:
-                        logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads[0])
-                        integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                        logger.info("Creating RPMD integrator with %i beads.\n" % int(rpmd_beads[0]))
+                        integrator = RPMDIntegrator(int(rpmd_beads[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond)
                     elif len(rpmd_beads) == 2:
                         contract = False
                         for frc in self.system.getForces():
@@ -609,11 +608,11 @@ class OpenMM(Engine):
                                 contract = True
                                 frc.setForceGroup(1)
                         if contract:
-                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i).\n" % (rpmd_beads[0], rpmd_beads[1]))
-                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_beads[1]})
+                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i).\n" % (int(rpmd_beads[0]), int(rpmd_beads[1])))
+                            integrator = RPMDIntegrator(int(rpmd_beads[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:int(rpmd_beads[1])})
                         else:
-                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (rpmd_beads[0]))
-                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (int(rpmd_beads[0])))
+                            integrator = RPMDIntegrator(int(rpmd_beads[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond)
                     elif len(rpmd_beads) == 3:
                         contract = False
                         contract_recip = False
@@ -625,14 +624,14 @@ class OpenMM(Engine):
                                     contract_recip = True
                                     frc.setReciprocalSpaceForceGroup(2)
                         if contract_recip:
-                            logger.info("Creating RPMD integrator with %i beads (NB/Recip forces contracted to %i/%i).\n" % (rpmd_beads[0], rpmd_beads[1], rpmd_beads[2]))
-                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_beads[1], 2:rpmd_beads[2]})
+                            logger.info("Creating RPMD integrator with %i beads (NB/Recip forces contracted to %i/%i).\n" % (int(rpmd_beads[0]), int(rpmd_beads[1]), int(rpmd_beads[2])))
+                            integrator = RPMDIntegrator(int(rpmd_beads[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:int(rpmd_beads[1]), 2:int(rpmd_beads[2])})
                         elif contract:
-                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i, no Recip).\n" % (rpmd_beads[0], rpmd_beads[1]))
-                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_beads[1]})
+                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i, no Recip).\n" % (int(rpmd_beads[0]), int(rpmd_beads[1])))
+                            integrator = RPMDIntegrator(int(rpmd_beads[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:int(rpmd_beads[1])})
                         else:
-                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (rpmd_beads[0]))
-                            integrator = RPMDIntegrator(rpmd_beads[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (int(rpmd_beads[0])))
+                            integrator = RPMDIntegrator(int(rpmd_beads[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond)
                     else:
                         raise RuntimeError("Please provide a list of length 1, 2, or 3 to rpmd_beads")
                 else:
@@ -997,22 +996,22 @@ class OpenMM(Engine):
                 self.simulation.step(nsave)
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
 #####
-            if self.tdiv>=2:
-                hbar=0.0635078*kilojoule*picosecond/mole
-                pimdstate=["?"]*self.tdiv
-                kinetic=0.0*kilojoule/mole
-                potential=0.0*kilojoule/mole
-                for i in range(self.tdiv):
-                    pimdstate[i]=integrator.getstate(i,getEnergy=True,getPositions=True,group=-1)
-                    potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv
-                    kinetic=kinetic+pimdstate[i].getKineticEnergy()/self.tdiv
-                for i in range(self.tdiv):
-                    ii=(i+1)%self.tdiv
-                    deltabead=np.array(pimdstate[i].getPositions())-np.array(pimdstate[ii].getPositions())
-                    kinetic=kinetic-np.sum(((deltabead*deltabead).sum(axis=1))*np.array([getParticleMass(j) for j in range (system.getNumParticles())]))*(kB**2*integrator.getTemperature()**2*self.tdiv)/(2.0*hbar**2)
-            else:
-                kinetic = state.getKineticEnergy()
-                potential = state.getPotentialEnergy()
+#            if self.tdiv>=2:
+#                hbar=0.0635078*kilojoule*picosecond/mole
+#                pimdstate=["?"]*self.tdiv
+#                kinetic=0.0*kilojoule/mole
+#                potential=0.0*kilojoule/mole
+#                for i in range(self.tdiv):
+#                    pimdstate[i]=integrator.getstate(i,getEnergy=True,getPositions=True,group=-1)
+#                    potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv
+#                    kinetic=kinetic+pimdstate[i].getKineticEnergy()/self.tdiv
+#                for i in range(self.tdiv):
+#                    ii=(i+1)%self.tdiv
+#                    deltabead=np.array(pimdstate[i].getPositions())-np.array(pimdstate[ii].getPositions())
+#                    kinetic=kinetic-np.sum(((deltabead*deltabead).sum(axis=1))*np.array([getParticleMass(j) for j in range (system.getNumParticles())]))*(kB**2*integrator.getTemperature()**2*self.tdiv)/(2.0*hbar**2)
+#            else:
+            kinetic = state.getKineticEnergy()/self.tdiv
+            potential = state.getPotentialEnergy()
 #####Energy Estimator
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
