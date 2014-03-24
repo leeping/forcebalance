@@ -462,6 +462,7 @@ def parse_inputs(input_file=None):
                 if section in ["SIMULATION","TARGET"] and newsection in mainsections:
                     tgt_opts.append(this_tgt_opt)
                     this_tgt_opt = deepcopy(tgt_opts_defaults)
+                if newsection == "END": newsection = "NONE"
                 section = newsection
             elif section in ["OPTIONS","SIMULATION","TARGET"]:
                 ## Depending on which section we are in, we choose the correct type dictionary
@@ -505,6 +506,9 @@ def parse_inputs(input_file=None):
                     logger.error("Perhaps this option actually belongs in %s section?\n" \
                           % (section == "OPTIONS" and "a TARGET" or "the OPTIONS"))
                     raise RuntimeError
+            elif section == "NONE" and len(s) > 0:
+                logger.error("Encountered a non-comment line outside of a section\n")
+                raise RuntimeError
             elif section not in mainsections:
                 logger.error("Unrecognized section: %s\n" % section)
                 raise RuntimeError
