@@ -73,12 +73,12 @@ def get_multipoles(simulation,q=None,positions=None):
             # Get array of positions in nanometers.
             if positions == None:
                 positions = simulation.context.getState(getPositions=True).getPositions()
-            mass = np.array([simulation.context.getSystem().getParticleMass(i).value_in_unit(dalton) \
-                                 for i in range(simulation.context.getSystem().getNumParticles())])
+            mass = np.array([simulation.context.getSystem().getParticleMass(k).value_in_unit(dalton) \
+                                 for k in range(simulation.context.getSystem().getNumParticles())])
             x = np.array(positions.value_in_unit(nanometer))
             com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
             x -= com
-            xx, xy, xz, yy, yz, zz = (x[:,i]*x[:,j] for i, j in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
+            xx, xy, xz, yy, yz, zz = (x[:,k]*x[:,l] for k, l in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
             # Multiply charges by positions to get dipole moment.
             dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
             dx += dip[0]
@@ -105,7 +105,7 @@ def get_dipole(simulation,q=None,positions=None):
 def ResetVirtualSites(positions, system):
     """Given a set of OpenMM-compatible positions and a System object,
     compute the correct virtual site positions according to the System."""
-    if any([system.isVirtualSite(i) for i in range(system.getNumParticles())]):
+    if any([system.isVirtualSite(j) for j in range(system.getNumParticles())]):
         pos = positions.value_in_unit(nanometer)
         for i in range(system.getNumParticles()):
             if system.isVirtualSite(i):
@@ -442,6 +442,7 @@ class OpenMM(Engine):
             self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
             if self.verbose: logger.info("Setting OpenCL Precision to %s\n" % self.precision)
             self.platform.setPropertyDefaultValue("OpenCLPrecision", self.precision)
+        self.simkwargs = {}
 
     def readsrc(self, **kwargs):
 
@@ -633,9 +634,12 @@ class OpenMM(Engine):
         parameters in the existing simulation object.  This should be
         run when we write a new force field XML file.
         """
+        if len(kwargs) > 0:
+            self.simkwargs = kwargs
         self.forcefield = ForceField(self.ffxml)
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
+        # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
 
         #----
@@ -651,7 +655,7 @@ class OpenMM(Engine):
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
         else:
-            self.create_simulation(**kwargs)
+            self.create_simulation(**self.simkwargs)
 
     def set_positions(self, shot=0, traj=None):
         
@@ -691,7 +695,7 @@ class OpenMM(Engine):
         return mass
 
     def evaluate_one_(self, force=False, dipole=False):
-        # Perform a single point calculation on the current geometry.
+        # Perform a single point calculation on the current geometry.        
         State = self.simulation.context.getState(getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
@@ -729,6 +733,13 @@ class OpenMM(Engine):
             Energies.append(R1["Energy"])
             if force: Forces.append(R1["Force"])
             if dipole: Dipoles.append(R1["Dipole"])
+        # Redo the first snapshot because of strange OpenMM issue!!
+        for I in range(1):
+            self.set_positions(I)
+            R1 = self.evaluate_one_(force, dipole)
+            Energies[I] = R1["Energy"]
+            if force: Forces[I] = R1["Force"]
+            if dipole: Dipoles[I] = R1["Dipole"]
         # Compile it all into the dictionary object
         Result = OrderedDict()
         Result["Energy"] = np.array(Energies)
