@@ -817,13 +817,14 @@ class AbInitio(Target):
         # Dump energies and forces to disk.
         M_all_print = M_all.copy()
         if not self.absolute:
-            M_all_print[:,0] -= np.mean(M_all_print[:,0])
+            M_all_print[:,0] -= np.average(M_all_print[:,0], weights=self.boltz_wts)
         if self.force:
             Q_all_print = np.hstack((col(self.eqm),self.fref))
         else:
             Q_all_print = col(self.eqm)
         if not self.absolute:
-            Q_all_print[:,0] -= np.mean(Q_all_print[:,0])
+            QEtmp = np.array(Q_all_print[:,0]).flatten()
+            Q_all_print[:,0] -= np.average(QEtmp, weights=self.boltz_wts)
         if self.writelevel > 1:
             np.savetxt('M.txt',M_all_print)
             np.savetxt('Q.txt',Q_all_print)
@@ -1002,8 +1003,6 @@ class AbInitio(Target):
 
         if self.writelevel > 0:
             dE_print = (col(M_all_print[:,0]) - col(Q_all_print[:,0])) - (E0_M - E0_Q)
-            print dE_print.shape
-            print self.boltz_wts.shape
             ErrsvsWts = np.hstack((dE_print, col(self.boltz_wts)))
             np.savetxt('Errs-vs-Wts.txt',ErrsvsWts)
 

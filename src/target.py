@@ -118,6 +118,8 @@ class Target(forcebalance.BaseClass):
         ## Directory to read data from.
         self.set_option(tgt_opts, 'read', 'rd')
         if self.rd != None: self.rd = self.rd.strip("/")
+        ## Iteration where we turn on zero-gradient skipping.
+        self.set_option(options, 'zerograd')
         ## Dictionary of whether to call the derivatives.
         self.pgrad = range(forcefield.np)
 
@@ -219,6 +221,7 @@ class Target(forcebalance.BaseClass):
                 # Write parameter names corresponding to this parameter number.
                 for pid in self.FF.map:
                     if self.FF.map[pid] == i and pid not in zero_pids:
+                        logger.info("Adding %s to zero_pids in %s\n" % (i, self.name))
                         zero_pids.append(pid)
             # If a parameter number has a nonzero gradient, then the parameter
             # names associated with this parameter number are removed from the list.
@@ -226,6 +229,7 @@ class Target(forcebalance.BaseClass):
             if Ans['G'][i] != 0.0:
                 for pid in self.FF.map:
                     if self.FF.map[pid] == i and pid in zero_pids:
+                        logger.info("Removing %s from zero_pids in %s\n" % (i, self.name))
                         zero_pids.remove(pid)
         if len(zero_pids) > 0:
             fout = open(zero_prm, 'w')
@@ -557,7 +561,9 @@ class Target(forcebalance.BaseClass):
         if not in_fd_srch():
             np.savetxt('mvals.txt', mvals)
         ## Read in file that specifies which derivatives may be skipped.
-        self.read_0grads()
+        if Counter() == self.zerograd: 
+            logger.info("Deactivating zero-gradient parameters in %s" % (self.name))
+            self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
         if self.rd == None or Counter() > First(): self.submit_jobs(mvals, AGrad, AHess)
