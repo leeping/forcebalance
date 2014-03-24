@@ -119,7 +119,7 @@ class Target(forcebalance.BaseClass):
         self.set_option(tgt_opts, 'read', 'rd')
         if self.rd != None: self.rd = self.rd.strip("/")
         ## Iteration where we turn on zero-gradient skipping.
-        self.set_option(options, 'zerograd')
+        self.set_option(options, 'zerograd', forceprint=True)
         ## Dictionary of whether to call the derivatives.
         self.pgrad = range(forcefield.np)
         self.OptionDict['pgrad'] = self.pgrad
@@ -563,7 +563,7 @@ class Target(forcebalance.BaseClass):
             np.savetxt('mvals.txt', mvals)
         ## Read in file that specifies which derivatives may be skipped.
         if Counter() == self.zerograd: 
-            logger.info("Deactivating zero-gradient parameters in %s" % (self.name))
+            logger.info("Deactivating zero-gradient parameters in %s\n" % (self.name))
             self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
