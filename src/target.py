@@ -122,6 +122,7 @@ class Target(forcebalance.BaseClass):
         self.set_option(options, 'zerograd')
         ## Dictionary of whether to call the derivatives.
         self.pgrad = range(forcefield.np)
+        self.OptionDict['pgrad'] = self.pgrad
 
         #======================================#
         #     Variables which are set here     #
