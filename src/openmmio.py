@@ -526,9 +526,8 @@ class OpenMM(Engine):
                 self.mmopts.setdefault('pmeGridDimensions', [24,24,24])
             else:
                 self.mmopts.setdefault('nonbondedCutoff', 0.85*nanometer)
-                # self.mmopts.setdefault('useSwitchingFunction', True)
-                # self.mmopts.setdefault('switchingDistance', 0.75*nanometer)
-                self.mmopts.setdefault('useSwitchingFunction', False)
+                self.mmopts.setdefault('useSwitchingFunction', True)
+                self.mmopts.setdefault('switchingDistance', 0.75*nanometer)
             self.mmopts.setdefault('useDispersionCorrection', True)
         else:
             self.mmopts.setdefault('nonbondedMethod', NoCutoff)
@@ -676,9 +675,10 @@ class OpenMM(Engine):
         # else:
         #     simulation.context.computeVirtualSites()
         #----
-        self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
+        # NOTE: Periodic box vectors must be set FIRST
         if self.pbc:
             self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+        self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
