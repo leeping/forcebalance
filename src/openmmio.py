@@ -102,6 +102,57 @@ def get_dipole(simulation,q=None,positions=None):
     Note that this quantity is meaningless if the system carries a net charge."""
     return get_multipoles(simulation, q=q, positions=positions)[:3]
 
+def PrepareVirtualSites(system):
+    """ Prepare a list of function wrappers and vsite parameters from the system. """
+    vsfuncs = []
+    isvsite = []
+    vsidxs = []
+    vswts = []
+    for i in range(system.getNumParticles()):
+        if system.isVirtualSite(i):
+            isvsite.append(1)
+            vs = system.getVirtualSite(i)
+            if isinstance(vs, TwoParticleAverageSite):
+                vsidx = [_openmm.VirtualSite_getParticle(vs, 0), _openmm.VirtualSite_getParticle(vs, 1)]
+                vswt = [_openmm.TwoParticleAverageSite_getWeight(vs, 0), _openmm.TwoParticleAverageSite_getWeight(vs, 1)]
+                def f(pos, idx_, wt_):
+                    return wt_[0]*pos[idx_[0]] + wt_[1]*pos[idx_[1]]
+            elif isinstance(vs, ThreeParticleAverageSite):
+                vsidx = [_openmm.VirtualSite_getParticle(vs, 0), _openmm.VirtualSite_getParticle(vs, 1), _openmm.VirtualSite_getParticle(vs, 2)]
+                vswt = [_openmm.ThreeParticleAverageSite_getWeight(vs, 0), _openmm.ThreeParticleAverageSite_getWeight(vs, 1), _openmm.ThreeParticleAverageSite_getWeight(vs, 2)]
+                def f(pos, idx_, wt_):
+                    return wt_[0]*pos[idx_[0]] + wt_[1]*pos[idx_[1]] + wt_[2]*pos[idx_[2]]
+            elif isinstance(vs, OutOfPlaneSite):
+                vsidx = [_openmm.VirtualSite_getParticle(vs, 0), _openmm.VirtualSite_getParticle(vs, 1), _openmm.VirtualSite_getParticle(vs, 2)]
+                vswt = [_openmm.OutOfPlaneSite_getWeight12(vs), _openmm.OutOfPlaneSite_getWeight13(vs), _openmm.OutOfPlaneSite_getWeightCross(vs)]
+                def f(pos, idx_, wt_):
+                    v1 = pos[idx_[1]] - pos[idx_[0]]
+                    v2 = pos[idx_[2]] - pos[idx_[0]]
+                    cross = np.array([v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0]])
+                    return pos[idx_[0]] + wt_[0]*v1 + wt_[1]*v2 + wt_[2]*cross
+        else:
+            isvsite.append(0)
+            vswt = None
+            vsidx = None
+            f = None
+        vsfuncs.append(deepcopy(f))
+        vsidxs.append(vsidx)
+        vswts.append(vswt)
+    return vsfuncs, isvsite, vsidxs, vswts
+
+def ResetVirtualSites_fast(positions, vsfuncs, isvsite, vsidxs, vswts):
+    """Given a set of OpenMM-compatible positions and a System object,
+    compute the correct virtual site positions according to the System."""
+    if any(isvsite):
+        pos = np.array(positions.value_in_unit(nanometer))
+        for i in range(len(positions)):
+            if isvsite[i]:
+                pos[i] = vsfuncs[i](pos, vsidxs[i], vswts[i])
+        newpos = [Vec3(*i) for i in pos]*nanometer
+        return newpos
+    else:
+        return positions
+
 def ResetVirtualSites(positions, system):
     """Given a set of OpenMM-compatible positions and a System object,
     compute the correct virtual site positions according to the System."""
@@ -640,6 +691,7 @@ class OpenMM(Engine):
         self.mod.addExtraParticles(self.forcefield)
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
+        self.vsfuncs, self.isvsite, self.vsidxs, self.vswts = PrepareVirtualSites(self.system)
 
         #----
         # If the virtual site parameters have changed,
@@ -677,7 +729,8 @@ class OpenMM(Engine):
         # NOTE: Periodic box vectors must be set FIRST
         if self.pbc:
             self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
-        self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
+        # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
+        self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsfuncs, self.isvsite, self.vsidx, self.vswts))
 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
@@ -792,7 +845,8 @@ class OpenMM(Engine):
         # Set geometry in OpenMM, requires some hoops.
         mod = Modeller(self.pdb.topology, [Vec3(i[0],i[1],i[2]) for i in X1]*angstrom)
         mod.addExtraParticles(self.forcefield)
-        self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
+        # self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
+        self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsfuncs, self.isvsite, self.vsidx, self.vswts))
         return E, M.ref_rmsd(0)[1]
 
     def multipole_moments(self, shot=0, optimize=True, polarizability=False):
