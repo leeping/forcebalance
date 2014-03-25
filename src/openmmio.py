@@ -731,7 +731,7 @@ class OpenMM(Engine):
         if self.pbc:
             self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
-        self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo)
+        self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
@@ -847,7 +847,7 @@ class OpenMM(Engine):
         mod = Modeller(self.pdb.topology, [Vec3(i[0],i[1],i[2]) for i in X1]*angstrom)
         mod.addExtraParticles(self.forcefield)
         # self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
-        self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo)
+        self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
         return E, M.ref_rmsd(0)[1]
 
     def multipole_moments(self, shot=0, optimize=True, polarizability=False):
