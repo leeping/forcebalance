@@ -765,6 +765,13 @@ def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
 #=====================================#
 #| File and process management stuff |#
 #=====================================#
+def click():
+    """ Stopwatch function for timing. """
+    ans = time.time() - click.t0
+    click.t0 = time.time()
+    return ans
+click.t0 = time.time()
+
 # Back up a file.
 def bak(path, dest=None):
     oldf = path
