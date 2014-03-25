@@ -737,7 +737,9 @@ class OpenMM(Engine):
         if self.pbc:
             self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
-        self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
+        # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
+        self.simulation.context.setPositions(self.xyz_omms[shot][0])
+        self.simulation.context.computeVirtualSites()
 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
