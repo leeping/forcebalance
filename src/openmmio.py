@@ -106,27 +106,26 @@ def ResetVirtualSites(positions, system):
     """Given a set of OpenMM-compatible positions and a System object,
     compute the correct virtual site positions according to the System."""
     if any([system.isVirtualSite(j) for j in range(system.getNumParticles())]):
-        pos = positions.value_in_unit(nanometer)
+        pos = np.array(positions.value_in_unit(nanometer))
         for i in range(system.getNumParticles()):
             if system.isVirtualSite(i):
                 vs = system.getVirtualSite(i)
-                vstype = vs.__class__.__name__
                 # Faster code to work around Python API slowness.
-                if vstype == 'TwoParticleAverageSite':
+                if isinstance(vs, TwoParticleAverageSite):
                     vspos = _openmm.TwoParticleAverageSite_getWeight(vs, 0)*pos[_openmm.VirtualSite_getParticle(vs, 0)] \
                         + _openmm.TwoParticleAverageSite_getWeight(vs, 1)*pos[_openmm.VirtualSite_getParticle(vs, 1)]
-                elif vstype == 'ThreeParticleAverageSite':
+                elif isinstance(vs, ThreeParticleAverageSite):
                     vspos = _openmm.ThreeParticleAverageSite_getWeight(vs, 0)*pos[_openmm.VirtualSite_getParticle(vs, 0)] \
                         + _openmm.ThreeParticleAverageSite_getWeight(vs, 1)*pos[_openmm.VirtualSite_getParticle(vs, 1)] \
                         + _openmm.ThreeParticleAverageSite_getWeight(vs, 2)*pos[_openmm.VirtualSite_getParticle(vs, 2)]
-                elif vstype == 'OutOfPlaneSite':
+                elif isinstance(vs, OutOfPlaneSite):
                     v1 = pos[_openmm.VirtualSite_getParticle(vs, 1)] - pos[_openmm.VirtualSite_getParticle(vs, 0)]
                     v2 = pos[_openmm.VirtualSite_getParticle(vs, 2)] - pos[_openmm.VirtualSite_getParticle(vs, 0)]
                     cross = Vec3(v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0])
                     vspos = pos[_openmm.VirtualSite_getParticle(vs, 0)] + _openmm.OutOfPlaneSite_getWeight12(vs)*v1 \
                         + _openmm.OutOfPlaneSite_getWeight13(vs)*v2 + _openmm.OutOfPlaneSite_getWeightCross(vs)*cross
                 pos[i] = vspos
-        newpos = pos*nanometer
+        newpos = [Vec3(*i) for i in pos]*nanometer
         return newpos
     else: return positions
 

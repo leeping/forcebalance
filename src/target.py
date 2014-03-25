@@ -119,7 +119,7 @@ class Target(forcebalance.BaseClass):
         self.set_option(tgt_opts, 'read', 'rd')
         if self.rd != None: self.rd = self.rd.strip("/")
         ## Iteration where we turn on zero-gradient skipping.
-        self.set_option(options, 'zerograd', forceprint=True)
+        self.set_option(options, 'zerograd')
         ## Dictionary of whether to call the derivatives.
         self.pgrad = range(forcefield.np)
         self.OptionDict['pgrad'] = self.pgrad
