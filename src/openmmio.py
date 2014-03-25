@@ -734,13 +734,6 @@ class OpenMM(Engine):
             Energies.append(R1["Energy"])
             if force: Forces.append(R1["Force"])
             if dipole: Dipoles.append(R1["Dipole"])
-        # Redo the first snapshot because of strange OpenMM issue!!
-        for I in range(1):
-            self.set_positions(I)
-            R1 = self.evaluate_one_(force, dipole)
-            Energies[I] = R1["Energy"]
-            if force: Forces[I] = R1["Force"]
-            if dipole: Dipoles[I] = R1["Dipole"]
         # Compile it all into the dictionary object
         Result = OrderedDict()
         Result["Energy"] = np.array(Energies)
