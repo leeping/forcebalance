@@ -42,7 +42,7 @@ def energy_components(Sim, verbose=False):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
 
-def get_multipoles(simulation,q=None,positions=None):
+def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     """Return the current multipole moments in Debye and Buckingham units. """
     dx = 0.0
     dy = 0.0
@@ -55,7 +55,7 @@ def get_multipoles(simulation,q=None,positions=None):
     qzz = 0.0
     enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
     for i in simulation.system.getForces():
-        if i.__class__.__name__ == "AmoebaMultipoleForce":
+        if isinstance(i, AmoebaMultipoleForce):
             mm = i.getSystemMultipoleMoments(simulation.context)
             dx += mm[1]
             dy += mm[2]
@@ -66,18 +66,20 @@ def get_multipoles(simulation,q=None,positions=None):
             qyy += mm[8]
             qyz += mm[9]
             qzz += mm[12]
-        if i.__class__.__name__ == "NonbondedForce":
+        if isinstance(i, NonbondedForce):
             # Get array of charges.
             if q == None:
                 q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
             # Get array of positions in nanometers.
             if positions == None:
                 positions = simulation.context.getState(getPositions=True).getPositions()
-            mass = np.array([simulation.context.getSystem().getParticleMass(k).value_in_unit(dalton) \
-                                 for k in range(simulation.context.getSystem().getNumParticles())])
+            if mass == None:
+                mass = np.array([simulation.context.getSystem().getParticleMass(k).value_in_unit(dalton) \
+                                     for k in range(simulation.context.getSystem().getNumParticles())])
             x = np.array(positions.value_in_unit(nanometer))
-            com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
-            x -= com
+            if rmcom:
+                com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
+                x -= com
             xx, xy, xz, yy, yz, zz = (x[:,k]*x[:,l] for k, l in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
             # Multiply charges by positions to get dipole moment.
             dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
@@ -97,10 +99,10 @@ def get_multipoles(simulation,q=None,positions=None):
     # This ordering has to do with the way TINKER prints it out.
     return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
 
-def get_dipole(simulation,q=None,positions=None):
+def get_dipole(simulation,q=None,mass=None,positions=None):
     """Return the current dipole moment in Debye.
     Note that this quantity is meaningless if the system carries a net charge."""
-    return get_multipoles(simulation, q=q, positions=positions)[:3]
+    return get_multipoles(simulation, q=q, mass=mass, positions=positions, rmcom=False)[:3]
 
 def PrepareVirtualSites(system):
     """ Prepare a list of function wrappers and vsite parameters from the system. """
@@ -693,6 +695,10 @@ class OpenMM(Engine):
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
+        self.nbcharges = np.zeros(self.system.getNumParticles())
+        for i in self.system.getForces():
+            if isinstance(i, NonbondedForce):
+                self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
 
         #----
         # If the virtual site parameters have changed,
@@ -750,14 +756,14 @@ class OpenMM(Engine):
 
     def evaluate_one_(self, force=False, dipole=False):
         # Perform a single point calculation on the current geometry.        
-        State = self.simulation.context.getState(getEnergy=True, getForces=force)
+        State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
         if force: 
             Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
             Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
-        if dipole: Result["Dipole"] = get_dipole(self.simulation)
+        if dipole: Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
         return Result
 
     def evaluate_(self, force=False, dipole=False, traj=False):
