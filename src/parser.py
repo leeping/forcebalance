@@ -84,6 +84,7 @@ gen_opts_types = {
                  "objective_history"  : (2, 20, 'Number of good optimization steps to average over when checking the objective convergence criterion', 'Main Optimizer (jobtype "newton")'),
                  "wq_port"   : (0, 0, 'The port number to use for Work Queue', 'Targets that use Work Queue (advanced usage)'),
                  "criteria"   : (1, 160, 'The number of convergence criteria that must be met for main optimizer to converge', 'Main Optimizer'),
+                 "zerograd"         : (-1, 0, 'Set to a nonnegative number to turn on zero gradient skipping at that optimization step.', 'All'),
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
@@ -461,6 +462,7 @@ def parse_inputs(input_file=None):
                 if section in ["SIMULATION","TARGET"] and newsection in mainsections:
                     tgt_opts.append(this_tgt_opt)
                     this_tgt_opt = deepcopy(tgt_opts_defaults)
+                if newsection == "END": newsection = "NONE"
                 section = newsection
             elif section in ["OPTIONS","SIMULATION","TARGET"]:
                 ## Depending on which section we are in, we choose the correct type dictionary
@@ -504,6 +506,9 @@ def parse_inputs(input_file=None):
                     logger.error("Perhaps this option actually belongs in %s section?\n" \
                           % (section == "OPTIONS" and "a TARGET" or "the OPTIONS"))
                     raise RuntimeError
+            elif section == "NONE" and len(s) > 0:
+                logger.error("Encountered a non-comment line outside of a section\n")
+                raise RuntimeError
             elif section not in mainsections:
                 logger.error("Unrecognized section: %s\n" % section)
                 raise RuntimeError
