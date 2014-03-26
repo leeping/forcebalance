@@ -166,6 +166,7 @@ tgt_opts_types = {
                  "liquid_eq_steps"    : (1000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),
                  "lipid_md_steps"     : (10000, 0, 'Number of time steps for the lipid production run.', 'Condensed phase property targets', 'lipid'),
                  "lipid_eq_steps"     : (1000, 0, 'Number of time steps for the lipid equilibration run.', 'Condensed phase property targets', 'lipid'),
+                 "n_mcbarostat"       : (25, 0, 'Number of steps in the liquid simulation between MC barostat volume adjustments.', 'Liquid properties in OpenMM', 'Liquid_OpenMM'),
                  "gas_md_steps"       : (100000, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "gas_eq_steps"       : (10000, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "writelevel"         : (0, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
