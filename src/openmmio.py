@@ -1066,16 +1066,18 @@ class OpenMM(Engine):
             if self.tdiv>=2:
                 hbar=0.0635078*kilojoule*picosecond/mole
                 pimdstate=["?"]*self.tdiv
+                centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*system.getNumParticles())
                 kinetic=0.0*kilojoule/mole
                 potential=0.0*kilojoule/mole
                 for i in range(self.tdiv):
                     pimdstate[i]=integrator.getstate(i,getEnergy=True,getPositions=True,group=-1)
+                    centroid=centroid+np.array(pimdstate[i].getPositions())/self.tdiv
                     potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv
-                    kinetic=kinetic+pimdstate[i].getKineticEnergy()/self.tdiv
+                    kinetic=kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)
                 for i in range(self.tdiv):
-                    ii=(i+1)%self.tdiv
-                    deltabead=np.array(pimdstate[i].getPositions())-np.array(pimdstate[ii].getPositions())
-                    kinetic=kinetic-np.sum(((deltabead*deltabead).sum(axis=1))*np.array([getParticleMass(j) for j in range (system.getNumParticles())]))*(kB**2*integrator.getTemperature()**2*self.tdiv)/(2.0*hbar**2)
+                    dif=np.array(pimdstate[i].getPositions())-centroid
+                    der=-1.0*np.array(pimdstates[i].getForces())
+                    kinetic=kinetic+np.sum((dif*der).sum(axis=1))*0.5/self.tdiv 
             else:
                 kinetic = state.getKineticEnergy()/self.tdiv
                 potential = state.getPotentialEnergy()
