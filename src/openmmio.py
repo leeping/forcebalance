@@ -1112,6 +1112,8 @@ class Liquid_OpenMM(Liquid):
         self.set_option(tgt_opts,'liquid_coords',default='liquid.pdb',forceprint=True)
         # Name of the gas coordinate file.
         self.set_option(tgt_opts,'gas_coords',default='gas.pdb',forceprint=True)
+        # Set the number of steps between MC barostat adjustments.
+        self.set_option(tgt_opts,'mc_nbarostat')
         # Class for creating engine object.
         self.engine_ = OpenMM
         # Name of the engine to pass to npt.py.

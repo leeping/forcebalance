@@ -314,6 +314,7 @@ def main():
     mts = TgtOptions.get('mts_integrator', 0)
     rpmd_beads = TgtOptions.get('rpmd_beads', 0)
     force_cuda = TgtOptions.get('force_cuda', 0)
+    nbarostat = TgtOptions.get('n_mcbarostat', 25)
     anisotropic = TgtOptions.get('anisotropic_box', 0)
     minimize = TgtOptions.get('minimize_energy', 1)
 
@@ -389,7 +390,7 @@ def main():
                                     ("nequil", liquid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
                                     ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
-                                    ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", 10),
+                                    ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", nbarostat),
                                     ("mts", mts), ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
