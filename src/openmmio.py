@@ -696,7 +696,6 @@ class OpenMM(Engine):
                 raise RuntimeError("No RPMD integrator without temperature control.")
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
-
         ## Add the barostat.
         if pressure != None:
             if anisotropic:
@@ -717,13 +716,11 @@ class OpenMM(Engine):
 
         ## Finally create the simulation object.
         self.simulation = Simulation(self.mod.topology, self.system, integrator, self.platform)
-        
         ## Print platform properties.
         # logger.info("I'm using the platform %s\n" % self.simulation.context.getPlatform().getName())
         # printcool_dictionary({i:self.simulation.context.getPlatform().getPropertyValue(self.simulation.context,i) \
         #                           for i in self.simulation.context.getPlatform().getPropertyNames()}, \
         #                          title="Platform %s has properties:" % self.simulation.context.getPlatform().getName())
-
     def update_simulation(self, **kwargs):
 
         """ 
@@ -758,7 +755,6 @@ class OpenMM(Engine):
             UpdateSimulationParameters(self.system, self.simulation)
         else:
             self.create_simulation(**self.simkwargs)
-
     def set_positions(self, shot=0, traj=None):
         
         """
@@ -784,7 +780,6 @@ class OpenMM(Engine):
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
         self.simulation.context.setPositions(self.xyz_omms[shot][0])
         self.simulation.context.computeVirtualSites()
-
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
         [a,b,c] = box_vectors
@@ -972,7 +967,6 @@ class OpenMM(Engine):
         B = self.B.energy()
 
         return (D - A - B) / 4.184
-
     def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, save_traj=False, verbose=False, **kwargs):
         
         """
@@ -1034,7 +1028,6 @@ class OpenMM(Engine):
         # Determine number of degrees of freedom.
         self.ndof = 3*(self.system.getNumParticles() - sum([self.system.isVirtualSite(i) for i in range(self.system.getNumParticles())])) \
             - self.system.getNumConstraints() - 3*self.pbc
-
         # Initialize statistics.
         edecomp = OrderedDict()
         # Stored coordinates, box vectors
@@ -1065,21 +1058,22 @@ class OpenMM(Engine):
 #####Energy estimator
             if self.tdiv>=2:
                 hbar=0.0635078*kilojoule*picosecond/mole
-                pimdstate=["?"]*self.tdiv
-                centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*system.getNumParticles())
+                pimdstate=[]
+                centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*self.system.getNumParticles())
                 kinetic=0.0*kilojoule/mole
                 potential=0.0*kilojoule/mole
+                integrator=self.simulation.context.getIntegrator()
                 for i in range(self.tdiv):
-                    pimdstate[i]=integrator.getstate(i,getEnergy=True,getPositions=True,group=-1)
+                    pimdstate.append(integrator.getState(i,getEnergy=True,getPositions=True,getForces=True,groups=-1))
                     centroid=centroid+np.array(pimdstate[i].getPositions())/self.tdiv
                     potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv
                     kinetic=kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)
                 for i in range(self.tdiv):
                     dif=np.array(pimdstate[i].getPositions())-centroid
-                    der=-1.0*np.array(pimdstates[i].getForces())
+                    der=-1.0*np.array(pimdstate[i].getForces())
                     kinetic=kinetic+np.sum((dif*der).sum(axis=1))*0.5/self.tdiv 
             else:
-                kinetic = state.getKineticEnergy()/self.tdiv
+                kinetic = state.getKineticEnergy()
                 potential = state.getPotentialEnergy()
 #####
             if self.pbc:
@@ -1111,8 +1105,27 @@ class OpenMM(Engine):
             if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-            kinetic = state.getKineticEnergy()/self.tdiv
-            potential = state.getPotentialEnergy()
+#####RPMD Energy estimator
+            if self.tdiv>=2:
+                hbar=0.0635078*kilojoule*picosecond/mole
+                pimdstate=[]
+                centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*self.system.getNumParticles())
+                kinetic=0.0*kilojoule/mole
+                potential=0.0*kilojoule/mole
+                integrator=self.simulation.context.getIntegrator()
+                for i in range(self.tdiv):
+                    pimdstate.append(integrator.getState(i,getEnergy=True,getPositions=True,getForces=True,groups=-1))
+                    centroid=centroid+np.array(pimdstate[i].getPositions())/self.tdiv
+                    potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv
+                    kinetic=kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)
+                for i in range(self.tdiv):
+                    dif=np.array(pimdstate[i].getPositions())-centroid
+                    der=-1.0*np.array(pimdstate[i].getForces())
+                    kinetic=kinetic+np.sum((dif*der).sum(axis=1))*0.5/self.tdiv
+            else:
+                kinetic = state.getKineticEnergy()
+                potential = state.getPotentialEnergy()
+#####
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
