@@ -460,7 +460,7 @@ class Target(forcebalance.BaseClass):
                 os.chdir(os.path.join(self.root, self.rundir))
                 # If indicate.log already exists then we've made some kind of mistake.
                 if os.path.exists('indicate.log'):
-                    raise RuntimeError('indicate.log should not exist yet in this directory: %s' % os.getcwd())
+                    logger.warn('A bit surprised that indicate.log exists in this directory: %s' % os.getcwd())
                 # Add a handler for printing to screen and file
                 logger = getLogger("forcebalance")
                 hdlr = forcebalance.output.RawFileHandler('indicate.log')
