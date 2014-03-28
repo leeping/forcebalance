@@ -131,6 +131,7 @@ class Liquid(Target):
             self.gas_engine = self.engine_(target=self, mol=self.gas_mol, name="selfpol", **self.gas_engine_args)
         # Don't read indicate.log when calling meta_indicate()
         self.read_indicate = False
+        self.write_indicate = False
         # Don't read objective.p when calling meta_get()
         # self.read_objective = False
         #======================================#
