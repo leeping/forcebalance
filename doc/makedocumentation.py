@@ -126,6 +126,10 @@ def build(interactive=False, upstream=False):
         print "\n# Switch back to master branch"
         display("git checkout master")
         os.system('git checkout master')
+        display("git checkout gh-pages ForceBalance-Manual.pdf")
+        os.system('git checkout gh-pages ForceBalance-Manual.pdf')
+        display("git checkout gh-pages ForceBalance-API.pdf")
+        os.system('git checkout gh-pages ForceBalance-API.pdf')
         
         if upstream:
             print "\n# Remove local copy of successfully pushed documentation branch"
