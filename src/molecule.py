@@ -312,6 +312,7 @@ def BuildLatticeFromVectors(v1, v2, v3):
 #|  Good for doing simple  |#
 #|     topology tricks     |#
 #===========================#
+have_contact = 0
 try:
     import networkx as nx
     class MyG(nx.Graph):
@@ -348,6 +349,7 @@ try:
             return np.array([coors[i] for i in self.L()])
     try:
         import contact
+        have_contact = 1
     except:
         warn("'contact' cannot be imported (topology tools will be slow.)")
 except:
@@ -1309,7 +1311,6 @@ class Molecule(object):
             zgrd = np.arange(zmin, zmax, gszz)
             # 2) Grid cells are denoted by a three-index tuple.
             gidx = list(itertools.product(range(len(xgrd)), range(len(ygrd)), range(len(zgrd))))
-            # print gidx
             # 3) Build a dictionary which maps a grid cell to itself plus its neighboring grid cells.
             # Two grid cells are defined to be neighbors if the differences between their x, y, z indices are at most 1.
             gngh = OrderedDict()
@@ -2073,6 +2074,7 @@ class Molecule(object):
         readsuf              = True
         suffix               = [] # The suffix, which comes after every atom line in the $molecule section, is for determining the MM atom type and topology.
         ghost                = [] # If the element in the $molecule section is preceded by an '@' sign, it's a ghost atom for counterpoise calculations.
+        infsm                = False
 
         for line in open(fnm).readlines():
             line = line.strip().expandtabs()
@@ -2105,7 +2107,9 @@ class Molecule(object):
                     inside_section = True
             elif inside_section:
                 if section == 'molecule' and not zmatrix:
-                    if len(dline) >= 4 and all([isfloat(dline[i]) for i in range(1,4)]):
+                    if line.startswith("*"):
+                        infsm = True
+                    if (not infsm) and (len(dline) >= 4 and all([isfloat(dline[i]) for i in range(1,4)])):
                         if fff:
                             reading_template = False
                             template_cut = list(i for i, dat in enumerate(template) if dat[0] == '@@@@')[-1]
@@ -2404,7 +2408,7 @@ class Molecule(object):
             if "MAXIMUM OPTIMIZATION CYCLES REACHED" in line:
                 IRCData[IRCDir]['stat'] = 1
             # Output file indicates whether we can start a geometry optimization from this point.
-            if "geom opt from this point" in line:
+            if "geom opt from" in line:
                 IRCData[IRCDir]['stat'] = 1
                 IRCDir = 1
             #----- End IRC stuff
@@ -2492,11 +2496,17 @@ class Molecule(object):
 
         # If we have any QM energies (not the case if SCF convergence failure)
         if 'qm_energies' in Answer:
-            lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
             # Catch the case of failed geometry optimizations.
             if len(Answer['xyzs']) == len(Answer['qm_energies']) + 1:
                 Answer['xyzs'] = Answer['xyzs'][:-1]
-            elif len(set(lens)) != 1:
+            # Catch the case of freezing string method, it prints out two extra coordinates.
+            if len(Answer['xyzs']) == len(Answer['qm_energies']) + 2:
+                for i in range(2):
+                    Answer['qm_energies'].append(0.0)
+                    mkchg.append([0.0 for j in mkchg[-1]])
+                    mkspn.append([0.0 for j in mkchg[-1]])
+            lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
+            if len(set(lens)) != 1:
                 raise Exception('The number of energies and coordinates in %s are not the same : %s' % (fnm, str(lens)))
 
         # The number of atoms should all be the same
@@ -2538,7 +2548,8 @@ class Molecule(object):
             read = kwargs['read']
         else:
             read = False
-        for I in select:
+        for SI, I in enumerate(select):
+            fsm = False
             remidx = 0
             molecule_printed = False
             # Each 'extchg' has number_of_atoms * 4 elements corresponding to x, y, z, q.
@@ -2549,6 +2560,10 @@ class Molecule(object):
                     out.append("% 15.10f % 15.10f % 15.10f %15.10f" % (extchg[i,0],extchg[i,1],extchg[i,2],extchg[i,3]))
                 out.append('$end')
             for SectName, SectData in self.qctemplate:
+                if 'jobtype' in self.qcrems[remidx] and self.qcrems[remidx]['jobtype'].lower() == 'fsm':
+                    fsm = True
+                    if len(select) != 2:
+                        raise RuntimeError('For freezing string method, please provide two structures only.')
                 if SectName != '@@@@':
                     out.append('$%s' % SectName)
                     for line in SectData:
@@ -2566,6 +2581,14 @@ class Molecule(object):
                                     suf =  self.Data['qcsuf'][an] if 'qcsuf' in self.Data else ''
                                     out.append(pre + format_xyz_coord(e, x) + suf)
                                     an += 1
+                                if fsm:
+                                    out.append("****")
+                                    an = 0
+                                    for e, x in zip(self.elem, self.xyzs[select[SI+1]]):
+                                        pre = '@' if ('qm_ghost' in self.Data and self.Data['qm_ghost'][an]) else ''
+                                        suf =  self.Data['qcsuf'][an] if 'qcsuf' in self.Data else ''
+                                        out.append(pre + format_xyz_coord(e, x) + suf)
+                                        an += 1
                     if SectName == 'rem':
                         for key, val in self.qcrems[remidx].items():
                             out.append("%-21s %-s" % (key, str(val)))
@@ -2577,6 +2600,7 @@ class Molecule(object):
                     out.append('@@@@')
                 out.append('')
             #if I < (len(self) - 1):
+            if fsm: break
             if I != select[-1]:
                 out.append('@@@@')
                 out.append('')
