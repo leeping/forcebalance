@@ -1,9 +1,6 @@
-This is makeindex, version 2.15 [TeX Live 2011] (kpathsea + Thai support).
-Scanning input file refman.idx....
-!! Input index error (file = refman.idx, line = 652):
-   -- First argument too long (max 1024).
-...done (3968 entries accepted, 1 rejected).
-Sorting entries......................................done (51317 comparisons).
-Generating output file refman.ind.......done (7755 lines written, 0 warnings).
+This is makeindex, version 2.15 [TeX Live 2013] (kpathsea + Thai support).
+Scanning input file refman.idx....done (71 entries accepted, 0 rejected).
+Sorting entries....done (456 comparisons).
+Generating output file refman.ind....done (130 lines written, 0 warnings).
 Output written in refman.ind.
 Transcript written in refman.ilg.
