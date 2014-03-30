@@ -9,7 +9,7 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key
+from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd_srch
 from forcebalance.optimizer import Counter, First
 from forcebalance.output import getLogger
@@ -132,6 +132,14 @@ class Target(forcebalance.BaseClass):
             tgtdir = 'targets'
         elif os.path.exists('simulations'):
             tgtdir = 'simulations'
+        elif os.path.exists('targets.tar.bz2'):
+            logger.info("Extracting targets folder from archive.\n")
+            _exec("tar xvjf targets.tar.bz2")
+            tgtdir = 'targets'
+        elif os.path.exists('targets.tar.gz'):
+            logger.info("Extracting targets folder from archive.\n")
+            _exec("tar xvzf targets.tar.gz")
+            tgtdir = 'targets'
         else:
             raise Exception('\x1b[91mThe targets directory is missing!\x1b[0m\nDid you finish setting up the target data?\nPlace the data in a directory called "targets" or "simulations"')
         self.set_option(None, None, 'tgtdir', os.path.join(tgtdir,self.name))
