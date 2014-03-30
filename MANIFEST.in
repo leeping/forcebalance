@@ -10,11 +10,4 @@ include doc/*.py
 recursive-include ext *
 recursive-include bin *
 recursive-include src *
-
-recursive-include studies/Settings *
-include studies/001_water_tutorial/*.in
-include studies/001_water_tutorial/*.out
-recursive-include studies/001_water_tutorial/forcefield *
-recursive-include studies/001_water_tutorial/targets *
-recursive-include studies/005_iamoeba *
-recursive-include studies/2013_Mar_OpenMM_Workshop *
+recursive-include studies *

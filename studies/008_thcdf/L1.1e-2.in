@@ -50,307 +50,307 @@ normalize_weights no
 
 $end
 
-$simulation
+$target
 name molc0
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc1
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc2
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc3
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc4
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc5
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc6
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc7
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc8
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc9
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc10
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc11
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc12
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc13
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc14
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc15
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc16
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc17
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc18
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc19
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc20
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc21
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc22
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc23
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc24
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc25
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc26
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc27
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc28
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc29
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc30
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc31
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc32
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc33
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc34
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc35
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc36
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc37
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc38
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc39
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name molc40
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans0
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans1
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans2
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans3
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans4
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans5
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans6
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans7
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans8
 simtype THCDF_Psi4
 weight 1.0
 $end
 
-$simulation
+$target
 name trans9
 simtype THCDF_Psi4
 weight 1.0
