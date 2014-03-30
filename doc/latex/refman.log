@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2014.1.29)  30 MAR 2014 16:42
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2014.1.29)  30 MAR 2014 16:46
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1086,11 +1086,11 @@ File: ts1phv.fd 2001/06/04 scalable font definitions for TS1/phv.
 LaTeX Font Info:    Font shape `TS1/phv/m/n' will be
 (Font)              scaled to size 8.99994pt on input line 51.
 
-<cycle.png, id=193, 2256.43pt x 2256.43pt>
+<cycle.png, id=193, 433.62pt x 433.62pt>
 File: cycle.png Graphic file (type png)
  <use cycle.png>
 Package pdftex.def Info: cycle.png used on input line 60.
-(pdftex.def)             Requested size: 284.4976pt x 284.52756pt.
+(pdftex.def)             Requested size: 284.54257pt x 284.52756pt.
  [4 <./cycle.png>])
 (./installation.tex [5]
 LaTeX Font Info:    Font shape `OT1/phv/m/n' will be
@@ -1172,7 +1172,7 @@ tic/uhvb8a.pfb></home/leeping/local/texlive/2013/texmf-dist/fonts/type1/urw/hel
 vetic/uhvbo8a.pfb></home/leeping/local/texlive/2013/texmf-dist/fonts/type1/urw/
 helvetic/uhvr8a.pfb></home/leeping/local/texlive/2013/texmf-dist/fonts/type1/ur
 w/helvetic/uhvro8a.pfb>
-Output written on refman.pdf (41 pages, 1516961 bytes).
+Output written on refman.pdf (41 pages, 1999638 bytes).
 PDF statistics:
  443 PDF objects out of 1000 (max. 8388607)
  370 compressed objects within 4 object streams
