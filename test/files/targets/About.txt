@@ -1,4 +1,0 @@
-The targets in this directory are for the various test cases.
-
-clusters-## : QM Energy and Force calculations on water clusters of various size containing three different types
-of geometries.

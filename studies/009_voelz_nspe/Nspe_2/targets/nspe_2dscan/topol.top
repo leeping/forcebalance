@@ -1,8 +1,0 @@
-#include "molecule.itp"
-
-[ system ]
-SPE
-
-[ molecules ]
-; Compound        nmols
-SPE              1     

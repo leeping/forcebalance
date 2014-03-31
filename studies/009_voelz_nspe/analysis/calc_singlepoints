@@ -1,3 +1,0 @@
-grompp -f singlepoint.mdp -c chi0.omega0.gro -p topol.top -o after.tpr
-mdrun -s after.tpr -rerun all.gro
-
