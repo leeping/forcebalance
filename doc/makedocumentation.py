@@ -63,8 +63,8 @@ def build(interactive=False, upstream=False):
             f.write(api)
 
         # Delete HTML and API documentation folders
-        display("rm -rf html latex")
-        os.system("rm -rf html latex")
+        display("rm -rf html latex html_ latex_")
+        os.system("rm -rf html latex html_ latex_")
         
         # Run doxygen to generate general documentation
         print "\n# run doxygen with doxygen.cfg as input to generate general documentation"
@@ -135,7 +135,7 @@ def build(interactive=False, upstream=False):
         # Rsync the newly generated html and latex folders
         display("rsync -a --delete html_/ html")
         os.system("rsync -a --delete html_/ html")
-        display("rsync -a --delete html_/ html")
+        display("rsync -a --delete latex_/ latex")
         os.system("rsync -a --delete latex_/ latex")
         display("mv ForceBalance-API.pdf_ ForceBalance-API.pdf")
         os.system("mv ForceBalance-API.pdf_ ForceBalance-API.pdf")
@@ -147,8 +147,8 @@ def build(interactive=False, upstream=False):
             display("git add html latex")
             if os.system('git add html latex'): raise OSError("Error trying to stage files for commit")
             print"\n# Commit changes locally"
-            display('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M")))
-            if os.system('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M"))):
+            display('git commit -a -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M")))
+            if os.system('git commit -a -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M"))):
                 raise OSError("Error trying to commit files to local gh-pages branch")
             display("git push")
             print "\n# Push updated documentation upstream"
