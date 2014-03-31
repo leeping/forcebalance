@@ -9,6 +9,14 @@ How to do this effectively:
 - Make sure dot (from graphviz) is in the PATH
 - Make sure version numbers are correct in four places: .api.cfg, .doxygen.cfg, header.tex, api_header.tex
 
+The comment syntax below in a docstring will break it:
+    Quantity
+    ========
+ 
+    Base class for thermodynamical quantity used for fitting. This can
+    be any experimental data that can be calculated as an ensemble
+    average from a simulation.
+
 """
 
 import os, sys
