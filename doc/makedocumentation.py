@@ -116,10 +116,9 @@ def build(interactive=False, upstream=False):
         print "\n# Switch to documentation branch before writing files"
 
         # Move folders to temporary location prior to branch switch
-        display("mv latex latex_")
-        os.system("mv latex latex_")
-        display("mv html html_")
-        os.system("mv html html_")
+        for fnm in ["latex", "html", "ForceBalance-API.pdf", "ForceBalance-Manual.pdf"]:
+            display("mv %s %s_" % (fnm, fnm))
+            os.system("mv %s %s_" % (fnm, fnm))
         
         # Make sure we only push the current branch
         display("git config --global push.default current")
@@ -129,8 +128,8 @@ def build(interactive=False, upstream=False):
         display("git checkout gh-pages")
         if os.system("git checkout gh-pages"):
             print "\n# encountered ERROR in checking out branch (above).  Please commit files and try again."
-            os.system("mv latex_ latex")
-            os.system("mv html_ html")
+            for fnm in ["latex", "html", "ForceBalance-API.pdf", "ForceBalance-Manual.pdf"]:
+                os.system("mv %s_ %s" % (fnm, fnm))
             sys.exit(1)
 
         # Rsync the newly generated html and latex folders
@@ -138,6 +137,10 @@ def build(interactive=False, upstream=False):
         os.system("rsync -a --delete html_/ html")
         display("rsync -a --delete html_/ html")
         os.system("rsync -a --delete latex_/ latex")
+        display("mv ForceBalance-API.pdf_ ForceBalance-API.pdf")
+        os.system("mv ForceBalance-API.pdf_ ForceBalance-API.pdf")
+        display("mv ForceBalance-Manual.pdf_ ForceBalance-Manual.pdf")
+        os.system("mv ForceBalance-Manual.pdf_ ForceBalance-Manual.pdf")
         try:
             # Commit the new html and latex files
             print "\n# Stage changes for commit"
