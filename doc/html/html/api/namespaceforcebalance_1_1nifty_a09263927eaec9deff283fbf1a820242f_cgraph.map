@@ -1,4 +1,0 @@
-<map id="forcebalance.nifty.isdecimal" name="forcebalance.nifty.isdecimal">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a8e3ef0108b9d37b82ba0dced7c6037ae" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="252,5,425,35"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a3f1c7a1af9d35d5d1693074bc6f5497c" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="257,59,420,88"/>
-</map>
