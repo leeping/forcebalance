@@ -75,30 +75,18 @@ def \hyperlink{classforcebalance_1_1BaseReader_aab2c64ccf0f803d4eff3bbf40a6cb0b7
 \subsubsection{Detailed Description}
 Finite state machine for parsing G\-R\-O\-M\-A\-C\-S force field files. 
 
-\begin{DoxyVerb} We open the force field file and read all of its lines.  As we loop
- through the force field file, we look for two types of tags: (1) section
- markers, in GMX indicated by [ section_name ], which allows us to determine
- the section, and (2) parameter tags, indicated by the 'PARM' or 'RPT' keywords.
+We open the force field file and read all of its lines. As we loop through the force field file, we look for two types of tags\-: (1) section markers, in \hyperlink{classforcebalance_1_1gmxio_1_1GMX}{G\-M\-X} indicated by \mbox{[} section\-\_\-name \mbox{]}, which allows us to determine the section, and (2) parameter tags, indicated by the 'P\-R\-M' or 'R\-P\-T' keywords.
 
- As we go through the file, we figure out the atoms involved in the interaction
- described on each line.
+As we go through the file, we figure out the atoms involved in the interaction described on each line.
 
- When a 'PARM' keyword is indicated, it is followed by a number which is the field
- in the line to be modified, starting with zero.  Based on the field number and the
- section name, we can figure out the parameter type.  With the parameter type
- and the atoms in hand, we construct a 'parameter identifier' or pid which uniquely
- identifies that parameter.  We also store the physical parameter value in an array
- called 'pvals0' and the precise location of that parameter (by filename, line number,
- and field number) in a list called 'pfields'.
+When a 'P\-R\-M' keyword is indicated, it is followed by a number which is the field in the line to be modified, starting with zero. Based on the field number and the section name, we can figure out the parameter type. With the parameter type and the atoms in hand, we construct a 'parameter identifier' or pid which uniquely identifies that parameter. We also store the physical parameter value in an array called 'pvals0' and the precise location of that parameter (by filename, line number, and field number) in a list called 'pfields'.
 
- An example: Suppose in 'my_ff.itp' I encounter the following on lines 146 and 147:
-\end{DoxyVerb}
-
+An example\-: Suppose in 'my\-\_\-ff.\-itp' I encounter the following on lines 146 and 147\-:
 
 
 \begin{DoxyCode}
 1 [ angletypes ]
-2 CA   CB   O   1   109.47  350.00  ; PARM 4 5
+2 CA   CB   O   1   109.47  350.00  ; PRM 4 5
 \end{DoxyCode}
 
 
@@ -120,7 +108,7 @@ If {\ttfamily 'R\-P\-T'} is encountered in the line, it is always in the syntax\
 \item[\hyperlink{todo__todo000011}{Todo}]Note that I can also create the opposite virtual site position by changing the atom labeling, woo!\end{DoxyRefDesc}
 
 
-Definition at line 277 of file gmxio.\-py.
+Definition at line 328 of file gmxio.\-py.
 
 
 
@@ -135,7 +123,7 @@ Definition at line 277 of file gmxio.\-py.
 )}}\label{classforcebalance_1_1gmxio_1_1ITP__Reader_a6ed010e4c85c0d7d672d455316e3f7f7}
 
 
-Definition at line 280 of file gmxio.\-py.
+Definition at line 331 of file gmxio.\-py.
 
 
 
@@ -160,7 +148,7 @@ If, however, 'pdict' does not contain the ptype value, a suitable substitute is 
 
 Note that if the interaction type state is not set, then it defaults to the file name, so a generic parameter I\-D is 'filename.\-line\-\_\-num.\-field\-\_\-num' 
 
-Definition at line 107 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 124 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_a700d33a1e51684d87b476c5dc80ee29f}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!feed@{feed}}
 \index{feed@{feed}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -175,7 +163,7 @@ Definition at line 107 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 Given a line, determine the interaction type and the atoms involved (the suffix). 
 
 For example, we want \par
- {\ttfamily  H O H 5 1.\-231258497536e+02 4.\-269161426840e+02 -\/1.\-033397697685e-\/02 1.\-304674117410e+04 ; P\-A\-R\-M 4 5 6 7 } \par
+ {\ttfamily  H O H 5 1.\-231258497536e+02 4.\-269161426840e+02 -\/1.\-033397697685e-\/02 1.\-304674117410e+04 ; P\-R\-M 4 5 6 7 } \par
  to give us itype = 'U\-R\-E\-Y\-\_\-\-B\-R\-A\-D\-L\-E\-Y' and suffix = 'H\-O\-H'
 
 If we are in a Type\-Section, it returns a list of atom types; \par
@@ -187,7 +175,7 @@ Note that we can call gmxdump for this as well, but I prefer to read the force f
 
 To\-Do\-: \mbox{[} atoms \mbox{]} section might need to be more flexible to accommodate optional fields 
 
-Definition at line 318 of file gmxio.\-py.
+Definition at line 369 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_acded199bbc003eb93d071a972ef38901}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!Split@{Split}}
 \index{Split@{Split}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -199,18 +187,7 @@ Definition at line 318 of file gmxio.\-py.
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_acded199bbc003eb93d071a972ef38901}
 
 
-Definition at line 82 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
-
-
-
-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1BaseReader_acded199bbc003eb93d071a972ef38901_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 99 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_af2af8a559625614474a1c6fe245b5e13}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!Whites@{Whites}}
 \index{Whites@{Whites}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -222,18 +199,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_af2af8a559625614474a1c6fe245b5e13}
 
 
-Definition at line 85 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
-
-
-
-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1BaseReader_af2af8a559625614474a1c6fe245b5e13_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 102 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 
 
@@ -247,7 +213,7 @@ The mapping of (this residue, atom number) to (atom name) for building atom-\/sp
 
 
 
-Definition at line 72 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 89 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_a0cbe42a9c0bf233255cfb8dd6ebe102e}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!atomnames@{atomnames}}
 \index{atomnames@{atomnames}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -258,7 +224,7 @@ Listing of all atom names in the file, (probably unnecessary)
 
 
 
-Definition at line 292 of file gmxio.\-py.
+Definition at line 343 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_ae4ae7fb78a864a7ca15f68b376e84c35}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!atomtype\-\_\-to\-\_\-mass@{atomtype\-\_\-to\-\_\-mass}}
 \index{atomtype\-\_\-to\-\_\-mass@{atomtype\-\_\-to\-\_\-mass}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -269,14 +235,14 @@ A dictionary of atomic masses.
 
 
 
-Definition at line 296 of file gmxio.\-py.
+Definition at line 347 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_a69ca7d949a4a3df4d9f61e617fe0e270}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!Atom\-Types@{Atom\-Types}}
 \index{Atom\-Types@{Atom\-Types}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
 \paragraph[{Atom\-Types}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Reader.\-Atom\-Types\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_a69ca7d949a4a3df4d9f61e617fe0e270}
 
 
-Definition at line 80 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 97 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_a771f60fa6b3020c422062bb9ceb51291}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!atomtypes@{atomtypes}}
 \index{atomtypes@{atomtypes}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -287,21 +253,21 @@ Listing of all atom types in the file, (probably unnecessary)
 
 
 
-Definition at line 294 of file gmxio.\-py.
+Definition at line 345 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_a1809bf22503b8647f48ea37c9f6f4cee}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!itype@{itype}}
 \index{itype@{itype}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
 \paragraph[{itype}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-gmxio.\-I\-T\-P\-\_\-\-Reader.\-itype}}\label{classforcebalance_1_1gmxio_1_1ITP__Reader_a1809bf22503b8647f48ea37c9f6f4cee}
 
 
-Definition at line 321 of file gmxio.\-py.
+Definition at line 372 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_a80c8e3bea212600742968aa8669e557b}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!ln@{ln}}
 \index{ln@{ln}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
 \paragraph[{ln}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Reader.\-ln\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_a80c8e3bea212600742968aa8669e557b}
 
 
-Definition at line 67 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 84 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_a8d70d960437fa51e58954d908fdd297d}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!mol@{mol}}
 \index{mol@{mol}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -312,21 +278,21 @@ The current molecule (set by the moleculetype keyword)
 
 
 
-Definition at line 288 of file gmxio.\-py.
+Definition at line 339 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_ad22477e12597eceeceedeb327d723094}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!molatom@{molatom}}
 \index{molatom@{molatom}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
 \paragraph[{molatom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-gmxio.\-I\-T\-P\-\_\-\-Reader.\-molatom}}\label{classforcebalance_1_1gmxio_1_1ITP__Reader_ad22477e12597eceeceedeb327d723094}
 
 
-Definition at line 428 of file gmxio.\-py.
+Definition at line 479 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_a4369b5fb663a83b11602daa71db6862e}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!Molecules@{Molecules}}
 \index{Molecules@{Molecules}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
 \paragraph[{Molecules}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Reader.\-Molecules\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_a4369b5fb663a83b11602daa71db6862e}
 
 
-Definition at line 79 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 96 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_ad1485d8f448b3f12c5bce4f05a18cf8c}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!nbtype@{nbtype}}
 \index{nbtype@{nbtype}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -337,7 +303,7 @@ Nonbonded type.
 
 
 
-Definition at line 286 of file gmxio.\-py.
+Definition at line 337 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_a1c74f6a71b392ecbf20ccc1e12b0d321}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!pdict@{pdict}}
 \index{pdict@{pdict}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -348,7 +314,7 @@ The parameter dictionary (defined in this file)
 
 
 
-Definition at line 290 of file gmxio.\-py.
+Definition at line 341 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_a744b1698c9ccfc1be470d83862099551}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!sec@{sec}}
 \index{sec@{sec}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
@@ -359,14 +325,14 @@ The current section that we're in.
 
 
 
-Definition at line 284 of file gmxio.\-py.
+Definition at line 335 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1gmxio_1_1ITP__Reader_a147438dd2683af88b92b659c96162848}{\index{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}!suffix@{suffix}}
 \index{suffix@{suffix}!forcebalance::gmxio::ITP_Reader@{forcebalance\-::gmxio\-::\-I\-T\-P\-\_\-\-Reader}}
 \paragraph[{suffix}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-gmxio.\-I\-T\-P\-\_\-\-Reader.\-suffix}}\label{classforcebalance_1_1gmxio_1_1ITP__Reader_a147438dd2683af88b92b659c96162848}
 
 
-Definition at line 423 of file gmxio.\-py.
+Definition at line 474 of file gmxio.\-py.
 
 
 

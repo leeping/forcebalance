@@ -659,10 +659,10 @@ Waals parameters on oxygen are to be optimized, using the following
 syntax:
 
 @verbatim
-OW	8     15.99940     0.000       A    3.15365e-01  6.48520e-01 ; PRM 5 6
+OW	8     15.99940     0.000       A    3.15365e-01  6.48520e-01 ; PARM 5 6
 @endverbatim
 
-The comment <tt>PRM 5 6</tt> signals that "the parameters in fields 5
+The comment <tt>PARM 5 6</tt> signals that "the parameters in fields 5
 and 6 are to be optimized."  The force field parser stores the
 physical value of the parameter and gives the parameter a name.  These
 are printed out in the output file:

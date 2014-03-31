@@ -1,0 +1,5 @@
+<map id="forcebalance.openmmio.OpenMM.optimize" name="forcebalance.openmmio.OpenMM.optimize">
+<area shape="rect" id="node3" href="$classforcebalance_1_1openmmio_1_1OpenMM.html#a8f584613e1512c0963c62427f759c8b0" title="Create the simulation object, or update the force field parameters in the existing simulation object..." alt="" coords="271,5,484,51"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1openmmio_1_1OpenMM.html#a77e08b50b78e299cc6c80c09ea4975a6" title="Set the positions and periodic box vectors to one of the stored coordinates. " alt="" coords="271,74,484,121"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1openmmio.html#a1f92d88085657ca5726f8925bfa68f6f" title="Given a set of OpenMM&#45;compatible positions and a System object, compute the correct virtual site posi..." alt="" coords="269,143,485,190"/>
+</map>

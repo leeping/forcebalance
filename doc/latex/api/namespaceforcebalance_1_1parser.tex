@@ -40,7 +40,7 @@ dictionary \hyperlink{namespaceforcebalance_1_1parser_abb7a7e9723de629aa97727a85
 \item 
 dictionary \hyperlink{namespaceforcebalance_1_1parser_aff4922444f06b7334a0994a835607393}{tgt\-\_\-opts\-\_\-defaults} = \{\}
 \begin{DoxyCompactList}\small\item\em Default target options -\/ basically a collapsed version of tgt\-\_\-opts\-\_\-types. \end{DoxyCompactList}\item 
-dictionary \hyperlink{namespaceforcebalance_1_1parser_a121eaaef101563523a8fb20bd5ace409}{bkwd} = \{\char`\"{}simtype\char`\"{} \-: \char`\"{}type\char`\"{}, \char`\"{}masterfile\char`\"{} \-: \char`\"{}binding\-\_\-txt\char`\"{}\}
+dictionary \hyperlink{namespaceforcebalance_1_1parser_a121eaaef101563523a8fb20bd5ace409}{bkwd}
 \begin{DoxyCompactList}\small\item\em Option maps for maintaining backward compatibility. \end{DoxyCompactList}\item 
 list \hyperlink{namespaceforcebalance_1_1parser_a682a3870774181592a7a4784ab108ae6}{mainsections} = \mbox{[}\char`\"{}S\-I\-M\-U\-L\-A\-T\-I\-O\-N\char`\"{},\char`\"{}T\-A\-R\-G\-E\-T\char`\"{},\char`\"{}O\-P\-T\-I\-O\-N\-S\char`\"{},\char`\"{}E\-N\-D\char`\"{},\char`\"{}N\-O\-N\-E\char`\"{}\mbox{]}
 \begin{DoxyCompactList}\small\item\em Listing of sections in the input file. \end{DoxyCompactList}\item 
@@ -104,33 +104,31 @@ Lee-\/\-Ping Wang
 
 Parse through the input file and read all user-\/supplied options. 
 
-\begin{DoxyVerb} This is usually the first thing that happens when an executable script is called.
- Our parser first loads the default options, and then updates these options as it
- encounters keywords.
+This is usually the first thing that happens when an executable script is called. Our parser first loads the default options, and then updates these options as it encounters keywords.
 
- Each keyword corresponds to a variable type; each variable type (e.g. string,
- integer, float, boolean) is treated differently.  For more elaborate inputs,
- there is a 'section' variable type.
+Each keyword corresponds to a variable type; each variable type (e.\-g. string, integer, float, boolean) is treated differently. For more elaborate inputs, there is a 'section' variable type.
 
- There is only one set of general options, but multiple sets of target options.
- Each target has its own section delimited by the \em $target keyword,
- and we build a list of target options.  
-
- @param[in]  input_file The name of the input file.
- @return     options    General options.
- @return     tgt_opts   List of fitting target options.
-\end{DoxyVerb}
+There is only one set of general options, but multiple sets of target options. Each target has its own section delimited by the {\itshape \$target} keyword, and we build a list of target options.
 
 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em input\-\_\-file} & The name of the input file. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+options General options. 
+
+tgt\-\_\-opts List of fitting target options.
+\end{DoxyReturn}
 \begin{DoxyRefDesc}{Todo}
-\item[\hyperlink{todo__todo000017}{Todo}]Implement internal coordinates. 
+\item[\hyperlink{todo__todo000016}{Todo}]Implement internal coordinates. 
 
 Implement sampling correction. 
 
 Implement charge groups. \end{DoxyRefDesc}
 
 
-Definition at line 396 of file parser.\-py.
+Definition at line 438 of file parser.\-py.
 
 
 
@@ -173,19 +171,7 @@ Answer List of strings for the section that we are printing out.
 \end{DoxyReturn}
 
 
-Definition at line 299 of file parser.\-py.
-
-
-
-Here is the call graph for this function\-:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{namespaceforcebalance_1_1parser_a00a8cb7b534312c13b11d4bb39bb3959_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 341 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a10827b0b21d0463bc9e786f161a02654}{\index{forcebalance\-::parser@{forcebalance\-::parser}!read\-\_\-internals@{read\-\_\-internals}}
 \index{read\-\_\-internals@{read\-\_\-internals}!forcebalance::parser@{forcebalance\-::parser}}
@@ -196,7 +182,7 @@ Here is the call graph for this function\-:
 )}}\label{namespaceforcebalance_1_1parser_a10827b0b21d0463bc9e786f161a02654}
 
 
-Definition at line 273 of file parser.\-py.
+Definition at line 315 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_aef8b51dba6bb9767a9a956319eb3cc08}{\index{forcebalance\-::parser@{forcebalance\-::parser}!read\-\_\-mvals@{read\-\_\-mvals}}
 \index{read\-\_\-mvals@{read\-\_\-mvals}!forcebalance::parser@{forcebalance\-::parser}}
@@ -207,19 +193,7 @@ Definition at line 273 of file parser.\-py.
 )}}\label{namespaceforcebalance_1_1parser_aef8b51dba6bb9767a9a956319eb3cc08}
 
 
-Definition at line 248 of file parser.\-py.
-
-
-
-Here is the call graph for this function\-:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{namespaceforcebalance_1_1parser_aef8b51dba6bb9767a9a956319eb3cc08_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 290 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a94c3f1acd06b640db3042dc45e32af8e}{\index{forcebalance\-::parser@{forcebalance\-::parser}!read\-\_\-priors@{read\-\_\-priors}}
 \index{read\-\_\-priors@{read\-\_\-priors}!forcebalance::parser@{forcebalance\-::parser}}
@@ -230,19 +204,7 @@ Here is the call graph for this function\-:
 )}}\label{namespaceforcebalance_1_1parser_a94c3f1acd06b640db3042dc45e32af8e}
 
 
-Definition at line 264 of file parser.\-py.
-
-
-
-Here is the call graph for this function\-:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{namespaceforcebalance_1_1parser_a94c3f1acd06b640db3042dc45e32af8e_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 306 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a56fb1e139dad24bac29f25a3870765ca}{\index{forcebalance\-::parser@{forcebalance\-::parser}!read\-\_\-pvals@{read\-\_\-pvals}}
 \index{read\-\_\-pvals@{read\-\_\-pvals}!forcebalance::parser@{forcebalance\-::parser}}
@@ -253,19 +215,7 @@ Here is the call graph for this function\-:
 )}}\label{namespaceforcebalance_1_1parser_a56fb1e139dad24bac29f25a3870765ca}
 
 
-Definition at line 256 of file parser.\-py.
-
-
-
-Here is the call graph for this function\-:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{namespaceforcebalance_1_1parser_a56fb1e139dad24bac29f25a3870765ca_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 298 of file parser.\-py.
 
 
 
@@ -275,18 +225,34 @@ Here is the call graph for this function\-:
 \paragraph[{all\-\_\-opts\-\_\-names}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-parser.\-all\-\_\-opts\-\_\-names = list(itertools.\-chain($\ast$\mbox{[}i.\-keys() for i in gen\-\_\-opts\-\_\-types.\-values()\mbox{]}))}}\label{namespaceforcebalance_1_1parser_ae606fd3971c0081009e4bf63d50cc92f}
 
 
-Definition at line 213 of file parser.\-py.
+Definition at line 243 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a121eaaef101563523a8fb20bd5ace409}{\index{forcebalance\-::parser@{forcebalance\-::parser}!bkwd@{bkwd}}
 \index{bkwd@{bkwd}!forcebalance::parser@{forcebalance\-::parser}}
-\paragraph[{bkwd}]{\setlength{\rightskip}{0pt plus 5cm}dictionary forcebalance.\-parser.\-bkwd = \{\char`\"{}simtype\char`\"{} \-: \char`\"{}type\char`\"{}, \char`\"{}masterfile\char`\"{} \-: \char`\"{}binding\-\_\-txt\char`\"{}\}}}\label{namespaceforcebalance_1_1parser_a121eaaef101563523a8fb20bd5ace409}
+\paragraph[{bkwd}]{\setlength{\rightskip}{0pt plus 5cm}dictionary forcebalance.\-parser.\-bkwd}}\label{namespaceforcebalance_1_1parser_a121eaaef101563523a8fb20bd5ace409}
+{\bfseries Initial value\-:}
+\begin{DoxyCode}
+1 = \{\textcolor{stringliteral}{"simtype"} : \textcolor{stringliteral}{"type"}, 
+2         \textcolor{stringliteral}{"masterfile"} : \textcolor{stringliteral}{"inter\_txt"}, 
+3         \textcolor{stringliteral}{"openmm\_cuda\_precision"} : \textcolor{stringliteral}{"openmm\_precision"},
+4         \textcolor{stringliteral}{"mdrun\_threads"} : \textcolor{stringliteral}{"md\_threads"},
+5         \textcolor{stringliteral}{"mts\_vvvr"} : \textcolor{stringliteral}{"mts\_integrator"},
+6         \textcolor{stringliteral}{"amoeba\_polarization"} : \textcolor{stringliteral}{"amoeba\_pol"},
+7         \textcolor{stringliteral}{"liquid\_prod\_steps"} : \textcolor{stringliteral}{"liquid\_md\_steps"},
+8         \textcolor{stringliteral}{"gas\_prod\_steps"} : \textcolor{stringliteral}{"gas\_md\_steps"},
+9         \textcolor{stringliteral}{"liquid\_equ\_steps"} : \textcolor{stringliteral}{"liquid\_eq\_steps"},
+10         \textcolor{stringliteral}{"gas\_equ\_steps"} : \textcolor{stringliteral}{"gas\_eq\_steps"},
+11         \textcolor{stringliteral}{"lipid\_prod\_steps"} : \textcolor{stringliteral}{"lipid\_md\_steps"},
+12         \textcolor{stringliteral}{"lipid\_equ\_steps"} : \textcolor{stringliteral}{"lipid\_eq\_steps"},
+13         \}
+\end{DoxyCode}
 
 
 Option maps for maintaining backward compatibility. 
 
 
 
-Definition at line 243 of file parser.\-py.
+Definition at line 273 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a980fd024b1f2877247de482247250b9e}{\index{forcebalance\-::parser@{forcebalance\-::parser}!gen\-\_\-opts\-\_\-defaults@{gen\-\_\-opts\-\_\-defaults}}
 \index{gen\-\_\-opts\-\_\-defaults@{gen\-\_\-opts\-\_\-defaults}!forcebalance::parser@{forcebalance\-::parser}}
@@ -297,7 +263,7 @@ Default general options -\/ basically a collapsed veresion of gen\-\_\-opts\-\_\
 
 
 
-Definition at line 227 of file parser.\-py.
+Definition at line 257 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a1ccdff008f4be5f63c068d2a592d69ab}{\index{forcebalance\-::parser@{forcebalance\-::parser}!gen\-\_\-opts\-\_\-types@{gen\-\_\-opts\-\_\-types}}
 \index{gen\-\_\-opts\-\_\-types@{gen\-\_\-opts\-\_\-types}!forcebalance::parser@{forcebalance\-::parser}}
@@ -319,7 +285,7 @@ Check for uniqueness of option names.
 
 
 
-Definition at line 216 of file parser.\-py.
+Definition at line 246 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_ab1a411e01f194a0a8fc51b5aaf4b05ac}{\index{forcebalance\-::parser@{forcebalance\-::parser}!logger@{logger}}
 \index{logger@{logger}!forcebalance::parser@{forcebalance\-::parser}}
@@ -337,7 +303,7 @@ Listing of sections in the input file.
 
 
 
-Definition at line 246 of file parser.\-py.
+Definition at line 288 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a492c80e361e80dc74aebc13e7a072dfb}{\index{forcebalance\-::parser@{forcebalance\-::parser}!Pars\-Tab@{Pars\-Tab}}
 \index{Pars\-Tab@{Pars\-Tab}!forcebalance::parser@{forcebalance\-::parser}}
@@ -356,14 +322,14 @@ Pars\-Tab that refers to subsection parsers.
 
 
 
-Definition at line 277 of file parser.\-py.
+Definition at line 319 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_abb7a7e9723de629aa97727a85bcdbad1}{\index{forcebalance\-::parser@{forcebalance\-::parser}!subdict@{subdict}}
 \index{subdict@{subdict}!forcebalance::parser@{forcebalance\-::parser}}
 \paragraph[{subdict}]{\setlength{\rightskip}{0pt plus 5cm}dictionary forcebalance.\-parser.\-subdict = \{\}}}\label{namespaceforcebalance_1_1parser_abb7a7e9723de629aa97727a85bcdbad1}
 
 
-Definition at line 229 of file parser.\-py.
+Definition at line 259 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_aff4922444f06b7334a0994a835607393}{\index{forcebalance\-::parser@{forcebalance\-::parser}!tgt\-\_\-opts\-\_\-defaults@{tgt\-\_\-opts\-\_\-defaults}}
 \index{tgt\-\_\-opts\-\_\-defaults@{tgt\-\_\-opts\-\_\-defaults}!forcebalance::parser@{forcebalance\-::parser}}
@@ -374,7 +340,7 @@ Default target options -\/ basically a collapsed version of tgt\-\_\-opts\-\_\-t
 
 
 
-Definition at line 235 of file parser.\-py.
+Definition at line 265 of file parser.\-py.
 
 \hypertarget{namespaceforcebalance_1_1parser_a95436b7fb9e99bd7b9f0a040b15fbe3a}{\index{forcebalance\-::parser@{forcebalance\-::parser}!tgt\-\_\-opts\-\_\-types@{tgt\-\_\-opts\-\_\-types}}
 \index{tgt\-\_\-opts\-\_\-types@{tgt\-\_\-opts\-\_\-types}!forcebalance::parser@{forcebalance\-::parser}}
@@ -385,5 +351,5 @@ Default fitting target options.
 
 
 
-Definition at line 126 of file parser.\-py.
+Definition at line 135 of file parser.\-py.
 

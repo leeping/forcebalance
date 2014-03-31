@@ -1,4 +1,5 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="350,5,546,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="595,31,803,57"/>
+<map id="forcebalance.molecule.Molecule.read_com" name="forcebalance.molecule.Molecule.read_com">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a71da1c1e530afd8b9b5f08d9bd27259f" title="Split the molecule object into a number of separate files (chunks), either by specifying the number o..." alt="" coords="349,5,605,35"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="380,59,575,88"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="373,112,581,141"/>
 </map>

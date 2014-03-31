@@ -1,6 +1,3 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a15a7a0e0377e6dfd52e60c77fbc583c1" title="Parse a .xyz file which contains several xyz coordinates, and return their elements." alt="" coords="406,31,693,57"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="741,5,1112,32"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a1d34af6a7d22dd34850d58efe8595b20" title="forcebalance.molecule.Molecule.read_qdata" alt="" coords="775,56,1078,83"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989" title="This function takes in three lattice vectors and tries to return a complete box specification." alt="" coords="1161,5,1485,32"/>
+<map id="forcebalance.molecule.Molecule.openmm_positions" name="forcebalance.molecule.Molecule.openmm_positions">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="341,13,616,43"/>
 </map>

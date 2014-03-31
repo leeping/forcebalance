@@ -1,0 +1,157 @@
+\hypertarget{classforcebalance_1_1quantity_1_1Quantity}{\subsection{forcebalance.\-quantity.\-Quantity Class Reference}
+\label{classforcebalance_1_1quantity_1_1Quantity}\index{forcebalance.\-quantity.\-Quantity@{forcebalance.\-quantity.\-Quantity}}
+}
+
+
+Base class for thermodynamical quantity used for fitting.  
+
+
+
+
+Inheritance diagram for forcebalance.\-quantity.\-Quantity\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1quantity_1_1Quantity__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-quantity.\-Quantity\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=242pt]{classforcebalance_1_1quantity_1_1Quantity__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1quantity_1_1Quantity_a33f2f73a76a335864ee5cdc9c299fe83}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1quantity_1_1Quantity_a0b789c405027c2b184f268702d751ff5}{\-\_\-\-\_\-str\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1quantity_1_1Quantity_af237c272a8ec761b4f9b64980eded918}{extract}
+\begin{DoxyCompactList}\small\item\em Calculate and extract the quantity from M\-D results. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1quantity_1_1Quantity_a9122f1e96aa8c0cd146694656bcd0649}{name}
+\item 
+\hyperlink{classforcebalance_1_1quantity_1_1Quantity_a2cd1c71d0780a12b3cbf308d05737055}{engname}
+\item 
+\hyperlink{classforcebalance_1_1quantity_1_1Quantity_a30da0699f09b247b74014a9a1a6a2d09}{temperature}
+\item 
+\hyperlink{classforcebalance_1_1quantity_1_1Quantity_a972fbe22434f2aedca70addaed1a0bea}{pressure}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Base class for thermodynamical quantity used for fitting. 
+
+This can be any experimental data that can be calculated as an ensemble average from a simulation.
+
+\paragraph*{Data attributes }
+
+name \-: string Identifier for the quantity that is specified in {\ttfamily quantities} in Target options. engname \-: string Use this engine to extract the quantity from the simulation results. At present, only {\ttfamily gromacs} is supported. temperature \-: float Calculate the quantity at this temperature (in K). pressure \-: float Calculate the quantity at this pressure (in bar). 
+
+Definition at line 88 of file quantity.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1quantity_1_1Quantity_a33f2f73a76a335864ee5cdc9c299fe83}{\index{forcebalance\-::quantity\-::\-Quantity@{forcebalance\-::quantity\-::\-Quantity}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::quantity::Quantity@{forcebalance\-::quantity\-::\-Quantity}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-quantity.\-Quantity.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{engname, }
+\item[{}]{temperature, }
+\item[{}]{pressure, }
+\item[{}]{name = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1quantity_1_1Quantity_a33f2f73a76a335864ee5cdc9c299fe83}
+
+
+Definition at line 89 of file quantity.\-py.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1quantity_1_1Quantity_a0b789c405027c2b184f268702d751ff5}{\index{forcebalance\-::quantity\-::\-Quantity@{forcebalance\-::quantity\-::\-Quantity}!\-\_\-\-\_\-str\-\_\-\-\_\-@{\-\_\-\-\_\-str\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-str\-\_\-\-\_\-@{\-\_\-\-\_\-str\-\_\-\-\_\-}!forcebalance::quantity::Quantity@{forcebalance\-::quantity\-::\-Quantity}}
+\paragraph[{\-\_\-\-\_\-str\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-quantity.\-Quantity.\-\_\-\-\_\-str\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1quantity_1_1Quantity_a0b789c405027c2b184f268702d751ff5}
+
+
+Definition at line 95 of file quantity.\-py.
+
+\hypertarget{classforcebalance_1_1quantity_1_1Quantity_af237c272a8ec761b4f9b64980eded918}{\index{forcebalance\-::quantity\-::\-Quantity@{forcebalance\-::quantity\-::\-Quantity}!extract@{extract}}
+\index{extract@{extract}!forcebalance::quantity::Quantity@{forcebalance\-::quantity\-::\-Quantity}}
+\paragraph[{extract}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-quantity.\-Quantity.\-extract (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{engines, }
+\item[{}]{F\-F, }
+\item[{}]{mvals, }
+\item[{}]{h, }
+\item[{}]{A\-Grad = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1quantity_1_1Quantity_af237c272a8ec761b4f9b64980eded918}
+
+
+Calculate and extract the quantity from M\-D results. 
+
+How this is done depends on the quantity and the engine so this must be implemented in the subclass.
+
+\paragraph*{Parameters }
+
+engines \-: list A list of Engine objects that are requred to calculate the quantity. F\-F \-: F\-F Force field object. mvals \-: list Mathematical parameter values. h \-: float Finite difference step size. A\-Grad \-: Boolean Switch that turns derivatives on or off; if off, return all zeros.
+
+\paragraph*{Returns }
+
+result \-: (float, float, np.\-array) The returned tuple is (Q, Qerr, Qgrad), where Q is the calculated quantity, Qerr is the calculated standard deviation of the quantity, and Qgrad is a M-\/array with the calculated gradients for the quantity, with M being the number of force field parameters that are being fitted. 
+
+Definition at line 126 of file quantity.\-py.
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1quantity_1_1Quantity_a2cd1c71d0780a12b3cbf308d05737055}{\index{forcebalance\-::quantity\-::\-Quantity@{forcebalance\-::quantity\-::\-Quantity}!engname@{engname}}
+\index{engname@{engname}!forcebalance::quantity::Quantity@{forcebalance\-::quantity\-::\-Quantity}}
+\paragraph[{engname}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-quantity.\-Quantity.\-engname}}\label{classforcebalance_1_1quantity_1_1Quantity_a2cd1c71d0780a12b3cbf308d05737055}
+
+
+Definition at line 91 of file quantity.\-py.
+
+\hypertarget{classforcebalance_1_1quantity_1_1Quantity_a9122f1e96aa8c0cd146694656bcd0649}{\index{forcebalance\-::quantity\-::\-Quantity@{forcebalance\-::quantity\-::\-Quantity}!name@{name}}
+\index{name@{name}!forcebalance::quantity::Quantity@{forcebalance\-::quantity\-::\-Quantity}}
+\paragraph[{name}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-quantity.\-Quantity.\-name}}\label{classforcebalance_1_1quantity_1_1Quantity_a9122f1e96aa8c0cd146694656bcd0649}
+
+
+Definition at line 90 of file quantity.\-py.
+
+\hypertarget{classforcebalance_1_1quantity_1_1Quantity_a972fbe22434f2aedca70addaed1a0bea}{\index{forcebalance\-::quantity\-::\-Quantity@{forcebalance\-::quantity\-::\-Quantity}!pressure@{pressure}}
+\index{pressure@{pressure}!forcebalance::quantity::Quantity@{forcebalance\-::quantity\-::\-Quantity}}
+\paragraph[{pressure}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-quantity.\-Quantity.\-pressure}}\label{classforcebalance_1_1quantity_1_1Quantity_a972fbe22434f2aedca70addaed1a0bea}
+
+
+Definition at line 93 of file quantity.\-py.
+
+\hypertarget{classforcebalance_1_1quantity_1_1Quantity_a30da0699f09b247b74014a9a1a6a2d09}{\index{forcebalance\-::quantity\-::\-Quantity@{forcebalance\-::quantity\-::\-Quantity}!temperature@{temperature}}
+\index{temperature@{temperature}!forcebalance::quantity::Quantity@{forcebalance\-::quantity\-::\-Quantity}}
+\paragraph[{temperature}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-quantity.\-Quantity.\-temperature}}\label{classforcebalance_1_1quantity_1_1Quantity_a30da0699f09b247b74014a9a1a6a2d09}
+
+
+Definition at line 92 of file quantity.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{quantity_8py}{quantity.\-py}\end{DoxyCompactItemize}

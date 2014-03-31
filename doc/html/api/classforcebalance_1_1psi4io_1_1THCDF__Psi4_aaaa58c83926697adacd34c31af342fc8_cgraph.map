@@ -1,7 +1,3 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#a2fd5e08b9c214fc374167a029270be99" title="forcebalance.psi4io.THCDF_Psi4.indicate" alt="" coords="438,31,717,57"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#ae4389941b46ce11689f45115fdb61b39" title="forcebalance.psi4io.THCDF_Psi4.write_nested_destroy" alt="" coords="765,31,1131,57"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#a14993bd872840bd869fefced495e7ba2" title="forcebalance.psi4io.THCDF_Psi4.driver" alt="" coords="1179,5,1445,32"/>
-<area shape="rect" id="node10" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="1191,56,1433,83"/>
-<area shape="rect" id="node12" href="$namespaceforcebalance_1_1leastsq.html#a8e7ef329e27aff738bc91dd79bd2dd1c" title="forcebalance.leastsq.CheckBasis" alt="" coords="1197,107,1427,133"/>
+<map id="forcebalance.psi4io.THCDF_Psi4.prepare_temp_directory" name="forcebalance.psi4io.THCDF_Psi4.prepare_temp_directory">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a185aa094549d280fdc18479459980164" title="If trying to write to a symbolic link, remove it first. " alt="" coords="267,13,445,43"/>
 </map>

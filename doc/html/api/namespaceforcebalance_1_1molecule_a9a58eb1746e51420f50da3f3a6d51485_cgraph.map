@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a08840b73e95bf34bf9ca7ea36ad0492d" title="forcebalance.molecule.get_rotate_translate" alt="" coords="317,5,619,32"/>
+<map id="forcebalance.molecule.AlignToDensity" name="forcebalance.molecule.AlignToDensity">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a8fcbb4a2b3470a85d25699b6f28a54fc" title="Computes an &#39;overlap&#39; between two molecules based on some fictitious density. " alt="" coords="256,5,485,51"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#af02bf73765f34bbef81c4a5b000b86ce" title="Constructs an Euler matrix from three Euler angles. " alt="" coords="533,35,736,82"/>
 </map>

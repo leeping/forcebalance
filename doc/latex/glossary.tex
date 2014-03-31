@@ -35,12 +35,15 @@ This section contains a listing of the general options available when running a 
 {\bfseries  Recommendation }\-: 0.\-2 is a conservative value, 0.\-5 for big step size adjustments.
 
 \begin{DoxyItemize}
-\item {\bfseries  A\-M\-O\-E\-B\-A\-\_\-\-P\-O\-L\-A\-R\-I\-Z\-A\-T\-I\-O\-N } (String) \par
+\item {\bfseries  A\-M\-O\-E\-B\-A\-\_\-\-E\-P\-S } (Float) \par
+{\bfseries  One-\/line description }\-: The A\-M\-O\-E\-B\-A mutual polarization criterion. \par
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  A\-M\-O\-E\-B\-A\-\_\-\-P\-O\-L } (String) \par
 {\bfseries  One-\/line description }\-: The A\-M\-O\-E\-B\-A polarization type, either direct, mutual, or nonpolarizable. \par
-{\bfseries  Default Value }\-: direct \par
-{\bfseries  Scope }\-: Optimizations of the A\-M\-O\-E\-B\-A polarizable force field (Optional) \par
-{\bfseries  Full description }\-: When optimizing a force field with the A\-M\-O\-E\-B\-A functional form, set this variable to 'direct', 'mutual', or 'nonpolarizable'. At present this variable affects Open\-M\-M A\-P\-I calls, but not T\-I\-N\-K\-E\-R input files. \par
-{\bfseries  Recommendation }\-: No recommendation, depends on the application.\end{DoxyItemize}
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  A\-S\-Y\-N\-C\-H\-R\-O\-N\-O\-U\-S } (Bool) \par
 {\bfseries  One-\/line description }\-: Execute Work Queue tasks and local calculations asynchronously for improved speed \par
@@ -61,9 +64,14 @@ This section contains a listing of the general options available when running a 
 {\bfseries  Full description }\-: It is important for force fields with point charges to not change the overall charge on the molecule or ion. Setting this option will activate a linear transformation which projects out the direction in parameter space that changes the net charge. \par
 {\bfseries  Recommendation }\-: Either set to true and check your output carefully, or use \char`\"{}eval\char`\"{} statements in the force field file for finer control.\end{DoxyItemize}
 \begin{DoxyItemize}
+\item {\bfseries  C\-O\-N\-T\-I\-N\-U\-E } (Bool) \par
+{\bfseries  One-\/line description }\-: Continue the current run from where we left off (supports mid-\/iteration recovery). \par
+{\bfseries  Default Value }\-: 0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
 \item {\bfseries  C\-O\-N\-V\-E\-R\-G\-E\-N\-C\-E\-\_\-\-G\-R\-A\-D\-I\-E\-N\-T } (Float) \par
 {\bfseries  One-\/line description }\-: Convergence criterion of gradient norm \par
-{\bfseries  Default Value }\-: 0.\-0001 \par
+{\bfseries  Default Value }\-: 0.\-001 \par
 {\bfseries  Scope }\-: Main optimizer (Optional) \par
 {\bfseries  Full description }\-: The main optimizer will quit when the objective function gradient falls below this number. Since this is a newly implemented option, I can't say when this option will fail. \par
 {\bfseries  Recommendation }\-: Leave at the default, or set to several orders of magnitude below a typical value of the gradient (perhaps the gradient at the start of the optimization.)\end{DoxyItemize}
@@ -81,6 +89,11 @@ This section contains a listing of the general options available when running a 
 {\bfseries  Scope }\-: Main optimizer (Optional) \par
 {\bfseries  Full description }\-: The main optimizer will quit when the step size falls below this number. This happens if we are approaching a local minimum, or if the optimizer is constantly taking bad steps and the trust radius is reduced until it falls below this number. In the latter case, this usually means that the derivatives are wrong. \par
 {\bfseries  Recommendation }\-: Make sure that this value is much smaller than trust0.\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  C\-R\-I\-T\-E\-R\-I\-A } (Int) \par
+{\bfseries  One-\/line description }\-: The number of convergence criteria that must be met for main optimizer to converge \par
+{\bfseries  Default Value }\-: 1 \par
+(Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  E\-I\-G\-\_\-\-L\-O\-W\-E\-R\-B\-O\-U\-N\-D } (Float) \par
 {\bfseries  One-\/line description }\-: Minimum eigenvalue for applying steepest descent correction \par
@@ -101,6 +114,11 @@ This section contains a listing of the general options available when running a 
 {\bfseries  Default Value }\-: forcefield \par
 {\bfseries  Scope }\-: All force field optimizations (Optional) \par
 {\bfseries  Recommendation }\-: Unless you're using a nonstandard location for force field files, you probably shouldn't change this.\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  F\-I\-N\-I\-T\-E\-\_\-\-D\-I\-F\-F\-E\-R\-E\-N\-C\-E\-\_\-\-F\-A\-C\-T\-O\-R } (Float) \par
+{\bfseries  One-\/line description }\-: Make sure that the finite difference step size does not exceed this multiple of the trust radius. \par
+{\bfseries  Default Value }\-: 0.\-1 \par
+(Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  F\-I\-N\-I\-T\-E\-\_\-\-D\-I\-F\-F\-E\-R\-E\-N\-C\-E\-\_\-\-H } (Float) \par
 {\bfseries  One-\/line description }\-: Step size for finite difference derivatives in many functions \par
@@ -148,6 +166,11 @@ This section contains a listing of the general options available when running a 
 \item {\bfseries  L\-O\-G\-A\-R\-I\-T\-H\-M\-I\-C\-\_\-\-M\-A\-P } (Bool) \par
 {\bfseries  One-\/line description }\-: Optimize in the space of log-\/variables \par
 {\bfseries  Default Value }\-: 0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  L\-Q\-\_\-\-C\-O\-N\-V\-E\-R\-G\-E } (Bool) \par
+{\bfseries  One-\/line description }\-: Allow convergence on \char`\"{}low quality\char`\"{} steps \par
+{\bfseries  Default Value }\-: 1 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  M\-A\-X\-S\-T\-E\-P } (Int) \par
@@ -254,8 +277,18 @@ This section contains a listing of the general options available when running a 
 {\bfseries  Scope }\-: Main optimizer (Optional) \par
 {\bfseries  Full description }\-: The main optimizer has the ability to pick up where it left off by reading / writing checkpoint files. Here you may specify the checkpoint file to read in from a previous optimization run. This is equivalent to reading in stored parameter values, except the gradient and Hessian (which contains memory from previous steps) is recorded too.\end{DoxyItemize}
 \begin{DoxyItemize}
+\item {\bfseries  R\-E\-E\-V\-A\-L\-U\-A\-T\-E } (Bool) \par
+{\bfseries  One-\/line description }\-: Re-\/evaluate the objective function and gradients when the step is rejected (for noisy objective functions). \par
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
 \item {\bfseries  R\-I\-G\-I\-D\-\_\-\-W\-A\-T\-E\-R } (Bool) \par
 {\bfseries  One-\/line description }\-: Perform calculations using rigid water molecules. \par
+{\bfseries  Default Value }\-: 0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  R\-P\-M\-D\-\_\-\-B\-E\-A\-D\-S } (Int) \par
+{\bfseries  One-\/line description }\-: Number of beads in ring polymer M\-D (zero to disable) \par
 {\bfseries  Default Value }\-: 0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
@@ -283,6 +316,11 @@ This section contains a listing of the general options available when running a 
 \item {\bfseries  S\-E\-A\-R\-C\-H\-\_\-\-T\-O\-L\-E\-R\-A\-N\-C\-E } (Float) \par
 {\bfseries  One-\/line description }\-: Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search. \par
 {\bfseries  Default Value }\-: 0.\-0001 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  S\-T\-E\-P\-\_\-\-L\-O\-W\-E\-R\-B\-O\-U\-N\-D } (Float) \par
+{\bfseries  One-\/line description }\-: Optimization will \char`\"{}fail\char`\"{} if step falls below this size \par
+{\bfseries  Default Value }\-: 1e-\/06 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  T\-I\-N\-K\-E\-R\-P\-A\-T\-H } (String) \par
@@ -326,12 +364,22 @@ This section contains a listing of the general options available when running a 
 {\bfseries  Scope }\-: Main optimizer when 'writechk' is turned on (Optional) \par
 {\bfseries  Full description }\-: Write a checkpoint file every single step, not just after the job is finished. \par
 {\bfseries  Recommendation }\-: Useful if you want to quit an optimization before it finishes and restart, but make sure you don't overwrite existing checkpoint files by accident.\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  Z\-E\-R\-O\-G\-R\-A\-D } (Int) \par
+{\bfseries  One-\/line description }\-: Set to a nonnegative number to turn on zero gradient skipping at that optimization step. \par
+{\bfseries  Default Value }\-: -\/1 \par
+(Needs full documentation)\end{DoxyItemize}
 \hypertarget{glossary_tgt_option_index}{}\subsection{Option index\-: Target options}\label{glossary_tgt_option_index}
 This section contains a listing of the target options available when running a Force\-Balance job, which go into the \$tgt\-\_\-opts section. There can be multiple \$tgt\-\_\-opts sections in a Force\-Balance input file, one for each target.
 
 \begin{DoxyItemize}
 \item {\bfseries  A\-B\-S\-O\-L\-U\-T\-E } (Bool) \par
 {\bfseries  One-\/line description }\-: When matching energies in Ab\-Initio, do not subtract the mean energy gap. \par
+{\bfseries  Default Value }\-: 0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  A\-D\-A\-P\-T\-\_\-\-E\-R\-R\-O\-R\-S } (Bool) \par
+{\bfseries  One-\/line description }\-: Adapt to simulation uncertainty by combining property estimations and adjusting simulation length. \par
 {\bfseries  Default Value }\-: 0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
@@ -356,17 +404,12 @@ This section contains a listing of the target options available when running a F
 {\bfseries  Scope }\-: All target types (Optional) \par
 {\bfseries  Full description }\-: This is a stub for future functionality. When the flag is switched on, the jobs corresponding to finite difference derivatives are evaluated in parallel on a distributed computing platform.\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  B\-I\-N\-D\-I\-N\-G\-\_\-\-T\-X\-T } (String) \par
-{\bfseries  One-\/line description }\-: Text file containing interacting systems. If not provided, will search for a default. \par
-{\bfseries  Default Value }\-: None \par
-(Needs full documentation)\end{DoxyItemize}
-\begin{DoxyItemize}
 \item {\bfseries  C\-A\-U\-C\-H\-Y } (Bool) \par
 {\bfseries  One-\/line description }\-: Normalize interaction energies each using 1/(denom$\ast$$\ast$2 + reference$\ast$$\ast$2) which resembles a Cauchy distribution \par
 {\bfseries  Default Value }\-: 0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  C\-O\-O\-R\-D\-S } (List) \par
+\item {\bfseries  C\-O\-O\-R\-D\-S } (String) \par
 {\bfseries  One-\/line description }\-: Coordinates for single point evaluation; if not provided, will search for a default. \par
 {\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
@@ -406,6 +449,16 @@ This section contains a listing of the target options available when running a F
 \item {\bfseries  E\-N\-G\-I\-N\-E } (Allcap) \par
 {\bfseries  One-\/line description }\-: The external code used to execute the simulations (G\-M\-X, T\-I\-N\-K\-E\-R, A\-M\-B\-E\-R, Open\-M\-M) \par
 {\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  E\-Q\-\_\-\-S\-T\-E\-P\-S } (Int) \par
+{\bfseries  One-\/line description }\-: Number of time steps for the equilibration run. \par
+{\bfseries  Default Value }\-: 20000 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  E\-X\-P\-D\-A\-T\-A\-\_\-\-T\-X\-T } (String) \par
+{\bfseries  One-\/line description }\-: Text file containing experimental data. \par
+{\bfseries  Default Value }\-: expset.\-txt \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  F\-D\-\_\-\-P\-T\-Y\-P\-E\-S } (List) \par
@@ -460,40 +513,50 @@ This section contains a listing of the target options available when running a F
 \begin{DoxyItemize}
 \item {\bfseries  F\-R\-A\-G\-M\-E\-N\-T1 } (String) \par
 {\bfseries  One-\/line description }\-: Interaction fragment 1\-: a selection of atoms specified using atoms and dashes, e.\-g. 1-\/6 to select the first through sixth atom (i.\-e. list numbering starts from 1) \par
-{\bfseries  Default Value }\-: \par
+{\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  F\-R\-A\-G\-M\-E\-N\-T2 } (String) \par
 {\bfseries  One-\/line description }\-: Interaction fragment 2\-: a selection of atoms specified using atoms and dashes, e.\-g. 7-\/11 to select atoms 7 through 11. \par
-{\bfseries  Default Value }\-: \par
+{\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  G\-A\-S\-\_\-\-E\-Q\-U\-\_\-\-S\-T\-E\-P\-S } (Int) \par
+\item {\bfseries  G\-A\-S\-\_\-\-C\-O\-O\-R\-D\-S } (String) \par
+{\bfseries  One-\/line description }\-: Provide file name for gas phase coordinates. \par
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  G\-A\-S\-\_\-\-E\-Q\-\_\-\-S\-T\-E\-P\-S } (Int) \par
 {\bfseries  One-\/line description }\-: Number of time steps for the gas equilibration run, if different from default. \par
-{\bfseries  Default Value }\-: 0 \par
+{\bfseries  Default Value }\-: 10000 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  G\-A\-S\-\_\-\-I\-N\-T\-E\-R\-V\-A\-L } (Float) \par
 {\bfseries  One-\/line description }\-: Time interval for saving coordinates for the gas production run (if zero, use default in external script.) \par
-{\bfseries  Default Value }\-: 0.\-0 \par
+{\bfseries  Default Value }\-: 0.\-1 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  G\-A\-S\-\_\-\-P\-R\-O\-D\-\_\-\-S\-T\-E\-P\-S } (Int) \par
+\item {\bfseries  G\-A\-S\-\_\-\-M\-D\-\_\-\-S\-T\-E\-P\-S } (Int) \par
 {\bfseries  One-\/line description }\-: Number of time steps for the gas production run, if different from default. \par
-{\bfseries  Default Value }\-: 0 \par
+{\bfseries  Default Value }\-: 100000 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  G\-A\-S\-\_\-\-T\-I\-M\-E\-S\-T\-E\-P } (Float) \par
 {\bfseries  One-\/line description }\-: Time step size for the gas simulation (if zero, use default in external script.). \par
-{\bfseries  Default Value }\-: 0.\-0 \par
+{\bfseries  Default Value }\-: 1.\-0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  G\-M\-X\-\_\-\-M\-D\-P } (List) \par
+\item {\bfseries  G\-M\-X\-\_\-\-M\-D\-P } (String) \par
 {\bfseries  One-\/line description }\-: Gromacs .mdp files. If not provided, will search for default. \par
 {\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  G\-M\-X\-\_\-\-T\-O\-P } (List) \par
+\item {\bfseries  G\-M\-X\-\_\-\-N\-D\-X } (String) \par
+{\bfseries  One-\/line description }\-: Gromacs .ndx files. If not provided, will search for default. \par
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  G\-M\-X\-\_\-\-T\-O\-P } (String) \par
 {\bfseries  One-\/line description }\-: Gromacs .top files. If not provided, will search for default. \par
 {\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
@@ -503,24 +566,59 @@ This section contains a listing of the target options available when running a F
 {\bfseries  Default Value }\-: 0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  L\-I\-Q\-U\-I\-D\-\_\-\-E\-Q\-U\-\_\-\-S\-T\-E\-P\-S } (Int) \par
-{\bfseries  One-\/line description }\-: Number of time steps for the liquid equilibration run. \par
+\item {\bfseries  I\-N\-T\-E\-R\-\_\-\-T\-X\-T } (String) \par
+{\bfseries  One-\/line description }\-: Text file containing interacting systems. If not provided, will search for a default. \par
+{\bfseries  Default Value }\-: interactions.\-txt \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  L\-I\-P\-I\-D\-\_\-\-C\-O\-O\-R\-D\-S } (String) \par
+{\bfseries  One-\/line description }\-: Provide file name for lipid coordinates. \par
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  L\-I\-P\-I\-D\-\_\-\-E\-Q\-\_\-\-S\-T\-E\-P\-S } (Int) \par
+{\bfseries  One-\/line description }\-: Number of time steps for the lipid equilibration run. \par
+{\bfseries  Default Value }\-: 1000 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  L\-I\-P\-I\-D\-\_\-\-I\-N\-T\-E\-R\-V\-A\-L } (Float) \par
+{\bfseries  One-\/line description }\-: Time interval for saving coordinates for the lipid production run. \par
+{\bfseries  Default Value }\-: 0.\-1 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  L\-I\-P\-I\-D\-\_\-\-M\-D\-\_\-\-S\-T\-E\-P\-S } (Int) \par
+{\bfseries  One-\/line description }\-: Number of time steps for the lipid production run. \par
 {\bfseries  Default Value }\-: 10000 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  L\-I\-P\-I\-D\-\_\-\-T\-I\-M\-E\-S\-T\-E\-P } (Float) \par
+{\bfseries  One-\/line description }\-: Time step size for the lipid simulation. \par
+{\bfseries  Default Value }\-: 1.\-0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  L\-I\-Q\-U\-I\-D\-\_\-\-C\-O\-O\-R\-D\-S } (String) \par
+{\bfseries  One-\/line description }\-: Provide file name for condensed phase coordinates. \par
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  L\-I\-Q\-U\-I\-D\-\_\-\-E\-Q\-\_\-\-S\-T\-E\-P\-S } (Int) \par
+{\bfseries  One-\/line description }\-: Number of time steps for the liquid equilibration run. \par
+{\bfseries  Default Value }\-: 1000 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  L\-I\-Q\-U\-I\-D\-\_\-\-I\-N\-T\-E\-R\-V\-A\-L } (Float) \par
 {\bfseries  One-\/line description }\-: Time interval for saving coordinates for the liquid production run. \par
-{\bfseries  Default Value }\-: 0.\-05 \par
+{\bfseries  Default Value }\-: 0.\-1 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  L\-I\-Q\-U\-I\-D\-\_\-\-P\-R\-O\-D\-\_\-\-S\-T\-E\-P\-S } (Int) \par
+\item {\bfseries  L\-I\-Q\-U\-I\-D\-\_\-\-M\-D\-\_\-\-S\-T\-E\-P\-S } (Int) \par
 {\bfseries  One-\/line description }\-: Number of time steps for the liquid production run. \par
-{\bfseries  Default Value }\-: 20000 \par
+{\bfseries  Default Value }\-: 10000 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  L\-I\-Q\-U\-I\-D\-\_\-\-T\-I\-M\-E\-S\-T\-E\-P } (Float) \par
 {\bfseries  One-\/line description }\-: Time step size for the liquid simulation. \par
-{\bfseries  Default Value }\-: 0.\-5 \par
+{\bfseries  Default Value }\-: 1.\-0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  M\-A\-N\-U\-A\-L } (Bool) \par
@@ -528,8 +626,13 @@ This section contains a listing of the target options available when running a F
 {\bfseries  Default Value }\-: 0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  M\-D\-R\-U\-N\-\_\-\-T\-H\-R\-E\-A\-D\-S } (Int) \par
-{\bfseries  One-\/line description }\-: Set the number of threads used by remote Gromacs processes \par
+\item {\bfseries  M\-D\-\_\-\-S\-T\-E\-P\-S } (Int) \par
+{\bfseries  One-\/line description }\-: Number of time steps for the production run. \par
+{\bfseries  Default Value }\-: 50000 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  M\-D\-\_\-\-T\-H\-R\-E\-A\-D\-S } (Int) \par
+{\bfseries  One-\/line description }\-: Set the number of threads used by Gromacs or T\-I\-N\-K\-E\-R processes in M\-D simulations \par
 {\bfseries  Default Value }\-: 1 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
@@ -538,9 +641,19 @@ This section contains a listing of the target options available when running a F
 {\bfseries  Default Value }\-: 1 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  M\-T\-S\-\_\-\-V\-V\-V\-R } (Bool) \par
+\item {\bfseries  M\-T\-S\-\_\-\-I\-N\-T\-E\-G\-R\-A\-T\-O\-R } (Bool) \par
 {\bfseries  One-\/line description }\-: Enable multiple-\/timestep integrator in external npt.\-py script \par
 {\bfseries  Default Value }\-: 0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  N\-\_\-\-M\-C\-B\-A\-R\-O\-S\-T\-A\-T } (Int) \par
+{\bfseries  One-\/line description }\-: Number of steps in the liquid simulation between M\-C barostat volume adjustments. \par
+{\bfseries  Default Value }\-: 25 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  N\-\_\-\-S\-I\-M\-\_\-\-C\-H\-A\-I\-N } (Int) \par
+{\bfseries  One-\/line description }\-: Number of simulations required to calculate quantities. \par
+{\bfseries  Default Value }\-: 1 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  N\-A\-M\-E } (String) \par
@@ -549,14 +662,24 @@ This section contains a listing of the target options available when running a F
 {\bfseries  Scope }\-: All targets ({\bfseries {\itshape Required}}) \par
 {\bfseries  Recommendation }\-: Choose a descriptive name and make sure all targets have different names.\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  O\-P\-E\-N\-M\-M\-\_\-\-C\-U\-D\-A\-\_\-\-P\-R\-E\-C\-I\-S\-I\-O\-N } (String) \par
-{\bfseries  One-\/line description }\-: Precision of local Open\-M\-M calculation. Choose either single, double or mixed ; defaults to the Open\-M\-M default. \par
-{\bfseries  Default Value }\-: \par
+\item {\bfseries  O\-P\-E\-N\-M\-M\-\_\-\-P\-L\-A\-T\-F\-O\-R\-M } (String) \par
+{\bfseries  One-\/line description }\-: Open\-M\-M platform. Choose either Reference, C\-U\-D\-A or Open\-C\-L. A\-M\-O\-E\-B\-A is on Reference or C\-U\-D\-A only. \par
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  O\-P\-E\-N\-M\-M\-\_\-\-P\-R\-E\-C\-I\-S\-I\-O\-N } (String) \par
+{\bfseries  One-\/line description }\-: Precision of Open\-M\-M calculation if using C\-U\-D\-A or Open\-C\-L platform. Choose either single, double or mixed ; defaults to the Open\-M\-M default. \par
+{\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  O\-P\-T\-I\-M\-I\-Z\-E\-\_\-\-G\-E\-O\-M\-E\-T\-R\-Y } (Bool) \par
 {\bfseries  One-\/line description }\-: Perform a geometry optimization before computing properties \par
 {\bfseries  Default Value }\-: 1 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  P\-D\-B } (String) \par
+{\bfseries  One-\/line description }\-: P\-D\-B file mainly used for building Open\-M\-M systems but can also contain coordinates. \par
+{\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  P\-O\-L\-A\-R\-I\-Z\-A\-B\-I\-L\-I\-T\-Y\-\_\-\-D\-E\-N\-O\-M } (Float) \par
@@ -586,6 +709,21 @@ This section contains a listing of the target options available when running a F
 \item {\bfseries  Q\-U\-A\-D\-R\-U\-P\-O\-L\-E\-\_\-\-D\-E\-N\-O\-M } (Float) \par
 {\bfseries  One-\/line description }\-: Quadrupole normalization (Buckingham) ; set to 0 if a zero weight is desired \par
 {\bfseries  Default Value }\-: 1.\-0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  Q\-U\-A\-N\-T\-I\-T\-I\-E\-S } (List) \par
+{\bfseries  One-\/line description }\-: List of quantities to be fitted, each must have corresponding Quantity subclass \par
+{\bfseries  Default Value }\-: \mbox{[}\mbox{]} \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  R\-E\-A\-D } (String) \par
+{\bfseries  One-\/line description }\-: Provide a temporary directory \char`\"{}.\-tmp\char`\"{} to read data from a previous calculation on the initial iteration (for instance, to restart an aborted run). \par
+{\bfseries  Default Value }\-: None \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  R\-E\-A\-S\-S\-I\-G\-N\-\_\-\-M\-O\-D\-E\-S } (String) \par
+{\bfseries  One-\/line description }\-: Reassign modes before fitting frequencies, using either linear assignment \char`\"{}permute\char`\"{} or maximum overlap \char`\"{}overlap\char`\"{}. \par
+{\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  R\-E\-M\-O\-T\-E } (Bool) \par
@@ -650,17 +788,22 @@ This section contains a listing of the target options available when running a F
 {\bfseries  Default Value }\-: 0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
-\item {\bfseries  T\-I\-N\-K\-E\-R\-\_\-\-K\-E\-Y } (List) \par
+\item {\bfseries  T\-I\-N\-K\-E\-R\-\_\-\-K\-E\-Y } (String) \par
 {\bfseries  One-\/line description }\-: T\-I\-N\-K\-E\-R .key files. If not provided, will search for default. \par
 {\bfseries  Default Value }\-: None \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  T\-Y\-P\-E } (Allcap) \par
-{\bfseries  One-\/line description }\-: The type of fitting target (Abinitio, Binding\-Energy, Liquid, Moments, Vibration) ; must correspond to the name of a Target subclass. \par
+{\bfseries  One-\/line description }\-: The type of fitting target, for instance Ab\-Initio\-\_\-\-G\-M\-X ; this must correspond to the name of a Target subclass. \par
 {\bfseries  Default Value }\-: None \par
 {\bfseries  Scope }\-: All targets ({\bfseries {\itshape Required}}) \par
-{\bfseries  Full description }\-: This is the type of target that you are running. The current accepted values for the target type are given in the beginning of the objective.\-py file\-: C\-O\-U\-N\-T\-E\-R\-P\-O\-I\-S\-E, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-A\-M\-B\-E\-R, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-G\-M\-X, L\-I\-Q\-U\-I\-D\-\_\-\-G\-M\-X, L\-I\-Q\-U\-I\-D\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-T\-I\-N\-K\-E\-R, B\-I\-N\-D\-I\-N\-G\-E\-N\-E\-R\-G\-Y\-\_\-\-T\-I\-N\-K\-E\-R, M\-O\-N\-O\-M\-E\-R\-\_\-\-Q\-T\-P\-I\-E, R\-D\-V\-R3\-\_\-\-P\-S\-I4, I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-I\-N\-T\-E\-R\-N\-A\-L, M\-O\-M\-E\-N\-T\-S\-\_\-\-T\-I\-N\-K\-E\-R, T\-H\-C\-D\-F\-\_\-\-P\-S\-I4, R\-E\-M\-O\-T\-E\-\_\-\-T\-A\-R\-G\-E\-T, V\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R, L\-I\-Q\-U\-I\-D\-\_\-\-T\-I\-N\-K\-E\-R, I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R. \par
+{\bfseries  Full description }\-: This is the type of target that you are running. The current accepted values for the target type are given in the beginning of the objective.\-py file\-: I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-O\-P\-E\-N\-M\-M, L\-I\-Q\-U\-I\-D\-\_\-\-O\-P\-E\-N\-M\-M, M\-O\-M\-E\-N\-T\-S\-\_\-\-G\-M\-X, B\-I\-N\-D\-I\-N\-G\-E\-N\-E\-R\-G\-Y\-\_\-\-T\-I\-N\-K\-E\-R, B\-I\-N\-D\-I\-N\-G\-E\-N\-E\-R\-G\-Y\-\_\-\-G\-M\-X, V\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-G\-M\-X, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-A\-M\-B\-E\-R, T\-H\-E\-R\-M\-O\-\_\-\-G\-M\-X, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-T\-I\-N\-K\-E\-R, M\-O\-M\-E\-N\-T\-S\-\_\-\-O\-P\-E\-N\-M\-M, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-I\-N\-T\-E\-R\-N\-A\-L, L\-I\-P\-I\-D\-\_\-\-G\-M\-X, L\-I\-Q\-U\-I\-D\-\_\-\-G\-M\-X, C\-O\-U\-N\-T\-E\-R\-P\-O\-I\-S\-E, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-O\-P\-E\-N\-M\-M, R\-D\-V\-R3\-\_\-\-P\-S\-I4, M\-O\-M\-E\-N\-T\-S\-\_\-\-T\-I\-N\-K\-E\-R, T\-H\-C\-D\-F\-\_\-\-P\-S\-I4, I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R, A\-B\-I\-N\-I\-T\-I\-O\-\_\-\-G\-M\-X, B\-I\-N\-D\-I\-N\-G\-E\-N\-E\-R\-G\-Y\-\_\-\-O\-P\-E\-N\-M\-M, I\-N\-T\-E\-R\-A\-C\-T\-I\-O\-N\-\_\-\-G\-M\-X, R\-E\-M\-O\-T\-E\-\_\-\-T\-A\-R\-G\-E\-T, V\-I\-B\-R\-A\-T\-I\-O\-N\-\_\-\-T\-I\-N\-K\-E\-R, L\-I\-Q\-U\-I\-D\-\_\-\-T\-I\-N\-K\-E\-R. \par
 {\bfseries  Recommendation }\-: Choose the appropriate type, and if the target type is missing, feel free to implement your own (or ask me for help).\end{DoxyItemize}
+\begin{DoxyItemize}
+\item {\bfseries  W\-\_\-\-A\-L } (Float) \par
+{\bfseries  One-\/line description }\-: Weight of average area per lipid \par
+{\bfseries  Default Value }\-: 1.\-0 \par
+(Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
 \item {\bfseries  W\-\_\-\-A\-L\-P\-H\-A } (Float) \par
 {\bfseries  One-\/line description }\-: Weight of thermal expansion coefficient \par
@@ -712,6 +855,11 @@ This section contains a listing of the target options available when running a F
 {\bfseries  Default Value }\-: 1.\-0 \par
 (Needs full documentation)\end{DoxyItemize}
 \begin{DoxyItemize}
+\item {\bfseries  W\-\_\-\-S\-C\-D } (Float) \par
+{\bfseries  One-\/line description }\-: Weight of dielectric constant \par
+{\bfseries  Default Value }\-: 1.\-0 \par
+(Needs full documentation)\end{DoxyItemize}
+\begin{DoxyItemize}
 \item {\bfseries  W\-\_\-\-T\-O\-R\-Q\-U\-E } (Float) \par
 {\bfseries  One-\/line description }\-: Weight of torques (condensed to molecules, residues, or charge groups) \par
 {\bfseries  Default Value }\-: 0.\-0 \par
@@ -738,7 +886,7 @@ This section contains a listing of the target options available when running a F
 \begin{DoxyItemize}
 \item {\bfseries  W\-R\-I\-T\-E\-L\-E\-V\-E\-L } (Int) \par
 {\bfseries  One-\/line description }\-: Affects the amount of data being printed to the temp directory. \par
-{\bfseries  Default Value }\-: 1 \par
+{\bfseries  Default Value }\-: 0 \par
 (Needs full documentation)\end{DoxyItemize}
 
 \begin{DoxyImage}

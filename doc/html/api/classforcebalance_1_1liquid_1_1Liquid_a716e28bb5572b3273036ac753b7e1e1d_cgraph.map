@@ -1,22 +1,15 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a2ff762a2f2d2b6bb1c7dd067bd1a1e88" title="Use this instead of pickle.dump for pickling anything that contains _ElementTree types." alt="" coords="411,5,603,32"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b" title="forcebalance.optimizer.Counter" alt="" coords="395,107,618,133"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="387,56,626,83"/>
-<area shape="rect" id="node15" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#ad6a30e41f4c0bc319d7ffbbb09cfcf5d" title="Submit a NPT simulation to the Work Queue." alt="" coords="317,208,696,235"/>
-<area shape="rect" id="node38" href="$classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html#a53a10ac99cdfbf026526ed625d4de809" title="Submit a NPT simulation to the Work Queue." alt="" coords="334,157,679,184"/>
-<area shape="rect" id="node44" href="$classforcebalance_1_1liquid_1_1Liquid.html#a802c4139e5c002fabdeab5de88093880" title="Fitting of liquid bulk properties." alt="" coords="403,259,610,285"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWorkQueue" alt="" coords="795,5,1026,32"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1optimizer.html#ab43948ecf30c90d319e0c0b107fe484a" title="forcebalance.optimizer.GoodStep" alt="" coords="793,107,1028,133"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="789,56,1032,83"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue." alt="" coords="811,208,1011,235"/>
-<area shape="rect" id="node36" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#a92379bd73128234b309fae789946035d" title="Instantiation of the subclass." alt="" coords="745,259,1077,285"/>
-<area shape="rect" id="node19" href="$namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue." alt="" coords="1125,183,1387,209"/>
-<area shape="rect" id="node21" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished." alt="" coords="1159,233,1353,260"/>
-<area shape="rect" id="node23" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="1435,157,1621,184"/>
-<area shape="rect" id="node25" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="1670,183,1847,209"/>
-<area shape="rect" id="node31" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="1439,259,1617,285"/>
-<area shape="rect" id="node34" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="1441,309,1615,336"/>
-<area shape="rect" id="node27" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.MissingFileInspection" alt="" coords="1896,183,2165,209"/>
-<area shape="rect" id="node29" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link_dir_contents" alt="" coords="2214,183,2458,209"/>
-<area shape="rect" id="node42" href="$classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html#a307529b9902b34a790a8b016e153c7d6" title="Instantiation of the subclass." alt="" coords="761,157,1060,184"/>
+<map id="forcebalance.liquid.Liquid.submit_jobs" name="forcebalance.liquid.Liquid.submit_jobs">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a11babd62dc7bca389162c6318f9672ca" title="Cool&#45;looking printout for slick formatting of output. " alt="" coords="333,5,525,35"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="624,23,789,70"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a185aa094549d280fdc18479459980164" title="If trying to write to a symbolic link, remove it first. " alt="" coords="340,109,519,139"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a2ff762a2f2d2b6bb1c7dd067bd1a1e88" title="Use this instead of pickle.dump for pickling anything that contains _ElementTree types. " alt="" coords="333,163,525,192"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b" title="forcebalance.optimizer.Counter" alt="" coords="319,216,540,245"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1optimizer.html#a1b6394e430a899f19957694a173e9150" title="forcebalance.optimizer.First" alt="" coords="331,269,528,299"/>
+<area shape="rect" id="node16" href="$namespaceforcebalance_1_1optimizer.html#ab43948ecf30c90d319e0c0b107fe484a" title="forcebalance.optimizer.GoodStep" alt="" coords="589,381,824,411"/>
+<area shape="rect" id="node18" href="$classforcebalance_1_1gmxio_1_1Liquid__GMX.html#a4f844facdd6963b7981cc9e1cf3dc750" title="Submit a NPT simulation to the Work Queue. " alt="" coords="336,373,523,419"/>
+<area shape="rect" id="node21" href="$classforcebalance_1_1gmxio_1_1Lipid__GMX.html#a96b5ec8ce3421a14841f76ac21b55958" title="Submit a NPT simulation to the Work Queue. " alt="" coords="340,442,519,489"/>
+<area shape="rect" id="node24" href="$classforcebalance_1_1lipid_1_1Lipid.html#ade4fa56d07269b34736f6a06e0cc8237" title="Submit a NPT simulation to the Work Queue. " alt="" coords="335,581,524,627"/>
+<area shape="rect" id="node30" href="$classforcebalance_1_1liquid_1_1Liquid.html#a07a59f9f335693329b789a9c7608fc9f" title="Submit a NPT simulation to the Work Queue. " alt="" coords="327,511,532,558"/>
+<area shape="rect" id="node26" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="613,511,800,558"/>
+<area shape="rect" id="node28" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="628,581,785,627"/>
 </map>

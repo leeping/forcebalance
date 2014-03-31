@@ -1,3 +1,4 @@
-<map id="G" name="G">
-<area shape="rect" id="node1" href="$classforcebalance_1_1nifty_1_1RawStreamHandler.html" title="Exactly like logging.StreamHandler except it does no extra formatting before sending logging messages..." alt="" coords="6,5,266,32"/>
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node3" href="$classforcebalance_1_1output_1_1CleanStreamHandler.html" title="Similar to RawStreamHandler except it does not write terminal escape codes. " alt="" coords="192,5,381,51"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1output_1_1RawStreamHandler.html" title="Exactly like output.StreamHandler except it does no extra formatting before sending logging messages ..." alt="" coords="173,74,400,121"/>
 </map>

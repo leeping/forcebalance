@@ -3,7 +3,7 @@
 }
 
 
-Finite state machine for parsing T\-I\-N\-K\-E\-R force field files.  
+Finite state machine for parsing \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} force field files.  
 
 
 
@@ -45,7 +45,7 @@ def \hyperlink{classforcebalance_1_1BaseReader_aab2c64ccf0f803d4eff3bbf40a6cb0b7
 \hyperlink{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a357973ff305fe5135067499292f32a37}{pdict}
 \begin{DoxyCompactList}\small\item\em The parameter dictionary (defined in this file) \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a77b335b67d8e723248ac52515867607d}{atom}
-\begin{DoxyCompactList}\small\item\em The atom numbers in the interaction (stored in the T\-I\-N\-K\-E\-R parser) \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em The atom numbers in the interaction (stored in the \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} parser) \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a248491ef24b63a0c027d66d75e80e70e}{itype}
 \item 
 \hyperlink{classforcebalance_1_1tinkerio_1_1Tinker__Reader_ad9a91824cf94ed13b39a115ebbd784c3}{suffix}
@@ -63,11 +63,11 @@ def \hyperlink{classforcebalance_1_1BaseReader_aab2c64ccf0f803d4eff3bbf40a6cb0b7
 
 
 \subsubsection{Detailed Description}
-Finite state machine for parsing T\-I\-N\-K\-E\-R force field files. 
+Finite state machine for parsing \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} force field files. 
 
 This class is instantiated when we begin to read in a file. The feed(line) method updates the state of the machine, informing it of the current interaction type. Using this information we can look up the interaction type and parameter type for building the parameter I\-D. 
 
-Definition at line 66 of file tinkerio.\-py.
+Definition at line 92 of file tinkerio.\-py.
 
 
 
@@ -82,7 +82,7 @@ Definition at line 66 of file tinkerio.\-py.
 )}}\label{classforcebalance_1_1tinkerio_1_1Tinker__Reader_ae0432662e2cf0c979be26ba05859a1c5}
 
 
-Definition at line 68 of file tinkerio.\-py.
+Definition at line 94 of file tinkerio.\-py.
 
 
 
@@ -107,7 +107,7 @@ If, however, 'pdict' does not contain the ptype value, a suitable substitute is 
 
 Note that if the interaction type state is not set, then it defaults to the file name, so a generic parameter I\-D is 'filename.\-line\-\_\-num.\-field\-\_\-num' 
 
-Definition at line 107 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 124 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a78df181e8a2ffea7054b1915e47384b7}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!feed@{feed}}
 \index{feed@{feed}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
@@ -121,15 +121,13 @@ Definition at line 107 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 Given a line, determine the interaction type and the atoms involved (the suffix). 
 
-\begin{DoxyVerb}     TINKER generally has stuff like this:
-\end{DoxyVerb}
-
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} generally has stuff like this\-:
 
 \begin{DoxyVerb}         bond-cubic              -2.55
          bond-quartic            3.793125
  
          vdw           1               3.4050     0.1100
-         vdw           2               2.6550     0.0135      0.910 # PARM 4
+         vdw           2               2.6550     0.0135      0.910 # PRM 4
  
          multipole     2    1    2               0.25983
                                                 -0.03859    0.00000   -0.05818
@@ -138,10 +136,10 @@ Given a line, determine the interaction type and the atoms involved (the suffix)
                                                 -0.00203    0.00000    0.14412\end{DoxyVerb}
 
 
-The '\#\-P\-A\-R\-M 4' has no effect on T\-I\-N\-K\-E\-R but it indicates that we are tuning the fourth field on the line (the 0.\-910 value).
+The '\#\-P\-R\-M 4' has no effect on \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} but it indicates that we are tuning the fourth field on the line (the 0.\-910 value).
 
 \begin{DoxyRefDesc}{Todo}
-\item[\hyperlink{todo__todo000018}{Todo}]Put the rescaling factors for T\-I\-N\-K\-E\-R parameters in here. Currently we're using the initial value to determine the rescaling factor which is not very good.\end{DoxyRefDesc}
+\item[\hyperlink{todo__todo000017}{Todo}]Put the rescaling factors for \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} parameters in here. Currently we're using the initial value to determine the rescaling factor which is not very good.\end{DoxyRefDesc}
 \begin{DoxyVerb}     Every parameter line is prefaced by the interaction type
      except for 'multipole' which is on multiple lines.  Because
      the lines that come after 'multipole' are predictable, we just
@@ -150,7 +148,7 @@ The '\#\-P\-A\-R\-M 4' has no effect on T\-I\-N\-K\-E\-R but it indicates that w
      Random note: Unit of force is kcal / mole / angstrom squared.\end{DoxyVerb}
  
 
-Definition at line 109 of file tinkerio.\-py.
+Definition at line 135 of file tinkerio.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_acded199bbc003eb93d071a972ef38901}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!Split@{Split}}
 \index{Split@{Split}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
@@ -162,18 +160,7 @@ Definition at line 109 of file tinkerio.\-py.
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_acded199bbc003eb93d071a972ef38901}
 
 
-Definition at line 82 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
-
-
-
-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1BaseReader_acded199bbc003eb93d071a972ef38901_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 99 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_af2af8a559625614474a1c6fe245b5e13}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!Whites@{Whites}}
 \index{Whites@{Whites}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
@@ -185,18 +172,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_af2af8a559625614474a1c6fe245b5e13}
 
 
-Definition at line 85 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
-
-
-
-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1BaseReader_af2af8a559625614474a1c6fe245b5e13_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 102 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 
 
@@ -210,39 +186,39 @@ The mapping of (this residue, atom number) to (atom name) for building atom-\/sp
 
 
 
-Definition at line 72 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 89 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a77b335b67d8e723248ac52515867607d}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!atom@{atom}}
 \index{atom@{atom}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
 \paragraph[{atom}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Tinker\-\_\-\-Reader.\-atom}}\label{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a77b335b67d8e723248ac52515867607d}
 
 
-The atom numbers in the interaction (stored in the T\-I\-N\-K\-E\-R parser) 
+The atom numbers in the interaction (stored in the \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} parser) 
 
 
 
-Definition at line 73 of file tinkerio.\-py.
+Definition at line 99 of file tinkerio.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_a69ca7d949a4a3df4d9f61e617fe0e270}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!Atom\-Types@{Atom\-Types}}
 \index{Atom\-Types@{Atom\-Types}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
 \paragraph[{Atom\-Types}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Reader.\-Atom\-Types\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_a69ca7d949a4a3df4d9f61e617fe0e270}
 
 
-Definition at line 80 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 97 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a248491ef24b63a0c027d66d75e80e70e}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!itype@{itype}}
 \index{itype@{itype}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
 \paragraph[{itype}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Tinker\-\_\-\-Reader.\-itype}}\label{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a248491ef24b63a0c027d66d75e80e70e}
 
 
-Definition at line 117 of file tinkerio.\-py.
+Definition at line 143 of file tinkerio.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_a80c8e3bea212600742968aa8669e557b}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!ln@{ln}}
 \index{ln@{ln}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
 \paragraph[{ln}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Reader.\-ln\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_a80c8e3bea212600742968aa8669e557b}
 
 
-Definition at line 67 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 84 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_ab444c213e15929253dd73395ac5f19fc}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!molatom@{molatom}}
 \index{molatom@{molatom}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
@@ -253,14 +229,14 @@ The mapping of (molecule name) to a dictionary of of atom types for the atoms in
 
 self.\-moleculedict = Ordered\-Dict() The listing of 'R\-E\-S\-:A\-T\-O\-M\-N\-A\-M\-E\-S' for atom names in the line This is obviously a placeholder. 
 
-Definition at line 77 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 94 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1BaseReader_a4369b5fb663a83b11602daa71db6862e}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!Molecules@{Molecules}}
 \index{Molecules@{Molecules}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
 \paragraph[{Molecules}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Reader.\-Molecules\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseReader_a4369b5fb663a83b11602daa71db6862e}
 
 
-Definition at line 79 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 96 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1tinkerio_1_1Tinker__Reader_a357973ff305fe5135067499292f32a37}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!pdict@{pdict}}
 \index{pdict@{pdict}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
@@ -271,14 +247,14 @@ The parameter dictionary (defined in this file)
 
 
 
-Definition at line 71 of file tinkerio.\-py.
+Definition at line 97 of file tinkerio.\-py.
 
 \hypertarget{classforcebalance_1_1tinkerio_1_1Tinker__Reader_ad9a91824cf94ed13b39a115ebbd784c3}{\index{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}!suffix@{suffix}}
 \index{suffix@{suffix}!forcebalance::tinkerio::Tinker_Reader@{forcebalance\-::tinkerio\-::\-Tinker\-\_\-\-Reader}}
 \paragraph[{suffix}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Tinker\-\_\-\-Reader.\-suffix}}\label{classforcebalance_1_1tinkerio_1_1Tinker__Reader_ad9a91824cf94ed13b39a115ebbd784c3}
 
 
-Definition at line 139 of file tinkerio.\-py.
+Definition at line 165 of file tinkerio.\-py.
 
 
 

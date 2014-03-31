@@ -1,5 +1,10 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="373,5,648,32"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#ad47d05a3ea76e013a628bd7b25ae3050" title="forcebalance.molecule.Molecule.require_resname" alt="" coords="341,56,680,83"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a90fe456919fda305703e36af389e60e1" title="forcebalance.molecule.Molecule.require_resid" alt="" coords="354,107,667,133"/>
+<map id="forcebalance.molecule.Molecule.write_gro" name="forcebalance.molecule.Molecule.write_gro">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="341,5,616,35"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#ad47d05a3ea76e013a628bd7b25ae3050" title="forcebalance.molecule.Molecule.require\l_resname" alt="" coords="341,58,616,105"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a90fe456919fda305703e36af389e60e1" title="forcebalance.molecule.Molecule.require\l_resid" alt="" coords="341,127,616,174"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a03af3cfb99ea8f1c8c7e93d04bdcf967" title="forcebalance.molecule.Molecule.require\l_boxes" alt="" coords="341,197,616,243"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1molecule.html#a41c13064e4285973aa6c49369d3d3390" title="Print a line in accordance with .gro file format, with six decimal points of precision. " alt="" coords="372,266,585,313"/>
+<area shape="rect" id="node17" href="$namespaceforcebalance_1_1molecule.html#ae25aa5331b3a2dd0e9d1e184380357db" title="Print a line corresponding to the box vector in accordance with .gro file format. ..." alt="" coords="372,335,585,382"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="665,162,865,209"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989" title="This function takes in three lattice vectors and tries to return a complete box specification. " alt="" coords="665,231,865,278"/>
 </map>

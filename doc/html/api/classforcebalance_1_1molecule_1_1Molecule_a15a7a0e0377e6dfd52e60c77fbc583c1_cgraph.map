@@ -1,5 +1,8 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="341,5,712,32"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a1d34af6a7d22dd34850d58efe8595b20" title="forcebalance.molecule.Molecule.read_qdata" alt="" coords="375,56,678,83"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989" title="This function takes in three lattice vectors and tries to return a complete box specification." alt="" coords="761,5,1085,32"/>
+<map id="forcebalance.molecule.Molecule.read_xyz" name="forcebalance.molecule.Molecule.read_xyz">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#aff79ac248e1f0cfe92b5b9e0b559f56e" title="Parse a .xyz file which contains several xyz coordinates, and return their elements. " alt="" coords="343,44,636,73"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#aeb5983ae61079198f077f55e448e2c32" title="Read a TINKER .arc file. " alt="" coords="347,97,632,127"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="685,5,893,35"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="689,58,889,105"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="692,128,887,157"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1molecule.html#a7429f0c377d6396711c128f6590ef810" title="Given an atom name, attempt to get the element in most cases. " alt="" coords="688,181,891,227"/>
 </map>

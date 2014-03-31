@@ -3,7 +3,7 @@
 }
 
 
-Subclass of Interaction for interaction energy matching using G\-R\-O\-M\-A\-C\-S.  
+Interaction energy matching using G\-R\-O\-M\-A\-C\-S.  
 
 
 
@@ -31,12 +31,6 @@ Collaboration diagram for forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X\-:
 \item 
 def \hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_a325cf41b32aa979201a35329f7c9d546}{\-\_\-\-\_\-init\-\_\-\-\_\-}
 \item 
-def \hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_a2dee88df57edbb437dbf69678038dd17}{prepare\-\_\-temp\-\_\-directory}
-\item 
-def \hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8ce5c501d7ca8ae08ee2f5c21a67e0fc}{interaction\-\_\-driver}
-\begin{DoxyCompactList}\small\item\em Computes the energy and force using G\-R\-O\-M\-A\-C\-S for a single snapshot. \end{DoxyCompactList}\item 
-def \hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_a5bac92638e1962f1ccbe189f4e20898b}{interaction\-\_\-driver\-\_\-all}
-\begin{DoxyCompactList}\small\item\em Computes the energy and force using G\-R\-O\-M\-A\-C\-S for a trajectory. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1interaction_1_1Interaction_aa67c082c3b6fa2d87ba3f4cf1a74e4f8}{read\-\_\-reference\-\_\-data}
 \begin{DoxyCompactList}\small\item\em Read the reference ab initio data from a file such as qdata.\-txt. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1interaction_1_1Interaction_a91f94b978b73dd886035dcdb96b53cc1}{indicate}
@@ -45,6 +39,10 @@ def \hyperlink{classforcebalance_1_1interaction_1_1Interaction_a9fc3a40eb2852241
 \begin{DoxyCompactList}\small\item\em Evaluate objective function. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{get\-\_\-\-X}
 \begin{DoxyCompactList}\small\item\em Computes the objective function contribution without any parametric derivatives. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{read\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Read a file from the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{write\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Write a file to the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{get\-\_\-\-G}
 \begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{get\-\_\-\-H}
@@ -53,8 +51,18 @@ def \hyperlink{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a07
 \item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{refresh\-\_\-temp\-\_\-directory}
 \begin{DoxyCompactList}\small\item\em Back up the temporary directory if desired, delete it and then create a new one. \end{DoxyCompactList}\item 
-def \hyperlink{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{sget}
-\begin{DoxyCompactList}\small\item\em Stages the directory for the target, and then calls 'get'. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}{check\-\_\-files}
+\begin{DoxyCompactList}\small\item\em Check this directory for the presence of readable files when the 'read' option is set. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read}
+\begin{DoxyCompactList}\small\item\em Read data from disk for the initial optimization step if the user has provided the directory to the \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{absrd}
+\begin{DoxyCompactList}\small\item\em Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{maxrd}
+\begin{DoxyCompactList}\small\item\em Supply the latest existing temp-\/directory containing valid data. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{meta\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Wrap around the indicate function, so it can print to screen and also to a file. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{meta\-\_\-get}
+\begin{DoxyCompactList}\small\item\em Wrapper around the get function. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}{submit\-\_\-jobs}
 \item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{stage}
@@ -63,19 +71,15 @@ def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491b
 \begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
 \begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\-\_\-\-\_\-setattr\-\_\-\-\_\-}
+\item 
 def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
 \end{DoxyCompactItemize}
 \subsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_a6509ba9c6cb4618812e493c2715a64f3}{trajfnm}
-\begin{DoxyCompactList}\small\item\em Name of the trajectory. \end{DoxyCompactList}\item 
-\hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8d43d5b83c331a64f7c97253ce64a9c8}{topfnm}
-\item 
-\hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_af61ae542d6d62f7fa88256e1fe838815}{Dielectric}
-\item 
-\hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8a253cb432123a346b8a51f96fae20be}{Diel\-\_\-\-B}
-\item 
+\hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX_a4df62a6e001ef3d09eff402deb0c71c6}{engine\-\_\-}
+\begin{DoxyCompactList}\small\item\em Default file names for coordinates, top and mdp files. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_a22c4a698eb3bf91187894fdce874e8d5}{select1}
 \begin{DoxyCompactList}\small\item\em Number of snapshots. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_acbdfffa2596af6c90adf0bfe071d2205}{select2}
@@ -87,13 +91,15 @@ def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_a6b49404cbea9c353fc4b97506ff143c6}{qfnm}
 \begin{DoxyCompactList}\small\item\em The qdata.\-txt file that contains the Q\-M energies and forces. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_a1577e34cd7031365ade75a2a56ec9b0d}{e\-\_\-err}
-\begin{DoxyCompactList}\small\item\em Qualitative Indicator\-: average energy error (in k\-J/mol) \end{DoxyCompactList}\item 
+\item 
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_ae66b1b95cac5307950ae787b5409200b}{e\-\_\-err\-\_\-pct}
 \item 
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_af8eea2643c465ee51732bff35b4b9bc8}{ns}
 \begin{DoxyCompactList}\small\item\em Read in the trajectory file. \end{DoxyCompactList}\item 
-\hyperlink{classforcebalance_1_1interaction_1_1Interaction_af838808df9bf58ead305d079ccf21f8a}{traj}
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_ae701905246f4c2f5af7cfa1a7d053002}{mol}
 \item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_ae4c7f1d811ba889282620acbaa4c5f2a}{engine}
+\begin{DoxyCompactList}\small\item\em Build keyword dictionaries to pass to engine. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_a57f25d35d31643d5467fd32579f64030}{divisor}
 \begin{DoxyCompactList}\small\item\em Read in the reference data. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_ad4e78437713a0b9b809e4ba52cbbf9d2}{prefactor}
@@ -104,10 +110,16 @@ def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 \item 
 \hyperlink{classforcebalance_1_1interaction_1_1Interaction_ad25168cac2752545c55fc7e9206d9d29}{objective}
 \item 
-\hyperlink{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{tempdir}
+\hyperlink{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{rd}
 \begin{DoxyCompactList}\small\item\em Root directory of the whole project. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{pgrad}
+\begin{DoxyCompactList}\small\item\em Iteration where we turn on zero-\/gradient skipping. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{tempbase}
+\begin{DoxyCompactList}\small\item\em Relative directory of target. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{tempdir}
+\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{rundir}
-\begin{DoxyCompactList}\small\item\em The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{F\-F}
 \begin{DoxyCompactList}\small\item\em Need the forcefield (here for now) \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{xct}
@@ -116,18 +128,26 @@ def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 \begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
 \begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
-\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
-\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}{read\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Whether to read indicate.\-log from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}{write\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Whether to write indicate.\-log at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{read\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to read objective.\-p from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{write\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to write objective.\-p at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
 \end{DoxyCompactItemize}
 
 
 \subsubsection{Detailed Description}
-Subclass of Interaction for interaction energy matching using G\-R\-O\-M\-A\-C\-S. 
+Interaction energy matching using G\-R\-O\-M\-A\-C\-S. 
 
 
 
-Definition at line 732 of file gmxio.\-py.
+Definition at line 1469 of file gmxio.\-py.
 
 
 
@@ -144,7 +164,7 @@ Definition at line 732 of file gmxio.\-py.
 )}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_a325cf41b32aa979201a35329f7c9d546}
 
 
-Definition at line 734 of file gmxio.\-py.
+Definition at line 1470 of file gmxio.\-py.
 
 
 
@@ -161,6 +181,63 @@ Here is the call graph for this function\-:
 
 
 \subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{\-\_\-\-\_\-setattr\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-\_\-\-\_\-setattr\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{key, }
+\item[{}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}
+
+
+Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!absrd@{absrd}}
+\index{absrd@{absrd}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{absrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-absrd (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{inum = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}
+
+
+Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 393 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!check\-\_\-files@{check\-\_\-files}}
+\index{check\-\_\-files@{check\-\_\-files}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{check\-\_\-files}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-check\-\_\-files (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{there}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}
+
+
+Check this directory for the presence of readable files when the 'read' option is set. 
+
+
+
+Definition at line 364 of file target.\-py.
+
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a9fc3a40eb2852241ea440af719f6cf29}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!get@{get}}
 \index{get@{get}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-interaction.\-Interaction.\-get (
@@ -177,7 +254,7 @@ Evaluate objective function.
 
 
 
-Definition at line 163 of file interaction.\-py.
+Definition at line 157 of file interaction.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!get\-\_\-\-G@{get\-\_\-\-G}}
 \index{get\-\_\-\-G@{get\-\_\-\-G}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -191,13 +268,16 @@ Definition at line 163 of file interaction.\-py.
 
 Computes the objective function contribution and its gradient. 
 
-First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
+First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on.
 
-Definition at line 172 of file target.\-py.
+In this function we also record which parameters cause a nonzero change in the objective function contribution. Parameters which do not change the objective function will not be differentiated in subsequent calculations. This is recorded in a text file in the targets directory. 
+
+Definition at line 272 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -222,11 +302,12 @@ First the low-\/level 'get' method is called with the analytic gradient and Hess
 
 This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
 
-Definition at line 195 of file target.\-py.
+Definition at line 296 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -249,11 +330,12 @@ Computes the objective function contribution without any parametric derivatives.
 
 
 
-Definition at line 155 of file target.\-py.
+Definition at line 184 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -271,7 +353,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a91f94b978b73dd886035dcdb96b53cc1}
 
 
-Definition at line 147 of file interaction.\-py.
+Definition at line 141 of file interaction.\-py.
 
 
 
@@ -281,50 +363,6 @@ Here is the call graph for this function\-:
 \begin{center}
 \leavevmode
 \includegraphics[width=350pt]{classforcebalance_1_1interaction_1_1Interaction_a91f94b978b73dd886035dcdb96b53cc1_cgraph}
-\end{center}
-\end{figure}
-
-
-\hypertarget{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8ce5c501d7ca8ae08ee2f5c21a67e0fc}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!interaction\-\_\-driver@{interaction\-\_\-driver}}
-\index{interaction\-\_\-driver@{interaction\-\_\-driver}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{interaction\-\_\-driver}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X.\-interaction\-\_\-driver (
-\begin{DoxyParamCaption}
-\item[{}]{self, }
-\item[{}]{shot}
-\end{DoxyParamCaption}
-)}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8ce5c501d7ca8ae08ee2f5c21a67e0fc}
-
-
-Computes the energy and force using G\-R\-O\-M\-A\-C\-S for a single snapshot. 
-
-This does not require G\-R\-O\-M\-A\-C\-S-\/\-X2. 
-
-Definition at line 765 of file gmxio.\-py.
-
-\hypertarget{classforcebalance_1_1gmxio_1_1Interaction__GMX_a5bac92638e1962f1ccbe189f4e20898b}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!interaction\-\_\-driver\-\_\-all@{interaction\-\_\-driver\-\_\-all}}
-\index{interaction\-\_\-driver\-\_\-all@{interaction\-\_\-driver\-\_\-all}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{interaction\-\_\-driver\-\_\-all}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X.\-interaction\-\_\-driver\-\_\-all (
-\begin{DoxyParamCaption}
-\item[{}]{self, }
-\item[{}]{dielectric = {\ttfamily False}}
-\end{DoxyParamCaption}
-)}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_a5bac92638e1962f1ccbe189f4e20898b}
-
-
-Computes the energy and force using G\-R\-O\-M\-A\-C\-S for a trajectory. 
-
-This does not require G\-R\-O\-M\-A\-C\-S-\/\-X2. 
-
-Definition at line 770 of file gmxio.\-py.
-
-
-
-Here is the call graph for this function\-:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1gmxio_1_1Interaction__GMX_a5bac92638e1962f1ccbe189f4e20898b_cgraph}
 \end{center}
 \end{figure}
 
@@ -339,20 +377,7 @@ Here is the call graph for this function\-:
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
 
 
-Definition at line 213 of file target.\-py.
-
-\hypertarget{classforcebalance_1_1gmxio_1_1Interaction__GMX_a2dee88df57edbb437dbf69678038dd17}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!prepare\-\_\-temp\-\_\-directory@{prepare\-\_\-temp\-\_\-directory}}
-\index{prepare\-\_\-temp\-\_\-directory@{prepare\-\_\-temp\-\_\-directory}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{prepare\-\_\-temp\-\_\-directory}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X.\-prepare\-\_\-temp\-\_\-directory (
-\begin{DoxyParamCaption}
-\item[{}]{self, }
-\item[{}]{options, }
-\item[{}]{tgt\-\_\-opts}
-\end{DoxyParamCaption}
-)}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_a2dee88df57edbb437dbf69678038dd17}
-
-
-Definition at line 742 of file gmxio.\-py.
+Definition at line 315 of file target.\-py.
 
 
 
@@ -361,7 +386,92 @@ Here is the call graph for this function\-:
 \begin{figure}[H]
 \begin{center}
 \leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1gmxio_1_1Interaction__GMX_a2dee88df57edbb437dbf69678038dd17_cgraph}
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!maxrd@{maxrd}}
+\index{maxrd@{maxrd}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{maxrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-maxrd (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}
+
+
+Supply the latest existing temp-\/directory containing valid data. 
+
+
+
+Definition at line 447 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!meta\-\_\-get@{meta\-\_\-get}}
+\index{meta\-\_\-get@{meta\-\_\-get}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{meta\-\_\-get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}
+
+
+Wrapper around the get function. 
+
+Create the directory for the target, and then calls 'get'. If we are reading existing data, go into the appropriate read directory and call \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read()} instead. The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 511 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!meta\-\_\-indicate@{meta\-\_\-indicate}}
+\index{meta\-\_\-indicate@{meta\-\_\-indicate}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{meta\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-indicate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}
+
+
+Wrap around the indicate function, so it can print to screen and also to a file. 
+
+If reading from checkpoint file, don't call the indicate() function, instead just print the file contents to the screen. 
+
+Definition at line 469 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4_cgraph}
 \end{center}
 \end{figure}
 
@@ -399,11 +509,12 @@ The input should be something like\-:
 \end{DoxyParams}
 
 
-Definition at line 367 of file target.\-py.
+Definition at line 638 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -411,6 +522,53 @@ Here is the call graph for this function\-:\nopagebreak
 \end{center}
 \end{figure}
 
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!read@{read}}
+\index{read@{read}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{read}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}
+
+
+Read data from disk for the initial optimization step if the user has provided the directory to the \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 379 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!read\-\_\-0grads@{read\-\_\-0grads}}
+\index{read\-\_\-0grads@{read\-\_\-0grads}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{read\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}
+
+
+Read a file from the target directory containing names of parameters that don't contribute to the gradient. 
+
+{\itshape Note} that we are checking the derivatives of the objective function, and not the derivatives of the quantities that go into building the objective function. However, it is the quantities that we actually differentiate. Since there is a simple chain rule relationship, the parameters that do/don't contribute to the objective function/quantities are the same.
+
+However, property gradients do contribute to objective function Hessian elements, so we cannot use the same mechanism for excluding the calculation of property Hessians. This is mostly fine since we rarely if ever calculate an explicit property Hessian. 
+
+Definition at line 207 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_aa67c082c3b6fa2d87ba3f4cf1a74e4f8}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!read\-\_\-reference\-\_\-data@{read\-\_\-reference\-\_\-data}}
 \index{read\-\_\-reference\-\_\-data@{read\-\_\-reference\-\_\-data}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -423,21 +581,9 @@ Here is the call graph for this function\-:\nopagebreak
 
 Read the reference ab initio data from a file such as qdata.\-txt. 
 
-After reading in the information from qdata.\-txt, it is converted into the G\-R\-O\-M\-A\-C\-S/\-Open\-M\-M units (k\-J/mol for energy, k\-J/mol/nm force). 
+After reading in the information from qdata.\-txt, it is converted into kcal/mol. 
 
-Definition at line 125 of file interaction.\-py.
-
-
-
-Here is the call graph for this function\-:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1interaction_1_1Interaction_aa67c082c3b6fa2d87ba3f4cf1a74e4f8_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 124 of file interaction.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}}
 \index{refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -452,18 +598,7 @@ Back up the temporary directory if desired, delete it and then create a new one.
 
 
 
-Definition at line 219 of file target.\-py.
-
-
-
-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 321 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!set\-\_\-option@{set\-\_\-option}}
 \index{set\-\_\-option@{set\-\_\-option}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -480,37 +615,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 
 
-Definition at line 32 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
-
-\hypertarget{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!sget@{sget}}
-\index{sget@{sget}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{sget}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-sget (
-\begin{DoxyParamCaption}
-\item[{}]{self, }
-\item[{}]{mvals, }
-\item[{}]{A\-Grad = {\ttfamily False}, }
-\item[{}]{A\-Hess = {\ttfamily False}, }
-\item[{}]{customdir = {\ttfamily None}}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}
-
-
-Stages the directory for the target, and then calls 'get'. 
-
-The 'get' method should not worry about the directory that it's running in. 
-
-Definition at line 266 of file target.\-py.
-
-
-
-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 42 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!stage@{stage}}
 \index{stage@{stage}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -529,11 +634,12 @@ Stages the directory for the target, and then launches Work Queue processes if a
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 301 of file target.\-py.
+Definition at line 565 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -554,7 +660,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}
 
 
-Definition at line 291 of file target.\-py.
+Definition at line 555 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!wq\-\_\-complete@{wq\-\_\-complete}}
 \index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -569,11 +675,12 @@ This method determines whether the Work Queue tasks for the current target have 
 
 
 
-Definition at line 331 of file target.\-py.
+Definition at line 602 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -582,23 +689,25 @@ Here is the call graph for this function\-:\nopagebreak
 \end{figure}
 
 
+\hypertarget{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!write\-\_\-0grads@{write\-\_\-0grads}}
+\index{write\-\_\-0grads@{write\-\_\-0grads}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{write\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-write\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{Ans}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}
+
+
+Write a file to the target directory containing names of parameters that don't contribute to the gradient. 
+
+
+
+Definition at line 225 of file target.\-py.
+
 
 
 \subsubsection{Member Data Documentation}
-\hypertarget{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8a253cb432123a346b8a51f96fae20be}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!Diel\-\_\-\-B@{Diel\-\_\-\-B}}
-\index{Diel\-\_\-\-B@{Diel\-\_\-\-B}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{Diel\-\_\-\-B}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X.\-Diel\-\_\-\-B}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8a253cb432123a346b8a51f96fae20be}
-
-
-Definition at line 810 of file gmxio.\-py.
-
-\hypertarget{classforcebalance_1_1gmxio_1_1Interaction__GMX_af61ae542d6d62f7fa88256e1fe838815}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!Dielectric@{Dielectric}}
-\index{Dielectric@{Dielectric}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{Dielectric}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X.\-Dielectric}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_af61ae542d6d62f7fa88256e1fe838815}
-
-
-Definition at line 739 of file gmxio.\-py.
-
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a57f25d35d31643d5467fd32579f64030}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!divisor@{divisor}}
 \index{divisor@{divisor}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{divisor}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-divisor\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a57f25d35d31643d5467fd32579f64030}
@@ -606,34 +715,52 @@ Definition at line 739 of file gmxio.\-py.
 
 Read in the reference data. 
 
-Prepare the temporary directory 
 
-Definition at line 96 of file interaction.\-py.
+
+Definition at line 95 of file interaction.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a1577e34cd7031365ade75a2a56ec9b0d}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!e\-\_\-err@{e\-\_\-err}}
 \index{e\-\_\-err@{e\-\_\-err}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{e\-\_\-err}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-e\-\_\-err\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a1577e34cd7031365ade75a2a56ec9b0d}
 
 
-Qualitative Indicator\-: average energy error (in k\-J/mol) 
-
-
-
-Definition at line 78 of file interaction.\-py.
+Definition at line 77 of file interaction.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_ae66b1b95cac5307950ae787b5409200b}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!e\-\_\-err\-\_\-pct@{e\-\_\-err\-\_\-pct}}
 \index{e\-\_\-err\-\_\-pct@{e\-\_\-err\-\_\-pct}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{e\-\_\-err\-\_\-pct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-e\-\_\-err\-\_\-pct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ae66b1b95cac5307950ae787b5409200b}
 
 
-Definition at line 79 of file interaction.\-py.
+Definition at line 78 of file interaction.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a2b97abefbf9d9f2b061b9da3b9d0bb30}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!emm@{emm}}
 \index{emm@{emm}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{emm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-emm\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a2b97abefbf9d9f2b061b9da3b9d0bb30}
 
 
-Definition at line 200 of file interaction.\-py.
+Definition at line 194 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_ae4c7f1d811ba889282620acbaa4c5f2a}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!engine@{engine}}
+\index{engine@{engine}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{engine}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-engine\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ae4c7f1d811ba889282620acbaa4c5f2a}
+
+
+Build keyword dictionaries to pass to engine. 
+
+
+
+Definition at line 88 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1gmxio_1_1Interaction__GMX_a4df62a6e001ef3d09eff402deb0c71c6}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!engine\-\_\-@{engine\-\_\-}}
+\index{engine\-\_\-@{engine\-\_\-}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{engine\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X.\-engine\-\_\-}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_a4df62a6e001ef3d09eff402deb0c71c6}
+
+
+Default file names for coordinates, top and mdp files. 
+
+
+
+Definition at line 1475 of file gmxio.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a4e609a6bd7e9a0852622ecc4ca5537d1}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!eqm@{eqm}}
 \index{eqm@{eqm}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -655,7 +782,7 @@ Need the forcefield (here for now)
 
 
 
-Definition at line 139 of file target.\-py.
+Definition at line 160 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!gct@{gct}}
 \index{gct@{gct}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -666,7 +793,7 @@ Counts how often the gradient was computed.
 
 
 
-Definition at line 143 of file target.\-py.
+Definition at line 164 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!hct@{hct}}
 \index{hct@{hct}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -677,7 +804,7 @@ Counts how often the Hessian was computed.
 
 
 
-Definition at line 145 of file target.\-py.
+Definition at line 166 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a35a5c40d99a474bbf6032888f1f75e46}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!label@{label}}
 \index{label@{label}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -690,6 +817,13 @@ Snapshot label, useful for graphing.
 
 Definition at line 74 of file interaction.\-py.
 
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_ae701905246f4c2f5af7cfa1a7d053002}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!mol@{mol}}
+\index{mol@{mol}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{mol}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-mol\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ae701905246f4c2f5af7cfa1a7d053002}
+
+
+Definition at line 81 of file interaction.\-py.
+
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_af8eea2643c465ee51732bff35b4b9bc8}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!ns@{ns}}
 \index{ns@{ns}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{ns}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-ns\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_af8eea2643c465ee51732bff35b4b9bc8}
@@ -699,28 +833,39 @@ Read in the trajectory file.
 
 
 
-Definition at line 81 of file interaction.\-py.
+Definition at line 80 of file interaction.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_ad25168cac2752545c55fc7e9206d9d29}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!objective@{objective}}
 \index{objective@{objective}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ad25168cac2752545c55fc7e9206d9d29}
 
 
-Definition at line 201 of file interaction.\-py.
+Definition at line 195 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!pgrad@{pgrad}}
+\index{pgrad@{pgrad}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{pgrad}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-pgrad\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}
+
+
+Iteration where we turn on zero-\/gradient skipping. 
+
+Dictionary of whether to call the derivatives. 
+
+Definition at line 127 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_ad4e78437713a0b9b809e4ba52cbbf9d2}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!prefactor@{prefactor}}
 \index{prefactor@{prefactor}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{prefactor}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-prefactor\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ad4e78437713a0b9b809e4ba52cbbf9d2}
 
 
-Definition at line 114 of file interaction.\-py.
+Definition at line 113 of file interaction.\-py.
 
 \hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
 
 
-Definition at line 29 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 44 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a6b49404cbea9c353fc4b97506ff143c6}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!qfnm@{qfnm}}
 \index{qfnm@{qfnm}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -733,16 +878,53 @@ The qdata.\-txt file that contains the Q\-M energies and forces.
 
 Definition at line 76 of file interaction.\-py.
 
+\hypertarget{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!rd@{rd}}
+\index{rd@{rd}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{rd}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rd\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}
+
+
+Root directory of the whole project. 
+
+Submit jobs to the Work Queue.
+
+Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Directory to read data from.
+
+Definition at line 123 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!read\-\_\-indicate@{read\-\_\-indicate}}
+\index{read\-\_\-indicate@{read\-\_\-indicate}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{read\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}
+
+
+Whether to read indicate.\-log from file when restarting an aborted run. 
+
+
+
+Definition at line 168 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!read\-\_\-objective@{read\-\_\-objective}}
+\index{read\-\_\-objective@{read\-\_\-objective}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{read\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}
+
+
+Whether to read objective.\-p from file when restarting an aborted run. 
+
+
+
+Definition at line 172 of file target.\-py.
+
 \hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!rundir@{rundir}}
 \index{rundir@{rundir}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{rundir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rundir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}
 
 
-The directory in which the simulation is running -\/ this can be updated. 
+self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. 
 
 Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
 
-Definition at line 137 of file target.\-py.
+Not expecting more than ten thousand iterations Go into the directory where \hyperlink{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a}{get()} will be executed. Write mathematical parameters to file; will be used to checkpoint calculation. Read in file that specifies which derivatives may be skipped. 
+
+Definition at line 158 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a22c4a698eb3bf91187894fdce874e8d5}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!select1@{select1}}
 \index{select1@{select1}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -766,55 +948,59 @@ Set fragment 2.
 
 Definition at line 65 of file interaction.\-py.
 
+\hypertarget{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!tempbase@{tempbase}}
+\index{tempbase@{tempbase}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{tempbase}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempbase\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}
+
+
+Relative directory of target. 
+
+Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
+
+Definition at line 152 of file target.\-py.
+
 \hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!tempdir@{tempdir}}
 \index{tempdir@{tempdir}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{tempdir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempdir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}
 
 
-Root directory of the whole project. 
-
-Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
-
-Definition at line 135 of file target.\-py.
-
-\hypertarget{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8d43d5b83c331a64f7c97253ce64a9c8}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!topfnm@{topfnm}}
-\index{topfnm@{topfnm}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{topfnm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X.\-topfnm}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_a8d43d5b83c331a64f7c97253ce64a9c8}
-
-
-Definition at line 737 of file gmxio.\-py.
-
-\hypertarget{classforcebalance_1_1interaction_1_1Interaction_af838808df9bf58ead305d079ccf21f8a}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!traj@{traj}}
-\index{traj@{traj}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{traj}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-traj\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_af838808df9bf58ead305d079ccf21f8a}
-
-
-Definition at line 82 of file interaction.\-py.
-
-\hypertarget{classforcebalance_1_1gmxio_1_1Interaction__GMX_a6509ba9c6cb4618812e493c2715a64f3}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!trajfnm@{trajfnm}}
-\index{trajfnm@{trajfnm}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
-\paragraph[{trajfnm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X.\-trajfnm}}\label{classforcebalance_1_1gmxio_1_1Interaction__GMX_a6509ba9c6cb4618812e493c2715a64f3}
-
-
-Name of the trajectory. 
-
-
-
-Definition at line 736 of file gmxio.\-py.
+Definition at line 155 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
 
 
-Definition at line 30 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 40 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1interaction_1_1Interaction_a68a6e43e48ec75f375fb987e177126a9}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!weight@{weight}}
 \index{weight@{weight}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
 \paragraph[{weight}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-weight\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a68a6e43e48ec75f375fb987e177126a9}
 
 
-Definition at line 167 of file interaction.\-py.
+Definition at line 161 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!write\-\_\-indicate@{write\-\_\-indicate}}
+\index{write\-\_\-indicate@{write\-\_\-indicate}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{write\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}
+
+
+Whether to write indicate.\-log at every iteration (true for all but remote.) 
+
+
+
+Definition at line 170 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!write\-\_\-objective@{write\-\_\-objective}}
+\index{write\-\_\-objective@{write\-\_\-objective}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
+\paragraph[{write\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}
+
+
+Whether to write objective.\-p at every iteration (true for all but remote.) 
+
+
+
+Definition at line 174 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}!xct@{xct}}
 \index{xct@{xct}!forcebalance::gmxio::Interaction_GMX@{forcebalance\-::gmxio\-::\-Interaction\-\_\-\-G\-M\-X}}
@@ -825,7 +1011,7 @@ Counts how often the objective function was computed.
 
 
 
-Definition at line 141 of file target.\-py.
+Definition at line 162 of file target.\-py.
 
 
 

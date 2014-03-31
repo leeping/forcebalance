@@ -5,25 +5,41 @@
 \begin{DoxyCompactItemize}
 \item 
 class \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM__Reader}{forcebalance.\-openmmio.\-Open\-M\-M\-\_\-\-Reader}
-\begin{DoxyCompactList}\small\item\em Class for parsing Open\-M\-M force field files. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Class for parsing \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M} force field files. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{forcebalance.\-openmmio.\-Open\-M\-M}
+\begin{DoxyCompactList}\small\item\em Derived from Engine object for carrying out general purpose \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M} calculations. \end{DoxyCompactList}\item 
 class \hyperlink{classforcebalance_1_1openmmio_1_1Liquid__OpenMM}{forcebalance.\-openmmio.\-Liquid\-\_\-\-Open\-M\-M}
-\item 
+\begin{DoxyCompactList}\small\item\em Condensed phase property matching using \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M}. \end{DoxyCompactList}\item 
 class \hyperlink{classforcebalance_1_1openmmio_1_1AbInitio__OpenMM}{forcebalance.\-openmmio.\-Ab\-Initio\-\_\-\-Open\-M\-M}
-\begin{DoxyCompactList}\small\item\em Subclass of Ab\-Initio for force and energy matching using Open\-M\-M. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em Force and energy matching using \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M}. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1openmmio_1_1BindingEnergy__OpenMM}{forcebalance.\-openmmio.\-Binding\-Energy\-\_\-\-Open\-M\-M}
+\begin{DoxyCompactList}\small\item\em Binding energy matching using \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M}. \end{DoxyCompactList}\item 
 class \hyperlink{classforcebalance_1_1openmmio_1_1Interaction__OpenMM}{forcebalance.\-openmmio.\-Interaction\-\_\-\-Open\-M\-M}
-\begin{DoxyCompactList}\small\item\em Subclass of Target for interaction matching using Open\-M\-M. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Interaction matching using \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M}. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1openmmio_1_1Moments__OpenMM}{forcebalance.\-openmmio.\-Moments\-\_\-\-Open\-M\-M}
+\begin{DoxyCompactList}\small\item\em Multipole moment matching using \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M}. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Namespaces}
 \begin{DoxyCompactItemize}
 \item 
 \hyperlink{namespaceforcebalance_1_1openmmio}{forcebalance.\-openmmio}
-\begin{DoxyCompactList}\small\item\em Open\-M\-M input/output. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M} input/output. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
+def \hyperlink{namespaceforcebalance_1_1openmmio_a0266102cb0a6907750a62e6948299255}{forcebalance.\-openmmio.\-energy\-\_\-components}
+\item 
+def \hyperlink{namespaceforcebalance_1_1openmmio_a829487387c4b4a4817a2e3fc50242857}{forcebalance.\-openmmio.\-get\-\_\-multipoles}
+\begin{DoxyCompactList}\small\item\em Return the current multipole moments in Debye and Buckingham units. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1openmmio_a8a2081dcaf027b9b9ab224e22680714d}{forcebalance.\-openmmio.\-get\-\_\-dipole}
 \begin{DoxyCompactList}\small\item\em Return the current dipole moment in Debye. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1openmmio_ac7c1f986acada081a7c24a5d77701a35}{forcebalance.\-openmmio.\-Prepare\-Virtual\-Sites}
+\begin{DoxyCompactList}\small\item\em Prepare a list of function wrappers and vsite parameters from the system. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1openmmio_a1f92d88085657ca5726f8925bfa68f6f}{forcebalance.\-openmmio.\-Reset\-Virtual\-Sites\-\_\-fast}
+\begin{DoxyCompactList}\small\item\em Given a set of Open\-M\-M-\/compatible positions and a System object, compute the correct virtual site positions according to the System. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1openmmio_af623fa5af97de6c6a0bc5f98ce8db432}{forcebalance.\-openmmio.\-Reset\-Virtual\-Sites}
 \begin{DoxyCompactList}\small\item\em Given a set of Open\-M\-M-\/compatible positions and a System object, compute the correct virtual site positions according to the System. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1openmmio_a71e9c5b9d6a71839f5e04cd7ad7351db}{forcebalance.\-openmmio.\-Get\-Virtual\-Site\-Parameters}
+\begin{DoxyCompactList}\small\item\em Return an array of all virtual site parameters in the system. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1openmmio_a792a195b31612f2140b35927fe28fa1a}{forcebalance.\-openmmio.\-Copy\-Amoeba\-Bond\-Parameters}
 \item 
 def \hyperlink{namespaceforcebalance_1_1openmmio_a2e95f600757655d41660c25af8fd8e80}{forcebalance.\-openmmio.\-Copy\-Amoeba\-Out\-Of\-Plane\-Bend\-Parameters}

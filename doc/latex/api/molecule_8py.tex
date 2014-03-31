@@ -4,6 +4,8 @@
 \subsubsection*{Classes}
 \begin{DoxyCompactItemize}
 \item 
+class \hyperlink{classforcebalance_1_1molecule_1_1MyG}{forcebalance.\-molecule.\-My\-G}
+\item 
 class \hyperlink{classforcebalance_1_1molecule_1_1MolfileTimestep}{forcebalance.\-molecule.\-Molfile\-Timestep}
 \begin{DoxyCompactList}\small\item\em Wrapper for the timestep C structure used in molfile plugins. \end{DoxyCompactList}\item 
 class \hyperlink{classforcebalance_1_1molecule_1_1Molecule}{forcebalance.\-molecule.\-Molecule}
@@ -26,6 +28,8 @@ def \hyperlink{namespaceforcebalance_1_1molecule_a0dd31eff88d2bed0884ab21a13261d
 \begin{DoxyCompactList}\small\item\em O\-N\-L\-Y matches integers! If you have a decimal point? None shall pass! \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1molecule_afe989ffd119568047fc8265b1d329a70}{forcebalance.\-molecule.\-isfloat}
 \begin{DoxyCompactList}\small\item\em Matches A\-N\-Y number; it can be a decimal, scientific notation, integer, or what have you. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1molecule_aa2020b34bd18c73558cf39334b204981}{forcebalance.\-molecule.\-Cubic\-Lattice}
+\begin{DoxyCompactList}\small\item\em This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1molecule_a0a6e3e79b04534bf2e83d09def189444}{forcebalance.\-molecule.\-Build\-Lattice\-From\-Lengths\-Angles}
 \begin{DoxyCompactList}\small\item\em This function takes in three lattice lengths and three lattice angles, and tries to return a complete box specification. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1molecule_a29fb1ac9324f4280f07c65baea339989}{forcebalance.\-molecule.\-Build\-Lattice\-From\-Vectors}
@@ -79,11 +83,11 @@ tuple \hyperlink{namespaceforcebalance_1_1molecule_a0044fa397e0923635a8b3e9625aa
 \item 
 tuple \hyperlink{namespaceforcebalance_1_1molecule_a5daa68e835dcb9877d6c3f2fb559b54b}{forcebalance.\-molecule.\-Atom\-Variable\-Names} = set(\mbox{[}'elem', 'partial\-\_\-charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm\-\_\-ghost', 'chain', 'altloc', 'icode'\mbox{]})
 \item 
-tuple \hyperlink{namespaceforcebalance_1_1molecule_a38e1c99e9567fe42b792af43db9b7488}{forcebalance.\-molecule.\-Meta\-Variable\-Names} = set(\mbox{[}'fnm', 'ftype', 'qcrems', 'qctemplate', 'charge', 'mult', 'bonds'\mbox{]})
+tuple \hyperlink{namespaceforcebalance_1_1molecule_a38e1c99e9567fe42b792af43db9b7488}{forcebalance.\-molecule.\-Meta\-Variable\-Names} = set(\mbox{[}'fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds'\mbox{]})
 \item 
 tuple \hyperlink{namespaceforcebalance_1_1molecule_ab67efeab6049ec1f416b9ad1eed6ffcc}{forcebalance.\-molecule.\-Quantum\-Variable\-Names} = set(\mbox{[}'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm\-\_\-ghost'\mbox{]})
 \item 
-\hyperlink{namespaceforcebalance_1_1molecule_a8fcfb88fe12a9256b61980f3d4fe3b63}{forcebalance.\-molecule.\-All\-Variable\-Names} = Quantum\-Variable\-Names$|$Atom\-Variable\-Names$|$Meta\-Variable\-Names$|$Frame\-Variable\-Names
+\hyperlink{namespaceforcebalance_1_1molecule_a8fcfb88fe12a9256b61980f3d4fe3b63}{forcebalance.\-molecule.\-All\-Variable\-Names} = Quantum\-Variable\-Names$\vert$Atom\-Variable\-Names$\vert$Meta\-Variable\-Names$\vert$Frame\-Variable\-Names
 \item 
 list \hyperlink{namespaceforcebalance_1_1molecule_a74f55a89a14ca676b5a06441d1fdab19}{forcebalance.\-molecule.\-Radii}
 \item 
@@ -93,11 +97,11 @@ tuple \hyperlink{namespaceforcebalance_1_1molecule_adc5040ec456762f2ac240fb08feb
 \item 
 float \hyperlink{namespaceforcebalance_1_1molecule_a76af9edfbaaa8999680e32aafe1b1b61}{forcebalance.\-molecule.\-bohrang} = 0.\-529177249
 \begin{DoxyCompactList}\small\item\em One bohr equals this many angstroms. \end{DoxyCompactList}\item 
-tuple \hyperlink{namespaceforcebalance_1_1molecule_a09d04113accea9c88b084051c5de29d1}{forcebalance.\-molecule.\-splitter} = re.\-compile(r'(\textbackslash{}s+$|$\textbackslash{}S+)')
+tuple \hyperlink{namespaceforcebalance_1_1molecule_a09d04113accea9c88b084051c5de29d1}{forcebalance.\-molecule.\-splitter} = re.\-compile(r'(\textbackslash{}s+$\vert$\textbackslash{}S+)')
 \item 
 tuple \hyperlink{namespaceforcebalance_1_1molecule_aa761cf1cf260e15d0b03a6f61569c840}{forcebalance.\-molecule.\-Box} = namedtuple('Box',\mbox{[}'a','b','c','alpha','beta','gamma','A','B','C','V'\mbox{]})
 \item 
 int \hyperlink{namespaceforcebalance_1_1molecule_a1ee5389ce8a9042e053c7972dbbfb005}{forcebalance.\-molecule.\-radian} = 180
 \item 
-\hyperlink{namespaceforcebalance_1_1molecule_a2986996d4f957928047df06fbec3717d}{forcebalance.\-molecule.\-Alive}
+int \hyperlink{namespaceforcebalance_1_1molecule_a56640bd990a2e85f43fdba20b61cb8b8}{forcebalance.\-molecule.\-have\-\_\-contact} = 0
 \end{DoxyCompactItemize}

@@ -39,6 +39,10 @@ def \hyperlink{classforcebalance_1_1counterpoise_1_1Counterpoise_a5fd50a4bb7d5e9
 \begin{DoxyCompactList}\small\item\em Gets the objective function for fitting the counterpoise correction. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{get\-\_\-\-X}
 \begin{DoxyCompactList}\small\item\em Computes the objective function contribution without any parametric derivatives. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{read\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Read a file from the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{write\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Write a file to the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{get\-\_\-\-G}
 \begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{get\-\_\-\-H}
@@ -47,8 +51,18 @@ def \hyperlink{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a07
 \item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{refresh\-\_\-temp\-\_\-directory}
 \begin{DoxyCompactList}\small\item\em Back up the temporary directory if desired, delete it and then create a new one. \end{DoxyCompactList}\item 
-def \hyperlink{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{sget}
-\begin{DoxyCompactList}\small\item\em Stages the directory for the target, and then calls 'get'. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}{check\-\_\-files}
+\begin{DoxyCompactList}\small\item\em Check this directory for the presence of readable files when the 'read' option is set. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read}
+\begin{DoxyCompactList}\small\item\em Read data from disk for the initial optimization step if the user has provided the directory to the \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{absrd}
+\begin{DoxyCompactList}\small\item\em Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{maxrd}
+\begin{DoxyCompactList}\small\item\em Supply the latest existing temp-\/directory containing valid data. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{meta\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Wrap around the indicate function, so it can print to screen and also to a file. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{meta\-\_\-get}
+\begin{DoxyCompactList}\small\item\em Wrapper around the get function. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}{submit\-\_\-jobs}
 \item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{stage}
@@ -57,6 +71,8 @@ def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491b
 \begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
 def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
 \begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\-\_\-\-\_\-setattr\-\_\-\-\_\-}
+\item 
 def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
 \end{DoxyCompactItemize}
 \subsubsection*{Public Attributes}
@@ -70,10 +86,16 @@ def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 \begin{DoxyCompactList}\small\item\em Number of atoms. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1counterpoise_1_1Counterpoise_a2a8334eaf74299344a1cf53be98f150b}{ns}
 \item 
-\hyperlink{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{tempdir}
+\hyperlink{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{rd}
 \begin{DoxyCompactList}\small\item\em Root directory of the whole project. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{pgrad}
+\begin{DoxyCompactList}\small\item\em Iteration where we turn on zero-\/gradient skipping. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{tempbase}
+\begin{DoxyCompactList}\small\item\em Relative directory of target. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{tempdir}
+\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{rundir}
-\begin{DoxyCompactList}\small\item\em The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
+\begin{DoxyCompactList}\small\item\em self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{F\-F}
 \begin{DoxyCompactList}\small\item\em Need the forcefield (here for now) \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{xct}
@@ -82,9 +104,17 @@ def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 \begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
 \begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
-\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
-\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}{read\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Whether to read indicate.\-log from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}{write\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Whether to write indicate.\-log at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{read\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to read objective.\-p from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{write\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to write objective.\-p at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
 \hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
 \end{DoxyCompactItemize}
 
 
@@ -93,7 +123,7 @@ Target subclass for matching the counterpoise correction.
 
 
 
-Definition at line 33 of file counterpoise.\-py.
+Definition at line 34 of file counterpoise.\-py.
 
 
 
@@ -114,7 +144,7 @@ To instantiate \hyperlink{classforcebalance_1_1counterpoise_1_1Counterpoise}{Cou
 
 
 
-Definition at line 37 of file counterpoise.\-py.
+Definition at line 38 of file counterpoise.\-py.
 
 
 
@@ -131,6 +161,63 @@ Here is the call graph for this function\-:
 
 
 \subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{\-\_\-\-\_\-setattr\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-\_\-\-\_\-setattr\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{key, }
+\item[{}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}
+
+
+Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!absrd@{absrd}}
+\index{absrd@{absrd}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{absrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-absrd (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{inum = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}
+
+
+Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 393 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!check\-\_\-files@{check\-\_\-files}}
+\index{check\-\_\-files@{check\-\_\-files}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{check\-\_\-files}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-check\-\_\-files (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{there}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}
+
+
+Check this directory for the presence of readable files when the 'read' option is set. 
+
+
+
+Definition at line 364 of file target.\-py.
+
 \hypertarget{classforcebalance_1_1counterpoise_1_1Counterpoise_a5fd50a4bb7d5e939b7e99ac648b35d59}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!get@{get}}
 \index{get@{get}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
 \paragraph[{get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-counterpoise.\-Counterpoise.\-get (
@@ -167,7 +254,19 @@ Answer Contribution to the objective function
 \end{DoxyReturn}
 
 
-Definition at line 124 of file counterpoise.\-py.
+Definition at line 125 of file counterpoise.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1counterpoise_1_1Counterpoise_a5fd50a4bb7d5e939b7e99ac648b35d59_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!get\-\_\-\-G@{get\-\_\-\-G}}
 \index{get\-\_\-\-G@{get\-\_\-\-G}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -181,13 +280,16 @@ Definition at line 124 of file counterpoise.\-py.
 
 Computes the objective function contribution and its gradient. 
 
-First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on. 
+First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on.
 
-Definition at line 172 of file target.\-py.
+In this function we also record which parameters cause a nonzero change in the objective function contribution. Parameters which do not change the objective function will not be differentiated in subsequent calculations. This is recorded in a text file in the targets directory. 
+
+Definition at line 272 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -212,11 +314,12 @@ First the low-\/level 'get' method is called with the analytic gradient and Hess
 
 This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
 
-Definition at line 195 of file target.\-py.
+Definition at line 296 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -239,11 +342,12 @@ Computes the objective function contribution without any parametric derivatives.
 
 
 
-Definition at line 155 of file target.\-py.
+Definition at line 184 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -262,7 +366,19 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
 
 
-Definition at line 213 of file target.\-py.
+Definition at line 315 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1counterpoise_1_1Counterpoise_afdbc053ae726ac5e4066087bcc1039b1}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!load\-\_\-cp@{load\-\_\-cp}}
 \index{load\-\_\-cp@{load\-\_\-cp}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -278,7 +394,7 @@ Load in the counterpoise data, which is easy; the file consists of floating poin
 
 
 
-Definition at line 95 of file counterpoise.\-py.
+Definition at line 96 of file counterpoise.\-py.
 
 \hypertarget{classforcebalance_1_1counterpoise_1_1Counterpoise_a8795bd01b0f62b3f612e4e5c762f96f8}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!loadxyz@{loadxyz}}
 \index{loadxyz@{loadxyz}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -292,15 +408,106 @@ Definition at line 95 of file counterpoise.\-py.
 
 Parse an X\-Y\-Z file which contains several xyz coordinates, and return their elements. 
 
-\begin{DoxyVerb}     @param[in] fnm The input XYZ file name
-     @return elem A list of chemical elements in the XYZ file
-     @return xyzs A list of XYZ coordinates (number of snapshots times number of atoms)
-\end{DoxyVerb}
- \begin{DoxyRefDesc}{Todo}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fnm} & The input X\-Y\-Z file name \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+elem A list of chemical elements in the X\-Y\-Z file 
+
+xyzs A list of X\-Y\-Z coordinates (number of snapshots times number of atoms) 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
 \item[\hyperlink{todo__todo000006}{Todo}]I should probably put this into a more general library for reading coordinates. \end{DoxyRefDesc}
 
 
-Definition at line 63 of file counterpoise.\-py.
+Definition at line 64 of file counterpoise.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!maxrd@{maxrd}}
+\index{maxrd@{maxrd}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{maxrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-maxrd (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}
+
+
+Supply the latest existing temp-\/directory containing valid data. 
+
+
+
+Definition at line 447 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!meta\-\_\-get@{meta\-\_\-get}}
+\index{meta\-\_\-get@{meta\-\_\-get}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{meta\-\_\-get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}
+
+
+Wrapper around the get function. 
+
+Create the directory for the target, and then calls 'get'. If we are reading existing data, go into the appropriate read directory and call \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read()} instead. The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 511 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!meta\-\_\-indicate@{meta\-\_\-indicate}}
+\index{meta\-\_\-indicate@{meta\-\_\-indicate}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{meta\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-indicate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}
+
+
+Wrap around the indicate function, so it can print to screen and also to a file. 
+
+If reading from checkpoint file, don't call the indicate() function, instead just print the file contents to the screen. 
+
+Definition at line 469 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4_cgraph}
+\end{center}
+\end{figure}
+
 
 \hypertarget{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!printcool\-\_\-table@{printcool\-\_\-table}}
 \index{printcool\-\_\-table@{printcool\-\_\-table}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -335,11 +542,12 @@ The input should be something like\-:
 \end{DoxyParams}
 
 
-Definition at line 367 of file target.\-py.
+Definition at line 638 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -347,6 +555,53 @@ Here is the call graph for this function\-:\nopagebreak
 \end{center}
 \end{figure}
 
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!read@{read}}
+\index{read@{read}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{read}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}
+
+
+Read data from disk for the initial optimization step if the user has provided the directory to the \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 379 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!read\-\_\-0grads@{read\-\_\-0grads}}
+\index{read\-\_\-0grads@{read\-\_\-0grads}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{read\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}
+
+
+Read a file from the target directory containing names of parameters that don't contribute to the gradient. 
+
+{\itshape Note} that we are checking the derivatives of the objective function, and not the derivatives of the quantities that go into building the objective function. However, it is the quantities that we actually differentiate. Since there is a simple chain rule relationship, the parameters that do/don't contribute to the objective function/quantities are the same.
+
+However, property gradients do contribute to objective function Hessian elements, so we cannot use the same mechanism for excluding the calculation of property Hessians. This is mostly fine since we rarely if ever calculate an explicit property Hessian. 
+
+Definition at line 207 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}}
 \index{refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -361,18 +616,7 @@ Back up the temporary directory if desired, delete it and then create a new one.
 
 
 
-Definition at line 219 of file target.\-py.
-
-
-
-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 321 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!set\-\_\-option@{set\-\_\-option}}
 \index{set\-\_\-option@{set\-\_\-option}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -389,37 +633,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
 
 
-Definition at line 32 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
-
-\hypertarget{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!sget@{sget}}
-\index{sget@{sget}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
-\paragraph[{sget}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-sget (
-\begin{DoxyParamCaption}
-\item[{}]{self, }
-\item[{}]{mvals, }
-\item[{}]{A\-Grad = {\ttfamily False}, }
-\item[{}]{A\-Hess = {\ttfamily False}, }
-\item[{}]{customdir = {\ttfamily None}}
-\end{DoxyParamCaption}
-)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c}
-
-
-Stages the directory for the target, and then calls 'get'. 
-
-The 'get' method should not worry about the directory that it's running in. 
-
-Definition at line 266 of file target.\-py.
-
-
-
-Here is the call graph for this function\-:\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a51d58b55242bf4d4909c1837174f5f3c_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 42 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!stage@{stage}}
 \index{stage@{stage}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -438,11 +652,12 @@ Stages the directory for the target, and then launches Work Queue processes if a
 
 The 'get' method should not worry about the directory that it's running in. 
 
-Definition at line 301 of file target.\-py.
+Definition at line 565 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -463,7 +678,7 @@ Here is the call graph for this function\-:\nopagebreak
 )\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}
 
 
-Definition at line 291 of file target.\-py.
+Definition at line 555 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!wq\-\_\-complete@{wq\-\_\-complete}}
 \index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -478,11 +693,12 @@ This method determines whether the Work Queue tasks for the current target have 
 
 
 
-Definition at line 331 of file target.\-py.
+Definition at line 602 of file target.\-py.
 
 
 
-Here is the call graph for this function\-:\nopagebreak
+Here is the call graph for this function\-:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -490,6 +706,22 @@ Here is the call graph for this function\-:\nopagebreak
 \end{center}
 \end{figure}
 
+
+\hypertarget{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!write\-\_\-0grads@{write\-\_\-0grads}}
+\index{write\-\_\-0grads@{write\-\_\-0grads}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{write\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-write\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{Ans}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}
+
+
+Write a file to the target directory containing names of parameters that don't contribute to the gradient. 
+
+
+
+Definition at line 225 of file target.\-py.
 
 
 
@@ -503,7 +735,7 @@ Here is the call graph for this function\-:\nopagebreak
 
 
 
-Definition at line 53 of file counterpoise.\-py.
+Definition at line 54 of file counterpoise.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!F\-F@{F\-F}}
 \index{F\-F@{F\-F}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -514,7 +746,7 @@ Need the forcefield (here for now)
 
 
 
-Definition at line 139 of file target.\-py.
+Definition at line 160 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!gct@{gct}}
 \index{gct@{gct}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -525,7 +757,7 @@ Counts how often the gradient was computed.
 
 
 
-Definition at line 143 of file target.\-py.
+Definition at line 164 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!hct@{hct}}
 \index{hct@{hct}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -536,7 +768,7 @@ Counts how often the Hessian was computed.
 
 
 
-Definition at line 145 of file target.\-py.
+Definition at line 166 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1counterpoise_1_1Counterpoise_a4b7699f3f3b2bd34aaa3fe8374c2ff69}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!na@{na}}
 \index{na@{na}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -547,50 +779,127 @@ Number of atoms.
 
 
 
-Definition at line 76 of file counterpoise.\-py.
+Definition at line 77 of file counterpoise.\-py.
 
 \hypertarget{classforcebalance_1_1counterpoise_1_1Counterpoise_a2a8334eaf74299344a1cf53be98f150b}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!ns@{ns}}
 \index{ns@{ns}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
 \paragraph[{ns}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-counterpoise.\-Counterpoise.\-ns}}\label{classforcebalance_1_1counterpoise_1_1Counterpoise_a2a8334eaf74299344a1cf53be98f150b}
 
 
-Definition at line 89 of file counterpoise.\-py.
+Definition at line 90 of file counterpoise.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!pgrad@{pgrad}}
+\index{pgrad@{pgrad}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{pgrad}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-pgrad\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}
+
+
+Iteration where we turn on zero-\/gradient skipping. 
+
+Dictionary of whether to call the derivatives. 
+
+Definition at line 127 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!Print\-Option\-Dict@{Print\-Option\-Dict}}
 \index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
 \paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
 
 
-Definition at line 29 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 44 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!rd@{rd}}
+\index{rd@{rd}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{rd}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rd\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}
+
+
+Root directory of the whole project. 
+
+Submit jobs to the Work Queue.
+
+Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Directory to read data from.
+
+Definition at line 123 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!read\-\_\-indicate@{read\-\_\-indicate}}
+\index{read\-\_\-indicate@{read\-\_\-indicate}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{read\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}
+
+
+Whether to read indicate.\-log from file when restarting an aborted run. 
+
+
+
+Definition at line 168 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!read\-\_\-objective@{read\-\_\-objective}}
+\index{read\-\_\-objective@{read\-\_\-objective}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{read\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}
+
+
+Whether to read objective.\-p from file when restarting an aborted run. 
+
+
+
+Definition at line 172 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!rundir@{rundir}}
 \index{rundir@{rundir}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
 \paragraph[{rundir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rundir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}
 
 
-The directory in which the simulation is running -\/ this can be updated. 
+self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. 
 
 Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
 
-Definition at line 137 of file target.\-py.
+Not expecting more than ten thousand iterations Go into the directory where \hyperlink{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a}{get()} will be executed. Write mathematical parameters to file; will be used to checkpoint calculation. Read in file that specifies which derivatives may be skipped. 
+
+Definition at line 158 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!tempbase@{tempbase}}
+\index{tempbase@{tempbase}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{tempbase}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempbase\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}
+
+
+Relative directory of target. 
+
+Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
+
+Definition at line 152 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!tempdir@{tempdir}}
 \index{tempdir@{tempdir}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
 \paragraph[{tempdir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempdir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}
 
 
-Root directory of the whole project. 
-
-Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Relative directory of target Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
-
-Definition at line 135 of file target.\-py.
+Definition at line 155 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!verbose\-\_\-options@{verbose\-\_\-options}}
 \index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
 \paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
 
 
-Definition at line 30 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+Definition at line 40 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!write\-\_\-indicate@{write\-\_\-indicate}}
+\index{write\-\_\-indicate@{write\-\_\-indicate}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{write\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}
+
+
+Whether to write indicate.\-log at every iteration (true for all but remote.) 
+
+
+
+Definition at line 170 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!write\-\_\-objective@{write\-\_\-objective}}
+\index{write\-\_\-objective@{write\-\_\-objective}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
+\paragraph[{write\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}
+
+
+Whether to write objective.\-p at every iteration (true for all but remote.) 
+
+
+
+Definition at line 174 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!xct@{xct}}
 \index{xct@{xct}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -601,7 +910,7 @@ Counts how often the objective function was computed.
 
 
 
-Definition at line 141 of file target.\-py.
+Definition at line 162 of file target.\-py.
 
 \hypertarget{classforcebalance_1_1counterpoise_1_1Counterpoise_a2793b896bff71a3c6b9c6f6568ba1be2}{\index{forcebalance\-::counterpoise\-::\-Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}!xyzs@{xyzs}}
 \index{xyzs@{xyzs}!forcebalance::counterpoise::Counterpoise@{forcebalance\-::counterpoise\-::\-Counterpoise}}
@@ -612,7 +921,7 @@ Number of snapshots.
 
 X\-Y\-Z elements and coordinates 
 
-Definition at line 51 of file counterpoise.\-py.
+Definition at line 52 of file counterpoise.\-py.
 
 
 

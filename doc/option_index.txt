@@ -32,14 +32,15 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 
 \n<b> Recommendation </b>: 0.2 is a conservative value, 0.5 for big step size adjustments.
 
-@li <b> AMOEBA_POLARIZATION </b> (String)
+@li <b> AMOEBA_EPS </b> (Float)
+\n<b> One-line description </b>: The AMOEBA mutual polarization criterion.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> AMOEBA_POL </b> (String)
 \n<b> One-line description </b>: The AMOEBA polarization type, either direct, mutual, or nonpolarizable.
-\n<b> Default Value </b>: direct
-\n<b> Scope </b>: Optimizations of the AMOEBA polarizable force field (Optional)
-\n<b> Full description </b>: When optimizing a force field with the AMOEBA functional form, 
-                                         set this variable to 'direct', 'mutual', or 'nonpolarizable'.  At present 
-                                         this variable affects OpenMM API calls, but not TINKER input files.
-\n<b> Recommendation </b>: No recommendation, depends on the application.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
 
 @li <b> ASYNCHRONOUS </b> (Bool)
 \n<b> One-line description </b>: Execute Work Queue tasks and local calculations asynchronously for improved speed
@@ -64,9 +65,14 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
                                       will activate a linear transformation which projects out the direction in parameter space that changes the net charge.
 \n<b> Recommendation </b>: Either set to true and check your output carefully, or use "eval" statements in the force field file for finer control.
 
+@li <b> CONTINUE </b> (Bool)
+\n<b> One-line description </b>: Continue the current run from where we left off (supports mid-iteration recovery).
+\n<b> Default Value </b>: 0
+\n(Needs full documentation)
+
 @li <b> CONVERGENCE_GRADIENT </b> (Float)
 \n<b> One-line description </b>: Convergence criterion of gradient norm
-\n<b> Default Value </b>: 0.0001
+\n<b> Default Value </b>: 0.001
 \n<b> Scope </b>: Main optimizer (Optional)
 \n<b> Full description </b>: The main optimizer will quit when the objective function gradient falls below this number.
                                           Since this is a newly implemented option, I can't say when this option will fail.
@@ -90,6 +96,11 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
                                       reduced until it falls below this number.  In the latter case, this usually means that the derivatives are
                                       wrong.
 \n<b> Recommendation </b>: Make sure that this value is much smaller than trust0.
+
+@li <b> CRITERIA </b> (Int)
+\n<b> One-line description </b>: The number of convergence criteria that must be met for main optimizer to converge
+\n<b> Default Value </b>: 1
+\n(Needs full documentation)
 
 @li <b> EIG_LOWERBOUND </b> (Float)
 \n<b> One-line description </b>: Minimum eigenvalue for applying steepest descent correction
@@ -118,6 +129,11 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 \n<b> Scope </b>: All force field optimizations (Optional)
 \n<b> Recommendation </b>: Unless you're using a nonstandard location for force field files, you probably shouldn't change this.
 
+@li <b> FINITE_DIFFERENCE_FACTOR </b> (Float)
+\n<b> One-line description </b>: Make sure that the finite difference step size does not exceed this multiple of the trust radius.
+\n<b> Default Value </b>: 0.1
+\n(Needs full documentation)
+
 @li <b> FINITE_DIFFERENCE_H </b> (Float)
 \n<b> One-line description </b>: Step size for finite difference derivatives in many functions
 \n<b> Default Value </b>: 0.001
@@ -136,7 +152,7 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 
 @li <b> GMXPATH </b> (String)
 \n<b> One-line description </b>: Path for GROMACS executables (if not the default)
-\n<b> Default Value </b>: /usr/bin
+\n<b> Default Value </b>: /home/leeping/opt/gromacs/bin
 \n<b> Scope </b>: Targets that use GROMACS (<b><em>Required</em></b>)
 \n<b> Full description </b>: Specify the path where GROMACS executables are installed, most likely ending in 'bin'.
                              Note that executables are only installed 'bin' if the program is installed using 'make install';
@@ -173,6 +189,11 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 @li <b> LOGARITHMIC_MAP </b> (Bool)
 \n<b> One-line description </b>: Optimize in the space of log-variables
 \n<b> Default Value </b>: 0
+\n(Needs full documentation)
+
+@li <b> LQ_CONVERGE </b> (Bool)
+\n<b> One-line description </b>: Allow convergence on "low quality" steps
+\n<b> Default Value </b>: 1
 \n(Needs full documentation)
 
 @li <b> MAXSTEP </b> (Int)
@@ -292,8 +313,18 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
                              equivalent to reading in stored parameter values, except the gradient and Hessian (which contains memory from previous
                              steps) is recorded too.
 
+@li <b> REEVALUATE </b> (Bool)
+\n<b> One-line description </b>: Re-evaluate the objective function and gradients when the step is rejected (for noisy objective functions).
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
 @li <b> RIGID_WATER </b> (Bool)
 \n<b> One-line description </b>: Perform calculations using rigid water molecules.
+\n<b> Default Value </b>: 0
+\n(Needs full documentation)
+
+@li <b> RPMD_BEADS </b> (Int)
+\n<b> One-line description </b>: Number of beads in ring polymer MD (zero to disable)
 \n<b> Default Value </b>: 0
 \n(Needs full documentation)
 
@@ -328,9 +359,14 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 \n<b> Default Value </b>: 0.0001
 \n(Needs full documentation)
 
+@li <b> STEP_LOWERBOUND </b> (Float)
+\n<b> One-line description </b>: Optimization will "fail" if step falls below this size
+\n<b> Default Value </b>: 1e-06
+\n(Needs full documentation)
+
 @li <b> TINKERPATH </b> (String)
 \n<b> One-line description </b>: Path for TINKER executables (if not the default)
-\n<b> Default Value </b>: 
+\n<b> Default Value </b>: /home/leeping/opt/tinker/bin
 \n<b> Scope </b>: Targets that use TINKER (<b><em>Required</em></b>)
 \n<b> Recommendation </b>: Depends on your local installation and environment.
 
@@ -373,6 +409,11 @@ trust = max(ndx*(1./(1+adaptive_factor)), self.mintrust)
 \n<b> Full description </b>: Write a checkpoint file every single step, not just after the job is finished.
 \n<b> Recommendation </b>: Useful if you want to quit an optimization before it finishes and restart, but make sure you don't overwrite existing checkpoint files by accident.
 
+@li <b> ZEROGRAD </b> (Int)
+\n<b> One-line description </b>: Set to a nonnegative number to turn on zero gradient skipping at that optimization step.
+\n<b> Default Value </b>: -1
+\n(Needs full documentation)
+
 \section tgt_option_index Option index: Target options
 
 This section contains a listing of the target options available when running
@@ -381,6 +422,11 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 
 @li <b> ABSOLUTE </b> (Bool)
 \n<b> One-line description </b>: When matching energies in AbInitio, do not subtract the mean energy gap.
+\n<b> Default Value </b>: 0
+\n(Needs full documentation)
+
+@li <b> ADAPT_ERRORS </b> (Bool)
+\n<b> One-line description </b>: Adapt to simulation uncertainty by combining property estimations and adjusting simulation length.
 \n<b> Default Value </b>: 0
 \n(Needs full documentation)
 
@@ -409,6 +455,11 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 @li <b> CAUCHY </b> (Bool)
 \n<b> One-line description </b>: Normalize interaction energies each using 1/(denom**2 + reference**2) which resembles a Cauchy distribution
 \n<b> Default Value </b>: 0
+\n(Needs full documentation)
+
+@li <b> COORDS </b> (String)
+\n<b> One-line description </b>: Coordinates for single point evaluation; if not provided, will search for a default.
+\n<b> Default Value </b>: None
 \n(Needs full documentation)
 
 @li <b> COVARIANCE </b> (Bool)
@@ -445,6 +496,21 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 @li <b> ENERGY_UPPER </b> (Float)
 \n<b> One-line description </b>: Upper energy cutoff (in kcal/mol); super-repulsive interactions are given zero weight
 \n<b> Default Value </b>: 30.0
+\n(Needs full documentation)
+
+@li <b> ENGINE </b> (Allcap)
+\n<b> One-line description </b>: The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> EQ_STEPS </b> (Int)
+\n<b> One-line description </b>: Number of time steps for the equilibration run.
+\n<b> Default Value </b>: 20000
+\n(Needs full documentation)
+
+@li <b> EXPDATA_TXT </b> (String)
+\n<b> One-line description </b>: Text file containing experimental data.
+\n<b> Default Value </b>: expset.txt
 \n(Needs full documentation)
 
 @li <b> FD_PTYPES </b> (List)
@@ -513,32 +579,52 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 
 @li <b> FRAGMENT1 </b> (String)
 \n<b> One-line description </b>: Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)
-\n<b> Default Value </b>: 
+\n<b> Default Value </b>: None
 \n(Needs full documentation)
 
 @li <b> FRAGMENT2 </b> (String)
 \n<b> One-line description </b>: Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.
-\n<b> Default Value </b>: 
+\n<b> Default Value </b>: None
 \n(Needs full documentation)
 
-@li <b> GAS_EQU_STEPS </b> (Int)
+@li <b> GAS_COORDS </b> (String)
+\n<b> One-line description </b>: Provide file name for gas phase coordinates.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> GAS_EQ_STEPS </b> (Int)
 \n<b> One-line description </b>: Number of time steps for the gas equilibration run, if different from default.
-\n<b> Default Value </b>: 0
+\n<b> Default Value </b>: 10000
 \n(Needs full documentation)
 
 @li <b> GAS_INTERVAL </b> (Float)
 \n<b> One-line description </b>: Time interval for saving coordinates for the gas production run (if zero, use default in external script.)
-\n<b> Default Value </b>: 0.0
+\n<b> Default Value </b>: 0.1
 \n(Needs full documentation)
 
-@li <b> GAS_PROD_STEPS </b> (Int)
+@li <b> GAS_MD_STEPS </b> (Int)
 \n<b> One-line description </b>: Number of time steps for the gas production run, if different from default.
-\n<b> Default Value </b>: 0
+\n<b> Default Value </b>: 100000
 \n(Needs full documentation)
 
 @li <b> GAS_TIMESTEP </b> (Float)
 \n<b> One-line description </b>: Time step size for the gas simulation (if zero, use default in external script.).
-\n<b> Default Value </b>: 0.0
+\n<b> Default Value </b>: 1.0
+\n(Needs full documentation)
+
+@li <b> GMX_MDP </b> (String)
+\n<b> One-line description </b>: Gromacs .mdp files.  If not provided, will search for default.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> GMX_NDX </b> (String)
+\n<b> One-line description </b>: Gromacs .ndx files.  If not provided, will search for default.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> GMX_TOP </b> (String)
+\n<b> One-line description </b>: Gromacs .top files.  If not provided, will search for default.
+\n<b> Default Value </b>: None
 \n(Needs full documentation)
 
 @li <b> HVAP_SUBAVERAGE </b> (Bool)
@@ -546,24 +632,59 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 0
 \n(Needs full documentation)
 
-@li <b> LIQUID_EQU_STEPS </b> (Int)
-\n<b> One-line description </b>: Number of time steps for the liquid equilibration run.
+@li <b> INTER_TXT </b> (String)
+\n<b> One-line description </b>: Text file containing interacting systems.  If not provided, will search for a default.
+\n<b> Default Value </b>: interactions.txt
+\n(Needs full documentation)
+
+@li <b> LIPID_COORDS </b> (String)
+\n<b> One-line description </b>: Provide file name for lipid coordinates.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> LIPID_EQ_STEPS </b> (Int)
+\n<b> One-line description </b>: Number of time steps for the lipid equilibration run.
+\n<b> Default Value </b>: 1000
+\n(Needs full documentation)
+
+@li <b> LIPID_INTERVAL </b> (Float)
+\n<b> One-line description </b>: Time interval for saving coordinates for the lipid production run.
+\n<b> Default Value </b>: 0.1
+\n(Needs full documentation)
+
+@li <b> LIPID_MD_STEPS </b> (Int)
+\n<b> One-line description </b>: Number of time steps for the lipid production run.
 \n<b> Default Value </b>: 10000
+\n(Needs full documentation)
+
+@li <b> LIPID_TIMESTEP </b> (Float)
+\n<b> One-line description </b>: Time step size for the lipid simulation.
+\n<b> Default Value </b>: 1.0
+\n(Needs full documentation)
+
+@li <b> LIQUID_COORDS </b> (String)
+\n<b> One-line description </b>: Provide file name for condensed phase coordinates.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> LIQUID_EQ_STEPS </b> (Int)
+\n<b> One-line description </b>: Number of time steps for the liquid equilibration run.
+\n<b> Default Value </b>: 1000
 \n(Needs full documentation)
 
 @li <b> LIQUID_INTERVAL </b> (Float)
 \n<b> One-line description </b>: Time interval for saving coordinates for the liquid production run.
-\n<b> Default Value </b>: 0.05
+\n<b> Default Value </b>: 0.1
 \n(Needs full documentation)
 
-@li <b> LIQUID_PROD_STEPS </b> (Int)
+@li <b> LIQUID_MD_STEPS </b> (Int)
 \n<b> One-line description </b>: Number of time steps for the liquid production run.
-\n<b> Default Value </b>: 20000
+\n<b> Default Value </b>: 10000
 \n(Needs full documentation)
 
 @li <b> LIQUID_TIMESTEP </b> (Float)
 \n<b> One-line description </b>: Time step size for the liquid simulation.
-\n<b> Default Value </b>: 0.5
+\n<b> Default Value </b>: 1.0
 \n(Needs full documentation)
 
 @li <b> MANUAL </b> (Bool)
@@ -571,13 +692,13 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 0
 \n(Needs full documentation)
 
-@li <b> MASTERFILE </b> (String)
-\n<b> One-line description </b>: The name of the master file containing interacting systems
-\n<b> Default Value </b>: interactions.txt
+@li <b> MD_STEPS </b> (Int)
+\n<b> One-line description </b>: Number of time steps for the production run.
+\n<b> Default Value </b>: 50000
 \n(Needs full documentation)
 
-@li <b> MDRUN_THREADS </b> (Int)
-\n<b> One-line description </b>: Set the number of threads used by remote Gromacs processes
+@li <b> MD_THREADS </b> (Int)
+\n<b> One-line description </b>: Set the number of threads used by Gromacs or TINKER processes in MD simulations
 \n<b> Default Value </b>: 1
 \n(Needs full documentation)
 
@@ -586,9 +707,19 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 1
 \n(Needs full documentation)
 
-@li <b> MTS_VVVR </b> (Bool)
+@li <b> MTS_INTEGRATOR </b> (Bool)
 \n<b> One-line description </b>: Enable multiple-timestep integrator in external npt.py script
 \n<b> Default Value </b>: 0
+\n(Needs full documentation)
+
+@li <b> N_MCBAROSTAT </b> (Int)
+\n<b> One-line description </b>: Number of steps in the liquid simulation between MC barostat volume adjustments.
+\n<b> Default Value </b>: 25
+\n(Needs full documentation)
+
+@li <b> N_SIM_CHAIN </b> (Int)
+\n<b> One-line description </b>: Number of simulations required to calculate quantities.
+\n<b> Default Value </b>: 1
 \n(Needs full documentation)
 
 @li <b> NAME </b> (String)
@@ -597,9 +728,14 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Scope </b>: All targets (<b><em>Required</em></b>)
 \n<b> Recommendation </b>: Choose a descriptive name and make sure all targets have different names.
 
-@li <b> OPENMM_CUDA_PRECISION </b> (String)
-\n<b> One-line description </b>: Precision of local OpenMM calculation.  Choose either single, double or mixed ; defaults to the OpenMM default.
-\n<b> Default Value </b>: 
+@li <b> OPENMM_PLATFORM </b> (String)
+\n<b> One-line description </b>: OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> OPENMM_PRECISION </b> (String)
+\n<b> One-line description </b>: Precision of OpenMM calculation if using CUDA or OpenCL platform.  Choose either single, double or mixed ; defaults to the OpenMM default.
+\n<b> Default Value </b>: None
 \n(Needs full documentation)
 
 @li <b> OPTIMIZE_GEOMETRY </b> (Bool)
@@ -607,9 +743,19 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 1
 \n(Needs full documentation)
 
+@li <b> PDB </b> (String)
+\n<b> One-line description </b>: PDB file mainly used for building OpenMM systems but can also contain coordinates.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
 @li <b> POLARIZABILITY_DENOM </b> (Float)
 \n<b> One-line description </b>: Dipole polarizability tensor normalization (cubic Angstrom) ; set to 0 if a zero weight is desired
 \n<b> Default Value </b>: 1.0
+\n(Needs full documentation)
+
+@li <b> QDATA_TXT </b> (String)
+\n<b> One-line description </b>: Text file containing quantum data.  If not provided, will search for a default (qdata.txt).
+\n<b> Default Value </b>: None
 \n(Needs full documentation)
 
 @li <b> QMBOLTZ </b> (Float)
@@ -636,6 +782,26 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 @li <b> QUADRUPOLE_DENOM </b> (Float)
 \n<b> One-line description </b>: Quadrupole normalization (Buckingham) ; set to 0 if a zero weight is desired
 \n<b> Default Value </b>: 1.0
+\n(Needs full documentation)
+
+@li <b> QUANTITIES </b> (List)
+\n<b> One-line description </b>: List of quantities to be fitted, each must have corresponding Quantity subclass
+\n<b> Default Value </b>: []
+\n(Needs full documentation)
+
+@li <b> READ </b> (String)
+\n<b> One-line description </b>: Provide a temporary directory ".tmp" to read data from a previous calculation on the initial iteration (for instance, to restart an aborted run).
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> REASSIGN_MODES </b> (String)
+\n<b> One-line description </b>: Reassign modes before fitting frequencies, using either linear assignment "permute" or maximum overlap "overlap".
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
+@li <b> REMOTE </b> (Bool)
+\n<b> One-line description </b>: Evaluate target as a remote work_queue task
+\n<b> Default Value </b>: 0
 \n(Needs full documentation)
 
 @li <b> RESP </b> (Bool)
@@ -668,6 +834,11 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 0
 \n(Needs full documentation)
 
+@li <b> SAVE_TRAJ </b> (Int)
+\n<b> One-line description </b>: Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save
+\n<b> Default Value </b>: 0
+\n(Needs full documentation)
+
 @li <b> SELF_POL_ALPHA </b> (Float)
 \n<b> One-line description </b>: Polarizability parameter for self-polarization correction (in debye).
 \n<b> Default Value </b>: 0.0
@@ -693,13 +864,23 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 0
 \n(Needs full documentation)
 
+@li <b> TINKER_KEY </b> (String)
+\n<b> One-line description </b>: TINKER .key files.  If not provided, will search for default.
+\n<b> Default Value </b>: None
+\n(Needs full documentation)
+
 @li <b> TYPE </b> (Allcap)
 \n<b> One-line description </b>: The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.
 \n<b> Default Value </b>: None
 \n<b> Scope </b>: All targets (<b><em>Required</em></b>)
 \n<b> Full description </b>: This is the type of target that you are running.  The current accepted values for the target type
-                             are given in the beginning of the objective.py file: COUNTERPOISE, ABINITIO_AMBER, ABINITIO_GMX, LIQUID_GMX, LIQUID_OPENMM, ABINITIO_OPENMM, ABINITIO_TINKER, BINDINGENERGY_TINKER, MONOMER_QTPIE, RDVR3_PSI4, INTERACTION_OPENMM, ABINITIO_INTERNAL, MOMENTS_TINKER, THCDF_PSI4, VIBRATION_TINKER, LIQUID_TINKER, INTERACTION_TINKER.
+                             are given in the beginning of the objective.py file: INTERACTION_OPENMM, LIQUID_OPENMM, MOMENTS_GMX, BINDINGENERGY_TINKER, BINDINGENERGY_GMX, VIBRATION_GMX, ABINITIO_AMBER, THERMO_GMX, ABINITIO_TINKER, MOMENTS_OPENMM, ABINITIO_INTERNAL, LIPID_GMX, LIQUID_GMX, COUNTERPOISE, ABINITIO_OPENMM, RDVR3_PSI4, MOMENTS_TINKER, THCDF_PSI4, INTERACTION_TINKER, ABINITIO_GMX, BINDINGENERGY_OPENMM, INTERACTION_GMX, REMOTE_TARGET, VIBRATION_TINKER, LIQUID_TINKER.
 \n<b> Recommendation </b>: Choose the appropriate type, and if the target type is missing, feel free to implement your own (or ask me for help).
+
+@li <b> W_AL </b> (Float)
+\n<b> One-line description </b>: Weight of average area per lipid
+\n<b> Default Value </b>: 1.0
+\n(Needs full documentation)
 
 @li <b> W_ALPHA </b> (Float)
 \n<b> One-line description </b>: Weight of thermal expansion coefficient
@@ -751,6 +932,11 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 \n<b> Default Value </b>: 1.0
 \n(Needs full documentation)
 
+@li <b> W_SCD </b> (Float)
+\n<b> One-line description </b>: Weight of dielectric constant
+\n<b> Default Value </b>: 1.0
+\n(Needs full documentation)
+
 @li <b> W_TORQUE </b> (Float)
 \n<b> One-line description </b>: Weight of torques (condensed to molecules, residues, or charge groups)
 \n<b> Default Value </b>: 0.0
@@ -786,6 +972,6 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
 
 @li <b> WRITELEVEL </b> (Int)
 \n<b> One-line description </b>: Affects the amount of data being printed to the temp directory.
-\n<b> Default Value </b>: 1
+\n<b> Default Value </b>: 0
 \n(Needs full documentation)
 

@@ -16,7 +16,8 @@ def \hyperlink{namespaceforcebalance_1_1contact_acffb04a66580454b8a87648faa1c5c1
 \paragraph[{atom\-\_\-distances}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-contact.\-atom\-\_\-distances (
 \begin{DoxyParamCaption}
 \item[{}]{xyzlist, }
-\item[{}]{atom\-\_\-contacts}
+\item[{}]{atom\-\_\-contacts, }
+\item[{}]{box = {\ttfamily None}}
 \end{DoxyParamCaption}
 )}}\label{namespaceforcebalance_1_1contact_a3592dbbf524c6115f34d9a70b50e2e0f}
 
@@ -27,23 +28,13 @@ xyzlist should be a traj\-\_\-length x num\-\_\-atoms x num\-\_\-dims array of t
 
 contacts should be a num\-\_\-contacts x 2 array where each row gives the indices of 2 atoms whos distance you care to monitor.
 
+box should be a 3-\/element array containing the a, b, and c lattice lengths.
+
 Returns\-: traj\-\_\-length x num\-\_\-contacts array of euclidean distances
 
 Note\-: For nice wrappers around this, see the prepare\-\_\-trajectory method of various metrics in metrics.\-py 
 
-Definition at line 27 of file contact.\-py.
-
-
-
-Here is the call graph for this function\-:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{namespaceforcebalance_1_1contact_a3592dbbf524c6115f34d9a70b50e2e0f_cgraph}
-\end{center}
-\end{figure}
-
+Definition at line 29 of file contact.\-py.
 
 \hypertarget{namespaceforcebalance_1_1contact_acffb04a66580454b8a87648faa1c5c16}{\index{forcebalance\-::contact@{forcebalance\-::contact}!residue\-\_\-distances@{residue\-\_\-distances}}
 \index{residue\-\_\-distances@{residue\-\_\-distances}!forcebalance::contact@{forcebalance\-::contact}}
@@ -66,5 +57,5 @@ residue\-\_\-contacts should be a 2\-D numpy array of shape num\-\_\-contacts x 
 
 Returns\-: a 2\-D array of traj\-\_\-lenth x num\-\_\-contacts where out\mbox{[}i,j\mbox{]} contains the distance between the pair of atoms, one from residue\-\_\-membership\mbox{[}residue\-\_\-contacts\mbox{[}j,0\mbox{]}\mbox{]} and one from residue\-\_\-membership\mbox{[}residue\-\_\-contacts\mbox{[}j,1\mbox{]}\mbox{]} that are closest. 
 
-Definition at line 86 of file contact.\-py.
+Definition at line 99 of file contact.\-py.
 

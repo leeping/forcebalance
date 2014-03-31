@@ -13,17 +13,29 @@ class \hyperlink{classforcebalance_1_1gmxio_1_1ITP__Reader}{I\-T\-P\-\_\-\-Reade
 \begin{DoxyCompactList}\small\item\em Finite state machine for parsing G\-R\-O\-M\-A\-C\-S force field files. \end{DoxyCompactList}\item 
 class \hyperlink{classforcebalance_1_1gmxio_1_1GMX}{G\-M\-X}
 \begin{DoxyCompactList}\small\item\em Derived from Engine object for carrying out general purpose G\-R\-O\-M\-A\-C\-S calculations. \end{DoxyCompactList}\item 
-class \hyperlink{classforcebalance_1_1gmxio_1_1AbInitio__GMX}{Ab\-Initio\-\_\-\-G\-M\-X}
-\begin{DoxyCompactList}\small\item\em Subclass of Ab\-Initio for force and energy matching using normal G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\item 
 class \hyperlink{classforcebalance_1_1gmxio_1_1Liquid__GMX}{Liquid\-\_\-\-G\-M\-X}
 \item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1Lipid__GMX}{Lipid\-\_\-\-G\-M\-X}
+\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1AbInitio__GMX}{Ab\-Initio\-\_\-\-G\-M\-X}
+\begin{DoxyCompactList}\small\item\em Subclass of Ab\-Initio for force and energy matching using G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1BindingEnergy__GMX}{Binding\-Energy\-\_\-\-G\-M\-X}
+\begin{DoxyCompactList}\small\item\em Binding energy matching using Gromacs. \end{DoxyCompactList}\item 
 class \hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX}{Interaction\-\_\-\-G\-M\-X}
-\begin{DoxyCompactList}\small\item\em Subclass of Interaction for interaction energy matching using G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Interaction energy matching using G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1Moments__GMX}{Moments\-\_\-\-G\-M\-X}
+\begin{DoxyCompactList}\small\item\em Multipole moment matching using G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1Vibration__GMX}{Vibration\-\_\-\-G\-M\-X}
+\begin{DoxyCompactList}\small\item\em Vibrational frequency matching using G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1Thermo__GMX}{Thermo\-\_\-\-G\-M\-X}
+\begin{DoxyCompactList}\small\item\em Thermodynamical property matching using G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-def \hyperlink{namespaceforcebalance_1_1gmxio_acc5bef2c5c991cd70a948a1dd43ef6a6}{edit\-\_\-mdp}
+def \hyperlink{namespaceforcebalance_1_1gmxio_a73a881531c27adfddab62cda7f2232cd}{write\-\_\-mdp}
 \begin{DoxyCompactList}\small\item\em Create or edit a Gromacs M\-D\-P file. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1gmxio_a02c974d03c4ac22f6169593dc0d812da}{write\-\_\-ndx}
+\begin{DoxyCompactList}\small\item\em Create or edit a Gromacs ndx file. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1gmxio_a29af6ace00d7e58258e0a854ca13d954}{parse\-\_\-atomtype\-\_\-line}
 \begin{DoxyCompactList}\small\item\em Parses the 'atomtype' line. \end{DoxyCompactList}\item 
 def \hyperlink{namespaceforcebalance_1_1gmxio_acac8488f29b62fb0d4cb54bb5a041026}{rm\-\_\-gmx\-\_\-baks}
@@ -46,9 +58,7 @@ list \hyperlink{namespaceforcebalance_1_1gmxio_acd9fed3887161c6386506563fd4f3534
 dictionary \hyperlink{namespaceforcebalance_1_1gmxio_a179cbde2e55b4c025af89b225612d6e1}{fdict}
 \begin{DoxyCompactList}\small\item\em Section -\/$>$ Interaction type dictionary. \end{DoxyCompactList}\item 
 dictionary \hyperlink{namespaceforcebalance_1_1gmxio_ae845e0b923ecde16c79f2742b94534a6}{pdict}
-\begin{DoxyCompactList}\small\item\em Interaction type -\/$>$ Parameter Dictionary. \end{DoxyCompactList}\item 
-string \hyperlink{namespaceforcebalance_1_1gmxio_a35d747dea4a5446d049d901e782feaa2}{shot\-\_\-mdp}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Interaction type -\/$>$ Parameter Dictionary. \end{DoxyCompactList}\end{DoxyCompactItemize}
 
 
 \subsubsection{Detailed Description}
@@ -60,60 +70,11 @@ G\-R\-O\-M\-A\-C\-S input/output. \begin{DoxyRefDesc}{Todo}
 Lee-\/\-Ping Wang 
 \end{DoxyAuthor}
 \begin{DoxyDate}{Date}
-12/2011
-\end{DoxyDate}
-\begin{DoxyRefDesc}{Todo}
-\item[\hyperlink{todo__todo000012}{Todo}]Even more stuff from \hyperlink{forcefield_8py}{forcefield.\-py} needs to go into here.\end{DoxyRefDesc}
-
-
-\begin{DoxyAuthor}{Author}
-Lee-\/\-Ping Wang 
-\end{DoxyAuthor}
-\begin{DoxyDate}{Date}
 12/2011 
 \end{DoxyDate}
 
 
 \subsubsection{Function Documentation}
-\hypertarget{namespaceforcebalance_1_1gmxio_acc5bef2c5c991cd70a948a1dd43ef6a6}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!edit\-\_\-mdp@{edit\-\_\-mdp}}
-\index{edit\-\_\-mdp@{edit\-\_\-mdp}!forcebalance::gmxio@{forcebalance\-::gmxio}}
-\paragraph[{edit\-\_\-mdp}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-gmxio.\-edit\-\_\-mdp (
-\begin{DoxyParamCaption}
-\item[{}]{fin, }
-\item[{}]{fout, }
-\item[{}]{options, }
-\item[{}]{verbose = {\ttfamily False}}
-\end{DoxyParamCaption}
-)}}\label{namespaceforcebalance_1_1gmxio_acc5bef2c5c991cd70a948a1dd43ef6a6}
-
-
-Create or edit a Gromacs M\-D\-P file. 
-
-
-\begin{DoxyParams}[1]{Parameters}
-\mbox{\tt in}  & {\em fin} & Input file name. \\
-\hline
-\mbox{\tt in}  & {\em fout} & Output file name, can be the same as input file name. \\
-\hline
-\mbox{\tt in}  & {\em options} & Dictionary containing mdp options. Existing options are replaced, new options are added at the end. \\
-\hline
-\end{DoxyParams}
-
-
-Definition at line 37 of file gmxio.\-py.
-
-
-
-Here is the call graph for this function\-:
-\nopagebreak
-\begin{figure}[H]
-\begin{center}
-\leavevmode
-\includegraphics[width=350pt]{namespaceforcebalance_1_1gmxio_acc5bef2c5c991cd70a948a1dd43ef6a6_cgraph}
-\end{center}
-\end{figure}
-
-
 \hypertarget{namespaceforcebalance_1_1gmxio_a29af6ace00d7e58258e0a854ca13d954}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!parse\-\_\-atomtype\-\_\-line@{parse\-\_\-atomtype\-\_\-line}}
 \index{parse\-\_\-atomtype\-\_\-line@{parse\-\_\-atomtype\-\_\-line}!forcebalance::gmxio@{forcebalance\-::gmxio}}
 \paragraph[{parse\-\_\-atomtype\-\_\-line}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-gmxio.\-parse\-\_\-atomtype\-\_\-line (
@@ -128,7 +89,7 @@ Parses the 'atomtype' line.
 Parses lines like this\-:\par
  {\ttfamily  opls\-\_\-135 C\-T 6 12.\-0107 0.\-0000 A 3.\-5000e-\/01 2.\-7614e-\/01\par
  C 12.\-0107 0.\-0000 A 3.\-7500e-\/01 4.\-3932e-\/01\par
- Na 11 22.\-9897 0.\-0000 A 6.\-068128070229e+03 2.\-662662556402e+01 0.\-0000e+00 ; P\-A\-R\-M 5 6\par
+ Na 11 22.\-9897 0.\-0000 A 6.\-068128070229e+03 2.\-662662556402e+01 0.\-0000e+00 ; P\-R\-M 5 6\par
  } Look at all the variety!
 
 
@@ -149,7 +110,7 @@ answer Dictionary containing\-:\par
 \end{DoxyReturn}
 
 
-Definition at line 183 of file gmxio.\-py.
+Definition at line 234 of file gmxio.\-py.
 
 
 
@@ -172,7 +133,89 @@ Here is the call graph for this function\-:
 )}}\label{namespaceforcebalance_1_1gmxio_acac8488f29b62fb0d4cb54bb5a041026}
 
 
-Definition at line 430 of file gmxio.\-py.
+Definition at line 481 of file gmxio.\-py.
+
+\hypertarget{namespaceforcebalance_1_1gmxio_a73a881531c27adfddab62cda7f2232cd}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!write\-\_\-mdp@{write\-\_\-mdp}}
+\index{write\-\_\-mdp@{write\-\_\-mdp}!forcebalance::gmxio@{forcebalance\-::gmxio}}
+\paragraph[{write\-\_\-mdp}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-gmxio.\-write\-\_\-mdp (
+\begin{DoxyParamCaption}
+\item[{}]{fout, }
+\item[{}]{options, }
+\item[{}]{fin = {\ttfamily None}, }
+\item[{}]{defaults = {\ttfamily \{\}}, }
+\item[{}]{verbose = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1gmxio_a73a881531c27adfddab62cda7f2232cd}
+
+
+Create or edit a Gromacs M\-D\-P file. 
+
+The M\-D\-P file contains G\-R\-O\-M\-A\-C\-S run parameters. 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fout} & Output file name, can be the same as input file name. \\
+\hline
+\mbox{\tt in}  & {\em options} & Dictionary containing mdp options. Existing options are replaced, new options are added at the end. \\
+\hline
+\mbox{\tt in}  & {\em fin} & Input file name. \\
+\hline
+\mbox{\tt in}  & {\em defaults} & Default options to add to the mdp only if they don't already exist. \\
+\hline
+\mbox{\tt in}  & {\em verbose} & Print out all modifications to the file. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 46 of file gmxio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1gmxio_a73a881531c27adfddab62cda7f2232cd_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{namespaceforcebalance_1_1gmxio_a02c974d03c4ac22f6169593dc0d812da}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!write\-\_\-ndx@{write\-\_\-ndx}}
+\index{write\-\_\-ndx@{write\-\_\-ndx}!forcebalance::gmxio@{forcebalance\-::gmxio}}
+\paragraph[{write\-\_\-ndx}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-gmxio.\-write\-\_\-ndx (
+\begin{DoxyParamCaption}
+\item[{}]{fout, }
+\item[{}]{grps, }
+\item[{}]{fin = {\ttfamily None}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1gmxio_a02c974d03c4ac22f6169593dc0d812da}
+
+
+Create or edit a Gromacs ndx file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fout} & Output file name, can be the same as input file name. \\
+\hline
+\mbox{\tt in}  & {\em grps} & Dictionary containing key \-: atom selections. \\
+\hline
+\mbox{\tt in}  & {\em fin} & Input file name. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 116 of file gmxio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespaceforcebalance_1_1gmxio_a02c974d03c4ac22f6169593dc0d812da_cgraph}
+\end{center}
+\end{figure}
+
 
 
 
@@ -191,7 +234,7 @@ Angle interaction function types.
 
 
 
-Definition at line 93 of file gmxio.\-py.
+Definition at line 144 of file gmxio.\-py.
 
 \hypertarget{namespaceforcebalance_1_1gmxio_a49a34b85d405c9286ceec1e6f088069f}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!bftypes@{bftypes}}
 \index{bftypes@{bftypes}!forcebalance::gmxio@{forcebalance\-::gmxio}}
@@ -202,7 +245,7 @@ Bonded interaction function types.
 
 
 
-Definition at line 91 of file gmxio.\-py.
+Definition at line 142 of file gmxio.\-py.
 
 \hypertarget{namespaceforcebalance_1_1gmxio_acd9fed3887161c6386506563fd4f3534}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!dftypes@{dftypes}}
 \index{dftypes@{dftypes}!forcebalance::gmxio@{forcebalance\-::gmxio}}
@@ -213,7 +256,7 @@ Dihedral interaction function types.
 
 
 
-Definition at line 96 of file gmxio.\-py.
+Definition at line 147 of file gmxio.\-py.
 
 \hypertarget{namespaceforcebalance_1_1gmxio_a179cbde2e55b4c025af89b225612d6e1}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!fdict@{fdict}}
 \index{fdict@{fdict}!forcebalance::gmxio@{forcebalance\-::gmxio}}
@@ -240,14 +283,14 @@ Section -\/$>$ Interaction type dictionary.
 
 Based on the section you're in and the integer given on the current line, this looks up the 'interaction type' -\/ for example, within bonded interactions there are four interaction types\-: harmonic, G96, Morse, and quartic interactions. 
 
-Definition at line 104 of file gmxio.\-py.
+Definition at line 155 of file gmxio.\-py.
 
 \hypertarget{namespaceforcebalance_1_1gmxio_ac10457054444ca04e0a265665afc2512}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!logger@{logger}}
 \index{logger@{logger}!forcebalance::gmxio@{forcebalance\-::gmxio}}
 \paragraph[{logger}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-gmxio.\-logger = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)}}\label{namespaceforcebalance_1_1gmxio_ac10457054444ca04e0a265665afc2512}
 
 
-Definition at line 28 of file gmxio.\-py.
+Definition at line 35 of file gmxio.\-py.
 
 \hypertarget{namespaceforcebalance_1_1gmxio_a337bc61280b58a43319380dec9c5529a}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!nftypes@{nftypes}}
 \index{nftypes@{nftypes}!forcebalance::gmxio@{forcebalance\-::gmxio}}
@@ -258,7 +301,7 @@ Vd\-W interaction function types.
 
 
 
-Definition at line 87 of file gmxio.\-py.
+Definition at line 138 of file gmxio.\-py.
 
 \hypertarget{namespaceforcebalance_1_1gmxio_ae845e0b923ecde16c79f2742b94534a6}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!pdict@{pdict}}
 \index{pdict@{pdict}!forcebalance::gmxio@{forcebalance\-::gmxio}}
@@ -273,7 +316,7 @@ A list of supported G\-R\-O\-M\-A\-C\-S interaction types in force matching. The
 How about making the P\-D\-I\-H\-S less ugly? \end{DoxyRefDesc}
 
 
-Definition at line 127 of file gmxio.\-py.
+Definition at line 178 of file gmxio.\-py.
 
 \hypertarget{namespaceforcebalance_1_1gmxio_a59695b79df36efbe64ac88fd64bfb366}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!pftypes@{pftypes}}
 \index{pftypes@{pftypes}!forcebalance::gmxio@{forcebalance\-::gmxio}}
@@ -284,35 +327,5 @@ Pairwise interaction function types.
 
 
 
-Definition at line 89 of file gmxio.\-py.
-
-\hypertarget{namespaceforcebalance_1_1gmxio_a35d747dea4a5446d049d901e782feaa2}{\index{forcebalance\-::gmxio@{forcebalance\-::gmxio}!shot\-\_\-mdp@{shot\-\_\-mdp}}
-\index{shot\-\_\-mdp@{shot\-\_\-mdp}!forcebalance::gmxio@{forcebalance\-::gmxio}}
-\paragraph[{shot\-\_\-mdp}]{\setlength{\rightskip}{0pt plus 5cm}string forcebalance.\-gmxio.\-shot\-\_\-mdp}}\label{namespaceforcebalance_1_1gmxio_a35d747dea4a5446d049d901e782feaa2}
-{\bfseries Initial value\-:}
-\begin{DoxyCode}
-1 = \textcolor{stringliteral}{"""integrator = md}
-2 \textcolor{stringliteral}{dt              = 0.001}
-3 \textcolor{stringliteral}{nsteps          = 0}
-4 \textcolor{stringliteral}{nstxout         = 0}
-5 \textcolor{stringliteral}{nstfout         = 1}
-6 \textcolor{stringliteral}{nstenergy       = 1}
-7 \textcolor{stringliteral}{nstxtcout       = 0}
-8 \textcolor{stringliteral}{xtc\_grps        = System}
-9 \textcolor{stringliteral}{energygrps      = System}
-10 \textcolor{stringliteral}{}
-11 \textcolor{stringliteral}{nstlist         = 0}
-12 \textcolor{stringliteral}{ns\_type         = simple}
-13 \textcolor{stringliteral}{rlist           = 0.0}
-14 \textcolor{stringliteral}{vdwtype         = cut-off}
-15 \textcolor{stringliteral}{coulombtype     = cut-off}
-16 \textcolor{stringliteral}{rcoulomb        = 0.0}
-17 \textcolor{stringliteral}{rvdw            = 0.0}
-18 \textcolor{stringliteral}{constraints     = none}
-19 \textcolor{stringliteral}{pbc             = no}
-20 \textcolor{stringliteral}{"""}
-\end{DoxyCode}
-
-
-Definition at line 438 of file gmxio.\-py.
+Definition at line 140 of file gmxio.\-py.
 
