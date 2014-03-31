@@ -250,9 +250,3 @@ if __name__ == '__main__':
         print "Cleaning up..."
         os.system("rm -rf latex option_index.txt api.dox mainpage.dox")   # cleanup
     
-    print "#===================================#"
-    print "#| Make sure to update the version |#"
-    print "#| manually in doc/header.tex and  |#"
-    print "#| doc/api_header.tex!!            |#"
-    print "#===================================#"
-        
