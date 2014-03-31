@@ -116,7 +116,7 @@ def build(interactive=False, upstream=False):
         print "\n# Switch to documentation branch before writing files"
 
         # Move folders to temporary location prior to branch switch
-        for fnm in ["latex", "html", "ForceBalance-API.pdf", "ForceBalance-Manual.pdf"]:
+        for fnm in ["latex", "html"]:
             display("mv %s %s_" % (fnm, fnm))
             os.system("mv %s %s_" % (fnm, fnm))
         
@@ -124,11 +124,16 @@ def build(interactive=False, upstream=False):
         display("git config --global push.default current")
         os.system("git config --global push.default current")
 
+        raw_input("\n Press a key to COMMIT the master branch (will update manuals).")
+        display('git commit -a -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M")))
+        if os.system('git commit -a -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M"))):
+            raise OSError("Error trying to commit files to local master branch")
+
         # Check out the gh-pages branch
         display("git checkout gh-pages")
         if os.system("git checkout gh-pages"):
             print "\n# encountered ERROR in checking out branch (above).  Please commit files and try again."
-            for fnm in ["latex", "html", "ForceBalance-API.pdf", "ForceBalance-Manual.pdf"]:
+            for fnm in ["latex", "html"]:
                 os.system("mv %s_ %s" % (fnm, fnm))
             sys.exit(1)
 
@@ -137,10 +142,10 @@ def build(interactive=False, upstream=False):
         os.system("rsync -a --delete html_/ html")
         display("rsync -a --delete latex_/ latex")
         os.system("rsync -a --delete latex_/ latex")
-        display("cp ForceBalance-API.pdf_ ForceBalance-API.pdf")
-        os.system("cp ForceBalance-API.pdf_ ForceBalance-API.pdf")
-        display("cp ForceBalance-Manual.pdf_ ForceBalance-Manual.pdf")
-        os.system("cp ForceBalance-Manual.pdf_ ForceBalance-Manual.pdf")
+        display("git checkout master ForceBalance-API.pdf")
+        os.system("git checkout master ForceBalance-API.pdf")
+        display("git checkout master ForceBalance-Manual.pdf")
+        os.system("git checkout master ForceBalance-Manual.pdf")
         try:
             # Commit the new html and latex files
             print "\n# Stage changes for commit"
@@ -163,6 +168,8 @@ def build(interactive=False, upstream=False):
             print "\n# Switch back to master branch"
             display("git checkout master")
             os.system('git checkout master')
+            for fnm in ["latex", "html"]:
+                os.system("mv %s_ %s" % (fnm, fnm))
 
 def add_tabs():
     """Adjust tabs in html version of documentation"""
