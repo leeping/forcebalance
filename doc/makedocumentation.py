@@ -44,6 +44,12 @@ def build(interactive=False, upstream=False):
     display("git checkout gh-pages")
     if os.system("git checkout gh-pages"):
         sys.exit(1)
+    display("git checkout master header.tex")
+    if os.system("git checkout master header.tex"):
+        sys.exit(1)
+    display("git checkout master api_header.tex")
+    if os.system("git checkout master api_header.tex"):
+        sys.exit(1)
     
     # try to write changes to new branch. If anything goes wrong, reset and return to master
     try:
