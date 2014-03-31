@@ -137,10 +137,10 @@ def build(interactive=False, upstream=False):
         os.system("rsync -a --delete html_/ html")
         display("rsync -a --delete latex_/ latex")
         os.system("rsync -a --delete latex_/ latex")
-        display("mv ForceBalance-API.pdf_ ForceBalance-API.pdf")
-        os.system("mv ForceBalance-API.pdf_ ForceBalance-API.pdf")
-        display("mv ForceBalance-Manual.pdf_ ForceBalance-Manual.pdf")
-        os.system("mv ForceBalance-Manual.pdf_ ForceBalance-Manual.pdf")
+        display("cp ForceBalance-API.pdf_ ForceBalance-API.pdf")
+        os.system("cp ForceBalance-API.pdf_ ForceBalance-API.pdf")
+        display("cp ForceBalance-Manual.pdf_ ForceBalance-Manual.pdf")
+        os.system("cp ForceBalance-Manual.pdf_ ForceBalance-Manual.pdf")
         try:
             # Commit the new html and latex files
             print "\n# Stage changes for commit"
