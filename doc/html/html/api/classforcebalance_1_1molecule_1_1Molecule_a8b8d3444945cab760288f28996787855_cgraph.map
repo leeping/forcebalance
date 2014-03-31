@@ -1,0 +1,5 @@
+<map id="forcebalance.molecule.Molecule.read_charmm" name="forcebalance.molecule.Molecule.read_charmm">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a838d85848bd817e801d0f5f6502217ef" title="Determines whether a line contains CHARMM data or not. " alt="" coords="313,23,492,70"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="548,5,743,35"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="541,59,749,88"/>
+</map>

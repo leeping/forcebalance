@@ -1,0 +1,1020 @@
+\hypertarget{classforcebalance_1_1openmmio_1_1Interaction__OpenMM}{\subsection{forcebalance.\-openmmio.\-Interaction\-\_\-\-Open\-M\-M Class Reference}
+\label{classforcebalance_1_1openmmio_1_1Interaction__OpenMM}\index{forcebalance.\-openmmio.\-Interaction\-\_\-\-Open\-M\-M@{forcebalance.\-openmmio.\-Interaction\-\_\-\-Open\-M\-M}}
+}
+
+
+Interaction matching using \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M}.  
+
+
+
+
+Inheritance diagram for forcebalance.\-openmmio.\-Interaction\-\_\-\-Open\-M\-M\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{classforcebalance_1_1openmmio_1_1Interaction__OpenMM__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-openmmio.\-Interaction\-\_\-\-Open\-M\-M\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=266pt]{classforcebalance_1_1openmmio_1_1Interaction__OpenMM__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1openmmio_1_1Interaction__OpenMM_a6ee56006edfbdcbb64eff468f819e2b1}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1interaction_1_1Interaction_aa67c082c3b6fa2d87ba3f4cf1a74e4f8}{read\-\_\-reference\-\_\-data}
+\begin{DoxyCompactList}\small\item\em Read the reference ab initio data from a file such as qdata.\-txt. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1interaction_1_1Interaction_a91f94b978b73dd886035dcdb96b53cc1}{indicate}
+\item 
+def \hyperlink{classforcebalance_1_1interaction_1_1Interaction_a9fc3a40eb2852241ea440af719f6cf29}{get}
+\begin{DoxyCompactList}\small\item\em Evaluate objective function. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{get\-\_\-\-X}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution without any parametric derivatives. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{read\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Read a file from the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{write\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Write a file to the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{get\-\_\-\-G}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{get\-\_\-\-H}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient / Hessian. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{link\-\_\-from\-\_\-tempdir}
+\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{refresh\-\_\-temp\-\_\-directory}
+\begin{DoxyCompactList}\small\item\em Back up the temporary directory if desired, delete it and then create a new one. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}{check\-\_\-files}
+\begin{DoxyCompactList}\small\item\em Check this directory for the presence of readable files when the 'read' option is set. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read}
+\begin{DoxyCompactList}\small\item\em Read data from disk for the initial optimization step if the user has provided the directory to the \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{absrd}
+\begin{DoxyCompactList}\small\item\em Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{maxrd}
+\begin{DoxyCompactList}\small\item\em Supply the latest existing temp-\/directory containing valid data. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{meta\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Wrap around the indicate function, so it can print to screen and also to a file. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{meta\-\_\-get}
+\begin{DoxyCompactList}\small\item\em Wrapper around the get function. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}{submit\-\_\-jobs}
+\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{stage}
+\begin{DoxyCompactList}\small\item\em Stages the directory for the target, and then launches Work Queue processes if any. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{wq\-\_\-complete}
+\begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
+\begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\-\_\-\-\_\-setattr\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1openmmio_1_1Interaction__OpenMM_afe985bbfcd0be8d5668bd3c0bd437e60}{engine\-\_\-}
+\begin{DoxyCompactList}\small\item\em Default file names for coordinates and key file. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_a22c4a698eb3bf91187894fdce874e8d5}{select1}
+\begin{DoxyCompactList}\small\item\em Number of snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_acbdfffa2596af6c90adf0bfe071d2205}{select2}
+\begin{DoxyCompactList}\small\item\em Set fragment 2. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_a4e609a6bd7e9a0852622ecc4ca5537d1}{eqm}
+\begin{DoxyCompactList}\small\item\em Set upper cutoff energy. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_a35a5c40d99a474bbf6032888f1f75e46}{label}
+\begin{DoxyCompactList}\small\item\em Snapshot label, useful for graphing. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_a6b49404cbea9c353fc4b97506ff143c6}{qfnm}
+\begin{DoxyCompactList}\small\item\em The qdata.\-txt file that contains the Q\-M energies and forces. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_a1577e34cd7031365ade75a2a56ec9b0d}{e\-\_\-err}
+\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_ae66b1b95cac5307950ae787b5409200b}{e\-\_\-err\-\_\-pct}
+\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_af8eea2643c465ee51732bff35b4b9bc8}{ns}
+\begin{DoxyCompactList}\small\item\em Read in the trajectory file. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_ae701905246f4c2f5af7cfa1a7d053002}{mol}
+\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_ae4c7f1d811ba889282620acbaa4c5f2a}{engine}
+\begin{DoxyCompactList}\small\item\em Build keyword dictionaries to pass to engine. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_a57f25d35d31643d5467fd32579f64030}{divisor}
+\begin{DoxyCompactList}\small\item\em Read in the reference data. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_ad4e78437713a0b9b809e4ba52cbbf9d2}{prefactor}
+\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_a68a6e43e48ec75f375fb987e177126a9}{weight}
+\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_a2b97abefbf9d9f2b061b9da3b9d0bb30}{emm}
+\item 
+\hyperlink{classforcebalance_1_1interaction_1_1Interaction_ad25168cac2752545c55fc7e9206d9d29}{objective}
+\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{rd}
+\begin{DoxyCompactList}\small\item\em Root directory of the whole project. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{pgrad}
+\begin{DoxyCompactList}\small\item\em Iteration where we turn on zero-\/gradient skipping. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{tempbase}
+\begin{DoxyCompactList}\small\item\em Relative directory of target. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{tempdir}
+\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{rundir}
+\begin{DoxyCompactList}\small\item\em self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{F\-F}
+\begin{DoxyCompactList}\small\item\em Need the forcefield (here for now) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{xct}
+\begin{DoxyCompactList}\small\item\em Counts how often the objective function was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{gct}
+\begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
+\begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}{read\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Whether to read indicate.\-log from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}{write\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Whether to write indicate.\-log at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{read\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to read objective.\-p from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{write\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to write objective.\-p at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Interaction matching using \hyperlink{classforcebalance_1_1openmmio_1_1OpenMM}{Open\-M\-M}. 
+
+
+
+Definition at line 1190 of file openmmio.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1openmmio_1_1Interaction__OpenMM_a6ee56006edfbdcbb64eff468f819e2b1}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-openmmio.\-Interaction\-\_\-\-Open\-M\-M.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{options, }
+\item[{}]{tgt\-\_\-opts, }
+\item[{}]{forcefield}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1openmmio_1_1Interaction__OpenMM_a6ee56006edfbdcbb64eff468f819e2b1}
+
+
+Definition at line 1191 of file openmmio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1openmmio_1_1Interaction__OpenMM_a6ee56006edfbdcbb64eff468f819e2b1_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{\-\_\-\-\_\-setattr\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-\_\-\-\_\-setattr\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{key, }
+\item[{}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}
+
+
+Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!absrd@{absrd}}
+\index{absrd@{absrd}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{absrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-absrd (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{inum = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}
+
+
+Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 393 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!check\-\_\-files@{check\-\_\-files}}
+\index{check\-\_\-files@{check\-\_\-files}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{check\-\_\-files}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-check\-\_\-files (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{there}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}
+
+
+Check this directory for the presence of readable files when the 'read' option is set. 
+
+
+
+Definition at line 364 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a9fc3a40eb2852241ea440af719f6cf29}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!get@{get}}
+\index{get@{get}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-interaction.\-Interaction.\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a9fc3a40eb2852241ea440af719f6cf29}
+
+
+Evaluate objective function. 
+
+
+
+Definition at line 157 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!get\-\_\-\-G@{get\-\_\-\-G}}
+\index{get\-\_\-\-G@{get\-\_\-\-G}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{get\-\_\-\-G}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-G (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}
+
+
+Computes the objective function contribution and its gradient. 
+
+First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on.
+
+In this function we also record which parameters cause a nonzero change in the objective function contribution. Parameters which do not change the objective function will not be differentiated in subsequent calculations. This is recorded in a text file in the targets directory. 
+
+Definition at line 272 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!get\-\_\-\-H@{get\-\_\-\-H}}
+\index{get\-\_\-\-H@{get\-\_\-\-H}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{get\-\_\-\-H}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-H (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}
+
+
+Computes the objective function contribution and its gradient / Hessian. 
+
+First the low-\/level 'get' method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on.
+
+This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
+
+Definition at line 296 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!get\-\_\-\-X@{get\-\_\-\-X}}
+\index{get\-\_\-\-X@{get\-\_\-\-X}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{get\-\_\-\-X}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-X (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}
+
+
+Computes the objective function contribution without any parametric derivatives. 
+
+
+
+Definition at line 184 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a91f94b978b73dd886035dcdb96b53cc1}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!indicate@{indicate}}
+\index{indicate@{indicate}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{indicate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-interaction.\-Interaction.\-indicate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a91f94b978b73dd886035dcdb96b53cc1}
+
+
+Definition at line 141 of file interaction.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1interaction_1_1Interaction_a91f94b978b73dd886035dcdb96b53cc1_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}}
+\index{link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{link\-\_\-from\-\_\-tempdir}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-link\-\_\-from\-\_\-tempdir (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{absdestdir}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
+
+
+Definition at line 315 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!maxrd@{maxrd}}
+\index{maxrd@{maxrd}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{maxrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-maxrd (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}
+
+
+Supply the latest existing temp-\/directory containing valid data. 
+
+
+
+Definition at line 447 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!meta\-\_\-get@{meta\-\_\-get}}
+\index{meta\-\_\-get@{meta\-\_\-get}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{meta\-\_\-get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}
+
+
+Wrapper around the get function. 
+
+Create the directory for the target, and then calls 'get'. If we are reading existing data, go into the appropriate read directory and call \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read()} instead. The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 511 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!meta\-\_\-indicate@{meta\-\_\-indicate}}
+\index{meta\-\_\-indicate@{meta\-\_\-indicate}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{meta\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-indicate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}
+
+
+Wrap around the indicate function, so it can print to screen and also to a file. 
+
+If reading from checkpoint file, don't call the indicate() function, instead just print the file contents to the screen. 
+
+Definition at line 469 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!printcool\-\_\-table@{printcool\-\_\-table}}
+\index{printcool\-\_\-table@{printcool\-\_\-table}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{printcool\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-printcool\-\_\-table (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{data = {\ttfamily OrderedDict(\mbox{[}\mbox{]})}, }
+\item[{}]{headings = {\ttfamily \mbox{[}\mbox{]}}, }
+\item[{}]{banner = {\ttfamily None}, }
+\item[{}]{footnote = {\ttfamily None}, }
+\item[{}]{color = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}
+
+
+Print target information in an organized table format. 
+
+Implemented 6/30 because multiple targets are already printing out tabulated information in very similar ways. This method is a simple wrapper around printcool\-\_\-dictionary.
+
+The input should be something like\-:
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Column contents in the form of an Ordered\-Dict, with string keys and list vals. The key is printed in the leftmost column and the vals are printed in the other columns. If non-\/strings are passed, they will be converted to strings (not recommended).\\
+\hline
+{\em headings} & Column headings in the form of a list. It must be equal to the number to the list length for each of the \char`\"{}vals\char`\"{} in Ordered\-Dict, plus one. Use \char`\"{}\textbackslash{}n\char`\"{} characters to specify long column names that may take up more than one line.\\
+\hline
+{\em banner} & Optional heading line, which will be printed at the top in the title. \\
+\hline
+{\em footnote} & Optional footnote line, which will be printed at the bottom. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 638 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!read@{read}}
+\index{read@{read}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{read}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}
+
+
+Read data from disk for the initial optimization step if the user has provided the directory to the \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 379 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!read\-\_\-0grads@{read\-\_\-0grads}}
+\index{read\-\_\-0grads@{read\-\_\-0grads}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{read\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}
+
+
+Read a file from the target directory containing names of parameters that don't contribute to the gradient. 
+
+{\itshape Note} that we are checking the derivatives of the objective function, and not the derivatives of the quantities that go into building the objective function. However, it is the quantities that we actually differentiate. Since there is a simple chain rule relationship, the parameters that do/don't contribute to the objective function/quantities are the same.
+
+However, property gradients do contribute to objective function Hessian elements, so we cannot use the same mechanism for excluding the calculation of property Hessians. This is mostly fine since we rarely if ever calculate an explicit property Hessian. 
+
+Definition at line 207 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_aa67c082c3b6fa2d87ba3f4cf1a74e4f8}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!read\-\_\-reference\-\_\-data@{read\-\_\-reference\-\_\-data}}
+\index{read\-\_\-reference\-\_\-data@{read\-\_\-reference\-\_\-data}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{read\-\_\-reference\-\_\-data}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-interaction.\-Interaction.\-read\-\_\-reference\-\_\-data (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_aa67c082c3b6fa2d87ba3f4cf1a74e4f8}
+
+
+Read the reference ab initio data from a file such as qdata.\-txt. 
+
+After reading in the information from qdata.\-txt, it is converted into kcal/mol. 
+
+Definition at line 124 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}}
+\index{refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{refresh\-\_\-temp\-\_\-directory}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-refresh\-\_\-temp\-\_\-directory (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}
+
+
+Back up the temporary directory if desired, delete it and then create a new one. 
+
+
+
+Definition at line 321 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!set\-\_\-option@{set\-\_\-option}}
+\index{set\-\_\-option@{set\-\_\-option}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-set\-\_\-option (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{in\-\_\-dict, }
+\item[{}]{src\-\_\-key, }
+\item[{}]{dest\-\_\-key = {\ttfamily None}, }
+\item[{}]{val = {\ttfamily None}, }
+\item[{}]{default = {\ttfamily None}, }
+\item[{}]{forceprint = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
+
+
+Definition at line 42 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!stage@{stage}}
+\index{stage@{stage}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{stage}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-stage (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}
+
+
+Stages the directory for the target, and then launches Work Queue processes if any. 
+
+The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 565 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!submit\-\_\-jobs@{submit\-\_\-jobs}}
+\index{submit\-\_\-jobs@{submit\-\_\-jobs}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{submit\-\_\-jobs}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-submit\-\_\-jobs (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a78cd29b94cbcc201eed99c78aaef46a4}
+
+
+Definition at line 555 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!wq\-\_\-complete@{wq\-\_\-complete}}
+\index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{wq\-\_\-complete}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-wq\-\_\-complete (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}
+
+
+This method determines whether the Work Queue tasks for the current target have completed. 
+
+
+
+Definition at line 602 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!write\-\_\-0grads@{write\-\_\-0grads}}
+\index{write\-\_\-0grads@{write\-\_\-0grads}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{write\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-write\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{Ans}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}
+
+
+Write a file to the target directory containing names of parameters that don't contribute to the gradient. 
+
+
+
+Definition at line 225 of file target.\-py.
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a57f25d35d31643d5467fd32579f64030}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!divisor@{divisor}}
+\index{divisor@{divisor}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{divisor}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-divisor\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a57f25d35d31643d5467fd32579f64030}
+
+
+Read in the reference data. 
+
+
+
+Definition at line 95 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a1577e34cd7031365ade75a2a56ec9b0d}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!e\-\_\-err@{e\-\_\-err}}
+\index{e\-\_\-err@{e\-\_\-err}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{e\-\_\-err}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-e\-\_\-err\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a1577e34cd7031365ade75a2a56ec9b0d}
+
+
+Definition at line 77 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_ae66b1b95cac5307950ae787b5409200b}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!e\-\_\-err\-\_\-pct@{e\-\_\-err\-\_\-pct}}
+\index{e\-\_\-err\-\_\-pct@{e\-\_\-err\-\_\-pct}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{e\-\_\-err\-\_\-pct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-e\-\_\-err\-\_\-pct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ae66b1b95cac5307950ae787b5409200b}
+
+
+Definition at line 78 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a2b97abefbf9d9f2b061b9da3b9d0bb30}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!emm@{emm}}
+\index{emm@{emm}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{emm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-emm\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a2b97abefbf9d9f2b061b9da3b9d0bb30}
+
+
+Definition at line 194 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_ae4c7f1d811ba889282620acbaa4c5f2a}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!engine@{engine}}
+\index{engine@{engine}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{engine}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-engine\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ae4c7f1d811ba889282620acbaa4c5f2a}
+
+
+Build keyword dictionaries to pass to engine. 
+
+
+
+Definition at line 88 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1openmmio_1_1Interaction__OpenMM_afe985bbfcd0be8d5668bd3c0bd437e60}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!engine\-\_\-@{engine\-\_\-}}
+\index{engine\-\_\-@{engine\-\_\-}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{engine\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-openmmio.\-Interaction\-\_\-\-Open\-M\-M.\-engine\-\_\-}}\label{classforcebalance_1_1openmmio_1_1Interaction__OpenMM_afe985bbfcd0be8d5668bd3c0bd437e60}
+
+
+Default file names for coordinates and key file. 
+
+
+
+Definition at line 1196 of file openmmio.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a4e609a6bd7e9a0852622ecc4ca5537d1}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!eqm@{eqm}}
+\index{eqm@{eqm}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{eqm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-eqm\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a4e609a6bd7e9a0852622ecc4ca5537d1}
+
+
+Set upper cutoff energy. 
+
+Reference (Q\-M) interaction energies 
+
+Definition at line 72 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!F\-F@{F\-F}}
+\index{F\-F@{F\-F}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{F\-F}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-F\-F\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}
+
+
+Need the forcefield (here for now) 
+
+
+
+Definition at line 160 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!gct@{gct}}
+\index{gct@{gct}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{gct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-gct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}
+
+
+Counts how often the gradient was computed. 
+
+
+
+Definition at line 164 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!hct@{hct}}
+\index{hct@{hct}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{hct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-hct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}
+
+
+Counts how often the Hessian was computed. 
+
+
+
+Definition at line 166 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a35a5c40d99a474bbf6032888f1f75e46}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!label@{label}}
+\index{label@{label}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{label}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-label\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a35a5c40d99a474bbf6032888f1f75e46}
+
+
+Snapshot label, useful for graphing. 
+
+
+
+Definition at line 74 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_ae701905246f4c2f5af7cfa1a7d053002}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!mol@{mol}}
+\index{mol@{mol}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{mol}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-mol\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ae701905246f4c2f5af7cfa1a7d053002}
+
+
+Definition at line 81 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_af8eea2643c465ee51732bff35b4b9bc8}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!ns@{ns}}
+\index{ns@{ns}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{ns}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-ns\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_af8eea2643c465ee51732bff35b4b9bc8}
+
+
+Read in the trajectory file. 
+
+
+
+Definition at line 80 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_ad25168cac2752545c55fc7e9206d9d29}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!objective@{objective}}
+\index{objective@{objective}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ad25168cac2752545c55fc7e9206d9d29}
+
+
+Definition at line 195 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!pgrad@{pgrad}}
+\index{pgrad@{pgrad}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{pgrad}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-pgrad\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}
+
+
+Iteration where we turn on zero-\/gradient skipping. 
+
+Dictionary of whether to call the derivatives. 
+
+Definition at line 127 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_ad4e78437713a0b9b809e4ba52cbbf9d2}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!prefactor@{prefactor}}
+\index{prefactor@{prefactor}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{prefactor}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-prefactor\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_ad4e78437713a0b9b809e4ba52cbbf9d2}
+
+
+Definition at line 113 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!Print\-Option\-Dict@{Print\-Option\-Dict}}
+\index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
+
+
+Definition at line 44 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a6b49404cbea9c353fc4b97506ff143c6}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!qfnm@{qfnm}}
+\index{qfnm@{qfnm}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{qfnm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-qfnm\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a6b49404cbea9c353fc4b97506ff143c6}
+
+
+The qdata.\-txt file that contains the Q\-M energies and forces. 
+
+
+
+Definition at line 76 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!rd@{rd}}
+\index{rd@{rd}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{rd}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rd\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}
+
+
+Root directory of the whole project. 
+
+Submit jobs to the Work Queue.
+
+Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Directory to read data from.
+
+Definition at line 123 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!read\-\_\-indicate@{read\-\_\-indicate}}
+\index{read\-\_\-indicate@{read\-\_\-indicate}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{read\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}
+
+
+Whether to read indicate.\-log from file when restarting an aborted run. 
+
+
+
+Definition at line 168 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!read\-\_\-objective@{read\-\_\-objective}}
+\index{read\-\_\-objective@{read\-\_\-objective}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{read\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}
+
+
+Whether to read objective.\-p from file when restarting an aborted run. 
+
+
+
+Definition at line 172 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!rundir@{rundir}}
+\index{rundir@{rundir}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{rundir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rundir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}
+
+
+self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. 
+
+Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
+
+Not expecting more than ten thousand iterations Go into the directory where \hyperlink{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a}{get()} will be executed. Write mathematical parameters to file; will be used to checkpoint calculation. Read in file that specifies which derivatives may be skipped. 
+
+Definition at line 158 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a22c4a698eb3bf91187894fdce874e8d5}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!select1@{select1}}
+\index{select1@{select1}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{select1}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-select1\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a22c4a698eb3bf91187894fdce874e8d5}
+
+
+Number of snapshots. 
+
+Do we call Q-\/\-Chem for dielectric energies? (Currently needs to be fixed) Do we put the reference energy into the denominator? Do we put the reference energy into the denominator? What is the energy denominator? Set fragment 1 
+
+Definition at line 60 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_acbdfffa2596af6c90adf0bfe071d2205}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!select2@{select2}}
+\index{select2@{select2}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{select2}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-select2\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_acbdfffa2596af6c90adf0bfe071d2205}
+
+
+Set fragment 2. 
+
+
+
+Definition at line 65 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!tempbase@{tempbase}}
+\index{tempbase@{tempbase}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{tempbase}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempbase\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}
+
+
+Relative directory of target. 
+
+Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
+
+Definition at line 152 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!tempdir@{tempdir}}
+\index{tempdir@{tempdir}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{tempdir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempdir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}
+
+
+Definition at line 155 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!verbose\-\_\-options@{verbose\-\_\-options}}
+\index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
+
+
+Definition at line 40 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1interaction_1_1Interaction_a68a6e43e48ec75f375fb987e177126a9}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!weight@{weight}}
+\index{weight@{weight}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{weight}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-interaction.\-Interaction.\-weight\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1interaction_1_1Interaction_a68a6e43e48ec75f375fb987e177126a9}
+
+
+Definition at line 161 of file interaction.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!write\-\_\-indicate@{write\-\_\-indicate}}
+\index{write\-\_\-indicate@{write\-\_\-indicate}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{write\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}
+
+
+Whether to write indicate.\-log at every iteration (true for all but remote.) 
+
+
+
+Definition at line 170 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!write\-\_\-objective@{write\-\_\-objective}}
+\index{write\-\_\-objective@{write\-\_\-objective}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{write\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}
+
+
+Whether to write objective.\-p at every iteration (true for all but remote.) 
+
+
+
+Definition at line 174 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}!xct@{xct}}
+\index{xct@{xct}!forcebalance::openmmio::Interaction_OpenMM@{forcebalance\-::openmmio\-::\-Interaction\-\_\-\-Open\-M\-M}}
+\paragraph[{xct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-xct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}
+
+
+Counts how often the objective function was computed. 
+
+
+
+Definition at line 162 of file target.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{openmmio_8py}{openmmio.\-py}\end{DoxyCompactItemize}

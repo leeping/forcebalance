@@ -1,0 +1,48 @@
+\hypertarget{parser_8py}{\subsection{parser.\-py File Reference}
+\label{parser_8py}\index{parser.\-py@{parser.\-py}}
+}
+\subsubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespaceforcebalance_1_1parser}{forcebalance.\-parser}
+\begin{DoxyCompactList}\small\item\em Input file parser for Force\-Balance jobs. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespaceforcebalance_1_1parser_aef8b51dba6bb9767a9a956319eb3cc08}{forcebalance.\-parser.\-read\-\_\-mvals}
+\item 
+def \hyperlink{namespaceforcebalance_1_1parser_a56fb1e139dad24bac29f25a3870765ca}{forcebalance.\-parser.\-read\-\_\-pvals}
+\item 
+def \hyperlink{namespaceforcebalance_1_1parser_a94c3f1acd06b640db3042dc45e32af8e}{forcebalance.\-parser.\-read\-\_\-priors}
+\item 
+def \hyperlink{namespaceforcebalance_1_1parser_a10827b0b21d0463bc9e786f161a02654}{forcebalance.\-parser.\-read\-\_\-internals}
+\item 
+def \hyperlink{namespaceforcebalance_1_1parser_a00a8cb7b534312c13b11d4bb39bb3959}{forcebalance.\-parser.\-printsection}
+\begin{DoxyCompactList}\small\item\em Print out a section of the input file in a parser-\/compliant and readable format. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1parser_ac184c809737a27f35530020322431f7c}{forcebalance.\-parser.\-parse\-\_\-inputs}
+\begin{DoxyCompactList}\small\item\em Parse through the input file and read all user-\/supplied options. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1parser_ab1a411e01f194a0a8fc51b5aaf4b05ac}{forcebalance.\-parser.\-logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\item 
+dictionary \hyperlink{namespaceforcebalance_1_1parser_a1ccdff008f4be5f63c068d2a592d69ab}{forcebalance.\-parser.\-gen\-\_\-opts\-\_\-types}
+\begin{DoxyCompactList}\small\item\em Default general options. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespaceforcebalance_1_1parser_a95436b7fb9e99bd7b9f0a040b15fbe3a}{forcebalance.\-parser.\-tgt\-\_\-opts\-\_\-types}
+\begin{DoxyCompactList}\small\item\em Default fitting target options. \end{DoxyCompactList}\item 
+tuple \hyperlink{namespaceforcebalance_1_1parser_ae606fd3971c0081009e4bf63d50cc92f}{forcebalance.\-parser.\-all\-\_\-opts\-\_\-names} = list(itertools.\-chain($\ast$\mbox{[}i.\-keys() for i in gen\-\_\-opts\-\_\-types.\-values()\mbox{]}))
+\item 
+list \hyperlink{namespaceforcebalance_1_1parser_a150e23172366de5938d0f32018d0b58b}{forcebalance.\-parser.\-iocc} = \mbox{[}$\,$\mbox{]}
+\begin{DoxyCompactList}\small\item\em Check for uniqueness of option names. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespaceforcebalance_1_1parser_a980fd024b1f2877247de482247250b9e}{forcebalance.\-parser.\-gen\-\_\-opts\-\_\-defaults} = \{\}
+\begin{DoxyCompactList}\small\item\em Default general options -\/ basically a collapsed veresion of gen\-\_\-opts\-\_\-types. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespaceforcebalance_1_1parser_abb7a7e9723de629aa97727a85bcdbad1}{forcebalance.\-parser.\-subdict} = \{\}
+\item 
+dictionary \hyperlink{namespaceforcebalance_1_1parser_aff4922444f06b7334a0994a835607393}{forcebalance.\-parser.\-tgt\-\_\-opts\-\_\-defaults} = \{\}
+\begin{DoxyCompactList}\small\item\em Default target options -\/ basically a collapsed version of tgt\-\_\-opts\-\_\-types. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespaceforcebalance_1_1parser_a121eaaef101563523a8fb20bd5ace409}{forcebalance.\-parser.\-bkwd}
+\begin{DoxyCompactList}\small\item\em Option maps for maintaining backward compatibility. \end{DoxyCompactList}\item 
+list \hyperlink{namespaceforcebalance_1_1parser_a682a3870774181592a7a4784ab108ae6}{forcebalance.\-parser.\-mainsections} = \mbox{[}\char`\"{}S\-I\-M\-U\-L\-A\-T\-I\-O\-N\char`\"{},\char`\"{}T\-A\-R\-G\-E\-T\char`\"{},\char`\"{}O\-P\-T\-I\-O\-N\-S\char`\"{},\char`\"{}E\-N\-D\char`\"{},\char`\"{}N\-O\-N\-E\char`\"{}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Listing of sections in the input file. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespaceforcebalance_1_1parser_a492c80e361e80dc74aebc13e7a072dfb}{forcebalance.\-parser.\-Pars\-Tab}
+\begin{DoxyCompactList}\small\item\em Pars\-Tab that refers to subsection parsers. \end{DoxyCompactList}\end{DoxyCompactItemize}

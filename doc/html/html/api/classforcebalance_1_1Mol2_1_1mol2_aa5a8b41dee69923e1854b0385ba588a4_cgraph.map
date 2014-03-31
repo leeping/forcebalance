@@ -1,0 +1,4 @@
+<map id="forcebalance.Mol2.mol2.set_donnor_acceptor_atoms" name="forcebalance.Mol2.mol2.set_donnor_acceptor_atoms">
+<area shape="rect" id="node3" href="$classforcebalance_1_1Mol2_1_1mol2.html#a2d2b34613f2b72ad3a7fcdc94a3de994" title="return a dictionnary of atom instances bonded to the atom, and their types " alt="" coords="255,5,452,51"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1Mol2_1_1mol2.html#af5a261aefed1c65fd5f56b5b30e69995" title="return the atom instance given its atom identifier " alt="" coords="501,13,741,43"/>
+</map>

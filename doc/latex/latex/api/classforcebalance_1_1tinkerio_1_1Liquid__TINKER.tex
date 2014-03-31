@@ -1,0 +1,1286 @@
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER}{\subsection{forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R Class Reference}
+\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER}\index{forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+}
+
+
+Condensed phase property matching using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R}.  
+
+
+
+
+Inheritance diagram for forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classforcebalance_1_1tinkerio_1_1Liquid__TINKER__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classforcebalance_1_1tinkerio_1_1Liquid__TINKER__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a307529b9902b34a790a8b016e153c7d6}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a53a10ac99cdfbf026526ed625d4de809}{npt\-\_\-simulation}
+\begin{DoxyCompactList}\small\item\em Submit a N\-P\-T simulation to the Work Queue. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a550ea5869db69be9f3b8f0b83b07d8cb}{prepare\-\_\-temp\-\_\-directory}
+\begin{DoxyCompactList}\small\item\em Prepare the temporary directory by copying in important files. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a08b698af913d56f780d0587821c922cd}{read\-\_\-data}
+\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a50d90e978d689cfebb67649942719b69}{check\-\_\-files}
+\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a51ea9d9fb4418ec2497fe8e2d8033d41}{polarization\-\_\-correction}
+\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_ae94ce30dfd0e92fdd6d746e6743be844}{indicate}
+\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a00c23db61bcb86cc19f79dacdb2bc1f3}{objective\-\_\-term}
+\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a716e28bb5572b3273036ac753b7e1e1d}{submit\-\_\-jobs}
+\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a121ae6aa86f6eb692e0c23cec82aa734}{read}
+\begin{DoxyCompactList}\small\item\em Read in time series for all previous iterations. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1liquid_1_1Liquid_a802c4139e5c002fabdeab5de88093880}{get}
+\begin{DoxyCompactList}\small\item\em Fitting of liquid bulk properties. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{get\-\_\-\-X}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution without any parametric derivatives. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{read\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Read a file from the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{write\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Write a file to the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{get\-\_\-\-G}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{get\-\_\-\-H}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient / Hessian. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{link\-\_\-from\-\_\-tempdir}
+\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{refresh\-\_\-temp\-\_\-directory}
+\begin{DoxyCompactList}\small\item\em Back up the temporary directory if desired, delete it and then create a new one. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{absrd}
+\begin{DoxyCompactList}\small\item\em Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{maxrd}
+\begin{DoxyCompactList}\small\item\em Supply the latest existing temp-\/directory containing valid data. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{meta\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Wrap around the indicate function, so it can print to screen and also to a file. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{meta\-\_\-get}
+\begin{DoxyCompactList}\small\item\em Wrapper around the get function. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{stage}
+\begin{DoxyCompactList}\small\item\em Stages the directory for the target, and then launches Work Queue processes if any. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{wq\-\_\-complete}
+\begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
+\begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\-\_\-\-\_\-setattr\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a62f767cd526de672669a376d0314534f}{engine\-\_\-}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a6f85a9476fa3db7cea777682fda4e9df}{engname}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a9c243bfb5a728a06285b0a7b8efb3568}{nptpfx}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a4827b63f297bd4d68b165040f58436f3}{nptfiles}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a68c9a00d9f73cb7500c675d64b53299a}{gas\-\_\-engine\-\_\-args}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a426ef9f0db4235ed46b433c51e1a5fef}{scripts}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a50a73b281be42f33ab66c5780b464823}{extra\-\_\-output}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a4a720f5a6f9808afc07b7baf08dcbceb}{Dyn\-Dict}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_af2dfb536a3fbe64e5e657c5edc1d656a}{Dyn\-Dict\-\_\-\-New}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_af4063471b49ee7573e231e7ffbbed9b2}{last\-\_\-traj}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a2cf65dd56f058636e68a0b3bf2af210e}{do\-\_\-self\-\_\-pol}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a418c09a62e307b812199067c212aae01}{liquid\-\_\-mol}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a70138842aef1987abe7ba2f9250110b0}{gas\-\_\-mol}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a7bcadb869325c9a00156a2bbd43eb148}{gas\-\_\-engine}
+\begin{DoxyCompactList}\small\item\em Read the reference data. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a22374f490cab2648b246dc16e94db020}{read\-\_\-indicate}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a2ef5b56bb5efbc942535ee406d514610}{write\-\_\-indicate}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a0da0c00cdc193c9c470d7e528043fb99}{Saved\-Traj}
+\begin{DoxyCompactList}\small\item\em Saved trajectories for all iterations and all temperatures. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a6c00a87ae43f535118b77d41af51a5d7}{M\-Bar\-Energy}
+\begin{DoxyCompactList}\small\item\em Evaluated energies for all trajectories (i.\-e. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a2a6b03a459dc55596920124abd0f7d13}{All\-Results}
+\begin{DoxyCompactList}\small\item\em Saved results for all iterations self.\-Saved\-M\-Vals = \mbox{[}\mbox{]}. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a472f32bbaf18b8ead19b9156f305b8fc}{Ref\-Data}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a2c10490d9073a069bd19361f386422ef}{Phase\-Points}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a50f976d2d3d6a1c261756035a26390e2}{Labels}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_aef8ad1dda086bde6f48130d273af9784}{w\-\_\-rho}
+\begin{DoxyCompactList}\small\item\em Density. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_abe985fe3aaa03d9f3a1b0a90f26b774d}{w\-\_\-hvap}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a0d36d27d8c406b53bbb1096fbb76adbb}{w\-\_\-alpha}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a6b262d9343247a902063bf62d5f19108}{w\-\_\-kappa}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a3809c649d95ac6c9f662d599e6b1b93d}{w\-\_\-cp}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a75ad3ea94ec845e91499f858e7be5f27}{w\-\_\-eps0}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a551536bc5fa6e40eeeba61619ebe072d}{Xp}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a34fc96849307fd94c2cb41705ad4445c}{Wp}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a31ab3ddf113f6998b67bbc2bad3998f5}{Pp}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a3c2c643beab52bc7a25256588566ee7e}{Gp}
+\item 
+\hyperlink{classforcebalance_1_1liquid_1_1Liquid_a93b9986b3c980abc9cf8f65765864e12}{Objective}
+\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{rd}
+\begin{DoxyCompactList}\small\item\em Root directory of the whole project. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{pgrad}
+\begin{DoxyCompactList}\small\item\em Iteration where we turn on zero-\/gradient skipping. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{tempbase}
+\begin{DoxyCompactList}\small\item\em Relative directory of target. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{tempdir}
+\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{rundir}
+\begin{DoxyCompactList}\small\item\em self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{F\-F}
+\begin{DoxyCompactList}\small\item\em Need the forcefield (here for now) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{xct}
+\begin{DoxyCompactList}\small\item\em Counts how often the objective function was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{gct}
+\begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
+\begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{read\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to read objective.\-p from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{write\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to write objective.\-p at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Condensed phase property matching using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R}. 
+
+
+
+Definition at line 1014 of file tinkerio.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a307529b9902b34a790a8b016e153c7d6}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{options, }
+\item[{}]{tgt\-\_\-opts, }
+\item[{}]{forcefield}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a307529b9902b34a790a8b016e153c7d6}
+
+
+Definition at line 1015 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a307529b9902b34a790a8b016e153c7d6_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{\-\_\-\-\_\-setattr\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-\_\-\-\_\-setattr\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{key, }
+\item[{}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}
+
+
+Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!absrd@{absrd}}
+\index{absrd@{absrd}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{absrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-absrd (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{inum = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}
+
+
+Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 393 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a50d90e978d689cfebb67649942719b69}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!check\-\_\-files@{check\-\_\-files}}
+\index{check\-\_\-files@{check\-\_\-files}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{check\-\_\-files}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-check\-\_\-files (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{there}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a50d90e978d689cfebb67649942719b69}
+
+
+Definition at line 253 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a802c4139e5c002fabdeab5de88093880}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!get@{get}}
+\index{get@{get}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily True}, }
+\item[{}]{A\-Hess = {\ttfamily True}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a802c4139e5c002fabdeab5de88093880}
+
+
+Fitting of liquid bulk properties. 
+
+This is the current major direction of development for Force\-Balance. Basically, fitting the Q\-M energies / forces alone does not always give us the best simulation behavior. In many cases it makes more sense to try and reproduce some experimentally known data as well.
+
+In order to reproduce experimentally known data, we need to run a simulation and compare the simulation result to experiment. The main challenge here is that the simulations are computationally intensive (i.\-e. they require energy and force evaluations), and furthermore the results are noisy. We need to run the simulations automatically and remotely (i.\-e. on clusters) and a good way to calculate the derivatives of the simulation results with respect to the parameter values.
+
+This function contains some experimentally known values of the density and enthalpy of vaporization (Hvap) of liquid water. It launches the density and Hvap calculations on the cluster, and gathers the results / derivatives. The actual calculation of results / derivatives is done in a separate file.
+
+After the results come back, they are gathered together to form an objective function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & Mathematical parameter values \\
+\hline
+\mbox{\tt in}  & {\em A\-Grad} & Switch to turn on analytic gradient \\
+\hline
+\mbox{\tt in}  & {\em A\-Hess} & Switch to turn on analytic Hessian \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Answer Contribution to the objective function Fill in the weight matrix with M\-B\-A\-R weights where M\-B\-A\-R was run, and equal weights otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line 553 of file liquid.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1liquid_1_1Liquid_a802c4139e5c002fabdeab5de88093880_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!get\-\_\-\-G@{get\-\_\-\-G}}
+\index{get\-\_\-\-G@{get\-\_\-\-G}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{get\-\_\-\-G}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-G (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}
+
+
+Computes the objective function contribution and its gradient. 
+
+First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on.
+
+In this function we also record which parameters cause a nonzero change in the objective function contribution. Parameters which do not change the objective function will not be differentiated in subsequent calculations. This is recorded in a text file in the targets directory. 
+
+Definition at line 272 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!get\-\_\-\-H@{get\-\_\-\-H}}
+\index{get\-\_\-\-H@{get\-\_\-\-H}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{get\-\_\-\-H}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-H (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}
+
+
+Computes the objective function contribution and its gradient / Hessian. 
+
+First the low-\/level 'get' method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on.
+
+This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
+
+Definition at line 296 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!get\-\_\-\-X@{get\-\_\-\-X}}
+\index{get\-\_\-\-X@{get\-\_\-\-X}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{get\-\_\-\-X}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-X (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}
+
+
+Computes the objective function contribution without any parametric derivatives. 
+
+
+
+Definition at line 184 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_ae94ce30dfd0e92fdd6d746e6743be844}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!indicate@{indicate}}
+\index{indicate@{indicate}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{indicate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-indicate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_ae94ce30dfd0e92fdd6d746e6743be844}
+
+
+Definition at line 304 of file liquid.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1liquid_1_1Liquid_ae94ce30dfd0e92fdd6d746e6743be844_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}}
+\index{link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{link\-\_\-from\-\_\-tempdir}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-link\-\_\-from\-\_\-tempdir (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{absdestdir}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
+
+
+Definition at line 315 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!maxrd@{maxrd}}
+\index{maxrd@{maxrd}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{maxrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-maxrd (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}
+
+
+Supply the latest existing temp-\/directory containing valid data. 
+
+
+
+Definition at line 447 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!meta\-\_\-get@{meta\-\_\-get}}
+\index{meta\-\_\-get@{meta\-\_\-get}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{meta\-\_\-get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}
+
+
+Wrapper around the get function. 
+
+Create the directory for the target, and then calls 'get'. If we are reading existing data, go into the appropriate read directory and call \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read()} instead. The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 511 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!meta\-\_\-indicate@{meta\-\_\-indicate}}
+\index{meta\-\_\-indicate@{meta\-\_\-indicate}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{meta\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-indicate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}
+
+
+Wrap around the indicate function, so it can print to screen and also to a file. 
+
+If reading from checkpoint file, don't call the indicate() function, instead just print the file contents to the screen. 
+
+Definition at line 469 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a53a10ac99cdfbf026526ed625d4de809}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!npt\-\_\-simulation@{npt\-\_\-simulation}}
+\index{npt\-\_\-simulation@{npt\-\_\-simulation}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{npt\-\_\-simulation}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-npt\-\_\-simulation (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{temperature, }
+\item[{}]{pressure, }
+\item[{}]{simnum}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a53a10ac99cdfbf026526ed625d4de809}
+
+
+Submit a N\-P\-T simulation to the Work Queue. 
+
+
+
+Definition at line 1052 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a53a10ac99cdfbf026526ed625d4de809_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a00c23db61bcb86cc19f79dacdb2bc1f3}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!objective\-\_\-term@{objective\-\_\-term}}
+\index{objective\-\_\-term@{objective\-\_\-term}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{objective\-\_\-term}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-objective\-\_\-term (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{points, }
+\item[{}]{expname, }
+\item[{}]{calc, }
+\item[{}]{err, }
+\item[{}]{grad, }
+\item[{}]{name = {\ttfamily \char`\"{}Quantity\char`\"{}}, }
+\item[{}]{Sub\-Average = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a00c23db61bcb86cc19f79dacdb2bc1f3}
+
+
+Definition at line 330 of file liquid.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1liquid_1_1Liquid_a00c23db61bcb86cc19f79dacdb2bc1f3_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a51ea9d9fb4418ec2497fe8e2d8033d41}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!polarization\-\_\-correction@{polarization\-\_\-correction}}
+\index{polarization\-\_\-correction@{polarization\-\_\-correction}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{polarization\-\_\-correction}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-polarization\-\_\-correction (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a51ea9d9fb4418ec2497fe8e2d8033d41}
+
+
+Definition at line 286 of file liquid.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1liquid_1_1Liquid_a51ea9d9fb4418ec2497fe8e2d8033d41_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a550ea5869db69be9f3b8f0b83b07d8cb}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!prepare\-\_\-temp\-\_\-directory@{prepare\-\_\-temp\-\_\-directory}}
+\index{prepare\-\_\-temp\-\_\-directory@{prepare\-\_\-temp\-\_\-directory}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{prepare\-\_\-temp\-\_\-directory}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-prepare\-\_\-temp\-\_\-directory (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a550ea5869db69be9f3b8f0b83b07d8cb}
+
+
+Prepare the temporary directory by copying in important files. 
+
+
+
+Definition at line 155 of file liquid.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1liquid_1_1Liquid_a550ea5869db69be9f3b8f0b83b07d8cb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!printcool\-\_\-table@{printcool\-\_\-table}}
+\index{printcool\-\_\-table@{printcool\-\_\-table}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{printcool\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-printcool\-\_\-table (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{data = {\ttfamily OrderedDict(\mbox{[}\mbox{]})}, }
+\item[{}]{headings = {\ttfamily \mbox{[}\mbox{]}}, }
+\item[{}]{banner = {\ttfamily None}, }
+\item[{}]{footnote = {\ttfamily None}, }
+\item[{}]{color = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}
+
+
+Print target information in an organized table format. 
+
+Implemented 6/30 because multiple targets are already printing out tabulated information in very similar ways. This method is a simple wrapper around printcool\-\_\-dictionary.
+
+The input should be something like\-:
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Column contents in the form of an Ordered\-Dict, with string keys and list vals. The key is printed in the leftmost column and the vals are printed in the other columns. If non-\/strings are passed, they will be converted to strings (not recommended).\\
+\hline
+{\em headings} & Column headings in the form of a list. It must be equal to the number to the list length for each of the \char`\"{}vals\char`\"{} in Ordered\-Dict, plus one. Use \char`\"{}\textbackslash{}n\char`\"{} characters to specify long column names that may take up more than one line.\\
+\hline
+{\em banner} & Optional heading line, which will be printed at the top in the title. \\
+\hline
+{\em footnote} & Optional footnote line, which will be printed at the bottom. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 638 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a121ae6aa86f6eb692e0c23cec82aa734}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!read@{read}}
+\index{read@{read}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{read}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-read (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily True}, }
+\item[{}]{A\-Hess = {\ttfamily True}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a121ae6aa86f6eb692e0c23cec82aa734}
+
+
+Read in time series for all previous iterations. 
+
+
+
+Definition at line 447 of file liquid.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1liquid_1_1Liquid_a121ae6aa86f6eb692e0c23cec82aa734_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!read\-\_\-0grads@{read\-\_\-0grads}}
+\index{read\-\_\-0grads@{read\-\_\-0grads}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{read\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}
+
+
+Read a file from the target directory containing names of parameters that don't contribute to the gradient. 
+
+{\itshape Note} that we are checking the derivatives of the objective function, and not the derivatives of the quantities that go into building the objective function. However, it is the quantities that we actually differentiate. Since there is a simple chain rule relationship, the parameters that do/don't contribute to the objective function/quantities are the same.
+
+However, property gradients do contribute to objective function Hessian elements, so we cannot use the same mechanism for excluding the calculation of property Hessians. This is mostly fine since we rarely if ever calculate an explicit property Hessian. 
+
+Definition at line 207 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a08b698af913d56f780d0587821c922cd}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!read\-\_\-data@{read\-\_\-data}}
+\index{read\-\_\-data@{read\-\_\-data}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{read\-\_\-data}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-read\-\_\-data (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a08b698af913d56f780d0587821c922cd}
+
+
+Definition at line 162 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}}
+\index{refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{refresh\-\_\-temp\-\_\-directory}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-refresh\-\_\-temp\-\_\-directory (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}
+
+
+Back up the temporary directory if desired, delete it and then create a new one. 
+
+
+
+Definition at line 321 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!set\-\_\-option@{set\-\_\-option}}
+\index{set\-\_\-option@{set\-\_\-option}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-set\-\_\-option (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{in\-\_\-dict, }
+\item[{}]{src\-\_\-key, }
+\item[{}]{dest\-\_\-key = {\ttfamily None}, }
+\item[{}]{val = {\ttfamily None}, }
+\item[{}]{default = {\ttfamily None}, }
+\item[{}]{forceprint = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
+
+
+Definition at line 42 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!stage@{stage}}
+\index{stage@{stage}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{stage}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-stage (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}
+
+
+Stages the directory for the target, and then launches Work Queue processes if any. 
+
+The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 565 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a716e28bb5572b3273036ac753b7e1e1d}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!submit\-\_\-jobs@{submit\-\_\-jobs}}
+\index{submit\-\_\-jobs@{submit\-\_\-jobs}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{submit\-\_\-jobs}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-liquid.\-Liquid.\-submit\-\_\-jobs (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily True}, }
+\item[{}]{A\-Hess = {\ttfamily True}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a716e28bb5572b3273036ac753b7e1e1d}
+
+
+Definition at line 409 of file liquid.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1liquid_1_1Liquid_a716e28bb5572b3273036ac753b7e1e1d_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!wq\-\_\-complete@{wq\-\_\-complete}}
+\index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{wq\-\_\-complete}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-wq\-\_\-complete (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}
+
+
+This method determines whether the Work Queue tasks for the current target have completed. 
+
+
+
+Definition at line 602 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!write\-\_\-0grads@{write\-\_\-0grads}}
+\index{write\-\_\-0grads@{write\-\_\-0grads}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{write\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-write\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{Ans}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}
+
+
+Write a file to the target directory containing names of parameters that don't contribute to the gradient. 
+
+
+
+Definition at line 225 of file target.\-py.
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a2a6b03a459dc55596920124abd0f7d13}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!All\-Results@{All\-Results}}
+\index{All\-Results@{All\-Results}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{All\-Results}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-All\-Results\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a2a6b03a459dc55596920124abd0f7d13}
+
+
+Saved results for all iterations self.\-Saved\-M\-Vals = \mbox{[}\mbox{]}. 
+
+
+
+Definition at line 151 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a2cf65dd56f058636e68a0b3bf2af210e}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!do\-\_\-self\-\_\-pol@{do\-\_\-self\-\_\-pol}}
+\index{do\-\_\-self\-\_\-pol@{do\-\_\-self\-\_\-pol}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{do\-\_\-self\-\_\-pol}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-do\-\_\-self\-\_\-pol\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a2cf65dd56f058636e68a0b3bf2af210e}
+
+
+Definition at line 98 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a4a720f5a6f9808afc07b7baf08dcbceb}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Dyn\-Dict@{Dyn\-Dict}}
+\index{Dyn\-Dict@{Dyn\-Dict}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Dyn\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-Dyn\-Dict}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a4a720f5a6f9808afc07b7baf08dcbceb}
+
+
+Definition at line 1047 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_af2dfb536a3fbe64e5e657c5edc1d656a}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Dyn\-Dict\-\_\-\-New@{Dyn\-Dict\-\_\-\-New}}
+\index{Dyn\-Dict\-\_\-\-New@{Dyn\-Dict\-\_\-\-New}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Dyn\-Dict\-\_\-\-New}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-Dyn\-Dict\-\_\-\-New}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_af2dfb536a3fbe64e5e657c5edc1d656a}
+
+
+Definition at line 1048 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a62f767cd526de672669a376d0314534f}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!engine\-\_\-@{engine\-\_\-}}
+\index{engine\-\_\-@{engine\-\_\-}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{engine\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-engine\-\_\-}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a62f767cd526de672669a376d0314534f}
+
+
+Definition at line 1025 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a6f85a9476fa3db7cea777682fda4e9df}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!engname@{engname}}
+\index{engname@{engname}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{engname}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-engname}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a6f85a9476fa3db7cea777682fda4e9df}
+
+
+Definition at line 1027 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a50a73b281be42f33ab66c5780b464823}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!extra\-\_\-output@{extra\-\_\-output}}
+\index{extra\-\_\-output@{extra\-\_\-output}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{extra\-\_\-output}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-extra\-\_\-output}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a50a73b281be42f33ab66c5780b464823}
+
+
+Definition at line 1043 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!F\-F@{F\-F}}
+\index{F\-F@{F\-F}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{F\-F}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-F\-F\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}
+
+
+Need the forcefield (here for now) 
+
+
+
+Definition at line 160 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a7bcadb869325c9a00156a2bbd43eb148}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!gas\-\_\-engine@{gas\-\_\-engine}}
+\index{gas\-\_\-engine@{gas\-\_\-engine}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{gas\-\_\-engine}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-gas\-\_\-engine\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a7bcadb869325c9a00156a2bbd43eb148}
+
+
+Read the reference data. 
+
+
+
+Definition at line 133 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a68c9a00d9f73cb7500c675d64b53299a}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!gas\-\_\-engine\-\_\-args@{gas\-\_\-engine\-\_\-args}}
+\index{gas\-\_\-engine\-\_\-args@{gas\-\_\-engine\-\_\-args}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{gas\-\_\-engine\-\_\-args}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-gas\-\_\-engine\-\_\-args}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a68c9a00d9f73cb7500c675d64b53299a}
+
+
+Definition at line 1033 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a70138842aef1987abe7ba2f9250110b0}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!gas\-\_\-mol@{gas\-\_\-mol}}
+\index{gas\-\_\-mol@{gas\-\_\-mol}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{gas\-\_\-mol}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-gas\-\_\-mol\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a70138842aef1987abe7ba2f9250110b0}
+
+
+Definition at line 114 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!gct@{gct}}
+\index{gct@{gct}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{gct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-gct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}
+
+
+Counts how often the gradient was computed. 
+
+
+
+Definition at line 164 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a3c2c643beab52bc7a25256588566ee7e}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Gp@{Gp}}
+\index{Gp@{Gp}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Gp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Gp\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a3c2c643beab52bc7a25256588566ee7e}
+
+
+Definition at line 895 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!hct@{hct}}
+\index{hct@{hct}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{hct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-hct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}
+
+
+Counts how often the Hessian was computed. 
+
+
+
+Definition at line 166 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a50f976d2d3d6a1c261756035a26390e2}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Labels@{Labels}}
+\index{Labels@{Labels}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Labels}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Labels\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a50f976d2d3d6a1c261756035a26390e2}
+
+
+Definition at line 243 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_af4063471b49ee7573e231e7ffbbed9b2}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!last\-\_\-traj@{last\-\_\-traj}}
+\index{last\-\_\-traj@{last\-\_\-traj}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{last\-\_\-traj}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-last\-\_\-traj}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_af4063471b49ee7573e231e7ffbbed9b2}
+
+
+Definition at line 1063 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a418c09a62e307b812199067c212aae01}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!liquid\-\_\-mol@{liquid\-\_\-mol}}
+\index{liquid\-\_\-mol@{liquid\-\_\-mol}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{liquid\-\_\-mol}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-liquid\-\_\-mol\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a418c09a62e307b812199067c212aae01}
+
+
+Definition at line 110 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a6c00a87ae43f535118b77d41af51a5d7}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!M\-Bar\-Energy@{M\-Bar\-Energy}}
+\index{M\-Bar\-Energy@{M\-Bar\-Energy}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{M\-Bar\-Energy}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-M\-Bar\-Energy\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a6c00a87ae43f535118b77d41af51a5d7}
+
+
+Evaluated energies for all trajectories (i.\-e. 
+
+all iterations and all temperatures), using all mvals 
+
+Definition at line 148 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a4827b63f297bd4d68b165040f58436f3}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!nptfiles@{nptfiles}}
+\index{nptfiles@{nptfiles}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{nptfiles}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-nptfiles}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a4827b63f297bd4d68b165040f58436f3}
+
+
+Definition at line 1031 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a9c243bfb5a728a06285b0a7b8efb3568}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!nptpfx@{nptpfx}}
+\index{nptpfx@{nptpfx}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{nptpfx}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-nptpfx}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a9c243bfb5a728a06285b0a7b8efb3568}
+
+
+Definition at line 1029 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a93b9986b3c980abc9cf8f65765864e12}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Objective@{Objective}}
+\index{Objective@{Objective}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a93b9986b3c980abc9cf8f65765864e12}
+
+
+Definition at line 897 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!pgrad@{pgrad}}
+\index{pgrad@{pgrad}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{pgrad}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-pgrad\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}
+
+
+Iteration where we turn on zero-\/gradient skipping. 
+
+Dictionary of whether to call the derivatives. 
+
+Definition at line 127 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a2c10490d9073a069bd19361f386422ef}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Phase\-Points@{Phase\-Points}}
+\index{Phase\-Points@{Phase\-Points}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Phase\-Points}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Phase\-Points\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a2c10490d9073a069bd19361f386422ef}
+
+
+Definition at line 239 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a31ab3ddf113f6998b67bbc2bad3998f5}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Pp@{Pp}}
+\index{Pp@{Pp}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Pp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Pp\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a31ab3ddf113f6998b67bbc2bad3998f5}
+
+
+Definition at line 892 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Print\-Option\-Dict@{Print\-Option\-Dict}}
+\index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
+
+
+Definition at line 44 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!rd@{rd}}
+\index{rd@{rd}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{rd}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rd\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}
+
+
+Root directory of the whole project. 
+
+Submit jobs to the Work Queue.
+
+Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Directory to read data from.
+
+Definition at line 123 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a22374f490cab2648b246dc16e94db020}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!read\-\_\-indicate@{read\-\_\-indicate}}
+\index{read\-\_\-indicate@{read\-\_\-indicate}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{read\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-read\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a22374f490cab2648b246dc16e94db020}
+
+
+Definition at line 135 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!read\-\_\-objective@{read\-\_\-objective}}
+\index{read\-\_\-objective@{read\-\_\-objective}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{read\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}
+
+
+Whether to read objective.\-p from file when restarting an aborted run. 
+
+
+
+Definition at line 172 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a472f32bbaf18b8ead19b9156f305b8fc}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Ref\-Data@{Ref\-Data}}
+\index{Ref\-Data@{Ref\-Data}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Ref\-Data}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Ref\-Data\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a472f32bbaf18b8ead19b9156f305b8fc}
+
+
+Definition at line 173 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!rundir@{rundir}}
+\index{rundir@{rundir}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{rundir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rundir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}
+
+
+self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. 
+
+Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
+
+Not expecting more than ten thousand iterations Go into the directory where \hyperlink{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a}{get()} will be executed. Write mathematical parameters to file; will be used to checkpoint calculation. Read in file that specifies which derivatives may be skipped. 
+
+Definition at line 158 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a0da0c00cdc193c9c470d7e528043fb99}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Saved\-Traj@{Saved\-Traj}}
+\index{Saved\-Traj@{Saved\-Traj}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Saved\-Traj}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Saved\-Traj\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a0da0c00cdc193c9c470d7e528043fb99}
+
+
+Saved trajectories for all iterations and all temperatures. 
+
+
+
+Definition at line 146 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a426ef9f0db4235ed46b433c51e1a5fef}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!scripts@{scripts}}
+\index{scripts@{scripts}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{scripts}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R.\-scripts}}\label{classforcebalance_1_1tinkerio_1_1Liquid__TINKER_a426ef9f0db4235ed46b433c51e1a5fef}
+
+
+Definition at line 1035 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!tempbase@{tempbase}}
+\index{tempbase@{tempbase}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{tempbase}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempbase\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}
+
+
+Relative directory of target. 
+
+Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
+
+Definition at line 152 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!tempdir@{tempdir}}
+\index{tempdir@{tempdir}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{tempdir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempdir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}
+
+
+Definition at line 155 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!verbose\-\_\-options@{verbose\-\_\-options}}
+\index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
+
+
+Definition at line 40 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a0d36d27d8c406b53bbb1096fbb76adbb}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!w\-\_\-alpha@{w\-\_\-alpha}}
+\index{w\-\_\-alpha@{w\-\_\-alpha}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{w\-\_\-alpha}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-alpha\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a0d36d27d8c406b53bbb1096fbb76adbb}
+
+
+Definition at line 868 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a3809c649d95ac6c9f662d599e6b1b93d}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!w\-\_\-cp@{w\-\_\-cp}}
+\index{w\-\_\-cp@{w\-\_\-cp}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{w\-\_\-cp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-cp\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a3809c649d95ac6c9f662d599e6b1b93d}
+
+
+Definition at line 870 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a75ad3ea94ec845e91499f858e7be5f27}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!w\-\_\-eps0@{w\-\_\-eps0}}
+\index{w\-\_\-eps0@{w\-\_\-eps0}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{w\-\_\-eps0}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-eps0\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a75ad3ea94ec845e91499f858e7be5f27}
+
+
+Definition at line 871 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_abe985fe3aaa03d9f3a1b0a90f26b774d}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!w\-\_\-hvap@{w\-\_\-hvap}}
+\index{w\-\_\-hvap@{w\-\_\-hvap}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{w\-\_\-hvap}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-hvap\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_abe985fe3aaa03d9f3a1b0a90f26b774d}
+
+
+Definition at line 867 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a6b262d9343247a902063bf62d5f19108}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!w\-\_\-kappa@{w\-\_\-kappa}}
+\index{w\-\_\-kappa@{w\-\_\-kappa}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{w\-\_\-kappa}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-kappa\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a6b262d9343247a902063bf62d5f19108}
+
+
+Definition at line 869 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_aef8ad1dda086bde6f48130d273af9784}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!w\-\_\-rho@{w\-\_\-rho}}
+\index{w\-\_\-rho@{w\-\_\-rho}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{w\-\_\-rho}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-w\-\_\-rho\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_aef8ad1dda086bde6f48130d273af9784}
+
+
+Density. 
+
+Enthalpy of vaporization. Thermal expansion coefficient. Isothermal compressibility. Isobaric heat capacity. Static dielectric constant. Estimation of errors. 
+
+Definition at line 866 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a34fc96849307fd94c2cb41705ad4445c}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Wp@{Wp}}
+\index{Wp@{Wp}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Wp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Wp\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a34fc96849307fd94c2cb41705ad4445c}
+
+
+Definition at line 890 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a2ef5b56bb5efbc942535ee406d514610}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!write\-\_\-indicate@{write\-\_\-indicate}}
+\index{write\-\_\-indicate@{write\-\_\-indicate}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{write\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-write\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a2ef5b56bb5efbc942535ee406d514610}
+
+
+Definition at line 136 of file liquid.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!write\-\_\-objective@{write\-\_\-objective}}
+\index{write\-\_\-objective@{write\-\_\-objective}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{write\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}
+
+
+Whether to write objective.\-p at every iteration (true for all but remote.) 
+
+
+
+Definition at line 174 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!xct@{xct}}
+\index{xct@{xct}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{xct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-xct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}
+
+
+Counts how often the objective function was computed. 
+
+
+
+Definition at line 162 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1liquid_1_1Liquid_a551536bc5fa6e40eeeba61619ebe072d}{\index{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}!Xp@{Xp}}
+\index{Xp@{Xp}!forcebalance::tinkerio::Liquid_TINKER@{forcebalance\-::tinkerio\-::\-Liquid\-\_\-\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Xp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-liquid.\-Liquid.\-Xp\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1liquid_1_1Liquid_a551536bc5fa6e40eeeba61619ebe072d}
+
+
+Definition at line 888 of file liquid.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{tinkerio_8py}{tinkerio.\-py}\end{DoxyCompactItemize}

@@ -1,0 +1,9 @@
+<map id="forcebalance.target.RemoteTarget.submit_jobs" name="forcebalance.target.RemoteTarget.submit_jobs">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1optimizer.html#ae1f6c649703a22b2f767a5f6bf53297b" title="forcebalance.optimizer.Counter" alt="" coords="255,5,476,35"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a185aa094549d280fdc18479459980164" title="If trying to write to a symbolic link, remove it first. " alt="" coords="276,59,455,88"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a2ff762a2f2d2b6bb1c7dd067bd1a1e88" title="Use this instead of pickle.dump for pickling anything that contains _ElementTree types. " alt="" coords="269,112,461,141"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="275,165,456,195"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="272,218,459,265"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue. " alt="" coords="265,288,465,317"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="525,157,709,203"/>
+</map>

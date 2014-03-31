@@ -1,0 +1,1028 @@
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo}{\subsection{forcebalance.\-thermo.\-Thermo Class Reference}
+\label{classforcebalance_1_1thermo_1_1Thermo}\index{forcebalance.\-thermo.\-Thermo@{forcebalance.\-thermo.\-Thermo}}
+}
+
+
+A target for fitting general experimental data sets.  
+
+
+
+
+Inheritance diagram for forcebalance.\-thermo.\-Thermo\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=256pt]{classforcebalance_1_1thermo_1_1Thermo__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-thermo.\-Thermo\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=236pt]{classforcebalance_1_1thermo_1_1Thermo__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1thermo_1_1Thermo_aaad140e3127a6fd98719db342b686ae4}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1thermo_1_1Thermo_a51a7c7849be08dbac153e8b2ff06afd8}{retrieve}
+\begin{DoxyCompactList}\small\item\em Retrieve the molecular dynamics (M\-D) results and store the calculated quantities in the \hyperlink{classforcebalance_1_1thermo_1_1Point}{Point} object dp. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1thermo_1_1Thermo_a05ed95e5ac3c5b12048e6d928c5488b8}{submit\-\_\-jobs}
+\begin{DoxyCompactList}\small\item\em This routine is called by Objective.\-stage() and will run before \char`\"{}get\char`\"{}. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1thermo_1_1Thermo_ae4c2b2c26951e2f72b40d39074d0979d}{indicate}
+\begin{DoxyCompactList}\small\item\em Shows optimization state. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1thermo_1_1Thermo_a2578b390753ec351162dc429501b0760}{objective\-\_\-term}
+\begin{DoxyCompactList}\small\item\em Calculates the contribution to the objective function (the term) for a given quantity. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1thermo_1_1Thermo_aa24e72e49064830a2ab069e6debb3dfa}{get}
+\begin{DoxyCompactList}\small\item\em Return the contribution to the total objective function. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{get\-\_\-\-X}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution without any parametric derivatives. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{read\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Read a file from the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{write\-\_\-0grads}
+\begin{DoxyCompactList}\small\item\em Write a file to the target directory containing names of parameters that don't contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{get\-\_\-\-G}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{get\-\_\-\-H}
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient / Hessian. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{link\-\_\-from\-\_\-tempdir}
+\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{refresh\-\_\-temp\-\_\-directory}
+\begin{DoxyCompactList}\small\item\em Back up the temporary directory if desired, delete it and then create a new one. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}{check\-\_\-files}
+\begin{DoxyCompactList}\small\item\em Check this directory for the presence of readable files when the 'read' option is set. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read}
+\begin{DoxyCompactList}\small\item\em Read data from disk for the initial optimization step if the user has provided the directory to the \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{absrd}
+\begin{DoxyCompactList}\small\item\em Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{maxrd}
+\begin{DoxyCompactList}\small\item\em Supply the latest existing temp-\/directory containing valid data. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{meta\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Wrap around the indicate function, so it can print to screen and also to a file. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{meta\-\_\-get}
+\begin{DoxyCompactList}\small\item\em Wrapper around the get function. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{stage}
+\begin{DoxyCompactList}\small\item\em Stages the directory for the target, and then launches Work Queue processes if any. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{wq\-\_\-complete}
+\begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{printcool\-\_\-table}
+\begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\-\_\-\-\_\-setattr\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_ab0c5f73c4c9812e2d733ffb0f65edeb9}{simpfx}
+\begin{DoxyCompactList}\small\item\em Initialize base class. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_a026babae21684ddf5751cf17a91c5588}{points}
+\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_a2cfee647c0b5b8dd9f575d3a5d0b7d88}{denoms}
+\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_a2821e61578dac23a40db4788abacda0f}{weights}
+\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_a5d5c7cfd9aa3bbd85ff15cb476ba990b}{Xp}
+\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_ace1a9dd4cc6b80f40a10d56309b30a01}{Wp}
+\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_a542d45d19d3ac48f3c7f25c00fd9d839}{Pp}
+\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_a2c052c89904a57ae487c1ff082e3f023}{Gp}
+\item 
+\hyperlink{classforcebalance_1_1thermo_1_1Thermo_ad0f733fe26b94c3d7b632d7257c91e78}{Objective}
+\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{rd}
+\begin{DoxyCompactList}\small\item\em Root directory of the whole project. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{pgrad}
+\begin{DoxyCompactList}\small\item\em Iteration where we turn on zero-\/gradient skipping. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{tempbase}
+\begin{DoxyCompactList}\small\item\em Relative directory of target. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{tempdir}
+\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{rundir}
+\begin{DoxyCompactList}\small\item\em self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{F\-F}
+\begin{DoxyCompactList}\small\item\em Need the forcefield (here for now) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{xct}
+\begin{DoxyCompactList}\small\item\em Counts how often the objective function was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{gct}
+\begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{hct}
+\begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}{read\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Whether to read indicate.\-log from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}{write\-\_\-indicate}
+\begin{DoxyCompactList}\small\item\em Whether to write indicate.\-log at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{read\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to read objective.\-p from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{write\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em Whether to write objective.\-p at every iteration (true for all but remote.) \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+A target for fitting general experimental data sets. 
+
+The experimental data is described in a .txt file and is handled with a {\ttfamily Quantity} subclass. 
+
+Definition at line 24 of file thermo.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_aaad140e3127a6fd98719db342b686ae4}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-thermo.\-Thermo.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{options, }
+\item[{}]{tgt\-\_\-opts, }
+\item[{}]{forcefield}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1thermo_1_1Thermo_aaad140e3127a6fd98719db342b686ae4}
+
+
+Definition at line 25 of file thermo.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1thermo_1_1Thermo_aaad140e3127a6fd98719db342b686ae4_cgraph}
+\end{center}
+\end{figure}
+
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{\-\_\-\-\_\-setattr\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-\_\-\-\_\-setattr\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{key, }
+\item[{}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}
+
+
+Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!absrd@{absrd}}
+\index{absrd@{absrd}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{absrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-absrd (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{inum = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4}
+
+
+Supply the correct directory specified by user's \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 393 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_abb0a6089d8deaead8f78186cc8e4cbe4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!check\-\_\-files@{check\-\_\-files}}
+\index{check\-\_\-files@{check\-\_\-files}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{check\-\_\-files}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-check\-\_\-files (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{there}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ac790529c5f85f0547fe3601ad1cf2419}
+
+
+Check this directory for the presence of readable files when the 'read' option is set. 
+
+
+
+Definition at line 364 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_aa24e72e49064830a2ab069e6debb3dfa}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!get@{get}}
+\index{get@{get}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-thermo.\-Thermo.\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily True}, }
+\item[{}]{A\-Hess = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1thermo_1_1Thermo_aa24e72e49064830a2ab069e6debb3dfa}
+
+
+Return the contribution to the total objective function. 
+
+This is a weighted average of the calculated quantities.
+
+\paragraph*{Parameters }
+
+mvals \-: list Mathematical parameter values. A\-Grad \-: Boolean Switch to turn on analytic gradient. A\-Hess \-: Boolean Switch to turn on analytic Hessian.
+
+\paragraph*{Returns }
+
+Answer \-: dict Contribution to the objective function. {\ttfamily Answer} is a dict with keys {\ttfamily X} for the objective function, {\ttfamily G} for its gradient and {\ttfamily H} for its Hessian. 
+
+Definition at line 361 of file thermo.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1thermo_1_1Thermo_aa24e72e49064830a2ab069e6debb3dfa_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!get\-\_\-\-G@{get\-\_\-\-G}}
+\index{get\-\_\-\-G@{get\-\_\-\-G}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{get\-\_\-\-G}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-G (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049}
+
+
+Computes the objective function contribution and its gradient. 
+
+First the low-\/level 'get' method is called with the analytic gradient switch turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if 'fdhessdiag' is turned on.
+
+In this function we also record which parameters cause a nonzero change in the objective function contribution. Parameters which do not change the objective function will not be differentiated in subsequent calculations. This is recorded in a text file in the targets directory. 
+
+Definition at line 272 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afa8cc38c8bba8861c072e789717aa049_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!get\-\_\-\-H@{get\-\_\-\-H}}
+\index{get\-\_\-\-H@{get\-\_\-\-H}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{get\-\_\-\-H}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-H (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb}
+
+
+Computes the objective function contribution and its gradient / Hessian. 
+
+First the low-\/level 'get' method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1\-\_\-pids and compute the corresponding elements of the gradient by finite difference, if the 'fdgrad' switch is turned on.
+
+This is followed by looping through the fd2\-\_\-pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
+
+Definition at line 296 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a1d2ee27fe86a09769c1816af23b09adb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!get\-\_\-\-X@{get\-\_\-\-X}}
+\index{get\-\_\-\-X@{get\-\_\-\-X}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{get\-\_\-\-X}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-get\-\_\-\-X (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949}
+
+
+Computes the objective function contribution without any parametric derivatives. 
+
+
+
+Definition at line 184 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a606dd136f195c267c05a2455405e5949_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_ae4c2b2c26951e2f72b40d39074d0979d}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!indicate@{indicate}}
+\index{indicate@{indicate}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{indicate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-thermo.\-Thermo.\-indicate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1thermo_1_1Thermo_ae4c2b2c26951e2f72b40d39074d0979d}
+
+
+Shows optimization state. 
+
+
+
+Definition at line 220 of file thermo.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1thermo_1_1Thermo_ae4c2b2c26951e2f72b40d39074d0979d_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}}
+\index{link\-\_\-from\-\_\-tempdir@{link\-\_\-from\-\_\-tempdir}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{link\-\_\-from\-\_\-tempdir}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-link\-\_\-from\-\_\-tempdir (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{absdestdir}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82}
+
+
+Definition at line 315 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a5aa4958cea0a48138511567a076c5a82_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!maxrd@{maxrd}}
+\index{maxrd@{maxrd}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{maxrd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-maxrd (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df}
+
+
+Supply the latest existing temp-\/directory containing valid data. 
+
+
+
+Definition at line 447 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a961ce7e772836b1465cb44e3f03145df_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!meta\-\_\-get@{meta\-\_\-get}}
+\index{meta\-\_\-get@{meta\-\_\-get}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{meta\-\_\-get}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-get (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103}
+
+
+Wrapper around the get function. 
+
+Create the directory for the target, and then calls 'get'. If we are reading existing data, go into the appropriate read directory and call \hyperlink{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{read()} instead. The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 511 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a17c8ac0c7dd0a0430accddfd12602103_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!meta\-\_\-indicate@{meta\-\_\-indicate}}
+\index{meta\-\_\-indicate@{meta\-\_\-indicate}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{meta\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-meta\-\_\-indicate (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4}
+
+
+Wrap around the indicate function, so it can print to screen and also to a file. 
+
+If reading from checkpoint file, don't call the indicate() function, instead just print the file contents to the screen. 
+
+Definition at line 469 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_a99c84ef8ea504d7699c927e261f648e4_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a2578b390753ec351162dc429501b0760}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!objective\-\_\-term@{objective\-\_\-term}}
+\index{objective\-\_\-term@{objective\-\_\-term}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{objective\-\_\-term}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-thermo.\-Thermo.\-objective\-\_\-term (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{quantity}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1thermo_1_1Thermo_a2578b390753ec351162dc429501b0760}
+
+
+Calculates the contribution to the objective function (the term) for a given quantity. 
+
+\paragraph*{Parameters }
+
+quantity \-: string Calculate the objective term for this quantity.
+
+\paragraph*{Returns }
+
+term \-: dict {\ttfamily term} is a dict with keys {\ttfamily X}, {\ttfamily G}, {\ttfamily H} and {\ttfamily info}. The values of these keys are the objective term itself ({\ttfamily X}), its gradient ({\ttfamily G}), its Hessian ({\ttfamily H}), and an Ordered\-Dict with print information on individiual data points ({\ttfamily info}). 
+
+Definition at line 273 of file thermo.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1thermo_1_1Thermo_a2578b390753ec351162dc429501b0760_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!printcool\-\_\-table@{printcool\-\_\-table}}
+\index{printcool\-\_\-table@{printcool\-\_\-table}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{printcool\-\_\-table}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-printcool\-\_\-table (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{data = {\ttfamily OrderedDict(\mbox{[}\mbox{]})}, }
+\item[{}]{headings = {\ttfamily \mbox{[}\mbox{]}}, }
+\item[{}]{banner = {\ttfamily None}, }
+\item[{}]{footnote = {\ttfamily None}, }
+\item[{}]{color = {\ttfamily 0}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b}
+
+
+Print target information in an organized table format. 
+
+Implemented 6/30 because multiple targets are already printing out tabulated information in very similar ways. This method is a simple wrapper around printcool\-\_\-dictionary.
+
+The input should be something like\-:
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Column contents in the form of an Ordered\-Dict, with string keys and list vals. The key is printed in the leftmost column and the vals are printed in the other columns. If non-\/strings are passed, they will be converted to strings (not recommended).\\
+\hline
+{\em headings} & Column headings in the form of a list. It must be equal to the number to the list length for each of the \char`\"{}vals\char`\"{} in Ordered\-Dict, plus one. Use \char`\"{}\textbackslash{}n\char`\"{} characters to specify long column names that may take up more than one line.\\
+\hline
+{\em banner} & Optional heading line, which will be printed at the top in the title. \\
+\hline
+{\em footnote} & Optional footnote line, which will be printed at the bottom. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 638 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_ac30a4e9d7d9fe06f7caefa5f7cfab09b_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!read@{read}}
+\index{read@{read}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{read}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a}
+
+
+Read data from disk for the initial optimization step if the user has provided the directory to the \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 379 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_afb87b4d33b88bb381c74b76752c5892a_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!read\-\_\-0grads@{read\-\_\-0grads}}
+\index{read\-\_\-0grads@{read\-\_\-0grads}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{read\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-read\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a09bb0e8350a17974c908a9728b2709bf}
+
+
+Read a file from the target directory containing names of parameters that don't contribute to the gradient. 
+
+{\itshape Note} that we are checking the derivatives of the objective function, and not the derivatives of the quantities that go into building the objective function. However, it is the quantities that we actually differentiate. Since there is a simple chain rule relationship, the parameters that do/don't contribute to the objective function/quantities are the same.
+
+However, property gradients do contribute to objective function Hessian elements, so we cannot use the same mechanism for excluding the calculation of property Hessians. This is mostly fine since we rarely if ever calculate an explicit property Hessian. 
+
+Definition at line 207 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}}
+\index{refresh\-\_\-temp\-\_\-directory@{refresh\-\_\-temp\-\_\-directory}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{refresh\-\_\-temp\-\_\-directory}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-refresh\-\_\-temp\-\_\-directory (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_afe815eafab06ac92f10bbf4b88ad95c8}
+
+
+Back up the temporary directory if desired, delete it and then create a new one. 
+
+
+
+Definition at line 321 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a51a7c7849be08dbac153e8b2ff06afd8}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!retrieve@{retrieve}}
+\index{retrieve@{retrieve}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{retrieve}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-thermo.\-Thermo.\-retrieve (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{dp}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1thermo_1_1Thermo_a51a7c7849be08dbac153e8b2ff06afd8}
+
+
+Retrieve the molecular dynamics (M\-D) results and store the calculated quantities in the \hyperlink{classforcebalance_1_1thermo_1_1Point}{Point} object dp. 
+
+\paragraph*{Parameters }
+
+dp \-: \hyperlink{classforcebalance_1_1thermo_1_1Point}{Point} Store the calculated quantities in this point.
+
+\paragraph*{Returns }
+
+Nothing 
+
+Definition at line 140 of file thermo.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1thermo_1_1Thermo_a51a7c7849be08dbac153e8b2ff06afd8_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!set\-\_\-option@{set\-\_\-option}}
+\index{set\-\_\-option@{set\-\_\-option}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-set\-\_\-option (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{in\-\_\-dict, }
+\item[{}]{src\-\_\-key, }
+\item[{}]{dest\-\_\-key = {\ttfamily None}, }
+\item[{}]{val = {\ttfamily None}, }
+\item[{}]{default = {\ttfamily None}, }
+\item[{}]{forceprint = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
+
+
+Definition at line 42 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!stage@{stage}}
+\index{stage@{stage}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{stage}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-stage (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily False}, }
+\item[{}]{A\-Hess = {\ttfamily False}, }
+\item[{}]{customdir = {\ttfamily None}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}
+
+
+Stages the directory for the target, and then launches Work Queue processes if any. 
+
+The 'get' method should not worry about the directory that it's running in. 
+
+Definition at line 565 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a05ed95e5ac3c5b12048e6d928c5488b8}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!submit\-\_\-jobs@{submit\-\_\-jobs}}
+\index{submit\-\_\-jobs@{submit\-\_\-jobs}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{submit\-\_\-jobs}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-thermo.\-Thermo.\-submit\-\_\-jobs (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{mvals, }
+\item[{}]{A\-Grad = {\ttfamily True}, }
+\item[{}]{A\-Hess = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1thermo_1_1Thermo_a05ed95e5ac3c5b12048e6d928c5488b8}
+
+
+This routine is called by Objective.\-stage() and will run before \char`\"{}get\char`\"{}. 
+
+It submits the jobs and the \hyperlink{classforcebalance_1_1target_1_1Target_af8d2a4658c87841e40296795aec478bb}{stage()} function will wait for jobs to complete.
+
+\paragraph*{Parameters }
+
+mvals \-: list Mathematical parameter values. A\-Grad \-: Boolean Switch to turn on analytic gradient. A\-Hess \-: Boolean Switch to turn on analytic Hessian.
+
+\paragraph*{Returns }
+
+Nothing. 
+
+Definition at line 179 of file thermo.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1thermo_1_1Thermo_a05ed95e5ac3c5b12048e6d928c5488b8_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!wq\-\_\-complete@{wq\-\_\-complete}}
+\index{wq\-\_\-complete@{wq\-\_\-complete}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{wq\-\_\-complete}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-wq\-\_\-complete (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04}
+
+
+This method determines whether the Work Queue tasks for the current target have completed. 
+
+
+
+Definition at line 602 of file target.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1target_1_1Target_af6099ec09486213869dba2491bd8ea04_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!write\-\_\-0grads@{write\-\_\-0grads}}
+\index{write\-\_\-0grads@{write\-\_\-0grads}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{write\-\_\-0grads}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-target.\-Target.\-write\-\_\-0grads (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{Ans}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_acc7601caa4b719bf7e31961c2eb30dd7}
+
+
+Write a file to the target directory containing names of parameters that don't contribute to the gradient. 
+
+
+
+Definition at line 225 of file target.\-py.
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a2cfee647c0b5b8dd9f575d3a5d0b7d88}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!denoms@{denoms}}
+\index{denoms@{denoms}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{denoms}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-denoms}}\label{classforcebalance_1_1thermo_1_1Thermo_a2cfee647c0b5b8dd9f575d3a5d0b7d88}
+
+
+Definition at line 47 of file thermo.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!F\-F@{F\-F}}
+\index{F\-F@{F\-F}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{F\-F}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-F\-F\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a38a37919783141ea37fdcf8b00ce0aaf}
+
+
+Need the forcefield (here for now) 
+
+
+
+Definition at line 160 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!gct@{gct}}
+\index{gct@{gct}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{gct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-gct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa625ac88c6744eb14ef281d9496d0dbb}
+
+
+Counts how often the gradient was computed. 
+
+
+
+Definition at line 164 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a2c052c89904a57ae487c1ff082e3f023}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!Gp@{Gp}}
+\index{Gp@{Gp}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{Gp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-Gp}}\label{classforcebalance_1_1thermo_1_1Thermo_a2c052c89904a57ae487c1ff082e3f023}
+
+
+Definition at line 418 of file thermo.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!hct@{hct}}
+\index{hct@{hct}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{hct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-hct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a5b5a42f78052b47f29ed4b940c6111a1}
+
+
+Counts how often the Hessian was computed. 
+
+
+
+Definition at line 166 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_ad0f733fe26b94c3d7b632d7257c91e78}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!Objective@{Objective}}
+\index{Objective@{Objective}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{Objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-Objective}}\label{classforcebalance_1_1thermo_1_1Thermo_ad0f733fe26b94c3d7b632d7257c91e78}
+
+
+Definition at line 420 of file thermo.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!pgrad@{pgrad}}
+\index{pgrad@{pgrad}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{pgrad}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-pgrad\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a684235b4332b608c4e2da22982c2fdfa}
+
+
+Iteration where we turn on zero-\/gradient skipping. 
+
+Dictionary of whether to call the derivatives. 
+
+Definition at line 127 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a026babae21684ddf5751cf17a91c5588}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!points@{points}}
+\index{points@{points}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{points}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-points}}\label{classforcebalance_1_1thermo_1_1Thermo_a026babae21684ddf5751cf17a91c5588}
+
+
+Definition at line 45 of file thermo.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a542d45d19d3ac48f3c7f25c00fd9d839}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!Pp@{Pp}}
+\index{Pp@{Pp}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{Pp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-Pp}}\label{classforcebalance_1_1thermo_1_1Thermo_a542d45d19d3ac48f3c7f25c00fd9d839}
+
+
+Definition at line 415 of file thermo.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!Print\-Option\-Dict@{Print\-Option\-Dict}}
+\index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
+
+
+Definition at line 44 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!rd@{rd}}
+\index{rd@{rd}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{rd}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rd\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a4edb69fbde792e9f2f27e54b7c978c8e}
+
+
+Root directory of the whole project. 
+
+Submit jobs to the Work Queue.
+
+Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for F\-D gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger F\-D gradient elements Parameter types that trigger F\-D Hessian elements Finite difference step size Whether to make backup files Directory to read data from.
+
+Definition at line 123 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!read\-\_\-indicate@{read\-\_\-indicate}}
+\index{read\-\_\-indicate@{read\-\_\-indicate}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{read\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa8af57d5be669c4bb1c0cfd4b7a9220e}
+
+
+Whether to read indicate.\-log from file when restarting an aborted run. 
+
+
+
+Definition at line 168 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!read\-\_\-objective@{read\-\_\-objective}}
+\index{read\-\_\-objective@{read\-\_\-objective}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{read\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-read\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a22bdc4bbce2020ae44b44ad3e444fda6}
+
+
+Whether to read objective.\-p from file when restarting an aborted run. 
+
+
+
+Definition at line 172 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!rundir@{rundir}}
+\index{rundir@{rundir}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{rundir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-rundir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a6872de5b2d4273b82336ea5b0da29c9e}
+
+
+self.\-tempdir = os.\-path.\-join('temp',self.\-name) The directory in which the simulation is running -\/ this can be updated. 
+
+Directory of the current iteration; if not None, then the simulation runs under temp/target\-\_\-name/iteration\-\_\-number The 'customdir' is customizable and can go below anything.
+
+Not expecting more than ten thousand iterations Go into the directory where \hyperlink{classforcebalance_1_1target_1_1Target_a1389888302c49d529716cb45b13a6f5a}{get()} will be executed. Write mathematical parameters to file; will be used to checkpoint calculation. Read in file that specifies which derivatives may be skipped. 
+
+Definition at line 158 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_ab0c5f73c4c9812e2d733ffb0f65edeb9}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!simpfx@{simpfx}}
+\index{simpfx@{simpfx}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{simpfx}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-simpfx}}\label{classforcebalance_1_1thermo_1_1Thermo_ab0c5f73c4c9812e2d733ffb0f65edeb9}
+
+
+Initialize base class. 
+
+Parameters Reference experimental data Variables Prefix names for simulation data 
+
+Definition at line 43 of file thermo.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!tempbase@{tempbase}}
+\index{tempbase@{tempbase}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{tempbase}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempbase\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_ae5b544d3e11365865813ef3d626ef81d}
+
+
+Relative directory of target. 
+
+Temporary (working) directory; it is temp/(target\-\_\-name) Used for storing temporary variables that don't change through the course of the optimization 
+
+Definition at line 152 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!tempdir@{tempdir}}
+\index{tempdir@{tempdir}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{tempdir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-tempdir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aa1f01b5b78db253b5b66384ed11ed193}
+
+
+Definition at line 155 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!verbose\-\_\-options@{verbose\-\_\-options}}
+\index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
+
+
+Definition at line 40 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a2821e61578dac23a40db4788abacda0f}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!weights@{weights}}
+\index{weights@{weights}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{weights}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-weights}}\label{classforcebalance_1_1thermo_1_1Thermo_a2821e61578dac23a40db4788abacda0f}
+
+
+Definition at line 49 of file thermo.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_ace1a9dd4cc6b80f40a10d56309b30a01}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!Wp@{Wp}}
+\index{Wp@{Wp}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{Wp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-Wp}}\label{classforcebalance_1_1thermo_1_1Thermo_ace1a9dd4cc6b80f40a10d56309b30a01}
+
+
+Definition at line 413 of file thermo.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!write\-\_\-indicate@{write\-\_\-indicate}}
+\index{write\-\_\-indicate@{write\-\_\-indicate}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{write\-\_\-indicate}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-indicate\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a3a2f5d4bbb8d6ecb580eadb261977a57}
+
+
+Whether to write indicate.\-log at every iteration (true for all but remote.) 
+
+
+
+Definition at line 170 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!write\-\_\-objective@{write\-\_\-objective}}
+\index{write\-\_\-objective@{write\-\_\-objective}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{write\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-write\-\_\-objective\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_a7a95624dfe03f0cee0e5f1ae09db306a}
+
+
+Whether to write objective.\-p at every iteration (true for all but remote.) 
+
+
+
+Definition at line 174 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!xct@{xct}}
+\index{xct@{xct}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{xct}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-target.\-Target.\-xct\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1target_1_1Target_aad2e385cfbf7b4a68f1c2cb41133fe82}
+
+
+Counts how often the objective function was computed. 
+
+
+
+Definition at line 162 of file target.\-py.
+
+\hypertarget{classforcebalance_1_1thermo_1_1Thermo_a5d5c7cfd9aa3bbd85ff15cb476ba990b}{\index{forcebalance\-::thermo\-::\-Thermo@{forcebalance\-::thermo\-::\-Thermo}!Xp@{Xp}}
+\index{Xp@{Xp}!forcebalance::thermo::Thermo@{forcebalance\-::thermo\-::\-Thermo}}
+\paragraph[{Xp}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-thermo.\-Thermo.\-Xp}}\label{classforcebalance_1_1thermo_1_1Thermo_a5d5c7cfd9aa3bbd85ff15cb476ba990b}
+
+
+Definition at line 412 of file thermo.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{thermo_8py}{thermo.\-py}\end{DoxyCompactItemize}

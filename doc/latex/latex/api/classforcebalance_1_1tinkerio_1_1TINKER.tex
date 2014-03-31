@@ -1,0 +1,782 @@
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER}{\subsection{forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R Class Reference}
+\label{classforcebalance_1_1tinkerio_1_1TINKER}\index{forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R@{forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R}}
+}
+
+
+Engine for carrying out general purpose \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} calculations.  
+
+
+
+
+Inheritance diagram for forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=232pt]{classforcebalance_1_1tinkerio_1_1TINKER__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=232pt]{classforcebalance_1_1tinkerio_1_1TINKER__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_acf3c691c3b992262820a8e71cabefa32}{\-\_\-\-\_\-init\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a7b620772ae2ee1b71d91e45e19627d3d}{setopts}
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; Set T\-I\-N\-K\-E\-R-\/specific options. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_ac5490b42e2a13be406cd1701789b72b4}{readsrc}
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; read files from the source directory. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_addfa1257c7cb85c51c980474c7354cab}{calltinker}
+\begin{DoxyCompactList}\small\item\em Call \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R}; prepend the tinkerpath to calling the \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} program. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_adf31eba4afc23ec8326fc8b6461f5692}{prepare}
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; prepare the temp directory and figure out the topology. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a98b822222eafd8dd16f474e1fdebd2bf}{optimize}
+\begin{DoxyCompactList}\small\item\em Optimize the geometry and align the optimized geometry to the starting geometry. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a26caae60b8feb93fbb810e0f51ea2238}{evaluate\-\_\-}
+\begin{DoxyCompactList}\small\item\em Utility function for computing energy, and (optionally) forces and dipoles using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R}. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a78f330c7a2cd41402fa742010073016f}{energy\-\_\-force\-\_\-one}
+\begin{DoxyCompactList}\small\item\em Computes the energy and force using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} for one snapshot. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_abd62dc7b18f9a1601b9bcb9b2738b616}{energy}
+\begin{DoxyCompactList}\small\item\em Computes the energy using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a9da41177664b07fa14fa934224b325a7}{energy\-\_\-force}
+\begin{DoxyCompactList}\small\item\em Computes the energy and force using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a61a4a69208f080876818e02a422f2706}{energy\-\_\-dipole}
+\begin{DoxyCompactList}\small\item\em Computes the energy and dipole using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a2e5df995bf9fbc58354b117964860cab}{normal\-\_\-modes}
+\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_ae45c6b635bb487f63dcef3fee375ae74}{multipole\-\_\-moments}
+\begin{DoxyCompactList}\small\item\em Return the multipole moments of the 1st snapshot in Debye and Buckingham units. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a4c3ad9caa51f1c79e3cdf319b7be7162}{energy\-\_\-rmsd}
+\begin{DoxyCompactList}\small\item\em Calculate energy of the selected structure (optionally minimize and return the minimized energy and R\-M\-S\-D). \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_ae1e2192c6626b66dbc32e0e836e161b5}{interaction\-\_\-energy}
+\begin{DoxyCompactList}\small\item\em Calculate the interaction energy for two fragments. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a6c31a390a4df2ab9f7d4c4e72432274f}{molecular\-\_\-dynamics}
+\begin{DoxyCompactList}\small\item\em Method for running a molecular dynamics simulation. \end{DoxyCompactList}\item 
+def \hyperlink{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}{prepare}
+\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\-\_\-\-\_\-setattr\-\_\-\-\_\-}
+\item 
+def \hyperlink{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{set\-\_\-option}
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_ab9a4b2893724d9298a858477d31e46a5}{valkwd}
+\begin{DoxyCompactList}\small\item\em Keyword args that aren't in this list are filtered out. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_accc63c58abe79aea21fb74b1b6f99214}{warn\-\_\-vn}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_afff41f58d443d1a202227c75aaaf5ec4}{tinkerpath}
+\begin{DoxyCompactList}\small\item\em The directory containing \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} executables (e.\-g. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_aaf8b049b7a15899cd4c644d936e90976}{key}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_ad0d8dfd8b8f2848c0f8e62c14575ca89}{prm}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_aed2329014887793404d2d49b7e8c54ed}{mol}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a9abbee24076b6516dbf51f829b212898}{rigid}
+\begin{DoxyCompactList}\small\item\em Attempt to set some \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} options. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_aff7dd4c7e503ae1ad00317acdca1f7d4}{pbc}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_ada313a70357c2d3a1b240f6d6ef41a4d}{abskey}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a17a5941d3b43e4b8671c38fb2683c074}{Atom\-Mask}
+\begin{DoxyCompactList}\small\item\em If the coordinates do not come with \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} suffixes then throw an error. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a7cc6fc75f1b433c724d4be094109b2e6}{Atom\-Lists}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_abffae1bbf80b2ef21aedb60fe2be2bbe}{A}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_a28d1166b702fd00583368dd019bbf67a}{B}
+\item 
+\hyperlink{classforcebalance_1_1tinkerio_1_1TINKER_af0d4fd73fd056064753d80ad55e5be8d}{mdtraj}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_add3a4bf15527832034d88fb692a37115}{name}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_a29b97ebf8984e50fd19eb831715ab659}{verbose}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_a1fdd29fbd127cba331326a3557558e2a}{target}
+\begin{DoxyCompactList}\small\item\em Engines can get properties from the Target that creates them. \end{DoxyCompactList}\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_a82e9382a3316d3e26ef29efb58db4a00}{root}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_ad9c499329de6299f0b8acf898d71e7d5}{srcdir}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_a7bb2deae7ee926f0df7758a92b382515}{tempdir}
+\item 
+\hyperlink{classforcebalance_1_1engine_1_1Engine_aeb55142568e89f7a92d745e04ec3c964}{F\-F}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{verbose\-\_\-options}
+\item 
+\hyperlink{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{Print\-Option\-Dict}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Engine for carrying out general purpose \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} calculations. 
+
+
+
+Definition at line 304 of file tinkerio.\-py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_acf3c691c3b992262820a8e71cabefa32}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-init\-\_\-\-\_\-@{\-\_\-\-\_\-init\-\_\-\-\_\-}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{\-\_\-\-\_\-init\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-\_\-\-\_\-init\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{name = {\ttfamily \char`\"{}tinker\char`\"{}}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_acf3c691c3b992262820a8e71cabefa32}
+
+
+Definition at line 307 of file tinkerio.\-py.
+
+
+
+\subsubsection{Member Function Documentation}
+\hypertarget{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}}
+\index{\-\_\-\-\_\-setattr\-\_\-\-\_\-@{\-\_\-\-\_\-setattr\-\_\-\-\_\-}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{\-\_\-\-\_\-setattr\-\_\-\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-\_\-\-\_\-setattr\-\_\-\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{key, }
+\item[{}]{value}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a0c851d413c3b2f30561b72a46771bcff}
+
+
+Definition at line 28 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_addfa1257c7cb85c51c980474c7354cab}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!calltinker@{calltinker}}
+\index{calltinker@{calltinker}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{calltinker}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-calltinker (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{command, }
+\item[{}]{stdin = {\ttfamily None}, }
+\item[{}]{print\-\_\-to\-\_\-screen = {\ttfamily False}, }
+\item[{}]{print\-\_\-command = {\ttfamily False}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_addfa1257c7cb85c51c980474c7354cab}
+
+
+Call \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R}; prepend the tinkerpath to calling the \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} program. 
+
+
+
+Definition at line 351 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_addfa1257c7cb85c51c980474c7354cab_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_abd62dc7b18f9a1601b9bcb9b2738b616}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!energy@{energy}}
+\index{energy@{energy}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{energy}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-energy (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_abd62dc7b18f9a1601b9bcb9b2738b616}
+
+
+Computes the energy using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} over a trajectory. 
+
+
+
+Definition at line 654 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_abd62dc7b18f9a1601b9bcb9b2738b616_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a61a4a69208f080876818e02a422f2706}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!energy\-\_\-dipole@{energy\-\_\-dipole}}
+\index{energy\-\_\-dipole@{energy\-\_\-dipole}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{energy\-\_\-dipole}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-energy\-\_\-dipole (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a61a4a69208f080876818e02a422f2706}
+
+
+Computes the energy and dipole using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} over a trajectory. 
+
+
+
+Definition at line 679 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_a61a4a69208f080876818e02a422f2706_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a9da41177664b07fa14fa934224b325a7}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!energy\-\_\-force@{energy\-\_\-force}}
+\index{energy\-\_\-force@{energy\-\_\-force}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{energy\-\_\-force}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-energy\-\_\-force (
+\begin{DoxyParamCaption}
+\item[{}]{self}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a9da41177664b07fa14fa934224b325a7}
+
+
+Computes the energy and force using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} over a trajectory. 
+
+
+
+Definition at line 666 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_a9da41177664b07fa14fa934224b325a7_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a78f330c7a2cd41402fa742010073016f}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!energy\-\_\-force\-\_\-one@{energy\-\_\-force\-\_\-one}}
+\index{energy\-\_\-force\-\_\-one@{energy\-\_\-force\-\_\-one}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{energy\-\_\-force\-\_\-one}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-energy\-\_\-force\-\_\-one (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{shot}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a78f330c7a2cd41402fa742010073016f}
+
+
+Computes the energy and force using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} for one snapshot. 
+
+
+
+Definition at line 645 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_a78f330c7a2cd41402fa742010073016f_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a4c3ad9caa51f1c79e3cdf319b7be7162}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!energy\-\_\-rmsd@{energy\-\_\-rmsd}}
+\index{energy\-\_\-rmsd@{energy\-\_\-rmsd}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{energy\-\_\-rmsd}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-energy\-\_\-rmsd (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{shot = {\ttfamily 0}, }
+\item[{}]{optimize = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a4c3ad9caa51f1c79e3cdf319b7be7162}
+
+
+Calculate energy of the selected structure (optionally minimize and return the minimized energy and R\-M\-S\-D). 
+
+In kcal/mol. 
+
+Definition at line 791 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_a4c3ad9caa51f1c79e3cdf319b7be7162_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a26caae60b8feb93fbb810e0f51ea2238}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!evaluate\-\_\-@{evaluate\-\_\-}}
+\index{evaluate\-\_\-@{evaluate\-\_\-}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{evaluate\-\_\-}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-evaluate\-\_\- (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{xyzin, }
+\item[{}]{force = {\ttfamily False}, }
+\item[{}]{dipole = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a26caae60b8feb93fbb810e0f51ea2238}
+
+
+Utility function for computing energy, and (optionally) forces and dipoles using \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R}. 
+
+Inputs\-: xyzin\-: \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} .xyz file name. force\-: Switch for calculating the force. dipole\-: Switch for calculating the dipole.
+
+Outputs\-: Result\-: Dictionary containing energies, forces and/or dipoles. 
+
+Definition at line 596 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_a26caae60b8feb93fbb810e0f51ea2238_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_ae1e2192c6626b66dbc32e0e836e161b5}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!interaction\-\_\-energy@{interaction\-\_\-energy}}
+\index{interaction\-\_\-energy@{interaction\-\_\-energy}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{interaction\-\_\-energy}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-interaction\-\_\-energy (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{fraga, }
+\item[{}]{fragb}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_ae1e2192c6626b66dbc32e0e836e161b5}
+
+
+Calculate the interaction energy for two fragments. 
+
+
+
+Definition at line 829 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a6c31a390a4df2ab9f7d4c4e72432274f}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!molecular\-\_\-dynamics@{molecular\-\_\-dynamics}}
+\index{molecular\-\_\-dynamics@{molecular\-\_\-dynamics}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{molecular\-\_\-dynamics}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-molecular\-\_\-dynamics (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{nsteps, }
+\item[{}]{timestep, }
+\item[{}]{temperature = {\ttfamily None}, }
+\item[{}]{pressure = {\ttfamily None}, }
+\item[{}]{nequil = {\ttfamily 0}, }
+\item[{}]{nsave = {\ttfamily 1000}, }
+\item[{}]{minimize = {\ttfamily True}, }
+\item[{}]{anisotropic = {\ttfamily False}, }
+\item[{}]{threads = {\ttfamily 1}, }
+\item[{}]{verbose = {\ttfamily False}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a6c31a390a4df2ab9f7d4c4e72432274f}
+
+
+Method for running a molecular dynamics simulation. 
+
+Required arguments\-: nsteps = (int) Number of total time steps timestep = (float) Time step in F\-E\-M\-T\-O\-S\-E\-C\-O\-N\-D\-S temperature = (float) Temperature control (Kelvin) pressure = (float) Pressure control (atmospheres) nequil = (int) Number of additional time steps at the beginning for equilibration nsave = (int) Step interval for saving and printing data minimize = (bool) Perform an energy minimization prior to dynamics threads = (int) Specify how many Open\-M\-P threads to use
+
+Returns simulation data\-: Rhos = (array) Density in kilogram m$^\wedge$-\/3 Potentials = (array) Potential energies Kinetics = (array) Kinetic energies Volumes = (array) Box volumes Dips = (3x\-N array) Dipole moments E\-Comps = (dict) Energy components 
+
+Definition at line 860 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_a6c31a390a4df2ab9f7d4c4e72432274f_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_ae45c6b635bb487f63dcef3fee375ae74}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!multipole\-\_\-moments@{multipole\-\_\-moments}}
+\index{multipole\-\_\-moments@{multipole\-\_\-moments}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{multipole\-\_\-moments}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-multipole\-\_\-moments (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{shot = {\ttfamily 0}, }
+\item[{}]{optimize = {\ttfamily True}, }
+\item[{}]{polarizability = {\ttfamily False}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_ae45c6b635bb487f63dcef3fee375ae74}
+
+
+Return the multipole moments of the 1st snapshot in Debye and Buckingham units. 
+
+
+
+Definition at line 728 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_ae45c6b635bb487f63dcef3fee375ae74_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a2e5df995bf9fbc58354b117964860cab}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!normal\-\_\-modes@{normal\-\_\-modes}}
+\index{normal\-\_\-modes@{normal\-\_\-modes}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{normal\-\_\-modes}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-normal\-\_\-modes (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{shot = {\ttfamily 0}, }
+\item[{}]{optimize = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a2e5df995bf9fbc58354b117964860cab}
+
+
+Definition at line 690 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_a2e5df995bf9fbc58354b117964860cab_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a98b822222eafd8dd16f474e1fdebd2bf}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!optimize@{optimize}}
+\index{optimize@{optimize}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{optimize}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-optimize (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{shot = {\ttfamily 0}, }
+\item[{}]{method = {\ttfamily \char`\"{}newton\char`\"{}}, }
+\item[{}]{crit = {\ttfamily 1e-\/4}}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a98b822222eafd8dd16f474e1fdebd2bf}
+
+
+Optimize the geometry and align the optimized geometry to the starting geometry. 
+
+
+
+Definition at line 543 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_a98b822222eafd8dd16f474e1fdebd2bf_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!prepare@{prepare}}
+\index{prepare@{prepare}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{prepare}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-engine.\-Engine.\-prepare (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1engine_1_1Engine_a2eab57877002b41dc3742f0c67f2f24e}
+
+
+Definition at line 95 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_adf31eba4afc23ec8326fc8b6461f5692}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!prepare@{prepare}}
+\index{prepare@{prepare}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{prepare}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-prepare (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{pbc = {\ttfamily False}, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_adf31eba4afc23ec8326fc8b6461f5692}
+
+
+Called by {\bfseries init} ; prepare the temp directory and figure out the topology. 
+
+
+
+Definition at line 393 of file tinkerio.\-py.
+
+
+
+Here is the call graph for this function\-:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classforcebalance_1_1tinkerio_1_1TINKER_adf31eba4afc23ec8326fc8b6461f5692_cgraph}
+\end{center}
+\end{figure}
+
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_ac5490b42e2a13be406cd1701789b72b4}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!readsrc@{readsrc}}
+\index{readsrc@{readsrc}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{readsrc}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-readsrc (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_ac5490b42e2a13be406cd1701789b72b4}
+
+
+Called by {\bfseries init} ; read files from the source directory. 
+
+
+
+Definition at line 332 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!set\-\_\-option@{set\-\_\-option}}
+\index{set\-\_\-option@{set\-\_\-option}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{set\-\_\-option}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-Base\-Class.\-set\-\_\-option (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{in\-\_\-dict, }
+\item[{}]{src\-\_\-key, }
+\item[{}]{dest\-\_\-key = {\ttfamily None}, }
+\item[{}]{val = {\ttfamily None}, }
+\item[{}]{default = {\ttfamily None}, }
+\item[{}]{forceprint = {\ttfamily False}}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_a73e9a37a7632e79eb99f49bd15aced45}
+
+
+Definition at line 42 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a7b620772ae2ee1b71d91e45e19627d3d}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!setopts@{setopts}}
+\index{setopts@{setopts}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{setopts}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-setopts (
+\begin{DoxyParamCaption}
+\item[{}]{self, }
+\item[{}]{kwargs}
+\end{DoxyParamCaption}
+)}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a7b620772ae2ee1b71d91e45e19627d3d}
+
+
+Called by {\bfseries init} ; Set T\-I\-N\-K\-E\-R-\/specific options. 
+
+
+
+Definition at line 315 of file tinkerio.\-py.
+
+
+
+\subsubsection{Member Data Documentation}
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_abffae1bbf80b2ef21aedb60fe2be2bbe}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!A@{A}}
+\index{A@{A}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{A}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-A}}\label{classforcebalance_1_1tinkerio_1_1TINKER_abffae1bbf80b2ef21aedb60fe2be2bbe}
+
+
+Definition at line 832 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_ada313a70357c2d3a1b240f6d6ef41a4d}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!abskey@{abskey}}
+\index{abskey@{abskey}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{abskey}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-abskey}}\label{classforcebalance_1_1tinkerio_1_1TINKER_ada313a70357c2d3a1b240f6d6ef41a4d}
+
+
+Definition at line 481 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a7cc6fc75f1b433c724d4be094109b2e6}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!Atom\-Lists@{Atom\-Lists}}
+\index{Atom\-Lists@{Atom\-Lists}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Atom\-Lists}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-Atom\-Lists}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a7cc6fc75f1b433c724d4be094109b2e6}
+
+
+Definition at line 494 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a17a5941d3b43e4b8671c38fb2683c074}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!Atom\-Mask@{Atom\-Mask}}
+\index{Atom\-Mask@{Atom\-Mask}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Atom\-Mask}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-Atom\-Mask}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a17a5941d3b43e4b8671c38fb2683c074}
+
+
+If the coordinates do not come with \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} suffixes then throw an error. 
+
+Call analyze to read information needed to build the atom lists. Parse the output of analyze. 
+
+Definition at line 493 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a28d1166b702fd00583368dd019bbf67a}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!B@{B}}
+\index{B@{B}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{B}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-B}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a28d1166b702fd00583368dd019bbf67a}
+
+
+Definition at line 833 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_aeb55142568e89f7a92d745e04ec3c964}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!F\-F@{F\-F}}
+\index{F\-F@{F\-F}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{F\-F}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-engine.\-Engine.\-F\-F\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1engine_1_1Engine_aeb55142568e89f7a92d745e04ec3c964}
+
+
+Definition at line 65 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_aaf8b049b7a15899cd4c644d936e90976}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!key@{key}}
+\index{key@{key}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{key}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-key}}\label{classforcebalance_1_1tinkerio_1_1TINKER_aaf8b049b7a15899cd4c644d936e90976}
+
+
+Definition at line 335 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_af0d4fd73fd056064753d80ad55e5be8d}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!mdtraj@{mdtraj}}
+\index{mdtraj@{mdtraj}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{mdtraj}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-mdtraj}}\label{classforcebalance_1_1tinkerio_1_1TINKER_af0d4fd73fd056064753d80ad55e5be8d}
+
+
+Definition at line 929 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_aed2329014887793404d2d49b7e8c54ed}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!mol@{mol}}
+\index{mol@{mol}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{mol}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-mol}}\label{classforcebalance_1_1tinkerio_1_1TINKER_aed2329014887793404d2d49b7e8c54ed}
+
+
+Definition at line 338 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_add3a4bf15527832034d88fb692a37115}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!name@{name}}
+\index{name@{name}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{name}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-engine.\-Engine.\-name\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1engine_1_1Engine_add3a4bf15527832034d88fb692a37115}
+
+
+Definition at line 48 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_aff7dd4c7e503ae1ad00317acdca1f7d4}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!pbc@{pbc}}
+\index{pbc@{pbc}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{pbc}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-pbc}}\label{classforcebalance_1_1tinkerio_1_1TINKER_aff7dd4c7e503ae1ad00317acdca1f7d4}
+
+
+Definition at line 458 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!Print\-Option\-Dict@{Print\-Option\-Dict}}
+\index{Print\-Option\-Dict@{Print\-Option\-Dict}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{Print\-Option\-Dict}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-Print\-Option\-Dict\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afc6659278497d7245bc492ecf405ccae}
+
+
+Definition at line 44 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_ad0d8dfd8b8f2848c0f8e62c14575ca89}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!prm@{prm}}
+\index{prm@{prm}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{prm}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-prm}}\label{classforcebalance_1_1tinkerio_1_1TINKER_ad0d8dfd8b8f2848c0f8e62c14575ca89}
+
+
+Definition at line 336 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_a9abbee24076b6516dbf51f829b212898}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!rigid@{rigid}}
+\index{rigid@{rigid}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{rigid}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-rigid}}\label{classforcebalance_1_1tinkerio_1_1TINKER_a9abbee24076b6516dbf51f829b212898}
+
+
+Attempt to set some \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} options. 
+
+
+
+Definition at line 399 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a82e9382a3316d3e26ef29efb58db4a00}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!root@{root}}
+\index{root@{root}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{root}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-engine.\-Engine.\-root\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1engine_1_1Engine_a82e9382a3316d3e26ef29efb58db4a00}
+
+
+Definition at line 56 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_ad9c499329de6299f0b8acf898d71e7d5}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!srcdir@{srcdir}}
+\index{srcdir@{srcdir}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{srcdir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-engine.\-Engine.\-srcdir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1engine_1_1Engine_ad9c499329de6299f0b8acf898d71e7d5}
+
+
+Definition at line 57 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a1fdd29fbd127cba331326a3557558e2a}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!target@{target}}
+\index{target@{target}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{target}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-engine.\-Engine.\-target\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1engine_1_1Engine_a1fdd29fbd127cba331326a3557558e2a}
+
+
+Engines can get properties from the Target that creates them. 
+
+
+
+Definition at line 55 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a7bb2deae7ee926f0df7758a92b382515}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!tempdir@{tempdir}}
+\index{tempdir@{tempdir}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{tempdir}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-engine.\-Engine.\-tempdir\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1engine_1_1Engine_a7bb2deae7ee926f0df7758a92b382515}
+
+
+Definition at line 58 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_afff41f58d443d1a202227c75aaaf5ec4}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!tinkerpath@{tinkerpath}}
+\index{tinkerpath@{tinkerpath}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{tinkerpath}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-tinkerpath}}\label{classforcebalance_1_1tinkerio_1_1TINKER_afff41f58d443d1a202227c75aaaf5ec4}
+
+
+The directory containing \hyperlink{classforcebalance_1_1tinkerio_1_1TINKER}{T\-I\-N\-K\-E\-R} executables (e.\-g. 
+
+dynamic) 
+
+Definition at line 320 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_ab9a4b2893724d9298a858477d31e46a5}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!valkwd@{valkwd}}
+\index{valkwd@{valkwd}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{valkwd}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-valkwd}}\label{classforcebalance_1_1tinkerio_1_1TINKER_ab9a4b2893724d9298a858477d31e46a5}
+
+
+Keyword args that aren't in this list are filtered out. 
+
+
+
+Definition at line 309 of file tinkerio.\-py.
+
+\hypertarget{classforcebalance_1_1engine_1_1Engine_a29b97ebf8984e50fd19eb831715ab659}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!verbose@{verbose}}
+\index{verbose@{verbose}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{verbose}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-engine.\-Engine.\-verbose\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1engine_1_1Engine_a29b97ebf8984e50fd19eb831715ab659}
+
+
+Definition at line 50 of file engine.\-py.
+
+\hypertarget{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!verbose\-\_\-options@{verbose\-\_\-options}}
+\index{verbose\-\_\-options@{verbose\-\_\-options}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{verbose\-\_\-options}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-Base\-Class.\-verbose\-\_\-options\hspace{0.3cm}{\ttfamily [inherited]}}}\label{classforcebalance_1_1BaseClass_afd68efa29ccd2f320f4cf82198214aac}
+
+
+Definition at line 40 of file \-\_\-\-\_\-init\-\_\-\-\_\-.\-py.
+
+\hypertarget{classforcebalance_1_1tinkerio_1_1TINKER_accc63c58abe79aea21fb74b1b6f99214}{\index{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}!warn\-\_\-vn@{warn\-\_\-vn}}
+\index{warn\-\_\-vn@{warn\-\_\-vn}!forcebalance::tinkerio::TINKER@{forcebalance\-::tinkerio\-::\-T\-I\-N\-K\-E\-R}}
+\paragraph[{warn\-\_\-vn}]{\setlength{\rightskip}{0pt plus 5cm}forcebalance.\-tinkerio.\-T\-I\-N\-K\-E\-R.\-warn\-\_\-vn}}\label{classforcebalance_1_1tinkerio_1_1TINKER_accc63c58abe79aea21fb74b1b6f99214}
+
+
+Definition at line 310 of file tinkerio.\-py.
+
+
+
+The documentation for this class was generated from the following file\-:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{tinkerio_8py}{tinkerio.\-py}\end{DoxyCompactItemize}

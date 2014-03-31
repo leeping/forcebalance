@@ -1,0 +1,114 @@
+\hypertarget{namespaceforcebalance_1_1abinitio}{\subsection{forcebalance.\-abinitio Namespace Reference}
+\label{namespaceforcebalance_1_1abinitio}\index{forcebalance.\-abinitio@{forcebalance.\-abinitio}}
+}
+
+
+Ab-\/initio fitting module (energies, forces, resp).  
+
+
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classforcebalance_1_1abinitio_1_1AbInitio}{Ab\-Initio}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for fitting force fields to ab initio data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespaceforcebalance_1_1abinitio_aba970cb59bab95eec79027ea05655110}{weighted\-\_\-variance}
+\begin{DoxyCompactList}\small\item\em A more generalized version of build\-\_\-objective which is callable for derivatives, but the covariance is not there anymore. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1abinitio_ab9554761125a4ec7c3c13d6ae4ea537d}{weighted\-\_\-variance2}
+\begin{DoxyCompactList}\small\item\em A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1abinitio_aadd1d6c5a34c82d495d6be7380b73601}{build\-\_\-objective}
+\begin{DoxyCompactList}\small\item\em This function builds an objective function (number) from the complicated polytensor and covariance matrices. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1abinitio_a338e08128cae5bd4135a9ffb19f78f14}{logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Ab-\/initio fitting module (energies, forces, resp). \begin{DoxyAuthor}{Author}
+Lee-\/\-Ping Wang 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+05/2012 
+\end{DoxyDate}
+
+
+\subsubsection{Function Documentation}
+\hypertarget{namespaceforcebalance_1_1abinitio_aadd1d6c5a34c82d495d6be7380b73601}{\index{forcebalance\-::abinitio@{forcebalance\-::abinitio}!build\-\_\-objective@{build\-\_\-objective}}
+\index{build\-\_\-objective@{build\-\_\-objective}!forcebalance::abinitio@{forcebalance\-::abinitio}}
+\paragraph[{build\-\_\-objective}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-abinitio.\-build\-\_\-objective (
+\begin{DoxyParamCaption}
+\item[{}]{S\-Pi\-Xi, }
+\item[{}]{W\-Ci\-W, }
+\item[{}]{Z, }
+\item[{}]{Q0, }
+\item[{}]{M0, }
+\item[{}]{N\-C\-P1, }
+\item[{}]{subtract\-\_\-mean = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1abinitio_aadd1d6c5a34c82d495d6be7380b73601}
+
+
+This function builds an objective function (number) from the complicated polytensor and covariance matrices. 
+
+
+
+Definition at line 1208 of file abinitio.\-py.
+
+\hypertarget{namespaceforcebalance_1_1abinitio_aba970cb59bab95eec79027ea05655110}{\index{forcebalance\-::abinitio@{forcebalance\-::abinitio}!weighted\-\_\-variance@{weighted\-\_\-variance}}
+\index{weighted\-\_\-variance@{weighted\-\_\-variance}!forcebalance::abinitio@{forcebalance\-::abinitio}}
+\paragraph[{weighted\-\_\-variance}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-abinitio.\-weighted\-\_\-variance (
+\begin{DoxyParamCaption}
+\item[{}]{S\-Pi\-Xi, }
+\item[{}]{W\-Ci\-W, }
+\item[{}]{Z, }
+\item[{}]{L, }
+\item[{}]{R, }
+\item[{}]{N\-C\-P1, }
+\item[{}]{subtract\-\_\-mean = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1abinitio_aba970cb59bab95eec79027ea05655110}
+
+
+A more generalized version of build\-\_\-objective which is callable for derivatives, but the covariance is not there anymore. 
+
+
+
+Definition at line 1178 of file abinitio.\-py.
+
+\hypertarget{namespaceforcebalance_1_1abinitio_ab9554761125a4ec7c3c13d6ae4ea537d}{\index{forcebalance\-::abinitio@{forcebalance\-::abinitio}!weighted\-\_\-variance2@{weighted\-\_\-variance2}}
+\index{weighted\-\_\-variance2@{weighted\-\_\-variance2}!forcebalance::abinitio@{forcebalance\-::abinitio}}
+\paragraph[{weighted\-\_\-variance2}]{\setlength{\rightskip}{0pt plus 5cm}def forcebalance.\-abinitio.\-weighted\-\_\-variance2 (
+\begin{DoxyParamCaption}
+\item[{}]{S\-Pi\-Xi, }
+\item[{}]{W\-Ci\-W, }
+\item[{}]{Z, }
+\item[{}]{L, }
+\item[{}]{R, }
+\item[{}]{L2, }
+\item[{}]{R2, }
+\item[{}]{N\-C\-P1, }
+\item[{}]{subtract\-\_\-mean = {\ttfamily True}}
+\end{DoxyParamCaption}
+)}}\label{namespaceforcebalance_1_1abinitio_ab9554761125a4ec7c3c13d6ae4ea537d}
+
+
+A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements. 
+
+
+
+Definition at line 1192 of file abinitio.\-py.
+
+
+
+\subsubsection{Variable Documentation}
+\hypertarget{namespaceforcebalance_1_1abinitio_a338e08128cae5bd4135a9ffb19f78f14}{\index{forcebalance\-::abinitio@{forcebalance\-::abinitio}!logger@{logger}}
+\index{logger@{logger}!forcebalance::abinitio@{forcebalance\-::abinitio}}
+\paragraph[{logger}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-abinitio.\-logger = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)}}\label{namespaceforcebalance_1_1abinitio_a338e08128cae5bd4135a9ffb19f78f14}
+
+
+Definition at line 24 of file abinitio.\-py.
+

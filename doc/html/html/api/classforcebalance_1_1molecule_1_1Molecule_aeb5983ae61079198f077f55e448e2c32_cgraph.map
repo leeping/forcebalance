@@ -1,0 +1,6 @@
+<map id="forcebalance.molecule.Molecule.read_arc" name="forcebalance.molecule.Molecule.read_arc">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="341,5,549,35"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="345,58,545,105"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="348,128,543,157"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#a7429f0c377d6396711c128f6590ef810" title="Given an atom name, attempt to get the element in most cases. " alt="" coords="344,181,547,227"/>
+</map>

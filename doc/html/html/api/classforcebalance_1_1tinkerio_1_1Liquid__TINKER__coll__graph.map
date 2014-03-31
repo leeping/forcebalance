@@ -1,0 +1,5 @@
+<map id="forcebalance.tinkerio.Liquid_TINKER" name="forcebalance.tinkerio.Liquid_TINKER">
+<area shape="rect" id="node2" href="$classforcebalance_1_1liquid_1_1Liquid.html" title="Subclass of Target for liquid property matching. " alt="" coords="12,237,193,267"/>
+<area shape="rect" id="node4" href="$classforcebalance_1_1target_1_1Target.html" title="Base class for all fitting targets. " alt="" coords="8,160,197,189"/>
+<area shape="rect" id="node6" href="$classforcebalance_1_1BaseClass.html" title="Provides some nifty functions that are common to all ForceBalance classes. " alt="" coords="16,83,189,112"/>
+</map>

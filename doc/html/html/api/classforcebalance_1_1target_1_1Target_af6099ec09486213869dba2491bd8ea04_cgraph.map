@@ -1,0 +1,5 @@
+<map id="forcebalance.target.Target.wq_complete" name="forcebalance.target.Target.wq_complete">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="269,5,456,51"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#abe1e72c32252d62a6551b47290c7584f" title="forcebalance.nifty.getWQIds" alt="" coords="264,75,461,104"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished. " alt="" coords="285,127,440,174"/>
+</map>
