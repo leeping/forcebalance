@@ -3,6 +3,35 @@ is used to do the actual generation, so these functions act primarily to
 streamline the process and provide some customizations to the automatically
 generated documents.
 
+The motivation is:
+- Want to have automatic online docs
+- Want to version-control PDF manuals 
+- Don't want to version-control HTML / latex files (it generates too many changes)
+
+The solution is:
+- Have a separate gh-pages branch that only keeps track of latex and html folders, and PDF files
+- Pushing to gh-pages branch will update documentation on
+  http://leeping.github.io/forcebalance/doc/html/index.html and
+  http://leeping.github.io/forcebalance/doc/ForceBalance-Manual.pdf
+
+The workflow for generating documentation:
+- Generate doxygen config files from source controlled templates
+- Generate option index using make-option-index.py
+- Generate doxygen source files from source controlled text files
+- Delete existing HTML and latex files
+- Run doxygen to generate HTML files and latex files
+- Hack the HTML files to add extra tabs
+- Run latex to generate PDF documents
+
+If upstream update is requested:
+- Commit master branch (because manual is part of master branch)
+- Move html and latex folders out of the way, check out gh-pages branch, update html and latex folders
+  This is because html and latex folders are not tracked by the master branch,
+  and if we check out the gh-pages branch we will get an error.
+- Check out updated manuals from master branch
+- Commit gh-pages branch and push upstream
+- Check out master branch and restore folder locations
+
 How to do this effectively:
 
 - Make sure doxypy executable is in the PATH
