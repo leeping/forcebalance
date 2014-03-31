@@ -5,4 +5,7 @@
 /doc/*
 !/doc/latex
 !/doc/html
+!/doc/ForceBalance-API.pdf
+!/doc/ForceBalance-Manual.pdf
+
 
