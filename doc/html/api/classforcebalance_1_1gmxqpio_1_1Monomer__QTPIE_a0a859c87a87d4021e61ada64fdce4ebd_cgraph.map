@@ -1,7 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="559,5,798,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="587,56,770,83"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#ac227bf1f1ed6d579fea2eeda64c389cb" title="forcebalance.gmxqpio.Monomer_QTPIE.unpack_moments" alt="" coords="483,107,874,133"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="949,56,1193,83"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#a46144411b5166a1839bf954b584ca3a7" title="Every target must be able to return a contribution to the objective function &#45; however, this must be implemented in the specific subclass." alt="" coords="923,107,1219,133"/>
-</map>
