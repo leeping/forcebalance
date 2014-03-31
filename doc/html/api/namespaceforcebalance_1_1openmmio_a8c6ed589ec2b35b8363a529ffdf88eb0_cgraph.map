@@ -1,7 +1,5 @@
-<map id="forcebalance.openmmio.CopySystemParameters" name="forcebalance.openmmio.CopySystemParameters">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="298,5,465,46"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1openmmio.html#a9f9fc56475dbfcc94a40fef6a84ed25f" title="forcebalance.openmmio.Update\lSimulationParameters" alt="" coords="267,70,495,111"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map(). " alt="" coords="544,12,787,39"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1openmmio.html#a95d91538d72e354fc95433539c42450c" title="forcebalance.openmmio.Set\lAmoebaVirtualExclusions" alt="" coords="564,70,767,111"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator. " alt="" coords="835,77,1141,104"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="455,5,694,32"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1openmmio.html#a9f9fc56475dbfcc94a40fef6a84ed25f" title="forcebalance.openmmio.UpdateSimulationParameters" alt="" coords="389,56,760,83"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1openmmio.html#aa085594c11e9cd00ce71f5a8ead72b68" title="Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator." alt="" coords="808,56,1115,83"/>
 </map>

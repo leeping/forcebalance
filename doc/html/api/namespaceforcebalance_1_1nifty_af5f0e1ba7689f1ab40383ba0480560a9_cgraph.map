@@ -1,3 +1,6 @@
-<map id="forcebalance.nifty.CopyFile" name="forcebalance.nifty.CopyFile">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#aa1ff334c4b4e30e91978b91d9a9ec065" title="forcebalance.nifty.which" alt="" coords="243,5,415,32"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#aa1ff334c4b4e30e91978b91d9a9ec065" title="forcebalance.nifty.which" alt="" coords="243,31,415,57"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="465,5,703,32"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a26e563ec71ed229c30f3d61d3448c8f1" title="Prints a warning but will only do so once in a given run." alt="" coords="481,56,687,83"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map()." alt="" coords="752,56,995,83"/>
 </map>

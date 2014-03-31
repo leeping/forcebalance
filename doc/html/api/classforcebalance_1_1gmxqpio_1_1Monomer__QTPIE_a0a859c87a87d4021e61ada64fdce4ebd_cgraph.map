@@ -1,15 +1,7 @@
-<map id="forcebalance.gmxqpio.Monomer_QTPIE.prepare_temp_directory" name="forcebalance.gmxqpio.Monomer_QTPIE.prepare_temp_directory">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="314,5,481,46"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="306,71,489,97"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#ac227bf1f1ed6d579fea2eeda64c389cb" title="forcebalance.gmxqpio.Monomer\l_QTPIE.unpack_moments" alt="" coords="283,129,511,170"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map(). " alt="" coords="560,12,803,39"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error). " alt="" coords="588,63,775,105"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#a46144411b5166a1839bf954b584ca3a7" title="forcebalance.gmxqpio.Monomer\l_QTPIE.get" alt="" coords="567,129,795,170"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1gmxqpio.html#a499ed366638eae7be524b18760a986b8" title="forcebalance.gmxqpio.get\l_monomer_properties" alt="" coords="851,41,1039,82"/>
-<area shape="rect" id="node20" href="$namespaceforcebalance_1_1finite__difference.html#aa69a8819e4680091f400303c1d6ddeb7" title="A three&#45;point finite difference stencil. " alt="" coords="875,158,1015,199"/>
-<area shape="rect" id="node22" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="1123,113,1261,154"/>
-<area shape="rect" id="node24" href="$namespaceforcebalance_1_1finite__difference.html#ae484c591ae8c4e5bae73a0ef2660c339" title="A function wrapper for finite difference designed for differentiating &#39;get&#39;&#45;type functions. " alt="" coords="1123,203,1261,245"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="1088,48,1296,75"/>
-<area shape="rect" id="node26" href="$namespaceforcebalance_1_1finite__difference.html#a00322fb65860c390616f74d05037c797" title="A driver to fdwrap for gradients (see documentation for fdwrap) Inputs: tgt = The Target containing t..." alt="" coords="1344,203,1499,245"/>
-<area shape="rect" id="node29" href="$namespaceforcebalance_1_1finite__difference.html#a77a0bc1ae3cbbcc8d38a0ef9ca877d6d" title="A driver to fdwrap for Hessians (see documentation for fdwrap) Inputs: tgt = The Target containing th..." alt="" coords="1344,269,1499,310"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn_press_key" alt="" coords="559,5,798,32"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ab182a9da2a2f42cf45942fbee6acf9b1" title="forcebalance.nifty.LinkFile" alt="" coords="587,56,770,83"/>
+<area shape="rect" id="node9" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#ac227bf1f1ed6d579fea2eeda64c389cb" title="forcebalance.gmxqpio.Monomer_QTPIE.unpack_moments" alt="" coords="483,107,874,133"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="949,56,1193,83"/>
+<area shape="rect" id="node11" href="$classforcebalance_1_1gmxqpio_1_1Monomer__QTPIE.html#a46144411b5166a1839bf954b584ca3a7" title="Every target must be able to return a contribution to the objective function &#45; however, this must be implemented in the specific subclass." alt="" coords="923,107,1219,133"/>
 </map>

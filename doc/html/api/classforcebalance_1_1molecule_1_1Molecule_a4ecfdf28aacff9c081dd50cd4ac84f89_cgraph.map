@@ -1,8 +1,5 @@
-<map id="forcebalance.molecule.Molecule.write" name="forcebalance.molecule.Molecule.write">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a02ff6f6642ed47c3b1fa3bb00191c32a" title="forcebalance.molecule.Molecule.radius\l_of_gyration" alt="" coords="316,37,585,78"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center\l_of_mass" alt="" coords="315,102,586,143"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a33020ff5e5cec23a3d9d1fe7adfa8583" title="forcebalance.molecule.Molecule.add\l_quantum" alt="" coords="635,5,890,46"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1molecule_1_1Molecule.html#a13d86eb62139bdc2a835756cacb3be66" title="Add a virtual site to the system. " alt="" coords="635,70,890,111"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a432affdec68562b5b19fd249124480c3" title="Return a copy of the object with certain atoms selected. " alt="" coords="939,5,1203,46"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1molecule_1_1Molecule.html#a685c8092020a46cd7cf5b52ab45ca6e4" title="Align molecules using the &quot;moment of inertia.&quot; Note that we&#39;re following the MSMBuilder convention ..." alt="" coords="1251,5,1511,46"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center_of_mass" alt="" coords="315,5,647,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a441d8367806c9a802bd0693fea16c62a" title="forcebalance.molecule.Molecule.edit_qcrems" alt="" coords="696,5,1005,32"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#ad825186bec1659fdad2521a1b377323b" title="Replace all of the data for a certain attribute in the system from orig to want." alt="" coords="1053,5,1392,32"/>
 </map>

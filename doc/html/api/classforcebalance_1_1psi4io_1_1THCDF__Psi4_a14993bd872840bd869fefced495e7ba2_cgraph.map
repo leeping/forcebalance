@@ -1,7 +1,5 @@
-<map id="forcebalance.psi4io.THCDF_Psi4.driver" name="forcebalance.psi4io.THCDF_Psi4.driver">
-<area shape="rect" id="node3" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#ae4389941b46ce11689f45115fdb61b39" title="forcebalance.psi4io.THCDF\l_Psi4.write_nested_destroy" alt="" coords="245,63,440,105"/>
-<area shape="rect" id="node6" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="540,5,679,46"/>
-<area shape="rect" id="node10" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="259,129,426,170"/>
-<area shape="rect" id="node8" href="$namespaceforcebalance_1_1leastsq.html#a8e7ef329e27aff738bc91dd79bd2dd1c" title="forcebalance.leastsq.Check\lBasis" alt="" coords="511,70,708,111"/>
-<area shape="rect" id="node12" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map(). " alt="" coords="488,136,731,163"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1psi4io_1_1THCDF__Psi4.html#ae4389941b46ce11689f45115fdb61b39" title="forcebalance.psi4io.THCDF_Psi4.write_nested_destroy" alt="" coords="320,31,685,57"/>
+<area shape="rect" id="node6" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="733,5,976,32"/>
+<area shape="rect" id="node8" href="$namespaceforcebalance_1_1leastsq.html#a8e7ef329e27aff738bc91dd79bd2dd1c" title="forcebalance.leastsq.CheckBasis" alt="" coords="739,56,970,83"/>
 </map>

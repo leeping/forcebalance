@@ -1,4 +1,5 @@
-<map id="forcebalance.molecule.Molecule.write_dcd" name="forcebalance.molecule.Molecule.write_dcd">
-<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="344,12,619,39"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#a6aa22586a5590f63ea20e269e3f195a5" title="forcebalance.molecule.Molecule.center\l_of_mass" alt="" coords="667,5,938,46"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1molecule_1_1Molecule.html#a80851250d8e749bea882d5aa4bcfcdd1" title="forcebalance.molecule.Molecule.require" alt="" coords="376,5,651,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1molecule_1_1Molecule.html#ad47d05a3ea76e013a628bd7b25ae3050" title="forcebalance.molecule.Molecule.require_resname" alt="" coords="344,56,683,83"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1molecule_1_1Molecule.html#a90fe456919fda305703e36af389e60e1" title="forcebalance.molecule.Molecule.require_resid" alt="" coords="357,107,670,133"/>
 </map>

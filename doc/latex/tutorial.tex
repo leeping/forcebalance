@@ -9,11 +9,11 @@ If the installation was successful, you will get an output file similar to {\ttf
 
 Force\-Balance begins by reading the force field files from the {\ttfamily forcefield} directory. The parameters to be optimized are specified in the parameter file by adding a special comment inside the file. For example, in the {\ttfamily water.\-itp} file, we specify that the two van der Waals parameters on oxygen are to be optimized, using the following syntax\-:
 
-\begin{DoxyVerb}OW      8     15.99940     0.000       A    3.15365e-01  6.48520e-01 ; PRM 5 6
+\begin{DoxyVerb}OW      8     15.99940     0.000       A    3.15365e-01  6.48520e-01 ; PARM 5 6
 \end{DoxyVerb}
 
 
-The comment {\ttfamily P\-R\-M 5 6} signals that \char`\"{}the parameters in fields 5
+The comment {\ttfamily P\-A\-R\-M 5 6} signals that \char`\"{}the parameters in fields 5
 and 6 are to be optimized.\char`\"{} The force field parser stores the physical value of the parameter and gives the parameter a name. These are printed out in the output file\-:
 
 \begin{DoxyVerb}Reading force field from file: water.itp
@@ -177,7 +177,7 @@ Using the new parameter values, the values for each target have gone down -\/ th
 The last line reports\-:
 
 \begin{DoxyItemize}
-\item The step number ({\ttfamily Step}) \item The length of the parameter vector in the mathematical parameter space ({\ttfamily $\vert$k$\vert$}) \item The length of the most recent step ({\ttfamily $\vert$dk$\vert$}) \item The magnitude of the objective function gradient vector ({\ttfamily $\vert$grad$\vert$}) \item The objective function value ({\ttfamily -\/=X2=-\/}) \item The standard deviation of the objective function over a user-\/specified number of optimization steps \item The ratio of actual-\/to-\/predicted change in the objective function value. A {\ttfamily Step\-Qual} value of 1.\-0 signifies that the trust radius can be increased.\end{DoxyItemize}
+\item The step number ({\ttfamily Step}) \item The length of the parameter vector in the mathematical parameter space ({\ttfamily $|$k$|$}) \item The length of the most recent step ({\ttfamily $|$dk$|$}) \item The magnitude of the objective function gradient vector ({\ttfamily $|$grad$|$}) \item The objective function value ({\ttfamily -\/=X2=-\/}) \item The standard deviation of the objective function over a user-\/specified number of optimization steps \item The ratio of actual-\/to-\/predicted change in the objective function value. A {\ttfamily Step\-Qual} value of 1.\-0 signifies that the trust radius can be increased.\end{DoxyItemize}
 Eventually, the optimization will converge. For this job (and when this documentation was written) it took five steps\-:
 
 \begin{DoxyVerb}#=======================================================================#

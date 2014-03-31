@@ -1,8 +1,0 @@
-<map id="forcebalance.abinitio.AbInitio.get" name="forcebalance.abinitio.AbInitio.get">
-<area shape="rect" id="node3" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#a313c848f46579817803c8a3ff100974e" title="LPW 06&#45;30&#45;2013." alt="" coords="251,5,424,51"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1abinitio_1_1AbInitio.html#abfe50569805218075c5942fd3be8bbe7" title="Electrostatic potential fitting." alt="" coords="251,74,424,121"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="268,143,407,190"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1abinitio.html#aba970cb59bab95eec79027ea05655110" title="A more generalized version of build_objective which is callable for derivatives, but the covariance i..." alt="" coords="231,213,444,259"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1abinitio.html#ab9554761125a4ec7c3c13d6ae4ea537d" title="A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements..." alt="" coords="495,213,708,259"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1abinitio.html#aadd1d6c5a34c82d495d6be7380b73601" title="This function builds an objective function (number) from the complicated polytensor and covariance ma..." alt="" coords="759,213,945,259"/>
-</map>

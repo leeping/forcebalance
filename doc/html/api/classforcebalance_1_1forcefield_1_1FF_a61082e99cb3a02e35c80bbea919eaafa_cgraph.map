@@ -1,4 +1,4 @@
-<map id="forcebalance.forcefield.FF.print_map" name="forcebalance.forcefield.FF.print_map">
-<area shape="rect" id="node3" href="$classforcebalance_1_1forcefield_1_1FF.html#a2c9cda9adb5a6446fbccfa7b35f8dff5" title="Record the locations of a parameter in a txt file; [[file name, line number, field number..." alt="" coords="224,5,395,46"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1forcefield.html#ab1a855bace20dd5e45928467e2a133f1" title="This function takes in a dictionary (rsfactors) and a string (termtype). " alt="" coords="443,5,626,46"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1forcefield_1_1FF.html#a2c9cda9adb5a6446fbccfa7b35f8dff5" title="Record the locations of a parameter in a txt file; [[file name, line number, field number..." alt="" coords="305,5,565,32"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1forcefield.html#ab1a855bace20dd5e45928467e2a133f1" title="This function takes in a dictionary (rsfactors) and a string (termtype)." alt="" coords="614,5,855,32"/>
 </map>

@@ -1,13 +1,10 @@
-<map id="forcebalance.molecule.format_xyz_coord" name="forcebalance.molecule.format_xyz_coord">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a4948e4662b8d2c8d515427d1bbb3d01e" title="Print a line consisting of (element, p, q, r, s, t, ...) where (p, q, r) are arbitrary atom&#45;wise data..." alt="" coords="267,18,480,60"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a12b7bb398c2fa49a223f258ec7737483" title="Determines whether a line contains GROMACS data or not. " alt="" coords="529,77,709,118"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="758,26,954,52"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="1012,26,1220,52"/>
-<area shape="rect" id="node12" href="$namespaceforcebalance_1_1molecule.html#aafc8c924eed4480fed8ddc9c474d3bc1" title="Determines whether a line contains a GROMACS box vector or not. " alt="" coords="766,128,946,169"/>
-<area shape="rect" id="node14" href="$namespaceforcebalance_1_1molecule.html#a58c3f09152db4d1c6e1db9df29c60c43" title="forcebalance.molecule.pvec" alt="" coords="1016,135,1216,162"/>
-<area shape="rect" id="node16" href="$namespaceforcebalance_1_1molecule.html#a7fe52c2928c7b0329882541bef2e34cd" title="Groups a big long iterable into groups of ten or what have you. " alt="" coords="1006,186,1226,212"/>
-<area shape="rect" id="node20" href="$namespaceforcebalance_1_1molecule.html#a5f529179461765fadbd0a742cdc2c677" title="Creates a list of number sequences divided as evenly as possible. " alt="" coords="1003,84,1229,111"/>
-<area shape="rect" id="node18" href="$namespaceforcebalance_1_1molecule.html#a5b50df23cc4d0e617fdc56538f0bea63" title="forcebalance.molecule.both" alt="" coords="1282,186,1481,212"/>
-<area shape="rect" id="node22" href="$namespaceforcebalance_1_1molecule.html#a6f7c6217b1c64da309a8abd21dfdcf08" title="forcebalance.molecule.diff" alt="" coords="1287,110,1476,136"/>
-<area shape="rect" id="node24" href="$namespaceforcebalance_1_1molecule.html#a75775be6563ad7f10695a9a45ff49ba9" title="forcebalance.molecule.either" alt="" coords="1278,59,1485,86"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a4948e4662b8d2c8d515427d1bbb3d01e" title="Print a line consisting of (element, p, q, r, s, t, ...) where (p, q, r) are arbitrary atom&#45;wise data..." alt="" coords="339,56,647,83"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a12b7bb398c2fa49a223f258ec7737483" title="Determines whether a line contains GROMACS data or not." alt="" coords="696,56,947,83"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="1017,5,1213,32"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="1289,5,1497,32"/>
+<area shape="rect" id="node12" href="$namespaceforcebalance_1_1molecule.html#aafc8c924eed4480fed8ddc9c474d3bc1" title="Determines whether a line contains a GROMACS box vector or not." alt="" coords="995,107,1234,133"/>
+<area shape="rect" id="node14" href="$namespaceforcebalance_1_1molecule.html#a58c3f09152db4d1c6e1db9df29c60c43" title="forcebalance.molecule.pvec" alt="" coords="1293,81,1493,108"/>
+<area shape="rect" id="node16" href="$namespaceforcebalance_1_1molecule.html#a7fe52c2928c7b0329882541bef2e34cd" title="Groups a big long iterable into groups of ten or what have you." alt="" coords="1283,132,1503,159"/>
+<area shape="rect" id="node18" href="$namespaceforcebalance_1_1molecule.html#a5b50df23cc4d0e617fdc56538f0bea63" title="forcebalance.molecule.both" alt="" coords="1553,132,1751,159"/>
 </map>

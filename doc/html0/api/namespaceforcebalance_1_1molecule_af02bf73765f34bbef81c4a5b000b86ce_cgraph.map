@@ -1,6 +1,0 @@
-<map id="G" name="G">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a8fcbb4a2b3470a85d25699b6f28a54fc" title="Computes an &#39;overlap&#39; between two molecules based on some fictitious density." alt="" coords="297,5,575,32"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#a9a58eb1746e51420f50da3f3a6d51485" title="Computes a &quot;overlap density&quot; from two frames." alt="" coords="305,56,567,83"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#aa9ad9b92efa7bd3c1d589d62bbb8108e" title="Pre&#45;aligns molecules to &#39;moment of inertia&#39;." alt="" coords="637,5,912,32"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1molecule.html#a08840b73e95bf34bf9ca7ea36ad0492d" title="forcebalance.molecule.get_rotate_translate" alt="" coords="624,56,925,83"/>
-</map>

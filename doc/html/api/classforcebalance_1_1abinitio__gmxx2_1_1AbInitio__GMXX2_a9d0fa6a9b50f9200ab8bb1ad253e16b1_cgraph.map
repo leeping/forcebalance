@@ -1,7 +1,0 @@
-<map id="forcebalance.abinitio_gmxx2.AbInitio_GMXX2.get_energy_force_" name="forcebalance.abinitio_gmxx2.AbInitio_GMXX2.get_energy_force_">
-<area shape="rect" id="node2" href="$namespaceforcebalance_1_1nifty.html#a25efa4d501ad852a234721af18978f7e" title="Remove the file if it exists (doesn&#39;t return an error)." alt="" coords="273,5,434,49"/>
-<area shape="rect" id="node3" href="$classforcebalance_1_1abinitio__gmxx2_1_1AbInitio__GMXX2.html#ad3524d1acf965453947b0dc36131deab" title="Call the modified GROMACS!" alt="" coords="240,73,467,117"/>
-<area shape="rect" id="node4" href="$namespaceforcebalance_1_1nifty.html#a8d63c8ae9a67c66673a6cf81357f827d" title="Returns a big number if we encounter NaN." alt="" coords="265,141,441,169"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a6c9727360cdff8f3011a12cc54d0e86e" title="Given any list, array, or matrix, return a 1&#45;row matrix." alt="" coords="516,141,658,169"/>
-<area shape="rect" id="node6" href="$namespaceforcebalance_1_1nifty.html#a7676236002c6a65ea7d2e69a09923889" title="Given two vectors vec1 and vec2, project out the component of vec1 that is along the vec2&#45;direction..." alt="" coords="707,141,901,169"/>
-</map>

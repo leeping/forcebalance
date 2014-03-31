@@ -1,4 +1,5 @@
-<map id="forcebalance.gmxio.AbInitio_GMX.generate_vsite_positions" name="forcebalance.gmxio.AbInitio_GMX.generate_vsite_positions">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#abb8f59044961a12588e0653c2baa8b01" title="forcebalance.nifty.warn\l_press_key" alt="" coords="275,5,442,46"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a2fc81730e7efa7d138dd86f733507bfc" title="Similar to the bultin function map(). " alt="" coords="491,12,733,39"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#a1d03ae8104bcecacf96884058f2698af" title="Initialization; define a few core concepts." alt="" coords="508,5,793,32"/>
+<area shape="rect" id="node7" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" title="forcebalance.baseclass.ForceBalanceBaseClass.set_option" alt="" coords="451,56,850,83"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1gmxio_1_1AbInitio__GMX.html#aba138ca4195a1737f2f00bd8c5f3ca07" title="This function parses the GROMACS topology file (.top) which contains a listing of the molecules in th..." alt="" coords="899,5,1229,32"/>
 </map>

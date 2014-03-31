@@ -1,5 +1,5 @@
-<map id="forcebalance.psi4io.GBS_Reader.feed" name="forcebalance.psi4io.GBS_Reader.feed">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="233,5,429,32"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="477,31,685,57"/>
-<area shape="rect" id="node8" href="$classforcebalance_1_1psi4io_1_1GBS__Reader.html#a9cc5f721f9933963c2074031e3847a6e" title="forcebalance.psi4io.GBS\l_Reader.__init__" alt="" coords="242,107,419,149"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0dd31eff88d2bed0884ab21a13261d42" title="ONLY matches integers! If you have a decimal point? None shall pass!" alt="" coords="354,5,550,32"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#afe989ffd119568047fc8265b1d329a70" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="640,31,848,57"/>
+<area shape="rect" id="node8" href="$classforcebalance_1_1psi4io_1_1GBS__Reader.html#a9cc5f721f9933963c2074031e3847a6e" title="forcebalance.psi4io.GBS_Reader.__init__" alt="" coords="313,107,591,133"/>
 </map>

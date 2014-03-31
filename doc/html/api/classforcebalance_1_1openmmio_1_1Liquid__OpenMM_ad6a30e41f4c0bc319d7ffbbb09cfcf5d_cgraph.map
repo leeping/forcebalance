@@ -1,13 +1,12 @@
-<map id="forcebalance.openmmio.Liquid_OpenMM.npt_simulation" name="forcebalance.openmmio.Liquid_OpenMM.npt_simulation">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue." alt="" coords="281,84,481,113"/>
-<area shape="rect" id="node22" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#a92379bd73128234b309fae789946035d" title="forcebalance.openmmio.Liquid\l_OpenMM.__init__" alt="" coords="273,141,489,187"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue." alt="" coords="556,6,732,53"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished." alt="" coords="568,75,720,122"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="799,5,983,35"/>
-<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="1032,32,1208,61"/>
-<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="801,109,980,139"/>
-<area shape="rect" id="node20" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="804,163,977,192"/>
-<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.Missing\lFileInspection" alt="" coords="1256,23,1440,70"/>
-<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link\l_dir_contents" alt="" coords="1488,23,1645,70"/>
-<area shape="rect" id="node24" href="$classforcebalance_1_1baseclass_1_1ForceBalanceBaseClass.html#abaaf4d99b043d41f02fabc41db59252b" title="forcebalance.baseclass.Force\lBalanceBaseClass.set_option" alt="" coords="539,145,749,191"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$namespaceforcebalance_1_1nifty.html#a673f4a044169f5d8d822823989a836a7" title="Submit a job to the Work Queue." alt="" coords="499,56,699,83"/>
+<area shape="rect" id="node22" href="$classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html#a92379bd73128234b309fae789946035d" title="Instantiation of the subclass." alt="" coords="433,107,765,133"/>
+<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#a5d5abeb4a185fde64721d044831e18ee" title="Submit a job to the Work Queue." alt="" coords="813,31,1075,57"/>
+<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished." alt="" coords="847,81,1041,108"/>
+<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty." alt="" coords="1123,5,1309,32"/>
+<area shape="rect" id="node11" href="$namespaceforcebalance_1_1nifty.html#ac9ab6c5543a2e3080061e0024850edf3" title="forcebalance.nifty.allsplit" alt="" coords="1358,31,1535,57"/>
+<area shape="rect" id="node17" href="$namespaceforcebalance_1_1nifty.html#ad432b88307e1178b0690c0d350b1af36" title="forcebalance.nifty.GoInto" alt="" coords="1127,107,1305,133"/>
+<area shape="rect" id="node20" href="$namespaceforcebalance_1_1nifty.html#ab04e8690d099db2379dc860e0d040120" title="forcebalance.nifty.Leave" alt="" coords="1129,157,1303,184"/>
+<area shape="rect" id="node13" href="$namespaceforcebalance_1_1nifty.html#ae87c7def5f8edf2ec30737bdb1d2636f" title="forcebalance.nifty.MissingFileInspection" alt="" coords="1584,31,1853,57"/>
+<area shape="rect" id="node15" href="$namespaceforcebalance_1_1nifty.html#a0cf4e58f90acf20e3d6224be2354082c" title="forcebalance.nifty.link_dir_contents" alt="" coords="1902,31,2146,57"/>
 </map>

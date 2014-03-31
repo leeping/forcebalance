@@ -1,3 +1,41 @@
 \hypertarget{namespaceforcebalance_1_1counterpoise}{\subsection{forcebalance.\-counterpoise Namespace Reference}
 \label{namespaceforcebalance_1_1counterpoise}\index{forcebalance.\-counterpoise@{forcebalance.\-counterpoise}}
 }
+
+
+Match an empirical potential to the counterpoise correction for basis set superposition error (B\-S\-S\-E).  
+
+
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classforcebalance_1_1counterpoise_1_1Counterpoise}{Counterpoise}
+\begin{DoxyCompactList}\small\item\em Target subclass for matching the counterpoise correction. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1counterpoise_a9a7008a650c37185e7e43c9b1c943bd6}{logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Match an empirical potential to the counterpoise correction for basis set superposition error (B\-S\-S\-E). Here we test two different functional forms\-: a three-\/parameter Gaussian repulsive potential and a four-\/parameter Gaussian which goes smoothly to an exponential. The latter can be written in two different ways -\/ one which gives us control over the exponential, the switching distance and the Gaussian decay constant, and another which gives us control over the Gaussian and the switching distance. They are called 'C\-P\-G\-A\-U\-S\-S', 'C\-P\-E\-X\-P\-G', and 'C\-P\-G\-E\-X\-P'. I think the third option is the best although our early tests have indicated that none of the force fields perform particularly well for the water dimer.
+
+This subclass of Target implements the 'get' method.
+
+\begin{DoxyAuthor}{Author}
+Lee-\/\-Ping Wang 
+\end{DoxyAuthor}
+\begin{DoxyDate}{Date}
+12/2011 
+\end{DoxyDate}
+
+
+\subsubsection{Variable Documentation}
+\hypertarget{namespaceforcebalance_1_1counterpoise_a9a7008a650c37185e7e43c9b1c943bd6}{\index{forcebalance\-::counterpoise@{forcebalance\-::counterpoise}!logger@{logger}}
+\index{logger@{logger}!forcebalance::counterpoise@{forcebalance\-::counterpoise}}
+\paragraph[{logger}]{\setlength{\rightskip}{0pt plus 5cm}tuple forcebalance.\-counterpoise.\-logger = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)}}\label{namespaceforcebalance_1_1counterpoise_a9a7008a650c37185e7e43c9b1c943bd6}
+
+
+Definition at line 29 of file counterpoise.\-py.
+

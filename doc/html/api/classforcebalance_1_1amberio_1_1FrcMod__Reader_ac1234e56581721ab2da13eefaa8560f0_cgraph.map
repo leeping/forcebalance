@@ -1,8 +1,4 @@
-<map id="forcebalance.amberio.FrcMod_Reader.Split" name="forcebalance.amberio.FrcMod_Reader.Split">
-<area shape="rect" id="node3" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html#a684b946f7faca6589c8ed49e77e31f73" title="forcebalance.amberio.Frc\lMod_Reader.Whites" alt="" coords="238,38,421,79"/>
-<area shape="rect" id="node5" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html#a689bb40a107f763472b15175be6f0f12" title="forcebalance.amberio.Frc\lMod_Reader.feed" alt="" coords="471,5,654,46"/>
-<area shape="rect" id="node7" href="$classforcebalance_1_1BaseReader.html#acded199bbc003eb93d071a972ef38901" title="forcebalance.BaseReader.\lSplit" alt="" coords="469,70,656,111"/>
-<area shape="rect" id="node9" href="$classforcebalance_1_1BaseReader.html#af2af8a559625614474a1c6fe245b5e13" title="forcebalance.BaseReader.\lWhites" alt="" coords="704,70,891,111"/>
-<area shape="rect" id="node11" href="$classforcebalance_1_1BaseReader.html#a3c46942ef8cc25ece21d52be5b7ba05f" title="forcebalance.BaseReader.feed" alt="" coords="939,77,1154,104"/>
-<area shape="rect" id="node13" href="$classforcebalance_1_1BaseReader.html#aab2c64ccf0f803d4eff3bbf40a6cb0b7" title="Returns the parameter type (e.g. " alt="" coords="1203,77,1445,104"/>
+<map id="G" name="G">
+<area shape="rect" id="node3" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html#a684b946f7faca6589c8ed49e77e31f73" title="forcebalance.amberio.FrcMod_Reader.Whites" alt="" coords="347,5,653,32"/>
+<area shape="rect" id="node5" href="$classforcebalance_1_1amberio_1_1FrcMod__Reader.html#a689bb40a107f763472b15175be6f0f12" title="forcebalance.amberio.FrcMod_Reader.feed" alt="" coords="702,5,994,32"/>
 </map>

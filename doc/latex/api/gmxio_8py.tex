@@ -1,8 +1,51 @@
 \hypertarget{gmxio_8py}{\subsection{gmxio.\-py File Reference}
 \label{gmxio_8py}\index{gmxio.\-py@{gmxio.\-py}}
 }
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1ITP__Reader}{forcebalance.\-gmxio.\-I\-T\-P\-\_\-\-Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing G\-R\-O\-M\-A\-C\-S force field files. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1GMX}{forcebalance.\-gmxio.\-G\-M\-X}
+\begin{DoxyCompactList}\small\item\em Derived from Engine object for carrying out general purpose G\-R\-O\-M\-A\-C\-S calculations. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1AbInitio__GMX}{forcebalance.\-gmxio.\-Ab\-Initio\-\_\-\-G\-M\-X}
+\begin{DoxyCompactList}\small\item\em Subclass of Ab\-Initio for force and energy matching using normal G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1Liquid__GMX}{forcebalance.\-gmxio.\-Liquid\-\_\-\-G\-M\-X}
+\item 
+class \hyperlink{classforcebalance_1_1gmxio_1_1Interaction__GMX}{forcebalance.\-gmxio.\-Interaction\-\_\-\-G\-M\-X}
+\begin{DoxyCompactList}\small\item\em Subclass of Interaction for interaction energy matching using G\-R\-O\-M\-A\-C\-S. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Namespaces}
 \begin{DoxyCompactItemize}
 \item 
 \hyperlink{namespaceforcebalance_1_1gmxio}{forcebalance.\-gmxio}
+\begin{DoxyCompactList}\small\item\em G\-R\-O\-M\-A\-C\-S input/output. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespaceforcebalance_1_1gmxio_acc5bef2c5c991cd70a948a1dd43ef6a6}{forcebalance.\-gmxio.\-edit\-\_\-mdp}
+\begin{DoxyCompactList}\small\item\em Create or edit a Gromacs M\-D\-P file. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1gmxio_a29af6ace00d7e58258e0a854ca13d954}{forcebalance.\-gmxio.\-parse\-\_\-atomtype\-\_\-line}
+\begin{DoxyCompactList}\small\item\em Parses the 'atomtype' line. \end{DoxyCompactList}\item 
+def \hyperlink{namespaceforcebalance_1_1gmxio_acac8488f29b62fb0d4cb54bb5a041026}{forcebalance.\-gmxio.\-rm\-\_\-gmx\-\_\-baks}
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+tuple \hyperlink{namespaceforcebalance_1_1gmxio_ac10457054444ca04e0a265665afc2512}{forcebalance.\-gmxio.\-logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\item 
+list \hyperlink{namespaceforcebalance_1_1gmxio_a337bc61280b58a43319380dec9c5529a}{forcebalance.\-gmxio.\-nftypes} = \mbox{[}None, 'V\-D\-W', 'V\-D\-W\-\_\-\-B\-H\-A\-M'\mbox{]}
+\begin{DoxyCompactList}\small\item\em Vd\-W interaction function types. \end{DoxyCompactList}\item 
+list \hyperlink{namespaceforcebalance_1_1gmxio_a59695b79df36efbe64ac88fd64bfb366}{forcebalance.\-gmxio.\-pftypes} = \mbox{[}None, 'V\-P\-A\-I\-R', 'V\-P\-A\-I\-R\-\_\-\-B\-H\-A\-M'\mbox{]}
+\begin{DoxyCompactList}\small\item\em Pairwise interaction function types. \end{DoxyCompactList}\item 
+list \hyperlink{namespaceforcebalance_1_1gmxio_a49a34b85d405c9286ceec1e6f088069f}{forcebalance.\-gmxio.\-bftypes} = \mbox{[}None, 'B\-O\-N\-D\-S', 'G96\-B\-O\-N\-D\-S', 'M\-O\-R\-S\-E'\mbox{]}
+\begin{DoxyCompactList}\small\item\em Bonded interaction function types. \end{DoxyCompactList}\item 
+list \hyperlink{namespaceforcebalance_1_1gmxio_aef89ff391902f81feb14e28ec301296c}{forcebalance.\-gmxio.\-aftypes}
+\begin{DoxyCompactList}\small\item\em Angle interaction function types. \end{DoxyCompactList}\item 
+list \hyperlink{namespaceforcebalance_1_1gmxio_acd9fed3887161c6386506563fd4f3534}{forcebalance.\-gmxio.\-dftypes} = \mbox{[}None, 'P\-D\-I\-H\-S', 'I\-D\-I\-H\-S', 'R\-B\-D\-I\-H\-S', 'P\-I\-M\-P\-D\-I\-H\-S', 'F\-O\-U\-R\-D\-I\-H\-S', None, None, 'T\-A\-B\-D\-I\-H\-S', 'P\-D\-I\-H\-M\-U\-L\-S'\mbox{]}
+\begin{DoxyCompactList}\small\item\em Dihedral interaction function types. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespaceforcebalance_1_1gmxio_a179cbde2e55b4c025af89b225612d6e1}{forcebalance.\-gmxio.\-fdict}
+\begin{DoxyCompactList}\small\item\em Section -\/$>$ Interaction type dictionary. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespaceforcebalance_1_1gmxio_ae845e0b923ecde16c79f2742b94534a6}{forcebalance.\-gmxio.\-pdict}
+\begin{DoxyCompactList}\small\item\em Interaction type -\/$>$ Parameter Dictionary. \end{DoxyCompactList}\item 
+string \hyperlink{namespaceforcebalance_1_1gmxio_a35d747dea4a5446d049d901e782feaa2}{forcebalance.\-gmxio.\-shot\-\_\-mdp}
 \end{DoxyCompactItemize}
