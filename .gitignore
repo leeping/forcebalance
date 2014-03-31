@@ -1,0 +1,8 @@
+# Documentation branch should only track doc folder
+# exclude everything except directory doc/latex and doc/html
+/*
+!/doc
+/doc/*
+!/doc/latex
+!/doc/html
+
