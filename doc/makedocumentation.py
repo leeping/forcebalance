@@ -20,7 +20,7 @@ from traceback import print_exc
 from socket import gethostname
 from datetime import datetime
 
-def build(interactive=False, upstream=False):
+def build(interactive=False, upstream=False, branch=False):
 
     if interactive:
         display = lambda txt : raw_input("$ %s " % txt)
@@ -47,16 +47,17 @@ def build(interactive=False, upstream=False):
         api+=page.read()
     api+="\n\n*/"
     
-    print "\n# Switch to documentation branch before writing files"
-    display("git checkout gh-pages")
-    if os.system("git checkout gh-pages"):
-        sys.exit(1)
-    display("git checkout master header.tex")
-    if os.system("git checkout master header.tex"):
-        sys.exit(1)
-    display("git checkout master api_header.tex")
-    if os.system("git checkout master api_header.tex"):
-        sys.exit(1)
+    if branch:
+        print "\n# Switch to documentation branch before writing files"
+        display("git checkout gh-pages")
+        if os.system("git checkout gh-pages"):
+            sys.exit(1)
+        display("git checkout master header.tex")
+        if os.system("git checkout master header.tex"):
+            sys.exit(1)
+        display("git checkout master api_header.tex")
+        if os.system("git checkout master api_header.tex"):
+            sys.exit(1)
     
     # try to write changes to new branch. If anything goes wrong, reset and return to master
     try:
@@ -105,49 +106,52 @@ def build(interactive=False, upstream=False):
         os.chdir('../..')
         shutil.copy('latex/api/refman.pdf', 'ForceBalance-API.pdf')
         
-        print "\n# Stage changes for commit"
-        display("git add .")
-        if os.system('git add .'): raise OSError("Error trying to stage files for commit")
-        print"\n# Commit changes locally"
-        display('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M")))
-        if os.system('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M"))):
-            raise OSError("Error trying to commit files to local gh-pages branch")
-        
-        # push changes upstream if upstream option was given
-        if upstream:
-            try:
-                print "\n# Push updated documentation upstream"
-                display("git push")
-                if os.system('git push'): raise OSError("While trying to push changes upstream 'git push' gave a nonzero return code")
-            except:
-                print_exc()
-                upstream = False  # changes could not be pushed upstream so we should switch to the local mode
-                raw_input("\n# encountered ERROR. Documentation could not be pushed upstream.")
+        if branch:
+            print "\n# Stage changes for commit"
+            display("git add .")
+            if os.system('git add .'): raise OSError("Error trying to stage files for commit")
+            print"\n# Commit changes locally"
+            display('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M")))
+            if os.system('git commit -m "Automatic documentation generation at %s on %s"' % (gethostname(), datetime.now().strftime("%m-%d-%Y %H:%M"))):
+                raise OSError("Error trying to commit files to local gh-pages branch")
+            
+            # push changes upstream if upstream option was given
+            if upstream:
+                try:
+                    print "\n# Push updated documentation upstream"
+                    display("git push")
+                    if os.system('git push'): raise OSError("While trying to push changes upstream 'git push' gave a nonzero return code")
+                except:
+                    print_exc()
+                    upstream = False  # changes could not be pushed upstream so we should switch to the local mode
+                    raw_input("\n# encountered ERROR. Documentation could not be pushed upstream.")
         
     except:
         print_exc()
         upstream = False  # since documentation generation failed,
         raw_input("\n# encountered ERROR (above). Documentation could not be generated.") 
-        
-        print "\n# Putting any uncommmited changes on the stash"
-        display("git stash")
-        os.system('git stash')
+
+        if branch:
+            print "\n# Putting any uncommmited changes on the stash"
+            display("git stash")
+            os.system('git stash')
         
     else:
         print "Documentation successfully generated"
     finally:
-        print "\n# Switch back to master branch"
-        display("git checkout master")
-        os.system('git checkout master')
-        display("git checkout gh-pages ForceBalance-Manual.pdf")
-        os.system('git checkout gh-pages ForceBalance-Manual.pdf')
-        display("git checkout gh-pages ForceBalance-API.pdf")
-        os.system('git checkout gh-pages ForceBalance-API.pdf')
-        
-        if upstream:
-            print "\n# Remove local copy of successfully pushed documentation branch"
-            display("git branch -D gh-pages")
-            os.system('git branch -D gh-pages')
+        if branch:
+            print "\n# Switch back to master branch"
+            display("git checkout master")
+            os.system('git checkout master')
+            display("git checkout gh-pages ForceBalance-Manual.pdf")
+            os.system('git checkout gh-pages ForceBalance-Manual.pdf')
+            display("git checkout gh-pages ForceBalance-API.pdf")
+            os.system('git checkout gh-pages ForceBalance-API.pdf')
+            
+            if upstream:
+                print "\n# Remove local copy of successfully pushed documentation branch"
+                display("git branch -D gh-pages")
+                os.system('git branch -D gh-pages')
     
 
 def add_tabs(fnm):
@@ -246,6 +250,7 @@ def build_config():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--interactive', '-i', action='store_true', help="run in interactive mode, pausing before each command")
+    parser.add_argument('--branch', '-b', action='store_true', help="run documentation generation on gh-pages branch")
     parser.add_argument('--clean', '-k', action='store_true', help="remove temporary files after script is complete")
     parser.add_argument('--configure', '-c', action='store_true', help="generate doxygen configuration files from templates")
     parser.add_argument('--upstream', '-u', action='store_true', help="push updated documentation to upstream github repository")
