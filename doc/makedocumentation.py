@@ -1,7 +1,14 @@
 """This file contains a documentation generating script. Doxygen
 is used to do the actual generation, so these functions act primarily to
 streamline the process and provide some customizations to the automatically
-generated documents
+generated documents.
+
+How to do this effectively:
+
+- Make sure doxypy executable is in the PATH
+- Make sure dot (from graphviz) is in the PATH
+- Make sure version numbers are correct in four places: .api.cfg, .doxygen.cfg, header.tex, api_header.tex
+
 """
 
 import os, sys
