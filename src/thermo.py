@@ -1,6 +1,7 @@
 import os
 import errno
 import numpy as np
+import pandas as pd
 
 from forcebalance.target import Target
 from forcebalance.finite_difference import in_fd
