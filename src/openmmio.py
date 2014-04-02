@@ -774,12 +774,19 @@ class OpenMM(Engine):
         #     simulation.context.computeVirtualSites()
         #----
         # NOTE: Periodic box vectors must be set FIRST
-        if self.pbc:
-            self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+        if self.tdiv==1:
+          if self.pbc:
+              self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
-        self.simulation.context.setPositions(self.xyz_omms[shot][0])
-        self.simulation.context.computeVirtualSites()
+          self.simulation.context.setPositions(self.xyz_omms[shot][0])
+          self.simulation.context.computeVirtualSites()
+        if self.tdiv>1:
+          if self.pbc:
+              self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+          for i in range(self.tdiv):
+              self.simulation.context.getIntegrator.setPositions(i,self.simulation.context.getIngegrator.getState(i,getPositions=True).getPositions())
+              
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
         [a,b,c] = box_vectors
@@ -1057,7 +1064,6 @@ class OpenMM(Engine):
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
 #####Energy estimator
             if self.tdiv>=2:
-                hbar=0.0635078*kilojoule*picosecond/mole
                 pimdstate=[]
                 centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*self.system.getNumParticles())
                 kinetic=0.0*kilojoule/mole
