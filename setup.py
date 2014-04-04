@@ -29,7 +29,7 @@ except ImportError:
 #| doc/api_header.tex              |#
 #| src/__init__.py                 |#
 #===================================#
-__version__ = "v1.2.2"
+__version__ = "v1.3.0"
 try:
     # use git to find current version
     git_describe = subprocess.check_output(["git", "describe"]).strip()
@@ -252,7 +252,8 @@ def main():
     setupKeywords=buildKeywordDictionary(args)
     setup(**setupKeywords)
 
-    shutil.rmtree('build')
+    if os.path.exists('build'):
+        shutil.rmtree('build')
 
 if __name__ == '__main__':
     main()

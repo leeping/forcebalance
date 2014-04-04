@@ -1,5 +1,6 @@
 *.pyc
-doc/*
+doc/html
+doc/latex
 
 test.log
 temp
