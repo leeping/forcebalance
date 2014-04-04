@@ -49,6 +49,8 @@ class Interaction(Target):
         self.set_option(tgt_opts,'cauchy','cauchy')
         ## Do we put the reference energy into the denominator?
         self.set_option(tgt_opts,'attenuate','attenuate')
+        ## Divide by the number of snapshots?
+        self.set_option(tgt_opts, 'normalize')
         ## What is the energy denominator?
         self.set_option(tgt_opts,'energy_denom','energy_denom')
         ## Set fragment 1
@@ -103,14 +105,17 @@ class Interaction(Target):
                     self.divisor[i] = np.sqrt(denom**2 + (self.eqm[i]-denom)**2)
         else:
             self.divisor = np.ones(len(self.eqm)) * denom
+        
         if self.cauchy:
             logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
         if self.energy_upper > 0:
-            logger.info("Interactions more repulsive than %s will not be fitted\n" % str(self.energy_upper))
             ecut = self.energy_upper
             self.prefactor = 1.0 * (self.eqm < ecut)
+            logger.info("Interactions more repulsive than %s will not be fitted (%i/%i excluded) \n" % (str(self.energy_upper), sum(self.eqm > ecut), len(self.eqm)))
         else:
             self.prefactor = np.ones(len(self.eqm))
+        if self.normalize:
+            self.prefactor /= len(self.prefactor)
 
     def read_reference_data(self):
         
@@ -136,16 +141,25 @@ class Interaction(Target):
         self.eqm *= (eqcgmx / 4.184)
 
     def indicate(self):
+        delta = (self.emm-self.eqm)
+        deltanrm = self.prefactor*(delta/self.divisor)**2
         if len(self.label) == self.ns:
             PrintDict = OrderedDict()
-            delta = (self.emm-self.eqm)
-            deltanrm = self.prefactor*(delta/self.divisor)**2
             for i,label in enumerate(self.label):
                 PrintDict[label] = "% 9.3f % 9.3f % 9.3f % 9.3f % 11.5f" % (self.emm[i], self.eqm[i], delta[i], self.divisor[i], deltanrm[i])
             printcool_dictionary(PrintDict,title="Target: %s\nInteraction Energies (kcal/mol), Objective = % .5e\n %-10s %9s %9s %9s %9s %11s" % 
                                  (self.name, self.objective, "Label", "Calc.", "Ref.", "Delta", "Divisor", "Term"),keywidth=15)
         else:
-            logger.info("Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)\n" % (self.name,self.objective))
+            # logger.info("Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)\n" % (self.name,self.objective))
+            Headings = ["Observable", "Difference\nRMS (Calc-Ref)", "Denominator\n(Specified)", " Percent \nDifference"]
+            Data = OrderedDict([])
+            Data['Energy (kcal/mol)'] = ["%8.4f" % np.sqrt(np.mean(delta**2)),
+                                       "%8.4f" % np.mean(self.divisor),
+                                       "%.4f%%" % (np.sqrt(np.mean(delta/self.divisor)**2)*100)]
+            self.printcool_table(data=Data, headings=Headings, color=0)
+            logger.info("add LABEL keywords in qdata.txt to print out each snapshot\n")
+    
+
         # if len(self.RMSDDict) > 0:x
         #     printcool_dictionary(self.RMSDDict,title="Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s" % (self.rmsd_part, "System", "RMSD", "Term"), keywidth=45)
 

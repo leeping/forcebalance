@@ -120,6 +120,8 @@ class Target(forcebalance.BaseClass):
         if self.rd != None: self.rd = self.rd.strip("/")
         ## Iteration where we turn on zero-gradient skipping.
         self.set_option(options, 'zerograd')
+        ## Gradient norm below which we skip.
+        self.set_option(tgt_opts, 'epsgrad')
         ## Dictionary of whether to call the derivatives.
         self.pgrad = range(forcefield.np)
         self.OptionDict['pgrad'] = self.pgrad
@@ -218,7 +220,7 @@ class Target(forcebalance.BaseClass):
             zero_pids = []
         for i in range(self.FF.np):
             # Check whether this parameter number has a nonzero gradient.
-            if Ans['G'][i] == 0.0:
+            if abs(Ans['G'][i]) <= self.epsgrad:
                 # Write parameter names corresponding to this parameter number.
                 for pid in self.FF.map:
                     if self.FF.map[pid] == i and pid not in zero_pids:
@@ -227,7 +229,7 @@ class Target(forcebalance.BaseClass):
             # If a parameter number has a nonzero gradient, then the parameter
             # names associated with this parameter number are removed from the list.
             # (Not sure if this will ever happen.)
-            if Ans['G'][i] != 0.0:
+            if abs(Ans['G'][i]) > self.epsgrad:
                 for pid in self.FF.map:
                     if self.FF.map[pid] == i and pid in zero_pids:
                         logger.info("Removing %s from zero_pids in %s\n" % (i, self.name))
