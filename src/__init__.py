@@ -16,7 +16,7 @@ try:
     import pkg_resources
     __version__ = pkg_resources.get_distribution("forcebalance").version
 except:
-    __version__ = "v1.2.1"
+    __version__ = "v1.3.0"
 
 from collections import OrderedDict
 from parser import tgt_opts_defaults, gen_opts_defaults

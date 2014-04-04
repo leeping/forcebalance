@@ -78,7 +78,7 @@ read_mvals
 
 $end
 
-$simulation
+$target
 name molc2
 simtype THCDF_Psi4
 weight 1.0

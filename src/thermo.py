@@ -16,9 +16,6 @@ logger = getLogger(__name__)
 #
 class Thermo(Target):
     """
-    Thermo
-    ======
-
     A target for fitting general experimental data sets. The
     experimental data is described in a .txt file and is handled with a
     `Quantity` subclass.
