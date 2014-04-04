@@ -1,7 +1,11 @@
 import os
+import re
+import csv
 import errno
 import numpy as np
 import pandas as pd
+import itertools
+import cStringIO
 
 from forcebalance.target import Target
 from forcebalance.finite_difference import in_fd
@@ -10,16 +14,284 @@ from forcebalance.nifty import lp_dump, lp_load, wopen, _exec
 from forcebalance.nifty import LinkFile, link_dir_contents
 from forcebalance.nifty import printcool, printcool_dictionary
 
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
-#
+
+class TextParser(object):
+    """ Parse a text file. """
+    def __init__(self, fnm):
+        self.fnm = fnm
+        self.parse()
+
+    def is_empty_line(self):
+        return all([len(fld.strip()) == 0 for fld in self.fields])
+
+    def is_comment_line(self):
+        return re.match('^[\'"]?#',self.fields[0].strip())
+
+    def process_header(self):
+        """ Function for setting more attributes using the header line, if needed. """
+        self.headings = [i.strip() for i in self.fields[:]]
+
+    def process_data(self):
+        """ Function for setting more attributes using the current line, if needed. """
+        trow = []
+        for ifld in range(len(self.headings)):
+            if ifld < len(self.fields):
+                trow.append(self.fields[ifld])
+            else:
+                trow.append('')
+        return trow
+
+    def sanity_check(self):
+        """ Extra sanity checks. """
+
+    def parse(self):
+        self.headings = []                 # Fields in header line
+        meta = defaultdict(list)          # Dictionary of metadata
+        found_header = 0                  # Whether we found the header line
+        table = []                        # List of data records
+        self.generate_splits()            # Generate a list of records for each line.
+        self.ln = 0                       # Current line number
+        for line, fields in zip(open(self.fnm).readlines(), self.splits):
+            # Set attribute so methods can use it.
+            self.fields = fields
+            # Skip over empty lines or comment lines.
+            if self.is_empty_line():
+                logger.info("\x1b[96mempt\x1b[0m %s\n" % line.replace('\n',''))
+                self.ln += 1
+                continue
+            if self.is_comment_line():
+                logger.info("\x1b[96mcomm\x1b[0m %s\n" % line.replace('\n',''))
+                self.ln += 1
+                continue
+            # Indicates metadata mode.
+            is_meta = 0
+            # Indicates whether this is the header line.
+            is_header = 0
+            # Split line by tabs.
+            for ifld, fld in enumerate(fields):
+                fld = fld.strip()
+                # Stop parsing when we encounter a comment line.
+                if re.match('^[\'"]?#',fld): break
+                # The first word would contain the name of the metadata key.
+                if ifld == 0:
+                    mkey = fld
+                # Check if the first field is an equals sign (turn on metadata mode).
+                if ifld == 1:
+                    # Activate metadata mode.
+                    if fld == "=":
+                        is_meta = 1
+                    # Otherwise, this is the header line.
+                    elif not found_header:
+                        is_header = 1
+                        found_header = 1
+                # Read in metadata.
+                if ifld > 1 and is_meta:
+                    meta[mkey].append(fld)
+            # Set field start, field end, and field content for the header.
+            if is_header:
+                logger.info("\x1b[1;96mhead\x1b[0m %s\n" % line.replace('\n',''))
+                self.process_header()
+            elif is_meta:
+                logger.info("\x1b[96mmeta\x1b[0m %s\n" % line.replace('\n',''))
+            else:
+                # Build the row of data to be appended to the table.
+                # Loop through the fields in the header and inserts fields
+                # in the data line accordingly.  Ignores trailing tabs/spaces.
+                logger.info("\x1b[96mdata\x1b[0m %s\n" % line.replace('\n',''))
+                table.append(self.process_data())
+            self.ln += 1
+        self.sanity_check()
+        printcool("%s parsed as %s" % (self.fnm.replace(os.getcwd()+'/',''), self.format), color=6)
+        self.metadata = meta
+        self.table = table
+        
+class CSV_Parser(TextParser):
+    
+    """ 
+    Parse a comma-separated file.  This class is for all
+    source files that are .csv format (characterized by having the
+    same number of comma-separated fields in each line).  Fields are
+    separated by commas but they may contain commas as well.
+
+    In contrast to the other formats, .csv MUST contain the same
+    number of commas in each line.  .csv format is easily prepared
+    using Excel.
+    """
+    
+    def __init__(self, fnm):
+        self.format = "comma-separated values (csv)"
+        super(CSV_Parser, self).__init__(fnm)
+
+    def generate_splits(self):
+        with open(self.fnm, 'r') as f: self.splits = list(csv.reader(f))
+
+class TAB_Parser(TextParser):
+    
+    """ 
+    Parse a tab-delimited file.  This function is called for all
+    source files that aren't csv and contain at least one tab.  
+    Fields are separated by tabs and do not contain tabs.
+
+    Tab-delimited format is easy to prepare using programs like Excel.
+    It is easier to read than .csv but represented differently by
+    different editors.  
+    
+    Empty fields must still exist (represented using multiple tabs).
+    """
+    
+    def __init__(self, fnm):
+        self.format = "tab-delimited text"
+        super(TAB_Parser, self).__init__(fnm)
+
+    def generate_splits(self):
+        self.splits = [line.split('\t') for line in open(self.fnm).readlines()]
+
+class FIX_Parser(TextParser):
+    
+    """ 
+    Parse a fixed width format file.  This function is called for all
+    source files that aren't csv and contain no tabs.
+
+    Fixed width is harder to prepare by hand but easiest to read,
+    because it looks the same in all text editors.  The field width is
+    determined by the header line (first line in the data table),
+    i.e. the first non-empty, non-comment, non-metadata line.
+
+    Empty fields need to be filled with the correct number of spaces.
+    All fields must have the same alignment (left or right).  The
+    start and end of each field is determined from the header line and
+    used to determine alignment. If the alignment cannot be determined
+    then it will throw an error.
+
+    Example of a left-aligned fixed width file:
+
+    T           P (atm)     Al          Al_wt       Scd1_idx    Scd1        Scd2_idx    Scd2    
+    323.15      1           0.631       1           C15                     C34                 
+                                                    C17         0.198144    C36         0.198144
+                                                    C18         0.198128    C37         0.198128
+                                                    C19         0.198111    C38         0.198111
+                                                    C20         0.198095    C39         0.198095
+                                                    C21         0.198079    C40         0.198079
+                                                    C22         0.197799    C41         0.197537
+                                                    C23         0.198045    C42         0.198046
+                                                    C24         0.178844    C43         0.178844
+                                                    C25         0.167527    C44         0.178565
+                                                    C26         0.148851    C45         0.16751
+                                                    C27         0.134117    C46         0.148834
+                                                    C28         0.119646    C47         0.1341
+                                                    C29         0.100969    C48         0.110956
+                                                    C30         0.07546     C49         0.087549
+                                                    C31                     C50
+
+    """
+
+    def __init__(self, fnm):
+        self.format = "fixed-width text"
+        self.fbegs_dat = []
+        self.fends_dat = []
+        super(FIX_Parser, self).__init__(fnm)
+
+    def generate_splits(self):
+        # This regular expression splits a string looking like this:
+        # "Density (kg m^-3) Hvap (kJ mol^-1) Alpha Kappa".  But I
+        # don't want to split in these places: "Density_(kg_m^-3)
+        # Hvap_(kJ_mol^-1) Alpha Kappa"
+        allfields = [list(re.finditer('[^\s(]+(?:\s*\([^)]*\))?', line)) for line in open(self.fnm).readlines()]
+        self.splits = []
+        # Field start / end positions for each line in the file
+        self.fbegs = []
+        self.fends = []
+        for line, fields in zip(open(self.fnm).readlines(), allfields):
+            self.splits.append([fld.group(0) for fld in fields])
+            self.fbegs.append([fld.start() for fld in fields])
+            self.fends.append([fld.end() for fld in fields])
+        
+    def process_header(self):
+        super(FIX_Parser, self).process_header()
+        # Field start / end positions for the header line
+        self.hbeg = self.fbegs[self.ln]
+        self.hend = self.fends[self.ln]
+
+    def process_data(self):
+        trow = []
+        hbeg = self.hbeg
+        hend = self.hend
+        fbeg = self.fbegs[self.ln]
+        fend = self.fends[self.ln]
+        fields = self.fields
+        # Check alignment and throw an error if incorrectly formatted.
+        if not ((set(fbeg).issubset(hbeg)) or (set(fend).issubset(hend))):
+            logger.error("This \x1b[91mdata line\x1b[0m is not aligned with the \x1b[92mheader line\x1b[0m!\n")
+            logger.error("\x1b[92m%s\x1b[0m\n" % header.replace('\n',''))
+            logger.error("\x1b[91m%s\x1b[0m\n" % line.replace('\n',''))
+            raise RuntimeError
+        # Left-aligned case
+        if set(fbeg).issubset(hbeg):
+            for hpos in hbeg:
+                if hpos in fbeg:
+                    trow.append(fields[fbeg.index(hpos)])
+                else:
+                    trow.append('')
+        # Right-aligned case
+        if set(fend).issubset(hend):
+            for hpos in hend:
+                if hpos in fend:
+                    trow.append(fields[fend.index(hpos)])
+                else:
+                    trow.append('')
+        # Field start / end positions for the line of data
+        self.fbegs_dat.append(fbeg[:])
+        self.fends_dat.append(fend[:])
+        return trow
+
+    def sanity_check(self):
+        if set(self.hbeg).issuperset(set(itertools.chain(*self.fbegs_dat))):
+            self.format = "left-aligned fixed width text"
+        elif set(self.hend).issuperset(set(itertools.chain(*self.fends_dat))):
+            self.format = "right-aligned fixed width text"
+        else:
+            # Sanity check - it should never get here unless the parser is incorrect.
+            raise RuntimeError("Fixed-width format detected but columns are neither left-aligned nor right-aligned!")
+    
+def parse1(fnm):
+
+    """Determine the format of the source file and call the
+    appropriate parsing function."""
+
+    # CSV files have the same number of comma separated fields in every line, they are the simplest to parse.
+    with open(fnm, 'r') as f: csvf = list(csv.reader(f))
+    if len(csvf[0]) > 1 and len(set([len(i) for i in csvf])) == 1:
+        return CSV_Parser(fnm)
+
+    # Strip away comments and empty lines.
+    nclines = [re.sub('[ \t]*#.*$','',line) for line in open(fnm).readlines() 
+               if not (line.strip().startswith("#") or not line.strip())]
+
+    # Print the sanitized lines to a new file object.
+    # Note the file object needs ot be rewound every time we read or write to it.
+    fdat = cStringIO.StringIO()
+    for line in nclines:
+        print >> fdat, line,
+    fdat.seek(0)
+    
+    # Now the file can either be tab-delimited or fixed width.
+    # If ANY tabs are found in the sanitized lines, then it is taken to be
+    # a tab-delimited file.
+    have_tabs = any(['\t' in line for line in fdat.readlines()]) ; fdat.seek(0)
+    if have_tabs:
+        return TAB_Parser(fnm)
+    else:
+        return FIX_Parser(fnm)
+    return
+
 class Thermo(Target):
     """
     A target for fitting general experimental data sets. The
-    experimental data is described in a .txt file and is handled with a
-    `Quantity` subclass.
+    source data is described in a .txt file.
 
     """
     def __init__(self, options, tgt_opts, forcefield):
@@ -27,8 +299,8 @@ class Thermo(Target):
         super(Thermo, self).__init__(options, tgt_opts, forcefield)
 
         ## Parameters
-        # Reference experimental data
-        self.set_option(tgt_opts, "expdata_txt", forceprint=True)
+        # Source data (experimental data, model parameters and weights)
+        self.set_option(tgt_opts, "source", forceprint=True)
         # Quantities to calculate
         self.set_option(tgt_opts, "quantities", forceprint=True)
         # Length of simulation chain
@@ -48,31 +320,68 @@ class Thermo(Target):
         # Weights for quantities
         self.weights   = {}
 
-        ## Read experimental data and initialize points
-        self._read_expdata(os.path.join(self.root,
-                                        self.tgtdir,
-                                        self.expdata_txt))
+        ## Read source data and initialize points
+        self.read_source(os.path.join(self.root, self.tgtdir, self.source))
         
         ## Copy run scripts from ForceBalance installation directory
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
                      os.path.join(self.root, self.tempdir, f))
     
-    def _read_expdata(self, expdata):
-        """Read and store experimental data.
+    def read_source(self, source):
+        """Read and store source data.
 
         Parameters
         ----------
-        expdata : string
-            Read experimental data from this filename.
+        source : string
+            Read source data from this filename.
 
         Returns
         -------
         Nothing
 
         """
-        fp = open(expdata)
+            
+        parser = parse1(source)
+        print parser.headings
+        printcool_dictionary(parser.metadata, title="Metadata")
+        # print parser.table
+        revised_headings = []
+        obs = ''
+        def error_left(i):
+            logger.error('Encountered heading %s but there is no observable to the left\n' % i)
+            raise RuntimeError
 
+        for head in parser.headings:
+            usplit = re.split(' *\(', head, maxsplit=1)
+            if len(usplit) > 1:
+                hfirst = usplit[0]
+                punit = re.sub('\)$','',usplit[1].strip())
+                print "header", head, "split into", hfirst, ",", punit
+            else:
+                hfirst = head
+                punit = ''
+            newh = hfirst
+            if head.lower() in ['w', 'wt', 'wts']:
+                if obs == '': error_left(head)
+                newh = obs + '_' + hfirst
+            elif head.lower() in ['s', 'sig', 'sigma']:
+                if obs == '': error_left(head)
+                newh = obs + '_' + hfirst
+            elif head.lower() in ['idx']:
+                if obs == '': error_left(head)
+                newh = obs + '_' + hfirst
+            else:
+                obs = hfirst
+            if newh != hfirst:
+                print "header", head, "renamed to", newh
+
+        raw_input()
+
+        return
+
+        fp = open(expdata)
+        
         line         = fp.readline()
         foundHeader  = False
         names        = None
@@ -80,32 +389,32 @@ class Thermo(Target):
         label_header = None
         label_unit   = None
         count        = 0
+        metadata     = {}
         while line:
             # Skip comments and blank lines
             if line.lstrip().startswith("#") or not line.strip():
                 line = fp.readline()
                 continue
-
+            # Metadata is denoted using 
             if "=" in line: # Read variable
                 param, value = line.split("=")
                 param = param.strip().lower()
-                if param == "denoms":
-                    for e, v in enumerate(value.split()):
-                        self.denoms[self.quantities[e]] = float(v)
-                elif param == "weights":
-                    for e, v in enumerate(value.split()):
-                        self.weights[self.quantities[e]] = float(v)
+                metadata[param] = value
+                # if param == "denoms":
+                #     for e, v in enumerate(value.split()):
+                #         self.denoms[self.quantities[e]] = float(v)
+                # elif param == "weights":
+                #     for e, v in enumerate(value.split()):
+                #         self.weights[self.quantities[e]] = float(v)
             elif foundHeader: # Read exp data
                 count      += 1
                 vals        = line.split()
-                
                 label       = (vals[0], label_header, label_unit)
                 refs        = np.array(vals[1:-2:2]).astype(float)
                 wts         = np.array(vals[2:-2:2]).astype(float)
                 temperature = float(vals[-2])
                 pressure    = None if vals[-1].lower() == "none" else \
                   float(vals[-1])
-                
                 dp = Point(count, label=label, refs=refs, weights=wts,
                            names=names, units=units,
                            temperature=temperature, pressure=pressure)
@@ -114,12 +423,10 @@ class Thermo(Target):
                 foundHeader = True
                 headers = zip(*[tuple(h.split("_")) for h in line.split()
                                 if h != "w"])
-
                 label_header = list(headers[0])[0]
                 label_unit   = list(headers[1])[0]
                 names        = list(headers[0][1:-2])
                 units        = list(headers[1][1:-2])
-                                
             line = fp.readline()            
     
     def retrieve(self, dp):
@@ -214,6 +521,7 @@ class Thermo(Target):
 
     def indicate(self):
         """Shows optimization state."""
+        return
         AGrad     = hasattr(self, 'Gp')
         PrintDict = OrderedDict()
         
@@ -358,6 +666,7 @@ class Thermo(Target):
         Objective = 0.0
         Gradient  = np.zeros(self.FF.np)
         Hessian   = np.zeros((self.FF.np, self.FF.np))
+        return { "X": Objective, "G": Gradient, "H": Hessian} 
 
         for pt in self.points:
             # Update data point with MD results
