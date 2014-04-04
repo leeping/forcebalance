@@ -54,50 +54,96 @@ def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     qyz = 0.0
     qzz = 0.0
     enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
-    for i in simulation.system.getForces():
-        if isinstance(i, AmoebaMultipoleForce):
-            mm = i.getSystemMultipoleMoments(simulation.context)
-            dx += mm[1]
-            dy += mm[2]
-            dz += mm[3]
-            qxx += mm[4]
-            qxy += mm[5]
-            qxz += mm[6]
-            qyy += mm[8]
-            qyz += mm[9]
-            qzz += mm[12]
-        if isinstance(i, NonbondedForce):
-            # Get array of charges.
-            if q == None:
-                q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-            # Get array of positions in nanometers.
-            if positions == None:
-                positions = simulation.context.getState(getPositions=True).getPositions()
-            if mass == None:
-                mass = np.array([simulation.context.getSystem().getParticleMass(k).value_in_unit(dalton) \
-                                     for k in range(simulation.context.getSystem().getNumParticles())])
-            x = np.array(positions.value_in_unit(nanometer))
-            if rmcom:
-                com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
-                x -= com
-            xx, xy, xz, yy, yz, zz = (x[:,k]*x[:,l] for k, l in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
-            # Multiply charges by positions to get dipole moment.
-            dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
-            dx += dip[0]
-            dy += dip[1]
-            dz += dip[2]
-            qxx += enm_debye * 15 * np.sum(q*xx)
-            qxy += enm_debye * 15 * np.sum(q*xy)
-            qxz += enm_debye * 15 * np.sum(q*xz)
-            qyy += enm_debye * 15 * np.sum(q*yy)
-            qyz += enm_debye * 15 * np.sum(q*yz)
-            qzz += enm_debye * 15 * np.sum(q*zz)
-            tr = qxx+qyy+qzz
-            qxx -= tr/3
-            qyy -= tr/3
-            qzz -= tr/3
-    # This ordering has to do with the way TINKER prints it out.
-    return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
+    if(str(simulation.context.getIntegrator())[21:25]!='RPMD'):#if not RPMD integrator^-^
+        for i in simulation.system.getForces():
+            if isinstance(i, AmoebaMultipoleForce):
+                mm = i.getSystemMultipoleMoments(simulation.context)
+                dx += mm[1]
+                dy += mm[2]
+                dz += mm[3]
+                qxx += mm[4]
+                qxy += mm[5]
+                qxz += mm[6]
+                qyy += mm[8]
+                qyz += mm[9]
+                qzz += mm[12]
+            if isinstance(i, NonbondedForce):
+                # Get array of charges.
+                if q == None:
+                    q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+                # Get array of positions in nanometers.
+                if positions == None:
+                    positions = simulation.context.getState(getPositions=True).getPositions()
+                if mass == None:
+                    mass = np.array([simulation.context.getSystem().getParticleMass(k).value_in_unit(dalton) \
+                                         for k in range(simulation.context.getSystem().getNumParticles())])
+                x = np.array(positions.value_in_unit(nanometer))
+                if rmcom:
+                    com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
+                    x -= com
+                xx, xy, xz, yy, yz, zz = (x[:,k]*x[:,l] for k, l in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
+                # Multiply charges by positions to get dipole moment.
+                dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
+                dx += dip[0]
+                dy += dip[1]
+                dz += dip[2]
+                qxx += enm_debye * 15 * np.sum(q*xx)
+                qxy += enm_debye * 15 * np.sum(q*xy)
+                qxz += enm_debye * 15 * np.sum(q*xz)
+                qyy += enm_debye * 15 * np.sum(q*yy)
+                qyz += enm_debye * 15 * np.sum(q*yz)
+                qzz += enm_debye * 15 * np.sum(q*zz)
+                tr = qxx+qyy+qzz
+                qxx -= tr/3
+                qyy -= tr/3
+                qzz -= tr/3
+        # This ordering has to do with the way TINKER prints it out.
+        return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
+    else:#RPMD integrator^-^(no edit yet)
+        for i in simulation.system.getForces():
+            if isinstance(i, AmoebaMultipoleForce):
+                mm = i.getSystemMultipoleMoments(simulation.context)
+                dx += mm[1]
+                dy += mm[2]
+                dz += mm[3]
+                qxx += mm[4]
+                qxy += mm[5]
+                qxz += mm[6]
+                qyy += mm[8]
+                qyz += mm[9]
+                qzz += mm[12]
+            if isinstance(i, NonbondedForce):
+                # Get array of charges.
+                if q == None:
+                    q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+                # Get array of positions in nanometers.
+                if positions == None:
+                    positions = simulation.context.getState(getPositions=True).getPositions()
+                if mass == None:
+                    mass = np.array([simulation.context.getSystem().getParticleMass(k).value_in_unit(dalton) \
+                                         for k in range(simulation.context.getSystem().getNumParticles())])
+                x = np.array(positions.value_in_unit(nanometer))
+                if rmcom:
+                    com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
+                    x -= com
+                xx, xy, xz, yy, yz, zz = (x[:,k]*x[:,l] for k, l in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
+                # Multiply charges by positions to get dipole moment.
+                dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
+                dx += dip[0]
+                dy += dip[1]
+                dz += dip[2]
+                qxx += enm_debye * 15 * np.sum(q*xx)
+                qxy += enm_debye * 15 * np.sum(q*xy)
+                qxz += enm_debye * 15 * np.sum(q*xz)
+                qyy += enm_debye * 15 * np.sum(q*yy)
+                qyz += enm_debye * 15 * np.sum(q*yz)
+                qzz += enm_debye * 15 * np.sum(q*zz)
+                tr = qxx+qyy+qzz
+                qxx -= tr/3
+                qyy -= tr/3
+                qzz -= tr/3
+        # This ordering has to do with the way TINKER prints it out.
+        return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
 
 def get_dipole(simulation,q=None,mass=None,positions=None):
     """Return the current dipole moment in Debye.
@@ -774,18 +820,17 @@ class OpenMM(Engine):
         #     simulation.context.computeVirtualSites()
         #----
         # NOTE: Periodic box vectors must be set FIRST
-        if self.tdiv==1:
-          if self.pbc:
-              self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+        if self.pbc:
+          self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
-          self.simulation.context.setPositions(self.xyz_omms[shot][0])
-          self.simulation.context.computeVirtualSites()
+        self.simulation.context.setPositions(self.xyz_omms[shot][0])
+        self.simulation.context.computeVirtualSites()
         if self.tdiv>1:
-          if self.pbc:
-              self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
           for i in range(self.tdiv):
-              self.simulation.context.getIntegrator.setPositions(i,self.simulation.context.getIngegrator.getState(i,getPositions=True).getPositions())
+              integrator=self.simulation.context.getIntegrator()
+              integrator.setPositions(i,self.xyz_omms[shot][0])
+              ##compute virtual site method?^-^
               
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
@@ -1051,6 +1096,7 @@ class OpenMM(Engine):
         #========================#
         # Initialize velocities.
         self.simulation.context.setVelocitiesToTemperature(temperature*kelvin)
+        
         # Equilibrate.
         if iequil > 0: 
             if verbose: logger.info("Equilibrating...\n")
@@ -1071,6 +1117,7 @@ class OpenMM(Engine):
                 integrator=self.simulation.context.getIntegrator()
                 for i in range(self.tdiv):
                     pimdstate.append(integrator.getState(i,getEnergy=True,getPositions=True,getForces=True,groups=-1))
+                for i in range(self.tdiv):
                     centroid=centroid+np.array(pimdstate[i].getPositions())/self.tdiv
                     potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv
                     kinetic=kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)
@@ -1079,7 +1126,7 @@ class OpenMM(Engine):
                     der=-1.0*np.array(pimdstate[i].getForces())
                     kinetic=kinetic+np.sum((dif*der).sum(axis=1))*0.5/self.tdiv 
             else:
-                kinetic = state.getKineticEnergy()
+                kinetic = state.getKineticEnergy()/self.tdiv
                 potential = state.getPotentialEnergy()
 #####
             if self.pbc:
@@ -1121,6 +1168,7 @@ class OpenMM(Engine):
                 integrator=self.simulation.context.getIntegrator()
                 for i in range(self.tdiv):
                     pimdstate.append(integrator.getState(i,getEnergy=True,getPositions=True,getForces=True,groups=-1))
+                for i in range(self.tdiv):
                     centroid=centroid+np.array(pimdstate[i].getPositions())/self.tdiv
                     potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv
                     kinetic=kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)
@@ -1129,7 +1177,7 @@ class OpenMM(Engine):
                     der=-1.0*np.array(pimdstate[i].getForces())
                     kinetic=kinetic+np.sum((dif*der).sum(axis=1))*0.5/self.tdiv
             else:
-                kinetic = state.getKineticEnergy()
+                kinetic = state.getKineticEnergy()/self.tdiv
                 potential = state.getPotentialEnergy()
 #####
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
