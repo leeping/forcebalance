@@ -202,9 +202,11 @@ class Target(forcebalance.BaseClass):
         mostly fine since we rarely if ever calculate an explicit
         property Hessian. """
         
-        zero_prm = os.path.join(self.root, self.tgtdir, 'zero_grad.txt')
+        zero_prm = os.path.join(self.root, self.tgtdir, 'zerograd.txt')
         # If the 'zero parameters' text file exists, then we load
         # the parameter names from the file for exclusion.
+        pgrad0 = self.pgrad[:]
+        self.pgrad = range(self.FF.np)
         if os.path.exists(zero_prm):
             for ln, line in enumerate(open(zero_prm).readlines()):
                 pid = line.strip()
@@ -212,6 +214,13 @@ class Target(forcebalance.BaseClass):
                 # the derivative is switched off for this target.
                 if pid in self.FF.map and self.FF.map[pid] in self.pgrad:
                     self.pgrad.remove(self.FF.map[pid])
+        for i in pgrad0:
+            if i not in self.pgrad:
+                logger.info("Parameter %s was deactivated in %s\n" % (i, self.name))
+        for i in self.pgrad:
+            if i not in pgrad0:
+                logger.info("Parameter %s was reactivated in %s\n" % (i, self.name))
+        # Set pgrad in the OptionDict so remote targets may use it.
         self.OptionDict['pgrad'] = self.pgrad
 
     def write_0grads(self, Ans):
@@ -219,7 +228,7 @@ class Target(forcebalance.BaseClass):
         """ Write a file to the target directory containing names of
         parameters that don't contribute to the gradient. """
 
-        zero_prm = os.path.join(self.root, self.tgtdir, 'zero_grad.txt')
+        zero_prm = os.path.join(self.root, self.tgtdir, 'zerograd.txt')
         if os.path.exists(zero_prm):
             zero_pids = [i.strip() for i in open(zero_prm).readlines()]
         else:
@@ -271,7 +280,8 @@ class Target(forcebalance.BaseClass):
                 elif self.fdgrad:
                     Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
         self.gct += 1
-        self.write_0grads(Ans)
+        if Counter() == self.zerograd and self.zerograd >= 0: 
+            self.write_0grads(Ans)
         return Ans
 
     def get_H(self,mvals=None):
@@ -300,7 +310,8 @@ class Target(forcebalance.BaseClass):
             for i in self.pgrad:
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h, f0 = Ans['X'])
-        self.write_0grads(Ans)
+        if Counter() == self.zerograd and self.zerograd >= 0: 
+            self.write_0grads(Ans)
         self.hct += 1
         return Ans
     
@@ -570,8 +581,7 @@ class Target(forcebalance.BaseClass):
         if not in_fd_srch():
             np.savetxt('mvals.txt', mvals)
         ## Read in file that specifies which derivatives may be skipped.
-        if Counter() == self.zerograd: 
-            logger.info("Deactivating zero-gradient parameters in %s\n" % (self.name))
+        if Counter() >= self.zerograd and self.zerograd >= 0: 
             self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.

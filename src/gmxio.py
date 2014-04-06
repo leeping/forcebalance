@@ -603,8 +603,18 @@ class GMX(Engine):
             # Sanity check; the force fields should be referenced by the .top file.
             if self.top != None and os.path.exists(self.top):
                 if self.top not in self.FF.fnms and (not any([any([fnm in line for fnm in self.FF.fnms]) for line in open(self.top)])):
-                    warn_press_key("None of the force field files %s are referenced in the .top file. "
-                                   "Are you referencing the files through C preprocessor directives?" % self.FF.fnms)
+                    logger.warning('Force field file is not referenced in the .top file\nAssuming the first .itp file is to be included\n')
+                    for itpfnm in self.FF.fnms:
+                        if itpfnm.endswith(".itp"):
+                            break
+                    topol = open(self.top).readlines()
+                    with wopen(self.top) as f:
+                        print >> f, "#include \"%s\"" % itpfnm
+                        print >> f
+                        for line in topol:
+                            print >> f, line
+                    # warn_press_key("None of the force field files %s are referenced in the .top file. "
+                    #                "Are you referencing the files through C preprocessor directives?" % self.FF.fnms)
 
         ## Write out the trajectory coordinates to a .gro file.
         if hasattr(self, 'target') and hasattr(self.target,'shots'):

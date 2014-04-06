@@ -825,6 +825,11 @@ class AbInitio(Target):
         if not self.absolute:
             QEtmp = np.array(Q_all_print[:,0]).flatten()
             Q_all_print[:,0] -= np.average(QEtmp, weights=self.boltz_wts)
+        if self.attenuate: 
+            QEtmp = np.array(Q_all_print[:,0]).flatten()
+            Q_all_print[:,0] -= np.min(QEtmp)
+            MEtmp = np.array(M_all_print[:,0]).flatten()
+            M_all_print[:,0] -= np.min(MEtmp)
         if self.writelevel > 1:
             np.savetxt('M.txt',M_all_print)
             np.savetxt('Q.txt',Q_all_print)
