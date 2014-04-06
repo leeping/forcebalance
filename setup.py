@@ -252,7 +252,8 @@ def main():
     setupKeywords=buildKeywordDictionary(args)
     setup(**setupKeywords)
 
-    shutil.rmtree('build')
+    if os.path.exists('build'):
+        shutil.rmtree('build')
 
 if __name__ == '__main__':
     main()
