@@ -236,6 +236,29 @@ if "forcebalance" in __name__:
 ## One bohr equals this many angstroms
 bohrang = 0.529177249
 
+def unmangle(M1, M2):
+    """ 
+    Create a mapping that takes M1's atom indices to M2's atom indices based on position.  
+    
+    If we start with atoms in molecule "PDB", and the new molecule "M" 
+    contains re-numbered atoms, then this code works:
+    
+    M.elem = list(np.array(PDB.elem)[unmangled])
+    """
+    if len(M1) != 1 or len(M2) != 1:
+        raise RuntimeError("Unmangler only deals with length-1 molecule objects")
+    if M1.na != M2.na:
+        raise RuntimeError("Unmangler only deals with same number of atoms")
+    unmangler = {}
+    for i in range(M1.na):
+        for j in range(M2.na):
+            if np.linalg.norm(M1.xyzs[0][i] - M2.xyzs[0][j]) < 0.1:
+                unmangler[j] = i
+    unmangled = [unmangler[i] for i in sorted(unmangler.keys())]
+    if len(unmangled) != M1.na:
+        raise RuntimeError("Unmangler failed (different structures?)")
+    return unmangled
+
 def nodematch(node1,node2):
     # Matching two nodes of a graph.  Nodes are equivalent if the elements are the same
     return node1['e'] == node2['e']
@@ -849,6 +872,34 @@ class Molecule(object):
                             '- this isn\'t supposed to happen for two AtomKeys member variables.' \
                                 % (key, klast, len(self.Data[key]), len(self.Data[klast])))
 
+    def reorder_according_to(self, other):
+
+        """ 
+
+        Reorder atoms according to some other Molecule object.  This
+        happens when we run a program like pdb2gmx or pdbxyz and it
+        scrambles our atom ordering, forcing us to reorder the atoms
+        for all frames in the current Molecule object.
+
+        Directions: 
+        (1) Load up the scrambled file as a new Molecule object.
+        (2) Call this function: Original_Molecule.reorder_according_to(scrambled)
+        (3) Save Original_Molecule to a new file name.
+
+        """
+
+        M = self[0]
+        N = other
+        unmangled       = unmangle(M, N)
+        NewData = {}
+        for key in self.AtomKeys:
+            NewData[key] = list(np.array(M.Data[key])[unmangled])
+        for key in self.FrameKeys:
+            if key in ['xyzs', 'qm_forces', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+                NewData[key] = list([self.Data[key][i][unmangled] for i in range(len(self))])
+        for key in NewData:
+            setattr(self, key, copy.deepcopy(NewData[key]))
+            
     def append(self,other):
         self += other
 
@@ -2232,7 +2283,7 @@ class Molecule(object):
                     for i in range(2, len(s)):
                         bonds.append((int(s[1])-1, int(s[i])-1))
 
-        Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":AtomNames,
+        Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":[str(i) for i in AtomNames],
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
                 "comms":['' for i in range(len(XYZList))]}
 
