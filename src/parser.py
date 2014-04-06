@@ -252,7 +252,8 @@ for i in all_opts_names:
         if i in dct:
             iocc.append("gen_opt_types %s" % typ)
     if len(iocc) != 1:
-        raise RuntimeError("CODING ERROR: ForceBalance option %s occurs in more than one place (%s)" % (i, str(iocc)))
+        logger.error("CODING ERROR: ForceBalance option %s occurs in more than one place (%s)\n" % (i, str(iocc)))
+        raise RuntimeError
 
 ## Default general options - basically a collapsed veresion of gen_opts_types.
 gen_opts_defaults = {}
@@ -499,7 +500,8 @@ def parse_inputs(input_file=None):
                     elif isfloat(s[1]) and int(float(s[1])) == 1:
                         this_opt[key] = True
                     else:
-                        raise RuntimeError('%s is a true/false option but you provided %s; to enable, provide ["1", "yes", "true", "on" or <no value>].  To disable, provide ["0", "no", "false", or "off"].' % (key, s[1]))
+                        logger.error('%s is a true/false option but you provided %s; to enable, provide ["1", "yes", "true", "on" or <no value>].  To disable, provide ["0", "no", "false", or "off"].\n' % (key, s[1]))
+                        raise RuntimeError
                 elif key in opts_types['floats']:
                     this_opt[key] = float(s[1])
                 elif key in opts_types['sections']:

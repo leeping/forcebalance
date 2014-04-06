@@ -70,7 +70,7 @@ $target
 name LiquidBromine
 type Thermo_GMX
 weight 1.0
-expdata_txt expset.txt
+source expset.txt
 quantities density h_vap
 n_sim_chain 2
 md_steps 100000
@@ -81,7 +81,7 @@ $target
 name LiquidBromine_CSV
 type Thermo_GMX
 weight 1.0
-expdata_txt data.csv
+source data.csv
 quantities density h_vap
 n_sim_chain 2
 md_steps 100000
@@ -92,7 +92,7 @@ $target
 name LiquidBromine_TAB
 type Thermo_GMX
 weight 1.0
-expdata_txt data.tab.txt
+source data.tab.txt
 quantities density h_vap
 n_sim_chain 2
 md_steps 100000
@@ -103,7 +103,7 @@ $target
 name Lipid_SPC
 type Thermo_GMX
 weight 1.0
-expdata_txt lipidcol1.txt
+source lipidcol1.txt
 quantities density h_vap
 n_sim_chain 2
 md_steps 100000
@@ -114,7 +114,7 @@ $target
 name Lipid_RIT
 type Thermo_GMX
 weight 1.0
-expdata_txt lipidcol1.txt
+source lipidcol1.txt
 quantities density h_vap
 n_sim_chain 2
 md_steps 100000
@@ -125,7 +125,7 @@ $target
 name Lipid_TAB
 type Thermo_GMX
 weight 1.0
-expdata_txt lipidcol1.txt
+source lipidcol1.txt
 quantities density h_vap
 n_sim_chain 2
 md_steps 100000
@@ -136,7 +136,7 @@ $target
 name Lipid_MUL
 type Thermo_GMX
 weight 1.0
-expdata_txt lipidcol2a.txt
+source lipidcol2a.txt
 quantities density h_vap
 n_sim_chain 2
 md_steps 100000

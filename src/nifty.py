@@ -124,7 +124,8 @@ def uncommadash(s):
             logger.warning("List is out of order\n")
             raise
     except:
-        raise Exception('Invalid string for converting to list of numbers: %s' % s)
+        logger.error('Invalid string for converting to list of numbers: %s\n' % s)
+        raise RuntimeError
     return L
 
 def extract_int(arr, avgthre, limthre, label="value", verbose=True):
@@ -477,7 +478,8 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     N = A_n.shape[0]
     # Be sure A_n and B_n have the same dimensions.
     if(A_n.shape != B_n.shape):
-        raise ParameterError('A_n and B_n must have same dimensions.')
+        logger.error('A_n and B_n must have same dimensions.\n')
+        raise ParameterError
     # Initialize statistical inefficiency estimate with uncorrelated value.
     g = 1.0
     # Compute mean of each timeseries.
@@ -574,11 +576,13 @@ class Unpickler_LP(pickle.Unpickler):
                 for q in "\"'": # double or single quote
                     if rep.startswith(q):
                         if not rep.endswith(q):
-                            raise ValueError, "insecure string pickle"
+                            logger.error("insecure string pickle\n")
+                            raise ValueError
                         rep = rep[len(q):-len(q)]
                         break
                 else:
-                    raise ValueError, "insecure string pickle"
+                    logger.error("insecure string pickle\n")
+                    raise ValueError
                 ## The string is converted to an _ElementTree type before it is finally loaded.
                 self.append(etree.ElementTree(etree.fromstring(rep.decode("string-escape"))))
             except:
@@ -817,7 +821,9 @@ def onefile(ext, arg=None):
 def GoInto(Dir):
     if os.path.exists(Dir):
         if os.path.isdir(Dir): pass
-        else: raise Exception("Tried to create directory %s, it exists but isn't a directory" % newdir)
+        else: 
+            logger.error("Tried to create directory %s, it exists but isn't a directory\n" % newdir)
+            raise RuntimeError
     else:
         os.makedirs(Dir)
     os.chdir(Dir)
@@ -830,7 +836,8 @@ def allsplit(Dir):
 
 def Leave(Dir):
     if os.path.split(os.getcwd())[1] != Dir:
-        raise Exception("Trying to leave directory %s, but we're actually in directory %s (check your code)" % (Dir,os.path.split(os.getcwd())[1]))
+        logger.error("Trying to leave directory %s, but we're actually in directory %s (check your code)\n" % (Dir,os.path.split(os.getcwd())[1]))
+        raise RuntimeError
     for i in range(len(allsplit(Dir))):
         os.chdir('..')
 
@@ -871,23 +878,28 @@ def LinkFile(src, dest, nosrcok = False):
     if os.path.exists(src):
         if os.path.exists(dest):
             if os.path.islink(dest): pass
-            else: raise Exception("Tried to create symbolic link %s to %s, destination exists but isn't a symbolic link" % (src, dest))
+            else: 
+                logger.error("Tried to create symbolic link %s to %s, destination exists but isn't a symbolic link\n" % (src, dest))
+                raise RuntimeError
         else:
             os.symlink(src, dest)
     else:
         if not nosrcok:
-            raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist%s" % (src,dest,MissingFileInspection(src)))
+            logger.error("Tried to create symbolic link %s to %s, but source file doesn't exist%s\n" % (src,dest,MissingFileInspection(src)))
+            raise RuntimeError
     
 
 def CopyFile(src, dest):
     if os.path.exists(src):
         if os.path.exists(dest):
             if os.path.islink(dest): 
-                raise Exception("Tried to copy %s to %s, destination exists but it's a symbolic link" % (src, dest))
+                logger.error("Tried to copy %s to %s, destination exists but it's a symbolic link\n" % (src, dest))
+                raise RuntimeError
         else:
             shutil.copy2(src, dest)
     else:
-        raise Exception("Tried to copy %s to %s, but source file doesn't exist%s" % (src,dest,MissingFileInspection(src)))
+        logger.error("Tried to copy %s to %s, but source file doesn't exist%s\n" % (src,dest,MissingFileInspection(src)))
+        raise RuntimeError
 
 def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
@@ -1050,7 +1062,8 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             # This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.
             # sys.stderr.write("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
             # sys.exit(p.returncode)
-            raise Exception("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
+            logger.error("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n\n" % (command, p.returncode))
+            raise RuntimeError
         
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
     Out = process_out.stdout.split('\n')

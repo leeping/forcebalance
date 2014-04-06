@@ -119,7 +119,8 @@ class Moments(Target):
                 self.ref_moments['polarizability']['zz'] = float(s[2])
             else:
                 logger.info("%s\n" % line)
-                raise Exception("This line doesn't comply with our multipole file format!")
+                logger.error("This line doesn't comply with our multipole file format!\n")
+                raise RuntimeError
             ln += 1
         # Subtract the trace of the quadrupole moment.
         if 'quadrupole' in self.ref_moments:

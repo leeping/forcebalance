@@ -210,7 +210,8 @@ class AbInitio(Target):
         elif self.force_map == 'chargegroup' and 'ChargeGroupNumber' in self.AtomLists:
             Block = self.AtomLists['ChargeGroupNumber']
         else:
-            raise Exception('force_map keyword "%s" is invalid. Please choose from: %s' % (self.force_map, ', '.join(['"%s"' % kwds[k] for k in self.AtomLists.keys() if k in kwds])))
+            logger.error('force_map keyword "%s" is invalid. Please choose from: %s\n' % (self.force_map, ', '.join(['"%s"' % kwds[k] for k in self.AtomLists.keys() if k in kwds])))
+            raise RuntimeError
 
         nft = self.fitatoms
         # Number of particles that the force is acting on
@@ -225,14 +226,16 @@ class AbInitio(Target):
         mask = np.array([i for i in range(npr) if self.AtomMask[i]])
         
         if nfp not in [npr, nat]:
-            raise RuntimeError('Force contains %i particles but expected %i or %i' % (nfp, npr, nat))
+            logger.error('Force contains %i particles but expected %i or %i\n' % (nfp, npr, nat))
+            raise RuntimeError
         elif nfp == nat:
             frc1 = force.reshape(-1,3)[:nft].flatten()
         elif nfp == npr:
             frc1 = force.reshape(-1,3)[mask][:nft].flatten()
 
         if nxp not in [npr, nat]:
-            raise RuntimeError('Coordinates contains %i particles but expected %i or %i' % (nfp, npr, nat))
+            logger.error('Coordinates contains %i particles but expected %i or %i\n' % (nfp, npr, nat))
+            raise RuntimeError
         elif nxp == nat:
             xyz1 = xyz[:nft]
         elif nxp == npr:
@@ -377,7 +380,8 @@ class AbInitio(Target):
             self.emd0 -= np.mean(self.emd0)
         if self.whamboltz == True:
             if self.attenuate:
-                raise RuntimeError('whamboltz and attenuate are mutually exclusive')
+                logger.error('whamboltz and attenuate are mutually exclusive\n')
+                raise RuntimeError
             self.boltz_wts = np.array([float(i.strip()) for i in open(os.path.join(self.root,self.tgtdir,"wham-weights.txt")).readlines()])
             #   This is a constant pre-multiplier in front of every snapshot.
             bar = printcool("Using WHAM MM Boltzmann weights.", color=4)
@@ -469,13 +473,15 @@ class AbInitio(Target):
         if hasattr(self, 'engine'):
             return self.engine.energy().reshape(-1,1)
         else:
-            raise NotImplementedError("Target must contain an engine object")
+            logger.error("Target must contain an engine object\n")
+            raise NotImplementedError
 
     def energy_force_all(self):
         if hasattr(self, 'engine'):
             return self.engine.energy_force()
         else:
-            raise NotImplementedError("Target must contain an engine object")
+            logger.error("Target must contain an engine object\n")
+            raise NotImplementedError
         
     def energy_force_transform(self):
         if self.force:
@@ -498,13 +504,15 @@ class AbInitio(Target):
         if hasattr(self, 'engine'):
             return self.engine.energy_one(i)
         else:
-            raise NotImplementedError("Target must contain an engine object")
+            logger.error("Target must contain an engine object\n")
+            raise NotImplementedError
 
     def energy_force_one(self, i):
         if hasattr(self, 'engine'):
             return self.engine.energy_force_one(i)
         else:
-            raise NotImplementedError("Target must contain an engine object")
+            logger.error("Target must contain an engine object\n")
+            raise NotImplementedError
 
     def energy_force_transform_one(self,i):
         if self.force:
@@ -1165,7 +1173,8 @@ class AbInitio(Target):
             for i in Answer_ESP:
                 Answer[i] += w_resp * Answer_ESP[i]
         if not any([self.energy, self.force, self.resp]):
-            raise Exception("Ab initio fitting must have at least one of: Energy, Force, ESP")
+            logger.error("Ab initio fitting must have at least one of: Energy, Force, ESP\n")
+            raise RuntimeError
         if not in_fd():
             self.objective = Answer['X']
         return Answer

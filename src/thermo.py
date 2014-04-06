@@ -255,7 +255,8 @@ class FIX_Parser(TextParser):
             self.format = "right-aligned fixed width text"
         else:
             # Sanity check - it should never get here unless the parser is incorrect.
-            raise RuntimeError("Fixed-width format detected but columns are neither left-aligned nor right-aligned!")
+            logger.error("Fixed-width format detected but columns are neither left-aligned nor right-aligned!\n")
+            raise RuntimeError
     
 def parse1(fnm):
 
@@ -328,12 +329,12 @@ class Thermo(Target):
             LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
                      os.path.join(self.root, self.tempdir, f))
     
-    def read_source(self, source):
+    def read_source(self, srcfnm):
         """Read and store source data.
 
         Parameters
         ----------
-        source : string
+        srcfnm : string
             Read source data from this filename.
 
         Returns
@@ -342,40 +343,91 @@ class Thermo(Target):
 
         """
             
-        parser = parse1(source)
-        print parser.headings
-        printcool_dictionary(parser.metadata, title="Metadata")
-        # print parser.table
-        revised_headings = []
+        source = parse1(srcfnm)
+        printcool_dictionary(source.metadata, title="Metadata")
+        # print source.table
+        revhead = []
         obs = ''
         def error_left(i):
-            logger.error('Encountered heading %s but there is no observable to the left\n' % i)
+            logger.error('\x1b[91mEncountered heading %s but there is no observable to the left\x1b[0m\n' % i)
             raise RuntimeError
 
-        for head in parser.headings:
+        def standardize_heading(obs, head, abbrevs, standard_abbrev):
+            if head in abbrevs:
+                if obs == '': error_left(head)
+                return obs + '_' + standard_abbrev, False
+            elif len(head.split('_')) > 1 and head.split('_')[-1] in abbrevs:
+                newhl = head.split('_')
+                newhl[-1] = standard_abbrev
+                return '_'.join(newhl), False
+            else:
+                return head, True
+
+        units = defaultdict(str)
+
+        for i, head in enumerate(source.headings):
+            head = head.lower()
+            if i == 0 and head == 'index': # Treat special case because index can also mean other things
+                revhead.append(head)
+                continue
             usplit = re.split(' *\(', head, maxsplit=1)
+            punit = ''
             if len(usplit) > 1:
                 hfirst = usplit[0]
                 punit = re.sub('\)$','',usplit[1].strip())
                 print "header", head, "split into", hfirst, ",", punit
             else:
                 hfirst = head
-                punit = ''
             newh = hfirst
-            if head.lower() in ['w', 'wt', 'wts']:
-                if obs == '': error_left(head)
-                newh = obs + '_' + hfirst
-            elif head.lower() in ['s', 'sig', 'sigma']:
-                if obs == '': error_left(head)
-                newh = obs + '_' + hfirst
-            elif head.lower() in ['idx']:
-                if obs == '': error_left(head)
-                newh = obs + '_' + hfirst
-            else:
+            newh, o1 = standardize_heading(obs, newh, ['w', 'wt', 'wts', 'weight', 'weights'], 'weight')
+            newh, o2 = standardize_heading(obs, newh, ['s', 'sig', 'sigma', 'sigmas'], 'sigma')
+            newh, o3 = standardize_heading(obs, newh, ['i', 'idx', 'index', 'indices'], 'index')
+            if newh in ['t', 'temp', 'temperature']: newh = 'temperature'
+            if newh in ['p', 'pres', 'pressure']: newh = 'pressure'
+            if all([o1, o2, o3]):
                 obs = hfirst
             if newh != hfirst:
-                print "header", head, "renamed to", newh
+                print "header", hfirst, "renamed to", newh
+            revhead.append(newh)
+            if punit != '':
+                units[newh] = punit
+ 
+        if len(set(revhead)) != len(revhead):
+            logger.error('Column headings : ' + str(revhead) + '\n')
+            logger.error('\x1b[91mColumn headings are not unique!\x1b[0m\n')
+            raise RuntimeError
 
+        print revhead
+        if revhead[0] != 'index':
+            logger.error('\x1b[91mIndex column heading is not present\x1b[0m\n(Add an Index column on the left!)\n')
+            raise RuntimeError
+            
+        uqidx = []
+        saveidx = ''
+        index = []
+        # thisidx = Index that is built from the current row (may be empty)
+        # saveidx = Index that may have been saved from a previous row
+        for row in source.table:
+            thisidx = row[0]
+            if thisidx != '': 
+                saveidx = thisidx
+                if saveidx in uqidx: 
+                    logger.error('Index %s is duplicated in data table\n' % i)
+                    raise RuntimeError
+                uqidx.append(saveidx)
+            index.append(saveidx)
+            if saveidx == '':
+                logger.error('Row of data : ' + str(row) + '\n')
+                logger.error('\x1b[91mThis row does not have an index!\x1b[0m\n')
+                raise RuntimeError
+                
+        self.Data = pd.DataFrame([])
+
+        # pd.DataFrame([OrderedDict([(head, row[i]) for i, head in revised_headings if row[i] != '']) for row in source.table])
+
+
+        # pd.DataFrame(OrderedDict([(head,[row[i] for row in source.table]) for i, head in enumerate(revised_headings)]))
+        # print self.Data.__repr__
         raw_input()
 
         return
