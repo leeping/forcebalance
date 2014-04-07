@@ -157,7 +157,7 @@ tgt_opts_types = {
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
                  },
     'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
-                 "quantities" : ([], 100, 'List of quantities to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
+                 "observables" : ([], 100, 'List of observables to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
@@ -174,7 +174,7 @@ tgt_opts_types = {
                  "save_traj"          : (0, -10, 'Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save', 'Condensed phase properties', 'Liquid, Lipid'),
                  "eq_steps"           : (20000, 0, 'Number of time steps for the equilibration run.', 'Thermodynamic property targets', 'thermo'),
                  "md_steps"           : (50000, 0, 'Number of time steps for the production run.', 'Thermodynamic property targets', 'thermo'),
-                 "n_sim_chain"        : (1, 0, 'Number of simulations required to calculate quantities.', 'Thermodynamic property targets', 'thermo'),
+                 "n_sim_chain"        : (1, 0, 'Number of simulations required to calculate observables.', 'Thermodynamic property targets', 'thermo'),
                  },
     'bools'   : {"whamboltz"        : (0, -100, 'Whether to use WHAM Boltzmann Weights', 'Ab initio targets with Boltzmann weights (advanced usage)', 'AbInitio'),
                  "sampcorr"         : (0, -150, 'Whether to use the archaic sampling correction', 'Energy + Force Matching, very old option, do not use', 'AbInitio'),
@@ -285,6 +285,7 @@ bkwd = {"simtype" : "type",
         "lipid_prod_steps" : "lipid_md_steps",
         "lipid_equ_steps" : "lipid_eq_steps",
         "expdata_txt" : "source", 
+        "quantities" : "observables", 
         }
 
 ## Listing of sections in the input file.

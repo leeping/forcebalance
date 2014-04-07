@@ -63,44 +63,49 @@ def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True):
         G[i,:]   = EDG[:]
     return G
 
-class Quantity(object):
+class Observable(object):
     """
-    Base class for thermodynamical quantity used for fitting. This can
+    Base class for thermodynamical observable used for fitting. This can
     be any experimental data that can be calculated as an ensemble
     average from a simulation.
 
     Data attributes
     ---------------
     name : string
-        Identifier for the quantity that is specified in `quantities` in Target
+        Identifier for the observable that is specified in `observables` in Target
         options.
-    engname : string
-        Use this engine to extract the quantity from the simulation results.
-        At present, only `gromacs` is supported.
-    temperature : float
-        Calculate the quantity at this temperature (in K).
-    pressure : float
-        Calculate the quantity at this pressure (in bar).
-        
+    sreq : list of (strings or lists)
+        The names of simulation types that are needed to calculate
+        this observable.  If a string is added to the list, then that
+        simulation is *required* to calculate the observable.  If a
+        list is added, then any simulation within that type is allowed,
+        but the first member of the list is used by default.
+    treq : list of strings
+        The names of timeseries from each simulation that are needed to
+        calculate this observable.
+    dreq : list of strings
+        The names of timeseries from each simulation - in addition to
+        "treq" - that are needed to *differentiate* this observable.
+        (Usually energy derivatives)
     """
-    def __init__(self, engname, temperature, pressure, name=None):
+    def __init__(self, source, name=None):
         self.name        = name if name is not None else "empty"
-        self.engname     = engname
-        self.temperature = temperature
-        self.pressure    = pressure
+        self.sreq = []
+        self.treq = []
+        self.dreq = ['energy_derivatives']
                     
     def __str__(self):
-        return "quantity is " + self.name.capitalize() + "."
+        return "observable is " + self.name.capitalize() + "."
 
     def extract(self, engines, FF, mvals, h, AGrad=True):
-        """Calculate and extract the quantity from MD results. How this is done
-        depends on the quantity and the engine so this must be
+        """Calculate and extract the observable from MD results. How this is done
+        depends on the observable and the engine so this must be
         implemented in the subclass.
 
         Parameters
         ----------
         engines : list
-            A list of Engine objects that are requred to calculate the quantity.
+            A list of Engine objects that are requred to calculate the observable.
         FF : FF
             Force field object.
         mvals : list
@@ -114,22 +119,28 @@ class Quantity(object):
         -------
         result : (float, float, np.array)
             The returned tuple is (Q, Qerr, Qgrad), where Q is the calculated
-            quantity, Qerr is the calculated standard deviation of the quantity,
+            observable, Qerr is the calculated standard deviation of the observable,
             and Qgrad is a M-array with the calculated gradients for the
-            quantity, with M being the number of force field parameters that are
+            observable, with M being the number of force field parameters that are
             being fitted. 
         
         """
         logger.error("Extract method not implemented in base class.\n")    
         raise NotImplementedError
 
-# class Quantity_Density
-class Quantity_Density(Quantity):
-    def __init__(self, engname, temperature, pressure, name=None):
+# class Observable_Density
+class Observable_Density(Observable):
+    def __init__(self, source, name=None):
         """ Density. """
-        super(Quantity_Density, self).__init__(engname, temperature, pressure, name)
+        super(Observable_Density, self).__init__(source, name)
         
         self.name = name if name is not None else "density"
+
+        # Calculating the density requires either a liquid or solid simulation.
+        self.sreq = [['liquid', 'solid']]
+
+        # Requires timeseries of densities from the simulation.
+        self.treq = ['density']
 
     def extract(self, engines, FF, mvals, h, pgrad, AGrad=True):         
         #==========================================#
@@ -182,9 +193,9 @@ class Quantity_Density(Quantity):
                   color=4, bold=True)    
         G = energy_derivatives(engines[0], FF, mvals, h, pgrad, len(Energy), AGrad)
         
-        #=======================================#
-        #  Quantity properties and derivatives. #
-        #=======================================#
+        #=========================================#
+        #  Observable properties and derivatives. #
+        #=========================================#
         # Average and error.
         Rho_avg, Rho_err = mean_stderr(Density)
         # Analytic first derivative.
@@ -193,13 +204,19 @@ class Quantity_Density(Quantity):
             
         return Rho_avg, Rho_err, Rho_grad
 
-# class Quantity_H_vap
-class Quantity_H_vap(Quantity):
-    def __init__(self, engname, temperature, pressure, name=None):
+# class Observable_H_vap
+class Observable_H_vap(Observable):
+    def __init__(self, source, name=None):
         """ Enthalpy of vaporization. """
-        super(Quantity_H_vap, self).__init__(engname, temperature, pressure, name)
+        super(Observable_H_vap, self).__init__(source, name)
         
         self.name = name if name is not None else "H_vap"
+
+        # Calculating the heat of vaporization requires a liquid simulation and a gas simulation.
+        self.sreq = ['liquid', 'gas']
+
+        # Requires timeseries of energies and volumes from the simulation.
+        self.treq = ['energy', 'volume']
 
     def extract(self, engines, FF, mvals, h, pgrad, AGrad=True): 
         #==========================================#
@@ -274,9 +291,9 @@ class Quantity_H_vap(Quantity):
         G  = energy_derivatives(engines[0], FF, mvals, h, pgrad, len(Energy), AGrad)
         Gm = energy_derivatives(engines[1], FF, mvals, h, pgrad, len(mEnergy), AGrad)
                 
-        #=======================================#
-        #  Quantity properties and derivatives. #
-        #=======================================#
+        #=========================================#
+        #  Observable properties and derivatives. #
+        #=========================================#
         # Average and error.
         E_avg, E_err     = mean_stderr(Energy)
         Em_avg, Em_err   = mean_stderr(mEnergy)

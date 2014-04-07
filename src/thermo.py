@@ -7,6 +7,7 @@ import pandas as pd
 import itertools
 import cStringIO
 
+from forcebalance.observable import *
 from forcebalance.target import Target
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import flat, col, row, isint
@@ -346,6 +347,17 @@ def stand_head(head, obs):
         logger.debug("header %s renamed to %s\n" % (hfirst, newh))
     return newh, punit, obs
 
+def determine_needed_simulations(observables):
+
+    """ Given a list of Observable objects, determine the list of
+    simulations that are needed to calculate all of them. """
+
+    sreqs = OrderedDict()
+    for obs in observables:
+        sreqs[obs.name] = obs.sreq[:]
+    print sreqs
+
+
 class Thermo(Target):
     """
     A target for fitting general experimental data sets. The source
@@ -360,8 +372,8 @@ class Thermo(Target):
         ## Parameters
         # Source data (experimental data, model parameters and weights)
         self.set_option(tgt_opts, "source", forceprint=True)
-        # Quantities to calculate
-        self.set_option(tgt_opts, "quantities", forceprint=True)
+        # Observables to calculate
+        self.set_option(tgt_opts, "observables", "observable_names", forceprint=True)
         # Length of simulation chain
         self.set_option(tgt_opts, "n_sim_chain", forceprint=True)
         # Number of time steps in the equilibration run
@@ -372,21 +384,30 @@ class Thermo(Target):
         ## Variables
         # Prefix names for simulation data
         self.simpfx    = "sim"
-        # Data points for quantities
+        # Data points for observables
         self.points    = []
-        # Denominators for quantities
+        # Denominators for observables
         self.denoms    = {}
-        # Weights for quantities
+        # Weights for observables
         self.weights   = {}
 
-        ## Read source data and initialize points
+        ## A mapping that takes us from observable names to Observable objects.
+        self.Observable_Map = {'density' : Observable_Density,
+                               'rho' : Observable_Density,
+                               'hvap' : Observable_H_vap,
+                               'h_vap' : Observable_H_vap}
+
+        ## Read source data and initialize points; creates self.Data, self.Ensembles and self.Observables objects.
         self.read_source(os.path.join(self.root, self.tgtdir, self.source))
         
         ## Copy run scripts from ForceBalance installation directory
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
                      os.path.join(self.root, self.tempdir, f))
-    
+
+        ## Set up simulations
+        self.prepare_simulations()
+
     def read_source(self, srcfnm):
         """Read and store source data.
 
@@ -406,7 +427,7 @@ class Thermo(Target):
         printcool_dictionary(source.metadata, title="Metadata")
         revhead = []
         obs = ''
-
+        obsnames = []
 
         units = defaultdict(str)
 
@@ -415,6 +436,7 @@ class Thermo(Target):
                 revhead.append('index')
                 continue
             newh, punit, obs = stand_head(head, obs)
+            if obs not in obsnames + ['temp', 'pres', 'n_ic']: obsnames.append(obs)
             revhead.append(newh)
             if punit != '':
                 units[newh] = punit
@@ -514,7 +536,63 @@ class Thermo(Target):
             drows.append([i if i != '' else np.nan for i in row[1:]])
 
         # Turn it into a pandas DataFrame.
-        self.Data = pd.DataFrame(drows, columns=revhead[1:], index=index)
+        self.Data = pd.DataFrame(drows, columns=revhead[1:], index=pd.MultiIndex.from_tuples(index, names=['ensemble', 'subindex']))
+
+        # A list of ensembles (i.e. top-level indices) which correspond
+        # to sets of simulations that we'll be running.
+        self.Ensembles = []
+        for idx in self.Data.index:
+            if idx[0] not in self.Ensembles:
+                self.Ensembles.append(idx[0])
+
+        # A list of Observable objects (i.e. column headings) which
+        # contain methods for calculating observables that we need.
+        # Think about: 
+        # (1) How much variability is allowed across Ensembles?
+        #     For instance, different S_cd is permissible.
+        self.Observables = OrderedDict()
+        for obsname in [stand_head(i, '')[2] for i in self.observable_names]:
+            if obsname in self.Observables:
+                logger.error('%s was already specified as an observable' % (obsname))
+            self.Observables[obsname] = OrderedDict()
+            for ie, ensemble in enumerate(self.Ensembles):
+                if obsname in self.Observable_Map:
+                    newobs = self.Observable_Map[obsname](source=self.Data.ix[ensemble])
+                    logger.info('%s is specified as an observable, appending %s class\n' % (obsname, newobs.__class__.__name__))
+                    self.Observables[obsname][ensemble] = newobs
+                else:
+                    logger.warn('%s is specified but there is no corresponding Observable class, appending empty one\n' % obsname)
+                    self.Observables[obsname][ensemble] = Observable(name=obsname, source=self.Data.ix[ensemble])
+
+        # for ensemble in self.Ensembles:
+        #     self.Observables[ensemble] = []
+        # for obsname in obsnames:
+        #     for ensemble, ie in enumerate(self.Ensembles):
+        #         if obsname in self.Observable_Map:
+        #             newobs = self.Observable_Map[obsname](source=self.Data.ix[ensemble])
+        #             if newobs.name in [obs.name for obs in self.Observables[ensemble]]:
+        #                 logger.error('%s is specified but a %s observable already exists' % (obsname, newobs.__class__.__name__))
+        #             logger.info('%s is specified as an observable, appending %s class\n' % (obsname, newobs.__class__.__name__))
+        #             self.Observables[ensemble].append(newobs)
+        #         else:
+        #             logger.warn('%s is specified but there is no corresponding Observable class, appending empty one\n' % obsname)
+        #             self.Observables[ensemble].append(Observable(name=obsname, source=self.Data.ix[ensemble]))
+        return
+
+    def prepare_simulations(self):
+
+        """ 
+
+        Prepare simulations to be launched.  Set initial conditions
+        and create directories.  This function is intended to be run
+        at the start of each optimization cycle, so that initial
+        conditions may be easily set.
+
+        """
+
+        # The list of simulations that we'll be running.
+        self.Simulations = OrderedDict([(i, []) for i in self.Ensembles])
+        
         return
 
     def launch_simulation(self, index, simname):
@@ -591,10 +669,10 @@ class Thermo(Target):
         #         metadata[param] = value
         #         # if param == "denoms":
         #         #     for e, v in enumerate(value.split()):
-        #         #         self.denoms[self.quantities[e]] = float(v)
+        #         #         self.denoms[self.observables[e]] = float(v)
         #         # elif param == "weights":
         #         #     for e, v in enumerate(value.split()):
-        #         #         self.weights[self.quantities[e]] = float(v)
+        #         #         self.weights[self.observables[e]] = float(v)
         #     elif foundHeader: # Read exp data
         #         count      += 1
         #         vals        = line.split()
@@ -620,12 +698,12 @@ class Thermo(Target):
     
     def retrieve(self, dp):
         """Retrieve the molecular dynamics (MD) results and store the calculated
-        quantities in the Point object dp.
+        observables in the Point object dp.
 
         Parameters
         ----------
         dp : Point
-            Store the calculated quantities in this point.
+            Store the calculated observables in this point.
 
         Returns
         -------
@@ -647,9 +725,9 @@ class Thermo(Target):
             msg = 'The file ' + abspath + ' does not exist so we cannot read it.\n'
             logger.warning(msg)
 
-            dp.data["values"] = np.zeros((len(self.quantities)))
-            dp.data["errors"] = np.zeros((len(self.quantities)))
-            dp.data["grads"]  = np.zeros((len(self.quantities), self.FF.np))
+            dp.data["values"] = np.zeros((len(self.observables)))
+            dp.data["errors"] = np.zeros((len(self.observables)))
+            dp.data["grads"]  = np.zeros((len(self.observables), self.FF.np))
             
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         """This routine is called by Objective.stage() and will run before "get".
@@ -696,7 +774,7 @@ class Thermo(Target):
                 
             # Run the simulation chain for point.        
             cmdstr = ("%s python md_chain.py " % self.mdpfx +
-                      " ".join(self.quantities) + " " +
+                      " ".join(self.observables) + " " +
                       "--engine %s " % self.engname +
                       "--length %d " % self.n_sim_chain + 
                       "--name %s " % self.simpfx +
@@ -735,7 +813,7 @@ class Thermo(Target):
                                    (self.Xp[key], self.Wp[key],
                                     self.Xp[key]*self.Wp[key])))
 
-        for i, q in enumerate(self.quantities):
+        for i, q in enumerate(self.observables):
             print_item(q, self.points[0].ref["units"][i])
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","", self.Objective)
@@ -745,14 +823,14 @@ class Thermo(Target):
         printcool_dictionary(PrintDict, color=4, title=Title, keywidth=31)
         return
 
-    def objective_term(self, quantity):
+    def objective_term(self, observable):
         """Calculates the contribution to the objective function (the term) for a
-        given quantity.
+        given observable.
 
         Parameters
         ----------
-        quantity : string
-            Calculate the objective term for this quantity.
+        observable : string
+            Calculate the objective term for this observable.
 
         Returns
         -------
@@ -767,18 +845,18 @@ class Thermo(Target):
         Gradient  = np.zeros(self.FF.np)
         Hessian   = np.zeros((self.FF.np, self.FF.np))
 
-        # Grab ref data for quantity        
-        qid       = self.quantities.index(quantity)
+        # Grab ref data for observable        
+        qid       = self.observables.index(observable)
         Exp       = np.array([pt.ref["refs"][qid] for pt in self.points])
         Weights   = np.array([pt.ref["weights"][qid] for pt in self.points])
-        Denom     = self.denoms[quantity]
+        Denom     = self.denoms[observable]
             
         # Renormalize weights
         Weights /= np.sum(Weights)
         logger.info("Renormalized weights to " + str(np.sum(Weights)) + "\n")
-        logger.info(("Physical quantity '%s' uses denominator = %g %s\n" %
-                     (quantity.capitalize(), Denom,
-                      self.points[0].ref["units"][self.quantities.index(quantity)])))
+        logger.info(("Physical observable '%s' uses denominator = %g %s\n" %
+                     (observable.capitalize(), Denom,
+                      self.points[0].ref["units"][self.observables.index(observable)])))
 
         # Grab calculated values        
         values = np.array([pt.data["values"][qid] for pt in self.points])
@@ -814,7 +892,7 @@ class Thermo(Target):
             GradMapPrint.append([' %8.2f %8.1f' % (temp, press)] +
                                 ["% 9.3e" % i for i in grads[pt.idnr-1]])
 
-        o = wopen('gradient_%s.dat' % quantity)
+        o = wopen('gradient_%s.dat' % observable)
         for line in GradMapPrint:
             print >> o, ' '.join(line)
         o.close()
@@ -831,7 +909,7 @@ class Thermo(Target):
 
     def get(self, mvals, AGrad=True, AHess=True):
         """Return the contribution to the total objective function. This is a
-        weighted average of the calculated quantities.
+        weighted average of the calculated observables.
 
         Parameters
         ----------
@@ -863,16 +941,16 @@ class Thermo(Target):
 
         obj        = OrderedDict()
         reweighted = []
-        for q in self.quantities:
+        for q in self.observables:
             # Returns dict with keys "X"=objective term value, "G"=the
             # gradient, "H"=the hessian, and "info"=printed info about points
             obj[q] = self.objective_term(q)
         
-            # Apply weights for quantities (normalized)
+            # Apply weights for observables (normalized)
             if obj[q]["X"] == 0:
                 self.weights[q] = 0.0
 
-            # Store weights sorted in the order of self.quantities
+            # Store weights sorted in the order of self.observables
             reweighted.append(self.weights[q])
         
         # Normalize weights
@@ -880,16 +958,16 @@ class Thermo(Target):
         wtot        = np.sum(reweighted)
         reweighted  = reweighted/wtot if wtot > 0 else reweighted
          
-        # Picks out the "X", "G" and "H" keys for the quantities sorted in the
-        # order of self.quantities. Xs is N-array, Gs is NxM-array and Hs is
-        # NxMxM-array, where N is number of quantities and M is number of
+        # Picks out the "X", "G" and "H" keys for the observables sorted in the
+        # order of self.observables. Xs is N-array, Gs is NxM-array and Hs is
+        # NxMxM-array, where N is number of observables and M is number of
         # parameters.
         Xs = np.array([dic["X"] for dic in obj.values()])
         Gs = np.array([dic["G"] for dic in obj.values()])
         Hs = np.array([dic["H"] for dic in obj.values()])
                                 
         # Target contribution is (normalized) weighted averages of the
-        # individual quantity terms.
+        # individual observable terms.
         Objective    = np.average(Xs, weights=(None if np.all(reweighted == 0) else \
                                                reweighted), axis=0)
         if AGrad:
@@ -902,7 +980,7 @@ class Thermo(Target):
         if not in_fd():
             # Store results to show with indicator() function
             self.Xp = {q : dic["X"] for (q, dic) in obj.items()}
-            self.Wp = {q : reweighted[self.quantities.index(q)]
+            self.Wp = {q : reweighted[self.observables.index(q)]
                        for (q, dic) in obj.items()}
             self.Pp = {q : dic["info"] for (q, dic) in obj.items()}
 
