@@ -144,7 +144,7 @@ eq_steps 50000
 $end
 
 $target
-name Lipid_HARD
+name Lipid_MIX
 type Thermo_GMX
 weight 1.0
 source lipidcol1.txt

@@ -63,11 +63,11 @@ class TextParser(object):
             self.fields = fields
             # Skip over empty lines or comment lines.
             if self.is_empty_line():
-                logger.info("\x1b[96mempt\x1b[0m %s\n" % line.replace('\n',''))
+                logger.debug("\x1b[96mempt\x1b[0m %s\n" % line.replace('\n',''))
                 self.ln += 1
                 continue
             if self.is_comment_line():
-                logger.info("\x1b[96mcomm\x1b[0m %s\n" % line.replace('\n',''))
+                logger.debug("\x1b[96mcomm\x1b[0m %s\n" % line.replace('\n',''))
                 self.ln += 1
                 continue
             # Indicates metadata mode.
@@ -96,19 +96,20 @@ class TextParser(object):
                     meta[mkey].append(fld)
             # Set field start, field end, and field content for the header.
             if is_header:
-                logger.info("\x1b[1;96mhead\x1b[0m %s\n" % line.replace('\n',''))
+                logger.debug("\x1b[1;96mhead\x1b[0m %s\n" % line.replace('\n',''))
                 self.process_header()
             elif is_meta:
-                logger.info("\x1b[96mmeta\x1b[0m %s\n" % line.replace('\n',''))
+                logger.debug("\x1b[96mmeta\x1b[0m %s\n" % line.replace('\n',''))
             else:
                 # Build the row of data to be appended to the table.
                 # Loop through the fields in the header and inserts fields
                 # in the data line accordingly.  Ignores trailing tabs/spaces.
-                logger.info("\x1b[96mdata\x1b[0m %s\n" % line.replace('\n',''))
+                logger.debug("\x1b[96mdata\x1b[0m %s\n" % line.replace('\n',''))
                 table.append(self.process_data())
             self.ln += 1
         self.sanity_check()
-        printcool("%s parsed as %s" % (self.fnm.replace(os.getcwd()+'/',''), self.format), color=6)
+        if logger.level == DEBUG:
+            printcool("%s parsed as %s" % (self.fnm.replace(os.getcwd()+'/',''), self.format), color=6)
         self.metadata = meta
         self.table = table
         
@@ -330,7 +331,7 @@ def stand_head(head, obs):
     if len(usplit) > 1:
         hfirst = usplit[0]
         punit = re.sub('\)$','',usplit[1].strip())
-        print "header", head, "split into", hfirst, ",", punit
+        logger.debug("header %s split into %s, %s" % (head, hfirst, punit))
     else:
         hfirst = head
     newh = hfirst
@@ -342,13 +343,14 @@ def stand_head(head, obs):
     if all([o1, o2, o3]):
         obs = newh
     if newh != hfirst:
-        print "header", hfirst, "renamed to", newh
+        logger.debug("header %s renamed to %s\n" % (hfirst, newh))
     return newh, punit, obs
 
 class Thermo(Target):
     """
-    A target for fitting general experimental data sets. The
-    source data is described in a .txt file.
+    A target for fitting general experimental data sets. The source
+    data is described in a text file formatted according to the
+    Specification.
 
     """
     def __init__(self, options, tgt_opts, forcefield):
@@ -402,7 +404,6 @@ class Thermo(Target):
         logger.info('Parsing source file %s\n' % srcfnm)
         source = parse1(srcfnm)
         printcool_dictionary(source.metadata, title="Metadata")
-        # print source.table
         revhead = []
         obs = ''
 
@@ -424,7 +425,6 @@ class Thermo(Target):
             logger.error('\x1b[91mColumn headings are not unique!\x1b[0m\n')
             raise RuntimeError
 
-        print revhead
         if revhead[0] != 'index':
             logger.error('\x1b[91mIndex column heading is not present\x1b[0m\n(Add an Index column on the left!)\n')
             raise RuntimeError
@@ -441,7 +441,6 @@ class Thermo(Target):
         fref = OrderedDict()
         for rn, row in enumerate(source.table):
             this_insert = []
-            # crow = row[1:]
             thisidx = row[0]
             if thisidx != '': 
                 saveidx = thisidx
@@ -457,7 +456,14 @@ class Thermo(Target):
                 raise RuntimeError
             snum += 1
             if any([':' in fld for fld in row[1:]]):
-                # Here we insert rows from another data table.
+                # Here we read rows from another data table.  
+                # Other files may be referenced in the cell of a primary
+                # table using filename:column_number (numbered from 1).
+                # Rules: (1) No matter where the filename appears in the column,
+                # the column is inserted at the beginning of the system index.
+                # (2) There can only be one file per system index / column.
+                # (3) The column heading in the secondary file that's being
+                # referenced must match that of the reference in the primary file.
                 obs2 = ''
                 for cid_, fld in enumerate(row[1:]):
                     if ':' not in fld: continue
@@ -486,6 +492,8 @@ class Thermo(Target):
                         reffld_error("Column heading of %s (%s) doesn't match original (%s)" % (fnm, head2, revhead[cid]))
                     fref[(saveidx, revhead[cid])] = [row2[fcol] for row2 in subfile.table]
 
+        # Insert the file-referenced data tables appropriately into
+        # our main data table.
         for (saveidx, head), newcol in fref.items():
             inum = 0
             for irow in range(len(source.table)):
@@ -499,81 +507,116 @@ class Thermo(Target):
                 lrow += 1
                 nrow = ['' for i in range(len(revhead))]
                 nrow[cidx] = newcol[inum1]
-                print "Inserting", nrow, "after row", lrow
                 source.table.insert(lrow, nrow)
                 index.insert(lrow, (saveidx, inum1))
-
-            # for irow in range(
-            # for irow1 in range(max(0, len(newcol)-inum))
                 
         for rn, row in enumerate(source.table):
             drows.append([i if i != '' else np.nan for i in row[1:]])
 
-        print revhead[1:]
-        for rn, row in enumerate(drows):
-            print index[rn], row
-
+        # Turn it into a pandas DataFrame.
         self.Data = pd.DataFrame(drows, columns=revhead[1:], index=index)
-        print repr(self.Data)
-
-        # pd.DataFrame([OrderedDict([(head, row[i]) for i, head in revised_heading if row[i] != '']) for row in source.table])
-
-
-        # pd.DataFrame(OrderedDict([(head,[row[i] for row in source.table]) for i, head in enumerate(revised_heading)]))
-        # print self.Data.__repr__
-        # raw_input()
         return
 
-        # return
+    def launch_simulation(self, index, simname):
 
-        fp = open(expdata)
+        """ 
+
+        Launch a simulation - either locally or via the Work Queue.
+        This function is intended to be run within the folder:
+        target_name/iteration_number/system_index/simulation_name/initial_condition OR 
+        target_name/iteration_number/system_index/simulation_name
         
-        line         = fp.readline()
-        foundHeader  = False
-        names        = None
-        units        = None
-        label_header = None
-        label_unit   = None
-        count        = 0
-        metadata     = {}
-        while line:
-            # Skip comments and blank lines
-            if line.lstrip().startswith("#") or not line.strip():
-                line = fp.readline()
-                continue
-            # Metadata is denoted using 
-            if "=" in line: # Read variable
-                param, value = line.split("=")
-                param = param.strip().lower()
-                metadata[param] = value
-                # if param == "denoms":
-                #     for e, v in enumerate(value.split()):
-                #         self.denoms[self.quantities[e]] = float(v)
-                # elif param == "weights":
-                #     for e, v in enumerate(value.split()):
-                #         self.weights[self.quantities[e]] = float(v)
-            elif foundHeader: # Read exp data
-                count      += 1
-                vals        = line.split()
-                label       = (vals[0], label_header, label_unit)
-                refs        = np.array(vals[1:-2:2]).astype(float)
-                wts         = np.array(vals[2:-2:2]).astype(float)
-                temperature = float(vals[-2])
-                pressure    = None if vals[-1].lower() == "none" else \
-                  float(vals[-1])
-                dp = Point(count, label=label, refs=refs, weights=wts,
-                           names=names, units=units,
-                           temperature=temperature, pressure=pressure)
-                self.points.append(dp)
-            else: # Read headers
-                foundHeader = True
-                headers = zip(*[tuple(h.split("_")) for h in line.split()
-                                if h != "w"])
-                label_header = list(headers[0])[0]
-                label_unit   = list(headers[1])[0]
-                names        = list(headers[0][1:-2])
-                units        = list(headers[1][1:-2])
-            line = fp.readline()            
+        """
+        
+        wq = getWorkQueue()
+        if not (os.path.exists('result.p') or os.path.exists('result.p.bz2')):
+            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
+            self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
+            if wq == None:
+                logger.info("Running condensed phase simulation locally.\n")
+                logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
+                _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
+            else:
+                queue_up(wq, command = cmdstr+' &> npt.out',
+                         input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
+                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
+    
+    # NAMES FOR OBJECTS!  
+
+    # Timeseries: Time series of an instantaneous observable that is
+    # returned by the MD simulation.
+
+    # Observable: A thermodynamic property which can be compared to
+    # experiment and possesses methods for calculating the property
+    # and its derivatives.
+
+    # State? Point? What should this be called??
+
+        # # print revhead[1:]
+        # # for rn, row in enumerate(drows):
+        # #     print index[rn], row
+
+        # # print repr(self.Data)
+
+        # # # pd.DataFrame([OrderedDict([(head, row[i]) for i, head in revised_heading if row[i] != '']) for row in source.table])
+
+
+        # # # pd.DataFrame(OrderedDict([(head,[row[i] for row in source.table]) for i, head in enumerate(revised_heading)]))
+        # # # print self.Data.__repr__
+        # # # raw_input()
+
+        # # return
+
+        # fp = open(expdata)
+        
+        # line         = fp.readline()
+        # foundHeader  = False
+        # names        = None
+        # units        = None
+        # label_header = None
+        # label_unit   = None
+        # count        = 0
+        # metadata     = {}
+        # while line:
+        #     # Skip comments and blank lines
+        #     if line.lstrip().startswith("#") or not line.strip():
+        #         line = fp.readline()
+        #         continue
+        #     # Metadata is denoted using 
+        #     if "=" in line: # Read variable
+        #         param, value = line.split("=")
+        #         param = param.strip().lower()
+        #         metadata[param] = value
+        #         # if param == "denoms":
+        #         #     for e, v in enumerate(value.split()):
+        #         #         self.denoms[self.quantities[e]] = float(v)
+        #         # elif param == "weights":
+        #         #     for e, v in enumerate(value.split()):
+        #         #         self.weights[self.quantities[e]] = float(v)
+        #     elif foundHeader: # Read exp data
+        #         count      += 1
+        #         vals        = line.split()
+        #         label       = (vals[0], label_header, label_unit)
+        #         refs        = np.array(vals[1:-2:2]).astype(float)
+        #         wts         = np.array(vals[2:-2:2]).astype(float)
+        #         temperature = float(vals[-2])
+        #         pressure    = None if vals[-1].lower() == "none" else \
+        #           float(vals[-1])
+        #         dp = Point(count, label=label, refs=refs, weights=wts,
+        #                    names=names, units=units,
+        #                    temperature=temperature, pressure=pressure)
+        #         self.points.append(dp)
+        #     else: # Read headers
+        #         foundHeader = True
+        #         headers = zip(*[tuple(h.split("_")) for h in line.split()
+        #                         if h != "w"])
+        #         label_header = list(headers[0])[0]
+        #         label_unit   = list(headers[1])[0]
+        #         names        = list(headers[0][1:-2])
+        #         units        = list(headers[1][1:-2])
+        #     line = fp.readline()            
     
     def retrieve(self, dp):
         """Retrieve the molecular dynamics (MD) results and store the calculated
