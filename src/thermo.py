@@ -498,7 +498,7 @@ class Thermo(Target):
             for inum1 in range(inum, len(newcol)):
                 lrow += 1
                 nrow = ['' for i in range(len(revhead))]
-                nrow[cidx] = newcol[inum]
+                nrow[cidx] = newcol[inum1]
                 print "Inserting", nrow, "after row", lrow
                 source.table.insert(lrow, nrow)
                 index.insert(lrow, (saveidx, inum1))
@@ -521,9 +521,10 @@ class Thermo(Target):
 
         # pd.DataFrame(OrderedDict([(head,[row[i] for row in source.table]) for i, head in enumerate(revised_heading)]))
         # print self.Data.__repr__
-        raw_input()
-
+        # raw_input()
         return
+
+        # return
 
         fp = open(expdata)
         
