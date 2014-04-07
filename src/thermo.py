@@ -1,6 +1,7 @@
 import os
 import re
 import csv
+import copy
 import errno
 import numpy as np
 import pandas as pd
@@ -347,17 +348,6 @@ def stand_head(head, obs):
         logger.debug("header %s renamed to %s\n" % (hfirst, newh))
     return newh, punit, obs
 
-def determine_needed_simulations(observables):
-
-    """ Given a list of Observable objects, determine the list of
-    simulations that are needed to calculate all of them. """
-
-    sreqs = OrderedDict()
-    for obs in observables:
-        sreqs[obs.name] = obs.sreq[:]
-    print sreqs
-
-
 class Thermo(Target):
     """
     A target for fitting general experimental data sets. The source
@@ -579,6 +569,57 @@ class Thermo(Target):
         #             self.Observables[ensemble].append(Observable(name=obsname, source=self.Data.ix[ensemble]))
         return
 
+    def determine_simulations(self):
+
+        """ 
+        Determine which simulations need to be run.  The same
+        simulations are run for each ensemble in the data set.
+        """
+
+        # Determine which simulations are needed.
+        sreqs = OrderedDict()
+        for obsname in self.Observables:
+            sreqs[obsname] = self.Observables[obsname][self.Ensembles[0]].sreq
+
+        def narrow():
+            # Get the names of simulations that are REQUIRED to calculate the observables.
+            toplevel = list(itertools.chain(*[[j for j in sreqs[i] if type(j) == str] for i in sreqs]))
+            # Whoa, this is a deeply nested loop.  What does it do?
+            # First loop over the elements in "sreqs" for each observable name.
+            # If the element is a string, then it's a required simulation name (top level).
+            # If the element is a list, then it's a list of valid simulation names
+            # and we need to narrow the list down.
+            # For the ones that are lists (and have any intersection with the top level),
+            # delete the ones that don't intersect.
+            sreq0 = copy.deepcopy(sreqs)
+            for obsname in sreqs:
+                for sims in sreqs[obsname]:
+                    if type(sims) == list:
+                        if len(sims) == 1:
+                            sreqs[obsname] = [sims[0]]
+                        elif any([i in sims for i in toplevel]):
+                            for j in sims:
+                                if j not in toplevel: sims.remove(j)
+            return sreqs != sreq0
+
+        print sreqs
+        while narrow():
+            print sreqs
+        # For the leftover observables where there is still some ambiguity,
+        # we attempt 
+        # To do: Figure this out from existing initial conditions maybe
+        for obsname in sreqs:
+            for sims in sreqs[obsname]:
+                if type(sims) == list:
+                    for sim in sims:
+                        if has_ic(sim):
+                            sreqs[obsname] = [sim]
+                        
+
+        self.Simulations = OrderedDict([(i, []) for i in self.Ensembles])
+        
+        return
+
     def prepare_simulations(self):
 
         """ 
@@ -589,7 +630,8 @@ class Thermo(Target):
         conditions may be easily set.
 
         """
-
+        # print narrow()
+            
         # The list of simulations that we'll be running.
         self.Simulations = OrderedDict([(i, []) for i in self.Ensembles])
         
