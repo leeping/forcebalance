@@ -9,15 +9,18 @@ import cStringIO
 
 from forcebalance.target import Target
 from forcebalance.finite_difference import in_fd
-from forcebalance.nifty import flat, col, row
+from forcebalance.nifty import flat, col, row, isint
 from forcebalance.nifty import lp_dump, lp_load, wopen, _exec
 from forcebalance.nifty import LinkFile, link_dir_contents
 from forcebalance.nifty import printcool, printcool_dictionary
 
 from collections import defaultdict, OrderedDict
 
-from forcebalance.output import getLogger
+import forcebalance
+from forcebalance.output import *
 logger = getLogger(__name__)
+# print logger.parent.parent.handlers[0]
+# logger.parent.parent.handlers = []
 
 class TextParser(object):
     """ Parse a text file. """
@@ -33,14 +36,14 @@ class TextParser(object):
 
     def process_header(self):
         """ Function for setting more attributes using the header line, if needed. """
-        self.headings = [i.strip() for i in self.fields[:]]
+        self.heading = [i.strip() for i in self.fields[:]]
 
     def process_data(self):
         """ Function for setting more attributes using the current line, if needed. """
         trow = []
-        for ifld in range(len(self.headings)):
+        for ifld in range(len(self.heading)):
             if ifld < len(self.fields):
-                trow.append(self.fields[ifld])
+                trow.append(self.fields[ifld].strip())
             else:
                 trow.append('')
         return trow
@@ -49,7 +52,7 @@ class TextParser(object):
         """ Extra sanity checks. """
 
     def parse(self):
-        self.headings = []                 # Fields in header line
+        self.heading = []                 # Fields in header line
         meta = defaultdict(list)          # Dictionary of metadata
         found_header = 0                  # Whether we found the header line
         table = []                        # List of data records
@@ -240,7 +243,7 @@ class FIX_Parser(TextParser):
         if set(fend).issubset(hend):
             for hpos in hend:
                 if hpos in fend:
-                    trow.append(fields[fend.index(hpos)])
+                    trow.append(fields[fend.index(hpos)].strip())
                 else:
                     trow.append('')
         # Field start / end positions for the line of data
@@ -288,6 +291,59 @@ def parse1(fnm):
     else:
         return FIX_Parser(fnm)
     return
+
+def fix_suffix(obs, head, suffixs, standard_suffix):
+
+    """ Standardize the suffix in a column heading. """
+
+    if head in suffixs:
+        if obs == '': 
+            logger.error('\x1b[91mEncountered heading %s but there is no observable to the left\x1b[0m\n' % head)
+            raise RuntimeError
+        return obs + '_' + standard_suffix, False
+    elif len(head.split('_')) > 1 and head.split('_')[-1] in suffixs:
+        newhl = head.split('_')
+        newhl[-1] = standard_suffix
+        return '_'.join(newhl), False
+    else:
+        return head, True
+
+def stand_head(head, obs):
+
+    """ 
+    Standardize a column heading.  Does the following:
+
+    1) Make lowercase
+    2) Split off the physical unit
+    3) If a weight, uncertainty or atom index, prepend the observable name
+    4) Shorten temperature and pressure
+    5) Determine if this is a new observable
+    
+    Parameters:
+    head = Name of the heading
+    obs = Name of the observable (e.g. from a previously read field)
+    """
+
+    head = head.lower()
+    usplit = re.split(' *\(', head, maxsplit=1)
+    punit = ''
+    if len(usplit) > 1:
+        hfirst = usplit[0]
+        punit = re.sub('\)$','',usplit[1].strip())
+        print "header", head, "split into", hfirst, ",", punit
+    else:
+        hfirst = head
+    newh = hfirst
+    newh, o1 = fix_suffix(obs, newh, ['w', 'wt', 'wts', 'weight', 'weights'], 'wt')
+    newh, o2 = fix_suffix(obs, newh, ['s', 'sig', 'sigma', 'sigmas'], 'sig')
+    newh, o3 = fix_suffix(obs, newh, ['i', 'idx', 'index', 'indices'], 'idx')
+    if newh in ['t', 'temp', 'temperature']: newh = 'temp'
+    if newh in ['p', 'pres', 'pressure']: newh = 'pres'
+    if all([o1, o2, o3]):
+        obs = newh
+    if newh != hfirst:
+        print "header", hfirst, "renamed to", newh
+    return newh, punit, obs
 
 class Thermo(Target):
     """
@@ -343,54 +399,25 @@ class Thermo(Target):
 
         """
             
+        logger.info('Parsing source file %s\n' % srcfnm)
         source = parse1(srcfnm)
         printcool_dictionary(source.metadata, title="Metadata")
         # print source.table
         revhead = []
         obs = ''
-        def error_left(i):
-            logger.error('\x1b[91mEncountered heading %s but there is no observable to the left\x1b[0m\n' % i)
-            raise RuntimeError
 
-        def standardize_heading(obs, head, abbrevs, standard_abbrev):
-            if head in abbrevs:
-                if obs == '': error_left(head)
-                return obs + '_' + standard_abbrev, False
-            elif len(head.split('_')) > 1 and head.split('_')[-1] in abbrevs:
-                newhl = head.split('_')
-                newhl[-1] = standard_abbrev
-                return '_'.join(newhl), False
-            else:
-                return head, True
 
         units = defaultdict(str)
 
-        for i, head in enumerate(source.headings):
-            head = head.lower()
-            if i == 0 and head == 'index': # Treat special case because index can also mean other things
-                revhead.append(head)
+        for i, head in enumerate(source.heading):
+            if i == 0 and head.lower() == 'index': # Treat special case because index can also mean other things
+                revhead.append('index')
                 continue
-            usplit = re.split(' *\(', head, maxsplit=1)
-            punit = ''
-            if len(usplit) > 1:
-                hfirst = usplit[0]
-                punit = re.sub('\)$','',usplit[1].strip())
-                print "header", head, "split into", hfirst, ",", punit
-            else:
-                hfirst = head
-            newh = hfirst
-            newh, o1 = standardize_heading(obs, newh, ['w', 'wt', 'wts', 'weight', 'weights'], 'weight')
-            newh, o2 = standardize_heading(obs, newh, ['s', 'sig', 'sigma', 'sigmas'], 'sigma')
-            newh, o3 = standardize_heading(obs, newh, ['i', 'idx', 'index', 'indices'], 'index')
-            if newh in ['t', 'temp', 'temperature']: newh = 'temperature'
-            if newh in ['p', 'pres', 'pressure']: newh = 'pressure'
-            if all([o1, o2, o3]):
-                obs = hfirst
-            if newh != hfirst:
-                print "header", hfirst, "renamed to", newh
+            newh, punit, obs = stand_head(head, obs)
             revhead.append(newh)
             if punit != '':
                 units[newh] = punit
+        source.heading = revhead
  
         if len(set(revhead)) != len(revhead):
             logger.error('Column headings : ' + str(revhead) + '\n')
@@ -405,28 +432,94 @@ class Thermo(Target):
         uqidx = []
         saveidx = ''
         index = []
+        snum = 0
+        drows = []
         # thisidx = Index that is built from the current row (may be empty)
         # saveidx = Index that may have been saved from a previous row
-        for row in source.table:
+        # snum = Subindex number
+        # List of (index, heading) tuples which contain file references.
+        fref = OrderedDict()
+        for rn, row in enumerate(source.table):
+            this_insert = []
+            # crow = row[1:]
             thisidx = row[0]
             if thisidx != '': 
                 saveidx = thisidx
+                snum = 0
                 if saveidx in uqidx: 
                     logger.error('Index %s is duplicated in data table\n' % i)
                     raise RuntimeError
                 uqidx.append(saveidx)
-            index.append(saveidx)
+            index.append((saveidx, snum))
             if saveidx == '':
                 logger.error('Row of data : ' + str(row) + '\n')
                 logger.error('\x1b[91mThis row does not have an index!\x1b[0m\n')
                 raise RuntimeError
+            snum += 1
+            if any([':' in fld for fld in row[1:]]):
+                # Here we insert rows from another data table.
+                obs2 = ''
+                for cid_, fld in enumerate(row[1:]):
+                    if ':' not in fld: continue
+                    cid = cid_ + 1
+                    def reffld_error(reason=''):
+                        logger.error('Row: : ' + ' '.join(row) + '\n')
+                        logger.error('Entry : ' + fld + '\n')
+                        logger.error('This filename:column reference is not valid!%s' % 
+                                     (' (%s)' % reason if reason != '' else ''))
+                        raise RuntimeError
+                    if len(fld.split(':')) != 2:
+                        reffld_error('Wrong number of colon-separated fields')
+                    if not isint(fld.split(':')[1]):
+                        reffld_error('Must be an integer after the colon')
+                    fnm = fld.split(':')[0]
+                    fcol_ = int(fld.split(':')[1])
+                    fpath = os.path.join(os.path.split(srcfnm)[0], fnm)
+                    if not os.path.exists(fpath):
+                        reffld_error('%s does not exist' % fpath)
+                    if (saveidx, revhead[cid]) in fref:
+                        reffld_error('%s already contains a file reference' % (saveidx, revhead[cid]))
+                    subfile = parse1(fpath)
+                    fcol = fcol_ - 1
+                    head2, punit2, obs2 = stand_head(subfile.heading[fcol], obs2)
+                    if revhead[cid] != head2:
+                        reffld_error("Column heading of %s (%s) doesn't match original (%s)" % (fnm, head2, revhead[cid]))
+                    fref[(saveidx, revhead[cid])] = [row2[fcol] for row2 in subfile.table]
+
+        for (saveidx, head), newcol in fref.items():
+            inum = 0
+            for irow in range(len(source.table)):
+                if index[irow][0] != saveidx: continue
+                lrow = irow
+                cidx = revhead.index(head)
+                source.table[irow][cidx] = newcol[inum]
+                inum += 1
+                if inum >= len(newcol): break
+            for inum1 in range(inum, len(newcol)):
+                lrow += 1
+                nrow = ['' for i in range(len(revhead))]
+                nrow[cidx] = newcol[inum]
+                print "Inserting", nrow, "after row", lrow
+                source.table.insert(lrow, nrow)
+                index.insert(lrow, (saveidx, inum1))
+
+            # for irow in range(
+            # for irow1 in range(max(0, len(newcol)-inum))
                 
-        self.Data = pd.DataFrame([])
+        for rn, row in enumerate(source.table):
+            drows.append([i if i != '' else np.nan for i in row[1:]])
 
-        # pd.DataFrame([OrderedDict([(head, row[i]) for i, head in revised_headings if row[i] != '']) for row in source.table])
+        print revhead[1:]
+        for rn, row in enumerate(drows):
+            print index[rn], row
+
+        self.Data = pd.DataFrame(drows, columns=revhead[1:], index=index)
+        print repr(self.Data)
+
+        # pd.DataFrame([OrderedDict([(head, row[i]) for i, head in revised_heading if row[i] != '']) for row in source.table])
 
 
-        # pd.DataFrame(OrderedDict([(head,[row[i] for row in source.table]) for i, head in enumerate(revised_headings)]))
+        # pd.DataFrame(OrderedDict([(head,[row[i] for row in source.table]) for i, head in enumerate(revised_heading)]))
         # print self.Data.__repr__
         raw_input()
 

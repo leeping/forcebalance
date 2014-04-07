@@ -1,0 +1,67 @@
+metadata = 'Mao'
+
+Index   T           P (atm)     Al          Al_wt       Scd1_idx    Scd1            Scd2_idx    Scd2            Scd1_wt     Kappa       Kappa_wt    n_ic
+50C     323.15      1           0.631       1           C15         scd323.txt:2    C34         scd323.txt:4    1           58          1           10
+                                                        C17                         C36                                                             
+                                                        C18                         C37                                                             
+                                                        C19                         C38                                                             
+                                                        C20                         C39                                                             
+                                                        C21                         C40                                                             
+                                                        C22                         C41                                                             
+                                                        C23                         C42                                                             
+                                                        C24                         C43                                                             
+                                                        C25                         C44                                                             
+                                                        C26                         C45                                                             
+                                                        C27                         C46                                                             
+                                                        C28                         C47                                                             
+                                                        C29                         C48                                                             
+                                                        C30                         C49                                                             
+                                                        C31                         C50                                                             
+60C     333.15      1           0.65        1           C15         scd333.txt:2    C34         scd333.txt:4    0           58          0           10
+                                                        C17                         C36                                                             
+                                                        C18                         C37                                                             
+                                                        C19                         C38                                                             
+                                                        C20                         C39                     
+                                                        C21                         C40                                                             
+                                                        C22                         C41                                                             
+                                                        C23                         C42                     
+                                                        C24                         C43                                                             
+                                                        C25                         C44                                                             
+                                                        C26                         C45                                                             
+                                                        C27                         C46                                                             
+                                                        C28                         C47                                                             
+                                                        C29                         C48                                                             
+                                                        C30                         C49                                                             
+                                                        C31                         C50                                                             
+65C     338.15      1           0.671       1           C15         scd338.txt:2    C34         scd338.txt:4    1           58          0           10
+                                                        C17                         C36                                                             
+                                                        C18                         C37                                                             
+                                                        C19                         C38                                                             
+                                                        C20                         C39                                                             
+                                                        C21                         C40                                                             
+                                                        C22                         C41                                                             
+                                                        C23                         C42                                                             
+                                                        C24                         C43                                                             
+                                                        C25                         C44                                                             
+                                                        C26                         C45                                                             
+                                                        C27                         C46                                                             
+                                                        C28                         C47                                                             
+                                                        C29                         C48                                                             
+                                                        C30                         C49                                                             
+                                                        C31                         C50                                                             
+80C     353.15      1           0.719       1           C15         scd353.txt:2    C34         scd353.txt:4    1           58          0           10
+                                                        C17                         C36                                                             
+                                                        C18                         C37                                                             
+                                                        C19                         C38                                                             
+                                                        C20                         C39                                                             
+                                                        C21                         C40                                                             
+                                                        C22                         C41                                                             
+                                                        C23                         C42                                                             
+                                                        C24                         C43                                                             
+                                                        C25                         C44                                                             
+                                                        C26                         C45                                                             
+                                                        C27                         C46                                                             
+                                                        C28                         C47                                                             
+                                                        C29                         C48                                                             
+                                                        C30                         C49                                                             
+                                                        C31                         C50                                                             

@@ -143,3 +143,14 @@ md_steps 100000
 eq_steps 50000
 $end
 
+$target
+name Lipid_HARD
+type Thermo_GMX
+weight 1.0
+source lipidcol1.txt
+quantities density h_vap
+n_sim_chain 2
+md_steps 100000
+eq_steps 50000
+$end
+
