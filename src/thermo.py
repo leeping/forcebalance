@@ -8,10 +8,11 @@ import pandas as pd
 import itertools
 import cStringIO
 
-from forcebalance.observable import *
+from forcebalance.molecule import Molecule
+from forcebalance.observable import OMap
 from forcebalance.target import Target
 from forcebalance.finite_difference import in_fd
-from forcebalance.nifty import flat, col, row, isint
+from forcebalance.nifty import flat, col, row, isint, isnan
 from forcebalance.nifty import lp_dump, lp_load, wopen, _exec
 from forcebalance.nifty import LinkFile, link_dir_contents
 from forcebalance.nifty import printcool, printcool_dictionary
@@ -363,9 +364,9 @@ class Thermo(Target):
         # Source data (experimental data, model parameters and weights)
         self.set_option(tgt_opts, "source", forceprint=True)
         # Observables to calculate
-        self.set_option(tgt_opts, "observables", "observable_names", forceprint=True)
+        self.set_option(tgt_opts, "observables", "onames", forceprint=True)
         # Length of simulation chain
-        self.set_option(tgt_opts, "n_sim_chain", forceprint=True)
+        self.set_option(tgt_opts, "simulations", forceprint=True)
         # Number of time steps in the equilibration run
         self.set_option(tgt_opts, "eq_steps", forceprint=True)
         # Number of time steps in the production run
@@ -385,23 +386,20 @@ class Thermo(Target):
                           'tinker':['.xyz', '.arc'], 
                           'openmm':['.pdb']}[self.engname.lower()]
 
-        ## A mapping that takes us from observable names to Observable objects.
-        self.Observable_Map = {'density' : Observable_Density,
-                               'rho' : Observable_Density,
-                               'hvap' : Observable_H_vap,
-                               'h_vap' : Observable_H_vap}
-        
-
-        ## Read source data and initialize points; creates self.Data, self.Indices and self.Observables objects.
+        ## Read source data and initialize points; creates self.Data, self.Indices and self.Columns objects.
         self.read_source(os.path.join(self.root, self.tgtdir, self.source))
+
+        ## Set up self.Observables.
+        self.initialize_observables()
+
+        ## Set up self.Simulations.
+        self.initialize_simulations()
         
         ## Copy run scripts from ForceBalance installation directory
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
                      os.path.join(self.root, self.tempdir, f))
 
-        ## Set up simulations
-        #self.determine_simulations()
 
     def read_source(self, srcfnm):
         """Read and store source data.
@@ -421,8 +419,8 @@ class Thermo(Target):
         source = parse1(srcfnm)
         printcool_dictionary(source.metadata, title="Metadata")
         revhead = []
-        obs = ''
-        obsnames = []
+        col = ''
+        colnames = []
 
         units = defaultdict(str)
 
@@ -430,8 +428,8 @@ class Thermo(Target):
             if i == 0 and head.lower() == 'index': # Treat special case because index can also mean other things
                 revhead.append('index')
                 continue
-            newh, punit, obs = stand_head(head, obs)
-            if obs not in obsnames + ['temp', 'pres', 'n_ic']: obsnames.append(obs)
+            newh, punit, col = stand_head(head, col)
+            if col not in colnames + ['temp', 'pres', 'n_ic']: colnames.append(col)
             revhead.append(newh)
             if punit != '':
                 units[newh] = punit
@@ -481,7 +479,7 @@ class Thermo(Target):
                 # (2) There can only be one file per system index / column.
                 # (3) The column heading in the secondary file that's being
                 # referenced must match that of the reference in the primary file.
-                obs2 = ''
+                col2 = ''
                 for cid_, fld in enumerate(row[1:]):
                     if ':' not in fld: continue
                     cid = cid_ + 1
@@ -504,7 +502,7 @@ class Thermo(Target):
                         reffld_error('%s already contains a file reference' % (saveidx, revhead[cid]))
                     subfile = parse1(fpath)
                     fcol = fcol_ - 1
-                    head2, punit2, obs2 = stand_head(subfile.heading[fcol], obs2)
+                    head2, punit2, col2 = stand_head(subfile.heading[fcol], col2)
                     if revhead[cid] != head2:
                         reffld_error("Column heading of %s (%s) doesn't match original (%s)" % (fnm, head2, revhead[cid]))
                     fref[(saveidx, revhead[cid])] = [row2[fcol] for row2 in subfile.table]
@@ -533,6 +531,18 @@ class Thermo(Target):
         # Turn it into a pandas DataFrame.
         self.Data = pd.DataFrame(drows, columns=revhead[1:], index=pd.MultiIndex.from_tuples(index, names=['index', 'subindex']))
 
+        def intcol(col):
+            if col in self.Data.columns:
+                for idx in self.Data.index:
+                    if not isnan(self.Data[col][idx]):
+                        self.Data[col][idx] = int(self.Data[col][idx])
+
+        def floatcol(col):
+            if col in self.Data.columns:
+                self.Data[col] = self.Data[col].astype(float)
+
+        intcol('n_ic')
+
         # A list of indices (i.e. top-level indices) which correspond
         # to sets of simulations that we'll be running.
         self.Indices = []
@@ -540,42 +550,9 @@ class Thermo(Target):
             if idx[0] not in self.Indices:
                 self.Indices.append(idx[0])
 
-        # A list of Observable objects (i.e. column headings) which
-        # contain methods for calculating observables that we need.
-        # Think about: 
-        # (1) How much variability is allowed across Indices?
-        #     For instance, different S_cd is permissible.
-        self.Observables = OrderedDict()
-        for obsname in [stand_head(i, '')[2] for i in self.observable_names]:
-            if obsname in self.Observables:
-                logger.error('%s was already specified as an observable' % (obsname))
-            self.Observables[obsname] = OrderedDict()
-            for ie, index in enumerate(self.Indices):
-                if obsname in self.Observable_Map:
-                    newobs = self.Observable_Map[obsname](source=self.Data.ix[index])
-                    logger.info('%s is specified as an observable, appending %s class\n' % (obsname, newobs.__class__.__name__))
-                    self.Observables[obsname][index] = newobs
-                else:
-                    logger.warn('%s is specified but there is no corresponding Observable class, appending empty one\n' % obsname)
-                    self.Observables[obsname][index] = Observable(name=obsname, source=self.Data.ix[index])
+        # List of columns in the main data table.
+        self.Columns = self.Data.columns
 
-        print self.Indices
-        print self.Observables
-        print repr(self.Data)
-        raw_input()
-        # for index in self.Indices:
-        #     self.Observables[index] = []
-        # for obsname in obsnames:
-        #     for index, ie in enumerate(self.Indices):
-        #         if obsname in self.Observable_Map:
-        #             newobs = self.Observable_Map[obsname](source=self.Data.ix[index])
-        #             if newobs.name in [obs.name for obs in self.Observables[index]]:
-        #                 logger.error('%s is specified but a %s observable already exists' % (obsname, newobs.__class__.__name__))
-        #             logger.info('%s is specified as an observable, appending %s class\n' % (obsname, newobs.__class__.__name__))
-        #             self.Observables[index].append(newobs)
-        #         else:
-        #             logger.warn('%s is specified but there is no corresponding Observable class, appending empty one\n' % obsname)
-        #             self.Observables[index].append(Observable(name=obsname, source=self.Data.ix[index]))
         return
 
     def find_ic(self, index, stype, icn):
@@ -623,195 +600,75 @@ class Thermo(Target):
                         logger.info('Target %s Index %s Simulation %s : '
                                     'found initial coordinate file %s\n' % (self.name, index, stype, fpath))
                         found = fpath
-        # if found == '':
-        #     logger.error('Target %s Index %s Simulation %s : '
-        #                  'could not find initial coordinate file\n'
-        #                  'Please provide one of the following:\n%s' 
-        #                  % (self.name, index, stype, '\n'.join(paths)))
-        #     raise RuntimeError
+
+        if found == '':
+            logger.error('Could not find initial coordinate file for simulation type %s' % stype)
+            raise RuntimeError
+
         return found, 0 if numbered else icn
     
-    def determine_simulations(self):
-
+    def initialize_observables(self):
         """ 
-        Determine which simulations need to be run.  The same
-        simulations are run for each index in the data set.
+        Determine Observable objects to be created.  Checks to see
+        whether simulations are consistent with observables (i.e. no
+        missing simulations or ambiguities.)
 
+        In order to implement a new observable, create a class in
+        observable.py and add it to OMap.
+        """
+        self.Observables = OrderedDict()
+        for oname in [stand_head(i, '')[2] for i in self.onames]:
+            if oname in self.Observables:
+                logger.error('%s was already specified as an observable' % (oname))
+                raise RuntimeError
+            self.Observables[oname] = OrderedDict()
+            for index in self.Indices:
+                if oname in OMap:
+                    Objs = []
+                    Reqs = []
+                    for OClass in OMap[oname]:
+                        OObj = OClass(self.Data)
+                        Reqs.append(OObj.requires.keys())
+                        if all([i in self.simulations for i in OObj.requires.keys()]):
+                            Objs.append(OObj)
+                    if len(Objs) == 0:
+                        logger.error('Observable %s is specified but required simulations are missing; choose %s' % (oname, ' or '.join([str(r) for r in Reqs])))
+                        raise RuntimeError
+                    if len(Objs) > 1:
+                        logger.error("Observable %s not uniquely mapped to simulations (choose between %s)" % (oname, ' or '.join([o.name in Objs])))
+                        raise RuntimeError
+                    logger.info("Creating %s observable object for index %s\n" % (Objs[0].name, index))
+                    self.Observables[oname][index] = Objs[0]
+                else:
+                    logger.error('%s is specified but there is no corresponding Observable class\n' % oname)
+                    raise RuntimeError
+        return
+
+    def initialize_simulations(self):
+        """ 
+        Determine simulations to be run.  The same simulations are
+        run for each index in the data set. 
+        
         Note that there may be a different number of initial
         conditions (i.e. parallel runs) for different indices.
         """
 
-        # Determine which simulations are needed.
-        sreqs = OrderedDict()
-        for obsname in self.Observables:
-            sreqs[obsname] = self.Observables[obsname][self.Indices[0]].sreq
-
-        # toplevel = list(itertools.chain(*[[j for j in sreqs[i] if type(j) == str] for i in sreqs]))
-
         self.Simulations = OrderedDict([(i, OrderedDict()) for i in self.Indices])
-        tsnames = []
-        for obsname in self.Observables:
-            treqs = self.Observables[obsname][self.Indices[0]].treq
-            for treq in treqs:
-                if treq not in tsnames:
-                    tsnames.append(treq)
-
         for index in self.Indices:
-            # Loop over observable names.  Here we determine whether
-            # the initial coordinates are missing (bad), unique (good) or ambiguous (bad).
             if 'n_ic' in self.Data.ix[index]:
-                n_ic = self.Data.ix[index]['n_ic']
+                nics = [i for i in self.Data.ix[index]['n_ic'] if not isnan(i)]
+                if len(nics) != 1:
+                    logger.error("Expected 1 number for n_ic but got %i" % len(nics))
+                    raise RuntimeError
+                n_ic = nics[0]
             else:
                 n_ic = 1
-            for obsname in sreqs:
-                for stypes in sreqs[obsname]:
-                    if isinstance(stypes, str):
-                        stypes = [stypes]
-                    for icn in range(n_ic):
-                        icfiles = []
-                        svalid = []
-                        for stype in stypes:
-                            fpath, iframe = self.find_ic(index, stype, icn)
-                            if fpath != '':
-                                icfiles.append(fpath)
-                                svalid.append(stype)
-                        if len(icfiles) == 0:
-                            logger.error('Target %s Index %s Simulation %s : '
-                                         'could not find initial coordinate file\n'
-                                         % (self.name, index, stype))
-                            raise RuntimeError
-                        elif len(icfiles) > 1:
-                            logger.error('Target %s Index %s Simulation %s : '
-                                         'ambiguous initial coordinate files (%s)'
-                                         % (self.name, index, stype, ' '.join(icfiles)))
-                        self.Simulations[index][svalid[0]] = Simulation(index, svalid[0], icfiles[0], iframe, tsnames)
-                    
-        print self.Simulations
-        print tsnames
-        # raw_input()
-                # if isinstance(sreqs[obsname], str):
-                #     stypes = [sreqs[obsname]]
-                # for stype in stypes:
-                #     print index, stype
-                
-        # for stype in toplevel:
-        #     for index in self.Indices:
-        #         def find_ic(icn):
-        #             found = ''
-        #             # Initial condition files will be searched for in the following priority:
-        #             # targets/target_name/index/stype/ICs/stype_#.xyz
-        #             # targets/target_name/index/stype/ICs/stype#.xyz
-        #             # targets/target_name/index/stype/ICs/#.xyz
-        #             # targets/target_name/index/stype/ICs/stype.xyz
-        #             # targets/target_name/index/stype/ICs/coords.xyz
-        #             # targets/target_name/index/stype/stype.xyz
-        #             # targets/target_name/index/stype/coords.xyz
-        #             # targets/target_name/index/stype.xyz
-        #             # targets/target_name/stype.xyz
-        #             basefnms = [(os.path.join(index, stype, 'ICs', stype+'_'+("%i" % icn)), True),
-        #                         (os.path.join(index, stype, 'ICs', stype+("%i" % icn)), True),
-        #                         (os.path.join(index, stype, 'ICs', ("%i" % icn)), True),
-        #                         (os.path.join(index, stype, 'ICs', stype), False),
-        #                         (os.path.join(index, stype, 'ICs', 'coords'), False),
-        #                         (os.path.join(index, stype, stype), False),
-        #                         (os.path.join(index, stype, 'coords'), False),
-        #                         (os.path.join(index, stype), False),
-        #                         (os.path.join(stype), False)]
-        #             paths = []
-        #             for fnm, numbered in basefnms:
-        #                 for crdsfx in self.crdsfx:
-        #                     fpath = os.path.join(self.tgtdir, fnm+crdsfx)
-        #                     paths.append(fpath)
-        #                     if os.path.exists(fpath):
-        #                         if found != '':
-        #                             logger.info('Target %s Index %s Simulation %s : '
-        #                                         '%s overrides %s\n' % (self.name, index, stype, fpath))
-        #                         else:
-        #                             if not numbered:
-        #                                 M = Molecule(fpath)
-        #                                 if len(M) <= icn:
-        #                                     logger.error("Target %s Index %s Simulation %s : "
-        #                                                  "initial coordinate file %s doesn't have enough structures\n" % 
-        #                                                  (self.name, index, stype, fpath))
-        #                                     raise RuntimeError
-        #                             logger.info('Target %s Index %s Simulation %s : '
-        #                                         'found initial coordinate file %s\n' % (self.name, index, stype, fpath))
-        #                             found = fpath
-        #             if found == '':
-        #                 logger.error('Target %s Index %s Simulation %s : '
-        #                              'could not find initial coordinate file\n'
-        #                              'Please provide one of the following:\n%s' 
-        #                              % (self.name, index, stype, '\n'.join(paths)))
-        #                 raise RuntimeError
-        #             return found
-        #         if 'n_ic' in self.Data.ix[index]:
-        #             n_ic = self.Data.ix[index]['n_ic']
-        #         else:
-        #             n_ic = 1
-        #         for i in range(n_ic):
-        #             fpath = find_ic(i)
-
-        raw_input()
-        
-        # toplevel = list(itertools.chain(*[[j for j in sreqs[i] if type(j) == str] for i in sreqs]))
-        # print toplevel
-        # raw_input()
-        # return
-
-        # def narrow():
-        #     # Get the names of simulations that are REQUIRED to calculate the observables.
-        #     toplevel = list(itertools.chain(*[[j for j in sreqs[i] if type(j) == str] for i in sreqs]))
-        #     # Whoa, this is a deeply nested loop.  What does it do?
-        #     # First loop over the elements in "sreqs" for each observable name.
-        #     # If the element is a string, then it's a required simulation name (top level).
-        #     # If the element is a list, then it's a list of valid simulation names
-        #     # and we need to narrow the list down.
-        #     # For the ones that are lists (and have any intersection with the top level),
-        #     # delete the ones that don't intersect.
-        #     sreq0 = copy.deepcopy(sreqs)
-        #     for obsname in sreqs:
-        #         for sims in sreqs[obsname]:
-        #             if type(sims) == list:
-        #                 if len(sims) == 1:
-        #                     sreqs[obsname] = [sims[0]]
-        #                 elif any([i in sims for i in toplevel]):
-        #                     for j in sims:
-        #                         if j not in toplevel: sims.remove(j)
-        #     return sreqs != sreq0
-
-        # print sreqs
-        # while narrow():
-        #     print sreqs
-        # For the leftover observables where there is still some ambiguity,
-        # we attempt 
-        # To do: Figure this out from existing initial conditions maybe
-        # for obsname in sreqs:
-        #     for sims in sreqs[obsname]:
-        #         if type(sims) == list:
-        #             for sim in sims:
-        #                 if has_ic(sim):
-        #                     sreqs[obsname] = [sim]
-                        
-
-        # self.Simulations = OrderedDict([(i, []) for i in self.Indices])
-        
-        return
-
-    def prepare_simulations(self):
-
-        """ 
-
-        Prepare simulations to be launched.  Set initial conditions
-        and create directories.  This function is intended to be run
-        at the start of each optimization cycle, so that initial
-        conditions may be easily set.
-
-        """
-        # print narrow()
-            
-        # The list of simulations that we'll be running.
-        self.Simulations = OrderedDict([(i, []) for i in self.Indices])
-        
+            for s in self.simulations:
+                for icn in range(n_ic):
+                    fpath, iframe = self.find_ic(index, s, icn)
+                    self.Simulations[index][s] = Simulation(index, s, fpath, iframe)
+                    print index, s, str(self.Simulations[index][s])
+        # print self.Simulations
         return
 
     def launch_simulation(self, index, simname):
@@ -1254,31 +1111,14 @@ class Simulation(object):
     type, initial condition).
     """
 
-    def __init__(self, index, stype, initial, iframe, tsnames):
+    def __init__(self, index, stype, initial, iframe):
         self.index = index
-        self.stype = stype
+        self.type = stype
         self.initial = initial
         self.iframe = iframe
-        self.timeseries = OrderedDict([(i, []) for i in tsnames])
 
     def __str__(self):
         msg = []
-        if self.temperature is None:
-            msg.append("State: Unknown.")
-        elif self.pressure is None:
-            msg.append("State: Point " + str(self.idnr) + " at " +
-                       str(self.temperature) + " K.")
-        else:
-            msg.append("State: Point " + str(self.idnr) + " at " +
-                       str(self.temperature) + " K and " +
-                       str(self.pressure) + " bar.")
-
-        msg.append("Point " + str(self.idnr) + " reference data " + "-"*30)
-        for key in self.ref:
-            msg.append("  " + key.strip() + " = " + str(self.ref[key]).strip())
-            
-        msg.append("Point " + str(self.idnr) + " calculated data " + "-"*30)
-        for key in self.data:
-            msg.append("  " + key.strip() + " = " + str(self.data[key]).strip())
-
-        return "\n".join(msg)
+        msg.append("Simulation: Index %s Type %s" % (self.index, self.type))
+        msg.append("Initial conditions: File %s Frame %i" % (self.initial, self.iframe))
+        return '\n'.join(msg)

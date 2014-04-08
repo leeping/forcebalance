@@ -68,7 +68,7 @@ type Thermo_GMX
 weight 1.0
 source expset.txt
 quantities density h_vap
-n_sim_chain 2
+simulations liquid gas
 md_steps 100000
 eq_steps 50000
 $end
