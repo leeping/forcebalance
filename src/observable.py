@@ -213,10 +213,10 @@ class Observable_H_vap(Observable):
         self.name = name if name is not None else "H_vap"
 
         # Calculating the heat of vaporization requires a liquid simulation and a gas simulation.
-        self.sreq = ['liquid', 'gas']
+        self.sreq = [['liquid'], ['gas']]
 
         # Requires timeseries of energies and volumes from the simulation.
-        self.treq = ['energy', 'volume']
+        self.treq = [['energy', 'volume'], ['energy']]
 
     def extract(self, engines, FF, mvals, h, pgrad, AGrad=True): 
         #==========================================#
@@ -315,3 +315,23 @@ class Observable_H_vap(Observable):
 
         return Hvap_avg, Hvap_err, Hvap_grad
 
+# class Observable_Kappa
+class Observable_Kappa(Observable):
+    def __init__(self, source, name=None):
+        """ Compressibility (applies to liquid and lipid bilayer.) """
+        super(Observable_H_vap, self).__init__(source, name)
+        
+        self.name = name if name is not None else "H_vap"
+
+        # List of dictionaries of simulations, keyed to timeseries to extract from the simulation.
+        # Each dictionary represents a simulation in a sequence, but the observable isn't mapped to a unique simulation each time.
+        # Because of this, we determine which simulation to launch (in the sequence) based on the available initial coordinates (or explicit user input).
+        # Depending on which simulation is executed, we require different timeseries from the simulation, and different formulas.
+        # But another way is to just define two observables ... need to think about it.
+
+        self.sreq = [{'liquid':['volume'], 'bilayer':['al']},
+                     ]
+        
+
+        # Requires timeseries of energies and volumes from the simulation.
+        self.treq = [['energy', 'volume'], ['energy']]
