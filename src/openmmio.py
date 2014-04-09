@@ -41,6 +41,8 @@ def energy_components(Sim, verbose=False):
         for i in range(Sim.system.getNumForces()):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
+#def centroid_position(Sim):
+    # 
 def evaluate_potential(Sim):
     # Getting potential energy, taking RPMD into account(average over all copy of systems). If running classical simulation, it does nothing more than calling the getPotential energy function
     if isinstance(Sim.integrator, RPMDIntegrator):
@@ -61,9 +63,10 @@ def evaluate_kinetic(Sim):
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
 def primitive_kinetic(Sim):
     # This is primitive quantum kinetic energy estimator for RPMD simulation. Return classical KE in classical simulation. 
-    if isinstance(Sim.integrator,RPMDintegrator):
+    if isinstance(Sim.integrator,RPMDIntegrator):
         priKE=0.0*kilojoule/mole
         hbar=0.0635078*nanometer**2*dalton/picosecond
+        kb=0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
         for i in range(Sim.integrator.getNumCopies()):
             priKE=priKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies()) #First term in primitive KE
         mass_matrix=[]
@@ -73,13 +76,13 @@ def primitive_kinetic(Sim):
         for i in range(Sim.integrator.getNumCopies()):
             j=(i+1)%(Sim.integrator.getNumCopies())
             beaddif=np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())#calculate difference between ith and i+1th bead
-            priKE=priKE-np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kB**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#2nd term in primitive estimator
+            priKE=priKE-np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kb**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#2nd term in primitive estimator
         return priKE           
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
 def centroid_kinetic(Sim):
     # This is centroid quantum kinetic energy estimator for RPMD simulation. Return classical KE in classical simulation.
-    if isinstance(Sim.integrator,RPMDintegrator):
+    if isinstance(Sim.integrator,RPMDIntegrator):
         cenKE=0.0*kilojoule/mole
         for i in range(Sim.integrator.getNumCopies()):
             cenKE=cenKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies()**2)#First term in centroid KE
