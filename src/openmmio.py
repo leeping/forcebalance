@@ -1114,41 +1114,11 @@ class OpenMM(Engine):
                 self.simulation.step(nsave)
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
 
-##### Virial Energy estimator
-            if self.tdiv>=2:
-                hbar=0.0635078*nanometer**2*dalton/picosecond
-                pimdstate=[]
-                centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*self.system.getNumParticles())
-                kinetic=0.0*kilojoule/mole
-                cent_kinetic=0.0*kilojoule/mole
-                pri_kinetic=0.0*kilojoule/mole
-                potential=0.0*kilojoule/mole
-                integrator=self.simulation.context.getIntegrator()
-                for i in range(self.tdiv):
-                    pimdstate.append(integrator.getState(i,getEnergy=True,getPositions=True,getForces=True,groups=-1))
-                for i in range(self.tdiv):
-                    centroid=centroid+np.array(pimdstate[i].getPositions())/self.tdiv
-                    potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv#potential energy
-                    cent_kinetic=cent_kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)#1st term in centroid energy estimator
-                    pri_kinetic=pri_kinetic+pimdstate[i].getKineticEnergy()/self.tdiv#1st term in primitive kinetic energy estimator
-                    kinetic=kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)#the kinetic energy that average to thermostat temperature
-                for i in range(self.tdiv):#2nd term in centroid kinetic energy estimator
-                    dif=np.array(pimdstate[i].getPositions())-centroid
-                    der=-1.0*np.array(pimdstate[i].getForces())
-                    cent_kinetic=cent_kinetic+np.sum((dif*der).sum(axis=1))*0.5/self.tdiv
-                mass_matrix=[]
-                for i in range(self.system.getNumParticles()):
-                    mass_matrix.append(self.system.getParticleMass(i))
-                mass_matrix=np.array(mass_matrix)
-                for i in range(self.tdiv):#2nd term in primitive kinetic energy estimator
-                    j=(i+1)%(self.tdiv)
-                    beaddif=np.array(pimdstate[j].getPositions())-np.array(pimdstate[i].getPositions())#difference in position between ith and i+1th bead
-                    pri_kinetic=pri_kinetic-np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kB**2*integrator.getTemperature()**2*self.tdiv)/(2.0*hbar**2))
-            else:
-                kinetic = state.getKineticEnergy()/self.tdiv
-                potential = state.getPotentialEnergy()
-                cent_kinetic=0.0*kilojoule/mole
-                pri_kinetic=0.0*kilojoule/mole#Don't use centroid or primitive kinetic energy estimator for non-RPMD simulation
+##### Energy Data
+            kinetic=evaluate_potential(self.simulation)
+            potential=evaluate_kinetic(self.simulation)
+            pri_kinetic=primitive_kinetic(self.simulation)
+            cen_kinetic=centroid_kinetic(self.simulation)
 #####
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
@@ -1179,41 +1149,11 @@ class OpenMM(Engine):
             if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-#####Virial Energy estimator
-            if self.tdiv>=2:
-                hbar=0.0635078*nanometer**2*dalton/picosecond
-                pimdstate=[]
-                centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*self.system.getNumParticles())
-                kinetic=0.0*kilojoule/mole
-                cent_kinetic=0.0*kilojoule/mole
-                pri_kinetic=0.0*kilojoule/mole
-                potential=0.0*kilojoule/mole
-                integrator=self.simulation.context.getIntegrator()
-                for i in range(self.tdiv):
-                    pimdstate.append(integrator.getState(i,getEnergy=True,getPositions=True,getForces=True,groups=-1))
-                for i in range(self.tdiv):
-                    centroid=centroid+np.array(pimdstate[i].getPositions())/self.tdiv
-                    potential=potential+pimdstate[i].getPotentialEnergy()/self.tdiv#potential energy
-                    cent_kinetic=cent_kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)#1st term in centroid energy estimator
-                    pri_kinetic=pri_kinetic+pimdstate[i].getKineticEnergy()/self.tdiv#1st term in primitive kinetic energy estimator
-                    kinetic=kinetic+pimdstate[i].getKineticEnergy()/(self.tdiv*self.tdiv)#the kinetic energy that average to thermostat temperature
-                for i in range(self.tdiv):#2nd term in centroid kinetic energy estimator
-                    dif=np.array(pimdstate[i].getPositions())-centroid
-                    der=-1.0*np.array(pimdstate[i].getForces())
-                    cent_kinetic=cent_kinetic+np.sum((dif*der).sum(axis=1))*0.5/self.tdiv
-                mass_matrix=[]
-                for i in range(self.system.getNumParticles()):
-                    mass_matrix.append(self.system.getParticleMass(i))
-                mass_matrix=np.array(mass_matrix)
-                for i in range(self.tdiv):#2nd term in primitive kinetic energy estimator
-                    j=(i+1)%(self.tdiv)
-                    beaddif=np.array(pimdstate[j].getPositions())-np.array(pimdstate[i].getPositions())#difference in position between ith and i+1th bead
-                    pri_kinetic=pri_kinetic-np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kB**2*integrator.getTemperature()**2*self.tdiv)/(2.0*hbar**2))
-            else:
-                kinetic = state.getKineticEnergy()/self.tdiv
-                potential = state.getPotentialEnergy()
-                cent_kinetic=0.0*kilojoule/mole
-                pri_kinetic=0.0*kilojoule/mole#Don't use centroid or primitive kinetic energy estimator for non-RPMD simulation
+##### Energy Data
+            kinetic=evaluate_potential(self.simulation)
+            potential=evaluate_kinetic(self.simulation)
+            pri_kinetic=primitive_kinetic(self.simulation)
+            cen_kinetic=centroid_kinetic(self.simulation)
 #####
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
