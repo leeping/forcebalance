@@ -41,8 +41,15 @@ def energy_components(Sim, verbose=False):
         for i in range(Sim.system.getNumForces()):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
-#def centroid_position(Sim):
-    # 
+def centroid_position(Sim):
+    #Calculate RPMD centroid position in RPMD simulation(May not be what you actually need!), no difference from simply call getPosition in Classical simulation
+    if isinstance(Sim.integrator, RPMDIntegrator):
+        centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*Sim.system.getNumParticles())
+        for i in range(Sim.integrator.getNumCopies()):
+            centroid=centroid+np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/Sim.integrator.getNumCopies()#Calculate centroid of ring polymer
+        return centroid
+    else:
+        return Sim.context.getState(getPositions=True).getPositions() 
 def evaluate_potential(Sim):
     # Getting potential energy, taking RPMD into account(average over all copy of systems). If running classical simulation, it does nothing more than calling the getPotential energy function
     if isinstance(Sim.integrator, RPMDIntegrator):
