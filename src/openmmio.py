@@ -42,7 +42,7 @@ def energy_components(Sim, verbose=False):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
 def centroid_position(Sim):
-    #Calculate RPMD centroid position in RPMD simulation(May not be what you actually need!), no difference from simply call getPosition in Classical simulation
+    ##Calculate RPMD centroid position in RPMD simulation(May not be what you actually need!), no difference from simply call getPosition in Classical simulation
     if isinstance(Sim.integrator, RPMDIntegrator):
         centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*Sim.system.getNumParticles())
         for i in range(Sim.integrator.getNumCopies()):
