@@ -159,6 +159,9 @@ def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
             qzz -= tr/3
     # This ordering has to do with the way TINKER prints it out.
     return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
+def get_multipoles_ave(simulation,q=None,mass=None,positions=None,rmcom=True)
+# If RPMD simulation, average over all copies of systems, else(in classical simulation) just do the same thing get_multipoles do
+
 
 def get_dipole(simulation,q=None,mass=None,positions=None):
     """Return the current dipole moment in Debye.
@@ -1125,8 +1128,8 @@ class OpenMM(Engine):
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
 
 ##### Energy Data
-            kinetic=evaluate_potential(self.simulation)
-            potential=evaluate_kinetic(self.simulation)
+            kinetic=evaluate_kinetic(self.simulation)
+            potential=evaluate_potential(self.simulation)
             pri_kinetic=primitive_kinetic(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
 #####
@@ -1160,8 +1163,8 @@ class OpenMM(Engine):
             # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
 ##### Energy Data
-            kinetic=evaluate_potential(self.simulation)
-            potential=evaluate_kinetic(self.simulation)
+            kinetic=evaluate_kinetic(self.simulation)
+            potential=evaluate_potential(self.simulation)
             pri_kinetic=primitive_kinetic(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
 #####
