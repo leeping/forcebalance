@@ -41,7 +41,58 @@ def energy_components(Sim, verbose=False):
         for i in range(Sim.system.getNumForces()):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
-
+def evaluate_potential(Sim):
+    # Getting potential energy, taking RPMD into account(average over all copy of systems). If running classical simulation, it does nothing more than calling the getPotential energy function
+    if isinstance(Sim.integrator, RPMDIntegrator):
+        PE=0.0*kilojoule/mole
+        for i in range(Sim.integrator.getNumCopies()):
+            PE=PE+Sim.integrator.getState(i,getEnergy=True).getPotentialEnergy()/(Sim.integrator.getNumCopies())
+        return PE
+    else:
+        return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
+def evaluate_kinetic(Sim):
+    # It gets kinetic energy for classical simulation, or kinetic energy in classical sense(i.e. only dep. on how fast particles move) in RPMD simulation(sample to thermostat T*# of beads). It's NOT a quantum kinetic energy estimator.
+    if isinstance(Sim.integrator, RPMDIntegrator):
+        KE=0.0*kilojoule/mole
+        for i in range(Sim.integrator.getNumCopies()):
+            KE=KE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies())
+        return KE
+    else:
+        return Sim.context.getState(getEnergy=True).getKineticEnergy()
+def primitive_kinetic(Sim):
+    # This is primitive quantum kinetic energy estimator for RPMD simulation. Return classical KE in classical simulation. 
+    if isinstance(Sim.integrator,RPMDintegrator):
+        priKE=0.0*kilojoule/mole
+        hbar=0.0635078*nanometer**2*dalton/picosecond
+        for i in range(Sim.integrator.getNumCopies()):
+            priKE=priKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies()) #First term in primitive KE
+        mass_matrix=[]
+        for i in range(Sim.system.getNumParticles()):
+            mass_matrix.append(Sim.system.getParticleMass(i))
+        mass_matrix=np.array(mass_matrix)
+        for i in range(Sim.integrator.getNumCopies()):
+            j=(i+1)%(Sim.integrator.getNumCopies())
+            beaddif=np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())#calculate difference between ith and i+1th bead
+            priKE=priKE-np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kB**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#2nd term in primitive estimator
+        return priKE           
+    else:
+        return Sim.context.getState(getEnergy=True).getKineticEnergy()
+def centroid_kinetic(Sim):
+    # This is centroid quantum kinetic energy estimator for RPMD simulation. Return classical KE in classical simulation.
+    if isinstance(Sim.integrator,RPMDintegrator):
+        cenKE=0.0*kilojoule/mole
+        for i in range(Sim.integrator.getNumCopies()):
+            cenKE=cenKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies()**2)#First term in centroid KE
+        centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*Sim.system.getNumParticles())
+        for i in range(Sim.integrator.getNumCopies()):
+            centroid=centroid+np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/Sim.integrator.getNumCopies()#Calculate centroid of ring polymer
+        for i in range(Sim.integrator.getNumCopies()):#2nd term of centroid KE
+            dif=np.array(Sim.integrator.getState(i,getPositions=True).getPositions())-centroid
+            der=-1.0*np.array(Sim.integrator.getState(i,getForces=True).getForces())
+            cenKE=cenKE+np.sum((dif*der).sum(axis=1))*0.5/Sim.integrator.getNumCopies()
+        return cenKE
+    else:
+        return Sim.context.getState(getEnergy=True).getKineticEnergy()
 def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     """Return the current multipole moments in Debye and Buckingham units. """
     dx = 0.0
