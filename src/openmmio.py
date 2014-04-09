@@ -159,7 +159,7 @@ def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
             qzz -= tr/3
     # This ordering has to do with the way TINKER prints it out.
     return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
-def get_multipoles_ave(simulation,q=None,mass=None,positions=None,rmcom=True)
+#def get_multipoles_ave(simulation,q=None,mass=None,positions=None,rmcom=True)
 # If RPMD simulation, average over all copies of systems, else(in classical simulation) just do the same thing get_multipoles do
 
 
