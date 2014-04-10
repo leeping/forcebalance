@@ -223,7 +223,7 @@ class FF(forcebalance.BaseClass):
         ## AMOEBA mutual dipole convergence tolerance.
         self.set_option(options, 'amoeba_eps')
         ## Switch for rigid water molecules
-        self.set_option(options, 'rigid_water')
+        self.set_option(options, 'rigid_water', forceprint=True)
         ## Bypass the transformation and use physical parameters directly
         self.set_option(options, 'use_pvals')
         
@@ -1115,7 +1115,8 @@ class FF(forcebalance.BaseClass):
     def list_map(self):
         """ Create the plist, which is like a reversed version of the parameter map.  More convenient for printing. """
         if len(self.map) == 0:
-            warn_press_key('The parameter map has no elements (Okay if we are not actually tuning any parameters.)')
+            #warn_press_key('The parameter map has no elements (Okay if we are not actually tuning any parameters.)')
+            logger.warning('The parameter map has no elements (Okay if we are not actually tuning any parameters.)\n')
         else:
             self.plist = [[] for j in range(max([self.map[i] for i in self.map])+1)]
             for i in self.map:
