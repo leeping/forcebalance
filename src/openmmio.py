@@ -848,7 +848,7 @@ class OpenMM(Engine):
           integrator=self.simulation.context.getIntegrator()
           for i in range(self.tdiv):
               integrator.setPositions(i,self.xyz_omms[shot][0])
-          for i in range(self.tdiv)
+          for i in range(self.tdiv):
               temp_position=integrator.getState(i,getPositions=true).getPositions()
               self.simulation.context.setPositions(temp_position)
               self.simulation.context.computeVirtualSites()
