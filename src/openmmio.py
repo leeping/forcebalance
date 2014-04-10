@@ -845,11 +845,15 @@ class OpenMM(Engine):
         self.simulation.context.setPositions(self.xyz_omms[shot][0])
         self.simulation.context.computeVirtualSites()
         if self.tdiv>1:
+          integrator=self.simulation.context.getIntegrator()
           for i in range(self.tdiv):
-              integrator=self.simulation.context.getIntegrator()
               integrator.setPositions(i,self.xyz_omms[shot][0])
-              ##compute virtual site method?^-^
-              
+          for i in range(self.tdiv)
+              temp_position=integrator.getState(i,getPositions=true).getPositions()
+              self.simulation.context.setPositions(temp_position)
+              self.simulation.context.computeVirtualSites()
+              position_with_virtual_site=self.simulation.context.getPositions()
+              integrator.setPositions(i,position_with_virtual_site) 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
         [a,b,c] = box_vectors
