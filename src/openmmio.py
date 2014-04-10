@@ -1198,7 +1198,10 @@ class OpenMM(Engine):
             Temps.append(kinetic_temperature / kelvin)
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
-            Kinetics.append(kinetic / kilojoules_per_mole)
+            if self.tdiv>1:
+                Kinetics.append(cen_kinetic / kilojoules_per_mole)#If RPMD, we use centroid estimator to calculate quantum kinetic energy
+            else:
+                Kinetics.append(kinetic / kilojoules_per_mole)
             Volumes.append(volume / nanometer**3)
             Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
         Rhos = np.array(Rhos)
