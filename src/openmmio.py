@@ -844,7 +844,7 @@ class OpenMM(Engine):
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
         self.simulation.context.setPositions(self.xyz_omms[shot][0])
         self.simulation.context.computeVirtualSites()
-        if self.tdiv>1:
+        if self.tdiv>1:#RPMDintegrator
           integrator=self.simulation.context.getIntegrator()
           for i in range(self.tdiv):
               integrator.setPositions(i,self.xyz_omms[shot][0])
