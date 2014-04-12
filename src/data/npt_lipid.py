@@ -658,11 +658,10 @@ def main():
             a_ = kwargs['a_']
         return (2 * kT * bzavg(a_,b)) / ((bzavg(a_**2,b)-bzavg(a_,b)**2) * 128), bzavg(a_,b), bzavg(a_**2,b)
 
-    LKappa_eles = calc_lkappa(None,**{'a_': Als})
-    LKappa = LKappa_eles[0]
-    al_avg = LKappa_eles[1]
-    al_sq_avg = LKappa_eles[2]
-    al_avg_sq = al_avg*n
+    LKappa = calc_lkappa(None,**{'a_': Als})
+    al_avg = avg(Als)
+    al_sq_avg = avg(Als**2)
+    al_avg_sq = al_avg**2
     al_var = al_sq_avg - al_avg_sq
 
     LKappaboot = []
