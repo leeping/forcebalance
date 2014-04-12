@@ -650,6 +650,43 @@ def main():
     # calc_al(None, **{'a_': Als})
 
     #----
+    # Bilayer Isothermal compressibility
+    #----
+    def calc_lkappa(b=None, **kwargs):
+        if b == None: b = np.ones(L,dtype=float)
+        if 'a_' in kwargs:
+            a_ = kwargs['a_']
+        return (2 * kT * bzavg(a_,b)) / ((bzavg(a_**2,b)-bzavg(a_,b)**2) * 128), bzavg(a_,b), bzavg(a_**2,b)
+
+    LKappa_eles = calc_lkappa(None,**{'a_': Als})
+    LKappa = LKappa_eles[0]
+    al_avg = LKappa_eles[1]
+    al_sq_avg = LKappa_eles[2]
+    al_avg_sq = al_avg*n
+    al_var = al_sq_avg - al_avg_sq
+
+    LKappaboot = []
+    for i in range(numboots):
+        boot = np.random.randint(L,size=L)
+        LKappaboot.append(calc_kappa(None,**{'a_':Als[boot]}[0]))
+    LKappaboot = np.array(LKappaboot)
+    LKappa_err = np.std(LKappaboot) * np.sqrt(statisticalInefficiency(Als))
+
+    # Bilayer Isothermal compressibility analytic derivative
+    Sep = printcool("Lipid Isothermal compressibility:  % .4e +- %.4e bar^-1\nAnalytic Derivative:" % (LKappa, LKappa_err))
+    GLKappa1 = covde(Als) / al_var
+    GLKappa2 = (al_avg / al_var**2) * (covde(Als**2) - 2 * avg_al * covde(Als))
+    GLKappa  = (2 * kT / 128) * (GLKappa1 - GLKappa2)
+    FF.print_map(vals=GLKappa)
+    if FDCheck:
+        GLKappa_fd = property_derivatives(Lipid, FF, mvals, h, pgrad, kT, calc_lkappa, {'a_':Als})
+        Sep = printcool("Numerical Derivative:")
+        FF.print_map(vals=GLKappa_fd)
+        Sep = printcool("Difference (Absolute, Fractional):")
+        absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GLKappa, GLKappa_fd)]
+        FF.print_map(vals=absfrac)
+
+    #----
     # Deuterium Order Parameter
     #----
     Scd_avg, Scd_e = mean_stderr(Scds)
