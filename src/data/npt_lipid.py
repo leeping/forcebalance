@@ -667,7 +667,7 @@ def main():
     LKappaboot = []
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
-        LKappaboot.append(calc_kappa(None,**{'a_':Als[boot]}[0]))
+        LKappaboot.append(calc_kappa(None,**{'a_':Als[boot]}))
     LKappaboot = np.array(LKappaboot)
     LKappa_err = np.std(LKappaboot) * np.sqrt(statisticalInefficiency(Als))
 
