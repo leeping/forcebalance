@@ -547,7 +547,7 @@ class Lipid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, \
-            Rho_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, Als, Al_errs, Scds, Scd_errs = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+            Rho_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, Als, Al_errs, Scds, Scd_errs, LKappas, LKappa_errs = ([Results[t][i] for t in range(len(Points))] for i in range(19))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -586,6 +586,9 @@ class Lipid(Target):
         Al_calc = OrderedDict([])
         Al_grad = OrderedDict([])
         Al_std  = OrderedDict([])
+        LKappa_calc = OrderedDict([])
+        LKappa_grad = OrderedDict([])
+        LKappa_std  = OrderedDict([])
         Scd_calc = OrderedDict([])
         Scd_grad = OrderedDict([])
         Scd_std  = OrderedDict([])
@@ -707,6 +710,15 @@ class Lipid(Target):
             ## Average area per lipid
             Al_calc[PT]   = np.dot(W,A)
             Al_grad[PT]   = mBeta*(flat(np.mat(G)*col(W*A)) - np.dot(W,A)*Gbar)
+            ## Isothermal compressibility.
+            LKappa_calc[PT] = (2 * kT / 128) * (avg(A) / avg(A**2)-avg(A)**2)
+            al_avg = avg(A)
+            al_sq_avg = avg(A**2)
+            al_avg_sq = al_avg**2
+            al_var = al_sq_avg - al_avg_sq
+            GLKappa1 = covde(Als) / al_var
+            GLKappa2 = (al_avg / al_var**2) * (covde(Als**2) - 2 * avg_al * covde(Als))
+            LKappa_grad[PT] = (2 * kT / 128) * (GLKappa1 - GLKappa2)
             ## Deuterium order parameter
             Scd_calc[PT]   = np.dot(W,S)
             Scd_grad[PT]   = mBeta * (flat(np.average(np.mat(G) * (S * W[:, np.newaxis]), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
@@ -718,6 +730,7 @@ class Lipid(Target):
             Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
             Al_std[PT]    = np.sqrt(sum(C**2 * np.array(Al_errs)**2))
             Scd_std[PT]    = np.sqrt(sum(np.mat(C**2) * np.array(Scd_errs)**2))
+            LKappa_std[PT]   = np.sqrt(sum(C**2 * np.array(LKappa_errs)**2)) * 1e6
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
@@ -727,6 +740,7 @@ class Lipid(Target):
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
         X_Al, G_Al, H_Al, AlPrint = self.objective_term(Points, 'al', Al_calc, Al_std, Al_grad, name="Avg Area per Lipid")
         X_Scd, G_Scd, H_Scd, ScdPrint = self.objective_term(Points, 'scd', Scd_calc, Scd_std, Scd_grad, name="Deuterium Order Parameter")
+        X_LKappa, G_LKappa, H_LKappa, LKappaPrint = self.objective_term(Points, 'lkappa', LKappa_calc, LKappa_std, LKappa_grad, name="Bilayer Compressibility")
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
@@ -738,8 +752,9 @@ class Lipid(Target):
         if X_Eps0 == 0: self.w_eps0 = 0.0
         if X_Al == 0: self.w_al = 0.0
         if X_Scd == 0: self.w_scd = 0.0
+        if X_LKappa == 0: self.w_lkappa = 0.0
 
-        w_tot = self.w_rho + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_al + self.w_scd
+        w_tot = self.w_rho + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_al + self.w_scd + self.w_lkappa
         w_1 = self.w_rho / w_tot
         w_3 = self.w_alpha / w_tot
         w_4 = self.w_kappa / w_tot
@@ -747,23 +762,24 @@ class Lipid(Target):
         w_6 = self.w_eps0 / w_tot
         w_7 = self.w_al / w_tot
         w_8 = self.w_scd / w_tot
+        w_9 = self.w_lkappa / w_tot
 
-        Objective    = w_1 * X_Rho + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Al + w_8 * X_Scd
+        Objective    = w_1 * X_Rho + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Al + w_8 * X_Scd + w_9 * X_LKappa
         if AGrad:
-            Gradient = w_1 * G_Rho + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_Al + w_8 * G_Scd
+            Gradient = w_1 * G_Rho + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_Al + w_8 * G_Scd + w_9 * G_LKappa
         if AHess:
-            Hessian  = w_1 * H_Rho + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_Al + w_8 * H_Scd
+            Hessian  = w_1 * H_Rho + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_Al + w_8 * H_Scd + w_9 * H_LKappa
 
         if not in_fd():
             self.Xp = {"Rho" : X_Rho, "Alpha" : X_Alpha, 
-                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Al" : X_Al, "Scd" : X_Scd}
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Al" : X_Al, "Scd" : X_Scd, "LKappa" : X_LKappa}
             self.Wp = {"Rho" : w_1, "Alpha" : w_3, 
-                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Al" : w_7, "Scd" : w_8}
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Al" : w_7, "Scd" : w_8, "LKappa" : w_9}
             self.Pp = {"Rho" : RhoPrint, "Alpha" : AlphaPrint, 
-                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Al" : AlPrint, "Scd" : ScdPrint}
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Al" : AlPrint, "Scd" : ScdPrint, "LKappa": LKappaPrint}
             if AGrad:
                 self.Gp = {"Rho" : G_Rho, "Alpha" : G_Alpha, 
-                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Al" : G_Al, "Scd" : G_Scd}
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Al" : G_Al, "Scd" : G_Scd, "LKappa" : G_LKappa}
             self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
