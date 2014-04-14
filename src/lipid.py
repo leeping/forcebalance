@@ -174,7 +174,7 @@ class Lipid(Target):
         global_opts = OrderedDict()
         found_headings = False
         known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
-                      'cvib_inter','cni','devib_intra','devib_inter', 'al', 'scd', 'n_ic']
+                      'cvib_inter','cni','devib_intra','devib_inter', 'al', 'scd', 'n_ic', 'lkappa']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -547,7 +547,7 @@ class Lipid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, \
-            Rho_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, Als, Al_errs, Scds, Scd_errs, LKappas, LKappa_errs = ([Results[t][i] for t in range(len(Points))] for i in range(19))
+            Rho_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, Als, Al_errs, Scds, Scd_errs, LKappa_errs = ([Results[t][i] for t in range(len(Points))] for i in range(18))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -738,7 +738,7 @@ class Lipid(Target):
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Points, 'kappa', Kappa_calc, Kappa_std, Kappa_grad, name="Compressibility")
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
-        X_Al, G_Al, H_Al, AlPrint = self.objective_term(Points, 'al', Al_calc, Al_std, Al_grad, name="Avg Area per Lipid")
+        8_Al, G_Al, H_Al, AlPrint = self.objective_term(Points, 'al', Al_calc, Al_std, Al_grad, name="Avg Area per Lipid")
         X_Scd, G_Scd, H_Scd, ScdPrint = self.objective_term(Points, 'scd', Scd_calc, Scd_std, Scd_grad, name="Deuterium Order Parameter")
         X_LKappa, G_LKappa, H_LKappa, LKappaPrint = self.objective_term(Points, 'lkappa', LKappa_calc, LKappa_std, LKappa_grad, name="Bilayer Compressibility")
 
