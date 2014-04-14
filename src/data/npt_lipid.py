@@ -709,7 +709,7 @@ def main():
     pvals = FF.make(mvals)
 
     logger.info("Writing all simulation data to disk.\n")
-    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], Rho_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Als, Al_err, Scds, Scd_err),f)
+    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], Rho_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Als, Al_err, Scds, Scd_err, LKappa_err),f)
 
 if __name__ == "__main__":
     main()
