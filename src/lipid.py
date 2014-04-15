@@ -64,6 +64,8 @@ class Lipid(Target):
         self.set_option(tgt_opts,'w_eps0',forceprint=True)
         # Fractional weight of the area per lipid
         self.set_option(tgt_opts,'w_al',forceprint=True)
+        # Fractional weight of the bilayer isothermal compressibility
+        self.set_option(tgt_opts,'w_lkappa',forceprint=True)
         # Fractional weight of the deuterium order parameter
         self.set_option(tgt_opts,'w_scd',forceprint=True)
         # Optionally pause on the zeroth step
@@ -317,8 +319,9 @@ class Lipid(Target):
         print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
-        print_item("Al", "Average area per lipid", "nm^2")
+        print_item("Al", "Average Area per Lipid", "nm^2")
         print_item("Scd", "Deuterium Order Parameter", None)
+        print_item("LKappa", "Bilayer Isothermal Compressibility", "mN/m")
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
@@ -710,15 +713,17 @@ class Lipid(Target):
             ## Average area per lipid
             Al_calc[PT]   = np.dot(W,A)
             Al_grad[PT]   = mBeta*(flat(np.mat(G)*col(W*A)) - np.dot(W,A)*Gbar)
-            ## Isothermal compressibility.
-            LKappa_calc[PT] = (2 * kT / 128) * (avg(A) / avg(A**2)-avg(A)**2)
-            al_avg = avg(A)
-            al_sq_avg = avg(A**2)
+            ## Bilayer Isothermal compressibility.
+            A_m2 = A * 1e-18
+            kbT = 1.3806488e-23 * T
+            LKappa_calc[PT] = (1e3 * 2 * kbT / 128) * (avg(A_m2) / (avg(A_m2**2)-avg(A_m2)**2))
+            al_avg = avg(A_m2)
+            al_sq_avg = avg(A_m2**2)
             al_avg_sq = al_avg**2
             al_var = al_sq_avg - al_avg_sq
-            GLKappa1 = covde(Als) / al_var
-            GLKappa2 = (al_avg / al_var**2) * (covde(Als**2) - 2 * avg_al * covde(Als))
-            LKappa_grad[PT] = (2 * kT / 128) * (GLKappa1 - GLKappa2)
+            GLKappa1 = covde(A_m2) / al_var
+            GLKappa2 = (al_avg / al_var**2) * (covde(A_m2**2) - (2 * al_avg * covde(A)))
+            LKappa_grad[PT] = (1e3 * 2 * kbT / 128) * (GLKappa1 - GLKappa2)
             ## Deuterium order parameter
             Scd_calc[PT]   = np.dot(W,S)
             Scd_grad[PT]   = mBeta * (flat(np.average(np.mat(G) * (S * W[:, np.newaxis]), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
@@ -738,7 +743,7 @@ class Lipid(Target):
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Points, 'kappa', Kappa_calc, Kappa_std, Kappa_grad, name="Compressibility")
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
-        8_Al, G_Al, H_Al, AlPrint = self.objective_term(Points, 'al', Al_calc, Al_std, Al_grad, name="Avg Area per Lipid")
+        X_Al, G_Al, H_Al, AlPrint = self.objective_term(Points, 'al', Al_calc, Al_std, Al_grad, name="Avg Area per Lipid")
         X_Scd, G_Scd, H_Scd, ScdPrint = self.objective_term(Points, 'scd', Scd_calc, Scd_std, Scd_grad, name="Deuterium Order Parameter")
         X_LKappa, G_LKappa, H_LKappa, LKappaPrint = self.objective_term(Points, 'lkappa', LKappa_calc, LKappa_std, LKappa_grad, name="Bilayer Compressibility")
 
