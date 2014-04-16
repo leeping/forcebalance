@@ -1491,12 +1491,15 @@ class Thermo_GMX(Thermo):
         self.set_option(options,'gmxpath')
         # Suffix for GROMACS executables.
         self.set_option(options,'gmxsuffix')
+        # Engine for calculating things locally (e.g. polarization correction)
         self.engine_ = GMX
         # Name of the engine to pass to scripts.
         self.engname = "gromacs"
+        # Valid coordinate suffix.
+        self.crdsfx = ['.gro', '.pdb']
         # Command prefix.
         self.mdpfx = "bash gmxprefix.bash"
         # Scripts to be copied from the ForceBalance installation directory.
-        self.scripts = ['gmxprefix.bash', 'md_chain.py']
+        self.scripts = ['gmxprefix.bash', 'md_one.py']
         ## Initialize base class.
         super(Thermo_GMX,self).__init__(options,tgt_opts,forcefield)

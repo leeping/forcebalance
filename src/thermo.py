@@ -11,10 +11,11 @@ import cStringIO
 from forcebalance.observable import *
 from forcebalance.target import Target
 from forcebalance.finite_difference import in_fd
-from forcebalance.nifty import flat, col, row, isint
+from forcebalance.nifty import flat, col, row, isint, isnpnan
 from forcebalance.nifty import lp_dump, lp_load, wopen, _exec
-from forcebalance.nifty import LinkFile, link_dir_contents
+from forcebalance.nifty import GoInto, LinkFile, link_dir_contents
 from forcebalance.nifty import printcool, printcool_dictionary
+from forcebalance.nifty import getWorkQueue
 
 from collections import defaultdict, OrderedDict
 
@@ -363,9 +364,9 @@ class Thermo(Target):
         # Source data (experimental data, model parameters and weights)
         self.set_option(tgt_opts, "source", forceprint=True)
         # Observables to calculate
-        self.set_option(tgt_opts, "observables", "observable_names", forceprint=True)
+        self.set_option(tgt_opts, "observables", "user_observable_names", forceprint=True)
         # Length of simulation chain
-        self.set_option(tgt_opts, "n_sim_chain", forceprint=True)
+        self.set_option(tgt_opts, "simulations", "user_simulation_names", forceprint=True)
         # Number of time steps in the equilibration run
         self.set_option(tgt_opts, "eq_steps", forceprint=True)
         # Number of time steps in the production run
@@ -380,10 +381,6 @@ class Thermo(Target):
         self.denoms    = {}
         # Weights for observables
         self.weights   = {}
-        # Suffixes for coordinate files
-        self.crdsfx    = {'gromacs':['.gro', '.pdb'], 
-                          'tinker':['.xyz', '.arc'], 
-                          'openmm':['.pdb']}[self.engname.lower()]
 
         ## A mapping that takes us from observable names to Observable objects.
         self.Observable_Map = {'density' : Observable_Density,
@@ -401,7 +398,7 @@ class Thermo(Target):
                      os.path.join(self.root, self.tempdir, f))
 
         ## Set up simulations
-        #self.determine_simulations()
+        self.prepare_simulations()
 
     def read_source(self, srcfnm):
         """Read and store source data.
@@ -533,6 +530,9 @@ class Thermo(Target):
         # Turn it into a pandas DataFrame.
         self.Data = pd.DataFrame(drows, columns=revhead[1:], index=pd.MultiIndex.from_tuples(index, names=['index', 'subindex']))
 
+        # self.collapse = 
+        # self.
+
         # A list of indices (i.e. top-level indices) which correspond
         # to sets of simulations that we'll be running.
         self.Indices = []
@@ -540,17 +540,36 @@ class Thermo(Target):
             if idx[0] not in self.Indices:
                 self.Indices.append(idx[0])
 
+        # Certain things (e.g. run parameters like temp, pres) are keyed to the index only.
+        chead = []
+        crows = []
+        for index in self.Indices:
+            crow = []
+            for head in ['temp', 'pres']:
+                if head not in self.Data: continue
+                if head not in chead: chead.append(head)
+                rlist = list(set([i for i in self.Data.ix[index][head][:] if not isnpnan(i)]))
+                if len(rlist) != 1:
+                    logger.error('Heading %s should appear once for index %s (found %i)' % (head, index, len(rlist)))
+                    raise RuntimeError
+                crow.append(rlist[0])
+            crows.append(crow[:])
+
+        # Now create the mini data table.
+        self.Data2 = pd.DataFrame(crows, columns=chead, index=self.Indices)
+
         # A list of Observable objects (i.e. column headings) which
         # contain methods for calculating observables that we need.
         # Think about: 
         # (1) How much variability is allowed across Indices?
         #     For instance, different S_cd is permissible.
         self.Observables = OrderedDict()
-        for obsname in [stand_head(i, '')[2] for i in self.observable_names]:
+        self.ObsNames = []
+        for obsname in [stand_head(i, '')[2] for i in self.user_observable_names]:
             if obsname in self.Observables:
                 logger.error('%s was already specified as an observable' % (obsname))
             self.Observables[obsname] = OrderedDict()
-            for ie, index in enumerate(self.Indices):
+            for index in self.Indices:
                 if obsname in self.Observable_Map:
                     newobs = self.Observable_Map[obsname](source=self.Data.ix[index])
                     logger.info('%s is specified as an observable, appending %s class\n' % (obsname, newobs.__class__.__name__))
@@ -558,24 +577,16 @@ class Thermo(Target):
                 else:
                     logger.warn('%s is specified but there is no corresponding Observable class, appending empty one\n' % obsname)
                     self.Observables[obsname][index] = Observable(name=obsname, source=self.Data.ix[index])
+            self.ObsNames.append(obsname)
 
         print self.Indices
         print self.Observables
         print repr(self.Data)
+        # if 'temp' in self.Data:
+        #     self.Temperatures = OrderedDict()
+        #     for index in self.Indices:
+        # print self.Data['temp'][0]
         raw_input()
-        # for index in self.Indices:
-        #     self.Observables[index] = []
-        # for obsname in obsnames:
-        #     for index, ie in enumerate(self.Indices):
-        #         if obsname in self.Observable_Map:
-        #             newobs = self.Observable_Map[obsname](source=self.Data.ix[index])
-        #             if newobs.name in [obs.name for obs in self.Observables[index]]:
-        #                 logger.error('%s is specified but a %s observable already exists' % (obsname, newobs.__class__.__name__))
-        #             logger.info('%s is specified as an observable, appending %s class\n' % (obsname, newobs.__class__.__name__))
-        #             self.Observables[index].append(newobs)
-        #         else:
-        #             logger.warn('%s is specified but there is no corresponding Observable class, appending empty one\n' % obsname)
-        #             self.Observables[index].append(Observable(name=obsname, source=self.Data.ix[index]))
         return
 
     def find_ic(self, index, stype, icn):
@@ -623,180 +634,8 @@ class Thermo(Target):
                         logger.info('Target %s Index %s Simulation %s : '
                                     'found initial coordinate file %s\n' % (self.name, index, stype, fpath))
                         found = fpath
-        # if found == '':
-        #     logger.error('Target %s Index %s Simulation %s : '
-        #                  'could not find initial coordinate file\n'
-        #                  'Please provide one of the following:\n%s' 
-        #                  % (self.name, index, stype, '\n'.join(paths)))
-        #     raise RuntimeError
         return found, 0 if numbered else icn
     
-    def determine_simulations(self):
-
-        """ 
-        Determine which simulations need to be run.  The same
-        simulations are run for each index in the data set.
-
-        Note that there may be a different number of initial
-        conditions (i.e. parallel runs) for different indices.
-        """
-
-        # Determine which simulations are needed.
-        sreqs = OrderedDict()
-        for obsname in self.Observables:
-            sreqs[obsname] = self.Observables[obsname][self.Indices[0]].sreq
-
-        # toplevel = list(itertools.chain(*[[j for j in sreqs[i] if type(j) == str] for i in sreqs]))
-
-        self.Simulations = OrderedDict([(i, OrderedDict()) for i in self.Indices])
-        tsnames = []
-        for obsname in self.Observables:
-            treqs = self.Observables[obsname][self.Indices[0]].treq
-            for treq in treqs:
-                if treq not in tsnames:
-                    tsnames.append(treq)
-
-        for index in self.Indices:
-            # Loop over observable names.  Here we determine whether
-            # the initial coordinates are missing (bad), unique (good) or ambiguous (bad).
-            if 'n_ic' in self.Data.ix[index]:
-                n_ic = self.Data.ix[index]['n_ic']
-            else:
-                n_ic = 1
-            for obsname in sreqs:
-                for stypes in sreqs[obsname]:
-                    if isinstance(stypes, str):
-                        stypes = [stypes]
-                    for icn in range(n_ic):
-                        icfiles = []
-                        svalid = []
-                        for stype in stypes:
-                            fpath, iframe = self.find_ic(index, stype, icn)
-                            if fpath != '':
-                                icfiles.append(fpath)
-                                svalid.append(stype)
-                        if len(icfiles) == 0:
-                            logger.error('Target %s Index %s Simulation %s : '
-                                         'could not find initial coordinate file\n'
-                                         % (self.name, index, stype))
-                            raise RuntimeError
-                        elif len(icfiles) > 1:
-                            logger.error('Target %s Index %s Simulation %s : '
-                                         'ambiguous initial coordinate files (%s)'
-                                         % (self.name, index, stype, ' '.join(icfiles)))
-                        self.Simulations[index][svalid[0]] = Simulation(index, svalid[0], icfiles[0], iframe, tsnames)
-                    
-        print self.Simulations
-        print tsnames
-        # raw_input()
-                # if isinstance(sreqs[obsname], str):
-                #     stypes = [sreqs[obsname]]
-                # for stype in stypes:
-                #     print index, stype
-                
-        # for stype in toplevel:
-        #     for index in self.Indices:
-        #         def find_ic(icn):
-        #             found = ''
-        #             # Initial condition files will be searched for in the following priority:
-        #             # targets/target_name/index/stype/ICs/stype_#.xyz
-        #             # targets/target_name/index/stype/ICs/stype#.xyz
-        #             # targets/target_name/index/stype/ICs/#.xyz
-        #             # targets/target_name/index/stype/ICs/stype.xyz
-        #             # targets/target_name/index/stype/ICs/coords.xyz
-        #             # targets/target_name/index/stype/stype.xyz
-        #             # targets/target_name/index/stype/coords.xyz
-        #             # targets/target_name/index/stype.xyz
-        #             # targets/target_name/stype.xyz
-        #             basefnms = [(os.path.join(index, stype, 'ICs', stype+'_'+("%i" % icn)), True),
-        #                         (os.path.join(index, stype, 'ICs', stype+("%i" % icn)), True),
-        #                         (os.path.join(index, stype, 'ICs', ("%i" % icn)), True),
-        #                         (os.path.join(index, stype, 'ICs', stype), False),
-        #                         (os.path.join(index, stype, 'ICs', 'coords'), False),
-        #                         (os.path.join(index, stype, stype), False),
-        #                         (os.path.join(index, stype, 'coords'), False),
-        #                         (os.path.join(index, stype), False),
-        #                         (os.path.join(stype), False)]
-        #             paths = []
-        #             for fnm, numbered in basefnms:
-        #                 for crdsfx in self.crdsfx:
-        #                     fpath = os.path.join(self.tgtdir, fnm+crdsfx)
-        #                     paths.append(fpath)
-        #                     if os.path.exists(fpath):
-        #                         if found != '':
-        #                             logger.info('Target %s Index %s Simulation %s : '
-        #                                         '%s overrides %s\n' % (self.name, index, stype, fpath))
-        #                         else:
-        #                             if not numbered:
-        #                                 M = Molecule(fpath)
-        #                                 if len(M) <= icn:
-        #                                     logger.error("Target %s Index %s Simulation %s : "
-        #                                                  "initial coordinate file %s doesn't have enough structures\n" % 
-        #                                                  (self.name, index, stype, fpath))
-        #                                     raise RuntimeError
-        #                             logger.info('Target %s Index %s Simulation %s : '
-        #                                         'found initial coordinate file %s\n' % (self.name, index, stype, fpath))
-        #                             found = fpath
-        #             if found == '':
-        #                 logger.error('Target %s Index %s Simulation %s : '
-        #                              'could not find initial coordinate file\n'
-        #                              'Please provide one of the following:\n%s' 
-        #                              % (self.name, index, stype, '\n'.join(paths)))
-        #                 raise RuntimeError
-        #             return found
-        #         if 'n_ic' in self.Data.ix[index]:
-        #             n_ic = self.Data.ix[index]['n_ic']
-        #         else:
-        #             n_ic = 1
-        #         for i in range(n_ic):
-        #             fpath = find_ic(i)
-
-        raw_input()
-        
-        # toplevel = list(itertools.chain(*[[j for j in sreqs[i] if type(j) == str] for i in sreqs]))
-        # print toplevel
-        # raw_input()
-        # return
-
-        # def narrow():
-        #     # Get the names of simulations that are REQUIRED to calculate the observables.
-        #     toplevel = list(itertools.chain(*[[j for j in sreqs[i] if type(j) == str] for i in sreqs]))
-        #     # Whoa, this is a deeply nested loop.  What does it do?
-        #     # First loop over the elements in "sreqs" for each observable name.
-        #     # If the element is a string, then it's a required simulation name (top level).
-        #     # If the element is a list, then it's a list of valid simulation names
-        #     # and we need to narrow the list down.
-        #     # For the ones that are lists (and have any intersection with the top level),
-        #     # delete the ones that don't intersect.
-        #     sreq0 = copy.deepcopy(sreqs)
-        #     for obsname in sreqs:
-        #         for sims in sreqs[obsname]:
-        #             if type(sims) == list:
-        #                 if len(sims) == 1:
-        #                     sreqs[obsname] = [sims[0]]
-        #                 elif any([i in sims for i in toplevel]):
-        #                     for j in sims:
-        #                         if j not in toplevel: sims.remove(j)
-        #     return sreqs != sreq0
-
-        # print sreqs
-        # while narrow():
-        #     print sreqs
-        # For the leftover observables where there is still some ambiguity,
-        # we attempt 
-        # To do: Figure this out from existing initial conditions maybe
-        # for obsname in sreqs:
-        #     for sims in sreqs[obsname]:
-        #         if type(sims) == list:
-        #             for sim in sims:
-        #                 if has_ic(sim):
-        #                     sreqs[obsname] = [sim]
-                        
-
-        # self.Simulations = OrderedDict([(i, []) for i in self.Indices])
-        
-        return
-
     def prepare_simulations(self):
 
         """ 
@@ -810,110 +649,51 @@ class Thermo(Target):
         # print narrow()
             
         # The list of simulations that we'll be running.
+        self.SimNames = [i.lower() for i in self.user_simulation_names]
         self.Simulations = OrderedDict([(i, []) for i in self.Indices])
-        
+        # Dictionary of time series to extract from each simulation.
+        SimTS = defaultdict(set)
+        # Check to see whether each observable can be unambiguously calculated from the specified simulations
+        for obsname in self.ObsNames:
+            sreq = self.Observables[obsname][self.Indices[0]].sreq
+            ssels = []
+            SimTS_ = defaultdict(set)
+            for sdct in sreq:
+                # This is a dictionary of simulation names : 
+                if len(set(self.SimNames).intersection(sdct.keys())) > 1:
+                    logger.error("Ambiguous: Don't know which simulation to use in calculating observable %s" % obsname)
+                    logger.error("Choose ONE from this menu of required simulations: [%s]" % ' '.join(sdct.keys()))
+                    raise RuntimeError
+                if len(set(self.SimNames).intersection(sdct.keys())) == 0:
+                    logger.error("Missing Simulation: Cannot calculate observable %s" % obsname)
+                    logger.error("Choose ONE from this menu of required simulations: [%s]" % ' '.join(sdct.keys()))
+                    raise RuntimeError
+                # One of the simulations that will be used in calculating this observable.
+                ssel = list(set(self.SimNames).intersection(sdct.keys()))[0]
+                SimTS[ssel].update(set(sdct[ssel]))
+                SimTS_[ssel].update(set(sdct[ssel]))
+            printcool_dictionary({i:' '.join(sorted(list(SimTS_[i]))) for i in sorted(SimTS_.keys())}, title="Observable %s uses these simulations : timeseries" % obsname)
+        printcool_dictionary({i:' '.join(sorted(list(SimTS[i]))) for i in sorted(SimTS.keys())}, title="Needed Simulations : Extracted Timeseries")
+        unused = sorted(list(set(self.SimNames).difference(set(SimTS.keys()))))
+        if len(unused) > 0:
+            logger.error("Simulation %s is specified but it's never used to calculate any observables" % ', '.join(unused))
+            raise RuntimeError
+
+        for index in self.Indices:
+            for stype, tsset in SimTS.items():
+                if 'n_ic' in self.Data.ix[index]:
+                    n_ic = self.Data.ix[index]['n_ic']
+                    if n_ic < 1:
+                        logger.error("n_ic must >= 1")
+                        raise RuntimeError
+                else:
+                    n_ic = 1
+                for icn in range(n_ic):
+                    icfnm, icframe = self.find_ic(index, stype, icn)
+                    sname = "%s_%i" % (stype, icn) if n_ic > 1 else stype
+                    self.Simulations[index].append(Simulation(sname, index, stype, icfnm, icframe, sorted(list(tsset))))
+                    
         return
-
-    def launch_simulation(self, index, simname):
-
-        """ 
-
-        Launch a simulation - either locally or via the Work Queue.
-        This function is intended to be run within the folder:
-        target_name/iteration_number/system_index/simulation_name/initial_condition OR 
-        target_name/iteration_number/system_index/simulation_name
-        
-        """
-        
-        wq = getWorkQueue()
-        if not (os.path.exists('result.p') or os.path.exists('result.p.bz2')):
-            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-            self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
-            cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
-            if wq == None:
-                logger.info("Running condensed phase simulation locally.\n")
-                logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
-                _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
-            else:
-                queue_up(wq, command = cmdstr+' &> npt.out',
-                         input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
-                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
-    
-    # NAMES FOR OBJECTS!  
-
-    # Timeseries: Time series of an instantaneous observable that is
-    # returned by the MD simulation.
-
-    # Observable: A thermodynamic property which can be compared to
-    # experiment and possesses methods for calculating the property
-    # and its derivatives.
-
-    # State? Point? What should this be called??
-
-        # # print revhead[1:]
-        # # for rn, row in enumerate(drows):
-        # #     print index[rn], row
-
-        # # print repr(self.Data)
-
-        # # # pd.DataFrame([OrderedDict([(head, row[i]) for i, head in revised_heading if row[i] != '']) for row in source.table])
-
-
-        # # # pd.DataFrame(OrderedDict([(head,[row[i] for row in source.table]) for i, head in enumerate(revised_heading)]))
-        # # # print self.Data.__repr__
-        # # # raw_input()
-
-        # # return
-
-        # fp = open(expdata)
-        
-        # line         = fp.readline()
-        # foundHeader  = False
-        # names        = None
-        # units        = None
-        # label_header = None
-        # label_unit   = None
-        # count        = 0
-        # metadata     = {}
-        # while line:
-        #     # Skip comments and blank lines
-        #     if line.lstrip().startswith("#") or not line.strip():
-        #         line = fp.readline()
-        #         continue
-        #     # Metadata is denoted using 
-        #     if "=" in line: # Read variable
-        #         param, value = line.split("=")
-        #         param = param.strip().lower()
-        #         metadata[param] = value
-        #         # if param == "denoms":
-        #         #     for e, v in enumerate(value.split()):
-        #         #         self.denoms[self.observables[e]] = float(v)
-        #         # elif param == "weights":
-        #         #     for e, v in enumerate(value.split()):
-        #         #         self.weights[self.observables[e]] = float(v)
-        #     elif foundHeader: # Read exp data
-        #         count      += 1
-        #         vals        = line.split()
-        #         label       = (vals[0], label_header, label_unit)
-        #         refs        = np.array(vals[1:-2:2]).astype(float)
-        #         wts         = np.array(vals[2:-2:2]).astype(float)
-        #         temperature = float(vals[-2])
-        #         pressure    = None if vals[-1].lower() == "none" else \
-        #           float(vals[-1])
-        #         dp = Point(count, label=label, refs=refs, weights=wts,
-        #                    names=names, units=units,
-        #                    temperature=temperature, pressure=pressure)
-        #         self.points.append(dp)
-        #     else: # Read headers
-        #         foundHeader = True
-        #         headers = zip(*[tuple(h.split("_")) for h in line.split()
-        #                         if h != "w"])
-        #         label_header = list(headers[0])[0]
-        #         label_unit   = list(headers[1])[0]
-        #         names        = list(headers[0][1:-2])
-        #         units        = list(headers[1][1:-2])
-        #     line = fp.readline()            
     
     def retrieve(self, dp):
         """Retrieve the molecular dynamics (MD) results and store the calculated
@@ -950,7 +730,7 @@ class Thermo(Target):
             
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         """This routine is called by Objective.stage() and will run before "get".
-        It submits the jobs and the stage() function will wait for jobs
+        It submits the jobs (or runs them locally) and the stage() function will wait for jobs
         to complete.
 
         Parameters
@@ -967,6 +747,49 @@ class Thermo(Target):
         Nothing.
         
         """
+
+        printcool("Submitting jobs")
+        cwd = os.getcwd()
+        wq = getWorkQueue()
+        for index in self.Indices:
+            # if 'temp' in self.Data:
+            #     tset = set([iself.Data['temp'].ix[index][:])
+            temp = self.Data2['temp'].ix[index] if 'temp' in self.Data2 else None
+            pres = self.Data2['pres'].ix[index] if 'pres' in self.Data2 else None
+            for Sim in self.Simulations[index]:
+                simd = os.path.join(os.getcwd(), index, Sim.name)
+                GoInto(simd)
+                # Submit or run the simulation if the result file does not exist.
+                if not (os.path.exists('result.p') or os.path.exists('result.p.bz2')):
+                    # Write to disk: Force field object, current parameter values, target options
+                    with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict),f)
+                    M = Molecule(os.path.join(self.root, Sim.initial))[Sim.iframe]
+                    M.write("%s%s" % (Sim.stype, self.crdsfx[0]))
+                    # # Get relevant files from the target folder, I suppose.
+                    # link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+                    # # Determine initial coordinates.
+                    # self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
+                    # self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+                    # Command for running the simulation.
+                    cmdlist = ['%s python md_one.py %s' % (self.mdpfx, Sim.stype)]
+                    if temp != None:
+                        cmdlist.append('-T %f' % float(temp))
+                    if pres != None:
+                        cmdlist.append('-P %f' % float(pres))
+                    cmdstr = ' '.join(cmdlist)
+                    print cmdstr
+                    # # cmdstr = '%s python md1.py %s %.3f %.3f' % (self.runpfx, temperature, pressure)
+                    # if wq == None:
+                    #     logger.info("Running condensed phase simulation locally.\n")
+                    #     logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
+                    #     _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
+                    # else:
+                    #     queue_up(wq, command = cmdstr+' &> npt.out',
+                    #              input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
+                    #              output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
+                os.chdir(cwd)
+        return
+
         # Set up and run the simulation chain on all points.
         for pt in self.points:
             # Create subdir
@@ -1254,31 +1077,43 @@ class Simulation(object):
     type, initial condition).
     """
 
-    def __init__(self, index, stype, initial, iframe, tsnames):
+    def __init__(self, name, index, stype, initial, iframe, tsnames):
+        # The simulation name will identify the simulation within a collection
+        # belonging to the Index.
+        self.name = name
+        # The Index that the simulation belongs to.
         self.index = index
+        # The type of simulation (liquid, gas, solid, bilayer...)
         self.stype = stype
+        # The file containing initial coordinates.
         self.initial = initial
+        # The frame number in the initial coordinate file.
         self.iframe = iframe
+        # The time series for the simulation.
         self.timeseries = OrderedDict([(i, []) for i in tsnames])
 
     def __str__(self):
         msg = []
-        if self.temperature is None:
-            msg.append("State: Unknown.")
-        elif self.pressure is None:
-            msg.append("State: Point " + str(self.idnr) + " at " +
-                       str(self.temperature) + " K.")
-        else:
-            msg.append("State: Point " + str(self.idnr) + " at " +
-                       str(self.temperature) + " K and " +
-                       str(self.pressure) + " bar.")
-
-        msg.append("Point " + str(self.idnr) + " reference data " + "-"*30)
-        for key in self.ref:
-            msg.append("  " + key.strip() + " = " + str(self.ref[key]).strip())
-            
-        msg.append("Point " + str(self.idnr) + " calculated data " + "-"*30)
-        for key in self.data:
-            msg.append("  " + key.strip() + " = " + str(self.data[key]).strip())
-
+        msg.append("Simulation: Name %s, Index %s, Type %s" % (self.name, self.index, self.stype))
+        msg.append("Initial Conditions: File %s Frame %i" % (self.initial, self.iframe))
+        msg.append("Timeseries Names: %s" % (', '.join(self.timeseries.keys())))
         return "\n".join(msg)
+        # if self.temperature is None:
+        #     msg.append("State: Unknown.")
+        # elif self.pressure is None:
+        #     msg.append("State: Point " + str(self.idnr) + " at " +
+        #                str(self.temperature) + " K.")
+        # else:
+        #     msg.append("State: Point " + str(self.idnr) + " at " +
+        #                str(self.temperature) + " K and " +
+        #                str(self.pressure) + " bar.")
+
+        # msg.append("Point " + str(self.idnr) + " reference data " + "-"*30)
+        # for key in self.ref:
+        #     msg.append("  " + key.strip() + " = " + str(self.ref[key]).strip())
+            
+        # msg.append("Point " + str(self.idnr) + " calculated data " + "-"*30)
+        # for key in self.data:
+        #     msg.append("  " + key.strip() + " = " + str(self.data[key]).strip())
+
+        # return "\n".join(msg)

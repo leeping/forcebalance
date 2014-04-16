@@ -193,7 +193,7 @@ class FF(forcebalance.BaseClass):
     For details on force field parsing, see the detailed documentation for addff.
     
     """
-    def __init__(self, options, verbose=True):
+    def __init__(self, options, verbose=True, printopt=True):
 
         """Instantiation of force field class.
 
@@ -227,6 +227,8 @@ class FF(forcebalance.BaseClass):
         self.set_option(options, 'rigid_water')
         ## Bypass the transformation and use physical parameters directly
         self.set_option(options, 'use_pvals')
+        ## Allow duplicate parameter names (internally construct unique names)
+        self.set_option(options, 'duplicate_pnames')
         
         #======================================#
         #     Variables which are set here     #
@@ -318,7 +320,12 @@ class FF(forcebalance.BaseClass):
         self.linedestroy_this = []
         self.prmdestroy_this = []
         ## Print the optimizer options.
-        printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
+        if printopt: printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
+
+    @classmethod
+    def fromfile(cls, fnm):
+        options = {'forcefield' : [fnm], 'ffdir' : '.', 'duplicate_pnames' : True}
+        return cls(options, verbose=False, printopt=False)
 
     def addff(self,ffname):
         """ Parse a force field file and add it to the class.
@@ -496,15 +503,32 @@ class FF(forcebalance.BaseClass):
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
+                    pid_ = pid
                     # Add pid into the dictionary.
                     # LPW: Here is a hack to allow duplicate parameter IDs.
                     if pid in self.map:
                         pid0 = pid
                         extranum = 0
+                        dupfnms = [os.path.basename(i[0]) for i in self.pfields[self.map[pid]]]
+                        duplns = [i[1] for i in self.pfields[self.map[pid]]]
+                        dupflds = [i[2] for i in self.pfields[self.map[pid]]]
                         while pid in self.map:
                             pid = "%s%i" % (pid0, extranum)
                             extranum += 1
-                        logger.info("Encountered an duplicate parameter ID: parameter name has been changed to %s\n" % pid)
+                        def warn_or_err(*args):
+                            if self.duplicate_pnames:
+                                logger.warn(*args)
+                            else:
+                                logger.error(*args)
+                        warn_or_err("Encountered an duplicate parameter ID (%s)\n" % pid_)
+                        warn_or_err("file %s line %i field %i duplicates:\n" 
+                                    % (os.path.basename(ffname), ln+1, pfld))
+                        for dupfnm, dupln, dupfld in zip(dupfnms, duplns, dupflds):
+                            warn_or_err("file %s line %i field %i\n" % (dupfnm, dupln+1, dupfld))
+                        if self.duplicate_pnames:
+                            logger.warn("Parameter name has been changed to %s\n" % pid)
+                        else:
+                            raise RuntimeError
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
                     self.patoms.append([self.Readers[ffname].molatom])

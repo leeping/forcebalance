@@ -279,6 +279,18 @@ def floatornan(word):
         logger.info("Setting %s to % .1e\n" % big)
         return big
 
+def isnpnan(var):
+    """ 
+
+    Determine whether a variable is np.nan.  I wrote this function
+    because np.isnan would crash if we use it on a dtype that is not
+    np.float
+    
+    """
+    if type(var) in [np.float, np.float32, np.float64, np.double]:
+        return np.isnan(var)
+    return False
+
 def col(vec):
     """
     Given any list, array, or matrix, return a 1-column matrix.
