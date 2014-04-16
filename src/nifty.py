@@ -237,6 +237,12 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
 #===============================#
 #| Math: Variable manipulation |#
 #===============================#
+def isnan(var):
+    """ Attempt to see if the given variable is np.nan. """
+    if isinstance(var, float):
+        return np.isnan(var)
+    return False
+
 def isint(word):
     """ONLY matches integers! If you have a decimal point? None shall pass!
 

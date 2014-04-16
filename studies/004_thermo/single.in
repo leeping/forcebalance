@@ -72,13 +72,3 @@ simulations liquid gas
 md_steps 100000
 eq_steps 50000
 $end
-
-$target
-name Lipid_TAB
-type Thermo_GMX
-weight 1.0
-source lipidcol1.txt
-observables al scd kappa
-md_steps 100000
-eq_steps 50000
-$end

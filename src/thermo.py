@@ -8,7 +8,8 @@ import pandas as pd
 import itertools
 import cStringIO
 
-from forcebalance.observable import *
+from forcebalance.molecule import Molecule
+from forcebalance.observable import OMap
 from forcebalance.target import Target
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import flat, col, row, isint, isnpnan
@@ -381,24 +382,22 @@ class Thermo(Target):
         self.denoms    = {}
         # Weights for observables
         self.weights   = {}
+        # The list of simulations that we'll be running.
+        self.SimNames = [i.lower() for i in self.user_simulation_names]
 
-        ## A mapping that takes us from observable names to Observable objects.
-        self.Observable_Map = {'density' : Observable_Density,
-                               'rho' : Observable_Density,
-                               'hvap' : Observable_H_vap,
-                               'h_vap' : Observable_H_vap}
-        
-
-        ## Read source data and initialize points; creates self.Data, self.Indices and self.Observables objects.
+        ## Read source data and initialize points; creates self.Data, self.Indices and self.Columns objects.
         self.read_source(os.path.join(self.root, self.tgtdir, self.source))
+
+        ## Set up self.Observables.
+        self.initialize_observables()
+
+        ## Set up self.Simulations.
+        self.initialize_simulations()
         
         ## Copy run scripts from ForceBalance installation directory
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
                      os.path.join(self.root, self.tempdir, f))
-
-        ## Set up simulations
-        self.prepare_simulations()
 
     def read_source(self, srcfnm):
         """Read and store source data.
@@ -418,8 +417,8 @@ class Thermo(Target):
         source = parse1(srcfnm)
         printcool_dictionary(source.metadata, title="Metadata")
         revhead = []
-        obs = ''
-        obsnames = []
+        col = ''
+        colnames = []
 
         units = defaultdict(str)
 
@@ -427,8 +426,8 @@ class Thermo(Target):
             if i == 0 and head.lower() == 'index': # Treat special case because index can also mean other things
                 revhead.append('index')
                 continue
-            newh, punit, obs = stand_head(head, obs)
-            if obs not in obsnames + ['temp', 'pres', 'n_ic']: obsnames.append(obs)
+            newh, punit, col = stand_head(head, col)
+            if col not in colnames + ['temp', 'pres', 'n_ic']: colnames.append(col)
             revhead.append(newh)
             if punit != '':
                 units[newh] = punit
@@ -478,7 +477,7 @@ class Thermo(Target):
                 # (2) There can only be one file per system index / column.
                 # (3) The column heading in the secondary file that's being
                 # referenced must match that of the reference in the primary file.
-                obs2 = ''
+                col2 = ''
                 for cid_, fld in enumerate(row[1:]):
                     if ':' not in fld: continue
                     cid = cid_ + 1
@@ -501,7 +500,7 @@ class Thermo(Target):
                         reffld_error('%s already contains a file reference' % (saveidx, revhead[cid]))
                     subfile = parse1(fpath)
                     fcol = fcol_ - 1
-                    head2, punit2, obs2 = stand_head(subfile.heading[fcol], obs2)
+                    head2, punit2, col2 = stand_head(subfile.heading[fcol], col2)
                     if revhead[cid] != head2:
                         reffld_error("Column heading of %s (%s) doesn't match original (%s)" % (fnm, head2, revhead[cid]))
                     fref[(saveidx, revhead[cid])] = [row2[fcol] for row2 in subfile.table]
@@ -530,8 +529,17 @@ class Thermo(Target):
         # Turn it into a pandas DataFrame.
         self.Data = pd.DataFrame(drows, columns=revhead[1:], index=pd.MultiIndex.from_tuples(index, names=['index', 'subindex']))
 
-        # self.collapse = 
-        # self.
+        def intcol(col):
+            if col in self.Data.columns:
+                for idx in self.Data.index:
+                    if not isnan(self.Data[col][idx]):
+                        self.Data[col][idx] = int(self.Data[col][idx])
+
+        def floatcol(col):
+            if col in self.Data.columns:
+                self.Data[col] = self.Data[col].astype(float)
+
+        intcol('n_ic')
 
         # A list of indices (i.e. top-level indices) which correspond
         # to sets of simulations that we'll be running.
@@ -539,6 +547,9 @@ class Thermo(Target):
         for idx in self.Data.index:
             if idx[0] not in self.Indices:
                 self.Indices.append(idx[0])
+
+        # List of columns in the main data table.
+        self.Columns = self.Data.columns
 
         # Certain things (e.g. run parameters like temp, pres) are keyed to the index only.
         chead = []
@@ -558,35 +569,6 @@ class Thermo(Target):
         # Now create the mini data table.
         self.Data2 = pd.DataFrame(crows, columns=chead, index=self.Indices)
 
-        # A list of Observable objects (i.e. column headings) which
-        # contain methods for calculating observables that we need.
-        # Think about: 
-        # (1) How much variability is allowed across Indices?
-        #     For instance, different S_cd is permissible.
-        self.Observables = OrderedDict()
-        self.ObsNames = []
-        for obsname in [stand_head(i, '')[2] for i in self.user_observable_names]:
-            if obsname in self.Observables:
-                logger.error('%s was already specified as an observable' % (obsname))
-            self.Observables[obsname] = OrderedDict()
-            for index in self.Indices:
-                if obsname in self.Observable_Map:
-                    newobs = self.Observable_Map[obsname](source=self.Data.ix[index])
-                    logger.info('%s is specified as an observable, appending %s class\n' % (obsname, newobs.__class__.__name__))
-                    self.Observables[obsname][index] = newobs
-                else:
-                    logger.warn('%s is specified but there is no corresponding Observable class, appending empty one\n' % obsname)
-                    self.Observables[obsname][index] = Observable(name=obsname, source=self.Data.ix[index])
-            self.ObsNames.append(obsname)
-
-        print self.Indices
-        print self.Observables
-        print repr(self.Data)
-        # if 'temp' in self.Data:
-        #     self.Temperatures = OrderedDict()
-        #     for index in self.Indices:
-        # print self.Data['temp'][0]
-        raw_input()
         return
 
     def find_ic(self, index, stype, icn):
@@ -636,7 +618,44 @@ class Thermo(Target):
                         found = fpath
         return found, 0 if numbered else icn
     
-    def prepare_simulations(self):
+    def initialize_observables(self):
+        """ 
+        Determine Observable objects to be created.  Checks to see
+        whether simulations are consistent with observables (i.e. no
+        missing simulations or ambiguities.)
+
+        In order to implement a new observable, create a class in
+        observable.py and add it to OMap.
+        """
+        self.Observables = OrderedDict()
+        for oname in [stand_head(i, '')[2] for i in self.user_observable_names]:
+            if oname in self.Observables:
+                logger.error('%s was already specified as an observable' % (oname))
+                raise RuntimeError
+            self.Observables[oname] = OrderedDict()
+            for index in self.Indices:
+                if oname in OMap:
+                    Objs = []
+                    Reqs = []
+                    for OClass in OMap[oname]:
+                        OObj = OClass(self.Data)
+                        Reqs.append(OObj.requires.keys())
+                        if all([i in self.SimNames for i in OObj.requires.keys()]):
+                            Objs.append(OObj)
+                    if len(Objs) == 0:
+                        logger.error('Observable %s is specified but required simulations are missing; choose %s' % (oname, ' or '.join([str(r) for r in Reqs])))
+                        raise RuntimeError
+                    if len(Objs) > 1:
+                        logger.error("Observable %s not uniquely mapped to simulations (choose between %s)" % (oname, ' or '.join([o.name in Objs])))
+                        raise RuntimeError
+                    logger.info("Creating %s observable object for index %s\n" % (Objs[0].name, index))
+                    self.Observables[oname][index] = Objs[0]
+                else:
+                    logger.error('%s is specified but there is no corresponding Observable class\n' % oname)
+                    raise RuntimeError
+        return
+
+    def initialize_simulations(self):
 
         """ 
 
@@ -648,32 +667,17 @@ class Thermo(Target):
         """
         # print narrow()
             
-        # The list of simulations that we'll be running.
-        self.SimNames = [i.lower() for i in self.user_simulation_names]
         self.Simulations = OrderedDict([(i, []) for i in self.Indices])
         # Dictionary of time series to extract from each simulation.
         SimTS = defaultdict(set)
         # Check to see whether each observable can be unambiguously calculated from the specified simulations
-        for obsname in self.ObsNames:
-            sreq = self.Observables[obsname][self.Indices[0]].sreq
-            ssels = []
-            SimTS_ = defaultdict(set)
-            for sdct in sreq:
-                # This is a dictionary of simulation names : 
-                if len(set(self.SimNames).intersection(sdct.keys())) > 1:
-                    logger.error("Ambiguous: Don't know which simulation to use in calculating observable %s" % obsname)
-                    logger.error("Choose ONE from this menu of required simulations: [%s]" % ' '.join(sdct.keys()))
-                    raise RuntimeError
-                if len(set(self.SimNames).intersection(sdct.keys())) == 0:
-                    logger.error("Missing Simulation: Cannot calculate observable %s" % obsname)
-                    logger.error("Choose ONE from this menu of required simulations: [%s]" % ' '.join(sdct.keys()))
-                    raise RuntimeError
-                # One of the simulations that will be used in calculating this observable.
-                ssel = list(set(self.SimNames).intersection(sdct.keys()))[0]
-                SimTS[ssel].update(set(sdct[ssel]))
-                SimTS_[ssel].update(set(sdct[ssel]))
-            printcool_dictionary({i:' '.join(sorted(list(SimTS_[i]))) for i in sorted(SimTS_.keys())}, title="Observable %s uses these simulations : timeseries" % obsname)
-        printcool_dictionary({i:' '.join(sorted(list(SimTS[i]))) for i in sorted(SimTS.keys())}, title="Needed Simulations : Extracted Timeseries")
+        for obsname in self.Observables.keys():
+            sreq = self.Observables[obsname][self.Indices[0]].requires
+            for i, j in sreq.items():
+                SimTS[i].update(set(j))
+            printcool_dictionary(sreq, title="Observable %s uses these simulations : timeseries" % obsname)
+        printcool_dictionary({i:' '.join(sorted(list(SimTS[i]))) for i in sorted(SimTS.keys())}, 
+                             title="Needed Simulations : Extracted Timeseries")
         unused = sorted(list(set(self.SimNames).difference(set(SimTS.keys()))))
         if len(unused) > 0:
             logger.error("Simulation %s is specified but it's never used to calculate any observables" % ', '.join(unused))
@@ -694,40 +698,7 @@ class Thermo(Target):
                     self.Simulations[index].append(Simulation(sname, index, stype, icfnm, icframe, sorted(list(tsset))))
                     
         return
-    
-    def retrieve(self, dp):
-        """Retrieve the molecular dynamics (MD) results and store the calculated
-        observables in the Point object dp.
 
-        Parameters
-        ----------
-        dp : Point
-            Store the calculated observables in this point.
-
-        Returns
-        -------
-        Nothing
-        
-        """
-        abspath = os.path.join(os.getcwd(), '%d/md_result.p' % dp.idnr)
-
-        if os.path.exists(abspath):
-            logger.info('Reading data from ' + abspath + '.\n')
-
-            vals, errs, grads = lp_load(open(abspath))
-
-            dp.data["values"] = vals
-            dp.data["errors"] = errs
-            dp.data["grads"]  = grads
-
-        else:
-            msg = 'The file ' + abspath + ' does not exist so we cannot read it.\n'
-            logger.warning(msg)
-
-            dp.data["values"] = np.zeros((len(self.observables)))
-            dp.data["errors"] = np.zeros((len(self.observables)))
-            dp.data["grads"]  = np.zeros((len(self.observables), self.FF.np))
-            
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         """This routine is called by Objective.stage() and will run before "get".
         It submits the jobs (or runs them locally) and the stage() function will wait for jobs
@@ -764,18 +735,18 @@ class Thermo(Target):
                     # Write to disk: Force field object, current parameter values, target options
                     with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict),f)
                     M = Molecule(os.path.join(self.root, Sim.initial))[Sim.iframe]
-                    M.write("%s%s" % (Sim.stype, self.crdsfx[0]))
+                    M.write("%s%s" % (Sim.type, self.crdsfx[0]))
                     # # Get relevant files from the target folder, I suppose.
                     # link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
                     # # Determine initial coordinates.
                     # self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
                     # self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
                     # Command for running the simulation.
-                    cmdlist = ['%s python md_one.py %s' % (self.mdpfx, Sim.stype)]
+                    cmdlist = ['%s python md_one.py %s' % (self.mdpfx, Sim.type)]
                     if temp != None:
-                        cmdlist.append('-T %f' % float(temp))
+                        cmdlist.append('-T %g' % float(temp))
                     if pres != None:
-                        cmdlist.append('-P %f' % float(pres))
+                        cmdlist.append('-P %g' % float(pres))
                     cmdstr = ' '.join(cmdlist)
                     print cmdstr
                     # # cmdstr = '%s python md1.py %s %.3f %.3f' % (self.runpfx, temperature, pressure)
@@ -790,44 +761,39 @@ class Thermo(Target):
                 os.chdir(cwd)
         return
 
-        # Set up and run the simulation chain on all points.
-        for pt in self.points:
-            # Create subdir
-            try:
-                os.makedirs(str(pt.idnr))
-            except OSError as exception:
-                if exception.errno != errno.EEXIST:
-                    raise            
-                
-            # Goto subdir
-            os.chdir(str(pt.idnr))
+    def retrieve(self, dp):
+        """Retrieve the molecular dynamics (MD) results and store the calculated
+        observables in the Point object dp.
 
-            # Link dir contents from target subdir to current temp directory.
-            for f in self.scripts:
-                LinkFile(os.path.join(self.root, self.tempdir, f),
-                         os.path.join(os.getcwd(), f))
-                
-            link_dir_contents(os.path.join(self.root, self.tgtdir,
-                                           str(pt.idnr)), os.getcwd())
-            
-            # Dump the force field to a pickle file
-            with wopen('forcebalance.p') as f:
-                lp_dump((self.FF, mvals, self.OptionDict, AGrad), f)
-                
-            # Run the simulation chain for point.        
-            cmdstr = ("%s python md_chain.py " % self.mdpfx +
-                      " ".join(self.observables) + " " +
-                      "--engine %s " % self.engname +
-                      "--length %d " % self.n_sim_chain + 
-                      "--name %s " % self.simpfx +
-                      "--temperature %f " % pt.temperature +
-                      "--pressure %f " % pt.pressure +
-                      "--nequil %d " % self.eq_steps +
-                      "--nsteps %d " % self.md_steps)
-            _exec(cmdstr, copy_stderr=True, outfnm='md_chain.out')
+        Parameters
+        ----------
+        dp : Point
+            Store the calculated observables in this point.
+
+        Returns
+        -------
+        Nothing
         
-            os.chdir('..')
+        """
+        abspath = os.path.join(os.getcwd(), '%d/md_result.p' % dp.idnr)
 
+        if os.path.exists(abspath):
+            logger.info('Reading data from ' + abspath + '.\n')
+
+            vals, errs, grads = lp_load(open(abspath))
+
+            dp.data["values"] = vals
+            dp.data["errors"] = errs
+            dp.data["grads"]  = grads
+
+        else:
+            msg = 'The file ' + abspath + ' does not exist so we cannot read it.\n'
+            logger.warning(msg)
+
+            dp.data["values"] = np.zeros((len(self.observables)))
+            dp.data["errors"] = np.zeros((len(self.observables)))
+            dp.data["grads"]  = np.zeros((len(self.observables), self.FF.np))
+            
     def indicate(self):
         """Shows optimization state."""
         return
@@ -1084,7 +1050,7 @@ class Simulation(object):
         # The Index that the simulation belongs to.
         self.index = index
         # The type of simulation (liquid, gas, solid, bilayer...)
-        self.stype = stype
+        self.type = stype
         # The file containing initial coordinates.
         self.initial = initial
         # The frame number in the initial coordinate file.
@@ -1094,26 +1060,7 @@ class Simulation(object):
 
     def __str__(self):
         msg = []
-        msg.append("Simulation: Name %s, Index %s, Type %s" % (self.name, self.index, self.stype))
+        msg.append("Simulation: Name %s, Index %s, Type %s" % (self.name, self.index, self.type))
         msg.append("Initial Conditions: File %s Frame %i" % (self.initial, self.iframe))
         msg.append("Timeseries Names: %s" % (', '.join(self.timeseries.keys())))
         return "\n".join(msg)
-        # if self.temperature is None:
-        #     msg.append("State: Unknown.")
-        # elif self.pressure is None:
-        #     msg.append("State: Point " + str(self.idnr) + " at " +
-        #                str(self.temperature) + " K.")
-        # else:
-        #     msg.append("State: Point " + str(self.idnr) + " at " +
-        #                str(self.temperature) + " K and " +
-        #                str(self.pressure) + " bar.")
-
-        # msg.append("Point " + str(self.idnr) + " reference data " + "-"*30)
-        # for key in self.ref:
-        #     msg.append("  " + key.strip() + " = " + str(self.ref[key]).strip())
-            
-        # msg.append("Point " + str(self.idnr) + " calculated data " + "-"*30)
-        # for key in self.data:
-        #     msg.append("  " + key.strip() + " = " + str(self.data[key]).strip())
-
-        # return "\n".join(msg)

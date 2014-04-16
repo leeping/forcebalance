@@ -74,27 +74,14 @@ class Observable(object):
     name : string
         Identifier for the observable that is specified in `observables` in Target
         options.
-    sreq : list of (strings or lists)
-        The names of simulation types that are needed to calculate
-        this observable.  If a string is added to the list, then that
-        simulation is *required* to calculate the observable.  If a
-        list is added, then any simulation within that type is allowed,
-        but the first member of the list is used by default.
-    treq : list of strings
-        The names of timeseries from each simulation that are needed to
-        calculate this observable.
-    dreq : list of strings
-        The names of timeseries from each simulation - in addition to
-        "treq" - that are needed to *differentiate* this observable.
-        (Usually energy derivatives)
     """
     def __init__(self, source, name=None):
-        self.name        = name if name is not None else "empty"
-        self.sreq = []
-        self.dreq = ['energy_derivatives']
+        # Reference data which can be useful in calculating the observable.
+        self.Data = source[self.columns]
+        self.name = name if name is not None else "empty"
                     
     def __str__(self):
-        return "observable is " + self.name.capitalize() + "."
+        return "Observable = " + self.name.capitalize() + "; Columns = " + ', '.join(self.columns)
 
     def extract(self, engines, FF, mvals, h, AGrad=True):
         """Calculate and extract the observable from MD results. How this is done
@@ -129,12 +116,25 @@ class Observable(object):
 
 # class Observable_Density
 class Observable_Density(Observable):
-    def __init__(self, source, name=None):
-        """ Density. """
-        super(Observable_Density, self).__init__(source, name)
-        
-        self.name = name if name is not None else "density"
-        self.sreq = [{'liquid':['density'], 'solid':['density']}]
+
+    """ 
+    The Observable_Density class implements common methods for
+    extracting the density from a simulation, but does not specify the
+    simulation itself ('requires' attribute).  Don't create a
+    Density object directly, use the Liquid_Density and Solid_Density
+    derived classes.
+
+    This is due to our overall framework that each observable must
+    have a unique list of required simulations, yet the formula for
+    calculating the density and its derivative is always the same.
+    """
+
+    def __init__(self, source):
+        # Name of the observable.
+        self.name = 'density'
+        # Columns that are taken from the data table.
+        self.columns = ['density']
+        super(Observable_Density, self).__init__(source)
 
     def extract(self, engines, FF, mvals, h, pgrad, AGrad=True):         
         #==========================================#
@@ -195,20 +195,32 @@ class Observable_Density(Observable):
         # Analytic first derivative.
         Rho_grad = mBeta * (flat(np.mat(G) * col(Density)) / len(Density) \
                             - np.mean(Density) * np.mean(G, axis=1))
-            
         return Rho_avg, Rho_err, Rho_grad
+
+class Liquid_Density(Observable_Density):
+    def __init__(self, source):
+        # The density time series is required from the simulation.
+        self.requires = OrderedDict([('liquid', ['density'])])
+        super(Liquid_Density, self).__init__(source)
+
+class Solid_Density(Observable_Density):
+    def __init__(self, source):
+        # The density time series is required from the simulation.
+        self.requires = OrderedDict([('solid', ['density'])])
+        super(Solid_Density, self).__init__(source)
 
 # class Observable_H_vap
 class Observable_H_vap(Observable):
-    def __init__(self, source, name=None):
+    def __init__(self, source):
         """ Enthalpy of vaporization. """
-        super(Observable_H_vap, self).__init__(source, name)
-        
-        self.name = name if name is not None else "H_vap"
-
-        # Calculating the heat of vaporization requires a liquid simulation and a gas simulation.
-        self.sreq = [{'liquid':['energy', 'volume']},
-                     {'gas':['energy']}]
+        # Name of the observable.
+        self.name = 'hvap'
+        # Columns that are taken from the data table.
+        self.columns = ['hvap']
+        # Get energy/volume from liquid simulation, and energy from gas simulation.
+        self.requires = OrderedDict([('liquid', ['energy', 'volume']), ('gas', ['energy'])])
+        # Initialize the base class
+        super(Observable_H_vap, self).__init__(source)
 
     def extract(self, engines, FF, mvals, h, pgrad, AGrad=True): 
         #==========================================#
@@ -307,16 +319,63 @@ class Observable_H_vap(Observable):
 
         return Hvap_avg, Hvap_err, Hvap_grad
 
-# class Observable_Kappa
-class Observable_Kappa(Observable):
-    def __init__(self, source, name=None):
-        """ Compressibility (applies to liquid and lipid bilayer.) """
-        super(Observable_H_vap, self).__init__(source, name)
-        self.name = name if name is not None else "H_vap"
-        # List of dictionaries of simulation names : timeseries that
-        # we extract from the simulation.
+# class Observable_Al
+class Observable_Al(Observable):
+    def __init__(self, source):
+        """ Area per lipid. """
+        # Name of the observable.
+        self.name = 'al'
+        # Columns that are taken from the data table.
+        self.columns = ['al']
+        # Get area per lipid from the bilayer simulation.
+        self.requires = OrderedDict([('bilayer', ['al'])])
+        # Initialize the base class
+        super(Observable_Al, self).__init__(source)
 
-        # Each dictionary represents a simulation needed to calculate
-        # the observable, but the required timeseries depends on the
-        # simulation that we run.
-        self.sreq = [{'liquid':['volume'], 'bilayer':['al']}],
+# class Observable_Scd
+class Observable_Scd(Observable):
+    def __init__(self, source):
+        """ Deuterium order parameter. """
+        # Name of the observable.
+        self.name = 'scd'
+        # Columns that are taken from the data table.
+        self.columns = ['scd1_idx', 'scd1', 'scd2_idx', 'scd2']
+        # Get deuterium order parameter from the bilayer simulation.
+        self.requires = OrderedDict([('bilayer', ['scd1', 'scd2'])])
+        # Initialize the base class
+        super(Observable_Scd, self).__init__(source)
+
+# class Lipid_Kappa
+class Lipid_Kappa(Observable):
+    def __init__(self, source):
+        """ Compressibility as calculated for lipid bilayers. """
+        # Name of the observable.
+        self.name = 'kappa'
+        # Columns that are taken from the data table.
+        self.columns = ['kappa']
+        # Get area per lipid from the bilayer simulation.
+        self.requires = OrderedDict([('bilayer', ['al'])])
+        # Initialize the base class
+        super(Lipid_Kappa, self).__init__(source)
+
+# class Liquid_Kappa
+class Liquid_Kappa(Observable):
+    def __init__(self, source):
+        """ Compressibility as calculated for liquids. """
+        # Name of the observable.
+        self.name = 'kappa'
+        # Columns that are taken from the data table.
+        self.columns = ['kappa']
+        # Get area per lipid from the bilayer simulation.
+        self.requires = OrderedDict([('liquid', ['volume'])])
+        # Initialize the base class
+        super(Liquid_Kappa, self).__init__(source)
+
+## A mapping that takes us from observable names to possible Observable objects.
+OMap = {'density' : [Liquid_Density, Solid_Density],
+        'rho' : [Liquid_Density, Solid_Density],
+        'hvap' : [Observable_H_vap],
+        'h_vap' : [Observable_H_vap],
+        'al' : [Observable_Al],
+        'kappa' : [Liquid_Kappa, Lipid_Kappa],
+        'scd' : [Observable_Scd]}
