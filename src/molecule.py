@@ -2454,6 +2454,11 @@ class Molecule(object):
                     sline = line.split()
                     mkchgThis.append(float(sline[2]))
                     mkspnThis.append(float(sline[3]))
+                elif re.match("^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){1}$", line):
+                    MMode = 2
+                    sline = line.split()
+                    mkchgThis.append(float(sline[2]))
+                    mkspnThis.append(0.0)
                 elif MMode == 2: # Break out of the loop if we encounter anything other than Mulliken charges
                     mkchg.append(mkchgThis[:])
                     mkspn.append(mkspnThis[:])

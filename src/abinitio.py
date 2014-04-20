@@ -446,28 +446,34 @@ class AbInitio(Target):
             self.ntq = 0
 
     def indicate(self):
-        Headings = ["Observable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference", "Weight"]
+        Headings = ["Observable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference", "Weight", "Contribution"]
         Data = OrderedDict([])
         if self.energy:
             Data['Energy (kJ/mol)'] = ["%8.4f" % self.e_err,
                                        "%8.4f" % self.e_ref,
                                        "%.4f%%" % (self.e_err_pct*100),
-                                       "%.3f" % self.w_energy]
+                                       "%.3f" % self.w_energy,
+                                       "%8.4f" % self.e_ctr]
         if self.force:
             Data['Gradient (kJ/mol/A)'] = ["%8.4f" % (self.f_err/10),
                                            "%8.4f" % (self.f_ref/10),
                                            "%.4f%%" % (self.f_err_pct*100),
-                                           "%.3f" % self.w_force]
+                                           "%.3f" % self.w_force,
+                                           "%8.4f" % self.f_ctr]
             if self.use_nft:
                 Data['Net Force (kJ/mol/A)'] = ["%8.4f" % (self.nf_err/10),
                                                 "%8.4f" % (self.nf_ref/10),
                                                 "%.4f%%" % (self.nf_err_pct*100),
-                                                "%.3f" % self.w_netforce]
+                                                "%.3f" % self.w_netforce,
+                                                "%8.4f" % self.nf_ctr]
                 Data['Torque (kJ/mol/rad)'] = ["%8.4f" % self.tq_err,
                                                "%8.4f" % self.tq_ref,
                                                "%.4f%%" % (self.tq_err_pct*100),
-                                               "%.3f" % self.w_torque]
+                                               "%.3f" % self.w_torque,
+                                               "%8.4f" % self.tq_ctr]
         self.printcool_table(data=Data, headings=Headings, color=0)
+        if self.force:
+            logger.info("Maximum force error on atom %i (%s), frame %i, %8.4f kJ/mol/A\n" % (self.maxfatom, self.mol.elem[self.maxfatom], self.maxfshot, self.maxdf/10))
 
     def energy_all(self):
         if hasattr(self, 'engine'):
@@ -710,6 +716,10 @@ class AbInitio(Target):
                     return self.energy_force_transform()
                 for p in self.pgrad:
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
+        if self.force and not in_fd():
+            self.maxfatom = -1
+            self.maxfshot = -1
+            self.maxdf = 0.0
         for i in range(NS):
             if i % 100 == 0:
                 logger.debug("\rIncrementing quantities for snapshot %i\r" % i)
@@ -740,7 +750,12 @@ class AbInitio(Target):
             # Increment the average values.
             a = 1
             if self.force:
-                dfrcarray = np.mean(np.array([np.linalg.norm(M[a+3*j:a+3*j+3] - Q[a+3*j:a+3*j+3]) for j in range(nat)]))
+                dfrcarray_ = np.array([np.linalg.norm(M[a+3*j:a+3*j+3] - Q[a+3*j:a+3*j+3]) for j in range(nat)])
+                if not in_fd() and np.max(dfrcarray_) > self.maxdf:
+                    self.maxdf = np.max(dfrcarray_)
+                    self.maxfatom = np.argmax(dfrcarray_)
+                    self.maxfshot = i
+                dfrcarray = np.mean(dfrcarray_)
                 qfrcarray = np.mean(np.array([np.linalg.norm(Q[a+3*j:a+3*j+3]) for j in range(nat)]))
                 dF_M    += P*dfrcarray
                 dF_Q    += R*dfrcarray
@@ -1035,17 +1050,26 @@ class AbInitio(Target):
             dTfrac = MBP * dT_M / qT_M + QBP * dT_Q / qT_Q
         # Save values to qualitative indicator if not inside finite difference code.
         if not in_fd():
+            # Contribution from energy and force parts.
+            self.e_ctr = (MBP * weighted_variance(np.array([SPiXi[0]]),np.array([WCiW[0]]),Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute) + 
+                          QBP * weighted_variance(np.array([SRiXi[0]]),np.array([WCiW[0]]),Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute))
             self.e_ref = MBP * np.sqrt(QQ_M[0]/Z - Q0_M[0]**2/Z/Z) + QBP * np.sqrt((QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
             self.e_err = dE
             self.e_err_pct = dEfrac
             if self.force:
+                self.f_ctr = (MBP * weighted_variance(SPiXi[1:1+3*nat],WCiW[1:1+3*nat],Z,X0_M,X0_M,NCP1,subtract_mean = False) + 
+                              QBP * weighted_variance(SRiXi[1:1+3*nat],WCiW[1:1+3*nat],Y,X0_Q,X0_Q,NCP1,subtract_mean = False))
                 self.f_ref = qF
                 self.f_err = dF
                 self.f_err_pct = dFfrac
             if self.use_nft:
+                self.nf_ctr = (MBP * weighted_variance(SPiXi[1+3*nat:1+3*nat+3*nnf],WCiW[1+3*nat:1+3*nat+3*nnf],Z,X0_M,X0_M,NCP1,subtract_mean = False) + 
+                               QBP * weighted_variance(SRiXi[1+3*nat:1+3*nat+3*nnf],WCiW[1+3*nat:1+3*nat+3*nnf],Y,X0_Q,X0_Q,NCP1,subtract_mean = False))
                 self.nf_ref = qN
                 self.nf_err = dN
                 self.nf_err_pct = dNfrac
+                self.tq_ctr = (MBP * weighted_variance(SPiXi[1+3*nat+3*nnf:1+3*nat+3*nnf+3*ntq],WCiW[1+3*nat+3*nnf:1+3*nat+3*nnf+3*ntq],Z,X0_M,X0_M,NCP1,subtract_mean = False) + 
+                               QBP * weighted_variance(SRiXi[1+3*nat+3*nnf:1+3*nat+3*nnf+3*ntq],WCiW[1+3*nat+3*nnf:1+3*nat+3*nnf+3*ntq],Y,X0_Q,X0_Q,NCP1,subtract_mean = False))
                 self.tq_ref = qT
                 self.tq_err = dT
                 self.tq_err_pct = dTfrac
