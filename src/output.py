@@ -12,6 +12,7 @@ class ForceBalanceLogger(Logger):
         self.defaultHandler = RawStreamHandler(sys.stdout)
         super(ForceBalanceLogger, self).addHandler(self.defaultHandler)
         self.setLevel(INFO)
+        self.propagate = False
         
     def addHandler(self, hdlr):
         if self.defaultHandler:
@@ -86,3 +87,4 @@ class ModLogger(Logger):
 
 # module level loggers should use the default logger object
 setLoggerClass(ModLogger)
+
