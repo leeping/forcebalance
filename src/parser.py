@@ -102,6 +102,7 @@ gen_opts_types = {
                  "asynchronous"     : (0, 0, 'Execute Work Queue tasks and local calculations asynchronously for improved speed', 'Targets that use Work Queue (advanced usage)'),
                  "reevaluate"       : (None, 0, 'Re-evaluate the objective function and gradients when the step is rejected (for noisy objective functions).', 'Main Optimizer'),
                  "continue"         : (0, 140, 'Continue the current run from where we left off (supports mid-iteration recovery).', 'Main Optimizer'),
+                 "duplicate_pnames" : (0, -150, 'Allow duplicate parameter names (only if you know what you are doing!', 'Force Field Parser'),
                  },
     'floats'  : {"trust0"                 : (1e-1, 100, 'Levenberg-Marquardt trust radius; set to negative for nonlinear search', 'Main Optimizer'),
                  "mintrust"               : (0.0,   10, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)', 'Main Optimizer'),
