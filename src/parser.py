@@ -193,7 +193,7 @@ tgt_opts_types = {
                  "absolute"         : (0, -150, 'When matching energies in AbInitio, do not subtract the mean energy gap.', 'Energy matching (advanced usage)', 'abinitio'),
                  "cauchy"           : (0, 0, 'Normalize interaction energies each using 1/(denom**2 + reference**2) which resembles a Cauchy distribution', 'Interaction energy targets', 'interaction'),
                  "attenuate"        : (0, 0, 'Normalize interaction energies using 1/(denom**2 + reference**2) only for repulsive interactions greater than denom.', 'Interaction energy targets', 'interaction'),
-                 "normalize"        : (0, -150, 'Divide interaction energy objective by the number of snapshots', 'Interaction energy targets', 'interaction'),
+                 "normalize"        : (0, -150, 'Divide objective function by the number of snapshots / vibrations', 'Interaction energy / vibrational mode targets', 'interaction, vibration'),
                  "manual"           : (0, -150, 'Give the user a chance to fill in condensed phase stuff on the zeroth step', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "hvap_subaverage"  : (0, -150, 'Don\'t target the average enthalpy of vaporization and allow it to freely float (experimental)', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "force_cuda"       : (0, -150, 'Force the external npt.py script to crash if CUDA Platform not available', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
