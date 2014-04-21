@@ -478,7 +478,8 @@ class OpenMM(Engine):
         self.precision = self.precision.lower()
         valprecs = ['single','mixed','double']
         if self.precision not in valprecs:
-            raise RuntimeError("Please specify one of %s for precision" % valprecs)
+            logger.error("Please specify one of %s for precision\n" % valprecs)
+            raise RuntimeError
         ## Set the simulation platform
         if self.verbose: logger.info("Setting Platform to %s\n" % self.platname)
         self.platform = Platform.getPlatformByName(self.platname)
@@ -508,14 +509,17 @@ class OpenMM(Engine):
         if 'pdb' in kwargs and os.path.exists(kwargs['pdb']):
             # Case 1. The PDB file name is provided explicitly
             pdbfnm = kwargs['pdb']
-            if not os.path.exists(pdbfnm): raise RuntimeError("%s specified but doesn't exist" % pdbfnm)
+            if not os.path.exists(pdbfnm): 
+                logger.error("%s specified but doesn't exist\n" % pdbfnm)
+                raise RuntimeError
 
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
         elif 'coords' in kwargs:
             self.mol = Molecule(kwargs['coords'])
         else:
-            raise RuntimeError('Must provide either a molecule object or coordinate file.')
+            logger.error('Must provide either a molecule object or coordinate file.\n')
+            raise RuntimeError
 
         if pdbfnm != None:
             mpdb = Molecule(pdbfnm)
@@ -543,7 +547,8 @@ class OpenMM(Engine):
         else:
             if 'ffxml' in kwargs:
                 if not os.path.exists(kwargs['ffxml']): 
-                    raise RuntimeError("%s doesn't exist" % kwargs['ffxml'])
+                    logger.error("%s doesn't exist\n" % kwargs['ffxml'])
+                    raise RuntimeError
                 self.ffxml = kwargs['ffxml']
             elif onefile('xml'):
                 self.ffxml = onefile('xml')
@@ -559,7 +564,8 @@ class OpenMM(Engine):
         if hasattr(self,'FF'):
             if self.AMOEBA:
                 if self.FF.amoeba_pol == None:
-                    raise RuntimeError('You must specify amoeba_pol if there are any AMOEBA forces.')
+                    logger.error('You must specify amoeba_pol if there are any AMOEBA forces.\n')
+                    raise RuntimeError
                 if self.FF.amoeba_pol == 'mutual':
                     self.mmopts['polarization'] = 'mutual'
                     self.mmopts.setdefault('mutualInducedTargetEpsilon', self.FF.amoeba_eps if self.FF.amoeba_eps != None else 1e-6)
@@ -597,7 +603,8 @@ class OpenMM(Engine):
             if self.pbc:
                 # Obtain the periodic box
                 if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
-                    raise RuntimeError('OpenMM cannot handle nonorthogonal boxes.')
+                    logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
+                    raise RuntimeError
                 box_omm = [Vec3(self.mol.boxes[I].a, 0, 0)*angstrom, 
                            Vec3(0, self.mol.boxes[I].b, 0)*angstrom, 
                            Vec3(0, 0, self.mol.boxes[I].c)*angstrom]
@@ -636,7 +643,8 @@ class OpenMM(Engine):
             ## If temperature control is turned on, then run Langevin dynamics.
             if mts:
                 if rpmd_beads > 0:
-                    raise RuntimeError("No multiple timestep integrator without temperature control.")
+                    logger.error("No multiple timestep integrator without temperature control.\n")
+                    raise RuntimeError
                 integrator = MTSVVVRIntegrator(temperature*kelvin, collision/picosecond,
                                                timestep*femtosecond, self.system, ninnersteps=int(timestep/faststep))
             else:
@@ -649,7 +657,8 @@ class OpenMM(Engine):
         else:
             ## If no temperature control, default to the Verlet integrator.
             if rpmd_beads > 0:
-                raise RuntimeError("No RPMD integrator without temperature control.")
+                logger.error("No RPMD integrator without temperature control.\n")
+                raise RuntimeError
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
 
@@ -827,7 +836,8 @@ class OpenMM(Engine):
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
     def normal_modes(self, shot=0, optimize=True):
-        raise NotImplementedError("OpenMM cannot do normal mode analysis")
+        logger.error("OpenMM cannot do normal mode analysis\n")
+        raise NotImplementedError
 
     def optimize(self, shot=0, crit=1e-4):
 
@@ -865,7 +875,8 @@ class OpenMM(Engine):
         self.update_simulation()
 
         if polarizability:
-            raise NotImplementedError("Polarizability calculation is available in TINKER only.")
+            logger.error("Polarizability calculation is available in TINKER only.\n")
+            raise NotImplementedError
 
         if optimize: self.optimize(shot)
         else: self.set_positions(shot)
@@ -906,7 +917,8 @@ class OpenMM(Engine):
         self.update_simulation()
 
         if self.name == 'A' or self.name == 'B':
-            raise RuntimeError("Don't name the engine A or B!")
+            logger.error("Don't name the engine A or B!\n")
+            raise RuntimeError
 
         # Create two subengines.
         if hasattr(self,'target'):
@@ -953,11 +965,13 @@ class OpenMM(Engine):
         """
 
         if float(int(float(nequil)/float(nsave))) != float(nequil)/float(nsave):
-            raise RuntimeError("Please set nequil to an integer multiple of nsave")
+            logger.error("Please set nequil to an integer multiple of nsave\n")
+            raise RuntimeError
         iequil = nequil/nsave
 
         if float(int(float(nsteps)/float(nsave))) != float(nsteps)/float(nsave):
-            raise RuntimeError("Please set nsteps to an integer multiple of nsave")
+            logger.error("Please set nsteps to an integer multiple of nsave\n")
+            raise RuntimeError
         isteps = nsteps/nsave
 
         if hasattr(self, 'simulation'):

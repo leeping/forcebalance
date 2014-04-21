@@ -179,7 +179,8 @@ class BackedUpDict(dict):
         try:
             return self.backup_dict[self['AtomType']][key]
         except:
-            raise KeyError('The key %s does not exist as an atom attribute or as an atom type attribute!' % key)
+            logger.error('The key %s does not exist as an atom attribute or as an atom type attribute!\n' % key)
+            raise KeyError
 
 class FF(forcebalance.BaseClass):
     """ Force field class.
@@ -477,7 +478,7 @@ class FF(forcebalance.BaseClass):
             for k in kwds:
                 if sline.count(k) > 1:
                     logger.error(line)
-                    logger.error("The above line contains multiple occurrences of the keyword %s" % k)
+                    logger.error("The above line contains multiple occurrences of the keyword %s\n" % k)
                     raise RuntimeError
                 elif sline.count(k) == 1:
                     marks[k] = (np.array(sline) == k).argmax()
@@ -531,7 +532,8 @@ class FF(forcebalance.BaseClass):
                             count += 1
                         sys.stderr.write("\nOffending ID: %s\n" % sline[parse+1])
                         
-                        raise Exception('Parameter repetition entry in force field file is incorrect (see above)')
+                        logger.error('Parameter repetition entry in force field file is incorrect (see above)\n')
+                        raise RuntimeError
                     pid = self.Readers[ffname].build_pid(pfld)
                     self.map[pid] = prep
                     # This repeated parameter ID also has these atoms involved.
@@ -626,9 +628,11 @@ class FF(forcebalance.BaseClass):
         
         """
         if type(vals)==np.ndarray and vals.ndim != 1:
-            raise Exception('Please only pass 1-D arrays')
+            logger.error('Please only pass 1-D arrays\n')
+            raise RuntimeError
         if len(vals) != self.np:
-            raise Exception('Input parameter np.array (%i) not the required size (%i)' % (len(vals), self.np))
+            logger.error('Input parameter np.array (%i) not the required size (%i)\n' % (len(vals), self.np))
+            raise RuntimeError
         if use_pvals or self.use_pvals:
             logger.info("Using physical parameters directly!\r")
             pvals = vals.copy().flatten()
@@ -684,7 +688,8 @@ class FF(forcebalance.BaseClass):
                         wval = eval(cmd.replace("PARM","PRM"))
                     except:
                         logger.error(traceback.format_exc() + '\n')
-                        raise Exception("The command %s (written in the force field file) cannot be evaluated!" % cmd)
+                        logger.error("The command %s (written in the force field file) cannot be evaluated!\n" % cmd)
+                        raise RuntimeError
                 else:
                     wval = mult*pvals[i]
                 if self.ffdata_isxml[fnm]:
@@ -833,7 +838,8 @@ class FF(forcebalance.BaseClass):
                 pvals = np.exp(mvals.flatten()) * self.pvals0
             except:
                 logger.exception(mvals + '\n')
-                raise Exception('What the hell did you do?')
+                logger.error('What the hell did you do?\n')
+                raise RuntimeError
         else:
             pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
@@ -859,7 +865,8 @@ class FF(forcebalance.BaseClass):
         @return mvals The mathematical parameters
         """
         if self.logarithmic_map:
-            raise Exception('create_mvals has not been implemented for logarithmic_map')
+            logger.error('create_mvals has not been implemented for logarithmic_map\n')
+            raise RuntimeError
         mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
         return mvals
         

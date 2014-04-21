@@ -76,6 +76,7 @@ logger.setLevel(INFO)
 
 class ModLogger(Logger):
     def error(self, msg, *args, **kwargs):
+        msg = '\n'.join(['\x1b[91m%s\x1b[0m' % s for s in msg.split('\n') if len(s.strip()) > 0])+'\n'
         for hdlr in (self.parent.handlers if self.propagate else self.handlers):
             hdlr.savestream = hdlr.stream
             hdlr.stream = sys.stderr

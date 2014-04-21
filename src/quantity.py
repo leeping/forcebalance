@@ -120,8 +120,9 @@ class Quantity(object):
             being fitted. 
         
         """
-        raise NotImplementedError(("Extract method not implemented"
-                                  " in base class."))    
+        logger.error("Extract method not implemented in base class.\n")    
+        raise NotImplementedError
+
 # class Quantity_Density
 class Quantity_Density(Quantity):
     def __init__(self, engname, temperature, pressure, name=None):

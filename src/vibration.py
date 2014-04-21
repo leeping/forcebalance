@@ -60,7 +60,8 @@ class Vibration(Target):
         ## Create engine object.
         self.engine = self.engine_(target=self, **engine_args)
         if self.FF.rigid_water:
-            raise Exception('This class cannot be used with rigid water molecules.')
+            logger.error('This class cannot be used with rigid water molecules.\n')
+            raise RuntimeError
 
     def read_reference_data(self):
         """ Read the reference vibrational data from a file. """
@@ -94,7 +95,8 @@ class Vibration(Target):
                 pass
             else:
                 logger.info(line + '\n')
-                raise Exception("This line doesn't comply with our vibration file format!")
+                logger.error("This line doesn't comply with our vibration file format!\n")
+                raise RuntimeError
             ln += 1
         self.ref_eigvals = np.array(self.ref_eigvals)
         self.ref_eigvecs = np.array(self.ref_eigvecs)
@@ -115,7 +117,8 @@ class Vibration(Target):
         if hasattr(self, 'engine') and hasattr(self.engine, 'normal_modes'):
             return self.engine.normal_modes()
         else:
-            raise NotImplementedError('Normal mode calculation not supported, try using a different engine')
+            logger.error('Normal mode calculation not supported, try using a different engine\n')
+            raise NotImplementedError
 
 
     def process_vectors(self, vecs, verbose=False, check=False):
