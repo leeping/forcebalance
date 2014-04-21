@@ -106,6 +106,8 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'energy_denom','energy_denom')
         ## Set upper cutoff energy
         self.set_option(tgt_opts,'energy_upper','energy_upper')
+        ## Average forces over individual atoms ('atom') or all atoms ('all')
+        self.set_option(tgt_opts,'force_average')
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -978,12 +980,13 @@ class AbInitio(Target):
             QBP  = self.qmboltz
             MBP  = 1 - self.qmboltz
             C    = MBP*(QQ_M-Q0_M*Q0_M/Z)/Z + QBP*(QQ_Q-Q0_Q*Q0_Q/Y)/Y
-            # Normalize the force components
-            # Normalize by atom?
-            # for i in range(1, len(C), 3):
-            #     C[i:i+3] = np.mean(C[i:i+3])
-            # Or normalize all forces?
-            C[1:len(C)] = np.mean(C[1:len(C)])
+            if self.force_average:
+                # Normalize over all atoms
+                C[1:len(C)] = np.mean(C[1:len(C)])
+            else:
+                # Normalize over individual atoms (default)
+                for i in range(1, len(C), 3):
+                    C[i:i+3] = np.mean(C[i:i+3])
             Ci    = 1. / C
             WCiW = WM * Ci * WM
         #==============================================================#

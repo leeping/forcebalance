@@ -5,6 +5,7 @@ trust0 -1                              # Negative number for "nonlinear search",
 penalty_type L1                        # L2 for Gaussian prior, L1 for Laplacian prior
 penalty_hyperbolic_b   1e-6            # Kicks in when penalty_type is set to L1
 penalty_additive       0.01            # Global prefactor for penalty function
+duplicate_pnames
 
 # Priors for different parameters can be adjusted this way, just read the parameter names off the output.
 #priors
