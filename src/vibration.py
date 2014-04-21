@@ -45,6 +45,7 @@ class Vibration(Target):
         #======================================#
         self.set_option(tgt_opts,'wavenumber_tol','denom')
         self.set_option(tgt_opts,'reassign_modes','reassign')
+        self.set_option(tgt_opts,'normalize')
         
         #======================================#
         #     Variables which are set here     #
@@ -103,7 +104,7 @@ class Vibration(Target):
 
     def indicate(self):
         """ Print qualitative indicator. """
-        # if self.reassign == 'overlap' : count_assignment(self.c2r)
+        if self.reassign == 'overlap' : count_assignment(self.c2r)
         banner = "Frequencies (wavenumbers)"
         headings = ["Mode #", "Reference", "Calculated", "Difference", "Ref(dot)Calc"]
         data = OrderedDict([(i, [self.ref_eigvals[i], self.calc_eigvals[i], self.calc_eigvals[i] - self.ref_eigvals[i], "%.4f" % self.overlaps[i]]) for i in range(len(self.ref_eigvals))])
@@ -151,14 +152,21 @@ class Vibration(Target):
             self.FF.make(mvals_)
             eigvals, eigvecs = self.vibration_driver()
             eigvecs_nrm, eigvecs_nrm_mw = self.process_vectors(eigvecs)
+            # The overlap metric may take into account some frequency differences
+            dev = np.array([[(np.abs(i-j)/1000)/(1.0+np.abs(i-j)/1000) for j in self.ref_eigvals] for i in eigvals])
+            for i in range(dev.shape[0]):
+                dev[i, :] /= max(dev[i, :])
+
             if self.reassign in ['permute', 'overlap']:
-                a = np.array([[int(1e6*(1.0-np.dot(v1.flatten(),v2.flatten())**2)) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])
                 # In the matrix that we constructed, these are the column numbers (reference mode numbers) 
                 # that are mapped to the row numbers (calculated mode numbers)
                 if self.reassign == 'permute':
+                    a = np.array([[int(1e6*(1.0-np.dot(v1.flatten(),v2.flatten())**2)) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])
                     c2r = Assign(a)
                     eigvals = eigvals[c2r]
                 elif self.reassign == 'overlap':
+                    a = np.array([[(1.0-np.dot(v1.flatten(),v2.flatten())**2) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])
+                    a += dev
                     c2r = np.argmin(a, axis=0)
                     eigvals_p = []
                     for j in c2r:
@@ -182,11 +190,11 @@ class Vibration(Target):
         if AGrad or AHess:
             for p in self.pgrad:
                 dV[p,:], _ = f12d3p(fdwrap(get_eigvals, mvals, p), h = self.h, f0 = calc_eigvals)
-        Answer['X'] = np.dot(D,D) / self.denom**2
+        Answer['X'] = np.dot(D,D) / self.denom**2 / (len(D) if self.normalize else 1)
         for p in self.pgrad:
-            Answer['G'][p] = 2*np.dot(D, dV[p,:]) / self.denom**2
+            Answer['G'][p] = 2*np.dot(D, dV[p,:]) / self.denom**2 / (len(D) if self.normalize else 1)
             for q in self.pgrad:
-                Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:]) / self.denom**2
+                Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:]) / self.denom**2 / (len(D) if self.normalize else 1)
         if not in_fd():
             self.calc_eigvals = calc_eigvals
             self.objective = Answer['X']
