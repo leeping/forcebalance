@@ -269,7 +269,9 @@ class Optimizer(forcebalance.BaseClass):
                 if in_mvals: continue
                 print >> fout, line,
                 if line1.startswith("read_mvals"):
-                    if have_mvals: raise RuntimeError("Encountered more than one read_mvals section")
+                    if have_mvals: 
+                        logger.error("Encountered more than one read_mvals section\n")
+                        raise RuntimeError
                     have_mvals = 1
                     in_mvals = 1
                     print >> fout, self.FF.sprint_map(mvals, precision=8)

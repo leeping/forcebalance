@@ -73,7 +73,8 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
                 val = options[key]
                 val0 = valf.strip()
                 if key in clashes and val != val0:
-                    raise RuntimeError("write_mdp tried to set %s = %s but its original value was %s = %s" % (key, val, key, val0))
+                    logger.error("write_mdp tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
+                    raise RuntimeError
                 # Passing None as the value causes the option to be deleted
                 if val == None: continue
                 if len(val) < len(valf):
@@ -518,7 +519,8 @@ class GMX(Engine):
             warn_once("The 'gmxpath' option was not specified; using default.")
             if which('mdrun'+self.gmxsuffix) == '':
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
-                raise RuntimeError("Cannot find the GROMACS executables!")
+                logger.error("Cannot find the GROMACS executables!\n")
+                raise RuntimeError
             else:
                 self.gmxpath = which('mdrun'+self.gmxsuffix)
                 havegmx = True
@@ -629,7 +631,8 @@ class GMX(Engine):
         if self.top != None and os.path.exists(self.top):
             LinkFile(self.top, '%s.top' % self.name)
         else:
-            raise RuntimeError("No .top file found, cannot continue.")
+            logger.error("No .top file found, cannot continue.\n")
+            raise RuntimeError
         write_mdp("%s.mdp" % self.name, gmx_opts, fin=self.mdp, defaults=self.gmx_defs)
 
         ## Call grompp followed by gmxdump to read the trajectory
@@ -678,13 +681,15 @@ class GMX(Engine):
             if topfile != None:
                 LinkFile(topfile, "%s.top" % self.name)
             else:
-                raise RuntimeError("No .top file found, cannot continue.")
+                logger.error("No .top file found, cannot continue.\n")
+                raise RuntimeError
         if not os.path.exists('%s.mdp' % self.name):
             mdpfile = onefile('mdp')
             if mdpfile != None:
                 LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
             else:
-                raise RuntimeError("No .mdp file found, cannot continue.")
+                logger.error("No .mdp file found, cannot continue.\n")
+                raise RuntimeError
 
     def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -738,7 +743,8 @@ class GMX(Engine):
         elif fatal:
             for line in o:
                 logger.error(line+'\n')
-            raise RuntimeError('grompp encountered a fatal error!')
+            logger.error('grompp encountered a fatal error!\n')
+            raise RuntimeError
         return o
 
     def energy_termnames(self, edrfile=None):
@@ -748,7 +754,8 @@ class GMX(Engine):
         if edrfile == None:
             edrfile = "%s.edr" % self.name
         if not os.path.exists(edrfile):
-            raise RuntimeError('Cannot determine energy term names without an .edr file')
+            logger.error('Cannot determine energy term names without an .edr file\n')
+            raise RuntimeError
         ## Figure out which energy terms need to be printed.
         o = self.callgmx("g_energy -f %s -xvg no" % (edrfile), stdin="Total-Energy\n", copy_stdout=False, copy_stderr=True)
         parsemode = 0
@@ -1352,7 +1359,8 @@ class Liquid_GMX(Liquid):
         # Error checking.
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
-                raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+                logger.error('Please provide %s; it is needed to proceed.\n' % i)
+                raise RuntimeError
         # Send back last frame of production trajectory.
         self.extra_output = ['liquid-md.gro']
         # Send back the trajectory file.
@@ -1402,7 +1410,8 @@ class Lipid_GMX(Lipid):
         # Error checking.
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
-                raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+                logger.error('Please provide %s; it is needed to proceed.\n' % i)
+                raise RuntimeError
         # Send back last frame of production trajectory.
         self.extra_output = ['lipid-md.gro']
         # Send back the trajectory file.

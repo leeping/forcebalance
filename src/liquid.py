@@ -104,11 +104,13 @@ class Liquid(Target):
         #======================================#
         # Read in liquid starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)): 
-            raise RuntimeError("%s doesn't exist; please provide liquid_coords option" % self.liquid_coords)
+            logger.error("%s doesn't exist; please provide liquid_coords option\n" % self.liquid_coords)
+            raise RuntimeError
         self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.liquid_coords))
         # Read in gas starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.gas_coords)): 
-            raise RuntimeError("%s doesn't exist; please provide gas_coords option" % self.gas_coords)
+            logger.error("%s doesn't exist; please provide gas_coords option\n" % self.gas_coords)
+            raise RuntimeError
         self.gas_mol = Molecule(os.path.join(self.root, self.tgtdir, self.gas_coords))
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
@@ -181,11 +183,14 @@ class Liquid(Target):
                 found_headings = True
                 headings = line
                 if len(set(headings)) != len(headings):
-                    raise Exception('Column headings in data.csv must be unique')
+                    logger.error('Column headings in data.csv must be unique\n')
+                    raise RuntimeError
                 if 'p' not in headings:
-                    raise Exception('There must be a pressure column heading labeled by "p" in data.csv')
+                    logger.error('There must be a pressure column heading labeled by "p" in data.csv\n')
+                    raise RuntimeError
                 if 't' not in headings:
-                    raise Exception('There must be a temperature column heading labeled by "t" in data.csv')
+                    logger.error('There must be a temperature column heading labeled by "t" in data.csv\n')
+                    raise RuntimeError
             elif found_headings:
                 try:
                     # Temperatures are in kelvin.
@@ -195,7 +200,8 @@ class Liquid(Target):
                     punit = [val.split()[1] if len(val.split()) >= 1 else "atm" for head, val in zip(headings,line) if head == 'p'][0]
                     unrec = set([punit]).difference(['atm','bar']) 
                     if len(unrec) > 0:
-                        raise Exception('The pressure unit %s is not recognized, please use bar or atm' % unrec[0])
+                        logger.error('The pressure unit %s is not recognized, please use bar or atm\n' % unrec[0])
+                        raise RuntimeError
                     # This line actually reads the reference data and inserts it into the RefData dictionary of dictionaries.
                     for head, val in zip(headings,line):
                         if head == 't' or head == 'p' : continue
@@ -207,17 +213,20 @@ class Liquid(Target):
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = False
                 except:
                     logger.error(line + '\n')
-                    raise Exception('Encountered an error reading this line!')
+                    logger.error('Encountered an error reading this line!\n')
+                    raise RuntimeError
             else:
                 logger.error(line + '\n')
-                raise Exception('I did not recognize this line!')
+                logger.error('I did not recognize this line!\n')
+                raise RuntimeError
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
         PhasePoints = None
         for head in self.RefData:
             if head not in known_vars+[i+"_wt" for i in known_vars]:
                 # Only hard-coded properties may be recognized.
-                raise Exception("The column heading %s is not recognized in data.csv" % head)
+                logger.error("The column heading %s is not recognized in data.csv\n" % head)
+                raise RuntimeError
             if head in known_vars:
                 if head+"_wt" not in self.RefData:
                     # If the phase-point weights are not specified in the reference data file, initialize them all to one.
@@ -470,7 +479,8 @@ class Liquid(Target):
                     logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it\n' % label)
                     pass
             if len(Points) == 0:
-                raise Exception('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!')
+                logger.error('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!\n')
+                raise RuntimeError
     
             # Assign variable names to all the stuff in npt_result.p
             Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
@@ -478,7 +488,8 @@ class Liquid(Target):
             # Determine the number of molecules
             if len(set(NMols)) != 1:
                 logger.error(str(NMols))
-                raise Exception('The above list should only contain one number - the number of molecules')
+                logger.error('The above list should only contain one number - the number of molecules\n')
+                raise RuntimeError
             else:
                 NMol = list(set(NMols))[0]
         
@@ -581,7 +592,8 @@ class Liquid(Target):
                 logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it\n' % label)
                 pass
         if len(Points) == 0:
-            raise Exception('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!')
+            logger.error('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!\n')
+            raise RuntimeError
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
@@ -589,7 +601,8 @@ class Liquid(Target):
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
-            raise Exception('The above list should only contain one number - the number of molecules')
+            logger.error('The above list should only contain one number - the number of molecules\n')
+            raise RuntimeError
         else:
             NMol = list(set(NMols))[0]
     
@@ -627,7 +640,8 @@ class Liquid(Target):
                           "Increasing simulation length: %i -> %i steps" % \
                           (Nrpt, self.liquid_md_steps, sumsteps), color=6)
             if self.liquid_md_steps * 2 != sumsteps:
-                raise RuntimeError("Spoo!")
+                logger.error("Spoo!\n")
+                raise RuntimeError
             self.liquid_eq_steps *= 2
             self.liquid_md_steps *= 2
             self.gas_eq_steps *= 2
@@ -787,17 +801,20 @@ class Liquid(Target):
                     Hvap_grad[PT] -= GEPol
                 if hasattr(self,'use_cni') and self.use_cni:
                     if not ('cni' in self.RefData and self.RefData['cni'][PT]):
-                        raise RuntimeError('Asked for a nonideality correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
+                        logger.error('Asked for a nonideality correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.\n')
+                        raise RuntimeError
                     logger.debug("Adding % .3f to enthalpy of vaporization at " % self.RefData['cni'][PT] + str(PT) + '\n')
                     Hvap_calc[PT] += self.RefData['cni'][PT]
                 if hasattr(self,'use_cvib_intra') and self.use_cvib_intra:
                     if not ('cvib_intra' in self.RefData and self.RefData['cvib_intra'][PT]):
-                        raise RuntimeError('Asked for a quantum intramolecular vibrational correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
+                        logger.error('Asked for a quantum intramolecular vibrational correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.\n')
+                        raise RuntimeError
                     logger.debug("Adding % .3f to enthalpy of vaporization at " % self.RefData['cvib_intra'][PT] + str(PT) + '\n')
                     Hvap_calc[PT] += self.RefData['cvib_intra'][PT]
                 if hasattr(self,'use_cvib_inter') and self.use_cvib_inter:
                     if not ('cvib_inter' in self.RefData and self.RefData['cvib_inter'][PT]):
-                        raise RuntimeError('Asked for a quantum intermolecular vibrational correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.')
+                        logger.error('Asked for a quantum intermolecular vibrational correction but not provided in reference data (data.csv).  Either disable the option in data.csv or add data.\n')
+                        raise RuntimeError
                     logger.debug("Adding % .3f to enthalpy of vaporization at " % self.RefData['cvib_inter'][PT] + str(PT) + '\n')
                     Hvap_calc[PT] += self.RefData['cvib_inter'][PT]
             else:

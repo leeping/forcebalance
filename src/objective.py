@@ -129,13 +129,15 @@ class Objective(forcebalance.BaseClass):
         self.Targets = []
         for opts in tgt_opts:
             if opts['type'] not in Implemented_Targets:
-                raise RuntimeError('The target type \x1b[1;91m%s\x1b[0m is not implemented!' % opts['type'])
+                logger.error('The target type \x1b[1;91m%s\x1b[0m is not implemented!\n' % opts['type'])
+                raise RuntimeError
             if opts["remote"]: Tgt = forcebalance.target.RemoteTarget(options, opts, forcefield)
             else: Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
             self.Targets.append(Tgt)
             printcool_dictionary(Tgt.PrintOptionDict,"Setup for target %s :" % Tgt.name)
         if len(set([Tgt.name for Tgt in self.Targets])) != len([Tgt.name for Tgt in self.Targets]):
-            raise Exception("The list of target names is not unique!")
+            logger.error("The list of target names is not unique!\n")
+            raise RuntimeError
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.
