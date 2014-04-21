@@ -6,7 +6,7 @@
 
 import os
 import shutil
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once, pvec1d
 import numpy as np
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
@@ -445,6 +445,10 @@ class AbInitio(Target):
             self.nnf = 0
             self.ntq = 0
 
+        # Normalize Boltzmann weights.
+        self.boltz_wts /= sum(self.boltz_wts)
+        self.qmboltz_wts /= sum(self.qmboltz_wts)
+
     def indicate(self):
         Headings = ["Observable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference", "Weight", "Contribution"]
         Data = OrderedDict([])
@@ -688,6 +692,8 @@ class AbInitio(Target):
             # Objective functions
             SPiXi = np.zeros(NCP1)
             SRiXi = np.zeros(NCP1)
+            # Debug: Store all objective function contributions
+            XiAll = np.zeros((NS, NCP1))
             if AGrad:
                 SPiXi_p = np.zeros((NP,NCP1))
                 SRiXi_p = np.zeros((NP,NCP1))
@@ -792,6 +798,7 @@ class AbInitio(Target):
                 Xi  = np.outer(M,M) - 2*np.outer(Q,M) + np.outer(Q,Q)
             else:
                 Xi     = X**2                   
+            XiAll[i] = Xi.copy()
             SPiXi += P * Xi
             SRiXi += R * Xi
             #==============================================================#
@@ -972,8 +979,11 @@ class AbInitio(Target):
             MBP  = 1 - self.qmboltz
             C    = MBP*(QQ_M-Q0_M*Q0_M/Z)/Z + QBP*(QQ_Q-Q0_Q*Q0_Q/Y)/Y
             # Normalize the force components
-            for i in range(1, len(C), 3):
-                C[i:i+3] = np.mean(C[i:i+3])
+            # Normalize by atom?
+            # for i in range(1, len(C), 3):
+            #     C[i:i+3] = np.mean(C[i:i+3])
+            # Or normalize all forces?
+            C[1:len(C)] = np.mean(C[1:len(C)])
             Ci    = 1. / C
             WCiW = WM * Ci * WM
         #==============================================================#
@@ -987,6 +997,14 @@ class AbInitio(Target):
         else:
             X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
             X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute)
+            # Print out all energy / force contributions, useful for debugging.
+            # for i in range(XiAll.shape[0]):
+            #     efctr = weighted_variance(XiAll[i],WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
+            #     WCiW1 = WCiW.copy()
+            #     for j in range(1, len(WCiW1)):
+            #         WCiW1[j] = 0.0
+            #     ectr = weighted_variance(XiAll[i],WCiW1,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
+            #     print i, "ectr = %.3f efctr = %.3f" % (ectr, efctr)
             for p in self.pgrad:
                 if not AGrad: continue
                 X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1,subtract_mean = not self.absolute)
