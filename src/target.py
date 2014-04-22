@@ -715,7 +715,7 @@ class RemoteTarget(Target):
         
         wq = getWorkQueue()
         
-        logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
+        # logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
         # input:
         #   forcebalance.p: pickled mvals, options, and forcefield
         #   rtarget.py: remote target evaluation script
@@ -726,7 +726,7 @@ class RemoteTarget(Target):
         forcebalance.nifty.queue_up(wq, "python rtarget.py > rtarget.out 2>&1",
             ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
             ['objective.p', 'indicate.log', 'rtarget.out'],
-            tgt=self)
+            tgt=self, verbose=False)
 
     def read(self,mvals,AGrad=False,AHess=False):
         return self.get(mvals, AGrad, AHess)
