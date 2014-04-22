@@ -10,7 +10,7 @@ logger.setLevel(forcebalance.output.DEBUG)
 
 # load pickled variables from forcebalance.p
 f=open('forcebalance.p', 'r')
-mvals, AGrad, AHess, id_string, options, tgt_opts, forcefield = forcebalance.nifty.lp_load(f)
+mvals, AGrad, AHess, id_string, options, tgt_opts, forcefield, pgrad = forcebalance.nifty.lp_load(f)
 f.close()
 
 print "Evaluating remote target ID: %s" % id_string
@@ -31,10 +31,14 @@ Tgt.read_objective = False
 Tgt.read_indicate = False
 Tgt.write_objective = False
 Tgt.write_indicate = False
-Tgt.read_0grads()
-Tgt.submit_jobs(mvals, AGrad = True, AHess = True)
 
-Ans = Tgt.meta_get(mvals, AGrad=True, AHess=True)
+# The "active" parameters are determined by the master, written to disk and sent over.
+Tgt.pgrad = pgrad
+
+# Should the remote target be submitting jobs of its own??
+Tgt.submit_jobs(mvals, AGrad = AGrad, AHess = AHess)
+
+Ans = Tgt.meta_get(mvals, AGrad = AGrad, AHess = AHess)
 
 with wopen('objective.p') as f:
     forcebalance.nifty.lp_dump(Ans, f)        # or some other method of storing resulting objective

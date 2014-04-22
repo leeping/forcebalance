@@ -708,7 +708,7 @@ class RemoteTarget(Target):
 
         id_string = "%s_iter%04i" % (self.name, Counter())
 
-        with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
+        with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF, self.pgrad),f)
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
         forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, "target.tar.bz2"),"target.tar.bz2")
