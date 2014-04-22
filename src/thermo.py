@@ -369,9 +369,13 @@ class Thermo(Target):
         # Length of simulation chain
         self.set_option(tgt_opts, "simulations", "user_simulation_names", forceprint=True)
         # Number of time steps in the equilibration run
-        self.set_option(tgt_opts, "eq_steps", forceprint=True)
+        self.set_option(tgt_opts, "eq_steps", "nequil", forceprint=True)
         # Number of time steps in the production run
-        self.set_option(tgt_opts, "md_steps", forceprint=True)
+        self.set_option(tgt_opts, "md_steps", "nsteps", forceprint=True)
+        # Time step (in femtoseconds)
+        self.set_option(tgt_opts, "timestep", forceprint=True)
+        # Sampling interval (in picoseconds)
+        self.set_option(tgt_opts, "interval", "sample", forceprint=True)
 
         ## Variables
         # Prefix names for simulation data
@@ -384,6 +388,8 @@ class Thermo(Target):
         self.weights   = {}
         # The list of simulations that we'll be running.
         self.SimNames = [i.lower() for i in self.user_simulation_names]
+        # Store the dictionary of allowed suffixes
+        self.OptionDict['crdsfx'] = self.crdsfx
 
         ## Read source data and initialize points; creates self.Data, self.Indices and self.Columns objects.
         self.read_source(os.path.join(self.root, self.tgtdir, self.source))
@@ -762,7 +768,6 @@ class Thermo(Target):
                 # Submit or run the simulation if the result file does not exist.
                 if not (os.path.exists('result.p') or os.path.exists('result.p.bz2')):
                     # Write to disk: Force field object, current parameter values, target options
-                    with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict),f)
                     M = Molecule(os.path.join(self.root, Sim.initial))[Sim.iframe]
                     M.write("%s%s" % (Sim.type, self.crdsfx[0]))
                     # # Get relevant files from the target folder, I suppose.
@@ -771,20 +776,43 @@ class Thermo(Target):
                     # self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
                     # self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
                     # Command for running the simulation.
+                    ## Copy run scripts from ForceBalance installation directory
+
+                    # We can build the entire MD options dictionary here!!
+                    # Update dictionary with simulation options.
+                    OptionDict = copy.deepcopy(self.OptionDict)
+                    OptionDict['gradient'] = AGrad
+                    OptionDict['coords'] = "%s%s" % (Sim.type, self.crdsfx[0])
+                    OptionDict['simtype'] = Sim.type
+                    # # In the future we should have these settings 
+                    # OptionDict['nequil'] = self.nequil
+                    # OptionDict['nsteps'] = self.nsteps
+                    # OptionDict['timestep'] = self.timestep
+                    # OptionDict['sample'] = self.sample
+                    # OptionDict['minimize'] = self.minimize
+                    printcool_dictionary(OptionDict)
+
+                    with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,OptionDict),f)
+                    for f in self.scripts:
+                        LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
+                                 os.path.join(os.getcwd(), f))
                     cmdlist = ['%s python md_one.py %s' % (self.mdpfx, Sim.type)]
+                    #cmdlist.append('-eq %i -md %i -dt %g -sp %g' % (self.nequil, self.nsteps, self.timestep, self.sample))
                     if temp != None:
                         cmdlist.append('-T %g' % float(temp))
                     if pres != None:
                         cmdlist.append('-P %g' % float(pres))
-                    if AGrad or AHess:
-                        cmdlist.append('-g')
+                    # if AGrad or AHess:
+                    #     cmdlist.append('-g')
+                    # cmdlist.append('-o')
+                    # cmdlist += Sim.timeseries.keys()
                     cmdstr = ' '.join(cmdlist)
                     print cmdstr
                     # # cmdstr = '%s python md1.py %s %.3f %.3f' % (self.runpfx, temperature, pressure)
                     # if wq == None:
                     #     logger.info("Running condensed phase simulation locally.\n")
                     #     logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
-                    #     _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
+                    _exec(cmdstr, copy_stderr=True, outfnm='md_one.out')
                     # else:
                     #     queue_up(wq, command = cmdstr+' &> npt.out',
                     #              input_files = self.nptfiles + self.scripts + ['forcebalance.p'],

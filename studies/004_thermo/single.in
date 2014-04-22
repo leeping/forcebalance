@@ -71,4 +71,6 @@ quantities density h_vap
 simulations liquid gas
 md_steps 100000
 eq_steps 50000
+interval 0.1
+timestep 2.0
 $end
