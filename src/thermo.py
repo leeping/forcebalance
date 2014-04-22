@@ -532,7 +532,7 @@ class Thermo(Target):
         def intcol(col):
             if col in self.Data.columns:
                 for idx in self.Data.index:
-                    if not isnan(self.Data[col][idx]):
+                    if not isnpnan(self.Data[col][idx]):
                         self.Data[col][idx] = int(self.Data[col][idx])
 
         def floatcol(col):
@@ -571,36 +571,61 @@ class Thermo(Target):
 
         return
 
-    def find_ic(self, index, stype, icn):
+    def find_file(self, index, stype, sufs, icn):
         """ 
-        Search for a suitable initial condition file.
+        Search for a suitable file that matches the simulation index,
+        type, suffix and IC number.  This can be used to search for
+        initial coordinates, but also auxiliary files for the
+        simulation (e.g. .top and .mdp files for a Gromacs simulation,
+        or .key files for a Tinker simulation.)
+
+        Generally, it is preferred to provide files where the base
+        name matches the simulation type.  However, since it is also
+        okay to put all files for a simulation type into a
+        subdirectory, generic file names like 'topol' and 'conf' may
+        be used.
     
-        Initial condition files will be searched for in the following priority:
-        targets/target_name/index/stype/ICs/stype_#.xyz
-        targets/target_name/index/stype/ICs/stype#.xyz
-        targets/target_name/index/stype/ICs/#.xyz
-        targets/target_name/index/stype/ICs/stype.xyz
-        targets/target_name/index/stype/ICs/coords.xyz
-        targets/target_name/index/stype/stype.xyz
-        targets/target_name/index/stype/coords.xyz
-        targets/target_name/index/stype.xyz
-        targets/target_name/stype.xyz
+        Initial condition files will be searched for in the following priority (suf stands for suffix)
+        targets/target_name/index/stype/ICs/stype_#.suf
+        targets/target_name/index/stype/ICs/stype#.suf
+        targets/target_name/index/stype/ICs/#.suf
+        targets/target_name/index/stype/ICs/stype.suf
+        targets/target_name/index/stype/ICs/coords.suf
+        targets/target_name/index/stype/ICs/conf.suf
+        targets/target_name/index/stype/ICs/topol.suf
+        targets/target_name/index/stype/ICs/grompp.suf
+        targets/target_name/index/stype/ICs/input.suf
+        targets/target_name/index/stype/ICs/tinker.suf
+        targets/target_name/index/stype/stype.suf
+        targets/target_name/index/stype/coords.suf
+        targets/target_name/index/stype.suf
+        targets/target_name/stype.suf
+
+        @param[in] index Name of the index directory to look in
+        @param[in] stype Name of the simulation type to look for
+        @param[in] sufs List of suffixes to look for in order of priority
+        @param[in] icn Initial coordinate number (will look for sequentially numbered file, or single file with multiple structures)
         """
         found = ''
-        basefnms = [(os.path.join(index, stype, 'ICs', stype+'_'+("%i" % icn)), True),
-                    (os.path.join(index, stype, 'ICs', stype+("%i" % icn)), True),
-                    (os.path.join(index, stype, 'ICs', ("%i" % icn)), True),
-                    (os.path.join(index, stype, 'ICs', stype), False),
-                    (os.path.join(index, stype, 'ICs', 'coords'), False),
-                    (os.path.join(index, stype, stype), False),
-                    (os.path.join(index, stype, 'coords'), False),
-                    (os.path.join(index, stype), False),
-                    (os.path.join(stype), False)]
-        paths = []
+        # The 2-tuple here corresponds to:
+        # - Search path for the file
+        # - Whether the file that we're looking for is 'numbered'
+        #   (i.e. a different file for each structure); otherwise the
+        #   single file may contain multiple structures
+        pfxs = [stype, 'coords', 'conf', 'topol', 'grompp', 'input', 'tinker', '']
+        
+        basefnms = list(itertools.chain(*[[(os.path.join(index, stype, 'ICs', pfx+'_'+("%i" % icn)), True),
+                                           (os.path.join(index, stype, 'ICs', pfx+("%i" % icn)), True),
+                                           (os.path.join(index, stype, 'ICs', pfx), False),
+                                           (os.path.join(index, stype, pfx), False),
+                                           (os.path.join(index, pfx), False),
+                                           (os.path.join(pfx), False)] for pfx in pfxs]))
+
+        paths = OrderedDict()
         for fnm, numbered in basefnms:
-            for crdsfx in self.crdsfx:
-                fpath = os.path.join(self.tgtdir, fnm+crdsfx)
-                paths.append(fpath)
+            for suf in sufs:
+                fpath = os.path.join(self.tgtdir, fnm+suf if suf.startswith('.') else fnm+'.'+suf)
+                paths[fpath] = os.path.exists(fpath)
                 if os.path.exists(fpath):
                     if found != '':
                         logger.info('Target %s Index %s Simulation %s : '
@@ -610,12 +635,15 @@ class Thermo(Target):
                             M = Molecule(fpath)
                             if len(M) <= icn:
                                 logger.error("Target %s Index %s Simulation %s : "
-                                             "initial coordinate file %s doesn't have enough structures\n" % 
+                                             "file %s doesn't have enough structures\n" % 
                                              (self.name, index, stype, fpath))
                                 raise RuntimeError
                         logger.info('Target %s Index %s Simulation %s : '
-                                    'found initial coordinate file %s\n' % (self.name, index, stype, fpath))
+                                    'found file %s\n' % (self.name, index, stype, fpath))
                         found = fpath
+        if found == '':
+            logger.error("Can't find a file for index %s, simulation %s, suffix %s in the search path" % (index, stype, '/'.join(sufs)))
+            raise RuntimeError
         return found, 0 if numbered else icn
     
     def initialize_observables(self):
@@ -685,15 +713,16 @@ class Thermo(Target):
 
         for index in self.Indices:
             for stype, tsset in SimTS.items():
-                if 'n_ic' in self.Data.ix[index]:
-                    n_ic = self.Data.ix[index]['n_ic']
+                if 'n_ic' in self.Data2.ix[index]:
+                    n_ic = self.Data2.ix[index]['n_ic']
+                    print n_ic
                     if n_ic < 1:
                         logger.error("n_ic must >= 1")
                         raise RuntimeError
                 else:
                     n_ic = 1
                 for icn in range(n_ic):
-                    icfnm, icframe = self.find_ic(index, stype, icn)
+                    icfnm, icframe = self.find_file(index, stype, self.crdsfx, icn)
                     sname = "%s_%i" % (stype, icn) if n_ic > 1 else stype
                     self.Simulations[index].append(Simulation(sname, index, stype, icfnm, icframe, sorted(list(tsset))))
                     
@@ -747,6 +776,8 @@ class Thermo(Target):
                         cmdlist.append('-T %g' % float(temp))
                     if pres != None:
                         cmdlist.append('-P %g' % float(pres))
+                    if AGrad or AHess:
+                        cmdlist.append('-g')
                     cmdstr = ' '.join(cmdlist)
                     print cmdstr
                     # # cmdstr = '%s python md1.py %s %.3f %.3f' % (self.runpfx, temperature, pressure)
