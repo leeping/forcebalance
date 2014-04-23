@@ -1193,69 +1193,16 @@ class GMX(Engine):
                        'Dips': Extract['dipole'], 
                        'Ecomps': Extract['components']}
         if pbc:
-            Extract1 = self.md_extract(OrderedDict([(i, 0) for i in ['density', 'volume']]))
-            prop_return['Rhos'] = Extract['density']
-            prop_return['Volumes'] = Extract['volume']
+            Extract_ = self.md_extract(OrderedDict([(i, 0) for i in ['density', 'volume']]))
+            prop_return['Rhos'] = Extract_['density']
+            prop_return['Volumes'] = Extract_['volume']
         if bilayer:
-            n_snap = self.n_snaps(nsteps, 1000, timestep)
-            Scds = self.calc_scd(n_snap, timestep)
-            al_vars = ['Box-Y', 'Box-X']
-            self.callgmx("g_energy -f %s-md.edr -o %s-md-energy-xy.xvg -xvg no" % 
-                         (self.name, self.name), stdin="\n".join(al_vars))
-            Xs = []
-            Ys = []
-            for line in open("%s-md-energy-xy.xvg" % self.name):
-                s = [float(i) for i in line.split()]
-                Xs.append(s[-1])
-                Ys.append(s[-2])
-            Xs = np.array(Xs)
-            Ys = np.array(Ys)
-            Als = (Xs * Ys) / 64
-            prop_return['Scds'] = Scds
-            prop_return['Als'] = Als
+            Extract__ = self.md_extract(OrderedDict([(i, 0) for i in ['al', 'scd']]))
+            prop_return['Als'] = Extract__['al']
+            prop_return['Scds'] = Extract__['scd']
 
         if verbose: logger.info("Finished!\n")
         return prop_return
-        # ecomp = OrderedDict()
-        # for line in open("%s-md-energy.xvg" % self.name):
-        #     s = [float(i) for i in line.split()][1:]
-        #     for i, j in enumerate(ekeep):
-        #         val = s[i]
-        #         if j in ecomp:
-        #             ecomp[j].append(s[i])
-        #         else:
-        #             ecomp[j] = [s[i]]
-        # print ecomp.keys()
-            # Rhos.append(s[-1])
-            # Volumes.append(s[-2])
-        # Calculate deuterium order parameter for bilayer optimization.
-        # # Perform energy component analysis and return properties.
-        # self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(ekeep))
-        # ecomp = OrderedDict()
-        # Rhos = []
-        # Volumes = []
-        # Kinetics = []
-        # Potentials = []
-        # for line in open("%s-md-energy.xvg" % self.name):
-        #     s = [float(i) for i in line.split()]
-        #     for i in range(len(ekeep) - 2):
-        #         val = s[i+1]
-        #         if ekeep[i] in ecomp:
-        #             ecomp[ekeep[i]].append(val)
-        #         else:
-        #             ecomp[ekeep[i]] = [val]
-        #     Rhos.append(s[-1])
-        #     Volumes.append(s[-2])
-        # Rhos = np.array(Rhos)
-        # Volumes = np.array(Volumes)
-        # Potentials = np.array(ecomp['Potential'])
-        # Kinetics = np.array(ecomp['Kinetic-En.'])
-        # Ecomps = OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
-        # # Initialized property dictionary.
-        # prop_return = OrderedDict()
-        # prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'Als': Als, 'Scds': Scds})
-        # if verbose: logger.info("Finished!\n")
-        # return prop_return
 
     def md_extract(self, tsspec, verbose=True):
         """
@@ -1340,10 +1287,18 @@ class GMX(Engine):
         if 'components' in tsspec:
             for i in ecomp:
                 Output[i] = np.array(DF[copy_keys[i]])
+
         # Area per lipid.
         # HARD CODED NUMBER: number of lipid molecules!
         if 'al' in tsspec:
             Output['al'] = np.array(DF['Box-X'])*np.array(DF['Box-Y']) / 64
+
+        # Deuterium order parameter.
+        # HARD CODED: atom names of lipid tails!
+        if 'scd' in tsspec:
+            n_snap = self.n_snaps(nsteps, 1000, timestep)
+            Scds = self.calc_scd(n_snap, timestep)
+            Output['scd'] = Scds
 
         # Dipole moments; note we use g_dipoles and not the multipole_moments function.
         if 'dipole' in tsspec:
