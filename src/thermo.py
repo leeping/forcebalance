@@ -792,7 +792,7 @@ class Thermo(Target):
                         LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
                                  os.path.join(os.getcwd(), f))
                     # Put together the command.
-                    cmdlist = ['%s python md_one.py %s' % (self.mdpfx, Sim.type)]
+                    cmdlist = ['%s python md_one.py' % (self.mdpfx)]
                     if temp != None:
                         cmdlist.append('-T %g' % float(temp))
                     if pres != None:

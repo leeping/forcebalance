@@ -1192,7 +1192,7 @@ class GMX(Engine):
                        'Kinetics': Extract['kinetic'], 
                        'Dips': Extract['dipole'], 
                        'Ecomps': Extract['components']}
-        if pbc:
+        if self.pbc:
             Extract_ = self.md_extract(OrderedDict([(i, 0) for i in ['density', 'volume']]))
             prop_return['Rhos'] = Extract_['density']
             prop_return['Volumes'] = Extract_['volume']
@@ -1225,8 +1225,6 @@ class GMX(Engine):
             raise RuntimeError
 
         if verbose: logger.info("Calculating properties...\n")
-
-        Output = OrderedDict()
 
         # Figure out which energy terms need to be printed.
         energyterms = self.energy_termnames(edrfile="%s-md.edr" % self.name)
@@ -1278,15 +1276,23 @@ class GMX(Engine):
         # Perform energy component analysis and return properties.
         self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(eksort))
 
+        
         DF = pd.DataFrame([[float(i) for i in line.split()[1:]] for line in open("%s-md-energy.xvg" % self.name)], columns=eksort,
                           index = pd.Index([float(line.split()[0]) for line in open("%s-md-energy.xvg" % self.name)], name='time'))
+
+
+        # Okay, I'm not completely pandas-crazy yet.
+        Output = OrderedDict()
+
         # Now take the output values from g_energy and allocate them into the Output dictionary.
         for i in tsspec:
             if i in copy_keys:
                 Output[i] = np.array(DF[copy_keys[i]])
         if 'components' in tsspec:
+            Components = OrderedDict()
             for i in ecomp:
-                Output[i] = np.array(DF[copy_keys[i]])
+                Components[i] = np.array(DF[i])
+            Output['components'] = Components
 
         # Area per lipid.
         # HARD CODED NUMBER: number of lipid molecules!
@@ -1307,7 +1313,6 @@ class GMX(Engine):
             Output['dipole'] = np.array([[float(i) for i in line.split()[1:4]] 
                                           for line in open("%s-md-dip.xvg" % self.name)])
 
-        printcool_dictionary(Output, title = 'Output')
         return Output
         
 
