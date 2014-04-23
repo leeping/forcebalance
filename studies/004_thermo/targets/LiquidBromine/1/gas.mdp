@@ -11,16 +11,16 @@ nstxtcout       = 50
 xtc_grps        = System
 energygrps      = System
 
-nstlist		= 10
-ns_type		= grid
-rlist		= 0.9
+nstlist		= 0
+ns_type		= simple
+rlist		= 0.0
 vdwtype		= cut-off
 coulombtype	= cut-off
-rcoulomb	= 0.9
-rvdw		= 0.9
-rvdw_switch     = 0.9
+rcoulomb	= 0.0
+rvdw		= 0.0
+rvdw_switch     = 0.0
 constraints	= all-bonds
-pbc		= xyz
+pbc		= no
 
 tcoupl		= v-rescale
 tc_grps		= System

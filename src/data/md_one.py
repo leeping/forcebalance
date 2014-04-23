@@ -36,9 +36,6 @@ logger = getLogger(__name__)
 
 # Note: Only the simulation settings that vary across different
 # simulations in a target may be specified on the command line.
-
-# ANYTHING THREE LETTERS OR BELOW IS A SHORT OPTION WITH ONE DASH!
-
 parser = argparse.ArgumentParser()
 parser.add_argument('simulation', type=str,
                     help='The simulation name (important; used in setting up)')
@@ -66,7 +63,41 @@ parser.add_argument('-min', '--minimize', dest='minimize', action='store_true',
 parser.add_argument('-o', '-out', '--output', dest='output', type=str, nargs='+', 
                     help='Specify the time series which are written to disk')
 
-Copts = vars(parser.parse_args())
+# Parse the command line options and save as a dictionary (don't save NoneTypes)
+parsed = parser.parse_args()
+args = OrderedDict([(i, j) for i, j in vars(parsed).items() if j != None])
+
+#----
+# Load the ForceBalance pickle file which contains:
+#----
+# - Force field object
+# - Optimization parameters
+# - Options loaded from file
+FF, mvals, Sim = lp_load(open('forcebalance.p'))
+FF.ffdir = '.'
+
+# Engine name.
+engname = Sim.engname
+
+# Import modules and create the correct Engine object.
+if engname == "openmm":
+    try:
+        from simtk.unit import *
+        from simtk.openmm import *
+        from simtk.openmm.app import *
+    except:
+        traceback.print_exc()
+        raise Exception("Cannot import OpenMM modules")
+    from forcebalance.openmmio import *
+    Engine = OpenMM
+elif engname == "gromacs" or engname == "gmx":
+    from forcebalance.gmxio import *
+    Engine = GMX
+elif engname == "tinker":
+    from forcebalance.tinkerio import *
+    Engine = TINKER
+else:
+    raise Exception('OpenMM, GROMACS, and TINKER are supported at this time.')
 
 def main():
     
@@ -88,39 +119,44 @@ def main():
     
     """
 
-    # printcool("ForceBalance simulation using engine: %s" % engname.upper(),
-    #           color=4, bold=True)
-
-    #----
-    # Load the ForceBalance pickle file which contains:
-    #----
-    # - Force field object
-    # - Optimization parameters
-    # - Options loaded from file
-    FF, mvals, Fopts = lp_load(open('forcebalance.p'))
-    FF.ffdir = '.'
     # Write the force field file.
     FF.make(mvals)
 
-    printcool_dictionary(Copts, title="Options from command line")
-    printcool_dictionary(Fopts, title="Options from file")
+    # Read the command line options (they may override the options from file.)
+    AGrad = args['gradient'] or Sim.gradient
+    for i in ['temperature', 'pressure', 'nequil', 'nsteps', 'timestep', 'sample', 'threads', 'minimize']:
+        if i in args:
+            Sim.MDOpts[i] = args[i]
 
-    # Read the command line options (they can override the options from file.)
-    # Calculate energy / dipole derivatives.
-    AGrad = Copts['gradient'] or Fopts['gradient']
-    # Whether to minimize the energy.
-    minimize = Copts['minimize'] or Fopts['minimize']
-    # Engine name.
-    engname = Fopts['engname']
-    # 
-    threads = Copts.get('threads', Fopts.get('threads', 1))
+    #----
+    # Print some options.
+    # At this point, engine and MD options should be SET!
+    #----
+    printcool("ForceBalance simulation using engine: %s" % engname.upper(),
+              color=4, bold=True)
+    printcool_dictionary(args, title="Options from command line")
+    printcool_dictionary(Sim.EngOpts, title="Engine options")
+    printcool_dictionary(Sim.MDOpts, title="Molecular dynamics options")
+
+    #----
+    # For convenience, assign some local variables.
+    #----
+    # Finite difference step size
+    h = Sim.h
+    # Active parameters to differentiate
+    pgrad = Sim.pgrad
+
+    # Create instances of the MD Engine objects.
+    MDEngine = Engine(name=Sim.type, **Sim.EngOpts)
+
+    sys.exit()
 
     # # Get the temperature.
-    # temperature = Copts.get('temperature', Fopts.get('temperature', None))
+    # temperature = args.get('temperature', Fopts.get('temperature', None))
     # # Get the pressure.
-    # pressure = Copts.get('pressure', Fopts.get('pressure', None))
+    # pressure = args.get('pressure', Fopts.get('pressure', None))
     # # 
-    # nequil = Copts.get('nequil', Fopts.get('nequil'))
+    # nequil = args.get('nequil', Fopts.get('nequil'))
     
     #----
     # load some options from file
