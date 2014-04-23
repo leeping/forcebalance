@@ -21,6 +21,7 @@ import argparse
 import numpy as np
 import importlib as il
 
+from forcebalance.nifty import click
 from forcebalance.nifty import lp_dump, lp_load, wopen
 from forcebalance.nifty import printcool, printcool_dictionary
 from forcebalance.molecule import Molecule
@@ -89,13 +90,13 @@ if engname == "openmm":
         traceback.print_exc()
         raise Exception("Cannot import OpenMM modules")
     from forcebalance.openmmio import *
-    Engine = OpenMM
+    EngineClass = OpenMM
 elif engname == "gromacs" or engname == "gmx":
     from forcebalance.gmxio import *
-    Engine = GMX
+    EngineClass = GMX
 elif engname == "tinker":
     from forcebalance.tinkerio import *
-    Engine = TINKER
+    EngineClass = TINKER
 else:
     raise Exception('OpenMM, GROMACS, and TINKER are supported at this time.')
 
@@ -147,7 +148,12 @@ def main():
     pgrad = Sim.pgrad
 
     # Create instances of the MD Engine objects.
-    MDEngine = Engine(name=Sim.type, **Sim.EngOpts)
+    Engine = EngineClass(name=Sim.type, **Sim.EngOpts)
+
+    click() # Start timer.
+    # This line runs the condensed phase simulation.
+    prop_return = Engine.molecular_dynamics(**Sim.MDOpts)
+    logger.info("MD simulation took %.3f seconds\n" % click())
 
     sys.exit()
 

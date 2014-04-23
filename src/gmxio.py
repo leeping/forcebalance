@@ -1120,13 +1120,18 @@ class GMX(Engine):
         if temperature != None:
             md_opts["ref_t"] = temperature
             md_opts["gen_vel"] = "no"
+            # Set some default methods for temperature coupling.
             md_defs["tc_grps"] = "System"
             md_defs["tcoupl"] = "v-rescale"
             md_defs["tau_t"] = 1.0
         if self.pbc:
             md_opts["comm_mode"] = "linear"
+            # Removing center of mass motion at every time step should not impact performance.
+            # http://gromacs.5086.x6.nabble.com/COM-motion-removal-td4413458.html
+            md_opts["nstcomm"] = 1
             if pressure != None:
                 md_opts["ref_p"] = pressure
+                # Set some default methods for pressure coupling.
                 md_defs["pcoupl"] = "parrinello-rahman"
                 md_defs["tau_p"] = 1.5
         else:
@@ -1172,6 +1177,16 @@ class GMX(Engine):
         self.warngmx("grompp -c %s -p %s.top -f %s-md.mdp -o %s-md.tpr" % (gro2, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
         self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
 
+        if verbose: logger.info("Finished!\n")
+
+        # Final frame of molecular dynamics.
+        self.md_final = "%s-md.gro" % self.name
+
+        if 1: return
+
+        #----
+        # Below 
+        #----
         self.mdtraj = '%s-md.trr' % self.name
 
         if verbose: logger.info("Production run finished, calculating properties...\n")
