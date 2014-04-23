@@ -152,8 +152,19 @@ def main():
 
     click() # Start timer.
     # This line runs the condensed phase simulation.
-    prop_return = Engine.molecular_dynamics(**Sim.MDOpts)
+    Engine.molecular_dynamics(**Sim.MDOpts)
     logger.info("MD simulation took %.3f seconds\n" % click())
+    
+    # Extract properties.
+    Results = Engine.md_extract(OrderedDict([(i, {}) for i in Sim.timeseries.keys()]))
+
+    # Dump results to file
+    logger.info("Writing final force field.\n")
+    pvals = FF.make(mvals)
+    
+    logger.info("Writing all simulation data to disk.\n")
+    with wopen('md_result.p') as f:
+        lp_dump(Results, f)
 
     sys.exit()
 
@@ -211,6 +222,8 @@ def main():
 
         # if Fopts['threads'] > 1: 
     printcool_dictionary(EngOpts, title="Engine options")
+
+    
 
     # Number of threads, multiple timestep integrator, anisotropic box etc.
     # threads = Fopts.get('md_threads', 1)
