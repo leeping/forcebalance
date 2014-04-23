@@ -66,8 +66,7 @@ parser.add_argument('-min', '--minimize', dest='minimize', action='store_true',
 parser.add_argument('-o', '-out', '--output', dest='output', type=str, nargs='+', 
                     help='Specify the time series which are written to disk')
 
-args = vars(parser.parse_args())
-# args = dict([(i, j) for i, j in vars(parser.parse_args()).items() if j != None])
+Copts = vars(parser.parse_args())
 
 def main():
     
@@ -98,39 +97,93 @@ def main():
     # - Force field object
     # - Optimization parameters
     # - Options loaded from file
-    FF, mvals, fopts = lp_load(open('forcebalance.p'))
+    FF, mvals, Fopts = lp_load(open('forcebalance.p'))
     FF.ffdir = '.'
     # Write the force field file.
     FF.make(mvals)
-    # # Switch for calculating gradients of output time series.
-    # AGrad = args['gradient']
 
+    printcool_dictionary(Copts, title="Options from command line")
+    printcool_dictionary(Fopts, title="Options from file")
+
+    # Read the command line options (they can override the options from file.)
+    # Calculate energy / dipole derivatives.
+    AGrad = Copts['gradient'] or Fopts['gradient']
+    # Whether to minimize the energy.
+    minimize = Copts['minimize'] or Fopts['minimize']
+    # Engine name.
+    engname = Fopts['engname']
+    # 
+    threads = Copts.get('threads', Fopts.get('threads', 1))
+
+    # # Get the temperature.
+    # temperature = Copts.get('temperature', Fopts.get('temperature', None))
+    # # Get the pressure.
+    # pressure = Copts.get('pressure', Fopts.get('pressure', None))
+    # # 
+    # nequil = Copts.get('nequil', Fopts.get('nequil'))
+    
     #----
-    # Load some options from file
+    # load some options from file
     #----
     # Finite difference step size
-    h = fopts['h']
-    # Active parameters for gradient (if we filtered out the
-    # parameters that are known to have no effect)
-    pgrad = fopts['pgrad']
+    h = Fopts['h']
+    # Active parameters for taking the gradient
+    pgrad = Fopts['pgrad']
+    # Name of the initial coordinate file
+    coords = Fopts['coords']
+    # Base name of the initial coordinate file
+    cbase = os.path.splitext(coords)[0]
+    # Actually start to do stuff.
+    # Molecule object corresponding to 
+    M = Molecule(coords)
 
-    printcool_dictionary(args)
+    #----
+    # Engine options
+    #----
+    EngOpts = OrderedDict([("coords", coords), ("pbc", Fopts['pbc'])])
+    if engname == "openmm":
+        if pbc:
+            EngOpts["platname"] = 'CUDA'
+        else:
+            EngOpts["platname"] = 'Reference'
+        # Force crash if asking for the CUDA platform and force_cuda option is on
+        # (because we don't want to inadvertently run using Reference platform)
+        if EngOpts["platname"] == 'CUDA' and Fopts['force_cuda']:
+            try: Platform.getPlatformByName('CUDA')
+            except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
+        if threads > 1:
+            logger.warn("Setting the number of threads will have no effect on OpenMM engine.\n")
+    elif engname == "gromacs":
+        # Gromacs-specific options
+        EngOpts["gmxpath"] = Fopts["gmxpath"]
+        EngOpts["gmxsuffix"] = Fopts["gmxsuffix"]
+        EngOpts["gmx_top"] = Fopts["gmx_top"]
+        EngOpts["gmx_mdp"] = Fopts["gmx_mdp"]
+        if Fopts['force_cuda']: logger.warn("force_cuda option has no effect on Gromacs engine.")
+        if Fopts['rpmd_beads'] > 0: raise RuntimeError("Gromacs cannot handle RPMD.")
+        if Fopts['mts']: logger.warn("Gromacs not configured for multiple timestep integrator.")
+        if Fopts['anisotropic']: logger.warn("Gromacs not configured for anisotropic box scaling.")
+    elif engname == "tinker":
+        EngOpts["tinkerpath"] = Fopts["tinkerpath"]
+        EngOpts["tinker_key"] = Fopts["tinker_key"]
+
+        # if Fopts['threads'] > 1: 
+    printcool_dictionary(EngOpts, title="Engine options")
 
     # Number of threads, multiple timestep integrator, anisotropic box etc.
-    threads = fopts.get('md_threads', 1)
-    mts = fopts.get('mts_integrator', 0)
-    rpmd_beads = fopts.get('rpmd_beads', 0)
-    force_cuda = fopts.get('force_cuda', 0)
-    nbarostat = fopts.get('n_mcbarostat', 25)
-    anisotropic = fopts.get('anisotropic_box', 0)
-    minimize = fopts.get('minimize_energy', 1)
-
+    # threads = Fopts.get('md_threads', 1)
+    # mts = Fopts.get('mts_integrator', 0)
+    # rpmd_beads = Fopts.get('rpmd_beads', 0)
+    # force_cuda = Fopts.get('force_cuda', 0)
+    # nbarostat = Fopts.get('n_mcbarostat', 25)
+    # anisotropic = Fopts.get('anisotropic_box', 0)
+    # minimize = Fopts.get('minimize_energy', 1)
+    sys.exit()
+    
     #----
     # Setting up MD simulations
     #----
-
-    EngOpts = OrderedDict()
-    EngOpts = OrderedDict([("coords", fopts['coords']), ("pbc", False)])
+    
 
     EngOpts["liquid"] = OrderedDict([("coords", liquid_fnm), ("mol", ML), ("pbc", True)])
     GenOpts = OrderedDict([('FF', FF)])
@@ -144,8 +197,8 @@ def main():
         if threads > 1: logger.warn("Setting the number of threads will have no effect on OpenMM engine.\n")
     elif engname == "gromacs":
         # Gromacs-specific options
-        GenOpts["gmxpath"] = fopts["gmxpath"]
-        GenOpts["gmxsuffix"] = fopts["gmxsuffix"]
+        GenOpts["gmxpath"] = Fopts["gmxpath"]
+        GenOpts["gmxsuffix"] = Fopts["gmxsuffix"]
         EngOpts["liquid"]["gmx_top"] = os.path.splitext(liquid_fnm)[0] + ".top"
         EngOpts["liquid"]["gmx_mdp"] = os.path.splitext(liquid_fnm)[0] + ".mdp"
         EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
@@ -156,7 +209,7 @@ def main():
         if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")
     elif engname == "tinker":
         # Tinker-specific options
-        GenOpts["tinkerpath"] = fopts["tinkerpath"]
+        GenOpts["tinkerpath"] = Fopts["tinkerpath"]
         EngOpts["liquid"]["tinker_key"] = os.path.splitext(liquid_fnm)[0] + ".key"
         EngOpts["gas"]["tinker_key"] = os.path.splitext(gas_fnm)[0] + ".key"
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
@@ -174,7 +227,7 @@ def main():
                                     ("temperature", temperature), ("pressure", pressure),
                                     ("nequil", liquid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
-                                    ("verbose", True), ('save_traj', fopts['save_traj']), 
+                                    ("verbose", True), ('save_traj', Fopts['save_traj']), 
                                     ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", nbarostat),
                                     ("mts", mts), ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),

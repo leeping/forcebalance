@@ -1497,6 +1497,8 @@ class Thermo_GMX(Thermo):
         self.engname = "gromacs"
         # Valid coordinate suffix.
         self.crdsfx = ['.gro', '.pdb']
+        # Auxiliary (e.g. topology) files.
+        self.auxsfx = [['.mdp'], ['.top']]
         # Command prefix.
         self.mdpfx = "bash gmxprefix.bash"
         # Scripts to be copied from the ForceBalance installation directory.

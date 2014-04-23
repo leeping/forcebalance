@@ -9,6 +9,7 @@ import itertools
 import cStringIO
 
 from forcebalance.molecule import Molecule
+from forcebalance.simulation import Simulation
 from forcebalance.observable import OMap
 from forcebalance.target import Target
 from forcebalance.finite_difference import in_fd
@@ -350,6 +351,81 @@ def stand_head(head, obs):
         logger.debug("header %s renamed to %s\n" % (hfirst, newh))
     return newh, punit, obs
 
+def find_file(tgtdir, index, stype, sufs, icn):
+    """ 
+    Search for a suitable file that matches the simulation index,
+    type, suffix and IC number.  This can be used to search for
+    initial coordinates, but also auxiliary files for the
+    simulation (e.g. .top and .mdp files for a Gromacs simulation,
+    or .key files for a Tinker simulation.)
+
+    Generally, it is preferred to provide files where the base
+    name matches the simulation type.  However, since it is also
+    okay to put all files for a simulation type into a
+    subdirectory, generic file names like 'topol' and 'conf' may
+    be used.
+
+    Initial condition files will be searched for in the following priority (suf stands for suffix)
+    targets/target_name/index/stype/ICs/stype_#.suf
+    targets/target_name/index/stype/ICs/stype#.suf
+    targets/target_name/index/stype/ICs/#.suf
+    targets/target_name/index/stype/ICs/stype.suf
+    targets/target_name/index/stype/ICs/coords.suf
+    targets/target_name/index/stype/ICs/conf.suf
+    targets/target_name/index/stype/ICs/topol.suf
+    targets/target_name/index/stype/ICs/grompp.suf
+    targets/target_name/index/stype/ICs/input.suf
+    targets/target_name/index/stype/ICs/tinker.suf
+    targets/target_name/index/stype/stype.suf
+    targets/target_name/index/stype/coords.suf
+    targets/target_name/index/stype.suf
+    targets/target_name/stype.suf
+
+    @param[in] index Name of the index directory to look in
+    @param[in] stype Name of the simulation type to look for
+    @param[in] sufs List of suffixes to look for in order of priority
+    @param[in] icn Initial coordinate number (will look for sequentially numbered file, or single file with multiple structures)
+    """
+    found = ''
+    # The 2-tuple here corresponds to:
+    # - Search path for the file
+    # - Whether the file that we're looking for is 'numbered'
+    #   (i.e. a different file for each structure); otherwise the
+    #   single file may contain multiple structures
+    pfxs = [stype, 'coords', 'conf', 'topol', 'grompp', 'input', 'tinker', '']
+    
+    basefnms = list(itertools.chain(*[[(os.path.join(index, stype, 'ICs', pfx+'_'+("%i" % icn)), True),
+                                       (os.path.join(index, stype, 'ICs', pfx+("%i" % icn)), True),
+                                       (os.path.join(index, stype, 'ICs', pfx), False),
+                                       (os.path.join(index, stype, pfx), False),
+                                       (os.path.join(index, pfx), False),
+                                       (os.path.join(pfx), False)] for pfx in pfxs]))
+    
+    paths = OrderedDict()
+    for fnm, numbered in basefnms:
+        for suf in sufs:
+            fpath = os.path.join(tgtdir, fnm+suf if suf.startswith('.') else fnm+'.'+suf)
+            paths[fpath] = os.path.exists(fpath)
+            if os.path.exists(fpath):
+                if found != '':
+                    logger.info('Target %s Index %s Simulation %s : '
+                                '%s overrides %s\n' % (os.path.basename(tgtdir), index, stype, fpath))
+                else:
+                    if not numbered:
+                        M = Molecule(fpath)
+                        if len(M) <= icn:
+                            logger.error("Target %s Index %s Simulation %s : "
+                                         "file %s doesn't have enough structures\n" % 
+                                         (os.path.basename(tgtdir), index, stype, fpath))
+                            raise RuntimeError
+                    logger.info('Target %s Index %s Simulation %s : '
+                                'found file %s\n' % (os.path.basename(tgtdir), index, stype, fpath))
+                    found = fpath
+    if found == '':
+        logger.error("Can't find a file for index %s, simulation %s, suffix %s in the search path" % (index, stype, '/'.join(sufs)))
+        raise RuntimeError
+    return found, 0 if numbered else icn
+
 class Thermo(Target):
     """
     A target for fitting general experimental data sets. The source
@@ -577,81 +653,6 @@ class Thermo(Target):
 
         return
 
-    def find_file(self, index, stype, sufs, icn):
-        """ 
-        Search for a suitable file that matches the simulation index,
-        type, suffix and IC number.  This can be used to search for
-        initial coordinates, but also auxiliary files for the
-        simulation (e.g. .top and .mdp files for a Gromacs simulation,
-        or .key files for a Tinker simulation.)
-
-        Generally, it is preferred to provide files where the base
-        name matches the simulation type.  However, since it is also
-        okay to put all files for a simulation type into a
-        subdirectory, generic file names like 'topol' and 'conf' may
-        be used.
-    
-        Initial condition files will be searched for in the following priority (suf stands for suffix)
-        targets/target_name/index/stype/ICs/stype_#.suf
-        targets/target_name/index/stype/ICs/stype#.suf
-        targets/target_name/index/stype/ICs/#.suf
-        targets/target_name/index/stype/ICs/stype.suf
-        targets/target_name/index/stype/ICs/coords.suf
-        targets/target_name/index/stype/ICs/conf.suf
-        targets/target_name/index/stype/ICs/topol.suf
-        targets/target_name/index/stype/ICs/grompp.suf
-        targets/target_name/index/stype/ICs/input.suf
-        targets/target_name/index/stype/ICs/tinker.suf
-        targets/target_name/index/stype/stype.suf
-        targets/target_name/index/stype/coords.suf
-        targets/target_name/index/stype.suf
-        targets/target_name/stype.suf
-
-        @param[in] index Name of the index directory to look in
-        @param[in] stype Name of the simulation type to look for
-        @param[in] sufs List of suffixes to look for in order of priority
-        @param[in] icn Initial coordinate number (will look for sequentially numbered file, or single file with multiple structures)
-        """
-        found = ''
-        # The 2-tuple here corresponds to:
-        # - Search path for the file
-        # - Whether the file that we're looking for is 'numbered'
-        #   (i.e. a different file for each structure); otherwise the
-        #   single file may contain multiple structures
-        pfxs = [stype, 'coords', 'conf', 'topol', 'grompp', 'input', 'tinker', '']
-        
-        basefnms = list(itertools.chain(*[[(os.path.join(index, stype, 'ICs', pfx+'_'+("%i" % icn)), True),
-                                           (os.path.join(index, stype, 'ICs', pfx+("%i" % icn)), True),
-                                           (os.path.join(index, stype, 'ICs', pfx), False),
-                                           (os.path.join(index, stype, pfx), False),
-                                           (os.path.join(index, pfx), False),
-                                           (os.path.join(pfx), False)] for pfx in pfxs]))
-
-        paths = OrderedDict()
-        for fnm, numbered in basefnms:
-            for suf in sufs:
-                fpath = os.path.join(self.tgtdir, fnm+suf if suf.startswith('.') else fnm+'.'+suf)
-                paths[fpath] = os.path.exists(fpath)
-                if os.path.exists(fpath):
-                    if found != '':
-                        logger.info('Target %s Index %s Simulation %s : '
-                                    '%s overrides %s\n' % (self.name, index, stype, fpath))
-                    else:
-                        if not numbered:
-                            M = Molecule(fpath)
-                            if len(M) <= icn:
-                                logger.error("Target %s Index %s Simulation %s : "
-                                             "file %s doesn't have enough structures\n" % 
-                                             (self.name, index, stype, fpath))
-                                raise RuntimeError
-                        logger.info('Target %s Index %s Simulation %s : '
-                                    'found file %s\n' % (self.name, index, stype, fpath))
-                        found = fpath
-        if found == '':
-            logger.error("Can't find a file for index %s, simulation %s, suffix %s in the search path" % (index, stype, '/'.join(sufs)))
-            raise RuntimeError
-        return found, 0 if numbered else icn
-    
     def initialize_observables(self):
         """ 
         Determine Observable objects to be created.  Checks to see
@@ -728,10 +729,9 @@ class Thermo(Target):
                 else:
                     n_ic = 1
                 for icn in range(n_ic):
-                    icfnm, icframe = self.find_file(index, stype, self.crdsfx, icn)
+                    icfnm, icframe = find_file(self.tgtdir, index, stype, self.crdsfx, icn)
                     sname = "%s_%i" % (stype, icn) if n_ic > 1 else stype
-                    self.Simulations[index].append(Simulation(sname, index, stype, icfnm, icframe, sorted(list(tsset))))
-                    
+                    self.Simulations[index].append(Simulation(self, sname, index, stype, icfnm, icframe, sorted(list(tsset))))
         return
 
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
@@ -769,7 +769,7 @@ class Thermo(Target):
                 if not (os.path.exists('result.p') or os.path.exists('result.p.bz2')):
                     # Write to disk: Force field object, current parameter values, target options
                     M = Molecule(os.path.join(self.root, Sim.initial))[Sim.iframe]
-                    M.write("%s%s" % (Sim.type, self.crdsfx[0]))
+                    M.write(Sim.coords)
                     # # Get relevant files from the target folder, I suppose.
                     # link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
                     # # Determine initial coordinates.
@@ -777,22 +777,33 @@ class Thermo(Target):
                     # self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
                     # Command for running the simulation.
                     ## Copy run scripts from ForceBalance installation directory
-
                     # We can build the entire MD options dictionary here!!
                     # Update dictionary with simulation options.
-                    OptionDict = copy.deepcopy(self.OptionDict)
-                    OptionDict['gradient'] = AGrad
-                    OptionDict['coords'] = "%s%s" % (Sim.type, self.crdsfx[0])
-                    OptionDict['simtype'] = Sim.type
+                    # OptionDict = copy.deepcopy(self.OptionDict)
+                    # OptionDict['gradient'] = AGrad
+                    # Sim.gradient = AGrad
+                    # Sim.nequil = self.nequil
+                    # Sim.nsteps = self.nsteps
+                    # Sim.timestep = self.timestep
+                    # Sim.sample = self.sample
+                    # Sim.h = 
+                    # Sim.pgrad = 
+                    # OptionDict['coords'] = "%s%s" % (Sim.type, self.crdsfx[0])
+                    # OptionDict.update(vars(Sim))
+                    # OptionDict['simtype'] = Sim.type
                     # # In the future we should have these settings 
                     # OptionDict['nequil'] = self.nequil
                     # OptionDict['nsteps'] = self.nsteps
                     # OptionDict['timestep'] = self.timestep
                     # OptionDict['sample'] = self.sample
                     # OptionDict['minimize'] = self.minimize
-                    printcool_dictionary(OptionDict)
+                    # printcool_dictionary(vars(Sim))
+                    # SimOpts = dict(vars(Sim))
+                    Opts = vars(Sim)
+                    Opts['gradient'] = AGrad
+                    Opts['pgrad'] = self.pgrad
 
-                    with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,OptionDict),f)
+                    with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,Opts),f)
                     for f in self.scripts:
                         LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
                                  os.path.join(os.getcwd(), f))
@@ -812,7 +823,7 @@ class Thermo(Target):
                     # if wq == None:
                     #     logger.info("Running condensed phase simulation locally.\n")
                     #     logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
-                    _exec(cmdstr, copy_stderr=True, outfnm='md_one.out')
+                    _exec(cmdstr, copy_stderr=False, outfnm='md_one.out')
                     # else:
                     #     queue_up(wq, command = cmdstr+' &> npt.out',
                     #              input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
@@ -1095,31 +1106,3 @@ class Point(object):
 
         return "\n".join(msg)
 
-class Simulation(object):
-
-    """ 
-    Data container for a simulation (specified by index, simulation
-    type, initial condition).
-    """
-
-    def __init__(self, name, index, stype, initial, iframe, tsnames):
-        # The simulation name will identify the simulation within a collection
-        # belonging to the Index.
-        self.name = name
-        # The Index that the simulation belongs to.
-        self.index = index
-        # The type of simulation (liquid, gas, solid, bilayer...)
-        self.type = stype
-        # The file containing initial coordinates.
-        self.initial = initial
-        # The frame number in the initial coordinate file.
-        self.iframe = iframe
-        # The time series for the simulation.
-        self.timeseries = OrderedDict([(i, []) for i in tsnames])
-
-    def __str__(self):
-        msg = []
-        msg.append("Simulation: Name %s, Index %s, Type %s" % (self.name, self.index, self.type))
-        msg.append("Initial Conditions: File %s Frame %i" % (self.initial, self.iframe))
-        msg.append("Timeseries Names: %s" % (', '.join(self.timeseries.keys())))
-        return "\n".join(msg)
