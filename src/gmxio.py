@@ -1016,7 +1016,7 @@ class GMX(Engine):
             self.mol[shot].write("%s.gro" % self.name)
             self.warngmx("grompp -c %s.gro -p %s.top -f %s-nm.mdp -o %s-nm.tpr" % (self.name, self.name, self.name, self.name))
 
-        self.callgmx("mdrun -deffnm %s-nm -mtx %s-nm.mtx -v" % (self.name, self.name))
+        self.callgmx("mdrun -deffnm %s-nm -nt 1 -mtx %s-nm.mtx -v" % (self.name, self.name))
         self.callgmx("g_nmeig -s %s-nm.tpr -f %s-nm.mtx -of %s-nm.xvg -v %s-nm.trr -last 10000 -xvg no" % \
                          (self.name, self.name, self.name, self.name))
         self.callgmx("trjconv -s %s-nm.tpr -f %s-nm.trr -o %s-nm.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
