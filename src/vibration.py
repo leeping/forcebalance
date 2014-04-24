@@ -85,7 +85,11 @@ class Vibration(Target):
                 xyz[an, :] = np.array([float(i) for i in s[1:]])
                 an += 1
             elif len(s) == 1:
-                self.ref_eigvals.append(float(s[0]))
+                if float(s[0]) < 0:
+                    logger.warning('Warning: Setting imaginary frequency = % .3fi to zero.\n' % abs(float(s[0])))
+                    self.ref_eigvals.append(0.0)
+                else:
+                    self.ref_eigvals.append(float(s[0]))
                 self.ref_eigvecs.append(np.zeros((self.na, 3)))
                 an = 0
             elif len(s) == 3:
