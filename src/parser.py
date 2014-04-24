@@ -133,8 +133,7 @@ gen_opts_types = {
 
 ## Default fitting target options.
 tgt_opts_types = {
-    'strings' : {"name"      : (None, 200, 'The name of the target, corresponding to the directory targets/name', 'All targets (important)'),
-                 "force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
+    'strings' : {"force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
                  "fragment1" : (None, 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
                  "fragment2" : (None, 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
                  "openmm_precision" : (None, -10, 'Precision of OpenMM calculation if using CUDA or OpenCL platform.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
@@ -157,7 +156,8 @@ tgt_opts_types = {
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
                  },
-    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
+    'lists'   : {"name"      : ([], 200, 'The name of the target, corresponding to the directory targets/name ; may provide a list if multiple targets have the same settings', 'All targets (important)'),
+                 "fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
                  "quantities" : ([], 100, 'List of quantities to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
@@ -528,4 +528,11 @@ def parse_inputs(input_file=None):
         tgt_opts.append(this_tgt_opt)
     if not options['verbose_options']:
         printcool("Options at their default values are not printed\n Use 'verbose_options True' to Enable", color=5)
-    return options, tgt_opts
+    # Expand target options (i.e. create multiple tgt_opts dictionaries if multiple target names are specified)
+    tgt_opts_x = []
+    for topt in tgt_opts:
+        for name in topt['name']:
+            toptx = deepcopy(topt)
+            toptx['name'] = name
+            tgt_opts_x.append(toptx)
+    return options, tgt_opts_x
