@@ -12,12 +12,13 @@ import cStringIO
 from forcebalance.molecule import Molecule
 from forcebalance.observable import OMap
 from forcebalance.target import Target
-from forcebalance.finite_difference import in_fd
+from forcebalance.finite_difference import in_fd, fdwrap, f12d3p
 from forcebalance.nifty import flat, col, row, isint, isnpnan
-from forcebalance.nifty import lp_dump, lp_load, wopen, _exec
+from forcebalance.nifty import lp_dump, lp_load, wopen, _exec, getval
 from forcebalance.nifty import GoInto, LinkFile, link_dir_contents
 from forcebalance.nifty import printcool, printcool_dictionary
 from forcebalance.nifty import getWorkQueue
+from forcebalance.optimizer import Counter
 
 from collections import defaultdict, OrderedDict
 
@@ -26,14 +27,6 @@ from forcebalance.output import *
 logger = getLogger(__name__)
 # print logger.parent.parent.handlers[0]
 # logger.parent.parent.handlers = []
-
-def getval(dframe, col):
-    """ Extract the single non-NaN value from a column. """
-    nnan = [i for i in dframe[col] if not isnpnan(i)]
-    if len(nnan) != 1:
-        logger.error('%i values in column %s are not NaN (expected only 1)' % (len(nnan), col))
-        raise RuntimeError
-    return nnan[0]
 
 class TextParser(object):
     """ Parse a text file. """
@@ -436,6 +429,53 @@ def find_file(tgtdir, index, stype, sufs, iscrd, icn=0):
         raise RuntimeError
     return found, 0 if numbered else icn
 
+def energy_derivatives(engine, FF, mvals, h, pgrad, dipole=False):
+
+    """
+    Compute the first and second derivatives of a set of snapshot
+    energies with respect to the force field parameters.
+
+    This basically calls the finite difference subroutine on the
+    energy_driver subroutine also in this script.
+
+    In the future we may need to be more sophisticated with
+    controlling the quantities which are differentiated, but for
+    now this is okay..
+
+    @param[in] engine Engine object for calculating energies
+    @param[in] FF Force field object
+    @param[in] mvals Mathematical parameter values
+    @param[in] h Finite difference step size
+    @param[in] pgrad List of active parameters for differentiation
+    @param[in] dipole Switch for dipole derivatives.
+    @return G First derivative of the energies in a N_param x N_coord array
+    @return GDx First derivative of the box dipole moment x-component in a N_param x N_coord array
+    @return GDy First derivative of the box dipole moment y-component in a N_param x N_coord array
+    @return GDz First derivative of the box dipole moment z-component in a N_param x N_coord array
+
+    """
+    def single_point(mvals_):
+        FF.make(mvals_)
+        if dipole:
+            return engine.energy_dipole()
+        else:
+            return engine.energy()
+
+    ED0 = single_point(mvals)
+    G   = OrderedDict()
+    G['potential'] = np.zeros((FF.np, ED0.shape[0]))
+    if dipole:
+        G['dipole'] = np.zeros((FF.np, ED0.shape[0], 3))
+    for i in pgrad:
+        logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
+        edg, _ = f12d3p(fdwrap(single_point,mvals,i),h,f0=ED0)
+        if dipole:
+            G['potential'][i] = edg[:,0]
+            G['dipole'][i]    = edg[:,1:]
+        else:
+            G['potential'][i] = edg[:]
+    return G
+
 class Thermo(Target):
     """
     A target for fitting general experimental data sets. The source
@@ -634,6 +674,8 @@ class Thermo(Target):
                 self.Data[col] = self.Data[col].astype(float)
 
         intcol('n_ic')
+        floatcol('temp')
+        floatcol('pres')
 
         # A list of indices (i.e. top-level indices) which correspond
         # to sets of simulations that we'll be running.
@@ -685,7 +727,7 @@ class Thermo(Target):
                     Objs = []
                     Reqs = []
                     for OClass in OMap[oname]:
-                        OObj = OClass(self.Data)
+                        OObj = OClass(self.Data.ix[index])
                         Reqs.append(OObj.requires.keys())
                         if all([i in self.SimNames for i in OObj.requires.keys()]):
                             Objs.append(OObj)
@@ -776,6 +818,7 @@ class Thermo(Target):
             for Sim in self.Simulations[index]:
                 Sim.gradient = AGrad
                 simd = os.path.join(os.getcwd(), index, Sim.name)
+                Sim.RunDirs[Counter()] = simd
                 GoInto(simd)
                 # Submit or run the simulation if the result file does not exist.
                 if not (os.path.exists('result.p') or os.path.exists('result.p.bz2')):
@@ -807,7 +850,7 @@ class Thermo(Target):
                     # if wq == None:
                     #     logger.info("Running condensed phase simulation locally.\n")
                     #     logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
-                    _exec(cmdstr, copy_stderr=False, outfnm='md_one.out')
+                    _exec(cmdstr, copy_stderr=True, outfnm='md_one.out')
                     # else:
                     #     queue_up(wq, command = cmdstr+' &> npt.out',
                     #              input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
@@ -815,39 +858,6 @@ class Thermo(Target):
                 os.chdir(cwd)
         return
 
-    def retrieve(self, dp):
-        """Retrieve the molecular dynamics (MD) results and store the calculated
-        observables in the Point object dp.
-
-        Parameters
-        ----------
-        dp : Point
-            Store the calculated observables in this point.
-
-        Returns
-        -------
-        Nothing
-        
-        """
-        abspath = os.path.join(os.getcwd(), '%d/md_result.p' % dp.idnr)
-
-        if os.path.exists(abspath):
-            logger.info('Reading data from ' + abspath + '.\n')
-
-            vals, errs, grads = lp_load(open(abspath))
-
-            dp.data["values"] = vals
-            dp.data["errors"] = errs
-            dp.data["grads"]  = grads
-
-        else:
-            msg = 'The file ' + abspath + ' does not exist so we cannot read it.\n'
-            logger.warning(msg)
-
-            dp.data["values"] = np.zeros((len(self.observables)))
-            dp.data["errors"] = np.zeros((len(self.observables)))
-            dp.data["grads"]  = np.zeros((len(self.observables), self.FF.np))
-            
     def indicate(self):
         """Shows optimization state."""
         return
@@ -995,6 +1005,18 @@ class Thermo(Target):
         Objective = 0.0
         Gradient  = np.zeros(self.FF.np)
         Hessian   = np.zeros((self.FF.np, self.FF.np))
+
+        # Retrieve simulation results.
+        for index in self.Indices:
+            for Sim in self.Simulations[index]:
+                Sim.retrieve()
+        
+        # Calculate observable values.
+        for oname in self.Observables.keys():
+            for index in self.Indices:
+                self.Observables[oname][index].aggregate(self.Simulations[index], AGrad)
+                if oname == 'density': self.Observables[oname][index].evaluate(AGrad)
+
         return { "X": Objective, "G": Gradient, "H": Hessian} 
 
         for pt in self.points:
@@ -1120,10 +1142,13 @@ class Simulation(object):
         self.Data = copy.deepcopy(data)
         # Type of the simulation (map to simulation settings)
         self.type = stype
+        # Root directory of the ForceBalance job
+        self.root = tgt.root
         # Locate the initial coordinate file and frame number.
         self.initial, self.iframe = find_file(os.path.join(tgt.root, tgt.tgtdir), index, stype, tgt.crdsfx, True, icn)
         # The time series for the simulation.
         self.timeseries = OrderedDict([(i, []) for i in tsnames])
+        self.timeseries['potential'] = [] # ALWAYS require the potential energy.
         # The file extension that the coordinate file will be written with.
         self.fext = os.path.splitext(self.initial)[1]
         # Auxiliary files to be copied to the current location prior to running the simulation.
@@ -1139,6 +1164,10 @@ class Simulation(object):
         self.h = tgt.h
         # Active parameters to differentiate over.
         self.pgrad = tgt.pgrad
+        # List of ITERATION : directory pairs.
+        self.RunDirs = OrderedDict()
+        # List of ITERATION : result data structures.
+        self.Results = OrderedDict()
 
         pbc = Simulation.type_settings[self.type]['pbc']
 
@@ -1214,3 +1243,27 @@ class Simulation(object):
         msg.append("Initial Conditions: File %s Frame %i" % (self.initial, self.iframe))
         msg.append("Timeseries Names: %s" % (', '.join(self.timeseries.keys())))
         return "\n".join(msg)
+
+    def retrieve(self, cycle=None):
+        """Retrieve the molecular dynamics (MD) results and store the calculated
+        observables in the Simulation object.
+
+        Parameters
+        ----------
+        dp : Point
+            Store the calculated observables in this point.
+
+        Returns
+        -------
+        Nothing
+        
+        """
+        if cycle == None: cycle = Counter()
+
+        abspath = os.path.join(self.RunDirs[cycle], 'md_result.p')
+        if os.path.exists(abspath):
+            logger.info('Simulation %s reading data from ' % self.name  + abspath.replace(self.root+'/', '') + ' .\n')
+            self.Results[cycle] = lp_load(open(abspath))
+        else:
+            logger.warning('The file ' + abspath + ' does not exist so we cannot read it.\n')
+            self.Results[cycle] = None

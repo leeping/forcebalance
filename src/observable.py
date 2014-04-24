@@ -3,8 +3,9 @@ import numpy as np
 
 from forcebalance.finite_difference import fdwrap, f12d3p
 from forcebalance.molecule import Molecule
-from forcebalance.nifty import col, flat, statisticalInefficiency
-from forcebalance.nifty import printcool
+from forcebalance.nifty import col, flat, getval
+from forcebalance.nifty import printcool, statisticalInefficiency
+from forcebalance.optimizer import Counter
 
 from collections import OrderedDict
 
@@ -14,8 +15,7 @@ logger = getLogger(__name__)
 # method mean_stderr
 def mean_stderr(ts):
     """Return mean and standard deviation of a time series ts."""
-    return np.mean(ts), \
-      np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
+    return np.mean(ts), np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
 
 # method energy_derivatives
 def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True):
@@ -75,11 +75,12 @@ class Observable(object):
         Identifier for the observable that is specified in `observables` in Target
         options.
     """
-    def __init__(self, source, name=None):
+    def __init__(self, source):
         # Reference data which can be useful in calculating the observable.
+        if 'temp' in source: self.temp = getval(source, 'temp')
+        if 'pres' in source: self.pres = getval(source, 'pres')
         self.Data = source[self.columns]
-        self.name = name if name is not None else "empty"
-                    
+        
     def __str__(self):
         return "Observable = " + self.name.capitalize() + "; Columns = " + ', '.join(self.columns)
 
@@ -114,6 +115,26 @@ class Observable(object):
         logger.error("Extract method not implemented in base class.\n")    
         raise NotImplementedError
 
+    def aggregate(self, Sims, AGrad, cycle=None):
+        print self.name
+        if cycle == None: cycle = Counter()
+        # Different from the Results objects in the Simulation, this
+        # one is keyed by the simulation type then by the time series
+        # data type.
+        self.TimeSeries = OrderedDict([(i, OrderedDict()) for i, j in self.requires.items()])
+        for stype in self.requires:
+            for dtype in self.requires[stype]:
+                self.TimeSeries[stype][dtype] = np.concatenate([Sim.Results[cycle][dtype] for Sim in Sims if Sim.type == stype])
+        if AGrad:
+            # Also aggregate the derivative information along the second axis (snapshot axis)
+            self.Derivatives = OrderedDict()
+            for stype in self.requires:
+                # The derivatives that we have may be obtained from the 'derivatives' data structure of the first Simulation
+                # that matches the required simulation type.
+                self.Derivatives[stype] = OrderedDict()
+                for dtype in [Sim.Results[cycle]['derivatives'].keys() for Sim in Sims if Sim.type == stype][0]:
+                    self.Derivatives[stype][dtype] = np.concatenate([Sim.Results[cycle]['derivatives'][dtype] for Sim in Sims if Sim.type == stype], axis=1)
+
 # class Observable_Density
 class Observable_Density(Observable):
 
@@ -136,66 +157,30 @@ class Observable_Density(Observable):
         self.columns = ['density']
         super(Observable_Density, self).__init__(source)
 
-    def extract(self, engines, FF, mvals, h, pgrad, AGrad=True):         
+    def evaluate(self, AGrad):         
         #==========================================#
         #  Physical constants and local variables. #
         #==========================================#
         # Energies in kJ/mol and lengths in nanometers.
         kB    = 0.008314472471220214
-        kT    = kB*self.temperature
+        kT    = kB*self.temp
         Beta  = 1.0/kT
         mBeta = -Beta
- 
-        #======================================================#
-        #  Get simulation properties depending on the engines. #
-        #======================================================#
-        if self.engname == "gromacs":
-            # Default name
-            deffnm = os.path.basename(os.path.splitext(engines[0].mdene)[0])
-            # What energy terms are there and what is their order
-            energyterms = engines[0].energy_termnames(edrfile="%s.%s" % (deffnm, "edr"))
-            # Grab energy terms to print and keep track of energy term order.
-            ekeep  = ['Total-Energy', 'Potential', 'Kinetic-En.', 'Temperature']
-            ekeep += ['Volume', 'Density']
-
-            ekeep_order = [key for (key, value) in
-                           sorted(energyterms.items(), key=lambda (k, v) : v)
-                           if key in ekeep]
-
-            # Perform energy component analysis and return properties.
-            engines[0].callgmx(("g_energy " +
-                                "-f %s.%s " % (deffnm, "edr") +
-                                "-o %s-energy.xvg " % deffnm +
-                                "-xvg no"),
-                                stdin="\n".join(ekeep))
-            
-        # Read data and store properties by grabbing columns in right order.
-        data        = np.loadtxt("%s-energy.xvg" % deffnm)            
-        Energy      = data[:, ekeep_order.index("Total-Energy") + 1]
-        Potential   = data[:, ekeep_order.index("Potential") + 1]
-        Kinetic     = data[:, ekeep_order.index("Kinetic-En.") + 1]
-        Volume      = data[:, ekeep_order.index("Volume") + 1]
-        Temperature = data[:, ekeep_order.index("Temperature") + 1]
-        Density     = data[:, ekeep_order.index("Density") + 1]
-
-        #============================================#
-        #  Compute the potential energy derivatives. #
-        #============================================#
-        logger.info(("Calculating potential energy derivatives " +
-                     "with finite difference step size: %f\n" % h))
-        printcool("Initializing array to length %i" % len(Energy),
-                  color=4, bold=True)    
-        G = energy_derivatives(engines[0], FF, mvals, h, pgrad, len(Energy), AGrad)
-        
-        #=========================================#
-        #  Observable properties and derivatives. #
-        #=========================================#
+        phase = self.requires.keys()[0]
+        # Density time series.
+        Density  = self.TimeSeries[phase]['density']
         # Average and error.
         Rho_avg, Rho_err = mean_stderr(Density)
-        # Analytic first derivative.
-        Rho_grad = mBeta * (flat(np.mat(G) * col(Density)) / len(Density) \
-                            - np.mean(Density) * np.mean(G, axis=1))
-        return Rho_avg, Rho_err, Rho_grad
+        Answer = OrderedDict()
+        Answer['mean'] = Rho_avg
+        Answer['stderr'] = Rho_err
+        if AGrad:
+            G = self.Derivatives[phase]['potential']
+            # Analytic first derivative.
+            Rho_grad = mBeta * (flat(np.matrix(G) * col(Density)) / len(Density)
+                                - np.mean(Density) * np.mean(G, axis=1))
+            Answer['grad'] = Rho_grad
+        return Answer
 
 class Liquid_Density(Observable_Density):
     def __init__(self, source):

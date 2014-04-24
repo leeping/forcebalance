@@ -1187,34 +1187,29 @@ class GMX(Engine):
         self.mdtraj = '%s-md.trr' % self.name
 
         # Call md_extract and return the prop_return dictionary (backward compatibility with old functionality.)
-        Extract = self.md_extract(OrderedDict([(i, 0) for i in ['potential', 'kinetic', 'dipole', 'components']]))
-        prop_return = {'Potentials': Extract['potential'], 
-                       'Kinetics': Extract['kinetic'], 
-                       'Dips': Extract['dipole'], 
-                       'Ecomps': Extract['components']}
-        if self.pbc:
-            Extract_ = self.md_extract(OrderedDict([(i, 0) for i in ['density', 'volume']]))
-            prop_return['Rhos'] = Extract_['density']
-            prop_return['Volumes'] = Extract_['volume']
-        if bilayer:
-            Extract__ = self.md_extract(OrderedDict([(i, 0) for i in ['al', 'scd']]))
-            prop_return['Als'] = Extract__['al']
-            prop_return['Scds'] = Extract__['scd']
-
-        if verbose: logger.info("Finished!\n")
+        old_map = {'potential' : 'Potentials', 'kinetic' : 'Kinetics', 'dipole' : 'Dips', 'components' : 'Ecomps',
+                   'density' : 'Rhos', 'volume' : 'Volumes', 'al' : 'Als', 'scd' : 'Scds'}
+        tsnames = ['potential', 'kinetic', 'dipole', 'components']
+        if self.pbc: tsnames += ['density', 'volume']
+        if bilayer: tsnames += ['al', 'scd']
+        Extract = self.md_extract(tsnames)
+        prop_return = OrderedDict([(old_map[i], Extract[i]) for i in Extract.keys() if i in old_map])
         return prop_return
 
-    def md_extract(self, tsspec, verbose=True):
+    def md_extract(self, tsnames, tsspec={}, verbose=True):
         """
         Extract time series from the MD trajectory / energy file.
         Since Gromacs can do so many things in a single call to
         g_energy, we implement all the functionality in a single big
         function (it can be split off later.)
 
+        @param[in] tsnames List of tsnames, containing names of
+        timeseries that need to be evaluated.
+
         @param[in] tsspec Dictionary with tsnames : tsparams key/value
         pairs.  tsparams contains any extra information needed to
         calculate the observable (e.g. atom indices in S_cd) but it
-        may also be None.
+        isn't strictly required.
         
         @return answer Dictionary with tsnames : timeseries key/value pairs.
         The leading dimension of the time series is always the sample axis.
@@ -1251,7 +1246,7 @@ class GMX(Engine):
         # Term names that we want to get from g_energy.
         ekeep = []
         # Save anything that comes before Total-Energy if doing an energy component analysis.
-        if 'components' in tsspec:
+        if 'components' in tsnames:
             ecomp = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
             ekeep += ecomp[:]
         # These are time series which can be directly copied from g_energy output.
@@ -1259,10 +1254,10 @@ class GMX(Engine):
                      'temperature' : 'Temperature', 'pressure' : 'Pressure', 'volume' : 'Volume',
                      'density' : 'Density', 'pv' : 'pV'}
         for i in copy_keys:
-            if i in tsspec and copy_keys[i] not in ekeep:
+            if i in tsnames and copy_keys[i] not in ekeep:
                 ekeep.append(copy_keys[i])
         # Area per lipid requires Box-X and Box-Y time series.
-        if 'al' in tsspec:
+        if 'al' in tsnames:
             ekeep += ['Box-X', 'Box-Y']
         ekeep = list(set(ekeep))
         eksort = []
@@ -1276,45 +1271,44 @@ class GMX(Engine):
         # Perform energy component analysis and return properties.
         self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(eksort))
 
-        
-        DF = pd.DataFrame([[float(i) for i in line.split()[1:]] for line in open("%s-md-energy.xvg" % self.name)], columns=eksort,
-                          index = pd.Index([float(line.split()[0]) for line in open("%s-md-energy.xvg" % self.name)], name='time'))
+        tarray = np.array([float(line.split()[0]) for line in open("%s-md-energy.xvg" % self.name)])
+        times = pd.Index(tarray, name='time')
+        xvgdata = [[float(i) for i in line.split()[1:]] for line in open("%s-md-energy.xvg" % self.name)]
+        xvgdf = pd.DataFrame(xvgdata, columns=eksort, index = times)
 
 
-        # Okay, I'm not completely pandas-crazy yet.
+        # Attempt to use Pandas more effectively.
         Output = OrderedDict()
 
+        Output['time'] = tarray
         # Now take the output values from g_energy and allocate them into the Output dictionary.
-        for i in tsspec:
+        for i in tsnames:
             if i in copy_keys:
-                Output[i] = np.array(DF[copy_keys[i]])
-        if 'components' in tsspec:
-            Components = OrderedDict()
-            for i in ecomp:
-                Components[i] = np.array(DF[i])
-            Output['components'] = Components
+                Output[i] = np.array(xvgdf[copy_keys[i]])
+        if 'components' in tsnames:
+            # Energy component analysis is a DataFrame.
+            Output['components'] = xvgdf[ecomp]
 
         # Area per lipid.
         # HARD CODED NUMBER: number of lipid molecules!
-        if 'al' in tsspec:
-            Output['al'] = np.array(DF['Box-X'])*np.array(DF['Box-Y']) / 64
+        if 'al' in tsnames:
+            Output['al'] = np.array(xvgdf['Box-X'])*np.array(xvgdf['Box-Y']) / 64
 
         # Deuterium order parameter.
         # HARD CODED: atom names of lipid tails!
-        if 'scd' in tsspec:
+        if 'scd' in tsnames:
             n_snap = self.n_snaps(nsteps, 1000, timestep)
-            Scds = self.calc_scd(n_snap, timestep)
-            Output['scd'] = Scds
+            Output['scd'] = self.calc_scd(n_snap, timestep)
 
         # Dipole moments; note we use g_dipoles and not the multipole_moments function.
-        if 'dipole' in tsspec:
+        if 'dipole' in tsnames:
             self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % 
                          (self.name, self.name, self.name), stdin="System\n")
             Output['dipole'] = np.array([[float(i) for i in line.split()[1:4]] 
-                                          for line in open("%s-md-dip.xvg" % self.name)])
-
+                                         for line in open("%s-md-dip.xvg" % self.name)])
+            
+        # We could convert it to a Panel if we wanted, but I'm not fully confident using it...
         return Output
-        
 
     def md(self, nsteps=0, nequil=0, verbose=False, deffnm=None, **kwargs):
         

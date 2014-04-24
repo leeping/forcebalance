@@ -25,6 +25,7 @@ from forcebalance.nifty import click
 from forcebalance.nifty import lp_dump, lp_load, wopen
 from forcebalance.nifty import printcool, printcool_dictionary
 from forcebalance.molecule import Molecule
+from forcebalance.thermo import energy_derivatives
 
 from collections import OrderedDict
 
@@ -152,6 +153,9 @@ def main():
     logger.info("MD simulation took %.3f seconds\n" % click())
     # Extract properties.
     Results = Engine.md_extract(OrderedDict([(i, {}) for i in Sim.timeseries.keys()]))
+    # Calculate energy and dipole derivatives if needed.
+    if AGrad:
+        Results['derivatives'] = energy_derivatives(Engine, FF, mvals, h, pgrad, dipole='dipole' in Sim.timeseries.keys())
     # Dump results to file
     logger.info("Writing final force field.\n")
     pvals = FF.make(mvals)

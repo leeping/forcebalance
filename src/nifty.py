@@ -320,6 +320,14 @@ def flat(vec):
     """
     return np.array(vec).reshape(-1)
 
+def getval(dframe, col):
+    """ Extract the single non-NaN value from a column. """
+    nnan = [i for i in dframe[col] if not isnpnan(i)]
+    if len(nnan) != 1:
+        logger.error('%i values in column %s are not NaN (expected only 1)' % (len(nnan), col))
+        raise RuntimeError
+    return nnan[0]
+
 def monotonic(arr, start, end):
     # Make sure an array is monotonically decreasing from the start to the end.
     a0 = arr[start]
