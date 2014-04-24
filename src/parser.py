@@ -123,7 +123,7 @@ gen_opts_types = {
                  "adaptive_damping"       : (0.5,   10, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.', 'Main Optimizer'),
                  "error_tolerance"        : (0.0,   10, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.', 'Main Optimizer'),
                  "search_tolerance"       : (1e-4, -10, 'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.', 'Main Optimizer with negative mintrust; advanced usage'),
-                 "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER']),
                  },
     'sections': {"read_mvals" : (None, 100, 'Paste mathematical parameters into the input file for them to be read in directly', 'Restarting an optimization'),
                  "read_pvals" : (None, 100, 'Paste physical parameters into the input file for them to be read in directly', 'Restarting an optimization (recommend use_mvals instead)'),
@@ -151,14 +151,15 @@ tgt_opts_types = {
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_ndx"               : (None, -10, 'Gromacs .ndx files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
-                 "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),
+                 "source"                : ('data.txt', 0, 'Text file containing source data (experimental data, parameters for observable models, weights).', 'Thermodynamic properties target', 'thermo'),
                  "read"                  : (None, 50, 'Provide a temporary directory ".tmp" to read data from a previous calculation on the initial iteration (for instance, to restart an aborted run).', 'Liquid and Remote targets', 'Liquid, Remote'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
                  },
     'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
-                 "quantities" : ([], 100, 'List of quantities to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
+                 "observables" : ([], 100, 'List of observables to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
+                 "simulations" : ([], 100, 'List of simulations to be run (in order to calculate fitting observables)', 'Thermodynamic properties target', 'thermo'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
@@ -175,7 +176,6 @@ tgt_opts_types = {
                  "save_traj"          : (0, -10, 'Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save', 'Condensed phase properties', 'Liquid, Lipid'),
                  "eq_steps"           : (20000, 0, 'Number of time steps for the equilibration run.', 'Thermodynamic property targets', 'thermo'),
                  "md_steps"           : (50000, 0, 'Number of time steps for the production run.', 'Thermodynamic property targets', 'thermo'),
-                 "n_sim_chain"        : (1, 0, 'Number of simulations required to calculate quantities.', 'Thermodynamic property targets', 'thermo'),
                  },
     'bools'   : {"whamboltz"        : (0, -100, 'Whether to use WHAM Boltzmann Weights', 'Ab initio targets with Boltzmann weights (advanced usage)', 'AbInitio'),
                  "sampcorr"         : (0, -150, 'Whether to use the archaic sampling correction', 'Energy + Force Matching, very old option, do not use', 'AbInitio'),
@@ -239,6 +239,8 @@ tgt_opts_types = {
                  "self_pol_mu0"  : (0.0, -150, 'Gas-phase dipole parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "epsgrad"         : (0.0, -150, 'Gradient below this threshold will be set to zero.', 'All targets'),
+                 "timestep"               : (1.0, 0, 'Time step for molecular dynamics (in femtoseconds).', 'Thermodynamic property targets', 'thermo'),
+                 "interval"               : (1.0, 0, 'Sampling interval for molecular dynamics (in picoseconds).', 'Thermodynamic property targets', 'thermo'),
                  },
     'sections': {}
     }
@@ -286,6 +288,8 @@ bkwd = {"simtype" : "type",
         "gas_equ_steps" : "gas_eq_steps",
         "lipid_prod_steps" : "lipid_md_steps",
         "lipid_equ_steps" : "lipid_eq_steps",
+        "expdata_txt" : "source", 
+        "quantities" : "observables", 
         }
 
 ## Listing of sections in the input file.

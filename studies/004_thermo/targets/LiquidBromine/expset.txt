@@ -1,0 +1,8 @@
+# Experimental data for liquid bromine.
+
+ Index  Temp (K) Pressure (bar) Density (kg/m^3) w   Hvap ( kJ/mol ) w    
+ 1      298.15   1.01325        3102.8           1.0 29.96           1.0  
+
+# Variables: Denominators and weights for quantities
+Denoms  = 30 0.3
+Weights = 1.0 1.0

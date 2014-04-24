@@ -3,8 +3,9 @@ import numpy as np
 
 from forcebalance.finite_difference import fdwrap, f12d3p
 from forcebalance.molecule import Molecule
-from forcebalance.nifty import col, flat, statisticalInefficiency
-from forcebalance.nifty import printcool
+from forcebalance.nifty import col, flat, getval
+from forcebalance.nifty import printcool, statisticalInefficiency
+from forcebalance.optimizer import Counter
 
 from collections import OrderedDict
 
@@ -14,8 +15,7 @@ logger = getLogger(__name__)
 # method mean_stderr
 def mean_stderr(ts):
     """Return mean and standard deviation of a time series ts."""
-    return np.mean(ts), \
-      np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
+    return np.mean(ts), np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
 
 # method energy_derivatives
 def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True):
@@ -63,44 +63,36 @@ def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True):
         G[i,:]   = EDG[:]
     return G
 
-class Quantity(object):
+class Observable(object):
     """
-    Base class for thermodynamical quantity used for fitting. This can
+    Base class for thermodynamical observable used for fitting. This can
     be any experimental data that can be calculated as an ensemble
     average from a simulation.
 
     Data attributes
     ---------------
     name : string
-        Identifier for the quantity that is specified in `quantities` in Target
+        Identifier for the observable that is specified in `observables` in Target
         options.
-    engname : string
-        Use this engine to extract the quantity from the simulation results.
-        At present, only `gromacs` is supported.
-    temperature : float
-        Calculate the quantity at this temperature (in K).
-    pressure : float
-        Calculate the quantity at this pressure (in bar).
-        
     """
-    def __init__(self, engname, temperature, pressure, name=None):
-        self.name        = name if name is not None else "empty"
-        self.engname     = engname
-        self.temperature = temperature
-        self.pressure    = pressure
-                    
+    def __init__(self, source):
+        # Reference data which can be useful in calculating the observable.
+        if 'temp' in source: self.temp = getval(source, 'temp')
+        if 'pres' in source: self.pres = getval(source, 'pres')
+        self.Data = source[self.columns]
+        
     def __str__(self):
-        return "quantity is " + self.name.capitalize() + "."
+        return "Observable = " + self.name.capitalize() + "; Columns = " + ', '.join(self.columns)
 
     def extract(self, engines, FF, mvals, h, AGrad=True):
-        """Calculate and extract the quantity from MD results. How this is done
-        depends on the quantity and the engine so this must be
+        """Calculate and extract the observable from MD results. How this is done
+        depends on the observable and the engine so this must be
         implemented in the subclass.
 
         Parameters
         ----------
         engines : list
-            A list of Engine objects that are requred to calculate the quantity.
+            A list of Engine objects that are requred to calculate the observable.
         FF : FF
             Force field object.
         mvals : list
@@ -114,92 +106,106 @@ class Quantity(object):
         -------
         result : (float, float, np.array)
             The returned tuple is (Q, Qerr, Qgrad), where Q is the calculated
-            quantity, Qerr is the calculated standard deviation of the quantity,
+            observable, Qerr is the calculated standard deviation of the observable,
             and Qgrad is a M-array with the calculated gradients for the
-            quantity, with M being the number of force field parameters that are
+            observable, with M being the number of force field parameters that are
             being fitted. 
         
         """
         logger.error("Extract method not implemented in base class.\n")    
         raise NotImplementedError
 
-# class Quantity_Density
-class Quantity_Density(Quantity):
-    def __init__(self, engname, temperature, pressure, name=None):
-        """ Density. """
-        super(Quantity_Density, self).__init__(engname, temperature, pressure, name)
-        
-        self.name = name if name is not None else "density"
+    def aggregate(self, Sims, AGrad, cycle=None):
+        print self.name
+        if cycle == None: cycle = Counter()
+        # Different from the Results objects in the Simulation, this
+        # one is keyed by the simulation type then by the time series
+        # data type.
+        self.TimeSeries = OrderedDict([(i, OrderedDict()) for i, j in self.requires.items()])
+        for stype in self.requires:
+            for dtype in self.requires[stype]:
+                self.TimeSeries[stype][dtype] = np.concatenate([Sim.Results[cycle][dtype] for Sim in Sims if Sim.type == stype])
+        if AGrad:
+            # Also aggregate the derivative information along the second axis (snapshot axis)
+            self.Derivatives = OrderedDict()
+            for stype in self.requires:
+                # The derivatives that we have may be obtained from the 'derivatives' data structure of the first Simulation
+                # that matches the required simulation type.
+                self.Derivatives[stype] = OrderedDict()
+                for dtype in [Sim.Results[cycle]['derivatives'].keys() for Sim in Sims if Sim.type == stype][0]:
+                    self.Derivatives[stype][dtype] = np.concatenate([Sim.Results[cycle]['derivatives'][dtype] for Sim in Sims if Sim.type == stype], axis=1)
 
-    def extract(self, engines, FF, mvals, h, pgrad, AGrad=True):         
+# class Observable_Density
+class Observable_Density(Observable):
+
+    """ 
+    The Observable_Density class implements common methods for
+    extracting the density from a simulation, but does not specify the
+    simulation itself ('requires' attribute).  Don't create a
+    Density object directly, use the Liquid_Density and Solid_Density
+    derived classes.
+
+    This is due to our overall framework that each observable must
+    have a unique list of required simulations, yet the formula for
+    calculating the density and its derivative is always the same.
+    """
+
+    def __init__(self, source):
+        # Name of the observable.
+        self.name = 'density'
+        # Columns that are taken from the data table.
+        self.columns = ['density']
+        super(Observable_Density, self).__init__(source)
+
+    def evaluate(self, AGrad):         
         #==========================================#
         #  Physical constants and local variables. #
         #==========================================#
         # Energies in kJ/mol and lengths in nanometers.
         kB    = 0.008314472471220214
-        kT    = kB*self.temperature
+        kT    = kB*self.temp
         Beta  = 1.0/kT
         mBeta = -Beta
- 
-        #======================================================#
-        #  Get simulation properties depending on the engines. #
-        #======================================================#
-        if self.engname == "gromacs":
-            # Default name
-            deffnm = os.path.basename(os.path.splitext(engines[0].mdene)[0])
-            # What energy terms are there and what is their order
-            energyterms = engines[0].energy_termnames(edrfile="%s.%s" % (deffnm, "edr"))
-            # Grab energy terms to print and keep track of energy term order.
-            ekeep  = ['Total-Energy', 'Potential', 'Kinetic-En.', 'Temperature']
-            ekeep += ['Volume', 'Density']
-
-            ekeep_order = [key for (key, value) in
-                           sorted(energyterms.items(), key=lambda (k, v) : v)
-                           if key in ekeep]
-
-            # Perform energy component analysis and return properties.
-            engines[0].callgmx(("g_energy " +
-                                "-f %s.%s " % (deffnm, "edr") +
-                                "-o %s-energy.xvg " % deffnm +
-                                "-xvg no"),
-                                stdin="\n".join(ekeep))
-            
-        # Read data and store properties by grabbing columns in right order.
-        data        = np.loadtxt("%s-energy.xvg" % deffnm)            
-        Energy      = data[:, ekeep_order.index("Total-Energy") + 1]
-        Potential   = data[:, ekeep_order.index("Potential") + 1]
-        Kinetic     = data[:, ekeep_order.index("Kinetic-En.") + 1]
-        Volume      = data[:, ekeep_order.index("Volume") + 1]
-        Temperature = data[:, ekeep_order.index("Temperature") + 1]
-        Density     = data[:, ekeep_order.index("Density") + 1]
-
-        #============================================#
-        #  Compute the potential energy derivatives. #
-        #============================================#
-        logger.info(("Calculating potential energy derivatives " +
-                     "with finite difference step size: %f\n" % h))
-        printcool("Initializing array to length %i" % len(Energy),
-                  color=4, bold=True)    
-        G = energy_derivatives(engines[0], FF, mvals, h, pgrad, len(Energy), AGrad)
-        
-        #=======================================#
-        #  Quantity properties and derivatives. #
-        #=======================================#
+        phase = self.requires.keys()[0]
+        # Density time series.
+        Density  = self.TimeSeries[phase]['density']
         # Average and error.
         Rho_avg, Rho_err = mean_stderr(Density)
-        # Analytic first derivative.
-        Rho_grad = mBeta * (flat(np.mat(G) * col(Density)) / len(Density) \
-                            - np.mean(Density) * np.mean(G, axis=1))
-            
-        return Rho_avg, Rho_err, Rho_grad
+        Answer = OrderedDict()
+        Answer['mean'] = Rho_avg
+        Answer['stderr'] = Rho_err
+        if AGrad:
+            G = self.Derivatives[phase]['potential']
+            # Analytic first derivative.
+            Rho_grad = mBeta * (flat(np.matrix(G) * col(Density)) / len(Density)
+                                - np.mean(Density) * np.mean(G, axis=1))
+            Answer['grad'] = Rho_grad
+        return Answer
 
-# class Quantity_H_vap
-class Quantity_H_vap(Quantity):
-    def __init__(self, engname, temperature, pressure, name=None):
+class Liquid_Density(Observable_Density):
+    def __init__(self, source):
+        # The density time series is required from the simulation.
+        self.requires = OrderedDict([('liquid', ['density'])])
+        super(Liquid_Density, self).__init__(source)
+
+class Solid_Density(Observable_Density):
+    def __init__(self, source):
+        # The density time series is required from the simulation.
+        self.requires = OrderedDict([('solid', ['density'])])
+        super(Solid_Density, self).__init__(source)
+
+# class Observable_H_vap
+class Observable_H_vap(Observable):
+    def __init__(self, source):
         """ Enthalpy of vaporization. """
-        super(Quantity_H_vap, self).__init__(engname, temperature, pressure, name)
-        
-        self.name = name if name is not None else "H_vap"
+        # Name of the observable.
+        self.name = 'hvap'
+        # Columns that are taken from the data table.
+        self.columns = ['hvap']
+        # Get energy/volume from liquid simulation, and energy from gas simulation.
+        self.requires = OrderedDict([('liquid', ['energy', 'volume']), ('gas', ['energy'])])
+        # Initialize the base class
+        super(Observable_H_vap, self).__init__(source)
 
     def extract(self, engines, FF, mvals, h, pgrad, AGrad=True): 
         #==========================================#
@@ -274,9 +280,9 @@ class Quantity_H_vap(Quantity):
         G  = energy_derivatives(engines[0], FF, mvals, h, pgrad, len(Energy), AGrad)
         Gm = energy_derivatives(engines[1], FF, mvals, h, pgrad, len(mEnergy), AGrad)
                 
-        #=======================================#
-        #  Quantity properties and derivatives. #
-        #=======================================#
+        #=========================================#
+        #  Observable properties and derivatives. #
+        #=========================================#
         # Average and error.
         E_avg, E_err     = mean_stderr(Energy)
         Em_avg, Em_err   = mean_stderr(mEnergy)
@@ -298,3 +304,63 @@ class Quantity_H_vap(Quantity):
 
         return Hvap_avg, Hvap_err, Hvap_grad
 
+# class Observable_Al
+class Observable_Al(Observable):
+    def __init__(self, source):
+        """ Area per lipid. """
+        # Name of the observable.
+        self.name = 'al'
+        # Columns that are taken from the data table.
+        self.columns = ['al']
+        # Get area per lipid from the bilayer simulation.
+        self.requires = OrderedDict([('bilayer', ['al'])])
+        # Initialize the base class
+        super(Observable_Al, self).__init__(source)
+
+# class Observable_Scd
+class Observable_Scd(Observable):
+    def __init__(self, source):
+        """ Deuterium order parameter. """
+        # Name of the observable.
+        self.name = 'scd'
+        # Columns that are taken from the data table.
+        self.columns = ['scd1_idx', 'scd1', 'scd2_idx', 'scd2']
+        # Get deuterium order parameter from the bilayer simulation.
+        self.requires = OrderedDict([('bilayer', ['scd1', 'scd2'])])
+        # Initialize the base class
+        super(Observable_Scd, self).__init__(source)
+
+# class Lipid_Kappa
+class Lipid_Kappa(Observable):
+    def __init__(self, source):
+        """ Compressibility as calculated for lipid bilayers. """
+        # Name of the observable.
+        self.name = 'kappa'
+        # Columns that are taken from the data table.
+        self.columns = ['kappa']
+        # Get area per lipid from the bilayer simulation.
+        self.requires = OrderedDict([('bilayer', ['al'])])
+        # Initialize the base class
+        super(Lipid_Kappa, self).__init__(source)
+
+# class Liquid_Kappa
+class Liquid_Kappa(Observable):
+    def __init__(self, source):
+        """ Compressibility as calculated for liquids. """
+        # Name of the observable.
+        self.name = 'kappa'
+        # Columns that are taken from the data table.
+        self.columns = ['kappa']
+        # Get area per lipid from the bilayer simulation.
+        self.requires = OrderedDict([('liquid', ['volume'])])
+        # Initialize the base class
+        super(Liquid_Kappa, self).__init__(source)
+
+## A mapping that takes us from observable names to possible Observable objects.
+OMap = {'density' : [Liquid_Density, Solid_Density],
+        'rho' : [Liquid_Density, Solid_Density],
+        'hvap' : [Observable_H_vap],
+        'h_vap' : [Observable_H_vap],
+        'al' : [Observable_Al],
+        'kappa' : [Liquid_Kappa, Lipid_Kappa],
+        'scd' : [Observable_Scd]}

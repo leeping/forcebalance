@@ -8,6 +8,7 @@
 
 import os, sys
 import re
+import pandas as pd
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 from forcebalance import BaseReader
@@ -1120,13 +1121,18 @@ class GMX(Engine):
         if temperature != None:
             md_opts["ref_t"] = temperature
             md_opts["gen_vel"] = "no"
+            # Set some default methods for temperature coupling.
             md_defs["tc_grps"] = "System"
             md_defs["tcoupl"] = "v-rescale"
             md_defs["tau_t"] = 1.0
         if self.pbc:
             md_opts["comm_mode"] = "linear"
+            # Removing center of mass motion at every time step should not impact performance.
+            # http://gromacs.5086.x6.nabble.com/COM-motion-removal-td4413458.html
+            md_opts["nstcomm"] = 1
             if pressure != None:
                 md_opts["ref_p"] = pressure
+                # Set some default methods for pressure coupling.
                 md_defs["pcoupl"] = "parrinello-rahman"
                 md_defs["tau_p"] = 1.5
         else:
@@ -1172,64 +1178,137 @@ class GMX(Engine):
         self.warngmx("grompp -c %s -p %s.top -f %s-md.mdp -o %s-md.tpr" % (gro2, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
         self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
 
+        if verbose: logger.info("Finished!\n")
+
+        # Final frame of molecular dynamics.
+        self.md_final = "%s-md.gro" % self.name
+
+        # Name of the molecular dynamics trajectory.
         self.mdtraj = '%s-md.trr' % self.name
 
-        if verbose: logger.info("Production run finished, calculating properties...\n")
-        # Figure out dipoles - note we use g_dipoles and not the multipole_moments function.
-        self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
+        # Call md_extract and return the prop_return dictionary (backward compatibility with old functionality.)
+        old_map = {'potential' : 'Potentials', 'kinetic' : 'Kinetics', 'dipole' : 'Dips', 'components' : 'Ecomps',
+                   'density' : 'Rhos', 'volume' : 'Volumes', 'al' : 'Als', 'scd' : 'Scds'}
+        tsnames = ['potential', 'kinetic', 'dipole', 'components']
+        if self.pbc: tsnames += ['density', 'volume']
+        if bilayer: tsnames += ['al', 'scd']
+        Extract = self.md_extract(tsnames)
+        prop_return = OrderedDict([(old_map[i], Extract[i]) for i in Extract.keys() if i in old_map])
+        return prop_return
+
+    def md_extract(self, tsnames, tsspec={}, verbose=True):
+        """
+        Extract time series from the MD trajectory / energy file.
+        Since Gromacs can do so many things in a single call to
+        g_energy, we implement all the functionality in a single big
+        function (it can be split off later.)
+
+        @param[in] tsnames List of tsnames, containing names of
+        timeseries that need to be evaluated.
+
+        @param[in] tsspec Dictionary with tsnames : tsparams key/value
+        pairs.  tsparams contains any extra information needed to
+        calculate the observable (e.g. atom indices in S_cd) but it
+        isn't strictly required.
+        
+        @return answer Dictionary with tsnames : timeseries key/value pairs.
+        The leading dimension of the time series is always the sample axis.
+        """
+
+        if not hasattr(self, 'mdtraj') or not os.path.exists(self.mdtraj):
+            logger.error('Called the md_extract method without having an MD trajectory!')
+            raise RuntimeError
+
+        if verbose: logger.info("Calculating properties...\n")
 
         # Figure out which energy terms need to be printed.
         energyterms = self.energy_termnames(edrfile="%s-md.edr" % self.name)
-        ekeep = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
-        ekeep += ['Temperature', 'Volume', 'Density']
+        """
+        For reference the menu from g_energy may look like this.
+        
+        Select the terms you want from the following list by
+        selecting either (part of) the name or the number or a combination.
+        End your selection with an empty line or a zero.
+        -------------------------------------------------------------------
+        1  LJ-(SR)          2  Disper.-corr.    3  Coulomb-(SR)     4  Potential     
+        5  Kinetic-En.      6  Total-Energy     7  Temperature      8  Pres.-DC      
+        9  Pressure        10  Constr.-rmsd    11  Box-X           12  Box-Y         
+        13  Box-Z           14  Volume          15  Density         16  pV            
+        17  Enthalpy        18  Vir-XX          19  Vir-XY          20  Vir-XZ        
+        21  Vir-YX          22  Vir-YY          23  Vir-YZ          24  Vir-ZX        
+        25  Vir-ZY          26  Vir-ZZ          27  Pres-XX         28  Pres-XY       
+        29  Pres-XZ         30  Pres-YX         31  Pres-YY         32  Pres-YZ       
+        33  Pres-ZX         34  Pres-ZY         35  Pres-ZZ         36  #Surf*SurfTen 
+        37  Box-Vel-XX      38  Box-Vel-YY      39  Box-Vel-ZZ      40  T-System      
+        41  Lamb-System   
+        """
 
-        # Calculate deuterium order parameter for bilayer optimization.
-        if bilayer:
-            n_snap = self.n_snaps(nsteps, 1000, timestep)
-            Scds = self.calc_scd(n_snap, timestep)
-            al_vars = ['Box-Y', 'Box-X']
-            self.callgmx("g_energy -f %s-md.edr -o %s-md-energy-xy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(al_vars))
-            Xs = []
-            Ys = []
-            for line in open("%s-md-energy-xy.xvg" % self.name):
-                s = [float(i) for i in line.split()]
-                Xs.append(s[-1])
-                Ys.append(s[-2])
-            Xs = np.array(Xs)
-            Ys = np.array(Ys)
-            Als = (Xs * Ys) / 64
-        else:
-            Scds = 0
-            Als = 0
+        # Term names that we want to get from g_energy.
+        ekeep = []
+        # Save anything that comes before Total-Energy if doing an energy component analysis.
+        if 'components' in tsnames:
+            ecomp = [k for k,v in energyterms.items() if v <= energyterms['Total-Energy']]
+            ekeep += ecomp[:]
+        # These are time series which can be directly copied from g_energy output.
+        copy_keys = {'energy' : 'Total-Energy', 'potential' : 'Potential', 'kinetic' : 'Kinetic-En.',
+                     'temperature' : 'Temperature', 'pressure' : 'Pressure', 'volume' : 'Volume',
+                     'density' : 'Density', 'pv' : 'pV'}
+        for i in copy_keys:
+            if i in tsnames and copy_keys[i] not in ekeep:
+                ekeep.append(copy_keys[i])
+        # Area per lipid requires Box-X and Box-Y time series.
+        if 'al' in tsnames:
+            ekeep += ['Box-X', 'Box-Y']
+        ekeep = list(set(ekeep))
+        eksort = []
+        for i in energyterms.keys():
+            for j in ekeep:
+                if j not in energyterms.keys():
+                    logger.error('Energy term in ekeep %s is not present in edr file' % j)
+                    raise RuntimeError
+                if i == j: eksort.append(j)
 
         # Perform energy component analysis and return properties.
-        self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(ekeep))
-        ecomp = OrderedDict()
-        Rhos = []
-        Volumes = []
-        Kinetics = []
-        Potentials = []
-        for line in open("%s-md-energy.xvg" % self.name):
-            s = [float(i) for i in line.split()]
-            for i in range(len(ekeep) - 2):
-                val = s[i+1]
-                if ekeep[i] in ecomp:
-                    ecomp[ekeep[i]].append(val)
-                else:
-                    ecomp[ekeep[i]] = [val]
-            Rhos.append(s[-1])
-            Volumes.append(s[-2])
-        Rhos = np.array(Rhos)
-        Volumes = np.array(Volumes)
-        Potentials = np.array(ecomp['Potential'])
-        Kinetics = np.array(ecomp['Kinetic-En.'])
-        Dips = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-md-dip.xvg" % self.name)])
-        Ecomps = OrderedDict([(key, np.array(val)) for key, val in ecomp.items()])
-        # Initialized property dictionary.
-        prop_return = OrderedDict()
-        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'Als': Als, 'Scds': Scds})
-        if verbose: logger.info("Finished!\n")
-        return prop_return
+        self.callgmx("g_energy -f %s-md.edr -o %s-md-energy.xvg -xvg no" % (self.name, self.name), stdin="\n".join(eksort))
+
+        tarray = np.array([float(line.split()[0]) for line in open("%s-md-energy.xvg" % self.name)])
+        times = pd.Index(tarray, name='time')
+        xvgdata = [[float(i) for i in line.split()[1:]] for line in open("%s-md-energy.xvg" % self.name)]
+        xvgdf = pd.DataFrame(xvgdata, columns=eksort, index = times)
+
+
+        # Attempt to use Pandas more effectively.
+        Output = OrderedDict()
+
+        Output['time'] = tarray
+        # Now take the output values from g_energy and allocate them into the Output dictionary.
+        for i in tsnames:
+            if i in copy_keys:
+                Output[i] = np.array(xvgdf[copy_keys[i]])
+        if 'components' in tsnames:
+            # Energy component analysis is a DataFrame.
+            Output['components'] = xvgdf[ecomp]
+
+        # Area per lipid.
+        # HARD CODED NUMBER: number of lipid molecules!
+        if 'al' in tsnames:
+            Output['al'] = np.array(xvgdf['Box-X'])*np.array(xvgdf['Box-Y']) / 64
+
+        # Deuterium order parameter.
+        # HARD CODED: atom names of lipid tails!
+        if 'scd' in tsnames:
+            n_snap = self.n_snaps(nsteps, 1000, timestep)
+            Output['scd'] = self.calc_scd(n_snap, timestep)
+
+        # Dipole moments; note we use g_dipoles and not the multipole_moments function.
+        if 'dipole' in tsnames:
+            self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % 
+                         (self.name, self.name, self.name), stdin="System\n")
+            Output['dipole'] = np.array([[float(i) for i in line.split()[1:4]] 
+                                         for line in open("%s-md-dip.xvg" % self.name)])
+            
+        # We could convert it to a Panel if we wanted, but I'm not fully confident using it...
+        return Output
 
     def md(self, nsteps=0, nequil=0, verbose=False, deffnm=None, **kwargs):
         
@@ -1491,12 +1570,18 @@ class Thermo_GMX(Thermo):
         self.set_option(options,'gmxpath')
         # Suffix for GROMACS executables.
         self.set_option(options,'gmxsuffix')
+        # Engine for calculating things locally (e.g. polarization correction)
         self.engine_ = GMX
         # Name of the engine to pass to scripts.
         self.engname = "gromacs"
+        # Valid coordinate suffix.
+        self.crdsfx = ['.gro', '.pdb']
+        # Auxiliary (e.g. topology) files.
+        self.auxsfx = [['.mdp'], ['.top']]
         # Command prefix.
         self.mdpfx = "bash gmxprefix.bash"
         # Scripts to be copied from the ForceBalance installation directory.
-        self.scripts = ['gmxprefix.bash', 'md_chain.py']
+        self.scripts = ['gmxprefix.bash', 'md_one.py']
         ## Initialize base class.
         super(Thermo_GMX,self).__init__(options,tgt_opts,forcefield)
+ 

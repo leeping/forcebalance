@@ -179,7 +179,7 @@ class TestBromineStudy(ForceBalanceTestCase):
 class TestThermoBromineStudy(ForceBalanceTestCase):
     def setUp(self):
         super(ForceBalanceTestCase,self).setUp()
-        os.chdir('studies/004_thermo_liquid_bromine')
+        os.chdir('studies/004_thermo')
 
     def tearDown(self):
         os.system('rm -rf results *.bak *.tmp')

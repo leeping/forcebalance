@@ -237,6 +237,18 @@ def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidt
 #===============================#
 #| Math: Variable manipulation |#
 #===============================#
+def isnpnan(var):
+    """ 
+
+    Determine whether a variable is np.nan.  I wrote this function
+    because np.isnan would crash if we use it on a dtype that is not
+    np.float
+    
+    """
+    if any([isinstance(var, x) for x in [float, np.float, np.float32, np.float64, np.double]]):
+        return np.isnan(var)
+    else: return False
+
 def isint(word):
     """ONLY matches integers! If you have a decimal point? None shall pass!
 
@@ -307,6 +319,14 @@ def flat(vec):
     @return answer The flattened data
     """
     return np.array(vec).reshape(-1)
+
+def getval(dframe, col):
+    """ Extract the single non-NaN value from a column. """
+    nnan = [i for i in dframe[col] if not isnpnan(i)]
+    if len(nnan) != 1:
+        logger.error('%i values in column %s are not NaN (expected only 1)' % (len(nnan), col))
+        raise RuntimeError
+    return nnan[0]
 
 def monotonic(arr, start, end):
     # Make sure an array is monotonically decreasing from the start to the end.

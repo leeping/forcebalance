@@ -66,9 +66,11 @@ $target
 name LiquidBromine
 type Thermo_GMX
 weight 1.0
-expdata_txt expset.txt
+source expset.txt
 quantities density h_vap
-n_sim_chain 2
+simulations liquid gas
 md_steps 100000
 eq_steps 50000
+interval 0.1
+timestep 2.0
 $end

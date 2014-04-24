@@ -1,0 +1,5 @@
+Index   T           P (atm)   Al            Al_wt         Scd1_idx      Scd1          Scd2_idx      Scd2          Scd1_wt       Kappa         Kappa_wt      n_ic
+50C     323.15      1         0.631         1             scd323.txt:1  scd323.txt:2  scd323.txt:3  scd323.txt:4  1             58            1             10
+60C     333.15      1         0.65          1             scd333.txt:1  scd333.txt:2  scd333.txt:3  scd333.txt:4  0             58            0             10
+65C     338.15      1         0.671         1             scd338.txt:1  scd338.txt:2  scd338.txt:3  scd338.txt:4  1             58            0             10
+80C     353.15      1         0.719         1             scd353.txt:1  scd353.txt:2  scd353.txt:3  scd353.txt:4  1             58            0             10
