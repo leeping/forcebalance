@@ -236,6 +236,32 @@ if "forcebalance" in __name__:
 ## One bohr equals this many angstroms
 bohrang = 0.529177249
 
+def unmangle(M1, M2):
+    """ 
+    Create a mapping that takes M1's atom indices to M2's atom indices based on position.  
+    
+    If we start with atoms in molecule "PDB", and the new molecule "M" 
+    contains re-numbered atoms, then this code works:
+    
+    M.elem = list(np.array(PDB.elem)[unmangled])
+    """
+    if len(M1) != 1 or len(M2) != 1:
+        logger.error("Unmangler only deals with length-1 molecule objects\n")
+        raise RuntimeError
+    if M1.na != M2.na:
+        logger.error("Unmangler only deals with same number of atoms\n")
+        raise RuntimeError
+    unmangler = {}
+    for i in range(M1.na):
+        for j in range(M2.na):
+            if np.linalg.norm(M1.xyzs[0][i] - M2.xyzs[0][j]) < 0.1:
+                unmangler[j] = i
+    unmangled = [unmangler[i] for i in sorted(unmangler.keys())]
+    if len(unmangled) != M1.na:
+        logger.error("Unmangler failed (different structures?)\n")
+        raise RuntimeError
+    return unmangled
+
 def nodematch(node1,node2):
     # Matching two nodes of a graph.  Nodes are equivalent if the elements are the same
     return node1['e'] == node2['e']
@@ -697,7 +723,7 @@ class Molecule(object):
                 return len(self.xyzs[0])
             else:
                 return 0
-            #raise Exception('na is ill-defined if the molecule has no AtomKeys member variables.')
+            #raise RuntimeError('na is ill-defined if the molecule has no AtomKeys member variables.')
         ## These attributes return a list of attribute names defined in this class that belong in the chosen category.
         ## For example: self.FrameKeys should return set(['xyzs','boxes']) if xyzs and boxes exist in self.Data
         elif key == 'FrameKeys':
@@ -738,7 +764,8 @@ class Molecule(object):
                 New.Data[k] = copy.deepcopy(self.Data[k])
             return New
         else:
-            raise Exception('getitem is not implemented for keys of type %s' % str(key))
+            logger.error('getitem is not implemented for keys of type %s\n' % str(key))
+            raise RuntimeError
 
     def __delitem__(self, key):
         """ 
@@ -765,7 +792,8 @@ class Molecule(object):
         """ Add method for Molecule objects. """
         # Check type of other
         if not isinstance(other,Molecule):
-            raise TypeError('A Molecule instance can only be added to another Molecule instance')
+            logger.error('A Molecule instance can only be added to another Molecule instance\n')
+            raise TypeError
         # Create the sum of the two classes by copying the first class.
         Sum = Molecule()
         for key in AtomVariableNames | MetaVariableNames:
@@ -776,7 +804,8 @@ class Molecule(object):
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
                     print i, j, i==j
-                raise Exception('The data member called %s is not the same for these two objects' % key)
+                logger.error('The data member called %s is not the same for these two objects\n' % key)
+                raise RuntimeError
             elif key in self.Data:
                 Sum.Data[key] = copy.deepcopy(self.Data[key])
             elif key in other.Data:
@@ -784,9 +813,11 @@ class Molecule(object):
         for key in FrameVariableNames:
             if both(self, other, key):
                 if type(self.Data[key]) is not list:
-                    raise Exception('Key %s in self is a FrameKey, it must be a list' % key)
+                    logger.error('Key %s in self is a FrameKey, it must be a list\n' % key)
+                    raise RuntimeError
                 if type(other.Data[key]) is not list:
-                    raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
+                    logger.error('Key %s in other is a FrameKey, it must be a list\n' % key)
+                    raise RuntimeError
                 Sum.Data[key] = list(self.Data[key] + other.Data[key])
             elif either(self, other, key):
                 # TINKER 6.3 compatibility - catch the specific case that one has a periodic box and the other doesn't.
@@ -796,21 +827,24 @@ class Molecule(object):
                     elif key in other.Data:
                         self.Data['boxes'] = [other.Data['boxes'][0] for i in range(len(self))]
                 else:
-                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
+                    logger.error('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).\n' % key)
+                    raise RuntimeError
         return Sum
  
     def __iadd__(self,other):
         """ Add method for Molecule objects. """
         # Check type of other
         if not isinstance(other,Molecule):
-            raise TypeError('A Molecule instance can only be added to another Molecule instance')
+            logger.error('A Molecule instance can only be added to another Molecule instance\n')
+            raise TypeError
         # Create the sum of the two classes by copying the first class.
         for key in AtomVariableNames | MetaVariableNames:
             if key in ['fnm', 'ftype', 'bonds']: pass
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
                     print i, j, i==j
-                raise Exception('The data member called %s is not the same for these two objects' % key)
+                logger.error('The data member called %s is not the same for these two objects\n' % key)
+                raise RuntimeError
             # Information from the other class is added to this class (if said info doesn't exist.)
             elif key in other.Data:
                 self.Data[key] = copy.deepcopy(other.Data[key])
@@ -818,9 +852,11 @@ class Molecule(object):
         for key in FrameVariableNames:
             if both(self, other, key):
                 if type(self.Data[key]) is not list:
-                    raise Exception('Key %s in self is a FrameKey, it must be a list' % key)
+                    logger.error('Key %s in self is a FrameKey, it must be a list\n' % key)
+                    raise RuntimeError
                 if type(other.Data[key]) is not list:
-                    raise Exception('Key %s in other is a FrameKey, it must be a list' % key)
+                    logger.error('Key %s in other is a FrameKey, it must be a list\n' % key)
+                    raise RuntimeError
                 self.Data[key] += other.Data[key]
             elif either(self, other, key):
                 # TINKER 6.3 compatibility - catch the specific case that one has a periodic box and the other doesn't.
@@ -830,7 +866,8 @@ class Molecule(object):
                     elif key in other.Data:
                         self.Data['boxes'] = [other.Data['boxes'][0] for i in range(len(self))]
                 else:
-                    raise Exception('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).' % key)
+                    logger.error('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).\n' % key)
+                    raise RuntimeError
         return self
 
     def repair(self, key, klast):
@@ -845,10 +882,39 @@ class Molecule(object):
             # If we only have one box then we can fill in the rest of the trajectory.
             for i in range(diff): self.Data['boxes'].append(self.Data['boxes'][-1])
         else:
-            raise Exception('The keys %s and %s have different lengths (%i %i)'
-                            '- this isn\'t supposed to happen for two AtomKeys member variables.' \
-                                % (key, klast, len(self.Data[key]), len(self.Data[klast])))
+            logger.error('The keys %s and %s have different lengths (%i %i)'
+                         '- this isn\'t supposed to happen for two AtomKeys member variables.' 
+                         % (key, klast, len(self.Data[key]), len(self.Data[klast])))
+            raise RuntimeError
 
+    def reorder_according_to(self, other):
+
+        """ 
+
+        Reorder atoms according to some other Molecule object.  This
+        happens when we run a program like pdb2gmx or pdbxyz and it
+        scrambles our atom ordering, forcing us to reorder the atoms
+        for all frames in the current Molecule object.
+
+        Directions: 
+        (1) Load up the scrambled file as a new Molecule object.
+        (2) Call this function: Original_Molecule.reorder_according_to(scrambled)
+        (3) Save Original_Molecule to a new file name.
+
+        """
+
+        M = self[0]
+        N = other
+        unmangled       = unmangle(M, N)
+        NewData = {}
+        for key in self.AtomKeys:
+            NewData[key] = list(np.array(M.Data[key])[unmangled])
+        for key in self.FrameKeys:
+            if key in ['xyzs', 'qm_forces', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+                NewData[key] = list([self.Data[key][i][unmangled] for i in range(len(self))])
+        for key in NewData:
+            setattr(self, key, copy.deepcopy(NewData[key]))
+            
     def append(self,other):
         self += other
 
@@ -915,7 +981,8 @@ class Molecule(object):
                 ## Try to determine from the file name using the extension.
                 ftype = os.path.splitext(fnm)[1][1:]
             if not os.path.exists(fnm):
-                raise IOError('Tried to create Molecule object from a file that does not exist: %s' % fnm)
+                logger.error('Tried to create Molecule object from a file that does not exist: %s\n' % fnm)
+                raise IOError
             self.Data['ftype'] = ftype
             ## Actually read the file.
             Parsed = self.Read_Tab[self.Funnel[ftype.lower()]](fnm, **kwargs)
@@ -949,7 +1016,8 @@ class Molecule(object):
     def require(self, *args):
         for arg in args:
             if arg not in self.Data:
-                raise Exception("%s is a required attribute for writing this type of file but it's not present" % arg)
+                logger.error("%s is a required attribute for writing this type of file but it's not present\n" % arg)
+                raise RuntimeError
 
     # def read(self, fnm, ftype = None):
     #     """ Read in a file. """
@@ -963,10 +1031,13 @@ class Molecule(object):
 
     def write(self,fnm=None,ftype=None,append=False,select=None,**kwargs):
         if fnm == None and ftype == None:
-            raise Exception("Output file name and file type are not specified.")
+            logger.error("Output file name and file type are not specified.\n")
+            raise RuntimeError
         elif ftype == None:
             ftype = os.path.splitext(fnm)[1][1:]
         ## Fill in comments.
+        if 'comms' not in self.Data:
+            self.comms = ['Generated by ForceBalance from %s: Frame %i of %i' % (fnm, i+1, self.ns) for i in range(self.ns)]
         if 'xyzs' in self.Data and len(self.comms) < len(self.xyzs):
             for i in range(len(self.comms), len(self.xyzs)):
                 self.comms.append("Frame %i: generated by ForceBalance" % i)
@@ -1062,7 +1133,8 @@ class Molecule(object):
     def load_frames(self, fnm):
         NewMol = Molecule(fnm)
         if NewMol.na != self.na:
-            raise Exception('When loading frames, don\'t change the number of atoms.')
+            logger.error('When loading frames, don\'t change the number of atoms.\n')
+            raise RuntimeError
         for key in NewMol.FrameKeys:
             self.Data[key] = NewMol.Data[key]
 
@@ -1089,7 +1161,8 @@ class Molecule(object):
             OtherMol = Molecule(other)
         for key in OtherMol.QuantumKeys:
             if key in AtomVariableNames and len(OtherMol.Data[key]) != self.na:
-                raise Exception('The quantum-key %s is AtomData, but it doesn\'t have the same number of atoms as the Molecule object we\'re adding it to.')
+                logger.error('The quantum-key %s is AtomData, but it doesn\'t have the same number of atoms as the Molecule object we\'re adding it to.')
+                raise RuntimeError
             self.Data[key] = copy.deepcopy(OtherMol.Data[key])
 
     def add_virtual_site(self, idx, **kwargs):
@@ -1098,7 +1171,8 @@ class Molecule(object):
             if key in kwargs:
                 self.Data[key].insert(idx,kwargs[key])
             else:
-                raise Exception('You need to specify %s when adding a virtual site to this molecule.' % key)
+                logger.error('You need to specify %s when adding a virtual site to this molecule.\n' % key)
+                raise RuntimeError
         if 'xyzs' in self.Data:
             for i, xyz in enumerate(self.xyzs):
                 if 'pos' in kwargs:
@@ -1106,7 +1180,8 @@ class Molecule(object):
                 else:
                     self.xyzs[i] = np.insert(xyz, idx, 0.0, axis=0)
         else:
-            raise Exception('You need to have xyzs in this molecule to add a virtual site.')
+            logger.error('You need to have xyzs in this molecule to add a virtual site.\n')
+            raise RuntimeError
 
     def replace_peratom(self, key, orig, want):
         """ Replace all of the data for a certain attribute in the system from orig to want. """
@@ -1115,7 +1190,8 @@ class Molecule(object):
                 if self.Data[key][i] == orig:
                     self.Data[key][i] = want
         else:
-            raise Exception('The key that we want to replace (%s) doesn\'t exist.' % key)
+            logger.error('The key that we want to replace (%s) doesn\'t exist.\n' % key)
+            raise RuntimeError
 
     def replace_peratom_conditional(self, key1, cond, key2, orig, want):
         """ Replace all of the data for a attribute key2 from orig to want, contingent on key1 being equal to cond. 
@@ -1125,7 +1201,8 @@ class Molecule(object):
                 if self.Data[key2][i] == orig and self.Data[key1][i] == cond:
                     self.Data[key2][i] = want
         else:
-            raise Exception('Either the comparison or replacement key (%s, %s) doesn\'t exist.' % (key1, key2))
+            logger.error('Either the comparison or replacement key (%s, %s) doesn\'t exist.\n' % (key1, key2))
+            raise RuntimeError
 
     def atom_select(self,atomslice):
         """ Return a copy of the object with certain atoms selected.  Takes an integer, list or array as argument. """
@@ -1168,7 +1245,8 @@ class Molecule(object):
     def atom_stack(self, other):
         """ Return a copy of the object with another molecule object appended.  WARNING: This function may invalidate stuff like QM energies. """
         if len(other) != len(self):
-            raise Exception('The number of frames of the Molecule objects being stacked are not equal.')
+            logger.error('The number of frames of the Molecule objects being stacked are not equal.\n')
+            raise RuntimeError
 
         New = Molecule()
         for key in self.FrameKeys | self.MetaKeys:
@@ -1184,7 +1262,8 @@ class Molecule(object):
         # Now build the new atom keys.
         for key in self.AtomKeys:
             if key not in other.Data:
-                raise Exception('Trying to stack two Molecule objects - the first object contains %s and the other does not' % (key))
+                logger.error('Trying to stack two Molecule objects - the first object contains %s and the other does not\n' % (key))
+                raise RuntimeError
             if key == 'tinkersuf': # Tinker suffix is a bit tricky
                 NewSuf = []
                 for line in other.Data[key]:
@@ -1201,7 +1280,8 @@ class Molecule(object):
                 elif type(self.Data[key]) is list:
                     New.Data[key] = self.Data[key] + other.Data[key]
                 else:
-                    raise Exception('Cannot stack %s because it is of type %s' % (key, str(type(New.Data[key]))))
+                    logger.error('Cannot stack %s because it is of type %s\n' % (key, str(type(New.Data[key]))))
+                    raise RuntimeError
         if 'bonds' in self.Data and 'bonds' in other.Data:
             New.Data['bonds'] = self.bonds + [(b[0]+self.na, b[1]+self.na) for b in other.bonds]
         return New
@@ -1234,7 +1314,8 @@ class Molecule(object):
         if isinstance(select, list):
             select = np.array(select)
         if center and center_mass:
-            raise Exception('Specify center=True or center_mass=True but set the other one to False')
+            logger.error('Specify center=True or center_mass=True but set the other one to False\n')
+            raise RuntimeError
 
         coms = self.center_of_mass()
         xyz1 = self.xyzs[0]
@@ -1410,7 +1491,8 @@ class Molecule(object):
         dipeptide when comparing to TINKER's analyze program. """
 
         if not hasattr(self, 'topology'):
-            raise RuntimeError("Need to have built a topology to find angles")
+            logger.error("Need to have built a topology to find angles\n")
+            raise RuntimeError
 
         angidx = []
         # Iterate over separate molecules
@@ -1435,7 +1517,8 @@ class Molecule(object):
         program. """
         
         if not hasattr(self, 'topology'):
-            raise RuntimeError("Need to have built a topology to find dihedrals")
+            logger.error("Need to have built a topology to find dihedrals\n")
+            raise RuntimeError
 
         dihidx = []
         # Iterate over separate molecules
@@ -1755,7 +1838,8 @@ class Molecule(object):
         xyzs = []
         boxes = []
         if _dcdlib.vmdplugin_init() != 0:
-            raise IOError("Unable to init DCD plugin")
+            logger.error("Unable to init DCD plugin\n")
+            raise IOError
         natoms = c_int(-1)
         frame  = 0
         dcd       = _dcdlib.open_dcd_read(fnm, "dcd", byref(natoms))
@@ -2232,7 +2316,7 @@ class Molecule(object):
                     for i in range(2, len(s)):
                         bonds.append((int(s[1])-1, int(s[i])-1))
 
-        Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":AtomNames,
+        Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":[str(i) for i in AtomNames],
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
                 "comms":['' for i in range(len(XYZList))]}
 
@@ -2342,7 +2426,8 @@ class Molecule(object):
                     Answer['qcerr'] = line.strip()
                     fatal = 0
                 else:
-                    raise Exception('Calculation encountered a fatal error! (%s)' % line)
+                    logger.error('Calculation encountered a fatal error! (%s)\n' % line)
+                    raise RuntimeError
             if 'Q-Chem fatal error' in line:
                 fatal = 1
             if XMode >= 1:
@@ -2356,7 +2441,8 @@ class Molecule(object):
                     if elem == []:
                         elem = elemThis
                     elif elem != elemThis:
-                        raise Exception('Q-Chem output parser will not work if successive calculations have different numbers of atoms!')
+                        logger.error('Q-Chem output parser will not work if successive calculations have different numbers of atoms!\n')
+                        raise RuntimeError
                     elemThis = []
                     xyzs.append(np.array(xyz))
                     xyz  = []
@@ -2370,6 +2456,11 @@ class Molecule(object):
                     sline = line.split()
                     mkchgThis.append(float(sline[2]))
                     mkspnThis.append(float(sline[3]))
+                elif re.match("^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){1}$", line):
+                    MMode = 2
+                    sline = line.split()
+                    mkchgThis.append(float(sline[2]))
+                    mkspnThis.append(0.0)
                 elif MMode == 2: # Break out of the loop if we encounter anything other than Mulliken charges
                     mkchg.append(mkchgThis[:])
                     mkspn.append(mkspnThis[:])
@@ -2469,7 +2560,7 @@ class Molecule(object):
         if len(Mats['hessian_scf']['All']) > 0:
             Answer['qm_hessians'] = Mats['hessian_scf']['All']
         #else:
-        #    raise Exception('There are no forces in %s' % fnm)
+        #    raise RuntimeError('There are no forces in %s' % fnm)
         # Also work our way down with the energies.
         if len(Floats['energy_ccsdt']) > 0:
             Answer['qm_energies'] = Floats['energy_ccsdt']
@@ -2479,20 +2570,24 @@ class Molecule(object):
             Answer['qm_energies'] = Floats['energy_mp2']
         elif len(energy_scf) > 0:
             if 'correlation' in Answer['qcrems'][0] and Answer['qcrems'][0]['correlation'].lower() in ['mp2', 'rimp2', 'ccsd', 'ccsd(t)']:
-                raise Exception("Q-Chem was called with a post-HF theory but we only got the SCF energy")
+                logger.error("Q-Chem was called with a post-HF theory but we only got the SCF energy\n")
+                raise RuntimeError
             Answer['qm_energies'] = energy_scf
         elif 'SCF failed to converge' not in errok:
-            raise Exception('There are no energies in %s' % fnm)
+            logger.error('There are no energies in %s\n' % fnm)
+            raise RuntimeError
     
         #### Sanity checks
         # We currently don't have a graceful way of dealing with SCF convergence failures in the output file.
         # For instance, a failed calculation will have elem / xyz but no forces. :/
         if 0 in conv and 'SCF failed to converge' not in errok:
-            raise Exception('SCF convergence failure encountered in parsing %s' % fnm)
+            logger.error('SCF convergence failure encountered in parsing %s\n' % fnm)
+            raise RuntimeError
         elif (0 not in conv):
             # The molecule should have only one charge and one multiplicity
             if len(set(Floats['charge'])) != 1 or len(set(Floats['mult'])) != 1:
-                raise Exception('Unexpected number of charges or multiplicities in parsing %s' % fnm)
+                logger.error('Unexpected number of charges or multiplicities in parsing %s\n' % fnm)
+                raise RuntimeError
 
         # If we have any QM energies (not the case if SCF convergence failure)
         if 'qm_energies' in Answer:
@@ -2507,11 +2602,13 @@ class Molecule(object):
                     mkspn.append([0.0 for j in mkchg[-1]])
             lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
             if len(set(lens)) != 1:
-                raise Exception('The number of energies and coordinates in %s are not the same : %s' % (fnm, str(lens)))
+                logger.error('The number of energies and coordinates in %s are not the same : %s\n' % (fnm, str(lens)))
+                raise RuntimeError
 
         # The number of atoms should all be the same
         if len(set([len(i) for i in Answer['xyzs']])) > 1:
-            raise Exception('The numbers of atoms across frames in %s are not all the same' % (fnm))
+            logger.error('The numbers of atoms across frames in %s are not all the same\n' % (fnm))
+            raise RuntimeError
 
         if 'qm_forces' in Answer:
             for i, frc in enumerate(Answer['qm_forces']):
@@ -2563,7 +2660,8 @@ class Molecule(object):
                 if 'jobtype' in self.qcrems[remidx] and self.qcrems[remidx]['jobtype'].lower() == 'fsm':
                     fsm = True
                     if len(select) != 2:
-                        raise RuntimeError('For freezing string method, please provide two structures only.')
+                        logger.error('For freezing string method, please provide two structures only.\n')
+                        raise RuntimeError
                 if SectName != '@@@@':
                     out.append('$%s' % SectName)
                     for line in SectData:
@@ -2692,7 +2790,8 @@ class Molecule(object):
 
     def write_dcd(self, select, **kwargs):
         if _dcdlib.vmdplugin_init() != 0:
-            raise IOError("Unable to init DCD plugin")
+            logger.error("Unable to init DCD plugin\n")
+            raise IOError
         natoms    = c_int(self.na)
         dcd       = _dcdlib.open_dcd_write(self.fout, "dcd", natoms)
         ts        = MolfileTimestep()
@@ -2705,7 +2804,8 @@ class Molecule(object):
             ts.C      = self.boxes[I].c if 'boxes' in self.Data else 1.0
             result    = _dcdlib.write_timestep(dcd, byref(ts))
             if result != 0:
-                raise IOError("Error encountered when writing DCD")
+                logger.error("Error encountered when writing DCD\n")
+                raise IOError
         ## Close the DCD file
         _dcdlib.close_file_write(dcd)
         dcd = None
@@ -2917,7 +3017,8 @@ class Molecule(object):
                 v3 = np.array([s[7], s[8], s[2]])
                 return BuildLatticeFromVectors(v1, v2, v3)
             else:
-                raise Exception("Not sure what to do since you gave me %i numbers" % len(s))
+                logger.error("Not sure what to do since you gave me %i numbers\n" % len(s))
+                raise RuntimeError
             
         if 'boxes' not in self.Data or len(self.boxes) != self.ns:
             sys.stderr.write("Please specify the periodic box using:\n")
@@ -2930,7 +3031,8 @@ class Molecule(object):
             if os.path.exists(boxstr):
                 boxfile = open(boxstr).readlines()
                 if len(boxfile) != len(self):
-                    raise Exception('Tried to read in the box file, but it has a different length from the number of frames.')
+                    logger.error('Tried to read in the box file, but it has a different length from the number of frames.\n')
+                    raise RuntimeError
                 else:
                     self.boxes = [buildbox(line) for line in boxfile]
             else:

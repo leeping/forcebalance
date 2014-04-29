@@ -102,7 +102,8 @@ class Lipid(Target):
         #======================================#
         # Read in lipid starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.lipid_coords)): 
-            raise RuntimeError("%s doesn't exist; please provide lipid_coords option" % self.lipid_coords)
+            logger.error("%s doesn't exist; please provide lipid_coords option\n" % self.lipid_coords)
+            raise RuntimeError
         self.lipid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.lipid_coords))
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
@@ -174,11 +175,14 @@ class Lipid(Target):
                 found_headings = True
                 headings = line
                 if len(set(headings)) != len(headings):
-                    raise Exception('Column headings in data.csv must be unique')
+                    logger.error('Column headings in data.csv must be unique\n')
+                    raise RuntimeError
                 if 'p' not in headings:
-                    raise Exception('There must be a pressure column heading labeled by "p" in data.csv')
+                    logger.error('There must be a pressure column heading labeled by "p" in data.csv\n')
+                    raise RuntimeError
                 if 't' not in headings:
-                    raise Exception('There must be a temperature column heading labeled by "t" in data.csv')
+                    logger.error('There must be a temperature column heading labeled by "t" in data.csv\n')
+                    raise RuntimeError
             elif found_headings:
                 try:
                     # Temperatures are in kelvin.
@@ -188,7 +192,8 @@ class Lipid(Target):
                     punit = [val.split()[1] if len(val.split()) >= 1 else "atm" for head, val in zip(headings,line) if head == 'p'][0]
                     unrec = set([punit]).difference(['atm','bar']) 
                     if len(unrec) > 0:
-                        raise Exception('The pressure unit %s is not recognized, please use bar or atm' % unrec[0])
+                        logger.error('The pressure unit %s is not recognized, please use bar or atm\n' % unrec[0])
+                        raise RuntimeError
                     # This line actually reads the reference data and inserts it into the RefData dictionary of dictionaries.
                     for head, val in zip(headings,line):
                         if head == 't' or head == 'p' : continue
@@ -202,17 +207,20 @@ class Lipid(Target):
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = np.array(map(float, val.split()))
                 except:
                     logger.error(line + '\n')
-                    raise Exception('Encountered an error reading this line!')
+                    logger.error('Encountered an error reading this line!\n')
+                    raise RuntimeError
             else:
                 logger.error(line + '\n')
-                raise Exception('I did not recognize this line!')
+                logger.error('I did not recognize this line!\n')
+                raise RuntimeError
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
         PhasePoints = None
         for head in self.RefData:
             if head not in known_vars+[i+"_wt" for i in known_vars]:
                 # Only hard-coded properties may be recognized.
-                raise Exception("The column heading %s is not recognized in data.csv" % head)
+                logger.error("The column heading %s is not recognized in data.csv\n" % head)
+                raise RuntimeError
             if head in known_vars:
                 if head+"_wt" not in self.RefData:
                     # If the phase-point weights are not specified in the reference data file, initialize them all to one.
@@ -500,7 +508,8 @@ class Lipid(Target):
                 # for obs in self.RefData:
                 #     del self.RefData[obs][PT]
         if len(Points) == 0:
-            raise Exception('The lipid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!')
+            logger.error('The lipid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!\n')
+            raise RuntimeError
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, \
@@ -508,7 +517,8 @@ class Lipid(Target):
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
-            raise Exception('The above list should only contain one number - the number of molecules')
+            logger.error('The above list should only contain one number - the number of molecules\n')
+            raise RuntimeError
         else:
             NMol = list(set(NMols))[0]
     
