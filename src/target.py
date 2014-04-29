@@ -143,7 +143,8 @@ class Target(forcebalance.BaseClass):
             _exec("tar xvzf targets.tar.gz")
             tgtdir = 'targets'
         else:
-            raise Exception('\x1b[91mThe targets directory is missing!\x1b[0m\nDid you finish setting up the target data?\nPlace the data in a directory called "targets" or "simulations"')
+            logger.error('\x1b[91mThe targets directory is missing!\x1b[0m\nDid you finish setting up the target data?\nPlace the data in a directory called "targets" or "simulations"\n')
+            raise RuntimeError
         self.set_option(None, None, 'tgtdir', os.path.join(tgtdir,self.name))
         ## Temporary (working) directory; it is temp/(target_name)
         ## Used for storing temporary variables that don't change through the course of the optimization
@@ -204,9 +205,11 @@ class Target(forcebalance.BaseClass):
         mostly fine since we rarely if ever calculate an explicit
         property Hessian. """
         
-        zero_prm = os.path.join(self.root, self.tgtdir, 'zero_grad.txt')
+        zero_prm = os.path.join(self.root, self.tgtdir, 'zerograd.txt')
         # If the 'zero parameters' text file exists, then we load
         # the parameter names from the file for exclusion.
+        pgrad0 = self.pgrad[:]
+        self.pgrad = range(self.FF.np)
         if os.path.exists(zero_prm):
             for ln, line in enumerate(open(zero_prm).readlines()):
                 pid = line.strip()
@@ -214,6 +217,13 @@ class Target(forcebalance.BaseClass):
                 # the derivative is switched off for this target.
                 if pid in self.FF.map and self.FF.map[pid] in self.pgrad:
                     self.pgrad.remove(self.FF.map[pid])
+        for i in pgrad0:
+            if i not in self.pgrad:
+                logger.info("Parameter %s was deactivated in %s\n" % (i, self.name))
+        for i in self.pgrad:
+            if i not in pgrad0:
+                logger.info("Parameter %s was reactivated in %s\n" % (i, self.name))
+        # Set pgrad in the OptionDict so remote targets may use it.
         self.OptionDict['pgrad'] = self.pgrad
 
     def write_0grads(self, Ans):
@@ -221,7 +231,7 @@ class Target(forcebalance.BaseClass):
         """ Write a file to the target directory containing names of
         parameters that don't contribute to the gradient. """
 
-        zero_prm = os.path.join(self.root, self.tgtdir, 'zero_grad.txt')
+        zero_prm = os.path.join(self.root, self.tgtdir, 'zerograd.txt')
         if os.path.exists(zero_prm):
             zero_pids = [i.strip() for i in open(zero_prm).readlines()]
         else:
@@ -273,7 +283,8 @@ class Target(forcebalance.BaseClass):
                 elif self.fdgrad:
                     Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
         self.gct += 1
-        self.write_0grads(Ans)
+        if Counter() == self.zerograd and self.zerograd >= 0: 
+            self.write_0grads(Ans)
         return Ans
 
     def get_H(self,mvals=None):
@@ -302,7 +313,8 @@ class Target(forcebalance.BaseClass):
             for i in self.pgrad:
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h, f0 = Ans['X'])
-        self.write_0grads(Ans)
+        if Counter() == self.zerograd and self.zerograd >= 0: 
+            self.write_0grads(Ans)
         self.hct += 1
         return Ans
     
@@ -349,7 +361,8 @@ class Target(forcebalance.BaseClass):
 
         """
         
-        raise NotImplementedError('The get method is not implemented in the Target base class')
+        logger.error('The get method is not implemented in the Target base class\n')
+        raise NotImplementedError
 
     def check_files(self, there):
 
@@ -383,9 +396,11 @@ class Target(forcebalance.BaseClass):
         """
         
         if Counter() > First():
-            raise RuntimeError("Iteration number of this run must be %s to read data from disk (it is %s)" % (First(), Counter()))
+            logger.error("Iteration number of this run must be %s to read data from disk (it is %s)\n" % (First(), Counter()))
+            raise RuntimeError
         if self.rd == None:
-            raise RuntimeError("The directory for reading is not set")
+            logger.error("The directory for reading is not set\n")
+            raise RuntimeError
 
         # Current directory. Move back into here after reading data.
         here = os.getcwd()
@@ -396,7 +411,8 @@ class Target(forcebalance.BaseClass):
             abs_rd = os.path.join(self.root, self.rd)
         # Check for directory existence.
         if not os.path.exists(abs_rd):
-            raise RuntimeError("Provided path %s does not exist" % self.rd)
+            logger.error("Provided path %s does not exist\n" % self.rd)
+            raise RuntimeError
         # Figure out which directory to go into.
         s = os.path.split(self.rd)
         have_data = 0
@@ -404,7 +420,8 @@ class Target(forcebalance.BaseClass):
             # Case 1: User has provided a specific directory to read from.
             there = abs_rd
             if not self.check_files(there):
-                raise RuntimeError("Provided path %s does not contain remote target output" % self.rd)
+                logger.error("Provided path %s does not contain remote target output\n" % self.rd)
+                raise RuntimeError
             have_data = 1
         elif s[-1] == self.name:
             # Case 2: User has provided the target name.
@@ -417,7 +434,8 @@ class Target(forcebalance.BaseClass):
         else:
             # Case 3: User has provided something else (must contain the target name in the next directory down.)
             if not os.path.exists(os.path.join(abs_rd, self.name)):
-                raise RuntimeError("Target directory %s does not exist in %s" % (self.name, self.rd))
+                logger.error("Target directory %s does not exist in %s\n" % (self.name, self.rd))
+                raise RuntimeError
             iterints = [int(d.replace('iter_','')) for d in os.listdir(os.path.join(abs_rd, self.name)) if os.path.isdir(os.path.join(abs_rd, self.name, d))]
             for i in sorted(iterints)[::-1]:
                 there = os.path.join(abs_rd, self.name, 'iter_%04i' % i)
@@ -425,7 +443,8 @@ class Target(forcebalance.BaseClass):
                     have_data = 1
                     break
         if not have_data:
-            raise RuntimeError("Did not find data to read in %s" % self.rd)
+            logger.error("Did not find data to read in %s\n" % self.rd)
+            raise RuntimeError
 
         if inum != None:
             there = os.path.join(os.path.split(there)[0],'iter_%04i' % inum)
@@ -470,7 +489,8 @@ class Target(forcebalance.BaseClass):
                 os.chdir(os.path.join(self.root, self.rundir))
                 # If indicate.log already exists then we've made some kind of mistake.
                 if os.path.exists('indicate.log'):
-                    raise RuntimeError('indicate.log should not exist yet in this directory: %s' % os.getcwd())
+                    logger.error('indicate.log should not exist yet in this directory: %s\n' % os.getcwd())
+                    raise RuntimeError
                 # Add a handler for printing to screen and file
                 logger = getLogger("forcebalance")
                 hdlr = forcebalance.output.RawFileHandler('indicate.log')
@@ -504,7 +524,8 @@ class Target(forcebalance.BaseClass):
         if Counter() is not None:
             # Not expecting more than ten thousand iterations
             if Counter() > 10000:
-                raise RuntimeError('Cannot handle more than 10000 iterations due to current directory structure.  Consider revising code.')
+                logger.error('Cannot handle more than 10000 iterations due to current directory structure.  Consider revising code.\n')
+                raise RuntimeError
             iterdir = "iter_%04i" % Counter()
             absgetdir = os.path.join(absgetdir,iterdir)
         if customdir is not None:
@@ -572,8 +593,7 @@ class Target(forcebalance.BaseClass):
         if not in_fd_srch():
             np.savetxt('mvals.txt', mvals)
         ## Read in file that specifies which derivatives may be skipped.
-        if Counter() == self.zerograd: 
-            logger.info("Deactivating zero-gradient parameters in %s\n" % (self.name))
+        if Counter() >= self.zerograd and self.zerograd >= 0: 
             self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
@@ -628,7 +648,8 @@ class Target(forcebalance.BaseClass):
         # Sanity check.
         for val in data.values():
             if (len(val)+1) != nc:
-                raise RuntimeError('There are %i column headings, so the values in the data dictionary must be lists of length %i (currently %i)' % (nc, nc-1, len(val)))
+                logger.error('There are %i column headings, so the values in the data dictionary must be lists of length %i (currently %i)\n' % (nc, nc-1, len(val)))
+                raise RuntimeError
         cwidths = [0 for i in range(nc)]
         # Figure out maximum column width.
         # First look at all of the column headings...
@@ -674,7 +695,8 @@ class RemoteTarget(Target):
         self.remote_indicate = ""
 
         if options['wq_port'] == 0:
-            raise RuntimeError("Please set the Work Queue port to use Remote Targets.")
+            logger.error("Please set the Work Queue port to use Remote Targets.\n")
+            raise RuntimeError
 
         # Remote target will read objective.p and indicate.log at the same time,
         # and it uses a different mechanism because it does this at every iteration (not just the 0th).
@@ -686,14 +708,14 @@ class RemoteTarget(Target):
 
         id_string = "%s_iter%04i" % (self.name, Counter())
 
-        with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF),f)
+        with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF, self.pgrad),f)
         
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
         forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, "target.tar.bz2"),"target.tar.bz2")
         
         wq = getWorkQueue()
         
-        logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
+        # logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
         # input:
         #   forcebalance.p: pickled mvals, options, and forcefield
         #   rtarget.py: remote target evaluation script
@@ -704,7 +726,7 @@ class RemoteTarget(Target):
         forcebalance.nifty.queue_up(wq, "python rtarget.py > rtarget.out 2>&1",
             ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
             ['objective.p', 'indicate.log', 'rtarget.out'],
-            tgt=self)
+            tgt=self, verbose=False)
 
     def read(self,mvals,AGrad=False,AHess=False):
         return self.get(mvals, AGrad, AHess)

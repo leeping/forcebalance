@@ -29,15 +29,18 @@ def atom_distances(xyzlist, atom_contacts, box=None):
     # check shapes
     traj_length, num_atoms, num_dims = xyzlist.shape
     if not num_dims == 3:
-        raise ValueError("xyzlist must be an n x m x 3 array")
+        logger.error("xyzlist must be an n x m x 3 array\n")
+        raise ValueError
     try: 
         num_contacts, width = atom_contacts.shape
         assert width is 2
     except (AttributeError, ValueError, AssertionError):
-        raise ValueError('contacts must be an n x 2 array')
+        logger.error('contacts must be an n x 2 array\n')
+        raise ValueError
         
     if not np.all(np.unique(atom_contacts) < num_atoms):
-        raise ValueError('Atom contacts goes larger than num_atoms')
+        logger.error('Atom contacts goes larger than num_atoms\n')
+        raise ValueError
     
     # check type
     if xyzlist.dtype != np.float32:
@@ -59,7 +62,8 @@ def atom_distances(xyzlist, atom_contacts, box=None):
         _contact_wrap.atomic_contact_wrap(xyzlist, atom_contacts, results)
     else:
         if box.shape != (3,):
-            raise ValueError('box must be a 3-element array')
+            logger.error('box must be a 3-element array\n')
+            raise ValueError
         if box.dtype != np.float32:
             box = np.float32(box)
         # make sure contiguous
@@ -97,12 +101,14 @@ def residue_distances(xyzlist, residue_membership, residue_contacts):
     
     traj_length, num_atoms, num_dims = xyzlist.shape
     if not num_dims == 3:
-        raise ValueError("xyzlist must be n x m x 3")
+        logger.error("xyzlist must be n x m x 3\n")
+        raise ValueError
     try: 
         num_contacts, width = residue_contacts.shape
         assert width is 2
     except (AttributeError, ValueError, AssertionError):
-        raise ValueError('residue_contacts must be an n x 2 array')
+        logger.error('residue_contacts must be an n x 2 array\n')
+        raise ValueError
         
     # check type
     if xyzlist.dtype != np.float32:

@@ -56,12 +56,14 @@ class Interaction(Target):
         ## Set fragment 1
         self.set_option(tgt_opts,'fragment1','fragment1')
         if len(self.fragment1) == 0:
-            raise Exception('You need to define the first fragment using the fragment1 keyword')
+            logger.error('You need to define the first fragment using the fragment1 keyword\n')
+            raise RuntimeError
         self.select1 = np.array(uncommadash(self.fragment1))
         ## Set fragment 2
         self.set_option(tgt_opts,'fragment2','fragment2')
         if len(self.fragment2) == 0:
-            raise Exception('You need to define the second fragment using the fragment2 keyword')
+            logger.error('You need to define the second fragment using the fragment2 keyword\n')
+            raise RuntimeError
         self.select2 = np.array(uncommadash(self.fragment2))
         ## Set upper cutoff energy
         self.set_option(tgt_opts,'energy_upper','energy_upper')
@@ -94,7 +96,8 @@ class Interaction(Target):
         if self.cauchy:
             self.divisor = np.sqrt(self.eqm**2 + denom**2)
             if self.attenuate:
-                raise Exception('attenuate and cauchy are mutually exclusive')
+                logger.error('attenuate and cauchy are mutually exclusive\n')
+                raise RuntimeError
         elif self.attenuate:
             # Attenuate only large repulsions.
             self.divisor = np.zeros(len(self.eqm))
