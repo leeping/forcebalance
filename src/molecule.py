@@ -2690,11 +2690,11 @@ class Molecule(object):
                     if SectName == 'rem':
                         for key, val in self.qcrems[remidx].items():
                             out.append("%-21s %-s" % (key, str(val)))
-                        remidx += 1
                     if SectName == 'comments' and 'comms' in self.Data:
                         out.append(self.comms[I])
                     out.append('$end')
                 else:
+                    remidx += 1
                     out.append('@@@@')
                 out.append('')
             #if I < (len(self) - 1):
