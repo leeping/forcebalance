@@ -519,6 +519,11 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     # Return the computed statistical inefficiency.
     return g
 
+def mean_stderr(ts):
+    """Return mean and standard deviation of a time series ts."""
+    return np.mean(ts), \
+      np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
+
 # Slices a 2D array of data by column.  The new array is fed into the statisticalInefficiency function.
 def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     n_row = A_n.shape[0]
