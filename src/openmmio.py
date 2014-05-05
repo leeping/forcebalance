@@ -34,6 +34,26 @@ try:
 except:
     pass
 
+def H_spring_energy(Sim): # Spring energy in RPMD simulation,only count H atom, it can be used to calculate the HD fractionation ratio. If classical simulation, return 0.
+    if isinstance(Sim.integrator,RPMDIntegrator):
+        springE=0.0*kilojoule/mole
+        hbar=0.0635078*nanometer**2*dalton/picosecond
+        kb=0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
+        mass_matrix=[]
+        for i in range(Sim.system.getNumParticles()):
+            if (Sim.system.getParticleMass(i)<1.02*dalton):#Only count Hydrogen
+                mass_matrix.append(Sim.system.getParticleMass(i))
+            else
+                mass_matrix.append(0.0*dalton)
+        mass_matrix=np.array(mass_matrix)
+        for i in range(Sim.integrator.getNumCopies()):
+            j=(i+1)%(Sim.integrator.getNumCopies())
+            beaddif=np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())#calculate difference between ith and i+1th bead
+            springE=springE+np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kb**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#spring energy
+        return springE
+    else:
+        return Sim.context.getState(getEnergy=True).getKineticEnergy()
+
 def energy_components(Sim, verbose=False):
     # Before using EnergyComponents, make sure each Force is set to a different group.
     EnergyTerms = OrderedDict()
@@ -51,11 +71,13 @@ def centroid_position(Sim):
     else:
         return Sim.context.getState(getPositions=True).getPositions() 
 def evaluate_potential(Sim):
-    # Getting potential energy, taking RPMD into account(average over all copy of systems). If running classical simulation, it does nothing more than calling the getPotential energy function
+    # Getting potential energy, taking RPMD into account(average over 4 copies of systems). If running classical simulation, it does nothing more than calling the getPotential energy function
     if isinstance(Sim.integrator, RPMDIntegrator):
         PE=0.0*kilojoule/mole
-        for i in range(Sim.integrator.getNumCopies()):
-            PE=PE+Sim.integrator.getState(i,getEnergy=True).getPotentialEnergy()/(Sim.integrator.getNumCopies())
+        nob=Sim.integrator.getNumCopies()
+        hello=int(nob/4)
+        for i in range(0,nob,hello):
+            PE=PE+Sim.integrator.getState(i,getEnergy=True).getPotentialEnergy()/4.0
         return PE
     else:
         return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
@@ -63,8 +85,10 @@ def evaluate_kinetic(Sim):
     # It gets kinetic energy for classical simulation, or kinetic energy in classical sense(i.e. only dep. on how fast particles move) in RPMD simulation(sample to thermostat T*# of beads). It's NOT a quantum kinetic energy estimator.
     if isinstance(Sim.integrator, RPMDIntegrator):
         KE=0.0*kilojoule/mole
-        for i in range(Sim.integrator.getNumCopies()):
-            KE=KE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies())
+        nob=Sim.integrator.getNumCopies()
+        hello=int(nob/4)
+        for i in range(0,nob,hello):
+            KE=KE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/4.0
         return KE
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
@@ -91,15 +115,17 @@ def centroid_kinetic(Sim):
     # This is centroid quantum kinetic energy estimator for RPMD simulation. Return classical KE in classical simulation.
     if isinstance(Sim.integrator,RPMDIntegrator):
         cenKE=0.0*kilojoule/mole
-        for i in range(Sim.integrator.getNumCopies()):
-            cenKE=cenKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies()**2)#First term in centroid KE
+        nob=Sim.integrator.getNumCopies()
+        hello=int(nob/4)
+        for i in range(0,nob,hello):
+            cenKE=cenKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(nob*4.0)#First term in centroid KE
         centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*Sim.system.getNumParticles())
-        for i in range(Sim.integrator.getNumCopies()):
-            centroid=centroid+np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/Sim.integrator.getNumCopies()#Calculate centroid of ring polymer
-        for i in range(Sim.integrator.getNumCopies()):#2nd term of centroid KE
+        for i in range(0,nob,hello):
+            centroid=centroid+np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/4.0#Calculate centroid of ring polymer
+        for i in range(0,nob,hello):#2nd term of centroid KE
             dif=np.array(Sim.integrator.getState(i,getPositions=True).getPositions())-centroid
             der=-1.0*np.array(Sim.integrator.getState(i,getForces=True).getForces())
-            cenKE=cenKE+np.sum((dif*der).sum(axis=1))*0.5/Sim.integrator.getNumCopies()
+            cenKE=cenKE+np.sum((dif*der).sum(axis=1))*0.5/4.0
         return cenKE
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
@@ -780,6 +806,7 @@ class OpenMM(Engine):
 
         ## Finally create the simulation object.
         self.simulation = Simulation(self.mod.topology, self.system, integrator, self.platform)
+        #fffff.write(XmlSerializer.serialize(self.simulation.system))
         ## Print platform properties.
         # logger.info("I'm using the platform %s\n" % self.simulation.context.getPlatform().getName())
         # printcool_dictionary({i:self.simulation.context.getPlatform().getPropertyValue(self.simulation.context,i) \
@@ -848,12 +875,12 @@ class OpenMM(Engine):
           integrator=self.simulation.context.getIntegrator()
           for i in range(self.tdiv):
               integrator.setPositions(i,self.xyz_omms[shot][0])
-          for i in range(self.tdiv):
-              temp_position=integrator.getState(i,getPositions=true).getPositions()
-              self.simulation.context.setPositions(temp_position)
-              self.simulation.context.computeVirtualSites()
-              position_with_virtual_site=self.simulation.context.getPositions()
-              integrator.setPositions(i,position_with_virtual_site) 
+#          for i in range(self.tdiv):
+#              temp_position=integrator.getState(i,getPositions=True).getPositions()
+#              self.simulation.context.setPositions(temp_position)
+#              self.simulation.context.computeVirtualSites()
+#              position_with_virtual_site=self.simulation.context.getState(getPositions=True).getPositions()
+#              integrator.setPositions(i,position_with_virtual_site) 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
         [a,b,c] = box_vectors
@@ -1118,7 +1145,7 @@ class OpenMM(Engine):
         #========================#
         # Initialize velocities.
         self.simulation.context.setVelocitiesToTemperature(temperature*kelvin)
-        
+        #print(XmlSerializer.serialize(self.simulation.system)) 
         # Equilibrate.
         if iequil > 0: 
             if verbose: logger.info("Equilibrating...\n")
@@ -1126,15 +1153,17 @@ class OpenMM(Engine):
                 if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
             else:
                 if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
-        for iteration in range(-1, iequil):
+        for iteration in range(-1 if self.tdiv == 1 else 0, iequil):
             if iteration >= 0:
                 self.simulation.step(nsave)
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
 
 ##### Energy Data
-            kinetic=evaluate_kinetic(self.simulation)
+#            kinetic=state.getKineticEnergy()/self.tdiv
+#            potential=state.getPotentialEnergy()
+            kinetic=evaluate_kinetic(self.simulation)/self.tdiv
             potential=evaluate_potential(self.simulation)
-            pri_kinetic=primitive_kinetic(self.simulation)
+           #pri_kinetic=primitive_kinetic(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
 #####
             if self.pbc:
@@ -1161,15 +1190,17 @@ class OpenMM(Engine):
         if save_traj:
             self.simulation.reporters.append(PDBReporter('%s-md.pdb' % self.name, nsteps))
             self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave))
-        for iteration in range(-1, isteps):
+        for iteration in range(-1 if self.tdiv == 1 else 0, isteps):
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
 ##### Energy Data
-            kinetic=evaluate_kinetic(self.simulation)
+#            kinetic=state.getKineticEnergy()/self.tdiv
+#            potential=state.getPotentialEnergy()
+            kinetic=evaluate_kinetic(self.simulation)/self.tdiv
             potential=evaluate_potential(self.simulation)
-            pri_kinetic=primitive_kinetic(self.simulation)
+            #pri_kinetic=primitive_kinetic(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
 #####
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
@@ -1199,9 +1230,9 @@ class OpenMM(Engine):
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
             if self.tdiv>1:
-                Kinetics.append(cen_kinetic / kilojoules_per_mole)#If RPMD, we use centroid estimator to calculate quantum kinetic energy
+              Kinetics.append(cen_kinetic / kilojoules_per_mole)#If RPMD, we use centroid estimator to calculate quantum kinetic energy
             else:
-                Kinetics.append(kinetic / kilojoules_per_mole)
+              Kinetics.append(kinetic / kilojoules_per_mole)#else just classical kinetic energy
             Volumes.append(volume / nanometer**3)
             Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
         Rhos = np.array(Rhos)
@@ -1216,7 +1247,7 @@ class OpenMM(Engine):
         Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
         # Initialized property dictionary.
         prop_return = OrderedDict()
-        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'One': 1.0})
         return prop_return
 
 class Liquid_OpenMM(Liquid):
