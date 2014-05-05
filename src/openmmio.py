@@ -34,25 +34,25 @@ try:
 except:
     pass
 
-def H_spring_energy(Sim): # Spring energy in RPMD simulation,only count H atom, it can be used to calculate the HD fractionation ratio. If classical simulation, return 0.
-    if isinstance(Sim.integrator,RPMDIntegrator):
-        springE=0.0*kilojoule/mole
-        hbar=0.0635078*nanometer**2*dalton/picosecond
-        kb=0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
-        mass_matrix=[]
-        for i in range(Sim.system.getNumParticles()):
-            if (Sim.system.getParticleMass(i)<1.02*dalton):#Only count Hydrogen
-                mass_matrix.append(Sim.system.getParticleMass(i))
-            else:
-                mass_matrix.append(0.0*dalton)
-        mass_matrix=np.array(mass_matrix)
-        for i in range(Sim.integrator.getNumCopies()):
-            j=(i+1)%(Sim.integrator.getNumCopies())
-            beaddif=np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())#calculate difference between ith and i+1th bead
-            springE=springE+np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kb**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#spring energy
-        return springE
-    else:
-        return 0.0*kilojoule/mole
+#def H_spring_energy(Sim): # Spring energy in RPMD simulation,only count H atom, it can be used to calculate the HD fractionation ratio. If classical simulation, return 0.
+#    if isinstance(Sim.integrator,RPMDIntegrator):
+#        springE=0.0*kilojoule/mole
+#        hbar=0.0635078*nanometer**2*dalton/picosecond
+#        kb=0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
+#        mass_matrix=[]
+#        for i in range(Sim.system.getNumParticles()):
+#            if (Sim.system.getParticleMass(i)<1.02*dalton):#Only count Hydrogen
+#                mass_matrix.append(Sim.system.getParticleMass(i))
+#            else:
+#                mass_matrix.append(0.0*dalton)
+#        mass_matrix=np.array(mass_matrix)
+#        for i in range(Sim.integrator.getNumCopies()):
+#            j=(i+1)%(Sim.integrator.getNumCopies())
+#            beaddif=np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())#calculate difference between ith and i+1th bead
+#            springE=springE+np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kb**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#spring energy
+#        return springE
+#    else:
+#        return 0.0*kilojoule/mole
 
 def energy_components(Sim, verbose=False):
     # Before using EnergyComponents, make sure each Force is set to a different group.
