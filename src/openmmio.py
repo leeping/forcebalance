@@ -43,7 +43,7 @@ def H_spring_energy(Sim): # Spring energy in RPMD simulation,only count H atom, 
         for i in range(Sim.system.getNumParticles()):
             if (Sim.system.getParticleMass(i)<1.02*dalton):#Only count Hydrogen
                 mass_matrix.append(Sim.system.getParticleMass(i))
-            else
+            else:
                 mass_matrix.append(0.0*dalton)
         mass_matrix=np.array(mass_matrix)
         for i in range(Sim.integrator.getNumCopies()):
