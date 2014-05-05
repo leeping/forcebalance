@@ -52,7 +52,7 @@ def H_spring_energy(Sim): # Spring energy in RPMD simulation,only count H atom, 
             springE=springE+np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kb**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#spring energy
         return springE
     else:
-        return Sim.context.getState(getEnergy=True).getKineticEnergy()
+        return 0.0*kilojoule/mole
 
 def energy_components(Sim, verbose=False):
     # Before using EnergyComponents, make sure each Force is set to a different group.
