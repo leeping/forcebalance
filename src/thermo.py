@@ -3,6 +3,7 @@ import re
 import csv
 import copy
 import errno
+import shutil
 import numpy as np
 import pandas as pd
 import itertools
@@ -11,12 +12,13 @@ import cStringIO
 from forcebalance.molecule import Molecule
 from forcebalance.observable import OMap
 from forcebalance.target import Target
-from forcebalance.finite_difference import in_fd
+from forcebalance.finite_difference import in_fd, fdwrap, f12d3p
 from forcebalance.nifty import flat, col, row, isint, isnpnan
-from forcebalance.nifty import lp_dump, lp_load, wopen, _exec
+from forcebalance.nifty import lp_dump, lp_load, wopen, _exec, getval
 from forcebalance.nifty import GoInto, LinkFile, link_dir_contents
 from forcebalance.nifty import printcool, printcool_dictionary
 from forcebalance.nifty import getWorkQueue
+from forcebalance.optimizer import Counter
 
 from collections import defaultdict, OrderedDict
 
@@ -350,6 +352,130 @@ def stand_head(head, obs):
         logger.debug("header %s renamed to %s\n" % (hfirst, newh))
     return newh, punit, obs
 
+def find_file(tgtdir, index, stype, sufs, iscrd, icn=0):
+    """ 
+    Search for a suitable file that matches the simulation index,
+    type, suffix and IC number.  This can be used to search for
+    initial coordinates, but also auxiliary files for the
+    simulation (e.g. .top and .mdp files for a Gromacs simulation,
+    or .key files for a Tinker simulation.)
+
+    Generally, it is preferred to provide files where the base
+    name matches the simulation type.  However, since it is also
+    okay to put all files for a simulation type into a
+    subdirectory, generic file names like 'topol' and 'conf' may
+    be used.
+
+    Initial condition files will be searched for in the following priority (suf stands for suffix)
+    targets/target_name/index/stype/ICs/stype_#.suf
+    targets/target_name/index/stype/ICs/stype#.suf
+    targets/target_name/index/stype/ICs/#.suf
+    targets/target_name/index/stype/ICs/stype.suf
+    targets/target_name/index/stype/ICs/coords.suf
+    targets/target_name/index/stype/ICs/conf.suf
+    targets/target_name/index/stype/ICs/topol.suf
+    targets/target_name/index/stype/ICs/grompp.suf
+    targets/target_name/index/stype/ICs/input.suf
+    targets/target_name/index/stype/ICs/tinker.suf
+    targets/target_name/index/stype/stype.suf
+    targets/target_name/index/stype/coords.suf
+    targets/target_name/index/stype.suf
+    targets/target_name/stype.suf
+
+    @param[in] tgtdir Name of the target directory to look in
+    @param[in] index Name of the index directory to look in (within tgtdir)
+    @param[in] stype Name of the simulation type to look for
+    @param[in] sufs List of suffixes to look for in order of priority
+    @param[in] iscrd Whether the file is a coordinate file (false for auxiliary files like .mdp).
+    @param[in] icn Initial coordinate number (will look for sequentially numbered file, or single file with multiple structures)
+    """
+    found = ''
+    # The 2-tuple here corresponds to:
+    # - Search path for the file
+    # - Whether the file that we're looking for is 'numbered'
+    #   (i.e. a different file for each structure); otherwise the
+    #   single file may contain multiple structures
+    pfxs = [stype, 'coords', 'conf', 'topol', 'grompp', 'input', 'tinker', '']
+    
+    basefnms = list(itertools.chain(*[[(os.path.join(index, stype, 'ICs', pfx+'_'+("%i" % icn)), True),
+                                       (os.path.join(index, stype, 'ICs', pfx+("%i" % icn)), True),
+                                       (os.path.join(index, stype, 'ICs', pfx), False),
+                                       (os.path.join(index, stype, pfx), False),
+                                       (os.path.join(index, pfx), False),
+                                       (os.path.join(pfx), False)] for pfx in pfxs]))
+    
+    paths = OrderedDict()
+    for fnm, numbered in basefnms:
+        for suf in sufs:
+            fpath = os.path.join(tgtdir, fnm+suf if suf.startswith('.') else fnm+'.'+suf)
+            paths[fpath] = os.path.exists(fpath)
+            if os.path.exists(fpath):
+                if found != '':
+                    logger.info('Target %s Index %s Simulation %s : '
+                                '%s overrides %s\n' % (os.path.basename(tgtdir), index, stype, fpath))
+                else:
+                    if iscrd and not numbered:
+                        M = Molecule(fpath)
+                        if len(M) <= icn:
+                            logger.error("Target %s Index %s Simulation %s : "
+                                         "file %s doesn't have enough structures\n" % 
+                                         (os.path.basename(tgtdir), index, stype, fpath))
+                            raise RuntimeError
+                    logger.info('Target %s Index %s Simulation %s : '
+                                'found file %s\n' % (os.path.basename(tgtdir), index, stype, fpath))
+                    found = os.path.abspath(fpath)
+    if found == '':
+        logger.error("Can't find a file for index %s, simulation %s, suffix %s in the search path" % (index, stype, '/'.join(sufs)))
+        raise RuntimeError
+    return found, 0 if numbered else icn
+
+def energy_derivatives(engine, FF, mvals, h, pgrad, dipole=False):
+
+    """
+    Compute the first and second derivatives of a set of snapshot
+    energies with respect to the force field parameters.
+
+    This basically calls the finite difference subroutine on the
+    energy_driver subroutine also in this script.
+
+    In the future we may need to be more sophisticated with
+    controlling the quantities which are differentiated, but for
+    now this is okay..
+
+    @param[in] engine Engine object for calculating energies
+    @param[in] FF Force field object
+    @param[in] mvals Mathematical parameter values
+    @param[in] h Finite difference step size
+    @param[in] pgrad List of active parameters for differentiation
+    @param[in] dipole Switch for dipole derivatives.
+    @return G First derivative of the energies in a N_param x N_coord array
+    @return GDx First derivative of the box dipole moment x-component in a N_param x N_coord array
+    @return GDy First derivative of the box dipole moment y-component in a N_param x N_coord array
+    @return GDz First derivative of the box dipole moment z-component in a N_param x N_coord array
+
+    """
+    def single_point(mvals_):
+        FF.make(mvals_)
+        if dipole:
+            return engine.energy_dipole()
+        else:
+            return engine.energy()
+
+    ED0 = single_point(mvals)
+    G   = OrderedDict()
+    G['potential'] = np.zeros((FF.np, ED0.shape[0]))
+    if dipole:
+        G['dipole'] = np.zeros((FF.np, ED0.shape[0], 3))
+    for i in pgrad:
+        logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
+        edg, _ = f12d3p(fdwrap(single_point,mvals,i),h,f0=ED0)
+        if dipole:
+            G['potential'][i] = edg[:,0]
+            G['dipole'][i]    = edg[:,1:]
+        else:
+            G['potential'][i] = edg[:]
+    return G
+
 class Thermo(Target):
     """
     A target for fitting general experimental data sets. The source
@@ -372,6 +498,12 @@ class Thermo(Target):
         self.set_option(tgt_opts, "eq_steps", forceprint=True)
         # Number of time steps in the production run
         self.set_option(tgt_opts, "md_steps", forceprint=True)
+        # Time step (in femtoseconds)
+        self.set_option(tgt_opts, "timestep", forceprint=True)
+        # Sampling interval (in picoseconds)
+        self.set_option(tgt_opts, "interval", forceprint=True)
+        # Save trajectories?
+        self.set_option(tgt_opts, "save_traj", forceprint=True)
 
         ## Variables
         # Prefix names for simulation data
@@ -384,6 +516,8 @@ class Thermo(Target):
         self.weights   = {}
         # The list of simulations that we'll be running.
         self.SimNames = [i.lower() for i in self.user_simulation_names]
+        # Store the dictionary of allowed suffixes
+        self.OptionDict['crdsfx'] = self.crdsfx
 
         ## Read source data and initialize points; creates self.Data, self.Indices and self.Columns objects.
         self.read_source(os.path.join(self.root, self.tgtdir, self.source))
@@ -532,7 +666,7 @@ class Thermo(Target):
         def intcol(col):
             if col in self.Data.columns:
                 for idx in self.Data.index:
-                    if not isnan(self.Data[col][idx]):
+                    if not isnpnan(self.Data[col][idx]):
                         self.Data[col][idx] = int(self.Data[col][idx])
 
         def floatcol(col):
@@ -540,6 +674,8 @@ class Thermo(Target):
                 self.Data[col] = self.Data[col].astype(float)
 
         intcol('n_ic')
+        floatcol('temp')
+        floatcol('pres')
 
         # A list of indices (i.e. top-level indices) which correspond
         # to sets of simulations that we'll be running.
@@ -571,53 +707,6 @@ class Thermo(Target):
 
         return
 
-    def find_ic(self, index, stype, icn):
-        """ 
-        Search for a suitable initial condition file.
-    
-        Initial condition files will be searched for in the following priority:
-        targets/target_name/index/stype/ICs/stype_#.xyz
-        targets/target_name/index/stype/ICs/stype#.xyz
-        targets/target_name/index/stype/ICs/#.xyz
-        targets/target_name/index/stype/ICs/stype.xyz
-        targets/target_name/index/stype/ICs/coords.xyz
-        targets/target_name/index/stype/stype.xyz
-        targets/target_name/index/stype/coords.xyz
-        targets/target_name/index/stype.xyz
-        targets/target_name/stype.xyz
-        """
-        found = ''
-        basefnms = [(os.path.join(index, stype, 'ICs', stype+'_'+("%i" % icn)), True),
-                    (os.path.join(index, stype, 'ICs', stype+("%i" % icn)), True),
-                    (os.path.join(index, stype, 'ICs', ("%i" % icn)), True),
-                    (os.path.join(index, stype, 'ICs', stype), False),
-                    (os.path.join(index, stype, 'ICs', 'coords'), False),
-                    (os.path.join(index, stype, stype), False),
-                    (os.path.join(index, stype, 'coords'), False),
-                    (os.path.join(index, stype), False),
-                    (os.path.join(stype), False)]
-        paths = []
-        for fnm, numbered in basefnms:
-            for crdsfx in self.crdsfx:
-                fpath = os.path.join(self.tgtdir, fnm+crdsfx)
-                paths.append(fpath)
-                if os.path.exists(fpath):
-                    if found != '':
-                        logger.info('Target %s Index %s Simulation %s : '
-                                    '%s overrides %s\n' % (self.name, index, stype, fpath))
-                    else:
-                        if not numbered:
-                            M = Molecule(fpath)
-                            if len(M) <= icn:
-                                logger.error("Target %s Index %s Simulation %s : "
-                                             "initial coordinate file %s doesn't have enough structures\n" % 
-                                             (self.name, index, stype, fpath))
-                                raise RuntimeError
-                        logger.info('Target %s Index %s Simulation %s : '
-                                    'found initial coordinate file %s\n' % (self.name, index, stype, fpath))
-                        found = fpath
-        return found, 0 if numbered else icn
-    
     def initialize_observables(self):
         """ 
         Determine Observable objects to be created.  Checks to see
@@ -638,7 +727,7 @@ class Thermo(Target):
                     Objs = []
                     Reqs = []
                     for OClass in OMap[oname]:
-                        OObj = OClass(self.Data)
+                        OObj = OClass(self.Data.ix[index])
                         Reqs.append(OObj.requires.keys())
                         if all([i in self.SimNames for i in OObj.requires.keys()]):
                             Objs.append(OObj)
@@ -685,18 +774,17 @@ class Thermo(Target):
 
         for index in self.Indices:
             for stype, tsset in SimTS.items():
-                if 'n_ic' in self.Data.ix[index]:
-                    n_ic = self.Data.ix[index]['n_ic']
+                if 'n_ic' in self.Data2.ix[index]:
+                    n_ic = self.Data2.ix[index]['n_ic']
+                    print n_ic
                     if n_ic < 1:
                         logger.error("n_ic must >= 1")
                         raise RuntimeError
                 else:
                     n_ic = 1
                 for icn in range(n_ic):
-                    icfnm, icframe = self.find_ic(index, stype, icn)
                     sname = "%s_%i" % (stype, icn) if n_ic > 1 else stype
-                    self.Simulations[index].append(Simulation(sname, index, stype, icfnm, icframe, sorted(list(tsset))))
-                    
+                    self.Simulations[index].append(Simulation(self, self.Data.ix[index], sname, index, stype, icn, sorted(list(tsset))))
         return
 
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
@@ -728,32 +816,41 @@ class Thermo(Target):
             temp = self.Data2['temp'].ix[index] if 'temp' in self.Data2 else None
             pres = self.Data2['pres'].ix[index] if 'pres' in self.Data2 else None
             for Sim in self.Simulations[index]:
+                Sim.gradient = AGrad
                 simd = os.path.join(os.getcwd(), index, Sim.name)
+                Sim.RunDirs[Counter()] = simd
                 GoInto(simd)
                 # Submit or run the simulation if the result file does not exist.
                 if not (os.path.exists('result.p') or os.path.exists('result.p.bz2')):
-                    # Write to disk: Force field object, current parameter values, target options
-                    with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict),f)
+                    # Write coordinate file in the current location.
                     M = Molecule(os.path.join(self.root, Sim.initial))[Sim.iframe]
-                    M.write("%s%s" % (Sim.type, self.crdsfx[0]))
-                    # # Get relevant files from the target folder, I suppose.
-                    # link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-                    # # Determine initial coordinates.
-                    # self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
-                    # self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
-                    # Command for running the simulation.
-                    cmdlist = ['%s python md_one.py %s' % (self.mdpfx, Sim.type)]
+                    M.write(Sim.EngOpts['coords'])
+                    # Copy auxiliary files to the current location.
+                    for i, j in Sim.faux.values():
+                        shutil.copy2(i, j)
+                    # Write to disk: Force field object, current parameter values, target options
+                    with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,Sim),f)
+                    # Copy scripts to the current location.
+                    for f in self.scripts:
+                        LinkFile(os.path.join(os.path.split(__file__)[0], "data", f),
+                                 os.path.join(os.getcwd(), f))
+                    # Put together the command.
+                    cmdlist = ['%s python md_one.py' % (self.mdpfx)]
                     if temp != None:
                         cmdlist.append('-T %g' % float(temp))
                     if pres != None:
                         cmdlist.append('-P %g' % float(pres))
+                    # if AGrad or AHess:
+                    #     cmdlist.append('-g')
+                    # cmdlist.append('-o')
+                    # cmdlist += Sim.timeseries.keys()
                     cmdstr = ' '.join(cmdlist)
                     print cmdstr
                     # # cmdstr = '%s python md1.py %s %.3f %.3f' % (self.runpfx, temperature, pressure)
                     # if wq == None:
                     #     logger.info("Running condensed phase simulation locally.\n")
                     #     logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
-                    #     _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
+                    _exec(cmdstr, copy_stderr=True, outfnm='md_one.out')
                     # else:
                     #     queue_up(wq, command = cmdstr+' &> npt.out',
                     #              input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
@@ -761,39 +858,6 @@ class Thermo(Target):
                 os.chdir(cwd)
         return
 
-    def retrieve(self, dp):
-        """Retrieve the molecular dynamics (MD) results and store the calculated
-        observables in the Point object dp.
-
-        Parameters
-        ----------
-        dp : Point
-            Store the calculated observables in this point.
-
-        Returns
-        -------
-        Nothing
-        
-        """
-        abspath = os.path.join(os.getcwd(), '%d/md_result.p' % dp.idnr)
-
-        if os.path.exists(abspath):
-            logger.info('Reading data from ' + abspath + '.\n')
-
-            vals, errs, grads = lp_load(open(abspath))
-
-            dp.data["values"] = vals
-            dp.data["errors"] = errs
-            dp.data["grads"]  = grads
-
-        else:
-            msg = 'The file ' + abspath + ' does not exist so we cannot read it.\n'
-            logger.warning(msg)
-
-            dp.data["values"] = np.zeros((len(self.observables)))
-            dp.data["errors"] = np.zeros((len(self.observables)))
-            dp.data["grads"]  = np.zeros((len(self.observables), self.FF.np))
-            
     def indicate(self):
         """Shows optimization state."""
         return
@@ -941,6 +1005,18 @@ class Thermo(Target):
         Objective = 0.0
         Gradient  = np.zeros(self.FF.np)
         Hessian   = np.zeros((self.FF.np, self.FF.np))
+
+        # Retrieve simulation results.
+        for index in self.Indices:
+            for Sim in self.Simulations[index]:
+                Sim.retrieve()
+        
+        # Calculate observable values.
+        for oname in self.Observables.keys():
+            for index in self.Indices:
+                self.Observables[oname][index].aggregate(self.Simulations[index], AGrad)
+                if oname == 'density': self.Observables[oname][index].evaluate(AGrad)
+
         return { "X": Objective, "G": Gradient, "H": Hessian} 
 
         for pt in self.points:
@@ -1039,24 +1115,127 @@ class Point(object):
 class Simulation(object):
 
     """ 
-    Data container for a simulation (specified by index, simulation
-    type, initial condition).
+    Data container for a MD simulation (specified by index, simulation
+    type, initial condition).  These settings are written to a file
+    then passed to md_one.py.
+
+    The Simulation object is passed between the master ForceBalance
+    process and the remote script (e.g. md_one.py).
     """
 
-    def __init__(self, name, index, stype, initial, iframe, tsnames):
-        # The simulation name will identify the simulation within a collection
-        # belonging to the Index.
+    type_settings = {'gas': {'pbc' : 0},
+                     'liquid': {'pbc' : 1},
+                     'solid': {'pbc' : 1, 'anisotropic_box' : 1},
+                     'bilayer': {'pbc' : 1, 'anisotropic_box' : 1}}
+
+    def __init__(self, tgt, data, name, index, stype, icn, tsnames):
+
+        # The name of the simulation (refers to a directory under job.tmp/target/iter_x/index/name)
         self.name = name
         # The Index that the simulation belongs to.
         self.index = index
         # The type of simulation (liquid, gas, solid, bilayer...)
+        if stype not in Simulation.type_settings.keys():
+            logger.error('Simulation type %s is not supported at this time')
+            raise RuntimeError
+        # The reference data! May contain parameters for calculating observables.
+        self.Data = copy.deepcopy(data)
+        # Type of the simulation (map to simulation settings)
         self.type = stype
-        # The file containing initial coordinates.
-        self.initial = initial
-        # The frame number in the initial coordinate file.
-        self.iframe = iframe
+        # Root directory of the ForceBalance job
+        self.root = tgt.root
+        # Locate the initial coordinate file and frame number.
+        self.initial, self.iframe = find_file(os.path.join(tgt.root, tgt.tgtdir), index, stype, tgt.crdsfx, True, icn)
         # The time series for the simulation.
         self.timeseries = OrderedDict([(i, []) for i in tsnames])
+        self.timeseries['potential'] = [] # ALWAYS require the potential energy.
+        # The file extension that the coordinate file will be written with.
+        self.fext = os.path.splitext(self.initial)[1]
+        # Auxiliary files to be copied to the current location prior to running the simulation.
+        self.faux = OrderedDict()
+        for sfx in tgt.auxsfx:
+            auxf = find_file(os.path.join(tgt.root, tgt.tgtdir), index, stype, sfx, False)[0]
+            self.faux[os.path.splitext(auxf)[1]] = (auxf, "%s%s" % (self.type, os.path.splitext(auxf)[1]))
+        # Name of the simulation engine
+        self.engname = tgt.engname
+        # Whether to use the CUDA platform (OpenMM only).
+        self.force_cuda = tgt.OptionDict.get('force_cuda', 0)
+        # Finite difference step size.
+        self.h = tgt.h
+        # Active parameters to differentiate over.
+        self.pgrad = tgt.pgrad
+        # List of ITERATION : directory pairs.
+        self.RunDirs = OrderedDict()
+        # List of ITERATION : result data structures.
+        self.Results = OrderedDict()
+
+        pbc = Simulation.type_settings[self.type]['pbc']
+
+        #----
+        # MD options, passed straight to the molecular_dynamics() method
+        #----
+        self.MDOpts = OrderedDict()
+        # The time step in femtoseconds.
+        self.MDOpts['timestep'] = tgt.timestep
+        # The number of equilibration MD steps.
+        self.MDOpts['nequil'] = tgt.eq_steps
+        # The number of production MD steps.
+        self.MDOpts['nsteps'] = tgt.md_steps
+        # The number of MD steps between sampling.
+        self.MDOpts['nsave'] = int(1000 * tgt.interval / self.MDOpts['timestep'])
+        # Flag for minimizing the energy.
+        self.MDOpts['minimize'] = tgt.OptionDict.get('minimize_energy', 0)
+        # The number of threads for this simulation (no-PBC simulations are 1 thread).
+        self.MDOpts['threads'] = tgt.OptionDict.get('md_threads', 1) if pbc else 1
+        # Whether to use multiple timestep integrator.
+        self.MDOpts['mts'] = tgt.OptionDict.get('mts_integrator', 0)
+        # The number of beads in an RPMD simulation.
+        self.MDOpts['rpmd_beads'] = tgt.OptionDict.get('rpmd_beads', 0)
+        # Print out lots of information.
+        self.MDOpts['verbose'] = True
+        # Save trajectory to disk.
+        self.MDOpts['save_traj'] = tgt.save_traj
+        # Number of MD steps between successive calls to Monte Carlo barostat (OpenMM only).
+        self.MDOpts['nbarostat'] = tgt.OptionDict.get('n_mcbarostat', 25)
+        # Flag for anisotropic simulation cell (OpenMM only).
+        self.MDOpts['anisotropic'] = tgt.OptionDict.get('anisotropic_box', 0)
+        # The time step for the 'fast forces' in femtoseconds in MTS integrators.
+        self.MDOpts['timestep'] = tgt.OptionDict.get('faststep', 0.25)
+        # Simulation temperature in Kelvin.
+        self.MDOpts['temperature'] = getval(self.Data, 'temp') if 'temp' in self.Data else None
+        # Simulation pressure in bar.
+        self.MDOpts['pressure'] = getval(self.Data, 'pres') if 'pres' in self.Data else None
+
+        #----
+        # Engine options, used in creating the Engine object
+        #----
+        self.EngOpts = OrderedDict()
+        # Whether to use periodic boundary conditions.
+        self.EngOpts['pbc'] = pbc
+        # The name of the coordinate file to be written prior to running the simulation.
+        self.EngOpts['coords'] = "%s%s" % (self.type, self.fext)
+        # Software-specific options.
+        if self.engname == 'openmm':
+            self.EngOpts['platname'] = 'CUDA' if self.EngOpts['pbc'] else 'Reference'
+        else:
+            if self.force_cuda: 
+                logger.error("force_cuda option is set, but has no effect on Gromacs engine.") ; raise RuntimeError
+            if self.MDOpts['rpmd_beads'] > 0: 
+                logger.error('Only the OpenMM engine can handle RPMD simulations.') ; raise RuntimeError
+            if self.MDOpts['mts']: 
+                logger.error('Only OpenMM is configured to use multiple timestep integrator.') ; raise RuntimeError
+            if self.MDOpts['anisotropic']: 
+                logger.error('Only OpenMM is configured to use anisotropic pressure coupling.') ; raise RuntimeError
+
+        if self.engname == 'gromacs':
+            self.EngOpts['gmxpath'] = tgt.gmxpath
+            self.EngOpts['gmxsuffix'] = tgt.gmxsuffix
+            self.EngOpts['gmx_top'] = self.faux['.top'][1]
+            self.EngOpts['gmx_mdp'] = self.faux['.mdp'][1]
+
+        if self.engname == 'tinker':
+            self.EngOpts['tinkerpath'] = tgt.tinkerpath
+            self.EngOpts['tinker_key'] = self.faux['.key'][1]
 
     def __str__(self):
         msg = []
@@ -1064,3 +1243,27 @@ class Simulation(object):
         msg.append("Initial Conditions: File %s Frame %i" % (self.initial, self.iframe))
         msg.append("Timeseries Names: %s" % (', '.join(self.timeseries.keys())))
         return "\n".join(msg)
+
+    def retrieve(self, cycle=None):
+        """Retrieve the molecular dynamics (MD) results and store the calculated
+        observables in the Simulation object.
+
+        Parameters
+        ----------
+        dp : Point
+            Store the calculated observables in this point.
+
+        Returns
+        -------
+        Nothing
+        
+        """
+        if cycle == None: cycle = Counter()
+
+        abspath = os.path.join(self.RunDirs[cycle], 'md_result.p')
+        if os.path.exists(abspath):
+            logger.info('Simulation %s reading data from ' % self.name  + abspath.replace(self.root+'/', '') + ' .\n')
+            self.Results[cycle] = lp_load(open(abspath))
+        else:
+            logger.warning('The file ' + abspath + ' does not exist so we cannot read it.\n')
+            self.Results[cycle] = None
