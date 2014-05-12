@@ -501,6 +501,7 @@ class Lipid(Target):
                 logger.info('Reading information from ./%s/npt_result.p\n' % label)
                 Points.append(PT)
                 Results[tt] = lp_load(open('./%s/npt_result.p' % label))
+                _exec('bzip2 ./%s/npt_result.p' % label, print_command=False)
                 tt += 1
             else:
                 logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it\n' % label)
