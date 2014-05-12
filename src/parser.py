@@ -152,6 +152,7 @@ tgt_opts_types = {
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),
                  "read"                  : (None, 50, 'Provide a temporary directory ".tmp" to read data from a previous calculation on the initial iteration (for instance, to restart an aborted run).', 'Liquid and Remote targets', 'Liquid, Remote'),
+                 "remote_prefix"         : ('', 50, 'Specify an optional prefix script to run in front of rtarget.py, for loading environment variables', 'Remote targets', 'Remote'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
