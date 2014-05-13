@@ -9,10 +9,12 @@ modules for other programs because it's so simple.
 
 import os
 from re import match, sub, split, findall
-from forcebalance.nifty import isint, isfloat, _exec, LinkFile
+from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile
 import numpy as np
 from forcebalance import BaseReader
+from forcebalance.engine import Engine
 from forcebalance.abinitio import AbInitio
+from forcebalance.molecule import Molecule
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -167,7 +169,7 @@ class AMBER(Engine):
 
     def __init__(self, name="amber", **kwargs):
         ## Keyword args that aren't in this list are filtered out.
-        self.valkwd = ['amberhome']
+        self.valkwd = ['amberhome', 'amber_mol2', 'amber_frcmod', 'amber_source']
         super(AMBER,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -184,215 +186,82 @@ class AMBER(Engine):
             warn_once("The 'amberhome' option was not specified; using default.")
             if which('sander') == '':
                 warn_press_key("Please add AMBER executables to the PATH or specify amberhome.")
-            self.tinkerpath = which('sander')
+            self.amberhome = os.path.split(which('sander'))[0]
 
     def readsrc(self, **kwargs):
 
         """ Called by __init__ ; read files from the source directory. """
 
-        self.key = onefile('key', kwargs['tinker_key'] if 'tinker_key' in kwargs else None)
-        self.prm = onefile('prm', kwargs['tinker_prm'] if 'tinker_prm' in kwargs else None)
-
-        if 'mol' in kwargs:
-            self.mol = kwargs['mol']
-        elif 'coords' in kwargs:
-            self.mol = Molecule(kwargs['coords'])
+        self.mol2 = onefile('mol2', kwargs['amber_mol2'] if 'amber_mol2' in kwargs else None)
+        self.frcmod = onefile('frcmod', kwargs['amber_frcmod'] if 'amber_frcmod' in kwargs else None)
+        if 'amber_source' in kwargs:
+            self.source = kwargs['amber_source'] 
         else:
-            pdbfile = onefile('pdb')
-            if not arcfile: 
-                logger.error('Cannot determine which .pdb file to use\n')
-                raise RuntimeError
-            self.mol = Molecule(pdbfile)
+            warn_once('Defaulting to hard coded default source files, leaprc.ff99SB and leaprc.gaff')
+            self.source = ['leaprc.ff99SB', 'leaprc.gaff']
+        # Name of the molecule, currently just call it a default name.
+        self.mname = 'molecule'
+        if 'mol' in kwargs:
+            logger.error('Do not provide mol or coords to AMBER engine\n')
+            raise RuntimeError
+        #     self.mol = kwargs['mol']
+        # elif 'coords' in kwargs:
+        #     self.mol = Molecule(kwargs['coords'])
+        else:
+            self.mol = Molecule(self.mol2)
 
-    def calltinker(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
+    def callamber(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
-        """ Call TINKER; prepend the tinkerpath to calling the TINKER program. """
+        """ Call TINKER; prepend the amberhome to calling the TINKER program. """
 
         csplit = command.split()
-        # Sometimes the engine changes dirs and the key goes missing, so we link it.
-        if "%s.key" % self.name in csplit and not os.path.exists("%s.key" % self.name):
-            LinkFile(self.abskey, "%s.key" % self.name)
-        prog = os.path.join(self.tinkerpath, csplit[0])
+        # Sometimes the engine changes dirs and the inpcrd/prmtop go missing, so we link it.
+        # Prepend the AMBER path to the program call.
+        prog = os.path.join(self.amberhome, "bin", csplit[0])
         csplit[0] = prog
+        # No need to catch exceptions since failed AMBER calculations will return nonzero exit status.
         o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
-        # Determine the TINKER version number.
-        for line in o[:10]:
-            if "Version" in line:
-                vw = line.split()[2]
-                if len(vw.split('.')) <= 2:
-                    vn = float(vw)
-                else:
-                    vn = float(vw.split('.')[:2])
-                vn_need = 6.3
-                try:
-                    if vn < vn_need:
-                        if self.warn_vn: 
-                            warn_press_key("ForceBalance requires TINKER %.1f - unexpected behavior with older versions!" % vn_need)
-                        self.warn_vn = True
-                except:
-                    logger.error("Unable to determine TINKER version number!\n")
-                    raise RuntimeError
-        for line in o[-10:]:
-            # Catch exceptions since TINKER does not have exit status.
-            if "TINKER is Unable to Continue" in line:
-                for l in o:
-                    logger.error("%s\n" % l)
-                time.sleep(1)
-                logger.error("TINKER may have crashed! (See above output)\nThe command was: %s\nThe directory was: %s\n" % (' '.join(csplit), os.getcwd()))
-                raise RuntimeError
-                break
-        for line in o:
-            if 'D+' in line:
-                logger.info(line+'\n')
-                warn_press_key("TINKER returned a very large floating point number! (See above line; will give error on parse)")
         return o
+
+    def leap(self, name=None):
+        if name == None: name = self.name
+        with open("%s.leap" % name, 'w') as f:
+            # Print file names to be sourced, e.g. leaprc.ff99SB
+            for fnm in self.source:
+                print >> f, "source %s" % fnm
+            print >> f, "loadamberparams %s" % self.frcmod
+            print >> f, "%s = loadmol2 %s" % (self.mname, self.mol2)
+            print >> f, "check %s" % self.mname
+            print >> f, "saveamberparm %s %s.prmtop %s.inpcrd" % (self.mname, self.name, self.name)
+            print >> f, "quit"
+        self.callamber("tleap -f %s.leap" % self.name)
 
     def prepare(self, pbc=False, **kwargs):
 
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
-        # Call TINKER but do nothing to figure out the version number.
-        o = self.calltinker("dynamic", persist=1, print_error=False)
-
-        self.rigid = False
-
-        ## Attempt to set some TINKER options.
-        tk_chk = []
-        tk_opts = OrderedDict([("digits", "10"), ("archive", "")])
-        tk_defs = OrderedDict()
-        
-        prmtmp = False
-
         if hasattr(self,'FF'):
-            if not os.path.exists(self.FF.tinkerprm):
+            if not (os.path.exists(self.FF.amber_frcmod) and os.path.exists(self.FF.amber_mol2)):
                 # If the parameter files don't already exist, create them for the purpose of
                 # preparing the engine, but then delete them afterward.
                 prmtmp = True
                 self.FF.make(np.zeros(self.FF.np))
-            if self.FF.rigid_water:
-                tk_opts["rattle"] = "water"
-                self.rigid = True
-            if self.FF.amoeba_pol == 'mutual':
-                tk_opts['polarization'] = 'mutual'
-                if self.FF.amoeba_eps != None:
-                    tk_opts['polar-eps'] = str(self.FF.amoeba_eps)
-                else:
-                    tk_defs['polar-eps'] = '1e-6'
-            elif self.FF.amoeba_pol == 'direct':
-                tk_opts['polarization'] = 'direct'
-            else:
-                warn_press_key("Using TINKER without explicitly specifying AMOEBA settings. Are you sure?")
-            self.prm = self.FF.tinkerprm
-            prmfnm = self.FF.tinkerprm
-        elif self.prm:
-            prmfnm = self.prm
-        else:
-            prmfnm = None
+            self.mol2 = self.FF.amber_mol2
+            self.frcmod = self.FF.amber_frcmod
 
-        # Periodic boundary conditions may come from the TINKER .key file.
-        keypbc = False
-        minbox = 1e10
-        if self.key:
-            for line in open(os.path.join(self.srcdir, self.key)).readlines():
-                s = line.split()
-                if len(s) > 0 and s[0].lower() == 'a-axis':
-                    keypbc = True
-                    minbox = float(s[1])
-                if len(s) > 0 and s[0].lower() == 'b-axis' and float(s[1]) < minbox:
-                    minbox = float(s[1])
-                if len(s) > 0 and s[0].lower() == 'c-axis' and float(s[1]) < minbox:
-                    minbox = float(s[1])
-            if keypbc and (not pbc):
-                warn_once("Deleting PBC options from the .key file.")
-                tk_opts['a-axis'] = None
-                tk_opts['b-axis'] = None
-                tk_opts['c-axis'] = None
-                tk_opts['alpha'] = None
-                tk_opts['beta'] = None
-                tk_opts['gamma'] = None
-        if pbc:
-            if (not keypbc) and 'boxes' not in self.mol.Data:
-                logger.error("Periodic boundary conditions require either (1) a-axis to be in the .key file or (b) boxes to be in the coordinate file.\n")
-                raise RuntimeError
-        self.pbc = pbc
-        if pbc:
-            tk_opts['ewald'] = ''
-            if minbox <= 10:
-                warn_press_key("Periodic box is set to less than 10 Angstroms across")
-            # TINKER likes to use up to 7.0 Angstrom for PME cutoffs
-            rpme = 0.05*(float(int(minbox - 1))) if minbox <= 15 else 7.0
-            tk_defs['ewald-cutoff'] = "%f" % rpme
-            # TINKER likes to use up to 9.0 Angstrom for vdW cutoffs
-            rvdw = 0.05*(float(int(minbox - 1))) if minbox <= 19 else 9.0
-            tk_defs['vdw-cutoff'] = "%f" % rvdw
-            if (minbox*0.5 - rpme) > 2.5 and (minbox*0.5 - rvdw) > 2.5:
-                tk_defs['neighbor-list'] = ''
-            elif (minbox*0.5 - rpme) > 2.5:
-                tk_defs['mpole-list'] = ''
-        else:
-            tk_opts['ewald'] = None
-            tk_opts['ewald-cutoff'] = None
-            tk_opts['vdw-cutoff'] = None
-            # This seems to have no effect on the kinetic energy.
-            # tk_opts['remove-inertia'] = '0'
+        # Figure out the topology information.
+        self.leap()
+        o = self.callamber("rdparm %s.prmtop" % self.name, stdin="printAtoms\nprintBonds\nexit\n", print_to_screen=True, persist=True)
 
-        write_key("%s.key" % self.name, tk_opts, os.path.join(self.srcdir, self.key) if self.key else None, tk_defs, verbose=False, prmfnm=prmfnm)
-        self.abskey = os.path.abspath("%s.key")
-
-        self.mol[0].write(os.path.join("%s.xyz" % self.name), ftype="tinker")
-
-        ## If the coordinates do not come with TINKER suffixes then throw an error.
-        self.mol.require('tinkersuf')
-
-        ## Call analyze to read information needed to build the atom lists.
-        o = self.calltinker("analyze %s.xyz P,C" % (self.name), stdin="ALL")
-
-        ## Parse the output of analyze.
-        mode = 0
-        self.AtomMask = []
-        self.AtomLists = defaultdict(list)
-        ptype_dict = {'atom': 'A', 'vsite': 'D'}
-        G = nx.Graph()
         for line in o:
-            s = line.split()
-            if len(s) == 0: continue
-            if "Atom Type Definition Parameters" in line:
-                mode = 1
-            if mode == 1:
-                if isint(s[0]): mode = 2
-            if mode == 2:
-                if isint(s[0]):
-                    mass = float(s[5])
-                    self.AtomLists['Mass'].append(mass)
-                    if mass < 1.0:
-                        # Particles with mass less than one count as virtual sites.
-                        self.AtomLists['ParticleType'].append('D')
-                    else:
-                        self.AtomLists['ParticleType'].append('A')
-                    self.AtomMask.append(mass >= 1.0)
-                else:
-                    mode = 0
-            if "List of 1-2 Connected Atomic Interactions" in line:
-                mode = 3
-            if mode == 3:
-                if isint(s[0]): mode = 4
-            if mode == 4:
-                if isint(s[0]):
-                    a = int(s[0])
-                    b = int(s[1])
-                    G.add_node(a)
-                    G.add_node(b)
-                    G.add_edge(a, b)
-                else: mode = 0
-        # Use networkx to figure out a list of molecule numbers.
-        if len(G.nodes()) > 0:
-            # The following code only works in TINKER 6.2
-            gs = nx.connected_component_subgraphs(G)
-            tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
-            self.AtomLists['MoleculeNumber'] = [[i+1 in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
-        else:
-            grouped = [i.L() for i in self.mol.molecules]
-            self.AtomLists['MoleculeNumber'] = [[i in g for g in grouped].index(1) for i in range(self.mol.na)]
+            print line
+        # self.AtomMask = []
+        # self.AtomLists = defaultdict(list)
+        # self.AtomLists['Mass'] = [a.element.mass.value_in_unit(dalton) if a.element != None else 0 for a in Atoms]
+        # self.AtomLists['ParticleType'] = ['A' if m >= 1.0 else 'D' for m in self.AtomLists['Mass']]
+        # self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
+        # self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
+
         if prmtmp:
             for f in self.FF.fnms: 
                 os.unlink(f)
