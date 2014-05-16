@@ -1346,6 +1346,8 @@ class Liquid_GMX(Liquid):
         self.engname = "gromacs"
         # Command prefix.
         self.nptpfx = "bash rungmx.sh"
+        if tgt_opts['remote_backup']:
+            self.nptpfx += " -b"
         # Extra files to be linked into the temp-directory.
         self.nptfiles = ['%s.mdp' % os.path.splitext(f)[0] for f in [self.liquid_coords, self.gas_coords]]
         self.nptfiles += ['%s.top' % os.path.splitext(f)[0] for f in [self.liquid_coords, self.gas_coords]]
@@ -1400,6 +1402,8 @@ class Lipid_GMX(Lipid):
         self.engname = "gromacs"
         # Command prefix.
         self.nptpfx = "bash rungmx.sh"
+        if tgt_opts['remote_backup']:
+            self.nptpfx += " -b"
         # Extra files to be linked into the temp-directory.
         self.nptfiles = ['%s.mdp' % os.path.splitext(f)[0] for f in [self.lipid_coords]]
         self.nptfiles += ['%s.top' % os.path.splitext(f)[0] for f in [self.lipid_coords]]
