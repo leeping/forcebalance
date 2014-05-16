@@ -205,6 +205,7 @@ tgt_opts_types = {
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
                  "adapt_errors"     : (0, 50, 'Adapt to simulation uncertainty by combining property estimations and adjusting simulation length.', 'Condensed phase property targets', 'liquid'),
                  "force_average"    : (0, -50, 'Average over all atoms when normalizing force errors.', 'Force matching', 'abinitio'),
+                 "remote_backup"    : (0, -50, 'When running remote target, back up files at the remote location.', 'Liquid, lipid and remote targets', 'liquid, lipid, remote'),
                  },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid, lipid'),
