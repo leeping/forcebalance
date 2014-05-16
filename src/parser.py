@@ -78,7 +78,7 @@ gen_opts_types = {
     'lists'   : {"forcefield"     : ([],  200, 'The names of force fields, corresponding to directory forcefields/file_name.(itp,xml,prm,frcmod,mol2)', 'All (important)'),
                  "scanindex_num"  : ([], -100, 'Numerical index of the parameter to scan over', 'Job types scan_mvals and scan_pvals'),
                  "scanindex_name" : ([], -100, 'Parameter name to scan over (should convert to a numerical index)', 'Job types scan_mvals and scan_pvals'),
-                 "rpmd_beads"     : ([], -160, 'Number of beads / NB contracted beads / Recip contracted beads in ring polymer MD', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
+                 "rpmd_opts"     : ([], -160, 'Number of beads / NB contracted beads / Recip contracted beads in ring polymer MD', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  },
     'ints'    : {"maxstep"      : (100, 50, 'Maximum number of steps in an optimization', 'Main Optimizer'),
                  "objective_history"  : (2, 20, 'Number of good optimization steps to average over when checking the objective convergence criterion', 'Main Optimizer (jobtype "newton")'),
