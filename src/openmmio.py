@@ -55,23 +55,23 @@ except:
 #        return 0.0*kilojoule/mole
 
 def energy_components(Sim, verbose=False):
-    # Before using EnergyComponents, make sure each Force is set to a different group.
+    # Before using energy_components(), make sure each Force is set to a different group.
     EnergyTerms = OrderedDict()
     if type(Sim.integrator) in [LangevinIntegrator, VerletIntegrator]:
         for i in range(Sim.system.getNumForces()):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
 def centroid_position(Sim):
-    ##Calculate RPMD centroid position in RPMD simulation(May not be what you actually need!), no difference from simply call getPosition in Classical simulation
+    # Calculates the RPMD centroid position in RPMD simulation (May not be what you actually need!). Same as calling getPositions() during a classical simulation. 
     if isinstance(Sim.integrator, RPMDIntegrator):
         centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*Sim.system.getNumParticles())
         for i in range(Sim.integrator.getNumCopies()):
-            centroid=centroid+np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/Sim.integrator.getNumCopies()#Calculate centroid of ring polymer
+            centroid=centroid+np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/Sim.integrator.getNumCopies() # Centroid calculation
         return centroid
     else:
         return Sim.context.getState(getPositions=True).getPositions() 
 def evaluate_potential(Sim):
-    # Getting potential energy, taking RPMD into account(average over 4 copies of systems). If running classical simulation, it does nothing more than calling the getPotential energy function
+    # Calculates the P.E., accouting for RPMD (avg. over 4 copies of system). This just amounts to calling getPotentialEnergy() for a classical simulation.
     if isinstance(Sim.integrator, RPMDIntegrator):
         PE=0.0*kilojoule/mole
         nob=Sim.integrator.getNumCopies()
@@ -82,7 +82,7 @@ def evaluate_potential(Sim):
     else:
         return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
 def evaluate_kinetic(Sim):
-    # It gets kinetic energy for classical simulation, or kinetic energy in classical sense(i.e. only dep. on how fast particles move) in RPMD simulation(sample to thermostat T*# of beads). It's NOT a quantum kinetic energy estimator.
+    # Calculates the K.E. for a classical simulation or the K.E. in a classical sense (i.e. only dep. on particle velocity) for RPMD (sample to thermostat T*(# beads). Does NOT estimate quantum K.E.
     if isinstance(Sim.integrator, RPMDIntegrator):
         KE=0.0*kilojoule/mole
         nob=Sim.integrator.getNumCopies()
@@ -93,36 +93,36 @@ def evaluate_kinetic(Sim):
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
 def primitive_kinetic(Sim):
-    # This is primitive quantum kinetic energy estimator for RPMD simulation. Return classical KE in classical simulation. 
+    # A primitive quantum K.E. estimator for RPMD simulation. Returns classical K.E. in a classical simulation. 
     if isinstance(Sim.integrator,RPMDIntegrator):
         priKE=0.0*kilojoule/mole
         hbar=0.0635078*nanometer**2*dalton/picosecond
         kb=0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
         for i in range(Sim.integrator.getNumCopies()):
-            priKE=priKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies()) #First term in primitive KE
+            priKE=priKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(Sim.integrator.getNumCopies()) # First term in primitive K.E.
         mass_matrix=[]
         for i in range(Sim.system.getNumParticles()):
             mass_matrix.append(Sim.system.getParticleMass(i))
         mass_matrix=np.array(mass_matrix)
         for i in range(Sim.integrator.getNumCopies()):
             j=(i+1)%(Sim.integrator.getNumCopies())
-            beaddif=np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())#calculate difference between ith and i+1th bead
-            priKE=priKE-np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kb**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#2nd term in primitive estimator
+            beaddif=np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions()) # Calculate difference between ith and i+1th bead
+            priKE=priKE-np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kb**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2))) # 2nd term in primitive estimator
         return priKE           
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
 def centroid_kinetic(Sim):
-    # This is centroid quantum kinetic energy estimator for RPMD simulation. Return classical KE in classical simulation.
+    # Centroid quantum K.E. estimator for RPMD simulation. Returns classical K.E. in classical simulation.
     if isinstance(Sim.integrator,RPMDIntegrator):
         cenKE=0.0*kilojoule/mole
         nob=Sim.integrator.getNumCopies()
         hello=int(nob/4)
         for i in range(0,nob,hello):
-            cenKE=cenKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(nob*4.0)#First term in centroid KE
+            cenKE=cenKE+Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/(nob*4.0) # First term in centroid K.E.
         centroid=np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*Sim.system.getNumParticles())
         for i in range(0,nob,hello):
-            centroid=centroid+np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/4.0#Calculate centroid of ring polymer
-        for i in range(0,nob,hello):#2nd term of centroid KE
+            centroid=centroid+np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/4.0 # Calculate centroid of ring polymer
+        for i in range(0,nob,hello): # 2nd term of centroid K.E.
             dif=np.array(Sim.integrator.getState(i,getPositions=True).getPositions())-centroid
             der=-1.0*np.array(Sim.integrator.getState(i,getForces=True).getForces())
             cenKE=cenKE+np.sum((dif*der).sum(axis=1))*0.5/4.0
@@ -187,7 +187,6 @@ def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
 #def get_multipoles_ave(simulation,q=None,mass=None,positions=None,rmcom=True)
 # If RPMD simulation, average over all copies of systems, else(in classical simulation) just do the same thing get_multipoles do
-
 
 def get_dipole(simulation,q=None,mass=None,positions=None):
     """Return the current dipole moment in Debye.
@@ -641,7 +640,6 @@ class OpenMM(Engine):
         os.unlink(pdb1)
         
         ## Create the OpenMM ForceField object.
-
         if hasattr(self, 'FF'):
             self.ffxml = self.FF.openmmxml
             self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.openmmxml))
