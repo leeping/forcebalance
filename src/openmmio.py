@@ -667,8 +667,18 @@ class OpenMM(Engine):
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
+        GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce', 'AmoebaWcaDispersionForce']
+        GrpNums = {}
         if not mts:
-            for i, j in enumerate(self.system.getForces()):
+            for j in self.system.getForces():
+                i = -1
+                if j.__class__.__name__ in GrpTogether:
+                    for k in GrpNums:
+                        if k in GrpTogether:
+                            i = GrpNums[k]
+                            break
+                if i == -1: i = len(set(GrpNums.values()))
+                GrpNums[j.__class__.__name__] = i
                 j.setForceGroup(i)
 
         ## If virtual particles are used with AMOEBA...

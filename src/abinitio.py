@@ -108,6 +108,8 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'energy_upper','energy_upper')
         ## Average forces over individual atoms ('atom') or all atoms ('all')
         self.set_option(tgt_opts,'force_average')
+        ## Assign a greater weight to 
+        self.set_option(tgt_opts,'energy_asymmetry')
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -724,6 +726,7 @@ class AbInitio(Target):
                     return self.energy_force_transform()
                 for p in self.pgrad:
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
+            dEmean = np.dot(self.boltz_wts, M_all[:, 0] - self.eqm)/np.sum(self.boltz_wts)
         if self.force and not in_fd():
             self.maxfatom = -1
             self.maxfshot = -1
@@ -733,6 +736,15 @@ class AbInitio(Target):
                 logger.debug("\rIncrementing quantities for snapshot %i\r" % i)
             # Build Boltzmann weights and increment partition function.
             P   = self.boltz_wts[i]
+            if self.energy_asymmetry != 1.0:
+                if not self.all_at_once:
+                    logger.error("Asymmetric weights only work when all_at_once is enabled")
+                    raise RuntimeError
+                if self.qmboltz != 0.0:
+                    logger.error("Asymmetric weights do not work with QM Boltzmann weights")
+                    raise RuntimeError
+                if (M_all[i][0]-self.eqm[i]) - dEmean < 0.0:
+                    P *= self.energy_asymmetry
             Z  += P
             R   = self.qmboltz_wts[i]*self.boltz_wts[i] / QBN
             Y  += R
