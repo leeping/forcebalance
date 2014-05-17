@@ -546,13 +546,22 @@ class OpenMM(Engine):
             self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.openmmxml))
         else:
             if 'ffxml' in kwargs:
-                if not os.path.exists(kwargs['ffxml']): 
-                    logger.error("%s doesn't exist\n" % kwargs['ffxml'])
-                    raise RuntimeError
+                if type(kwargs['ffxml']) == list:
+                    for i in kwargs['ffxml']:
+                        if not os.path.exists(i):
+                            logger.error("%s doesn't exist\n" % i)
+                            raise RuntimeError
+                else:
+                    if not os.path.exists(kwargs['ffxml']): 
+                        logger.error("%s doesn't exist\n" % kwargs['ffxml'])
+                        raise RuntimeError
                 self.ffxml = kwargs['ffxml']
             elif onefile('xml'):
                 self.ffxml = onefile('xml')
-            self.forcefield = ForceField(self.ffxml)
+            if type(self.ffxml) == list:
+                self.forcefield = ForceField(*self.ffxml)
+            else:
+                self.forcefield = ForceField(self.ffxml)
 
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
@@ -673,8 +682,18 @@ class OpenMM(Engine):
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
+        GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce', 'AmoebaWcaDispersionForce']
+        GrpNums = {}
         if not mts:
-            for i, j in enumerate(self.system.getForces()):
+            for j in self.system.getForces():
+                i = -1
+                if j.__class__.__name__ in GrpTogether:
+                    for k in GrpNums:
+                        if k in GrpTogether:
+                            i = GrpNums[k]
+                            break
+                if i == -1: i = len(set(GrpNums.values()))
+                GrpNums[j.__class__.__name__] = i
                 j.setForceGroup(i)
 
         ## If virtual particles are used with AMOEBA...
@@ -698,7 +717,10 @@ class OpenMM(Engine):
         """
         if len(kwargs) > 0:
             self.simkwargs = kwargs
-        self.forcefield = ForceField(self.ffxml)
+        if type(self.ffxml) == list:
+            self.forcefield = ForceField(*self.ffxml)
+        else:
+            self.forcefield = ForceField(self.ffxml)
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
