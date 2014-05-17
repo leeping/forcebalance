@@ -1156,6 +1156,8 @@ class Liquid_OpenMM(Liquid):
         self.engname = "openmm"
         # Command prefix.
         self.nptpfx = "bash runcuda.sh"
+        if tgt_opts['remote_backup']:
+            self.nptpfx += " -b"
         # Extra files to be linked into the temp-directory.
         self.nptfiles = []
         # Set some options for the polarization correction calculation.
