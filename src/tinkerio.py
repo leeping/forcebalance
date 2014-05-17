@@ -238,7 +238,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
                     warn_press_key("Expected a parameter file name but got none")
                 # This is the case where "parameters" correctly corresponds to optimize.in
                 prmflag = 1
-                if prmfnm == None or val0 in prms:
+                if prmfnm == None or val0 in prms or val0[:-4] in prms:
                     out.append(line1)
                     continue
                 else:
@@ -522,7 +522,8 @@ class TINKER(Engine):
             # The following code only works in TINKER 6.2
             gs = nx.connected_component_subgraphs(G)
             tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
-            self.AtomLists['MoleculeNumber'] = [[i+1 in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
+            mnodes = [m.nodes() for m in tmols]
+            self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
         else:
             grouped = [i.L() for i in self.mol.molecules]
             self.AtomLists['MoleculeNumber'] = [[i in g for g in grouped].index(1) for i in range(self.mol.na)]
