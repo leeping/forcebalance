@@ -743,7 +743,7 @@ class AbInitio(Target):
                 if self.qmboltz != 0.0:
                     logger.error("Asymmetric weights do not work with QM Boltzmann weights")
                     raise RuntimeError
-                if (M[i]-self.eqm[i]) - dEmean < 0.0:
+                if (M_all[i][0]-self.eqm[i]) - dEmean < 0.0:
                     P *= self.energy_asymmetry
             Z  += P
             R   = self.qmboltz_wts[i]*self.boltz_wts[i] / QBN
