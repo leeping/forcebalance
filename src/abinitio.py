@@ -726,7 +726,6 @@ class AbInitio(Target):
                     return self.energy_force_transform()
                 for p in self.pgrad:
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
-            dEmean = np.dot(self.boltz_wts, M_all[:, 0] - self.eqm)/np.sum(self.boltz_wts)
         if self.force and not in_fd():
             self.maxfatom = -1
             self.maxfshot = -1
@@ -743,7 +742,9 @@ class AbInitio(Target):
                 if self.qmboltz != 0.0:
                     logger.error("Asymmetric weights do not work with QM Boltzmann weights")
                     raise RuntimeError
-                if (M_all[i][0]-self.eqm[i]) - dEmean < 0.0:
+                EMref = M_all[:, 0] - min(M_all[:, 0])
+                EQref = self.eqm - min(self.eqm)
+                if EMref[i] - EQref[i] < 0.0:
                     P *= self.energy_asymmetry
             Z  += P
             R   = self.qmboltz_wts[i]*self.boltz_wts[i] / QBN
