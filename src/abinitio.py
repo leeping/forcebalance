@@ -742,8 +742,8 @@ class AbInitio(Target):
                 if self.qmboltz != 0.0:
                     logger.error("Asymmetric weights do not work with QM Boltzmann weights")
                     raise RuntimeError
-                EMref = M_all[:, 0] - min(M_all[:, 0])
                 EQref = self.eqm - min(self.eqm)
+                EMref = M_all[:, 0] - M_all[:, np.argmin(self.eqm)]
                 if EMref[i] - EQref[i] < 0.0:
                     P *= self.energy_asymmetry
             Z  += P
