@@ -9,7 +9,7 @@ modules for other programs because it's so simple.
 
 import os
 from re import match, sub, split, findall
-from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile
+from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles
 import numpy as np
 from forcebalance import BaseReader
 from forcebalance.engine import Engine
@@ -38,6 +38,54 @@ def is_mol2_atom(line):
     if len(s) < 9:
         return False
     return all([isint(s[0]), isfloat(s[2]), isfloat(s[3]), isfloat(s[4]), isfloat(s[8])])
+
+def write_leap(fnm, mol2=[], frcmod=[], pdb=[], name=None, delcheck=False):
+    """ Parse and edit an AMBER LEaP input file. Output file is written to inputfile_ (with trailing underscore.) """
+    have_fmod = []
+    have_mol2 = []
+    have_pdb = []
+    # The lines that will be printed out to actually run tleap
+    line_out = []
+    for line in open(fnm):
+        # Skip comment lines
+        if line.strip().startswith('#') : continue
+        line = line.split('#')[0]
+        s = line.split()
+        ll = line.lower()
+        ls = line.lower().split()
+        if len(s) >= 2 and ls[0] == 'loadamberparams':
+            have_fmod.append(s[1])
+        if len(s) >= 2 and 'loadmol2' in ll:
+            have_mol2.append(s[-1])
+        if len(s) >= 2 and 'loadpdb' in ll:
+            have_pdb.append(s[-1])
+            # Adopt the name from the loadpdb line.
+            if name == None: name = line.split('=')[0].strip()
+        if len(s) >= 1 and ls[0] == 'check' and delcheck:
+            # Skip over check steps if so decreed
+            line = "# " + line
+        if 'saveamberparm' in ll:
+            if s[1] != name or s[2] != name+'.prmtop' or s[3] != name+'.inpcrd':
+                logger.error(line)
+                logger.error("WARNING: saveamberparm should look like:")
+                logger.error("saveamberparm %s %s.prmtop %s.inpcrd" % (name, name, name))
+                raise RuntimeError
+        if len(s) >= 1 and ls[0] == 'quit':
+            # Don't write the quit line.
+            break
+        line_out.append(line)
+    for i in frcmod:
+        if i not in have_fmod:
+            logger.warning("WARNING: %s is not being loaded in %s" % (i, fnm))
+    for i in mol2:
+        if i not in have_mol2:
+            logger.warning("WARNING: %s is not being loaded in %s" % (i, fnm))
+    for i in pdb:
+        if i not in have_pdb:
+            logger.warning("WARNING: %s is not being loaded in %s" % (i, fnm))
+    fout = fnm+'_'
+    line_out.append('quit\n')
+    with open(fout, 'w') as f: print >> f, ''.join(line_out)
 
 class Mol2_Reader(BaseReader):
     """Finite state machine for parsing Mol2 force field file. (just for parameterizing the charges)"""
@@ -169,7 +217,7 @@ class AMBER(Engine):
 
     def __init__(self, name="amber", **kwargs):
         ## Keyword args that aren't in this list are filtered out.
-        self.valkwd = ['amberhome', 'amber_mol2', 'amber_frcmod', 'amber_source']
+        self.valkwd = ['amberhome', 'amber_mol2', 'amber_frcmod', 'amber_leapcmd']
         super(AMBER,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -192,23 +240,54 @@ class AMBER(Engine):
 
         """ Called by __init__ ; read files from the source directory. """
 
-        self.mol2 = onefile('mol2', kwargs['amber_mol2'] if 'amber_mol2' in kwargs else None)
-        self.frcmod = onefile('frcmod', kwargs['amber_frcmod'] if 'amber_frcmod' in kwargs else None)
-        if 'amber_source' in kwargs:
-            self.source = kwargs['amber_source'] 
-        else:
-            warn_once('Defaulting to hard coded default source files, leaprc.ff99SB and leaprc.gaff')
-            self.source = ['leaprc.ff99SB', 'leaprc.gaff']
+        self.mol2 = listfiles(kwargs.get('amber_mol2'), 'mol2')
+        self.frcmod = listfiles(kwargs.get('amber_frcmod'), 'frcmod')
+        self.leapcmd = onefile(kwargs.get('amber_leapcmd'), 'leap', err=True)
+            
         # Name of the molecule, currently just call it a default name.
         self.mname = 'molecule'
+
+        # if 'mol' in kwargs:
+        #     self.mol = kwargs['mol']
+        # elif 'coords' in kwargs:
+            
+
+        pdbfnm = None
+        # Determine the PDB file name.
+        if 'pdb' in kwargs and os.path.exists(kwargs['pdb']):
+            # Case 1. The PDB file name is provided explicitly
+            pdbfnm = kwargs['pdb']
+            if not os.path.exists(pdbfnm): 
+                logger.error("%s specified but doesn't exist\n" % pdbfnm)
+                raise RuntimeError
+
         if 'mol' in kwargs:
-            logger.error('Do not provide mol or coords to AMBER engine\n')
+            self.mol = kwargs['mol']
+        elif 'coords' in kwargs:
+            self.mol = Molecule(kwargs['coords'])
+        else:
+            logger.error('Must provide either a molecule object or coordinate file.\n')
             raise RuntimeError
+
+        if pdbfnm != None:
+            mpdb = Molecule(pdbfnm)
+            for i in ["chain", "atomname", "resid", "resname", "elem"]:
+                self.mol.Data[i] = mpdb.Data[i]
+
+        # if 'mol' in kwargs:
+        #     logger.error('Do not provide molecule object to AMBER engine!\n')
+        #     raise RuntimeError
+        # elif 'coords' in kwargs:
+        #     if 
+
+        # if 'mol' in kwargs:
+        #     logger.error('Do not provide mol or coords to AMBER engine\n')
+        #     raise RuntimeError
         #     self.mol = kwargs['mol']
         # elif 'coords' in kwargs:
         #     self.mol = Molecule(kwargs['coords'])
-        else:
-            self.mol = Molecule(self.mol2)
+        # else:
+        #     self.mol = Molecule(self.mol2)
 
     def callamber(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -224,16 +303,7 @@ class AMBER(Engine):
         return o
 
     def leap(self, name=None):
-        if name == None: name = self.name
-        with open("%s.leap" % name, 'w') as f:
-            # Print file names to be sourced, e.g. leaprc.ff99SB
-            for fnm in self.source:
-                print >> f, "source %s" % fnm
-            print >> f, "loadamberparams %s" % self.frcmod
-            print >> f, "%s = loadmol2 %s" % (self.mname, self.mol2)
-            print >> f, "check %s" % self.mname
-            print >> f, "saveamberparm %s %s.prmtop %s.inpcrd" % (self.mname, self.name, self.name)
-            print >> f, "quit"
+        write_leap(fnm, mol2=[], frcmod=[], pdb=[], name=None, delcheck=False)        
         self.callamber("tleap -f %s.leap" % self.name)
 
     def prepare(self, pbc=False, **kwargs):

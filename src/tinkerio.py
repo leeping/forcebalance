@@ -329,21 +329,13 @@ class TINKER(Engine):
 
         """ Called by __init__ ; read files from the source directory. """
 
-        self.key = onefile('key', kwargs['tinker_key'] if 'tinker_key' in kwargs else None)
-        self.prm = onefile('prm', kwargs['tinker_prm'] if 'tinker_prm' in kwargs else None)
+        self.key = onefile(kwargs.get('tinker_key'), 'key')
+        self.prm = onefile(kwargs.get('tinker_prm'), 'prm')
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
-        elif 'coords' in kwargs:
-            if kwargs['coords'].endswith('.xyz'):
-                self.mol = Molecule(kwargs['coords'], ftype="tinker")
-            else:
-                self.mol = Molecule(kwargs['coords'])
         else:
-            arcfile = onefile('arc')
-            if not arcfile: 
-                logger.error('Cannot determine which .arc file to use\n')
-                raise RuntimeError
-            self.mol = Molecule(arcfile)
+            crdfile = onefile(kwargs.get('coords'), 'arc', err=True)
+            self.mol = Molecule(crdfile)
 
     def calltinker(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
