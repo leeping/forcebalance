@@ -471,6 +471,7 @@ class Liquid(Target):
                 if os.path.exists('./%s/npt_result.p' % label):
                     Points.append(PT)
                     Results[tt] = lp_load(open('./%s/npt_result.p' % label))
+                    _exec('bzip2 ./%s/npt_result.p' % label, print_command=False)
                     if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mPoints]:
                         mPoints.append(PT)
                     tt += 1
@@ -580,6 +581,7 @@ class Liquid(Target):
                 logger.info('Reading information from ./%s/npt_result.p\n' % label)
                 Points.append(PT)
                 Results[tt] = lp_load(open('./%s/npt_result.p' % label))
+                _exec('bzip2 ./%s/npt_result.p' % label, print_command=False)
                 if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mPoints]:
                     mPoints.append(PT)
                 if 'mbar' in self.RefData and PT in self.RefData['mbar'] and self.RefData['mbar'][PT]:

@@ -684,6 +684,8 @@ class RemoteTarget(Target):
         
         self.r_options = options.copy()
         self.r_options["type"]="single"
+        self.set_option(tgt_opts, "remote_prefix", "rpfx")
+        self.set_option(tgt_opts, "remote_backup", "rbak")
         
         self.r_tgt_opts = tgt_opts.copy()
         self.r_tgt_opts["remote"]=False
@@ -710,6 +712,9 @@ class RemoteTarget(Target):
 
         with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF, self.pgrad),f)
         
+        # Link in the rpfx script.
+        if len(self.rpfx) > 0:
+            forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data",self.rpfx),self.rpfx)
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
         forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, "target.tar.bz2"),"target.tar.bz2")
         
@@ -723,10 +728,14 @@ class RemoteTarget(Target):
         # output:
         #   objective.p: pickled objective function dictionary
         #   indicate.log: results of target.indicate() written to file
-        forcebalance.nifty.queue_up(wq, "python rtarget.py > rtarget.out 2>&1",
-            ["forcebalance.p", "rtarget.py", "target.tar.bz2"],
-            ['objective.p', 'indicate.log', 'rtarget.out'],
-            tgt=self, verbose=False)
+        if len(self.rpfx) > 0 and self.rpfx not in ['rungmx.sh', 'runcuda.sh']:
+            logger.error('Unsupported prefix script for launching remote target')
+            raise RuntimeError
+        forcebalance.nifty.queue_up(wq, "%spython rtarget.py > rtarget.out 2>&1" % (("sh %s%s " % (self.rpfx, " -b" if self.rbak else "")) 
+                                                                                    if len(self.rpfx) > 0 else ""),
+                                    ["forcebalance.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
+                                    ['objective.p', 'indicate.log', 'rtarget.out'],
+                                    tgt=self, verbose=False)
 
     def read(self,mvals,AGrad=False,AHess=False):
         return self.get(mvals, AGrad, AHess)

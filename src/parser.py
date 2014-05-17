@@ -152,6 +152,7 @@ tgt_opts_types = {
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),
                  "read"                  : (None, 50, 'Provide a temporary directory ".tmp" to read data from a previous calculation on the initial iteration (for instance, to restart an aborted run).', 'Liquid and Remote targets', 'Liquid, Remote'),
+                 "remote_prefix"         : ('', 50, 'Specify an optional prefix script to run in front of rtarget.py, for loading environment variables', 'Remote targets', 'Remote'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
@@ -159,7 +160,6 @@ tgt_opts_types = {
     'lists'   : {"name"      : ([], 200, 'The name of the target, corresponding to the directory targets/name ; may provide a list if multiple targets have the same settings', 'All targets (important)'),
                  "fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
                  "quantities" : ([], 100, 'List of quantities to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
-                 "amber_source" : (["leaprc.ff99SB", "leaprc.gaff"], 100, 'List of leaprc files to load when setting up the AMBER engine', 'Targets that use the AMBER engine', 'amber'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
@@ -205,6 +205,7 @@ tgt_opts_types = {
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
                  "adapt_errors"     : (0, 50, 'Adapt to simulation uncertainty by combining property estimations and adjusting simulation length.', 'Condensed phase property targets', 'liquid'),
                  "force_average"    : (0, -50, 'Average over all atoms when normalizing force errors.', 'Force matching', 'abinitio'),
+                 "remote_backup"    : (0, -50, 'When running remote target, back up files at the remote location.', 'Liquid, lipid and remote targets', 'liquid, lipid, remote'),
                  },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid, lipid'),
