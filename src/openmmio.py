@@ -735,6 +735,9 @@ class OpenMM(Engine):
         """
         # Divisor for the temperature (RPMD sets it to nonzero.)
         self.tdiv = 1
+        
+        # Boolean flag indicating an RPMD simulation
+        self.rpmd = len(rpmd_opts)>0
 
         ## Determine the integrator.
         if temperature:
@@ -871,15 +874,20 @@ class OpenMM(Engine):
         #----
         # NOTE: Periodic box vectors must be set FIRST
         if self.pbc:
-          self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+            if not self.rpmd:
+                self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+            else:
+                self.simulation.context.setPeriodicBoxVectors(*self.xyz_rpmd[0][shot][1])
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
-        self.simulation.context.setPositions(self.xyz_omms[shot][0])
-        self.simulation.context.computeVirtualSites()
-        if self.tdiv>1:#RPMDintegrator
-          integrator=self.simulation.context.getIntegrator()
-          for i in range(self.tdiv):
-              integrator.setPositions(i,self.xyz_omms[shot][0])
+        if not self.rpmd:
+            self.simulation.context.setPositions(self.xyz_omms[shot][0])
+            self.simulation.context.computeVirtualSites()
+        else:
+            rpmdIntegrator = self.simulation.context.getIntegrator()
+            for i in range(rpmdIntegrator.getNumCopies()):
+                rpmdIntegrator.setPositions(i,self.xyz_rpmd[i][shot][0]
+            self.simulation.context.computeVirtualSites()
 #          for i in range(self.tdiv):
 #              temp_position=integrator.getState(i,getPositions=True).getPositions()
 #              self.simulation.context.setPositions(temp_position)
@@ -1143,6 +1151,10 @@ class OpenMM(Engine):
         edecomp = OrderedDict()
         # Stored coordinates, box vectors
         self.xyz_omms = []
+        # Stored coordinates, box vectors for each RPMD system copy
+        self.xyz_rpmd = []
+        for i in range(self.simulation.integrator.getNumCopies()):
+            self.xyz_rpmd.append([])
         # Densities, potential and kinetic energies, box volumes, dipole moments
         Rhos = []
         Potentials = []
@@ -1154,6 +1166,7 @@ class OpenMM(Engine):
         # Now run the simulation #
         #========================#
         # Initialize velocities.
+        #
         self.simulation.context.setVelocitiesToTemperature(temperature*kelvin)
         #print(XmlSerializer.serialize(self.simulation.system)) 
         # Equilibrate.
@@ -1166,8 +1179,14 @@ class OpenMM(Engine):
         for iteration in range(-1 if self.tdiv == 1 else 0, iequil):
             if iteration >= 0:
                 self.simulation.step(nsave)
-            state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-
+            if not self.rpmd:
+                state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
+            else:
+                self.rpmd_states = []
+                for i in range(self.simulation.integrator.getNumCopies()):
+                    self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True)
+                state = self.rpmd_states[0]
+#Need to confirm that these energy functions are properly implemented
 ##### Energy Data
 #            kinetic=state.getKineticEnergy()/self.tdiv
 #            potential=state.getPotentialEnergy()
@@ -1177,7 +1196,10 @@ class OpenMM(Engine):
             cen_kinetic=centroid_kinetic(self.simulation)
 #####
             if self.pbc:
-                box_vectors = state.getPeriodicBoxVectors()
+                if not self.rpmd:
+                    box_vectors = state.getPeriodicBoxVectors()
+                else:
+                    box_vectors = self.rpmd_states[0].getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
                 density = (self.mass / volume).in_units_of(kilogram / meter**3)
             else:
@@ -1199,12 +1221,19 @@ class OpenMM(Engine):
             if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
         if save_traj:
             self.simulation.reporters.append(PDBReporter('%s-md.pdb' % self.name, nsteps))
-            self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave))
+            self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave)))
         for iteration in range(-1 if self.tdiv == 1 else 0, isteps):
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
-            state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
+            if not self.rpmd:
+                state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
+            else:
+                self.rpmd_states = []
+                for i in range(self.simulation.integrator.getNumCopies()):
+                    self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True))
+                state = self.rpmd_states[0]
+                    
 ##### Energy Data
 #            kinetic=state.getKineticEnergy()/self.tdiv
 #            potential=state.getPotentialEnergy()
@@ -1215,14 +1244,21 @@ class OpenMM(Engine):
 #####
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
-                box_vectors = state.getPeriodicBoxVectors()
+                if self.rpmd:
+                    box_vectors = self.simulation.integrator.getState(0).getPeriodicBoxVectors()
+                else:
+                    box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
                 density = (self.mass / volume).in_units_of(kilogram / meter**3)
             else:
                 box_vectors = None
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            self.xyz_omms.append([state.getPositions(), box_vectors])
+            if not self.rpmd:
+                self.xyz_omms.append([state.getPositions(), box_vectors])
+            else:
+                for i in range(self.simulation.integrator.getNumCopies()):
+                    self.xyz_rpmd[i].append([self.rpmd_states[i].getPositions(), box_vectors])
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
