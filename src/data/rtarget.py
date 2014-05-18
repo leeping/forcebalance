@@ -9,9 +9,7 @@ logger = forcebalance.output.getLogger("forcebalance")
 logger.setLevel(forcebalance.output.DEBUG)
 
 # load pickled variables from forcebalance.p
-f=open('forcebalance.p', 'r')
-mvals, AGrad, AHess, id_string, options, tgt_opts, forcefield, pgrad = forcebalance.nifty.lp_load(f)
-f.close()
+mvals, AGrad, AHess, id_string, options, tgt_opts, forcefield, pgrad = forcebalance.nifty.lp_load('forcebalance.p')
 
 print "Evaluating remote target ID: %s" % id_string
 
@@ -40,8 +38,7 @@ Tgt.submit_jobs(mvals, AGrad = AGrad, AHess = AHess)
 
 Ans = Tgt.meta_get(mvals, AGrad = AGrad, AHess = AHess)
 
-with wopen('objective.p') as f:
-    forcebalance.nifty.lp_dump(Ans, f)        # or some other method of storing resulting objective
+forcebalance.nifty.lp_dump(Ans, 'objective.p')        # or some other method of storing resulting objective
 
 # also run target.indicate()
 logger = forcebalance.output.getLogger("forcebalance")

@@ -417,7 +417,7 @@ class Liquid(Target):
         #
         # First dump the force field to a pickle file
         printcool("Target: %s - launching MD simulations\nTime steps: %i (eq) + %i (md)" % (self.name, self.liquid_eq_steps, self.liquid_md_steps), color=0)
-        with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict,AGrad),f)
+        lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == First() and self.manual:
@@ -451,7 +451,7 @@ class Liquid(Target):
         Read in time series for all previous iterations.
         """
 
-        unpack = forcebalance.nifty.lp_load(open('forcebalance.p'))
+        unpack = forcebalance.nifty.lp_load('forcebalance.p')
         mvals1 = unpack[1]
         if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
@@ -466,12 +466,9 @@ class Liquid(Target):
             tt = 0
             logger.info('Reading liquid data from %s\n' % os.getcwd())
             for label, PT in zip(self.Labels, self.PhasePoints):
-                if os.path.exists('./%s/npt_result.p.bz2' % label):
-                    _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
                 if os.path.exists('./%s/npt_result.p' % label):
                     Points.append(PT)
-                    Results[tt] = lp_load(open('./%s/npt_result.p' % label))
-                    _exec('bzip2 ./%s/npt_result.p' % label, print_command=False)
+                    Results[tt] = lp_load('./%s/npt_result.p' % label)
                     if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mPoints]:
                         mPoints.append(PT)
                     tt += 1
@@ -559,7 +556,7 @@ class Liquid(Target):
         
         """
         
-        unpack = forcebalance.nifty.lp_load(open('forcebalance.p'))
+        unpack = forcebalance.nifty.lp_load('forcebalance.p')
         mvals1 = unpack[1]
         if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
@@ -575,13 +572,10 @@ class Liquid(Target):
         mPoints = [] # These are the phase points to use for enthalpy of vaporization; if we're scanning pressure then set hvap_wt for higher pressures to zero.
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
-            if os.path.exists('./%s/npt_result.p.bz2' % label):
-                _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
             if os.path.exists('./%s/npt_result.p' % label):
                 logger.info('Reading information from ./%s/npt_result.p\n' % label)
                 Points.append(PT)
-                Results[tt] = lp_load(open('./%s/npt_result.p' % label))
-                _exec('bzip2 ./%s/npt_result.p' % label, print_command=False)
+                Results[tt] = lp_load('./%s/npt_result.p' % label)
                 if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mPoints]:
                     mPoints.append(PT)
                 if 'mbar' in self.RefData and PT in self.RefData['mbar'] and self.RefData['mbar'][PT]:
