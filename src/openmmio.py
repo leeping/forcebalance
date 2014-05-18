@@ -886,8 +886,11 @@ class OpenMM(Engine):
         else:
             rpmdIntegrator = self.simulation.context.getIntegrator()
             for i in range(rpmdIntegrator.getNumCopies()):
-                rpmdIntegrator.setPositions(i,self.xyz_rpmd[i][shot][0]
-            self.simulation.context.computeVirtualSites()
+                tempPositions = self.xyz_rpmd[i][shot][0] 
+                self.simulation.context.setPositions(temp_positions)
+                self.simulation.context.computeVirtualSites()
+                posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
+                rpmdIntegrator.setPositions(i,posWithVsites)
 #          for i in range(self.tdiv):
 #              temp_position=integrator.getState(i,getPositions=True).getPositions()
 #              self.simulation.context.setPositions(temp_position)
