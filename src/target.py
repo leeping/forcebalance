@@ -463,6 +463,15 @@ class Target(forcebalance.BaseClass):
 
         return -1
 
+    def maxid(self):
+
+        """ Supply the latest existing temp-directory. """
+        
+        abs_rd = os.path.join(self.root, self.tempdir)
+
+        iterints = [int(d.replace('iter_','')) for d in os.listdir(abs_rd) if os.path.isdir(os.path.join(abs_rd, d))]
+        return sorted(iterints)[-1]
+
     def meta_indicate(self):
 
         """ 
