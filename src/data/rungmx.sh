@@ -21,6 +21,12 @@ COMMAND=$@
 . /etc/bashrc
 . ~/.bashrc
 
+# Load Gromacs environment variables if needed (e.g. Intel compiler variables)
+if [[ $HOSTNAME =~ "biox3" ]] ; then
+    # biox3 cluster
+    . ~/opt/intel/bin/compilervars.sh intel64
+fi
+
 # Backup folder
 export BAK=$HOME/temp/rungmx-backups
 
