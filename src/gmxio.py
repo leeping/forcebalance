@@ -25,7 +25,7 @@ from forcebalance.thermo import Thermo
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 import traceback
 import random
 #import IPython
@@ -207,6 +207,7 @@ pdict = {'BONDS':{3:'B', 4:'K'},
          'VSITE4FDN':{6:'A',7:'B',8:'C'},
          'DEF':{3:'FLJ',4:'FQQ'},
          'POL':{3:'ALPHA'},
+         'DEFINE':dict([(i, '') for i in range(100)])
          }
 
 def parse_atomtype_line(line):
@@ -367,9 +368,13 @@ class ITP_Reader(BaseReader):
         self.itype = None
         self.ln   += 1
         # No sense in doing anything for an empty line or a comment line.
-        # Also skip C preprocessor lines.
-        if len(s) == 0 or re.match('^ *;',line) or re.match('^#',line): return None, None
+        if len(s) == 0 or re.match('^ *;',line): return None, None
         # Now go through all the cases.
+        if re.match('^#', line):
+            self.override = 'DEFINE:' + s[1]
+        elif hasattr(self, 'override'):
+            delattr(self, 'override')
+
         if re.match('^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
             self.sec = re.sub('[\[\] \n]','',line.strip())
