@@ -137,7 +137,7 @@ echo "#=======================#"
 echo
 echo $COMMAND
 
-rm -f npt_result.p npt_result.p.bz2
+rm -f npt_result.p
 export PYTHONUNBUFFERED="y"
 
 # Run the actual command.
