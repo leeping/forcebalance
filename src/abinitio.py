@@ -110,6 +110,7 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'force_average')
         ## Assign a greater weight to 
         self.set_option(tgt_opts,'energy_asymmetry')
+        self.savg = (self.energy_asymmetry == 1.0 and not self.absolute)
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -757,6 +758,7 @@ class AbInitio(Target):
                 M_all[i,:] = M.copy()
             if not cv:
                 X     = M-Q
+                boost   = 1.0
                 if self.energy_asymmetry != 1.0:
                     if not self.all_at_once:
                         logger.error("Asymmetric weights only work when all_at_once is enabled")
@@ -765,9 +767,10 @@ class AbInitio(Target):
                         logger.error("Asymmetric weights do not work with QM Boltzmann weights")
                         raise RuntimeError
                     EQref = self.eqm - min(self.eqm)
-                    EMref = M_all[:, 0] - min(M_all[:,0]) #M_all[np.argmin(self.eqm), 0]
+                    EMref = M_all[:, 0] - M_all[np.argmin(self.eqm), 0]
+                    X[0] = (EMref[i] - EQref[i])
                     if EMref[i] - EQref[i] < 0.0:
-                        X *= self.energy_asymmetry
+                        boost = self.energy_asymmetry
             # Increment the average values.
             a = 1
             if self.force:
@@ -814,8 +817,8 @@ class AbInitio(Target):
             else:
                 Xi     = X**2                   
             XiAll[i] = Xi.copy()
-            SPiXi += P * Xi
-            SRiXi += R * Xi
+            SPiXi += P * Xi * boost
+            SRiXi += R * Xi * boost
             #==============================================================#
             #      STEP 2a: Increment gradients and mean quantities.       #
             #   This is only implemented for the case without covariance.  #
@@ -841,8 +844,8 @@ class AbInitio(Target):
                     #M0_M_pp[p][0] += P * M_pp[p][0]
                     #M0_Q_pp[p][0] += R * M_pp[p][0]
                     Xi_p        = 2 * X * M_p[p]
-                    SPiXi_p[p] += P * Xi_p
-                    SRiXi_p[p] += R * Xi_p
+                    SPiXi_p[p] += P * Xi_p * boost
+                    SRiXi_p[p] += R * Xi_p * boost
                     if not AHess: continue
                     if self.all_at_once:
                         M_pp[p] = ddM_all[i, p]
@@ -850,24 +853,24 @@ class AbInitio(Target):
                     #Xi_pq       = 2 * (M_p[p] * M_p[p] + X * M_pp[p])
                     # Gauss-Newton formula for approximate Hessian
                     Xi_pq       = 2 * (M_p[p] * M_p[p])
-                    SPiXi_pq[p,p] += P * Xi_pq
-                    SRiXi_pq[p,p] += R * Xi_pq
+                    SPiXi_pq[p,p] += P * Xi_pq * boost
+                    SRiXi_pq[p,p] += R * Xi_pq * boost
                     for q in range(p):
                         if all(M_p[q] == 0): continue
                         if q not in self.pgrad: continue
                         Xi_pq          = 2 * M_p[p] * M_p[q]
-                        SPiXi_pq[p,q] += P * Xi_pq
-                        SRiXi_pq[p,q] += R * Xi_pq
+                        SPiXi_pq[p,q] += P * Xi_pq * boost
+                        SRiXi_pq[p,q] += R * Xi_pq * boost
 
         # Dump energies and forces to disk.
         M_all_print = M_all.copy()
-        if not self.absolute:
+        if self.savg:
             M_all_print[:,0] -= np.average(M_all_print[:,0], weights=self.boltz_wts)
         if self.force:
             Q_all_print = np.hstack((col(self.eqm),self.fref))
         else:
             Q_all_print = col(self.eqm)
-        if not self.absolute:
+        if self.savg:
             QEtmp = np.array(Q_all_print[:,0]).flatten()
             Q_all_print[:,0] -= np.average(QEtmp, weights=self.boltz_wts)
         if self.attenuate: 
@@ -1011,27 +1014,27 @@ class AbInitio(Target):
             X2_M  = build_objective(SPiXi,WCiW,Z,Q0_M,M0_M,NCP1)
             X2_Q  = build_objective(SRiXi,WCiW,Y,Q0_Q,M0_Q,NCP1)
         else:
-            X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
-            X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute)
+            X2_M  = weighted_variance(SPiXi,WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = self.savg)
+            X2_Q  = weighted_variance(SRiXi,WCiW,Y,X0_Q,X0_Q,NCP1,subtract_mean = self.savg)
             # Print out all energy / force contributions, useful for debugging.
             # for i in range(XiAll.shape[0]):
-            #     efctr = weighted_variance(XiAll[i],WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
+            #     efctr = weighted_variance(XiAll[i],WCiW,Z,X0_M,X0_M,NCP1,subtract_mean = self.savg)
             #     WCiW1 = WCiW.copy()
             #     for j in range(1, len(WCiW1)):
             #         WCiW1[j] = 0.0
-            #     ectr = weighted_variance(XiAll[i],WCiW1,Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute)
+            #     ectr = weighted_variance(XiAll[i],WCiW1,Z,X0_M,X0_M,NCP1,subtract_mean = self.savg)
             #     print i, "ectr = %.3f efctr = %.3f" % (ectr, efctr)
             for p in self.pgrad:
                 if not AGrad: continue
-                X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1,subtract_mean = not self.absolute)
-                X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1,subtract_mean = not self.absolute)
+                X2_M_p[p] = weighted_variance(SPiXi_p[p],WCiW,Z,2*X0_M,M0_M_p[p],NCP1,subtract_mean = self.savg)
+                X2_Q_p[p] = weighted_variance(SRiXi_p[p],WCiW,Y,2*X0_Q,M0_Q_p[p],NCP1,subtract_mean = self.savg)
                 if not AHess: continue
-                X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1,subtract_mean = not self.absolute)
-                X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1,subtract_mean = not self.absolute)
+                X2_M_pq[p,p] = weighted_variance2(SPiXi_pq[p,p],WCiW,Z,2*M0_M_p[p],M0_M_p[p],2*X0_M,M0_M_pp[p],NCP1,subtract_mean = self.savg)
+                X2_Q_pq[p,p] = weighted_variance2(SRiXi_pq[p,p],WCiW,Y,2*M0_Q_p[p],M0_Q_p[p],2*X0_Q,M0_Q_pp[p],NCP1,subtract_mean = self.savg)
                 for q in range(p):
                     if q not in self.pgrad: continue
-                    X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1,subtract_mean = not self.absolute)
-                    X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1,subtract_mean = not self.absolute)
+                    X2_M_pq[p,q] = weighted_variance(SPiXi_pq[p,q],WCiW,Z,2*M0_M_p[p],M0_M_p[q],NCP1,subtract_mean = self.savg)
+                    X2_Q_pq[p,q] = weighted_variance(SRiXi_pq[p,q],WCiW,Y,2*M0_Q_p[p],M0_Q_p[q],NCP1,subtract_mean = self.savg)
                     # Get the other half of the Hessian matrix.
                     X2_M_pq[q,p] = X2_M_pq[p,q]
                     X2_Q_pq[q,p] = X2_Q_pq[p,q]
@@ -1051,7 +1054,7 @@ class AbInitio(Target):
                 for q in self.pgrad:
                     H[p,q] = MBP * X2_M_pq[p,q] + QBP * X2_Q_pq[p,q]
         # Energy error in kJ/mol
-        if not self.absolute:
+        if self.savg:
             E0_M = (2*Q0_M[0]*M0_M[0] - Q0_M[0]*Q0_M[0] - M0_M[0]*M0_M[0])/Z/Z;
             E0_Q = (2*Q0_Q[0]*M0_Q[0] - Q0_Q[0]*Q0_Q[0] - M0_Q[0]*M0_Q[0])/Y/Y;
         else:
@@ -1085,8 +1088,8 @@ class AbInitio(Target):
         # Save values to qualitative indicator if not inside finite difference code.
         if not in_fd():
             # Contribution from energy and force parts.
-            self.e_ctr = (MBP * weighted_variance(np.array([SPiXi[0]]),np.array([WCiW[0]]),Z,X0_M,X0_M,NCP1,subtract_mean = not self.absolute) + 
-                          QBP * weighted_variance(np.array([SRiXi[0]]),np.array([WCiW[0]]),Y,X0_Q,X0_Q,NCP1,subtract_mean = not self.absolute))
+            self.e_ctr = (MBP * weighted_variance(np.array([SPiXi[0]]),np.array([WCiW[0]]),Z,X0_M,X0_M,NCP1,subtract_mean = self.savg) + 
+                          QBP * weighted_variance(np.array([SRiXi[0]]),np.array([WCiW[0]]),Y,X0_Q,X0_Q,NCP1,subtract_mean = self.savg))
             self.e_ref = MBP * np.sqrt(QQ_M[0]/Z - Q0_M[0]**2/Z/Z) + QBP * np.sqrt((QQ_Q[0]/Y - Q0_Q[0]**2/Y/Y))
             self.e_err = dE
             self.e_err_pct = dEfrac
