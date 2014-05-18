@@ -216,11 +216,9 @@ class Optimizer(forcebalance.BaseClass):
 
         maxrd = max([T.maxrd() for T in self.Objective.Targets])
         if maxrd < 0: return
-        ## This will be invoked if we quit RIGHT at the start of an iteration (i.e. before any jobs have started)
-        # However, the behavior is incorrect if we quit at the very END of an iteration. (05/14/14)
-        # Need to figure out what to do here...
-        # if len(set([T.maxrd() for T in self.Objective.Targets])) == 1:
-        #     maxrd += 1
+        ## This will be invoked if we quit RIGHT at the start of an iteration (i.e. jobs were launched but none were finished)
+        if len(set([T.maxrd() for T in self.Objective.Targets])) == 1 and any([((T.maxid() - T.maxrd()) > 0) for T in self.Objective.Targets]):
+            maxrd += 1
         printcool("Continuing optimization from iteration %i\nThese targets will load data from disk:\n%s" % \
                       (maxrd, '\n'.join([T.name for T in self.Objective.Targets if T.maxrd() == maxrd])), color=4)
         ## If data exists in the temp-dir corresponding to the highest
