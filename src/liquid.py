@@ -264,8 +264,6 @@ class Liquid(Target):
                 if d in self.Labels:
                     if os.path.exists(os.path.join(there, d, 'npt_result.p')):
                         havepts += 1
-                    elif os.path.exists(os.path.join(there, d, 'npt_result.p.bz2')):
-                        havepts += 1
         if (float(havepts)/len(self.Labels)) > 0.75:
             return 1
         else:
@@ -274,7 +272,7 @@ class Liquid(Target):
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
-        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
+        if not (os.path.exists('npt_result.p')):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
             self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
@@ -286,7 +284,7 @@ class Liquid(Target):
             else:
                 queue_up(wq, command = cmdstr+' &> npt.out',
                          input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
-                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
+                         output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
         self.FF.make(mvals)
