@@ -19,7 +19,7 @@ echo $@
 
 # Remove the result file (so the result from a previous calculation
 # doesn't get accidentally sent back)
-rm -f md_result.p.bz2
+rm -f md_result.p
 export PYTHONPATH=~/research/forcebalance/lib/python2.7/site-packages/
 time $COMMAND
 exitstat=$?
