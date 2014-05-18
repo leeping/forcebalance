@@ -17,7 +17,9 @@ echo "#=======================#"
 echo
 echo $@
 
-rm -f md_result.p md_result.p.bz2
+# Remove the result file (so the result from a previous calculation
+# doesn't get accidentally sent back)
+rm -f md_result.p.bz2
 export PYTHONPATH=~/research/forcebalance/lib/python2.7/site-packages/
 time $COMMAND
 exitstat=$?
@@ -25,8 +27,5 @@ exitstat=$?
 find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
 mkdir -p $BAK/$PWD
 cp * $BAK/$PWD
-# For some reason I was still getting error messages about the bzip already existing.
-rm -f md_result.p.bz2
-#bzip2 md_result.p
 
 exit $exitstat

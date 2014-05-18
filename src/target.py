@@ -386,8 +386,7 @@ class Target(forcebalance.BaseClass):
         if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from mvals.txt does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
         
-        with open('objective.p') as f:
-            return forcebalance.nifty.lp_load(f)
+        return forcebalance.nifty.lp_load('objective.p')
 
     def absrd(self, inum=None):
 
@@ -546,8 +545,7 @@ class Target(forcebalance.BaseClass):
             ## Evaluate the objective function.
             Answer = self.get(mvals, AGrad, AHess)
             if self.write_objective:
-                with wopen('objective.p') as f:
-                    forcebalance.nifty.lp_dump(Answer, f)
+                forcebalance.nifty.lp_dump(Answer, 'objective.p')
 
         ## Save the force field files to this directory, so that it
         ## reflects the objective function and properties that were
@@ -710,7 +708,7 @@ class RemoteTarget(Target):
 
         id_string = "%s_iter%04i" % (self.name, Counter())
 
-        with wopen('forcebalance.p') as f: forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF, self.pgrad),f)
+        forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF, self.pgrad),'forcebalance.p')
         
         # Link in the rpfx script.
         if len(self.rpfx) > 0:
@@ -743,8 +741,7 @@ class RemoteTarget(Target):
     def get(self,mvals,AGrad=False,AHess=False):
         with open('indicate.log', 'r') as f:
             self.remote_indicate = f.read()
-        with open('objective.p', 'r') as f:
-            return forcebalance.nifty.lp_load(f)
+        return forcebalance.nifty.lp_load('objective.p')
         
     def indicate(self):
         logger.info(self.remote_indicate)
