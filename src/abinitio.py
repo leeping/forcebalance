@@ -735,17 +735,6 @@ class AbInitio(Target):
                 logger.debug("\rIncrementing quantities for snapshot %i\r" % i)
             # Build Boltzmann weights and increment partition function.
             P   = self.boltz_wts[i]
-            if self.energy_asymmetry != 1.0:
-                if not self.all_at_once:
-                    logger.error("Asymmetric weights only work when all_at_once is enabled")
-                    raise RuntimeError
-                if self.qmboltz != 0.0:
-                    logger.error("Asymmetric weights do not work with QM Boltzmann weights")
-                    raise RuntimeError
-                EQref = self.eqm - min(self.eqm)
-                EMref = M_all[:, 0] - M_all[np.argmin(self.eqm), 0]
-                if EMref[i] - EQref[i] < 0.0:
-                    P *= self.energy_asymmetry
             Z  += P
             R   = self.qmboltz_wts[i]*self.boltz_wts[i] / QBN
             Y  += R
@@ -768,6 +757,17 @@ class AbInitio(Target):
                 M_all[i,:] = M.copy()
             if not cv:
                 X     = M-Q
+                if self.energy_asymmetry != 1.0:
+                    if not self.all_at_once:
+                        logger.error("Asymmetric weights only work when all_at_once is enabled")
+                        raise RuntimeError
+                    if self.qmboltz != 0.0:
+                        logger.error("Asymmetric weights do not work with QM Boltzmann weights")
+                        raise RuntimeError
+                    EQref = self.eqm - min(self.eqm)
+                    EMref = M_all[:, 0] - min(M_all[:,0]) #M_all[np.argmin(self.eqm), 0]
+                    if EMref[i] - EQref[i] < 0.0:
+                        X *= self.energy_asymmetry
             # Increment the average values.
             a = 1
             if self.force:
