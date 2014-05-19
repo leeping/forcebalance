@@ -1179,7 +1179,7 @@ class OpenMM(Engine):
             else:
                 self.rpmd_states = []
                 for i in range(self.simulation.integrator.getNumCopies()):
-                    self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True)
+                    self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True))
                 state = self.rpmd_states[0]
 #Need to confirm that these energy functions are properly implemented
 ##### Energy Data
