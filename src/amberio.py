@@ -7,14 +7,16 @@ modules for other programs because it's so simple.
 @date 01/2012
 """
 
-import os
+import os, sys
 from re import match, sub, split, findall
-from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles
+import networkx as nx
+from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles, warn_press_key
 import numpy as np
 from forcebalance import BaseReader
 from forcebalance.engine import Engine
 from forcebalance.abinitio import AbInitio
 from forcebalance.molecule import Molecule
+from collections import OrderedDict, defaultdict
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -39,13 +41,16 @@ def is_mol2_atom(line):
         return False
     return all([isint(s[0]), isfloat(s[2]), isfloat(s[3]), isfloat(s[4]), isfloat(s[8])])
 
-def write_leap(fnm, mol2=[], frcmod=[], pdb=[], name=None, delcheck=False):
+def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], delcheck=False):
     """ Parse and edit an AMBER LEaP input file. Output file is written to inputfile_ (with trailing underscore.) """
     have_fmod = []
     have_mol2 = []
-    have_pdb = []
     # The lines that will be printed out to actually run tleap
     line_out = []
+    aload = ['loadamberparams', 'source', 'loadoff']
+    aload_eq = ['loadmol2']
+    spath.append('.')
+             
     for line in open(fnm):
         # Skip comment lines
         if line.strip().startswith('#') : continue
@@ -53,37 +58,49 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=[], name=None, delcheck=False):
         s = line.split()
         ll = line.lower()
         ls = line.lower().split()
+        # Check to see if all files being loaded are in the search path
+        if '=' in line:
+            if ll.split('=')[1].split()[0] in aload_eq:
+                if not any([os.path.exists(os.path.join(d, s[-1])) for d in spath]):
+                    logger.error("The file in this line cannot be loaded : " + line.strip())
+                    raise RuntimeError
+        elif len(ls) > 0 and ls[0] in aload:
+            if not any([os.path.exists(os.path.join(d, s[-1])) for d in spath]):
+                logger.error("The file in this line cannot be loaded : " + line.strip())
+                raise RuntimeError
         if len(s) >= 2 and ls[0] == 'loadamberparams':
             have_fmod.append(s[1])
         if len(s) >= 2 and 'loadmol2' in ll:
             have_mol2.append(s[-1])
         if len(s) >= 2 and 'loadpdb' in ll:
-            have_pdb.append(s[-1])
-            # Adopt the name from the loadpdb line.
-            if name == None: name = line.split('=')[0].strip()
+            # Adopt the AMBER molecule name from the loadpdb line.
+            ambername = line.split('=')[0].strip()
+            # If we pass in our own PDB, then this line is replaced.
+            if pdb == None:
+                line = '%s = loadpdb %s\n' % (ambername, pdb)
         if len(s) >= 1 and ls[0] == 'check' and delcheck:
             # Skip over check steps if so decreed
             line = "# " + line
-        if 'saveamberparm' in ll:
-            if s[1] != name or s[2] != name+'.prmtop' or s[3] != name+'.inpcrd':
-                logger.error(line)
-                logger.error("WARNING: saveamberparm should look like:")
-                logger.error("saveamberparm %s %s.prmtop %s.inpcrd" % (name, name, name))
-                raise RuntimeError
+        if 'saveamberparm' in ll: 
+            # We'll write the saveamberparm line ourselves
+            continue
         if len(s) >= 1 and ls[0] == 'quit':
             # Don't write the quit line.
             break
+        if not line.endswith('\n') : line += '\n'
         line_out.append(line)
+    # Sanity checks: If frcmod and mol2 files are provided to this function,
+    # they should be in the leap.cmd file as well.  There should be exactly
+    # one PDB file being loaded.
     for i in frcmod:
         if i not in have_fmod:
-            logger.warning("WARNING: %s is not being loaded in %s" % (i, fnm))
+            warn_press_key("WARNING: %s is not being loaded in %s" % (i, fnm))
     for i in mol2:
         if i not in have_mol2:
-            logger.warning("WARNING: %s is not being loaded in %s" % (i, fnm))
-    for i in pdb:
-        if i not in have_pdb:
-            logger.warning("WARNING: %s is not being loaded in %s" % (i, fnm))
+            warn_press_key("WARNING: %s is not being loaded in %s" % (i, fnm))
+
     fout = fnm+'_'
+    line_out.append('saveamberparm %s %s.prmtop %s.inpcrd\n' % (ambername, prefix, prefix))
     line_out.append('quit\n')
     with open(fout, 'w') as f: print >> f, ''.join(line_out)
 
@@ -217,7 +234,7 @@ class AMBER(Engine):
 
     def __init__(self, name="amber", **kwargs):
         ## Keyword args that aren't in this list are filtered out.
-        self.valkwd = ['amberhome', 'amber_mol2', 'amber_frcmod', 'amber_leapcmd']
+        self.valkwd = ['amberhome', 'pdb', 'mol2', 'frcmod', 'leapcmd']
         super(AMBER,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -235,59 +252,52 @@ class AMBER(Engine):
             if which('sander') == '':
                 warn_press_key("Please add AMBER executables to the PATH or specify amberhome.")
             self.amberhome = os.path.split(which('sander'))[0]
+        
+        with open('.quit.leap', 'w') as f:
+            print >> f, 'quit'
+
+        # AMBER search path
+        self.spath = []
+        for line in self.callamber('tleap -f .quit.leap'):
+            if 'Adding' in line and 'to search path' in line:
+                self.spath.append(line.split('Adding')[1].split()[0])
+        os.remove('.quit.leap')
 
     def readsrc(self, **kwargs):
 
         """ Called by __init__ ; read files from the source directory. """
 
-        self.mol2 = listfiles(kwargs.get('amber_mol2'), 'mol2')
-        self.frcmod = listfiles(kwargs.get('amber_frcmod'), 'frcmod')
-        self.leapcmd = onefile(kwargs.get('amber_leapcmd'), 'leap', err=True)
-            
         # Name of the molecule, currently just call it a default name.
         self.mname = 'molecule'
-
-        # if 'mol' in kwargs:
-        #     self.mol = kwargs['mol']
-        # elif 'coords' in kwargs:
-            
-
-        pdbfnm = None
-        # Determine the PDB file name.
-        if 'pdb' in kwargs and os.path.exists(kwargs['pdb']):
-            # Case 1. The PDB file name is provided explicitly
-            pdbfnm = kwargs['pdb']
-            if not os.path.exists(pdbfnm): 
-                logger.error("%s specified but doesn't exist\n" % pdbfnm)
-                raise RuntimeError
 
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
         elif 'coords' in kwargs:
-            self.mol = Molecule(kwargs['coords'])
-        else:
-            logger.error('Must provide either a molecule object or coordinate file.\n')
-            raise RuntimeError
+            crdfile = onefile(kwargs.get('coords'), None, err=True)
+            self.mol = Molecule(crdfile)
 
+        # If the molecule provides all of the needed topology information then
+        # there is no need to load a PDB.
+        needpdb = True
+        if hasattr(self, 'mol') and all([i in self.mol.Data.keys() for i in ["chain", "atomname", "resid", "resname", "elem"]]):
+            needpdb = False
+
+        # Determine the PDB file name.
+        # If 'pdb' is provided to Engine initialization, it will be used to 
+        # copy over topology information (chain, atomname etc.).  If mol/coords
+        # is not provided, then it will also provide the coordinates.
+        pdbfnm = onefile(kwargs.get('pdb'), 'pdb' if needpdb else None, err=needpdb)
         if pdbfnm != None:
             mpdb = Molecule(pdbfnm)
-            for i in ["chain", "atomname", "resid", "resname", "elem"]:
-                self.mol.Data[i] = mpdb.Data[i]
+            if hasattr(self, 'mol'):
+                for i in ["chain", "atomname", "resid", "resname", "elem"]:
+                    self.mol.Data[i] = mpdb.Data[i]
+            else:
+                self.mol = copy.deepcopy(mpdb)
 
-        # if 'mol' in kwargs:
-        #     logger.error('Do not provide molecule object to AMBER engine!\n')
-        #     raise RuntimeError
-        # elif 'coords' in kwargs:
-        #     if 
-
-        # if 'mol' in kwargs:
-        #     logger.error('Do not provide mol or coords to AMBER engine\n')
-        #     raise RuntimeError
-        #     self.mol = kwargs['mol']
-        # elif 'coords' in kwargs:
-        #     self.mol = Molecule(kwargs['coords'])
-        # else:
-        #     self.mol = Molecule(self.mol2)
+        # Write the PDB that AMBER is going to read in.
+        # This may or may not be identical to the one used to initialize the engine.
+        self.mol.write('%s.pdb' % self.name)
 
     def callamber(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -302,9 +312,10 @@ class AMBER(Engine):
         o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
         return o
 
-    def leap(self, name=None):
-        write_leap(fnm, mol2=[], frcmod=[], pdb=[], name=None, delcheck=False)        
-        self.callamber("tleap -f %s.leap" % self.name)
+    def leap(self, name=None, delcheck=False):
+        if name == None: name = self.name
+        write_leap(self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, pdb='%s.pdb' % self.name, prefix=name, spath=self.spath, delcheck=delcheck)
+        self.callamber("tleap -f %s_" % self.leapcmd)
 
     def prepare(self, pbc=False, **kwargs):
 
@@ -318,19 +329,76 @@ class AMBER(Engine):
                 self.FF.make(np.zeros(self.FF.np))
             self.mol2 = self.FF.amber_mol2
             self.frcmod = self.FF.amber_frcmod
+            if 'mol2' in kwargs:
+                logger.error("FF object is provided, which overrides mol2 keyword argument")
+                raise RuntimeError
+            if 'frcmod' in kwargs:
+                logger.error("FF object is provided, which overrides frcmod keyword argument")
+                raise RuntimeError
+        else:
+            prmtmp = False
+            self.mol2 = listfiles(kwargs.get('mol2'), 'mol2', err=True)
+            self.frcmod = listfiles(kwargs.get('frcmod'), 'frcmod', err=True)
+
+        self.leapcmd = onefile(kwargs.get('leapcmd'), 'leap', err=True)
 
         # Figure out the topology information.
         self.leap()
-        o = self.callamber("rdparm %s.prmtop" % self.name, stdin="printAtoms\nprintBonds\nexit\n", print_to_screen=True, persist=True)
+        o = self.callamber("rdparm %s.prmtop" % self.name, 
+                           stdin="printAtoms\nprintBonds\nexit\n", 
+                           persist=True, print_error=False)
 
+        mode = 'None'
+        self.AtomLists = defaultdict(list)
+        G = nx.Graph()
         for line in o:
-            print line
-        # self.AtomMask = []
-        # self.AtomLists = defaultdict(list)
-        # self.AtomLists['Mass'] = [a.element.mass.value_in_unit(dalton) if a.element != None else 0 for a in Atoms]
-        # self.AtomLists['ParticleType'] = ['A' if m >= 1.0 else 'D' for m in self.AtomLists['Mass']]
-        # self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
-        # self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
+            s = line.split()
+            if 'Atom' in line:
+                mode = 'Atom'
+            elif 'Bond' in line:
+                mode = 'Bond'
+            elif 'RDPARM MENU' in line:
+                continue
+            elif 'EXITING' in line:
+                break
+            elif len(s) == 0:
+                continue
+            elif mode == 'Atom':
+                # Based on parsing lines like these:
+                """
+   327:  HA   -0.01462  1.0 (  23:HIP )  H1    E   
+   328:  CB   -0.33212 12.0 (  23:HIP )  CT    3   
+   329:  HB2   0.10773  1.0 (  23:HIP )  HC    E   
+   330:  HB3   0.10773  1.0 (  23:HIP )  HC    E   
+   331:  CG    0.18240 12.0 (  23:HIP )  CC    B   
+                """
+                # Based on variable width fields.
+                atom_number = int(line.split(':')[0])
+                atom_name = line.split()[1]
+                atom_charge = float(line.split()[2])
+                atom_mass = float(line.split()[3])
+                rnn = line.split('(')[1].split(')')[0].split(':')
+                residue_number = int(rnn[0])
+                residue_name = rnn[1]
+                atom_type = line.split(')')[1].split()[0]
+                self.AtomLists['Name'].append(atom_name)
+                self.AtomLists['Charge'].append(atom_charge)
+                self.AtomLists['Mass'].append(atom_mass)
+                self.AtomLists['ResidueNumber'].append(residue_number)
+                self.AtomLists['ResidueName'].append(residue_name)
+                # Not sure if this works
+                G.add_node(atom_number)
+            elif mode == 'Bond':
+                a, b = (int(i) for i in (line.split('(')[1].split(')')[0].split(',')))
+                G.add_edge(a, b)
+
+        self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
+
+        # Use networkx to figure out a list of molecule numbers.
+        gs = nx.connected_component_subgraphs(G)
+        tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
+        mnodes = [m.nodes() for m in tmols]
+        self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
 
         if prmtmp:
             for f in self.FF.fnms: 
