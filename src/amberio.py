@@ -400,26 +400,127 @@ class AMBER(Engine):
         mnodes = [m.nodes() for m in tmols]
         self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
 
+        ## Write out the trajectory coordinates to a .mdcrd file.
+
+        # I also need to write the trajectory
+        if 'boxes' in self.mol.Data.keys():
+            warn_press_key("Writing %s-all.crd file with no periodic box information" % self.name)
+            del self.mol.Data['boxes']
+
+        if hasattr(self, 'target') and hasattr(self.target,'shots'):
+            self.mol.write("%s-all.crd" % self.name, select=range(self.target.shots))
+        else:
+            self.mol.write("%s-all.crd" % self.name)
+
         if prmtmp:
             for f in self.FF.fnms: 
                 os.unlink(f)
+
+    def evaluate_(self, crdin, force=False):
+
+        """ 
+        Utility function for computing energy and forces using AMBER. 
+        
+        Inputs:
+        crdin: AMBER .mdcrd file name.
+        force: Switch for parsing the force. (Currently it always calculates the forces.)
+
+        Outputs:
+        Result: Dictionary containing energies (and optionally) forces.
+        """
+
+        ## This line actually runs AMBER.
+        self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s-all.mdcrd -O" % 
+                       (self.name, self.name, self.name, self.name, self.name))
+        ParseMode = 0
+        Energies = []
+        Forces = []
+        Force = []
+        for line in open('forcedump.dat'):
+            line = line.strip()
+            sline = line.split()
+            if ParseMode == 1:
+                if len(sline) == 1 and isfloat(sline[0]):
+                    Energies.append(float(sline[0]) * 4.184)
+                    ParseMode = 0
+            if ParseMode == 2:
+                if len(sline) == 3 and all(isfloat(sline[i]) for i in range(3)):
+                    Force += [float(sline[i]) * 4.184 * 10 for i in range(3)]
+                if len(Force) == 3*self.qmatoms:
+                    Forces.append(np.array(Force))
+                    Force = []
+                    ParseMode = 0
+            if line == '0 START of Energies':
+                ParseMode = 1
+            elif line == '1 Total Force':
+                ParseMode = 2
+
+        Result["Energy"] = np.array(Energies[1:])
+        Result["Force"] = np.array(Forces[1:])
+        return Result
+
+    def energy_force_one(self, shot):
+
+        """ Computes the energy and force using TINKER for one snapshot. """
+
+        self.mol[shot].write("%s.xyz" % self.name, ftype="tinker")
+        Result = self.evaluate_("%s.xyz" % self.name, force=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+
+    def energy(self):
+
+        """ Computes the energy using TINKER over a trajectory. """
+
+        if hasattr(self, 'mdtraj') : 
+            x = self.mdtraj
+        else:
+            x = "%s-all.crd" % self.name
+            self.mol.write(x, ftype="tinker")
+        return self.evaluate_(x)["Energy"]
+
+    def energy_force(self):
+
+        """ Computes the energy and force using AMBER over a trajectory. """
+
+        if hasattr(self, 'mdtraj') : 
+            x = self.mdtraj
+        else:
+            x = "%s-all.crd" % self.name
+        Result = self.evaluate_(x, force=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+
+    def energy_dipole(self):
+
+        """ Computes the energy and dipole using TINKER over a trajectory. """
+
+        logger.error('Dipole moments are not yet implemented in AMBER interface')
+        raise NotImplementedError
+
+        if hasattr(self, 'mdtraj') : 
+            x = self.mdtraj
+        else:
+            x = "%s.xyz" % self.name
+            self.mol.write(x, ftype="tinker")
+        Result = self.evaluate_(x, dipole=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
     def optimize(self, shot=0, method="newton", crit=1e-4):
 
         """ Optimize the geometry and align the optimized geometry to the starting geometry. """
 
+        logger.error('Geometry optimizations are not yet implemented in AMBER interface')
+        raise NotImplementedError
+    
+        # Code from tinkerio.py
         if os.path.exists('%s.xyz_2' % self.name):
             os.unlink('%s.xyz_2' % self.name)
-
         self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
-
         if method == "newton":
             if self.rigid: optprog = "optrigid"
             else: optprog = "optimize"
         elif method == "bfgs":
             if self.rigid: optprog = "minrigid"
             else: optprog = "minimize"
-
         o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
         # Silently align the optimized geometry.
         M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
@@ -446,109 +547,12 @@ class AMBER(Engine):
             logger.info("The minimization did not converge in the geometry optimization - printout is above.\n")
         return E, rmsd
 
-    def evaluate_(self, xyzin, force=False, dipole=False):
-
-        """ 
-        Utility function for computing energy, and (optionally) forces and dipoles using TINKER. 
-        
-        Inputs:
-        xyzin: TINKER .xyz file name.
-        force: Switch for calculating the force.
-        dipole: Switch for calculating the dipole.
-
-        Outputs:
-        Result: Dictionary containing energies, forces and/or dipoles.
-        """
-
-        Result = OrderedDict()
-        # If we want the dipoles (or just energies), analyze is the way to go.
-        if dipole or (not force):
-            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="G,E,M", print_to_screen=False)
-            # Read potential energy and dipole from file.
-            eanl = []
-            dip = []
-            for line in oanl:
-                s = line.split()
-                if 'Total Potential Energy : ' in line:
-                    eanl.append(float(s[4]) * 4.184)
-                if dipole:
-                    if 'Dipole X,Y,Z-Components :' in line:
-                        dip.append([float(s[i]) for i in range(-3,0)])
-            Result["Energy"] = np.array(eanl)
-            Result["Dipole"] = np.array(dip)
-        # If we want forces, then we need to call testgrad.
-        if force:
-            E = []
-            F = []
-            Fi = []
-            o = self.calltinker("testgrad %s -k %s y n n" % (xyzin, self.name))
-            i = 0
-            ReadFrc = 0
-            for line in o:
-                s = line.split()
-                if "Total Potential Energy" in line:
-                    E.append(float(s[4]) * 4.184)
-                if "Cartesian Gradient Breakdown over Individual Atoms" in line:
-                    ReadFrc = 1
-                if ReadFrc and len(s) == 6 and all([s[0] == 'Anlyt',isint(s[1]),isfloat(s[2]),isfloat(s[3]),isfloat(s[4]),isfloat(s[5])]):
-                    ReadFrc = 2
-                    if self.AtomMask[i]:
-                        Fi += [-1 * float(j) * 4.184 * 10 for j in s[2:5]]
-                    i += 1
-                if ReadFrc == 2 and len(s) < 6:
-                    ReadFrc = 0
-                    F.append(Fi)
-                    Fi = []
-                    i = 0
-            Result["Energy"] = np.array(E)
-            Result["Force"] = np.array(F)
-        return Result
-
-    def energy_force_one(self, shot):
-
-        """ Computes the energy and force using TINKER for one snapshot. """
-
-        self.mol[shot].write("%s.xyz" % self.name, ftype="tinker")
-        Result = self.evaluate_("%s.xyz" % self.name, force=True)
-        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
-
-    def energy(self):
-
-        """ Computes the energy using TINKER over a trajectory. """
-
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
-        else:
-            x = "%s.xyz" % self.name
-            self.mol.write(x, ftype="tinker")
-        return self.evaluate_(x)["Energy"]
-
-    def energy_force(self):
-
-        """ Computes the energy and force using TINKER over a trajectory. """
-
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
-        else:
-            x = "%s.xyz" % self.name
-            self.mol.write(x, ftype="tinker")
-        Result = self.evaluate_(x, force=True)
-        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
-
-    def energy_dipole(self):
-
-        """ Computes the energy and dipole using TINKER over a trajectory. """
-
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
-        else:
-            x = "%s.xyz" % self.name
-            self.mol.write(x, ftype="tinker")
-        Result = self.evaluate_(x, dipole=True)
-        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
-
     def normal_modes(self, shot=0, optimize=True):
-        # This line actually runs TINKER
+
+        logger.error('Normal modes are not yet implemented in AMBER interface')
+        raise NotImplementedError
+
+        # Copied from tinkerio.py
         if optimize:
             self.optimize(shot, crit=1e-6)
             o = self.calltinker("vibrate %s.xyz_2 a" % (self.name))
@@ -585,8 +589,10 @@ class AMBER(Engine):
 
     def multipole_moments(self, shot=0, optimize=True, polarizability=False):
 
+        logger.error('Multipole moments are not yet implemented in AMBER interface')
+        raise NotImplementedError
+
         """ Return the multipole moments of the 1st snapshot in Debye and Buckingham units. """
-        
         # This line actually runs TINKER
         if optimize:
             self.optimize(shot, crit=1e-6)
@@ -612,9 +618,7 @@ class AMBER(Engine):
                 quadrupole_dict['yz'] = float(s[-2])
                 quadrupole_dict['zz'] = float(s[-1])
             ln += 1
-
         calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
-
         if polarizability:
             if optimize:
                 o = self.calltinker("polarize %s.xyz_2" % (self.name))
@@ -648,6 +652,9 @@ class AMBER(Engine):
     def energy_rmsd(self, shot=0, optimize=True):
 
         """ Calculate energy of the selected structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
+
+        logger.error('Geometry optimization is not yet implemented in AMBER interface')
+        raise NotImplementedError
 
         rmsd = 0.0
         # This line actually runs TINKER
@@ -687,6 +694,8 @@ class AMBER(Engine):
         
         """ Calculate the interaction energy for two fragments. """
 
+        logger.error('Interaction energy is not yet implemented in AMBER interface')
+        raise NotImplementedError
         self.A = TINKER(name="A", mol=self.mol.atom_select(fraga), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
         self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
 
@@ -716,6 +725,9 @@ class AMBER(Engine):
         Dips        = (3xN array) Dipole moments
         EComps      = (dict)      Energy components
         """
+
+        logger.error('Molecular dynamics not yet implemented in AMBER interface')
+        raise NotImplementedError
 
         md_defs = OrderedDict()
         md_opts = OrderedDict()
@@ -865,7 +877,6 @@ class AMBER(Engine):
         prop_return = OrderedDict()
         prop_return.update({'Rhos': rho, 'Potentials': edyn, 'Kinetics': kdyn, 'Volumes': vol, 'Dips': dip, 'Ecomps': ecomp})
         return prop_return
-
 
 class AbInitio_AMBER(AbInitio):
 
