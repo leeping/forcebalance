@@ -21,6 +21,11 @@ COMMAND=$@
 . /etc/bashrc
 . ~/.bashrc
 
+# Load Gromacs environment variables if needed (e.g. Intel compiler variables)
+if [[ $HOSTNAME =~ "biox3" || $HOSTNAME =~ "cn" ]] ; then
+    . ~/opt/intel/bin/compilervars.sh intel64
+fi
+
 # Backup folder
 export BAK=$HOME/temp/rungmx-backups
 
@@ -41,7 +46,7 @@ echo "#=======================#"
 echo
 echo $COMMAND
 
-rm -f npt_result.p npt_result.p.bz2
+rm -f npt_result.p
 export PYTHONUNBUFFERED="y"
 
 # Unset OMP_NUM_THREADS otherwise gromacs will complain.
@@ -60,9 +65,5 @@ if [ $do_bak -gt 0 ] ; then
     mkdir -p $BAK/$PWD
     cp * $BAK/$PWD
 fi
-
-# For some reason I was still getting error messages about the bzip already existing..
-rm -f npt_result.p.bz2
-if [ -f npt_result.p ] ; then bzip2 npt_result.p ; fi
 
 exit $exitstat

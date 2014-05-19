@@ -255,6 +255,14 @@ def main():
     if os.path.exists('build'):
         shutil.rmtree('build')
 
+
+    try:
+        import bz2
+    except ImportError:
+        print "Error importing bz2, which is important for distributed calculations and remote targets"
+        print "Please either (1) make sure Python is built/installed with bz2 support"
+        print "or (2) proceed with inefficient reading/writing of files; remote targets won't work."
+
 if __name__ == '__main__':
     main()
 
