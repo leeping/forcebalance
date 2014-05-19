@@ -872,13 +872,19 @@ def bak(path, dest=None):
 # the extension.  If so, return the file name.
 # 3) If list is still empty and err==True, then crash with an error.
 def onefile(fnm=None, ext=None, err=False):
+    if fnm == None and ext == None:
+        if err:
+            logger.error("Must provide either filename or extension to onefile()")
+            raise RuntimeError
+        else:
+            return None
     if fnm != None:
         if os.path.exists(fnm):
             return os.path.basename(fnm)
-        elif err==True:
+        elif (err==True or ext==None):
             logger.error("File specified by %s does not exist!" % fnm)
             raise RuntimeError
-        else:
+        elif ext != None:
             warn_once("File specified by %s does not exist - will try to autodetect .%s extension" % (fnm, ext))
     answer = None
     cwd = os.getcwd()
@@ -888,7 +894,8 @@ def onefile(fnm=None, ext=None, err=False):
             logger.error("Cannot find a unique file with extension .%s in %s (%i found)" % (ext, cwd, len(ls)))
             raise RuntimeError
         else:
-            warn_once("Cannot find a unique file with extension .%s in %s (%i found)" % (ext, cwd, len(ls)), warnhash = "Found %i .%s files" % (len(ls), ext))
+            warn_once("Cannot find a unique file with extension .%s in %s (%i found)" % 
+                      (ext, cwd, len(ls)), warnhash = "Found %i .%s files" % (len(ls), ext))
     else:
         answer = os.path.basename(ls[0])
         warn_once("Autodetected %s in %s" % (answer, cwd), warnhash = "Autodetected %s" % answer)
@@ -907,12 +914,12 @@ def listfiles(fnms=None, ext=None, err=False):
     if isinstance(fnms, list):
         for i in fnms:
             if not os.path.exists(i):
-                logger.error('Specified amber_mol2 %s but it does not exist' % i)
+                logger.error('Specified %s but it does not exist' % i)
                 raise RuntimeError
             answer.append(i)
     elif isinstance(fnms, str):
         if not os.path.exists(fnms):
-            logger.error('Specified amber_mol2 %s but it does not exist' % fnms)
+            logger.error('Specified %s but it does not exist' % fnms)
             raise RuntimeError
         answer = [fnms]
     elif fnms != None:
