@@ -52,9 +52,12 @@ import string, sys
 import copy  ### PC
 import numpy as np
 
-import forcebalance
-from forcebalance.output import *
-logger = getLogger(__name__)
+try:
+    import forcebalance
+    from forcebalance.output import *
+    logger = getLogger(__name__)
+except:
+    import logging as logger
 
 class END:
     """ END class
