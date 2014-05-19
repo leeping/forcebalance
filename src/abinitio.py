@@ -108,9 +108,17 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'energy_upper','energy_upper')
         ## Average forces over individual atoms ('atom') or all atoms ('all')
         self.set_option(tgt_opts,'force_average')
-        ## Assign a greater weight to 
+        ## Assign a greater weight to MM snapshots that underestimate the QM energy (surfaces referenced to QM absolute minimum)
         self.set_option(tgt_opts,'energy_asymmetry')
         self.savg = (self.energy_asymmetry == 1.0 and not self.absolute)
+        self.asym = (self.energy_asymmetry != 1.0)
+        if self.asym:
+            if not self.all_at_once:
+                logger.error("Asymmetric weights only work when all_at_once is enabled")
+                raise RuntimeError
+            if self.qmboltz != 0.0:
+                logger.error("Asymmetric weights do not work with QM Boltzmann weights")
+                raise RuntimeError
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -352,10 +360,15 @@ class AbInitio(Target):
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
         self.eqm = np.array(self.eqm)
         self.eqm *= eqcgmx
-        if not self.absolute:
-            self.eqm -= np.mean(self.eqm)
-        else:
+        if self.asym:
+            self.eqm  -= np.min(self.eqm)
+            self.smin  = np.argmin(self.eqm)
+            logger.info("Referencing all energies to the snapshot %i (minimum energy structure in QM)\n" % self.smin)
+        elif self.absolute:
             logger.info("Fitting absolute energies.  Make sure you know what you are doing!\n")
+        else:
+            self.eqm -= np.mean(self.eqm)
+
         if len(self.fqm) > 0:
             self.fqm = np.array(self.fqm)
             self.fqm *= fqcgmx
@@ -383,6 +396,7 @@ class AbInitio(Target):
         if len(self.emd0) > 0:
             self.emd0 = np.array(self.emd0)
             self.emd0 -= np.mean(self.emd0)
+
         if self.whamboltz == True:
             if self.attenuate:
                 logger.error('whamboltz and attenuate are mutually exclusive\n')
@@ -720,6 +734,8 @@ class AbInitio(Target):
         if self.all_at_once:
             logger.debug("\rExecuting\r")
             M_all = self.energy_force_transform()
+            if self.asym:
+                M_all[:, 0] -= M_all[:, self.smin]
             if not cv and (AGrad or AHess):
                 def callM(mvals_):
                     logger.debug("\r")
@@ -727,6 +743,9 @@ class AbInitio(Target):
                     return self.energy_force_transform()
                 for p in self.pgrad:
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
+                    if self.asym:
+                        dM_all[:, p, 0] -= dM_all[:, p, self.smin]
+                        ddM_all[:, p, 0] -= ddM_all[:, p, self.smin]
         if self.force and not in_fd():
             self.maxfatom = -1
             self.maxfshot = -1
@@ -759,18 +778,8 @@ class AbInitio(Target):
             if not cv:
                 X     = M-Q
                 boost   = 1.0
-                if self.energy_asymmetry != 1.0:
-                    if not self.all_at_once:
-                        logger.error("Asymmetric weights only work when all_at_once is enabled")
-                        raise RuntimeError
-                    if self.qmboltz != 0.0:
-                        logger.error("Asymmetric weights do not work with QM Boltzmann weights")
-                        raise RuntimeError
-                    EQref = self.eqm - min(self.eqm)
-                    EMref = M_all[:, 0] - M_all[np.argmin(self.eqm), 0]
-                    X[0] = (EMref[i] - EQref[i])
-                    if EMref[i] - EQref[i] < 0.0:
-                        boost = self.energy_asymmetry
+                if self.asym and X[0] < 0.0:
+                    boost = self.energy_asymmetry
             # Increment the average values.
             a = 1
             if self.force:
