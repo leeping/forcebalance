@@ -2,7 +2,7 @@
 
 # Download latest version from website.
 echo "Downloading source."
-cctools="cctools-4.1.2"
+cctools="cctools-4.1.3"
 cctools_src="$cctools-source"
 rm -rf $cctools_src $cctools_src.tar*
 wget http://www3.nd.edu/~ccl/software/files/$cctools_src.tar.gz
