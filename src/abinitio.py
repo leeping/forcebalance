@@ -816,9 +816,10 @@ class AbInitio(Target):
                 Xi  = np.outer(M,M) - 2*np.outer(Q,M) + np.outer(Q,Q)
             else:
                 Xi     = X**2                   
+                Xi[0] *= boost
             XiAll[i] = Xi.copy()
-            SPiXi += P * Xi * boost
-            SRiXi += R * Xi * boost
+            SPiXi += P * Xi
+            SRiXi += R * Xi
             #==============================================================#
             #      STEP 2a: Increment gradients and mean quantities.       #
             #   This is only implemented for the case without covariance.  #
@@ -844,8 +845,9 @@ class AbInitio(Target):
                     #M0_M_pp[p][0] += P * M_pp[p][0]
                     #M0_Q_pp[p][0] += R * M_pp[p][0]
                     Xi_p        = 2 * X * M_p[p]
-                    SPiXi_p[p] += P * Xi_p * boost
-                    SRiXi_p[p] += R * Xi_p * boost
+                    Xi_p[0]    *= boost
+                    SPiXi_p[p] += P * Xi_p
+                    SRiXi_p[p] += R * Xi_p
                     if not AHess: continue
                     if self.all_at_once:
                         M_pp[p] = ddM_all[i, p]
@@ -853,14 +855,16 @@ class AbInitio(Target):
                     #Xi_pq       = 2 * (M_p[p] * M_p[p] + X * M_pp[p])
                     # Gauss-Newton formula for approximate Hessian
                     Xi_pq       = 2 * (M_p[p] * M_p[p])
-                    SPiXi_pq[p,p] += P * Xi_pq * boost
-                    SRiXi_pq[p,p] += R * Xi_pq * boost
+                    Xi_pq[0]   *= boost
+                    SPiXi_pq[p,p] += P * Xi_pq
+                    SRiXi_pq[p,p] += R * Xi_pq
                     for q in range(p):
                         if all(M_p[q] == 0): continue
                         if q not in self.pgrad: continue
                         Xi_pq          = 2 * M_p[p] * M_p[q]
-                        SPiXi_pq[p,q] += P * Xi_pq * boost
-                        SRiXi_pq[p,q] += R * Xi_pq * boost
+                        Xi_pq[0]      *= boost
+                        SPiXi_pq[p,q] += P * Xi_pq
+                        SRiXi_pq[p,q] += R * Xi_pq
 
         # Dump energies and forces to disk.
         M_all_print = M_all.copy()
