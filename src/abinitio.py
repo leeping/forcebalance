@@ -735,7 +735,7 @@ class AbInitio(Target):
             logger.debug("\rExecuting\r")
             M_all = self.energy_force_transform()
             if self.asym:
-                M_all[:, 0] -= M_all[:, self.smin]
+                M_all[:, 0] -= M_all[self.smin, 0]
             if not cv and (AGrad or AHess):
                 def callM(mvals_):
                     logger.debug("\r")
@@ -744,8 +744,8 @@ class AbInitio(Target):
                 for p in self.pgrad:
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
                     if self.asym:
-                        dM_all[:, p, 0] -= dM_all[:, p, self.smin]
-                        ddM_all[:, p, 0] -= ddM_all[:, p, self.smin]
+                        dM_all[:, p, 0] -= dM_all[self.smin, p, 0]
+                        ddM_all[:, p, 0] -= ddM_all[self.smin, p, 0]
         if self.force and not in_fd():
             self.maxfatom = -1
             self.maxfshot = -1
