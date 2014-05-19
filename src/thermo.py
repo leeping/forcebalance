@@ -140,7 +140,7 @@ class Thermo(Target):
         if os.path.exists(abspath):
             logger.info('Reading data from ' + abspath + '.\n')
 
-            vals, errs, grads = lp_load(open(abspath))
+            vals, errs, grads = lp_load(abspath)
 
             dp.data["values"] = vals
             dp.data["errors"] = errs
@@ -194,8 +194,7 @@ class Thermo(Target):
                                            str(pt.idnr)), os.getcwd())
             
             # Dump the force field to a pickle file
-            with wopen('forcebalance.p') as f:
-                lp_dump((self.FF, mvals, self.OptionDict, AGrad), f)
+            lp_dump((self.FF, mvals, self.OptionDict, AGrad), 'forcebalance.p')
                 
             # Run the simulation chain for point.        
             cmdstr = ("%s python md_chain.py " % self.mdpfx +
