@@ -885,18 +885,14 @@ class OpenMM(Engine):
             self.simulation.context.computeVirtualSites()
         else:
             rpmdIntegrator = self.simulation.context.getIntegrator()
-            for i in range(rpmdIntegrator.getNumCopies()):
-                tempPositions = self.xyz_rpmd[i][shot][0] 
-                self.simulation.context.setPositions(temp_positions)
-                self.simulation.context.computeVirtualSites()
-                posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
-                rpmdIntegrator.setPositions(i,posWithVsites)
-#          for i in range(self.tdiv):
-#              temp_position=integrator.getState(i,getPositions=True).getPositions()
-#              self.simulation.context.setPositions(temp_position)
-#              self.simulation.context.computeVirtualSites()
-#              position_with_virtual_site=self.simulation.context.getState(getPositions=True).getPositions()
-#              integrator.setPositions(i,position_with_virtual_site) 
+            if hasattr(self, 'xyz_rpmd'):
+                for i in range(rpmdIntegrator.getNumCopies()):
+                    tempPositions = self.xyz_rpmd[i][shot][0] 
+                    self.simulation.context.setPositions(temp_positions)
+                    self.simulation.context.computeVirtualSites()
+                    posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
+                    rpmdIntegrator.setPositions(i,posWithVsites)
+    
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
         [a,b,c] = box_vectors
@@ -1154,10 +1150,6 @@ class OpenMM(Engine):
         edecomp = OrderedDict()
         # Stored coordinates, box vectors
         self.xyz_omms = []
-        # Stored coordinates, box vectors for each RPMD system copy
-        self.xyz_rpmd = []
-        for i in range(self.simulation.integrator.getNumCopies()):
-            self.xyz_rpmd.append([])
         # Densities, potential and kinetic energies, box volumes, dipole moments
         Rhos = []
         Potentials = []
@@ -1199,10 +1191,7 @@ class OpenMM(Engine):
             cen_kinetic=centroid_kinetic(self.simulation)
 #####
             if self.pbc:
-                if not self.rpmd:
-                    box_vectors = state.getPeriodicBoxVectors()
-                else:
-                    box_vectors = self.rpmd_states[0].getPeriodicBoxVectors()
+                box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
                 density = (self.mass / volume).in_units_of(kilogram / meter**3)
             else:
@@ -1216,6 +1205,10 @@ class OpenMM(Engine):
             else:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                        kinetic_temperature / kelvin, potential / kilojoules_per_mole))
+        # Stored coordinates, box vectors for each RPMD system copy
+        self.xyz_rpmd = []        
+        for i in range(self.simulation.integrator.getNumCopies()):
+            self.xyz_rpmd.append([])
         # Collect production data.
         if verbose: logger.info("Production...\n")
         if self.pbc:
@@ -1224,7 +1217,7 @@ class OpenMM(Engine):
             if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
         if save_traj:
             self.simulation.reporters.append(PDBReporter('%s-md.pdb' % self.name, nsteps))
-            self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave)))
+            self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave))
         for iteration in range(-1 if self.tdiv == 1 else 0, isteps):
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
@@ -1247,10 +1240,7 @@ class OpenMM(Engine):
 #####
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
-                if self.rpmd:
-                    box_vectors = self.simulation.integrator.getState(0).getPeriodicBoxVectors()
-                else:
-                    box_vectors = state.getPeriodicBoxVectors()
+                box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
                 density = (self.mass / volume).in_units_of(kilogram / meter**3)
             else:
