@@ -676,13 +676,11 @@ class Molecule(object):
     say, MyMolecule[1:10] returns a new Molecule object that contains
     frames 1 through 9 (inclusive and numbered starting from zero.)
     
-    Next step: Read in Q-Chem output data using this too!
-
     Special variables:  These variables cannot be set manually because
     there is a special method associated with getting them.
 
     na = The number of atoms.  You'll get this if you use MyMol.na or MyMol['na'].
-    na = The number of snapshots.  You'll get this if you use MyMol.ns or MyMol['ns'].
+    ns = The number of snapshots.  You'll get this if you use MyMol.ns or MyMol['ns'].
 
     Unit system:  Angstroms.
 
@@ -1672,8 +1670,8 @@ class Molecule(object):
         
         @return fnms A list of the file names that were written.
         """
-        
-        
+        logger.error('Apparently this function has not been implemented!!')
+        raise NotImplementedError
 
     #=====================================#
     #|         Reading functions         |#
