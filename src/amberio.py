@@ -408,15 +408,17 @@ class AMBER(Engine):
             del self.mol.Data['boxes']
 
         if hasattr(self, 'target') and hasattr(self.target,'shots'):
-            self.mol.write("%s-all.crd" % self.name, select=range(self.target.shots))
+            self.qmatoms = target.qmatoms
+            self.mol.write("%s-all.crd" % self.name, select=range(self.target.shots), ftype="mdcrd")
         else:
-            self.mol.write("%s-all.crd" % self.name)
+            self.qmatoms = self.mol.na
+            self.mol.write("%s-all.crd" % self.name, ftype="mdcrd")
 
         if prmtmp:
             for f in self.FF.fnms: 
                 os.unlink(f)
 
-    def evaluate_(self, crdin, force=False):
+    def evaluate_(self, force=False):
 
         """ 
         Utility function for computing energy and forces using AMBER. 
@@ -429,10 +431,22 @@ class AMBER(Engine):
         Result: Dictionary containing energies (and optionally) forces.
         """
 
+        force_mdin="""Loop over conformations and compute energy and force (use ioutfnm=1 for netcdf, ntb=0 for no box)
+&cntrl
+imin = 5, ntb = 0, cut=9, nstlim = 0, nsnb = 0
+/
+&debugf
+do_debugf = 1, dumpfrc = 1
+/
+"""
+        with open("%s-force.mdin" % self.name, 'w') as f:
+            print >> f, force_mdin
+
         ## This line actually runs AMBER.
-        self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s-all.mdcrd -O" % 
+        self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s-all.crd -O" % 
                        (self.name, self.name, self.name, self.name, self.name))
         ParseMode = 0
+        Result = {}
         Energies = []
         Forces = []
         Force = []
