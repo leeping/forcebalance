@@ -36,6 +36,11 @@ prefix=$HOME/opt
 swgpath=$HOME/local
 pypath=$HOME/local
 
+# Create these directories if they don't exist.
+mkdir -p $prefix
+mkdir -p $swgpath
+mkdir -p $pypath
+
 if [ ! -d $prefix ] ; then
     echo "Warning: Installation directory $prefix does not exist."
     read
