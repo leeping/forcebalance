@@ -137,7 +137,7 @@ echo "#=======================#"
 echo
 echo $COMMAND
 
-rm -f npt_result.p npt_result.p.bz2
+rm -f npt_result.p
 export PYTHONUNBUFFERED="y"
 
 # Run the actual command.
@@ -152,10 +152,6 @@ if [ $do_bak -gt 0 ] ; then
     mkdir -p $BAK/$PWD
     cp * $BAK/$PWD
 fi
-
-# For some reason I was still getting error messages abou5Ct the bzip already existing..
-rm -f npt_result.p.bz2
-if [ -f npt_result.p ] ; then bzip2 npt_result.p ; fi
 
 # Avoid the stupid segfault-on-quit that happens on fire
 # Ahh, i don't know how to do this..

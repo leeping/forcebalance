@@ -262,8 +262,6 @@ class Lipid(Target):
                 if d in self.Labels:
                     if os.path.exists(os.path.join(there, d, 'npt_result.p')):
                         havepts += 1
-                    elif os.path.exists(os.path.join(there, d, 'npt_result.p.bz2')):
-                        havepts += 1
         if (float(havepts)/len(self.Labels)) > 0.75:
             return 1
         else:
@@ -272,7 +270,7 @@ class Lipid(Target):
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
-        if not (os.path.exists('npt_result.p') or os.path.exists('npt_result.p.bz2')):
+        if not os.path.exists('npt_result.p'):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output if '.gro' not in i]
             prev_iter_ICs = os.path.join(os.getcwd(), "lipid.gro")
@@ -286,7 +284,7 @@ class Lipid(Target):
             else:
                 queue_up(wq, command = cmdstr+' &> npt.out',
                          input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
-                         output_files = ['npt_result.p.bz2', 'npt.out'] + self.extra_output, tgt=self)
+                         output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
         d = self.gas_engine.get_multipole_moments(optimize=True)['dipole']
@@ -420,7 +418,7 @@ class Lipid(Target):
         # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
         #
         # First dump the force field to a pickle file
-        with wopen('forcebalance.p') as f: lp_dump((self.FF,mvals,self.OptionDict,AGrad),f)
+        lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if Counter() == First() and self.manual:
@@ -491,17 +489,10 @@ class Lipid(Target):
         BPoints = [] # These are the phase points for which we are doing MBAR for the condensed phase.
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
-            if os.path.exists('./%s/npt_result.p.bz2' % label):
-                _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
-            elif os.path.exists('./%s/npt_result.p' % label): pass
-            else:
-                logger.warning('In %s :\n' % os.getcwd())
-                logger.warning('The file ./%s/npt_result.p.bz2 does not exist so we cannot unzip it\n' % label)
             if os.path.exists('./%s/npt_result.p' % label):
                 logger.info('Reading information from ./%s/npt_result.p\n' % label)
                 Points.append(PT)
-                Results[tt] = lp_load(open('./%s/npt_result.p' % label))
-                _exec('bzip2 ./%s/npt_result.p' % label, print_command=False)
+                Results[tt] = lp_load('./%s/npt_result.p' % label)
                 tt += 1
             else:
                 logger.warning('The file ./%s/npt_result.p does not exist so we cannot read it\n' % label)

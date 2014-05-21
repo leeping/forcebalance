@@ -241,6 +241,7 @@ tgt_opts_types = {
                  "self_pol_mu0"  : (0.0, -150, 'Gas-phase dipole parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "epsgrad"         : (0.0, -150, 'Gradient below this threshold will be set to zero.', 'All targets'),
+                 "energy_asymmetry": (1.0, -150, 'Snapshots with (E_MM - E_QM) < 0.0 will have their weights increased by this factor.', 'Ab initio targets'),
                  },
     'sections': {}
     }
