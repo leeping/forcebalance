@@ -245,9 +245,6 @@ def unmangle(M1, M2):
     
     M.elem = list(np.array(PDB.elem)[unmangled])
     """
-    if len(M1) != 1 or len(M2) != 1:
-        logger.error("Unmangler only deals with length-1 molecule objects\n")
-        raise RuntimeError
     if M1.na != M2.na:
         logger.error("Unmangler only deals with same number of atoms\n")
         raise RuntimeError
