@@ -219,7 +219,8 @@ class Target(forcebalance.BaseClass):
                     self.pgrad.remove(self.FF.map[pid])
         for i in pgrad0:
             if i not in self.pgrad:
-                logger.info("Parameter %s was deactivated in %s\n" % (i, self.name))
+                pass
+                # logger.info("Parameter %s was deactivated in %s\n" % (i, self.name))
         for i in self.pgrad:
             if i not in pgrad0:
                 logger.info("Parameter %s was reactivated in %s\n" % (i, self.name))
@@ -742,7 +743,7 @@ class RemoteTarget(Target):
                                                                                     if len(self.rpfx) > 0 else ""),
                                     ["forcebalance.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
                                     ['objective.p', 'indicate.log', 'rtarget.out'],
-                                    tgt=self, verbose=False)
+                                    tgt=self, tag=self.name, verbose=False)
 
     def read(self,mvals,AGrad=False,AHess=False):
         return self.get(mvals, AGrad, AHess)
