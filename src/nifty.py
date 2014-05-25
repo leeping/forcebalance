@@ -730,7 +730,7 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     task.specify_tag(tag)
     taskid = wq.submit(task)
     if verbose:
-        logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
+        logger.info("Submitting command '%s' to the Work Queue, %staskid %i\n" % (command, "tag %s, " % tag if tag != command else "", taskid))
     if tgt != None:
         WQIDS[tgt.name].append(taskid)
     else:
@@ -802,7 +802,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                 WQIDS[tgtname].append(taskid)
             else:
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
-                    logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
+                    logger.info("Task '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.tag, task.id, task.hostname, exectime))
                 for tnm in WQIDS:
                     if task.id in WQIDS[tnm]:
                         WQIDS[tnm].remove(task.id)
