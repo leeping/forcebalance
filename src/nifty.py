@@ -22,6 +22,14 @@ import threading
 import pickle
 import time
 import subprocess
+try:
+    import bz2
+    HaveBZ2 = True
+except:
+    logger.warning("bz2 module import failed (You can't compress or decompress pickle files)\n")
+    HaveBZ2 = False
+    
+from shutil import copyfileobj
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
 
@@ -43,6 +51,33 @@ bohrang = 0.529177249
 #=========================#
 #     I/O formatting      #
 #=========================#
+# These functions may be useful someday but I have not tested them
+# def bzip2(src):
+#     dest = src+'.bz2'
+#     if not os.path.exists(src):
+#         logger.error('File to be compressed does not exist')
+#         raise RuntimeError
+#     if os.path.exists(dest):
+#         logger.error('Archive to be created already exists')
+#         raise RuntimeError
+#     with open(src, 'rb') as input:
+#         with bz2.BZ2File(dest, 'wb', compresslevel=9) as output:
+#             copyfileobj(input, output)
+#     os.remove(input)
+
+# def bunzip2(src):
+#     dest = re.sub('\.bz2$', '', src)
+#     if not os.path.exists(src):
+#         logger.error('File to be decompressed does not exist')
+#         raise RuntimeError
+#     if os.path.exists(dest):
+#         logger.error('Target path for decompression already exists')
+#         raise RuntimeError
+#     with bz2.BZ2File(src, 'rb', compresslevel=9) as input:
+#         with open(dest, 'wb') as output:
+#             copyfileobj(input, output)
+#     os.remove(input)
+
 def pvec1d(vec1d, precision=1, format="e", loglevel=INFO):
     """Printout of a 1-D vector.
 
@@ -597,13 +632,43 @@ class Unpickler_LP(pickle.Unpickler):
         except:
             warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
 
-def lp_dump(obj, file, protocol=None):
-    """ Use this instead of pickle.dump for pickling anything that contains _ElementTree types. """
-    Pickler_LP(file, protocol).dump(obj)
+def lp_dump(obj, fnm, protocol=pickle.HIGHEST_PROTOCOL):
+    """ Write an object to a bzipped file specified by the path. """
+    # Safeguard against overwriting files?  Nah.
+    # if os.path.exists(fnm):
+    #     logger.error("lp_dump cannot write to an existing path")
+    #     raise IOError
+    if os.path.islink(fnm):
+        logger.warn("Trying to write to a symbolic link %s, removing it first\n" % fnm)
+        os.unlink(fnm)
+    if HaveBZ2:
+        f = bz2.BZ2File(fnm, 'wb')
+    else:
+        f = open(fnm, 'wb')
+    Pickler_LP(f, protocol).dump(obj)
+    f.close()
 
-def lp_load(file):
-    """ Use this instead of pickle.load for unpickling anything that contains _ElementTree types. """
-    return Unpickler_LP(file).load()
+def lp_load(fnm):
+    """ Read an object from a bzipped file specified by the path. """
+    if not os.path.exists(fnm):
+        logger.error("lp_load cannot read from a path that doesn't exist (%s)" % fnm)
+        raise IOError
+    if HaveBZ2:
+        try: 
+            f = bz2.BZ2File(fnm, 'rb')
+            answer = Unpickler_LP(f).load()
+            f.close()
+        except:
+            # This may happen if the file was written with a machine that doesn't have bz2.
+            logger.warning("bzip2 file loader failed, attempting to read as uncompressed file\n")
+            f = open(fnm, 'rb')
+            answer = Unpickler_LP(f).load()
+            f.close()
+    else:
+        f = open(fnm, 'rb')
+        answer = Unpickler_LP(f).load()
+        f.close()
+    return answer
 
 #==============================#
 #|      Work Queue stuff      |#
@@ -665,7 +730,7 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     task.specify_tag(tag)
     taskid = wq.submit(task)
     if verbose:
-        logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
+        logger.info("Submitting command '%s' to the Work Queue, %staskid %i\n" % (command, "tag %s, " % tag if tag != command else "", taskid))
     if tgt != None:
         WQIDS[tgt.name].append(taskid)
     else:
@@ -737,7 +802,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                 WQIDS[tgtname].append(taskid)
             else:
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
-                    logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
+                    logger.info("Task '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.tag, task.id, task.hostname, exectime))
                 for tnm in WQIDS:
                     if task.id in WQIDS[tnm]:
                         WQIDS[tnm].remove(task.id)

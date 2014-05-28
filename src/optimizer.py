@@ -211,13 +211,13 @@ class Optimizer(forcebalance.BaseClass):
         if os.path.exists(savfnm):
             soptions, stgt_opts = parse_inputs(savfnm)
             if soptions['read_mvals'] and np.max(np.abs(self.mvals0)) != 0.0:
-                warn_press_key("Save file read_mvals will overwrite input file.\nInput file: %s\nSave file : %s\n" % (self.mvals0, soptions['read_mvals']))
+                warn_press_key("Save file read_mvals will overwrite input file.\nInput file: %s\nSave file : %s\n" % (soptions['read_mvals'], self.mvals0))
             self.mvals0 = np.array(soptions['read_mvals'])
 
         maxrd = max([T.maxrd() for T in self.Objective.Targets])
         if maxrd < 0: return
-        ## This will be invoked if we quit RIGHT at the start of an iteration
-        if len(set([T.maxrd() for T in self.Objective.Targets])) == 1:
+        ## This will be invoked if we quit RIGHT at the start of an iteration (i.e. jobs were launched but none were finished)
+        if len(set([T.maxrd() for T in self.Objective.Targets])) == 1 and any([((T.maxid() - T.maxrd()) > 0) for T in self.Objective.Targets]):
             maxrd += 1
         printcool("Continuing optimization from iteration %i\nThese targets will load data from disk:\n%s" % \
                       (maxrd, '\n'.join([T.name for T in self.Objective.Targets if T.maxrd() == maxrd])), color=4)

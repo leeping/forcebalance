@@ -84,7 +84,7 @@ def main():
     # - Optimization parameters
     # - Options from the Target object that launched this simulation
     # - Switch for whether to evaluate analytic derivatives.
-    FF, mvals, TgtOptions, AGrad = lp_load(open('forcebalance.p'))
+    FF, mvals, TgtOptions, AGrad = lp_load('forcebalance.p')
     FF.ffdir = '.'
     # Write the force field file.
     FF.make(mvals)
@@ -174,10 +174,9 @@ def main():
     pvals = FF.make(mvals)
     
     logger.info("Writing all simulation data to disk.\n")
-    with wopen('md_result.p') as f:
-        lp_dump((np.asarray(results["values"]),
-                 np.asarray(results["errors"]),
-                 np.asarray(results["grads"])), f)
+    lp_dump((np.asarray(results["values"]),
+             np.asarray(results["errors"]),
+             np.asarray(results["grads"])), 'md_result.p')
     
 if __name__ == "__main__":
     main()

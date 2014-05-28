@@ -245,9 +245,6 @@ def unmangle(M1, M2):
     
     M.elem = list(np.array(PDB.elem)[unmangled])
     """
-    if len(M1) != 1 or len(M2) != 1:
-        logger.error("Unmangler only deals with length-1 molecule objects\n")
-        raise RuntimeError
     if M1.na != M2.na:
         logger.error("Unmangler only deals with same number of atoms\n")
         raise RuntimeError
@@ -914,6 +911,21 @@ class Molecule(object):
                 NewData[key] = list([self.Data[key][i][unmangled] for i in range(len(self))])
         for key in NewData:
             setattr(self, key, copy.deepcopy(NewData[key]))
+
+    def reorder_indices(self, other):
+
+        """ 
+
+        Return the indices that would reorder atoms according to some
+        other Molecule object.  This happens when we run a program
+        like pdb2gmx or pdbxyz and it scrambles our atom ordering.
+
+        Directions: 
+        (1) Load up the scrambled file as a new Molecule object.
+        (2) Call this function: Original_Molecule.reorder_indices(scrambled)
+
+        """
+        return unmangle(self[0], other)
             
     def append(self,other):
         self += other
