@@ -76,7 +76,8 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], de
             # Adopt the AMBER molecule name from the loadpdb line.
             ambername = line.split('=')[0].strip()
             # If we pass in our own PDB, then this line is replaced.
-            if pdb == None:
+            if pdb != None:
+                print "Replacing pdb line"
                 line = '%s = loadpdb %s\n' % (ambername, pdb)
         if len(s) >= 1 and ls[0] == 'check' and delcheck:
             # Skip over check steps if so decreed
@@ -274,7 +275,7 @@ class AMBER(Engine):
             self.mol = kwargs['mol']
         elif 'coords' in kwargs:
             crdfile = onefile(kwargs.get('coords'), None, err=True)
-            self.mol = Molecule(crdfile)
+            self.mol = Molecule(crdfile, build_topology=False)
 
         # If the molecule provides all of the needed topology information then
         # there is no need to load a PDB.
@@ -288,7 +289,7 @@ class AMBER(Engine):
         # is not provided, then it will also provide the coordinates.
         pdbfnm = onefile(kwargs.get('pdb'), 'pdb' if needpdb else None, err=needpdb)
         if pdbfnm != None:
-            mpdb = Molecule(pdbfnm)
+            mpdb = Molecule(pdbfnm, build_topology=False)
             if hasattr(self, 'mol'):
                 for i in ["chain", "atomname", "resid", "resname", "elem"]:
                     self.mol.Data[i] = mpdb.Data[i]
@@ -395,10 +396,10 @@ class AMBER(Engine):
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
 
         # Use networkx to figure out a list of molecule numbers.
-        gs = nx.connected_component_subgraphs(G)
-        tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
-        mnodes = [m.nodes() for m in tmols]
-        self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
+        # gs = nx.connected_component_subgraphs(G)
+        # tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
+        # mnodes = [m.nodes() for m in tmols]
+        # self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
 
         ## Write out the trajectory coordinates to a .mdcrd file.
 
@@ -443,6 +444,7 @@ do_debugf = 1, dumpfrc = 1
             print >> f, force_mdin
 
         ## This line actually runs AMBER.
+        self.leap()
         self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s-all.crd -O" % 
                        (self.name, self.name, self.name, self.name, self.name))
         ParseMode = 0
