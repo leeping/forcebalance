@@ -643,8 +643,8 @@ class TINKER(Engine):
 
         """ Computes the energy using TINKER over a trajectory. """
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
@@ -654,8 +654,8 @@ class TINKER(Engine):
 
         """ Computes the energy and force using TINKER over a trajectory. """
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
@@ -666,8 +666,8 @@ class TINKER(Engine):
 
         """ Computes the energy and dipole using TINKER over a trajectory. """
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
@@ -910,7 +910,7 @@ class TINKER(Engine):
             
         # Gather information.
         os.system("mv %s.arc %s-md.arc" % (self.name, self.name))
-        self.mdtraj = "%s-md.arc" % self.name
+        self.md_trajectory = "%s-md.arc" % self.name
         edyn = []
         kdyn = []
         temps = []

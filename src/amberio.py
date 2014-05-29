@@ -77,7 +77,6 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], de
             ambername = line.split('=')[0].strip()
             # If we pass in our own PDB, then this line is replaced.
             if pdb != None:
-                print "Replacing pdb line"
                 line = '%s = loadpdb %s\n' % (ambername, pdb)
         if len(s) >= 1 and ls[0] == 'check' and delcheck:
             # Skip over check steps if so decreed
@@ -268,6 +267,9 @@ class AMBER(Engine):
 
         """ Called by __init__ ; read files from the source directory. """
 
+        self.leapcmd = onefile(kwargs.get('leapcmd'), 'leap', err=True)
+        self.absleap = os.path.abspath(self.leapcmd)
+
         # Name of the molecule, currently just call it a default name.
         self.mname = 'molecule'
 
@@ -277,11 +279,10 @@ class AMBER(Engine):
             crdfile = onefile(kwargs.get('coords'), None, err=True)
             self.mol = Molecule(crdfile, build_topology=False)
 
-        # If the molecule provides all of the needed topology information then
-        # there is no need to load a PDB.
+        # AMBER has certain PDB requirements, so we will absolutely require one.
         needpdb = True
-        if hasattr(self, 'mol') and all([i in self.mol.Data.keys() for i in ["chain", "atomname", "resid", "resname", "elem"]]):
-            needpdb = False
+        # if hasattr(self, 'mol') and all([i in self.mol.Data.keys() for i in ["chain", "atomname", "resid", "resname", "elem"]]):
+        #     needpdb = False
 
         # Determine the PDB file name.
         # If 'pdb' is provided to Engine initialization, it will be used to 
@@ -295,10 +296,12 @@ class AMBER(Engine):
                     self.mol.Data[i] = mpdb.Data[i]
             else:
                 self.mol = copy.deepcopy(mpdb)
+        self.abspdb = os.path.abspath(pdbfnm)
 
         # Write the PDB that AMBER is going to read in.
         # This may or may not be identical to the one used to initialize the engine.
-        self.mol.write('%s.pdb' % self.name)
+        # self.mol.write('%s.pdb' % self.name)
+        # self.abspdb = os.path.abspath('%s.pdb' % self.name)
 
     def callamber(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -314,8 +317,13 @@ class AMBER(Engine):
         return o
 
     def leap(self, name=None, delcheck=False):
+        if not os.path.exists(self.leapcmd):
+            LinkFile(self.absleap, self.leapcmd)
+        pdb = os.path.basename(self.abspdb)
+        if not os.path.exists(pdb):
+            LinkFile(self.abspdb, pdb)
         if name == None: name = self.name
-        write_leap(self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, pdb='%s.pdb' % self.name, prefix=name, spath=self.spath, delcheck=delcheck)
+        write_leap(self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, pdb=pdb, prefix=name, spath=self.spath, delcheck=delcheck)
         self.callamber("tleap -f %s_" % self.leapcmd)
 
     def prepare(self, pbc=False, **kwargs):
@@ -328,8 +336,9 @@ class AMBER(Engine):
                 # preparing the engine, but then delete them afterward.
                 prmtmp = True
                 self.FF.make(np.zeros(self.FF.np))
-            self.mol2 = self.FF.amber_mol2
-            self.frcmod = self.FF.amber_frcmod
+            # Currently force field object only allows one mol2 and frcmod file although this can be lifted.
+            self.mol2 = [self.FF.amber_mol2]
+            self.frcmod = [self.FF.amber_frcmod]
             if 'mol2' in kwargs:
                 logger.error("FF object is provided, which overrides mol2 keyword argument")
                 raise RuntimeError
@@ -340,8 +349,6 @@ class AMBER(Engine):
             prmtmp = False
             self.mol2 = listfiles(kwargs.get('mol2'), 'mol2', err=True)
             self.frcmod = listfiles(kwargs.get('frcmod'), 'frcmod', err=True)
-
-        self.leapcmd = onefile(kwargs.get('leapcmd'), 'leap', err=True)
 
         # Figure out the topology information.
         self.leap()
@@ -419,7 +426,7 @@ class AMBER(Engine):
             for f in self.FF.fnms: 
                 os.unlink(f)
 
-    def evaluate_(self, force=False):
+    def evaluate_(self, crdin, force=False):
 
         """ 
         Utility function for computing energy and forces using AMBER. 
@@ -445,8 +452,8 @@ do_debugf = 1, dumpfrc = 1
 
         ## This line actually runs AMBER.
         self.leap()
-        self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s-all.crd -O" % 
-                       (self.name, self.name, self.name, self.name, self.name))
+        self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s -O" % 
+                       (self.name, self.name, self.name, self.name, crdin))
         ParseMode = 0
         Result = {}
         Energies = []
@@ -487,8 +494,8 @@ do_debugf = 1, dumpfrc = 1
 
         """ Computes the energy using TINKER over a trajectory. """
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s-all.crd" % self.name
             self.mol.write(x, ftype="tinker")
@@ -498,8 +505,8 @@ do_debugf = 1, dumpfrc = 1
 
         """ Computes the energy and force using AMBER over a trajectory. """
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s-all.crd" % self.name
         Result = self.evaluate_(x, force=True)
@@ -512,8 +519,8 @@ do_debugf = 1, dumpfrc = 1
         logger.error('Dipole moments are not yet implemented in AMBER interface')
         raise NotImplementedError
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
@@ -811,7 +818,7 @@ do_debugf = 1, dumpfrc = 1
             
         # Gather information.
         os.system("mv %s.arc %s-md.arc" % (self.name, self.name))
-        self.mdtraj = "%s-md.arc" % self.name
+        self.md_trajectory = "%s-md.arc" % self.name
         edyn = []
         kdyn = []
         temps = []
@@ -901,58 +908,15 @@ class AbInitio_AMBER(AbInitio):
     methods.  The get method is in the base class.  """
 
     def __init__(self,options,tgt_opts,forcefield):
-        ## Name of the trajectory, we need this BEFORE initializing the SuperClass
-        self.coords = "all.gro"
+        ## Coordinate file.
+        self.set_option(tgt_opts, 'coords')
+        ## PDB file for topology (if different from coordinate file.)
+        self.set_option(tgt_opts, 'pdb')
+        ## AMBER home directory.
+        self.set_option(tgt_opts, 'amberhome')
+        ## AMBER home directory.
+        self.set_option(tgt_opts, 'amber_leapcmd', 'leapcmd')
+        ## Name of the engine.
+        self.engine_ = AMBER
+        ## Initialize base class.
         super(AbInitio_AMBER,self).__init__(options,tgt_opts,forcefield)
-        ## all_at_once is not implemented.
-        self.all_at_once = True
-
-    def prepare_temp_directory(self, options, tgt_opts):
-        abstempdir = os.path.join(self.root,self.tempdir)
-        LinkFile(os.path.join(self.root,self.tgtdir,"force.mdin"),os.path.join(abstempdir,"force.mdin"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"stage.leap"),os.path.join(abstempdir,"stage.leap"))
-        # I also need to write the trajectory
-        if 'boxes' in self.mol.Data.keys():
-            del self.mol.Data['boxes']
-        self.mol.write(os.path.join(abstempdir,"all.mdcrd"))
-
-    def energy_force_driver_all_external_(self):
-        ## Create the run input files (inpcrd, prmtop) from the force field file.  
-        ## Note that the frcmod and mol2 files are required.
-        ## This is like 'grompp' in GROMACS.
-        _exec("tleap -f stage.leap", print_to_screen=False, print_command=False)
-        ## This line actually runs AMBER.
-        _exec("sander -i force.mdin -o force.mdout -p prmtop -c inpcrd -y all.mdcrd -O", print_to_screen=False, print_command=False)
-        ## Simple parser for 
-        ParseMode = 0
-        Energies = []
-        Forces = []
-        Force = []
-        for line in open('forcedump.dat'):
-            line = line.strip()
-            sline = line.split()
-            if ParseMode == 1:
-                if len(sline) == 1 and isfloat(sline[0]):
-                    Energies.append(float(sline[0]) * 4.184)
-                    ParseMode = 0
-            if ParseMode == 2:
-                if len(sline) == 3 and all(isfloat(sline[i]) for i in range(3)):
-                    Force += [float(sline[i]) * 4.184 * 10 for i in range(3)]
-                if len(Force) == 3*self.qmatoms:
-                    Forces.append(np.array(Force))
-                    Force = []
-                    ParseMode = 0
-            if line == '0 START of Energies':
-                ParseMode = 1
-            elif line == '1 Total Force':
-                ParseMode = 2
-
-        Energies = np.array(Energies[1:])
-        Forces = np.array(Forces[1:])
-        
-        M = np.hstack((Energies.reshape(-1,1), Forces))
-
-        return M
-
-    def energy_force_driver_all(self):
-        return self.energy_force_driver_all_external_()
