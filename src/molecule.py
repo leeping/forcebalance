@@ -933,10 +933,13 @@ class Molecule(object):
     def append(self,other):
         self += other
 
-    def __init__(self, fnm = None, ftype = None, positive_resid=True, build_topology = True, **kwargs):
+    def __init__(self, fnm = None, ftype = None, build_topology = True, **kwargs):
         """ To create the Molecule object, we simply define the table of
         file reading/writing functions and read in a file if it is
         provided."""
+        ## build_topology: Create a connectivity graph of atoms
+        ## toppbc: Use periodic boundary conditions in making connectivity graph
+        ## positive_resid: Enforce all positive resids
         #=========================================#
         #|           File type tables            |#
         #|    Feel free to edit these as more    |#
@@ -983,7 +986,7 @@ class Molecule(object):
                           'arc'     : 'tinker'}
         ## Creates entries like 'gromacs' : 'gromacs' and 'xyz' : 'xyz'
         ## in the Funnel
-        self.positive_resid = positive_resid
+        self.positive_resid = kwargs.get('positive_resid', 0)
         self.built_bonds = False
         for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
             self.Funnel[i] = i
@@ -1016,6 +1019,7 @@ class Molecule(object):
             if 'networkx' in sys.modules and hasattr(self, 'elem') and build_topology and self.na > 0:
                 if self.na > 100000:
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
+                self.toppbc = kwargs.get('toppbc', 0)
                 self.topology = self.build_topology()
                 self.molecules = nx.connected_component_subgraphs(self.topology)
                 if 'bonds' not in self.Data:
@@ -1249,6 +1253,7 @@ class Molecule(object):
             for i in range(self.ns):
                 New.xyzs[i] = self.xyzs[i][atomslice]
         if 'networkx' in sys.modules and self.built_bonds and self.na > 0:
+            New.toppbc = self.toppbc
             New.topology = New.build_topology()
             New.molecules = nx.connected_component_subgraphs(New.topology)
             New.Data['bonds'] = New.topology.edges()
@@ -1366,7 +1371,6 @@ class Molecule(object):
         maxs = np.max(self.xyzs[sn],axis=0)
         # Grid size in Angstrom.  This number is optimized for speed in a 15,000 atom system (united atom pentadecane).
         gsz = 6.0
-        toppbc = False
         if hasattr(self, 'boxes'): 
             xmin = 0.0
             ymin = 0.0
@@ -1374,11 +1378,11 @@ class Molecule(object):
             xmax = self.boxes[sn].a
             ymax = self.boxes[sn].b
             zmax = self.boxes[sn].c
-            if xmax > gsz and ymax > gsz and zmax > gsz:
-                toppbc = True
+            # if xmax > gsz and ymax > gsz and zmax > gsz:
+            #     toppbc = True
             if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
                 print "Warning: Topology building will not work with broken molecules in nonorthogonal cells."
-                toppbc = False
+                self.toppbc = False
         else:
             xmin = mins[0]
             ymin = mins[1]
@@ -1386,8 +1390,9 @@ class Molecule(object):
             xmax = maxs[0]
             ymax = maxs[1]
             zmax = maxs[2]
+            self.toppbc = False
 
-        if toppbc:
+        if self.toppbc:
             gszx = (xmax-xmin)/int((xmax-xmin)/gsz)
             gszy = (ymax-ymin)/int((ymax-ymin)/gsz)
             gszz = (zmax-zmin)/int((zmax-zmin)/gsz)
@@ -1398,7 +1403,7 @@ class Molecule(object):
 
         # Run algorithm to determine bonds.
         # Decide if we want to use the grid algorithm.
-        use_grid = toppbc or (np.max([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
+        use_grid = self.toppbc or (np.max([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.
@@ -1434,20 +1439,20 @@ class Molecule(object):
                 zidx = -1
                 for j in xgrd:
                     xi = self.xyzs[sn][i][0]
-                    while toppbc and xi < 0: xi += xmax
-                    while toppbc and xi > xmax: xi -= xmax
+                    while self.toppbc and xi < 0: xi += xmax
+                    while self.toppbc and xi > xmax: xi -= xmax
                     if xi < j: break
                     xidx += 1
                 for j in ygrd:
                     yi = self.xyzs[sn][i][1]
-                    while toppbc and yi < 0: yi += ymax
-                    while toppbc and yi > ymax: yi -= ymax
+                    while self.toppbc and yi < 0: yi += ymax
+                    while self.toppbc and yi > ymax: yi -= ymax
                     if yi < j: break
                     yidx += 1
                 for j in zgrd:
                     zi = self.xyzs[sn][i][2]
-                    while toppbc and zi < 0: zi += zmax
-                    while toppbc and zi > zmax: zi -= zmax
+                    while self.toppbc and zi < 0: zi += zmax
+                    while self.toppbc and zi > zmax: zi -= zmax
                     if zi < j: break
                     zidx += 1
                 gasn[(xidx,yidx,zidx)].append(i)
@@ -1469,7 +1474,7 @@ class Molecule(object):
         BondThresh = (BT0+BT1) * Fac
         BondThresh = (BondThresh > mindist) * BondThresh + (BondThresh < mindist) * mindist
         if 'forcebalance.contact' in sys.modules:
-            if hasattr(self, 'boxes'):
+            if hasattr(self, 'boxes') and self.toppbc:
                 dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
             else:
                 dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
