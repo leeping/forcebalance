@@ -1440,20 +1440,20 @@ class Molecule(object):
                 zidx = -1
                 for j in xgrd:
                     xi = self.xyzs[sn][i][0]
-                    while self.toppbc and xi < 0: xi += xmax
-                    while self.toppbc and xi > xmax: xi -= xmax
+                    while xi < 0: xi += xmax
+                    while xi > xmax: xi -= xmax
                     if xi < j: break
                     xidx += 1
                 for j in ygrd:
                     yi = self.xyzs[sn][i][1]
-                    while self.toppbc and yi < 0: yi += ymax
-                    while self.toppbc and yi > ymax: yi -= ymax
+                    while yi < 0: yi += ymax
+                    while yi > ymax: yi -= ymax
                     if yi < j: break
                     yidx += 1
                 for j in zgrd:
                     zi = self.xyzs[sn][i][2]
-                    while self.toppbc and zi < 0: zi += zmax
-                    while self.toppbc and zi > zmax: zi -= zmax
+                    while zi < 0: zi += zmax
+                    while zi > zmax: zi -= zmax
                     if zi < j: break
                     zidx += 1
                 gasn[(xidx,yidx,zidx)].append(i)
