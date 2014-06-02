@@ -99,7 +99,7 @@ class TestLipidGRO(ForceBalanceTestCase):
     def setUp(self):
         super(TestLipidGRO,self).setUp()
         os.chdir('test/files')
-        try: self.molecule = forcebalance.molecule.Molecule(self.source)
+        try: self.molecule = forcebalance.molecule.Molecule(self.source, toppbc=True)
         except IOError:
             self.skipTest("Input pdb file test/files/%s doesn't exist" % self.source)
         except:

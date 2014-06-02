@@ -106,7 +106,7 @@ class Liquid(Target):
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)): 
             logger.error("%s doesn't exist; please provide liquid_coords option\n" % self.liquid_coords)
             raise RuntimeError
-        self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.liquid_coords))
+        self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.liquid_coords), toppbc=True)
         # Read in gas starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.gas_coords)): 
             logger.error("%s doesn't exist; please provide gas_coords option\n" % self.gas_coords)

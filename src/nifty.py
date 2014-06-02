@@ -632,7 +632,7 @@ class Unpickler_LP(pickle.Unpickler):
         except:
             warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
 
-def lp_dump(obj, fnm, protocol=pickle.HIGHEST_PROTOCOL):
+def lp_dump(obj, fnm, protocol=0):
     """ Write an object to a bzipped file specified by the path. """
     # Safeguard against overwriting files?  Nah.
     # if os.path.exists(fnm):
