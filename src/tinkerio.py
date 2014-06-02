@@ -761,7 +761,7 @@ class TINKER(Engine):
             polarizability_dict = OrderedDict()
             for line in o:
                 s = line.split()
-                if "Total Polarizability Tensor" in line:
+                if "Molecular Polarizability Tensor" in line:
                     pn = ln
                 elif pn > 0 and ln == pn + 2:
                     polarizability_dict['xx'] = float(s[-3])
@@ -778,6 +778,8 @@ class TINKER(Engine):
                 ln += 1
             calc_moments['polarizability'] = polarizability_dict
         os.system("rm -rf *.xyz_* *.[0-9][0-9][0-9]")
+        print polarizability
+        print calc_moments
         return calc_moments
 
     def energy_rmsd(self, shot=0, optimize=True):
