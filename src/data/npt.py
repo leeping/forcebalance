@@ -338,7 +338,7 @@ def main():
     #----
     # Loading coordinates
     #----
-    ML = Molecule(liquid_fnm)
+    ML = Molecule(liquid_fnm, toppbc=True)
     MG = Molecule(gas_fnm)
     # Determine the number of molecules in the condensed phase coordinate file.
     NMol = len(ML.molecules)
