@@ -32,9 +32,9 @@ sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
 # versions of Python and Swig since the version 
 # installed for the OS might be too old.
 #----
-prefix=$HOME/opt
-swgpath=$HOME/install/epd-7.3-1-rh3-x86_64
-pypath=$HOME/install/epd-7.3-1-rh3-x86_64
+prefix=$HOME/install
+swgpath=$HOME/install/epd-7.3-1-rh5-x86_64
+pypath=$HOME/install/epd-7.3-1-rh5-x86_64
 
 # Create these directories if they don't exist.
 mkdir -p $prefix

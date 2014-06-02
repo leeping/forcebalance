@@ -747,7 +747,7 @@ class OpenMM(Engine):
         
         # Boolean flag indicating an RPMD simulation
         self.rpmd = len(rpmd_opts)>0
-
+        rpmd_opts = [int(i) for i in rpmd_opts]
         ## Determine the integrator.
         if temperature:
             ## If temperature control is turned on, then run Langevin dynamics.
@@ -803,6 +803,14 @@ class OpenMM(Engine):
                 raise RuntimeError("No RPMD integrator without temperature control.")
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
+        # Create list of rpmd positions here so that they exist before set_positions() is called.
+        if self.rpmd:
+            if not isinstance(integrator, RPMDIntegrator):
+                logger.error('Specified an RPMD simulation but the integrator is wrong!')
+                raise RuntimeError
+            self.xyz_rpmd = []
+            for i in range(integrator.getNumCopies()):
+                self.xyz_rpmd.append([])
         ## Add the barostat.
         if pressure != None:
             if anisotropic:
@@ -1228,9 +1236,13 @@ class OpenMM(Engine):
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                        kinetic_temperature / kelvin, potential / kilojoules_per_mole))
         # Stored coordinates, box vectors for each RPMD system copy
-        self.xyz_rpmd = []        
-        for i in range(self.simulation.integrator.getNumCopies()):
-            self.xyz_rpmd.append([])
+        #if self.rpmd:
+        #    if not isinstance(self.simulation.integrator, RPMDIntegrator):
+        #        logger.error('Specified an RPMD simulation but the integrator is wrong!')
+        #        raise RuntimeError
+        #    self.xyz_rpmd = []        
+        #    for i in range(self.simulation.integrator.getNumCopies()):
+        #        self.xyz_rpmd.append([])
         # Collect production data.
         if verbose: logger.info("Production...\n")
         if self.pbc:

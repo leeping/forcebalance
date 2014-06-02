@@ -53,8 +53,10 @@ elif [[ $HOSTNAME =~ "kid" ]] ; then
     export INCLUDE=$CUDA_HOME/include:$INCLUDE
     export BAK=/lustre/medusa/leeping/runcuda-backups
 elif [[ $HOSTNAME =~ "icme-gpu" || $HOSTNAME =~ "node0" ]] ; then
-    module load cuda55/toolkit
-    export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda55/toolkit/5.5.22/bin/nvcc
+    if [[ x$OPENMM_CUDA_COMPILER == x ]] ; then 
+        module load cuda55/toolkit
+        export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda55/toolkit/5.5.22/bin/nvcc
+    fi
     #export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda50/toolkit/5.0.35/bin/nvcc
 elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
