@@ -213,6 +213,7 @@ class Optimizer(forcebalance.BaseClass):
             if soptions['read_mvals'] and np.max(np.abs(self.mvals0)) != 0.0:
                 warn_press_key("Save file read_mvals will overwrite input file.\nInput file: %s\nSave file : %s\n" % (soptions['read_mvals'], self.mvals0))
             self.mvals0 = np.array(soptions['read_mvals'])
+            self.read_mvals = np.array(soptions['read_mvals'])
 
         maxrd = max([T.maxrd() for T in self.Objective.Targets])
         if maxrd < 0: return
