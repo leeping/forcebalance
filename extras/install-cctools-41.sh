@@ -2,7 +2,7 @@
 
 # Download latest version from website.
 echo "Downloading source."
-cctools="cctools-4.1.2"
+cctools="cctools-4.1.3"
 cctools_src="$cctools-source"
 rm -rf $cctools_src $cctools_src.tar*
 wget http://www3.nd.edu/~ccl/software/files/$cctools_src.tar.gz
@@ -35,6 +35,11 @@ sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
 prefix=$HOME/opt
 swgpath=$HOME/local
 pypath=$HOME/local
+
+# Create these directories if they don't exist.
+mkdir -p $prefix
+mkdir -p $swgpath
+mkdir -p $pypath
 
 if [ ! -d $prefix ] ; then
     echo "Warning: Installation directory $prefix does not exist."

@@ -325,7 +325,7 @@ def main():
     #----
     # Loading coordinates
     #----
-    ML = Molecule(lipid_fnm)
+    ML = Molecule(lipid_fnm, toppbc=True)
     # Determine the number of molecules in the condensed phase coordinate file.
     NMol = len(ML.molecules)
 
