@@ -533,6 +533,13 @@ class OpenMM(Engine):
         Simulation object yet, because that may depend on MD
         integrator parameters, thermostat, barostat etc.
         """
+        # Introduced to attempt to fix a bug, but didn't work,
+        # Might be sensible code anyway.
+        # if hasattr(self.mol, 'boxes') and not pbc:
+        #     del self.mol.Data['boxes']
+        # if pbc and not hasattr(self.mol, 'boxes'):
+        #     logger.error('Requested periodic boundary conditions but coordinate file contains no boxes')
+        #     raise RuntimeError
         ## Create the OpenMM PDB object.
         pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
         self.mol[0].write(pdb1)

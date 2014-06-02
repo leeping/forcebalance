@@ -104,7 +104,7 @@ class Lipid(Target):
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.lipid_coords)): 
             logger.error("%s doesn't exist; please provide lipid_coords option\n" % self.lipid_coords)
             raise RuntimeError
-        self.lipid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.lipid_coords))
+        self.lipid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.lipid_coords), toppbc=True)
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
         # Extra files to be copied back at the end of a run.
