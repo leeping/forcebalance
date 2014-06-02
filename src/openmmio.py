@@ -689,7 +689,8 @@ class OpenMM(Engine):
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
-        GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce', 'AmoebaWcaDispersionForce']
+        GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce','AmoebaWcaDispersionForce',
+                        'CustomNonbondedForce',  'NonbondedForce']
         GrpNums = {}
         if not mts:
             for j in self.system.getForces():
