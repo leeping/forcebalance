@@ -607,6 +607,7 @@ class FF(forcebalance.BaseClass):
         """
         
         fflist = list(self.ffdata[ffname].iter())
+        print "ELEMENT LIST PRINTOUT:", fflist
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
