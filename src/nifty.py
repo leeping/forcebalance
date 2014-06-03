@@ -131,7 +131,7 @@ def commadash(l):
 
 def uncommadash(s):
     # Takes a string like '27-31,88-91,100,136-139'
-    # and turns it into a list like [27, 28, 29, 30, 31, 88, 89, 90, 91, 100, 136, 137, 138, 139]
+    # and turns it into a list like [26, 27, 28, 29, 30, 87, 88, 89, 90, 99, 135, 136, 137, 138]
     L = []
     try:
         for w in s.split(','):
