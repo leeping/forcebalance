@@ -265,9 +265,9 @@ def CopyNonbondedParameters(src, dest):
 
 def CopyCustomNonbondedParameters(src, dest):
     for i in range(src.getNumParticles()):
-        dest.setParticleParameters(i,*src.getParticleParameters(i))
+        dest.setParticleParameters(i, list(src.getParticleParameters(i)))
     for i in range(src.getNumExclusions()):
-        dest.setExclusionParticles(i,*src.getExclusionParticles(i))
+        dest.setExclusionParticles(i, *src.getExclusionParticles(i))
 
 
 def do_nothing(src, dest):
