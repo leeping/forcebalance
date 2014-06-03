@@ -1062,8 +1062,9 @@ class FF(forcebalance.BaseClass):
                 if nmol == 0:
                     self.qid = qid
                     self.qmap = qmap
-                else:
-                    logger.info("Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted.\n" % molname)
+                # The warning about ESP fitting is not very helpful
+                # else:
+                #     logger.info("Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted.\n" % molname)
                 nmol += 1
         elif self.constrain_charge:
             warn_press_key("'adict' {molecule:atomnames} was not found.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
