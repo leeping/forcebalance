@@ -811,13 +811,13 @@ class OpenMM(Engine):
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
         # Create list of rpmd positions here so that they exist before set_positions() is called.
-        if self.rpmd:
-            if not isinstance(integrator, RPMDIntegrator):
-                logger.error('Specified an RPMD simulation but the integrator is wrong!')
-                raise RuntimeError
-            self.xyz_rpmd = []
-            for i in range(integrator.getNumCopies()):
-                self.xyz_rpmd.append([])
+        #if self.rpmd:
+        #    if not isinstance(integrator, RPMDIntegrator):
+        #        logger.error('Specified an RPMD simulation but the integrator is wrong!')
+        #        raise RuntimeError
+        #    self.xyz_rpmd = []
+        #    for i in range(integrator.getNumCopies()):
+        #        self.xyz_rpmd.append([])
         ## Add the barostat.
         if pressure != None:
             if anisotropic:
@@ -911,13 +911,13 @@ class OpenMM(Engine):
         #----
         # NOTE: Periodic box vectors must be set FIRST
         if self.pbc:
-            if not self.rpmd:
+            if not hasattr(self, 'xyz_rpmd'):
                 self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
             else:
                 self.simulation.context.setPeriodicBoxVectors(*self.xyz_rpmd[0][shot][1])
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
-        if not self.rpmd:
+        if not hasattr(self, 'xyz_rpmd'):
             self.simulation.context.setPositions(self.xyz_omms[shot][0])
             self.simulation.context.computeVirtualSites()
         else:
@@ -1187,6 +1187,14 @@ class OpenMM(Engine):
         edecomp = OrderedDict()
         # Stored coordinates, box vectors
         self.xyz_omms = []
+        # Stored coordinates, box vectors for RPMD
+        if self.rpmd:
+            if not isinstance(self.simulation.integrator, RPMDIntegrator):
+                logger.error('Specified an RPMD simulation but the integrator is wrong!')
+                raise RuntimeError
+            self.xyz_rpmd = []        
+            for i in range(self.simulation.integrator.getNumCopies()):
+                self.xyz_rpmd.append([])
         # Densities, potential and kinetic energies, box volumes, dipole moments
         Rhos = []
         Potentials = []
@@ -1242,15 +1250,6 @@ class OpenMM(Engine):
             else:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                        kinetic_temperature / kelvin, potential / kilojoules_per_mole))
-        # Stored coordinates, box vectors for each RPMD system copy
-        #if self.rpmd:
-        #    if not isinstance(self.simulation.integrator, RPMDIntegrator):
-        #        logger.error('Specified an RPMD simulation but the integrator is wrong!')
-        #        raise RuntimeError
-        #    self.xyz_rpmd = []        
-        #    for i in range(self.simulation.integrator.getNumCopies()):
-        #        self.xyz_rpmd.append([])
-        # Collect production data.
         if verbose: logger.info("Production...\n")
         if self.pbc:
             if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
@@ -1309,12 +1308,22 @@ class OpenMM(Engine):
             Temps.append(kinetic_temperature / kelvin)
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
-            if self.tdiv>1:
-              Kinetics.append(cen_kinetic / kilojoules_per_mole)#If RPMD, we use centroid estimator to calculate quantum kinetic energy
+            if self.rpmd:
+                Kinetics.append(cen_kinetic / kilojoules_per_mole)#If RPMD, we use centroid estimator to calculate quantum kinetic energy
             else:
-              Kinetics.append(kinetic / kilojoules_per_mole)#else just classical kinetic energy
+                Kinetics.append(kinetic / kilojoules_per_mole)#else just classical kinetic energy
             Volumes.append(volume / nanometer**3)
-            Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
+            if not self.rpmd:
+                Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
+            else:
+                # For RPMD, we have to average over all copies of the system, so call get_dipole on each 
+                # copy separately and average here, rather than modifying the method/duplicating code.
+                rpmdIntegrator = self.simulation.context.getIntegrator()
+                temp_dips = [0.0, 0.0, 0.0]
+                for i in range(rpmdIntegrator.getNumCopies()):
+                    temp_dips += get_dipole(self.simulation,positions=self.xyz_rpmd[i][-1][0])
+                temp_dips[:] = [value/rpmdIntegrator.getNumCopies() for value in temp_dips]  
+                Dips.append(temp_dips)     
         Rhos = np.array(Rhos)
         Potentials = np.array(Potentials)
         Kinetics = np.array(Kinetics)
