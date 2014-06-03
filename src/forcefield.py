@@ -609,7 +609,12 @@ class FF(forcebalance.BaseClass):
         fflist = list(self.ffdata[ffname].iter())
         ScriptElement = fflist[-1]
         ScriptText = ScriptElement.text
-        print "ELEMENT TEXT PRINTOUT:", ScriptText
+        wfile = open('temp.txt', 'w')
+        wfile.write(ScriptText)
+        wfile.close()
+        ffname = 'temp.txt'
+        fftype = determine_fftype(ffname)
+        self.addff_txt(ffname, fftype)
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
