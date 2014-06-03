@@ -609,7 +609,7 @@ class FF(forcebalance.BaseClass):
         fflist = list(self.ffdata[ffname].iter())
         ScriptElement = fflist[-1]
         ScriptText = ScriptElement.text
-        wfile = open('temp.txt', 'w')
+        wfile = open('forcefield/temp.txt', 'w')
         wfile.write(ScriptText)
         wfile.close()
         ffnametemp = 'temp.txt'
