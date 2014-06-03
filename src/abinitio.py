@@ -6,7 +6,7 @@
 
 import os
 import shutil
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once, pvec1d
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once, pvec1d, commadash, uncommadash, isint
 import numpy as np
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
@@ -75,7 +75,7 @@ class AbInitio(Target):
         ## The temperature for QM Boltzmann weights
         self.set_option(tgt_opts,'qmboltztemp','qmboltztemp')
         ## Number of atoms that we are fitting
-        self.set_option(tgt_opts,'fitatoms','fitatoms')
+        self.set_option(tgt_opts,'fitatoms','fitatoms_in')
         ## Whether to fit Energies.
         self.set_option(tgt_opts,'energy','energy')
         ## Whether to fit Forces.
@@ -138,8 +138,6 @@ class AbInitio(Target):
         self.espval        = []
         ## The qdata.txt file that contains the QM energies and forces
         self.qfnm = os.path.join(self.tgtdir,"qdata.txt")
-        ## The number of atoms in the QM calculation (Irrelevant if not fitting forces)
-        self.qmatoms      = 0
         ## Qualitative Indicator: average energy error (in kJ/mol)
         self.e_err = 0.0
         self.e_err_pct = None
@@ -226,7 +224,7 @@ class AbInitio(Target):
             logger.error('force_map keyword "%s" is invalid. Please choose from: %s\n' % (self.force_map, ', '.join(['"%s"' % kwds[k] for k in self.AtomLists.keys() if k in kwds])))
             raise RuntimeError
 
-        nft = self.fitatoms
+        nft = len(self.fitatoms)
         # Number of particles that the force is acting on
         nfp = force.reshape(-1,3).shape[0]
         # Number of particles in the XYZ coordinates
@@ -372,26 +370,37 @@ class AbInitio(Target):
         if len(self.fqm) > 0:
             self.fqm = np.array(self.fqm)
             self.fqm *= fqcgmx
-            self.qmatoms = self.fqm.shape[1]/3
+            self.qmatoms = range(self.fqm.shape[1]/3)
         else:
             logger.info("QM forces are not present, only fitting energies.\n")
             self.force = 0
             self.w_force = 0
-        self.nesp = len(self.espval[0]) if len(self.espval) > 0 else 0
+
         # Here we may choose a subset of atoms to do the force matching.
         if self.force:
-            if self.fitatoms == 0: 
-                self.fitatoms = self.qmatoms
-            elif self.fitatoms > self.qmatoms:
+            # Build a list corresponding to the atom indices where we are fitting the forces.
+            if isint(self.fitatoms_in):
+                if int(self.fitatoms_in) == 0:
+                    logger.info("Fitting the forces on all atoms\n")
+                    self.fitatoms = self.qmatoms
+                else:
+                    warn_press_key("Provided an integer for fitatoms; will assume this means the first %i atoms" % int(self.fitatoms_in))
+                    self.fitatoms = range(int(self.fitatoms_in))
+            else:
+                # If provided a "comma and dash" list, then expand the list.
+                self.fitatoms = uncommadash(self.fitatoms_in)
+
+            if len(self.fitatoms) > len(self.qmatoms):
                 warn_press_key("There are more fitting atoms than the total number of atoms in the QM calculation (something is probably wrong)")
             else:
-                # Indicate to Gromacs that we're only fitting the first however-many atoms.
-                logger.info("We're only fitting the first %i atoms\n" % self.fitatoms)
-                #print "The quantum force matrix appears to contain more components (%i) than those being fit (%i)." % (fqmm.shape[1], 3*self.fitatoms)
+                logger.info("Fitting the forces on atoms %s\n" % commadash(self.fitatoms))
                 logger.info("Pruning the quantum force matrix...\n")
-                self.fqm  = self.fqm[:, :3*self.fitatoms].copy()
+                selct = list(itertools.chain(*[[3*i+j for j in range(3)] for i in self.fitatoms]))
+                self.fqm  = self.fqm[:, selct]
         else:
-            self.fitatoms = 0
+            self.fitatoms = []
+
+        self.nesp = len(self.espval[0]) if len(self.espval) > 0 else 0
             
         if len(self.emd0) > 0:
             self.emd0 = np.array(self.emd0)
@@ -515,7 +524,8 @@ class AbInitio(Target):
     def energy_force_transform(self):
         if self.force:
             M = self.energy_force_all()
-            M = M[:, :3*self.fitatoms+1]
+            selct = [0] + list(itertools.chain(*[[1+3*i+j for j in range(3)] for i in self.fitatoms]))
+            M = M[:, selct]
             if self.use_nft:
                 Nfts = []
                 for i in range(len(M)):
@@ -546,7 +556,8 @@ class AbInitio(Target):
     def energy_force_transform_one(self,i):
         if self.force:
             M = self.energy_force_one(i)
-            M = M[:3*self.fitatoms+1]
+            selct = [0] + list(itertools.chain(*[[1+3*i+j for j in range(3)] for i in self.fitatoms]))
+            M = M[:, selct]
             if self.use_nft:
                 Fm  = M[1:]
                 Nft = self.compute_netforce_torque(self.mol.xyzs[i], Fm)
@@ -628,7 +639,7 @@ class AbInitio(Target):
         #======================================#
         #   Copied from the old ForTune code   #
         #======================================#
-        nat  = self.fitatoms
+        nat  = len(self.fitatoms)
         nnf  = self.nnf
         ntq  = self.ntq
         NC   = 3*nat
@@ -913,8 +924,8 @@ class AbInitio(Target):
             for i in range(NS):
                 Mforce_obj.xyzs[i] = Mforce_print[i, :].reshape(-1,3)
                 Qforce_obj.xyzs[i] = Qforce_print[i, :].reshape(-1,3)
-            if nat < self.qmatoms:
-                Fpad = np.zeros((self.qmatoms - nat, 3))
+            if nat < len(self.qmatoms):
+                Fpad = np.zeros((len(self.qmatoms) - nat, 3))
                 Mforce_obj.xyzs[i] = np.vstack((Mforce_obj.xyzs[i], Fpad))
                 Qforce_obj.xyzs[i] = np.vstack((Qforce_obj.xyzs[i], Fpad))
             if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
