@@ -613,8 +613,14 @@ class FF(forcebalance.BaseClass):
         wfile.write(ScriptText)
         wfile.close()
         ffnametemp = 'temp.txt'
-        #fftype = determine_fftype(ffname2)
-        self.addff(ffnametemp)
+        fftype = determine_fftype(ffnametemp)
+        absff = os.path.join(self.root, self.ffdir, ffnametemp)
+        ## Read in a text force field file as a list of lines
+        self.ffdata[ffnametemp] = [line.expandtabs() for line in open(absff).readlines()]
+        self.ffdata_isxml[ffnametemp] = False
+        # Process the file
+        self.addff_txt(ffname, fftype)
+
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
