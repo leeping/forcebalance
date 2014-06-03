@@ -605,9 +605,11 @@ class FF(forcebalance.BaseClass):
         parameters with opposite sign.
 
         """
-        
+
         fflist = list(self.ffdata[ffname].iter())
-        print "ELEMENT LIST PRINTOUT:", fflist
+        ScriptElement = fflist[-1]
+        ScriptText = ScriptElement.text
+        print "ELEMENT TEXT PRINTOUT:", ScriptText
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
