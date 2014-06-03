@@ -10,7 +10,7 @@ modules for other programs because it's so simple.
 import os, sys
 from re import match, sub, split, findall
 import networkx as nx
-from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles, warn_press_key
+from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles, warn_press_key, wopen
 import numpy as np
 from forcebalance import BaseReader
 from forcebalance.engine import Engine
@@ -102,7 +102,7 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], de
     fout = fnm+'_'
     line_out.append('saveamberparm %s %s.prmtop %s.inpcrd\n' % (ambername, prefix, prefix))
     line_out.append('quit\n')
-    with open(fout, 'w') as f: print >> f, ''.join(line_out)
+    with wopen(fout) as f: print >> f, ''.join(line_out)
 
 class Mol2_Reader(BaseReader):
     """Finite state machine for parsing Mol2 force field file. (just for parameterizing the charges)"""
@@ -253,7 +253,7 @@ class AMBER(Engine):
                 warn_press_key("Please add AMBER executables to the PATH or specify amberhome.")
             self.amberhome = os.path.split(which('sander'))[0]
         
-        with open('.quit.leap', 'w') as f:
+        with wopen('.quit.leap') as f:
             print >> f, 'quit'
 
         # AMBER search path
@@ -356,6 +356,11 @@ class AMBER(Engine):
                            stdin="printAtoms\nprintBonds\nexit\n", 
                            persist=True, print_error=False)
 
+        # Once we do this, we don't need the prmtop and inpcrd anymore
+        os.unlink("%s.inpcrd" % self.name)
+        os.unlink("%s.prmtop" % self.name)
+        os.unlink("leap.log")
+
         mode = 'None'
         self.AtomLists = defaultdict(list)
         G = nx.Graph()
@@ -447,11 +452,11 @@ imin = 5, ntb = 0, cut=9, nstlim = 0, nsnb = 0
 do_debugf = 1, dumpfrc = 1
 /
 """
-        with open("%s-force.mdin" % self.name, 'w') as f:
+        with wopen("%s-force.mdin" % self.name) as f:
             print >> f, force_mdin
 
         ## This line actually runs AMBER.
-        self.leap()
+        self.leap(delcheck=True)
         self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s -O" % 
                        (self.name, self.name, self.name, self.name, crdin))
         ParseMode = 0

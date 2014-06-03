@@ -505,7 +505,7 @@ class AbInitio(Target):
                                                "%8.4f" % self.tq_ctr]
         self.printcool_table(data=Data, headings=Headings, color=0)
         if self.force:
-            logger.info("Maximum force error on atom %i (%s), frame %i, %8.4f kJ/mol/A\n" % (self.maxfatom, self.mol.elem[self.maxfatom], self.maxfshot, self.maxdf/10))
+            logger.info("Maximum force error on atom %i (%s), frame %i, %8.4f kJ/mol/A\n" % (self.maxfatom, self.mol.elem[self.fitatoms[self.maxfatom]], self.maxfshot, self.maxdf/10))
 
     def energy_all(self):
         if hasattr(self, 'engine'):
