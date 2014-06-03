@@ -605,7 +605,7 @@ class FF(forcebalance.BaseClass):
         parameters with opposite sign.
 
         """
-
+        print "ffname looks like this: ", ffname
         fflist = list(self.ffdata[ffname].iter())
         ScriptElement = fflist[-1]
         ScriptText = ScriptElement.text
