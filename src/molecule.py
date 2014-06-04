@@ -100,10 +100,10 @@
 # xyzs       = List of arrays of atomic xyz coordinates
 # comms      = List of comment strings
 # boxes      = List of 3-element or 9-element arrays for periodic boxes
-# qm_forces  = List of arrays of atomistic forces from QM calculations
+# qm_grads   = List of arrays of gradients (i.e. negative of the atomistic forces) from QM calculations
 # qm_espxyzs = List of arrays of xyz coordinates for ESP evaluation
 # qm_espvals = List of arrays of ESP values
-FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_forces', 'qm_energies', 'qm_interaction', 
+FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', 'qm_energies', 'qm_interaction', 
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
@@ -673,13 +673,11 @@ class Molecule(object):
     say, MyMolecule[1:10] returns a new Molecule object that contains
     frames 1 through 9 (inclusive and numbered starting from zero.)
     
-    Next step: Read in Q-Chem output data using this too!
-
     Special variables:  These variables cannot be set manually because
     there is a special method associated with getting them.
 
     na = The number of atoms.  You'll get this if you use MyMol.na or MyMol['na'].
-    na = The number of snapshots.  You'll get this if you use MyMol.ns or MyMol['ns'].
+    ns = The number of snapshots.  You'll get this if you use MyMol.ns or MyMol['ns'].
 
     Unit system:  Angstroms.
 
@@ -702,6 +700,9 @@ class Molecule(object):
 
     def __getattr__(self, key):
         """ Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. """
+        if key == 'qm_forces':
+            warn('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
+            key = 'qm_grads'
         if key == 'ns':
             return len(self)
         elif key == 'na': # The 'na' attribute is the number of atoms.
@@ -739,6 +740,9 @@ class Molecule(object):
         """ Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. """
         ## These attributes return a list of attribute names defined in this class, that belong in the chosen category.
         ## For example: self.FrameKeys should return set(['xyzs','boxes']) if xyzs and boxes exist in self.Data
+        if key == 'qm_forces':
+            warn('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
+            key = 'qm_grads'
         if key in AllVariableNames:
             self.Data[key] = value
         return super(Molecule,self).__setattr__(key, value)
@@ -907,7 +911,7 @@ class Molecule(object):
         for key in self.AtomKeys:
             NewData[key] = list(np.array(M.Data[key])[unmangled])
         for key in self.FrameKeys:
-            if key in ['xyzs', 'qm_forces', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+            if key in ['xyzs', 'qm_grads', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
                 NewData[key] = list([self.Data[key][i][unmangled] for i in range(len(self))])
         for key in NewData:
             setattr(self, key, copy.deepcopy(NewData[key]))
@@ -1273,7 +1277,7 @@ class Molecule(object):
         def FrameStack(k):
             if k in self.Data and k in other.Data:
                 New.Data[k] = [np.vstack((s, o)) for s, o in zip(self.Data[k], other.Data[k])]
-        for i in ['xyzs', 'qm_forces', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+        for i in ['xyzs', 'qm_grads', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
             FrameStack(i)
 
         # Now build the new atom keys.
@@ -1674,8 +1678,8 @@ class Molecule(object):
         
         @return fnms A list of the file names that were written.
         """
-        
-        
+        logger.error('Apparently this function has not been implemented!!')
+        raise NotImplementedError
 
     #=====================================#
     #|         Reading functions         |#
@@ -1795,7 +1799,7 @@ class Molecule(object):
         if len(interaction) > 0:
             Answer['qm_interaction'] = interaction
         if len(forces) > 0:
-            Answer['qm_forces'] = forces
+            Answer['qm_grads'] = forces
         if len(espxyzs) > 0:
             Answer['qm_espxyzs'] = espxyzs
         if len(espvals) > 0:
@@ -2566,13 +2570,13 @@ class Molecule(object):
         # Q-Chem can print out gradients with several different headings.
         # We start with the most reliable heading and work our way down.
         if len(Mats['analytical_grad']['All']) > 0:
-            Answer['qm_forces'] = Mats['analytical_grad']['All']
+            Answer['qm_grads'] = Mats['analytical_grad']['All']
         elif len(Mats['gradient_mp2']['All']) > 0:
-            Answer['qm_forces'] = Mats['gradient_mp2']['All']
+            Answer['qm_grads'] = Mats['gradient_mp2']['All']
         elif len(Mats['gradient_dualbas']['All']) > 0:
-            Answer['qm_forces'] = Mats['gradient_dualbas']['All']
+            Answer['qm_grads'] = Mats['gradient_dualbas']['All']
         elif len(Mats['gradient_scf']['All']) > 0:
-            Answer['qm_forces'] = Mats['gradient_scf']['All']
+            Answer['qm_grads'] = Mats['gradient_scf']['All']
 
         if len(Mats['hessian_scf']['All']) > 0:
             Answer['qm_hessians'] = Mats['hessian_scf']['All']
@@ -2627,14 +2631,14 @@ class Molecule(object):
             logger.error('The numbers of atoms across frames in %s are not all the same\n' % (fnm))
             raise RuntimeError
 
-        if 'qm_forces' in Answer:
-            for i, frc in enumerate(Answer['qm_forces']):
-                Answer['qm_forces'][i] = frc.T
+        if 'qm_grads' in Answer:
+            for i, frc in enumerate(Answer['qm_grads']):
+                Answer['qm_grads'][i] = frc.T
             for i in np.where(np.array(conv) == 0)[0]:
-                Answer['qm_forces'].insert(i, Answer['qm_forces'][0]*0.0)
-            if len(Answer['qm_forces']) != len(Answer['qm_energies']):
+                Answer['qm_grads'].insert(i, Answer['qm_grads'][0]*0.0)
+            if len(Answer['qm_grads']) != len(Answer['qm_energies']):
                 warn("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
-                del Answer['qm_forces']
+                del Answer['qm_grads']
         # A strange peculiarity; Q-Chem sometimes prints out the final Mulliken charges a second time, after the geometry optimization.
         if mkchg != []:
             Answer['qm_mulliken_charges'] = list(np.array(mkchg))
@@ -2968,7 +2972,7 @@ class Molecule(object):
         
     def write_qdata(self, select, **kwargs):
         """ Text quantum data format. """
-        #self.require('xyzs','qm_energies','qm_forces')
+        #self.require('xyzs','qm_energies','qm_grads')
         out = []
         for I in select:
             xyz = self.xyzs[I]
@@ -2978,8 +2982,8 @@ class Molecule(object):
                 out.append("ENERGY % .12e" % self.qm_energies[I])
             if 'mm_energies' in self.Data:
                 out.append("EMD0   % .12e" % self.mm_energies[I])
-            if 'qm_forces' in self.Data:
-                out.append("FORCES"+pvec(self.qm_forces[I]))
+            if 'qm_grads' in self.Data:
+                out.append("FORCES"+pvec(self.qm_grads[I]))
             if 'qm_espxyzs' in self.Data and 'qm_espvals' in self.Data:
                 out.append("ESPXYZ"+pvec(self.qm_espxyzs[I]))
                 out.append("ESPVAL"+pvec(self.qm_espvals[I]))
