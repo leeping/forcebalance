@@ -778,8 +778,6 @@ class TINKER(Engine):
                 ln += 1
             calc_moments['polarizability'] = polarizability_dict
         os.system("rm -rf *.xyz_* *.[0-9][0-9][0-9]")
-        print polarizability
-        print calc_moments
         return calc_moments
 
     def energy_rmsd(self, shot=0, optimize=True):
