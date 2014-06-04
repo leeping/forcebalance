@@ -416,6 +416,18 @@ class FF(forcebalance.BaseClass):
             else:
                 self.openmmxml = ffname
 
+        if fftype == "mol2":
+            if hasattr(self, "amber_mol2"):
+                warn_press_key("There should only be one .mol2 file - confused!!")
+            else:
+                self.amber_mol2 = ffname
+
+        if fftype == "frcmod":
+            if hasattr(self, "amber_frcmod"):
+                warn_press_key("There should only be one .frcmod file - confused!!")
+            else:
+                self.amber_frcmod = ffname
+
         # Determine the appropriate parser from the FF_IOModules dictionary.
         # If we can't figure it out, then use the base reader, it ain't so bad. :)
         Reader = FF_IOModules.get(fftype, forcebalance.BaseReader)
@@ -1050,8 +1062,9 @@ class FF(forcebalance.BaseClass):
                 if nmol == 0:
                     self.qid = qid
                     self.qmap = qmap
-                else:
-                    logger.info("Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted.\n" % molname)
+                # The warning about ESP fitting is not very helpful
+                # else:
+                #     logger.info("Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted.\n" % molname)
                 nmol += 1
         elif self.constrain_charge:
             warn_press_key("'adict' {molecule:atomnames} was not found.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")
