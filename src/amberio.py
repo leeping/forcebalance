@@ -7,12 +7,16 @@ modules for other programs because it's so simple.
 @date 01/2012
 """
 
-import os
+import os, sys
 from re import match, sub, split, findall
-from forcebalance.nifty import isint, isfloat, _exec, LinkFile
+import networkx as nx
+from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles, warn_press_key, wopen
 import numpy as np
 from forcebalance import BaseReader
+from forcebalance.engine import Engine
 from forcebalance.abinitio import AbInitio
+from forcebalance.molecule import Molecule
+from collections import OrderedDict, defaultdict
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -36,6 +40,69 @@ def is_mol2_atom(line):
     if len(s) < 9:
         return False
     return all([isint(s[0]), isfloat(s[2]), isfloat(s[3]), isfloat(s[4]), isfloat(s[8])])
+
+def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], delcheck=False):
+    """ Parse and edit an AMBER LEaP input file. Output file is written to inputfile_ (with trailing underscore.) """
+    have_fmod = []
+    have_mol2 = []
+    # The lines that will be printed out to actually run tleap
+    line_out = []
+    aload = ['loadamberparams', 'source', 'loadoff']
+    aload_eq = ['loadmol2']
+    spath.append('.')
+             
+    for line in open(fnm):
+        # Skip comment lines
+        if line.strip().startswith('#') : continue
+        line = line.split('#')[0]
+        s = line.split()
+        ll = line.lower()
+        ls = line.lower().split()
+        # Check to see if all files being loaded are in the search path
+        if '=' in line:
+            if ll.split('=')[1].split()[0] in aload_eq:
+                if not any([os.path.exists(os.path.join(d, s[-1])) for d in spath]):
+                    logger.error("The file in this line cannot be loaded : " + line.strip())
+                    raise RuntimeError
+        elif len(ls) > 0 and ls[0] in aload:
+            if not any([os.path.exists(os.path.join(d, s[-1])) for d in spath]):
+                logger.error("The file in this line cannot be loaded : " + line.strip())
+                raise RuntimeError
+        if len(s) >= 2 and ls[0] == 'loadamberparams':
+            have_fmod.append(s[1])
+        if len(s) >= 2 and 'loadmol2' in ll:
+            have_mol2.append(s[-1])
+        if len(s) >= 2 and 'loadpdb' in ll:
+            # Adopt the AMBER molecule name from the loadpdb line.
+            ambername = line.split('=')[0].strip()
+            # If we pass in our own PDB, then this line is replaced.
+            if pdb != None:
+                line = '%s = loadpdb %s\n' % (ambername, pdb)
+        if len(s) >= 1 and ls[0] == 'check' and delcheck:
+            # Skip over check steps if so decreed
+            line = "# " + line
+        if 'saveamberparm' in ll: 
+            # We'll write the saveamberparm line ourselves
+            continue
+        if len(s) >= 1 and ls[0] == 'quit':
+            # Don't write the quit line.
+            break
+        if not line.endswith('\n') : line += '\n'
+        line_out.append(line)
+    # Sanity checks: If frcmod and mol2 files are provided to this function,
+    # they should be in the leap.cmd file as well.  There should be exactly
+    # one PDB file being loaded.
+    for i in frcmod:
+        if i not in have_fmod:
+            warn_press_key("WARNING: %s is not being loaded in %s" % (i, fnm))
+    for i in mol2:
+        if i not in have_mol2:
+            warn_press_key("WARNING: %s is not being loaded in %s" % (i, fnm))
+
+    fout = fnm+'_'
+    line_out.append('saveamberparm %s %s.prmtop %s.inpcrd\n' % (ambername, prefix, prefix))
+    line_out.append('quit\n')
+    with wopen(fout) as f: print >> f, ''.join(line_out)
 
 class Mol2_Reader(BaseReader):
     """Finite state machine for parsing Mol2 force field file. (just for parameterizing the charges)"""
@@ -161,37 +228,239 @@ class FrcMod_Reader(BaseReader):
             # types/classes involved in the interaction.
             self.suffix = ''.join(self.atom)
 
-class AbInitio_AMBER(AbInitio):
+class AMBER(Engine):
 
-    """Subclass of Target for force and energy matching
-    using AMBER.  Implements the prepare and energy_force_driver
-    methods.  The get method is in the base class.  """
+    """ Engine for carrying out general purpose AMBER calculations. """
 
-    def __init__(self,options,tgt_opts,forcefield):
-        ## Name of the trajectory, we need this BEFORE initializing the SuperClass
-        self.coords = "all.gro"
-        super(AbInitio_AMBER,self).__init__(options,tgt_opts,forcefield)
-        ## all_at_once is not implemented.
-        self.all_at_once = True
+    def __init__(self, name="amber", **kwargs):
+        ## Keyword args that aren't in this list are filtered out.
+        self.valkwd = ['amberhome', 'pdb', 'mol2', 'frcmod', 'leapcmd']
+        super(AMBER,self).__init__(name=name, **kwargs)
 
-    def prepare_temp_directory(self, options, tgt_opts):
-        abstempdir = os.path.join(self.root,self.tempdir)
-        LinkFile(os.path.join(self.root,self.tgtdir,"force.mdin"),os.path.join(abstempdir,"force.mdin"))
-        LinkFile(os.path.join(self.root,self.tgtdir,"stage.leap"),os.path.join(abstempdir,"stage.leap"))
+    def setopts(self, **kwargs):
+        
+        """ Called by __init__ ; Set AMBER-specific options. """
+
+        ## The directory containing TINKER executables (e.g. dynamic)
+        if 'amberhome' in kwargs:
+            self.amberhome = kwargs['amberhome']
+            if not os.path.exists(os.path.join(self.amberhome,"sander")):
+                warn_press_key("The 'sander' executable indicated by %s doesn't exist! (Check amberhome)" \
+                                   % os.path.join(self.amberhome,"sander"))
+        else:
+            warn_once("The 'amberhome' option was not specified; using default.")
+            if which('sander') == '':
+                warn_press_key("Please add AMBER executables to the PATH or specify amberhome.")
+            self.amberhome = os.path.split(which('sander'))[0]
+        
+        with wopen('.quit.leap') as f:
+            print >> f, 'quit'
+
+        # AMBER search path
+        self.spath = []
+        for line in self.callamber('tleap -f .quit.leap'):
+            if 'Adding' in line and 'to search path' in line:
+                self.spath.append(line.split('Adding')[1].split()[0])
+        os.remove('.quit.leap')
+
+    def readsrc(self, **kwargs):
+
+        """ Called by __init__ ; read files from the source directory. """
+
+        self.leapcmd = onefile(kwargs.get('leapcmd'), 'leap', err=True)
+        self.absleap = os.path.abspath(self.leapcmd)
+
+        # Name of the molecule, currently just call it a default name.
+        self.mname = 'molecule'
+
+        if 'mol' in kwargs:
+            self.mol = kwargs['mol']
+        elif 'coords' in kwargs:
+            crdfile = onefile(kwargs.get('coords'), None, err=True)
+            self.mol = Molecule(crdfile, build_topology=False)
+
+        # AMBER has certain PDB requirements, so we will absolutely require one.
+        needpdb = True
+        # if hasattr(self, 'mol') and all([i in self.mol.Data.keys() for i in ["chain", "atomname", "resid", "resname", "elem"]]):
+        #     needpdb = False
+
+        # Determine the PDB file name.
+        # If 'pdb' is provided to Engine initialization, it will be used to 
+        # copy over topology information (chain, atomname etc.).  If mol/coords
+        # is not provided, then it will also provide the coordinates.
+        pdbfnm = onefile(kwargs.get('pdb'), 'pdb' if needpdb else None, err=needpdb)
+        if pdbfnm != None:
+            mpdb = Molecule(pdbfnm, build_topology=False)
+            if hasattr(self, 'mol'):
+                for i in ["chain", "atomname", "resid", "resname", "elem"]:
+                    self.mol.Data[i] = mpdb.Data[i]
+            else:
+                self.mol = copy.deepcopy(mpdb)
+        self.abspdb = os.path.abspath(pdbfnm)
+
+        # Write the PDB that AMBER is going to read in.
+        # This may or may not be identical to the one used to initialize the engine.
+        # self.mol.write('%s.pdb' % self.name)
+        # self.abspdb = os.path.abspath('%s.pdb' % self.name)
+
+    def callamber(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
+
+        """ Call TINKER; prepend the amberhome to calling the TINKER program. """
+
+        csplit = command.split()
+        # Sometimes the engine changes dirs and the inpcrd/prmtop go missing, so we link it.
+        # Prepend the AMBER path to the program call.
+        prog = os.path.join(self.amberhome, "bin", csplit[0])
+        csplit[0] = prog
+        # No need to catch exceptions since failed AMBER calculations will return nonzero exit status.
+        o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
+        return o
+
+    def leap(self, name=None, delcheck=False):
+        if not os.path.exists(self.leapcmd):
+            LinkFile(self.absleap, self.leapcmd)
+        pdb = os.path.basename(self.abspdb)
+        if not os.path.exists(pdb):
+            LinkFile(self.abspdb, pdb)
+        if name == None: name = self.name
+        write_leap(self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, pdb=pdb, prefix=name, spath=self.spath, delcheck=delcheck)
+        self.callamber("tleap -f %s_" % self.leapcmd)
+
+    def prepare(self, pbc=False, **kwargs):
+
+        """ Called by __init__ ; prepare the temp directory and figure out the topology. """
+
+        if hasattr(self,'FF'):
+            if not (os.path.exists(self.FF.amber_frcmod) and os.path.exists(self.FF.amber_mol2)):
+                # If the parameter files don't already exist, create them for the purpose of
+                # preparing the engine, but then delete them afterward.
+                prmtmp = True
+                self.FF.make(np.zeros(self.FF.np))
+            # Currently force field object only allows one mol2 and frcmod file although this can be lifted.
+            self.mol2 = [self.FF.amber_mol2]
+            self.frcmod = [self.FF.amber_frcmod]
+            if 'mol2' in kwargs:
+                logger.error("FF object is provided, which overrides mol2 keyword argument")
+                raise RuntimeError
+            if 'frcmod' in kwargs:
+                logger.error("FF object is provided, which overrides frcmod keyword argument")
+                raise RuntimeError
+        else:
+            prmtmp = False
+            self.mol2 = listfiles(kwargs.get('mol2'), 'mol2', err=True)
+            self.frcmod = listfiles(kwargs.get('frcmod'), 'frcmod', err=True)
+
+        # Figure out the topology information.
+        self.leap()
+        o = self.callamber("rdparm %s.prmtop" % self.name, 
+                           stdin="printAtoms\nprintBonds\nexit\n", 
+                           persist=True, print_error=False)
+
+        # Once we do this, we don't need the prmtop and inpcrd anymore
+        os.unlink("%s.inpcrd" % self.name)
+        os.unlink("%s.prmtop" % self.name)
+        os.unlink("leap.log")
+
+        mode = 'None'
+        self.AtomLists = defaultdict(list)
+        G = nx.Graph()
+        for line in o:
+            s = line.split()
+            if 'Atom' in line:
+                mode = 'Atom'
+            elif 'Bond' in line:
+                mode = 'Bond'
+            elif 'RDPARM MENU' in line:
+                continue
+            elif 'EXITING' in line:
+                break
+            elif len(s) == 0:
+                continue
+            elif mode == 'Atom':
+                # Based on parsing lines like these:
+                """
+   327:  HA   -0.01462  1.0 (  23:HIP )  H1    E   
+   328:  CB   -0.33212 12.0 (  23:HIP )  CT    3   
+   329:  HB2   0.10773  1.0 (  23:HIP )  HC    E   
+   330:  HB3   0.10773  1.0 (  23:HIP )  HC    E   
+   331:  CG    0.18240 12.0 (  23:HIP )  CC    B   
+                """
+                # Based on variable width fields.
+                atom_number = int(line.split(':')[0])
+                atom_name = line.split()[1]
+                atom_charge = float(line.split()[2])
+                atom_mass = float(line.split()[3])
+                rnn = line.split('(')[1].split(')')[0].split(':')
+                residue_number = int(rnn[0])
+                residue_name = rnn[1]
+                atom_type = line.split(')')[1].split()[0]
+                self.AtomLists['Name'].append(atom_name)
+                self.AtomLists['Charge'].append(atom_charge)
+                self.AtomLists['Mass'].append(atom_mass)
+                self.AtomLists['ResidueNumber'].append(residue_number)
+                self.AtomLists['ResidueName'].append(residue_name)
+                # Not sure if this works
+                G.add_node(atom_number)
+            elif mode == 'Bond':
+                a, b = (int(i) for i in (line.split('(')[1].split(')')[0].split(',')))
+                G.add_edge(a, b)
+
+        self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
+
+        # Use networkx to figure out a list of molecule numbers.
+        # gs = nx.connected_component_subgraphs(G)
+        # tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
+        # mnodes = [m.nodes() for m in tmols]
+        # self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
+
+        ## Write out the trajectory coordinates to a .mdcrd file.
+
         # I also need to write the trajectory
         if 'boxes' in self.mol.Data.keys():
+            warn_press_key("Writing %s-all.crd file with no periodic box information" % self.name)
             del self.mol.Data['boxes']
-        self.mol.write(os.path.join(abstempdir,"all.mdcrd"))
 
-    def energy_force_driver_all_external_(self):
-        ## Create the run input files (inpcrd, prmtop) from the force field file.  
-        ## Note that the frcmod and mol2 files are required.
-        ## This is like 'grompp' in GROMACS.
-        _exec("tleap -f stage.leap", print_to_screen=False, print_command=False)
+        if hasattr(self, 'target') and hasattr(self.target,'shots'):
+            self.qmatoms = target.qmatoms
+            self.mol.write("%s-all.crd" % self.name, select=range(self.target.shots), ftype="mdcrd")
+        else:
+            self.qmatoms = self.mol.na
+            self.mol.write("%s-all.crd" % self.name, ftype="mdcrd")
+
+        if prmtmp:
+            for f in self.FF.fnms: 
+                os.unlink(f)
+
+    def evaluate_(self, crdin, force=False):
+
+        """ 
+        Utility function for computing energy and forces using AMBER. 
+        
+        Inputs:
+        crdin: AMBER .mdcrd file name.
+        force: Switch for parsing the force. (Currently it always calculates the forces.)
+
+        Outputs:
+        Result: Dictionary containing energies (and optionally) forces.
+        """
+
+        force_mdin="""Loop over conformations and compute energy and force (use ioutfnm=1 for netcdf, ntb=0 for no box)
+&cntrl
+imin = 5, ntb = 0, cut=9, nstlim = 0, nsnb = 0
+/
+&debugf
+do_debugf = 1, dumpfrc = 1
+/
+"""
+        with wopen("%s-force.mdin" % self.name) as f:
+            print >> f, force_mdin
+
         ## This line actually runs AMBER.
-        _exec("sander -i force.mdin -o force.mdout -p prmtop -c inpcrd -y all.mdcrd -O", print_to_screen=False, print_command=False)
-        ## Simple parser for 
+        self.leap(delcheck=True)
+        self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s -O" % 
+                       (self.name, self.name, self.name, self.name, crdin))
         ParseMode = 0
+        Result = {}
         Energies = []
         Forces = []
         Force = []
@@ -214,12 +483,445 @@ class AbInitio_AMBER(AbInitio):
             elif line == '1 Total Force':
                 ParseMode = 2
 
-        Energies = np.array(Energies[1:])
-        Forces = np.array(Forces[1:])
+        Result["Energy"] = np.array(Energies[1:])
+        Result["Force"] = np.array(Forces[1:])
+        return Result
+
+    def energy_force_one(self, shot):
+
+        """ Computes the energy and force using TINKER for one snapshot. """
+
+        self.mol[shot].write("%s.xyz" % self.name, ftype="tinker")
+        Result = self.evaluate_("%s.xyz" % self.name, force=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+
+    def energy(self):
+
+        """ Computes the energy using TINKER over a trajectory. """
+
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
+        else:
+            x = "%s-all.crd" % self.name
+            self.mol.write(x, ftype="tinker")
+        return self.evaluate_(x)["Energy"]
+
+    def energy_force(self):
+
+        """ Computes the energy and force using AMBER over a trajectory. """
+
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
+        else:
+            x = "%s-all.crd" % self.name
+        Result = self.evaluate_(x, force=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+
+    def energy_dipole(self):
+
+        """ Computes the energy and dipole using TINKER over a trajectory. """
+
+        logger.error('Dipole moments are not yet implemented in AMBER interface')
+        raise NotImplementedError
+
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
+        else:
+            x = "%s.xyz" % self.name
+            self.mol.write(x, ftype="tinker")
+        Result = self.evaluate_(x, dipole=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
+
+    def optimize(self, shot=0, method="newton", crit=1e-4):
+
+        """ Optimize the geometry and align the optimized geometry to the starting geometry. """
+
+        logger.error('Geometry optimizations are not yet implemented in AMBER interface')
+        raise NotImplementedError
+    
+        # Code from tinkerio.py
+        if os.path.exists('%s.xyz_2' % self.name):
+            os.unlink('%s.xyz_2' % self.name)
+        self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
+        if method == "newton":
+            if self.rigid: optprog = "optrigid"
+            else: optprog = "optimize"
+        elif method == "bfgs":
+            if self.rigid: optprog = "minrigid"
+            else: optprog = "minimize"
+        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
+        # Silently align the optimized geometry.
+        M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
+        if not self.pbc:
+            M12.align(center=False)
+        M12[1].write("%s.xyz_2" % self.name, ftype="tinker")
+        rmsd = M12.ref_rmsd(0)[1]
+        cnvgd = 0
+        mode = 0
+        for line in o:
+            s = line.split()
+            if len(s) == 0: continue
+            if "Optimally Conditioned Variable Metric Optimization" in line: mode = 1
+            if "Limited Memory BFGS Quasi-Newton Optimization" in line: mode = 1
+            if mode == 1 and isint(s[0]): mode = 2
+            if mode == 2:
+                if isint(s[0]): E = float(s[1])
+                else: mode = 0
+            if "Normal Termination" in line:
+                cnvgd = 1
+        if not cnvgd:
+            for line in o:
+                logger.info(str(line) + '\n')
+            logger.info("The minimization did not converge in the geometry optimization - printout is above.\n")
+        return E, rmsd
+
+    def normal_modes(self, shot=0, optimize=True):
+
+        logger.error('Normal modes are not yet implemented in AMBER interface')
+        raise NotImplementedError
+
+        # Copied from tinkerio.py
+        if optimize:
+            self.optimize(shot, crit=1e-6)
+            o = self.calltinker("vibrate %s.xyz_2 a" % (self.name))
+        else:
+            warn_once("Asking for normal modes without geometry optimization?")
+            self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
+            o = self.calltinker("vibrate %s.xyz a" % (self.name))
+        # Read the TINKER output.  The vibrational frequencies are ordered.
+        # The six modes with frequencies closest to zero are ignored
+        readev = False
+        calc_eigvals = []
+        calc_eigvecs = []
+        for line in o:
+            s = line.split()
+            if "Vibrational Normal Mode" in line:
+                freq = float(s[-2])
+                readev = False
+                calc_eigvals.append(freq)
+                calc_eigvecs.append([])
+            elif "Atom" in line and "Delta X" in line:
+                readev = True
+            elif readev and len(s) == 4 and all([isint(s[0]), isfloat(s[1]), isfloat(s[2]), isfloat(s[3])]):
+                calc_eigvecs[-1].append([float(i) for i in s[1:]])
+        calc_eigvals = np.array(calc_eigvals)
+        calc_eigvecs = np.array(calc_eigvecs)
+        # Sort by frequency absolute value and discard the six that are closest to zero
+        calc_eigvecs = calc_eigvecs[np.argsort(np.abs(calc_eigvals))][6:]
+        calc_eigvals = calc_eigvals[np.argsort(np.abs(calc_eigvals))][6:]
+        # Sort again by frequency
+        calc_eigvecs = calc_eigvecs[np.argsort(calc_eigvals)]
+        calc_eigvals = calc_eigvals[np.argsort(calc_eigvals)]
+        os.system("rm -rf *.xyz_* *.[0-9][0-9][0-9]")
+        return calc_eigvals, calc_eigvecs
+
+    def multipole_moments(self, shot=0, optimize=True, polarizability=False):
+
+        logger.error('Multipole moments are not yet implemented in AMBER interface')
+        raise NotImplementedError
+
+        """ Return the multipole moments of the 1st snapshot in Debye and Buckingham units. """
+        # This line actually runs TINKER
+        if optimize:
+            self.optimize(shot, crit=1e-6)
+            o = self.calltinker("analyze %s.xyz_2 M" % (self.name))
+        else:
+            self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
+            o = self.calltinker("analyze %s.xyz M" % (self.name))
+        # Read the TINKER output.
+        qn = -1
+        ln = 0
+        for line in o:
+            s = line.split()
+            if "Dipole X,Y,Z-Components" in line:
+                dipole_dict = OrderedDict(zip(['x','y','z'], [float(i) for i in s[-3:]]))
+            elif "Quadrupole Moment Tensor" in line:
+                qn = ln
+                quadrupole_dict = OrderedDict([('xx',float(s[-3]))])
+            elif qn > 0 and ln == qn + 1:
+                quadrupole_dict['xy'] = float(s[-3])
+                quadrupole_dict['yy'] = float(s[-2])
+            elif qn > 0 and ln == qn + 2:
+                quadrupole_dict['xz'] = float(s[-3])
+                quadrupole_dict['yz'] = float(s[-2])
+                quadrupole_dict['zz'] = float(s[-1])
+            ln += 1
+        calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
+        if polarizability:
+            if optimize:
+                o = self.calltinker("polarize %s.xyz_2" % (self.name))
+            else:
+                o = self.calltinker("polarize %s.xyz" % (self.name))
+            # Read the TINKER output.
+            pn = -1
+            ln = 0
+            polarizability_dict = OrderedDict()
+            for line in o:
+                s = line.split()
+                if "Total Polarizability Tensor" in line:
+                    pn = ln
+                elif pn > 0 and ln == pn + 2:
+                    polarizability_dict['xx'] = float(s[-3])
+                    polarizability_dict['yx'] = float(s[-2])
+                    polarizability_dict['zx'] = float(s[-1])
+                elif pn > 0 and ln == pn + 3:
+                    polarizability_dict['xy'] = float(s[-3])
+                    polarizability_dict['yy'] = float(s[-2])
+                    polarizability_dict['zy'] = float(s[-1])
+                elif pn > 0 and ln == pn + 4:
+                    polarizability_dict['xz'] = float(s[-3])
+                    polarizability_dict['yz'] = float(s[-2])
+                    polarizability_dict['zz'] = float(s[-1])
+                ln += 1
+            calc_moments['polarizability'] = polarizability_dict
+        os.system("rm -rf *.xyz_* *.[0-9][0-9][0-9]")
+        return calc_moments
+
+    def energy_rmsd(self, shot=0, optimize=True):
+
+        """ Calculate energy of the selected structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
+
+        logger.error('Geometry optimization is not yet implemented in AMBER interface')
+        raise NotImplementedError
+
+        rmsd = 0.0
+        # This line actually runs TINKER
+        # xyzfnm = sysname+".xyz"
+        if optimize:
+            E_, rmsd = self.optimize(shot)
+            o = self.calltinker("analyze %s.xyz_2 E" % self.name)
+            #----
+            # Two equivalent ways to get the RMSD, here for reference.
+            #----
+            # M1 = Molecule("%s.xyz" % self.name, ftype="tinker")
+            # M2 = Molecule("%s.xyz_2" % self.name, ftype="tinker")
+            # M1 += M2
+            # rmsd = M1.ref_rmsd(0)[1]
+            #----
+            # oo = self.calltinker("superpose %s.xyz %s.xyz_2 1 y u n 0" % (self.name, self.name))
+            # for line in oo:
+            #     if "Root Mean Square Distance" in line:
+            #         rmsd = float(line.split()[-1])
+            #----
+            os.system("rm %s.xyz_2" % self.name)
+        else:
+            o = self.calltinker("analyze %s.xyz E" % self.name)
+        # Read the TINKER output. 
+        E = None
+        for line in o:
+            if "Total Potential Energy" in line:
+                E = float(line.split()[-2].replace('D','e'))
+        if E == None:
+            logger.error("Total potential energy wasn't encountered when calling analyze!\n")
+            raise RuntimeError
+        if optimize and abs(E-E_) > 0.1:
+            warn_press_key("Energy from optimize and analyze aren't the same (%.3f vs. %.3f)" % (E, E_))
+        return E, rmsd
+
+    def interaction_energy(self, fraga, fragb):
         
-        M = np.hstack((Energies.reshape(-1,1), Forces))
+        """ Calculate the interaction energy for two fragments. """
 
-        return M
+        logger.error('Interaction energy is not yet implemented in AMBER interface')
+        raise NotImplementedError
+        self.A = TINKER(name="A", mol=self.mol.atom_select(fraga), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
+        self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
 
-    def energy_force_driver_all(self):
-        return self.energy_force_driver_all_external_()
+        # Interaction energy needs to be in kcal/mol.
+        return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
+
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, threads=1, verbose=False, **kwargs):
+        
+        """
+        Method for running a molecular dynamics simulation.  
+
+        Required arguments:
+        nsteps      = (int)   Number of total time steps
+        timestep    = (float) Time step in FEMTOSECONDS
+        temperature = (float) Temperature control (Kelvin)
+        pressure    = (float) Pressure control (atmospheres)
+        nequil      = (int)   Number of additional time steps at the beginning for equilibration
+        nsave       = (int)   Step interval for saving and printing data
+        minimize    = (bool)  Perform an energy minimization prior to dynamics
+        threads     = (int)   Specify how many OpenMP threads to use
+
+        Returns simulation data:
+        Rhos        = (array)     Density in kilogram m^-3
+        Potentials  = (array)     Potential energies
+        Kinetics    = (array)     Kinetic energies
+        Volumes     = (array)     Box volumes
+        Dips        = (3xN array) Dipole moments
+        EComps      = (dict)      Energy components
+        """
+
+        logger.error('Molecular dynamics not yet implemented in AMBER interface')
+        raise NotImplementedError
+
+        md_defs = OrderedDict()
+        md_opts = OrderedDict()
+        # Print out averages only at the end.
+        md_opts["printout"] = nsave
+        md_opts["openmp-threads"] = threads
+        # Langevin dynamics for temperature control.
+        if temperature != None:
+            md_defs["integrator"] = "stochastic"
+        else:
+            md_defs["integrator"] = "beeman"
+            md_opts["thermostat"] = None
+        # Periodic boundary conditions.
+        if self.pbc:
+            md_opts["vdw-correction"] = ''
+            if temperature != None and pressure != None: 
+                md_defs["integrator"] = "beeman"
+                md_defs["thermostat"] = "bussi"
+                md_defs["barostat"] = "montecarlo"
+                if anisotropic:
+                    md_opts["aniso-pressure"] = ''
+            elif pressure != None:
+                warn_once("Pressure is ignored because temperature is turned off.")
+        else:
+            if pressure != None:
+                warn_once("Pressure is ignored because pbc is set to False.")
+            # Use stochastic dynamics for the gas phase molecule.
+            # If we use the regular integrators it may miss
+            # six degrees of freedom in calculating the kinetic energy.
+            md_opts["barostat"] = None
+
+        eq_opts = deepcopy(md_opts)
+        if self.pbc and temperature != None and pressure != None: 
+            eq_opts["integrator"] = "beeman"
+            eq_opts["thermostat"] = "bussi"
+            eq_opts["barostat"] = "berendsen"
+
+        if minimize:
+            if verbose: logger.info("Minimizing the energy...")
+            self.optimize(method="bfgs", crit=1)
+            os.system("mv %s.xyz_2 %s.xyz" % (self.name, self.name))
+            if verbose: logger.info("Done\n")
+
+        # Run equilibration.
+        if nequil > 0:
+            write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
+            if verbose: printcool("Running equilibration dynamics", color=0)
+            if self.pbc and pressure != None:
+                self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 
+                                                                          temperature, pressure), print_to_screen=verbose)
+            else:
+                self.calltinker("dynamic %s -k %s-eq %i %f %f 2 %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,
+                                                                       temperature), print_to_screen=verbose)
+            os.system("rm -f %s.arc" % (self.name))
+
+        # Run production.
+        if verbose: printcool("Running production dynamics", color=0)
+        write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
+        if self.pbc and pressure != None:
+            odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
+                                                                             temperature, pressure), print_to_screen=verbose)
+        else:
+            odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 2 %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
+                                                                          temperature), print_to_screen=verbose)
+            
+        # Gather information.
+        os.system("mv %s.arc %s-md.arc" % (self.name, self.name))
+        self.md_trajectory = "%s-md.arc" % self.name
+        edyn = []
+        kdyn = []
+        temps = []
+        for line in odyn:
+            s = line.split()
+            if 'Current Potential' in line:
+                edyn.append(float(s[2]))
+            if 'Current Kinetic' in line:
+                kdyn.append(float(s[2]))
+            if len(s) > 0 and s[0] == 'Temperature' and s[2] == 'Kelvin':
+                temps.append(float(s[1]))
+
+        # Potential and kinetic energies converted to kJ/mol.
+        edyn = np.array(edyn) * 4.184
+        kdyn = np.array(kdyn) * 4.184
+        temps = np.array(temps)
+    
+        if verbose: logger.info("Post-processing to get the dipole moments\n")
+        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E,M", print_to_screen=False)
+
+        # Read potential energy and dipole from file.
+        eanl = []
+        dip = []
+        mass = 0.0
+        ecomp = OrderedDict()
+        havekeys = set()
+        first_shot = True
+        for ln, line in enumerate(oanl):
+            strip = line.strip()
+            s = line.split()
+            if 'Total System Mass' in line:
+                mass = float(s[-1])
+            if 'Total Potential Energy : ' in line:
+                eanl.append(float(s[4]))
+            if 'Dipole X,Y,Z-Components :' in line:
+                dip.append([float(s[i]) for i in range(-3,0)])
+            if first_shot:
+                for key in eckeys:
+                    if strip.startswith(key):
+                        if key in ecomp:
+                            ecomp[key].append(float(s[-2])*4.184)
+                        else:
+                            ecomp[key] = [float(s[-2])*4.184]
+                        if key in havekeys:
+                            first_shot = False
+                        havekeys.add(key)
+            else:
+                for key in havekeys:
+                    if strip.startswith(key):
+                        if key in ecomp:
+                            ecomp[key].append(float(s[-2])*4.184)
+                        else:
+                            ecomp[key] = [float(s[-2])*4.184]
+        for key in ecomp:
+            ecomp[key] = np.array(ecomp[key])
+        ecomp["Potential Energy"] = edyn
+        ecomp["Kinetic Energy"] = kdyn
+        ecomp["Temperature"] = temps
+        ecomp["Total Energy"] = edyn+kdyn
+
+        # Energies in kilojoules per mole
+        eanl = np.array(eanl) * 4.184
+        # Dipole moments in debye
+        dip = np.array(dip)
+        # Volume of simulation boxes in cubic nanometers
+        # Conversion factor derived from the following:
+        # In [22]: 1.0 * gram / mole / (1.0 * nanometer)**3 / AVOGADRO_CONSTANT_NA / (kilogram/meter**3)
+        # Out[22]: 1.6605387831627252
+        conv = 1.6605387831627252
+        if self.pbc:
+            vol = np.array([BuildLatticeFromLengthsAngles(*[float(j) for j in line.split()]).V \
+                                for line in open("%s-md.arc" % self.name).readlines() \
+                                if (len(line.split()) == 6 and isfloat(line.split()[1]) \
+                                        and all([isfloat(i) for i in line.split()[:6]]))]) / 1000
+            rho = conv * mass / vol
+        else:
+            vol = None
+            rho = None
+        prop_return = OrderedDict()
+        prop_return.update({'Rhos': rho, 'Potentials': edyn, 'Kinetics': kdyn, 'Volumes': vol, 'Dips': dip, 'Ecomps': ecomp})
+        return prop_return
+
+class AbInitio_AMBER(AbInitio):
+
+    """Subclass of Target for force and energy matching
+    using AMBER.  Implements the prepare and energy_force_driver
+    methods.  The get method is in the base class.  """
+
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Coordinate file.
+        self.set_option(tgt_opts, 'coords')
+        ## PDB file for topology (if different from coordinate file.)
+        self.set_option(tgt_opts, 'pdb')
+        ## AMBER home directory.
+        self.set_option(tgt_opts, 'amberhome')
+        ## AMBER home directory.
+        self.set_option(tgt_opts, 'amber_leapcmd', 'leapcmd')
+        ## Name of the engine.
+        self.engine_ = AMBER
+        ## Initialize base class.
+        super(AbInitio_AMBER,self).__init__(options,tgt_opts,forcefield)
