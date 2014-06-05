@@ -923,7 +923,7 @@ class AbInitio_AMBER(AbInitio):
         ## AMBER home directory.
         self.set_option(tgt_opts, 'amber_leapcmd', 'leapcmd')
         ## Nonbonded cutoff for AMBER (pacth).
-        self.set_option(tgt_opts, 'amber_nbcut', 'nbcut')
+        self.set_option(options, 'amber_nbcut', 'nbcut')
         ## Name of the engine.
         self.engine_ = AMBER
         ## Initialize base class.
