@@ -71,6 +71,7 @@ gen_opts_types = {
                  "writechk"     : (None, -50, 'Name of the restart file we write to (can be same as readchk)', 'Main optimizer'),
                  "ffdir"        : ('forcefield', 100, 'Directory containing force fields, relative to project directory', 'All'),
                  "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amberhome"    : (None, -10, 'Path to AMBER installation directory (leave blank to use AMBERHOME environment variable.', 'Targets that use AMBER', 'AMBER'),
                  },
     'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.', 
                                    'All (important); choose "single", "gradient", "hessian", "newton" (Main Optimizer), "bfgs", "powell", "simplex", "anneal", "genetic", "conjugategradient", "scan_mvals", "scan_pvals", "fdcheck[gh]"'),
@@ -124,6 +125,7 @@ gen_opts_types = {
                  "error_tolerance"        : (0.0,   10, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.', 'Main Optimizer'),
                  "search_tolerance"       : (1e-4, -10, 'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.', 'Main Optimizer with negative mintrust; advanced usage'),
                  "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER'])
                  },
     'sections': {"read_mvals" : (None, 100, 'Paste mathematical parameters into the input file for them to be read in directly', 'Restarting an optimization'),
                  "read_pvals" : (None, 100, 'Paste physical parameters into the input file for them to be read in directly', 'Restarting an optimization (recommend use_mvals instead)'),
@@ -149,7 +151,6 @@ tgt_opts_types = {
                  "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_ndx"               : (None, -10, 'Gromacs .ndx files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
-                 "amberhome"             : (None, -10, 'Path to AMBER installation directory (leave blank to use AMBERHOME environment variable.', 'Targets that use AMBER', 'AMBER'),
                  "amber_mol2"            : (None, -10, 'Name of mol2 file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "amber_frcmod"          : (None, -10, 'Name of frcmod file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "amber_leapcmd"         : (None, -10, 'File containing commands for "tleap" when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
