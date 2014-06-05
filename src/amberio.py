@@ -234,14 +234,13 @@ class AMBER(Engine):
 
     def __init__(self, name="amber", **kwargs):
         ## Keyword args that aren't in this list are filtered out.
-        self.valkwd = ['amberhome', 'pdb', 'mol2', 'frcmod', 'leapcmd']
+        self.valkwd = ['amberhome', 'pdb', 'mol2', 'frcmod', 'leapcmd', 'nbcut']
         super(AMBER,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
         
         """ Called by __init__ ; Set AMBER-specific options. """
 
-        ## The directory containing TINKER executables (e.g. dynamic)
         if 'amberhome' in kwargs:
             self.amberhome = kwargs['amberhome']
             if not os.path.exists(os.path.join(self.amberhome,"sander")):
@@ -255,6 +254,8 @@ class AMBER(Engine):
         
         with wopen('.quit.leap') as f:
             print >> f, 'quit'
+
+        self.nbcut = kwargs.get('nbcut', 9999)
 
         # AMBER search path
         self.spath = []
@@ -446,14 +447,14 @@ class AMBER(Engine):
 
         force_mdin="""Loop over conformations and compute energy and force (use ioutfnm=1 for netcdf, ntb=0 for no box)
 &cntrl
-imin = 5, ntb = 0, cut=9, nstlim = 0, nsnb = 0
+imin = 5, ntb = 0, cut={cut}, nstlim = 0, nsnb = 0
 /
 &debugf
 do_debugf = 1, dumpfrc = 1
 /
 """
         with wopen("%s-force.mdin" % self.name) as f:
-            print >> f, force_mdin
+            print >> f, force_mdin.format(cut=self.nbcut)
 
         ## This line actually runs AMBER.
         self.leap(delcheck=True)
@@ -918,9 +919,11 @@ class AbInitio_AMBER(AbInitio):
         ## PDB file for topology (if different from coordinate file.)
         self.set_option(tgt_opts, 'pdb')
         ## AMBER home directory.
-        self.set_option(tgt_opts, 'amberhome')
+        self.set_option(options, 'amberhome')
         ## AMBER home directory.
         self.set_option(tgt_opts, 'amber_leapcmd', 'leapcmd')
+        ## Nonbonded cutoff for AMBER (pacth).
+        self.set_option(tgt_opts, 'amber_nbcut', 'nbcut')
         ## Name of the engine.
         self.engine_ = AMBER
         ## Initialize base class.
