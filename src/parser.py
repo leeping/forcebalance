@@ -70,7 +70,7 @@ gen_opts_types = {
                  "readchk"      : (None, -50, 'Name of the restart file we read from', 'Restart jobtype "newton" with "writechk" set'),
                  "writechk"     : (None, -50, 'Name of the restart file we write to (can be same as readchk)', 'Main optimizer'),
                  "ffdir"        : ('forcefield', 100, 'Directory containing force fields, relative to project directory', 'All'),
-                 "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER']),
                  "amberhome"    : (None, -10, 'Path to AMBER installation directory (leave blank to use AMBERHOME environment variable.', 'Targets that use AMBER', 'AMBER'),
                  },
     'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.', 
