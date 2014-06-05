@@ -86,6 +86,7 @@ gen_opts_types = {
                  "criteria"   : (1, 160, 'The number of convergence criteria that must be met for main optimizer to converge', 'Main Optimizer'),
                  "rpmd_beads"       : (0, -160, 'Number of beads in ring polymer MD (zero to disable)', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "zerograd"         : (-1, 0, 'Set to a nonnegative number to turn on zero gradient skipping at that optimization step.', 'All'),
+                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER'])
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
@@ -125,7 +126,6 @@ gen_opts_types = {
                  "error_tolerance"        : (0.0,   10, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.', 'Main Optimizer'),
                  "search_tolerance"       : (1e-4, -10, 'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.', 'Main Optimizer with negative mintrust; advanced usage'),
                  "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER']),
-                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER'])
                  },
     'sections': {"read_mvals" : (None, 100, 'Paste mathematical parameters into the input file for them to be read in directly', 'Restarting an optimization'),
                  "read_pvals" : (None, 100, 'Paste physical parameters into the input file for them to be read in directly', 'Restarting an optimization (recommend use_mvals instead)'),

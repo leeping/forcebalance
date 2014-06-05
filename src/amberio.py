@@ -454,7 +454,7 @@ do_debugf = 1, dumpfrc = 1
 /
 """
         with wopen("%s-force.mdin" % self.name) as f:
-            print >> f, force_mdin.format(cut=self.nbcut)
+            print >> f, force_mdin.format(cut="%i" % int(self.nbcut))
 
         ## This line actually runs AMBER.
         self.leap(delcheck=True)
