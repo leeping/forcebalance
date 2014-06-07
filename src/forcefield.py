@@ -718,6 +718,8 @@ class FF(forcebalance.BaseClass):
         # to restrict the length of "pfields"? # 
         # Perhaps "eval" will make this obso.  #
         #======================================#
+        print "pfields: "
+        print self.pfields
         for i in range(len(self.pfields)):
             pfld_list = self.pfields[i]
             for pfield in pfld_list:
