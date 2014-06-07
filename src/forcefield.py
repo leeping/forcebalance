@@ -717,8 +717,7 @@ class FF(forcebalance.BaseClass):
         print "Script text: "
         tempElemText = tempElem.text
         print tempElemText
-        print "ffdata['tempScript.txt']: "
-        print newffdata['tempScript.txt']
+        
 
 
 
@@ -807,6 +806,9 @@ class FF(forcebalance.BaseClass):
 
         for fnm in newffdata:
             #if type(newffdata[fnm]) is etree._ElementTree:
+            if 'Script' in fnm:
+                print "new ffdata['tempScript.txt']: "
+                print newffdata['tempScript.txt']
             if self.ffdata_isxml[fnm]:
                 with wopen(os.path.join(absprintdir,fnm)) as f: newffdata[fnm].write(f)
             else:
