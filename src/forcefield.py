@@ -709,8 +709,8 @@ class FF(forcebalance.BaseClass):
         pvals = list(pvals)
         # pvec1d(vals, precision=4)
         newffdata = deepcopy(self.ffdata)
-        print "ffdata: "
-        print self.ffdata
+        print "ffdata['temp.xml'].iter(): "
+        print newffdata['temp.xml'].iter()
         # The dictionary that takes parameter names to physical values.
         PRM = {i:pvals[self.map[i]] for i in self.map}
 
