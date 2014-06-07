@@ -493,6 +493,8 @@ class FF(forcebalance.BaseClass):
             sline = self.Readers[ffname].Split(line)
             
             kwds = list(itertools.chain(*[[i, "/%s" % i] for i in ['PRM', 'PARM', 'RPT', 'EVAL']]))
+            print "kwds: "
+            print kwds
             marks = OrderedDict()
             for k in kwds:
                 if sline.count(k) > 1:
