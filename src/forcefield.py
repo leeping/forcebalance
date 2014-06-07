@@ -634,7 +634,7 @@ class FF(forcebalance.BaseClass):
         wfile.close()
         ffnametemp = 'temp.txt'
         #fftype = determine_fftype(ffname2)
-        self.addff(ffnametemp, xmlScript=TRUE)
+        self.addff(ffnametemp, TRUE)
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
