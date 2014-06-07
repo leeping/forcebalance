@@ -814,7 +814,7 @@ class FF(forcebalance.BaseClass):
                     tempText = tempText = "".join(newffdata[fnm])
                     fnmXml = fnm.split('Script')[0]+'.xml'
                     Ntemp = len(list(newffdata[fnmXml].iter()))
-                    list(newffdata[fnm].iter())[Ntemp-1].text = tempText
+                    list(newffdata[fnmXml].iter())[Ntemp-1].text = tempText
                     with wopen(os.path.join(absprintdir,fnmXml)) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
