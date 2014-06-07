@@ -327,7 +327,7 @@ class FF(forcebalance.BaseClass):
         options = {'forcefield' : [fnm], 'ffdir' : '.', 'duplicate_pnames' : True}
         return cls(options, verbose=False, printopt=False)
 
-    def addff(self,ffname):
+    def addff(self,ffname,xmlScript=False):
         """ Parse a force field file and add it to the class.
 
         First, figure out the type of force field file.  This is done
@@ -450,14 +450,14 @@ class FF(forcebalance.BaseClass):
             self.ffdata[ffname] = [line.expandtabs() for line in open(absff).readlines()]
             self.ffdata_isxml[ffname] = False
             # Process the file
-            self.addff_txt(ffname, fftype)
+            self.addff_txt(ffname, fftype,xmlScript)
         if hasattr(self.Readers[ffname], 'atomnames'):
             if len(self.atomnames) > 0:
                 sys.stderr.write('Found more than one force field containing atom names; skipping the second one (%s)\n' % ffname)
             else:
                 self.atomnames += self.Readers[ffname].atomnames
 
-    def addff_txt(self, ffname, fftype):
+    def addff_txt(self, ffname, fftype, xmlScript):
         """ Parse a text force field and create several important instance variables.
 
         Each line is processed using the 'feed' method as implemented
@@ -519,6 +519,8 @@ class FF(forcebalance.BaseClass):
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
+                    if xmlScript:
+                        pid = 'Script:'+sline[pfld-2]
                     print "pid: "
                     print pid
                     pid_ = pid
@@ -632,7 +634,7 @@ class FF(forcebalance.BaseClass):
         wfile.close()
         ffnametemp = 'temp.txt'
         #fftype = determine_fftype(ffname2)
-        self.addff(ffnametemp)
+        self.addff(ffnametemp, xmlScript=TRUE)
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
