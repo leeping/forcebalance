@@ -1463,7 +1463,8 @@ class Molecule(object):
             AtomIterator = []
             for i in gasn:
                 for j in gngh[i]:
-                    AtomIterator.append(cartesian_product2([gasn[i], gasn[j]]))
+                    apairs = cartesian_product2([gasn[i], gasn[j]])
+                    AtomIterator.append(apairs[apairs[:,0]>apairs[:,1]])
             AtomIterator = np.ascontiguousarray(np.vstack(AtomIterator))
         else:
             # Create a list of 2-tuples corresponding to combinations of atomic indices.
@@ -1481,11 +1482,11 @@ class Molecule(object):
                 dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
         else:
             # Inefficient implementation if importing contact doesn't work.
-            print "Warning: Using inefficient distance algorithm because 'contact' module was not imported."
-            if hasattr(self, 'boxes'):
-                print "No minimum image convention available (import 'contact' if you need it)."
-            dxij = [np.array(list(itertools.chain(*[[np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i in range(j+1,self.na)] for j in range(self.na)])))]
-
+            if hasattr(self, 'boxes') and self.toppbc:
+                logger.error("No minimum image convention available (import 'forcebalance.contact' if you need it).")
+                raise RuntimeError
+            dxij = [np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator])]
+            
         # Create a NetworkX graph object.
         G = MyG()
         bonds = [[] for i in range(self.na)]

@@ -912,7 +912,7 @@ class AbInitio(Target):
             np.savetxt('QM-vs-Wts.txt',WeightComparison)
         if self.force and self.writelevel > 1:
             # Write .xyz files which can be viewed in vmd.
-            QMTraj = self.mol[:]
+            QMTraj = self.mol[:].atom_select(self.fitatoms)
             Mforce_obj = QMTraj[:]
             Qforce_obj = QMTraj[:]
             Mforce_print = np.array(M_all_print[:,1:3*nat+1])
@@ -924,10 +924,10 @@ class AbInitio(Target):
             for i in range(NS):
                 Mforce_obj.xyzs[i] = Mforce_print[i, :].reshape(-1,3)
                 Qforce_obj.xyzs[i] = Qforce_print[i, :].reshape(-1,3)
-            if nat < len(self.qmatoms):
-                Fpad = np.zeros((len(self.qmatoms) - nat, 3))
-                Mforce_obj.xyzs[i] = np.vstack((Mforce_obj.xyzs[i], Fpad))
-                Qforce_obj.xyzs[i] = np.vstack((Qforce_obj.xyzs[i], Fpad))
+            # if nat < len(self.qmatoms):
+            #     Fpad = np.zeros((len(self.qmatoms) - nat, 3))
+            #     Mforce_obj.xyzs[i] = np.vstack((Mforce_obj.xyzs[i], Fpad))
+            #     Qforce_obj.xyzs[i] = np.vstack((Qforce_obj.xyzs[i], Fpad))
             if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
                 print Mforce_obj.na
                 print Mforce_obj.xyzs[0].shape[0]
