@@ -503,7 +503,8 @@ class FF(forcebalance.BaseClass):
                 elif sline.count(k) == 1:
                     marks[k] = (np.array(sline) == k).argmax()
             marks['END'] = len(sline)
-
+            print "sline: "
+            print sline
             pmark = marks.get('PRM',None)
             if pmark == None: pmark = marks.get('PARM',None)
             rmark = marks.get('RPT',None)
