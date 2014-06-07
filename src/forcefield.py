@@ -620,16 +620,16 @@ class FF(forcebalance.BaseClass):
         parameters with opposite sign.
 
         """
-        #print "ffname looks like this: ", ffname
+
         fflist = list(self.ffdata[ffname].iter())
         ScriptElement = fflist[-1]
         ScriptText = ScriptElement.text
-        wfile = open('forcefield/temp.txt', 'w')
+        ffnameList = ffname.split('.')
+        ffnameScript = ffnameList[0]+'Script.txt'
+        wfile = open('forcefield/'+ffnameScript, 'w')
         wfile.write(ScriptText)
         wfile.close()
-        ffnametemp = 'temp.txt'
-        #fftype = determine_fftype(ffname2)
-        self.addff(ffnametemp, xmlScript=True)
+        self.addff(ffnameScript, xmlScript=True)
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
@@ -724,6 +724,9 @@ class FF(forcebalance.BaseClass):
             pfld_list = self.pfields[i]
             for pfield in pfld_list:
                 fnm,ln,fld,mult,cmd = pfield
+                if 'Script.txt' in fnm:
+                    print "changed name to: "
+                    print fnm.split('Script')[0]+'.xml'
                 # XML force fields are easy to print.  
                 # Our 'pointer' to where to replace the value
                 # is given by the position of this line in the
@@ -936,11 +939,8 @@ class FF(forcebalance.BaseClass):
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
-        print "self.fnms: " 
-        print self.fnms
+        
         if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
-            print "self.map: "
-            print self.map
             termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
         else:
             termtypelist = itertools.chain(*sum([[[i+self.Readers[f].pdict[i][j] for j in self.Readers[f].pdict[i] if isint(str(j))] for i in self.Readers[f].pdict] for f in self.fnms],[]))
