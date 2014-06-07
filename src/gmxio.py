@@ -535,15 +535,12 @@ class GMX(Engine):
         """ Called by __init__ ; read files from the source directory. """
 
         ## Attempt to determine file names of .gro, .top, and .mdp files
-        self.top = onefile('top', kwargs['gmx_top'] if 'gmx_top' in kwargs else None)
-        self.mdp = onefile('mdp', kwargs['gmx_mdp'] if 'gmx_mdp' in kwargs else None)
+        self.top = onefile(kwargs.get('gmx_top'), 'top')
+        self.mdp = onefile(kwargs.get('gmx_mdp'), 'mdp')
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
-        elif 'coords' in kwargs and os.path.exists(kwargs['coords']):
-            self.mol = Molecule(kwargs['coords'])
         else:
-            grofile = onefile('gro')
-            self.mol = Molecule(grofile)
+            self.mol = Molecule(onefile(kwargs.get('coords'), 'gro', err=True))
 
     def prepare(self, pbc=False, **kwargs):
 
@@ -603,10 +600,8 @@ class GMX(Engine):
                 # preparing the engine, but then delete them afterward.
                 itptmp = True
                 self.FF.make(np.zeros(self.FF.np))
-            if self.top == None or not os.path.exists(self.top):
-                self.top = onefile('top')
-            if self.mdp == None or not os.path.exists(self.mdp):
-                self.mdp = onefile('mdp')
+            self.top = onefile(self.top, 'top')
+            self.mdp = onefile(self.mdp, 'mdp')
             # Sanity check; the force fields should be referenced by the .top file.
             if self.top != None and os.path.exists(self.top):
                 if self.top not in self.FF.fnms and (not any([any([fnm in line for fnm in self.FF.fnms]) for line in open(self.top)])):
@@ -681,20 +676,10 @@ class GMX(Engine):
                 os.unlink(f)
 
     def links(self):
-        if not os.path.exists('%s.top' % self.name):
-            topfile = onefile('top')
-            if topfile != None:
-                LinkFile(topfile, "%s.top" % self.name)
-            else:
-                logger.error("No .top file found, cannot continue.\n")
-                raise RuntimeError
-        if not os.path.exists('%s.mdp' % self.name):
-            mdpfile = onefile('mdp')
-            if mdpfile != None:
-                LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
-            else:
-                logger.error("No .mdp file found, cannot continue.\n")
-                raise RuntimeError
+        topfile = onefile('%s.top' % self.name, 'top', err=True)
+        LinkFile(topfile, "%s.top" % self.name)
+        mdpfile = onefile('%s.mdp' % self.name, 'mdp', err=True)
+        LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
 
     def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
