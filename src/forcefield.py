@@ -709,17 +709,16 @@ class FF(forcebalance.BaseClass):
         pvals = list(pvals)
         # pvec1d(vals, precision=4)
         newffdata = deepcopy(self.ffdata)
-        print "Script element: "
+        
         tempList = list(newffdata['temp.xml'].iter())
         tempN = len(tempList)
         tempElem = tempList[tempN-1]
-        print tempElem
-        print "Script text: "
+        
         tempElemText = tempElem.text
-        print tempElemText
-        print "ffdata['tempScript.txt'] joined text: "
+        
+        
         tempText = "".join(newffdata['tempScript.txt'])
-        print tempText
+        
         print "texts are equal: "
         print tempElemText==tempText
         
@@ -743,9 +742,7 @@ class FF(forcebalance.BaseClass):
             pfld_list = self.pfields[i]
             for pfield in pfld_list:
                 fnm,ln,fld,mult,cmd = pfield
-                if 'Script.txt' in fnm:
-                    print "changed name to: "
-                    print fnm.split('Script')[0]+'.xml'
+                
                 # XML force fields are easy to print.  
                 # Our 'pointer' to where to replace the value
                 # is given by the position of this line in the
@@ -813,6 +810,12 @@ class FF(forcebalance.BaseClass):
             #if type(newffdata[fnm]) is etree._ElementTree:
             if self.ffdata_isxml[fnm]:
                 with wopen(os.path.join(absprintdir,fnm)) as f: newffdata[fnm].write(f)
+            elif 'Script.txt' in fnm:
+                    tempText = tempText = "".join(newffdata[fnm])
+                    fnmXml = fnm.split('Script')[0]+'.xml'
+                    Ntemp = len(list(newffdata[fnmXml].iter()))
+                    list(newffdata[fnm].iter())[Ntemp-1].text = tempText
+                    with wopen(os.path.join(absprintdir,fnmXml)) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
         return pvals
