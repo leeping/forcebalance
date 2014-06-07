@@ -714,14 +714,9 @@ class FF(forcebalance.BaseClass):
         tempN = len(tempList)
         tempElem = tempList[tempN-1]
         print tempElem
-        print "Script element type: "
-        print type(tempElem)
-        print "numbe of subelements: "
-        print tempElem.__len__()
-        print "list of attributes: "
-        print tempElem.keys()
-        print "attribute values: "
-        print tempElem.values()
+        print "Script text: "
+        print tempElem.text
+
         
         
         # The dictionary that takes parameter names to physical values.
