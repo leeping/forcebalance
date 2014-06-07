@@ -714,9 +714,12 @@ class FF(forcebalance.BaseClass):
         tempN = len(tempList)
         tempElem = tempList[tempN-1]
         print tempElem
-        print "Script element as list: "
-        tempElemList = list(tempElem.iter())
-        print tempElemList
+        print "Script element type: "
+        print type(tempElem)
+        print "Script element field by field: "
+        for i in range(10):
+            print "field"+str(i)+": ", tempElem.attrib[i]
+        
         
         # The dictionary that takes parameter names to physical values.
         PRM = {i:pvals[self.map[i]] for i in self.map}
