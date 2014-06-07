@@ -518,6 +518,8 @@ class FF(forcebalance.BaseClass):
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
+                    print "pid: "
+                    print pid
                     pid_ = pid
                     # Add pid into the dictionary.
                     # LPW: Here is a hack to allow duplicate parameter IDs.
