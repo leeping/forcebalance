@@ -558,26 +558,11 @@ class OpenMM(Engine):
         ## Create the OpenMM ForceField object.
 
         if hasattr(self, 'FF'):
-            self.ffxml = self.FF.openmmxml
+            self.ffxml = [self.FF.openmmxml]
             self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.openmmxml))
         else:
-            if 'ffxml' in kwargs:
-                if type(kwargs['ffxml']) == list:
-                    for i in kwargs['ffxml']:
-                        if not os.path.exists(i):
-                            logger.error("%s doesn't exist\n" % i)
-                            raise RuntimeError
-                else:
-                    if not os.path.exists(kwargs['ffxml']): 
-                        logger.error("%s doesn't exist\n" % kwargs['ffxml'])
-                        raise RuntimeError
-                self.ffxml = kwargs['ffxml']
-            elif onefile('xml'):
-                self.ffxml = onefile('xml')
-            if type(self.ffxml) == list:
-                self.forcefield = ForceField(*self.ffxml)
-            else:
-                self.forcefield = ForceField(self.ffxml)
+            self.ffxml = listfiles(kwargs.get('ffxml'), 'xml', err=True)
+            self.forcefield = ForceField(*self.ffxml)
 
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
@@ -734,10 +719,7 @@ class OpenMM(Engine):
         """
         if len(kwargs) > 0:
             self.simkwargs = kwargs
-        if type(self.ffxml) == list:
-            self.forcefield = ForceField(*self.ffxml)
-        else:
-            self.forcefield = ForceField(self.ffxml)
+        self.forcefield = ForceField(*self.ffxml)
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))

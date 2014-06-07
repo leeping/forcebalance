@@ -736,9 +736,9 @@ class RemoteTarget(Target):
         # output:
         #   objective.p: pickled objective function dictionary
         #   indicate.log: results of target.indicate() written to file
-        if len(self.rpfx) > 0 and self.rpfx not in ['rungmx.sh', 'runcuda.sh']:
-            logger.error('Unsupported prefix script for launching remote target')
-            raise RuntimeError
+        # if len(self.rpfx) > 0 and self.rpfx not in ['rungmx.sh', 'runcuda.sh']:
+        #     logger.error('Unsupported prefix script for launching remote target')
+        #     raise RuntimeError
         forcebalance.nifty.queue_up(wq, "%spython rtarget.py > rtarget.out 2>&1" % (("sh %s%s " % (self.rpfx, " -b" if self.rbak else "")) 
                                                                                     if len(self.rpfx) > 0 else ""),
                                     ["forcebalance.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
