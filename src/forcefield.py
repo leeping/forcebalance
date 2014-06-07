@@ -716,9 +716,12 @@ class FF(forcebalance.BaseClass):
         print tempElem
         print "Script element type: "
         print type(tempElem)
-        print "Script element field by field: "
-        for i in range(10):
-            print "field"+str(i)+": ", tempElem.attrib[i]
+        print "numbe of subelements: "
+        print tempElem.__len__()
+        print "list of attributes: "
+        print tempElem.keys()
+        print "attribute values: "
+        print tempElem.values()
         
         
         # The dictionary that takes parameter names to physical values.
