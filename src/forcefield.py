@@ -931,8 +931,11 @@ class FF(forcebalance.BaseClass):
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
+        print "self.fnms: " 
+        print self.fnms
         if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
-            print i
+            print "self.map: "
+            print self.map
             termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
         else:
             termtypelist = itertools.chain(*sum([[[i+self.Readers[f].pdict[i][j] for j in self.Readers[f].pdict[i] if isint(str(j))] for i in self.Readers[f].pdict] for f in self.fnms],[]))
