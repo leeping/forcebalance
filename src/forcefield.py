@@ -493,8 +493,7 @@ class FF(forcebalance.BaseClass):
             sline = self.Readers[ffname].Split(line)
             
             kwds = list(itertools.chain(*[[i, "/%s" % i] for i in ['PRM', 'PARM', 'RPT', 'EVAL']]))
-            print "kwds: "
-            print kwds
+
             marks = OrderedDict()
             for k in kwds:
                 if sline.count(k) > 1:
@@ -514,6 +513,8 @@ class FF(forcebalance.BaseClass):
                 pstop = min([i for i in marks.values() if i > pmark])
                 pflds = [int(i) for i in sline[pmark+1:pstop]] # The integers that specify the parameter word positions
                 for pfld in pflds:
+                    print "pfld: "
+                    print pfld
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
