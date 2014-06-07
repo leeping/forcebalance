@@ -503,8 +503,7 @@ class FF(forcebalance.BaseClass):
                 elif sline.count(k) == 1:
                     marks[k] = (np.array(sline) == k).argmax()
             marks['END'] = len(sline)
-            print "sline: "
-            print sline
+            
             pmark = marks.get('PRM',None)
             if pmark == None: pmark = marks.get('PARM',None)
             rmark = marks.get('RPT',None)
@@ -514,15 +513,11 @@ class FF(forcebalance.BaseClass):
                 pstop = min([i for i in marks.values() if i > pmark])
                 pflds = [int(i) for i in sline[pmark+1:pstop]] # The integers that specify the parameter word positions
                 for pfld in pflds:
-                    print "pfld: "
-                    print pfld
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
                     if xmlScript:
-                        pid = 'Script:'+sline[pfld-2]
-                    print "pid: "
-                    print pid
+                        pid = 'Script/'+sline[pfld-2]+'/'
                     pid_ = pid
                     # Add pid into the dictionary.
                     # LPW: Here is a hack to allow duplicate parameter IDs.
