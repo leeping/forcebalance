@@ -718,7 +718,8 @@ class FF(forcebalance.BaseClass):
         tempElemText = tempElem.text
         print tempElemText
         print "ffdata['tempScript.txt']: "
-        print ffdata['tempScript.txt']
+        print newffdata['tempScript.txt']
+
 
 
         
