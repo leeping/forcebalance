@@ -621,6 +621,7 @@ class FF(forcebalance.BaseClass):
 
         """
 
+        
         fflist = list(self.ffdata[ffname].iter())
         ScriptElement = fflist[-1]
         ScriptText = ScriptElement.text
@@ -709,24 +710,7 @@ class FF(forcebalance.BaseClass):
         pvals = list(pvals)
         # pvec1d(vals, precision=4)
         newffdata = deepcopy(self.ffdata)
-        
-        tempList = list(newffdata['temp.xml'].iter())
-        tempN = len(tempList)
-        tempElem = tempList[tempN-1]
-        
-        tempElemText = tempElem.text
-        
-        
-        tempText = "".join(newffdata['tempScript.txt'])
-        
-        print "texts are equal: "
-        print tempElemText==tempText
-        
-
-
-
-        
-        
+    
         # The dictionary that takes parameter names to physical values.
         PRM = {i:pvals[self.map[i]] for i in self.map}
 
@@ -818,6 +802,15 @@ class FF(forcebalance.BaseClass):
                     with wopen(os.path.join(absprintdir,fnmXml)) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
+
+        tempList = list(newffdata['temp.xml'].iter())
+        tempN = len(tempList)
+        tempElem = tempList[tempN-1]
+        tempElemText = tempElem.text
+        tempText = "".join(newffdata['tempScript.txt'])
+        print "texts are equal: "
+        print tempElemText==tempText
+        
         return pvals
         
     def make_redirect(self,mvals):
