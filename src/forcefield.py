@@ -720,8 +720,7 @@ class FF(forcebalance.BaseClass):
         # to restrict the length of "pfields"? # 
         # Perhaps "eval" will make this obso.  #
         #======================================#
-        print "pfields: "
-        print self.pfields
+        
         for i in range(len(self.pfields)):
             pfld_list = self.pfields[i]
             for pfield in pfld_list:
@@ -899,6 +898,8 @@ class FF(forcebalance.BaseClass):
         @return pvals The physical parameters
         
         """
+        "create_pvals...starting with the following mvals: "
+        print mvals
         for p in self.redirect:
             mvals[p] = 0.0
         if self.logarithmic_map:
@@ -922,7 +923,11 @@ class FF(forcebalance.BaseClass):
         # if not in_fd():
         #     print pvals
         #print "pvals = ", pvals
+        print "outputting the following pvals: "
+        print pvals 
+        
         return pvals
+
 
     def create_mvals(self,pvals):
         """Converts physical to mathematical parameters.
@@ -932,8 +937,8 @@ class FF(forcebalance.BaseClass):
         @param[in] pvals The physical parameters
         @return mvals The mathematical parameters
         """
-        
-        print "starting with the following pvals: "
+
+        print "create_mvals....starting with the following pvals: "
         print pvals
 
         if self.logarithmic_map:
