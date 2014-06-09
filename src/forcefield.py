@@ -898,7 +898,7 @@ class FF(forcebalance.BaseClass):
         @return pvals The physical parameters
         
         """
-        "create_pvals...starting with the following mvals: "
+        print "create_pvals...starting with the following mvals: "
         print mvals
         for p in self.redirect:
             mvals[p] = 0.0
@@ -925,7 +925,7 @@ class FF(forcebalance.BaseClass):
         #print "pvals = ", pvals
         print "outputting the following pvals: "
         print pvals 
-        
+
         return pvals
 
 
