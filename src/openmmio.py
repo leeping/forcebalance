@@ -276,7 +276,7 @@ def CopyCustomNonbondedParameters(src, dest):
     for i in range(src.getNumExclusions()):
         dest.setExclusionParticles(i, *src.getExclusionParticles(i))
     pVal = src.getGlobalParameterDefaultValue(0)
-    dest.setGlobalParameterDefaultValue(0, pval)
+    dest.setGlobalParameterDefaultValue(0, pVal)
 
 
 
