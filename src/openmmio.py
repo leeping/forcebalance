@@ -617,6 +617,8 @@ class OpenMM(Engine):
             self.mol = kwargs['mol']
         elif 'coords' in kwargs:
             self.mol = Molecule(kwargs['coords'])
+        elif 'pdb' in kwargs:
+            self.mol = Molecule(kwargs['pdb'])
         else:
             logger.error('Must provide either a molecule object or coordinate file.\n')
             raise RuntimeError
