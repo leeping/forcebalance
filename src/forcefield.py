@@ -810,7 +810,7 @@ class FF(forcebalance.BaseClass):
         tempText = "".join(newffdata['tempScript.txt'])
         print "texts are equal: "
         print tempElemText==tempText
-        
+
         return pvals
         
     def make_redirect(self,mvals):
@@ -932,10 +932,17 @@ class FF(forcebalance.BaseClass):
         @param[in] pvals The physical parameters
         @return mvals The mathematical parameters
         """
+        
+        print "starting with the following pvals: "
+        print pvals
+
         if self.logarithmic_map:
             logger.error('create_mvals has not been implemented for logarithmic_map\n')
             raise RuntimeError
         mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
+        print "outputting the following mvals: "
+        print mvals
+
         return mvals
         
     def rsmake(self,printfacs=True):
