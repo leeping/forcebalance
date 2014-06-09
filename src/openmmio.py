@@ -264,10 +264,20 @@ def CopyNonbondedParameters(src, dest):
 
 
 def CopyCustomNonbondedParameters(src, dest):
+    '''
+    copies cutomNonBondedForce
+        pVal is the value of 
+        p in the gaussian pme force, in the future 
+        this needs to be extended, maybe copy all 
+        global parameters
+    '''
     for i in range(src.getNumParticles()):
         dest.setParticleParameters(i, list(src.getParticleParameters(i)))
     for i in range(src.getNumExclusions()):
         dest.setExclusionParticles(i, *src.getExclusionParticles(i))
+    pVal = src.getGlobalParameterDefaultValue(0)
+    dest.setGlobalParameterDefaultValue(0, pval)
+
 
 
 def do_nothing(src, dest):
