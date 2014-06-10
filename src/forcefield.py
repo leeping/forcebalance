@@ -626,8 +626,8 @@ class FF(forcebalance.BaseClass):
         ScriptElement = fflist[-1]
         print "Scrit element: "
         print ScriptElement
-        print "and its type: "
-        print type(ScriptElement)
+        print "instance of Script: "
+        print isinstance(ScriptElement, Script)
         ScriptText = ScriptElement.text
         ffnameList = ffname.split('.')
         ffnameScript = ffnameList[0]+'Script.txt'
