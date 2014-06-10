@@ -803,21 +803,7 @@ class OpenMM(Engine):
 
     def evaluate_one_(self, force=False, dipole=False,):
         # Perform a single point calculation on the current geometry.
-        '''
-        print "widths, p in context, and total energies :"
-        for i in range(self.simulation.system.getNumForces()):
-            if isinstance(self.simulation.system.getForce(i), CustomNonbondedForce):
-                for width in [0.1, 0.0999, 0.1001]:
-                    a = 1.0 / width
-                    a = a * a
-                    from math import sqrt
-                    p = sqrt(a * a / (a + a))
-                    self.simulation.context.getSystem().getForce(i).setGlobalParameterDefaultValue(0, p)
-                    self.simulation.context.reinitialize()
-                    self.set_positions(I)
-                    State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
-                    print "width: ", width, " p: ", self.simulation.context.getSystem().getForce(i).getGlobalParameterDefaultValue(0), " total PE: ", State.getPotentialEnergy()
-        '''
+        
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
@@ -858,7 +844,7 @@ class OpenMM(Engine):
             if dipole: Dipoles.append(R1["Dipole"])
         # Compile it all into the dictionary object
         Result = OrderedDict()
-        print "Total Energy: ", sum(Energies)
+        
         #print "printing Energies: "
         #print Energies
         Result["Energy"] = np.array(Energies)
