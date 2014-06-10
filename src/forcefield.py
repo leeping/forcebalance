@@ -621,20 +621,24 @@ class FF(forcebalance.BaseClass):
 
         """
 
-        
+        #check if xml file contains a script
+        #throw error if more than one script
+        #write script into .txt file and parse as text
         fflist = list(self.ffdata[ffname].iter())
+        scriptElements = [elem for elem in fflist if elem.tag=='Script']
+        if len(scriptElements) > 1:
+            logger.error('XML file'+ffname+'contains more than one script! Consolidate your scripts into one script!\n')
+            raise RuntimeError
+        else:
+            Script = scriptElements[0].text
+            ffnameList = ffname.split('.')
+            ffnameScript = ffnameList[0]+'Script.txt'
+            wfile = open('forcefield/'+ffnameScript, 'w')
+            wfile.write(ScriptText)
+            wfile.close()
+            self.addff(ffnameScript, xmlScript=True)
+        '''
         ScriptElement = fflist[-1]
-        print "Scrit element: "
-        print ScriptElement
-        print "class name: "
-        className = ScriptElement.__class__.__name__
-        print className
-        import IPython
-        IPython.embed()
-        print "instance of "+className+": "
-        print isinstance(ScriptElement, _Element)
-        print "Element tag: "
-        print ScriptElement.tag()
         ScriptText = ScriptElement.text
         ffnameList = ffname.split('.')
         ffnameScript = ffnameList[0]+'Script.txt'
@@ -642,6 +646,7 @@ class FF(forcebalance.BaseClass):
         wfile.write(ScriptText)
         wfile.close()
         self.addff(ffnameScript, xmlScript=True)
+        '''
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
