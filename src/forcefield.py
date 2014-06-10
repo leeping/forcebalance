@@ -624,6 +624,10 @@ class FF(forcebalance.BaseClass):
         
         fflist = list(self.ffdata[ffname].iter())
         ScriptElement = fflist[-1]
+        print "Scrit element: "
+        print ScriptElement
+        print "and its type: "
+        print type(ScriptElement)
         ScriptText = ScriptElement.text
         ffnameList = ffname.split('.')
         ffnameScript = ffnameList[0]+'Script.txt'
