@@ -852,7 +852,7 @@ class OpenMM(Engine):
         Dipoles = []
         for I in range(len(self.xyz_omms)):
             self.set_positions(I)
-            R1 = self.evaluate_one_(force, I, dipole)
+            R1 = self.evaluate_one_(force, dipole)
             Energies.append(R1["Energy"])
             if force: Forces.append(R1["Force"])
             if dipole: Dipoles.append(R1["Dipole"])
