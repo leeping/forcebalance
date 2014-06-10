@@ -314,6 +314,7 @@ def UpdateSimulationParameters(src_system, dest_simulation):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
 
+
 def SetAmoebaVirtualExclusions(system):
     if any([f.__class__.__name__ == "AmoebaMultipoleForce" for f in system.getForces()]):
         # logger.info("Cajoling AMOEBA covalent maps so they work with virtual sites.\n")
@@ -810,7 +811,7 @@ class OpenMM(Engine):
                     a = a * a
                     from math import sqrt
                     p = sqrt(a * a / (a + a))
-                    self.simulation.system.getForce(i).setGlobalParameterDefaultValue(0, p)
+                    self.simulation.context.getSystem().getForce(i).setGlobalParameterDefaultValue(0, p)
                     State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
                     print "width: ", width, " p: ", self.simulation.context.getSystem().getForce(i).getGlobalParameterDefaultValue(0), " total PE: ", State.getPotentialEnergy()
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
