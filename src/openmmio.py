@@ -275,8 +275,9 @@ def CopyCustomNonbondedParameters(src, dest):
         dest.setParticleParameters(i, list(src.getParticleParameters(i)))
     for i in range(src.getNumExclusions()):
         dest.setExclusionParticles(i, *src.getExclusionParticles(i))
-    import  IPython
-    IPython.embed()
+    from IPython.Shell import IPShellEmbed
+    IPShellEmbed()
+    #IPython.embed()
     pVal = src.getGlobalParameterDefaultValue(0)
     dest.setGlobalParameterDefaultValue(0, pVal)
 
