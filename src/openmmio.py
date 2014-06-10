@@ -738,12 +738,11 @@ class OpenMM(Engine):
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
-        print "value of p in the custom nonbonded force: "
+        
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-            elif isinstance(i, CustomNonbondedForce):
-                print "parameter: ",i.getGlobalParameterName(0), " value: ", i.getGlobalParameterDefaultValue(0)
+
 
         #----
         # If the virtual site parameters have changed,
@@ -829,6 +828,10 @@ class OpenMM(Engine):
         """
 
         self.update_simulation()
+        print "value of p in evaluate_ after self.update_simulation() :"
+        for i in self.system.getForces():
+            if isinstance(i, CustomNonbondedForce):
+                print "parameter: ", i.getGlobalParameterName(0), " value: ", i.getGlobalParameterDefaultValue(0)
         # If trajectory flag set to False, perform a single-point calculation.
         if not traj: return evaluate_one_(force, dipole)
         Energies = []
