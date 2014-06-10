@@ -802,8 +802,8 @@ class OpenMM(Engine):
 
     def evaluate_one_(self, force=False, dipole=False):
         # Perform a single point calculation on the current geometry.
-        print "value of p in evaluate_one_ after self.update_simulation() :"
-        for i in self.system.getForces():
+        print "value of p in self.simulation.system in evaluate_one_() :"
+        for i in self.simulation.system.getForces():
             if isinstance(i, CustomNonbondedForce):
                 print "parameter: ", i.getGlobalParameterName(0), " value: ", i.getGlobalParameterDefaultValue(0)        
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
