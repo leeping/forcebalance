@@ -634,7 +634,7 @@ class FF(forcebalance.BaseClass):
             ffnameList = ffname.split('.')
             ffnameScript = ffnameList[0]+'Script.txt'
             wfile = open('forcefield/'+ffnameScript, 'w')
-            wfile.write(ScriptText)
+            wfile.write(Script)
             wfile.close()
             self.addff(ffnameScript, xmlScript=True)
         '''
