@@ -630,7 +630,7 @@ class FF(forcebalance.BaseClass):
         className = ScriptElement.__class__.__name__
         print className
         print "instance of "+className+": "
-        print isinstance(ScriptName, className)
+        print isinstance(ScriptElement, className)
         print "Element tag: "
         print ScriptElement.tag()
         ScriptText = ScriptElement.text
