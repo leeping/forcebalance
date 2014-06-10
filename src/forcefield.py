@@ -675,7 +675,6 @@ class FF(forcebalance.BaseClass):
         and use physical parameters directly.
         
         """
-        print "NUMBER OF VALUES IS: ", len(vals)
         if type(vals)==np.ndarray and vals.ndim != 1:
             logger.error('Please only pass 1-D arrays\n')
             raise RuntimeError
@@ -802,14 +801,6 @@ class FF(forcebalance.BaseClass):
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
 
-        tempList = list(newffdata['temp.xml'].iter())
-        tempN = len(tempList)
-        tempElem = tempList[tempN-1]
-        tempElemText = tempElem.text
-        tempText = "".join(newffdata['tempScript.txt'])
-        print "texts are equal: "
-        print tempElemText==tempText
-
         return pvals
         
     def make_redirect(self,mvals):
@@ -898,8 +889,9 @@ class FF(forcebalance.BaseClass):
         @return pvals The physical parameters
         
         """
-        print "create_pvals...starting with the following mvals: "
-        print mvals
+        print "slef.redirect: "
+        print self.redirect 
+
         for p in self.redirect:
             mvals[p] = 0.0
         if self.logarithmic_map:
@@ -913,6 +905,10 @@ class FF(forcebalance.BaseClass):
             pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
+
+        print "create_pvals...starting with the following mvals: "
+        print mvals
+
         for i in range(self.np):
             if any([j in self.plist[i] for j in concern]) and pvals[i] * self.pvals0[i] < 0:
                 #print "Parameter %s has changed sign but it's not allowed to! Setting to zero." % self.plist[i]
@@ -938,15 +934,10 @@ class FF(forcebalance.BaseClass):
         @return mvals The mathematical parameters
         """
 
-        print "create_mvals....starting with the following pvals: "
-        print pvals
-
         if self.logarithmic_map:
             logger.error('create_mvals has not been implemented for logarithmic_map\n')
             raise RuntimeError
         mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
-        print "outputting the following mvals: "
-        print mvals
 
         return mvals
         
