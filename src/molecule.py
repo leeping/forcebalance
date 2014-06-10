@@ -1467,7 +1467,7 @@ class Molecule(object):
             for i in gasn:
                 for j in gngh[i]:
                     apairs = cartesian_product2([gasn[i], gasn[j]])
-                    AtomIterator.append(apairs[apairs[:,0]>apairs[:,1]])
+                    if len(apairs) > 0: AtomIterator.append(apairs[apairs[:,0]>apairs[:,1]])
             AtomIterator = np.ascontiguousarray(np.vstack(AtomIterator))
         else:
             # Create a list of 2-tuples corresponding to combinations of atomic indices.
