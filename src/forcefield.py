@@ -637,16 +637,7 @@ class FF(forcebalance.BaseClass):
             wfile.write(Script)
             wfile.close()
             self.addff(ffnameScript, xmlScript=True)
-        '''
-        ScriptElement = fflist[-1]
-        ScriptText = ScriptElement.text
-        ffnameList = ffname.split('.')
-        ffnameScript = ffnameList[0]+'Script.txt'
-        wfile = open('forcefield/'+ffnameScript, 'w')
-        wfile.write(ScriptText)
-        wfile.close()
-        self.addff(ffnameScript, xmlScript=True)
-        '''
+            
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
