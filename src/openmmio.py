@@ -738,12 +738,12 @@ class OpenMM(Engine):
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
-        print "finding custom nonbonded force: "
+        print "value of p in the custom nonbonded force: "
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
             elif isinstance(i, CustomNonbondedForce):
-                print "YES!"
+                print "parameter: ",i.getGlobalParameterName(0), " value: ", i.getGlobalParameterDefaultValue(0)
 
         #----
         # If the virtual site parameters have changed,
