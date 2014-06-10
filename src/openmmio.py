@@ -801,8 +801,9 @@ class OpenMM(Engine):
             mass += system.getParticleMass(i)
         return mass
 
-    def evaluate_one_(self, I, force=False, dipole=False,):
+    def evaluate_one_(self, force=False, dipole=False,):
         # Perform a single point calculation on the current geometry.
+        '''
         print "widths, p in context, and total energies :"
         for i in range(self.simulation.system.getNumForces()):
             if isinstance(self.simulation.system.getForce(i), CustomNonbondedForce):
@@ -816,6 +817,7 @@ class OpenMM(Engine):
                     self.set_positions(I)
                     State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
                     print "width: ", width, " p: ", self.simulation.context.getSystem().getForce(i).getGlobalParameterDefaultValue(0), " total PE: ", State.getPotentialEnergy()
+        '''
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
@@ -842,7 +844,7 @@ class OpenMM(Engine):
         """
 
         self.update_simulation()
-        
+        self.simulation.context.reinitialize()
         # If trajectory flag set to False, perform a single-point calculation.
         if not traj: return evaluate_one_(force, dipole)
         Energies = []
