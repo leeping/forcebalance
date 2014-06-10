@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                     Last updated March 30, 2014                    |#
+#|                     Last updated June 10, 2014                     |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -878,7 +878,12 @@ class Molecule(object):
         diff = abs(len(self.Data[key]) - len(self.Data[klast]))
         if kthis == 'comms':
             # Append empty comments if necessary because this causes way too many crashes.
-            for i in range(diff): self.Data['comms'].append('')
+            if diff > 0:
+                for i in range(diff): 
+                    self.Data['comms'].append('')
+            else:
+                for i in range(-1*diff):
+                    self.Data['comms'].pop()
         elif kthis == 'boxes' and len(self.Data['boxes']) == 1:
             # If we only have one box then we can fill in the rest of the trajectory.
             for i in range(diff): self.Data['boxes'].append(self.Data['boxes'][-1])
@@ -1379,8 +1384,6 @@ class Molecule(object):
             xmax = self.boxes[sn].a
             ymax = self.boxes[sn].b
             zmax = self.boxes[sn].c
-            # if xmax > gsz and ymax > gsz and zmax > gsz:
-            #     toppbc = True
             if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
                 print "Warning: Topology building will not work with broken molecules in nonorthogonal cells."
                 self.toppbc = False
