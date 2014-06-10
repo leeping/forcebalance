@@ -738,7 +738,9 @@ class OpenMM(Engine):
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
+        print "printing system forces: "
         for i in self.system.getForces():
+            print i
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
 
