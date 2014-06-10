@@ -803,14 +803,14 @@ class OpenMM(Engine):
     def evaluate_one_(self, force=False, dipole=False):
         # Perform a single point calculation on the current geometry.
         print "widths and total energies :"
-        for i in self.simulation.system.getForces():
-            if isinstance(i, CustomNonbondedForce):
+        for i in range(self.simulation.system.getNumForces()):
+            if isinstance(self.simulation.system.getForce(i), CustomNonbondedForce):
                 for width in [0.1, 0.0999, 0.1001]:
                     a = 1.0 / width
                     a = a * a
                     from math import sqrt
                     p = sqrt(a * a / (a + a))
-                    i.setGlobalParameterDefaultValue(0, p)
+                    self.simulation.system.getForce(i).setGlobalParameterDefaultValue(0, p)
                     State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
                     print "width: ", width, " total PE: ", State.getPotentialEnergy()
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
