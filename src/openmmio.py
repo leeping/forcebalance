@@ -812,6 +812,7 @@ class OpenMM(Engine):
                     from math import sqrt
                     p = sqrt(a * a / (a + a))
                     self.simulation.context.getSystem().getForce(i).setGlobalParameterDefaultValue(0, p)
+                    slef.simulation.context.reinitialize()
                     State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
                     print "width: ", width, " p: ", self.simulation.context.getSystem().getForce(i).getGlobalParameterDefaultValue(0), " total PE: ", State.getPotentialEnergy()
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
