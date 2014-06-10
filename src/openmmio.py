@@ -839,6 +839,9 @@ class OpenMM(Engine):
             if dipole: Dipoles.append(R1["Dipole"])
         # Compile it all into the dictionary object
         Result = OrderedDict()
+        print "Total Energy: ", sum(Energies)
+        print "printing Energies: "
+        print Energies
         Result["Energy"] = np.array(Energies)
         if force: Result["Force"] = np.array(Forces)
         if dipole: Result["Dipole"] = np.array(Dipoles)
