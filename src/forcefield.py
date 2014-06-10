@@ -629,6 +629,8 @@ class FF(forcebalance.BaseClass):
         print "class name: "
         className = ScriptElement.__class__.__name__
         print className
+        import IPython
+        IPython.embed()
         print "instance of "+className+": "
         print isinstance(ScriptElement, _Element)
         print "Element tag: "
