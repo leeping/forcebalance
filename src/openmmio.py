@@ -801,7 +801,7 @@ class OpenMM(Engine):
             mass += system.getParticleMass(i)
         return mass
 
-    def evaluate_one_(self, force=False, dipole=False):
+    def evaluate_one_(self, I, force=False, dipole=False,):
         # Perform a single point calculation on the current geometry.
         print "widths, p in context, and total energies :"
         for i in range(self.simulation.system.getNumForces()):
@@ -813,6 +813,7 @@ class OpenMM(Engine):
                     p = sqrt(a * a / (a + a))
                     self.simulation.context.getSystem().getForce(i).setGlobalParameterDefaultValue(0, p)
                     self.simulation.context.reinitialize()
+                    self.set_positions(I)
                     State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
                     print "width: ", width, " p: ", self.simulation.context.getSystem().getForce(i).getGlobalParameterDefaultValue(0), " total PE: ", State.getPotentialEnergy()
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
@@ -849,7 +850,7 @@ class OpenMM(Engine):
         Dipoles = []
         for I in range(len(self.xyz_omms)):
             self.set_positions(I)
-            R1 = self.evaluate_one_(force, dipole)
+            R1 = self.evaluate_one_(force, I, dipole)
             Energies.append(R1["Energy"])
             if force: Forces.append(R1["Force"])
             if dipole: Dipoles.append(R1["Dipole"])
