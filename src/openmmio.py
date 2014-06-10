@@ -812,7 +812,7 @@ class OpenMM(Engine):
                     p = sqrt(a * a / (a + a))
                     i.setGlobalParameterDefaultValue(0, p)
                     State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
-                    print "width: ", width, " total PE: ", sum(State.getPotentialEnergy())
+                    print "width: ", width, " total PE: ", sum(State.getPotentialEnergy() / kilojoules_per_mole)
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
