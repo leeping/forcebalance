@@ -889,9 +889,6 @@ class FF(forcebalance.BaseClass):
         @return pvals The physical parameters
         
         """
-        print "slef.redirect: "
-        print self.redirect 
-
         for p in self.redirect:
             mvals[p] = 0.0
         if self.logarithmic_map:
@@ -906,9 +903,6 @@ class FF(forcebalance.BaseClass):
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
 
-        print "create_pvals...starting with the following mvals: "
-        print mvals
-
         for i in range(self.np):
             if any([j in self.plist[i] for j in concern]) and pvals[i] * self.pvals0[i] < 0:
                 #print "Parameter %s has changed sign but it's not allowed to! Setting to zero." % self.plist[i]
@@ -919,8 +913,6 @@ class FF(forcebalance.BaseClass):
         # if not in_fd():
         #     print pvals
         #print "pvals = ", pvals
-        print "outputting the following pvals: "
-        print pvals 
 
         return pvals
 
