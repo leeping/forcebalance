@@ -305,7 +305,6 @@ def UpdateSimulationParameters(src_system, dest_simulation):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
         if isinstance(dest_simulation.system.getForce(i), CustomNonbondedForce):
-            print "detected CustomNonbondedForce. copying global parameters."
             force = src_system.getForce(i)
             for j in range(force.getNumGlobalParameters()):
                 pName = force.getGlobalParameterName(j)
@@ -828,7 +827,7 @@ class OpenMM(Engine):
         """
 
         self.update_simulation()
-        #self.simulation.context.reinitialize()
+        
         # If trajectory flag set to False, perform a single-point calculation.
         if not traj: return evaluate_one_(force, dipole)
         Energies = []
