@@ -262,6 +262,17 @@ def CopyNonbondedParameters(src, dest):
     for i in range(src.getNumExceptions()):
         dest.setExceptionParameters(i,*src.getExceptionParameters(i))
 
+
+def CopyCustomNonbondedParameters(src, dest):
+    '''
+    copy whatever updateParametersInContext can update:
+        per-particle parameters
+    '''
+    for i in range(src.getNumParticles()):
+        dest.setParticleParameters(i, list(src.getParticleParameters(i)))
+
+
+
 def do_nothing(src, dest):
     return
 
@@ -279,6 +290,7 @@ def CopySystemParameters(src,dest):
                'HarmonicAngleForce':CopyHarmonicAngleParameters,
                'PeriodicTorsionForce':CopyPeriodicTorsionParameters,
                'NonbondedForce':CopyNonbondedParameters,
+               'CustomNonbondedForce':CopyCustomNonbondedParameters,
                'CMMotionRemover':do_nothing}
     for i in range(src.getNumForces()):
         nm = src.getForce(i).__class__.__name__
@@ -292,6 +304,13 @@ def UpdateSimulationParameters(src_system, dest_simulation):
     for i in range(src_system.getNumForces()):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
+        if isinstance(dest_simulation.system.getForce(i), CustomNonbondedForce):
+            force = src_system.getForce(i)
+            for j in range(force.getNumGlobalParameters()):
+                pName = force.getGlobalParameterName(j)
+                pValue = force.getGlobalParameterDefaultValue(j)
+                dest_simulation.context.setParameter(pName, pValue)
+
 
 def SetAmoebaVirtualExclusions(system):
     if any([f.__class__.__name__ == "AmoebaMultipoleForce" for f in system.getForces()]):
@@ -674,7 +693,8 @@ class OpenMM(Engine):
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
-        GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce', 'AmoebaWcaDispersionForce']
+        GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce','AmoebaWcaDispersionForce',
+                        'CustomNonbondedForce',  'NonbondedForce']
         GrpNums = {}
         if not mts:
             for j in self.system.getForces():
@@ -716,9 +736,11 @@ class OpenMM(Engine):
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
+        
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+
 
         #----
         # If the virtual site parameters have changed,
@@ -776,8 +798,9 @@ class OpenMM(Engine):
             mass += system.getParticleMass(i)
         return mass
 
-    def evaluate_one_(self, force=False, dipole=False):
-        # Perform a single point calculation on the current geometry.        
+    def evaluate_one_(self, force=False, dipole=False,):
+        # Perform a single point calculation on the current geometry.
+        
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
@@ -804,6 +827,7 @@ class OpenMM(Engine):
         """
 
         self.update_simulation()
+        
         # If trajectory flag set to False, perform a single-point calculation.
         if not traj: return evaluate_one_(force, dipole)
         Energies = []
@@ -817,6 +841,9 @@ class OpenMM(Engine):
             if dipole: Dipoles.append(R1["Dipole"])
         # Compile it all into the dictionary object
         Result = OrderedDict()
+        
+        #print "printing Energies: "
+        #print Energies
         Result["Energy"] = np.array(Energies)
         if force: Result["Force"] = np.array(Forces)
         if dipole: Result["Dipole"] = np.array(Dipoles)
