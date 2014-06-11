@@ -265,20 +265,11 @@ def CopyNonbondedParameters(src, dest):
 
 def CopyCustomNonbondedParameters(src, dest):
     '''
-    copies cutomNonBondedForce
-        pVal is the value of 
-        p in the gaussian pme force, in the future 
-        this needs to be extended, maybe copy all 
-        global parameters
+    copy whatever updateParametersInContext can update:
+        per-particle parameters
     '''
     for i in range(src.getNumParticles()):
         dest.setParticleParameters(i, list(src.getParticleParameters(i)))
-    for i in range(src.getNumExclusions()):
-        dest.setExclusionParticles(i, *src.getExclusionParticles(i))
-    import IPython
-    IPython.embed()
-    pVal = src.getGlobalParameterDefaultValue(0)
-    dest.setGlobalParameterDefaultValue(0, pVal)
 
 
 
@@ -313,6 +304,13 @@ def UpdateSimulationParameters(src_system, dest_simulation):
     for i in range(src_system.getNumForces()):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
+        if isinstance(dest_simulation.system.getForce(i), 'CustomNonbondedForce'):
+            print "detected CustomNonbondedForce. copying global parameters."
+            force = src_system.getForce(i)
+            for j in range(force.getNumGlobalParameters()):
+                pName = force.getGlobalParameterName(j)
+                pValue = force.getGlobalParameterDefaultValue(j)
+                dest_simulation.context.setParameter(pName, pValue)
 
 
 def SetAmoebaVirtualExclusions(system):
@@ -830,7 +828,7 @@ class OpenMM(Engine):
         """
 
         self.update_simulation()
-        self.simulation.context.reinitialize()
+        #self.simulation.context.reinitialize()
         # If trajectory flag set to False, perform a single-point calculation.
         if not traj: return evaluate_one_(force, dipole)
         Energies = []
