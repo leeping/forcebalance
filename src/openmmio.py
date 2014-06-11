@@ -304,7 +304,7 @@ def UpdateSimulationParameters(src_system, dest_simulation):
     for i in range(src_system.getNumForces()):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
-        if isinstance(dest_simulation.system.getForce(i), 'CustomNonbondedForce'):
+        if isinstance(dest_simulation.system.getForce(i), CustomNonbondedForce):
             print "detected CustomNonbondedForce. copying global parameters."
             force = src_system.getForce(i)
             for j in range(force.getNumGlobalParameters()):
