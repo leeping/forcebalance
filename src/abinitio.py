@@ -171,7 +171,7 @@ class AbInitio(Target):
         self.read_reference_data()
         ## The below two options are related to whether we want to rebuild virtual site positions.
         ## Rebuild the distance matrix if virtual site positions have changed
-        self.new_vsites = True
+        self.buildx = True
         ## Save the mvals from the last time we updated the vsites.
         self.save_vmvals = {}
         self.set_option(None, 'shots', val=self.ns)
@@ -180,20 +180,20 @@ class AbInitio(Target):
         for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:
                 if i in self.save_vmvals and mvals[i] != self.save_vmvals[i]:
-                    self.new_vsites = True
+                    self.buildx = True
                     break
-        if not self.new_vsites: return self.invdists
+        if not self.buildx: return self.invdists
         if any(['VSITE' in i for i in self.FF.map.keys()]) or self.have_vsite:
             logger.info("\rGenerating virtual site positions.%s" % (" "*30))
             pvals = self.FF.make(mvals)
-            self.mol.xyzs = self.engine.generate_vsite_positions()
+            self.mol.xyzs = self.engine.generate_positions()
         # prepare the distance matrix for esp computations
         if len(self.espxyz) > 0:
             invdists = []
             logger.info("\rPreparing the distance matrix... it will have %i * %i * %i = %i elements" % (self.ns, self.nesp, self.nparticles, self.ns * self.nesp * self.nparticles))
             sn = 0
             for espset, xyz in zip(self.espxyz, self.mol.xyzs):
-                logger.info("\rGenerating ESP distances for snapshot %i%s" % (sn, " "*50))
+                logger.info("\rGenerating ESP distances for snapshot %i%s\r" % (sn, " "*50))
                 esparr = np.array(espset).reshape(-1,3)
                 # Create a matrix with Nesp rows and Natoms columns.
                 DistMat = np.array([[np.linalg.norm(i - j) for j in xyz] for i in esparr])
@@ -202,7 +202,7 @@ class AbInitio(Target):
         for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:
                 self.save_vmvals[i] = mvals[i]
-        self.new_vsites = False
+        self.buildx = False
         return np.array(invdists)
 
     def compute_netforce_torque(self, xyz, force, QM=False):
@@ -352,9 +352,7 @@ class AbInitio(Target):
                 self.espxyz.append([float(i) for i in sline[1:]])
             elif sline[0] == 'ESPVAL':
                 self.espval.append([float(i) for i in sline[1:]])
-            if all(len(i) in [self.ns, 0] for i in [self.eqm, self.fqm, self.emd0, self.espxyz, self.espval]) and len(self.eqm) == self.ns:
-                break
-        self.ns = len(self.eqm)
+
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
         self.eqm = np.array(self.eqm)
         self.eqm *= eqcgmx
@@ -505,6 +503,12 @@ class AbInitio(Target):
                                                "%.4f%%" % (self.tq_err_pct*100),
                                                "%.3f" % self.w_torque,
                                                "%8.4f" % self.tq_ctr]
+        if self.resp:
+            Data['Potential (a.u.'] = ["%8.4f" % (self.esp_err/10),
+                                       "%8.4f" % (self.esp_ref/10),
+                                       "%.4f%%" % (self.esp_err_pct*100),
+                                       "%.3f" % self.w_resp,
+                                       "%8.4f" % self.esp_ctr]
         self.printcool_table(data=Data, headings=Headings, color=0)
         if self.force:
             logger.info("Maximum force error on atom %i (%s), frame %i, %8.4f kJ/mol/A\n" % (self.maxfatom, self.mol.elem[self.fitatoms[self.maxfatom]], self.maxfshot, self.maxdf/10))
@@ -1158,27 +1162,29 @@ class AbInitio(Target):
         NP = self.FF.np
         Z = 0
         Y = 0
-        def getqatoms(mvals_):
-            """ This function takes the mathematical parameter values and returns the charges on the ATOMS (fancy mapping going on) """
+        def new_charges(mvals_):
+            """ Return the charges acting on the system. """
             logger.debug("\r")
+            pvals = self.FF.make(mvals_)
+            return self.engine.get_charges()
+            
             # Need to update the positions of atoms, if there are virtual sites.
-            pvals = self.FF.create_pvals(mvals_)
-            qvals = [pvals[i] for i in self.FF.qmap]
-            # All of a sudden I need the number of virtual sites.
-            qatoms = np.zeros(self.nparticles)
-            for i, jj in enumerate(self.FF.qid):
-                for j in jj:
-                    qatoms[j] = qvals[i]
-            return qatoms
+            # qvals = [pvals[i] for i in self.FF.qmap]
+            # # All of a sudden I need the number of virtual sites.
+            # qatoms = np.zeros(self.nparticles)
+            # for i, jj in enumerate(self.FF.qid):
+            #     for j in jj:
+            #         qatoms[j] = qvals[i]
+            # return qatoms
 
         # Obtain a derivative matrix the stupid way
         if AGrad:
             # dqPdqM = []
             # for i in range(NP):
             #     print "Now working on parameter number", i
-            #     dqPdqM.append(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0])
+            #     dqPdqM.append(f12d3p(fdwrap(new_charges,mvals,i), h = self.h)[0])
             # dqPdqM = mat(dqPdqM).T
-            dqPdqM = np.matrix([(f12d3p(fdwrap(getqatoms,mvals,i), h = self.h)[0] if i in self.pgrad else 0.0) for i in range(NP)]).T
+            dqPdqM = np.matrix([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h)[0] if i in self.pgrad else 0.0) for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)
         espxyz   = np.array(self.espxyz)
@@ -1191,6 +1197,7 @@ class AbInitio(Target):
                 if 'VSITE' in self.FF.plist[p]:
                     ddVdqPdVS[p], dddVdqPdVS2[p] = f12d3p(fdwrap(self.build_invdist,mvals,p), h = self.h, f0 = self.invdists)
         X = 0
+        Q = 0
         D = 0
         G = np.zeros(NP)
         H = np.zeros((NP, NP))
@@ -1199,19 +1206,20 @@ class AbInitio(Target):
             Z  += P
             dVdqP   = np.matrix(self.invdists[i])
             espqval = espqvals[i]
-            espmval = dVdqP * col(getqatoms(mvals))
+            espmval = dVdqP * col(new_charges(mvals))
             desp    = flat(espmval) - espqval
             X      += P * np.dot(desp, desp) / self.nesp
+            Q      += P * np.dot(espqval, espqval) / self.nesp
             D      += P * (np.dot(espqval, espqval) / self.nesp - (np.sum(espqval) / self.nesp)**2)
             if AGrad:
                 dVdqM   = (dVdqP * dqPdqM).T
                 for p, vsd in ddVdqPdVS.items():
-                    dVdqM[p,:] += flat(vsd[i] * col(getqatoms(mvals)))
+                    dVdqM[p,:] += flat(vsd[i] * col(new_charges(mvals)))
                 G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
                 if AHess:
                     d2VdqM2 = np.zeros(dVdqM.shape)
                     for p, vsd in dddVdqPdVS2.items():
-                        d2VdqM2[p,:] += flat(vsd[i] * col(getqatoms(mvals)))
+                        d2VdqM2[p,:] += flat(vsd[i] * col(new_charges(mvals)))
                     H      += np.array(P * 2 * (dVdqM * dVdqM.T + d2VdqM2 * col(desp))) / self.nesp
         # Redundant but we keep it anyway
         D /= Z
@@ -1221,14 +1229,19 @@ class AbInitio(Target):
         G /= D
         H /= Z
         H /= D
+        Q /= Z
+        Q /= D
         if not in_fd():
             self.esp_err = np.sqrt(X)
+            self.esp_ref = np.sqrt(Q)
+            self.esp_err_pct = self.esp_err / self.esp_ref
+            
         # Following is the restraint part
         # RESP hyperbola "strength" parameter; 0.0005 is weak, 0.001 is strong
         # RESP hyperbola "tightness" parameter; don't need to change this
         a = self.resp_a
         b = self.resp_b
-        q = getqatoms(mvals)
+        q = new_charges(mvals)
         R   = a*np.sum((q**2 + b**2)**0.5 - b)
         dR  = a*q*(q**2 + b**2)**-0.5
         ddR = a*b**2*(q**2 + b**2)**-1.5
@@ -1238,6 +1251,9 @@ class AbInitio(Target):
             G += flat(dqPdqM.T * col(dR))
             if AHess:
                 H += np.diag(flat(dqPdqM.T * col(ddR)))
+
+        if not in_fd():
+            self.esp_ctr = X
             
         Answer = {'X':X,'G':G,'H':H}
         return Answer

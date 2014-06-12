@@ -677,6 +677,10 @@ class GMX(Engine):
             for f in self.FF.fnms: 
                 os.unlink(f)
 
+    def get_charges(self):
+        logger.error('GMX engine does not have get_charges (should be easy to implement however.)')
+        raise NotImplementedError
+
     def links(self):
         topfile = onefile('%s.top' % self.name, 'top', err=True)
         LinkFile(topfile, "%s.top" % self.name)
@@ -1029,7 +1033,7 @@ class GMX(Engine):
             calc_eigvecs[i] /= np.linalg.norm(calc_eigvecs[i])
         return calc_eigvals, calc_eigvecs
 
-    def generate_vsite_positions(self):
+    def generate_positions(self):
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
