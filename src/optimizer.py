@@ -785,7 +785,6 @@ class Optimizer(forcebalance.BaseClass):
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False,customdir="micro_%02i" % search_fun.micro)['X'] - data['X']
             logger.info("Searching! Diagonal addition = %.4e, L = % .4e, length %.4e, result % .4e\n" % ((L-1)**2,L,np.linalg.norm(dx),Result))
-            print search_fun.micro
             search_fun.micro += 1
             return Result
         search_fun.micro = 0
