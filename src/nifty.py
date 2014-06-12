@@ -798,7 +798,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                         tgtname = tnm
                         WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
-                logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
+                logger.warning("Task '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.tag, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
             else:
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
