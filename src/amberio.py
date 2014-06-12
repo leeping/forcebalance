@@ -7,7 +7,7 @@ modules for other programs because it's so simple.
 @date 01/2012
 """
 
-import os, sys
+import os, sys, re
 from re import match, sub, split, findall
 import networkx as nx
 from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles, warn_press_key, wopen
@@ -227,6 +227,451 @@ class FrcMod_Reader(BaseReader):
             # The suffix of the parameter ID is built from the atom    #
             # types/classes involved in the interaction.
             self.suffix = ''.join(self.atom)
+
+#=============================================================================================
+# AMBER parmtop loader (from 'zander', by Randall J. Radmer)
+#=============================================================================================
+
+# A regex for extracting print format info from the FORMAT lines.
+FORMAT_RE_PATTERN=re.compile("([0-9]+)([a-zA-Z]+)([0-9]+)\.?([0-9]*)")
+
+# Pointer labels which map to pointer numbers at top of prmtop files
+POINTER_LABELS  = """
+              NATOM,  NTYPES, NBONH,  MBONA,  NTHETH, MTHETA,
+              NPHIH,  MPHIA,  NHPARM, NPARM,  NEXT,   NRES,
+              NBONA,  NTHETA, NPHIA,  NUMBND, NUMANG, NPTRA,
+              NATYP,  NPHB,   IFPERT, NBPER,  NGPER,  NDPER,
+              MBPER,  MGPER,  MDPER,  IFBOX,  NMXRS,  IFCAP
+"""
+
+# Pointer labels (above) as a list, not string.
+POINTER_LABEL_LIST = POINTER_LABELS.replace(',', '').split()
+
+class PrmtopLoader(object):
+    """Parsed AMBER prmtop file.
+
+    ParmtopLoader reads, parses and manages content from a AMBER prmtop file.
+
+    EXAMPLES
+
+    Parse a prmtop file of alanine dipeptide in implicit solvent.
+
+    >>> import os, os.path
+    >>> directory = os.path.join(os.getenv('YANK_INSTALL_DIR'), 'test', 'systems', 'alanine-dipeptide-gbsa')
+    >>> prmtop_filename = os.path.join(directory, 'alanine-dipeptide.prmtop')
+    >>> prmtop = PrmtopLoader(prmtop_filename)
+
+    Parse a prmtop file of alanine dipeptide in explicit solvent.
+
+    >>> import os, os.path
+    >>> directory = os.path.join(os.getenv('YANK_INSTALL_DIR'), 'test', 'systems', 'alanine-dipeptide-explicit')
+    >>> prmtop_filename = os.path.join(directory, 'alanine-dipeptide.prmtop')
+    >>> prmtop = PrmtopLoader(prmtop_filename)    
+
+    """
+    def __init__(self, inFilename):
+        """
+        Create a PrmtopLoader object from an AMBER prmtop file.
+
+        ARGUMENTS
+
+        inFilename (string) - AMBER 'new-style' prmtop file, probably generated with one of the AMBER tleap/xleap/sleap        
+
+        """
+
+        self._prmtopVersion=None
+        self._flags=[]
+        self._raw_format={}
+        self._raw_data={}
+
+        fIn=open(inFilename)
+        for line in fIn:
+            if line.startswith('%VERSION'):
+                tag, self._prmtopVersion = line.rstrip().split(None, 1)
+            elif line.startswith('%FLAG'):
+                tag, flag = line.rstrip().split(None, 1)
+                self._flags.append(flag)
+                self._raw_data[flag] = []
+            elif line.startswith('%FORMAT'):
+                format = line.rstrip()
+                index0=format.index('(')
+                index1=format.index(')')
+                format = format[index0+1:index1]
+                m = FORMAT_RE_PATTERN.search(format)
+                self._raw_format[self._flags[-1]] = (format, m.group(1), m.group(2), m.group(3), m.group(4))
+            elif self._flags \
+                 and 'TITLE'==self._flags[-1] \
+                 and not self._raw_data['TITLE']:
+                self._raw_data['TITLE'] = line.rstrip()
+            else:
+                flag=self._flags[-1]
+                (format, numItems, itemType,
+                 itemLength, itemPrecision) = self._getFormat(flag)
+                iLength=int(itemLength)
+                line = line.rstrip()
+                for index in range(0, len(line), iLength):
+                    item = line[index:index+iLength]
+                    if item:
+                        self._raw_data[flag].append(item.strip())
+        fIn.close()
+
+    def _getFormat(self, flag=None):
+        if not flag:
+            flag=self._flags[-1]
+        return self._raw_format[flag]
+
+    def _getPointerValue(self, pointerLabel):
+        """Return pointer value given pointer label
+
+           Parameter:
+            - pointerLabel: a string matching one of the following:
+
+            NATOM  : total number of atoms 
+            NTYPES : total number of distinct atom types
+            NBONH  : number of bonds containing hydrogen
+            MBONA  : number of bonds not containing hydrogen
+            NTHETH : number of angles containing hydrogen
+            MTHETA : number of angles not containing hydrogen
+            NPHIH  : number of dihedrals containing hydrogen
+            MPHIA  : number of dihedrals not containing hydrogen
+            NHPARM : currently not used
+            NPARM  : currently not used
+            NEXT   : number of excluded atoms
+            NRES   : number of residues
+            NBONA  : MBONA + number of constraint bonds
+            NTHETA : MTHETA + number of constraint angles
+            NPHIA  : MPHIA + number of constraint dihedrals
+            NUMBND : number of unique bond types
+            NUMANG : number of unique angle types
+            NPTRA  : number of unique dihedral types
+            NATYP  : number of atom types in parameter file, see SOLTY below
+            NPHB   : number of distinct 10-12 hydrogen bond pair types
+            IFPERT : set to 1 if perturbation info is to be read in
+            NBPER  : number of bonds to be perturbed
+            NGPER  : number of angles to be perturbed
+            NDPER  : number of dihedrals to be perturbed
+            MBPER  : number of bonds with atoms completely in perturbed group
+            MGPER  : number of angles with atoms completely in perturbed group
+            MDPER  : number of dihedrals with atoms completely in perturbed groups
+            IFBOX  : set to 1 if standard periodic box, 2 when truncated octahedral
+            NMXRS  : number of atoms in the largest residue
+            IFCAP  : set to 1 if the CAP option from edit was specified
+        """
+        index = POINTER_LABEL_LIST.index(pointerLabel) 
+        return float(self._raw_data['POINTERS'][index])
+
+    def getNumAtoms(self):
+        """Return the number of atoms in the system"""
+        return int(self._getPointerValue('NATOM'))
+
+    def getNumTypes(self):
+        """Return the number of AMBER atoms types in the system"""
+        return int(self._getPointerValue('NTYPES'))
+
+    def getIfBox(self):
+        """Return True if the system was build with periodic boundary conditions (PBC)"""
+        return int(self._getPointerValue('IFBOX'))
+
+    def getIfCap(self):
+        """Return True if the system was build with the cap option)"""
+        return int(self._getPointerValue('IFCAP'))
+
+    def getIfPert(self):
+        """Return True if the system was build with the perturbation parameters)"""
+        return int(self._getPointerValue('IFPERT'))
+
+    def getMasses(self):
+        """Return a list of atomic masses in the system"""
+        try:
+            return self._massList
+        except AttributeError:
+            pass
+
+        self._massList=[]
+        raw_masses=self._raw_data['MASS']
+        for ii in range(self.getNumAtoms()):
+            self._massList.append(float(raw_masses[ii]))
+        self._massList = self._massList
+        return self._massList
+
+    def getCharges(self):
+        """Return a list of atomic charges in the system"""
+        try:
+            return self._chargeList
+        except AttributeError:
+            pass
+
+        self._chargeList=[]
+        raw_charges=self._raw_data['CHARGE']
+        for ii in range(self.getNumAtoms()):
+            self._chargeList.append(float(raw_charges[ii])/18.2223)
+        self._chargeList = self._chargeList
+        return self._chargeList
+
+    def getAtomName(self, iAtom):
+        """Return the atom name for iAtom"""
+        atomNames = self.getAtomNames()
+        return atomNames[iAtom]
+
+    def getAtomNames(self):
+        """Return the list of the system atom names"""
+        return self._raw_data['ATOM_NAME']
+
+    def _getAtomTypeIndexes(self):
+        try:
+            return self._atomTypeIndexes
+        except AttributeError:
+            pass
+        self._atomTypeIndexes=[]
+        for atomTypeIndex in  self._raw_data['ATOM_TYPE_INDEX']:
+            self._atomTypeIndexes.append(int(atomTypeIndex))
+        return self._atomTypeIndexes
+
+    def getAtomType(self, iAtom):
+        """Return the AMBER atom type for iAtom"""
+        atomTypes=self.getAtomTypes()
+        return atomTypes[iAtom]
+
+    def getAtomTypes(self):
+        """Return the list of the AMBER atom types"""
+        return self._raw_data['AMBER_ATOM_TYPE']
+
+    def getResidueNumber(self, iAtom):
+        """Return iAtom's residue number"""
+        return self._getResiduePointer(iAtom)+1
+
+    def getResidueLabel(self, iAtom=None, iRes=None):
+        """Return residue label for iAtom OR iRes"""
+        if iRes==None and iAtom==None:
+            raise Exception("only specify iRes or iAtom, not both")
+        if iRes!=None and iAtom!=None:
+            raise Exception("iRes or iAtom must be set")
+        if iRes!=None:
+            return self._raw_data['RESIDUE_LABEL'][iRes]
+        else:
+            return self.getResidueLabel(iRes=self._getResiduePointer(iAtom))
+
+    def _getResiduePointer(self, iAtom):
+        try:
+            return self.residuePointerDict[iAtom]
+        except:
+            pass
+        self.residuePointerDict = {}
+        resPointers=self._raw_data['RESIDUE_POINTER']
+        firstAtom = [int(p)-1 for p in resPointers]
+        firstAtom.append(self.getNumAtoms())
+        res = 0
+        for i in range(self.getNumAtoms()):
+            while firstAtom[res+1] <= i:
+                res += 1
+            self.residuePointerDict[i] = res
+        return self.residuePointerDict[iAtom]
+
+    def getNonbondTerms(self):
+        """Return list of all rVdw, epsilon pairs for each atom.  Work in the AMBER unit system."""
+        try:
+            return self._nonbondTerms
+        except AttributeError:
+            pass
+        self._nonbondTerms=[]
+        lengthConversionFactor = 1.0
+        energyConversionFactor = 1.0
+        for iAtom in range(self.getNumAtoms()):
+            numTypes=self.getNumTypes()
+            atomTypeIndexes=self._getAtomTypeIndexes()
+            index=(numTypes+1)*(atomTypeIndexes[iAtom]-1)
+            nbIndex=int(self._raw_data['NONBONDED_PARM_INDEX'][index])-1
+            if nbIndex<0:
+                raise Exception("10-12 interactions are not supported")
+            acoef = float(self._raw_data['LENNARD_JONES_ACOEF'][nbIndex])
+            bcoef = float(self._raw_data['LENNARD_JONES_BCOEF'][nbIndex])
+            try:
+                rMin = (2*acoef/bcoef)**(1/6.0)
+                epsilon = 0.25*bcoef*bcoef/acoef
+            except ZeroDivisionError:
+                rMin = 1.0
+                epsilon = 0.0
+            rVdw = rMin/2.0*lengthConversionFactor
+            epsilon = epsilon*energyConversionFactor
+            self._nonbondTerms.append( (rVdw, epsilon) )
+        return self._nonbondTerms
+
+    def _getBonds(self, bondPointers):
+        forceConstant=self._raw_data["BOND_FORCE_CONSTANT"]
+        bondEquil=self._raw_data["BOND_EQUIL_VALUE"]
+        returnList=[]
+        forceConstConversionFactor = 1.0
+        lengthConversionFactor = 1.0
+        for ii in range(0,len(bondPointers),3):
+             if int(bondPointers[ii])<0 or \
+                int(bondPointers[ii+1])<0:
+                 raise Exception("Found negative bonded atom pointers %s"
+                                 % ((bondPointers[ii],
+                                     bondPointers[ii+1]),))
+             iType=int(bondPointers[ii+2])-1
+             returnList.append((int(bondPointers[ii])/3,
+                                int(bondPointers[ii+1])/3,
+                                float(forceConstant[iType])*forceConstConversionFactor,
+                                float(bondEquil[iType])*lengthConversionFactor))
+        return returnList
+
+    def getBondsWithH(self):
+        """Return list of bonded atom pairs, K, and Rmin for each bond with a hydrogen"""
+        try:
+            return self._bondListWithH
+        except AttributeError:
+            pass
+        bondPointers=self._raw_data["BONDS_INC_HYDROGEN"]
+        self._bondListWithH = self._getBonds(bondPointers)
+        return self._bondListWithH
+        
+
+    def getBondsNoH(self):
+        """Return list of bonded atom pairs, K, and Rmin for each bond with no hydrogen"""
+        try:
+            return self._bondListNoH
+        except AttributeError:
+            pass
+        bondPointers=self._raw_data["BONDS_WITHOUT_HYDROGEN"]
+        self._bondListNoH = self._getBonds(bondPointers)
+        return self._bondListNoH
+
+    def getAngles(self):
+        """Return list of atom triplets, K, and ThetaMin for each bond angle"""
+        try:
+            return self._angleList
+        except AttributeError:
+            pass
+        forceConstant=self._raw_data["ANGLE_FORCE_CONSTANT"]
+        angleEquil=self._raw_data["ANGLE_EQUIL_VALUE"]
+        anglePointers = self._raw_data["ANGLES_INC_HYDROGEN"] \
+                       +self._raw_data["ANGLES_WITHOUT_HYDROGEN"]
+        self._angleList=[]
+        forceConstConversionFactor = 1.0
+        for ii in range(0,len(anglePointers),4):
+             if int(anglePointers[ii])<0 or \
+                int(anglePointers[ii+1])<0 or \
+                int(anglePointers[ii+2])<0:
+                 raise Exception("Found negative angle atom pointers %s"
+                                 % ((anglePointers[ii],
+                                     anglePointers[ii+1],
+                                     anglePointers[ii+2]),))
+             iType=int(anglePointers[ii+3])-1
+             self._angleList.append((int(anglePointers[ii])/3,
+                                int(anglePointers[ii+1])/3,
+                                int(anglePointers[ii+2])/3,
+                                float(forceConstant[iType])*forceConstConversionFactor,
+                                float(angleEquil[iType])))
+        return self._angleList
+
+    def getDihedrals(self):
+        """Return list of atom quads, K, phase and periodicity for each dihedral angle"""
+        try:
+            return self._dihedralList
+        except AttributeError:
+            pass
+        forceConstant=self._raw_data["DIHEDRAL_FORCE_CONSTANT"]
+        phase=self._raw_data["DIHEDRAL_PHASE"]
+        periodicity=self._raw_data["DIHEDRAL_PERIODICITY"]
+        dihedralPointers = self._raw_data["DIHEDRALS_INC_HYDROGEN"] \
+                          +self._raw_data["DIHEDRALS_WITHOUT_HYDROGEN"]
+        self._dihedralList=[]
+        forceConstConversionFactor = 1.0
+        for ii in range(0,len(dihedralPointers),5):
+             if int(dihedralPointers[ii])<0 or int(dihedralPointers[ii+1])<0:
+                 raise Exception("Found negative dihedral atom pointers %s"
+                                 % ((dihedralPointers[ii],
+                                    dihedralPointers[ii+1],
+                                    dihedralPointers[ii+2],
+                                    dihedralPointers[ii+3]),))
+             iType=int(dihedralPointers[ii+4])-1
+             self._dihedralList.append((int(dihedralPointers[ii])/3,
+                                int(dihedralPointers[ii+1])/3,
+                                abs(int(dihedralPointers[ii+2]))/3,
+                                abs(int(dihedralPointers[ii+3]))/3,
+                                float(forceConstant[iType])*forceConstConversionFactor,
+                                float(phase[iType]),
+                                int(0.5+float(periodicity[iType]))))
+        return self._dihedralList
+
+    def get14Interactions(self):
+        """Return list of atom pairs, chargeProduct, rMin and epsilon for each 1-4 interaction"""
+        dihedralPointers = self._raw_data["DIHEDRALS_INC_HYDROGEN"] \
+                          +self._raw_data["DIHEDRALS_WITHOUT_HYDROGEN"]
+        returnList=[]
+        charges=self.getCharges()
+        nonbondTerms = self.getNonbondTerms()
+        for ii in range(0,len(dihedralPointers),5):
+             if int(dihedralPointers[ii+2])>0 and int(dihedralPointers[ii+3])>0:
+                 iAtom = int(dihedralPointers[ii])/3
+                 lAtom = int(dihedralPointers[ii+3])/3
+                 chargeProd = charges[iAtom]*charges[lAtom]
+                 (rVdwI, epsilonI) = nonbondTerms[iAtom]
+                 (rVdwL, epsilonL) = nonbondTerms[lAtom]
+                 rMin = (rVdwI+rVdwL)
+                 epsilon = math.sqrt(epsilonI*epsilonL)
+                 returnList.append((iAtom, lAtom, chargeProd, rMin, epsilon))
+        return returnList
+
+    def getExcludedAtoms(self):
+        """Return list of lists, giving all pairs of atoms that should have no non-bond interactions"""
+        try:
+            return self._excludedAtoms
+        except AttributeError:
+            pass
+        self._excludedAtoms=[]
+        numExcludedAtomsList=self._raw_data["NUMBER_EXCLUDED_ATOMS"]
+        excludedAtomsList=self._raw_data["EXCLUDED_ATOMS_LIST"]
+        total=0
+        for iAtom in range(self.getNumAtoms()):
+            index0=total
+            n=int(numExcludedAtomsList[iAtom])
+            total+=n
+            index1=total
+            atomList=[]
+            for jAtom in excludedAtomsList[index0:index1]:
+                j=int(jAtom)
+                if j>0:
+                    atomList.append(j-1)
+            self._excludedAtoms.append(atomList)
+        return self._excludedAtoms
+
+    def getGBParms(self, symbls=None):
+        """Return list giving GB params, Radius and screening factor"""
+        try:
+            return self._gb_List
+        except AttributeError:
+            pass
+        self._gb_List=[]
+        radii=self._raw_data["RADII"]
+        screen=self._raw_data["SCREEN"]
+        # Update screening parameters for GBn if specified
+        if symbls:
+            for (i, symbl) in enumerate(symbls):
+                if symbl[0] == ('c' or 'C'):
+                    screen[i] = 0.48435382330
+                elif symbl[0] == ('h' or 'H'):
+                    screen[i] = 1.09085413633
+                elif symbl[0] == ('n' or 'N'):
+                    screen[i] = 0.700147318409
+                elif symbl[0] == ('o' or 'O'):
+                    screen[i] = 1.06557401132
+                elif symbl[0] == ('s' or 'S'):
+                    screen[i] = 0.602256336067
+                else:
+                    screen[i] = 0.5
+        lengthConversionFactor = 1.0
+        for iAtom in range(len(radii)):
+            self._gb_List.append((float(radii[iAtom])*lengthConversionFactor, float(screen[iAtom])))
+        return self._gb_List
+
+    def getBoxBetaAndDimensions(self):
+        """Return periodic boundary box beta angle and dimensions"""
+        beta=float(self._raw_data["BOX_DIMENSIONS"][0])
+        x=float(self._raw_data["BOX_DIMENSIONS"][1])
+        y=float(self._raw_data["BOX_DIMENSIONS"][2])
+        z=float(self._raw_data["BOX_DIMENSIONS"][3])
+        return (beta, x, y, z)
 
 class AMBER(Engine):
 
