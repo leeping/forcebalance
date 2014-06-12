@@ -381,7 +381,6 @@ class AbInitio(Target):
             # Build a list corresponding to the atom indices where we are fitting the forces.
             if isint(self.fitatoms_in):
                 if int(self.fitatoms_in) == 0:
-                    logger.info("Fitting the forces on all atoms\n")
                     self.fitatoms = self.qmatoms
                 else:
                     warn_press_key("Provided an integer for fitatoms; will assume this means the first %i atoms" % int(self.fitatoms_in))
@@ -393,8 +392,11 @@ class AbInitio(Target):
             if len(self.fitatoms) > len(self.qmatoms):
                 warn_press_key("There are more fitting atoms than the total number of atoms in the QM calculation (something is probably wrong)")
             else:
-                logger.info("Fitting the forces on atoms %s\n" % commadash(self.fitatoms))
-                logger.info("Pruning the quantum force matrix...\n")
+                if len(self.fitatoms) == len(self.qmatoms):
+                    logger.info("Fitting the forces on all atoms\n")
+                else:
+                    logger.info("Fitting the forces on atoms %s\n" % commadash(self.fitatoms))
+                    logger.info("Pruning the quantum force matrix...\n")
                 selct = list(itertools.chain(*[[3*i+j for j in range(3)] for i in self.fitatoms]))
                 self.fqm  = self.fqm[:, selct]
         else:
