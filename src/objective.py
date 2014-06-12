@@ -160,12 +160,12 @@ class Objective(forcebalance.BaseClass):
         printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
 
         
-    def Target_Terms(self, mvals, Order=0, verbose=False):
+    def Target_Terms(self, mvals, Order=0, verbose=False, customdir=None):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
         Objective = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         # Loop through the targets, stage the directories and submit the Work Queue processes.
         for Tgt in self.Targets:
-            Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2)
+            Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2, customdir=customdir)
         if self.asynchronous:
             # Asynchronous evaluation of objective function and Work Queue tasks.
             # Create a list of the targets, and remove them from the list as they are finished.
@@ -180,10 +180,10 @@ class Objective(forcebalance.BaseClass):
                         # List of functions that I can call.
                         Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
                         # Call the appropriate function
-                        Ans = Funcs[Order](mvals)
+                        Ans = Funcs[Order](mvals, customdir=customdir)
                         # Print out the qualitative indicators
                         if verbose:
-                            Tgt.meta_indicate()
+                            Tgt.meta_indicate(customdir=customdir)
                         # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
                         if not in_fd():
                             self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
@@ -203,10 +203,10 @@ class Objective(forcebalance.BaseClass):
                 # List of functions that I can call.
                 Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
                 # Call the appropriate function
-                Ans = Funcs[Order](mvals)
+                Ans = Funcs[Order](mvals, customdir=customdir)
                 # Print out the qualitative indicators
                 if verbose:
-                    Tgt.meta_indicate()
+                    Tgt.meta_indicate(customdir=customdir)
                 # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
                 if not in_fd():
                     self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
@@ -257,8 +257,8 @@ class Objective(forcebalance.BaseClass):
         printcool_dictionary(PrintDict,color=4,title=Title)
         return
 
-    def Full(self, mvals, Order=0, verbose=False):
-        Objective = self.Target_Terms(mvals, Order, verbose)
+    def Full(self, mvals, Order=0, verbose=False, customdir=None):
+        Objective = self.Target_Terms(mvals, Order, verbose, customdir)
         ## Compute the penalty function.
         Extra = self.Penalty.compute(mvals,Objective)
         Objective['X0'] = Objective['X']

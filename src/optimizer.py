@@ -783,9 +783,12 @@ class Optimizer(forcebalance.BaseClass):
             dx, sol = solver(L) # dx is how much the step changes from the previous step.
             # This is our trial step.
             xk_ = dx + xk
-            Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
+            Result = self.Objective.Full(xk_,0,verbose=False,customdir="micro_%02i" % search_fun.micro)['X'] - data['X']
             logger.info("Searching! Diagonal addition = %.4e, L = % .4e, length %.4e, result % .4e\n" % ((L-1)**2,L,np.linalg.norm(dx),Result))
+            print search_fun.micro
+            search_fun.micro += 1
             return Result
+        search_fun.micro = 0
         
         if self.trust0 > 0: # This is the trust region code.
             bump = False
@@ -812,6 +815,7 @@ class Optimizer(forcebalance.BaseClass):
             dxnorm = np.linalg.norm(dx)
             logger.info("Starting Hessian diagonal search with step size %.4e\n" % dxnorm)
             bump = False
+            search_fun.micro = 0
             Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             if Result[1] > 0:
                 LOpt = optimize.brent(h_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)

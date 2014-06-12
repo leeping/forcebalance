@@ -179,9 +179,9 @@ class Target(forcebalance.BaseClass):
             if not os.path.exists(os.path.join(self.root,self.tempdir)):
                 os.makedirs(os.path.join(self.root,self.tempdir))
 
-    def get_X(self,mvals=None):
+    def get_X(self,mvals=None,customdir=None):
         """Computes the objective function contribution without any parametric derivatives"""
-        Ans = self.meta_get(mvals,0,0)
+        Ans = self.meta_get(mvals,0,0,customdir=customdir)
         self.xct += 1
         if Ans['X'] != Ans['X']:
             return {'X':1e10, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
@@ -259,7 +259,7 @@ class Target(forcebalance.BaseClass):
                 print >> fout, pid
             fout.close()
 
-    def get_G(self,mvals=None):
+    def get_G(self,mvals=None,customdir=None):
         """Computes the objective function contribution and its gradient.
 
         First the low-level 'get' method is called with the analytic gradient
@@ -276,7 +276,7 @@ class Target(forcebalance.BaseClass):
         recorded in a text file in the targets directory.
 
         """
-        Ans = self.meta_get(mvals,1,0)
+        Ans = self.meta_get(mvals,1,0,customdir=customdir)
         for i in self.pgrad:
             if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
                 if self.fdhessdiag:
@@ -288,7 +288,7 @@ class Target(forcebalance.BaseClass):
             self.write_0grads(Ans)
         return Ans
 
-    def get_H(self,mvals=None):
+    def get_H(self,mvals=None,customdir=None):
         """Computes the objective function contribution and its gradient / Hessian.
 
         First the low-level 'get' method is called with the analytic gradient
@@ -300,7 +300,7 @@ class Target(forcebalance.BaseClass):
         Hessian elements by finite difference.  Forward finite difference is used
         throughout for the sake of speed.
         """
-        Ans = self.meta_get(mvals,1,1)
+        Ans = self.meta_get(mvals,1,1,customdir=customdir)
         if self.fdhess:
             for i in self.pgrad:
                 if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
@@ -473,7 +473,7 @@ class Target(forcebalance.BaseClass):
         iterints = [int(d.replace('iter_','')) for d in os.listdir(abs_rd) if os.path.isdir(os.path.join(abs_rd, d))]
         return sorted(iterints)[-1]
 
-    def meta_indicate(self):
+    def meta_indicate(self, customdir=None):
 
         """ 
 
@@ -485,7 +485,8 @@ class Target(forcebalance.BaseClass):
         """
         # Using the module level logger
         logger = getLogger(__name__)
-        if self.rd != None and Counter() == First() and self.read_indicate:
+        # Note that reading information is not supported for custom folders (e.g. microiterations during search)
+        if self.rd != None and Counter() == First() and self.read_indicate and customdir == None:
             # Move into the directory for reading data, 
             cwd = os.getcwd()
             os.chdir(self.absrd())
@@ -546,7 +547,8 @@ class Target(forcebalance.BaseClass):
         self.link_from_tempdir(absgetdir)
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Read existing information from disk (i.e. when recovering an aborted run)
-        if self.rd != None and Counter() == First() and self.read_objective:
+        # Note that reading information is not supported for custom folders (e.g. microiterations during search)
+        if self.rd != None and Counter() == First() and self.read_objective and customdir == None:
             os.chdir(self.absrd())
             logger.info("Reading objective function information from %s\n" % os.getcwd())
             Answer = self.read(mvals, AGrad, AHess)
@@ -605,7 +607,11 @@ class Target(forcebalance.BaseClass):
             self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
-        if self.rd == None or Counter() > First(): self.submit_jobs(mvals, AGrad, AHess)
+        if self.rd == None or Counter() > First(): 
+            self.submit_jobs(mvals, AGrad, AHess)
+        elif customdir != None:
+            # Allows us to submit micro-iteration jobs for remote targets
+            self.submit_jobs(mvals, AGrad, AHess)
         os.chdir(cwd)
         
         return
