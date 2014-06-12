@@ -371,9 +371,11 @@ class ITP_Reader(BaseReader):
         if len(s) == 0 or re.match('^ *;',line): return None, None
         # Now go through all the cases.
         if re.match('^#', line):
-            self.override = 'DEFINE:' + s[1]
-        elif hasattr(self, 'override'):
-            delattr(self, 'override')
+            self.overpfx = 'DEFINE'
+            self.oversfx = s[1]
+        elif hasattr(self, 'overpfx'):
+            delattr(self, 'overpfx')
+            delattr(self, 'oversfx')
 
         if re.match('^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
