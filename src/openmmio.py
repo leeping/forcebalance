@@ -769,6 +769,10 @@ class OpenMM(Engine):
         self.simulation.context.setPositions(self.xyz_omms[shot][0])
         self.simulation.context.computeVirtualSites()
 
+    def get_charges(self):
+        logger.error('OpenMM engine does not have get_charges (should be trivial to implement however.)')
+        raise NotImplementedError
+
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
         [a,b,c] = box_vectors

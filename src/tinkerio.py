@@ -631,6 +631,10 @@ class TINKER(Engine):
             Result["Force"] = np.array(F)
         return Result
 
+    def get_charges(self):
+        logger.error('TINKER engine does not have get_charges (should be easy to implement however.)')
+        raise NotImplementedError
+
     def energy_force_one(self, shot):
 
         """ Computes the energy and force using TINKER for one snapshot. """

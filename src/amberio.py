@@ -762,7 +762,7 @@ class AMBER(Engine):
         o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
         return o
 
-    def leap(self, name=None, delcheck=False):
+    def leap(self, name=None, delcheck=False, read_prmtop=True):
         if not os.path.exists(self.leapcmd):
             LinkFile(self.absleap, self.leapcmd)
         pdb = os.path.basename(self.abspdb)
@@ -771,10 +771,19 @@ class AMBER(Engine):
         if name == None: name = self.name
         write_leap(self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, pdb=pdb, prefix=name, spath=self.spath, delcheck=delcheck)
         self.callamber("tleap -f %s_" % self.leapcmd)
+        if read_prmtop:
+            prmtop = PrmtopLoader('%s.prmtop' % name)
+            self.AtomLists['Charge'] = prmtop.getCharges()
+
+    def get_charges(self):
+        self.leap(read_prmtop=True)
+        return np.array(self.AtomLists['Charge'])
 
     def prepare(self, pbc=False, **kwargs):
 
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
+
+        self.AtomLists = defaultdict(list)
 
         if hasattr(self,'FF'):
             if not (os.path.exists(self.FF.amber_frcmod) and os.path.exists(self.FF.amber_mol2)):
@@ -798,6 +807,9 @@ class AMBER(Engine):
 
         # Figure out the topology information.
         self.leap()
+        
+        # This is done by "rdparm" although I could actually use the PrmtopLoader now.
+        # (Code written before I knew about the PrmtopLoader)
         o = self.callamber("rdparm %s.prmtop" % self.name, 
                            stdin="printAtoms\nprintBonds\nexit\n", 
                            persist=True, print_error=False)
@@ -808,7 +820,6 @@ class AMBER(Engine):
         os.unlink("leap.log")
 
         mode = 'None'
-        self.AtomLists = defaultdict(list)
         G = nx.Graph()
         for line in o:
             s = line.split()
