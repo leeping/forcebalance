@@ -352,6 +352,13 @@ class AbInitio(Target):
                 self.espxyz.append([float(i) for i in sline[1:]])
             elif sline[0] == 'ESPVAL':
                 self.espval.append([float(i) for i in sline[1:]])
+        
+        # Ensure that all lists are of length self.ns
+        self.eqm = self.eqm[:self.ns]
+        self.emd0 = self.emd0[:self.ns]
+        self.fqm = self.fqm[:self.ns]
+        self.espxyz = self.espxyz[:self.ns]
+        self.espval = self.espval[:self.ns]
 
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
         self.eqm = np.array(self.eqm)
