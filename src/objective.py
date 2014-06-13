@@ -46,7 +46,7 @@ except:
     logger.warning("Counterpoise module import failed\n")
 
 try:
-    from forcebalance.amberio import AbInitio_AMBER
+    from forcebalance.amberio import AbInitio_AMBER, Interaction_AMBER, Vibration_AMBER
 except:
     logger.warning(traceback.format_exc())
     logger.warning("Amber module import failed\n")
@@ -72,6 +72,7 @@ Implemented_Targets = {
     'ABINITIO_INTERNAL':AbInitio_Internal,
     'VIBRATION_TINKER':Vibration_TINKER,
     'VIBRATION_GMX':Vibration_GMX,
+    'VIBRATION_AMBER':Vibration_AMBER,
     'THERMO_GMX':Thermo_GMX,
     'LIQUID_OPENMM':Liquid_OpenMM,
     'LIQUID_TINKER':Liquid_TINKER, 
@@ -80,6 +81,7 @@ Implemented_Targets = {
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'RDVR3_PSI4':RDVR3_Psi4,
+    'INTERACTION_AMBER':Interaction_AMBER,
     'INTERACTION_GMX':Interaction_GMX,
     'INTERACTION_TINKER':Interaction_TINKER,
     'INTERACTION_OPENMM':Interaction_OpenMM,

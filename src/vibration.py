@@ -113,7 +113,7 @@ class Vibration(Target):
         if self.reassign == 'overlap' : count_assignment(self.c2r)
         banner = "Frequencies (wavenumbers)"
         headings = ["Mode #", "Reference", "Calculated", "Difference", "Ref(dot)Calc"]
-        data = OrderedDict([(i, [self.ref_eigvals[i], self.calc_eigvals[i], self.calc_eigvals[i] - self.ref_eigvals[i], "%.4f" % self.overlaps[i]]) for i in range(len(self.ref_eigvals))])
+        data = OrderedDict([(i, ["%.4f" % self.ref_eigvals[i], "%.4f" % self.calc_eigvals[i], "%.4f" % (self.calc_eigvals[i] - self.ref_eigvals[i]), "%.4f" % self.overlaps[i]]) for i in range(len(self.ref_eigvals))])
         self.printcool_table(data, headings, banner)
         return
 

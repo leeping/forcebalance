@@ -117,7 +117,8 @@ FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', '
 # tinkersuf  = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
 # resid      = Residue IDs (can come from MM coordinate file)
 # resname    = Residue names
-AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode'])
+# terminal   = List of true/false denoting whether this atom is followed by a terminal group.
+AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode', 'terminal'])
 #=========================================#
 #| This can be any data attribute we     |#
 #| want but it's usually some property   |#
@@ -2285,11 +2286,19 @@ class Molecule(object):
         Box = None
         #Separate into distinct lists for each model.
         PDBLines=[[]]
+        # LPW: Keep a record of atoms which are followed by a terminal group.
+        PDBTerms=[]
+        ReadTerms = True
         for x in ParsedPDB[0]:
             if x.__class__ in [END, ENDMDL]:
                 PDBLines.append([])
+                ReadTerms = False
             if x.__class__ in [ATOM, HETATM]:
                 PDBLines[-1].append(x)
+                if ReadTerms:
+                    PDBTerms.append(0)
+            if x.__class__ in [TER] and ReadTerms:
+                PDBTerms[-1] = 1
             if x.__class__==CRYST1:
                 Box = BuildLatticeFromLengthsAngles(x.a, x.b, x.c, x.alpha, x.beta, x.gamma)
 
@@ -2302,7 +2311,7 @@ class Molecule(object):
         AtomNames=np.array([x.name for x in X],'str')
         ResidueNames=np.array([x.resName for x in X],'str')
         ResidueID=np.array([x.resSeq for x in X],'int')
-        # Try not to number Residue IDs starting from 1...
+        # LPW: Try not to number Residue IDs starting from 1...
         if self.positive_resid:
             ResidueID=ResidueID-ResidueID[0]+1
 
@@ -2343,7 +2352,8 @@ class Molecule(object):
 
         Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":[str(i) for i in AtomNames],
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
-                "comms":['' for i in range(len(XYZList))]}
+                "comms":['' for i in range(len(XYZList))],
+                "terminal" : PDBTerms}
 
         if len(bonds) > 0:
             Answer["bonds"] = bonds
@@ -2836,41 +2846,8 @@ class Molecule(object):
         dcd = None
 
     def write_pdb(self, select, **kwargs):
-        """Save to a PDB. Copied wholesale from MSMBuilder.
-        COLUMNS  TYPE   FIELD  DEFINITION
-        ---------------------------------------------
-        7-11      int   serial        Atom serial number.
-        13-16     string name          Atom name.
-        17        string altLoc        Alternate location indicator.
-        18-20 (17-21 KAB)    string resName       Residue name.
-        22        string chainID       Chain identifier.
-        23-26     int    resSeq        Residue sequence number.
-        27        string iCode         Code for insertion of residues.
-        31-38     float  x             Orthogonal coordinates for X in
-        Angstroms.
-        39-46     float  y             Orthogonal coordinates for Y in
-        Angstroms.
-        47-54     float  z             Orthogonal coordinates for Z in
-        Angstroms.
-        55-60     float  occupancy     Occupancy.
-        61-66     float  tempFactor    Temperature factor.
-        73-76     string segID         Segment identifier, left-justified.
-        77-78     string element       Element symbol, right-justified.
-        79-80     string charge        Charge on the atom.
+        """Save to a PDB. Copied wholesale from MSMBuilder. """
 
-        CRYST1 line, added by Lee-Ping
-        COLUMNS  TYPE   FIELD  DEFINITION
-        ---------------------------------------
-         7-15    float  a      a (Angstroms).
-        16-24    float  b      b (Angstroms).
-        25-33    float  c      c (Angstroms).
-        34-40    float  alpha  alpha (degrees).
-        41-47    float  beta   beta (degrees).
-        48-54    float  gamma  gamma (degrees).
-        56-66    string sGroup Space group.
-        67-70    int    z      Z value.
-
-        """
         if sys.stdin.isatty():
             self.require('xyzs')
             self.require_resname()
@@ -2899,6 +2876,20 @@ class Molecule(object):
         if min(RESNUMS) == 0:
             RESNUMS = [i+1 for i in RESNUMS]
 
+        """
+        CRYST1 line, added by Lee-Ping
+        COLUMNS  TYPE   FIELD  DEFINITION
+        ---------------------------------------
+         7-15    float  a      a (Angstroms).
+        16-24    float  b      b (Angstroms).
+        25-33    float  c      c (Angstroms).
+        34-40    float  alpha  alpha (degrees).
+        41-47    float  beta   beta (degrees).
+        48-54    float  gamma  gamma (degrees).
+        56-66    string sGroup Space group.
+        67-70    int    z      Z value.
+        """
+
         if 'boxes' in self.Data:
             a = self.boxes[0].a
             b = self.boxes[0].b
@@ -2923,17 +2914,40 @@ class Molecule(object):
             
         for I in select:
             XYZ = self.xyzs[I]
+            Serial = 1
             for i in range(self.na):
-                ATOMNUM = i + 1
+                """
+                ATOM line.
+                COLUMNS  TYPE   FIELD  DEFINITION
+                ---------------------------------------------
+                7-11      int   serial        Atom serial number.
+                13-16     string name          Atom name.
+                17        string altLoc        Alternate location indicator.
+                18-20 (17-21 KAB)    string resName       Residue name.
+                22        string chainID       Chain identifier.
+                23-26     int    resSeq        Residue sequence number.
+                27        string iCode         Code for insertion of residues.
+                31-38     float  x             Orthogonal coordinates for X in
+                Angstroms.
+                39-46     float  y             Orthogonal coordinates for Y in
+                Angstroms.
+                47-54     float  z             Orthogonal coordinates for Z in
+                Angstroms.
+                55-60     float  occupancy     Occupancy.
+                61-66     float  tempFactor    Temperature factor.
+                73-76     string segID         Segment identifier, left-justified.
+                77-78     string element       Element symbol, right-justified.
+                79-80     string charge        Charge on the atom.
+                """
                 line=np.chararray(80)
                 line[:]=' '
                 line[0:4]=np.array(list("ATOM"))
                 line=np.array(line,'str')
-                line[6:11]=np.array(list(str(ATOMNUM%100000).rjust(5)))
-                # if ATOMNUM < 100000:
-                #     line[6:11]=np.array(list(str(ATOMNUM%100000).rjust(5)))
+                line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
+                # if Serial < 100000:
+                #     line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
                 # else:
-                #     line[6:11]=np.array(list(hex(ATOMNUM)[2:].rjust(5)))
+                #     line[6:11]=np.array(list(hex(Serial)[2:].rjust(5)))
                 #Molprobity is picky about atom name centering
                 if len(str(ATOMS[i]))==3:
                     line[12:16]=np.array(list(str(ATOMS[i]).rjust(4)))
@@ -2966,8 +2980,33 @@ class Molecule(object):
                 line[38:46]=np.array(list(("%8.3f"%(y))))
                 line[46:54]=np.array(list(("%8.3f"%(z))))
 
-                if ATOMNUM!=-1:
+                if Serial!=-1:
                     out.append(line.tostring())
+                Serial += 1
+
+                if 'terminal' in self.Data and self.terminal[i]:
+                    """
+                    TER line, added by Lee-Ping
+                    COLUMNS  TYPE   FIELD   DEFINITION
+                    -------------------------------------------
+                    7-11    int    serial  Serial number.
+                    18-20    string resName Residue name.
+                    22       string chainID Chain identifier.
+                    23-26    int    resSeq  Residue sequence number.
+                    27       string iCode   Insertion code.
+                    """
+                    line=np.chararray(27)
+                    line[:] = ' '
+                    line[0:3]=np.array(list("TER"))
+                    line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
+                    if len(str(RESNAMES[i]))==3:
+                        line[17:20]=np.array(list(str(RESNAMES[i])))
+                    else:
+                        line[17:21]=np.array(list(str(RESNAMES[i]).ljust(4)))
+                    line[21]=str(CHAIN[i]).rjust(1)
+                    line[22:26]=np.array(list(str(RESNUMS[i]%10000).rjust(4)))
+                    out.append(line.tostring())
+                    Serial += 1
             out.append('ENDMDL')
         if 'bonds' in self.Data:
             connects = ["CONECT%5i" % (b0+1) + "".join(["%5i" % (b[1]+1) for b in self.bonds if b[0] == b0]) for b0 in sorted(list(set(b[0] for b in self.bonds)))]
