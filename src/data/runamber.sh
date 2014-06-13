@@ -24,6 +24,8 @@ COMMAND=$@
 # Load Gromacs environment variables if needed (e.g. Intel compiler variables)
 if [[ $HOSTNAME =~ "sh" ]] ; then
     . /share/sw/licensed/intel-cluster-studio-2013.1.046/composer_xe_2013_sp1.2.144/bin/compilervars.sh intel64
+elif [[ $HOSTNAME =~ "biox" ]] ; then
+    . /home/leeping/opt/intel/bin/compilervars.sh intel64
 fi
 
 # Backup folder
