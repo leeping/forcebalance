@@ -8,6 +8,7 @@ modules for other programs because it's so simple.
 """
 
 import os, sys, re
+import copy
 from re import match, sub, split, findall
 import networkx as nx
 from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles, warn_press_key, wopen
@@ -15,6 +16,8 @@ import numpy as np
 from forcebalance import BaseReader
 from forcebalance.engine import Engine
 from forcebalance.abinitio import AbInitio
+from forcebalance.interaction import Interaction
+from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
 from collections import OrderedDict, defaultdict
 
@@ -679,7 +682,7 @@ class AMBER(Engine):
 
     def __init__(self, name="amber", **kwargs):
         ## Keyword args that aren't in this list are filtered out.
-        self.valkwd = ['amberhome', 'pdb', 'mol2', 'frcmod', 'leapcmd', 'nbcut']
+        self.valkwd = ['amberhome', 'pdb', 'mol2', 'frcmod', 'leapcmd', 'nbcut', 'reqpdb']
         super(AMBER,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -688,9 +691,9 @@ class AMBER(Engine):
 
         if 'amberhome' in kwargs:
             self.amberhome = kwargs['amberhome']
-            if not os.path.exists(os.path.join(self.amberhome,"sander")):
+            if not os.path.exists(os.path.join(self.amberhome, "bin", "sander")):
                 warn_press_key("The 'sander' executable indicated by %s doesn't exist! (Check amberhome)" \
-                                   % os.path.join(self.amberhome,"sander"))
+                                   % os.path.join(self.amberhome,"bin","sander"))
         else:
             warn_once("The 'amberhome' option was not specified; using default.")
             if which('sander') == '':
@@ -724,17 +727,13 @@ class AMBER(Engine):
         elif 'coords' in kwargs:
             crdfile = onefile(kwargs.get('coords'), None, err=True)
             self.mol = Molecule(crdfile, build_topology=False)
-
-        # AMBER has certain PDB requirements, so we will absolutely require one.
-        needpdb = True
-        # if hasattr(self, 'mol') and all([i in self.mol.Data.keys() for i in ["chain", "atomname", "resid", "resname", "elem"]]):
-        #     needpdb = False
+        reqpdb = kwargs.get('reqpdb', 1)
 
         # Determine the PDB file name.
         # If 'pdb' is provided to Engine initialization, it will be used to 
         # copy over topology information (chain, atomname etc.).  If mol/coords
         # is not provided, then it will also provide the coordinates.
-        pdbfnm = onefile(kwargs.get('pdb'), 'pdb' if needpdb else None, err=needpdb)
+        pdbfnm = onefile(kwargs.get('pdb'), 'pdb' if reqpdb else None, err=reqpdb)
         if pdbfnm != None:
             mpdb = Molecule(pdbfnm, build_topology=False)
             if hasattr(self, 'mol'):
@@ -742,6 +741,9 @@ class AMBER(Engine):
                     self.mol.Data[i] = mpdb.Data[i]
             else:
                 self.mol = copy.deepcopy(mpdb)
+        else:
+            pdbfnm = self.name + ".pdb"
+            self.mol[0].write(pdbfnm)
         self.abspdb = os.path.abspath(pdbfnm)
 
         # Write the PDB that AMBER is going to read in.
@@ -945,22 +947,22 @@ do_debugf = 1, dumpfrc = 1
         return Result
 
     def energy_force_one(self, shot):
-
-        """ Computes the energy and force using TINKER for one snapshot. """
-
-        self.mol[shot].write("%s.xyz" % self.name, ftype="tinker")
-        Result = self.evaluate_("%s.xyz" % self.name, force=True)
+        
+        """ Computes the energy and force using AMBER for one snapshot. """
+        
+        self.mol[shot].write("%s.mdcrd" % self.name, ftype="mdcrd")
+        Result = self.evaluate_("%s.mdcrd" % self.name, force=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
 
     def energy(self):
 
-        """ Computes the energy using TINKER over a trajectory. """
+        """ Computes the energy using AMBER over a trajectory. """
 
-        if hasattr(self, 'md_trajectory') : 
+        if hasattr(self, 'md_trajectory'): 
             x = self.md_trajectory
         else:
             x = "%s-all.crd" % self.name
-            self.mol.write(x, ftype="tinker")
+            self.mol.write(x, ftype="mdcrd")
         return self.evaluate_(x)["Energy"]
 
     def energy_force(self):
@@ -1033,36 +1035,63 @@ do_debugf = 1, dumpfrc = 1
         return E, rmsd
 
     def normal_modes(self, shot=0, optimize=True):
-
-        logger.error('Normal modes are not yet implemented in AMBER interface')
-        raise NotImplementedError
-
-        # Copied from tinkerio.py
+        self.leap(delcheck=True)
         if optimize:
-            self.optimize(shot, crit=1e-6)
-            o = self.calltinker("vibrate %s.xyz_2 a" % (self.name))
-        else:
-            warn_once("Asking for normal modes without geometry optimization?")
-            self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
-            o = self.calltinker("vibrate %s.xyz a" % (self.name))
-        # Read the TINKER output.  The vibrational frequencies are ordered.
-        # The six modes with frequencies closest to zero are ignored
-        readev = False
-        calc_eigvals = []
-        calc_eigvecs = []
-        for line in o:
-            s = line.split()
-            if "Vibrational Normal Mode" in line:
-                freq = float(s[-2])
-                readev = False
-                calc_eigvals.append(freq)
-                calc_eigvecs.append([])
-            elif "Atom" in line and "Delta X" in line:
-                readev = True
-            elif readev and len(s) == 4 and all([isint(s[0]), isfloat(s[1]), isfloat(s[2]), isfloat(s[3])]):
-                calc_eigvecs[-1].append([float(i) for i in s[1:]])
-        calc_eigvals = np.array(calc_eigvals)
-        calc_eigvecs = np.array(calc_eigvecs)
+            # Copied from AMBER tests folder.
+            opt_temp = """  Newton-Raphson minimization
+ &data
+     ntrun = 4, nsave=20, ndiag=2, cut={cut}
+     nprint=1, ioseen=0,
+     drms = 0.000001, maxcyc=400, bdwnhl=0.1, dfpred = 0.1,
+     scnb=2.0, scee=1.2, idiel=1,
+ /
+"""
+            with wopen("%s-nr.in" % self.name) as f: print >> f, opt_temp.format(cut="%i" % self.nbcut)
+            self.callamber("nmode -O -i %s-nr.in -c %s.inpcrd -p %s.prmtop -r %s.rst -o %s-nr.out" % (self.name, self.name, self.name, self.name, self.name))
+        nmode_temp = """  normal modes
+ &data
+     ntrun = 1, nsave=20, ndiag=2, cut={cut}
+     nprint=1, ioseen=0,
+     drms = 0.0001, maxcyc=1, bdwnhl=1.1, dfpred = 0.1,
+     scnb=2.0, scee=1.2, idiel=1,
+     nvect={nvect}, eta=0.9, ivform=2,
+ /
+"""
+        with wopen("%s-nmode.in" % self.name) as f: print >> f, nmode_temp.format(cut="%i" % self.nbcut, nvect=3*self.mol.na)
+        self.callamber("nmode -O -i %s-nmode.in -c %s.rst -p %s.prmtop -v %s-vecs.out -o %s-vibs.out" % (self.name, self.name, self.name, self.name, self.name))
+        # My attempt at parsing AMBER frequency output.
+        vmode = 0
+        ln = 0
+        freqs = []
+        modeA = []
+        modeB = []
+        modeC = []
+        vecs = []
+        for line in open("%s-vecs.out" % self.name).readlines():
+            if line.strip() == "$FREQ":
+                vmode = 1
+            elif line.strip().startswith("$"):
+                vmode = 0
+            elif vmode == 1: 
+                # We are in the vibrational block now.
+                if ln == 0: pass
+                elif ln == 1:
+                    freqs += [float(i) for i in line.split()]
+                else:
+                    modeA.append([float(i) for i in line.split()[0:3]])
+                    modeB.append([float(i) for i in line.split()[3:6]])
+                    modeC.append([float(i) for i in line.split()[6:9]])
+                    if len(modeA) == self.mol.na:
+                        vecs.append(modeA)
+                        vecs.append(modeB)
+                        vecs.append(modeC)
+                        modeA = []
+                        modeB = []
+                        modeC = []
+                        ln = -1
+                ln += 1
+        calc_eigvals = np.array(freqs)
+        calc_eigvecs = np.array(vecs)
         # Sort by frequency absolute value and discard the six that are closest to zero
         calc_eigvecs = calc_eigvecs[np.argsort(np.abs(calc_eigvals))][6:]
         calc_eigvals = calc_eigvals[np.argsort(np.abs(calc_eigvals))][6:]
@@ -1179,10 +1208,8 @@ do_debugf = 1, dumpfrc = 1
         
         """ Calculate the interaction energy for two fragments. """
 
-        logger.error('Interaction energy is not yet implemented in AMBER interface')
-        raise NotImplementedError
-        self.A = TINKER(name="A", mol=self.mol.atom_select(fraga), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
-        self.B = TINKER(name="B", mol=self.mol.atom_select(fragb), tinker_key="%s.key" % self.name, tinkerpath=self.tinkerpath)
+        self.A = AMBER(name="A", mol=self.mol.atom_select(fraga), amberhome=self.amberhome, leapcmd=self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, reqpdb=False)
+        self.B = AMBER(name="B", mol=self.mol.atom_select(fragb), amberhome=self.amberhome, leapcmd=self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, reqpdb=False)
 
         # Interaction energy needs to be in kcal/mol.
         return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
@@ -1366,8 +1393,7 @@ do_debugf = 1, dumpfrc = 1
 class AbInitio_AMBER(AbInitio):
 
     """Subclass of Target for force and energy matching
-    using AMBER.  Implements the prepare and energy_force_driver
-    methods.  The get method is in the base class.  """
+    using AMBER."""
 
     def __init__(self,options,tgt_opts,forcefield):
         ## Coordinate file.
@@ -1384,3 +1410,44 @@ class AbInitio_AMBER(AbInitio):
         self.engine_ = AMBER
         ## Initialize base class.
         super(AbInitio_AMBER,self).__init__(options,tgt_opts,forcefield)
+
+class Interaction_AMBER(Interaction):
+
+    """Subclass of Target for calculating and matching ineraction energies
+    using AMBER.  """
+
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Coordinate file.
+        self.set_option(tgt_opts, 'coords')
+        ## PDB file for topology (if different from coordinate file.)
+        self.set_option(tgt_opts, 'pdb')
+        ## AMBER home directory.
+        self.set_option(options, 'amberhome')
+        ## AMBER home directory.
+        self.set_option(tgt_opts, 'amber_leapcmd', 'leapcmd')
+        ## Nonbonded cutoff for AMBER (pacth).
+        self.set_option(options, 'amber_nbcut', 'nbcut')
+        ## Name of the engine.
+        self.engine_ = AMBER
+        ## Initialize base class.
+        super(Interaction_AMBER,self).__init__(options,tgt_opts,forcefield)
+
+class Vibration_AMBER(Vibration):
+
+    """Subclass of Target for calculating and matching vibrational modes using AMBER. """
+
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Coordinate file.
+        self.set_option(tgt_opts, 'coords')
+        ## PDB file for topology (if different from coordinate file.)
+        self.set_option(tgt_opts, 'pdb')
+        ## AMBER home directory.
+        self.set_option(options, 'amberhome')
+        ## AMBER home directory.
+        self.set_option(tgt_opts, 'amber_leapcmd', 'leapcmd')
+        ## Nonbonded cutoff for AMBER (pacth).
+        self.set_option(options, 'amber_nbcut', 'nbcut')
+        ## Name of the engine.
+        self.engine_ = AMBER
+        ## Initialize base class.
+        super(Vibration_AMBER,self).__init__(options,tgt_opts,forcefield)
