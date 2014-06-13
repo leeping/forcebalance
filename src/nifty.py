@@ -648,10 +648,10 @@ def lp_dump(obj, fnm, protocol=0):
     if os.path.islink(fnm):
         logger.warn("Trying to write to a symbolic link %s, removing it first\n" % fnm)
         os.unlink(fnm)
-    if HaveBZ2:
-        f = bz2.BZ2File(fnm, 'wb')
-    elif HaveGZ:
+    if HaveGZ:
         f = gzip.GzipFile(fnm, 'wb')
+    elif HaveBZ2:
+        f = bz2.BZ2File(fnm, 'wb')
     else:
         f = open(fnm, 'wb')
     Pickler_LP(f, protocol).dump(obj)
@@ -682,20 +682,20 @@ def lp_load(fnm):
         f.close()
         return answer
         
-    if HaveBZ2:
+    if HaveGZ:
         try: 
-            answer = load_bz2()
+            answer = load_gz()
         except:
-            if HaveGZ:
+            if HaveBZ2:
                 try:
-                    answer = load_gz()
+                    answer = load_bz2()
                 except:
                     answer = load_uncompress()
             else:
                 answer = load_uncompress()
-    elif HaveGZ:
+    elif HaveBZ2:
         try:
-            answer = load_gz()
+            answer = load_bz2()
         except:
             answer = load_uncompress()
     else:
