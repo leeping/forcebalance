@@ -86,7 +86,7 @@ class Interaction(Target):
             self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
         if self.select2 == None:
             self.select2 = [i for i in range(self.mol.na) if i not in self.select1]
-            logger.info('Fragment 2 is the complement of fragment 1 + %s\n' % (commadash(self.select2)))
+            logger.info('Fragment 2 is the complement of fragment 1 : %s\n' % (commadash(self.select2)))
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(self.OptionDict.items() + options.items())
         del engine_args['name']

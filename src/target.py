@@ -95,6 +95,9 @@ class Target(forcebalance.BaseClass):
         self.set_option(options, 'root')
         ## Name of the target
         self.set_option(tgt_opts, 'name')
+        if self.name in ["forcefield-remote"]:
+            logger.error("forcefield-remote is not an allowed target name (reserved)")
+            raise RuntimeError
         ## Type of target
         self.set_option(tgt_opts, 'type')
         ## Relative weight of the target
@@ -724,7 +727,29 @@ class RemoteTarget(Target):
 
         id_string = "%s_iter%04i" % (self.name, Counter())
 
-        forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF, self.pgrad),'forcebalance.p')
+        #--- This code ensures that the force field pickle file is only written once, because it takes time to compress it.
+
+        cwd = os.getcwd()
+        ffpd = cwd.replace(os.path.join(self.root, self.tempdir), os.path.join(self.root, self.tempbase, "forcefield-remote"))
+        if not os.path.exists(ffpd): os.makedirs(ffpd)
+        os.chdir(ffpd)
+        makeffp = False
+        if (os.path.exists("mvals.txt") and os.path.exists("forcefield.p")):
+            mvalsf = np.loadtxt("mvals.txt")
+            if np.max(np.abs(mvals - mvalsf)) != 0.0:
+                makeffp = True
+        else:
+            makeffp = True
+        if makeffp:
+            logger.info("Writing force field to: %s\n" % ffpd)
+            self.FF.make(mvals)
+            np.savetxt("mvals.txt", mvals)
+            forcebalance.nifty.lp_dump((mvals, self.FF), 'forcefield.p')
+        os.chdir(cwd)
+        forcebalance.nifty.LinkFile(os.path.join(ffpd, 'forcefield.p'), 'forcefield.p')
+        #---
+        
+        forcebalance.nifty.lp_dump((AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.pgrad),'options.p')
         
         # Link in the rpfx script.
         if len(self.rpfx) > 0:
@@ -736,7 +761,8 @@ class RemoteTarget(Target):
         
         # logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
         # input:
-        #   forcebalance.p: pickled mvals, options, and forcefield
+        #   forcefield.p: pickled force field
+        #   options.p: pickled mvals, options
         #   rtarget.py: remote target evaluation script
         #   target.tar.bz2: tarred target
         # output:
@@ -747,7 +773,7 @@ class RemoteTarget(Target):
         #     raise RuntimeError
         forcebalance.nifty.queue_up(wq, "%spython rtarget.py > rtarget.out 2>&1" % (("sh %s%s " % (self.rpfx, " -b" if self.rbak else "")) 
                                                                                     if len(self.rpfx) > 0 else ""),
-                                    ["forcebalance.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
+                                    ["forcefield.p", "options.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
                                     ['objective.p', 'indicate.log', 'rtarget.out'],
                                     tgt=self, tag=self.name, verbose=False)
 
