@@ -1185,13 +1185,14 @@ class AbInitio(Target):
             # return qatoms
 
         # Obtain a derivative matrix the stupid way
+        charge0 = new_charges(mvals)
         if AGrad:
             # dqPdqM = []
             # for i in range(NP):
             #     print "Now working on parameter number", i
             #     dqPdqM.append(f12d3p(fdwrap(new_charges,mvals,i), h = self.h)[0])
             # dqPdqM = mat(dqPdqM).T
-            dqPdqM = np.matrix([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h)[0] if i in self.pgrad else 0.0) for i in range(NP)]).T
+            dqPdqM = np.matrix([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h, f0 = charge0)[0] if i in self.pgrad else numpy.zeros_like(charge0)) for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)
         espxyz   = np.array(self.espxyz)
