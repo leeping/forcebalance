@@ -133,7 +133,7 @@ class Objective(forcebalance.BaseClass):
             if opts['type'] not in Implemented_Targets:
                 logger.error('The target type \x1b[1;91m%s\x1b[0m is not implemented!\n' % opts['type'])
                 raise RuntimeError
-            if opts["remote"]: Tgt = forcebalance.target.RemoteTarget(options, opts, forcefield)
+            if opts["remote"] and self.wq_port != 0: Tgt = forcebalance.target.RemoteTarget(options, opts, forcefield)
             else: Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
             self.Targets.append(Tgt)
             printcool_dictionary(Tgt.PrintOptionDict,"Setup for target %s :" % Tgt.name)
@@ -403,6 +403,7 @@ class Penalty:
         DC0   = np.sum((mvals**2 + self.b**2)**0.5 - self.b)
         DC1   = mvals*(mvals**2 + self.b**2)**-0.5
         DC2   = np.diag(self.b**2*(mvals**2 + self.b**2)**-1.5)
+
         return DC0, DC1, DC2
 
     def FUSE(self, mvals):

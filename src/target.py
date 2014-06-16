@@ -741,7 +741,7 @@ class RemoteTarget(Target):
         else:
             makeffp = True
         if makeffp:
-            logger.info("Writing force field to: %s\n" % ffpd)
+            # logger.info("Writing force field to: %s\n" % ffpd)
             self.FF.make(mvals)
             np.savetxt("mvals.txt", mvals)
             forcebalance.nifty.lp_dump((mvals, self.FF), 'forcefield.p')
