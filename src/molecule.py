@@ -1504,7 +1504,7 @@ class Molecule(object):
         for i, a in enumerate(bond_bool):
             if not a: continue
             (ii, jj) = AtomIterator[i]
-            if ii >= jj: continue
+            if ii == jj: continue
             bonds[ii].append(jj)
             bonds[jj].append(ii)
             G.add_edge(ii, jj)
