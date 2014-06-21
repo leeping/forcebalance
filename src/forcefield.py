@@ -629,11 +629,12 @@ class FF(forcebalance.BaseClass):
         if len(scriptElements) > 1:
             logger.error('XML file'+ffname+'contains more than one script! Consolidate your scripts into one script!\n')
             raise RuntimeError
-        else:
+        elif len(scriptElements)==1:
             Script = scriptElements[0].text
             ffnameList = ffname.split('.')
             ffnameScript = ffnameList[0]+'Script.txt'
-            wfile = open('forcefield/'+ffnameScript, 'w')
+            wfile = forcebalance.nifty.wopen('forcefield/'+ffnameScript)
+            #wfile = open('forcefield/'+ffnameScript, 'w')
             wfile.write(Script)
             wfile.close()
             self.addff(ffnameScript, xmlScript=True)
@@ -796,14 +797,27 @@ class FF(forcebalance.BaseClass):
             os.makedirs(absprintdir)
 
         for fnm in newffdata:
-            #if type(newffdata[fnm]) is etree._ElementTree:
             if self.ffdata_isxml[fnm]:
                 with wopen(os.path.join(absprintdir,fnm)) as f: newffdata[fnm].write(f)
+            # if the xml file contains a script, ForceBalance will generate
+            # a temporary .txt file containing the script and any updates.
+            # We copy the updates made in the .txt file into the xml file by:
+            #   First, find xml file corresponding to this .txt file
+            #   Second, copy context of the .txt file into the text attribute
+            #           of the script element (assumed to be the last element)
+            #   Third. open the updated xml file as in the if statement above
             elif 'Script.txt' in fnm:
-                    tempText = tempText = "".join(newffdata[fnm])
+                    tempText = "".join(newffdata[fnm])
                     fnmXml = fnm.split('Script')[0]+'.xml'
                     Ntemp = len(list(newffdata[fnmXml].iter()))
                     list(newffdata[fnmXml].iter())[Ntemp-1].text = tempText
+                    '''
+                    scriptElements = [elem for elem in fflist if elem.tag=='Script']
+                    if len(scriptElements) > 1:
+                        logger.error('XML file'+ffname+'contains more than one script! Consolidate your scripts into one script!\n')
+                        raise RuntimeError
+                    else:
+                    '''
                     with wopen(os.path.join(absprintdir,fnmXml)) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
