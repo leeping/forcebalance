@@ -1,0 +1,33 @@
+<ForceField>
+ <AtomTypes>
+  <Type name="qtip4pf-O" class="OW" element="O" mass="15.99943"/>
+  <Type name="qtip4pf-H" class="HW" element="H" mass="1.007947"/>
+  <Type name="qtip4pf-M" class="MW" mass="0"/>
+ </AtomTypes>
+ <Residues>
+  <Residue name="HOH">
+   <Atom name="O" type="qtip4pf-O"/>
+   <Atom name="H1" type="qtip4pf-H"/>
+   <Atom name="H2" type="qtip4pf-H"/>
+   <Atom name="M" type="qtip4pf-M"/>
+   <VirtualSite type="average3" index="3" atom1="0" atom2="1" atom3="2" weight1="0.73612" weight2="0.13194" weight3="0.13194"/>
+   <Bond from="0" to="1"/>
+   <Bond from="0" to="2"/>
+  </Residue>
+ </Residues>
+ <CustomBondForce energy="D*(a^2*(r-r0)^2-a^3*(r-r0)^3+(7/12)*a^4*(r-r0)^4)">
+  <PerBondParameter name="D"/>
+  <PerBondParameter name="a"/>
+  <PerBondParameter name="r0"/>
+  <Bond class1="OW" class2="HW" r0="0.09419" D="485.7" a="22.87"/>
+ </CustomBondForce>
+ <HarmonicAngleForce>
+  <Angle class1="HW" class2="OW" class3="HW" angle="1.87448361664" k="367.6"/>
+ </HarmonicAngleForce>
+ <NonbondedForce coulomb14scale="0.833333" lj14scale="0.5">
+  <Atom type="qtip4pf-O" charge="0" sigma="0.31589" epsilon="0.7749"/>
+  <Atom type="qtip4pf-H" charge="0.5564" sigma="1" epsilon="0"/>
+  <Atom type="qtip4pf-M" charge="-1.1128" sigma="1" epsilon="0"/>
+ </NonbondedForce>
+</ForceField>
+
