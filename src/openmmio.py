@@ -669,8 +669,8 @@ class OpenMM(Engine):
             if type(self.ffxml) == list:
                 self.forcefield = ForceField(*self.ffxml)
             else:
-                self.forcefield = ForceField(self.ffxml)
-
+                self.forcefield = ForceField(self.ffxml)    
+        
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
 
@@ -757,6 +757,12 @@ class OpenMM(Engine):
         # Boolean flag indicating an RPMD simulation
         self.rpmd = len(rpmd_opts)>0
         rpmd_opts = [int(i) for i in rpmd_opts]
+
+	# RPMD turns off constraints.
+	if self.rpmd:
+            self.prepare(mmopts={'rigidWater': False, 'constraints': 'None'})
+            self.update_simulation()
+
         ## Determine the integrator.
         if temperature:
             ## If temperature control is turned on, then run Langevin dynamics.
