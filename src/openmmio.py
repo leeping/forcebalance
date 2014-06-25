@@ -294,7 +294,7 @@ def GetVirtualSiteParameters(system):
 
 def GetSystemConstraints(system):
     """Return boolean value indicating whether system has constraints. RPMD simulations should have no constraints."""
-    return (system.getNumConstraints > 0)
+    return system.getNumConstraints() > 0
 
 def CopyAmoebaBondParameters(src,dest):
     dest.setAmoebaGlobalBondCubic(src.getAmoebaGlobalBondCubic())
