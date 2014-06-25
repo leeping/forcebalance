@@ -292,6 +292,10 @@ def GetVirtualSiteParameters(system):
                 vsprm.append(_openmm.OutOfPlaneSite_getWeightCross(vs))
     return np.array(vsprm)
 
+def GetSystemConstraints(system):
+    """Return an array of constraints applied to the system (e.g. rigid water)"""
+    return (system.getNumConstraints > 0)
+
 def CopyAmoebaBondParameters(src,dest):
     dest.setAmoebaGlobalBondCubic(src.getAmoebaGlobalBondCubic())
     dest.setAmoebaGlobalBondQuartic(src.getAmoebaGlobalBondQuartic())
@@ -759,9 +763,9 @@ class OpenMM(Engine):
         rpmd_opts = [int(i) for i in rpmd_opts]
 
 	# RPMD turns off constraints.
-	if self.rpmd:
-            self.prepare(mmopts={'rigidWater': False, 'constraints': 'None'})
-            self.update_simulation()
+	#if self.rpmd:
+        #    self.prepare(mmopts={'rigidWater': False, 'constraints': 'None'})
+        #    self.update_simulation()
 
         ## Determine the integrator.
         if temperature:
@@ -878,6 +882,12 @@ class OpenMM(Engine):
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
+        if 'rpmd_opts' in kwargs and not hasattr(self,'system') or 'rpmd_opts' in kwargs and GetSystemConstraints(self.system):
+            if hasattr(self, 'simulation'):
+                delattr(self, 'simulation')
+                self.mmopts = {'rigidWater':'False','constraints':'None'} 
+                #self.system = self.forcefield.createSystem(self.mod.topology, rigidWater=False, constraints=None)
+                #self.prepare(self.mmopts)
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
@@ -885,6 +895,8 @@ class OpenMM(Engine):
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
 
+        print(self.system.getNumConstraints())
+        print(GetSystemConstraints(self.system))
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
@@ -894,6 +906,11 @@ class OpenMM(Engine):
             if hasattr(self, 'simulation'): 
                 delattr(self, 'simulation')
         self.vsprm = vsprm.copy()
+
+        #if 'rpmd_opts' in kwargs and GetSystemConstraints(self.system):
+	#    if hasattr(self, 'simulation'): 
+        #        delattr(self, 'simulation')
+        #        self.prepare(rigidWater=False, constraints=None)                
 
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
