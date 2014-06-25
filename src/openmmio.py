@@ -293,7 +293,7 @@ def GetVirtualSiteParameters(system):
     return np.array(vsprm)
 
 def GetSystemConstraints(system):
-    """Return an array of constraints applied to the system (e.g. rigid water)"""
+    """Return boolean value indicating whether system has constraints. RPMD simulations should have no constraints."""
     return (system.getNumConstraints > 0)
 
 def CopyAmoebaBondParameters(src,dest):
