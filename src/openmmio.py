@@ -867,7 +867,7 @@ class OpenMM(Engine):
         #                           for i in self.simulation.context.getPlatform().getPropertyNames()}, \
         #                          title="Platform %s has properties:" % self.simulation.context.getPlatform().getName())
     def update_simulation(self, **kwargs):
-
+        
         """ 
         Create the simulation object, or update the force field
         parameters in the existing simulation object.  This should be
@@ -882,21 +882,18 @@ class OpenMM(Engine):
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
-        if 'rpmd_opts' in kwargs and not hasattr(self,'system') or 'rpmd_opts' in kwargs and GetSystemConstraints(self.system):
-            if hasattr(self, 'simulation'):
-                delattr(self, 'simulation')
-                self.mmopts = {'rigidWater':'False','constraints':'None'} 
-                #self.system = self.forcefield.createSystem(self.mod.topology, rigidWater=False, constraints=None)
-                #self.prepare(self.mmopts)
+        
+        # If RPMD simulation, constraints should be turned off before new system is made. 
+	if 'rpmd_opts' in kwargs:
+	    self.mmopts['rigidWater'] = False
+	    self.mmopts['constraints'] = 'None'
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
+        print(GetSystemConstraints(self.system))
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-
-        print(self.system.getNumConstraints())
-        print(GetSystemConstraints(self.system))
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
@@ -906,12 +903,15 @@ class OpenMM(Engine):
             if hasattr(self, 'simulation'): 
                 delattr(self, 'simulation')
         self.vsprm = vsprm.copy()
-
-        #if 'rpmd_opts' in kwargs and GetSystemConstraints(self.system):
-	#    if hasattr(self, 'simulation'): 
-        #        delattr(self, 'simulation')
-        #        self.prepare(rigidWater=False, constraints=None)                
-
+        #----
+	# If number of of constraints in the new
+	# system differs from simulation's system,
+	# similarly remake the simulation object
+	#----
+        if hasattr(self, 'simulation'):
+            new_system_constraints = GetSystemConstraints(self.system)
+            simulation_system_constraints = GetSystemConstraints(self.simulation.system)
+            if new_system_constraints != simulation_system_constraints: delattr(self, 'simulation')
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
         else:
