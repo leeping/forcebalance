@@ -888,7 +888,6 @@ class OpenMM(Engine):
 	    self.mmopts['rigidWater'] = False
 	    self.mmopts['constraints'] = 'None'
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
-        print(GetSystemConstraints(self.system))
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
         for i in self.system.getForces():
