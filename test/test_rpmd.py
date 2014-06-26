@@ -31,7 +31,7 @@ class TestRPMD(ForceBalanceTestCase):
         if not os.path.exists('temp'): os.mkdir('temp')
         os.chdir('temp')
         self.addCleanup(os.system, 'cd .. ; rm -r temp')
-        MD_data = self.ommEngine.molecular_dynamics(nsteps=2000, nsave=100, timestep=0.5, temperature=300, verbose=True, save_traj=True, rpmd_opts=['32','6'])
+        MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
         postprocess_potentials = self.ommEngine.evaluate_(traj=self.ommEngine.xyz_rpmd)
         self.assertAlmostEqual(MD_data['Potentials'].all(), postprocess_potentials['Energy'].all())
 
