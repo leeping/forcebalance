@@ -129,6 +129,17 @@ def centroid_kinetic(Sim):
         return cenKE
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
+def get_forces(Sim):
+    """Return forces on each atom or forces averaged over all copies in case of RPMD."""
+    if isinstance(Sim.integrator, RPMDIntegrator):
+        frcs = [0.0, 0.0, 0.0]
+        for i in range(Sim.integrator.getNumCopies()):
+            frcs += Sim.integrator.getState(i,getForces=True).getForces()
+            frcs[:] = [value/Sim.integrator.getNumCopies() for value in frcs]
+        return frcs
+    else:
+        State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
+        return State.getForces() 
 def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     """Return the current multipole moments in Debye and Buckingham units. """
     dx = 0.0
@@ -191,7 +202,15 @@ def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
 def get_dipole(simulation,q=None,mass=None,positions=None):
     """Return the current dipole moment in Debye.
     Note that this quantity is meaningless if the system carries a net charge."""
-    return get_multipoles(simulation, q=q, mass=mass, positions=positions, rmcom=False)[:3]
+    if hasattr(self,'xyz_rpmd'):
+        rpmdIntegrator = self.simulation.context.getIntegrator()
+        temp_dips = [0.0, 0.0, 0.0]
+        for i in range(rpmdIntegrator.getNumCopies()):
+            temp_dips += get_dipole(self.simulation, positions=self.xyz_rpmd[-1][0][i])
+            temp_dips[:] = [value/rpmdIntegrator.getNumCopies() for value in temp_dips]
+        return temp_dips
+    else:
+        return get_multipoles(simulation, q=q, mass=mass, positions=positions, rmcom=False)[:3]
 
 def PrepareVirtualSites(system):
     """ Prepare a list of function wrappers and vsite parameters from the system. """
@@ -938,7 +957,7 @@ class OpenMM(Engine):
             if not hasattr(self, 'xyz_rpmd'):
                 self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
             else:
-                self.simulation.context.setPeriodicBoxVectors(*self.xyz_rpmd[0][shot][1])
+                self.simulation.context.setPeriodicBoxVectors(*self.xyz_rpmd[shot][1])
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
         if not hasattr(self, 'xyz_rpmd'):
@@ -948,7 +967,8 @@ class OpenMM(Engine):
             rpmdIntegrator = self.simulation.context.getIntegrator()
             if hasattr(self, 'xyz_rpmd'):
                 for i in range(rpmdIntegrator.getNumCopies()):
-                    tempPositions = self.xyz_rpmd[i][shot][0] 
+		    temp_positions = self.xyz_rpmd[shot][0][i]
+                    #tempPositions = self.xyz_rpmd[i][shot][0] 
                     self.simulation.context.setPositions(temp_positions)
                     self.simulation.context.computeVirtualSites()
                     posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
@@ -971,11 +991,11 @@ class OpenMM(Engine):
 
     def evaluate_one_(self, force=False, dipole=False):
         # Perform a single point calculation on the current geometry.        
-        State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
+        #State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
-        Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
+        Result["Energy"] = evaluate_potential(self.simulation) / kilojoules_per_mole
         if force: 
-            Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
+            Force = list(np.array(get_forces(self.simulation) / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
             Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
         if dipole: Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
@@ -998,16 +1018,24 @@ class OpenMM(Engine):
 
         self.update_simulation()
         # If trajectory flag set to False, perform a single-point calculation.
-        if not traj: return evaluate_one_(force, dipole)
+        if not traj: return self.evaluate_one_(force, dipole)
         Energies = []
         Forces = []
         Dipoles = []
-        for I in range(len(self.xyz_omms)):
-            self.set_positions(I)
-            R1 = self.evaluate_one_(force, dipole)
-            Energies.append(R1["Energy"])
-            if force: Forces.append(R1["Force"])
-            if dipole: Dipoles.append(R1["Dipole"])
+        if hasattr(self, 'xyz_rpmd'):
+            for I in range(len(self.xyz_rpmd)):
+	        self.set_positions(I) 
+                R1 = self.evaluate_one_(force, dipole)
+                Energies.append(R1["Energy"])
+                if force: Forces.append(R1["Force"])
+                if dipole: Dipoles.append(R1["Dipole"])
+        else:
+            for I in range(len(self.xyz_omms)):
+                self.set_positions(I)
+                R1 = self.evaluate_one_(force, dipole)
+                Energies.append(R1["Energy"])
+                if force: Forces.append(R1["Force"])
+                if dipole: Dipoles.append(R1["Dipole"])
         # Compile it all into the dictionary object
         Result = OrderedDict()
         Result["Energy"] = np.array(Energies)
@@ -1216,9 +1244,11 @@ class OpenMM(Engine):
             if not isinstance(self.simulation.integrator, RPMDIntegrator):
                 logger.error('Specified an RPMD simulation but the integrator is wrong!')
                 raise RuntimeError
+            # Structure of xyz_rpmd is: [step][0 or 1], where index 0 is a list of coordinates for each copy
+	    # of the system and index 1 contains box vectors 
             self.xyz_rpmd = []        
-            for i in range(self.simulation.integrator.getNumCopies()):
-                self.xyz_rpmd.append([])
+            #for i in range(self.simulation.integrator.getNumCopies()):
+            #    self.xyz_rpmd.append([])
         # Densities, potential and kinetic energies, box volumes, dipole moments
         Rhos = []
         Potentials = []
@@ -1314,8 +1344,8 @@ class OpenMM(Engine):
             if not self.rpmd:
                 self.xyz_omms.append([state.getPositions(), box_vectors])
             else:
-                for i in range(self.simulation.integrator.getNumCopies()):
-                    self.xyz_rpmd[i].append([self.rpmd_states[i].getPositions(), box_vectors])
+                #for i in range(self.simulation.integrator.getNumCopies()):
+                self.xyz_rpmd.append([[self.rpmd_states[i].getPositions() for i in range(self.simulation.integrator.getNumCopies())], box_vectors])
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1345,7 +1375,8 @@ class OpenMM(Engine):
                 rpmdIntegrator = self.simulation.context.getIntegrator()
                 temp_dips = [0.0, 0.0, 0.0]
                 for i in range(rpmdIntegrator.getNumCopies()):
-                    temp_dips += get_dipole(self.simulation,positions=self.xyz_rpmd[i][-1][0])
+                    temp_dips += get_dipole(self.simulation, positions=self.xyz_rpmd[-1][0][i])
+                    #temp_dips += get_dipole(self.simulation,positions=self.xyz_rpmd[i][-1][0])
                 temp_dips[:] = [value/rpmdIntegrator.getNumCopies() for value in temp_dips]  
                 Dips.append(temp_dips)     
         Rhos = np.array(Rhos)
