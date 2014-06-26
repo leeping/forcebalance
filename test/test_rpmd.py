@@ -1,39 +1,41 @@
 import unittest
 import sys, os, re
+from subprocess import call
 import forcebalance
-import abc
 import numpy as np
 from __init__ import ForceBalanceTestCase
-from forcebalance.nifty import *
 from collections import OrderedDict
 from forcebalance.openmmio import OpenMM
 
-# This script creates an OpenMM Engine object and runs a short RPMD simulation.
-try:
-    import simtk.openmm
-    print('OpenMM successfully imported\n')
-except: 
-    print('OpenMM unsuccessfully imported\n')
+class TestRPMD(ForceBalanceTestCase):
 
-os.chdir(os.path.join('test','files','rpmd_files'))
+    """ RPMD unit test that runs a short RPMD simulation
+    and compares calculated potential energies from
+    MD with postprocessed potential energies as an
+    internal consistency check.
+    """
 
-ommEngine = OpenMM(ffxml='qtip4pf.xml', pdb='h2o.pdb', platname='CUDA', precision='mixed')
+    def setUp(self):
+        self.logger.debug('\nBuilding OpenMM engine...\n')
+        os.chdir(os.path.join('test','files','rpmd_files'))
+        openmm = False
+        try:
+            import simtk.openmm
+            openmm = True
+        except: logger.warn("OpenMM cannot be imported. Make sure it's installed!")
+        if openmm:
+            self.ommEngine = OpenMM(ffxml='qtip4pf.xml', pdb='h2o.pdb', platname='CUDA', precision='mixed')
+             
+    def test_rpmd_simulation(self):
+        self.logger.debug('\nRunning MD...\n')
+        if not os.path.exists('temp'): os.mkdir('temp')
+        os.chdir('temp')
+        self.addCleanup(os.system, 'cd .. ; rm -r temp')
+        MD_data = self.ommEngine.molecular_dynamics(nsteps=2000, nsave=100, timestep=0.5, temperature=300, verbose=True, save_traj=True, rpmd_opts=['32','6'])
+        postprocess_potentials = self.ommEngine.evaluate_(traj=self.ommEngine.xyz_rpmd)
+        self.assertAlmostEqual(MD_data['Potentials'].all(), postprocess_potentials['Energy'].all())
 
-print('Engine successfully created\n')
-
-os.chdir('../..')
-
-if not os.path.exists('temp'): os.mkdir('temp')
-
-os.chdir('temp')
-
-print('Creating simulation...\n')
-
-# Run RPMD and save trajectory data
-ommEngine.create_simulation(timestep=0.5, temperature=300, rpmd_opts=['32'])
-
-print('Starting MD...\n')
-
-data = ommEngine.molecular_dynamics(nsteps=10000, nsave=100, timestep=0.5, temperature=300, verbose=True, save_traj=True)
-
-sys.exit('Finished simulation!')
+suite = unittest.TestLoader().loadTestsFromTestCase(TestRPMD)
+unittest.TextTestRunner(verbosity=2).run(suite)
+#if __name__ == '__main__':
+#    unittest.main()
