@@ -138,7 +138,7 @@ def get_forces(Sim):
             frcs[:] = [value/Sim.integrator.getNumCopies() for value in frcs]
         return frcs
     else:
-        State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
+        State = Sim.context.getState(getPositions=True, getEnergy=True, getForces=True)
         return State.getForces() 
 def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     """Return the current multipole moments in Debye and Buckingham units. """
