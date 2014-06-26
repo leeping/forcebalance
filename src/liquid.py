@@ -451,7 +451,9 @@ class Liquid(Target):
 
         unpack = forcebalance.nifty.lp_load('forcebalance.p')
         mvals1 = unpack[1]
-        if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+        if mvals1.shape != mvals.shape:
+            warn_press_key("mvals from forcebalance.p has different shape compared to internal values!\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+        elif len(mvals1) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
         for dn in range(Counter()-1, -1, -1):
@@ -556,7 +558,9 @@ class Liquid(Target):
         
         unpack = forcebalance.nifty.lp_load('forcebalance.p')
         mvals1 = unpack[1]
-        if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+        if mvals1.shape != mvals.shape:
+            warn_press_key("mvals from forcebalance.p has different shape compared to internal values!\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+        elif len(mvals1) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
         mbar_verbose = False

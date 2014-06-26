@@ -773,11 +773,6 @@ class OpenMM(Engine):
         self.rpmd = len(rpmd_opts)>0
         rpmd_opts = [int(i) for i in rpmd_opts]
 
-	# RPMD turns off constraints.
-	#if self.rpmd:
-        #    self.prepare(mmopts={'rigidWater': False, 'constraints': 'None'})
-        #    self.update_simulation()
-
         ## Determine the integrator.
         if temperature:
             ## If temperature control is turned on, then run Langevin dynamics.
@@ -833,14 +828,6 @@ class OpenMM(Engine):
                 raise RuntimeError("No RPMD integrator without temperature control.")
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
-        # Create list of rpmd positions here so that they exist before set_positions() is called.
-        #if self.rpmd:
-        #    if not isinstance(integrator, RPMDIntegrator):
-        #        logger.error('Specified an RPMD simulation but the integrator is wrong!')
-        #        raise RuntimeError
-        #    self.xyz_rpmd = []
-        #    for i in range(integrator.getNumCopies()):
-        #        self.xyz_rpmd.append([])
         ## Add the barostat.
         if pressure != None:
             if anisotropic:
