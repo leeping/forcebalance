@@ -1,5 +1,5 @@
 import unittest
-import sys, os, re
+import sys, os, re, shutil
 from subprocess import call
 import forcebalance
 import numpy as np
@@ -24,12 +24,13 @@ class TestRPMD(ForceBalanceTestCase):
             openmm = True
         except: logger.warn("OpenMM cannot be imported. Make sure it's installed!")
         if openmm:
-            self.ommEngine = OpenMM(ffxml='qtip4pf.xml', pdb='h2o.pdb', platname='CUDA', precision='mixed')
+            self.ommEngine = OpenMM(ffxml='qtip4pf.xml', pdb='h2o.pdb', pbc=True, platname='CUDA', precision='mixed')
              
     def test_rpmd_simulation(self):
         self.logger.debug('\nRunning MD...\n')
         if not os.path.exists('temp'): os.mkdir('temp')
         os.chdir('temp')
+        shutil.copy2('../qtip4pf.xml','./qtip4pf.xml')
         self.addCleanup(os.system, 'cd .. ; rm -r temp')
         MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
         postprocess_potentials = self.ommEngine.evaluate_(traj=self.ommEngine.xyz_rpmd)
