@@ -30,6 +30,7 @@ class TestRPMD(ForceBalanceTestCase):
         self.logger.debug('\nRunning MD...\n')
         if not os.path.exists('temp'): os.mkdir('temp')
         os.chdir('temp')
+        # We're in the temp directory so need to copy the force field file here.
         shutil.copy2('../qtip4pf.xml','./qtip4pf.xml')
         self.addCleanup(os.system, 'cd .. ; rm -r temp')
         MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
