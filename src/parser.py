@@ -70,7 +70,8 @@ gen_opts_types = {
                  "readchk"      : (None, -50, 'Name of the restart file we read from', 'Restart jobtype "newton" with "writechk" set'),
                  "writechk"     : (None, -50, 'Name of the restart file we write to (can be same as readchk)', 'Main optimizer'),
                  "ffdir"        : ('forcefield', 100, 'Directory containing force fields, relative to project directory', 'All'),
-                 "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER']),
+                 "amberhome"    : (None, -10, 'Path to AMBER installation directory (leave blank to use AMBERHOME environment variable.', 'Targets that use AMBER', 'AMBER'),
                  },
     'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.', 
                                    'All (important); choose "single", "gradient", "hessian", "newton" (Main Optimizer), "bfgs", "powell", "simplex", "anneal", "genetic", "conjugategradient", "scan_mvals", "scan_pvals", "fdcheck[gh]"'),
@@ -85,6 +86,7 @@ gen_opts_types = {
                  "wq_port"   : (0, 0, 'The port number to use for Work Queue', 'Targets that use Work Queue (advanced usage)'),
                  "criteria"   : (1, 160, 'The number of convergence criteria that must be met for main optimizer to converge', 'Main Optimizer'),
                  "zerograd"         : (-1, 0, 'Set to a nonnegative number to turn on zero gradient skipping at that optimization step.', 'All'),
+                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER'])
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
@@ -123,7 +125,7 @@ gen_opts_types = {
                  "adaptive_damping"       : (0.5,   10, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.', 'Main Optimizer'),
                  "error_tolerance"        : (0.0,   10, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.', 'Main Optimizer'),
                  "search_tolerance"       : (1e-4, -10, 'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.', 'Main Optimizer with negative mintrust; advanced usage'),
-                 "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER']),
                  },
     'sections': {"read_mvals" : (None, 100, 'Paste mathematical parameters into the input file for them to be read in directly', 'Restarting an optimization'),
                  "read_pvals" : (None, 100, 'Paste physical parameters into the input file for them to be read in directly', 'Restarting an optimization (recommend use_mvals instead)'),
@@ -134,8 +136,8 @@ gen_opts_types = {
 ## Default fitting target options.
 tgt_opts_types = {
     'strings' : {"force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
-                 "fragment1" : (None, 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
-                 "fragment2" : (None, 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
+                 "fragment1" : ('', 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
+                 "fragment2" : ('', 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
                  "openmm_precision" : (None, -10, 'Precision of OpenMM calculation if using CUDA or OpenCL platform.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
                  "openmm_platform" : (None, -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
                  "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
@@ -149,10 +151,14 @@ tgt_opts_types = {
                  "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_ndx"               : (None, -10, 'Gromacs .ndx files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
+                 "amber_mol2"            : (None, -10, 'Name of mol2 file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
+                 "amber_frcmod"          : (None, -10, 'Name of frcmod file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
+                 "amber_leapcmd"         : (None, -10, 'File containing commands for "tleap" when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),
                  "read"                  : (None, 50, 'Provide a temporary directory ".tmp" to read data from a previous calculation on the initial iteration (for instance, to restart an aborted run).', 'Liquid and Remote targets', 'Liquid, Remote'),
                  "remote_prefix"         : ('', 50, 'Specify an optional prefix script to run in front of rtarget.py, for loading environment variables', 'Remote targets', 'Remote'),
+                 "fitatoms"              : ('0', 0, 'Number of fitting atoms; defaults to all of them.  Use a comma and dash style list (1,2-5), atoms numbered from one, inclusive', 'Energy + Force Matching', 'AbInitio'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
@@ -162,7 +168,6 @@ tgt_opts_types = {
                  "quantities" : ([], 100, 'List of quantities to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
-                 "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
                  "sleepy"             : (0, -50, 'Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)', 'All targets (advanced usage)'),
                  "liquid_md_steps"    : (10000, 0, 'Number of time steps for the liquid production run.', 'Condensed phase property targets', 'liquid'),
                  "liquid_eq_steps"    : (1000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),

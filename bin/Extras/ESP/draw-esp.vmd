@@ -1,0 +1,31 @@
+puts "Launch VMD with 'vmd -e draw-esp.vmd -args molecule.xyz'"
+puts "Requires: molecule.espx and molecule.esp generated using read-esp.py"
+
+proc draw_esp {xyzname} {
+    set espxyz [file rootname $xyzname].espx
+    set mesp [mol new $espxyz type {xyz} first 0 last -1 step 1 waitfor 1]
+    set espval [file rootname $xyzname].esp
+    set n [molinfo $mesp get numatoms]
+    set fp [open $espval r]
+    for {set i 0} {$i < $n} {incr i} {
+        set sel [atomselect $mesp "index $i"]
+        $sel set charge [list [gets $fp]]
+    }
+    mol delrep 0 $mesp
+    mol representation VDW 0.100000 29.000000
+    mol selection all
+    mol color Charge
+    mol material Transparent
+    mol addrep $mesp
+}
+
+color Display Background gray
+display rendermode GLSL
+display height 3.000000
+display resetview
+axes location Off
+set xyzname [lindex $argv 0]
+mol new $xyzname type xyz waitfor all
+mol modstyle 0 0 Licorice 0.100000 30.000000 30.000000
+draw_esp $xyzname
+

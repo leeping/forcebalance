@@ -46,7 +46,7 @@ except:
     logger.warning("Counterpoise module import failed\n")
 
 try:
-    from forcebalance.amberio import AbInitio_AMBER
+    from forcebalance.amberio import AbInitio_AMBER, Interaction_AMBER, Vibration_AMBER
 except:
     logger.warning(traceback.format_exc())
     logger.warning("Amber module import failed\n")
@@ -72,6 +72,7 @@ Implemented_Targets = {
     'ABINITIO_INTERNAL':AbInitio_Internal,
     'VIBRATION_TINKER':Vibration_TINKER,
     'VIBRATION_GMX':Vibration_GMX,
+    'VIBRATION_AMBER':Vibration_AMBER,
     'THERMO_GMX':Thermo_GMX,
     'LIQUID_OPENMM':Liquid_OpenMM,
     'LIQUID_TINKER':Liquid_TINKER, 
@@ -80,6 +81,7 @@ Implemented_Targets = {
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'RDVR3_PSI4':RDVR3_Psi4,
+    'INTERACTION_AMBER':Interaction_AMBER,
     'INTERACTION_GMX':Interaction_GMX,
     'INTERACTION_TINKER':Interaction_TINKER,
     'INTERACTION_OPENMM':Interaction_OpenMM,
@@ -131,7 +133,7 @@ class Objective(forcebalance.BaseClass):
             if opts['type'] not in Implemented_Targets:
                 logger.error('The target type \x1b[1;91m%s\x1b[0m is not implemented!\n' % opts['type'])
                 raise RuntimeError
-            if opts["remote"]: Tgt = forcebalance.target.RemoteTarget(options, opts, forcefield)
+            if opts["remote"] and self.wq_port != 0: Tgt = forcebalance.target.RemoteTarget(options, opts, forcefield)
             else: Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
             self.Targets.append(Tgt)
             printcool_dictionary(Tgt.PrintOptionDict,"Setup for target %s :" % Tgt.name)
@@ -160,12 +162,12 @@ class Objective(forcebalance.BaseClass):
         printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
 
         
-    def Target_Terms(self, mvals, Order=0, verbose=False):
+    def Target_Terms(self, mvals, Order=0, verbose=False, customdir=None):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
         Objective = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         # Loop through the targets, stage the directories and submit the Work Queue processes.
         for Tgt in self.Targets:
-            Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2)
+            Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2, customdir=customdir)
         if self.asynchronous:
             # Asynchronous evaluation of objective function and Work Queue tasks.
             # Create a list of the targets, and remove them from the list as they are finished.
@@ -180,10 +182,10 @@ class Objective(forcebalance.BaseClass):
                         # List of functions that I can call.
                         Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
                         # Call the appropriate function
-                        Ans = Funcs[Order](mvals)
+                        Ans = Funcs[Order](mvals, customdir=customdir)
                         # Print out the qualitative indicators
                         if verbose:
-                            Tgt.meta_indicate()
+                            Tgt.meta_indicate(customdir=customdir)
                         # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
                         if not in_fd():
                             self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
@@ -203,10 +205,10 @@ class Objective(forcebalance.BaseClass):
                 # List of functions that I can call.
                 Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
                 # Call the appropriate function
-                Ans = Funcs[Order](mvals)
+                Ans = Funcs[Order](mvals, customdir=customdir)
                 # Print out the qualitative indicators
                 if verbose:
-                    Tgt.meta_indicate()
+                    Tgt.meta_indicate(customdir=customdir)
                 # Note that no matter which order of function we call, we still increment the objective / gradient / Hessian the same way.
                 if not in_fd():
                     self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
@@ -257,8 +259,8 @@ class Objective(forcebalance.BaseClass):
         printcool_dictionary(PrintDict,color=4,title=Title)
         return
 
-    def Full(self, mvals, Order=0, verbose=False):
-        Objective = self.Target_Terms(mvals, Order, verbose)
+    def Full(self, mvals, Order=0, verbose=False, customdir=None):
+        Objective = self.Target_Terms(mvals, Order, verbose, customdir)
         ## Compute the penalty function.
         Extra = self.Penalty.compute(mvals,Objective)
         Objective['X0'] = Objective['X']
@@ -401,6 +403,7 @@ class Penalty:
         DC0   = np.sum((mvals**2 + self.b**2)**0.5 - self.b)
         DC1   = mvals*(mvals**2 + self.b**2)**-0.5
         DC2   = np.diag(self.b**2*(mvals**2 + self.b**2)**-1.5)
+
         return DC0, DC1, DC2
 
     def FUSE(self, mvals):

@@ -108,9 +108,9 @@ elif [[ `env | grep -i tacc | wc -l` -gt 0 ]] ; then
 fi
 
 if [[ x$CUDA_DEVICE != x ]] ; then
-    sleep $(( CUDA_DEVICE * 30 ))
+    sleep $(( CUDA_DEVICE * 10 ))
 elif [[ x$PBS_JOBID != x ]] ; then
-    sleep $(( PBS_JOBID * 30 ))
+    sleep $(( PBS_JOBID * 10 ))
 fi
 
 echo "#=======================#"

@@ -95,6 +95,9 @@ class Target(forcebalance.BaseClass):
         self.set_option(options, 'root')
         ## Name of the target
         self.set_option(tgt_opts, 'name')
+        if self.name in ["forcefield-remote"]:
+            logger.error("forcefield-remote is not an allowed target name (reserved)")
+            raise RuntimeError
         ## Type of target
         self.set_option(tgt_opts, 'type')
         ## Relative weight of the target
@@ -179,9 +182,9 @@ class Target(forcebalance.BaseClass):
             if not os.path.exists(os.path.join(self.root,self.tempdir)):
                 os.makedirs(os.path.join(self.root,self.tempdir))
 
-    def get_X(self,mvals=None):
+    def get_X(self,mvals=None,customdir=None):
         """Computes the objective function contribution without any parametric derivatives"""
-        Ans = self.meta_get(mvals,0,0)
+        Ans = self.meta_get(mvals,0,0,customdir=customdir)
         self.xct += 1
         if Ans['X'] != Ans['X']:
             return {'X':1e10, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
@@ -259,7 +262,7 @@ class Target(forcebalance.BaseClass):
                 print >> fout, pid
             fout.close()
 
-    def get_G(self,mvals=None):
+    def get_G(self,mvals=None,customdir=None):
         """Computes the objective function contribution and its gradient.
 
         First the low-level 'get' method is called with the analytic gradient
@@ -276,7 +279,7 @@ class Target(forcebalance.BaseClass):
         recorded in a text file in the targets directory.
 
         """
-        Ans = self.meta_get(mvals,1,0)
+        Ans = self.meta_get(mvals,1,0,customdir=customdir)
         for i in self.pgrad:
             if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
                 if self.fdhessdiag:
@@ -288,7 +291,7 @@ class Target(forcebalance.BaseClass):
             self.write_0grads(Ans)
         return Ans
 
-    def get_H(self,mvals=None):
+    def get_H(self,mvals=None,customdir=None):
         """Computes the objective function contribution and its gradient / Hessian.
 
         First the low-level 'get' method is called with the analytic gradient
@@ -300,7 +303,7 @@ class Target(forcebalance.BaseClass):
         Hessian elements by finite difference.  Forward finite difference is used
         throughout for the sake of speed.
         """
-        Ans = self.meta_get(mvals,1,1)
+        Ans = self.meta_get(mvals,1,1,customdir=customdir)
         if self.fdhess:
             for i in self.pgrad:
                 if any([j in self.FF.plist[i] for j in self.fd1_pids]) or 'ALL' in self.fd1_pids:
@@ -475,7 +478,7 @@ class Target(forcebalance.BaseClass):
         iterints = [int(d.replace('iter_','')) for d in os.listdir(abs_rd) if os.path.isdir(os.path.join(abs_rd, d))]
         return sorted(iterints)[-1]
 
-    def meta_indicate(self):
+    def meta_indicate(self, customdir=None):
 
         """ 
 
@@ -487,7 +490,8 @@ class Target(forcebalance.BaseClass):
         """
         # Using the module level logger
         logger = getLogger(__name__)
-        if self.rd != None and Counter() == First() and self.read_indicate:
+        # Note that reading information is not supported for custom folders (e.g. microiterations during search)
+        if self.rd != None and Counter() == First() and self.read_indicate and customdir == None:
             # Move into the directory for reading data, 
             cwd = os.getcwd()
             os.chdir(self.absrd())
@@ -548,7 +552,8 @@ class Target(forcebalance.BaseClass):
         self.link_from_tempdir(absgetdir)
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Read existing information from disk (i.e. when recovering an aborted run)
-        if self.rd != None and Counter() == First() and self.read_objective:
+        # Note that reading information is not supported for custom folders (e.g. microiterations during search)
+        if self.rd != None and Counter() == First() and self.read_objective and customdir == None:
             os.chdir(self.absrd())
             logger.info("Reading objective function information from %s\n" % os.getcwd())
             Answer = self.read(mvals, AGrad, AHess)
@@ -607,7 +612,11 @@ class Target(forcebalance.BaseClass):
             self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
-        if self.rd == None or Counter() > First(): self.submit_jobs(mvals, AGrad, AHess)
+        if self.rd == None or Counter() > First(): 
+            self.submit_jobs(mvals, AGrad, AHess)
+        elif customdir != None:
+            # Allows us to submit micro-iteration jobs for remote targets
+            self.submit_jobs(mvals, AGrad, AHess)
         os.chdir(cwd)
         
         return
@@ -720,7 +729,29 @@ class RemoteTarget(Target):
 
         id_string = "%s_iter%04i" % (self.name, Counter())
 
-        forcebalance.nifty.lp_dump((mvals, AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.FF, self.pgrad),'forcebalance.p')
+        #--- This code ensures that the force field pickle file is only written once, because it takes time to compress it.
+
+        cwd = os.getcwd()
+        ffpd = cwd.replace(os.path.join(self.root, self.tempdir), os.path.join(self.root, self.tempbase, "forcefield-remote"))
+        if not os.path.exists(ffpd): os.makedirs(ffpd)
+        os.chdir(ffpd)
+        makeffp = False
+        if (os.path.exists("mvals.txt") and os.path.exists("forcefield.p")):
+            mvalsf = np.loadtxt("mvals.txt")
+            if np.max(np.abs(mvals - mvalsf)) != 0.0:
+                makeffp = True
+        else:
+            makeffp = True
+        if makeffp:
+            # logger.info("Writing force field to: %s\n" % ffpd)
+            self.FF.make(mvals)
+            np.savetxt("mvals.txt", mvals)
+            forcebalance.nifty.lp_dump((mvals, self.FF), 'forcefield.p')
+        os.chdir(cwd)
+        forcebalance.nifty.LinkFile(os.path.join(ffpd, 'forcefield.p'), 'forcefield.p')
+        #---
+        
+        forcebalance.nifty.lp_dump((AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.pgrad),'options.p')
         
         # Link in the rpfx script.
         if len(self.rpfx) > 0:
@@ -732,18 +763,19 @@ class RemoteTarget(Target):
         
         # logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
         # input:
-        #   forcebalance.p: pickled mvals, options, and forcefield
+        #   forcefield.p: pickled force field
+        #   options.p: pickled mvals, options
         #   rtarget.py: remote target evaluation script
         #   target.tar.bz2: tarred target
         # output:
         #   objective.p: pickled objective function dictionary
         #   indicate.log: results of target.indicate() written to file
-        if len(self.rpfx) > 0 and self.rpfx not in ['rungmx.sh', 'runcuda.sh']:
-            logger.error('Unsupported prefix script for launching remote target')
-            raise RuntimeError
+        # if len(self.rpfx) > 0 and self.rpfx not in ['rungmx.sh', 'runcuda.sh']:
+        #     logger.error('Unsupported prefix script for launching remote target')
+        #     raise RuntimeError
         forcebalance.nifty.queue_up(wq, "%spython rtarget.py > rtarget.out 2>&1" % (("sh %s%s " % (self.rpfx, " -b" if self.rbak else "")) 
                                                                                     if len(self.rpfx) > 0 else ""),
-                                    ["forcebalance.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
+                                    ["forcefield.p", "options.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
                                     ['objective.p', 'indicate.log', 'rtarget.out'],
                                     tgt=self, tag=self.name, verbose=False)
 

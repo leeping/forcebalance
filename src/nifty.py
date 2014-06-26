@@ -26,8 +26,15 @@ try:
     import bz2
     HaveBZ2 = True
 except:
-    logger.warning("bz2 module import failed (You can't compress or decompress pickle files)\n")
+    logger.warning("bz2 module import failed (used in compressing or decompressing pickle files)\n")
     HaveBZ2 = False
+
+try:
+    import gzip
+    HaveGZ = True
+except:
+    logger.warning("gzip module import failed (used in compressing or decompressing pickle files)\n")
+    HaveGZ = False
     
 from shutil import copyfileobj
 from subprocess import PIPE, STDOUT
@@ -131,7 +138,7 @@ def commadash(l):
 
 def uncommadash(s):
     # Takes a string like '27-31,88-91,100,136-139'
-    # and turns it into a list like [27, 28, 29, 30, 31, 88, 89, 90, 91, 100, 136, 137, 138, 139]
+    # and turns it into a list like [26, 27, 28, 29, 30, 87, 88, 89, 90, 99, 135, 136, 137, 138]
     L = []
     try:
         for w in s.split(','):
@@ -633,7 +640,7 @@ class Unpickler_LP(pickle.Unpickler):
             warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
 
 def lp_dump(obj, fnm, protocol=0):
-    """ Write an object to a bzipped file specified by the path. """
+    """ Write an object to a zipped pickle file specified by the path. """
     # Safeguard against overwriting files?  Nah.
     # if os.path.exists(fnm):
     #     logger.error("lp_dump cannot write to an existing path")
@@ -641,7 +648,9 @@ def lp_dump(obj, fnm, protocol=0):
     if os.path.islink(fnm):
         logger.warn("Trying to write to a symbolic link %s, removing it first\n" % fnm)
         os.unlink(fnm)
-    if HaveBZ2:
+    if HaveGZ:
+        f = gzip.GzipFile(fnm, 'wb')
+    elif HaveBZ2:
         f = bz2.BZ2File(fnm, 'wb')
     else:
         f = open(fnm, 'wb')
@@ -653,21 +662,44 @@ def lp_load(fnm):
     if not os.path.exists(fnm):
         logger.error("lp_load cannot read from a path that doesn't exist (%s)" % fnm)
         raise IOError
-    if HaveBZ2:
-        try: 
-            f = bz2.BZ2File(fnm, 'rb')
-            answer = Unpickler_LP(f).load()
-            f.close()
-        except:
-            # This may happen if the file was written with a machine that doesn't have bz2.
-            logger.warning("bzip2 file loader failed, attempting to read as uncompressed file\n")
-            f = open(fnm, 'rb')
-            answer = Unpickler_LP(f).load()
-            f.close()
-    else:
+
+    def load_uncompress():
+        logger.warning("Compressed file loader failed, attempting to read as uncompressed file\n")
         f = open(fnm, 'rb')
         answer = Unpickler_LP(f).load()
         f.close()
+        return answer
+
+    def load_bz2():
+        f = bz2.BZ2File(fnm, 'rb')
+        answer = Unpickler_LP(f).load()
+        f.close()
+        return answer
+
+    def load_gz():
+        f = gzip.GzipFile(fnm, 'rb')
+        answer = Unpickler_LP(f).load()
+        f.close()
+        return answer
+        
+    if HaveGZ:
+        try: 
+            answer = load_gz()
+        except:
+            if HaveBZ2:
+                try:
+                    answer = load_bz2()
+                except:
+                    answer = load_uncompress()
+            else:
+                answer = load_uncompress()
+    elif HaveBZ2:
+        try:
+            answer = load_bz2()
+        except:
+            answer = load_uncompress()
+    else:
+        answer = load_uncompress()
     return answer
 
 #==============================#
@@ -798,7 +830,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                         tgtname = tnm
                         WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
-                logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
+                logger.warning("Task '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.tag, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
             else:
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
@@ -866,27 +898,71 @@ def bak(path, dest=None):
         shutil.move(oldf,newf)
     return newf
 
-# Search for exactly one file with a provided extension.
-# ext: File extension
-# arg: String name of an argument
-# kwargs: Dictionary of keyword arguments.
-def onefile(ext, arg=None):
-    fnm = None
-    if arg != None:
-        if os.path.exists(arg):
-            fnm = os.path.basename(arg)
+# Purpose: Given a file name and/or an extension, do one of the following:
+# 1) If provided a file name, check the file, crash if not exist and err==True.  Return the file name.
+# 2) If list is empty but extension is provided, check if one file exists that matches
+# the extension.  If so, return the file name.
+# 3) If list is still empty and err==True, then crash with an error.
+def onefile(fnm=None, ext=None, err=False):
+    if fnm == None and ext == None:
+        if err:
+            logger.error("Must provide either filename or extension to onefile()")
+            raise RuntimeError
         else:
-            warn_once("File specified by %s (%s) does not exist - will try to autodetect" % (ext, arg))
+            return None
+    if fnm != None:
+        if os.path.exists(fnm):
+            return os.path.basename(fnm)
+        elif (err==True or ext==None):
+            logger.error("File specified by %s does not exist!" % fnm)
+            raise RuntimeError
+        elif ext != None:
+            warn_once("File specified by %s does not exist - will try to autodetect .%s extension" % (fnm, ext))
+    answer = None
+    cwd = os.getcwd()
+    ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
+    if len(ls) != 1:
+        if err:
+            logger.error("Cannot find a unique file with extension .%s in %s (%i found)" % (ext, cwd, len(ls)))
+            raise RuntimeError
+        else:
+            warn_once("Cannot find a unique file with extension .%s in %s (%i found)" % 
+                      (ext, cwd, len(ls)), warnhash = "Found %i .%s files" % (len(ls), ext))
+    else:
+        answer = os.path.basename(ls[0])
+        warn_once("Autodetected %s in %s" % (answer, cwd), warnhash = "Autodetected %s" % answer)
+    return answer
 
-    if fnm == None:
-        cwd = os.getcwd()
-        ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
-        if len(ls) != 1:
-            warn_once("Found %i .%s files in %s" % (len(ls), ext, cwd), warnhash = "Found %i .%s files" % (len(ls), ext))
-        else:
-            fnm = os.path.basename(ls[0])
-            warn_once("Autodetected %s in %s" % (fnm, cwd), warnhash = "Autodetected %s" % fnm )
-    return fnm
+# Purpose: Given a file name / file list and/or an extension, do one of the following:
+# 1) If provided a file list, check each file in the list
+# and crash if any file does not exist.  Return the list.
+# 2) If provided a file name, check the file and crash if the file 
+# does not exist.  Return a length-one list with the file name.
+# 3) If list is empty but extension is provided, check for files that
+# match the extension.  If so, append them to the list.
+# 4) If list is still empty and err==True, then crash with an error.
+def listfiles(fnms=None, ext=None, err=False):
+    answer = []
+    if isinstance(fnms, list):
+        for i in fnms:
+            if not os.path.exists(i):
+                logger.error('Specified %s but it does not exist' % i)
+                raise RuntimeError
+            answer.append(i)
+    elif isinstance(fnms, str):
+        if not os.path.exists(fnms):
+            logger.error('Specified %s but it does not exist' % fnms)
+            raise RuntimeError
+        answer = [fnms]
+    elif fnms != None:
+        logger.error('First argument to listfiles must be a list, a string, or None')
+        raise RuntimeError
+    if answer == [] and ext != None:
+        answer = [os.path.basename(i) for i in os.listdir(os.getcwd()) if i.endswith('.%s' % ext)]
+    if answer == [] and err:
+        logger.error('listfiles function failed to come up with a file! (fnms = %s ext = %s)' % (str(fnms), str(ext)))
+        raise RuntimeError
+    return answer
 
 def GoInto(Dir):
     if os.path.exists(Dir):

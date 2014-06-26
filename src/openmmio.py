@@ -637,8 +637,12 @@ class OpenMM(Engine):
         else:
             logger.error('Must provide either a molecule object or coordinate file.\n')
             raise RuntimeError
-
+        
+        # If the PDB file exists, then it is copied directly to create
+        # the OpenMM pdb object rather than being written by the
+        # Molecule class.
         if pdbfnm != None:
+            self.abspdb = os.path.abspath(pdbfnm)
             mpdb = Molecule(pdbfnm)
             for i in ["chain", "atomname", "resid", "resname", "elem"]:
                 self.mol.Data[i] = mpdb.Data[i]
@@ -658,34 +662,23 @@ class OpenMM(Engine):
         #     logger.error('Requested periodic boundary conditions but coordinate file contains no boxes')
         #     raise RuntimeError
         ## Create the OpenMM PDB object.
-        pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
-        self.mol[0].write(pdb1)
-        self.pdb = PDBFile(pdb1)
-        os.unlink(pdb1)
+        if hasattr(self, 'abspdb'):
+            print self.abspdb
+            self.pdb = PDBFile(self.abspdb)
+        else:
+            pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
+            self.mol[0].write(pdb1)
+            self.pdb = PDBFile(pdb1)
+            os.unlink(pdb1)
         
         ## Create the OpenMM ForceField object.
         if hasattr(self, 'FF'):
-            self.ffxml = self.FF.openmmxml
+            self.ffxml = [self.FF.openmmxml]
             self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.openmmxml))
         else:
-            if 'ffxml' in kwargs:
-                if type(kwargs['ffxml']) == list:
-                    for i in kwargs['ffxml']:
-                        if not os.path.exists(i):
-                            logger.error("%s doesn't exist\n" % i)
-                            raise RuntimeError
-                else:
-                    if not os.path.exists(kwargs['ffxml']): 
-                        logger.error("%s doesn't exist\n" % kwargs['ffxml'])
-                        raise RuntimeError
-                self.ffxml = kwargs['ffxml']
-            elif onefile('xml'):
-                self.ffxml = onefile('xml')
-            if type(self.ffxml) == list:
-                self.forcefield = ForceField(*self.ffxml)
-            else:
-                self.forcefield = ForceField(self.ffxml)    
-        
+            self.ffxml = listfiles(kwargs.get('ffxml'), 'xml', err=True)
+            self.forcefield = ForceField(*self.ffxml)
+
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
 
@@ -873,10 +866,7 @@ class OpenMM(Engine):
         """
         if len(kwargs) > 0:
             self.simkwargs = kwargs
-        if type(self.ffxml) == list:
-            self.forcefield = ForceField(*self.ffxml)
-        else:
-            self.forcefield = ForceField(self.ffxml)
+        self.forcefield = ForceField(*self.ffxml)
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
@@ -947,12 +937,15 @@ class OpenMM(Engine):
             if hasattr(self, 'xyz_rpmd'):
                 for i in range(rpmdIntegrator.getNumCopies()):
 		    temp_positions = self.xyz_rpmd[shot][0][i]
-                    #tempPositions = self.xyz_rpmd[i][shot][0] 
                     self.simulation.context.setPositions(temp_positions)
                     self.simulation.context.computeVirtualSites()
                     posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
                     rpmdIntegrator.setPositions(i,posWithVsites)
     
+    def get_charges(self):
+        logger.error('OpenMM engine does not have get_charges (should be trivial to implement however.)')
+        raise NotImplementedError
+
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
         [a,b,c] = box_vectors

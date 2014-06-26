@@ -110,5 +110,24 @@ class TestLipidGRO(ForceBalanceTestCase):
         self.logger.debug("\nTrying to read lipid conformation... ")
         self.assertEqual(len(self.molecule.molecules), 3783, msg = "\nIncorrect number of molecules for lipid structure")
 
+class TestAlaGRO(ForceBalanceTestCase):
+    def __init__(self, methodName='runTest'):
+        super(TestAlaGRO,self).__init__(methodName)
+        self.source = 'ala.gro'
+
+    def setUp(self):
+        super(TestAlaGRO,self).setUp()
+        os.chdir('test/files')
+        try: self.molecule = forcebalance.molecule.Molecule(self.source)
+        except IOError:
+            self.skipTest("Input gro file test/files/%s doesn't exist" % self.source)
+        except:
+            self.fail("\nUnable to open gro file")
+
+    def test_ala_molecules(self):
+        """Check for the correct number of bonds in a simple molecule"""
+        self.logger.debug("\nTrying to read alanine dipeptide conformation... ")
+        self.assertEqual(len(self.molecule.bonds), 21, msg = "\nIncorrect number of bonds for alanine dipeptide structure")
+
 if __name__ == '__main__':
     unittest.main()

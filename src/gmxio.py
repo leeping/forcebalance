@@ -371,9 +371,11 @@ class ITP_Reader(BaseReader):
         if len(s) == 0 or re.match('^ *;',line): return None, None
         # Now go through all the cases.
         if re.match('^#', line):
-            self.override = 'DEFINE:' + s[1]
-        elif hasattr(self, 'override'):
-            delattr(self, 'override')
+            self.overpfx = 'DEFINE'
+            self.oversfx = s[1]
+        elif hasattr(self, 'overpfx'):
+            delattr(self, 'overpfx')
+            delattr(self, 'oversfx')
 
         if re.match('^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
@@ -535,15 +537,12 @@ class GMX(Engine):
         """ Called by __init__ ; read files from the source directory. """
 
         ## Attempt to determine file names of .gro, .top, and .mdp files
-        self.top = onefile('top', kwargs['gmx_top'] if 'gmx_top' in kwargs else None)
-        self.mdp = onefile('mdp', kwargs['gmx_mdp'] if 'gmx_mdp' in kwargs else None)
+        self.top = onefile(kwargs.get('gmx_top'), 'top')
+        self.mdp = onefile(kwargs.get('gmx_mdp'), 'mdp')
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
-        elif 'coords' in kwargs and os.path.exists(kwargs['coords']):
-            self.mol = Molecule(kwargs['coords'])
         else:
-            grofile = onefile('gro')
-            self.mol = Molecule(grofile)
+            self.mol = Molecule(onefile(kwargs.get('coords'), 'gro', err=True))
 
     def prepare(self, pbc=False, **kwargs):
 
@@ -603,10 +602,8 @@ class GMX(Engine):
                 # preparing the engine, but then delete them afterward.
                 itptmp = True
                 self.FF.make(np.zeros(self.FF.np))
-            if self.top == None or not os.path.exists(self.top):
-                self.top = onefile('top')
-            if self.mdp == None or not os.path.exists(self.mdp):
-                self.mdp = onefile('mdp')
+            self.top = onefile(self.top, 'top')
+            self.mdp = onefile(self.mdp, 'mdp')
             # Sanity check; the force fields should be referenced by the .top file.
             if self.top != None and os.path.exists(self.top):
                 if self.top not in self.FF.fnms and (not any([any([fnm in line for fnm in self.FF.fnms]) for line in open(self.top)])):
@@ -680,21 +677,15 @@ class GMX(Engine):
             for f in self.FF.fnms: 
                 os.unlink(f)
 
+    def get_charges(self):
+        logger.error('GMX engine does not have get_charges (should be easy to implement however.)')
+        raise NotImplementedError
+
     def links(self):
-        if not os.path.exists('%s.top' % self.name):
-            topfile = onefile('top')
-            if topfile != None:
-                LinkFile(topfile, "%s.top" % self.name)
-            else:
-                logger.error("No .top file found, cannot continue.\n")
-                raise RuntimeError
-        if not os.path.exists('%s.mdp' % self.name):
-            mdpfile = onefile('mdp')
-            if mdpfile != None:
-                LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
-            else:
-                logger.error("No .mdp file found, cannot continue.\n")
-                raise RuntimeError
+        topfile = onefile('%s.top' % self.name, 'top', err=True)
+        LinkFile(topfile, "%s.top" % self.name)
+        mdpfile = onefile('%s.mdp' % self.name, 'mdp', err=True)
+        LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
 
     def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -1042,7 +1033,7 @@ class GMX(Engine):
             calc_eigvecs[i] /= np.linalg.norm(calc_eigvecs[i])
         return calc_eigvals, calc_eigvecs
 
-    def generate_vsite_positions(self):
+    def generate_positions(self):
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))

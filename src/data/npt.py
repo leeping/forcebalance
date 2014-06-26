@@ -342,6 +342,7 @@ def main():
     MG = Molecule(gas_fnm)
     # Determine the number of molecules in the condensed phase coordinate file.
     NMol = len(ML.molecules)
+    logger.info("There are %i molecules in the liquid\n" % (NMol))
 
     #----
     # Setting up MD simulations
