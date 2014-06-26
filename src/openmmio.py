@@ -202,15 +202,7 @@ def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
 def get_dipole(simulation,q=None,mass=None,positions=None):
     """Return the current dipole moment in Debye.
     Note that this quantity is meaningless if the system carries a net charge."""
-    if hasattr(self,'xyz_rpmd'):
-        rpmdIntegrator = self.simulation.context.getIntegrator()
-        temp_dips = [0.0, 0.0, 0.0]
-        for i in range(rpmdIntegrator.getNumCopies()):
-            temp_dips += get_dipole(self.simulation, positions=self.xyz_rpmd[-1][0][i])
-            temp_dips[:] = [value/rpmdIntegrator.getNumCopies() for value in temp_dips]
-        return temp_dips
-    else:
-        return get_multipoles(simulation, q=q, mass=mass, positions=positions, rmcom=False)[:3]
+    return get_multipoles(simulation, q=q, mass=mass, positions=positions, rmcom=False)[:3]
 
 def PrepareVirtualSites(system):
     """ Prepare a list of function wrappers and vsite parameters from the system. """
@@ -998,7 +990,17 @@ class OpenMM(Engine):
             Force = list(np.array(get_forces(self.simulation) / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
             Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
-        if dipole: Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
+        if dipole:
+            if isinstance(self.simulation.integrator, RPMDIntegrator):
+                rpmdIntegrator = self.simulation.context.getIntegrator()
+                temp_dips = [0.0, 0.0, 0.0]
+                for i in range(rpmdIntegrator.getNumCopies()):
+                    temp_dips += get_dipole(self.simulation, positions=self.xyz_rpmd[-1][0][i])
+                temp_dips[:] = [value/rpmdIntegrator.getNumCopies() for value in temp_dips]
+                Result["Dipole"] = temp_dips
+            else:
+                State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)	
+                Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
         return Result
 
     def evaluate_(self, force=False, dipole=False, traj=False):
