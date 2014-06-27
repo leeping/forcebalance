@@ -33,8 +33,8 @@ sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
 # installed for the OS might be too old.
 #----
 prefix=$HOME/opt
-swgpath=$HOME/install/epd-7.3-2-rh5-x86_64
-pypath=$HOME/install/epd-7.3-2-rh5-x86_64
+swgpath=$HOME/local
+pypath=$HOME/local
 
 # Create these directories if they don't exist.
 mkdir -p $prefix

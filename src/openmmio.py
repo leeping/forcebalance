@@ -34,26 +34,6 @@ try:
 except:
     pass
 
-#def H_spring_energy(Sim): # Spring energy in RPMD simulation,only count H atom, it can be used to calculate the HD fractionation ratio. If classical simulation, return 0.
-#    if isinstance(Sim.integrator,RPMDIntegrator):
-#        springE=0.0*kilojoule/mole
-#        hbar=0.0635078*nanometer**2*dalton/picosecond
-#        kb=0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
-#        mass_matrix=[]
-#        for i in range(Sim.system.getNumParticles()):
-#            if (Sim.system.getParticleMass(i)<1.02*dalton):#Only count Hydrogen
-#                mass_matrix.append(Sim.system.getParticleMass(i))
-#            else:
-#                mass_matrix.append(0.0*dalton)
-#        mass_matrix=np.array(mass_matrix)
-#        for i in range(Sim.integrator.getNumCopies()):
-#            j=(i+1)%(Sim.integrator.getNumCopies())
-#            beaddif=np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())#calculate difference between ith and i+1th bead
-#            springE=springE+np.sum(((beaddif*beaddif).sum(axis=1))*mass_matrix*(kb**2*Sim.integrator.getTemperature()**2*Sim.integrator.getNumCopies()/(2.0*hbar**2)))#spring energy
-#        return springE
-#    else:
-#        return 0.0*kilojoule/mole
-
 def energy_components(Sim, verbose=False):
     # Before using energy_components(), make sure each Force is set to a different group.
     EnergyTerms = OrderedDict()
@@ -61,6 +41,7 @@ def energy_components(Sim, verbose=False):
         for i in range(Sim.system.getNumForces()):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
+
 def centroid_position(Sim):
     # Calculates the RPMD centroid position in RPMD simulation (May not be what you actually need!). Same as calling getPositions() during a classical simulation. 
     if isinstance(Sim.integrator, RPMDIntegrator):
@@ -70,6 +51,7 @@ def centroid_position(Sim):
         return centroid
     else:
         return Sim.context.getState(getPositions=True).getPositions() 
+
 def evaluate_potential(Sim):
     # Calculates the P.E., accouting for RPMD (avg. over 4 copies of system). This just amounts to calling getPotentialEnergy() for a classical simulation.
     if isinstance(Sim.integrator, RPMDIntegrator):
@@ -81,6 +63,7 @@ def evaluate_potential(Sim):
         return PE
     else:
         return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
+
 def evaluate_kinetic(Sim):
     # Calculates the K.E. for a classical simulation or the K.E. in a classical sense (i.e. only dep. on particle velocity) for RPMD (sample to thermostat T*(# beads). Does NOT estimate quantum K.E.
     if isinstance(Sim.integrator, RPMDIntegrator):
@@ -92,6 +75,7 @@ def evaluate_kinetic(Sim):
         return KE
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
+
 def primitive_kinetic(Sim):
     # A primitive quantum K.E. estimator for RPMD simulation. Returns classical K.E. in a classical simulation. 
     if isinstance(Sim.integrator,RPMDIntegrator):
@@ -111,6 +95,7 @@ def primitive_kinetic(Sim):
         return priKE           
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
+
 def centroid_kinetic(Sim):
     # Centroid quantum K.E. estimator for RPMD simulation. Returns classical K.E. in classical simulation.
     if isinstance(Sim.integrator,RPMDIntegrator):
@@ -129,6 +114,7 @@ def centroid_kinetic(Sim):
         return cenKE
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
+
 def get_forces(Sim):
     """Return forces on each atom or forces averaged over all copies in case of RPMD."""
     if isinstance(Sim.integrator, RPMDIntegrator):
@@ -140,6 +126,7 @@ def get_forces(Sim):
     else:
         State = Sim.context.getState(getPositions=True, getEnergy=True, getForces=True)
         return State.getForces() 
+
 def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     """Return the current multipole moments in Debye and Buckingham units. """
     dx = 0.0
@@ -196,8 +183,6 @@ def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
             qzz -= tr/3
     # This ordering has to do with the way TINKER prints it out.
     return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
-#def get_multipoles_ave(simulation,q=None,mass=None,positions=None,rmcom=True)
-# If RPMD simulation, average over all copies of systems, else(in classical simulation) just do the same thing get_multipoles do
 
 def get_dipole(simulation,q=None,mass=None,positions=None):
     """Return the current dipole moment in Debye.
@@ -963,7 +948,6 @@ class OpenMM(Engine):
 
     def evaluate_one_(self, force=False, dipole=False):
         # Perform a single point calculation on the current geometry.        
-        #State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = evaluate_potential(self.simulation) / kilojoules_per_mole
         if force: 
@@ -1262,15 +1246,9 @@ class OpenMM(Engine):
                 for i in range(self.simulation.integrator.getNumCopies()):
                     self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True))
                 state = self.rpmd_states[0]
-#Need to confirm that these energy functions are properly implemented
-##### Energy Data
-#            kinetic=state.getKineticEnergy()/self.tdiv
-#            potential=state.getPotentialEnergy()
             kinetic=evaluate_kinetic(self.simulation)/self.tdiv
             potential=evaluate_potential(self.simulation)
-           #pri_kinetic=primitive_kinetic(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
-#####
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -1305,15 +1283,9 @@ class OpenMM(Engine):
                 for i in range(self.simulation.integrator.getNumCopies()):
                     self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True))
                 state = self.rpmd_states[0]
-                    
-##### Energy Data
-#            kinetic=state.getKineticEnergy()/self.tdiv
-#            potential=state.getPotentialEnergy()
             kinetic=evaluate_kinetic(self.simulation)/self.tdiv
             potential=evaluate_potential(self.simulation)
-            #pri_kinetic=primitive_kinetic(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
-#####
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
@@ -1326,7 +1298,6 @@ class OpenMM(Engine):
             if not self.rpmd:
                 self.xyz_omms.append([state.getPositions(), box_vectors])
             else:
-                #for i in range(self.simulation.integrator.getNumCopies()):
                 self.xyz_rpmd.append([[self.rpmd_states[i].getPositions() for i in range(self.simulation.integrator.getNumCopies())], box_vectors])
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
@@ -1358,7 +1329,6 @@ class OpenMM(Engine):
                 temp_dips = [0.0, 0.0, 0.0]
                 for i in range(rpmdIntegrator.getNumCopies()):
                     temp_dips += get_dipole(self.simulation, positions=self.xyz_rpmd[-1][0][i])
-                    #temp_dips += get_dipole(self.simulation,positions=self.xyz_rpmd[i][-1][0])
                 temp_dips[:] = [value/rpmdIntegrator.getNumCopies() for value in temp_dips]  
                 Dips.append(temp_dips)     
         Rhos = np.array(Rhos)
