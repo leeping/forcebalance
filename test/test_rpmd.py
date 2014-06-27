@@ -33,11 +33,13 @@ class TestRPMD(ForceBalanceTestCase):
         # We're in the temp directory so need to copy the force field file here.
         shutil.copy2('../qtip4pf.xml','./qtip4pf.xml')
         self.addCleanup(os.system, 'cd .. ; rm -r temp')
-        MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
+        MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=False, save_traj=True, rpmd_opts=['32','6'])
+        # Line below performs same MD run, but using verbose option
+        #MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
         postprocess_potentials = self.ommEngine.evaluate_(traj=self.ommEngine.xyz_rpmd)
         self.assertAlmostEqual(MD_data['Potentials'].all(), postprocess_potentials['Energy'].all())
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestRPMD)
-unittest.TextTestRunner(verbosity=2).run(suite)
+unittest.TextTestRunner().run(suite)
 #if __name__ == '__main__':
 #    unittest.main()
