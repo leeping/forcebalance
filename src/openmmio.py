@@ -134,7 +134,7 @@ def rpmd_dips(Sim, qvals, masses):
     for i in range(rpmdIntegrator.getNumCopies()):
         temp_positions = rpmdIntegrator.getState(i,getPositions=True).getPositions()
         temp_dips.append(get_dipole(Sim, q=qvals, mass=masses, positions=temp_positions))
-        dip_avg = [sum(col) / float(len(col)) for col in zip(*temp_dips)]
+    dip_avg = [sum(col) / float(len(col)) for col in zip(*temp_dips)]
     return dip_avg
  
 def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
