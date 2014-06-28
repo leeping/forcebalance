@@ -24,7 +24,7 @@ class TestRPMD(ForceBalanceTestCase):
             openmm = True
         except: logger.warn("OpenMM cannot be imported. Make sure it's installed!")
         if openmm:
-            self.ommEngine = OpenMM(ffxml='qtip4pf.xml', pdb='h2o.pdb', pbc=True, platname='CUDA', precision='mixed')
+            self.ommEngine = OpenMM(ffxml='qtip4pf.xml', pdb='h2o.pdb', pbc=True, platname='CUDA', precision='double')
              
     def test_rpmd_simulation(self):
         self.logger.debug('\nRunning MD...\n')
@@ -36,8 +36,9 @@ class TestRPMD(ForceBalanceTestCase):
         MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=False, save_traj=True, rpmd_opts=['32','6'])
         # Line below performs same MD run, but using verbose option
         #MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
-        postprocess_potentials = self.ommEngine.evaluate_(traj=self.ommEngine.xyz_rpmd)
-        self.assertAlmostEqual(MD_data['Potentials'].all(), postprocess_potentials['Energy'].all())
+        postprocess_potentials = self.ommEngine.evaluate_(traj=self.ommEngine.xyz_rpmd, dipole=True)
+        self.assertEqual(MD_data['Dips'].all(), postprocess_potentials['Dipole'].all())
+        self.assertEqual(MD_data['Potentials'].all(), postprocess_potentials['Energy'].all())
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestRPMD)
 unittest.TextTestRunner().run(suite)
