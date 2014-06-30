@@ -355,7 +355,7 @@ try:
             return 1
         def L(self):
             ''' Return a list of the sorted atom numbers in this graph. '''
-            return sorted(self.nodes())
+            return sorted(list(self.nodes()))
         def AStr(self):
             ''' Return a string of atoms, which serves as a rudimentary 'fingerprint' : '99,100,103,151' . '''
             return ','.join(['%i' % i for i in self.L()])
@@ -1030,7 +1030,7 @@ class Molecule(object):
                 self.topology = self.build_topology()
                 self.molecules = list(nx.connected_component_subgraphs(self.topology))
                 if 'bonds' not in self.Data:
-                    self.Data['bonds'] = self.topology.edges()
+                    self.Data['bonds'] = list(self.topology.edges())
                     self.built_bonds = True
 
     #=====================================#
@@ -1263,7 +1263,7 @@ class Molecule(object):
             New.toppbc = self.toppbc
             New.topology = New.build_topology()
             New.molecules = list(nx.connected_component_subgraphs(New.topology))
-            New.Data['bonds'] = New.topology.edges()
+            New.Data['bonds'] = list(New.topology.edges())
             New.built_bonds = True
         elif 'bonds' in self.Data:
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
@@ -1524,7 +1524,7 @@ class Molecule(object):
         # Iterate over separate molecules
         for mol in self.molecules:
             # Iterate over atoms in the molecule
-            for a2 in mol.nodes():
+            for a2 in list(mol.nodes()):
                 # Find all bonded neighbors to this atom
                 friends = sorted(list(nx.all_neighbors(mol, a2)))
                 if len(friends) < 2: continue
@@ -1550,7 +1550,7 @@ class Molecule(object):
         # Iterate over separate molecules
         for mol in self.molecules:
             # Iterate over bonds in the molecule
-            for edge in mol.edges():
+            for edge in list(mol.edges()):
                 # Determine correct ordering of atoms (middle atoms are ordered by convention)
                 a2 = edge[0] if edge[0] < edge[1] else edge[1]
                 a3 = edge[1] if edge[0] < edge[1] else edge[0]
