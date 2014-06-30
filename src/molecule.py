@@ -1028,7 +1028,7 @@ class Molecule(object):
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
                 self.toppbc = kwargs.get('toppbc', 0)
                 self.topology = self.build_topology()
-                self.molecules = nx.connected_component_subgraphs(self.topology)
+                self.molecules = list(nx.connected_component_subgraphs(self.topology))
                 if 'bonds' not in self.Data:
                     self.Data['bonds'] = self.topology.edges()
                     self.built_bonds = True
@@ -1262,7 +1262,7 @@ class Molecule(object):
         if 'networkx' in sys.modules and self.built_bonds and self.na > 0:
             New.toppbc = self.toppbc
             New.topology = New.build_topology()
-            New.molecules = nx.connected_component_subgraphs(New.topology)
+            New.molecules = list(nx.connected_component_subgraphs(New.topology))
             New.Data['bonds'] = New.topology.edges()
             New.built_bonds = True
         elif 'bonds' in self.Data:
