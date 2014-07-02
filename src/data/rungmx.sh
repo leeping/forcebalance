@@ -22,7 +22,7 @@ COMMAND=$@
 . ~/.bashrc
 
 # Load Gromacs environment variables if needed (e.g. Intel compiler variables)
-if [[ $HOSTNAME =~ "biox3" || $HOSTNAME =~ "cn" ]] ; then
+if [[ $HOSTNAME =~ "biox3" || $HOSTNAME =~ "sh" || $HOSTNAME =~ "cn" ]] ; then
     . ~/opt/intel/bin/compilervars.sh intel64
 fi
 
