@@ -110,8 +110,26 @@ def centroid_kinetic(Sim):
         for i in range(0,nob,hello): # 2nd term of centroid K.E.
             dif=np.array(Sim.integrator.getState(i,getPositions=True).getPositions())-centroid
             der=-1.0*np.array(Sim.integrator.getState(i,getForces=True).getForces())
-            cenKE=cenKE+np.sum((dif*der).sum(axis=1))*0.5/4.0
+            cenKE=cenKE+np.sum(dif*der)*0.5/4.0
         return cenKE
+    else:
+        return Sim.context.getState(getEnergy=True).getKineticEnergy()
+
+def centroid_virial_estimator(Sim):
+    if isinstance(Sim.integrator, RPMDIntegrator):
+        rpmd_int = Sim.context.getIntegrator()
+        centroids = centroid_position(Sim)
+        N = Sim.system.getNumParticles()
+        n = rpmd_int.getNumCopies()
+        kT = rpmd_int.getTemperature() * BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
+        boltz = 0.00831446*nanometer**2 * dalton / (picosecond**2 * kelvin)
+        virial = 0.0*kilojoule/mole
+        for k in range(n):
+            rpmd_state = rpmd_int.getState(k, getPositions=True, getForces=True)
+            virial += np.sum((np.array(rpmd_state.getPositions()) - centroids) * -1.0 * np.array(rpmd_state.getForces()))
+        virial *= 3.0/(2.0 * N * n)
+        virial += (9.0/2.0) * kT 
+        return virial
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
 
@@ -1331,9 +1349,9 @@ class OpenMM(Engine):
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
             if self.rpmd:
-                Kinetics.append(cen_kinetic / kilojoules_per_mole)#If RPMD, we use centroid estimator to calculate quantum kinetic energy
+                Kinetics.append(cen_kinetic / kilojoules_per_mole) #If RPMD, we use centroid estimator to calculate quantum kinetic energy
             else:
-                Kinetics.append(kinetic / kilojoules_per_mole)#else just classical kinetic energy
+                Kinetics.append(kinetic / kilojoules_per_mole)
             Volumes.append(volume / nanometer**3)
             if not self.rpmd:
                 Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
