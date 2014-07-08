@@ -115,7 +115,7 @@ def centroid_kinetic(Sim):
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
 
-def centroid_virial_estimator(Sim):
+def centroid_virial_est(Sim):
     if isinstance(Sim.integrator, RPMDIntegrator):
         rpmd_int = Sim.context.getIntegrator()
         centroids = centroid_position(Sim)
@@ -950,14 +950,14 @@ class OpenMM(Engine):
             # compute virtual sites by processing each copy via the context. We should NOT redo this each 
             # time set_positions() is called, as by then the virtual sites are already contained in xyz_rpmd.
             #-----------------
-            if isinstance(self.simulation.integrator, RPMDIntegrator):
-                rpmdIntegrator = self.simulation.context.getIntegrator()
-                for i in range(rpmdIntegrator.getNumCopies()):
-                    temp_positions = self.xyz_omms[shot][0]
-                    self.simulation.context.setPositions(temp_positions)
-                    self.simulation.context.computeVirtualSites()
-                    posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
-                    rpmdIntegrator.setPositions(i,posWithVsites)
+            #if isinstance(self.simulation.integrator, RPMDIntegrator):
+            #    rpmdIntegrator = self.simulation.context.getIntegrator()
+            #    for i in range(rpmdIntegrator.getNumCopies()):
+            #        temp_positions = self.xyz_omms[shot][0]
+            #        self.simulation.context.setPositions(temp_positions)
+            #        self.simulation.context.computeVirtualSites()
+            #        posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
+            #        rpmdIntegrator.setPositions(i,posWithVsites)
         else:
             if hasattr(self, 'xyz_rpmd'): 
                 rpmdIntegrator = self.simulation.context.getIntegrator()
@@ -1282,6 +1282,7 @@ class OpenMM(Engine):
             kinetic=evaluate_kinetic(self.simulation)/self.tdiv
             potential=evaluate_potential(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
+            #cen_kinetic = centroid_virial_est(self.simulation)
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -1319,6 +1320,7 @@ class OpenMM(Engine):
             kinetic=evaluate_kinetic(self.simulation)/self.tdiv
             potential=evaluate_potential(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
+            #cen_kinetic=centroid_virial_est(self.simulation)
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
