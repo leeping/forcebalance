@@ -1022,7 +1022,10 @@ def wopen(dest):
 def LinkFile(src, dest, nosrcok = False):
     if os.path.abspath(src) == os.path.abspath(dest): return
     if os.path.exists(src):
-        if os.path.exists(dest):
+        # Remove broken link
+        if os.path.islink(dest) and not os.path.exists(dest):
+            os.remove(dest)
+        elif os.path.exists(dest):
             if os.path.islink(dest): pass
             else: 
                 logger.error("Tried to create symbolic link %s to %s, destination exists but isn't a symbolic link\n" % (src, dest))
