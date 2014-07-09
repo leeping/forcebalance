@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                     Last updated June 10, 2014                     |#
+#|                     Last updated July 7, 2014                      |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -34,7 +34,7 @@
 #|   It's better to be like a Millennium Falcon. :P                   |#
 #|                                                                    |#
 #|   Please make sure this file is up-to-date in                      |#
-#|   both the 'leeping' and 'forcebalance' modules                    |#
+#|   both the 'nanoreactor' and 'forcebalance' modules                |#
 #|                                                                    |#
 #|   At present, when I perform operations like adding two objects,   |#
 #|   the sum is created from deep copies of data members in the       |#
@@ -146,6 +146,7 @@ import itertools
 from collections import OrderedDict, namedtuple, Counter
 from ctypes import *
 from warnings import warn
+import logging as logger
 
 # Covalent radii from Cordero et al. 'Covalent radii revisited' Dalton Transactions 2008, 2832-2838.
 Radii = [0.31, 0.28, # H and He
@@ -936,7 +937,7 @@ class Molecule(object):
 
         """
         return unmangle(self[0], other)
-            
+
     def append(self,other):
         self += other
 
@@ -1490,7 +1491,7 @@ class Molecule(object):
                 logger.error("No minimum image convention available (import 'forcebalance.contact' if you need it).")
                 raise RuntimeError
             dxij = [np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator])]
-            
+
         # Create a NetworkX graph object.
         G = MyG()
         bonds = [[] for i in range(self.na)]
@@ -1509,6 +1510,24 @@ class Molecule(object):
             bonds[jj].append(ii)
             G.add_edge(ii, jj)
         return G
+
+    def distance_matrix(self):
+        ''' Build a distance matrix between atoms. '''
+        AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
+        dxij = []
+        if 'nanoreactor.contact' in sys.modules:
+            if hasattr(self, 'boxes'):
+                dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
+            else:
+                dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator)
+        else:
+            # Inefficient implementation if importing contact doesn't work.
+            if hasattr(self, 'boxes'):
+                logger.error("No minimum image convention available (import 'nanoreactor.contact' if you need it).")
+                raise RuntimeError
+            for sn in range(len(self)):
+                dxij.append(np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator]))
+        return AtomIterator, dxij
 
     def find_angles(self):
 
