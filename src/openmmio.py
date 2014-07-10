@@ -1268,6 +1268,7 @@ class OpenMM(Engine):
         Volumes = []
         Dips = []
         Temps = []
+        Prim_kinetics = []
         Centroid_first_terms = [] #remove 
         Primitive_first_terms = [] #remove
         #========================#
@@ -1335,9 +1336,9 @@ class OpenMM(Engine):
             kinetic=evaluate_kinetic(self.simulation)/self.tdiv
             potential=evaluate_potential(self.simulation)
             cen_kinetic=centroid_kinetic(self.simulation)
+            prim_kinetic=primitive_kinetic(self.simulation)
             centroid_first_term=centroid_est_first_term(self.simulation)
             primitive_first_term=primitive_est_first_term(self.simulation)
-            #cen_kinetic=centroid_virial_est(self.simulation)
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
@@ -1369,6 +1370,7 @@ class OpenMM(Engine):
             Potentials.append(potential / kilojoules_per_mole)
             if self.rpmd:
                 Kinetics.append(cen_kinetic / kilojoules_per_mole) #If RPMD, we use centroid estimator to calculate quantum kinetic energy
+                Prim_kinetics.append(prim_kinetic / kilojoules_per_mole) 
                 Centroid_first_terms.append(centroid_first_term / kilojoules_per_mole) 
                 Primitive_first_terms.append(primitive_first_term / kilojoules_per_mole)      
             else:
@@ -1396,8 +1398,8 @@ class OpenMM(Engine):
         Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
         # Initialized property dictionary.
         prop_return = OrderedDict()
-        #prop_return.update({'PFTs': Primitive_first_terms, 'CFTs': Centroid_first_terms,'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
-        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        prop_return.update({'PrimKs': Prim_kinetics, 'PFTs': Primitive_first_terms, 'CFTs': Centroid_first_terms,'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        #prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
         return prop_return
 
 class Liquid_OpenMM(Liquid):

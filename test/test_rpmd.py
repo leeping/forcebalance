@@ -24,7 +24,7 @@ class TestRPMD(ForceBalanceTestCase):
             openmm = True
         except: logger.warn("OpenMM cannot be imported. Make sure it's installed!")
         if openmm:
-            self.ommEngine = OpenMM(ffxml='qtip4pf.xml', pdb='h2o.pdb', pbc=True, platname='CUDA', precision='double')
+            self.ommEngine = OpenMM(ffxml='qtip4pf.xml', pdb='liquid.pdb', pbc=True, platname='CUDA', precision='double')
              
     def test_rpmd_simulation(self):
         self.logger.debug('\nRunning MD...\n')
@@ -33,10 +33,22 @@ class TestRPMD(ForceBalanceTestCase):
         # We're in the temp directory so need to copy the force field file here.
         shutil.copy2('../qtip4pf.xml','./qtip4pf.xml')
         self.addCleanup(os.system, 'cd .. ; rm -r temp')
-        MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=False, save_traj=True, rpmd_opts=['32','6'])
+        #MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=False, save_traj=True, rpmd_opts=['32','6'])
         # Line below performs same MD run, but using verbose option
-        #MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
+        MD_data = self.ommEngine.molecular_dynamics(nsteps=100000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
         postprocess_potentials = self.ommEngine.evaluate_(traj=self.ommEngine.xyz_rpmd, dipole=True)
+        print(MD_data['Dips'])
+        print(postprocess_potentials['Dipole'])
+        PFTs = np.array(MD_data['PFTs'])
+        CFTs = np.array(MD_data['CFTs'])
+        Cen_Ks = np.array(MD_data['Kinetics'])
+        Prim_Ks = np.array(MD_data['PrimKs'])
+        os.chdir('../../..')
+        #np.savetxt('PFT.txt', PFTs)
+        #np.savetxt('CFT.txt', CFTs)
+        np.savetxt('CKE.txt', Cen_Ks)
+        np.savetxt('PKE.txt', Prim_Ks)
+        os.chdir(os.path.join('test','files','rpmd_files','temp'))
         self.assertEqual(MD_data['Dips'].all(), postprocess_potentials['Dipole'].all())
         self.assertEqual(MD_data['Potentials'].all(), postprocess_potentials['Energy'].all())
 
