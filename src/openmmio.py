@@ -520,8 +520,12 @@ class OpenMM(Engine):
         else:
             logger.error('Must provide either a molecule object or coordinate file.\n')
             raise RuntimeError
-
+        
+        # If the PDB file exists, then it is copied directly to create
+        # the OpenMM pdb object rather than being written by the
+        # Molecule class.
         if pdbfnm != None:
+            self.abspdb = os.path.abspath(pdbfnm)
             mpdb = Molecule(pdbfnm)
             for i in ["chain", "atomname", "resid", "resname", "elem"]:
                 self.mol.Data[i] = mpdb.Data[i]
@@ -541,10 +545,14 @@ class OpenMM(Engine):
         #     logger.error('Requested periodic boundary conditions but coordinate file contains no boxes')
         #     raise RuntimeError
         ## Create the OpenMM PDB object.
-        pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
-        self.mol[0].write(pdb1)
-        self.pdb = PDBFile(pdb1)
-        os.unlink(pdb1)
+        if hasattr(self, 'abspdb'):
+            print self.abspdb
+            self.pdb = PDBFile(self.abspdb)
+        else:
+            pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
+            self.mol[0].write(pdb1)
+            self.pdb = PDBFile(pdb1)
+            os.unlink(pdb1)
         
         ## Create the OpenMM ForceField object.
 
@@ -760,6 +768,10 @@ class OpenMM(Engine):
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
         self.simulation.context.setPositions(self.xyz_omms[shot][0])
         self.simulation.context.computeVirtualSites()
+
+    def get_charges(self):
+        logger.error('OpenMM engine does not have get_charges (should be trivial to implement however.)')
+        raise NotImplementedError
 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """

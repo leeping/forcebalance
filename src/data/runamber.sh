@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This wrapper script is for running GROMACS jobs on clusters.
+# This wrapper script is for running AMBER jobs on clusters.
 
 # Command line switch indicates whether to do backups
 do_bak=0
@@ -22,10 +22,10 @@ COMMAND=$@
 . ~/.bashrc
 
 # Load Gromacs environment variables if needed (e.g. Intel compiler variables)
-if [[ $HOSTNAME =~ "biox3" || $HOSTNAME =~ "cn" ]] ; then
-    . ~/opt/intel/bin/compilervars.sh intel64
-elif [[ $HOSTNAME =~ "sh" ]] ; then
-    . /share/sw/licensed/intel-cluster-studio-2013.1.046/bin/compilervars.sh intel64
+if [[ $HOSTNAME =~ "sh" ]] ; then
+    . /share/sw/licensed/intel-cluster-studio-2013.1.046/composer_xe_2013_sp1.2.144/bin/compilervars.sh intel64
+elif [[ $HOSTNAME =~ "biox" ]] ; then
+    . /home/leeping/opt/intel/bin/compilervars.sh intel64
 fi
 
 # Backup folder
@@ -50,10 +50,6 @@ echo $COMMAND
 
 rm -f npt_result.p
 export PYTHONUNBUFFERED="y"
-
-# Unset OMP_NUM_THREADS otherwise gromacs will complain.
-unset OMP_NUM_THREADS
-unset MKL_NUM_THREADS
 
 # Actually run the command.
 time $COMMAND

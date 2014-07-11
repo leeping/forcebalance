@@ -26,8 +26,15 @@ try:
     import bz2
     HaveBZ2 = True
 except:
-    logger.warning("bz2 module import failed (You can't compress or decompress pickle files)\n")
+    logger.warning("bz2 module import failed (used in compressing or decompressing pickle files)\n")
     HaveBZ2 = False
+
+try:
+    import gzip
+    HaveGZ = True
+except:
+    logger.warning("gzip module import failed (used in compressing or decompressing pickle files)\n")
+    HaveGZ = False
     
 from shutil import copyfileobj
 from subprocess import PIPE, STDOUT
@@ -633,7 +640,7 @@ class Unpickler_LP(pickle.Unpickler):
             warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
 
 def lp_dump(obj, fnm, protocol=0):
-    """ Write an object to a bzipped file specified by the path. """
+    """ Write an object to a zipped pickle file specified by the path. """
     # Safeguard against overwriting files?  Nah.
     # if os.path.exists(fnm):
     #     logger.error("lp_dump cannot write to an existing path")
@@ -641,7 +648,9 @@ def lp_dump(obj, fnm, protocol=0):
     if os.path.islink(fnm):
         logger.warn("Trying to write to a symbolic link %s, removing it first\n" % fnm)
         os.unlink(fnm)
-    if HaveBZ2:
+    if HaveGZ:
+        f = gzip.GzipFile(fnm, 'wb')
+    elif HaveBZ2:
         f = bz2.BZ2File(fnm, 'wb')
     else:
         f = open(fnm, 'wb')
@@ -653,21 +662,44 @@ def lp_load(fnm):
     if not os.path.exists(fnm):
         logger.error("lp_load cannot read from a path that doesn't exist (%s)" % fnm)
         raise IOError
-    if HaveBZ2:
-        try: 
-            f = bz2.BZ2File(fnm, 'rb')
-            answer = Unpickler_LP(f).load()
-            f.close()
-        except:
-            # This may happen if the file was written with a machine that doesn't have bz2.
-            logger.warning("bzip2 file loader failed, attempting to read as uncompressed file\n")
-            f = open(fnm, 'rb')
-            answer = Unpickler_LP(f).load()
-            f.close()
-    else:
+
+    def load_uncompress():
+        logger.warning("Compressed file loader failed, attempting to read as uncompressed file\n")
         f = open(fnm, 'rb')
         answer = Unpickler_LP(f).load()
         f.close()
+        return answer
+
+    def load_bz2():
+        f = bz2.BZ2File(fnm, 'rb')
+        answer = Unpickler_LP(f).load()
+        f.close()
+        return answer
+
+    def load_gz():
+        f = gzip.GzipFile(fnm, 'rb')
+        answer = Unpickler_LP(f).load()
+        f.close()
+        return answer
+        
+    if HaveGZ:
+        try: 
+            answer = load_gz()
+        except:
+            if HaveBZ2:
+                try:
+                    answer = load_bz2()
+                except:
+                    answer = load_uncompress()
+            else:
+                answer = load_uncompress()
+    elif HaveBZ2:
+        try:
+            answer = load_bz2()
+        except:
+            answer = load_uncompress()
+    else:
+        answer = load_uncompress()
     return answer
 
 #==============================#
@@ -798,7 +830,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                         tgtname = tnm
                         WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
-                logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
+                logger.warning("Task '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.tag, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
             else:
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
@@ -990,7 +1022,10 @@ def wopen(dest):
 def LinkFile(src, dest, nosrcok = False):
     if os.path.abspath(src) == os.path.abspath(dest): return
     if os.path.exists(src):
-        if os.path.exists(dest):
+        # Remove broken link
+        if os.path.islink(dest) and not os.path.exists(dest):
+            os.remove(dest)
+        elif os.path.exists(dest):
             if os.path.islink(dest): pass
             else: 
                 logger.error("Tried to create symbolic link %s to %s, destination exists but isn't a symbolic link\n" % (src, dest))

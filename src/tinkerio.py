@@ -518,11 +518,11 @@ class TINKER(Engine):
                     G.add_edge(a, b)
                 else: mode = 0
         # Use networkx to figure out a list of molecule numbers.
-        if len(G.nodes()) > 0:
+        if len(list(G.nodes())) > 0:
             # The following code only works in TINKER 6.2
-            gs = nx.connected_component_subgraphs(G)
-            tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
-            mnodes = [m.nodes() for m in tmols]
+            gs = list(nx.connected_component_subgraphs(G))
+            tmols = [gs[i] for i in np.argsort(np.array([min(list(g.nodes())) for g in gs]))]
+            mnodes = [list(m.nodes()) for m in tmols]
             self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
         else:
             grouped = [i.L() for i in self.mol.molecules]
@@ -630,6 +630,10 @@ class TINKER(Engine):
             Result["Energy"] = np.array(E)
             Result["Force"] = np.array(F)
         return Result
+
+    def get_charges(self):
+        logger.error('TINKER engine does not have get_charges (should be easy to implement however.)')
+        raise NotImplementedError
 
     def energy_force_one(self, shot):
 
