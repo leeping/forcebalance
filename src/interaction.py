@@ -7,7 +7,7 @@
 import os
 import shutil
 import numpy as np
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, uncommadash, printcool_dictionary
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, commadash, uncommadash, printcool_dictionary
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -61,10 +61,10 @@ class Interaction(Target):
         self.select1 = np.array(uncommadash(self.fragment1))
         ## Set fragment 2
         self.set_option(tgt_opts,'fragment2','fragment2')
-        if len(self.fragment2) == 0:
-            logger.error('You need to define the second fragment using the fragment2 keyword\n')
-            raise RuntimeError
-        self.select2 = np.array(uncommadash(self.fragment2))
+        if len(self.fragment2) != 0:
+            self.select2 = np.array(uncommadash(self.fragment2))
+        else:
+            self.select2 = None
         ## Set upper cutoff energy
         self.set_option(tgt_opts,'energy_upper','energy_upper')
         #======================================#
@@ -84,6 +84,9 @@ class Interaction(Target):
             self.ns = len(self.mol)
         else:
             self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
+        if self.select2 == None:
+            self.select2 = [i for i in range(self.mol.na) if i not in self.select1]
+            logger.info('Fragment 2 is the complement of fragment 1 : %s\n' % (commadash(self.select2)))
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(self.OptionDict.items() + options.items())
         del engine_args['name']

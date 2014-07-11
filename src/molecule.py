@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                     Last updated March 30, 2014                    |#
+#|                     Last updated July 7, 2014                      |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -34,7 +34,7 @@
 #|   It's better to be like a Millennium Falcon. :P                   |#
 #|                                                                    |#
 #|   Please make sure this file is up-to-date in                      |#
-#|   both the 'leeping' and 'forcebalance' modules                    |#
+#|   both the 'nanoreactor' and 'forcebalance' modules                |#
 #|                                                                    |#
 #|   At present, when I perform operations like adding two objects,   |#
 #|   the sum is created from deep copies of data members in the       |#
@@ -117,7 +117,8 @@ FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', '
 # tinkersuf  = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
 # resid      = Residue IDs (can come from MM coordinate file)
 # resname    = Residue names
-AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode'])
+# terminal   = List of true/false denoting whether this atom is followed by a terminal group.
+AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode', 'terminal'])
 #=========================================#
 #| This can be any data attribute we     |#
 #| want but it's usually some property   |#
@@ -145,6 +146,7 @@ import itertools
 from collections import OrderedDict, namedtuple, Counter
 from ctypes import *
 from warnings import warn
+import logging as logger
 
 # Covalent radii from Cordero et al. 'Covalent radii revisited' Dalton Transactions 2008, 2832-2838.
 Radii = [0.31, 0.28, # H and He
@@ -354,7 +356,7 @@ try:
             return 1
         def L(self):
             ''' Return a list of the sorted atom numbers in this graph. '''
-            return sorted(self.nodes())
+            return sorted(list(self.nodes()))
         def AStr(self):
             ''' Return a string of atoms, which serves as a rudimentary 'fingerprint' : '99,100,103,151' . '''
             return ','.join(['%i' % i for i in self.L()])
@@ -878,7 +880,12 @@ class Molecule(object):
         diff = abs(len(self.Data[key]) - len(self.Data[klast]))
         if kthis == 'comms':
             # Append empty comments if necessary because this causes way too many crashes.
-            for i in range(diff): self.Data['comms'].append('')
+            if diff > 0:
+                for i in range(diff): 
+                    self.Data['comms'].append('')
+            else:
+                for i in range(-1*diff):
+                    self.Data['comms'].pop()
         elif kthis == 'boxes' and len(self.Data['boxes']) == 1:
             # If we only have one box then we can fill in the rest of the trajectory.
             for i in range(diff): self.Data['boxes'].append(self.Data['boxes'][-1])
@@ -930,7 +937,7 @@ class Molecule(object):
 
         """
         return unmangle(self[0], other)
-            
+
     def append(self,other):
         self += other
 
@@ -1022,9 +1029,9 @@ class Molecule(object):
                     print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
                 self.toppbc = kwargs.get('toppbc', 0)
                 self.topology = self.build_topology()
-                self.molecules = nx.connected_component_subgraphs(self.topology)
+                self.molecules = list(nx.connected_component_subgraphs(self.topology))
                 if 'bonds' not in self.Data:
-                    self.Data['bonds'] = self.topology.edges()
+                    self.Data['bonds'] = list(self.topology.edges())
                     self.built_bonds = True
 
     #=====================================#
@@ -1093,8 +1100,8 @@ class Molecule(object):
     #=====================================#
 
     def center_of_mass(self):
-        M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
-        return np.array([np.sum([xyz[i,:] * PeriodicTable[self.elem[i]] / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
+        M = sum([PeriodicTable.get(self.elem[i], 0.0) for i in range(self.na)])
+        return np.array([np.sum([xyz[i,:] * PeriodicTable.get(self.elem[i], 0.0) / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
 
     def radius_of_gyration(self):
         M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
@@ -1256,8 +1263,8 @@ class Molecule(object):
         if 'networkx' in sys.modules and self.built_bonds and self.na > 0:
             New.toppbc = self.toppbc
             New.topology = New.build_topology()
-            New.molecules = nx.connected_component_subgraphs(New.topology)
-            New.Data['bonds'] = New.topology.edges()
+            New.molecules = list(nx.connected_component_subgraphs(New.topology))
+            New.Data['bonds'] = list(New.topology.edges())
             New.built_bonds = True
         elif 'bonds' in self.Data:
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
@@ -1379,8 +1386,6 @@ class Molecule(object):
             xmax = self.boxes[sn].a
             ymax = self.boxes[sn].b
             zmax = self.boxes[sn].c
-            # if xmax > gsz and ymax > gsz and zmax > gsz:
-            #     toppbc = True
             if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
                 print "Warning: Topology building will not work with broken molecules in nonorthogonal cells."
                 self.toppbc = False
@@ -1463,7 +1468,8 @@ class Molecule(object):
             AtomIterator = []
             for i in gasn:
                 for j in gngh[i]:
-                    AtomIterator.append(cartesian_product2([gasn[i], gasn[j]]))
+                    apairs = cartesian_product2([gasn[i], gasn[j]])
+                    if len(apairs) > 0: AtomIterator.append(apairs[apairs[:,0]>apairs[:,1]])
             AtomIterator = np.ascontiguousarray(np.vstack(AtomIterator))
         else:
             # Create a list of 2-tuples corresponding to combinations of atomic indices.
@@ -1481,10 +1487,10 @@ class Molecule(object):
                 dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
         else:
             # Inefficient implementation if importing contact doesn't work.
-            print "Warning: Using inefficient distance algorithm because 'contact' module was not imported."
-            if hasattr(self, 'boxes'):
-                print "No minimum image convention available (import 'contact' if you need it)."
-            dxij = [np.array(list(itertools.chain(*[[np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i in range(j+1,self.na)] for j in range(self.na)])))]
+            if hasattr(self, 'boxes') and self.toppbc:
+                logger.error("No minimum image convention available (import 'forcebalance.contact' if you need it).")
+                raise RuntimeError
+            dxij = [np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator])]
 
         # Create a NetworkX graph object.
         G = MyG()
@@ -1499,11 +1505,29 @@ class Molecule(object):
         for i, a in enumerate(bond_bool):
             if not a: continue
             (ii, jj) = AtomIterator[i]
-            if ii >= jj: continue
+            if ii == jj: continue
             bonds[ii].append(jj)
             bonds[jj].append(ii)
             G.add_edge(ii, jj)
         return G
+
+    def distance_matrix(self):
+        ''' Build a distance matrix between atoms. '''
+        AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
+        dxij = []
+        if 'nanoreactor.contact' in sys.modules:
+            if hasattr(self, 'boxes'):
+                dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
+            else:
+                dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator)
+        else:
+            # Inefficient implementation if importing contact doesn't work.
+            if hasattr(self, 'boxes'):
+                logger.error("No minimum image convention available (import 'nanoreactor.contact' if you need it).")
+                raise RuntimeError
+            for sn in range(len(self)):
+                dxij.append(np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator]))
+        return AtomIterator, dxij
 
     def find_angles(self):
 
@@ -1519,7 +1543,7 @@ class Molecule(object):
         # Iterate over separate molecules
         for mol in self.molecules:
             # Iterate over atoms in the molecule
-            for a2 in mol.nodes():
+            for a2 in list(mol.nodes()):
                 # Find all bonded neighbors to this atom
                 friends = sorted(list(nx.neighbors(mol, a2)))
                 if len(friends) < 2: continue
@@ -1545,7 +1569,7 @@ class Molecule(object):
         # Iterate over separate molecules
         for mol in self.molecules:
             # Iterate over bonds in the molecule
-            for edge in mol.edges():
+            for edge in list(mol.edges()):
                 # Determine correct ordering of atoms (middle atoms are ordered by convention)
                 a2 = edge[0] if edge[0] < edge[1] else edge[1]
                 a3 = edge[1] if edge[0] < edge[1] else edge[0]
@@ -2281,11 +2305,19 @@ class Molecule(object):
         Box = None
         #Separate into distinct lists for each model.
         PDBLines=[[]]
+        # LPW: Keep a record of atoms which are followed by a terminal group.
+        PDBTerms=[]
+        ReadTerms = True
         for x in ParsedPDB[0]:
             if x.__class__ in [END, ENDMDL]:
                 PDBLines.append([])
+                ReadTerms = False
             if x.__class__ in [ATOM, HETATM]:
                 PDBLines[-1].append(x)
+                if ReadTerms:
+                    PDBTerms.append(0)
+            if x.__class__ in [TER] and ReadTerms:
+                PDBTerms[-1] = 1
             if x.__class__==CRYST1:
                 Box = BuildLatticeFromLengthsAngles(x.a, x.b, x.c, x.alpha, x.beta, x.gamma)
 
@@ -2298,7 +2330,7 @@ class Molecule(object):
         AtomNames=np.array([x.name for x in X],'str')
         ResidueNames=np.array([x.resName for x in X],'str')
         ResidueID=np.array([x.resSeq for x in X],'int')
-        # Try not to number Residue IDs starting from 1...
+        # LPW: Try not to number Residue IDs starting from 1...
         if self.positive_resid:
             ResidueID=ResidueID-ResidueID[0]+1
 
@@ -2339,7 +2371,8 @@ class Molecule(object):
 
         Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":[str(i) for i in AtomNames],
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
-                "comms":['' for i in range(len(XYZList))]}
+                "comms":['' for i in range(len(XYZList))],
+                "terminal" : PDBTerms}
 
         if len(bonds) > 0:
             Answer["bonds"] = bonds
@@ -2832,41 +2865,8 @@ class Molecule(object):
         dcd = None
 
     def write_pdb(self, select, **kwargs):
-        """Save to a PDB. Copied wholesale from MSMBuilder.
-        COLUMNS  TYPE   FIELD  DEFINITION
-        ---------------------------------------------
-        7-11      int   serial        Atom serial number.
-        13-16     string name          Atom name.
-        17        string altLoc        Alternate location indicator.
-        18-20 (17-21 KAB)    string resName       Residue name.
-        22        string chainID       Chain identifier.
-        23-26     int    resSeq        Residue sequence number.
-        27        string iCode         Code for insertion of residues.
-        31-38     float  x             Orthogonal coordinates for X in
-        Angstroms.
-        39-46     float  y             Orthogonal coordinates for Y in
-        Angstroms.
-        47-54     float  z             Orthogonal coordinates for Z in
-        Angstroms.
-        55-60     float  occupancy     Occupancy.
-        61-66     float  tempFactor    Temperature factor.
-        73-76     string segID         Segment identifier, left-justified.
-        77-78     string element       Element symbol, right-justified.
-        79-80     string charge        Charge on the atom.
+        """Save to a PDB. Copied wholesale from MSMBuilder. """
 
-        CRYST1 line, added by Lee-Ping
-        COLUMNS  TYPE   FIELD  DEFINITION
-        ---------------------------------------
-         7-15    float  a      a (Angstroms).
-        16-24    float  b      b (Angstroms).
-        25-33    float  c      c (Angstroms).
-        34-40    float  alpha  alpha (degrees).
-        41-47    float  beta   beta (degrees).
-        48-54    float  gamma  gamma (degrees).
-        56-66    string sGroup Space group.
-        67-70    int    z      Z value.
-
-        """
         if sys.stdin.isatty():
             self.require('xyzs')
             self.require_resname()
@@ -2895,6 +2895,20 @@ class Molecule(object):
         if min(RESNUMS) == 0:
             RESNUMS = [i+1 for i in RESNUMS]
 
+        """
+        CRYST1 line, added by Lee-Ping
+        COLUMNS  TYPE   FIELD  DEFINITION
+        ---------------------------------------
+         7-15    float  a      a (Angstroms).
+        16-24    float  b      b (Angstroms).
+        25-33    float  c      c (Angstroms).
+        34-40    float  alpha  alpha (degrees).
+        41-47    float  beta   beta (degrees).
+        48-54    float  gamma  gamma (degrees).
+        56-66    string sGroup Space group.
+        67-70    int    z      Z value.
+        """
+
         if 'boxes' in self.Data:
             a = self.boxes[0].a
             b = self.boxes[0].b
@@ -2919,17 +2933,40 @@ class Molecule(object):
             
         for I in select:
             XYZ = self.xyzs[I]
+            Serial = 1
             for i in range(self.na):
-                ATOMNUM = i + 1
+                """
+                ATOM line.
+                COLUMNS  TYPE   FIELD  DEFINITION
+                ---------------------------------------------
+                7-11      int   serial        Atom serial number.
+                13-16     string name          Atom name.
+                17        string altLoc        Alternate location indicator.
+                18-20 (17-21 KAB)    string resName       Residue name.
+                22        string chainID       Chain identifier.
+                23-26     int    resSeq        Residue sequence number.
+                27        string iCode         Code for insertion of residues.
+                31-38     float  x             Orthogonal coordinates for X in
+                Angstroms.
+                39-46     float  y             Orthogonal coordinates for Y in
+                Angstroms.
+                47-54     float  z             Orthogonal coordinates for Z in
+                Angstroms.
+                55-60     float  occupancy     Occupancy.
+                61-66     float  tempFactor    Temperature factor.
+                73-76     string segID         Segment identifier, left-justified.
+                77-78     string element       Element symbol, right-justified.
+                79-80     string charge        Charge on the atom.
+                """
                 line=np.chararray(80)
                 line[:]=' '
                 line[0:4]=np.array(list("ATOM"))
                 line=np.array(line,'str')
-                line[6:11]=np.array(list(str(ATOMNUM%100000).rjust(5)))
-                # if ATOMNUM < 100000:
-                #     line[6:11]=np.array(list(str(ATOMNUM%100000).rjust(5)))
+                line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
+                # if Serial < 100000:
+                #     line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
                 # else:
-                #     line[6:11]=np.array(list(hex(ATOMNUM)[2:].rjust(5)))
+                #     line[6:11]=np.array(list(hex(Serial)[2:].rjust(5)))
                 #Molprobity is picky about atom name centering
                 if len(str(ATOMS[i]))==3:
                     line[12:16]=np.array(list(str(ATOMS[i]).rjust(4)))
@@ -2962,8 +2999,33 @@ class Molecule(object):
                 line[38:46]=np.array(list(("%8.3f"%(y))))
                 line[46:54]=np.array(list(("%8.3f"%(z))))
 
-                if ATOMNUM!=-1:
+                if Serial!=-1:
                     out.append(line.tostring())
+                Serial += 1
+
+                if 'terminal' in self.Data and self.terminal[i]:
+                    """
+                    TER line, added by Lee-Ping
+                    COLUMNS  TYPE   FIELD   DEFINITION
+                    -------------------------------------------
+                    7-11    int    serial  Serial number.
+                    18-20    string resName Residue name.
+                    22       string chainID Chain identifier.
+                    23-26    int    resSeq  Residue sequence number.
+                    27       string iCode   Insertion code.
+                    """
+                    line=np.chararray(27)
+                    line[:] = ' '
+                    line[0:3]=np.array(list("TER"))
+                    line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
+                    if len(str(RESNAMES[i]))==3:
+                        line[17:20]=np.array(list(str(RESNAMES[i])))
+                    else:
+                        line[17:21]=np.array(list(str(RESNAMES[i]).ljust(4)))
+                    line[21]=str(CHAIN[i]).rjust(1)
+                    line[22:26]=np.array(list(str(RESNUMS[i]%10000).rjust(4)))
+                    out.append(line.tostring())
+                    Serial += 1
             out.append('ENDMDL')
         if 'bonds' in self.Data:
             connects = ["CONECT%5i" % (b0+1) + "".join(["%5i" % (b[1]+1) for b in self.bonds if b[0] == b0]) for b0 in sorted(list(set(b[0] for b in self.bonds)))]

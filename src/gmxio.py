@@ -371,9 +371,11 @@ class ITP_Reader(BaseReader):
         if len(s) == 0 or re.match('^ *;',line): return None, None
         # Now go through all the cases.
         if re.match('^#', line):
-            self.override = 'DEFINE:' + s[1]
-        elif hasattr(self, 'override'):
-            delattr(self, 'override')
+            self.overpfx = 'DEFINE'
+            self.oversfx = s[1]
+        elif hasattr(self, 'overpfx'):
+            delattr(self, 'overpfx')
+            delattr(self, 'oversfx')
 
         if re.match('^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
@@ -566,9 +568,11 @@ class GMX(Engine):
             self.gmx_defs["ns_type"] = "grid"
             self.gmx_defs["nstlist"] = 20
             self.gmx_defs["rlist"] = "%.2f" % rlist
-            self.gmx_defs["coulombtype"] = "pme-switch"
-            self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
-            self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
+            self.gmx_defs["coulombtype"] = "pme"
+            self.gmx_defs["rcoulomb"] = "%.2f" % rlist
+            # self.gmx_defs["coulombtype"] = "pme-switch"
+            # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
+            # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
             self.gmx_defs["vdwtype"] = "switch"
             self.gmx_defs["rvdw"] = "%.2f" % (rlist - 0.05)
             self.gmx_defs["rvdw_switch"] = "%.2f" % (rlist - 0.1)
@@ -675,6 +679,10 @@ class GMX(Engine):
             for f in self.FF.fnms: 
                 os.unlink(f)
 
+    def get_charges(self):
+        logger.error('GMX engine does not have get_charges (should be easy to implement however.)')
+        raise NotImplementedError
+
     def links(self):
         topfile = onefile('%s.top' % self.name, 'top', err=True)
         LinkFile(topfile, "%s.top" % self.name)
@@ -778,8 +786,12 @@ class GMX(Engine):
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
         else:
+            if self.FF.rigid_water:
+                algorithm = "steep"
+            else:
+                algorithm = "l-bfgs"
             # Arguments for running minimization.
-            min_opts = {"integrator" : "l-bfgs", "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
+            min_opts = {"integrator" : algorithm, "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
 
         write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
 
@@ -1027,7 +1039,7 @@ class GMX(Engine):
             calc_eigvecs[i] /= np.linalg.norm(calc_eigvecs[i])
         return calc_eigvals, calc_eigvecs
 
-    def generate_vsite_positions(self):
+    def generate_positions(self):
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))

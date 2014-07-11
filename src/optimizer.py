@@ -9,6 +9,7 @@ contained inside.
 """
 
 import os, pickle, re, sys
+# import cProfile
 import numpy as np
 from copy import deepcopy
 import forcebalance
@@ -17,6 +18,7 @@ from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, 
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
+import time
 from forcebalance.output import getLogger, DEBUG, CleanStreamHandler
 logger = getLogger(__name__)
 
@@ -686,36 +688,52 @@ class Optimizer(forcebalance.BaseClass):
                     self.Grad = np.zeros(len(HL))
                     self.Hess = np.zeros((len(HL),len(HL)))
                     self.Penalty = Penalty
+                    self.iter = 0
                 def _compute(self, dx):
                     self.dx = dx.copy()
-                    Tmp = np.matrix(self.H)*col(dx)
+                    #Tmp = np.matrix(self.H)*col(dx)
+                    Tmp = np.dot(self.H, dx)
                     Reg_Term   = self.Penalty.compute(xkd+flat(dx), Obj0)
-                    self.Val   = (X + np.dot(dx, G) + 0.5*row(dx)*Tmp + Reg_Term[0] - data['X'])[0,0]
-                    self.Grad  = flat(col(G) + Tmp) + Reg_Term[1]
+                    self.Val   = (X + np.dot(dx, G) + 0.5*np.dot(dx,Tmp) + Reg_Term[0] - data['X'])
+                    #self.Val   = (X + np.dot(dx, G) + 0.5*row(dx)*Tmp + Reg_Term[0] - data['X'])[0,0]
+                    self.Grad  = G + Tmp + Reg_Term[1]
+                    self.Hess  = H + Reg_Term[2]
+                    # print "_compute: iter = %i, val = %.6f, |grad| = %.6f" % (self.iter, self.Val, np.sqrt(np.dot(self.Grad, self.Grad)))
+                    self.iter += 1
                 def compute_val(self, dx):
-                    if np.linalg.norm(dx - self.dx) > 1e-8:
+                    ddx = dx - self.dx
+                    if np.dot(ddx, ddx) > 1e-16:
                         self._compute(dx)
                     return self.Val
                 def compute_grad(self, dx):
-                    if np.linalg.norm(dx - self.dx) > 1e-8:
+                    ddx = dx - self.dx
+                    if np.dot(ddx, ddx) > 1e-16:
                         self._compute(dx)
                     return self.Grad
                 def compute_hess(self, dx):
-                    if np.linalg.norm(dx - self.dx) > 1e-8:
+                    ddx = dx - self.dx
+                    if np.dot(ddx, ddx) > 1e-16:
                         self._compute(dx)
                     return self.Hess
             def hyper_solver(L):
                 dx0 = np.zeros(len(xkd))
                 HL = H + (L-1)**2*np.eye(len(H))
                 HYP = Hyper(HL, self.Objective.Penalty)
-                try:
-                    Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
-                except:
-                    Opt1 = optimize.fmin(HYP.compute_val,dx0,full_output=True,disp=0)
-                try:
-                    Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xkd,fprime=HYP.compute_grad,gtol=1e-5,full_output=True,disp=0)
-                except:
-                    Opt2 = optimize.fmin(HYP.compute_val,-xkd,full_output=True,disp=0)
+                # cProfile.runctx('HYP._compute(dx0)', globals={}, locals={'HYP': HYP, 'dx0': dx0})
+                # sys.exit()
+
+                t0 = time.time()
+                # Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5*np.sqrt(len(dx0)),full_output=True,disp=1)
+                # Opt1 = optimize.fmin_l_bfgs_b(HYP.compute_val,dx0,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,iprint=0,disp=1,maxfun=1e5,maxiter=1e5)
+                Opt1 = optimize.fmin_l_bfgs_b(HYP.compute_val,dx0,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,iprint=-1,disp=0,maxfun=1e5,maxiter=1e5)
+                logger.info("%.3f s (L-BFGS 1) ", time.time() - t0)
+
+                t0 = time.time()
+                # Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xkd,fprime=HYP.compute_grad,gtol=1e-5*np.sqrt(len(dx0)),full_output=True,disp=1)
+                # Opt2 = optimize.fmin_l_bfgs_b(HYP.compute_val,-xkd,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,iprint=0,disp=1,maxfun=1e5,maxiter=1e5)
+                Opt2 = optimize.fmin_l_bfgs_b(HYP.compute_val,-xkd,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,iprint=-1,disp=0,maxfun=1e5,maxiter=1e5)
+                logger.info("%.3f s (L-BFGS 2) ", time.time() - t0)
+
                 dx1, sol1 = Opt1[0], Opt1[1]
                 dx2, sol2 = Opt2[0], Opt2[1]
                 dxb, sol = (dx1, sol1) if sol1 <= sol2 else (dx2, sol2)
@@ -769,7 +787,8 @@ class Optimizer(forcebalance.BaseClass):
     
         def trust_fun(L):
             N = np.linalg.norm(solver(L)[0])
-            logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
+            logger.info("Finding trust radius: H+(1+%.4f)*I, length %.4e (target %.4e)\n" % ((L-1)**2,N,trust))
+            # logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
             return (N - trust)**2
 
         def h_fun(L):
@@ -783,9 +802,11 @@ class Optimizer(forcebalance.BaseClass):
             dx, sol = solver(L) # dx is how much the step changes from the previous step.
             # This is our trial step.
             xk_ = dx + xk
-            Result = self.Objective.Full(xk_,0,verbose=False)['X'] - data['X']
-            logger.info("Searching! Diagonal addition = %.4e, L = % .4e, length %.4e, result % .4e\n" % ((L-1)**2,L,np.linalg.norm(dx),Result))
+            Result = self.Objective.Full(xk_,0,verbose=False,customdir="micro_%02i" % search_fun.micro)['X'] - data['X']
+            logger.info("Hessian diagonal search: H+(1+%.4f)*I, length %.4e, result % .4e\n" % ((L-1)**2,np.linalg.norm(dx),Result))
+            search_fun.micro += 1
             return Result
+        search_fun.micro = 0
         
         if self.trust0 > 0: # This is the trust region code.
             bump = False
@@ -806,12 +827,18 @@ class Optimizer(forcebalance.BaseClass):
                 logger.info("Newton-Raphson step found (length %.4e)\n" % (dxnorm))
                 
         else: # This is the search code.
-            # First obtain a step that is the same length as the provided trust radius.
-            LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)
-            dx, expect = solver(LOpt)
+            # First obtain a step that is roughly the same length as the provided trust radius.
+            dx, expect = solver(1)
             dxnorm = np.linalg.norm(dx)
+            if dxnorm > trust:
+                LOpt = optimize.brent(trust_fun,brack=(self.lmg,self.lmg*4),tol=1e-4)
+                dx, expect = solver(LOpt)
+                dxnorm = np.linalg.norm(dx)
+            else:
+                LOpt = 1
             logger.info("Starting Hessian diagonal search with step size %.4e\n" % dxnorm)
             bump = False
+            search_fun.micro = 0
             Result = optimize.brent(search_fun,brack=(LOpt,LOpt*4),tol=self.search_tol,full_output=1)
             if Result[1] > 0:
                 LOpt = optimize.brent(h_fun,brack=(self.lmg,self.lmg*4),tol=1e-6)

@@ -120,7 +120,8 @@ class BaseReader(object):
         
         """
         #print self.pdict[self.itype][pfld]
-        if hasattr(self, 'override'): return self.override
+        if hasattr(self, 'overpfx'): 
+            return self.overpfx + ':%i:' % pfld + self.oversfx
         ptype = self.pdict.get(self.itype,{}).get(pfld,':%i.%i' % (self.ln,pfld))
         answer = self.itype
         answer += ptype
