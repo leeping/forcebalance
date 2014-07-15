@@ -42,7 +42,7 @@ def energy_components(Sim, verbose=False):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
 
-def get_multipoles(simulation,q=None,positions=None):
+def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     """Return the current multipole moments in Debye and Buckingham units. """
     dx = 0.0
     dy = 0.0
@@ -55,7 +55,7 @@ def get_multipoles(simulation,q=None,positions=None):
     qzz = 0.0
     enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
     for i in simulation.system.getForces():
-        if i.__class__.__name__ == "AmoebaMultipoleForce":
+        if isinstance(i, AmoebaMultipoleForce):
             mm = i.getSystemMultipoleMoments(simulation.context)
             dx += mm[1]
             dy += mm[2]
@@ -66,19 +66,21 @@ def get_multipoles(simulation,q=None,positions=None):
             qyy += mm[8]
             qyz += mm[9]
             qzz += mm[12]
-        if i.__class__.__name__ == "NonbondedForce":
+        if isinstance(i, NonbondedForce):
             # Get array of charges.
             if q == None:
                 q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
             # Get array of positions in nanometers.
             if positions == None:
                 positions = simulation.context.getState(getPositions=True).getPositions()
-            mass = np.array([simulation.context.getSystem().getParticleMass(i).value_in_unit(dalton) \
-                                 for i in range(simulation.context.getSystem().getNumParticles())])
+            if mass == None:
+                mass = np.array([simulation.context.getSystem().getParticleMass(k).value_in_unit(dalton) \
+                                     for k in range(simulation.context.getSystem().getNumParticles())])
             x = np.array(positions.value_in_unit(nanometer))
-            com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
-            x -= com
-            xx, xy, xz, yy, yz, zz = (x[:,i]*x[:,j] for i, j in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
+            if rmcom:
+                com = np.sum(x*mass.reshape(-1,1),axis=0) / np.sum(mass)
+                x -= com
+            xx, xy, xz, yy, yz, zz = (x[:,k]*x[:,l] for k, l in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
             # Multiply charges by positions to get dipole moment.
             dip = enm_debye * np.sum(x*q.reshape(-1,1),axis=0)
             dx += dip[0]
@@ -97,36 +99,87 @@ def get_multipoles(simulation,q=None,positions=None):
     # This ordering has to do with the way TINKER prints it out.
     return [dx,dy,dz,qxx,qxy,qyy,qxz,qyz,qzz]
 
-def get_dipole(simulation,q=None,positions=None):
+def get_dipole(simulation,q=None,mass=None,positions=None):
     """Return the current dipole moment in Debye.
     Note that this quantity is meaningless if the system carries a net charge."""
-    return get_multipoles(simulation, q=q, positions=positions)[:3]
+    return get_multipoles(simulation, q=q, mass=mass, positions=positions, rmcom=False)[:3]
+
+def PrepareVirtualSites(system):
+    """ Prepare a list of function wrappers and vsite parameters from the system. """
+    isvsites = []
+    vsfuncs = []
+    vsidxs = []
+    vswts = []
+    for i in range(system.getNumParticles()):
+        if system.isVirtualSite(i):
+            isvsites.append(1)
+            vs = system.getVirtualSite(i)
+            if isinstance(vs, TwoParticleAverageSite):
+                vsidx = [_openmm.VirtualSite_getParticle(vs, 0), _openmm.VirtualSite_getParticle(vs, 1)]
+                vswt = [_openmm.TwoParticleAverageSite_getWeight(vs, 0), _openmm.TwoParticleAverageSite_getWeight(vs, 1)]
+                def vsfunc(pos, idx_, wt_):
+                    return wt_[0]*pos[idx_[0]] + wt_[1]*pos[idx_[1]]
+            elif isinstance(vs, ThreeParticleAverageSite):
+                vsidx = [_openmm.VirtualSite_getParticle(vs, 0), _openmm.VirtualSite_getParticle(vs, 1), _openmm.VirtualSite_getParticle(vs, 2)]
+                vswt = [_openmm.ThreeParticleAverageSite_getWeight(vs, 0), _openmm.ThreeParticleAverageSite_getWeight(vs, 1), _openmm.ThreeParticleAverageSite_getWeight(vs, 2)]
+                def vsfunc(pos, idx_, wt_):
+                    return wt_[0]*pos[idx_[0]] + wt_[1]*pos[idx_[1]] + wt_[2]*pos[idx_[2]]
+            elif isinstance(vs, OutOfPlaneSite):
+                vsidx = [_openmm.VirtualSite_getParticle(vs, 0), _openmm.VirtualSite_getParticle(vs, 1), _openmm.VirtualSite_getParticle(vs, 2)]
+                vswt = [_openmm.OutOfPlaneSite_getWeight12(vs), _openmm.OutOfPlaneSite_getWeight13(vs), _openmm.OutOfPlaneSite_getWeightCross(vs)]
+                def vsfunc(pos, idx_, wt_):
+                    v1 = pos[idx_[1]] - pos[idx_[0]]
+                    v2 = pos[idx_[2]] - pos[idx_[0]]
+                    cross = np.array([v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0]])
+                    return pos[idx_[0]] + wt_[0]*v1 + wt_[1]*v2 + wt_[2]*cross
+        else:
+            isvsites.append(0)
+            vsfunc = None
+            vsidx = None
+            vswt = None
+        vsfuncs.append(deepcopy(vsfunc))
+        vsidxs.append(deepcopy(vsidx))
+        vswts.append(deepcopy(vswt))
+    return (isvsites, vsfuncs, vsidxs, vswts)
+
+def ResetVirtualSites_fast(positions, vsinfo):
+    """Given a set of OpenMM-compatible positions and a System object,
+    compute the correct virtual site positions according to the System."""
+    isvsites, vsfuncs, vsidxs, vswts = vsinfo
+    if any(isvsites):
+        pos = np.array(positions.value_in_unit(nanometer))
+        for i in range(len(positions)):
+            if isvsites[i]:
+                pos[i] = vsfuncs[i](pos, vsidxs[i], vswts[i])
+        newpos = [Vec3(*i) for i in pos]*nanometer
+        return newpos
+    else:
+        return positions
 
 def ResetVirtualSites(positions, system):
     """Given a set of OpenMM-compatible positions and a System object,
     compute the correct virtual site positions according to the System."""
-    if any([system.isVirtualSite(i) for i in range(system.getNumParticles())]):
-        pos = positions.value_in_unit(nanometer)
+    if any([system.isVirtualSite(j) for j in range(system.getNumParticles())]):
+        pos = np.array(positions.value_in_unit(nanometer))
         for i in range(system.getNumParticles()):
             if system.isVirtualSite(i):
                 vs = system.getVirtualSite(i)
-                vstype = vs.__class__.__name__
                 # Faster code to work around Python API slowness.
-                if vstype == 'TwoParticleAverageSite':
+                if isinstance(vs, TwoParticleAverageSite):
                     vspos = _openmm.TwoParticleAverageSite_getWeight(vs, 0)*pos[_openmm.VirtualSite_getParticle(vs, 0)] \
                         + _openmm.TwoParticleAverageSite_getWeight(vs, 1)*pos[_openmm.VirtualSite_getParticle(vs, 1)]
-                elif vstype == 'ThreeParticleAverageSite':
+                elif isinstance(vs, ThreeParticleAverageSite):
                     vspos = _openmm.ThreeParticleAverageSite_getWeight(vs, 0)*pos[_openmm.VirtualSite_getParticle(vs, 0)] \
                         + _openmm.ThreeParticleAverageSite_getWeight(vs, 1)*pos[_openmm.VirtualSite_getParticle(vs, 1)] \
                         + _openmm.ThreeParticleAverageSite_getWeight(vs, 2)*pos[_openmm.VirtualSite_getParticle(vs, 2)]
-                elif vstype == 'OutOfPlaneSite':
+                elif isinstance(vs, OutOfPlaneSite):
                     v1 = pos[_openmm.VirtualSite_getParticle(vs, 1)] - pos[_openmm.VirtualSite_getParticle(vs, 0)]
                     v2 = pos[_openmm.VirtualSite_getParticle(vs, 2)] - pos[_openmm.VirtualSite_getParticle(vs, 0)]
                     cross = Vec3(v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0])
                     vspos = pos[_openmm.VirtualSite_getParticle(vs, 0)] + _openmm.OutOfPlaneSite_getWeight12(vs)*v1 \
                         + _openmm.OutOfPlaneSite_getWeight13(vs)*v2 + _openmm.OutOfPlaneSite_getWeightCross(vs)*cross
                 pos[i] = vspos
-        newpos = pos*nanometer
+        newpos = [Vec3(*i) for i in pos]*nanometer
         return newpos
     else: return positions
 
@@ -425,7 +478,8 @@ class OpenMM(Engine):
         self.precision = self.precision.lower()
         valprecs = ['single','mixed','double']
         if self.precision not in valprecs:
-            raise RuntimeError("Please specify one of %s for precision" % valprecs)
+            logger.error("Please specify one of %s for precision\n" % valprecs)
+            raise RuntimeError
         ## Set the simulation platform
         if self.verbose: logger.info("Setting Platform to %s\n" % self.platname)
         self.platform = Platform.getPlatformByName(self.platname)
@@ -442,6 +496,7 @@ class OpenMM(Engine):
             self.platform.setPropertyDefaultValue("OpenCLDeviceIndex", device)
             if self.verbose: logger.info("Setting OpenCL Precision to %s\n" % self.precision)
             self.platform.setPropertyDefaultValue("OpenCLPrecision", self.precision)
+        self.simkwargs = {}
 
     def readsrc(self, **kwargs):
 
@@ -454,16 +509,23 @@ class OpenMM(Engine):
         if 'pdb' in kwargs and os.path.exists(kwargs['pdb']):
             # Case 1. The PDB file name is provided explicitly
             pdbfnm = kwargs['pdb']
-            if not os.path.exists(pdbfnm): raise RuntimeError("%s specified but doesn't exist" % pdbfnm)
+            if not os.path.exists(pdbfnm): 
+                logger.error("%s specified but doesn't exist\n" % pdbfnm)
+                raise RuntimeError
 
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
         elif 'coords' in kwargs:
             self.mol = Molecule(kwargs['coords'])
         else:
-            raise RuntimeError('Must provide either a molecule object or coordinate file.')
-
+            logger.error('Must provide either a molecule object or coordinate file.\n')
+            raise RuntimeError
+        
+        # If the PDB file exists, then it is copied directly to create
+        # the OpenMM pdb object rather than being written by the
+        # Molecule class.
         if pdbfnm != None:
+            self.abspdb = os.path.abspath(pdbfnm)
             mpdb = Molecule(pdbfnm)
             for i in ["chain", "atomname", "resid", "resname", "elem"]:
                 self.mol.Data[i] = mpdb.Data[i]
@@ -475,25 +537,31 @@ class OpenMM(Engine):
         Simulation object yet, because that may depend on MD
         integrator parameters, thermostat, barostat etc.
         """
+        # Introduced to attempt to fix a bug, but didn't work,
+        # Might be sensible code anyway.
+        # if hasattr(self.mol, 'boxes') and not pbc:
+        #     del self.mol.Data['boxes']
+        # if pbc and not hasattr(self.mol, 'boxes'):
+        #     logger.error('Requested periodic boundary conditions but coordinate file contains no boxes')
+        #     raise RuntimeError
         ## Create the OpenMM PDB object.
-        pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
-        self.mol[0].write(pdb1)
-        self.pdb = PDBFile(pdb1)
-        os.unlink(pdb1)
+        if hasattr(self, 'abspdb'):
+            print self.abspdb
+            self.pdb = PDBFile(self.abspdb)
+        else:
+            pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
+            self.mol[0].write(pdb1)
+            self.pdb = PDBFile(pdb1)
+            os.unlink(pdb1)
         
         ## Create the OpenMM ForceField object.
 
         if hasattr(self, 'FF'):
-            self.ffxml = self.FF.openmmxml
+            self.ffxml = [self.FF.openmmxml]
             self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.openmmxml))
         else:
-            if 'ffxml' in kwargs:
-                if not os.path.exists(kwargs['ffxml']): 
-                    raise RuntimeError("%s doesn't exist" % kwargs['ffxml'])
-                self.ffxml = kwargs['ffxml']
-            elif onefile('xml'):
-                self.ffxml = onefile('xml')
-            self.forcefield = ForceField(self.ffxml)
+            self.ffxml = listfiles(kwargs.get('ffxml'), 'xml', err=True)
+            self.forcefield = ForceField(*self.ffxml)
 
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
@@ -505,7 +573,8 @@ class OpenMM(Engine):
         if hasattr(self,'FF'):
             if self.AMOEBA:
                 if self.FF.amoeba_pol == None:
-                    raise RuntimeError('You must specify amoeba_pol if there are any AMOEBA forces.')
+                    logger.error('You must specify amoeba_pol if there are any AMOEBA forces.\n')
+                    raise RuntimeError
                 if self.FF.amoeba_pol == 'mutual':
                     self.mmopts['polarization'] = 'mutual'
                     self.mmopts.setdefault('mutualInducedTargetEpsilon', self.FF.amoeba_eps if self.FF.amoeba_eps != None else 1e-6)
@@ -543,7 +612,8 @@ class OpenMM(Engine):
             if self.pbc:
                 # Obtain the periodic box
                 if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
-                    raise RuntimeError('OpenMM cannot handle nonorthogonal boxes.')
+                    logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
+                    raise RuntimeError
                 box_omm = [Vec3(self.mol.boxes[I].a, 0, 0)*angstrom, 
                            Vec3(0, self.mol.boxes[I].b, 0)*angstrom, 
                            Vec3(0, 0, self.mol.boxes[I].c)*angstrom]
@@ -582,7 +652,8 @@ class OpenMM(Engine):
             ## If temperature control is turned on, then run Langevin dynamics.
             if mts:
                 if rpmd_beads > 0:
-                    raise RuntimeError("No multiple timestep integrator without temperature control.")
+                    logger.error("No multiple timestep integrator without temperature control.\n")
+                    raise RuntimeError
                 integrator = MTSVVVRIntegrator(temperature*kelvin, collision/picosecond,
                                                timestep*femtosecond, self.system, ninnersteps=int(timestep/faststep))
             else:
@@ -595,7 +666,8 @@ class OpenMM(Engine):
         else:
             ## If no temperature control, default to the Verlet integrator.
             if rpmd_beads > 0:
-                raise RuntimeError("No RPMD integrator without temperature control.")
+                logger.error("No RPMD integrator without temperature control.\n")
+                raise RuntimeError
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
 
@@ -610,8 +682,18 @@ class OpenMM(Engine):
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
+        GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce', 'AmoebaWcaDispersionForce']
+        GrpNums = {}
         if not mts:
-            for i, j in enumerate(self.system.getForces()):
+            for j in self.system.getForces():
+                i = -1
+                if j.__class__.__name__ in GrpTogether:
+                    for k in GrpNums:
+                        if k in GrpTogether:
+                            i = GrpNums[k]
+                            break
+                if i == -1: i = len(set(GrpNums.values()))
+                GrpNums[j.__class__.__name__] = i
                 j.setForceGroup(i)
 
         ## If virtual particles are used with AMOEBA...
@@ -633,10 +715,18 @@ class OpenMM(Engine):
         parameters in the existing simulation object.  This should be
         run when we write a new force field XML file.
         """
-        self.forcefield = ForceField(self.ffxml)
+        if len(kwargs) > 0:
+            self.simkwargs = kwargs
+        self.forcefield = ForceField(*self.ffxml)
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
+        # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
+        self.vsinfo = PrepareVirtualSites(self.system)
+        self.nbcharges = np.zeros(self.system.getNumParticles())
+        for i in self.system.getForces():
+            if isinstance(i, NonbondedForce):
+                self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
 
         #----
         # If the virtual site parameters have changed,
@@ -651,7 +741,7 @@ class OpenMM(Engine):
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
         else:
-            self.create_simulation(**kwargs)
+            self.create_simulation(**self.simkwargs)
 
     def set_positions(self, shot=0, traj=None):
         
@@ -671,9 +761,17 @@ class OpenMM(Engine):
         # else:
         #     simulation.context.computeVirtualSites()
         #----
-        self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
+        # NOTE: Periodic box vectors must be set FIRST
         if self.pbc:
             self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+        # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
+        # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
+        self.simulation.context.setPositions(self.xyz_omms[shot][0])
+        self.simulation.context.computeVirtualSites()
+
+    def get_charges(self):
+        logger.error('OpenMM engine does not have get_charges (should be trivial to implement however.)')
+        raise NotImplementedError
 
     def compute_volume(self, box_vectors):
         """ Compute the total volume of an OpenMM system. """
@@ -691,15 +789,15 @@ class OpenMM(Engine):
         return mass
 
     def evaluate_one_(self, force=False, dipole=False):
-        # Perform a single point calculation on the current geometry.
-        State = self.simulation.context.getState(getEnergy=True, getForces=force)
+        # Perform a single point calculation on the current geometry.        
+        State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
         if force: 
             Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
             Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
-        if dipole: Result["Dipole"] = get_dipole(self.simulation)
+        if dipole: Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
         return Result
 
     def evaluate_(self, force=False, dipole=False, traj=False):
@@ -761,7 +859,8 @@ class OpenMM(Engine):
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
     def normal_modes(self, shot=0, optimize=True):
-        raise NotImplementedError("OpenMM cannot do normal mode analysis")
+        logger.error("OpenMM cannot do normal mode analysis\n")
+        raise NotImplementedError
 
     def optimize(self, shot=0, crit=1e-4):
 
@@ -788,7 +887,8 @@ class OpenMM(Engine):
         # Set geometry in OpenMM, requires some hoops.
         mod = Modeller(self.pdb.topology, [Vec3(i[0],i[1],i[2]) for i in X1]*angstrom)
         mod.addExtraParticles(self.forcefield)
-        self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
+        # self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
+        self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
         return E, M.ref_rmsd(0)[1]
 
     def multipole_moments(self, shot=0, optimize=True, polarizability=False):
@@ -798,7 +898,8 @@ class OpenMM(Engine):
         self.update_simulation()
 
         if polarizability:
-            raise NotImplementedError("Polarizability calculation is available in TINKER only.")
+            logger.error("Polarizability calculation is available in TINKER only.\n")
+            raise NotImplementedError
 
         if optimize: self.optimize(shot)
         else: self.set_positions(shot)
@@ -839,7 +940,8 @@ class OpenMM(Engine):
         self.update_simulation()
 
         if self.name == 'A' or self.name == 'B':
-            raise RuntimeError("Don't name the engine A or B!")
+            logger.error("Don't name the engine A or B!\n")
+            raise RuntimeError
 
         # Create two subengines.
         if hasattr(self,'target'):
@@ -886,18 +988,20 @@ class OpenMM(Engine):
         """
 
         if float(int(float(nequil)/float(nsave))) != float(nequil)/float(nsave):
-            raise RuntimeError("Please set nequil to an integer multiple of nsave")
+            logger.error("Please set nequil to an integer multiple of nsave\n")
+            raise RuntimeError
         iequil = nequil/nsave
 
         if float(int(float(nsteps)/float(nsave))) != float(nsteps)/float(nsave):
-            raise RuntimeError("Please set nsteps to an integer multiple of nsave")
+            logger.error("Please set nsteps to an integer multiple of nsave\n")
+            raise RuntimeError
         isteps = nsteps/nsave
 
         if hasattr(self, 'simulation'):
             logger.warning('Deleting the simulation object and re-creating for MD\n')
             delattr(self, 'simulation')
 
-        self.update_simulation(timestep=timestep, temperature=temperature, pressure=pressure, **kwargs)
+        self.update_simulation(timestep=timestep, temperature=temperature, pressure=pressure, anisotropic=anisotropic, **kwargs)
         self.set_positions()
 
         # Minimize the energy.
@@ -1045,12 +1149,16 @@ class Liquid_OpenMM(Liquid):
         self.set_option(tgt_opts,'liquid_coords',default='liquid.pdb',forceprint=True)
         # Name of the gas coordinate file.
         self.set_option(tgt_opts,'gas_coords',default='gas.pdb',forceprint=True)
+        # Set the number of steps between MC barostat adjustments.
+        self.set_option(tgt_opts,'mc_nbarostat')
         # Class for creating engine object.
         self.engine_ = OpenMM
         # Name of the engine to pass to npt.py.
         self.engname = "openmm"
         # Command prefix.
         self.nptpfx = "bash runcuda.sh"
+        if tgt_opts['remote_backup']:
+            self.nptpfx += " -b"
         # Extra files to be linked into the temp-directory.
         self.nptfiles = []
         # Set some options for the polarization correction calculation.

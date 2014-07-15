@@ -15,14 +15,28 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 """
 
 from select import select
-import os, sys, shutil
-from re import match, sub
+import os, sys, re, shutil, errno
 import numpy as np
 import itertools
 import threading
 import pickle
 import time
 import subprocess
+try:
+    import bz2
+    HaveBZ2 = True
+except:
+    logger.warning("bz2 module import failed (used in compressing or decompressing pickle files)\n")
+    HaveBZ2 = False
+
+try:
+    import gzip
+    HaveGZ = True
+except:
+    logger.warning("gzip module import failed (used in compressing or decompressing pickle files)\n")
+    HaveGZ = False
+    
+from shutil import copyfileobj
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
 
@@ -44,6 +58,33 @@ bohrang = 0.529177249
 #=========================#
 #     I/O formatting      #
 #=========================#
+# These functions may be useful someday but I have not tested them
+# def bzip2(src):
+#     dest = src+'.bz2'
+#     if not os.path.exists(src):
+#         logger.error('File to be compressed does not exist')
+#         raise RuntimeError
+#     if os.path.exists(dest):
+#         logger.error('Archive to be created already exists')
+#         raise RuntimeError
+#     with open(src, 'rb') as input:
+#         with bz2.BZ2File(dest, 'wb', compresslevel=9) as output:
+#             copyfileobj(input, output)
+#     os.remove(input)
+
+# def bunzip2(src):
+#     dest = re.sub('\.bz2$', '', src)
+#     if not os.path.exists(src):
+#         logger.error('File to be decompressed does not exist')
+#         raise RuntimeError
+#     if os.path.exists(dest):
+#         logger.error('Target path for decompression already exists')
+#         raise RuntimeError
+#     with bz2.BZ2File(src, 'rb', compresslevel=9) as input:
+#         with open(dest, 'wb') as output:
+#             copyfileobj(input, output)
+#     os.remove(input)
+
 def pvec1d(vec1d, precision=1, format="e", loglevel=INFO):
     """Printout of a 1-D vector.
 
@@ -97,7 +138,7 @@ def commadash(l):
 
 def uncommadash(s):
     # Takes a string like '27-31,88-91,100,136-139'
-    # and turns it into a list like [27, 28, 29, 30, 31, 88, 89, 90, 91, 100, 136, 137, 138, 139]
+    # and turns it into a list like [26, 27, 28, 29, 30, 87, 88, 89, 90, 99, 135, 136, 137, 138]
     L = []
     try:
         for w in s.split(','):
@@ -125,9 +166,29 @@ def uncommadash(s):
             logger.warning("List is out of order\n")
             raise
     except:
-        raise Exception('Invalid string for converting to list of numbers: %s' % s)
+        logger.error('Invalid string for converting to list of numbers: %s\n' % s)
+        raise RuntimeError
     return L
-            
+
+def extract_int(arr, avgthre, limthre, label="value", verbose=True):
+    """ Get the representative integer value from an array.
+    Sanity check: Make sure the value does not go through big excursions.
+    The integer value is the rounded value of the average.
+    thresh = A threshold to make sure we're not dealing with 
+    fluctuations that are too large. """
+    average = np.mean(arr)
+    maximum = np.max(arr)
+    minimum = np.min(arr)
+    rounded = round(average)
+    passed = True
+    if abs(average - rounded) > avgthre:
+        if verbose: print "Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre)
+        passed = False                                                                                        
+    if abs(maximum - minimum) > limthre:
+        if verbose: print "Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre)
+        passed = False
+    return int(rounded), passed
+
 #list(itertools.chain(*[range(*(int(w.split('-')[0])-1, int(w.split('-')[1]) if len(w.split('-')) == 2 else int(w.split('-')[0])))  for w in Mao.split(',')]))
 
 def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,center=True,sym2="="):
@@ -159,7 +220,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     @return bar The bottom bar is returned for the user to print later, e.g. to mark off a 'section'    
     """
     def newlen(l):
-        return len(sub("\x1b\[[0-9;]*m","",line))
+        return len(re.sub("\x1b\[[0-9;]*m","",line))
     text = text.split('\n')
     width = max(minwidth,max([newlen(line) for line in text]))
     bar = ''.join([sym2 for i in range(width + 6)])
@@ -225,7 +286,7 @@ def isint(word):
     @return answer Boolean which specifies whether the string is an integer (only +/- sign followed by digits)
     
     """
-    return match('^[-+]?[0-9]+$',word)
+    return re.match('^[-+]?[0-9]+$',word)
 
 def isfloat(word):
     """Matches ANY number; it can be a decimal, scientific notation, what have you
@@ -235,7 +296,7 @@ def isfloat(word):
     @return answer Boolean which specifies whether the string is any number
     
     """
-    return match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
+    return re.match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
 
 def isdecimal(word):
     """Matches things with a decimal only; see isint and isfloat.
@@ -288,6 +349,27 @@ def flat(vec):
     @return answer The flattened data
     """
     return np.array(vec).reshape(-1)
+
+def monotonic(arr, start, end):
+    # Make sure an array is monotonically decreasing from the start to the end.
+    a0 = arr[start]
+    i0 = start
+    if end > start:
+        i = start+1
+        while i < end:
+            if arr[i] < a0:
+                arr[i0:i+1] = np.linspace(a0, arr[i], i-i0+1)
+                a0 = arr[i]
+                i0 = i
+            i += 1
+    if end < start:
+        i = start-1
+        while i >= end:
+            if arr[i] < a0:
+                arr[i:i0+1] = np.linspace(arr[i], a0, i0-i+1)
+                a0 = arr[i]
+                i0 = i
+            i -= 1
 
 #====================================#
 #| Math: Vectors and linear algebra |#
@@ -438,7 +520,8 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     N = A_n.shape[0]
     # Be sure A_n and B_n have the same dimensions.
     if(A_n.shape != B_n.shape):
-        raise ParameterError('A_n and B_n must have same dimensions.')
+        logger.error('A_n and B_n must have same dimensions.\n')
+        raise ParameterError
     # Initialize statistical inefficiency estimate with uncorrelated value.
     g = 1.0
     # Compute mean of each timeseries.
@@ -477,6 +560,11 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
     if (g < 1.0): g = 1.0
     # Return the computed statistical inefficiency.
     return g
+
+def mean_stderr(ts):
+    """Return mean and standard deviation of a time series ts."""
+    return np.mean(ts), \
+      np.std(ts)*np.sqrt(statisticalInefficiency(ts, warn=False)/len(ts))
 
 # Slices a 2D array of data by column.  The new array is fed into the statisticalInefficiency function.
 def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=True):
@@ -535,11 +623,13 @@ class Unpickler_LP(pickle.Unpickler):
                 for q in "\"'": # double or single quote
                     if rep.startswith(q):
                         if not rep.endswith(q):
-                            raise ValueError, "insecure string pickle"
+                            logger.error("insecure string pickle\n")
+                            raise ValueError
                         rep = rep[len(q):-len(q)]
                         break
                 else:
-                    raise ValueError, "insecure string pickle"
+                    logger.error("insecure string pickle\n")
+                    raise ValueError
                 ## The string is converted to an _ElementTree type before it is finally loaded.
                 self.append(etree.ElementTree(etree.fromstring(rep.decode("string-escape"))))
             except:
@@ -549,13 +639,68 @@ class Unpickler_LP(pickle.Unpickler):
         except:
             warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
 
-def lp_dump(obj, file, protocol=None):
-    """ Use this instead of pickle.dump for pickling anything that contains _ElementTree types. """
-    Pickler_LP(file, protocol).dump(obj)
+def lp_dump(obj, fnm, protocol=0):
+    """ Write an object to a zipped pickle file specified by the path. """
+    # Safeguard against overwriting files?  Nah.
+    # if os.path.exists(fnm):
+    #     logger.error("lp_dump cannot write to an existing path")
+    #     raise IOError
+    if os.path.islink(fnm):
+        logger.warn("Trying to write to a symbolic link %s, removing it first\n" % fnm)
+        os.unlink(fnm)
+    if HaveGZ:
+        f = gzip.GzipFile(fnm, 'wb')
+    elif HaveBZ2:
+        f = bz2.BZ2File(fnm, 'wb')
+    else:
+        f = open(fnm, 'wb')
+    Pickler_LP(f, protocol).dump(obj)
+    f.close()
 
-def lp_load(file):
-    """ Use this instead of pickle.load for unpickling anything that contains _ElementTree types. """
-    return Unpickler_LP(file).load()
+def lp_load(fnm):
+    """ Read an object from a bzipped file specified by the path. """
+    if not os.path.exists(fnm):
+        logger.error("lp_load cannot read from a path that doesn't exist (%s)" % fnm)
+        raise IOError
+
+    def load_uncompress():
+        logger.warning("Compressed file loader failed, attempting to read as uncompressed file\n")
+        f = open(fnm, 'rb')
+        answer = Unpickler_LP(f).load()
+        f.close()
+        return answer
+
+    def load_bz2():
+        f = bz2.BZ2File(fnm, 'rb')
+        answer = Unpickler_LP(f).load()
+        f.close()
+        return answer
+
+    def load_gz():
+        f = gzip.GzipFile(fnm, 'rb')
+        answer = Unpickler_LP(f).load()
+        f.close()
+        return answer
+        
+    if HaveGZ:
+        try: 
+            answer = load_gz()
+        except:
+            if HaveBZ2:
+                try:
+                    answer = load_bz2()
+                except:
+                    answer = load_uncompress()
+            else:
+                answer = load_uncompress()
+    elif HaveBZ2:
+        try:
+            answer = load_bz2()
+        except:
+            answer = load_uncompress()
+    else:
+        answer = load_uncompress()
+    return answer
 
 #==============================#
 #|      Work Queue stuff      |#
@@ -594,7 +739,7 @@ def destroyWorkQueue():
     WORK_QUEUE = None
     WQIDS = defaultdict(list)
 
-def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
+def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
     """ 
     Submit a job to the Work Queue.
 
@@ -613,16 +758,17 @@ def queue_up(wq, command, input_files, output_files, tgt=None, verbose=True):
         lf = os.path.join(cwd,f)
         task.specify_output_file(lf,f,cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-    task.specify_tag(command)
+    if tag == None: tag = command
+    task.specify_tag(tag)
     taskid = wq.submit(task)
     if verbose:
-        logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
+        logger.info("Submitting command '%s' to the Work Queue, %staskid %i\n" % (command, "tag %s, " % tag if tag != command else "", taskid))
     if tgt != None:
         WQIDS[tgt.name].append(taskid)
     else:
         WQIDS["None"].append(taskid)
     
-def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=True):
+def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
     """ 
     Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly
     specify where the input files come from, and where the output files go to.
@@ -643,7 +789,8 @@ def queue_up_src_dest(wq, command, input_files, output_files, tgt=None, verbose=
         # print f[0], f[1]
         task.specify_output_file(f[0],f[1],cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-    task.specify_tag(command)
+    if tag == None: tag = command
+    task.specify_tag(tag)
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
@@ -683,22 +830,19 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                         tgtname = tnm
                         WQIDS[tnm].remove(task.id)
                 taskid = wq.submit(task)
-                logger.warning("Command '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.command, oldid, oldhost, exectime, taskid))
+                logger.warning("Task '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.tag, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
             else:
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
-                    logger.info("Command '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.command, task.id, task.hostname, exectime))
+                    logger.info("Task '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.tag, task.id, task.hostname, exectime))
                 for tnm in WQIDS:
                     if task.id in WQIDS[tnm]:
                         WQIDS[tnm].remove(task.id)
                 del task
         if hasattr(wq.stats, 'workers_full'):
-            # Full workers were added with CCTools 4.0.1
+            # Full workers statistic was added with CCTools 4.0
             # But deprecated with CCTools 4.1 (so if they're equal we don't add them.)
-            if wq.stats.workers_busy == wq.stats.workers_full:
-                nbusy = wq.stats.workers_busy
-            else:
-                nbusy = wq.stats.workers_busy + wq.stats.workers_full
+            nbusy = wq.stats.workers_busy + wq.stats.workers_full
         else:
             nbusy = wq.stats.workers_busy
 
@@ -727,6 +871,13 @@ def wq_wait(wq, wait_time=10, wait_intvl=10, print_time=60, verbose=False):
 #=====================================#
 #| File and process management stuff |#
 #=====================================#
+def click():
+    """ Stopwatch function for timing. """
+    ans = time.time() - click.t0
+    click.t0 = time.time()
+    return ans
+click.t0 = time.time()
+
 # Back up a file.
 def bak(path, dest=None):
     oldf = path
@@ -747,32 +898,78 @@ def bak(path, dest=None):
         shutil.move(oldf,newf)
     return newf
 
-# Search for exactly one file with a provided extension.
-# ext: File extension
-# arg: String name of an argument
-# kwargs: Dictionary of keyword arguments.
-def onefile(ext, arg=None):
-    fnm = None
-    if arg != None:
-        if os.path.exists(arg):
-            fnm = os.path.basename(arg)
+# Purpose: Given a file name and/or an extension, do one of the following:
+# 1) If provided a file name, check the file, crash if not exist and err==True.  Return the file name.
+# 2) If list is empty but extension is provided, check if one file exists that matches
+# the extension.  If so, return the file name.
+# 3) If list is still empty and err==True, then crash with an error.
+def onefile(fnm=None, ext=None, err=False):
+    if fnm == None and ext == None:
+        if err:
+            logger.error("Must provide either filename or extension to onefile()")
+            raise RuntimeError
         else:
-            warn_once("File specified by %s (%s) does not exist - will try to autodetect" % (ext, arg))
+            return None
+    if fnm != None:
+        if os.path.exists(fnm):
+            return os.path.basename(fnm)
+        elif (err==True or ext==None):
+            logger.error("File specified by %s does not exist!" % fnm)
+            raise RuntimeError
+        elif ext != None:
+            warn_once("File specified by %s does not exist - will try to autodetect .%s extension" % (fnm, ext))
+    answer = None
+    cwd = os.getcwd()
+    ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
+    if len(ls) != 1:
+        if err:
+            logger.error("Cannot find a unique file with extension .%s in %s (%i found)" % (ext, cwd, len(ls)))
+            raise RuntimeError
+        else:
+            warn_once("Cannot find a unique file with extension .%s in %s (%i found)" % 
+                      (ext, cwd, len(ls)), warnhash = "Found %i .%s files" % (len(ls), ext))
+    else:
+        answer = os.path.basename(ls[0])
+        warn_once("Autodetected %s in %s" % (answer, cwd), warnhash = "Autodetected %s" % answer)
+    return answer
 
-    if fnm == None:
-        cwd = os.getcwd()
-        ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
-        if len(ls) != 1:
-            warn_once("Found %i .%s files in %s" % (len(ls), ext, cwd), warnhash = "Found %i .%s files" % (len(ls), ext))
-        else:
-            fnm = os.path.basename(ls[0])
-            warn_once("Autodetected %s in %s" % (fnm, cwd), warnhash = "Autodetected %s" % fnm )
-    return fnm
+# Purpose: Given a file name / file list and/or an extension, do one of the following:
+# 1) If provided a file list, check each file in the list
+# and crash if any file does not exist.  Return the list.
+# 2) If provided a file name, check the file and crash if the file 
+# does not exist.  Return a length-one list with the file name.
+# 3) If list is empty but extension is provided, check for files that
+# match the extension.  If so, append them to the list.
+# 4) If list is still empty and err==True, then crash with an error.
+def listfiles(fnms=None, ext=None, err=False):
+    answer = []
+    if isinstance(fnms, list):
+        for i in fnms:
+            if not os.path.exists(i):
+                logger.error('Specified %s but it does not exist' % i)
+                raise RuntimeError
+            answer.append(i)
+    elif isinstance(fnms, str):
+        if not os.path.exists(fnms):
+            logger.error('Specified %s but it does not exist' % fnms)
+            raise RuntimeError
+        answer = [fnms]
+    elif fnms != None:
+        logger.error('First argument to listfiles must be a list, a string, or None')
+        raise RuntimeError
+    if answer == [] and ext != None:
+        answer = [os.path.basename(i) for i in os.listdir(os.getcwd()) if i.endswith('.%s' % ext)]
+    if answer == [] and err:
+        logger.error('listfiles function failed to come up with a file! (fnms = %s ext = %s)' % (str(fnms), str(ext)))
+        raise RuntimeError
+    return answer
 
 def GoInto(Dir):
     if os.path.exists(Dir):
         if os.path.isdir(Dir): pass
-        else: raise Exception("Tried to create directory %s, it exists but isn't a directory" % newdir)
+        else: 
+            logger.error("Tried to create directory %s, it exists but isn't a directory\n" % newdir)
+            raise RuntimeError
     else:
         os.makedirs(Dir)
     os.chdir(Dir)
@@ -785,7 +982,8 @@ def allsplit(Dir):
 
 def Leave(Dir):
     if os.path.split(os.getcwd())[1] != Dir:
-        raise Exception("Trying to leave directory %s, but we're actually in directory %s (check your code)" % (Dir,os.path.split(os.getcwd())[1]))
+        logger.error("Trying to leave directory %s, but we're actually in directory %s (check your code)\n" % (Dir,os.path.split(os.getcwd())[1]))
+        raise RuntimeError
     for i in range(len(allsplit(Dir))):
         os.chdir('..')
 
@@ -810,7 +1008,7 @@ def MissingFileInspection(fnm):
     for key in specific_dct:
         if answer == "":
             answer += "\n"
-        if match(key, fnm):
+        if re.match(key, fnm):
             answer += "%s\n" % specific_dct[key]
     return answer
 
@@ -824,25 +1022,33 @@ def wopen(dest):
 def LinkFile(src, dest, nosrcok = False):
     if os.path.abspath(src) == os.path.abspath(dest): return
     if os.path.exists(src):
-        if os.path.exists(dest):
+        # Remove broken link
+        if os.path.islink(dest) and not os.path.exists(dest):
+            os.remove(dest)
+        elif os.path.exists(dest):
             if os.path.islink(dest): pass
-            else: raise Exception("Tried to create symbolic link %s to %s, destination exists but isn't a symbolic link" % (src, dest))
+            else: 
+                logger.error("Tried to create symbolic link %s to %s, destination exists but isn't a symbolic link\n" % (src, dest))
+                raise RuntimeError
         else:
             os.symlink(src, dest)
     else:
         if not nosrcok:
-            raise Exception("Tried to create symbolic link %s to %s, but source file doesn't exist%s" % (src,dest,MissingFileInspection(src)))
+            logger.error("Tried to create symbolic link %s to %s, but source file doesn't exist%s\n" % (src,dest,MissingFileInspection(src)))
+            raise RuntimeError
     
 
 def CopyFile(src, dest):
     if os.path.exists(src):
         if os.path.exists(dest):
             if os.path.islink(dest): 
-                raise Exception("Tried to copy %s to %s, destination exists but it's a symbolic link" % (src, dest))
+                logger.error("Tried to copy %s to %s, destination exists but it's a symbolic link\n" % (src, dest))
+                raise RuntimeError
         else:
             shutil.copy2(src, dest)
     else:
-        raise Exception("Tried to copy %s to %s, but source file doesn't exist%s" % (src,dest,MissingFileInspection(src)))
+        logger.error("Tried to copy %s to %s, but source file doesn't exist%s\n" % (src,dest,MissingFileInspection(src)))
+        raise RuntimeError
 
 def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
@@ -973,11 +1179,15 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             for fh in to_read:
                 if fh is p.stdout:
                     read = fh.read(rbytes)
-                    if not read: streams.remove(p.stdout)
+                    if not read: 
+                        streams.remove(p.stdout)
+                        p.stdout.close()
                     else: out_chunker.push(read)
                 elif fh is p.stderr:
                     read = fh.read(rbytes)
-                    if not read: streams.remove(p.stderr)
+                    if not read: 
+                        streams.remove(p.stderr)
+                        p.stderr.close()
                     else: err_chunker.push(read)
                 else:
                     raise RuntimeError
@@ -1001,7 +1211,8 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             # This code (commented out) would not throw an exception, but instead exit with the returncode of the crashed program.
             # sys.stderr.write("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
             # sys.exit(p.returncode)
-            raise Exception("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n" % (command, p.returncode))
+            logger.error("\x1b[1;94m%s\x1b[0m gave a return code of %i (\x1b[91mit may have crashed\x1b[0m)\n\n" % (command, p.returncode))
+            raise RuntimeError
         
     # Return the output in the form of a list of lines, so we can loop over it using "for line in output".
     Out = process_out.stdout.split('\n')

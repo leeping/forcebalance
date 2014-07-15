@@ -179,7 +179,8 @@ class BackedUpDict(dict):
         try:
             return self.backup_dict[self['AtomType']][key]
         except:
-            raise KeyError('The key %s does not exist as an atom attribute or as an atom type attribute!' % key)
+            logger.error('The key %s does not exist as an atom attribute or as an atom type attribute!\n' % key)
+            raise KeyError
 
 class FF(forcebalance.BaseClass):
     """ Force field class.
@@ -192,7 +193,7 @@ class FF(forcebalance.BaseClass):
     For details on force field parsing, see the detailed documentation for addff.
     
     """
-    def __init__(self, options, verbose=True):
+    def __init__(self, options, verbose=True, printopt=True):
 
         """Instantiation of force field class.
 
@@ -226,6 +227,8 @@ class FF(forcebalance.BaseClass):
         self.set_option(options, 'rigid_water')
         ## Bypass the transformation and use physical parameters directly
         self.set_option(options, 'use_pvals')
+        ## Allow duplicate parameter names (internally construct unique names)
+        self.set_option(options, 'duplicate_pnames')
         
         #======================================#
         #     Variables which are set here     #
@@ -317,7 +320,12 @@ class FF(forcebalance.BaseClass):
         self.linedestroy_this = []
         self.prmdestroy_this = []
         ## Print the optimizer options.
-        printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
+        if printopt: printcool_dictionary(self.PrintOptionDict, title="Setup for force field")
+
+    @classmethod
+    def fromfile(cls, fnm):
+        options = {'forcefield' : [fnm], 'ffdir' : '.', 'duplicate_pnames' : True}
+        return cls(options, verbose=False, printopt=False)
 
     def addff(self,ffname):
         """ Parse a force field file and add it to the class.
@@ -408,6 +416,18 @@ class FF(forcebalance.BaseClass):
             else:
                 self.openmmxml = ffname
 
+        if fftype == "mol2":
+            if hasattr(self, "amber_mol2"):
+                warn_press_key("There should only be one .mol2 file - confused!!")
+            else:
+                self.amber_mol2 = ffname
+
+        if fftype == "frcmod":
+            if hasattr(self, "amber_frcmod"):
+                warn_press_key("There should only be one .frcmod file - confused!!")
+            else:
+                self.amber_frcmod = ffname
+
         # Determine the appropriate parser from the FF_IOModules dictionary.
         # If we can't figure it out, then use the base reader, it ain't so bad. :)
         Reader = FF_IOModules.get(fftype, forcebalance.BaseReader)
@@ -477,7 +497,7 @@ class FF(forcebalance.BaseClass):
             for k in kwds:
                 if sline.count(k) > 1:
                     logger.error(line)
-                    logger.error("The above line contains multiple occurrences of the keyword %s" % k)
+                    logger.error("The above line contains multiple occurrences of the keyword %s\n" % k)
                     raise RuntimeError
                 elif sline.count(k) == 1:
                     marks[k] = (np.array(sline) == k).argmax()
@@ -495,15 +515,32 @@ class FF(forcebalance.BaseClass):
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
+                    pid_ = pid
                     # Add pid into the dictionary.
                     # LPW: Here is a hack to allow duplicate parameter IDs.
                     if pid in self.map:
                         pid0 = pid
                         extranum = 0
+                        dupfnms = [os.path.basename(i[0]) for i in self.pfields[self.map[pid]]]
+                        duplns = [i[1] for i in self.pfields[self.map[pid]]]
+                        dupflds = [i[2] for i in self.pfields[self.map[pid]]]
                         while pid in self.map:
                             pid = "%s%i" % (pid0, extranum)
                             extranum += 1
-                        logger.info("Encountered an duplicate parameter ID: parameter name has been changed to %s\n" % pid)
+                        def warn_or_err(*args):
+                            if self.duplicate_pnames:
+                                logger.warn(*args)
+                            else:
+                                logger.error(*args)
+                        warn_or_err("Encountered an duplicate parameter ID (%s)\n" % pid_)
+                        warn_or_err("file %s line %i field %i duplicates:\n" 
+                                    % (os.path.basename(ffname), ln+1, pfld))
+                        for dupfnm, dupln, dupfld in zip(dupfnms, duplns, dupflds):
+                            warn_or_err("file %s line %i field %i\n" % (dupfnm, dupln+1, dupfld))
+                        if self.duplicate_pnames:
+                            logger.warn("Parameter name has been changed to %s\n" % pid)
+                        else:
+                            raise RuntimeError
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
                     self.patoms.append([self.Readers[ffname].molatom])
@@ -531,7 +568,8 @@ class FF(forcebalance.BaseClass):
                             count += 1
                         sys.stderr.write("\nOffending ID: %s\n" % sline[parse+1])
                         
-                        raise Exception('Parameter repetition entry in force field file is incorrect (see above)')
+                        logger.error('Parameter repetition entry in force field file is incorrect (see above)\n')
+                        raise RuntimeError
                     pid = self.Readers[ffname].build_pid(pfld)
                     self.map[pid] = prep
                     # This repeated parameter ID also has these atoms involved.
@@ -626,9 +664,11 @@ class FF(forcebalance.BaseClass):
         
         """
         if type(vals)==np.ndarray and vals.ndim != 1:
-            raise Exception('Please only pass 1-D arrays')
+            logger.error('Please only pass 1-D arrays\n')
+            raise RuntimeError
         if len(vals) != self.np:
-            raise Exception('Input parameter np.array (%i) not the required size (%i)' % (len(vals), self.np))
+            logger.error('Input parameter np.array (%i) not the required size (%i)\n' % (len(vals), self.np))
+            raise RuntimeError
         if use_pvals or self.use_pvals:
             logger.info("Using physical parameters directly!\r")
             pvals = vals.copy().flatten()
@@ -684,7 +724,8 @@ class FF(forcebalance.BaseClass):
                         wval = eval(cmd.replace("PARM","PRM"))
                     except:
                         logger.error(traceback.format_exc() + '\n')
-                        raise Exception("The command %s (written in the force field file) cannot be evaluated!" % cmd)
+                        logger.error("The command %s (written in the force field file) cannot be evaluated!\n" % cmd)
+                        raise RuntimeError
                 else:
                     wval = mult*pvals[i]
                 if self.ffdata_isxml[fnm]:
@@ -833,7 +874,8 @@ class FF(forcebalance.BaseClass):
                 pvals = np.exp(mvals.flatten()) * self.pvals0
             except:
                 logger.exception(mvals + '\n')
-                raise Exception('What the hell did you do?')
+                logger.error('What the hell did you do?\n')
+                raise RuntimeError
         else:
             pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
@@ -859,7 +901,8 @@ class FF(forcebalance.BaseClass):
         @return mvals The mathematical parameters
         """
         if self.logarithmic_map:
-            raise Exception('create_mvals has not been implemented for logarithmic_map')
+            logger.error('create_mvals has not been implemented for logarithmic_map\n')
+            raise RuntimeError
         mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
         return mvals
         
@@ -1019,8 +1062,9 @@ class FF(forcebalance.BaseClass):
                 if nmol == 0:
                     self.qid = qid
                     self.qmap = qmap
-                else:
-                    logger.info("Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted.\n" % molname)
+                # The warning about ESP fitting is not very helpful
+                # else:
+                #     logger.info("Note: ESP fitting will be performed assuming that molecule id %s is the FIRST molecule and the only one being fitted.\n" % molname)
                 nmol += 1
         elif self.constrain_charge:
             warn_press_key("'adict' {molecule:atomnames} was not found.\n This isn't a big deal if we only have one molecule, but might cause problems if we want multiple charge neutrality constraints.")

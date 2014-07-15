@@ -6,7 +6,7 @@ import numpy as np
 import _contact_wrap
 import warnings
 
-def atom_distances(xyzlist, atom_contacts):
+def atom_distances(xyzlist, atom_contacts, box=None):
     '''
     For each frame in xyzlist, compute the (euclidean) distance between
     pairs of atoms whos indices are given in contacts.
@@ -16,6 +16,8 @@ def atom_distances(xyzlist, atom_contacts):
     
     contacts should be a num_contacts x 2 array where each row
     gives the indices of 2 atoms whos distance you care to monitor.
+
+    box should be a 3-element array containing the a, b, and c lattice lengths.
     
     Returns: traj_length x num_contacts array of euclidean distances
     
@@ -27,15 +29,18 @@ def atom_distances(xyzlist, atom_contacts):
     # check shapes
     traj_length, num_atoms, num_dims = xyzlist.shape
     if not num_dims == 3:
-        raise ValueError("xyzlist must be an n x m x 3 array")
+        logger.error("xyzlist must be an n x m x 3 array\n")
+        raise ValueError
     try: 
         num_contacts, width = atom_contacts.shape
         assert width is 2
     except (AttributeError, ValueError, AssertionError):
-        raise ValueError('contacts must be an n x 2 array')
+        logger.error('contacts must be an n x 2 array\n')
+        raise ValueError
         
     if not np.all(np.unique(atom_contacts) < num_atoms):
-        raise ValueError('Atom contacts goes larger than num_atoms')
+        logger.error('Atom contacts goes larger than num_atoms\n')
+        raise ValueError
     
     # check type
     if xyzlist.dtype != np.float32:
@@ -52,8 +57,20 @@ def atom_distances(xyzlist, atom_contacts):
         atom_contacts = np.copy(atom_contacts)
     
     results = np.zeros((traj_length, num_contacts), dtype=np.float32)
-    
-    _contact_wrap.atomic_contact_wrap(xyzlist, atom_contacts, results)
+
+    if box == None:
+        _contact_wrap.atomic_contact_wrap(xyzlist, atom_contacts, results)
+    else:
+        if box.shape != (3,):
+            logger.error('box must be a 3-element array\n')
+            raise ValueError
+        if box.dtype != np.float32:
+            box = np.float32(box)
+        # make sure contiguous
+        if not box.flags.contiguous:
+            warnings.warn("box is not contiguous: copying", RuntimeWarning)
+            box = np.copy(box)
+        _contact_wrap.atomic_contact_rect_image_wrap(xyzlist, box, atom_contacts, results)
     
     return results
 
@@ -84,12 +101,14 @@ def residue_distances(xyzlist, residue_membership, residue_contacts):
     
     traj_length, num_atoms, num_dims = xyzlist.shape
     if not num_dims == 3:
-        raise ValueError("xyzlist must be n x m x 3")
+        logger.error("xyzlist must be n x m x 3\n")
+        raise ValueError
     try: 
         num_contacts, width = residue_contacts.shape
         assert width is 2
     except (AttributeError, ValueError, AssertionError):
-        raise ValueError('residue_contacts must be an n x 2 array')
+        logger.error('residue_contacts must be an n x 2 array\n')
+        raise ValueError
         
     # check type
     if xyzlist.dtype != np.float32:

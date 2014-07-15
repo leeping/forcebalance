@@ -2,14 +2,26 @@
 
 # This wrapper script is for running CUDA jobs (hint hint, OpenMM) on clusters.
 
+# Command line switch indicates whether to do backups
+do_bak=0
+while [ $# -gt 0 ]
+do
+    case $1 in
+        -b) do_bak=1 ;;
+        *) break ;;
+    esac
+    shift
+done
+
+# This is the command that we want to run.
 COMMAND=$@
 
 # Load my environment variables. :)
 . /etc/profile
 . /etc/bashrc
 . ~/.bashrc
-# Make sure the Cuda environment is turned on
 
+# Make sure the Cuda environment is turned on
 # module load cuda
 # module load cudatoolkit
 # export OPENMM_CUDA_COMPILER=`which nvcc`
@@ -41,8 +53,9 @@ elif [[ $HOSTNAME =~ "kid" ]] ; then
     export INCLUDE=$CUDA_HOME/include:$INCLUDE
     export BAK=/lustre/medusa/leeping/runcuda-backups
 elif [[ $HOSTNAME =~ "icme-gpu" || $HOSTNAME =~ "node0" ]] ; then
-    module load cuda50/toolkit/5.0.35
-    export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda50/toolkit/5.0.35/bin/nvcc
+    module load cuda55/toolkit
+    export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda55/toolkit/5.5.22/bin/nvcc
+    #export OPENMM_CUDA_COMPILER=/cm/shared/apps/cuda50/toolkit/5.0.35/bin/nvcc
 elif [[ $HOSTNAME =~ "longhorn" ]] ; then
     module unload intel
     module load gcc
@@ -93,9 +106,9 @@ elif [[ `env | grep -i tacc | wc -l` -gt 0 ]] ; then
 fi
 
 if [[ x$CUDA_DEVICE != x ]] ; then
-    sleep $(( CUDA_DEVICE * 30 ))
+    sleep $(( CUDA_DEVICE * 10 ))
 elif [[ x$PBS_JOBID != x ]] ; then
-    sleep $(( PBS_JOBID * 30 ))
+    sleep $(( PBS_JOBID * 10 ))
 fi
 
 echo "#=======================#"
@@ -124,21 +137,24 @@ echo "#=======================#"
 echo
 echo $COMMAND
 
-rm -f npt_result.p npt_result.p.bz2
+rm -f npt_result.p
 export PYTHONUNBUFFERED="y"
+
+# Run the actual command.
 time $COMMAND
 exitstat=$?
+
 # Delete backup files that are older than one week.
-find $BAK/$PWD -type f -mtime +7 -exec rm {} \;
-mkdir -p $BAK/$PWD
-cp * $BAK/$PWD
-# For some reason I was still getting error messages about the bzip already existing..
-rm -f npt_result.p.bz2
-bzip2 npt_result.p
+find $BAK -type f -mtime +7 -exec rm {} \;
+
+# Copy backup files.
+if [ $do_bak -gt 0 ] ; then
+    mkdir -p $BAK/$PWD
+    cp * $BAK/$PWD
+fi
 
 # Avoid the stupid segfault-on-quit that happens on fire
 # Ahh, i don't know how to do this..
-
 if [ $? -gt 30000 ] ; then
     exit 0
 fi

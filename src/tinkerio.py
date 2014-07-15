@@ -53,7 +53,13 @@ logger = getLogger(__name__)
 pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals distance, well depth, distance from bonded neighbor?
          'BOND'         : {'Atom':[1,2], 3:'K',4:'B'},     # Bond force constant and equilibrium distance (Angstrom)
          'ANGLE'        : {'Atom':[1,2,3], 4:'K',5:'B'},   # Angle force constant and equilibrium angle
+         'STRBND'       : {'Atom':[1,2,3], 4:'K1',5:'K2'}, # Two stretch-bend force constants (usually same)
+         'OPBEND'       : {'Atom':[1,2,3,4], 5:'K'},       # Out-of-plane bending force constant
          'UREYBRAD'     : {'Atom':[1,2,3], 4:'K',5:'B'},   # Urey-Bradley force constant and equilibrium distance (Angstrom)
+         'TORSION'      : ({'Atom':[1,2,3,4], 5:'1K', 6:'1B', 
+                            8:'2K', 9:'2B', 11:'3K', 12:'3B'}), # Torsional force constants and equilibrium phi-angles
+         'PITORS'       : {'Atom':[1,2], 3:'K'},           # Pi-torsion force constants (usually 6.85 ..)
+         # Note torsion-torsion (CMAP) not implemented at this time.
          'MCHARGE'      : {'Atom':[1,2,3], 4:''},          # Atomic charge
          'DIPOLE'       : {0:'X',1:'Y',2:'Z'},             # Dipole moment in local frame
          'QUADX'        : {0:'X'},                         # Quadrupole moment, X component
@@ -170,7 +176,8 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
     # Make sure that the keys are lowercase, and the values are all strings.
     options = OrderedDict([(key.lower(), str(val) if val != None else None) for key, val in options.items()])
     if 'parameters' in options and prmfnm != None:
-        raise RuntimeError("Please pass prmfnm or 'parameters':'filename.prm' in options but not both.")
+        logger.error("Please pass prmfnm or 'parameters':'filename.prm' in options but not both.\n")
+        raise RuntimeError
     elif 'parameters' in options:
         prmfnm = options['parameters']
     
@@ -231,7 +238,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
                     warn_press_key("Expected a parameter file name but got none")
                 # This is the case where "parameters" correctly corresponds to optimize.in
                 prmflag = 1
-                if prmfnm == None or val0 in prms:
+                if prmfnm == None or val0 in prms or val0[:-4] in prms:
                     out.append(line1)
                     continue
                 else:
@@ -243,7 +250,8 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
                 val = options[key]
                 val0 = valf.strip()
                 if key in clashes and val != val0:
-                    raise RuntimeError("write_key tried to set %s = %s but its original value was %s = %s" % (key, val, key, val0))
+                    logger.error("write_key tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
+                    raise RuntimeError
                 # Passing None as the value causes the option to be deleted
                 if val == None: 
                     continue
@@ -277,10 +285,12 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
         options["parameters"] = prmfnm
     elif not prmflag:
         if not os.path.exists('%s.prm' % os.path.splitext(fout)[0]):
-            raise RuntimeError('No parameter file detected, this will cause TINKER to crash')
+            logger.error('No parameter file detected, this will cause TINKER to crash\n')
+            raise RuntimeError
     for i in chk:
         if i not in haveopts:
-            raise RuntimeError('%s is expected to be in the .key file, but not found' % i)
+            logger.error('%s is expected to be in the .key file, but not found\n' % i)
+            raise RuntimeError
     # Finally write the key file.
     file_out = wopen(fout) 
     for line in out:
@@ -319,19 +329,13 @@ class TINKER(Engine):
 
         """ Called by __init__ ; read files from the source directory. """
 
-        self.key = onefile('key', kwargs['tinker_key'] if 'tinker_key' in kwargs else None)
-        self.prm = onefile('prm', kwargs['tinker_prm'] if 'tinker_prm' in kwargs else None)
+        self.key = onefile(kwargs.get('tinker_key'), 'key')
+        self.prm = onefile(kwargs.get('tinker_prm'), 'prm')
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
-        elif 'coords' in kwargs:
-            if kwargs['coords'].endswith('.xyz'):
-                self.mol = Molecule(kwargs['coords'], ftype="tinker")
-            else:
-                self.mol = Molecule(kwargs['coords'])
         else:
-            arcfile = onefile('arc')
-            if not arcfile: raise RuntimeError('Cannot determine which .arc file to use')
-            self.mol = Molecule(arcfile)
+            crdfile = onefile(kwargs.get('coords'), 'arc', err=True)
+            self.mol = Molecule(crdfile)
 
     def calltinker(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -359,14 +363,16 @@ class TINKER(Engine):
                             warn_press_key("ForceBalance requires TINKER %.1f - unexpected behavior with older versions!" % vn_need)
                         self.warn_vn = True
                 except:
-                    raise RuntimeError("Unable to determine TINKER version number!")
+                    logger.error("Unable to determine TINKER version number!\n")
+                    raise RuntimeError
         for line in o[-10:]:
             # Catch exceptions since TINKER does not have exit status.
             if "TINKER is Unable to Continue" in line:
                 for l in o:
                     logger.error("%s\n" % l)
                 time.sleep(1)
-                raise RuntimeError("TINKER may have crashed! (See above output)\nThe command was: %s\nThe directory was: %s" % (' '.join(csplit), os.getcwd()))
+                logger.error("TINKER may have crashed! (See above output)\nThe command was: %s\nThe directory was: %s\n" % (' '.join(csplit), os.getcwd()))
+                raise RuntimeError
                 break
         for line in o:
             if 'D+' in line:
@@ -439,7 +445,8 @@ class TINKER(Engine):
                 tk_opts['gamma'] = None
         if pbc:
             if (not keypbc) and 'boxes' not in self.mol.Data:
-                raise RuntimeError("Periodic boundary conditions require either (1) a-axis to be in the .key file or (b) boxes to be in the coordinate file.")
+                logger.error("Periodic boundary conditions require either (1) a-axis to be in the .key file or (b) boxes to be in the coordinate file.\n")
+                raise RuntimeError
         self.pbc = pbc
         if pbc:
             tk_opts['ewald'] = ''
@@ -511,11 +518,12 @@ class TINKER(Engine):
                     G.add_edge(a, b)
                 else: mode = 0
         # Use networkx to figure out a list of molecule numbers.
-        if len(G.nodes()) > 0:
+        if len(list(G.nodes())) > 0:
             # The following code only works in TINKER 6.2
-            gs = nx.connected_component_subgraphs(G)
-            tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
-            self.AtomLists['MoleculeNumber'] = [[i+1 in m.nodes() for m in tmols].index(1) for i in range(self.mol.na)]
+            gs = list(nx.connected_component_subgraphs(G))
+            tmols = [gs[i] for i in np.argsort(np.array([min(list(g.nodes())) for g in gs]))]
+            mnodes = [list(m.nodes()) for m in tmols]
+            self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
         else:
             grouped = [i.L() for i in self.mol.molecules]
             self.AtomLists['MoleculeNumber'] = [[i in g for g in grouped].index(1) for i in range(self.mol.na)]
@@ -623,6 +631,10 @@ class TINKER(Engine):
             Result["Force"] = np.array(F)
         return Result
 
+    def get_charges(self):
+        logger.error('TINKER engine does not have get_charges (should be easy to implement however.)')
+        raise NotImplementedError
+
     def energy_force_one(self, shot):
 
         """ Computes the energy and force using TINKER for one snapshot. """
@@ -635,8 +647,8 @@ class TINKER(Engine):
 
         """ Computes the energy using TINKER over a trajectory. """
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
@@ -646,8 +658,8 @@ class TINKER(Engine):
 
         """ Computes the energy and force using TINKER over a trajectory. """
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
@@ -658,8 +670,8 @@ class TINKER(Engine):
 
         """ Computes the energy and dipole using TINKER over a trajectory. """
 
-        if hasattr(self, 'mdtraj') : 
-            x = self.mdtraj
+        if hasattr(self, 'md_trajectory') : 
+            x = self.md_trajectory
         else:
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
@@ -745,7 +757,7 @@ class TINKER(Engine):
             polarizability_dict = OrderedDict()
             for line in o:
                 s = line.split()
-                if "Total Polarizability Tensor" in line:
+                if "Molecular Polarizability Tensor" in line:
                     pn = ln
                 elif pn > 0 and ln == pn + 2:
                     polarizability_dict['xx'] = float(s[-3])
@@ -796,7 +808,8 @@ class TINKER(Engine):
             if "Total Potential Energy" in line:
                 E = float(line.split()[-2].replace('D','e'))
         if E == None:
-            raise RuntimeError("Total potential energy wasn't encountered when calling analyze!")
+            logger.error("Total potential energy wasn't encountered when calling analyze!\n")
+            raise RuntimeError
         if optimize and abs(E-E_) > 0.1:
             warn_press_key("Energy from optimize and analyze aren't the same (%.3f vs. %.3f)" % (E, E_))
         return E, rmsd
@@ -901,7 +914,7 @@ class TINKER(Engine):
             
         # Gather information.
         os.system("mv %s.arc %s-md.arc" % (self.name, self.name))
-        self.mdtraj = "%s-md.arc" % self.name
+        self.md_trajectory = "%s-md.arc" % self.name
         edyn = []
         kdyn = []
         temps = []
@@ -1012,7 +1025,8 @@ class Liquid_TINKER(Liquid):
         # Error checking.
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
-                raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+                logger.error('Please provide %s; it is needed to proceed.\n' % i)
+                raise RuntimeError
         # Send back the trajectory file.
         self.extra_output = ['liquid.dyn']
         if self.save_traj > 0:

@@ -65,9 +65,6 @@ def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True):
 
 class Quantity(object):
     """
-    Quantity
-    ========
-
     Base class for thermodynamical quantity used for fitting. This can
     be any experimental data that can be calculated as an ensemble
     average from a simulation.
@@ -123,8 +120,9 @@ class Quantity(object):
             being fitted. 
         
         """
-        raise NotImplementedError(("Extract method not implemented"
-                                  " in base class."))    
+        logger.error("Extract method not implemented in base class.\n")    
+        raise NotImplementedError
+
 # class Quantity_Density
 class Quantity_Density(Quantity):
     def __init__(self, engname, temperature, pressure, name=None):

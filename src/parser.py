@@ -70,7 +70,8 @@ gen_opts_types = {
                  "readchk"      : (None, -50, 'Name of the restart file we read from', 'Restart jobtype "newton" with "writechk" set'),
                  "writechk"     : (None, -50, 'Name of the restart file we write to (can be same as readchk)', 'Main optimizer'),
                  "ffdir"        : ('forcefield', 100, 'Directory containing force fields, relative to project directory', 'All'),
-                 "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER']),
+                 "amberhome"    : (None, -10, 'Path to AMBER installation directory (leave blank to use AMBERHOME environment variable.', 'Targets that use AMBER', 'AMBER'),
                  },
     'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.', 
                                    'All (important); choose "single", "gradient", "hessian", "newton" (Main Optimizer), "bfgs", "powell", "simplex", "anneal", "genetic", "conjugategradient", "scan_mvals", "scan_pvals", "fdcheck[gh]"'),
@@ -84,6 +85,8 @@ gen_opts_types = {
                  "wq_port"   : (0, 0, 'The port number to use for Work Queue', 'Targets that use Work Queue (advanced usage)'),
                  "criteria"   : (1, 160, 'The number of convergence criteria that must be met for main optimizer to converge', 'Main Optimizer'),
                  "rpmd_beads"       : (0, -160, 'Number of beads in ring polymer MD (zero to disable)', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
+                 "zerograd"         : (-1, 0, 'Set to a nonnegative number to turn on zero gradient skipping at that optimization step.', 'All'),
+                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER'])
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
@@ -101,6 +104,7 @@ gen_opts_types = {
                  "asynchronous"     : (0, 0, 'Execute Work Queue tasks and local calculations asynchronously for improved speed', 'Targets that use Work Queue (advanced usage)'),
                  "reevaluate"       : (None, 0, 'Re-evaluate the objective function and gradients when the step is rejected (for noisy objective functions).', 'Main Optimizer'),
                  "continue"         : (0, 140, 'Continue the current run from where we left off (supports mid-iteration recovery).', 'Main Optimizer'),
+                 "duplicate_pnames" : (0, -150, 'Allow duplicate parameter names (only if you know what you are doing!', 'Force Field Parser'),
                  },
     'floats'  : {"trust0"                 : (1e-1, 100, 'Levenberg-Marquardt trust radius; set to negative for nonlinear search', 'Main Optimizer'),
                  "mintrust"               : (0.0,   10, 'Minimum trust radius (if the trust radius is tiny, then noisy optimizations become really gnarly)', 'Main Optimizer'),
@@ -121,7 +125,7 @@ gen_opts_types = {
                  "adaptive_damping"       : (0.5,   10, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.', 'Main Optimizer'),
                  "error_tolerance"        : (0.0,   10, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.', 'Main Optimizer'),
                  "search_tolerance"       : (1e-4, -10, 'Search tolerance; used only when trust radius is negative, dictates convergence threshold of nonlinear search.', 'Main Optimizer with negative mintrust; advanced usage'),
-                 "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER'])
+                 "amoeba_eps"             : (None, -10, 'The AMOEBA mutual polarization criterion.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER']),
                  },
     'sections': {"read_mvals" : (None, 100, 'Paste mathematical parameters into the input file for them to be read in directly', 'Restarting an optimization'),
                  "read_pvals" : (None, 100, 'Paste physical parameters into the input file for them to be read in directly', 'Restarting an optimization (recommend use_mvals instead)'),
@@ -131,10 +135,9 @@ gen_opts_types = {
 
 ## Default fitting target options.
 tgt_opts_types = {
-    'strings' : {"name"      : (None, 200, 'The name of the target, corresponding to the directory targets/name', 'All targets (important)'),
-                 "force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
-                 "fragment1" : (None, 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
-                 "fragment2" : (None, 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
+    'strings' : {"force_map" : ('residue', 0, 'The resolution of mapping interactions to net forces and torques for groups of atoms.  In order of resolution: molecule > residue > charge-group', 'Force Matching', 'AbInitio'),
+                 "fragment1" : ('', 0, 'Interaction fragment 1: a selection of atoms specified using atoms and dashes, e.g. 1-6 to select the first through sixth atom (i.e. list numbering starts from 1)', 'Interaction energies', 'Interaction'),
+                 "fragment2" : ('', 0, 'Interaction fragment 2: a selection of atoms specified using atoms and dashes, e.g. 7-11 to select atoms 7 through 11.', 'Interaction energies', 'Interaction'),
                  "openmm_precision" : (None, -10, 'Precision of OpenMM calculation if using CUDA or OpenCL platform.  Choose either single, double or mixed ; defaults to the OpenMM default.', 'Targets that use OpenMM', 'OpenMM'),
                  "openmm_platform" : (None, -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
                  "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
@@ -148,23 +151,29 @@ tgt_opts_types = {
                  "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_ndx"               : (None, -10, 'Gromacs .ndx files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
+                 "amber_mol2"            : (None, -10, 'Name of mol2 file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
+                 "amber_frcmod"          : (None, -10, 'Name of frcmod file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
+                 "amber_leapcmd"         : (None, -10, 'File containing commands for "tleap" when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),
                  "read"                  : (None, 50, 'Provide a temporary directory ".tmp" to read data from a previous calculation on the initial iteration (for instance, to restart an aborted run).', 'Liquid and Remote targets', 'Liquid, Remote'),
+                 "remote_prefix"         : ('', 50, 'Specify an optional prefix script to run in front of rtarget.py, for loading environment variables', 'Remote targets', 'Remote'),
+                 "fitatoms"              : ('0', 0, 'Number of fitting atoms; defaults to all of them.  Use a comma and dash style list (1,2-5), atoms numbered from one, inclusive', 'Energy + Force Matching', 'AbInitio'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
                  },
-    'lists'   : {"fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
+    'lists'   : {"name"      : ([], 200, 'The name of the target, corresponding to the directory targets/name ; may provide a list if multiple targets have the same settings', 'All targets (important)'),
+                 "fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
                  "quantities" : ([], 100, 'List of quantities to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
-                 "fitatoms"           : (0, 0, 'Number of fitting atoms; defaults to all of them', 'Energy + Force Matching', 'AbInitio'),
                  "sleepy"             : (0, -50, 'Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)', 'All targets (advanced usage)'),
                  "liquid_md_steps"    : (10000, 0, 'Number of time steps for the liquid production run.', 'Condensed phase property targets', 'liquid'),
                  "liquid_eq_steps"    : (1000, 0, 'Number of time steps for the liquid equilibration run.', 'Condensed phase property targets', 'liquid'),
                  "lipid_md_steps"     : (10000, 0, 'Number of time steps for the lipid production run.', 'Condensed phase property targets', 'lipid'),
                  "lipid_eq_steps"     : (1000, 0, 'Number of time steps for the lipid equilibration run.', 'Condensed phase property targets', 'lipid'),
+                 "n_mcbarostat"       : (25, 0, 'Number of steps in the liquid simulation between MC barostat volume adjustments.', 'Liquid properties in OpenMM', 'Liquid_OpenMM'),
                  "gas_md_steps"       : (100000, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "gas_eq_steps"       : (10000, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "writelevel"         : (0, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
@@ -191,6 +200,7 @@ tgt_opts_types = {
                  "absolute"         : (0, -150, 'When matching energies in AbInitio, do not subtract the mean energy gap.', 'Energy matching (advanced usage)', 'abinitio'),
                  "cauchy"           : (0, 0, 'Normalize interaction energies each using 1/(denom**2 + reference**2) which resembles a Cauchy distribution', 'Interaction energy targets', 'interaction'),
                  "attenuate"        : (0, 0, 'Normalize interaction energies using 1/(denom**2 + reference**2) only for repulsive interactions greater than denom.', 'Interaction energy targets', 'interaction'),
+                 "normalize"        : (0, -150, 'Divide objective function by the number of snapshots / vibrations', 'Interaction energy / vibrational mode targets', 'interaction, vibration'),
                  "manual"           : (0, -150, 'Give the user a chance to fill in condensed phase stuff on the zeroth step', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "hvap_subaverage"  : (0, -150, 'Don\'t target the average enthalpy of vaporization and allow it to freely float (experimental)', 'Condensed phase property targets (advanced usage)', 'liquid'),
                  "force_cuda"       : (0, -150, 'Force the external npt.py script to crash if CUDA Platform not available', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
@@ -199,6 +209,8 @@ tgt_opts_types = {
                  "minimize_energy"  : (1, 0, 'Minimize the energy of the system prior to running dynamics', 'Condensed phase property targets (advanced usage)', 'liquid_openmm', 'liquid_tinker'),
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
                  "adapt_errors"     : (0, 50, 'Adapt to simulation uncertainty by combining property estimations and adjusting simulation length.', 'Condensed phase property targets', 'liquid'),
+                 "force_average"    : (0, -50, 'Average over all atoms when normalizing force errors.', 'Force matching', 'abinitio'),
+                 "remote_backup"    : (0, -50, 'When running remote target, back up files at the remote location.', 'Liquid, lipid and remote targets', 'liquid, lipid, remote'),
                  },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid, lipid'),
@@ -233,6 +245,8 @@ tgt_opts_types = {
                  "lipid_interval"  : (0.1, 0, 'Time interval for saving coordinates for the lipid production run.', 'Lipid property targets', 'lipid'),
                  "self_pol_mu0"  : (0.0, -150, 'Gas-phase dipole parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
+                 "epsgrad"         : (0.0, -150, 'Gradient below this threshold will be set to zero.', 'All targets'),
+                 "energy_asymmetry": (1.0, -150, 'Snapshots with (E_MM - E_QM) < 0.0 will have their weights increased by this factor.', 'Ab initio targets'),
                  },
     'sections': {}
     }
@@ -248,7 +262,8 @@ for i in all_opts_names:
         if i in dct:
             iocc.append("gen_opt_types %s" % typ)
     if len(iocc) != 1:
-        raise RuntimeError("CODING ERROR: ForceBalance option %s occurs in more than one place (%s)" % (i, str(iocc)))
+        logger.error("CODING ERROR: ForceBalance option %s occurs in more than one place (%s)\n" % (i, str(iocc)))
+        raise RuntimeError
 
 ## Default general options - basically a collapsed veresion of gen_opts_types.
 gen_opts_defaults = {}
@@ -461,6 +476,7 @@ def parse_inputs(input_file=None):
                 if section in ["SIMULATION","TARGET"] and newsection in mainsections:
                     tgt_opts.append(this_tgt_opt)
                     this_tgt_opt = deepcopy(tgt_opts_defaults)
+                if newsection == "END": newsection = "NONE"
                 section = newsection
             elif section in ["OPTIONS","SIMULATION","TARGET"]:
                 ## Depending on which section we are in, we choose the correct type dictionary
@@ -493,7 +509,8 @@ def parse_inputs(input_file=None):
                     elif isfloat(s[1]) and int(float(s[1])) == 1:
                         this_opt[key] = True
                     else:
-                        raise RuntimeError('%s is a true/false option but you provided %s; to enable, provide ["1", "yes", "true", "on" or <no value>].  To disable, provide ["0", "no", "false", or "off"].' % (key, s[1]))
+                        logger.error('%s is a true/false option but you provided %s; to enable, provide ["1", "yes", "true", "on" or <no value>].  To disable, provide ["0", "no", "false", or "off"].\n' % (key, s[1]))
+                        raise RuntimeError
                 elif key in opts_types['floats']:
                     this_opt[key] = float(s[1])
                 elif key in opts_types['sections']:
@@ -504,6 +521,9 @@ def parse_inputs(input_file=None):
                     logger.error("Perhaps this option actually belongs in %s section?\n" \
                           % (section == "OPTIONS" and "a TARGET" or "the OPTIONS"))
                     raise RuntimeError
+            elif section == "NONE" and len(s) > 0:
+                logger.error("Encountered a non-comment line outside of a section\n")
+                raise RuntimeError
             elif section not in mainsections:
                 logger.error("Unrecognized section: %s\n" % section)
                 raise RuntimeError
@@ -516,4 +536,11 @@ def parse_inputs(input_file=None):
         tgt_opts.append(this_tgt_opt)
     if not options['verbose_options']:
         printcool("Options at their default values are not printed\n Use 'verbose_options True' to Enable", color=5)
-    return options, tgt_opts
+    # Expand target options (i.e. create multiple tgt_opts dictionaries if multiple target names are specified)
+    tgt_opts_x = []
+    for topt in tgt_opts:
+        for name in topt['name']:
+            toptx = deepcopy(topt)
+            toptx['name'] = name
+            tgt_opts_x.append(toptx)
+    return options, tgt_opts_x

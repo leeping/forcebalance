@@ -42,6 +42,43 @@ extern PyObject *atomic_contact_wrap(PyObject *self, PyObject *args) {
 }
 
 
+extern PyObject *atomic_contact_rect_image_wrap(PyObject *self, PyObject *args) {
+    PyArrayObject *xyzlist_, *box_, *contacts_, *results_;
+    int traj_length, num_contacts, num_atoms, num_dims, width_contacts;
+    float *results;
+    const float *xyzlist;
+    const float *box;
+    const int *contacts;
+    if (!PyArg_ParseTuple(args, "O!O!O!O!",
+                          &PyArray_Type, &xyzlist_, &PyArray_Type, &box_, &PyArray_Type, &contacts_, &PyArray_Type, &results_)) {
+        return 0;
+    }
+    else {
+        xyzlist = (const float*) xyzlist_->data;
+        box = (const float*) box_->data;
+        contacts = (const int*) contacts_->data;
+        results = (float*) results_->data;
+        
+        traj_length = xyzlist_->dimensions[0];
+        num_atoms = xyzlist_->dimensions[1];
+        num_dims = xyzlist_->dimensions[2];
+        num_contacts = contacts_->dimensions[0];
+        width_contacts = contacts_->dimensions[1];
+        
+        if ((num_dims != 3) || (width_contacts != 2)) {
+            printf("Incorrect call to dihedrals_from_trajectory_wrap! Aborting");
+            exit(1);
+        }
+        
+        //printf("traj_length %d\n", traj_length);
+        //printf("num_atoms %d\n", num_atoms);
+        //printf("num_contacts %d\n", num_contacts);
+        
+        
+        atomic_contact_rect_image(xyzlist, box, contacts, num_contacts, traj_length, num_atoms, results);
+    }
+    return Py_BuildValue("d", 0.0);
+}
 
 
 
@@ -99,6 +136,7 @@ extern PyObject *closest_contact_wrap(PyObject *self, PyObject *args) {
 
 static PyMethodDef _contactWrapMethods[] = {
   {"atomic_contact_wrap", atomic_contact_wrap, METH_VARARGS},
+  {"atomic_contact_rect_image_wrap", atomic_contact_rect_image_wrap, METH_VARARGS},
   {"closest_contact_wrap", closest_contact_wrap, METH_VARARGS},
   {NULL, NULL}     /* Sentinel - marks the end of this structure */
 };
