@@ -1,0 +1,286 @@
+#======================================================================#
+#| [1m             Welcome to ForceBalance version 1.3! =D              [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                           Arthur Vigil                           [0m |#
+#| [1m                          Keri McKiernan                          [0m |#
+#| [1m                           Erik Brandt                            [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: test.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: tip4p.itp
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  3.1537e-01 ] : VDWS:OW
+   1 [  6.4852e-01 ] : VDWT:OW
+   2 [  5.2000e-01 ] : COUL:SOL-2
+   3 [  1.2800e-01 ] : VSITE3A:SOL-4
+-----------------------------------------------------------
+#========================================================#
+#| [91m    Rescaling Factors (Lower Takes Precedence):     [0m |#
+#========================================================#
+   VSITE3A                              : 5.29177e-02
+   VDWS                                 : 5.29177e-02
+   VSITE3B                              : 5.29177e-02
+   COUL                                 : 1.00000e+00
+   VDWT                                 : 2.47894e+00
+----------------------------------------------------------
+Building charge constraints...
+Parameter 2 occurs 2 times in molecule SOL in locations [1, 2] (COUL:SOL-2 COUL:SOL-3)
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['tip4p.itp'] 
+rigid_water               True 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link gas.top, removing it first
+#========================================================#
+#| [92m             Setup for target Liquid :              [0m |#
+#========================================================#
+md_threads                4 
+liquid_coords             liquid.gro 
+gas_coords                gas.gro 
+name                      Liquid 
+type                      LIQUID_GMX 
+backup                    False 
+tgtdir                    targets/Liquid 
+w_rho                     1.0 
+w_hvap                    1.0 
+w_alpha                   1.0 
+w_kappa                   1.0 
+w_cp                      1.0 
+w_eps0                    1.0 
+liquid_eq_steps           50000 
+liquid_md_steps           500000 
+gas_eq_steps              50000 
+gas_md_steps              500000 
+liquid_timestep           2.0 
+liquid_interval           0.2 
+gas_timestep              1.0 
+gas_interval              0.1 
+adapt_errors              0 
+minimize_energy           1 
+self_pol_mu0              1.855 
+self_pol_alpha            1.47 
+anisotropic_box           0 
+rho_denom                 1.0 
+hvap_denom                1.0 
+alpha_denom               2.0 
+kappa_denom               5.0 
+cp_denom                  2.0 
+eps0_denom                10.0 
+use_cvib_intra            True 
+use_cvib_inter            True 
+use_cni                   True 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+Fitting the forces on all atoms
+#========================================================#
+#| [92m           Setup for target cluster-06 :            [0m |#
+#========================================================#
+name                      cluster-06 
+type                      ABINITIO_GMX 
+backup                    False 
+tgtdir                    targets/cluster-06 
+w_force                   0.0 
+w_netforce                1.0 
+shots                     1208 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          1.0 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   SINGLE 
+trust0                    0.25 
+mintrust                  0.05 
+convergence_objective     0.01 
+convergence_step          0.001 
+convergence_gradient      0.01 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+print_hess                True 
+err_tol                   1.0 
+backup                    False 
+input_file                test.in 
+----------------------------------------------------------
+#========================================================#
+#|      Target: Liquid - launching MD simulations       |#
+#|         Time steps: 50000 (eq) + 500000 (md)         |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/007_tip4p_STP/test.tmp/Liquid/iter_0000/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash rungmx.sh python npt.py gromacs 298.150 1.000[0m Output: npt.out
+Reading information from ./298.15K-1.0atm/npt_result.p
+Single-precision GROMACS detected - recommend that you use double precision build.
+The molecular dipole moment is  2.177 debye
+#========================================================#
+#| [92m          Self-polarization correction to           [0m |#
+#| [92m     enthalpy of vaporization is  2.130 kJ/mol      [0m |#
+#========================================================#
+Weights have been renormalized to 1.0
+Physical quantity Density uses denominator =  1.0000
+Weights have been renormalized to 1.0
+Physical quantity H_vap uses denominator =  1.0000
+Weights have been renormalized to 1.0
+Physical quantity Thermal Expansion uses denominator =  2.0000
+Weights have been renormalized to 1.0
+Physical quantity Compressibility uses denominator =  5.0000
+Weights have been renormalized to 1.0
+Physical quantity Heat Capacity uses denominator =  2.0000
+Weights have been renormalized to 1.0
+Physical quantity Dielectric Constant uses denominator =  10.0000
+#==========================================================================================#
+#| [1;94m                              Liquid Density (kg m^-3)                                [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm   997.045      993.132 +- 0.639    -3.913   1.00000  15.31424 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m        Density objective function:  15.314         [0m |#
+#========================================================#
+#==========================================================================================#
+#| [1;94m                     Liquid Enthalpy of Vaporization (kJ mol^-1)                      [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm    43.989       40.786 +- 0.230    -3.203   1.00000  10.26183 
+--------------------------------------------------------------------------------------------
+#==========================================================#
+#| [92m Enthalpy of Vaporization objective function:  10.262 [0m |#
+#==========================================================#
+#==========================================================================================#
+#| [1;94m                  Liquid Thermal Expansion Coefficient (10^-4 K^-1)                   [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm     2.572        7.836 +- 2.408     5.264   1.00000   6.92683 
+--------------------------------------------------------------------------------------------
+#==============================================================#
+#| [92m Thermal Expansion Coefficient objective function:  6.927 [0m |#
+#==============================================================#
+#==========================================================================================#
+#| [1;94m                  Liquid Isothermal Compressibility (10^-6 bar^-1)                    [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm    45.247       54.923 +- 2.694     9.676   1.00000   3.74483 
+--------------------------------------------------------------------------------------------
+#===========================================================#
+#| [92m Isothermal Compressibility objective function:  3.745 [0m |#
+#===========================================================#
+#==========================================================================================#
+#| [1;94m                   Liquid Isobaric Heat Capacity (cal mol^-1 K^-1)                    [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm    18.002       18.554 +- 2.096     0.552   1.00000   0.07604 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m Isobaric Heat Capacity objective function:  0.076  [0m |#
+#========================================================#
+#==========================================================================================#
+#| [1;94m                              Liquid Dielectric Constant                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm    78.409       50.538 +- 3.960   -27.871   1.00000   7.76818 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m   Dielectric Constant objective function:  7.768   [0m |#
+#========================================================#
+#====================================================================#
+#| [94m               Liquid Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+Density                           15.31424    0.167    2.55237e+00 
+Enthalpy of Vaporization          10.26183    0.167    1.71030e+00 
+Thermal Expansion Coefficient      6.92683    0.167    1.15447e+00 
+Isothermal Compressibility         3.74483    0.167    6.24139e-01 
+Isobaric Heat Capacity             0.07604    0.167    1.26735e-02 
+Dielectric Constant                7.76818    0.167    1.29470e+00 
+Total                                                  7.34866e+00 
+----------------------------------------------------------------------
+#==========================================================================================#
+#|            Target: cluster-06  Type: AbInitio_GMX  Objective = 3.63393e-01             |#
+#|                         Difference   Denominator     Percent                           |#
+#|  Observable             (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#==========================================================================================#
+    Energy (kJ/mol)           13.8997       27.3135     50.8895%    1.000         0.1295 
+    Gradient (kJ/mol/A)      129.9164      119.0841    109.0964%    0.000         0.0000 
+    Net Force (kJ/mol/A)      19.6097       27.3744     71.6352%    1.000         0.2339 
+    Torque (kJ/mol/rad)        9.0821       19.0490     47.6778%    0.000         0.0000 
+--------------------------------------------------------------------------------------------
+Maximum force error on atom 3 (M), frame 498, 499.3322 kJ/mol/A
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+Liquid                         7.34866      1.000 [94m     7.34866e+00[0m 
+cluster-06                     0.36339      1.000 [94m     3.63393e-01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     7.71205e+00[0m 
+----------------------------------------------------------------------
+#========================================================#
+#| [92m    Objective Function Single Point: 7.71205125     [0m |#
+#========================================================#
+Parameter file same as original; will not be printed to results folder.
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#

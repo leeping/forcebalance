@@ -25,7 +25,7 @@ from forcebalance.thermo import Thermo
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
 import itertools
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 import traceback
 import random
 #import IPython
@@ -73,7 +73,8 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
                 val = options[key]
                 val0 = valf.strip()
                 if key in clashes and val != val0:
-                    raise RuntimeError("write_mdp tried to set %s = %s but its original value was %s = %s" % (key, val, key, val0))
+                    logger.error("write_mdp tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
+                    raise RuntimeError
                 # Passing None as the value causes the option to be deleted
                 if val == None: continue
                 if len(val) < len(valf):
@@ -206,6 +207,7 @@ pdict = {'BONDS':{3:'B', 4:'K'},
          'VSITE4FDN':{6:'A',7:'B',8:'C'},
          'DEF':{3:'FLJ',4:'FQQ'},
          'POL':{3:'ALPHA'},
+         'DEFINE':dict([(i, '') for i in range(100)])
          }
 
 def parse_atomtype_line(line):
@@ -366,9 +368,15 @@ class ITP_Reader(BaseReader):
         self.itype = None
         self.ln   += 1
         # No sense in doing anything for an empty line or a comment line.
-        # Also skip C preprocessor lines.
-        if len(s) == 0 or re.match('^ *;',line) or re.match('^#',line): return None, None
+        if len(s) == 0 or re.match('^ *;',line): return None, None
         # Now go through all the cases.
+        if re.match('^#', line):
+            self.overpfx = 'DEFINE'
+            self.oversfx = s[1]
+        elif hasattr(self, 'overpfx'):
+            delattr(self, 'overpfx')
+            delattr(self, 'oversfx')
+
         if re.match('^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
             self.sec = re.sub('[\[\] \n]','',line.strip())
@@ -518,7 +526,8 @@ class GMX(Engine):
             warn_once("The 'gmxpath' option was not specified; using default.")
             if which('mdrun'+self.gmxsuffix) == '':
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
-                raise RuntimeError("Cannot find the GROMACS executables!")
+                logger.error("Cannot find the GROMACS executables!\n")
+                raise RuntimeError
             else:
                 self.gmxpath = which('mdrun'+self.gmxsuffix)
                 havegmx = True
@@ -527,15 +536,12 @@ class GMX(Engine):
         """ Called by __init__ ; read files from the source directory. """
 
         ## Attempt to determine file names of .gro, .top, and .mdp files
-        self.top = onefile('top', kwargs['gmx_top'] if 'gmx_top' in kwargs else None)
-        self.mdp = onefile('mdp', kwargs['gmx_mdp'] if 'gmx_mdp' in kwargs else None)
+        self.top = onefile(kwargs.get('gmx_top'), 'top')
+        self.mdp = onefile(kwargs.get('gmx_mdp'), 'mdp')
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
-        elif 'coords' in kwargs and os.path.exists(kwargs['coords']):
-            self.mol = Molecule(kwargs['coords'])
         else:
-            grofile = onefile('gro')
-            self.mol = Molecule(grofile)
+            self.mol = Molecule(onefile(kwargs.get('coords'), 'gro', err=True))
 
     def prepare(self, pbc=False, **kwargs):
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
@@ -560,9 +566,11 @@ class GMX(Engine):
             self.gmx_defs["ns_type"] = "grid"
             self.gmx_defs["nstlist"] = 20
             self.gmx_defs["rlist"] = "%.2f" % rlist
-            self.gmx_defs["coulombtype"] = "pme-switch"
-            self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
-            self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
+            self.gmx_defs["coulombtype"] = "pme"
+            self.gmx_defs["rcoulomb"] = "%.2f" % rlist
+            # self.gmx_defs["coulombtype"] = "pme-switch"
+            # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
+            # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
             self.gmx_defs["vdwtype"] = "switch"
             self.gmx_defs["rvdw"] = "%.2f" % (rlist - 0.05)
             self.gmx_defs["rvdw_switch"] = "%.2f" % (rlist - 0.1)
@@ -594,15 +602,23 @@ class GMX(Engine):
                 # preparing the engine, but then delete them afterward.
                 itptmp = True
                 self.FF.make(np.zeros(self.FF.np))
-            if self.top == None or not os.path.exists(self.top):
-                self.top = onefile('top')
-            if self.mdp == None or not os.path.exists(self.mdp):
-                self.mdp = onefile('mdp')
+            self.top = onefile(self.top, 'top')
+            self.mdp = onefile(self.mdp, 'mdp')
             # Sanity check; the force fields should be referenced by the .top file.
             if self.top != None and os.path.exists(self.top):
                 if self.top not in self.FF.fnms and (not any([any([fnm in line for fnm in self.FF.fnms]) for line in open(self.top)])):
-                    warn_press_key("None of the force field files %s are referenced in the .top file. "
-                                   "Are you referencing the files through C preprocessor directives?" % self.FF.fnms)
+                    logger.warning('Force field file is not referenced in the .top file\nAssuming the first .itp file is to be included\n')
+                    for itpfnm in self.FF.fnms:
+                        if itpfnm.endswith(".itp"):
+                            break
+                    topol = open(self.top).readlines()
+                    with wopen(self.top) as f:
+                        print >> f, "#include \"%s\"" % itpfnm
+                        print >> f
+                        for line in topol:
+                            print >> f, line
+                    # warn_press_key("None of the force field files %s are referenced in the .top file. "
+                    #                "Are you referencing the files through C preprocessor directives?" % self.FF.fnms)
 
         ## Write out the trajectory coordinates to a .gro file.
         if hasattr(self, 'target') and hasattr(self.target,'shots'):
@@ -617,7 +633,8 @@ class GMX(Engine):
         if self.top != None and os.path.exists(self.top):
             LinkFile(self.top, '%s.top' % self.name)
         else:
-            raise RuntimeError("No .top file found, cannot continue.")
+            logger.error("No .top file found, cannot continue.\n")
+            raise RuntimeError
         write_mdp("%s.mdp" % self.name, gmx_opts, fin=self.mdp, defaults=self.gmx_defs)
 
         ## Call grompp followed by gmxdump to read the trajectory
@@ -660,19 +677,15 @@ class GMX(Engine):
             for f in self.FF.fnms: 
                 os.unlink(f)
 
+    def get_charges(self):
+        logger.error('GMX engine does not have get_charges (should be easy to implement however.)')
+        raise NotImplementedError
+
     def links(self):
-        if not os.path.exists('%s.top' % self.name):
-            topfile = onefile('top')
-            if topfile != None:
-                LinkFile(topfile, "%s.top" % self.name)
-            else:
-                raise RuntimeError("No .top file found, cannot continue.")
-        if not os.path.exists('%s.mdp' % self.name):
-            mdpfile = onefile('mdp')
-            if mdpfile != None:
-                LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
-            else:
-                raise RuntimeError("No .mdp file found, cannot continue.")
+        topfile = onefile('%s.top' % self.name, 'top', err=True)
+        LinkFile(topfile, "%s.top" % self.name)
+        mdpfile = onefile('%s.mdp' % self.name, 'mdp', err=True)
+        LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
 
     def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -726,7 +739,8 @@ class GMX(Engine):
         elif fatal:
             for line in o:
                 logger.error(line+'\n')
-            raise RuntimeError('grompp encountered a fatal error!')
+            logger.error('grompp encountered a fatal error!\n')
+            raise RuntimeError
         return o
 
     def energy_termnames(self, edrfile=None):
@@ -736,7 +750,8 @@ class GMX(Engine):
         if edrfile == None:
             edrfile = "%s.edr" % self.name
         if not os.path.exists(edrfile):
-            raise RuntimeError('Cannot determine energy term names without an .edr file')
+            logger.error('Cannot determine energy term names without an .edr file\n')
+            raise RuntimeError
         ## Figure out which energy terms need to be printed.
         o = self.callgmx("g_energy -f %s -xvg no" % (edrfile), stdin="Total-Energy\n", copy_stdout=False, copy_stderr=True)
         parsemode = 0
@@ -769,8 +784,12 @@ class GMX(Engine):
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
         else:
+            if self.FF.rigid_water:
+                algorithm = "steep"
+            else:
+                algorithm = "l-bfgs"
             # Arguments for running minimization.
-            min_opts = {"integrator" : "l-bfgs", "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
+            min_opts = {"integrator" : algorithm, "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
 
         write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
 
@@ -997,7 +1016,7 @@ class GMX(Engine):
             self.mol[shot].write("%s.gro" % self.name)
             self.warngmx("grompp -c %s.gro -p %s.top -f %s-nm.mdp -o %s-nm.tpr" % (self.name, self.name, self.name, self.name))
 
-        self.callgmx("mdrun -deffnm %s-nm -mtx %s-nm.mtx -v" % (self.name, self.name))
+        self.callgmx("mdrun -deffnm %s-nm -nt 1 -mtx %s-nm.mtx -v" % (self.name, self.name))
         self.callgmx("g_nmeig -s %s-nm.tpr -f %s-nm.mtx -of %s-nm.xvg -v %s-nm.trr -last 10000 -xvg no" % \
                          (self.name, self.name, self.name, self.name))
         self.callgmx("trjconv -s %s-nm.tpr -f %s-nm.trr -o %s-nm.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
@@ -1018,7 +1037,7 @@ class GMX(Engine):
             calc_eigvecs[i] /= np.linalg.norm(calc_eigvecs[i])
         return calc_eigvals, calc_eigvecs
 
-    def generate_vsite_positions(self):
+    def generate_positions(self):
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
@@ -1327,6 +1346,8 @@ class Liquid_GMX(Liquid):
         self.engname = "gromacs"
         # Command prefix.
         self.nptpfx = "bash rungmx.sh"
+        if tgt_opts['remote_backup']:
+            self.nptpfx += " -b"
         # Extra files to be linked into the temp-directory.
         self.nptfiles = ['%s.mdp' % os.path.splitext(f)[0] for f in [self.liquid_coords, self.gas_coords]]
         self.nptfiles += ['%s.top' % os.path.splitext(f)[0] for f in [self.liquid_coords, self.gas_coords]]
@@ -1340,7 +1361,8 @@ class Liquid_GMX(Liquid):
         # Error checking.
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
-                raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+                logger.error('Please provide %s; it is needed to proceed.\n' % i)
+                raise RuntimeError
         # Send back last frame of production trajectory.
         self.extra_output = ['liquid-md.gro']
         # Send back the trajectory file.
@@ -1380,6 +1402,8 @@ class Lipid_GMX(Lipid):
         self.engname = "gromacs"
         # Command prefix.
         self.nptpfx = "bash rungmx.sh"
+        if tgt_opts['remote_backup']:
+            self.nptpfx += " -b"
         # Extra files to be linked into the temp-directory.
         self.nptfiles = ['%s.mdp' % os.path.splitext(f)[0] for f in [self.lipid_coords]]
         self.nptfiles += ['%s.top' % os.path.splitext(f)[0] for f in [self.lipid_coords]]
@@ -1390,7 +1414,8 @@ class Lipid_GMX(Lipid):
         # Error checking.
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
-                raise RuntimeError('Please provide %s; it is needed to proceed.' % i)
+                logger.error('Please provide %s; it is needed to proceed.\n' % i)
+                raise RuntimeError
         # Send back last frame of production trajectory.
         self.extra_output = ['lipid-md.gro']
         # Send back the trajectory file.

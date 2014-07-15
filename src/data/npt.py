@@ -60,7 +60,7 @@ import numpy as np
 from copy import deepcopy
 from collections import namedtuple, OrderedDict
 from forcebalance.forcefield import FF
-from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, statisticalInefficiency, which, _exec, isint, wopen
+from forcebalance.nifty import col, flat, lp_dump, lp_load, printcool, printcool_dictionary, statisticalInefficiency, which, _exec, isint, wopen, click
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, f1d7p, in_fd
 from forcebalance.molecule import Molecule
 from forcebalance.output import getLogger
@@ -286,7 +286,7 @@ def main():
     # - Optimization parameters
     # - Options from the Target object that launched this simulation
     # - Switch for whether to evaluate analytic derivatives.
-    FF,mvals,TgtOptions,AGrad = lp_load(open('forcebalance.p'))
+    FF,mvals,TgtOptions,AGrad = lp_load('forcebalance.p')
     FF.ffdir = '.'
     # Write the force field file.
     FF.make(mvals)
@@ -314,6 +314,7 @@ def main():
     mts = TgtOptions.get('mts_integrator', 0)
     rpmd_beads = TgtOptions.get('rpmd_beads', 0)
     force_cuda = TgtOptions.get('force_cuda', 0)
+    nbarostat = TgtOptions.get('n_mcbarostat', 25)
     anisotropic = TgtOptions.get('anisotropic_box', 0)
     minimize = TgtOptions.get('minimize_energy', 1)
 
@@ -337,10 +338,11 @@ def main():
     #----
     # Loading coordinates
     #----
-    ML = Molecule(liquid_fnm)
+    ML = Molecule(liquid_fnm, toppbc=True)
     MG = Molecule(gas_fnm)
     # Determine the number of molecules in the condensed phase coordinate file.
     NMol = len(ML.molecules)
+    logger.info("There are %i molecules in the liquid\n" % (NMol))
 
     #----
     # Setting up MD simulations
@@ -389,7 +391,7 @@ def main():
                                     ("nequil", liquid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
                                     ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
-                                    ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", 10),
+                                    ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", nbarostat),
                                     ("mts", mts), ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
@@ -410,7 +412,9 @@ def main():
     printcool("Condensed phase molecular dynamics", color=4, bold=True)
 
     # This line runs the condensed phase simulation.
+    click()
     prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    logger.info("Liquid phase MD simulation took %.3f seconds\n" % click())
     Rhos = prop_return['Rhos']
     Potentials = prop_return['Potentials']
     Kinetics = prop_return['Kinetics']
@@ -450,7 +454,9 @@ def main():
     # Run the OpenMM simulation, gather information.
 
     printcool("Gas phase molecular dynamics", color=4, bold=True)
+    click()
     mprop_return = Gas.molecular_dynamics(**MDOpts["gas"])
+    logger.info("Gas phase MD simulation took %.3f seconds\n" % click())
     mPotentials = mprop_return['Potentials']
     mKinetics = mprop_return['Kinetics']
     mEDA = mprop_return['Ecomps']
@@ -475,9 +481,13 @@ def main():
 
     # Compute the energy and dipole derivatives.
     printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True)
+    click()
     G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
+    logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
+    click()
     printcool("Gas phase energy derivatives", color=4, bold=True)
     mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad, dipole=False)
+    logger.info("Gas phase energy derivatives took %.3f seconds\n" % click())
 
     #==============================================#
     #  Condensed phase properties and derivatives. #
@@ -697,7 +707,7 @@ def main():
     pvals = FF.make(mvals)
 
     logger.info("Writing all simulation data to disk.\n")
-    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),f)
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),'npt_result.p')
 
 if __name__ == "__main__":
     main()

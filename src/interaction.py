@@ -7,7 +7,7 @@
 import os
 import shutil
 import numpy as np
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, uncommadash, printcool_dictionary
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, commadash, uncommadash, printcool_dictionary
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -49,18 +49,22 @@ class Interaction(Target):
         self.set_option(tgt_opts,'cauchy','cauchy')
         ## Do we put the reference energy into the denominator?
         self.set_option(tgt_opts,'attenuate','attenuate')
+        ## Divide by the number of snapshots?
+        self.set_option(tgt_opts, 'normalize')
         ## What is the energy denominator?
         self.set_option(tgt_opts,'energy_denom','energy_denom')
         ## Set fragment 1
         self.set_option(tgt_opts,'fragment1','fragment1')
         if len(self.fragment1) == 0:
-            raise Exception('You need to define the first fragment using the fragment1 keyword')
+            logger.error('You need to define the first fragment using the fragment1 keyword\n')
+            raise RuntimeError
         self.select1 = np.array(uncommadash(self.fragment1))
         ## Set fragment 2
         self.set_option(tgt_opts,'fragment2','fragment2')
-        if len(self.fragment2) == 0:
-            raise Exception('You need to define the second fragment using the fragment2 keyword')
-        self.select2 = np.array(uncommadash(self.fragment2))
+        if len(self.fragment2) != 0:
+            self.select2 = np.array(uncommadash(self.fragment2))
+        else:
+            self.select2 = None
         ## Set upper cutoff energy
         self.set_option(tgt_opts,'energy_upper','energy_upper')
         #======================================#
@@ -80,6 +84,9 @@ class Interaction(Target):
             self.ns = len(self.mol)
         else:
             self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
+        if self.select2 == None:
+            self.select2 = [i for i in range(self.mol.na) if i not in self.select1]
+            logger.info('Fragment 2 is the complement of fragment 1 : %s\n' % (commadash(self.select2)))
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(self.OptionDict.items() + options.items())
         del engine_args['name']
@@ -92,7 +99,8 @@ class Interaction(Target):
         if self.cauchy:
             self.divisor = np.sqrt(self.eqm**2 + denom**2)
             if self.attenuate:
-                raise Exception('attenuate and cauchy are mutually exclusive')
+                logger.error('attenuate and cauchy are mutually exclusive\n')
+                raise RuntimeError
         elif self.attenuate:
             # Attenuate only large repulsions.
             self.divisor = np.zeros(len(self.eqm))
@@ -103,14 +111,17 @@ class Interaction(Target):
                     self.divisor[i] = np.sqrt(denom**2 + (self.eqm[i]-denom)**2)
         else:
             self.divisor = np.ones(len(self.eqm)) * denom
+        
         if self.cauchy:
             logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
         if self.energy_upper > 0:
-            logger.info("Interactions more repulsive than %s will not be fitted\n" % str(self.energy_upper))
             ecut = self.energy_upper
             self.prefactor = 1.0 * (self.eqm < ecut)
+            logger.info("Interactions more repulsive than %s will not be fitted (%i/%i excluded) \n" % (str(self.energy_upper), sum(self.eqm > ecut), len(self.eqm)))
         else:
             self.prefactor = np.ones(len(self.eqm))
+        if self.normalize:
+            self.prefactor /= len(self.prefactor)
 
     def read_reference_data(self):
         
@@ -136,16 +147,25 @@ class Interaction(Target):
         self.eqm *= (eqcgmx / 4.184)
 
     def indicate(self):
+        delta = (self.emm-self.eqm)
+        deltanrm = self.prefactor*(delta/self.divisor)**2
         if len(self.label) == self.ns:
             PrintDict = OrderedDict()
-            delta = (self.emm-self.eqm)
-            deltanrm = self.prefactor*(delta/self.divisor)**2
             for i,label in enumerate(self.label):
                 PrintDict[label] = "% 9.3f % 9.3f % 9.3f % 9.3f % 11.5f" % (self.emm[i], self.eqm[i], delta[i], self.divisor[i], deltanrm[i])
             printcool_dictionary(PrintDict,title="Target: %s\nInteraction Energies (kcal/mol), Objective = % .5e\n %-10s %9s %9s %9s %9s %11s" % 
                                  (self.name, self.objective, "Label", "Calc.", "Ref.", "Delta", "Divisor", "Term"),keywidth=15)
         else:
-            logger.info("Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)\n" % (self.name,self.objective))
+            # logger.info("Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)\n" % (self.name,self.objective))
+            Headings = ["Observable", "Difference\nRMS (Calc-Ref)", "Denominator\n(Specified)", " Percent \nDifference"]
+            Data = OrderedDict([])
+            Data['Energy (kcal/mol)'] = ["%8.4f" % np.sqrt(np.mean(delta**2)),
+                                       "%8.4f" % np.mean(self.divisor),
+                                       "%.4f%%" % (np.sqrt(np.mean(delta/self.divisor)**2)*100)]
+            self.printcool_table(data=Data, headings=Headings, color=0)
+            logger.info("add LABEL keywords in qdata.txt to print out each snapshot\n")
+    
+
         # if len(self.RMSDDict) > 0:x
         #     printcool_dictionary(self.RMSDDict,title="Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s" % (self.rmsd_part, "System", "RMSD", "Term"), keywidth=45)
 

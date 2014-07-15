@@ -16,7 +16,7 @@ try:
     import pkg_resources
     __version__ = pkg_resources.get_distribution("forcebalance").version
 except:
-    __version__ = "v1.2.1"
+    __version__ = "v1.3.0"
 
 from collections import OrderedDict
 from parser import tgt_opts_defaults, gen_opts_defaults
@@ -120,8 +120,13 @@ class BaseReader(object):
         
         """
         #print self.pdict[self.itype][pfld]
+        if hasattr(self, 'overpfx'): 
+            return self.overpfx + ':%i:' % pfld + self.oversfx
         ptype = self.pdict.get(self.itype,{}).get(pfld,':%i.%i' % (self.ln,pfld))
-        return self.itype+ptype+self.suffix
+        answer = self.itype
+        answer += ptype
+        answer += self.suffix
+        return answer
 
 import parser, forcefield, optimizer, objective, output
 

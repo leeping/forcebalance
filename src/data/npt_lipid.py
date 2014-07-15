@@ -287,7 +287,7 @@ def main():
     # - Optimization parameters
     # - Options from the Target object that launched this simulation
     # - Switch for whether to evaluate analytic derivatives.
-    FF,mvals,TgtOptions,AGrad = lp_load(open('forcebalance.p'))
+    FF,mvals,TgtOptions,AGrad = lp_load('forcebalance.p')
     FF.ffdir = '.'
     # Write the force field file.
     FF.make(mvals)
@@ -325,7 +325,7 @@ def main():
     #----
     # Loading coordinates
     #----
-    ML = Molecule(lipid_fnm)
+    ML = Molecule(lipid_fnm, toppbc=True)
     # Determine the number of molecules in the condensed phase coordinate file.
     NMol = len(ML.molecules)
 

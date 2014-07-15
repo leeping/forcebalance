@@ -133,7 +133,8 @@ class BindingEnergy(Target):
                     self.inter_opts[inter][opt] = self.global_opts[opt]
         for inter in self.inter_opts:
             if 'energy_unit' in self.inter_opts[inter] and self.inter_opts[inter]['energy_unit'].lower() not in ['kilocalorie_per_mole', 'kilocalories_per_mole']:
-                raise RuntimeError('Usage of physical units is has been removed, please provide all binding energies in kcal/mole')
+                logger.error('Usage of physical units is has been removed, please provide all binding energies in kcal/mole\n')
+                raise RuntimeError
             self.inter_opts[inter]['reference_physical'] = self.inter_opts[inter]['energy']
 
         if tgt_opts['energy_denom'] == 0.0:
@@ -152,7 +153,8 @@ class BindingEnergy(Target):
         if self.cauchy:
             logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( denom**2 + reference**2 )\n")
             if self.attenuate:
-                raise Exception('attenuate and cauchy are mutually exclusive')
+                logger.error('attenuate and cauchy are mutually exclusive\n')
+                raise RuntimeError
         elif self.attenuate:
             logger.info("Repulsive interactions beyond energy_denom will be scaled by 1.0 / ( denom**2 + (reference-denom)**2 )\n")
         ## Build keyword dictionaries to pass to engine.
