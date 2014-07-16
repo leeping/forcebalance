@@ -568,9 +568,11 @@ class GMX(Engine):
             self.gmx_defs["ns_type"] = "grid"
             self.gmx_defs["nstlist"] = 20
             self.gmx_defs["rlist"] = "%.2f" % rlist
-            self.gmx_defs["coulombtype"] = "pme-switch"
-            self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
-            self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
+            self.gmx_defs["coulombtype"] = "pme"
+            self.gmx_defs["rcoulomb"] = "%.2f" % rlist
+            # self.gmx_defs["coulombtype"] = "pme-switch"
+            # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
+            # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
             self.gmx_defs["vdwtype"] = "switch"
             self.gmx_defs["rvdw"] = "%.2f" % (rlist - 0.05)
             self.gmx_defs["rvdw_switch"] = "%.2f" % (rlist - 0.1)
@@ -784,8 +786,12 @@ class GMX(Engine):
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
         else:
+            if self.FF.rigid_water:
+                algorithm = "steep"
+            else:
+                algorithm = "l-bfgs"
             # Arguments for running minimization.
-            min_opts = {"integrator" : "l-bfgs", "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
+            min_opts = {"integrator" : algorithm, "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
 
         write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
 

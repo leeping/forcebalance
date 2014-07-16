@@ -1103,8 +1103,8 @@ class Molecule(object):
     #=====================================#
 
     def center_of_mass(self):
-        M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
-        return np.array([np.sum([xyz[i,:] * PeriodicTable[self.elem[i]] / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
+        M = sum([PeriodicTable.get(self.elem[i], 0.0) for i in range(self.na)])
+        return np.array([np.sum([xyz[i,:] * PeriodicTable.get(self.elem[i], 0.0) / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
 
     def radius_of_gyration(self):
         M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
