@@ -959,6 +959,7 @@ class Molecule(object):
                          'charmm'   : self.read_charmm,
                          'dcd'      : self.read_dcd,
                          'mdcrd'    : self.read_mdcrd,
+                         'inpcrd'   : self.read_inpcrd,
                          'pdb'      : self.read_pdb,
                          'xyz'      : self.read_xyz,
                          'mol2'     : self.read_mol2,
@@ -972,6 +973,7 @@ class Molecule(object):
                           'xyz'     : self.write_xyz,
                           'molproq' : self.write_molproq,
                           'dcd'     : self.write_dcd,
+                          'inpcrd'  : self.write_inpcrd,
                           'mdcrd'   : self.write_mdcrd,
                           'pdb'     : self.write_pdb,
                           'qcin'    : self.write_qcin,
@@ -986,6 +988,7 @@ class Molecule(object):
                           'in'      : 'qcin',
                           'qcin'    : 'qcin',
                           'com'     : 'gaussian',
+                          'rst'     : 'inpcrd',
                           'out'     : 'qcout',
                           'esp'     : 'qcesp',
                           'txt'     : 'qdata',
@@ -1790,6 +1793,70 @@ class Molecule(object):
                         xyz = []
             ln += 1
         Answer = {'xyzs' : xyzs}
+        if len(boxes) > 0:
+            Answer['boxes'] = boxes
+        return Answer
+
+    def read_inpcrd(self, fnm, **kwargs):
+        """ Parse an AMBER .inpcrd or .rst file.
+
+        @param[in] fnm The input file name
+        @return xyzs  A list of XYZ coordinates (number of snapshots times number of atoms)
+        @return boxes Boxes (if present.)
+
+        """
+        xyz    = []
+        xyzs   = []
+        # We read in velocities but never use them.
+        vel    = []
+        vels   = []
+        boxes  = []
+        ln     = 0
+        an     = 0
+        mode   = 'x'
+        for line in open(fnm):
+            line = line.replace('\n', '')
+            if ln == 0:
+                comms = [line]
+            elif ln == 1:
+                na = int(line[:5])
+            elif mode == 'x':
+                xyz.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
+                an += 1
+                if an == na: 
+                    xyzs.append(np.array(xyz))
+                    mode = 'v'
+                    an = 0
+                if len(line) > 36:
+                    xyz.append([float(line[36:48]), float(line[48:60]), float(line[60:72])])
+                    an += 1
+                    if an == na: 
+                        xyzs.append(np.array(xyz))
+                        mode = 'v'
+                        an = 0
+            elif mode == 'v':
+                vel.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
+                an += 1
+                if an == na: 
+                    vels.append(np.array(vel))
+                    mode = 'b'
+                    an = 0
+                if len(line) > 36:
+                    vel.append([float(line[36:48]), float(line[48:60]), float(line[60:72])])
+                    an += 1
+                    if an == na: 
+                        vels.append(np.array(vel))
+                        mode = 'b'
+                        an = 0
+            elif mode == 'b':
+                a, b, c = (float(line[:12]), float(line[12:24]), float(line[24:36]))
+                boxes.append(BuildLatticeFromLengthsAngles(a, b, c, 90.0, 90.0, 90.0))
+            ln += 1
+        # If there is only one velocity, then it should actually be a periodic box.
+        if len(vel) == 1:
+            a, b, c = vel[0]
+            boxes.append(BuildLatticeFromLengthsAngles(a, b, c, 90.0, 90.0, 90.0))
+        Answer = {'xyzs' : xyzs, 'comms' : comms}
         if len(boxes) > 0:
             Answer['boxes'] = boxes
         return Answer
@@ -2790,6 +2857,29 @@ class Molecule(object):
             out += [''.join(["%8.3f" % i for i in g]) for g in grouper(10, list(xyz.flatten()))]
             if 'boxes' in self.Data:
                 out.append(''.join(["%8.3f" % i for i in [self.boxes[I].a, self.boxes[I].b, self.boxes[I].c]]))
+        return out
+
+    def write_inpcrd(self, select, sn=None, **kwargs):
+        self.require('xyzs')
+        if len(self.xyzs) != 1 and sn == None:
+            logger.error("inpcrd can only be written for a single-frame trajectory\n")
+            raise RuntimeError
+        if sn != None:
+            self.xyzs = [self.xyzs[sn]]
+            self.comms = [self.comms[sn]]
+        # In inp files, there is only one comment line
+        # I believe 20A4 means 80 characters.
+        out = [self.comms[0][:80], '%5i' % self.na]
+        xyz = self.xyzs[0]
+        strout = ''
+        for ix, x in enumerate(xyz):
+            strout += "%12.7f%12.7f%12.7f" % (x[0], x[1], x[2])
+            if ix%2 == 1 or ix == (len(xyz) - 1):
+                out.append(strout)
+                strout = ''
+        # From reading the AMBER file specification I am not sure if this is correct.
+        if 'boxes' in self.Data:
+            out.append(''.join(["%12.7f" % i for i in [self.boxes[0].a, self.boxes[0].b, self.boxes[0].c]]))
         return out
 
     def write_arc(self, select, **kwargs):
