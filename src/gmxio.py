@@ -1428,7 +1428,6 @@ class Lipid_GMX(Lipid):
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """
             if "n_ic" in self.RefData:
-                logger.info("PhasePoints: %s" % self.PhasePoints)
                 phase_reorder = zip(*self.PhasePoints)
                 t_index = [i for i, x in enumerate(phase_reorder[0]) if x == temperature] 
                 p_index = [i for i, x in enumerate(phase_reorder[1]) if x == pressure] 
