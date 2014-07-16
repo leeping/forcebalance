@@ -451,7 +451,7 @@ class Lipid(Target):
             warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
-        if Counter() > 0 and GoodStep() and self.save_traj < 2:
+        if Counter() > First() and GoodStep() and self.save_traj < 2:
             for fn in self.last_traj:
                 if os.path.exists(fn):
                     os.remove(fn)
