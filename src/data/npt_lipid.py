@@ -657,7 +657,12 @@ def main():
         if b == None: b = np.ones(L,dtype=float)
         if 'a_' in kwargs:
             a_ = kwargs['a_']
-        return (1e3 * 2 * kbT / 128) * (bzavg(a_,b) / (bzavg(a_**2,b)-bzavg(a_,b)**2))
+        al_var = bzavg(a_**2,b)-bzavg(a_,b)**2
+        # Avoid dividing by zero if A_L time series is too short.
+        if abs(al_var) > 0: 
+            return (1e3 * 2 * kbT / 128) * (bzavg(a_,b) / al_var)
+        else:
+            return 0 * bzavg(a_,b)
 
     # Convert Als time series from nm^2 to m^2
     Als_m2 = Als * 1e-18
@@ -712,7 +717,8 @@ def main():
     pvals = FF.make(mvals)
 
     logger.info("Writing all simulation data to disk.\n")
-    with wopen(os.path.join('npt_result.p')) as f: lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], Rho_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Als, Al_err, Scds, Scd_err, LKappa_err),f)
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], Rho_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Als, Al_err, Scds, Scd_err, LKappa_err),'npt_result.p')
+
 
 if __name__ == "__main__":
     main()
