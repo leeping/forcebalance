@@ -1046,7 +1046,7 @@ class GMX(Engine):
         return NewMol.xyzs
 
     def n_snaps(self, nsteps, step_interval, timestep):
-        return int((nsteps / step_interval) * timestep)
+        return int((nsteps * 1.0 / step_interval) * timestep)
 
     def scd_persnap(self, ndx, timestep, final_frame):
         Scd = []
@@ -1428,8 +1428,11 @@ class Lipid_GMX(Lipid):
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """
             if "n_ic" in self.RefData:
-                # p_u assumes that all phasepoint pressure keys are of the same unit.  This may be a reasonable assumption.
-                p_u = self.PhasePoints[0][2]
+                logger.info("PhasePoints: %s" % self.PhasePoints)
+                phase_reorder = zip(*self.PhasePoints)
+                t_index = [i for i, x in enumerate(phase_reorder[0]) if x == temperature] 
+                p_index = [i for i, x in enumerate(phase_reorder[1]) if x == pressure] 
+                p_u = phase_reorder[-1][list(set(t_index) & set(p_index))[0]]
                 PT_vals = (temperature, pressure, p_u)
                 if not PT_vals in self.lipid_mols_new:
                     self.lipid_mols_new[PT_vals] = [os.path.join(os.getcwd(),'lipid-md.gro')]
