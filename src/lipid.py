@@ -531,16 +531,14 @@ class Lipid(Target):
         BPoints = [] # These are the phase points for which we are doing MBAR for the condensed phase.
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
-            """ KM: I think some of the file compression handling was changed - come back to this. """
             if 'n_ic' in self.RefData:
                 if GoodStep():
                     self.lipid_mols[PT] = [Molecule(last_frame) for last_frame in self.lipid_mols[PT]]
                 n_uniq_ic = int(self.RefData['n_ic'][PT])
                 for ic in range(n_uniq_ic):
-                    if os.path.exists('./%s/trj_%s/npt_result.p.bz2' % (label, ic)):
-                        _exec('bunzip2 ./%s/trj_%s/npt_result.p.bz2' % (label, ic), print_command=False)
+                    if os.path.exists('./%s/trj_%s/npt_result.p' % (label, ic)):
                         # Read in each each parallel simulation's data, and concatenate each property time series.
-                        ts = lp_load(open('./%s/trj_%s/npt_result.p' % (label, ic)))
+                        ts = lp_load('./%s/trj_%s/npt_result.p' % (label, ic))
                         if ic == 0:
                             ts_concat = list(ts)
                         else:
@@ -555,13 +553,7 @@ class Lipid(Target):
                                     ts_concat[d_arr] = [np.append(ts_concat[d_arr][i], ts[d_arr][i], axis = 1) for i in range(len(ts_concat[d_arr]))]
                         # Write concatenated time series to a pickle file.
                         if ic == (int(n_uniq_ic) - 1):
-                            with wopen('./%s/npt_result.p' % label) as f: lp_dump(ts_concat, f)
-            if os.path.exists('./%s/npt_result.p.bz2' % label):
-                _exec('bunzip2 ./%s/npt_result.p.bz2' % label, print_command=False)
-            elif os.path.exists('./%s/npt_result.p' % label): pass
-            else:
-                logger.warning('In %s :\n' % os.getcwd())
-                logger.warning('The file ./%s/npt_result.p.bz2 does not exist so we cannot unzip it\n' % label)
+                            lp_dump((ts_concat), './%s/npt_result.p' % label)
             if os.path.exists('./%s/npt_result.p' % label):
                 logger.info('Reading information from ./%s/npt_result.p\n' % label)
                 Points.append(PT)
