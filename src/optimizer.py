@@ -787,7 +787,7 @@ class Optimizer(forcebalance.BaseClass):
     
         def trust_fun(L):
             N = np.linalg.norm(solver(L)[0])
-            logger.info("Finding trust radius: H+%.4f*I, length %.4e (target %.4e)\n" % ((L-1)**2,N,trust))
+            logger.info("Finding trust radius: H%+.4f*I, length %.4e (target %.4e)\n" % ((L-1)**2,N,trust))
             # logger.debug("\rL = %.4e, Hessian diagonal addition = %.4e: found length %.4e, objective is %.4e\n" % (L, (L-1)**2, N, (N - trust)**2))
             return (N - trust)**2
 
@@ -803,7 +803,7 @@ class Optimizer(forcebalance.BaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False,customdir="micro_%02i" % search_fun.micro)['X'] - data['X']
-            logger.info("Hessian diagonal search: H+%.4f*I, length %.4e, result % .4e\n" % ((L-1)**2,np.linalg.norm(dx),Result))
+            logger.info("Hessian diagonal search: H%+.4f*I, length %.4e, result % .4e\n" % ((L-1)**2,np.linalg.norm(dx),Result))
             search_fun.micro += 1
             return Result
         search_fun.micro = 0
