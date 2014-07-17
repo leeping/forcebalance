@@ -1548,7 +1548,7 @@ class Molecule(object):
             # Iterate over atoms in the molecule
             for a2 in list(mol.nodes()):
                 # Find all bonded neighbors to this atom
-                friends = sorted(list(nx.all_neighbors(mol, a2)))
+                friends = sorted(list(nx.neighbors(mol, a2)))
                 if len(friends) < 2: continue
                 # Double loop over bonded neighbors
                 for i, a1 in enumerate(friends):
@@ -1576,9 +1576,9 @@ class Molecule(object):
                 # Determine correct ordering of atoms (middle atoms are ordered by convention)
                 a2 = edge[0] if edge[0] < edge[1] else edge[1]
                 a3 = edge[1] if edge[0] < edge[1] else edge[0]
-                for a1 in sorted(list(nx.all_neighbors(mol, a2))):
+                for a1 in sorted(list(nx.neighbors(mol, a2))):
                     if a1 != a3:
-                        for a4 in sorted(list(nx.all_neighbors(mol, a3))):
+                        for a4 in sorted(list(nx.neighbors(mol, a3))):
                             if a4 != a2:
                                 dihidx.append((a1, a2, a3, a4))
         return dihidx
