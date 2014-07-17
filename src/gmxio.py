@@ -554,6 +554,7 @@ class GMX(Engine):
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
+        self.have_constraints = False
         if pbc:
             minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
             if minbox <= 10:
