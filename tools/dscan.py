@@ -45,7 +45,7 @@ def divide_molecule(mol, a0, a1):
     if bond not in G.edges() and bond[::-1] not in G.edges():
         raise RuntimeError('%s must be a bond in the molecule' % str(bond))
     G.remove_edge(bond[0], bond[1])
-    Gsplit = nx.connected_component_subgraphs(G)
+    Gsplit = list(nx.connected_component_subgraphs(G))
     if len(Gsplit) != 2:
         raise RuntimeError('%s must divide the molecule into two segments' % str(bond))
     G0 = Gsplit[0]
@@ -58,7 +58,7 @@ def divide_molecule(mol, a0, a1):
         rotation_grp = G0.nodes()
     else:
         raise RuntimeError('Spoo!')
-    return rotation_grp, stationary_grp
+    return list(rotation_grp), list(stationary_grp)
 
 def get_rotated_xyz(mol, quartets, incs):
     xyz = mol.xyzs[0].copy()
