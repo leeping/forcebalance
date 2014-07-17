@@ -17,6 +17,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 from select import select
 import os, sys, re, shutil, errno
 import numpy as np
+import filecmp
 import itertools
 import threading
 import pickle
@@ -912,6 +913,22 @@ def onefile(fnm=None, ext=None, err=False):
             return None
     if fnm != None:
         if os.path.exists(fnm):
+            if os.path.dirname(os.path.abspath(fnm)) != os.getcwd():
+                fsrc = os.path.abspath(fnm)
+                fdest = os.path.join(os.getcwd(), os.path.basename(fnm))
+                #-----
+                # If the file path doesn't correspond to the current directory, copy the file over
+                # If the file exists in the current directory already and it's different, then crash.
+                #-----
+                if os.path.exists(fdest):
+                    if not filecmp.cmp(fsrc, fdest):
+                        logger.error("onefile() will not overwrite %s with %s\n" % (os.path.join(os.getcwd(), os.path.basename(fnm)),os.path.abspath(fnm)))
+                        raise RuntimeError
+                    else:
+                        logger.info("\x1b[93monefile() says the files %s and %s are identical\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
+                else:
+                    logger.info("\x1b[93monefile() will copy %s to %s\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
+                    shutil.copy2(fsrc, fdest)
             return os.path.basename(fnm)
         elif (err==True or ext==None):
             logger.error("File specified by %s does not exist!" % fnm)
@@ -962,6 +979,26 @@ def listfiles(fnms=None, ext=None, err=False):
     if answer == [] and err:
         logger.error('listfiles function failed to come up with a file! (fnms = %s ext = %s)' % (str(fnms), str(ext)))
         raise RuntimeError
+
+    for ifnm, fnm in enumerate(answer):
+        if os.path.dirname(os.path.abspath(fnm)) != os.getcwd():
+            fsrc = os.path.abspath(fnm)
+            fdest = os.path.join(os.getcwd(), os.path.basename(fnm))
+            #-----
+            # If the file path doesn't correspond to the current directory, copy the file over
+            # If the file exists in the current directory already and it's different, then crash.
+            #-----
+            if os.path.exists(fdest):
+                if not filecmp.cmp(fsrc, fdest):
+                    logger.error("onefile() will not overwrite %s with %s\n" % (os.path.join(os.getcwd(), os.path.basename(fnm)),os.path.abspath(fnm)))
+                    raise RuntimeError
+                else:
+                    logger.info("\x1b[93monefile() says the files %s and %s are identical\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
+                    answer[ifnm] = os.path.basename(fnm)
+            else:
+                logger.info("\x1b[93monefile() will copy %s to %s\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
+                shutil.copy2(fsrc, fdest)
+                answer[ifnm] = os.path.basename(fnm)
     return answer
 
 def GoInto(Dir):
