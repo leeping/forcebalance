@@ -602,7 +602,7 @@ class GMX(Engine):
             # This is because the .mdp and .top file can be force field files!
             # This bit affects how the geometry optimization is performed, but we should have
             # a more comprehensive way to pass constraint settings through.
-            self.have_constraints = FF.rigid_water
+            self.have_constraints = self.FF.rigid_water
             if not all([os.path.exists(f) for f in self.FF.fnms]):
                 # If the parameter files don't already exist, create them for the purpose of
                 # preparing the engine, but then delete them afterward.
