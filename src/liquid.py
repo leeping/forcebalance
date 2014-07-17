@@ -52,18 +52,22 @@ class Liquid(Target):
     def __init__(self,options,tgt_opts,forcefield):
         # Initialize base class
         super(Liquid,self).__init__(options,tgt_opts,forcefield)
-        # Fractional weight of the density
+        # Weight of the density
         self.set_option(tgt_opts,'w_rho',forceprint=True)
-        # Fractional weight of the enthalpy of vaporization
+        # Weight of the enthalpy of vaporization
         self.set_option(tgt_opts,'w_hvap',forceprint=True)
-        # Fractional weight of the thermal expansion coefficient
+        # Weight of the thermal expansion coefficient
         self.set_option(tgt_opts,'w_alpha',forceprint=True)
-        # Fractional weight of the isothermal compressibility
+        # Weight of the isothermal compressibility
         self.set_option(tgt_opts,'w_kappa',forceprint=True)
-        # Fractional weight of the isobaric heat capacity
+        # Weight of the isobaric heat capacity
         self.set_option(tgt_opts,'w_cp',forceprint=True)
-        # Fractional weight of the dielectric constant
+        # Weight of the dielectric constant
         self.set_option(tgt_opts,'w_eps0',forceprint=True)
+        # Normalize the contributions to the objective function
+        self.set_option(tgt_opts,'w_normalize',forceprint=True)
+        if not self.w_normalize:
+            warn_press_key("As of July 17, 2014, the property weights are no longer normalized by default.\nSet w_normalize in $target to restore the old behavior.")
         # Optionally pause on the zeroth step
         self.set_option(tgt_opts,'manual')
         # Don't target the average enthalpy of vaporization and allow it to freely float (experimental)
@@ -877,7 +881,10 @@ class Liquid(Target):
         if X_Cp == 0: self.w_cp = 0.0
         if X_Eps0 == 0: self.w_eps0 = 0.0
 
-        w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0
+        if self.w_normalize:
+            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0
+        else:
+            w_tot = 1.0
         w_1 = self.w_rho / w_tot
         w_2 = self.w_hvap / w_tot
         w_3 = self.w_alpha / w_tot
