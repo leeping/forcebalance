@@ -1043,7 +1043,7 @@ do_debugf = 1, dumpfrc = 1
  &data
      ntrun = 4, nsave=20, ndiag=2, cut={cut}
      nprint=1, ioseen=0,
-     drms = 0.000001, maxcyc=400, bdwnhl=0.1, dfpred = 0.1,
+     drms = 0.000001, maxcyc=4000, bdwnhl=0.1, dfpred = 0.1,
      scnb=2.0, scee=1.2, idiel=1,
  /
 """
