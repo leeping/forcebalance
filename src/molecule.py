@@ -2964,6 +2964,8 @@ class Molecule(object):
         else:
             self.require('xyzs','resname','resid')
 
+        write_conect = kwargs.pop('write_conect', 1)
+
         if 'atomname' not in self.Data:
             count = 0
             resid = -1
@@ -3117,7 +3119,7 @@ class Molecule(object):
                     out.append(line.tostring())
                     Serial += 1
             out.append('ENDMDL')
-        if 'bonds' in self.Data:
+        if 'bonds' in self.Data and write_conect:
             connects = ["CONECT%5i" % (b0+1) + "".join(["%5i" % (b[1]+1) for b in self.bonds if b[0] == b0]) for b0 in sorted(list(set(b[0] for b in self.bonds)))]
             out += connects
         return out
