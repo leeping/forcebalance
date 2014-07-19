@@ -1073,8 +1073,14 @@ class GMX(Engine):
         sn2 = self.scd_persnap('sn2', timestep, n_snap)
         for i in range(0, n_snap + 1):
             sn1[i].extend(sn2[i])
-        Scds = np.array(sn1)
+        Scds = np.abs(np.array(sn1))
         return Scds
+
+    def n_nonwater(self, structure_file):
+        mol = Molecule(structure_file)
+        n_mol = len(mol.molecules)
+        n_sol = len([i for i in mol.Data['resname'] if i == 'SOL']) * 1.0 / 3
+        return n_mol - n_sol
 
     def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, bilayer=False, **kwargs):
         
@@ -1185,6 +1191,8 @@ class GMX(Engine):
 
         # Calculate deuterium order parameter for bilayer optimization.
         if bilayer:
+            # Figure out how many lipids in simulation.
+            n_lip = self.n_nonwater('%s.gro' % self.name)
             n_snap = self.n_snaps(nsteps, 1000, timestep)
             Scds = self.calc_scd(n_snap, timestep)
             al_vars = ['Box-Y', 'Box-X']
@@ -1197,7 +1205,7 @@ class GMX(Engine):
                 Ys.append(s[-2])
             Xs = np.array(Xs)
             Ys = np.array(Ys)
-            Als = (Xs * Ys) / 64
+            Als = 2 * (Xs * Ys) / n_lip
         else:
             Scds = 0
             Als = 0
