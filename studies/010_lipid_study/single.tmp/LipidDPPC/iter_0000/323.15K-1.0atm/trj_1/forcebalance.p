@@ -1,1 +1,0 @@
-/home/kmckiern/src/forcebalance_kf/studies/010_lipid_study/single.tmp/LipidDPPC/iter_0000/forcebalance.p
