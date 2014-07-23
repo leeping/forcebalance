@@ -1,0 +1,837 @@
+Executing process: bash rungmx.sh python npt_lipid.py gromacs 323.150 1.000
+rungmx.sh: line 21: /etc/bashrc: No such file or directory
+#=======================#
+# ENVIRONMENT VARIABLES #
+#=======================#
+
+MODULE_VERSION_STACK=3.2.10
+CPLUS_INCLUDE_PATH=/usr/include:/usr/X11R6/include:/usr/local/include:/usr/local/include
+MANPATH=/usr/man:/usr/share/man:/usr/X11R6/man:/usr/local/man:/usr/local/X11/man:/usr/local/X11R6/man:/usr/local/man:/usr/local/X11/man:/usr/local/X11R6/man
+GMX_MAXBACKUP=-1
+TERM=xterm-256color
+SHELL=/bin/bash
+XDG_SESSION_COOKIE=87d7aea14dbbf538ddd9516b00000002-1406140386.559976-836883138
+SSH_CLIENT=171.66.19.212 55094 22
+LIBRARY_PATH=/lib:/usr/lib:/usr/X11R6/lib:/usr/local/lib:/usr/local/lib
+GNOME_PATH=/usr:/usr/local:/usr/local
+WORK_QUEUE_NAME=forcebalance
+SSH_TTY=/dev/pts/34
+GMX_NO_SOLV_OPT=TRUE
+PYTHONUSERBASE=/home/kmckiern/opt/epd-7.3.2
+XAPPLRESDIR=/usr/lib/X11/app-defaults:/usr/local/X11/app-defaults:/usr/local/X11/app-defaults
+USER=kmckiern
+__KMP_REGISTERED_LIB_2577=0x7f977dbb7810-cafe8b44-libiomp5.so
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:
+LD_LIBRARY_PATH=/home/kmckiern/local/pcre-8.34/lib:/home/kmckiern/local/cuda/lib64:/home/kmckiern/local/openmm/lib:/home/kmckiern/local/pcre-8.34/lib:/home/kmckiern/local/cuda/lib64:/home/kmckiern/local/openmm/lib:/lib:/usr/lib:/usr/X11R6/lib:/usr/local/lib:/usr/local/lib
+ENV=/home/kmckiern/.bashrc
+SSH_AUTH_SOCK=/tmp/ssh-SchnqT2502/agent.2502
+MODULE_VERSION=3.2.10
+MAIL=/var/mail/kmckiern
+PATH=/home/kmckiern/local/pcre-8.34/bin:/home/kmckiern/local/swig-2.0.11/bin:/usr/local/cuda/bin:/home/kmckiern/opt/openmm/bin:/home/kmckiern/opt/gromacs-4.6.2/bin::/home/kmckiern/opt/epd-7.3.2/bin:/home/kmckiern/local/bin:/home/kmckiern/opt/cctools-4.1.2/bin/:/usr/local/bin:/usr/local/X11/bin:/home/kmckiern/local/pcre-8.34/bin:/home/kmckiern/local/swig-2.0.11/bin:/usr/local/cuda/bin:/home/kmckiern/opt/openmm/bin:/home/kmckiern/opt/gromacs-4.6.2/bin::/home/kmckiern/opt/epd-7.3.2/bin:/home/kmckiern/local/bin:/home/kmckiern/opt/cctools-4.1.2/bin/:/usr/local/bin:/usr/local/X11/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/etc:/usr/etc:/usr/local/etc:.:/etc:/usr/etc:/usr/local/etc:.
+GNOME_LIBCONFIG_PATH=/usr/lib:/usr/local/lib:/usr/local/lib
+LD_RUN_PATH=/lib:/usr/lib:/usr/X11R6/lib:/usr/local/lib:/usr/local/lib
+C_INCLUDE_PATH=/usr/include:/usr/X11R6/include:/usr/local/include:/usr/local/include
+PWD=/home/kmckiern/src/forcebalance_kf/studies/010_lipid_study/single.tmp/LipidDPPC/iter_0000/323.15K-1.0atm/trj_0
+__KMP_REGISTERED_LIB_4751=0x7f977dbb7810-cafe4c4d-libiomp5.so
+LANG=en_US.UTF-8
+GMX_NO_ALLVSALL=TRUE
+MODULEPATH=/usr/local/Modules/versions:/usr/local/Modules/$MODULE_VERSION/modulefiles:/opt/modulefiles
+LOADEDMODULES=
+SHLVL=3
+HOME=/home/kmckiern
+BAK=/home/kmckiern/temp/rungmx-backups
+LOGNAME=kmckiern
+OPENMM_PLUGIN_DIR=/home/kmckiern/openmm/lib/plugins
+SSH_CONNECTION=171.66.19.212 55094 171.65.102.29 22
+MODULESHOME=/usr/local/Modules/3.2.10
+LESSOPEN=| /usr/bin/lesspipe %s
+INFOPATH=/usr/info:/usr/lib/info:/usr/gnu/info:/usr/local/info:/usr/local/info
+DISPLAY=localhost:12.0
+LESSCLOSE=/usr/bin/lesspipe %s %s
+module=() {  eval `/usr/local/Modules/$MODULE_VERSION/bin/modulecmd sh $*`
+}
+_=/usr/bin/env
+
+#=======================#
+# STARTING CALCULATION! #
+#=======================#
+
+python npt_lipid.py gromacs 323.150 1.000
+#===================================================================#
+#| [1;94m ForceBalance condensed phase simulation using engine: GROMACS [0m |#
+#===================================================================#
+#========================================================#
+#| [92m             Options from ForceBalance              [0m |#
+#========================================================#
+gmxpath                   /home/kmckiern/opt/gromacs-4.6.2/bin 
+gmxsuffix                  
+md_threads                1 
+lipid_coords              lipid.gro 
+root                      /home/kmckiern/src/forcebalance_kf/studies/010_lipid_study 
+name                      LipidDPPC 
+type                      LIPID_GMX 
+weight                    1.0 
+fdgrad                    0 
+fdhess                    0 
+fdhessdiag                0 
+sleepy                    0 
+fd1_pids                  [] 
+fd2_pids                  [] 
+h                         0.001 
+backup                    1 
+zerograd                  -1 
+epsgrad                   0.0 
+pgrad                     [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23] 
+tgtdir                    targets/LipidDPPC 
+w_rho                     1.0 
+w_alpha                   1.0 
+w_kappa                   1.0 
+w_cp                      1.0 
+w_eps0                    1.0 
+w_al                      1.0 
+w_scd                     1.0 
+manual                    0 
+lipid_eq_steps            2000 
+lipid_md_steps            2000 
+gas_eq_steps              10000 
+gas_md_steps              100000 
+lipid_timestep            2.0 
+lipid_interval            1.0 
+gas_timestep              1.0 
+gas_interval              0.1 
+minimize_energy           1 
+self_pol_mu0              0.0 
+self_pol_alpha            0.0 
+anisotropic_box           0 
+save_traj                 0 
+al_denom                  0.013 
+use_cvib_intra            False 
+use_cvib_inter            False 
+use_cni                   False 
+----------------------------------------------------------
+For the condensed phase system, I will collect 4 snapshots spaced apart by 500 x 2.000 fs time steps
+#========================================================#
+#| [92m              Engine options for lipid              [0m |#
+#========================================================#
+coords                    lipid.gro 
+mol                       <forcebalance.molecule.Molecule object at 0x2aa1a90> 
+pbc                       True 
+gmx_top                   lipid.top 
+gmx_mdp                   lipid.mdp 
+FF                        <forcebalance.forcefield.FF object at 0x2aa1390> 
+gmxpath                   /home/kmckiern/opt/gromacs-4.6.2/bin 
+gmxsuffix                  
+----------------------------------------------------------
+Running without a target, using current directory.
+Trying to write to a symbolic link lipid.mdp, removing it first
+#========================================================#
+#| [1;94m         Condensed phase molecular dynamics         [0m |#
+#========================================================#
+Molecular dynamics simulation with GROMACS engine.
+Minimizing energy... Done
+Equilibrating...
+Executing process: [92m/home/kmckiern/opt/gromacs-4.6.2/bin/grompp -c lipid-min.gro -p lipid.top -f lipid-eq.mdp -o lipid-eq.tpr -maxwarn 1[0m
+Executing process: [92m/home/kmckiern/opt/gromacs-4.6.2/bin/mdrun -v -deffnm lipid-eq -nt 1 -stepout 500[0m
+                         :-)  G  R  O  M  A  C  S  (-:
+
+                     Gyas ROwers Mature At Cryogenic Speed
+
+                            :-)  VERSION 4.6.2  (-:
+
+        Contributions from Mark Abraham, Emile Apol, Rossen Apostolov, 
+           Herman J.C. Berendsen, Aldert van Buuren, Pär Bjelkmar,  
+     Rudi van Drunen, Anton Feenstra, Gerrit Groenhof, Christoph Junghans, 
+        Peter Kasson, Carsten Kutzner, Per Larsson, Pieter Meulenhoff, 
+           Teemu Murtola, Szilard Pall, Sander Pronk, Roland Schulz, 
+                Michael Shirts, Alfons Sijbers, Peter Tieleman,
+
+               Berk Hess, David van der Spoel, and Erik Lindahl.
+
+       Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+         Copyright (c) 2001-2012,2013, The GROMACS development team at
+        Uppsala University & The Royal Institute of Technology, Sweden.
+            check out http://www.gromacs.org for more information.
+
+         This program is free software; you can redistribute it and/or
+       modify it under the terms of the GNU Lesser General Public License
+        as published by the Free Software Foundation; either version 2.1
+             of the License, or (at your option) any later version.
+
+              :-)  /home/kmckiern/opt/gromacs-4.6.2/bin/mdrun  (-:
+
+Option     Filename  Type         Description
+------------------------------------------------------------
+  -s   lipid-eq.tpr  Input        Run input file: tpr tpb tpa
+  -o   lipid-eq.trr  Output       Full precision trajectory: trr trj cpt
+  -x   lipid-eq.xtc  Output, Opt. Compressed trajectory (portable xdr format)
+-cpi   lipid-eq.cpt  Input, Opt.  Checkpoint file
+-cpo   lipid-eq.cpt  Output, Opt. Checkpoint file
+  -c   lipid-eq.gro  Output       Structure file: gro g96 pdb etc.
+  -e   lipid-eq.edr  Output       Energy file
+  -g   lipid-eq.log  Output       Log file
+-dhdl  lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+-field lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+-table lipid-eq.xvg  Input, Opt.  xvgr/xmgr file
+-tabletf   lipid-eq.xvg  Input, Opt.  xvgr/xmgr file
+-tablep   lipid-eq.xvg  Input, Opt.  xvgr/xmgr file
+-tableb   lipid-eq.xvg  Input, Opt.  xvgr/xmgr file
+-rerun lipid-eq.xtc  Input, Opt.  Trajectory: xtc trr trj gro g96 pdb cpt
+-tpi   lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+-tpid  lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+ -ei   lipid-eq.edi  Input, Opt.  ED sampling input
+ -eo   lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+  -j   lipid-eq.gct  Input, Opt.  General coupling stuff
+ -jo   lipid-eq.gct  Output, Opt. General coupling stuff
+-ffout lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+-devout   lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+-runav lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+ -px   lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+ -pf   lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+ -ro   lipid-eq.xvg  Output, Opt. xvgr/xmgr file
+ -ra   lipid-eq.log  Output, Opt. Log file
+ -rs   lipid-eq.log  Output, Opt. Log file
+ -rt   lipid-eq.log  Output, Opt. Log file
+-mtx   lipid-eq.mtx  Output, Opt. Hessian matrix
+ -dn   lipid-eq.ndx  Output, Opt. Index file
+-multidir  lipid-eq  Input, Opt., Mult. Run directory
+-membed   lipid-eq.dat  Input, Opt.  Generic data file
+ -mp   lipid-eq.top  Input, Opt.  Topology file
+ -mn   lipid-eq.ndx  Input, Opt.  Index file
+
+Option       Type   Value   Description
+------------------------------------------------------
+-[no]h       bool   no      Print help info and quit
+-[no]version bool   no      Print version info and quit
+-nice        int    0       Set the nicelevel
+-deffnm      string lipid-eq  Set the default filename for all file options
+-xvg         enum   xmgrace  xvg plot formatting: xmgrace, xmgr or none
+-[no]pd      bool   no      Use particle decompostion
+-dd          vector 0 0 0   Domain decomposition grid, 0 is optimize
+-ddorder     enum   interleave  DD node order: interleave, pp_pme or cartesian
+-npme        int    -1      Number of separate nodes to be used for PME, -1
+                            is guess
+-nt          int    1       Total number of threads to start (0 is guess)
+-ntmpi       int    0       Number of thread-MPI threads to start (0 is guess)
+-ntomp       int    0       Number of OpenMP threads per MPI process/thread
+                            to start (0 is guess)
+-ntomp_pme   int    0       Number of OpenMP threads per MPI process/thread
+                            to start (0 is -ntomp)
+-pin         enum   auto    Fix threads (or processes) to specific cores:
+                            auto, on or off
+-pinoffset   int    0       The starting logical core number for pinning to
+                            cores; used to avoid pinning threads from
+                            different mdrun instances to the same core
+-pinstride   int    0       Pinning distance in logical cores for threads,
+                            use 0 to minimize the number of threads per
+                            physical core
+-gpu_id      string         List of GPU id's to use
+-[no]ddcheck bool   yes     Check for all bonded interactions with DD
+-rdd         real   0       The maximum distance for bonded interactions with
+                            DD (nm), 0 is determine from initial coordinates
+-rcon        real   0       Maximum distance for P-LINCS (nm), 0 is estimate
+-dlb         enum   auto    Dynamic load balancing (with DD): auto, no or yes
+-dds         real   0.8     Minimum allowed dlb scaling of the DD cell size
+-gcom        int    -1      Global communication frequency
+-nb          enum   auto    Calculate non-bonded interactions on: auto, cpu,
+                            gpu or gpu_cpu
+-[no]tunepme bool   yes     Optimize PME load between PP/PME nodes or GPU/CPU
+-[no]testverlet bool   no      Test the Verlet non-bonded scheme
+-[no]v       bool   yes     Be loud and noisy
+-[no]compact bool   yes     Write a compact log file
+-[no]seppot  bool   no      Write separate V and dVdl terms for each
+                            interaction type and node to the log file(s)
+-pforce      real   -1      Print all forces larger than this (kJ/mol nm)
+-[no]reprod  bool   no      Try to avoid optimizations that affect binary
+                            reproducibility
+-cpt         real   15      Checkpoint interval (minutes)
+-[no]cpnum   bool   no      Keep and number checkpoint files
+-[no]append  bool   yes     Append to previous output files when continuing
+                            from checkpoint instead of adding the simulation
+                            part number to all file names
+-nsteps      step   -2      Run this number of steps, overrides .mdp file
+                            option
+-maxh        real   -1      Terminate after 0.99 times this time (hours)
+-multi       int    0       Do multiple simulations in parallel
+-replex      int    0       Attempt replica exchange periodically with this
+                            period (steps)
+-nex         int    0       Number of random exchanges to carry out each
+                            exchange interval (N^3 is one suggestion).  -nex
+                            zero or not specified gives neighbor replica
+                            exchange.
+-reseed      int    -1      Seed for replica exchange, -1 is generate a seed
+-[no]ionize  bool   no      Do a simulation including the effect of an X-Ray
+                            bombardment on your system
+
+Reading file lipid-eq.tpr, VERSION 4.6.2 (single precision)
+
+NOTE: GPU(s) found, but the current simulation can not use GPUs
+      To use a GPU, set the mdp option: cutoff-scheme = Verlet
+      (for quick performance testing you can use the -testverlet option)
+
+Using 1 MPI thread
+
+3 GPUs detected:
+  #0: NVIDIA GeForce GTX TITAN, compute cap.: 3.5, ECC:  no, stat: compatible
+  #1: NVIDIA Tesla K20c, compute cap.: 3.5, ECC:  no, stat: compatible
+  #2: NVIDIA GeForce GTX 580, compute cap.: 2.0, ECC:  no, stat: compatible
+
+starting mdrun 'DPPC Bilayer'
+2000 steps,      4.0 ps.
+step 0step 500, remaining runtime:     2 s          step 1000, remaining runtime:     1 s          step 1500, remaining runtime:     0 s          
+Writing final coordinates.
+step 2000, remaining runtime:     0 s          
+               Core t (s)   Wall t (s)        (%)
+       Time:        2.700        2.864       94.3
+                 (ns/day)    (hour/ns)
+Performance:      120.735        0.199
+
+gcq#27: "A Man Needs a Maid" (N. Young)
+
+Production run...
+Executing process: [92m/home/kmckiern/opt/gromacs-4.6.2/bin/grompp -c lipid-eq.gro -p lipid.top -f lipid-md.mdp -o lipid-md.tpr -maxwarn 1[0m
+Executing process: [92m/home/kmckiern/opt/gromacs-4.6.2/bin/mdrun -v -deffnm lipid-md -nt 1 -stepout 500[0m
+                         :-)  G  R  O  M  A  C  S  (-:
+
+               GRoups of Organic Molecules in ACtion for Science
+
+                            :-)  VERSION 4.6.2  (-:
+
+        Contributions from Mark Abraham, Emile Apol, Rossen Apostolov, 
+           Herman J.C. Berendsen, Aldert van Buuren, Pär Bjelkmar,  
+     Rudi van Drunen, Anton Feenstra, Gerrit Groenhof, Christoph Junghans, 
+        Peter Kasson, Carsten Kutzner, Per Larsson, Pieter Meulenhoff, 
+           Teemu Murtola, Szilard Pall, Sander Pronk, Roland Schulz, 
+                Michael Shirts, Alfons Sijbers, Peter Tieleman,
+
+               Berk Hess, David van der Spoel, and Erik Lindahl.
+
+       Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+         Copyright (c) 2001-2012,2013, The GROMACS development team at
+        Uppsala University & The Royal Institute of Technology, Sweden.
+            check out http://www.gromacs.org for more information.
+
+         This program is free software; you can redistribute it and/or
+       modify it under the terms of the GNU Lesser General Public License
+        as published by the Free Software Foundation; either version 2.1
+             of the License, or (at your option) any later version.
+
+              :-)  /home/kmckiern/opt/gromacs-4.6.2/bin/mdrun  (-:
+
+Option     Filename  Type         Description
+------------------------------------------------------------
+  -s   lipid-md.tpr  Input        Run input file: tpr tpb tpa
+  -o   lipid-md.trr  Output       Full precision trajectory: trr trj cpt
+  -x   lipid-md.xtc  Output, Opt. Compressed trajectory (portable xdr format)
+-cpi   lipid-md.cpt  Input, Opt.  Checkpoint file
+-cpo   lipid-md.cpt  Output, Opt. Checkpoint file
+  -c   lipid-md.gro  Output       Structure file: gro g96 pdb etc.
+  -e   lipid-md.edr  Output       Energy file
+  -g   lipid-md.log  Output       Log file
+-dhdl  lipid-md.xvg  Output, Opt. xvgr/xmgr file
+-field lipid-md.xvg  Output, Opt. xvgr/xmgr file
+-table lipid-md.xvg  Input, Opt.  xvgr/xmgr file
+-tabletf   lipid-md.xvg  Input, Opt.  xvgr/xmgr file
+-tablep   lipid-md.xvg  Input, Opt.  xvgr/xmgr file
+-tableb   lipid-md.xvg  Input, Opt.  xvgr/xmgr file
+-rerun lipid-md.xtc  Input, Opt.  Trajectory: xtc trr trj gro g96 pdb cpt
+-tpi   lipid-md.xvg  Output, Opt. xvgr/xmgr file
+-tpid  lipid-md.xvg  Output, Opt. xvgr/xmgr file
+ -ei   lipid-md.edi  Input, Opt.  ED sampling input
+ -eo   lipid-md.xvg  Output, Opt. xvgr/xmgr file
+  -j   lipid-md.gct  Input, Opt.  General coupling stuff
+ -jo   lipid-md.gct  Output, Opt. General coupling stuff
+-ffout lipid-md.xvg  Output, Opt. xvgr/xmgr file
+-devout   lipid-md.xvg  Output, Opt. xvgr/xmgr file
+-runav lipid-md.xvg  Output, Opt. xvgr/xmgr file
+ -px   lipid-md.xvg  Output, Opt. xvgr/xmgr file
+ -pf   lipid-md.xvg  Output, Opt. xvgr/xmgr file
+ -ro   lipid-md.xvg  Output, Opt. xvgr/xmgr file
+ -ra   lipid-md.log  Output, Opt. Log file
+ -rs   lipid-md.log  Output, Opt. Log file
+ -rt   lipid-md.log  Output, Opt. Log file
+-mtx   lipid-md.mtx  Output, Opt. Hessian matrix
+ -dn   lipid-md.ndx  Output, Opt. Index file
+-multidir  lipid-md  Input, Opt., Mult. Run directory
+-membed   lipid-md.dat  Input, Opt.  Generic data file
+ -mp   lipid-md.top  Input, Opt.  Topology file
+ -mn   lipid-md.ndx  Input, Opt.  Index file
+
+Option       Type   Value   Description
+------------------------------------------------------
+-[no]h       bool   no      Print help info and quit
+-[no]version bool   no      Print version info and quit
+-nice        int    0       Set the nicelevel
+-deffnm      string lipid-md  Set the default filename for all file options
+-xvg         enum   xmgrace  xvg plot formatting: xmgrace, xmgr or none
+-[no]pd      bool   no      Use particle decompostion
+-dd          vector 0 0 0   Domain decomposition grid, 0 is optimize
+-ddorder     enum   interleave  DD node order: interleave, pp_pme or cartesian
+-npme        int    -1      Number of separate nodes to be used for PME, -1
+                            is guess
+-nt          int    1       Total number of threads to start (0 is guess)
+-ntmpi       int    0       Number of thread-MPI threads to start (0 is guess)
+-ntomp       int    0       Number of OpenMP threads per MPI process/thread
+                            to start (0 is guess)
+-ntomp_pme   int    0       Number of OpenMP threads per MPI process/thread
+                            to start (0 is -ntomp)
+-pin         enum   auto    Fix threads (or processes) to specific cores:
+                            auto, on or off
+-pinoffset   int    0       The starting logical core number for pinning to
+                            cores; used to avoid pinning threads from
+                            different mdrun instances to the same core
+-pinstride   int    0       Pinning distance in logical cores for threads,
+                            use 0 to minimize the number of threads per
+                            physical core
+-gpu_id      string         List of GPU id's to use
+-[no]ddcheck bool   yes     Check for all bonded interactions with DD
+-rdd         real   0       The maximum distance for bonded interactions with
+                            DD (nm), 0 is determine from initial coordinates
+-rcon        real   0       Maximum distance for P-LINCS (nm), 0 is estimate
+-dlb         enum   auto    Dynamic load balancing (with DD): auto, no or yes
+-dds         real   0.8     Minimum allowed dlb scaling of the DD cell size
+-gcom        int    -1      Global communication frequency
+-nb          enum   auto    Calculate non-bonded interactions on: auto, cpu,
+                            gpu or gpu_cpu
+-[no]tunepme bool   yes     Optimize PME load between PP/PME nodes or GPU/CPU
+-[no]testverlet bool   no      Test the Verlet non-bonded scheme
+-[no]v       bool   yes     Be loud and noisy
+-[no]compact bool   yes     Write a compact log file
+-[no]seppot  bool   no      Write separate V and dVdl terms for each
+                            interaction type and node to the log file(s)
+-pforce      real   -1      Print all forces larger than this (kJ/mol nm)
+-[no]reprod  bool   no      Try to avoid optimizations that affect binary
+                            reproducibility
+-cpt         real   15      Checkpoint interval (minutes)
+-[no]cpnum   bool   no      Keep and number checkpoint files
+-[no]append  bool   yes     Append to previous output files when continuing
+                            from checkpoint instead of adding the simulation
+                            part number to all file names
+-nsteps      step   -2      Run this number of steps, overrides .mdp file
+                            option
+-maxh        real   -1      Terminate after 0.99 times this time (hours)
+-multi       int    0       Do multiple simulations in parallel
+-replex      int    0       Attempt replica exchange periodically with this
+                            period (steps)
+-nex         int    0       Number of random exchanges to carry out each
+                            exchange interval (N^3 is one suggestion).  -nex
+                            zero or not specified gives neighbor replica
+                            exchange.
+-reseed      int    -1      Seed for replica exchange, -1 is generate a seed
+-[no]ionize  bool   no      Do a simulation including the effect of an X-Ray
+                            bombardment on your system
+
+Reading file lipid-md.tpr, VERSION 4.6.2 (single precision)
+
+NOTE: GPU(s) found, but the current simulation can not use GPUs
+      To use a GPU, set the mdp option: cutoff-scheme = Verlet
+      (for quick performance testing you can use the -testverlet option)
+
+Using 1 MPI thread
+
+3 GPUs detected:
+  #0: NVIDIA GeForce GTX TITAN, compute cap.: 3.5, ECC:  no, stat: compatible
+  #1: NVIDIA Tesla K20c, compute cap.: 3.5, ECC:  no, stat: compatible
+  #2: NVIDIA GeForce GTX 580, compute cap.: 2.0, ECC:  no, stat: compatible
+
+starting mdrun 'DPPC Bilayer'
+2000 steps,      4.0 ps.
+step 0step 500, remaining runtime:     2 s          step 1000, remaining runtime:     1 s          step 1500, remaining runtime:     0 s          
+Writing final coordinates.
+step 2000, remaining runtime:     0 s          
+               Core t (s)   Wall t (s)        (%)
+       Time:        2.780        2.941       94.5
+                 (ns/day)    (hour/ns)
+Performance:      117.572        0.204
+
+gcq#119: "Step On the Brakes" (2 Unlimited)
+
+Production run finished, calculating properties...
+Finished!
+#=======================================================================#
+#| [92m Energy Component Analysis, Mean +- Stderr [Per Molecule] (kJ/mol) [0m |#
+#=======================================================================#
+Angle                        1566.3330 +-    21.7663 [    6.2156 +-  0.0864 ] 
+Proper-Dih.                   257.2832 +-     4.6645 [    1.0210 +-  0.0185 ] 
+Ryckaert-Bell.                487.2001 +-    14.4344 [    1.9333 +-  0.0573 ] 
+Improper-Dih.                  27.0406 +-     3.2327 [    0.1073 +-  0.0128 ] 
+LJ-14                         286.2860 +-     7.3398 [    1.1361 +-  0.0291 ] 
+Coulomb-14                    468.5119 +-    24.5513 [    1.8592 +-  0.0974 ] 
+LJ-(SR)                      1050.4708 +-    41.6117 [    4.1685 +-  0.1651 ] 
+Disper.-corr.               -1140.2490 +-     4.2519 [   -4.5248 +-  0.0169 ] 
+Coulomb-(SR)               -11510.2256 +-    74.2103 [  -45.6755 +-  0.2945 ] 
+Coul.-recip.               -10554.2424 +-    16.1302 [  -41.8819 +-  0.0640 ] 
+Potential                  -19061.5906 +-    57.9981 [  -75.6412 +-  0.2302 ] 
+Kinetic-En.                  3354.8788 +-    54.9963 [   13.3130 +-  0.2182 ] 
+Total-Energy               -15706.7119 +-    77.2654 [  -62.3282 +-  0.3066 ] 
+Temperature                   321.5114 +-     5.2705 [    1.2758 +-  0.0209 ] 
+-------------------------------------------------------------------------
+Calculating potential energy derivatives with finite difference step size: 0.001000
+#========================================================#
+#| [1;94m   Condensed phase energy and dipole derivatives    [0m |#
+#| [1;94m           Initializing array to length 5           [0m |#
+#========================================================#
+0 sigeps.txt:1.0                              fdwrap: energy_driver [0] = -1.0e-03                                                   fdwrap: energy_driver [0] =  1.0e-03                                                   1 sigeps.txt:1.1                              fdwrap: energy_driver [1] = -1.0e-03                                                   fdwrap: energy_driver [1] =  1.0e-03                                                   2 sigeps.txt:2.0                              fdwrap: energy_driver [2] = -1.0e-03                                                   fdwrap: energy_driver [2] =  1.0e-03                                                   3 sigeps.txt:2.1                              fdwrap: energy_driver [3] = -1.0e-03                                                   fdwrap: energy_driver [3] =  1.0e-03                                                   4 sigeps.txt:3.0                              fdwrap: energy_driver [4] = -1.0e-03                                                   fdwrap: energy_driver [4] =  1.0e-03                                                   5 sigeps.txt:3.1                              fdwrap: energy_driver [5] = -1.0e-03                                                   fdwrap: energy_driver [5] =  1.0e-03                                                   6 sigeps.txt:4.0                              fdwrap: energy_driver [6] = -1.0e-03                                                   fdwrap: energy_driver [6] =  1.0e-03                                                   7 sigeps.txt:4.1                              fdwrap: energy_driver [7] = -1.0e-03                                                   fdwrap: energy_driver [7] =  1.0e-03                                                   8 sigeps.txt:5.0                              fdwrap: energy_driver [8] = -1.0e-03                                                   fdwrap: energy_driver [8] =  1.0e-03                                                   9 sigeps.txt:5.1                              fdwrap: energy_driver [9] = -1.0e-03                                                   fdwrap: energy_driver [9] =  1.0e-03                                                   10 sigeps.txt:6.0                              fdwrap: energy_driver [10] = -1.0e-03                                                   fdwrap: energy_driver [10] =  1.0e-03                                                   11 sigeps.txt:6.1                              fdwrap: energy_driver [11] = -1.0e-03                                                   fdwrap: energy_driver [11] =  1.0e-03                                                   12 sigeps.txt:7.0                              fdwrap: energy_driver [12] = -1.0e-03                                                   fdwrap: energy_driver [12] =  1.0e-03                                                   13 sigeps.txt:7.1                              fdwrap: energy_driver [13] = -1.0e-03                                                   fdwrap: energy_driver [13] =  1.0e-03                                                   14 sigeps.txt:8.0                              fdwrap: energy_driver [14] = -1.0e-03                                                   fdwrap: energy_driver [14] =  1.0e-03                                                   15 sigeps.txt:8.1                              fdwrap: energy_driver [15] = -1.0e-03                                                   fdwrap: energy_driver [15] =  1.0e-03                                                   16 sigeps.txt:9.0                              fdwrap: energy_driver [16] = -1.0e-03                                                   fdwrap: energy_driver [16] =  1.0e-03                                                   17 sigeps.txt:9.1                              fdwrap: energy_driver [17] = -1.0e-03                                                   fdwrap: energy_driver [17] =  1.0e-03                                                   18 sigeps.txt:10.0                              fdwrap: energy_driver [18] = -1.0e-03                                                   fdwrap: energy_driver [18] =  1.0e-03                                                   19 sigeps.txt:10.1                              fdwrap: energy_driver [19] = -1.0e-03                                                   fdwrap: energy_driver [19] =  1.0e-03                                                   20 sigeps.txt:11.0                              fdwrap: energy_driver [20] = -1.0e-03                                                   fdwrap: energy_driver [20] =  1.0e-03                                                   21 sigeps.txt:11.1                              fdwrap: energy_driver [21] = -1.0e-03                                                   fdwrap: energy_driver [21] =  1.0e-03                                                   22 sigeps.txt:12.0                              fdwrap: energy_driver [22] = -1.0e-03                                                   fdwrap: energy_driver [22] =  1.0e-03                                                   23 sigeps.txt:12.1                              fdwrap: energy_driver [23] = -1.0e-03                                                   fdwrap: energy_driver [23] =  1.0e-03                                                   #========================================================#
+#| [92m       Density:  1003.0634 +-  3.7404 kg/m^3        [0m |#
+#| [92m                Analytic Derivative:                [0m |#
+#========================================================#
+   0 [  7.3699e+02 ] : sigeps.txt:1.0
+   1 [  2.1431e+01 ] : sigeps.txt:1.1
+   2 [ -2.9517e+03 ] : sigeps.txt:2.0
+   3 [ -6.9618e+01 ] : sigeps.txt:2.1
+   4 [  9.0715e+00 ] : sigeps.txt:3.0
+   5 [  2.2816e+00 ] : sigeps.txt:3.1
+   6 [  4.2460e+01 ] : sigeps.txt:4.0
+   7 [  1.9316e+00 ] : sigeps.txt:4.1
+   8 [  1.9932e+02 ] : sigeps.txt:5.0
+   9 [  1.6351e+01 ] : sigeps.txt:5.1
+  10 [ -1.2470e+02 ] : sigeps.txt:6.0
+  11 [ -3.1737e+00 ] : sigeps.txt:6.1
+  12 [ -1.8475e+02 ] : sigeps.txt:7.0
+  13 [ -1.3421e+00 ] : sigeps.txt:7.1
+  14 [ -4.6983e+02 ] : sigeps.txt:8.0
+  15 [ -7.4374e+00 ] : sigeps.txt:8.1
+  16 [ -8.3651e+01 ] : sigeps.txt:9.0
+  17 [  1.9362e+00 ] : sigeps.txt:9.1
+  18 [  9.5642e+00 ] : sigeps.txt:10.0
+  19 [ -1.1567e+00 ] : sigeps.txt:10.1
+  20 [  3.2874e+02 ] : sigeps.txt:11.0
+  21 [  2.3111e+01 ] : sigeps.txt:11.1
+  22 [ -2.3080e+02 ] : sigeps.txt:12.0
+  23 [ -8.2031e+00 ] : sigeps.txt:12.1
+----------------------------------------------------------
+#===================================================================#
+#| [92m Thermal expansion coefficient:  9.9851e-04 +- 7.1582e-04 K^-1 [0m |#
+#| [92m                     Analytic Derivative:                      [0m |#
+#===================================================================#
+   0 [  2.3662e-01 ] : sigeps.txt:1.0
+   1 [  6.1038e-03 ] : sigeps.txt:1.1
+   2 [ -3.1010e-01 ] : sigeps.txt:2.0
+   3 [ -7.9085e-03 ] : sigeps.txt:2.1
+   4 [  4.4349e-03 ] : sigeps.txt:3.0
+   5 [  3.5484e-04 ] : sigeps.txt:3.1
+   6 [ -4.4375e-03 ] : sigeps.txt:4.0
+   7 [  1.1238e-04 ] : sigeps.txt:4.1
+   8 [  3.0273e-02 ] : sigeps.txt:5.0
+   9 [  2.8361e-03 ] : sigeps.txt:5.1
+  10 [  3.4402e-05 ] : sigeps.txt:6.0
+  11 [  5.7214e-04 ] : sigeps.txt:6.1
+  12 [  1.7472e-02 ] : sigeps.txt:7.0
+  13 [  4.7709e-04 ] : sigeps.txt:7.1
+  14 [  1.0538e-02 ] : sigeps.txt:8.0
+  15 [  7.9742e-04 ] : sigeps.txt:8.1
+  16 [ -6.7591e-02 ] : sigeps.txt:9.0
+  17 [ -1.5997e-03 ] : sigeps.txt:9.1
+  18 [  4.0461e-04 ] : sigeps.txt:10.0
+  19 [ -3.2445e-04 ] : sigeps.txt:10.1
+  20 [  4.4306e-03 ] : sigeps.txt:11.0
+  21 [  1.8679e-03 ] : sigeps.txt:11.1
+  22 [ -4.6503e-02 ] : sigeps.txt:12.0
+  23 [ -1.8039e-03 ] : sigeps.txt:12.1
+#===================================================================#
+#| [92m Isothermal compressibility:   2.6376e-05 +- 9.4153e-06 bar^-1 [0m |#
+#| [92m                     Analytic Derivative:                      [0m |#
+#===================================================================#
+   0 [  4.5027e-03 ] : sigeps.txt:1.0
+   1 [  1.0665e-04 ] : sigeps.txt:1.1
+   2 [ -2.7360e-03 ] : sigeps.txt:2.0
+   3 [ -7.1892e-05 ] : sigeps.txt:2.1
+   4 [  4.8300e-05 ] : sigeps.txt:3.0
+   5 [  3.6206e-06 ] : sigeps.txt:3.1
+   6 [  9.0121e-05 ] : sigeps.txt:4.0
+   7 [ -2.1426e-06 ] : sigeps.txt:4.1
+   8 [  3.8227e-04 ] : sigeps.txt:5.0
+   9 [  2.7569e-05 ] : sigeps.txt:5.1
+  10 [  1.4306e-04 ] : sigeps.txt:6.0
+  11 [  7.8222e-06 ] : sigeps.txt:6.1
+  12 [  4.9714e-05 ] : sigeps.txt:7.0
+  13 [  3.6977e-08 ] : sigeps.txt:7.1
+  14 [  1.5712e-04 ] : sigeps.txt:8.0
+  15 [  4.4711e-06 ] : sigeps.txt:8.1
+  16 [ -2.6199e-04 ] : sigeps.txt:9.0
+  17 [ -2.5952e-05 ] : sigeps.txt:9.1
+  18 [  1.1626e-05 ] : sigeps.txt:10.0
+  19 [ -3.4888e-06 ] : sigeps.txt:10.1
+  20 [ -9.0916e-04 ] : sigeps.txt:11.0
+  21 [ -2.4160e-05 ] : sigeps.txt:11.1
+  22 [ -3.5526e-04 ] : sigeps.txt:12.0
+  23 [ -2.5638e-05 ] : sigeps.txt:12.1
+#======================================================================#
+#| [92m Isobaric heat capacity:   3.2608e+01 +- 1.7040e+01 cal mol-1 K-1 [0m |#
+#| [92m                       Analytic Derivative:                       [0m |#
+#======================================================================#
+   0 [  4.0177e+03 ] : sigeps.txt:1.0
+   1 [  1.0882e+02 ] : sigeps.txt:1.1
+   2 [ -9.5979e+03 ] : sigeps.txt:2.0
+   3 [ -2.3908e+02 ] : sigeps.txt:2.1
+   4 [  8.9077e+01 ] : sigeps.txt:3.0
+   5 [  9.6684e+00 ] : sigeps.txt:3.1
+   6 [ -7.0650e+00 ] : sigeps.txt:4.0
+   7 [  8.5209e+00 ] : sigeps.txt:4.1
+   8 [  1.0382e+03 ] : sigeps.txt:5.0
+   9 [  9.3881e+01 ] : sigeps.txt:5.1
+  10 [ -2.0890e+02 ] : sigeps.txt:6.0
+  11 [  2.1625e+00 ] : sigeps.txt:6.1
+  12 [  7.6852e+01 ] : sigeps.txt:7.0
+  13 [  5.9497e+00 ] : sigeps.txt:7.1
+  14 [ -2.2675e+02 ] : sigeps.txt:8.0
+  15 [  1.1338e+01 ] : sigeps.txt:8.1
+  16 [ -1.2432e+03 ] : sigeps.txt:9.0
+  17 [ -1.8240e+01 ] : sigeps.txt:9.1
+  18 [  2.2086e+01 ] : sigeps.txt:10.0
+  19 [ -7.9770e+00 ] : sigeps.txt:10.1
+  20 [  9.5842e+02 ] : sigeps.txt:11.0
+  21 [  8.2795e+01 ] : sigeps.txt:11.1
+  22 [ -1.2741e+03 ] : sigeps.txt:12.0
+  23 [ -4.6454e+01 ] : sigeps.txt:12.1
+#==============================================================#
+#| [92m Dielectric constant:            7.4179e-01 +- 2.1694e-01 [0m |#
+#| [92m                   Analytic Derivative:                   [0m |#
+#==============================================================#
+   0 [ -4.4870e+01 ] : sigeps.txt:1.0
+   1 [ -1.2770e+00 ] : sigeps.txt:1.1
+   2 [  4.7112e+01 ] : sigeps.txt:2.0
+   3 [  8.7652e-01 ] : sigeps.txt:2.1
+   4 [  1.3528e-02 ] : sigeps.txt:3.0
+   5 [ -5.4919e-03 ] : sigeps.txt:3.1
+   6 [  2.8846e+00 ] : sigeps.txt:4.0
+   7 [  1.9232e-01 ] : sigeps.txt:4.1
+   8 [  1.7024e+01 ] : sigeps.txt:5.0
+   9 [  1.4440e+00 ] : sigeps.txt:5.1
+  10 [  2.8359e+00 ] : sigeps.txt:6.0
+  11 [ -1.3172e-01 ] : sigeps.txt:6.1
+  12 [  3.6999e+00 ] : sigeps.txt:7.0
+  13 [ -1.0053e-01 ] : sigeps.txt:7.1
+  14 [  2.9404e+01 ] : sigeps.txt:8.0
+  15 [  6.9574e-01 ] : sigeps.txt:8.1
+  16 [  1.2309e+01 ] : sigeps.txt:9.0
+  17 [  2.1549e-01 ] : sigeps.txt:9.1
+  18 [  1.3251e-01 ] : sigeps.txt:10.0
+  19 [ -5.0117e-02 ] : sigeps.txt:10.1
+  20 [  5.1265e+00 ] : sigeps.txt:11.0
+  21 [  5.7229e-02 ] : sigeps.txt:11.1
+  22 [ -5.7872e+00 ] : sigeps.txt:12.0
+  23 [ -3.5590e-01 ] : sigeps.txt:12.1
+#========================================================#
+#| [92m  Average Area per Lipid:  0.7418 +-  0.0022 nm^2   [0m |#
+#| [92m                Analytic Derivative:                [0m |#
+#========================================================#
+   0 [ -4.1815e-01 ] : sigeps.txt:1.0
+   1 [ -1.1867e-02 ] : sigeps.txt:1.1
+   2 [  9.3505e-01 ] : sigeps.txt:2.0
+   3 [  1.9733e-02 ] : sigeps.txt:2.1
+   4 [  2.1721e-03 ] : sigeps.txt:3.0
+   5 [ -3.8278e-04 ] : sigeps.txt:3.1
+   6 [ -7.3714e-03 ] : sigeps.txt:4.0
+   7 [  1.0737e-03 ] : sigeps.txt:4.1
+   8 [  8.7042e-02 ] : sigeps.txt:5.0
+   9 [  8.3683e-03 ] : sigeps.txt:5.1
+  10 [  5.3546e-02 ] : sigeps.txt:6.0
+  11 [  6.8476e-04 ] : sigeps.txt:6.1
+  12 [  1.1794e-01 ] : sigeps.txt:7.0
+  13 [  6.0466e-04 ] : sigeps.txt:7.1
+  14 [  3.7953e-01 ] : sigeps.txt:8.0
+  15 [  8.7008e-03 ] : sigeps.txt:8.1
+  16 [  8.8249e-03 ] : sigeps.txt:9.0
+  17 [ -4.1937e-04 ] : sigeps.txt:9.1
+  18 [ -2.2552e-03 ] : sigeps.txt:10.0
+  19 [ -3.4900e-04 ] : sigeps.txt:10.1
+  20 [ -8.8201e-03 ] : sigeps.txt:11.0
+  21 [ -2.4292e-03 ] : sigeps.txt:11.1
+  22 [ -2.7128e-02 ] : sigeps.txt:12.0
+  23 [ -1.5078e-03 ] : sigeps.txt:12.1
+----------------------------------------------------------
+#==========================================================================#
+#| [92m Lipid Isothermal compressibility:   2.1442e+03 +- 1.9098e+04 N/nm^-1 [0m |#
+#| [92m                         Analytic Derivative:                         [0m |#
+#==========================================================================#
+   0 [ -1.3903e+06 ] : sigeps.txt:1.0
+   1 [ -3.4105e+04 ] : sigeps.txt:1.1
+   2 [  6.8901e+05 ] : sigeps.txt:2.0
+   3 [  1.6334e+04 ] : sigeps.txt:2.1
+   4 [ -1.1131e+04 ] : sigeps.txt:3.0
+   5 [ -6.7996e+02 ] : sigeps.txt:3.1
+   6 [  5.5613e+03 ] : sigeps.txt:4.0
+   7 [  2.2479e+03 ] : sigeps.txt:4.1
+   8 [  5.8552e+04 ] : sigeps.txt:5.0
+   9 [  6.0801e+03 ] : sigeps.txt:5.1
+  10 [ -2.9904e+04 ] : sigeps.txt:6.0
+  11 [ -3.4155e+03 ] : sigeps.txt:6.1
+  12 [ -9.2916e+03 ] : sigeps.txt:7.0
+  13 [ -9.9473e+02 ] : sigeps.txt:7.1
+  14 [  1.2509e+05 ] : sigeps.txt:8.0
+  15 [  3.1987e+03 ] : sigeps.txt:8.1
+  16 [  1.5472e+05 ] : sigeps.txt:9.0
+  17 [  8.4992e+03 ] : sigeps.txt:9.1
+  18 [ -6.7944e+02 ] : sigeps.txt:10.0
+  19 [  3.6274e+02 ] : sigeps.txt:10.1
+  20 [  3.0753e+05 ] : sigeps.txt:11.0
+  21 [  9.2659e+03 ] : sigeps.txt:11.1
+  22 [  1.8300e+04 ] : sigeps.txt:12.0
+  23 [  2.7486e+03 ] : sigeps.txt:12.1
+#========================================================#
+#| [92m    Deuterium order parameter: 0.2845 +- 0.0109     [0m |#
+#| [92m                  0.2276 +- 0.0181                  [0m |#
+#| [92m                  0.1796 +- 0.0296                  [0m |#
+#| [92m                  0.1499 +- 0.0110                  [0m |#
+#| [92m                  0.1391 +- 0.0218                  [0m |#
+#| [92m                  0.1740 +- 0.0264                  [0m |#
+#| [92m                  0.1002 +- 0.0110                  [0m |#
+#| [92m                  0.1235 +- 0.0150                  [0m |#
+#| [92m                  0.1687 +- 0.0078                  [0m |#
+#| [92m                  0.1100 +- 0.0188                  [0m |#
+#| [92m                  0.0737 +- 0.0238                  [0m |#
+#| [92m                  0.0534 +- 0.0163                  [0m |#
+#| [92m                  0.0608 +- 0.0218                  [0m |#
+#| [92m                  0.1399 +- 0.0138                  [0m |#
+#| [92m                  0.2344 +- 0.0146                  [0m |#
+#| [92m                  0.1580 +- 0.0134                  [0m |#
+#| [92m                  0.1075 +- 0.0126                  [0m |#
+#| [92m                  0.1497 +- 0.0161                  [0m |#
+#| [92m                  0.1387 +- 0.0219                  [0m |#
+#| [92m                  0.1264 +- 0.0089                  [0m |#
+#| [92m                  0.0657 +- 0.0119                  [0m |#
+#| [92m                  0.0742 +- 0.0168                  [0m |#
+#| [92m                  0.0497 +- 0.0145                  [0m |#
+#| [92m                  0.0520 +- 0.0185                  [0m |#
+#| [92m                  0.1675 +- 0.0247                  [0m |#
+#| [92m                  0.1433 +- 0.0225                  [0m |#
+#| [92m                  0.1012 +- 0.0223                  [0m |#
+#| [92m                  0.0357 +- 0.0142                  [0m |#
+#| [92m                                                    [0m |#
+#| [92m                Analytic Derivative:                [0m |#
+#========================================================#
+   0 [ [[  1.52288934  -2.4954682   -6.67280015  -0.094307    10.72453518
+   -6.27652581  -4.85262115   0.14800067  -2.80621386   8.98523929
+    9.55959424  -7.84012417  -6.73513354  -3.43812936   2.44367213
+   -0.66659028   2.79580265   1.91797663  -3.18125026  -2.92150573
+    4.91981794   7.53507196  -6.69715321   7.38567208  -0.32267439
+   -0.31999279 -11.1405653   -5.50670502]] ] : sigeps.txt:1.0
+   1 [ [[ 0.03848596 -0.0548357  -0.16279788 -0.00143725  0.25915466 -0.17886074
+  -0.12822276 -0.00723807 -0.07273372  0.23528059  0.25089445 -0.19500281
+  -0.17603444 -0.07743521  0.05508213 -0.01104934  0.0801796   0.06092366
+  -0.06409092 -0.07777992  0.11430829  0.19233706 -0.16709004  0.16611643
+  -0.0411876  -0.01920135 -0.25547264 -0.13790294]] ] : sigeps.txt:1.1
+   2 [ [[ -6.02702598  -6.99018661  -8.87181527  -4.62260027  -7.05695472
+    4.01532315   4.47352861   6.02558682   2.87006347  -9.95356411
+   -6.89632009   2.82393707  16.24918288   5.81127461  -5.67417302
+   -4.12021022  -2.92820526  -1.46849931   6.70740533   6.68453812
+    2.70001207 -11.74930655   1.20942738   5.30519956  17.80215567
+   14.25854377   5.08652024   5.06761604]] ] : sigeps.txt:2.0
+   3 [ [[-0.14246423 -0.15675395 -0.22453367 -0.11877916 -0.18546898  0.07069586
+   0.10054529  0.15032263  0.07155807 -0.23270931 -0.16039999  0.07087745
+   0.38471588  0.14658582 -0.13599137 -0.08567162 -0.06736839 -0.0320712
+   0.17149142  0.15531141  0.06171061 -0.27580838  0.02359039  0.12230104
+   0.40621142  0.33797489  0.13288329  0.11034501]] ] : sigeps.txt:2.1
+   4 [ [[ 0.00130156 -0.05253179 -0.02842829  0.0243144   0.13559506 -0.03874583
+  -0.04329078 -0.04643422 -0.04436481  0.09458854  0.11299837 -0.08852514
+  -0.05527437 -0.02740313 -0.00179493 -0.0432339   0.04863508  0.04897526
+  -0.01343968 -0.01868135  0.03985367  0.05481955 -0.04926666  0.04521376
+  -0.00875095 -0.00435509 -0.0777226  -0.01149915]] ] : sigeps.txt:3.0
+   5 [ [[ 0.00457264  0.00351631  0.00799756  0.00489175  0.00937614 -0.00036517
+  -0.00322092 -0.00587839 -0.00312319  0.00826313  0.00615661 -0.00375893
+  -0.01294831 -0.00595803  0.00459087  0.00112047  0.00244833  0.0012102
+  -0.0070061  -0.00490716 -0.00114513  0.00930517 -0.00097216 -0.00276767
+  -0.01134247 -0.0107684  -0.00669305 -0.00288949]] ] : sigeps.txt:3.1
+   6 [ [[ 0.29000261  0.37748075  0.64045263  0.18371929  0.05068488  0.6543447
+   0.17269835  0.07197722  0.08921817 -0.19733389 -0.46745102  0.22961178
+  -0.40245833 -0.41858641  0.43526618  0.19694164 -0.31504936 -0.45261162
+  -0.70699945 -0.12582612 -0.13393102  0.22923911  0.21724507 -0.0820931
+  -0.04893496 -0.48001661 -0.46468504 -0.10919184]] ] : sigeps.txt:4.0
+   7 [ [[ 0.00555961  0.01141027  0.03692482  0.01179711 -0.00491657  0.02682203
+   0.0095306  -0.01073895  0.00151908 -0.01111037 -0.01776155  0.01324456
+  -0.00687026 -0.00706256  0.00524187  0.00120335 -0.00606356 -0.007229
+  -0.01272136 -0.00062971 -0.01348166 -0.00250477  0.01737198 -0.02080086
+  -0.0117119  -0.01923168  0.00819824  0.01048703]] ] : sigeps.txt:4.1
+   8 [ [[ 0.69663025  0.70456486  2.78385554  1.10094268  0.80820187  2.40191272
+   0.56457172 -0.76789713 -0.07973373 -0.3741511  -0.99376872  0.45677613
+  -1.2101358  -1.22591754  0.90415415 -0.05008377 -0.52773592 -0.79395321
+  -1.90125269 -0.26985137 -0.6089249   0.46641256  0.97379485 -0.84432373
+  -0.4664738  -1.6617695  -0.86627981  0.42647662]] ] : sigeps.txt:5.0
+   9 [ [[ 0.05048628  0.05090576  0.23222119  0.09312342  0.06395073  0.1931288
+   0.04649153 -0.07485321 -0.00967133 -0.03013221 -0.07552544  0.03706993
+  -0.09033268 -0.09111874  0.06189026 -0.01186846 -0.03531829 -0.05292361
+  -0.13991579 -0.01809294 -0.0542209   0.02867085  0.08413043 -0.08078087
+  -0.04459933 -0.13285176 -0.04954348  0.04714339]] ] : sigeps.txt:5.1
+  10 [ [[-0.24221999 -0.56802949 -0.63320371 -0.15530439  0.31883345  0.17955475
+   0.06704832  0.26076702 -0.01204975 -0.1408628   0.04150067 -0.25587842
+   0.53576618  0.0423571  -0.15419381 -0.36281262 -0.05549811 -0.03199893
+   0.05503542  0.24365883  0.39962406 -0.28440621 -0.19974658  0.67233707
+   1.09366289  0.73106261 -0.40464261  0.09750596]] ] : sigeps.txt:6.0
+  11 [ [[-0.01378837 -0.03162107 -0.05142514 -0.01105107  0.02420703 -0.03256678
+  -0.01385755  0.00397211 -0.0085485   0.02041131  0.03584007 -0.02858485
+   0.01549001  0.01082385 -0.01558147 -0.01662899  0.01562348  0.01977465
+   0.02253406  0.00504305  0.02316963 -0.0015759  -0.02509173  0.03202149
+   0.02629185  0.03455584 -0.01167929 -0.00392229]] ] : sigeps.txt:6.1
+  12 [ [[-0.71024906 -1.24369286 -1.11139285 -0.20370773  0.41894413 -0.29522549
+  -0.03593308 -0.11738287 -0.20325845  0.01322784  0.60595393 -0.55300541
+   1.20363929  0.58994623 -0.86388613 -0.88652721  0.4061528   0.65685539
+   1.00142272  0.51832964  0.50059622 -0.78897573 -0.28895852  0.60057486
+   1.27649283  1.366773    0.37953058  0.58573369]] ] : sigeps.txt:7.0
+  13 [ [[-0.01183922 -0.01963751 -0.02791729 -0.00571687  0.0078813  -0.02726167
+  -0.00931592 -0.00554434 -0.00650473  0.01351663  0.02571881 -0.0153742
+   0.01336759  0.01457718 -0.01754558 -0.01160562  0.01539922  0.02087439
+   0.02677595  0.00432295  0.00869263 -0.00614039 -0.01198712  0.00755403
+   0.00393867  0.02007466  0.01218762  0.00403831]] ] : sigeps.txt:7.1
+  14 [ [[-1.05401645 -1.96991512  0.02460171  0.18975884  0.54484568  2.71826219
+   1.15897314  0.00622548  0.05150432 -1.7550466  -1.18573184  0.05504033
+   2.61840043  0.24360778 -0.93469645 -1.83179599 -0.47058981 -0.23858531
+   0.16977734  1.34860142  0.53129558 -2.16177421  0.70981357  0.89119806
+   3.94609087  2.18532764  0.04162762  1.85139696]] ] : sigeps.txt:8.0
+  15 [ [[ -2.05953511e-02  -4.02604352e-02   1.85578251e-02   1.30408976e-02
+    1.87575464e-02   6.18860687e-02   2.39238333e-02  -1.45033062e-02
+   -3.38273872e-03  -3.16841726e-02  -1.99815432e-02   7.23467275e-05
+    4.69283781e-02   2.93708130e-03  -2.11354410e-02  -4.23432408e-02
+   -4.66506746e-03   1.15771433e-03   2.67929931e-03   2.62486455e-02
+    5.08241677e-03  -4.30914130e-02   2.03890393e-02   5.69686706e-03
+    6.77889759e-02   3.41226034e-02   7.71506975e-03   4.59161835e-02]] ] : sigeps.txt:8.1
+  16 [ [[ 0.64336087  1.35348568  1.98996121  0.19304154 -1.36016948  2.75208648
+   1.18903228  0.90375615  0.8187074  -1.98976021 -2.89084605  1.68478382
+  -0.03307508 -0.85752522  1.16062839  0.8012024  -1.60874514 -1.98920795
+  -1.88836958  0.08848421 -0.67789232 -0.32657486  1.24194762 -0.44329305
+   0.79088944 -0.85779376 -0.57155898  0.03349909]] ] : sigeps.txt:9.0
+  17 [ [[ 0.01257413  0.04998188  0.07963867  0.01106152 -0.06892851  0.05056223
+   0.02986197 -0.00348775  0.02014752 -0.051125   -0.07196837  0.06060486
+   0.00085064  0.00032215  0.01107409  0.02673148 -0.0267226  -0.02883363
+  -0.01345409  0.00143323 -0.04483363 -0.01997249  0.0498731  -0.06415253
+  -0.03819802 -0.0423404   0.053474    0.01850156]] ] : sigeps.txt:9.1
+  18 [ [[  3.34100149e-02   4.22979099e-02   6.92637147e-02   2.46760460e-02
+    1.79797103e-02   4.06367070e-02   3.82134904e-03  -1.04072645e-02
+   -7.29537694e-06   6.08673346e-03  -1.98092448e-02   1.17202225e-02
+   -6.32049582e-02  -4.19834916e-02   4.23129835e-02   2.20339488e-02
+   -1.59147099e-02  -2.84772033e-02  -6.43185510e-02  -2.28707312e-02
+   -1.73239790e-02   4.00909815e-02   1.53412834e-02  -2.08786102e-02
+   -4.36255062e-02  -6.64881152e-02  -4.06055408e-02  -1.60004390e-02]] ] : sigeps.txt:10.0
+  19 [ [[-0.0022424   0.00028363 -0.00736402 -0.00469887 -0.00916871 -0.00499366
+   0.00059931  0.00504062  0.00256511 -0.00388648 -0.00292252  0.00303287
+   0.00675639  0.00499319 -0.00256633  0.00221987 -0.00108145 -0.00034001
+   0.00621451  0.00190038  0.00010539 -0.00431708 -0.00056222  0.00082406
+   0.0027297   0.00568453  0.0060403  -0.00076341]] ] : sigeps.txt:10.1
+  20 [ [[ 0.38884673  1.66497093  3.52430408  0.94608259 -1.79492151  0.76262372
+   0.51157431 -1.59201837  0.12783449 -0.62902069 -1.10662382  1.61825501
+  -0.70703907  0.30927874 -0.1627216   0.62625476  0.10069289  0.25567284
+   0.36274031 -0.24211857 -2.00293317 -0.33679291  1.76682602 -3.44312703
+  -3.40038254 -2.32001835  3.04207766  1.0698677 ]] ] : sigeps.txt:11.0
+  21 [ [[  2.94454513e-02   7.60586529e-02   1.61607406e-01   5.49277236e-02
+   -3.44841542e-02   6.52158442e-03  -6.25780687e-05  -9.35693322e-02
+   -1.12658441e-02   1.92250015e-02  -2.76525003e-03   4.30643872e-02
+   -7.87920569e-02  -1.92342277e-03   2.46204151e-03   2.77940203e-02
+    2.48679581e-02   2.93851539e-02   4.11837829e-03  -3.01230064e-02
+   -8.42925445e-02   2.40845776e-02   6.08753627e-02  -1.52714984e-01
+   -1.94639030e-01  -1.32475850e-01   1.08742542e-01   3.14674668e-02]] ] : sigeps.txt:11.1
+  22 [ [[-0.40062951 -0.25621638 -1.44633466 -0.76276626 -1.02497881 -0.58368105
+   0.10230197  0.93588297  0.35947071 -0.59040341 -0.38540795  0.24205926
+   1.16265586  0.6373267  -0.35072371  0.14612633 -0.22756717 -0.14410123
+   0.76875559  0.36696043  0.29885554 -0.66897522 -0.25139533  0.61939031
+   1.06487571  1.19240774  0.40472861 -0.15528239]] ] : sigeps.txt:12.0
+  23 [ [[-0.02318518 -0.00912344 -0.0581976  -0.03230287 -0.06011888 -0.04693372
+   0.00028514  0.02512301  0.01298487 -0.02024773 -0.00611238  0.01424195
+   0.05510582  0.04450363 -0.03075545  0.00649591  0.00325248  0.01268849
+   0.06116573  0.0164445   0.00155183 -0.03635811 -0.00618106  0.00179641
+   0.01548209  0.04749906  0.05746139  0.00285479]] ] : sigeps.txt:12.1
+----------------------------------------------------------
+Writing final force field.
+Writing all simulation data to disk.
+
+real	0m49.024s
+user	0m23.648s
+sys	0m25.924s
