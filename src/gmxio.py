@@ -1446,7 +1446,7 @@ class Lipid_GMX(Lipid):
                 else:
                     self.lipid_mols_new[PT_vals].append(os.path.join(os.getcwd(),'lipid-md.gro'))
                 super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
-                if GoodStep() and len(self.lipid_mols_new[PT_vals]) == int(self.RefData['n_ic'][PT_vals]):
+                if len(self.lipid_mols_new[PT_vals]) == int(self.RefData['n_ic'][PT_vals]):
                     self.lipid_mols[PT_vals] = self.lipid_mols_new[PT_vals]
                     self.lipid_mols_new.pop(PT_vals)
             else:
