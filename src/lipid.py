@@ -532,8 +532,7 @@ class Lipid(Target):
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if 'n_ic' in self.RefData:
-                if GoodStep():
-                    self.lipid_mols[PT] = [Molecule(last_frame) for last_frame in self.lipid_mols[PT]]
+                self.lipid_mols[PT] = [Molecule(last_frame) for last_frame in self.lipid_mols[PT]]
                 n_uniq_ic = int(self.RefData['n_ic'][PT])
                 for ic in range(n_uniq_ic):
                     if os.path.exists('./%s/trj_%s/npt_result.p' % (label, ic)):
