@@ -940,11 +940,11 @@ def onefile(fnm=None, ext=None, err=False):
     ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
     if len(ls) != 1:
         if err:
-            logger.error("Cannot find a unique file with extension .%s in %s (%i found)" % (ext, cwd, len(ls)))
+            logger.error("Cannot find a unique file with extension .%s in %s (%i found; %s)" % (ext, cwd, len(ls), ' '.join(ls)))
             raise RuntimeError
         else:
-            warn_once("Cannot find a unique file with extension .%s in %s (%i found)" % 
-                      (ext, cwd, len(ls)), warnhash = "Found %i .%s files" % (len(ls), ext))
+            warn_once("Cannot find a unique file with extension .%s in %s (%i found; %s)" % 
+                      (ext, cwd, len(ls), ' '.join(ls)), warnhash = "Found %i .%s files" % (len(ls), ext))
     else:
         answer = os.path.basename(ls[0])
         warn_once("Autodetected %s in %s" % (answer, cwd), warnhash = "Autodetected %s" % answer)
