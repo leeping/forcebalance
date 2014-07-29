@@ -1062,6 +1062,7 @@ def LinkFile(src, dest, nosrcok = False):
         # Remove broken link
         if os.path.islink(dest) and not os.path.exists(dest):
             os.remove(dest)
+            os.symlink(src, dest)
         elif os.path.exists(dest):
             if os.path.islink(dest): pass
             else: 
@@ -1091,6 +1092,8 @@ def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
         srcfnm = os.path.join(abssrcdir, fnm)
         destfnm = os.path.join(absdestdir, fnm)
+        if os.path.islink(destfnm) and not os.path.exists(destfnm):
+            os.remove(destfnm)
         if os.path.isfile(srcfnm):
             if not os.path.exists(destfnm):
                 #print "Linking %s to %s" % (srcfnm, destfnm)
