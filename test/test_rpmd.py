@@ -35,19 +35,14 @@ class TestRPMD(ForceBalanceTestCase):
         self.addCleanup(os.system, 'cd .. ; rm -r temp')
         #MD_data = self.ommEngine.molecular_dynamics(nsteps=1000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=False, save_traj=True, rpmd_opts=['32','6'])
         # Line below performs same MD run, but using verbose option
-        MD_data = self.ommEngine.molecular_dynamics(nsteps=100000, nsave=100, timestep=0.5, temperature=300, pressure=1.0, verbose=True, save_traj=True, rpmd_opts=['32','6'])
+        MD_data = self.ommEngine.molecular_dynamics(nsteps=400, nsave=100, timestep=0.5, temperature=300, verbose=True, save_traj=True, rpmd_opts=['32','6'])
         postprocess_potentials = self.ommEngine.evaluate_(traj=self.ommEngine.xyz_rpmd, dipole=True)
-        print(MD_data['Dips'])
-        print(postprocess_potentials['Dipole'])
-        PFTs = np.array(MD_data['PFTs'])
-        CFTs = np.array(MD_data['CFTs'])
-        Cen_Ks = np.array(MD_data['Kinetics'])
-        Prim_Ks = np.array(MD_data['PrimKs'])
+        #print MD_data['Dips']
+        #print postprocess_potentials['Dipole']
+        print MD_data['CV_T']
+        print MD_data['CV_CV']
+
         os.chdir('../../..')
-        #np.savetxt('PFT.txt', PFTs)
-        #np.savetxt('CFT.txt', CFTs)
-        np.savetxt('CKE.txt', Cen_Ks)
-        np.savetxt('PKE.txt', Prim_Ks)
         os.chdir(os.path.join('test','files','rpmd_files','temp'))
         self.assertEqual(MD_data['Dips'].all(), postprocess_potentials['Dipole'].all())
         self.assertEqual(MD_data['Potentials'].all(), postprocess_potentials['Energy'].all())

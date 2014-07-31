@@ -19,7 +19,7 @@ pdb = PDBFile('qtip4pf.pdb')
 forcefield = ForceField('qtip4pf.xml')
 
 # Initialize the parameters of the simulation. 
-system = forcefield.createSystem(pdb.topology, nonbondedMethod=PME,nonbondedCutoff=1.0*nanometer,constraints=None,rigidWater=False)
+system = forcefield.createSystem(pdb.topology,nonbondedMethod=PME,nonbondedCutoff=1.0*nanometer,constraints=None,rigidWater=False)
 
 # Intialize the RPMD integrator: Here we will perform a simulation at 300 Kelvin with 32 beads representing each particle
 # using a time-step of 0.5 fs. The PILE thermostat will be used with a friction of 1 ps^-1. 
