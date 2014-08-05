@@ -1416,9 +1416,11 @@ class Molecule(object):
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.
-            xgrd = np.arange(xmin, xmax, gszx)
-            ygrd = np.arange(ymin, ymax, gszy)
-            zgrd = np.arange(zmin, zmax, gszz)
+            # Note that we leave out the rightmost grid cell,
+            # because this may cause spurious partitionings.
+            xgrd = np.arange(xmin, xmax-gszx, gszx)
+            ygrd = np.arange(ymin, ymax-gszy, gszy)
+            zgrd = np.arange(zmin, zmax-gszz, gszz)
             # 2) Grid cells are denoted by a three-index tuple.
             gidx = list(itertools.product(range(len(xgrd)), range(len(ygrd)), range(len(zgrd))))
             # 3) Build a dictionary which maps a grid cell to itself plus its neighboring grid cells.
