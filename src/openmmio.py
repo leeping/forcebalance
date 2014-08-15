@@ -546,7 +546,6 @@ class OpenMM(Engine):
         #     raise RuntimeError
         ## Create the OpenMM PDB object.
         if hasattr(self, 'abspdb'):
-            print self.abspdb
             self.pdb = PDBFile(self.abspdb)
         else:
             pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
