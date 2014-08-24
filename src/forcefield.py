@@ -244,7 +244,7 @@ class FF(forcebalance.BaseClass):
         self.plist       = []
         ## A listing of parameter number -> atoms involved
         self.patoms      = []
-        ## A list where pfields[pnum] = ['file',line,field,mult,cmd],
+        ## A list where pfields[i] = [pid,'file',line,field,mult,cmd],
         ## basically a new way to modify force field files; when we modify the
         ## force field file, we go to the specific line/field in a given file
         ## and change the number.
@@ -457,6 +457,36 @@ class FF(forcebalance.BaseClass):
             else:
                 self.atomnames += self.Readers[ffname].atomnames
 
+    def check_dupes(self, pid, ffname, ln, pfld):
+        """ Check to see whether a given parameter ID already exists, and provide an alternate if needed. """
+        pid_ = pid
+        # Add pid into the dictionary.
+        # LPW: Here is a hack to allow duplicate parameter IDs.
+        if pid in self.map:
+            pid0 = pid
+            extranum = 0
+            dupfnms = [os.path.basename(i[1]) for i in self.pfields[self.map[pid]]]
+            duplns = [i[2] for i in self.pfields[self.map[pid]]]
+            dupflds = [i[3] for i in self.pfields[self.map[pid]]]
+            while pid in self.map:
+                pid = "%s%i" % (pid0, extranum)
+                extranum += 1
+            def warn_or_err(*args):
+                if self.duplicate_pnames:
+                    logger.warn(*args)
+                else:
+                    logger.error(*args)
+            warn_or_err("Encountered an duplicate parameter ID (%s)\n" % pid_)
+            warn_or_err("file %s line %i field %i duplicates:\n" 
+                        % (os.path.basename(ffname), ln+1, pfld))
+            for dupfnm, dupln, dupfld in zip(dupfnms, duplns, dupflds):
+                warn_or_err("file %s line %i field %i\n" % (dupfnm, dupln+1, dupfld))
+            if self.duplicate_pnames:
+                logger.warn("Parameter name has been changed to %s\n" % pid)
+            else:
+                raise RuntimeError
+        return pid
+
     def addff_txt(self, ffname, fftype):
         """ Parse a text force field and create several important instance variables.
 
@@ -480,7 +510,7 @@ class FF(forcebalance.BaseClass):
         prefix but remember that the sign needs to be flipped.
 
         """
-        
+
         for ln, line in enumerate(self.ffdata[ffname]):
             try:
                 self.Readers[ffname].feed(line)
@@ -515,38 +545,13 @@ class FF(forcebalance.BaseClass):
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
-                    pid_ = pid
-                    # Add pid into the dictionary.
-                    # LPW: Here is a hack to allow duplicate parameter IDs.
-                    if pid in self.map:
-                        pid0 = pid
-                        extranum = 0
-                        dupfnms = [os.path.basename(i[0]) for i in self.pfields[self.map[pid]]]
-                        duplns = [i[1] for i in self.pfields[self.map[pid]]]
-                        dupflds = [i[2] for i in self.pfields[self.map[pid]]]
-                        while pid in self.map:
-                            pid = "%s%i" % (pid0, extranum)
-                            extranum += 1
-                        def warn_or_err(*args):
-                            if self.duplicate_pnames:
-                                logger.warn(*args)
-                            else:
-                                logger.error(*args)
-                        warn_or_err("Encountered an duplicate parameter ID (%s)\n" % pid_)
-                        warn_or_err("file %s line %i field %i duplicates:\n" 
-                                    % (os.path.basename(ffname), ln+1, pfld))
-                        for dupfnm, dupln, dupfld in zip(dupfnms, duplns, dupflds):
-                            warn_or_err("file %s line %i field %i\n" % (dupfnm, dupln+1, dupfld))
-                        if self.duplicate_pnames:
-                            logger.warn("Parameter name has been changed to %s\n" % pid)
-                        else:
-                            raise RuntimeError
+                    pid = self.check_dupes(pid, ffname, ln, pfld)
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
                     self.patoms.append([self.Readers[ffname].molatom])
                     # Also append pid to the parameter list
                     self.assign_p0(self.np,float(sline[pfld]))
-                    self.assign_field(self.np,ffname,ln,pfld,1)
+                    self.assign_field(self.np,pid,ffname,ln,pfld,1)
                     self.np += 1
             if rmark != None:
                 parse = rmark + 1
@@ -571,10 +576,11 @@ class FF(forcebalance.BaseClass):
                         logger.error('Parameter repetition entry in force field file is incorrect (see above)\n')
                         raise RuntimeError
                     pid = self.Readers[ffname].build_pid(pfld)
+                    pid = self.check_dupes(pid, ffname, ln, pfld)
                     self.map[pid] = prep
                     # This repeated parameter ID also has these atoms involved.
                     self.patoms[prep].append(self.Readers[ffname].molatom)
-                    self.assign_field(prep,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
+                    self.assign_field(prep,pid,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
             if emark != None:
                 parse = emark + 1
@@ -585,11 +591,14 @@ class FF(forcebalance.BaseClass):
                     # Second is a Python command that determines how to calculate the parameter.
                     pfld = int(sline[parse])
                     evalcmd = sline[parse+1] # This string is actually Python code!!
-                    #pid = self.Readers[ffname].build_pid(pfld)
+                    pid = self.Readers[ffname].build_pid(pfld)
+                    pid = self.check_dupes(pid, ffname, ln, pfld)
+                    # EVAL parameters have no corresponding parameter index
+                    self.map[pid] = None
                     #self.map[pid] = prep
                     # This repeated parameter ID also has these atoms involved.
                     #self.patoms[prep].append(self.Readers[ffname].molatom)
-                    self.assign_field(None,ffname,ln,pfld,None,evalcmd)
+                    self.assign_field(None,pid,ffname,ln,pfld,None,evalcmd)
                     parse += 2
     
     def addff_xml(self, ffname):
@@ -625,7 +634,7 @@ class FF(forcebalance.BaseClass):
                 pid = self.Readers[ffname].build_pid(e, p)
                 self.map[pid] = self.np
                 self.assign_p0(self.np,float(e.get(p)))
-                self.assign_field(self.np,ffname,fflist.index(e),p,1)
+                self.assign_field(self.np,pid,ffname,fflist.index(e),p,1)
                 self.np += 1
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_repeat/..'):
@@ -636,13 +645,13 @@ class FF(forcebalance.BaseClass):
                     self.map[dest] = self.map[src]
                 else:
                     warn_press_key("Warning: You wanted to copy parameter from %s to %s, but the source parameter does not seem to exist!" % (src, dest))
-                self.assign_field(self.map[dest],ffname,fflist.index(e),dest.split('/')[1],1)
+                self.assign_field(self.map[dest],dest,ffname,fflist.index(e),dest.split('/')[1],1)
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
             for field in e.get('parameter_eval').split(','):
                 dest = self.Readers[ffname].build_pid(e, field.strip().split('=')[0])
                 evalcmd  = field.strip().split('=')[1]
-                self.assign_field(None,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
+                self.assign_field(None,dest,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
             
     def make(self,vals=None,use_pvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.
@@ -709,7 +718,7 @@ class FF(forcebalance.BaseClass):
         for i in range(len(self.pfields)):
             pfld_list = self.pfields[i]
             for pfield in pfld_list:
-                fnm,ln,fld,mult,cmd = pfield
+                pid,fnm,ln,fld,mult,cmd = pfield
                 # XML force fields are easy to print.  
                 # Our 'pointer' to where to replace the value
                 # is given by the position of this line in the
@@ -722,12 +731,14 @@ class FF(forcebalance.BaseClass):
                         if any([x in cmd for x in "system", "subprocess", "import"]):
                             warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
                         wval = eval(cmd.replace("PARM","PRM"))
+                        # Attempt to allow evaluated parameters to be functions of each other.
+                        PRM[pid] = wval
                     except:
                         logger.error(traceback.format_exc() + '\n')
                         logger.error("The command %s (written in the force field file) cannot be evaluated!\n" % cmd)
                         raise RuntimeError
                 else:
-                    wval = mult*pvals[i]
+                    wval = mult*pvals[self.map[pid]]
                 if self.ffdata_isxml[fnm]:
                     list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
                 # Text force fields are a bit harder.
@@ -945,6 +956,8 @@ class FF(forcebalance.BaseClass):
             rs_override(rsfactors,termtype)
         # Overrides from input file
         for termtype in self.priors:
+            while termtype in rsfac_list:
+                rsfac_list.remove(termtype)
             rsfac_list.append(termtype)
             rsfactors[termtype] = self.priors[termtype]
     
@@ -1192,12 +1205,13 @@ class FF(forcebalance.BaseClass):
         else:
             self.pvals0[idx] = val
             
-    def assign_field(self,idx,fnm,ln,pfld,mult,cmd=None):
+    def assign_field(self,idx,pid,fnm,ln,pfld,mult,cmd=None):
         """ Record the locations of a parameter in a txt file; [[file name, line number, field number, and multiplier]].
 
         Note that parameters can have multiple locations because of the repetition functionality.
 
-        @param[in] idx  The index of the parameter.
+        @param[in] idx  The (not necessarily unique) index of the parameter.
+        @param[in] pid  The unique parameter name.
         @param[in] fnm  The file name of the parameter field.
         @param[in] ln   The line number within the file (or the node index in the flattened xml)
         @param[in] pfld The field within the line (or the name of the attribute in the xml)
@@ -1205,16 +1219,16 @@ class FF(forcebalance.BaseClass):
         
         """
         if idx == len(self.pfields) or idx == None:
-            self.pfields.append([[fnm,ln,pfld,mult,cmd]])
+            self.pfields.append([[pid,fnm,ln,pfld,mult,cmd]])
         else:
-            self.pfields[idx].append([fnm,ln,pfld,mult,cmd])
+            self.pfields[idx].append([pid,fnm,ln,pfld,mult,cmd])
     
     def __eq__(self, other):
         # check equality of forcefields using comparison of pfields and map
         if isinstance(other, FF):
-            # list comprehension removes filename element of pfields since we don't care about filename uniqueness
-            self_pfields = [[p[1:] for p in pfield] for pfield in self.pfields]
-            other_pfields= [[p[1:] for p in pfield] for pfield in other.pfields]
+            # list comprehension removes pid/filename element of pfields since we don't care about filename uniqueness
+            self_pfields = [[p[2:] for p in pfield] for pfield in self.pfields]
+            other_pfields= [[p[2:] for p in pfield] for pfield in other.pfields]
 
             return  self_pfields == other_pfields and\
                         self.map == other.map and\
