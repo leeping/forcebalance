@@ -785,6 +785,8 @@ class OpenMM(Engine):
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
         self.simulation.context.setPositions(self.xyz_omms[shot][0])
+        if self.FF.rigid_water:
+            simulation.context.applyConstraints(1e-8)
         self.simulation.context.computeVirtualSites()
 
     def get_charges(self):
