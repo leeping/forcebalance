@@ -287,6 +287,8 @@ def isint(word):
     @return answer Boolean which specifies whether the string is an integer (only +/- sign followed by digits)
     
     """
+    try: word = str(word)
+    except: return False
     return re.match('^[-+]?[0-9]+$',word)
 
 def isfloat(word):
@@ -297,6 +299,8 @@ def isfloat(word):
     @return answer Boolean which specifies whether the string is any number
     
     """
+    try: word = str(word)
+    except: return False
     return re.match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
 
 def isdecimal(word):
@@ -306,6 +310,8 @@ def isdecimal(word):
     @return answer Boolean which specifies whether the string is a number with a decimal point
     
     """
+    try: word = str(word)
+    except: return False
     return isfloat(word) and not isint(word)
 
 def floatornan(word):
