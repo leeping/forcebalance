@@ -461,15 +461,14 @@ class FF(forcebalance.BaseClass):
         """ Check to see whether a given parameter ID already exists, and provide an alternate if needed. """
         pid_ = pid
 
-        pfchain = list(itertools.chain(*self.pfields))
-        have_pids = [f[0] for f in pfchain]
+        have_pids = [f[0] for f in self.pfields]
 
         if pid in have_pids:
             pid0 = pid
             extranum = 0
-            dupfnms = [i[1] for i in pfchain if pid == i[0]]
-            duplns  = [i[2] for i in pfchain if pid == i[0]]
-            dupflds = [i[3] for i in pfchain if pid == i[0]]
+            dupfnms = [i[1] for i in self.pfields if pid == i[0]]
+            duplns  = [i[2] for i in self.pfields if pid == i[0]]
+            dupflds = [i[3] for i in self.pfields if pid == i[0]]
             while pid in have_pids:
                 pid = "%s%i" % (pid0, extranum)
                 extranum += 1
@@ -714,69 +713,65 @@ class FF(forcebalance.BaseClass):
 
         #======================================#
         #     Print the new force field.       #
-        #   LPW Note: Is it really reasonable  #
-        # to restrict the length of "pfields"? # 
-        # Perhaps "eval" will make this obso.  #
         #======================================#
         for i in range(len(self.pfields)):
-            pfld_list = self.pfields[i]
-            for pfield in pfld_list:
-                pid,fnm,ln,fld,mult,cmd = pfield
-                # XML force fields are easy to print.  
-                # Our 'pointer' to where to replace the value
-                # is given by the position of this line in the
-                # iterable representation of the tree and the
-                # field number.
-                #if type(newffdata[fnm]) is etree._ElementTree:
-                if cmd != None:
-                    try:
-                        # Bobby Tables, anyone?
-                        if any([x in cmd for x in "system", "subprocess", "import"]):
-                            warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
-                        wval = eval(cmd.replace("PARM","PRM"))
-                        # Attempt to allow evaluated parameters to be functions of each other.
-                        PRM[pid] = wval
-                    except:
-                        logger.error(traceback.format_exc() + '\n')
-                        logger.error("The command %s (written in the force field file) cannot be evaluated!\n" % cmd)
-                        raise RuntimeError
+            pfield = self.pfields[i]
+            pid,fnm,ln,fld,mult,cmd = pfield
+            # XML force fields are easy to print.  
+            # Our 'pointer' to where to replace the value
+            # is given by the position of this line in the
+            # iterable representation of the tree and the
+            # field number.
+            #if type(newffdata[fnm]) is etree._ElementTree:
+            if cmd != None:
+                try:
+                    # Bobby Tables, anyone?
+                    if any([x in cmd for x in "system", "subprocess", "import"]):
+                        warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
+                    wval = eval(cmd.replace("PARM","PRM"))
+                    # Attempt to allow evaluated parameters to be functions of each other.
+                    PRM[pid] = wval
+                except:
+                    logger.error(traceback.format_exc() + '\n')
+                    logger.error("The command %s (written in the force field file) cannot be evaluated!\n" % cmd)
+                    raise RuntimeError
+            else:
+                wval = mult*pvals[self.map[pid]]
+            if self.ffdata_isxml[fnm]:
+                list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
+            # Text force fields are a bit harder.
+            # Our pointer is given by the line and field number.
+            # We take care to preserve whitespace in the printout
+            # so that the new force field still has nicely formated
+            # columns.
+            else:
+                # Split the string into whitespace and data fields.
+                sline       = self.Readers[fnm].Split(newffdata[fnm][ln])
+                whites      = self.Readers[fnm].Whites(newffdata[fnm][ln])
+                # Align whitespaces and fields (it should go white, field, white, field)
+                if newffdata[fnm][ln][0] != ' ':
+                    whites = [''] + whites
+                # Subtract one whitespace, unless the line begins with a minus sign.
+                if not match('^-',sline[fld]) and len(whites[fld]) > 1:
+                    whites[fld] = whites[fld][:-1]
+                # Actually replace the field with the physical parameter value.
+                if precision == 12:
+                    newrd  = "% 17.12e" % (wval)
                 else:
-                    wval = mult*pvals[self.map[pid]]
-                if self.ffdata_isxml[fnm]:
-                    list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
-                # Text force fields are a bit harder.
-                # Our pointer is given by the line and field number.
-                # We take care to preserve whitespace in the printout
-                # so that the new force field still has nicely formated
-                # columns.
-                else:
-                    # Split the string into whitespace and data fields.
-                    sline       = self.Readers[fnm].Split(newffdata[fnm][ln])
-                    whites      = self.Readers[fnm].Whites(newffdata[fnm][ln])
-                    # Align whitespaces and fields (it should go white, field, white, field)
-                    if newffdata[fnm][ln][0] != ' ':
-                        whites = [''] + whites
-                    # Subtract one whitespace, unless the line begins with a minus sign.
-                    if not match('^-',sline[fld]) and len(whites[fld]) > 1:
-                        whites[fld] = whites[fld][:-1]
-                    # Actually replace the field with the physical parameter value.
-                    if precision == 12:
-                        newrd  = "% 17.12e" % (wval)
-                    else:
-                        newrd  = TXTFormat(wval, precision)
-                    # The new word might be longer than the old word.
-                    # If this is the case, we can try to shave off some whitespace.
-                    Lold = len(sline[fld])
-                    if not match('^-',sline[fld]):
-                        Lold += 1
-                    Lnew = len(newrd)
-                    if Lnew > Lold:
-                        Shave = Lnew - Lold
-                        if Shave < (len(whites[fld+1])+2):
-                            whites[fld+1] = whites[fld+1][:-Shave]
-                    sline[fld] = newrd
-                    # Replace the line in the new force field.
-                    newffdata[fnm][ln] = ''.join([(whites[j] if (len(whites[j]) > 0 or j == 0) else ' ')+sline[j] for j in range(len(sline))])+'\n'
+                    newrd  = TXTFormat(wval, precision)
+                # The new word might be longer than the old word.
+                # If this is the case, we can try to shave off some whitespace.
+                Lold = len(sline[fld])
+                if not match('^-',sline[fld]):
+                    Lold += 1
+                Lnew = len(newrd)
+                if Lnew > Lold:
+                    Shave = Lnew - Lold
+                    if Shave < (len(whites[fld+1])+2):
+                        whites[fld+1] = whites[fld+1][:-Shave]
+                sline[fld] = newrd
+                # Replace the line in the new force field.
+                newffdata[fnm][ln] = ''.join([(whites[j] if (len(whites[j]) > 0 or j == 0) else ' ')+sline[j] for j in range(len(sline))])+'\n'
 
         if printdir != None:
             absprintdir = os.path.join(self.root,printdir)
@@ -1224,17 +1219,14 @@ class FF(forcebalance.BaseClass):
         @param[in] mult The multiplier (this is usually 1.0)
         
         """
-        if idx == len(self.pfields) or idx == None:
-            self.pfields.append([[pid,fnm,ln,pfld,mult,cmd]])
-        else:
-            self.pfields[idx].append([pid,fnm,ln,pfld,mult,cmd])
+        self.pfields.append([pid,fnm,ln,pfld,mult,cmd])
     
     def __eq__(self, other):
         # check equality of forcefields using comparison of pfields and map
         if isinstance(other, FF):
             # list comprehension removes pid/filename element of pfields since we don't care about filename uniqueness
-            self_pfields = [[p[2:] for p in pfield] for pfield in self.pfields]
-            other_pfields= [[p[2:] for p in pfield] for pfield in other.pfields]
+            self_pfields = [p[2:] for p in self.pfields]
+            other_pfields= [p[2:] for p in other.pfields]
 
             return  self_pfields == other_pfields and\
                         self.map == other.map and\
