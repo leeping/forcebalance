@@ -460,15 +460,17 @@ class FF(forcebalance.BaseClass):
     def check_dupes(self, pid, ffname, ln, pfld):
         """ Check to see whether a given parameter ID already exists, and provide an alternate if needed. """
         pid_ = pid
-        # Add pid into the dictionary.
-        # LPW: Here is a hack to allow duplicate parameter IDs.
-        if pid in self.map:
+
+        pfchain = list(itertools.chain(*self.pfields))
+        have_pids = [f[0] for f in pfchain]
+
+        if pid in have_pids:
             pid0 = pid
             extranum = 0
-            dupfnms = [os.path.basename(i[1]) for i in self.pfields[self.map[pid]]]
-            duplns = [i[2] for i in self.pfields[self.map[pid]]]
-            dupflds = [i[3] for i in self.pfields[self.map[pid]]]
-            while pid in self.map:
+            dupfnms = [i[1] for i in pfchain if pid == i[0]]
+            duplns  = [i[2] for i in pfchain if pid == i[0]]
+            dupflds = [i[3] for i in pfchain if pid == i[0]]
+            while pid in have_pids:
                 pid = "%s%i" % (pid0, extranum)
                 extranum += 1
             def warn_or_err(*args):
@@ -546,6 +548,7 @@ class FF(forcebalance.BaseClass):
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
                     pid = self.check_dupes(pid, ffname, ln, pfld)
+                    # print pid, self.np
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
                     self.patoms.append([self.Readers[ffname].molatom])
@@ -594,7 +597,7 @@ class FF(forcebalance.BaseClass):
                     pid = self.Readers[ffname].build_pid(pfld)
                     pid = self.check_dupes(pid, ffname, ln, pfld)
                     # EVAL parameters have no corresponding parameter index
-                    self.map[pid] = None
+                    #self.map[pid] = None
                     #self.map[pid] = prep
                     # This repeated parameter ID also has these atoms involved.
                     #self.patoms[prep].append(self.Readers[ffname].molatom)
@@ -1179,6 +1182,9 @@ class FF(forcebalance.BaseClass):
                 self.plist[self.map[i]].append(i)
             for i in range(self.np):
                 self.plist[i] = ' '.join(sorted(self.plist[i]))
+        # print self.map
+        # print self.plist
+        # raw_input()
             
     def print_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
