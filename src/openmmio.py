@@ -313,6 +313,18 @@ def SetAmoebaVirtualExclusions(system):
                 # for i in range(f.getNumMultipoles()):
                 #     logger.info("%s\n" % f.getCovalentMaps(i))
 
+def AddVirtualSiteBonds(mod, ff):
+    # print "In AddVirtualSiteBonds"
+    for ir, R in enumerate(list(mod.topology.residues())):
+        A = list(R.atoms())
+        # print "Residue", ir, ":", R.name
+        for vs in ff._templates[R.name].virtualSites:
+            vi = vs.index
+            for ai in vs.atoms:
+                bi = sorted([A[ai], A[vi]])
+                # print "Adding Bond", ai, vi
+                mod.topology.addBond(*bi)
+
 def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
     """
     Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
@@ -456,7 +468,7 @@ class OpenMM(Engine):
     """ Derived from Engine object for carrying out general purpose OpenMM calculations. """
 
     def __init__(self, name="openmm", **kwargs):
-        self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts']
+        self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts', 'vsite_bonds']
         super(OpenMM,self).__init__(name=name, **kwargs)
 
     def setopts(self, platname="CUDA", precision="single", **kwargs):
@@ -554,13 +566,16 @@ class OpenMM(Engine):
             os.unlink(pdb1)
         
         ## Create the OpenMM ForceField object.
-
         if hasattr(self, 'FF'):
             self.ffxml = [self.FF.openmmxml]
             self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.openmmxml))
         else:
             self.ffxml = listfiles(kwargs.get('ffxml'), 'xml', err=True)
             self.forcefield = ForceField(*self.ffxml)
+
+        ## Create bonds between virtual sites and their host atoms.
+        ## This is mainly for setting up AMOEBA multipoles.
+        self.vbonds = kwargs.get('vsite_bonds', 0)
 
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
@@ -719,7 +734,11 @@ class OpenMM(Engine):
         self.forcefield = ForceField(*self.ffxml)
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
+        # Add bonds for virtual sites. (Experimental)
+        if self.vbonds: AddVirtualSiteBonds(self.mod, self.forcefield)
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
+        # for b in list(self.mod.topology.bonds()):
+        #     print b[0].index, b[1].index
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
