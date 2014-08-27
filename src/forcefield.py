@@ -324,7 +324,9 @@ class FF(forcebalance.BaseClass):
 
     @classmethod
     def fromfile(cls, fnm):
-        options = {'forcefield' : [fnm], 'ffdir' : '.', 'duplicate_pnames' : True}
+        ffdir = os.path.split(fnm)[0]
+        fnm = os.path.split(fnm)[1]
+        options = {'forcefield' : [fnm], 'ffdir' : ffdir, 'duplicate_pnames' : True}
         return cls(options, verbose=False, printopt=False)
 
     def addff(self,ffname,xmlScript=False):
@@ -643,10 +645,15 @@ class FF(forcebalance.BaseClass):
             Script = scriptElements[0].text
             ffnameList = ffname.split('.')
             ffnameScript = ffnameList[0]+'Script.txt'
-            wfile = forcebalance.nifty.wopen('forcefield/'+ffnameScript)
+            absScript = os.path.join(self.root, self.ffdir, ffnameScript)
+            if os.path.exists(absScript):
+                logger.error('XML file '+absScript+' already exists on disk! Please delete it\n')
+                raise RuntimeError
+            wfile = forcebalance.nifty.wopen(absScript)
             wfile.write(Script)
             wfile.close()
             self.addff(ffnameScript, xmlScript=True)
+            os.unlink(absScript)
             
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
