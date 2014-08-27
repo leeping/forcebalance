@@ -62,7 +62,8 @@ class TestWaterTutorial(ForceBalanceTestCase):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
 
-        
+        self.assertEqual(optimizer.iterinit, 2, msg="\nInitial iteration counter is incorrect")
+        self.assertEqual(optimizer.iteration, 2, msg="\nFinal iteration counter is incorrect")
 
         # self.assertNdArrayEqual(EXPECTED_WATER_RESULTS,result,delta=0.001,
         #                         msg="\nCalculation results have changed from previously calculated values.\n"

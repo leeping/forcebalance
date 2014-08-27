@@ -214,6 +214,9 @@ class Objective(forcebalance.BaseClass):
                     self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
                 for i in range(3):
                     Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
+        # The target has evaluated at least once.
+        for Tgt in self.Targets:
+            Tgt.evaluated = True
         # Safeguard to make sure we don't have exact zeros on Hessian diagonal
         for i in range(self.FF.np):
             if Objective['H'][i,i] == 0.0:
