@@ -21,8 +21,8 @@ try:
 except: pass
 from pymbar import pymbar
 import itertools
+from forcebalance.optimizer import Counter
 from collections import defaultdict, namedtuple, OrderedDict
-from forcebalance.optimizer import Counter, First, GoodStep
 import csv
 
 from forcebalance.output import getLogger
@@ -422,11 +422,11 @@ class Liquid(Target):
         lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
-        if Counter() == First() and self.manual:
+        if (not self.evaluated) and self.manual:
             warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
-        if Counter() > First() and GoodStep() and self.save_traj < 2:
+        if self.evaluated and self.goodstep and self.save_traj < 2:
             for fn in self.last_traj:
                 if os.path.exists(fn):
                     os.remove(fn)

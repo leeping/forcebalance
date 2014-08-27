@@ -183,6 +183,8 @@ class Target(forcebalance.BaseClass):
                 os.makedirs(os.path.join(self.root,self.tempdir))
         ## This flag specifies whether the target has been evaluated yet.
         self.evaluated = False
+        ## This flag specifies whether the previous optimization step was good.
+        self.goodstep = False
 
     def get_X(self,mvals=None,customdir=None):
         """Computes the objective function contribution without any parametric derivatives"""
@@ -571,9 +573,6 @@ class Target(forcebalance.BaseClass):
             self.FF.make(mvals)
 
         os.chdir(cwd)
-        
-        ## The target has been evaluated at least once
-        self.evaluated = True
         
         return Answer
 

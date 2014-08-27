@@ -20,7 +20,6 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
-from forcebalance.optimizer import GoodStep
 from forcebalance.thermo import Thermo
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
@@ -1380,7 +1379,7 @@ class Liquid_GMX(Liquid):
 
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """
-            if GoodStep() and (temperature, pressure) in self.LfDict_New:
+            if self.goodstep and (temperature, pressure) in self.LfDict_New:
                 self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
             if (temperature, pressure) in self.LfDict:
                 lfsrc = self.LfDict[(temperature, pressure)]
@@ -1433,7 +1432,7 @@ class Lipid_GMX(Lipid):
 
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """
-            if GoodStep() and (temperature, pressure) in self.LfDict_New:
+            if self.goodstep and (temperature, pressure) in self.LfDict_New:
                 self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
             if (temperature, pressure) in self.LfDict:
                 lfsrc = self.LfDict[(temperature, pressure)]
