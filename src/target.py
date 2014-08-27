@@ -11,7 +11,7 @@ import tarfile
 import forcebalance
 from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd_srch
-from forcebalance.optimizer import Counter, First
+from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
@@ -175,12 +175,16 @@ class Target(forcebalance.BaseClass):
         self.read_objective       = True
         ## Whether to write objective.p at every iteration (true for all but remote.)
         self.write_objective      = True
-        # Create a new temp directory.
+        ## Create a new temp directory.
         if not options['continue']: 
             self.refresh_temp_directory()
         else:
             if not os.path.exists(os.path.join(self.root,self.tempdir)):
                 os.makedirs(os.path.join(self.root,self.tempdir))
+        ## This flag specifies whether the target has been evaluated yet.
+        self.evaluated = False
+        ## This flag specifies whether the previous optimization step was good.
+        self.goodstep = False
 
     def get_X(self,mvals=None,customdir=None):
         """Computes the objective function contribution without any parametric derivatives"""
@@ -398,8 +402,8 @@ class Target(forcebalance.BaseClass):
         Supply the correct directory specified by user's "read" option.
         """
         
-        if Counter() > First():
-            logger.error("Iteration number of this run must be %s to read data from disk (it is %s)\n" % (First(), Counter()))
+        if self.evaluated:
+            logger.error("Tried to read from disk, but not allowed because this target is evaluated already\n")
             raise RuntimeError
         if self.rd == None:
             logger.error("The directory for reading is not set\n")
@@ -489,7 +493,7 @@ class Target(forcebalance.BaseClass):
         # Using the module level logger
         logger = getLogger(__name__)
         # Note that reading information is not supported for custom folders (e.g. microiterations during search)
-        if self.rd != None and Counter() == First() and self.read_indicate and customdir == None:
+        if self.rd != None and (not self.evaluated) and self.read_indicate and customdir == None:
             # Move into the directory for reading data, 
             cwd = os.getcwd()
             os.chdir(self.absrd())
@@ -551,7 +555,7 @@ class Target(forcebalance.BaseClass):
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Read existing information from disk (i.e. when recovering an aborted run)
         # Note that reading information is not supported for custom folders (e.g. microiterations during search)
-        if self.rd != None and Counter() == First() and self.read_objective and customdir == None:
+        if self.rd != None and (not self.evaluated) and self.read_objective and customdir == None:
             os.chdir(self.absrd())
             logger.info("Reading objective function information from %s\n" % os.getcwd())
             Answer = self.read(mvals, AGrad, AHess)
@@ -575,7 +579,7 @@ class Target(forcebalance.BaseClass):
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         return
 
-    def stage(self, mvals, AGrad=False, AHess=False, customdir=None):
+    def stage(self, mvals, AGrad=False, AHess=False, customdir=None, firstIteration=False):
         """ 
 
         Stages the directory for the target, and then launches Work Queue processes if any.
@@ -610,7 +614,7 @@ class Target(forcebalance.BaseClass):
             self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
-        if self.rd == None or Counter() > First(): 
+        if self.rd == None or (not firstIteration): 
             self.submit_jobs(mvals, AGrad, AHess)
         elif customdir != None:
             # Allows us to submit micro-iteration jobs for remote targets

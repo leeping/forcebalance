@@ -14,7 +14,6 @@ from re import match, sub
 import subprocess
 from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
-from forcebalance.optimizer import Counter, First
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -98,7 +97,7 @@ class LeastSquares(Target):
             xgrad = []
             for p in self.pgrad:
                 dM_arr = f1d2p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
-                if np.max(np.abs(dM_arr)) == 0.0 and Counter() == First():
+                if np.max(np.abs(dM_arr)) == 0.0 and (not self.evaluated):
                     logger.info("\r Simulation %s will skip over parameter %i in subsequent steps\n" % (self.name, p))
                     xgrad.append(p)
                 else:
