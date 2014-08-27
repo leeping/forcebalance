@@ -324,10 +324,12 @@ class FF(forcebalance.BaseClass):
 
     @classmethod
     def fromfile(cls, fnm):
-        options = {'forcefield' : [fnm], 'ffdir' : '.', 'duplicate_pnames' : True}
+        ffdir = os.path.split(fnm)[0]
+        fnm = os.path.split(fnm)[1]
+        options = {'forcefield' : [fnm], 'ffdir' : ffdir, 'duplicate_pnames' : True}
         return cls(options, verbose=False, printopt=False)
 
-    def addff(self,ffname):
+    def addff(self,ffname,xmlScript=False):
         """ Parse a force field file and add it to the class.
 
         First, figure out the type of force field file.  This is done
@@ -450,7 +452,7 @@ class FF(forcebalance.BaseClass):
             self.ffdata[ffname] = [line.expandtabs() for line in open(absff).readlines()]
             self.ffdata_isxml[ffname] = False
             # Process the file
-            self.addff_txt(ffname, fftype)
+            self.addff_txt(ffname, fftype,xmlScript)
         if hasattr(self.Readers[ffname], 'atomnames'):
             if len(self.atomnames) > 0:
                 sys.stderr.write('Found more than one force field containing atom names; skipping the second one (%s)\n' % ffname)
@@ -488,7 +490,7 @@ class FF(forcebalance.BaseClass):
                 raise RuntimeError
         return pid
 
-    def addff_txt(self, ffname, fftype):
+    def addff_txt(self, ffname, fftype, xmlScript):
         """ Parse a text force field and create several important instance variables.
 
         Each line is processed using the 'feed' method as implemented
@@ -524,6 +526,7 @@ class FF(forcebalance.BaseClass):
             sline = self.Readers[ffname].Split(line)
             
             kwds = list(itertools.chain(*[[i, "/%s" % i] for i in ['PRM', 'PARM', 'RPT', 'EVAL']]))
+
             marks = OrderedDict()
             for k in kwds:
                 if sline.count(k) > 1:
@@ -533,7 +536,7 @@ class FF(forcebalance.BaseClass):
                 elif sline.count(k) == 1:
                     marks[k] = (np.array(sline) == k).argmax()
             marks['END'] = len(sline)
-
+            
             pmark = marks.get('PRM',None)
             if pmark == None: pmark = marks.get('PARM',None)
             rmark = marks.get('RPT',None)
@@ -546,8 +549,9 @@ class FF(forcebalance.BaseClass):
                     # For each of the fields that are to be parameterized (indicated by PRM #),
                     # assign a parameter type to it according to the Interaction Type -> Parameter Dictionary.
                     pid = self.Readers[ffname].build_pid(pfld)
+                    if xmlScript:
+                        pid = 'Script/'+sline[pfld-2]+'/'
                     pid = self.check_dupes(pid, ffname, ln, pfld)
-                    # print pid, self.np
                     self.map[pid] = self.np
                     # This parameter ID has these atoms involved.
                     self.patoms.append([self.Readers[ffname].molatom])
@@ -628,8 +632,29 @@ class FF(forcebalance.BaseClass):
         parameters with opposite sign.
 
         """
-        
+
+        #check if xml file contains a script
+        #throw error if more than one script
+        #write script into .txt file and parse as text
         fflist = list(self.ffdata[ffname].iter())
+        scriptElements = [elem for elem in fflist if elem.tag=='Script']
+        if len(scriptElements) > 1:
+            logger.error('XML file'+ffname+'contains more than one script! Consolidate your scripts into one script!\n')
+            raise RuntimeError
+        elif len(scriptElements)==1:
+            Script = scriptElements[0].text
+            ffnameList = ffname.split('.')
+            ffnameScript = ffnameList[0]+'Script.txt'
+            absScript = os.path.join(self.root, self.ffdir, ffnameScript)
+            if os.path.exists(absScript):
+                logger.error('XML file '+absScript+' already exists on disk! Please delete it\n')
+                raise RuntimeError
+            wfile = forcebalance.nifty.wopen(absScript)
+            wfile.write(Script)
+            wfile.close()
+            self.addff(ffnameScript, xmlScript=True)
+            os.unlink(absScript)
+            
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
@@ -708,12 +733,14 @@ class FF(forcebalance.BaseClass):
         pvals = list(pvals)
         # pvec1d(vals, precision=4)
         newffdata = deepcopy(self.ffdata)
+    
         # The dictionary that takes parameter names to physical values.
         PRM = {i:pvals[self.map[i]] for i in self.map}
 
         #======================================#
         #     Print the new force field.       #
         #======================================#
+        
         for i in range(len(self.pfields)):
             pfield = self.pfields[i]
             pid,fnm,ln,fld,mult,cmd = pfield
@@ -783,11 +810,31 @@ class FF(forcebalance.BaseClass):
             os.makedirs(absprintdir)
 
         for fnm in newffdata:
-            #if type(newffdata[fnm]) is etree._ElementTree:
             if self.ffdata_isxml[fnm]:
                 with wopen(os.path.join(absprintdir,fnm)) as f: newffdata[fnm].write(f)
+            elif 'Script.txt' in fnm:
+                # if the xml file contains a script, ForceBalance will generate
+                # a temporary .txt file containing the script and any updates.
+                # We copy the updates made in the .txt file into the xml file by:
+                #   First, find xml file corresponding to this .txt file
+                #   Second, copy context of the .txt file into the text attribute
+                #           of the script element (assumed to be the last element)
+                #   Third. open the updated xml file as in the if statement above
+                tempText = "".join(newffdata[fnm])
+                fnmXml = fnm.split('Script')[0]+'.xml'
+                Ntemp = len(list(newffdata[fnmXml].iter()))
+                list(newffdata[fnmXml].iter())[Ntemp-1].text = tempText
+                '''
+                scriptElements = [elem for elem in fflist if elem.tag=='Script']
+                if len(scriptElements) > 1:
+                logger.error('XML file'+ffname+'contains more than one script! Consolidate your scripts into one script!\n')
+                raise RuntimeError
+                else:
+                '''
+                with wopen(os.path.join(absprintdir,fnmXml)) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
+
         return pvals
         
     def make_redirect(self,mvals):
@@ -889,6 +936,7 @@ class FF(forcebalance.BaseClass):
             pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
+
         for i in range(self.np):
             if any([j in self.plist[i] for j in concern]) and pvals[i] * self.pvals0[i] < 0:
                 #print "Parameter %s has changed sign but it's not allowed to! Setting to zero." % self.plist[i]
@@ -899,7 +947,9 @@ class FF(forcebalance.BaseClass):
         # if not in_fd():
         #     print pvals
         #print "pvals = ", pvals
+
         return pvals
+
 
     def create_mvals(self,pvals):
         """Converts physical to mathematical parameters.
@@ -909,10 +959,12 @@ class FF(forcebalance.BaseClass):
         @param[in] pvals The physical parameters
         @return mvals The mathematical parameters
         """
+
         if self.logarithmic_map:
             logger.error('create_mvals has not been implemented for logarithmic_map\n')
             raise RuntimeError
         mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
+
         return mvals
         
     def rsmake(self,printfacs=True):
@@ -931,6 +983,7 @@ class FF(forcebalance.BaseClass):
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
+        
         if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
             termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
         else:
