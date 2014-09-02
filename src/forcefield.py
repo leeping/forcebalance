@@ -740,6 +740,8 @@ class FF(forcebalance.BaseClass):
         #======================================#
         #     Print the new force field.       #
         #======================================#
+
+        xml_lines = OrderedDict([(fnm, list(newffdata[fnm].iter())) for fnm in self.fnms])
         
         for i in range(len(self.pfields)):
             pfield = self.pfields[i]
@@ -765,7 +767,8 @@ class FF(forcebalance.BaseClass):
             else:
                 wval = mult*pvals[self.map[pid]]
             if self.ffdata_isxml[fnm]:
-                list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
+                xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval)
+                # list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
             # Text force fields are a bit harder.
             # Our pointer is given by the line and field number.
             # We take care to preserve whitespace in the printout
