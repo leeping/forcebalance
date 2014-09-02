@@ -158,7 +158,7 @@ class Tinker_Reader(BaseReader):
                 self.atom = [s[i] for i in pdict[self.itype]['Atom']]
             # The suffix of the parameter ID is built from the atom    #
             # types/classes involved in the interaction.
-            self.suffix = '.'.join(self.atom)
+            self.suffix = '/'+'.'.join(self.atom)
 
 def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, chk=[]):
     """

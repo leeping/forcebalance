@@ -3092,6 +3092,8 @@ class Molecule(object):
                 line[30:38]=np.array(list(("%8.3f"%(x))))
                 line[38:46]=np.array(list(("%8.3f"%(y))))
                 line[46:54]=np.array(list(("%8.3f"%(z))))
+                if hasattr(self, 'elem'):
+                    line[76:78]=np.array(list(self.elem[i]))
 
                 if Serial!=-1:
                     out.append(line.tostring())
