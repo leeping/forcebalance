@@ -28,7 +28,7 @@ except:
     logger.warning("Tinker module import failed\n")
 
 try:
-    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM
+    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM
 except:
     logger.warning(traceback.format_exc())
     logger.warning("OpenMM module import failed; check OpenMM package\n")
@@ -91,6 +91,7 @@ Implemented_Targets = {
     'MOMENTS_TINKER':Moments_TINKER,
     'MOMENTS_GMX':Moments_GMX,
     'MOMENTS_OPENMM':Moments_OpenMM,
+    'HYDRATION_OPENMM':Hydration_OpenMM,
     'REMOTE_TARGET':RemoteTarget,
     }
 

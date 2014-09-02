@@ -11,6 +11,7 @@ from forcebalance.binding import BindingEnergy
 from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
+from forcebalance.hydration import Hydration
 import networkx as nx
 import numpy as np
 import sys
@@ -275,6 +276,11 @@ def CopyNonbondedParameters(src, dest):
     for i in range(src.getNumExceptions()):
         dest.setExceptionParameters(i,*src.getExceptionParameters(i))
 
+def CopyGBSAOBCParameters(src, dest):
+    dest.setSolventDielectric(src.getSolventDielectric())
+    dest.setSoluteDielectric(src.getSoluteDielectric())
+    for i in range(src.getNumParticles()):
+        dest.setParticleParameters(i,*src.getParticleParameters(i))
 
 def CopyCustomNonbondedParameters(src, dest):
     '''
@@ -283,8 +289,6 @@ def CopyCustomNonbondedParameters(src, dest):
     '''
     for i in range(src.getNumParticles()):
         dest.setParticleParameters(i, list(src.getParticleParameters(i)))
-
-
 
 def do_nothing(src, dest):
     return
@@ -304,6 +308,7 @@ def CopySystemParameters(src,dest):
                'PeriodicTorsionForce':CopyPeriodicTorsionParameters,
                'NonbondedForce':CopyNonbondedParameters,
                'CustomNonbondedForce':CopyCustomNonbondedParameters,
+               'GBSAOBCForce':CopyGBSAOBCParameters,
                'CMMotionRemover':do_nothing}
     for i in range(src.getNumForces()):
         nm = src.getForce(i).__class__.__name__
@@ -458,13 +463,16 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "HarmonicAngleForce" : {"Angle" : ["class1","class2","class3"],},
                 "PeriodicTorsionForce" : {"Proper" : ["class1","class2","class3","class4"],},
                 "NonbondedForce" : {"Atom": ["type"]},
+                "GBSAOBCForce" : {"Atom": ["type"]},
                 "AmoebaBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaAngleForce" : {"Angle" : ["class1","class2","class3"]},
                 "AmoebaStretchBendForce" : {"StretchBend" : ["class1","class2","class3"]},
                 "AmoebaVdwForce" : {"Vdw" : ["class"]},
                 "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
                 "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]},
-                "Residues.Residue" : {"VirtualSite" : ["index"]}
+                "Residues.Residue" : {"VirtualSite" : ["index"]},
+                ## LPW's custom parameter definitions
+                "ForceBalance" : {"GB": ["type"]},
                 }
 
 ## pdict is a useless variable if the force field is XML.
@@ -500,7 +508,7 @@ class OpenMM(Engine):
     """ Derived from Engine object for carrying out general purpose OpenMM calculations. """
 
     def __init__(self, name="openmm", **kwargs):
-        self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts', 'vsite_bonds']
+        self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent']
         super(OpenMM,self).__init__(name=name, **kwargs)
 
     def setopts(self, platname="CUDA", precision="single", **kwargs):
@@ -541,6 +549,11 @@ class OpenMM(Engine):
             if self.verbose: logger.info("Setting OpenCL Precision to %s\n" % self.precision)
             self.platform.setPropertyDefaultValue("OpenCLPrecision", self.precision)
         self.simkwargs = {}
+        if 'implicit_solvent' in kwargs:
+            # Force implicit solvent to either On or Off.
+            self.ism = kwargs['implicit_solvent']
+        else:
+            self.ism = None
 
     def readsrc(self, **kwargs):
 
@@ -561,6 +574,8 @@ class OpenMM(Engine):
             self.mol = kwargs['mol']
         elif 'coords' in kwargs:
             self.mol = Molecule(kwargs['coords'])
+            if pdbfnm == None and kwargs['coords'].endswith('.pdb'):
+                pdbfnm = kwargs['coords']
         else:
             logger.error('Must provide either a molecule object or coordinate file.\n')
             raise RuntimeError
@@ -765,6 +780,16 @@ class OpenMM(Engine):
         if len(kwargs) > 0:
             self.simkwargs = kwargs
         self.forcefield = ForceField(*self.ffxml)
+        # OpenMM classes for force generators
+        ismgens = [forcefield.AmoebaGeneralizedKirkwoodGenerator, forcefield.AmoebaWcaDispersionGenerator,
+                     forcefield.CustomGBGenerator, forcefield.GBSAOBCGenerator, forcefield.GBVIGenerator]
+        if self.ism != None:
+            if self.ism == False:
+                self.forcefield._forces = [f for f in self.forcefield._forces if not any([isinstance(f, f_) for f_ in ismgens])]
+            elif self.ism == True:
+                if len([f for f in self.forcefield._forces if any([isinstance(f, f_) for f_ in ismgens])]) == 0:
+                    logger.error("There is no implicit solvent model!\n")
+                    raise RuntimeError
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.mod.addExtraParticles(self.forcefield)
         # Add bonds for virtual sites. (Experimental)
@@ -1270,3 +1295,14 @@ class Moments_OpenMM(Moments):
         self.engine_ = OpenMM
         ## Initialize base class.
         super(Moments_OpenMM,self).__init__(options,tgt_opts,forcefield)
+
+class Hydration_OpenMM(Hydration):
+    """ Single point hydration free energies using OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        # self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.engine_ = OpenMM
+        ## Initialize base class.
+        super(Hydration_OpenMM,self).__init__(options,tgt_opts,forcefield)
