@@ -34,6 +34,19 @@ try:
 except:
     pass
 
+def get_mask(grps):
+    """ Given a list of booleans [1, 0, 1] return the bitmask that sets 
+    these force groups appropriately in Context.getState(). Any values
+    not provided are defaulted to 1.  """
+    mask = 0
+    for i, j in enumerate(grps):
+        # print i, j, 2**i
+        mask += 2**i*j
+    for k in range(i+1, 31):
+        # print k, 1, 2**k
+        mask += 2**k
+    return mask
+
 def energy_components(Sim, verbose=False):
     # Before using EnergyComponents, make sure each Force is set to a different group.
     EnergyTerms = OrderedDict()
