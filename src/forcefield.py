@@ -741,7 +741,7 @@ class FF(forcebalance.BaseClass):
         #     Print the new force field.       #
         #======================================#
 
-        xml_lines = OrderedDict([(fnm, list(newffdata[fnm].iter())) for fnm in self.fnms])
+        xml_lines = OrderedDict([(fnm, list(newffdata[fnm].iter())) for fnm in self.fnms if self.ffdata_isxml[fnm]])
         
         for i in range(len(self.pfields)):
             pfield = self.pfields[i]
