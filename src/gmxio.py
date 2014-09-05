@@ -683,8 +683,20 @@ class GMX(Engine):
                 os.unlink(f)
 
     def get_charges(self):
-        logger.error('GMX engine does not have get_charges (should be easy to implement however.)')
-        raise NotImplementedError
+        # Call gmxdump to get system information and read the charges.
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
+        o = self.callgmx("gmxdump -s %s.tpr -sys" % self.name, copy_stderr=True)
+        # List of charges obtained from reading gmxdump.
+        charges = []
+        for line in o:
+            line = line.replace("=", "= ")
+            # These lines contain the charges
+            if "ptype=" in line:
+                s = line.split()
+                charge = float(s[s.index("q=")+1].replace(',','').lower())
+                charges.append(charge)
+        os.unlink('%s.tpr' % self.name)
+        return np.array(charges)
 
     def links(self):
         topfile = onefile('%s.top' % self.name, 'top', err=True)
@@ -1051,7 +1063,7 @@ class GMX(Engine):
         return NewMol.xyzs
 
     def n_snaps(self, nsteps, step_interval, timestep):
-        return int((nsteps / step_interval) * timestep)
+        return int((nsteps * 1.0 / step_interval) * timestep)
 
     def scd_persnap(self, ndx, timestep, final_frame):
         Scd = []
