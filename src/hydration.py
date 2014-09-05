@@ -168,7 +168,7 @@ class Hydration(Target):
             else:
                 queue_up(wq, command = cmdstr+' &> md.out',
                          input_files = self.scripts + ['simulation.p', 'forcefield.p', os.path.basename(self.molecules[label])],
-                         output_files = ['md_result.p', 'md.out'] + self.extra_output, tgt=self)
+                         output_files = ['md_result.p', 'md.out'] + self.extra_output, tgt=self, verbose=False)
         os.chdir('..')
 
     def submit_liq_gas(self, mvals, AGrad=True):
