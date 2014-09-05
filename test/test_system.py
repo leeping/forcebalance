@@ -20,7 +20,7 @@ EXPECTED_BROMINE_RESULTS = array([-0.305718, -0.12497])
 ITERATIONS_TO_CONVERGE = 5
 
 # expected results taken from previous runs. Update this if it changes and seems reasonable (updated 07/23/14)
-EXPECTED_LIPID_RESULTS = array([5.4174e-04, 1.1846e-05, -5.1842e-04, -9.4571e-06, 4.1843e-06, -1.6638e-07, 4.2787e-05, -6.0696e-07, -6.2657e-05, -5.0511e-06, 6.7021e-06, -1.4240e-06, -2.0110e-05, 9.9288e-07, -4.6615e-05, -1.5112e-06, -7.8517e-05, -1.7196e-05, -6.2720e-06, 1.0039e-06, -7.2299e-05,  4.3071e-07, 7.4747e-05, 1.1013e-06])
+EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 
 class TestWaterTutorial(ForceBalanceTestCase):
     def setUp(self):
@@ -244,7 +244,7 @@ class TestLipidStudy(ForceBalanceTestCase):
     def runTest(self):
         """Check lipid tutorial study runs without errors"""
         self.logger.debug("\nSetting input file to 'options.in'\n")
-        input_file='single.in'
+        input_file='simple.in'
 
         ## The general options and target options that come from parsing the input file
         self.logger.debug("Parsing inputs...\n")
@@ -276,7 +276,7 @@ class TestLipidStudy(ForceBalanceTestCase):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
 
-        self.assertNdArrayEqual(EXPECTED_LIPID_RESULTS,result,delta=0.010,
+        self.assertNdArrayEqual(absolute(EXPECTED_LIPID_RESULTS),absolute(result),delta=0.010,
                                 msg="\nCalculation results have changed from previously calculated values.\n"
                                 "If this seems reasonable, update EXPECTED_LIPID_RESULTS in test_system.py with these values (%s)" % result)
 
