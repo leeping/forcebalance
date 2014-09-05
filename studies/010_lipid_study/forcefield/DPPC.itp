@@ -4,18 +4,18 @@
 
 [ atomtypes ]
 ;name  at.num mass charge ptype  c6           c12
-   LO    15.9994    0.000  A 2.36400e-03 1.59000e-06 ; EVAL 4 4*PARM['sigeps.txt:1.1']*PARM['sigeps.txt:1.0']**6 5 4*PARM['sigeps.txt:1.1']*PARM['sigeps.txt:1.0']**12
-  LOM    15.9994    0.000  A 2.36400e-03 1.59000e-06 ; EVAL 4 4*PARM['sigeps.txt:2.1']*PARM['sigeps.txt:2.0']**6 5 4*PARM['sigeps.txt:2.1']*PARM['sigeps.txt:2.0']**12
-  LNL    14.0067    0.000  A 3.35300e-03 3.95100e-06 ; EVAL 4 4*PARM['sigeps.txt:3.1']*PARM['sigeps.txt:3.0']**6 5 4*PARM['sigeps.txt:3.1']*PARM['sigeps.txt:3.0']**12
-   LC    12.0110    0.000  A 4.88800e-03 1.35900e-05 ; EVAL 4 4*PARM['sigeps.txt:4.1']*PARM['sigeps.txt:4.0']**6 5 4*PARM['sigeps.txt:4.1']*PARM['sigeps.txt:4.0']**12
-  LH1    13.0190    0.000  A 4.03100e-03 1.21400e-05 ; EVAL 4 4*PARM['sigeps.txt:5.1']*PARM['sigeps.txt:5.0']**6 5 4*PARM['sigeps.txt:5.1']*PARM['sigeps.txt:5.0']**12
-  LH2    14.0270    0.000  A 7.00200e-03 2.48300e-05 ; EVAL 4 4*PARM['sigeps.txt:6.1']*PARM['sigeps.txt:6.0']**6 5 4*PARM['sigeps.txt:6.1']*PARM['sigeps.txt:6.0']**12
-   LP    30.9738    0.000  A 9.16000e-03 2.50700e-05 ; EVAL 4 4*PARM['sigeps.txt:7.1']*PARM['sigeps.txt:7.0']**6 5 4*PARM['sigeps.txt:7.1']*PARM['sigeps.txt:7.0']**12
-  LOS    15.9994    0.000  A 2.56300e-03 1.86800e-06 ; EVAL 4 4*PARM['sigeps.txt:8.1']*PARM['sigeps.txt:8.0']**6 5 4*PARM['sigeps.txt:8.1']*PARM['sigeps.txt:8.0']**12
-  LP2    14.0270    0.000  A 5.87400e-03 2.26500e-05 ; EVAL 4 4*PARM['sigeps.txt:9.1']*PARM['sigeps.txt:9.0']**6 5 4*PARM['sigeps.txt:9.1']*PARM['sigeps.txt:9.0']**12
-  LP3    15.0350    0.000  A 8.77700e-03 3.38500e-05 ; EVAL 4 4*PARM['sigeps.txt:10.1']*PARM['sigeps.txt:10.0']**6 5 4*PARM['sigeps.txt:10.1']*PARM['sigeps.txt:10.0']**12
-  LC3    15.0350    0.000  A 9.35700e-03 3.60900e-05 ; EVAL 4 4*PARM['sigeps.txt:11.1']*PARM['sigeps.txt:11.0']**6 5 4*PARM['sigeps.txt:11.1']*PARM['sigeps.txt:11.0']**12
-  LC2    14.0270    0.000  A 5.94700e-03 1.79000e-05 ; EVAL 4 4*PARM['sigeps.txt:12.1']*PARM['sigeps.txt:12.0']**6 5 4*PARM['sigeps.txt:12.1']*PARM['sigeps.txt:12.0']**12
+   LO    15.9994    0.000  A 2.36400e-03 1.59000e-06 ; 
+  LOM    15.9994    0.000  A 2.36400e-03 1.59000e-06 ; 
+  LNL    14.0067    0.000  A 3.35300e-03 3.95100e-06 ; 
+   LC    12.0110    0.000  A 4.88800e-03 1.35900e-05 ; 
+  LH1    13.0190    0.000  A 4.03100e-03 1.21400e-05 ; 
+  LH2    14.0270    0.000  A 7.00200e-03 2.48300e-05 ; 
+   LP    30.9738    0.000  A 9.16000e-03 2.50700e-05 ; 
+  LOS    15.9994    0.000  A 2.56300e-03 1.86800e-06 ; 
+  LP2    14.0270    0.000  A 5.87400e-03 2.26500e-05 ; 
+  LP3    15.0350    0.000  A 8.77700e-03 3.38500e-05 ; 
+  LC3    15.0350    0.000  A 9.35700e-03 3.60900e-05 ; 
+  LC2    14.0270    0.000  A 5.94700e-03 1.79000e-05 ; EVAL 4 4*PARM['sigeps.txt:1.1']*PARM['sigeps.txt:1.0']**6 5 4*PARM['sigeps.txt:1.1']*PARM['sigeps.txt:1.0']**12
    OW    8 	    0.000  0.000  A 2.6173456e-03 2.634129e-06
     H    1 	    0.000  0.000  A 0 0
 
