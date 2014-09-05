@@ -145,7 +145,8 @@ class Hydration(Target):
         eng_opts['implicit_solvent'] = liq
         eng_opts['coords'] = os.path.basename(self.molecules[label])
 
-        os.makedirs(sdnm)
+        if not os.path.exists(sdnm):
+            os.makedirs(sdnm)
         os.chdir(sdnm)
         if not os.path.exists('md_result.p'):
             # Link in a bunch of files... what were these again?
@@ -166,9 +167,9 @@ class Hydration(Target):
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='md.out')
             else:
-                queue_up(wq, command = cmdstr+' &> md.out',
+                queue_up(wq, command = cmdstr+' &> md.out', tag='%s:%s/%s' % (self.name, label, "liq" if liq else "gas"),
                          input_files = self.scripts + ['simulation.p', 'forcefield.p', os.path.basename(self.molecules[label])],
-                         output_files = ['md_result.p', 'md.out'] + self.extra_output, tgt=self, verbose=False)
+                         output_files = ['md_result.p', 'md.out'] + self.extra_output, tgt=self, verbose=False, print_time=3600)
         os.chdir('..')
 
     def submit_liq_gas(self, mvals, AGrad=True):

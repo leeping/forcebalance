@@ -752,7 +752,7 @@ def destroyWorkQueue():
     WORK_QUEUE = None
     WQIDS = defaultdict(list)
 
-def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
+def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True, print_time=60):
     """ 
     Submit a job to the Work Queue.
 
@@ -773,6 +773,7 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     if tag == None: tag = command
     task.specify_tag(tag)
+    task.print_time = print_time
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, %staskid %i\n" % (command, "tag %s, " % tag if tag != command else "", taskid))
@@ -781,7 +782,7 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     else:
         WQIDS["None"].append(taskid)
     
-def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
+def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True, print_time=60):
     """ 
     Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly
     specify where the input files come from, and where the output files go to.
@@ -804,6 +805,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     if tag == None: tag = command
     task.specify_tag(tag)
+    task.print_time = print_time
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
@@ -846,6 +848,8 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                 logger.warning("Task '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.tag, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
             else:
+                if hasattr(task, 'print_time'):
+                    print_time = task.print_time
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
                     logger.info("Task '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.tag, task.id, task.hostname, exectime))
                 for tnm in WQIDS:
