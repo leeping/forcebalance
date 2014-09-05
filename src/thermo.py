@@ -3,7 +3,7 @@ import errno
 import numpy as np
 
 from forcebalance.target import Target
-from forcebalance.finite_difference import in_fd
+from forcebalance.finite_difference import in_fd, f12d3p, fdwrap
 from forcebalance.nifty import flat, col, row
 from forcebalance.nifty import lp_dump, lp_load, wopen, _exec
 from forcebalance.nifty import LinkFile, link_dir_contents
@@ -13,6 +13,54 @@ from collections import OrderedDict
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
+
+def energy_derivatives(engine, FF, mvals, h, pgrad, dipole=False):
+
+    """
+    Compute the first and second derivatives of a set of snapshot
+    energies with respect to the force field parameters.
+
+    This basically calls the finite difference subroutine on the
+    energy_driver subroutine also in this script.
+
+    In the future we may need to be more sophisticated with
+    controlling the quantities which are differentiated, but for
+    now this is okay..
+
+    @param[in] engine Engine object for calculating energies
+    @param[in] FF Force field object
+    @param[in] mvals Mathematical parameter values
+    @param[in] h Finite difference step size
+    @param[in] pgrad List of active parameters for differentiation
+    @param[in] dipole Switch for dipole derivatives.
+    @return G First derivative of the energies in a N_param x N_coord array
+    @return GDx First derivative of the box dipole moment x-component in a N_param x N_coord array
+    @return GDy First derivative of the box dipole moment y-component in a N_param x N_coord array
+    @return GDz First derivative of the box dipole moment z-component in a N_param x N_coord array
+
+    """
+    def single_point(mvals_):
+        FF.make(mvals_)
+        if dipole:
+            return engine.energy_dipole()
+        else:
+            return engine.energy()
+
+    ED0 = single_point(mvals)
+    G   = OrderedDict()
+    G['potential'] = np.zeros((FF.np, ED0.shape[0]))
+    if dipole:
+        G['dipole'] = np.zeros((FF.np, ED0.shape[0], 3))
+    for i in pgrad:
+        logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
+        edg, _ = f12d3p(fdwrap(single_point,mvals,i),h,f0=ED0)
+        if dipole:
+            G['potential'][i] = edg[:,0]
+            G['dipole'][i]    = edg[:,1:]
+        else:
+            G['potential'][i] = edg[:]
+    return G
+
 #
 class Thermo(Target):
     """
@@ -449,5 +497,3 @@ class Point(object):
             msg.append("  " + key.strip() + " = " + str(self.data[key]).strip())
 
         return "\n".join(msg)
-
-
