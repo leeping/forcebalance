@@ -1011,13 +1011,27 @@ class FF(forcebalance.BaseClass):
                     x += 1
 
         def build_qtrans2(tq, qid, qmap):
+            """ """
             nq = len(qmap)
+            # tq = Total number of atomic charges that are being optimized on the molecule
+            # NOTE: This may be greater than the number of charge parameters (nq)
+            # The reason for the "one" here is because LP wanted to have multiple charge constraints
+            # at some point in the future
             cons0 = np.ones((1,tq))
             cons = np.zeros((cons0.shape[0], nq))
+            # Identity matrix equal to the number of charge parameters
             qtrans2 = np.eye(nq)
+            logger.info(printcool("*********Debuggg"))
+            logger.info(printcool("*********tq/qid/qmap: %s --- %s --- %s" % (tq, qid, qmap)))
+            # This is just one
             for i in range(cons.shape[0]):
+                # Loop over the number of charge parameters
                 for j in range(cons.shape[1]):
-                    cons[i][j] = sum([cons0[i][k-1] for k in qid[j]])
+                    # Each element of qid is a list that points to atom indices.
+                    # LPW: This code is breaking when we're not optimizing ALL the charges
+                    # Replace cons0[i][k-1] with all ones
+                    #cons[i][j] = sum([cons0[i][k-1] for k in qid[j]])
+                    cons[i][j] = float(len(qid[j]))
                 cons[i] /= np.linalg.norm(cons[i])
                 for j in range(i):
                     cons[i] = orthogonalize(cons[i], cons[j])
@@ -1165,7 +1179,7 @@ class FF(forcebalance.BaseClass):
             for i in self.map:
                 self.plist[self.map[i]].append(i)
             for i in range(self.np):
-                self.plist[i] = ' '.join(sorted(self.plist[i]))
+                self.plist[i] = ' '.join(natural_sort(self.plist[i]))
             
     def print_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""

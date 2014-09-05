@@ -170,6 +170,13 @@ def uncommadash(s):
         raise RuntimeError
     return L
 
+def natural_sort(l):
+    """ From stack overflow: Natural sorting of a list (so 11 comes after 7) """ 
+    convert = lambda text: int(text) if text.isdigit() else text.lower() 
+    alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+    return sorted(l, key = alphanum_key)
+
+
 def extract_int(arr, avgthre, limthre, label="value", verbose=True):
     """ Get the representative integer value from an array.
     Sanity check: Make sure the value does not go through big excursions.
