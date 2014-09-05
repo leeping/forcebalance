@@ -698,7 +698,39 @@ class Target(forcebalance.BaseClass):
         tlines += clines
         PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
         printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=[i==0 for i in range(len(tlines))], leftpad=4, color=color)
+
+    def serialize_ff(self, mvals, outside=None):
+        """ 
+        This code writes a force field pickle file to an folder in
+        "job.tmp/dnm/forcebalance.p", because it takes
+        time to compress and most targets can simply reuse this file.
         
+        Inputs:
+        mvals = Mathematical parameter values
+        outside = Write this file outside the targets directory
+        """
+        cwd = os.getcwd()
+        if outside != None:
+            self.ffpd = cwd.replace(os.path.join(self.root, self.tempdir), os.path.join(self.root, self.tempbase, self.outside))
+        else:
+            self.ffpd = os.path.abspath(os.path.join(self.root, self.rundir))
+        if not os.path.exists(self.ffpd): os.makedirs(self.ffpd)
+        os.chdir(self.ffpd)
+        makeffp = False
+        if (os.path.exists("mvals.txt") and os.path.exists("forcefield.p")):
+            mvalsf = np.loadtxt("mvals.txt")
+            if np.max(np.abs(mvals - mvalsf)) != 0.0:
+                makeffp = True
+        else:
+            makeffp = True
+        if makeffp:
+            # logger.info("Writing force field to: %s\n" % self.ffpd)
+            self.FF.make(mvals)
+            np.savetxt("mvals.txt", mvals)
+            forcebalance.nifty.lp_dump((self.FF, mvals), 'forcefield.p')
+        os.chdir(cwd)
+        forcebalance.nifty.LinkFile(os.path.join(self.ffpd, 'forcefield.p'), 'forcefield.p')
+               
 class RemoteTarget(Target):
     def __init__(self,options,tgt_opts,forcefield):
         super(RemoteTarget, self).__init__(options,tgt_opts,forcefield)
@@ -731,28 +763,7 @@ class RemoteTarget(Target):
 
         id_string = "%s_iter%04i" % (self.name, Counter())
 
-        #--- This code ensures that the force field pickle file is only written once, because it takes time to compress it.
-
-        cwd = os.getcwd()
-        ffpd = cwd.replace(os.path.join(self.root, self.tempdir), os.path.join(self.root, self.tempbase, "forcefield-remote"))
-        if not os.path.exists(ffpd): os.makedirs(ffpd)
-        os.chdir(ffpd)
-        makeffp = False
-        if (os.path.exists("mvals.txt") and os.path.exists("forcefield.p")):
-            mvalsf = np.loadtxt("mvals.txt")
-            if np.max(np.abs(mvals - mvalsf)) != 0.0:
-                makeffp = True
-        else:
-            makeffp = True
-        if makeffp:
-            # logger.info("Writing force field to: %s\n" % ffpd)
-            self.FF.make(mvals)
-            np.savetxt("mvals.txt", mvals)
-            forcebalance.nifty.lp_dump((mvals, self.FF), 'forcefield.p')
-        os.chdir(cwd)
-        forcebalance.nifty.LinkFile(os.path.join(ffpd, 'forcefield.p'), 'forcefield.p')
-        #---
-        
+        self.serialize_ff(mvals, outside="forcefield-remote")
         forcebalance.nifty.lp_dump((AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.pgrad),'options.p')
         
         # Link in the rpfx script.
