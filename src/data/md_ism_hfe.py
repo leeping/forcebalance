@@ -166,23 +166,29 @@ def main():
     Results = Engine.molecular_dynamics(**MDOpts)
     if AGrad:
         Results['Potential_Derivatives'] = energy_derivatives(Engine, FF, mvals, h, pgrad, dipole=False)['potential']
-    # Implicit solvent hydration energy hack.
-    # Set up engines in the liquid and gas and 
-    # calculate the potential in both simulations.
-    def get_phase_energy(liq):
-        EngOpts_ = deepcopy(EngOpts)
-        EngOpts_['implicit_solvent'] = liq
-        Engine_ = EngineClass(**EngOpts_)
-        Engine_.xyz_omms = Engine.xyz_omms
-        Energy_ = Engine_.energy()
-        if AGrad:
-            Derivs_ = energy_derivatives(Engine_, FF, mvals, h, pgrad, dipole=False)
-            return Energy_, Derivs_['potential']
-        else:
-            return Energy_, None
-        
-    Energy_liq, Derivs_liq = get_phase_energy(True)
-    Energy_gas, Derivs_gas = get_phase_energy(False)
+    # Set up engine and calculate the potential in the other phase.
+    EngOpts_ = deepcopy(EngOpts)
+    EngOpts_['implicit_solvent'] = not EngOpts['implicit_solvent']
+    Engine_ = EngineClass(**EngOpts_)
+    Engine_.xyz_omms = Engine.xyz_omms
+    Energy_ = Engine_.energy()
+    Results_ = {'Potentials' : Energy_}
+    if AGrad:
+        Derivs_ = energy_derivatives(Engine_, FF, mvals, h, pgrad, dipole=False)['potential']
+        Results_['Potential_Derivatives'] = Derivs_
+    # Calculate the hydration energy of each snapshot and its parametric derivatives.
+    if EngOpts['implicit_solvent']:
+        Energy_liq = Results['Potentials']
+        Energy_gas = Results_['Potentials']
+        if AGrad: 
+            Derivs_liq = Results['Potential_Derivatives']
+            Derivs_gas = Results_['Potential_Derivatives']
+    else:  
+        Energy_gas = Results['Potentials']
+        Energy_liq = Results_['Potentials']
+        if AGrad: 
+            Derivs_gas = Results['Potential_Derivatives']
+            Derivs_liq = Results_['Potential_Derivatives']
     Results['Hydration'] = Energy_liq - Energy_gas
     if AGrad:
         Results['Hydration_Derivatives'] = Derivs_liq - Derivs_gas
