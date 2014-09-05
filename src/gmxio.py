@@ -678,8 +678,21 @@ class GMX(Engine):
                 os.unlink(f)
 
     def get_charges(self):
-        logger.error('GMX engine does not have get_charges (should be easy to implement however.)')
-        raise NotImplementedError
+        # Call gmxdump to get system information and read the charges.
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
+        o = self.callgmx("gmxdump -s %s.tpr -sys" % self.name, copy_stderr=True)
+        # List of charges obtained from reading gmxdump.
+        charges = []
+        for line in o:
+            line = line.replace("=", "= ")
+            # These lines contain the charges
+            if "ptype=" in line:
+                s = line.split()
+                charge = float(s[s.index("q=")+1].replace(',','').lower())
+                charges.append(charge)
+        os.unlink('%s.tpr' % self.name)
+        print charges
+        return np.array(charges)
 
     def links(self):
         topfile = onefile('%s.top' % self.name, 'top', err=True)
@@ -1446,7 +1459,7 @@ class Lipid_GMX(Lipid):
                 else:
                     self.lipid_mols_new[PT_vals].append(os.path.join(os.getcwd(),'lipid-md.gro'))
                 super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
-                if GoodStep() and len(self.lipid_mols_new[PT_vals]) == int(self.RefData['n_ic'][PT_vals]):
+                if len(self.lipid_mols_new[PT_vals]) == int(self.RefData['n_ic'][PT_vals]):
                     self.lipid_mols[PT_vals] = self.lipid_mols_new[PT_vals]
                     self.lipid_mols_new.pop(PT_vals)
             else:

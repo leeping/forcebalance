@@ -447,7 +447,7 @@ class Lipid(Target):
         lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
-        if Counter() == 0 and self.manual:
+        if Counter() == First() and self.manual:
             warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
@@ -532,8 +532,7 @@ class Lipid(Target):
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if 'n_ic' in self.RefData:
-                if GoodStep():
-                    self.lipid_mols[PT] = [Molecule(last_frame) for last_frame in self.lipid_mols[PT]]
+                self.lipid_mols[PT] = [Molecule(last_frame) for last_frame in self.lipid_mols[PT]]
                 n_uniq_ic = int(self.RefData['n_ic'][PT])
                 for ic in range(n_uniq_ic):
                     if os.path.exists('./%s/trj_%s/npt_result.p' % (label, ic)):
