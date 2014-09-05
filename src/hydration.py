@@ -179,7 +179,7 @@ class Hydration(Target):
         # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
         printcool("Target: %s - launching %i MD simulations\nTime steps (liq):" 
                   "%i (eq) + %i (md)\nTime steps (g): %i (eq) + %i (md)" % 
-                  (self.name, len(self.refdata.keys()), self.liquid_eq_steps, self.liquid_md_steps,
+                  (self.name, 2*len(self.refdata.keys()), self.liquid_eq_steps, self.liquid_md_steps,
                    self.gas_eq_steps, self.gas_md_steps), color=0)
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
         if self.evaluated and self.goodstep and self.save_traj < 2:
