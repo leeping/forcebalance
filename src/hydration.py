@@ -167,7 +167,7 @@ class Hydration(Target):
                 _exec(cmdstr, copy_stderr=True, outfnm='md.out')
             else:
                 queue_up(wq, command = cmdstr+' &> md.out',
-                         input_files = self.scripts + ['simulation.p', 'forcefield.p'],
+                         input_files = self.scripts + ['simulation.p', 'forcefield.p', os.path.basename(self.molecules[label])],
                          output_files = ['md_result.p', 'md.out'] + self.extra_output, tgt=self)
         os.chdir('..')
 
@@ -226,7 +226,7 @@ class Hydration(Target):
         banner = "Hydration free energies (kcal/mol)"
         headings = ["Molecule", "Reference", "Calculated", "Difference", "Weight", "Residual"]
         data = OrderedDict([(i, ["%.4f" % self.refdata[i], "%.4f" % self.calc[i], "%.4f" % (self.calc[i] - self.refdata[i]), 
-                                 "%.4f" % self.whfe[ii], "%.4f" % self.whfe[ii]*(self.calc[i] - self.refdata[i])**2]) for ii, i in enumerate(self.refdata.keys())])
+                                 "%.4f" % self.whfe[ii], "%.4f" % (self.whfe[ii]*(self.calc[i] - self.refdata[i])**2)]) for ii, i in enumerate(self.refdata.keys())])
         self.printcool_table(data, headings, banner)
 
     def hydration_driver_sp(self):

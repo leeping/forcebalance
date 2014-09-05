@@ -1318,4 +1318,4 @@ class Hydration_OpenMM(Hydration):
         super(Hydration_OpenMM,self).__init__(options,tgt_opts,forcefield)
         ## Send back the trajectory file.
         if self.save_traj > 0:
-            self.extra_output = ['md.dcd']
+            self.extra_output = ['openmm-md.dcd']
