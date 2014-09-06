@@ -1451,16 +1451,20 @@ class Lipid_GMX(Lipid):
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """
             if "n_ic" in self.RefData:
+                # Get PT state information.
                 phase_reorder = zip(*self.PhasePoints)
                 t_index = [i for i, x in enumerate(phase_reorder[0]) if x == temperature] 
                 p_index = [i for i, x in enumerate(phase_reorder[1]) if x == pressure] 
                 p_u = phase_reorder[-1][list(set(t_index) & set(p_index))[0]]
                 PT_vals = (temperature, pressure, p_u)
+                # Build dictionary of current iteration final frames, indexed by phase points.
                 if not PT_vals in self.lipid_mols_new:
                     self.lipid_mols_new[PT_vals] = [os.path.join(os.getcwd(),'lipid-md.gro')]
                 else:
                     self.lipid_mols_new[PT_vals].append(os.path.join(os.getcwd(),'lipid-md.gro'))
+                # Run NPT simulation.
                 super(Lipid_GMX, self).npt_simulation(temperature, pressure, simnum)
+                # When lipid_mols_new is full, move values to lipid_mols for the next iteration.
                 if len(self.lipid_mols_new[PT_vals]) == int(self.RefData['n_ic'][PT_vals]):
                     self.lipid_mols[PT_vals] = self.lipid_mols_new[PT_vals]
                     self.lipid_mols_new.pop(PT_vals)

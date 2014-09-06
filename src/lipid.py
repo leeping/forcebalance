@@ -473,6 +473,7 @@ class Lipid(Target):
                 os.chdir(label)
                 if 'n_ic' in self.RefData:
                     n_uniq_ic = int(self.RefData['n_ic'][pt])
+                    # Loop over parallel trajectories.
                     for trj in range(n_uniq_ic):
                         rel_trj = "trj_%i" % trj
                         # Create directories for each parallel simulation.
@@ -480,6 +481,9 @@ class Lipid(Target):
                             os.makedirs(rel_trj)
                             os.chdir(rel_trj)
                             # Pull each simulation molecule from the lipid_mols dictionary.
+                            # lipid_mols is a dictionary of paths to either the initial 
+                            # geometry files, or the geometries from the final frame of the 
+                            # previous iteration.
                             self.lipid_mol = self.lipid_mols[pt][trj]
                             self.lipid_mol.write(self.lipid_coords)
                             if not self.lipid_coords in self.nptfiles:
