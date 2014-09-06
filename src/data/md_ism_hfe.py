@@ -136,7 +136,7 @@ def main():
     for i in ['temperature', 'pressure', 'nequil', 'nsteps', 'timestep', 'sample', 'threads', 'minimize']:
         if i in args:
             MDOpts[i] = args[i]
-    MDOpts['nsave'] = MDOpts['sample']
+    MDOpts['nsave'] = int(1000.0*MDOpts['sample']/MDOpts['timestep'])
     if 'save_traj' in TgtOpts:
         MDOpts['save_traj'] = TgtOpts['save_traj']
 
