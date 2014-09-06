@@ -110,6 +110,25 @@ class TestLipidGRO(ForceBalanceTestCase):
         self.logger.debug("\nTrying to read lipid conformation... ")
         self.assertEqual(len(self.molecule.molecules), 3783, msg = "\nIncorrect number of molecules for lipid structure")
 
+class TestWaterPDB(ForceBalanceTestCase):
+    def __init__(self, methodName='runTest'):
+        super(TestWaterPDB,self).__init__(methodName)
+        self.source = 'waterbox500.pdb'
+
+    def setUp(self):
+        super(TestWaterPDB,self).setUp()
+        os.chdir('test/files')
+        try: self.molecule = forcebalance.molecule.Molecule(self.source, toppbc=True)
+        except IOError:
+            self.skipTest("Input pdb file test/files/%s doesn't exist" % self.source)
+        except:
+            self.fail("\nUnable to open pdb file")
+
+    def test_water_molecules(self):
+        """Check for the correct number of molecules in a cubic water box"""
+        self.logger.debug("\nTrying to read water conformation... ")
+        self.assertEqual(len(self.molecule.molecules), 500, msg = "\nIncorrect number of molecules for water structure")
+
 class TestAlaGRO(ForceBalanceTestCase):
     def __init__(self, methodName='runTest'):
         super(TestAlaGRO,self).__init__(methodName)

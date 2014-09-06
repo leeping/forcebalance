@@ -959,6 +959,7 @@ class Molecule(object):
                          'charmm'   : self.read_charmm,
                          'dcd'      : self.read_dcd,
                          'mdcrd'    : self.read_mdcrd,
+                         'inpcrd'   : self.read_inpcrd,
                          'pdb'      : self.read_pdb,
                          'xyz'      : self.read_xyz,
                          'mol2'     : self.read_mol2,
@@ -972,6 +973,7 @@ class Molecule(object):
                           'xyz'     : self.write_xyz,
                           'molproq' : self.write_molproq,
                           'dcd'     : self.write_dcd,
+                          'inpcrd'  : self.write_inpcrd,
                           'mdcrd'   : self.write_mdcrd,
                           'pdb'     : self.write_pdb,
                           'qcin'    : self.write_qcin,
@@ -986,6 +988,7 @@ class Molecule(object):
                           'in'      : 'qcin',
                           'qcin'    : 'qcin',
                           'com'     : 'gaussian',
+                          'rst'     : 'inpcrd',
                           'out'     : 'qcout',
                           'esp'     : 'qcesp',
                           'txt'     : 'qdata',
@@ -1409,13 +1412,15 @@ class Molecule(object):
 
         # Run algorithm to determine bonds.
         # Decide if we want to use the grid algorithm.
-        use_grid = self.toppbc or (np.max([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
+        use_grid = self.toppbc or (np.min([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.
-            xgrd = np.arange(xmin, xmax, gszx)
-            ygrd = np.arange(ymin, ymax, gszy)
-            zgrd = np.arange(zmin, zmax, gszz)
+            # Note that we leave out the rightmost grid cell,
+            # because this may cause spurious partitionings.
+            xgrd = np.arange(xmin, xmax-gszx, gszx)
+            ygrd = np.arange(ymin, ymax-gszy, gszy)
+            zgrd = np.arange(zmin, zmax-gszz, gszz)
             # 2) Grid cells are denoted by a three-index tuple.
             gidx = list(itertools.product(range(len(xgrd)), range(len(ygrd)), range(len(zgrd))))
             # 3) Build a dictionary which maps a grid cell to itself plus its neighboring grid cells.
@@ -1545,7 +1550,7 @@ class Molecule(object):
             # Iterate over atoms in the molecule
             for a2 in list(mol.nodes()):
                 # Find all bonded neighbors to this atom
-                friends = sorted(list(nx.all_neighbors(mol, a2)))
+                friends = sorted(list(nx.neighbors(mol, a2)))
                 if len(friends) < 2: continue
                 # Double loop over bonded neighbors
                 for i, a1 in enumerate(friends):
@@ -1573,9 +1578,9 @@ class Molecule(object):
                 # Determine correct ordering of atoms (middle atoms are ordered by convention)
                 a2 = edge[0] if edge[0] < edge[1] else edge[1]
                 a3 = edge[1] if edge[0] < edge[1] else edge[0]
-                for a1 in sorted(list(nx.all_neighbors(mol, a2))):
+                for a1 in sorted(list(nx.neighbors(mol, a2))):
                     if a1 != a3:
-                        for a4 in sorted(list(nx.all_neighbors(mol, a3))):
+                        for a4 in sorted(list(nx.neighbors(mol, a3))):
                             if a4 != a2:
                                 dihidx.append((a1, a2, a3, a4))
         return dihidx
@@ -1790,6 +1795,70 @@ class Molecule(object):
                         xyz = []
             ln += 1
         Answer = {'xyzs' : xyzs}
+        if len(boxes) > 0:
+            Answer['boxes'] = boxes
+        return Answer
+
+    def read_inpcrd(self, fnm, **kwargs):
+        """ Parse an AMBER .inpcrd or .rst file.
+
+        @param[in] fnm The input file name
+        @return xyzs  A list of XYZ coordinates (number of snapshots times number of atoms)
+        @return boxes Boxes (if present.)
+
+        """
+        xyz    = []
+        xyzs   = []
+        # We read in velocities but never use them.
+        vel    = []
+        vels   = []
+        boxes  = []
+        ln     = 0
+        an     = 0
+        mode   = 'x'
+        for line in open(fnm):
+            line = line.replace('\n', '')
+            if ln == 0:
+                comms = [line]
+            elif ln == 1:
+                na = int(line[:5])
+            elif mode == 'x':
+                xyz.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
+                an += 1
+                if an == na: 
+                    xyzs.append(np.array(xyz))
+                    mode = 'v'
+                    an = 0
+                if len(line) > 36:
+                    xyz.append([float(line[36:48]), float(line[48:60]), float(line[60:72])])
+                    an += 1
+                    if an == na: 
+                        xyzs.append(np.array(xyz))
+                        mode = 'v'
+                        an = 0
+            elif mode == 'v':
+                vel.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
+                an += 1
+                if an == na: 
+                    vels.append(np.array(vel))
+                    mode = 'b'
+                    an = 0
+                if len(line) > 36:
+                    vel.append([float(line[36:48]), float(line[48:60]), float(line[60:72])])
+                    an += 1
+                    if an == na: 
+                        vels.append(np.array(vel))
+                        mode = 'b'
+                        an = 0
+            elif mode == 'b':
+                a, b, c = (float(line[:12]), float(line[12:24]), float(line[24:36]))
+                boxes.append(BuildLatticeFromLengthsAngles(a, b, c, 90.0, 90.0, 90.0))
+            ln += 1
+        # If there is only one velocity, then it should actually be a periodic box.
+        if len(vel) == 1:
+            a, b, c = vel[0]
+            boxes.append(BuildLatticeFromLengthsAngles(a, b, c, 90.0, 90.0, 90.0))
+        Answer = {'xyzs' : xyzs, 'comms' : comms}
         if len(boxes) > 0:
             Answer['boxes'] = boxes
         return Answer
@@ -2792,6 +2861,29 @@ class Molecule(object):
                 out.append(''.join(["%8.3f" % i for i in [self.boxes[I].a, self.boxes[I].b, self.boxes[I].c]]))
         return out
 
+    def write_inpcrd(self, select, sn=None, **kwargs):
+        self.require('xyzs')
+        if len(self.xyzs) != 1 and sn == None:
+            logger.error("inpcrd can only be written for a single-frame trajectory\n")
+            raise RuntimeError
+        if sn != None:
+            self.xyzs = [self.xyzs[sn]]
+            self.comms = [self.comms[sn]]
+        # In inp files, there is only one comment line
+        # I believe 20A4 means 80 characters.
+        out = [self.comms[0][:80], '%5i' % self.na]
+        xyz = self.xyzs[0]
+        strout = ''
+        for ix, x in enumerate(xyz):
+            strout += "%12.7f%12.7f%12.7f" % (x[0], x[1], x[2])
+            if ix%2 == 1 or ix == (len(xyz) - 1):
+                out.append(strout)
+                strout = ''
+        # From reading the AMBER file specification I am not sure if this is correct.
+        if 'boxes' in self.Data:
+            out.append(''.join(["%12.7f" % i for i in [self.boxes[0].a, self.boxes[0].b, self.boxes[0].c]]))
+        return out
+
     def write_arc(self, select, **kwargs):
         self.require('elem','xyzs')
         out = []
@@ -2873,6 +2965,8 @@ class Molecule(object):
             self.require_resid()
         else:
             self.require('xyzs','resname','resid')
+
+        write_conect = kwargs.pop('write_conect', 1)
 
         if 'atomname' not in self.Data:
             count = 0
@@ -2998,6 +3092,8 @@ class Molecule(object):
                 line[30:38]=np.array(list(("%8.3f"%(x))))
                 line[38:46]=np.array(list(("%8.3f"%(y))))
                 line[46:54]=np.array(list(("%8.3f"%(z))))
+                if hasattr(self, 'elem'):
+                    line[76:78]=np.array(list("%2s" % self.elem[i]))
 
                 if Serial!=-1:
                     out.append(line.tostring())
@@ -3027,7 +3123,7 @@ class Molecule(object):
                     out.append(line.tostring())
                     Serial += 1
             out.append('ENDMDL')
-        if 'bonds' in self.Data:
+        if 'bonds' in self.Data and write_conect:
             connects = ["CONECT%5i" % (b0+1) + "".join(["%5i" % (b[1]+1) for b in self.bonds if b[0] == b0]) for b0 in sorted(list(set(b[0] for b in self.bonds)))]
             out += connects
         return out

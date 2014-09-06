@@ -1,0 +1,87 @@
+<!-- Time and parameters of origin: -->
+<!-- 2014-08-26 17:12:30.825329 -->
+<!-- /home/leeping/opt/amber/dat/leap/parm/gaff.dat 1_bromobutane.gaff.rn.mol2 1_bromobutane.frcmod -->
+<ForceField>
+  <ForceBalance>
+    <GB type="H-C" radius="0.1250" scale="0.8500" parameterize="radius, scale"/>
+    <GB type="H-O" radius="0.1050" scale="0.8500" parameterize="radius, scale"/>
+    <GB type="C-SP3" radius="0.1900" scale="0.7200" parameterize="radius, scale"/>
+    <GB type="O-SP3" radius="0.1535" scale="0.8500" parameterize="radius, scale"/>
+  </ForceBalance>
+  <AtomTypes>
+    <Type name="ethanol-0-C1" class="c3" element="C" mass="12.01078"/>
+    <Type name="ethanol-0-C2" class="c3" element="C" mass="12.01078"/>
+    <Type name="ethanol-0-O1" class="oh" element="O" mass="15.99943"/>
+    <Type name="ethanol-0-H1" class="hc" element="H" mass="1.007947"/>
+    <Type name="ethanol-0-H2" class="hc" element="H" mass="1.007947"/>
+    <Type name="ethanol-0-H3" class="hc" element="H" mass="1.007947"/>
+    <Type name="ethanol-0-H4" class="h1" element="H" mass="1.007947"/>
+    <Type name="ethanol-0-H5" class="h1" element="H" mass="1.007947"/>
+    <Type name="ethanol-0-H6" class="ho" element="H" mass="1.007947"/>
+  </AtomTypes>
+  <Residues>
+    <Residue name="ethanol-0">
+      <Atom name="C1" type="ethanol-0-C1"/>
+      <Atom name="C2" type="ethanol-0-C2"/>
+      <Atom name="O1" type="ethanol-0-O1"/>
+      <Atom name="H1" type="ethanol-0-H1"/>
+      <Atom name="H2" type="ethanol-0-H2"/>
+      <Atom name="H3" type="ethanol-0-H3"/>
+      <Atom name="H4" type="ethanol-0-H4"/>
+      <Atom name="H5" type="ethanol-0-H5"/>
+      <Atom name="H6" type="ethanol-0-H6"/>
+      <Bond from="0" to="1"/>
+      <Bond from="1" to="2"/>
+      <Bond from="0" to="3"/>
+      <Bond from="0" to="4"/>
+      <Bond from="0" to="5"/>
+      <Bond from="1" to="6"/>
+      <Bond from="1" to="7"/>
+      <Bond from="2" to="8"/>
+    </Residue>
+  </Residues>
+  <HarmonicBondForce>
+    <Bond class1="c3" class2="c3" length="0.1535" k="253634.08"/>
+    <Bond class1="c3" class2="h1" length="0.1093" k="281081.12"/>
+    <Bond class1="c3" class2="hc" length="0.1092" k="282252.64"/>
+    <Bond class1="c3" class2="oh" length="0.1426" k="262838.88"/>
+    <Bond class1="ho" class2="oh" length="0.0974" k="309281.28"/>
+  </HarmonicBondForce>
+  <HarmonicAngleForce>
+    <Angle class1="c3" class2="c3" class3="h1" angle="1.92108390767" k="387.94048"/>
+    <Angle class1="c3" class2="c3" class3="hc" angle="1.92073484182" k="388.02416"/>
+    <Angle class1="c3" class2="c3" class3="oh" angle="1.90991380046" k="566.68096"/>
+    <Angle class1="hc" class2="c3" class3="hc" angle="1.89106424454" k="329.95024"/>
+    <Angle class1="h1" class2="c3" class3="h1" angle="1.91200819556" k="327.85824"/>
+    <Angle class1="c3" class2="oh" class3="ho" angle="1.88774811896" k="394.04912"/>
+    <Angle class1="h1" class2="c3" class3="oh" angle="1.91776778209" k="426.51696"/>
+  </HarmonicAngleForce>
+  <PeriodicTorsionForce>
+    <Proper class1="hc" class2="c3" class3="c3" class4="oh" periodicity1="3" phase1="0.0" k1="0.0" periodicity2="1" phase2="0.0" k2="1.046"/>
+    <Proper class1="ho" class2="oh" class3="c3" class4="c3" periodicity1="3" phase1="0.0" k1="0.66944" periodicity2="1" phase2="0.0" k2="1.046"/>
+    <Proper class1="" class2="c3" class3="oh" class4="" periodicity1="3" phase1="0.0" k1="0.697333333333"/>
+    <Proper class1="" class2="c3" class3="c3" class4="" periodicity1="3" phase1="0.0" k1="0.650844444444"/>
+  </PeriodicTorsionForce>
+  <NonbondedForce coulomb14scale="0.833333" lj14scale="0.5">
+    <Atom type="ethanol-0-C1" charge="-0.1361" sigma="0.339966950842" epsilon="0.4577296"/>
+    <Atom type="ethanol-0-C2" charge="0.1264" sigma="0.339966950842" epsilon="0.4577296"/>
+    <Atom type="ethanol-0-O1" charge="-0.5998" sigma="0.306647338784" epsilon="0.8803136"/>
+    <Atom type="ethanol-0-H1" charge="0.042367" sigma="0.264953278775" epsilon="0.0656888"/>
+    <Atom type="ethanol-0-H2" charge="0.042367" sigma="0.264953278775" epsilon="0.0656888"/>
+    <Atom type="ethanol-0-H3" charge="0.042367" sigma="0.264953278775" epsilon="0.0656888"/>
+    <Atom type="ethanol-0-H4" charge="0.0432" sigma="0.247135304412" epsilon="0.0656888"/>
+    <Atom type="ethanol-0-H5" charge="0.0432" sigma="0.247135304412" epsilon="0.0656888"/>
+    <Atom type="ethanol-0-H6" charge="0.396" sigma="0.0" epsilon="0.0"/>
+  </NonbondedForce>
+  <GBSAOBCForce>
+    <Atom type="ethanol-0-C1" charge="-0.1361" radius="0.1900" scale="0.72" parameter_eval="radius=PRM['GB/radius/C-SP3'], scale=PRM['GB/scale/C-SP3']"/>
+    <Atom type="ethanol-0-C2" charge="0.1264" radius="0.1900" scale="0.72" parameter_eval="radius=PRM['GB/radius/C-SP3'], scale=PRM['GB/scale/C-SP3']"/>
+    <Atom type="ethanol-0-O1" charge="-0.5998" radius="0.1535" scale="0.85" parameter_eval="radius=PRM['GB/radius/O-SP3'], scale=PRM['GB/scale/O-SP3']"/>
+    <Atom type="ethanol-0-H1" charge="0.042367" radius="0.1250" scale="0.85" parameter_eval="radius=PRM['GB/radius/H-C'], scale=PRM['GB/scale/H-C']"/>
+    <Atom type="ethanol-0-H2" charge="0.042367" radius="0.1250" scale="0.85" parameter_eval="radius=PRM['GB/radius/H-C'], scale=PRM['GB/scale/H-C']"/>
+    <Atom type="ethanol-0-H3" charge="0.042367" radius="0.1250" scale="0.85" parameter_eval="radius=PRM['GB/radius/H-C'], scale=PRM['GB/scale/H-C']"/>
+    <Atom type="ethanol-0-H4" charge="0.0432" radius="0.1250" scale="0.85" parameter_eval="radius=PRM['GB/radius/H-C'], scale=PRM['GB/scale/H-C']"/>
+    <Atom type="ethanol-0-H5" charge="0.0432" radius="0.1250" scale="0.85" parameter_eval="radius=PRM['GB/radius/H-C'], scale=PRM['GB/scale/H-C']"/>
+    <Atom type="ethanol-0-H6" charge="0.396" radius="0.1050" scale="0.85" parameter_eval="radius=PRM['GB/radius/H-O'], scale=PRM['GB/scale/H-O']"/>
+  </GBSAOBCForce>
+</ForceField>

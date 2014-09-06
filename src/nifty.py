@@ -17,6 +17,7 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 from select import select
 import os, sys, re, shutil, errno
 import numpy as np
+import filecmp
 import itertools
 import threading
 import pickle
@@ -176,7 +177,6 @@ def natural_sort(l):
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
     return sorted(l, key = alphanum_key)
 
-
 def extract_int(arr, avgthre, limthre, label="value", verbose=True):
     """ Get the representative integer value from an array.
     Sanity check: Make sure the value does not go through big excursions.
@@ -293,6 +293,8 @@ def isint(word):
     @return answer Boolean which specifies whether the string is an integer (only +/- sign followed by digits)
     
     """
+    try: word = str(word)
+    except: return False
     return re.match('^[-+]?[0-9]+$',word)
 
 def isfloat(word):
@@ -303,6 +305,8 @@ def isfloat(word):
     @return answer Boolean which specifies whether the string is any number
     
     """
+    try: word = str(word)
+    except: return False
     return re.match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
 
 def isdecimal(word):
@@ -312,6 +316,8 @@ def isdecimal(word):
     @return answer Boolean which specifies whether the string is a number with a decimal point
     
     """
+    try: word = str(word)
+    except: return False
     return isfloat(word) and not isint(word)
 
 def floatornan(word):
@@ -746,7 +752,7 @@ def destroyWorkQueue():
     WORK_QUEUE = None
     WQIDS = defaultdict(list)
 
-def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
+def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True, print_time=60):
     """ 
     Submit a job to the Work Queue.
 
@@ -767,6 +773,7 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     if tag == None: tag = command
     task.specify_tag(tag)
+    task.print_time = print_time
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, %staskid %i\n" % (command, "tag %s, " % tag if tag != command else "", taskid))
@@ -775,7 +782,7 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     else:
         WQIDS["None"].append(taskid)
     
-def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True):
+def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None, verbose=True, print_time=60):
     """ 
     Submit a job to the Work Queue.  This function is a bit fancier in that we can explicitly
     specify where the input files come from, and where the output files go to.
@@ -798,6 +805,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     if tag == None: tag = command
     task.specify_tag(tag)
+    task.print_time = print_time
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
@@ -840,6 +848,8 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                 logger.warning("Task '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.tag, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
             else:
+                if hasattr(task, 'print_time'):
+                    print_time = task.print_time
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
                     logger.info("Task '%s' (task %i) finished successfully on host %s (%i seconds)\n" % (task.tag, task.id, task.hostname, exectime))
                 for tnm in WQIDS:
@@ -919,6 +929,22 @@ def onefile(fnm=None, ext=None, err=False):
             return None
     if fnm != None:
         if os.path.exists(fnm):
+            if os.path.dirname(os.path.abspath(fnm)) != os.getcwd():
+                fsrc = os.path.abspath(fnm)
+                fdest = os.path.join(os.getcwd(), os.path.basename(fnm))
+                #-----
+                # If the file path doesn't correspond to the current directory, copy the file over
+                # If the file exists in the current directory already and it's different, then crash.
+                #-----
+                if os.path.exists(fdest):
+                    if not filecmp.cmp(fsrc, fdest):
+                        logger.error("onefile() will not overwrite %s with %s\n" % (os.path.join(os.getcwd(), os.path.basename(fnm)),os.path.abspath(fnm)))
+                        raise RuntimeError
+                    else:
+                        logger.info("\x1b[93monefile() says the files %s and %s are identical\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
+                else:
+                    logger.info("\x1b[93monefile() will copy %s to %s\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
+                    shutil.copy2(fsrc, fdest)
             return os.path.basename(fnm)
         elif (err==True or ext==None):
             logger.error("File specified by %s does not exist!" % fnm)
@@ -930,11 +956,11 @@ def onefile(fnm=None, ext=None, err=False):
     ls = [i for i in os.listdir(cwd) if i.endswith('.%s' % ext)]
     if len(ls) != 1:
         if err:
-            logger.error("Cannot find a unique file with extension .%s in %s (%i found)" % (ext, cwd, len(ls)))
+            logger.error("Cannot find a unique file with extension .%s in %s (%i found; %s)" % (ext, cwd, len(ls), ' '.join(ls)))
             raise RuntimeError
         else:
-            warn_once("Cannot find a unique file with extension .%s in %s (%i found)" % 
-                      (ext, cwd, len(ls)), warnhash = "Found %i .%s files" % (len(ls), ext))
+            warn_once("Cannot find a unique file with extension .%s in %s (%i found; %s)" % 
+                      (ext, cwd, len(ls), ' '.join(ls)), warnhash = "Found %i .%s files" % (len(ls), ext))
     else:
         answer = os.path.basename(ls[0])
         warn_once("Autodetected %s in %s" % (answer, cwd), warnhash = "Autodetected %s" % answer)
@@ -969,6 +995,26 @@ def listfiles(fnms=None, ext=None, err=False):
     if answer == [] and err:
         logger.error('listfiles function failed to come up with a file! (fnms = %s ext = %s)' % (str(fnms), str(ext)))
         raise RuntimeError
+
+    for ifnm, fnm in enumerate(answer):
+        if os.path.dirname(os.path.abspath(fnm)) != os.getcwd():
+            fsrc = os.path.abspath(fnm)
+            fdest = os.path.join(os.getcwd(), os.path.basename(fnm))
+            #-----
+            # If the file path doesn't correspond to the current directory, copy the file over
+            # If the file exists in the current directory already and it's different, then crash.
+            #-----
+            if os.path.exists(fdest):
+                if not filecmp.cmp(fsrc, fdest):
+                    logger.error("onefile() will not overwrite %s with %s\n" % (os.path.join(os.getcwd(), os.path.basename(fnm)),os.path.abspath(fnm)))
+                    raise RuntimeError
+                else:
+                    logger.info("\x1b[93monefile() says the files %s and %s are identical\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
+                    answer[ifnm] = os.path.basename(fnm)
+            else:
+                logger.info("\x1b[93monefile() will copy %s to %s\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
+                shutil.copy2(fsrc, fdest)
+                answer[ifnm] = os.path.basename(fnm)
     return answer
 
 def GoInto(Dir):
@@ -1032,6 +1078,7 @@ def LinkFile(src, dest, nosrcok = False):
         # Remove broken link
         if os.path.islink(dest) and not os.path.exists(dest):
             os.remove(dest)
+            os.symlink(src, dest)
         elif os.path.exists(dest):
             if os.path.islink(dest): pass
             else: 
@@ -1061,6 +1108,8 @@ def link_dir_contents(abssrcdir, absdestdir):
     for fnm in os.listdir(abssrcdir):
         srcfnm = os.path.join(abssrcdir, fnm)
         destfnm = os.path.join(absdestdir, fnm)
+        if os.path.islink(destfnm) and not os.path.exists(destfnm):
+            os.remove(destfnm)
         if os.path.isfile(srcfnm) or (os.path.isdir(srcfnm) and fnm == 'IC'):
             if not os.path.exists(destfnm):
                 #print "Linking %s to %s" % (srcfnm, destfnm)
