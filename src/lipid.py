@@ -22,7 +22,6 @@ except: pass
 from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple, OrderedDict
-from forcebalance.optimizer import Counter, First, GoodStep
 import csv
 
 from forcebalance.output import getLogger
@@ -52,22 +51,26 @@ class Lipid(Target):
     def __init__(self,options,tgt_opts,forcefield):
         # Initialize base class
         super(Lipid,self).__init__(options,tgt_opts,forcefield)
-        # Fractional weight of the density
+        # Weight of the density
         self.set_option(tgt_opts,'w_rho',forceprint=True)
-        # Fractional weight of the thermal expansion coefficient
+        # Weight of the thermal expansion coefficient
         self.set_option(tgt_opts,'w_alpha',forceprint=True)
-        # Fractional weight of the isothermal compressibility
+        # Weight of the isothermal compressibility
         self.set_option(tgt_opts,'w_kappa',forceprint=True)
-        # Fractional weight of the isobaric heat capacity
+        # Weight of the isobaric heat capacity
         self.set_option(tgt_opts,'w_cp',forceprint=True)
-        # Fractional weight of the dielectric constant
+        # Weight of the dielectric constant
         self.set_option(tgt_opts,'w_eps0',forceprint=True)
-        # Fractional weight of the area per lipid
+        # Weight of the area per lipid
         self.set_option(tgt_opts,'w_al',forceprint=True)
-        # Fractional weight of the bilayer isothermal compressibility
+        # Weight of the bilayer isothermal compressibility
         self.set_option(tgt_opts,'w_lkappa',forceprint=True)
-        # Fractional weight of the deuterium order parameter
+        # Weight of the deuterium order parameter
         self.set_option(tgt_opts,'w_scd',forceprint=True)
+        # Normalize the property contributions to the objective function
+        self.set_option(tgt_opts,'w_normalize',forceprint=True)
+        if not self.w_normalize:
+            warn_press_key("As of July 17, 2014, the property weights are no longer normalized by default.\nSet w_normalize in $target to restore the old behavior.")
         # Optionally pause on the zeroth step
         self.set_option(tgt_opts,'manual')
         # Number of time steps in the lipid "equilibration" run
@@ -447,11 +450,11 @@ class Lipid(Target):
         lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
-        if Counter() == First() and self.manual:
-            warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
+        if (not self.evaluated) and self.manual:
+            warn_press_key("Now's our chance to fill the temp directory up with data!\n(Considering using 'read' or 'continue' for better checkpointing)", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
-        if Counter() > First() and GoodStep() and self.save_traj < 2:
+        if self.evaluated and self.goodstep and self.save_traj < 2:
             for fn in self.last_traj:
                 if os.path.exists(fn):
                     os.remove(fn)
@@ -779,7 +782,10 @@ class Lipid(Target):
         if X_Scd == 0: self.w_scd = 0.0
         if X_LKappa == 0: self.w_lkappa = 0.0
 
-        w_tot = self.w_rho + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_al + self.w_scd + self.w_lkappa
+        if self.w_normalize:
+            w_tot = self.w_rho + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_al + self.w_scd + self.w_lkappa
+        else:
+            w_tot = 1.0
         w_1 = self.w_rho / w_tot
         w_3 = self.w_alpha / w_tot
         w_4 = self.w_kappa / w_tot

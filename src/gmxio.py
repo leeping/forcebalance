@@ -20,7 +20,6 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
-from forcebalance.optimizer import GoodStep
 from forcebalance.thermo import Thermo
 from copy import deepcopy
 from forcebalance.qchemio import QChem_Dielectric_Energy
@@ -552,6 +551,7 @@ class GMX(Engine):
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
+        self.have_constraints = False
         if pbc:
             minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
             if minbox <= 10:
@@ -597,6 +597,9 @@ class GMX(Engine):
         if hasattr(self,'FF'):
             # Create the force field in this directory if the force field object is provided.  
             # This is because the .mdp and .top file can be force field files!
+            # This bit affects how the geometry optimization is performed, but we should have
+            # a more comprehensive way to pass constraint settings through.
+            self.have_constraints = self.FF.rigid_water
             if not all([os.path.exists(f) for f in self.FF.fnms]):
                 # If the parameter files don't already exist, create them for the purpose of
                 # preparing the engine, but then delete them afterward.
@@ -691,7 +694,6 @@ class GMX(Engine):
                 charge = float(s[s.index("q=")+1].replace(',','').lower())
                 charges.append(charge)
         os.unlink('%s.tpr' % self.name)
-        print charges
         return np.array(charges)
 
     def links(self):
@@ -797,7 +799,7 @@ class GMX(Engine):
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
         else:
-            if self.FF.rigid_water:
+            if self.have_constraints:
                 algorithm = "steep"
             else:
                 algorithm = "l-bfgs"
@@ -1395,7 +1397,7 @@ class Liquid_GMX(Liquid):
 
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """
-            if GoodStep() and (temperature, pressure) in self.LfDict_New:
+            if self.goodstep and (temperature, pressure) in self.LfDict_New:
                 self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
             if (temperature, pressure) in self.LfDict:
                 lfsrc = self.LfDict[(temperature, pressure)]
@@ -1463,7 +1465,7 @@ class Lipid_GMX(Lipid):
                     self.lipid_mols[PT_vals] = self.lipid_mols_new[PT_vals]
                     self.lipid_mols_new.pop(PT_vals)
             else:
-                if GoodStep() and (temperature, pressure) in self.LfDict_New:
+                if self.goodstep and (temperature, pressure) in self.LfDict_New:
                     self.LfDict[(temperature, pressure)] = self.LfDict_New[(temperature, pressure)]
                 if (temperature, pressure) in self.LfDict:
                     lfsrc = self.LfDict[(temperature, pressure)]

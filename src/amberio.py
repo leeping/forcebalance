@@ -743,7 +743,8 @@ class AMBER(Engine):
                 self.mol = copy.deepcopy(mpdb)
         else:
             pdbfnm = self.name + ".pdb"
-            self.mol[0].write(pdbfnm)
+            # AMBER doesn't always like the CONECT records
+            self.mol[0].write(pdbfnm, write_conect=False)
         self.abspdb = os.path.abspath(pdbfnm)
 
         # Write the PDB that AMBER is going to read in.
@@ -1042,7 +1043,7 @@ do_debugf = 1, dumpfrc = 1
  &data
      ntrun = 4, nsave=20, ndiag=2, cut={cut}
      nprint=1, ioseen=0,
-     drms = 0.000001, maxcyc=400, bdwnhl=0.1, dfpred = 0.1,
+     drms = 0.000001, maxcyc=4000, bdwnhl=0.1, dfpred = 0.1,
      scnb=2.0, scee=1.2, idiel=1,
  /
 """

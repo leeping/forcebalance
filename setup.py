@@ -91,7 +91,6 @@ else:
     
 
 def buildKeywordDictionary(args):
-    from distutils.core import Extension
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
     setupKeywords["version"]           = __version__
@@ -113,7 +112,6 @@ def buildKeywordDictionary(args):
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
     setupKeywords["install_requires"]  = ['networkx>=1.9', 'decorator>=3.4.0']
-
     setupKeywords["long_description"]  = """
 
     ForceBalance (https://simtk.org/home/forcebalance) is a library
@@ -172,7 +170,6 @@ def main():
     parser.add_argument('-t', '--test', action='store_true', help='install forcebalance test suite')
     parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)
-    
     setupKeywords=buildKeywordDictionary(args)
     setup(**setupKeywords)
 

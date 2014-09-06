@@ -17,9 +17,10 @@ done
 COMMAND=$@
 
 # Load my environment variables. :)
-. /etc/profile
-. /etc/bashrc
-. ~/.bashrc
+if [ -f /etc/profile ] ; then . /etc/profile ; fi
+if [ -f /etc/bashrc ] ; then . /etc/bashrc ; fi
+if [ -f ~/.bash_profile ] ; then . ~/.bash_profile ; fi
+if [ -f ~/.bashrc ] ; then . ~/.bashrc ; fi
 
 # Make sure the Cuda environment is turned on
 # module load cuda
@@ -85,6 +86,13 @@ elif [[ $HOSTNAME =~ "cn" ]] ; then
     export CUDA_CACHE_PATH=/tmp/leeping/.nv/ComputeCache
     export OPENMM_CUDA_COMPILER=/opt/cuda5.0/bin/nvcc
     export BAK=/hsgs/nobackup/leeping/scratch/runcuda-backups
+elif [[ $HOSTNAME =~ "gpu-" ]] ; then
+    # GPU nodes on Sherlock cluster
+    export PATH=/usr/local/cuda-5.5/bin:$PATH
+    export LD_LIBRARY_PATH=/usr/local/cuda-5.5/lib64:$LD_LIBRARY_PATH
+    export CUDA_CACHE_PATH=/scratch/users/leeping/.nv/ComputeCache
+    export OPENMM_CUDA_COMPILER=/usr/local/cuda-5.5/bin/nvcc
+    export BAK=/scratch/users/leeping/runcuda-backups
 elif [[ $HOSTNAME =~ "nid" ]] ; then
     # Blue Waters XK Compute Node
     . /etc/bash.bashrc.local
