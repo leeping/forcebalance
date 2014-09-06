@@ -188,7 +188,9 @@ def main():
     # It also provides a list of installed files.  This is much less annoying.
     sys.argv.append('--single-version-externally-managed')
     sys.argv.append('--record=installed_files.txt')
-    sys.argv.append('--old-and-unmanageable')
+    # I think this accomplishes something similar, although the name of the option
+    # makes it sound like a bad idea.
+    # sys.argv.append('--old-and-unmanageable')
     setupKeywords=buildKeywordDictionary(args)
     setup(**setupKeywords)
 
