@@ -93,7 +93,8 @@ else:
 def buildKeywordDictionary(args):
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
-    setupKeywords["version"]           = __version__
+    # Don't create a separate installed version number for every commit
+    setupKeywords["version"]           = re.sub('-[0-9]*$','',__version__)
     setupKeywords["author"]            = "Lee-Ping Wang, Arthur Vigil"
     setupKeywords["author_email"]      = "leeping@stanford.edu"
     setupKeywords["license"]           = "GPL 3.0"
@@ -171,6 +172,8 @@ def main():
     parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)
     setupKeywords=buildKeywordDictionary(args)
+    ## Run setuptools command.
+    ## Refer to setup.cfg for customizing installation behavior
     setup(**setupKeywords)
 
     if os.path.exists('build'):

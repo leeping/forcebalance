@@ -1071,12 +1071,13 @@ class OpenMM(Engine):
         if float(int(float(nequil)/float(nsave))) != float(nequil)/float(nsave):
             logger.error("Please set nequil to an integer multiple of nsave\n")
             raise RuntimeError
-        iequil = nequil/nsave
+        iequil = int(nequil/nsave)
 
         if float(int(float(nsteps)/float(nsave))) != float(nsteps)/float(nsave):
             logger.error("Please set nsteps to an integer multiple of nsave\n")
             raise RuntimeError
-        isteps = nsteps/nsave
+        isteps = int(nsteps/nsave)
+        nsave = int(nsave)
 
         if hasattr(self, 'simulation'):
             logger.warning('Deleting the simulation object and re-creating for MD\n')
