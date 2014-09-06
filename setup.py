@@ -93,7 +93,8 @@ else:
 def buildKeywordDictionary(args):
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
-    setupKeywords["version"]           = __version__
+    # Don't create a separate installed version number for every commit
+    setupKeywords["version"]           = re.sub('-[0-9]*$','',__version__)
     setupKeywords["author"]            = "Lee-Ping Wang, Arthur Vigil"
     setupKeywords["author_email"]      = "leeping@stanford.edu"
     setupKeywords["license"]           = "GPL 3.0"
@@ -112,6 +113,7 @@ def buildKeywordDictionary(args):
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
     setupKeywords["install_requires"]  = ['networkx>=1.9', 'decorator>=3.4.0']
+    setupKeywords["zip_safe"]          = False
     setupKeywords["long_description"]  = """
 
     ForceBalance (https://simtk.org/home/forcebalance) is a library
@@ -170,6 +172,23 @@ def main():
     parser.add_argument('-t', '--test', action='store_true', help='install forcebalance test suite')
     parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)
+    #-----
+    # Change setuptools behavior
+    # LPW: This took a long time to figure out
+    #-----
+    # The default behavior of setup.py is to install the package to an egg folder such as:
+    # forcebalance-v1.3.2_143-py2.7-linux-x86_64.egg
+    #
+    # This caused a lot of annoying problems, the least of which "eggs" were strewn everywhere
+    # because the version number would be updated on every commit! This is why I removed the commit
+    # number from the installed version number (above).
+    # 
+    # Setuptools provides two ways around this. By providing the following command line arguments,
+    # it will install the base package and an "egg-info" folder.  
+    # It also provides a list of installed files.  This is much less annoying.
+    sys.argv.append('--single-version-externally-managed')
+    sys.argv.append('--record=installed_files.txt')
+    sys.argv.append('--old-and-unmanageable')
     setupKeywords=buildKeywordDictionary(args)
     setup(**setupKeywords)
 
