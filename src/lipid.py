@@ -63,6 +63,8 @@ class Lipid(Target):
         self.set_option(tgt_opts,'w_eps0',forceprint=True)
         # Weight of the area per lipid
         self.set_option(tgt_opts,'w_al',forceprint=True)
+        # Weight of the bilayer isothermal compressibility
+        self.set_option(tgt_opts,'w_lkappa',forceprint=True)
         # Weight of the deuterium order parameter
         self.set_option(tgt_opts,'w_scd',forceprint=True)
         # Normalize the property contributions to the objective function
@@ -103,19 +105,40 @@ class Lipid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
-        # Read in lipid starting coordinates.
-        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.lipid_coords)): 
-            logger.error("%s doesn't exist; please provide lipid_coords option\n" % self.lipid_coords)
-            raise RuntimeError
-        self.lipid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.lipid_coords), toppbc=True)
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
         # Extra files to be copied back at the end of a run.
         self.extra_output = []
-        ## Read the reference data
+        # Read the reference data
         self.read_data()
-        # Extra files to be linked into the temp-directory.
-        self.nptfiles += [self.lipid_coords]
+        # Read in lipid starting coordinates.
+        if 'n_ic' in self.RefData:
+            # Linked IC folder into the temp-directory.
+            self.nptfiles += ["IC"]
+            # Store IC frames in a dictionary.
+            self.lipid_mols = OrderedDict()
+            self.lipid_mols_new = OrderedDict()
+            for pt in self.PhasePoints:
+                pt_label = "IC/%sK-%s%s" % (pt[0], pt[1], pt[2])
+                if not os.path.exists(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords)):
+                    raise RuntimeError("Initial condition files don't exist; please provide IC directory")
+                # Create molecule object for each IC.
+                all_ic = Molecule(os.path.join(self.root, self.tgtdir, pt_label, self.lipid_coords))
+                self.lipid_mols[pt] = []
+                n_uniq_ic = int(self.RefData['n_ic'][pt])
+                if n_uniq_ic > len(all_ic):
+                    raise RuntimeError("Number of frames in initial conditions .gro file is less than the number of parallel simulations requested in data.csv")
+                # Index ICs by pressure and temperature in a dictionary.
+                for ic in range(n_uniq_ic):
+                    self.lipid_mols[pt].append(all_ic[ic])
+        else:
+            # Read in lipid starting coordinates.
+            if not os.path.exists(os.path.join(self.root, self.tgtdir, self.lipid_coords)): 
+                logger.error("%s doesn't exist; please provide lipid_coords option\n" % self.lipid_coords)
+                raise RuntimeError
+            self.lipid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.lipid_coords), toppbc=True)
+            # Extra files to be linked into the temp-directory.
+            self.nptfiles += [self.lipid_coords]
         # Scripts to be copied from the ForceBalance installation directory.
         self.scripts += ['npt_lipid.py']
         # Prepare the temporary directory.
@@ -163,7 +186,7 @@ class Lipid(Target):
         global_opts = OrderedDict()
         found_headings = False
         known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
-                      'cvib_inter','cni','devib_intra','devib_inter', 'al', 'scd']
+                      'cvib_inter','cni','devib_intra','devib_inter', 'al', 'scd', 'n_ic', 'lkappa']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -201,7 +224,7 @@ class Lipid(Target):
                     for head, val in zip(headings,line):
                         if head == 't' or head == 'p' : continue
                         if isfloat(val):
-                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = float(val)
+                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = float(val.strip())
                         elif val.lower() == 'true':
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = True
                         elif val.lower() == 'false':
@@ -220,6 +243,8 @@ class Lipid(Target):
         default_denoms = defaultdict(int)
         PhasePoints = None
         for head in self.RefData:
+            if head == 'n_ic':
+                continue
             if head not in known_vars+[i+"_wt" for i in known_vars]:
                 # Only hard-coded properties may be recognized.
                 logger.error("The column heading %s is not recognized in data.csv\n" % head)
@@ -236,13 +261,16 @@ class Lipid(Target):
                     # If there is more than one data point, then the default denominator is the
                     # standard deviation of the experimental values.
                     if head == 'scd':
-                        default_denoms[head+"_denom"] = np.sqrt((np.dot(wts, (dat-avg)**2)/wts.sum()).sum())
+                        default_denoms[head+"_denom"] = np.average(np.sqrt(np.dot(wts, (dat-avg)**2)/wts.sum()))
                     else:
                         default_denoms[head+"_denom"] = np.sqrt(np.dot(wts, (dat-avg)**2)/wts.sum())
                 else:
                     # If there is only one data point, then the denominator is just the single
                     # data point itself.
-                    default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
+                    if head == 'scd':
+                        default_denoms[head+"_denom"] = np.average(np.sqrt(np.abs(dat[0])))
+                    else:
+                        default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
             self.PhasePoints = self.RefData[head].keys()
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
@@ -269,16 +297,13 @@ class Lipid(Target):
             return 1
         else:
             return 0
-
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
         wq = getWorkQueue()
         if not os.path.exists('npt_result.p'):
             link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
-            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output if '.gro' not in i]
-            prev_iter_ICs = os.path.join(os.getcwd(), "lipid.gro")
-            if not os.path.exists(prev_iter_ICs):
-                self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
+            self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
+            self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
             cmdstr = '%s python npt_lipid.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq == None:
                 logger.info("Running condensed phase simulation locally.\n")
@@ -323,8 +348,9 @@ class Lipid(Target):
         print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
-        print_item("Al", "Average area per lipid", "nm^2")
+        print_item("Al", "Average Area per Lipid", "nm^2")
         print_item("Scd", "Deuterium Order Parameter", None)
+        print_item("LKappa", "Bilayer Isothermal Compressibility", "mN/m")
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
@@ -445,7 +471,27 @@ class Lipid(Target):
             if not os.path.exists(label):
                 os.makedirs(label)
                 os.chdir(label)
-                self.npt_simulation(T,P,snum)
+                if 'n_ic' in self.RefData:
+                    n_uniq_ic = int(self.RefData['n_ic'][pt])
+                    # Loop over parallel trajectories.
+                    for trj in range(n_uniq_ic):
+                        rel_trj = "trj_%i" % trj
+                        # Create directories for each parallel simulation.
+                        if not os.path.exists(rel_trj):
+                            os.makedirs(rel_trj)
+                            os.chdir(rel_trj)
+                            # Pull each simulation molecule from the lipid_mols dictionary.
+                            # lipid_mols is a dictionary of paths to either the initial 
+                            # geometry files, or the geometries from the final frame of the 
+                            # previous iteration.
+                            self.lipid_mol = self.lipid_mols[pt][trj]
+                            self.lipid_mol.write(self.lipid_coords)
+                            if not self.lipid_coords in self.nptfiles:
+                                self.nptfiles += [self.lipid_coords]
+                            self.npt_simulation(T,P,snum)
+                        os.chdir('..')
+                else:
+                    self.npt_simulation(T,P,snum)
                 os.chdir('..')
                 snum += 1
 
@@ -492,6 +538,28 @@ class Lipid(Target):
         BPoints = [] # These are the phase points for which we are doing MBAR for the condensed phase.
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
+            if 'n_ic' in self.RefData:
+                self.lipid_mols[PT] = [Molecule(last_frame) for last_frame in self.lipid_mols[PT]]
+                n_uniq_ic = int(self.RefData['n_ic'][PT])
+                for ic in range(n_uniq_ic):
+                    if os.path.exists('./%s/trj_%s/npt_result.p' % (label, ic)):
+                        # Read in each each parallel simulation's data, and concatenate each property time series.
+                        ts = lp_load('./%s/trj_%s/npt_result.p' % (label, ic))
+                        if ic == 0:
+                            ts_concat = list(ts)
+                        else:
+                            for d_arr in range(len(ts)):
+                                if isinstance(ts[d_arr], np.ndarray):
+                                    # Gradients need a unique append format.
+                                    if d_arr == 5:
+                                        ts_concat[d_arr] = np.append(ts_concat[d_arr], ts[d_arr], axis = 1)
+                                    else:
+                                        ts_concat[d_arr] = np.append(ts_concat[d_arr], ts[d_arr], axis = 0)
+                                if isinstance(ts_concat[d_arr], list):
+                                    ts_concat[d_arr] = [np.append(ts_concat[d_arr][i], ts[d_arr][i], axis = 1) for i in range(len(ts_concat[d_arr]))]
+                        # Write concatenated time series to a pickle file.
+                        if ic == (int(n_uniq_ic) - 1):
+                            lp_dump((ts_concat), './%s/npt_result.p' % label)
             if os.path.exists('./%s/npt_result.p' % label):
                 logger.info('Reading information from ./%s/npt_result.p\n' % label)
                 Points.append(PT)
@@ -508,7 +576,7 @@ class Lipid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, \
-            Rho_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, Als, Al_errs, Scds, Scd_errs = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+            Rho_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, Als, Al_errs, Scds, Scd_errs, LKappa_errs = ([Results[t][i] for t in range(len(Points))] for i in range(18))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -548,6 +616,9 @@ class Lipid(Target):
         Al_calc = OrderedDict([])
         Al_grad = OrderedDict([])
         Al_std  = OrderedDict([])
+        LKappa_calc = OrderedDict([])
+        LKappa_grad = OrderedDict([])
+        LKappa_std  = OrderedDict([])
         Scd_calc = OrderedDict([])
         Scd_grad = OrderedDict([])
         Scd_std  = OrderedDict([])
@@ -558,6 +629,7 @@ class Lipid(Target):
         # Run MBAR using the total energies. Required for estimates that use the kinetic energy.
         BSims = len(BPoints)
         Shots = len(Energies[0])
+        Shots_m = [len(i) for i in Energies]
         N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([BSims,BSims,Shots])
@@ -668,6 +740,17 @@ class Lipid(Target):
             ## Average area per lipid
             Al_calc[PT]   = np.dot(W,A)
             Al_grad[PT]   = mBeta*(flat(np.mat(G)*col(W*A)) - np.dot(W,A)*Gbar)
+            ## Bilayer Isothermal compressibility.
+            A_m2 = A * 1e-18
+            kbT = 1.3806488e-23 * T
+            LKappa_calc[PT] = (1e3 * 2 * kbT / 128) * (avg(A_m2) / (avg(A_m2**2)-avg(A_m2)**2))
+            al_avg = avg(A_m2)
+            al_sq_avg = avg(A_m2**2)
+            al_avg_sq = al_avg**2
+            al_var = al_sq_avg - al_avg_sq
+            GLKappa1 = covde(A_m2) / al_var
+            GLKappa2 = (al_avg / al_var**2) * (covde(A_m2**2) - (2 * al_avg * covde(A)))
+            LKappa_grad[PT] = (1e3 * 2 * kbT / 128) * (GLKappa1 - GLKappa2)
             ## Deuterium order parameter
             Scd_calc[PT]   = np.dot(W,S)
             Scd_grad[PT]   = mBeta * (flat(np.average(np.mat(G) * (S * W[:, np.newaxis]), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
@@ -679,6 +762,7 @@ class Lipid(Target):
             Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
             Al_std[PT]    = np.sqrt(sum(C**2 * np.array(Al_errs)**2))
             Scd_std[PT]    = np.sqrt(sum(np.mat(C**2) * np.array(Scd_errs)**2))
+            LKappa_std[PT]   = np.sqrt(sum(C**2 * np.array(LKappa_errs)**2)) * 1e6
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
@@ -688,6 +772,7 @@ class Lipid(Target):
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
         X_Al, G_Al, H_Al, AlPrint = self.objective_term(Points, 'al', Al_calc, Al_std, Al_grad, name="Avg Area per Lipid")
         X_Scd, G_Scd, H_Scd, ScdPrint = self.objective_term(Points, 'scd', Scd_calc, Scd_std, Scd_grad, name="Deuterium Order Parameter")
+        X_LKappa, G_LKappa, H_LKappa, LKappaPrint = self.objective_term(Points, 'lkappa', LKappa_calc, LKappa_std, LKappa_grad, name="Bilayer Compressibility")
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
@@ -699,9 +784,10 @@ class Lipid(Target):
         if X_Eps0 == 0: self.w_eps0 = 0.0
         if X_Al == 0: self.w_al = 0.0
         if X_Scd == 0: self.w_scd = 0.0
+        if X_LKappa == 0: self.w_lkappa = 0.0
 
         if self.w_normalize:
-            w_tot = self.w_rho + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_al + self.w_scd
+            w_tot = self.w_rho + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_al + self.w_scd + self.w_lkappa
         else:
             w_tot = 1.0
         w_1 = self.w_rho / w_tot
@@ -711,23 +797,24 @@ class Lipid(Target):
         w_6 = self.w_eps0 / w_tot
         w_7 = self.w_al / w_tot
         w_8 = self.w_scd / w_tot
+        w_9 = self.w_lkappa / w_tot
 
-        Objective    = w_1 * X_Rho + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Al + w_8 * X_Scd
+        Objective    = w_1 * X_Rho + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Al + w_8 * X_Scd + w_9 * X_LKappa
         if AGrad:
-            Gradient = w_1 * G_Rho + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_Al + w_8 * G_Scd
+            Gradient = w_1 * G_Rho + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_Al + w_8 * G_Scd + w_9 * G_LKappa
         if AHess:
-            Hessian  = w_1 * H_Rho + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_Al + w_8 * H_Scd
+            Hessian  = w_1 * H_Rho + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_Al + w_8 * H_Scd + w_9 * H_LKappa
 
         if not in_fd():
             self.Xp = {"Rho" : X_Rho, "Alpha" : X_Alpha, 
-                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Al" : X_Al, "Scd" : X_Scd}
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Al" : X_Al, "Scd" : X_Scd, "LKappa" : X_LKappa}
             self.Wp = {"Rho" : w_1, "Alpha" : w_3, 
-                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Al" : w_7, "Scd" : w_8}
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Al" : w_7, "Scd" : w_8, "LKappa" : w_9}
             self.Pp = {"Rho" : RhoPrint, "Alpha" : AlphaPrint, 
-                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Al" : AlPrint, "Scd" : ScdPrint}
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Al" : AlPrint, "Scd" : ScdPrint, "LKappa": LKappaPrint}
             if AGrad:
                 self.Gp = {"Rho" : G_Rho, "Alpha" : G_Alpha, 
-                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Al" : G_Al, "Scd" : G_Scd}
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Al" : G_Al, "Scd" : G_Scd, "LKappa" : G_LKappa}
             self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}

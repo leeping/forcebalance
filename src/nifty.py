@@ -1110,7 +1110,7 @@ def link_dir_contents(abssrcdir, absdestdir):
         destfnm = os.path.join(absdestdir, fnm)
         if os.path.islink(destfnm) and not os.path.exists(destfnm):
             os.remove(destfnm)
-        if os.path.isfile(srcfnm):
+        if os.path.isfile(srcfnm) or (os.path.isdir(srcfnm) and fnm == 'IC'):
             if not os.path.exists(destfnm):
                 #print "Linking %s to %s" % (srcfnm, destfnm)
                 os.symlink(srcfnm, destfnm)
