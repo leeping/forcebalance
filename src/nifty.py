@@ -156,7 +156,7 @@ def uncommadash(s):
                 if a < 0 or b <= 0:
                     logger.warning("Items in list cannot be zero or negative: %d %d\n" % (a, b))
                 else:
-                    logger.warning("Second number cannot be larger than first: %d %d\n" % (a, b))
+                    logger.warning("Second number cannot be smaller than first: %d %d\n" % (a, b))
                 raise
             newL = range(a,b)
             if any([i in L for i in newL]):
@@ -1154,7 +1154,7 @@ class LineChunker(object):
     def __exit__(self, *args, **kwargs):
         self.close()
 
-def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, print_error=True, rbytes=1, **kwargs):
+def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin = "", print_command = True, copy_stdout = True, copy_stderr = False, persist = False, expand_cr=False, print_error=True, rbytes=1, cwd=None, **kwargs):
     """Runs command line using subprocess, optionally returning stdout.
     Options:
     command (required) = Name of the command you want to execute
@@ -1172,6 +1172,13 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
 
     # Dictionary of options to be passed to the Popen object.
     cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
+
+    # If the current working directory is provided, the outputs will be written to there as well.
+    if cwd != None:
+        if outfnm != None:
+            outfnm = os.path.abspath(os.path.join(cwd, outfnm))
+        if logfnm != None:
+            logfnm = os.path.abspath(os.path.join(cwd, logfnm))
 
     # "write to file" : Function for writing some characters to the log and/or output files.
     def wtf(out):
@@ -1197,6 +1204,8 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         wtf("Executing process: %s%s\n" % (command, (" Stdin: %s" % stdin.replace('\n','\\n')) if stdin else ""))
 
     cmd_options.update(kwargs)
+    if cwd != None:
+        cmd_options['cwd'] = cwd
     p = subprocess.Popen(command, **cmd_options)
 
     # Write the stdin stream to the process.
