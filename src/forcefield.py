@@ -751,7 +751,7 @@ class FF(forcebalance.BaseClass):
             # is given by the position of this line in the
             # iterable representation of the tree and the
             # field number.
-            #if type(newffdata[fnm]) is etree._ElementTree:
+            # if type(newffdata[fnm]) is etree._ElementTree:
             if cmd != None:
                 try:
                     # Bobby Tables, anyone?
@@ -1095,7 +1095,7 @@ class FF(forcebalance.BaseClass):
                     # Each element of qid is a list that points to atom indices.
                     # LPW: This code is breaking when we're not optimizing ALL the charges
                     # Replace cons0[i][k-1] with all ones
-                    #cons[i][j] = sum([cons0[i][k-1] for k in qid[j]])
+                    # cons[i][j] = sum([cons0[i][k-1] for k in qid[j]])
                     cons[i][j] = float(len(qid[j]))
                 cons[i] /= np.linalg.norm(cons[i])
                 for j in range(i):

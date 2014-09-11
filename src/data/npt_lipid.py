@@ -650,6 +650,50 @@ def main():
     # calc_al(None, **{'a_': Als})
 
     #----
+    # Bilayer Isothermal compressibility
+    #----
+    kbT = 1.3806488e-23 * T
+    def calc_lkappa(b=None, **kwargs):
+        if b == None: b = np.ones(L,dtype=float)
+        if 'a_' in kwargs:
+            a_ = kwargs['a_']
+        al_var = bzavg(a_**2,b)-bzavg(a_,b)**2
+        # Avoid dividing by zero if A_L time series is too short.
+        if abs(al_var) > 0: 
+            return (1e3 * 2 * kbT / 128) * (bzavg(a_,b) / al_var)
+        else:
+            return 0 * bzavg(a_,b)
+
+    # Convert Als time series from nm^2 to m^2
+    Als_m2 = Als * 1e-18
+    LKappa = calc_lkappa(None,**{'a_': Als_m2})
+    al_avg = avg(Als_m2)
+    al_sq_avg = avg(Als_m2**2)
+    al_avg_sq = al_avg**2
+    al_var = al_sq_avg - al_avg_sq
+
+    LKappaboot = []
+    for i in range(numboots):
+        boot = np.random.randint(L,size=L)
+        LKappaboot.append(calc_lkappa(None,**{'a_':Als_m2[boot]}))
+    LKappaboot = np.array(LKappaboot)
+    LKappa_err = np.std(LKappaboot) * np.sqrt(statisticalInefficiency(Als_m2))
+
+    # Bilayer Isothermal compressibility analytic derivative
+    Sep = printcool("Lipid Isothermal compressibility:  % .4e +- %.4e N/nm^-1\nAnalytic Derivative:" % (LKappa, LKappa_err))
+    GLKappa1 = covde(Als_m2) / al_var
+    GLKappa2 = (al_avg / al_var**2) * (covde(Als_m2**2) - (2 * al_avg * covde(Als_m2)))
+    GLKappa  = (1e3 * 2 * kbT / 128) * (GLKappa1 - GLKappa2)
+    FF.print_map(vals=GLKappa)
+    if FDCheck:
+        GLKappa_fd = property_derivatives(Lipid, FF, mvals, h, pgrad, kT, calc_lkappa, {'a_':Als_m2})
+        Sep = printcool("Numerical Derivative:")
+        FF.print_map(vals=GLKappa_fd)
+        Sep = printcool("Difference (Absolute, Fractional):")
+        absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GLKappa, GLKappa_fd)]
+        FF.print_map(vals=absfrac)
+
+    #----
     # Deuterium Order Parameter
     #----
     Scd_avg, Scd_e = mean_stderr(Scds)
@@ -673,7 +717,8 @@ def main():
     pvals = FF.make(mvals)
 
     logger.info("Writing all simulation data to disk.\n")
-    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], Rho_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Als, Al_err, Scds, Scd_err),'npt_result.p')
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], Rho_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Als, Al_err, Scds, Scd_err, LKappa_err),'npt_result.p')
+
 
 if __name__ == "__main__":
     main()
