@@ -711,7 +711,7 @@ class Target(forcebalance.BaseClass):
         """
         cwd = os.getcwd()
         if outside != None:
-            self.ffpd = cwd.replace(os.path.join(self.root, self.tempdir), os.path.join(self.root, self.tempbase, self.outside))
+            self.ffpd = cwd.replace(os.path.join(self.root, self.tempdir), os.path.join(self.root, self.tempbase, outside))
         else:
             self.ffpd = os.path.abspath(os.path.join(self.root, self.rundir))
         if not os.path.exists(self.ffpd): os.makedirs(self.ffpd)
