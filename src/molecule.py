@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                     Last updated July 7, 2014                      |#
+#|                  Last updated September 13, 2014                   |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -131,7 +131,7 @@ AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tink
 # qctemplate = The Q-Chem template file, not including the coordinates or rem variables
 # charge     = The net charge of the molecule
 # mult       = The spin multiplicity of the molecule
-MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds'])
+MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds', 'topology', 'molecules'])
 # Variable names relevant to quantum calculations explicitly
 QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost'])
 # Superset of all variable names.
@@ -146,7 +146,11 @@ import itertools
 from collections import OrderedDict, namedtuple, Counter
 from ctypes import *
 from warnings import warn
-import logging as logger
+#import logging as logger
+import logging
+logger = logging.getLogger(__name__)
+
+module_name = __name__.replace('.molecule','')
 
 # Covalent radii from Cordero et al. 'Covalent radii revisited' Dalton Transactions 2008, 2832-2838.
 Radii = [0.31, 0.28, # H and He
@@ -380,6 +384,9 @@ try:
 except:
     warn("NetworkX cannot be imported (topology tools won't work).  Most functionality should still work though.")
 
+def TopEqual(mol1, mol2):
+    """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
+    return mol1.topology == mol2.topology
 
 def format_xyz_coord(element,xyz,tinker=False):
     """ Print a line consisting of (element, x, y, z) in accordance with .xyz file format
@@ -647,6 +654,109 @@ def cartesian_product2(arrays):
         arr[...,i] = a
     return arr.reshape(-1, la)
 
+def extract_int(arr, avgthre, limthre, label="value", verbose=True):
+    """ 
+    Get the representative integer value from an array.  
+    The integer value is the rounded mean.  Perform sanity 
+    checks to ensure the array isn't overly "non-integer".  
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        NumPy array containing a series of floating point values 
+        where we'd like to extract the representative integer value.
+    avgthre : float
+        If the average deviates from the closest integer by 
+        more than this amount, do not pass.
+    limthre : float
+        If any element in this array deviates from the closest integer by 
+        more than this amount, do not pass.
+    label : str
+        Descriptive name of this variable, used only in printout.
+    verbose : bool
+        Print information in case array makes excursions larger than the threshold
+        
+    Returns
+    -------
+    int
+        Representative integer value for the array.
+    passed : bool
+        Indicates whether the array mean and/or maximum deviations stayed with the thresholds.
+    """
+    average = np.mean(arr)
+    maximum = np.max(arr)
+    minimum = np.min(arr)
+    rounded = round(average)
+    passed = True
+    if abs(average - rounded) > avgthre:
+        if verbose: print "Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre)
+        passed = False
+    if abs(maximum - minimum) > limthre:
+        if verbose: print "Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre)
+        passed = False
+    return int(rounded), passed
+
+def extract_qsz(M, verbose=True):
+    """ 
+    Extract our best estimate of charge and spin-z from the comments
+    section of a Molecule object created with Nanoreactor.  Note that
+    spin-z is 1.0 if there is one unpaired electron (not one/half) because
+    the unit is in terms of populations.
+    
+    This function is intended to work on atoms that are *extracted*
+    from an ab initio MD trajectory, where the Mulliken charge and spin
+    populations are not exactly integers.  It attempts to return the closest
+    integer but it will sometimes fail.
+
+    If the number of electrons and spin-z are inconsistent, then
+    return -999,-999 (indicates failure).
+    
+
+    Parameters
+    ----------
+    M : Molecule
+        Molecule object that we're getting charge and spin from, with a known comment syntax
+        Reaction: formula CHO -> CO+H atoms ['0-2'] -> ['0-1','2'] frame 219482 charge -0.742 sz +0.000 sz^2 0.000
+    
+    Returns
+    -------
+    chg : int
+        Representative integer net charge of this Molecule, or -999 if inconsistent
+    spn : int
+        Representative integer spin-z of this Molecule (one unpaired electron: sz=1), or -999 if inconsistent
+    
+    """
+
+    # Read in the charge and spin on the whole system.
+    srch  = lambda s : np.array([float(re.search('(?<=%s )[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?' % s, c).group(0)) for c in M.comms if all([i in c for i in 'charge', 'sz'])])
+    Chgs  = srch('charge') # An array of the net charge.
+    SpnZs = srch('sz')    # An array of the net Z-spin.
+    Spn2s = srch('sz\^2') # An array of the sum of sz^2 by atom.
+    
+    chg, chgpass = extract_int(Chgs, 0.3, 1.0, label="charge")
+    spn, spnpass = extract_int(abs(SpnZs), 0.3, 1.0, label="spin-z")
+    
+    # Try to calculate the correct spin.
+    nproton = sum([Elements.index(i) for i in M.elem])
+    nelectron = nproton + chg
+    if not spnpass:
+        if verbose: print "Going with the minimum spin consistent with charge."
+        if nelectron%2 == 0:
+            spn = 0
+        else:
+            spn = 1
+    
+    # The number of electrons should be odd iff the spin is odd.
+    if ((nelectron-spn)/2)*2 != (nelectron-spn):
+        print "\x1b[91mThe number of electrons (%i) is inconsistent with the spin-z (%i)\x1b[0m" % (nelectron, spn)
+        return -999, -999
+
+    if verbose:
+        print "Number of electrons:", nelectron
+        print "Net charge:", chg
+        print "Net spin:", spn
+    return chg, spn
+
 class Molecule(object):
     """ Lee-Ping's general file format conversion class.
 
@@ -802,7 +912,7 @@ class Molecule(object):
         for key in AtomVariableNames | MetaVariableNames:
             # Because a molecule object can only have one 'file name' or 'file type' attribute,
             # we only keep the original one.  This isn't perfect, but that's okay.
-            if key in ['fnm', 'ftype', 'bonds'] and key in self.Data:
+            if key in ['fnm', 'ftype', 'bonds', 'molecules', 'topology'] and key in self.Data:
                 Sum.Data[key] = self.Data[key]
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
@@ -941,13 +1051,36 @@ class Molecule(object):
     def append(self,other):
         self += other
 
-    def __init__(self, fnm = None, ftype = None, build_topology = True, **kwargs):
-        """ To create the Molecule object, we simply define the table of
-        file reading/writing functions and read in a file if it is
-        provided."""
-        ## build_topology: Create a connectivity graph of atoms
-        ## toppbc: Use periodic boundary conditions in making connectivity graph
-        ## positive_resid: Enforce all positive resids
+    def __init__(self, fnm = None, ftype = None, **kwargs):
+        """ 
+        Create a Molecule object.
+        
+        Parameters
+        ----------
+        fnm : str, optional
+            File name to create the Molecule object from.  If provided,
+            the file will be parsed and used to fill in the fields such as
+            elem (elements), xyzs (coordinates) and so on.  If ftype is not
+            provided, will automatically try to determine file type from file
+            extension.  If not provided, will create an empty object.
+        ftype : str, optional
+            File type, corresponding to an entry in the internal table of known
+            file types.  Provide this if you have a nonstandard file extension
+            or if you wish to force to invoke a particular parser.
+        build_topology : bool, optional
+            Build the molecular topology consisting of: topology (overall connectivity graph),
+            molecules (list of connected subgraphs), bonds (if not explicitly read in), default True
+        toppbc : bool, optional
+            Use periodic boundary conditions when building the molecular topology, default False
+            The build_topology code will attempt to determine this intelligently.
+        topframe : int, optional
+            Provide a frame number for building the molecular topology, default first frame
+        Fac : float, optional
+            Multiplicative factor to covalent radii criterion for deciding whether two atoms are bonded
+            Default value of 1.2 is reasonable, 1.4 will produce lots of bonds
+        positive_resid : bool, optional
+            If provided, enforce all positive resIDs.
+        """
         #=========================================#
         #|           File type tables            |#
         #|    Feel free to edit these as more    |#
@@ -999,6 +1132,12 @@ class Molecule(object):
         ## in the Funnel
         self.positive_resid = kwargs.get('positive_resid', 0)
         self.built_bonds = False
+        ## Topology settings
+        self.top_settings = {'build' : kwargs.get('build_topology', True),
+                             'toppbc' : kwargs.get('toppbc', False),
+                             'topframe' : kwargs.get('topframe', 0),
+                             'Fac' : kwargs.get('Fac', 1.2)}
+
         for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
             self.Funnel[i] = i
         # Data container.  All of the data is stored in here.
@@ -1027,15 +1166,8 @@ class Molecule(object):
             # for i in range(len(self.comms)):
             #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
             # Attempt to build the topology for small systems. :)
-            if 'networkx' in sys.modules and hasattr(self, 'elem') and build_topology and self.na > 0:
-                if self.na > 100000:
-                    print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
-                self.toppbc = kwargs.get('toppbc', 0)
-                self.topology = self.build_topology()
-                self.molecules = list(nx.connected_component_subgraphs(self.topology))
-                if 'bonds' not in self.Data:
-                    self.Data['bonds'] = list(self.topology.edges())
-                    self.built_bonds = True
+            if 'networkx' in sys.modules and hasattr(self, 'elem') and self.na > 0:
+                self.build_topology()
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -1263,13 +1395,10 @@ class Molecule(object):
         if 'xyzs' in self.Data:
             for i in range(self.ns):
                 New.xyzs[i] = self.xyzs[i][atomslice]
-        if 'networkx' in sys.modules and self.built_bonds and self.na > 0:
-            New.toppbc = self.toppbc
-            New.topology = New.build_topology()
-            New.molecules = list(nx.connected_component_subgraphs(New.topology))
-            New.Data['bonds'] = list(New.topology.edges())
-            New.built_bonds = True
-        elif 'bonds' in self.Data:
+        if 'networkx' in sys.modules and hasattr(self, 'elem') and self.na > 0:
+            New.top_settings = self.top_settings
+            New.build_topology()
+        if 'bonds' in self.Data:
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
         return New
 
@@ -1330,6 +1459,24 @@ class Molecule(object):
             xyz2 = AlignToMoments(self.elem,xyz1,xyz2)
             self.xyzs[index2] = xyz2
 
+    def get_populations(self):
+        """ Return a cloned molecule object but with X-coordinates set
+        to Mulliken charges and Y-coordinates set to Mulliken
+        spins. """
+        QS = copy.deepcopy(self)
+        QSxyz = np.array(QS.xyzs)
+        QSxyz[:, :, 0] = self.qm_mulliken_charges
+        QSxyz[:, :, 1] = self.qm_mulliken_spins
+        QSxyz[:, :, 2] *= 0.0
+        QS.xyzs = list(QSxyz)
+        return QS
+
+    def load_popxyz(self, fnm):
+        """ Given a charge-spin xyz file, load the charges (x-coordinate) and spins (y-coordinate) into internal arrays. """
+        QS = Molecule(fnm, ftype='xyz', build_topology = False)
+        self.qm_mulliken_charges = list(np.array(QS.xyzs)[:, :, 0])
+        self.qm_mulliken_spins = list(np.array(QS.xyzs)[:, :, 1])
+
     def align(self, smooth = False, center = True, center_mass = False, select=None):
         """ Align molecules. 
         
@@ -1368,12 +1515,16 @@ class Molecule(object):
             xyz2 = np.dot(xyz2, rt) + tr
             self.xyzs[index2] = xyz2
 
-    def build_topology(self, sn=None, Fac=1.2):
+    def build_topology(self):
         ''' A bare-bones implementation of the bond graph capability in the nanoreactor code.  
         Returns a NetworkX graph that depicts the molecular topology, which might be useful for stuff. 
         Provide, optionally, the frame number used to compute the topology. '''
-        if sn == None:
-            sn = 0
+        if not self.top_settings['build']: return
+        if self.na > 100000:
+            print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
+        sn = self.top_settings['topframe']
+        toppbc = self.top_settings['toppbc']
+        Fac = self.top_settings['Fac']
         mindist = 1.0 # Any two atoms that are closer than this distance are bonded.
         # Create an atom-wise list of covalent radii.
         R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
@@ -1391,7 +1542,7 @@ class Molecule(object):
             zmax = self.boxes[sn].c
             if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
                 print "Warning: Topology building will not work with broken molecules in nonorthogonal cells."
-                self.toppbc = False
+                toppbc = False
         else:
             xmin = mins[0]
             ymin = mins[1]
@@ -1399,9 +1550,9 @@ class Molecule(object):
             xmax = maxs[0]
             ymax = maxs[1]
             zmax = maxs[2]
-            self.toppbc = False
+            toppbc = False
 
-        if self.toppbc:
+        if toppbc:
             gszx = (xmax-xmin)/int((xmax-xmin)/gsz)
             gszy = (ymax-ymin)/int((ymax-ymin)/gsz)
             gszz = (zmax-zmin)/int((zmax-zmin)/gsz)
@@ -1412,7 +1563,7 @@ class Molecule(object):
 
         # Run algorithm to determine bonds.
         # Decide if we want to use the grid algorithm.
-        use_grid = self.toppbc or (np.min([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
+        use_grid = toppbc or (np.min([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.
@@ -1485,15 +1636,15 @@ class Molecule(object):
         BT1 = R[AtomIterator[:,1]]
         BondThresh = (BT0+BT1) * Fac
         BondThresh = (BondThresh > mindist) * BondThresh + (BondThresh < mindist) * mindist
-        if 'forcebalance.contact' in sys.modules:
-            if hasattr(self, 'boxes') and self.toppbc:
+        if ('%s.contact' % module_name) in sys.modules:
+            if hasattr(self, 'boxes') and toppbc:
                 dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
             else:
                 dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
         else:
             # Inefficient implementation if importing contact doesn't work.
-            if hasattr(self, 'boxes') and self.toppbc:
-                logger.error("No minimum image convention available (import 'forcebalance.contact' if you need it).")
+            if hasattr(self, 'boxes') and toppbc:
+                logger.error("No minimum image convention available (import '%s.contact' if you need it)." % module_name)
                 raise RuntimeError
             dxij = [np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator])]
 
@@ -1514,7 +1665,14 @@ class Molecule(object):
             bonds[ii].append(jj)
             bonds[jj].append(ii)
             G.add_edge(ii, jj)
-        return G
+        # Update topology settings with what we learned
+        self.top_settings['toppbc'] = toppbc
+        # LPW: Molecule.molecules is an annoying misnomer... it should be fragments or substructures or something
+        self.topology = G
+        self.molecules = list(nx.connected_component_subgraphs(G))
+        if 'bonds' not in self.Data:
+            self.Data['bonds'] = list(G.edges())
+            self.built_bonds = True
 
     def distance_matrix(self):
         ''' Build a distance matrix between atoms. '''
@@ -1533,6 +1691,26 @@ class Molecule(object):
             for sn in range(len(self)):
                 dxij.append(np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator]))
         return AtomIterator, dxij
+
+    def distance_displacement(self):
+        ''' Build a distance matrix between atoms. '''
+        AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
+        drij = []
+        dxij = []
+        if 'nanoreactor.contact' in sys.modules:
+            if hasattr(self, 'boxes'):
+                drij, dxij = contact.atom_displacements(np.array(self.xyzs),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
+            else:
+                drij, dxij = contact.atom_displacements(np.array(self.xyzs),AtomIterator)
+        else:
+            # Inefficient implementation if importing contact doesn't work.
+            if hasattr(self, 'boxes'):
+                logger.error("No minimum image convention available (import 'nanoreactor.contact' if you need it).")
+                raise RuntimeError
+            for sn in range(len(self)):
+                drij.append(np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator]))
+                dxij.append(np.array([self.xyzs[sn][i]-self.xyzs[sn][j] for i, j in AtomIterator]))
+        return AtomIterator, drij, dxij
 
     def find_angles(self):
 
@@ -1709,6 +1887,26 @@ class Molecule(object):
         """
         logger.error('Apparently this function has not been implemented!!')
         raise NotImplementedError
+
+    def without(self, *args):
+        """
+        Return a copy of the Molecule object but with certain fields
+        deleted if they exist.  This is useful for when we'd like to
+        add Molecule objects that don't share some fields that we know
+        about.
+        """
+        # Create the sum of the two classes by copying the first class.
+        New = Molecule()
+        for key in AllVariableNames:
+            if key in self.Data and key not in args:
+                New.Data[key] = copy.deepcopy(self.Data[key])
+        return New
+
+    def read_comm_charge_mult(self, verbose=False):
+        """ Set charge and multiplicity from reading the comment line, formatted in a specific way. """
+        q, sz = extract_qsz(self, verbose=verbose)
+        self.charge = q
+        self.mult = abs(sz) + 1
 
     #=====================================#
     #|         Reading functions         |#
