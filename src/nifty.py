@@ -23,6 +23,9 @@ import threading
 import pickle
 import time
 import subprocess
+import forcebalance
+from forcebalance.output import *
+logger = getLogger(__name__)
 try:
     import bz2
     HaveBZ2 = True
@@ -41,9 +44,6 @@ from shutil import copyfileobj
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
 
-import forcebalance
-from forcebalance.output import *
-logger = getLogger(__name__)
 
 # import IPython as ip # For debugging
 
