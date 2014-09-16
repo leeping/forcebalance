@@ -13,7 +13,7 @@ from forcebalance.molecule import Molecule
 from re import match, sub
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import defaultdict, OrderedDict
-from forcebalance.nifty import getWorkQueue, queue_up, LinkFile, printcool, link_dir_contents, lp_dump, lp_load, _exec, kb, col, flat, uncommadash
+from forcebalance.nifty import getWorkQueue, queue_up, LinkFile, printcool, link_dir_contents, lp_dump, lp_load, _exec, kb, col, flat, uncommadash, statisticalInefficiency
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -83,14 +83,18 @@ class Hydration(Target):
         del self.engine_opts['name']
         ## Carry out necessary operations for specific modes.
         if self.hfemode.lower() in ['sp', 'single']:
-            logger.info("Hydration free energies will be calculated from \n"
-                        "geometry optimization and single point energy evaluation\n")
+            logger.info("Hydration free energies from geometry optimization and single point energy evaluation\n")
             self.build_engines()
         elif self.hfemode.lower() == 'ti2':
-            logger.info("Hydration free energies will be calculated from two-point \n"
-                        "thermodynamic integration (linear response approximation)\n")
+            logger.info("Hydration free energies from thermodynamic integration (linear response approximation)\n")
+        elif self.hfemode.lower() == 'exp_gas':
+            logger.info("Hydration free energies from exponential reweighting from the gas to the aqueous phase\n")
+        elif self.hfemode.lower() == 'exp_liq':
+            logger.info("Hydration free energies from exponential reweighting from the aqueous to the gas phase\n")
+        elif self.hfemode.lower() == 'exp_both':
+            logger.info("Hydration free energies from exponential reweighting from the aqueous to the gas phase and vice versa, taking the average\n")
         else:
-            logger.error("Please choose hfemode from single, sp, or ti2\n")
+            logger.error("Please choose hfemode from single, sp, ti2, exp_gas, exp_liq, or exp_both\n")
             raise RuntimeError
 
         if self.FF.rigid_water:
@@ -203,13 +207,13 @@ class Hydration(Target):
 
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         # If not calculating HFE using simulations, exit this function.
-        if self.hfemode.lower() not in ['ti2']:
+        if self.hfemode.lower() not in ['ti2', 'exp_gas', 'exp_liq', 'exp_both']:
             return
         else:
             # Prior to running simulations, write the force field pickle
             # file which will be shared by all simulations.
             self.serialize_ff(mvals)
-        if self.hfemode.lower() in ['ti2']:
+        if self.hfemode.lower() in ['ti2', 'exp_gas', 'exp_liq', 'exp_both']:
             self.submit_liq_gas(mvals, AGrad)
 
     def build_engines(self):
@@ -225,9 +229,14 @@ class Hydration(Target):
     def indicate(self):
         """ Print qualitative indicator. """
         banner = "Hydration free energies (kcal/mol)"
-        headings = ["Molecule", "Reference", "Calculated", "Difference", "Weight", "Residual"]
-        data = OrderedDict([(i, ["%.4f" % self.refdata[i], "%.4f" % self.calc[i], "%.4f" % (self.calc[i] - self.refdata[i]), 
-                                 "%.4f" % self.whfe[ii], "%.4f" % (self.whfe[ii]*(self.calc[i] - self.refdata[i])**2)]) for ii, i in enumerate(self.refdata.keys())])
+        if hasattr(self, 'calc_err'):
+            headings = ["Molecule", "Reference", "Calculated", "StdErr(Calc)", "Difference", "Weight", "Residual"]
+            data = OrderedDict([(i, ["%.4f" % self.refdata[i], "%.4f" % self.calc[i], "%.4f" % self.calc_err[i], "%.4f" % (self.calc[i] - self.refdata[i]), 
+                                     "%.4f" % self.whfe[ii], "%.4f" % (self.whfe[ii]*(self.calc[i] - self.refdata[i])**2)]) for ii, i in enumerate(self.refdata.keys())])
+        else:
+            headings = ["Molecule", "Reference", "Calculated", "Difference", "Weight", "Residual"]
+            data = OrderedDict([(i, ["%.4f" % self.refdata[i], "%.4f" % self.calc[i], "%.4f" % (self.calc[i] - self.refdata[i]), 
+                                     "%.4f" % self.whfe[ii], "%.4f" % (self.whfe[ii]*(self.calc[i] - self.refdata[i])**2)]) for ii, i in enumerate(self.refdata.keys())])
         self.printcool_table(data, headings, banner)
 
     def hydration_driver_sp(self):
@@ -251,6 +260,73 @@ class Hydration(Target):
         if AGrad or AHess:
             for p in self.pgrad:
                 dD[p,:], _ = f12d3p(fdwrap(get_hfe, mvals, p), h = self.h, f0 = calc_hfe)
+        return D, dD
+
+    def get_exp(self, mvals, AGrad=False, AHess=False):
+        """ Get the hydration free energy using the Zwanzig formula.  We will obtain two different estimates along with their uncertainties. """
+        self.hfe_dict = OrderedDict()
+        self.hfe_err = OrderedDict()
+        dD = np.zeros((self.FF.np,len(self.refdata.keys())))
+        kT = (kb * self.hfe_temperature)
+        beta = 1. / (kb * self.hfe_temperature)
+        for ilabel, label in enumerate(self.refdata.keys()):
+            os.chdir(label)
+            # This dictionary contains observables keyed by each phase.
+            data = defaultdict(dict)
+            for p in ['gas', 'liq']:
+                os.chdir(p)
+                # Load the results from molecular dynamics.
+                results = lp_load('md_result.p')
+                L = len(results['Potentials'])
+                if p == "gas":
+                    Eg = results['Potentials']
+                    Eaq = results['Potentials'] + results['Hydration']
+                    # Mean and standard error of the exponentiated hydration energy.
+                    expmbH = np.exp(-1.0*beta*results['Hydration'])
+                    data[p]['Hyd'] = -kT*np.log(np.mean(expmbH))
+                    # Estimate standard error by bootstrap method.  We also multiply by the 
+                    # square root of the statistical inefficiency of the hydration energy time series.
+                    data[p]['HydErr'] = np.std([-kT*np.log(np.mean(expmbH[np.random.randint(L,size=L)])) for i in range(100)]) * np.sqrt(statisticalInefficiency(results['Hydration']))
+                    if AGrad: 
+                        dEg = results['Potential_Derivatives']
+                        dEaq = results['Potential_Derivatives'] + results['Hydration_Derivatives']
+                        data[p]['dHyd'] = (flat(np.matrix(dEaq)*col(expmbH)/L)-np.mean(dEg,axis=1)*np.mean(expmbH)) / np.mean(expmbH)
+                elif p == "liq":
+                    Eg = results['Potentials'] - results['Hydration']
+                    Eaq = results['Potentials']
+                    # Mean and standard error of the exponentiated hydration energy.
+                    exppbH = np.exp(+1.0*beta*results['Hydration'])
+                    data[p]['Hyd'] = +kT*np.log(np.mean(exppbH))
+                    # Estimate standard error by bootstrap method.  We also multiply by the 
+                    # square root of the statistical inefficiency of the hydration energy time series.
+                    data[p]['HydErr'] = np.std([+kT*np.log(np.mean(exppbH[np.random.randint(L,size=L)])) for i in range(100)]) * np.sqrt(statisticalInefficiency(results['Hydration']))
+                    if AGrad: 
+                        dEg = results['Potential_Derivatives'] - results['Hydration_Derivatives']
+                        dEaq = results['Potential_Derivatives']
+                        data[p]['dHyd'] = -(flat(np.matrix(dEg)*col(exppbH)/L)-np.mean(dEaq,axis=1)*np.mean(exppbH)) / np.mean(exppbH)
+                os.chdir('..')
+            # Calculate the hydration free energy using gas phase, liquid phase or the average of both.
+            # Note that the molecular dynamics methods return energies in kJ/mol.
+            if self.hfemode == 'exp_gas':
+                self.hfe_dict[label] = data['gas']['Hyd'] / 4.184
+                self.hfe_err[label] = data['gas']['HydErr'] / 4.184
+            elif self.hfemode == 'exp_liq':
+                self.hfe_dict[label] = data['liq']['Hyd'] / 4.184
+                self.hfe_err[label] = data['liq']['HydErr'] / 4.184
+            elif self.hfemode == 'exp_both':
+                self.hfe_dict[label] = 0.5*(data['liq']['Hyd']+data['gas']['Hyd']) / 4.184
+                self.hfe_err[label] = 0.5*(data['liq']['HydErr']+data['gas']['HydErr']) / 4.184
+            if AGrad:
+                # Calculate the derivative of the hydration free energy.
+                if self.hfemode == 'exp_gas':
+                    dD[:, ilabel] = self.whfe[ilabel]*data['gas']['dHyd'] / 4.184
+                elif self.hfemode == 'exp_liq':
+                    dD[:, ilabel] = self.whfe[ilabel]*data['liq']['dHyd'] / 4.184
+                elif self.hfemode == 'exp_both':
+                    dD[:, ilabel] = 0.5*self.whfe[ilabel]*(data['liq']['dHyd']+data['gas']['dHyd']) / 4.184
+            os.chdir('..')
+        calc_hfe = np.array(self.hfe_dict.values())
+        D = self.whfe*(calc_hfe - np.array(self.refdata.values()))
         return D, dD
 
     def get_ti2(self, mvals, AGrad=False, AHess=False):
@@ -294,6 +370,8 @@ class Hydration(Target):
             D, dD = self.get_sp(mvals, AGrad, AHess)
         elif self.hfemode.lower() == 'ti2':
             D, dD = self.get_ti2(mvals, AGrad, AHess)
+        elif self.hfemode.lower() in ['exp_gas', 'exp_liq', 'exp_both']:
+            D, dD = self.get_exp(mvals, AGrad, AHess)
         Answer['X'] = np.dot(D,D) / self.denom**2 / (np.sum(self.whfe) if self.normalize else 1)
         for p in self.pgrad:
             Answer['G'][p] = 2*np.dot(D, dD[p,:]) / self.denom**2 / (np.sum(self.whfe) if self.normalize else 1)
@@ -301,5 +379,7 @@ class Hydration(Target):
                 Answer['H'][p,q] = 2*np.dot(dD[p,:], dD[q,:]) / self.denom**2 / (np.sum(self.whfe) if self.normalize else 1)
         if not in_fd():
             self.calc = self.hfe_dict
+            if hasattr(self, 'hfe_err'):
+                self.calc_err = self.hfe_err
             self.objective = Answer['X']
         return Answer
