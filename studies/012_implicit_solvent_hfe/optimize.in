@@ -1,0 +1,39 @@
+$options
+jobtype optimize
+forcefield ethanol.xml
+backup false
+penalty_additive 0.1
+trust0 0.1
+convergence_objective 0.002
+convergence_step 0.01
+
+priors
+GB/radius : 0.1
+GB/scale : 1.0
+/priors
+
+$end
+
+$target
+# Each molecule has its own target for maximum granularity.
+name ethanol
+
+type Hydration_OpenMM
+energy_denom 1.0
+hfedata_txt hfedata.txt
+hfemode ti2
+
+# No need to use the CUDA platform.
+openmm_platform Reference
+
+liquid_eq_steps 10000
+liquid_md_steps 100000
+liquid_timestep 1.0
+liquid_interval 1.0
+
+gas_eq_steps 10000
+gas_md_steps 100000
+gas_timestep 1.0
+gas_interval 1.0
+
+$end
