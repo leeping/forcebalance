@@ -67,173 +67,79 @@ def centroid_position(Sim):
         return Sim.context.getState(getPositions=True).getPositions() 
 
 def evaluate_potential(Sim):
-    # Calculates the P.E., accouting for RPMD (avg. over 4 copies of system). This just amounts to calling getPotentialEnergy() for a classical simulation.
+    # Calculate P.E., accouting for RPMD. This just amounts to calling getPotentialEnergy() for a classical simulation.
     if isinstance(Sim.integrator, RPMDIntegrator):
-        PE = 0.0*kilojoule/mole
-        nob = Sim.integrator.getNumCopies()
-        step = int(nob/4)
-        for i in range(0,nob,step):
-            PE += Sim.integrator.getState(i,getEnergy=True).getPotentialEnergy()/4.0
+        PE = 0.0 * kilojoule/mole
+        P = Sim.integrator.getNumCopies()
+        step = int(P/8)
+        for i in range(0,P,step):
+            PE += Sim.integrator.getState(i,getEnergy=True).getPotentialEnergy() / float(P/step)
         return PE
     else:
         return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
 
-def evaluate_kinetic(Sim):
-    # Calculates the K.E. for a classical simulation or the K.E. in a classical sense (i.e. only dep. on particle velocity) for RPMD (sample to thermostat T*(# beads). Does NOT estimate quantum K.E.
-    if isinstance(Sim.integrator, RPMDIntegrator):
-        KE = 0.0*kilojoule/mole
-        nob = Sim.integrator.getNumCopies()
-        step = int(nob/4)
-        for i in range(0,nob,step):
-            KE += Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()/4.0
-        return KE
-    else:
-        return Sim.context.getState(getEnergy=True).getKineticEnergy()
-
 def primitive_kinetic(Sim):
     # A primitive quantum K.E. estimator for RPMD simulation. Returns classical K.E. in a classical simulation. 
     if isinstance(Sim.integrator, RPMDIntegrator):
-        prim_KE = 0.0*kilojoule/mole
-        hbar    = 0.0635078*nanometer**2*dalton/picosecond
-        kb      = 0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
-        temp    = Sim.integrator.getTemperature() 
-        P       = Sim.integrator.getNumCopies()
+        KE_const = 0.0 * kilojoule/mole
+        KE_spring = 0.0 * kilojoule/mole
+        correction_spring = 0.0 * (kilojoule/mole)**2
+        correction_const = 0.0 * (kilojoule/mole)**2
+        hbar = 0.06350780 * nanometer**2*dalton/picosecond # 1 nm**2 * Da / ps**2 is 1 kJ/mol    
+        kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin) # Verified
+        T = Sim.integrator.getTemperature() # Note: this method call does NOT return instantaneous temp, but rather whatever the integrator was set to
+        P = Sim.integrator.getNumCopies()
+        N = Sim.system.getNumParticles() # Need correction bc OpenMM includes virtual sites in this count
         for i in range(P):
-            prim_KE += Sim.integrator.getState(i,getEnergy=True).getKineticEnergy() / P # First term in primitive K.E.
-        Cp_first = prim_KE
-        mass_matrix=[]
-        for i in range(Sim.system.getNumParticles()):
-            mass_matrix.append(Sim.system.getParticleMass(i))
-        mass_matrix = np.array(mass_matrix)
-        prim_KE_2 = 0.0*kilojoule/mole
-        for i in range(P):
-            j = (i+1) % P
-            beaddif = np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())
-            prim_KE_2 -= np.sum(((beaddif*beaddif).sum(axis=1)) * mass_matrix * (kb**2 * temp**2 * P / (2.0 * hbar**2)))   # 2nd term in primitive estimator
-        Cp_second = 2.0 * prim_KE_2
-        Cp = (Cp_first + Cp_second)/temp
-        prim_KE += prim_KE_2
-        return (prim_KE, Cp)            
-    else:
-        return Sim.context.getState(getEnergy=True).getKineticEnergy()
-
-def primitive_energy(Sim):
-    if isinstance(Sim.integrator, RPMDIntegrator):
-        hbar    = 0.0635078*nanometer**2*dalton/picosecond
-        kb      = 0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
-        T       = Sim.integrator.getTemperature()
-        P       = Sim.integrator.getNumCopies()
-        N       = Sim.system.getNumParticles() 
-        prim_E  = 3.0/2.0 * N * P * kb * T
-        prim_E  += evaluate_potential(Sim)
+            copy_KE = Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()
+            KE_const += copy_KE / P # First term of primitive K.E.
+            correction_const += copy_KE**2 * (2.0/(3.0 * (N-1000) * P**3))
         mass_matrix = []
         for i in range(N):
             mass_matrix.append(Sim.system.getParticleMass(i))
         mass_matrix = np.array(mass_matrix)
-        prim_E_term_2 = 0.0*kilojoule/mole
         for i in range(P):
             j = (i+1) % P
-            beaddif = np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())
-            prim_E_term_2 -= np.sum(((beaddif*beaddif).sum(axis=1)) * mass_matrix * ((kb * T)**2 * P / (2.0 * hbar**2)))
-        prim_E += prim_E_term_2
-        return prim_E
-
-def primitive_est_first_term(Sim):
-    if isinstance(Sim.integrator, RPMDIntegrator):
-        first_term = 0.0*kilojoule/mole
-        for i in range(Sim.integrator.getNumCopies()):
-            first_term += Sim.integrator.getState(i,getEnergy=True).getKineticEnergy() / Sim.integrator.getNumCopies()
-    return first_term
-
-def primitive_est_second_term(Sim):
-    second_term = 0.0*kilojoule/mole
-    hbar  = 0.0635078*nanometer**2*dalton/picosecond
-    kb    = 0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
-    mass_matrix = []
-    for i in range(Sim.system.getNumParticles()):
-        mass_matrix.append(Sim.system.getParticleMass(i))
-    mass_matrix = np.array(mass_matrix)
-    for i in range(Sim.integrator.getNumCopies()):
-        j = (i+1) % Sim.integrator.getNumCopies()
-        beaddif = np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())            # Calculate difference between ith and i+1th bead
-        second_term -= np.sum(((beaddif*beaddif).sum(axis=1)) * mass_matrix * (kb**2 * Sim.integrator.getTemperature()**2 * Sim.integrator.getNumCopies() / (2.0* hbar**2)))    
-    return second_term
+            diff = np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())
+            # Supress contributions from the virtual sites:
+            for k in range(N):
+                if Sim.system.isVirtualSite(k):
+                    diff[k] = [0.0*nanometer, 0.0*nanometer, 0.0*nanometer]
+            KE_spring -= np.sum((diff*diff).sum(axis=1) * mass_matrix * ((kb * T)**2 * P / (2.0 * hbar**2)))
+            correction_spring -= np.sum((diff*diff).sum(axis=1) * mass_matrix * ((kb * T)**3 * P / hbar**2))
+        return (KE_const, KE_spring, correction_const, correction_spring)
+    else:
+        return Sim.context.getState(getEnergy=True).getKineticEnergy()
 
 def centroid_kinetic(Sim):
     # Centroid quantum K.E. estimator for RPMD simulation. Returns classical K.E. in classical simulation.
     if isinstance(Sim.integrator, RPMDIntegrator):
-        cenKE = 0.0*kilojoule/mole
-        nob = Sim.integrator.getNumCopies()
-        step = int(nob/4)
-        for i in range(0,nob,step):
-            cenKE += Sim.integrator.getState(i,getEnergy=True).getKineticEnergy() / (nob*4.0)     # First term in centroid K.E.
-        centroid = np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*Sim.system.getNumParticles())
-        for i in range(0,nob,step):
-            centroid += np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/4.0 # Calculate centroid of ring polymer
-        for i in range(0,nob,step):                                                               # 2nd term of centroid K.E.
-            difference = np.array(Sim.integrator.getState(i,getPositions=True).getPositions())-centroid
-            derivative = -1.0*np.array(Sim.integrator.getState(i,getForces=True).getForces())
-            cenKE      += np.sum(difference*derivative)*0.5/4.0
-        return cenKE
-    else:
-        return Sim.context.getState(getEnergy=True).getKineticEnergy()
-
-def centroid_est_first_term(Sim):
-    if isinstance(Sim.integrator, RPMDIntegrator):
-        first_term = 0.0*kilojoule/mole
-        nob = Sim.integrator.getNumCopies()
-        step = int(nob/4)
-        for i in range(0,nob,step):
-            first_term += Sim.integrator.getState(i,getEnergy=True).getKineticEnergy() / (nob*4.0)
-    return first_term
-
-def centroid_virial_energy(Sim):
-    if isinstance(Sim.integrator, RPMDIntegrator):
-        hbar  = 0.0635078*nanometer**2*dalton/picosecond
-        kb    = 0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
-        T     = Sim.integrator.getTemperature()
-        P     = Sim.integrator.getNumCopies()
-        N     = Sim.system.getNumParticles()
-        step  = P/4
-        CV_E  = 3.0/2.0 * N * kb * T   
-        centroid = np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*Sim.system.getNumParticles())
+        CV_const = 0.0 * kilojoule/mole
+        CV_second = 0.0 * kilojoule/mole
+        CV_correction_const = 0.0 * (kilojoule/mole)**2
+        kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
+        T = Sim.integrator.getTemperature()
+        P = Sim.integrator.getNumCopies()
+        N = Sim.system.getNumParticles()
+        step = int(P/4)
+        for i in range(P):
+            copy_KE = Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()
+            CV_const += copy_KE / float(P**2)
+            CV_correction_const += copy_KE**2 * (2.0/(3.0 * (N-1000) * P**4))
+        centroid = np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*N)
         for i in range(0,P,step):
-            centroid += np.array(Sim.integrator.getState(i,getPositions=True).getPositions())/4.0
-        for i in range(0,P,step):                                                               
-            difference = np.array(Sim.integrator.getState(i,getPositions=True).getPositions())-centroid
+            centroid += np.array(Sim.integrator.getState(i,getPositions=True).getPositions()) / float(P/step) # Calculate centroid of the ring polymers
+        for i in range(0,P,step):
+            diff = np.array(Sim.integrator.getState(i,getPositions=True).getPositions()) - centroid
+            # Supress contributions from the virtual sites:
+            for j in range(N):
+                if Sim.system.isVirtualSite(j):
+                    diff[j] = [0.0*nanometer, 0.0*nanometer, 0.0*nanometer]
             derivative = -1.0*np.array(Sim.integrator.getState(i,getForces=True).getForces())
-            CV_E      += np.sum(difference*derivative)*0.5/4.0
-        return CV_E 
-
-def calc_cv_t(Sim, PE_arr, PE_sq_arr):
-    if isinstance(Sim.integrator, RPMDIntegrator):
-       hbar  = 0.0635078*nanometer**2*dalton/picosecond
-       kb    = 0.00831446*nanometer**2*dalton/(picosecond**2*kelvin)
-       T     = Sim.integrator.getTemperature()
-       beta  = 1.0/(kb*T).value_in_unit(kilojoule_per_mole)*mole/kilojoule
-       P     = Sim.integrator.getNumCopies()
-       N     = Sim.system.getNumParticles()
-       cv_t  = (np.average(PE_sq_arr) - np.average(PE_arr)**2 + (3.0/(2.0*beta**2) * N * P).value_in_unit(kilojoule_per_mole**2)) * (kilojoule/mole)**2
-       mass_matrix = []
-       for i in range(N):
-           mass_matrix.append(Sim.system.getParticleMass(i))
-       mass_matrix = np.array(mass_matrix)
-       cv_t_term_2 = 0.0*(kilojoule/mole)**2
-       for i in range(P):
-           j = (i+1) % P
-           beaddif = np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())
-           cv_t_term_2 -= np.sum(((beaddif*beaddif).sum(axis=1)) * mass_matrix * P / (beta**3 * hbar**2))
-       cv_t += cv_t_term_2
-       cv_t *= beta/T
-       return cv_t.value_in_unit(kilojoule/(mole*kelvin))
-       
-def calc_cv_cv(Sim, cross_arr, CVE_arr):
-    if isinstance(Sim.integrator, RPMDIntegrator):
-       kb    = (0.00831446*nanometer**2*dalton/(picosecond**2*kelvin))
-       T     = Sim.integrator.getTemperature()
-       beta  = 1.0/(kb*T).value_in_unit(kilojoule_per_mole)*mole/kilojoule
-       cv_cv = beta/T * ((np.average(cross_arr) - np.average(CVE_arr)**2) + (3.0/2.0 * (kb*T)**2 * Sim.system.getNumParticles()).value_in_unit(kilojoule_per_mole**2)) * (kilojoule/mole)**2
-       return cv_cv.value_in_unit(kilojoule/(mole*kelvin))
+            CV_second += np.sum(diff*derivative) * 0.5 / float(P/step)
+        return (CV_const, CV_second, CV_correction_const)
+    else:
+        Sim.context.getState(getEnergy=True).getKineticEnergy()
 
 def get_forces(Sim):
     """Return forces on each atom or forces averaged over all copies in case of RPMD."""
