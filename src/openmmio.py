@@ -78,7 +78,7 @@ def evaluate_potential(Sim):
     else:
         return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
 
-def primitive_kinetic(Sim):
+def evaluate_kinetic(Sim):
     # A primitive quantum K.E. estimator for RPMD simulation. Returns classical K.E. in a classical simulation. 
     if isinstance(Sim.integrator, RPMDIntegrator):
         KE_const = 0.0 * kilojoule/mole
@@ -93,7 +93,7 @@ def primitive_kinetic(Sim):
         for i in range(P):
             copy_KE = Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()
             KE_const += copy_KE / P # First term of primitive K.E.
-            correction_const += copy_KE**2 * (2.0/(3.0 * (N-1000) * P**3))
+            correction_const += copy_KE**2 * (2.0/(3.0 * (N) * P**3)) # N-1000 for water
         mass_matrix = []
         for i in range(N):
             mass_matrix.append(Sim.system.getParticleMass(i))
@@ -125,7 +125,7 @@ def centroid_kinetic(Sim):
         for i in range(P):
             copy_KE = Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()
             CV_const += copy_KE / float(P**2)
-            CV_correction_const += copy_KE**2 * (2.0/(3.0 * (N-1000) * P**4))
+            CV_correction_const += copy_KE**2 * (2.0/(3.0 * (N) * P**4)) # (N-1000) for water
         centroid = np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*N)
         for i in range(0,P,step):
             centroid += np.array(Sim.integrator.getState(i,getPositions=True).getPositions()) / float(P/step) # Calculate centroid of the ring polymers
@@ -147,7 +147,7 @@ def get_forces(Sim):
         frcs = [0.0, 0.0, 0.0]
         for i in range(Sim.integrator.getNumCopies()):
             frcs += Sim.integrator.getState(i,getForces=True).getForces()
-            frcs[:] = [value/Sim.integrator.getNumCopies() for value in frcs]
+        frcs[:] = [value/Sim.integrator.getNumCopies() for value in frcs]
         return frcs
     else:
         State = Sim.context.getState(getPositions=True, getEnergy=True, getForces=True)
@@ -941,10 +941,12 @@ class OpenMM(Engine):
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         # for b in list(self.mod.topology.bonds()):
         #     print b[0].index, b[1].index
+        if 'rpmd_opts' in kwargs:
+            self.mmopts['rigidWater'] = False
+            self.mmopts['constraints'] = 'None'
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
-        
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
@@ -1013,11 +1015,10 @@ class OpenMM(Engine):
                     posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
                     rpmdIntegrator.setPositions(i,posWithVsites)
         else:
-            if hasattr(self, 'xyz_rpmd'): 
-                rpmdIntegrator = self.simulation.context.getIntegrator()
-                for i in range(rpmdIntegrator.getNumCopies()):
-                    temp_positions = self.xyz_rpmd[shot][0][i]
-                    rpmdIntegrator.setPositions(i,temp_positions)
+            rpmdIntegrator = self.simulation.context.getIntegrator()
+            for i in range(rpmdIntegrator.getNumCopies()):
+                temp_positions = self.xyz_rpmd[shot][0][i]
+                rpmdIntegrator.setPositions(i,temp_positions)
     
     def get_charges(self):
         logger.error('OpenMM engine does not have get_charges (should be trivial to implement however.)')
@@ -1303,20 +1304,15 @@ class OpenMM(Engine):
 	    # of the system and index 1 contains box vectors. 
             self.xyz_rpmd = []
         else: 
-	    self.xyz.omms = []        
+	    self.xyz_omms = []        
         # Densities, potential and kinetic energies, box volumes, dipole moments
         Rhos = []
         Potentials = []
         Kinetics = []
+        Cv_corrections = []
         Volumes = []
         Dips = []
         Temps = []
-        primitive_energies = []          #remove
-        primitive_energies_sq = []       #remove
-        centroid_virial_energies  = []   #remove
-        cross_arr = []                   #remove 
-        CV_T  = []                       #remove
-        CV_CV = []                       #remove
         #========================#
         # Now run the simulation #
         #========================#
@@ -1341,11 +1337,12 @@ class OpenMM(Engine):
                 for i in range(self.simulation.integrator.getNumCopies()):
                     self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True))
                 state = self.rpmd_states[0]
-            kinetic=evaluate_kinetic(self.simulation)/self.tdiv
+            if self.rpmd:
+                kinetic_tuple=evaluate_kinetic(self.simulation)
+                kinetic=kinetic_tuple[0]+kinetic_tuple[1]
+            else:
+                kinetic=evaluate_kinetic(self.simulation)
             potential=evaluate_potential(self.simulation)
-            prim_kinetic_tuple=primitive_kinetic(self.simulation)
-            #cen_kinetic=centroid_kinetic(self.simulation)
-            #cen_kinetic = centroid_virial_est(self.simulation)
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -1380,18 +1377,12 @@ class OpenMM(Engine):
                 for i in range(self.simulation.integrator.getNumCopies()):
                     self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True))
                 state = self.rpmd_states[0]
-            kinetic=evaluate_kinetic(self.simulation)/self.tdiv
+            if self.rpmd:
+                kinetic_tuple=evaluate_kinetic(self.simulation)
+                kinetic=kinetic_tuple[0]+kinetic_tuple[1]
+            else:
+                kinetic=evaluate_kinetic(self.simulation)
             potential=evaluate_potential(self.simulation)
-            prim_kinetic_tuple=primitive_kinetic(self.simulation)
-           
-            primitive_energies.append(primitive_energy(self.simulation).value_in_unit(kilojoules_per_mole))
-            primitive_energies_sq.append(primitive_energies[-1]**2)
-            centroid_virial_energies.append(centroid_virial_energy(self.simulation).value_in_unit(kilojoules_per_mole))
-            cross_arr.append(primitive_energies[-1]*centroid_virial_energies[-1]) 
-   
-            CV_T.append(calc_cv_t(self.simulation, primitive_energies, primitive_energies_sq))
-            CV_CV.append(calc_cv_cv(self.simulation, cross_arr, centroid_virial_energies))
-
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
@@ -1421,10 +1412,7 @@ class OpenMM(Engine):
             Temps.append(kinetic_temperature / kelvin)
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
-            if self.rpmd:
-                Kinetics.append(prim_kinetic_tuple[0] / kilojoules_per_mole)
-            else:
-                Kinetics.append(kinetic / kilojoules_per_mole)
+            Kinetics.append(kinetic / kilojoules_per_mole)
             Volumes.append(volume / nanometer**3)
             if not self.rpmd:
                 Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
@@ -1441,8 +1429,6 @@ class OpenMM(Engine):
         Kinetics = np.array(Kinetics)
         Volumes = np.array(Volumes)
         Dips = np.array(Dips)
-        CV_T = np.array(CV_T)
-        CV_CV= np.array(CV_CV)
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
         Ecomps["Potential Energy"] = np.array(Potentials)
         Ecomps["Kinetic Energy"] = np.array(Kinetics)
@@ -1450,8 +1436,7 @@ class OpenMM(Engine):
         Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
         # Initialized property dictionary.
         prop_return = OrderedDict()
-        #prop_return.update({'Cps': Cps, 'PrimKs': Prim_kinetics, 'PFTs': Primitive_first_terms, 'CFTs': Centroid_first_terms,'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
-        prop_return.update({'CV_CV': CV_CV, 'CV_T': CV_T, 'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
         return prop_return
 
 class Liquid_OpenMM(Liquid):
