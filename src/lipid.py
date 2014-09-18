@@ -69,8 +69,6 @@ class Lipid(Target):
         self.set_option(tgt_opts,'w_scd',forceprint=True)
         # Normalize the property contributions to the objective function
         self.set_option(tgt_opts,'w_normalize',forceprint=True)
-        if not self.w_normalize:
-            warn_press_key("As of July 17, 2014, the property weights are no longer normalized by default.\nSet w_normalize in $target to restore the old behavior.")
         # Optionally pause on the zeroth step
         self.set_option(tgt_opts,'manual')
         # Number of time steps in the lipid "equilibration" run
