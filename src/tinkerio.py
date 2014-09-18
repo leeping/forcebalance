@@ -27,7 +27,6 @@ from forcebalance.binding import BindingEnergy
 from forcebalance.interaction import Interaction
 from forcebalance.finite_difference import in_fd
 from collections import OrderedDict
-from forcebalance.optimizer import GoodStep
 
 # All TINKER force field parameter types, which should eventually go into pdict
 # at some point (for full compatibility).
@@ -159,7 +158,7 @@ class Tinker_Reader(BaseReader):
                 self.atom = [s[i] for i in pdict[self.itype]['Atom']]
             # The suffix of the parameter ID is built from the atom    #
             # types/classes involved in the interaction.
-            self.suffix = '.'.join(self.atom)
+            self.suffix = '/'+'.'.join(self.atom)
 
 def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, chk=[]):
     """
@@ -518,11 +517,11 @@ class TINKER(Engine):
                     G.add_edge(a, b)
                 else: mode = 0
         # Use networkx to figure out a list of molecule numbers.
-        if len(G.nodes()) > 0:
+        if len(list(G.nodes())) > 0:
             # The following code only works in TINKER 6.2
-            gs = nx.connected_component_subgraphs(G)
-            tmols = [gs[i] for i in np.argsort(np.array([min(g.nodes()) for g in gs]))]
-            mnodes = [m.nodes() for m in tmols]
+            gs = list(nx.connected_component_subgraphs(G))
+            tmols = [gs[i] for i in np.argsort(np.array([min(list(g.nodes())) for g in gs]))]
+            mnodes = [list(m.nodes()) for m in tmols]
             self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
         else:
             grouped = [i.L() for i in self.mol.molecules]
@@ -1037,7 +1036,7 @@ class Liquid_TINKER(Liquid):
 
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
-        if GoodStep() and (temperature, pressure) in self.DynDict_New:
+        if self.goodstep and (temperature, pressure) in self.DynDict_New:
             self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
         if (temperature, pressure) in self.DynDict:
             dynsrc = self.DynDict[(temperature, pressure)]

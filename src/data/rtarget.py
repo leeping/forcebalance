@@ -12,7 +12,7 @@ logger.setLevel(forcebalance.output.DEBUG)
 if os.path.exists('forcebalance.p'):
     mvals, AGrad, AHess, id_string, options, tgt_opts, forcefield, pgrad = forcebalance.nifty.lp_load('forcebalance.p')
 else:
-    mvals, forcefield = forcebalance.nifty.lp_load('forcefield.p')
+    forcefield, mvals = forcebalance.nifty.lp_load('forcefield.p')
     AGrad, AHess, id_string, options, tgt_opts, pgrad = forcebalance.nifty.lp_load('options.p')
 
 print "Evaluating remote target ID: %s" % id_string

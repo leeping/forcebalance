@@ -397,11 +397,12 @@ class AbInitio(Target):
             if len(self.fitatoms) > len(self.qmatoms):
                 warn_press_key("There are more fitting atoms than the total number of atoms in the QM calculation (something is probably wrong)")
             else:
-                if len(self.fitatoms) == len(self.qmatoms):
-                    logger.info("Fitting the forces on all atoms\n")
-                else:
-                    logger.info("Fitting the forces on atoms %s\n" % commadash(self.fitatoms))
-                    logger.info("Pruning the quantum force matrix...\n")
+                if self.w_force > 0:
+                    if len(self.fitatoms) == len(self.qmatoms):
+                        logger.info("Fitting the forces on all atoms\n")
+                    else:
+                        logger.info("Fitting the forces on atoms %s\n" % commadash(self.fitatoms))
+                        logger.info("Pruning the quantum force matrix...\n")
                 selct = list(itertools.chain(*[[3*i+j for j in range(3)] for i in self.fitatoms]))
                 self.fqm  = self.fqm[:, selct]
         else:

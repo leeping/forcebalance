@@ -28,7 +28,7 @@ except:
     logger.warning("Tinker module import failed\n")
 
 try:
-    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM
+    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM
 except:
     logger.warning(traceback.format_exc())
     logger.warning("OpenMM module import failed; check OpenMM package\n")
@@ -91,6 +91,7 @@ Implemented_Targets = {
     'MOMENTS_TINKER':Moments_TINKER,
     'MOMENTS_GMX':Moments_GMX,
     'MOMENTS_OPENMM':Moments_OpenMM,
+    'HYDRATION_OPENMM':Hydration_OpenMM,
     'REMOTE_TARGET':RemoteTarget,
     }
 
@@ -214,6 +215,9 @@ class Objective(forcebalance.BaseClass):
                     self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
                 for i in range(3):
                     Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
+        # The target has evaluated at least once.
+        for Tgt in self.Targets:
+            Tgt.evaluated = True
         # Safeguard to make sure we don't have exact zeros on Hessian diagonal
         for i in range(self.FF.np):
             if Objective['H'][i,i] == 0.0:
@@ -348,19 +352,20 @@ class Penalty:
             printcool_dictionary(self.spacings, title="Starting zeta spacings\n(Pay attention to these)")
 
     def compute(self, mvals, Objective):
-        X = Objective['X']
-        G = Objective['G']
-        H = Objective['H']
-        NP = len(mvals)
         K0, K1, K2 = self.Pen_Tab[self.ptyp](mvals)
-        XAdd = 0.0
-        GAdd = np.zeros(NP)
-        HAdd = np.zeros((NP, NP))
         if self.fadd > 0.0:
-            XAdd += K0 * self.fadd
-            GAdd += K1 * self.fadd
-            HAdd += K2 * self.fadd
+            XAdd = K0 * self.fadd
+            GAdd = K1 * self.fadd
+            HAdd = K2 * self.fadd
+        else:
+            NP = len(mvals)
+            XAdd = 0.0
+            GAdd = np.zeros(NP)
+            HAdd = np.zeros((NP, NP))
         if self.fmul > 0.0:
+            X = Objective['X']
+            G = Objective['G']
+            H = Objective['H']
             XAdd += ( X*K0 ) * self.fmul
             GAdd += np.array( G*K0 + X*K1 ) * self.fmul
             GK1 = np.reshape(G, (1, -1))*np.reshape(K1, (-1, 1))
@@ -400,9 +405,10 @@ class Penalty:
         """
         mvals = np.array(mvals)
         NP = len(mvals)
-        DC0   = np.sum((mvals**2 + self.b**2)**0.5 - self.b)
-        DC1   = mvals*(mvals**2 + self.b**2)**-0.5
-        DC2   = np.diag(self.b**2*(mvals**2 + self.b**2)**-1.5)
+        sqt   = (mvals**2 + self.b**2)**0.5
+        DC0   = np.sum(sqt - self.b)
+        DC1   = mvals*(1.0/sqt)
+        DC2   = np.diag(self.b**2*(1.0/sqt**3))
 
         return DC0, DC1, DC2
 

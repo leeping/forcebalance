@@ -4,8 +4,7 @@ setup.py: Install ForceBalance.
 """
 __author__ = "Lee-Ping Wang, Arthur Vigil"
 
-from distutils.sysconfig import get_config_var
-from distutils.core import setup,Extension
+from setuptools import setup,Extension
 import os,sys,re
 import shutil
 import glob
@@ -29,7 +28,7 @@ except ImportError:
 #| doc/api_header.tex              |#
 #| src/__init__.py                 |#
 #===================================#
-__version__ = "v1.3.0"
+__version__ = "v1.3.2"
 try:
     # use git to find current version
     git_describe = subprocess.check_output(["git", "describe"]).strip()
@@ -90,81 +89,12 @@ else:
                         extra_link_args=['-lgomp'],
                         include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
     
-def installNetworkX():          
-    setup(
-        packages=["networkx",
-          "networkx.algorithms",
-          "networkx.algorithms.assortativity",
-          "networkx.algorithms.bipartite",
-          "networkx.algorithms.centrality",
-          "networkx.algorithms.chordal",
-          "networkx.algorithms.community",
-          "networkx.algorithms.components",
-          "networkx.algorithms.flow",
-          "networkx.algorithms.traversal",
-          "networkx.algorithms.isomorphism",
-          "networkx.algorithms.shortest_paths",
-          "networkx.algorithms.link_analysis",
-          "networkx.algorithms.operators",
-          "networkx.algorithms.approximation",
-          "networkx.classes",
-          "networkx.external",
-          "networkx.external.decorator",
-          "networkx.generators",
-          "networkx.drawing",
-          "networkx.linalg",
-          "networkx.readwrite",
-          "networkx.readwrite.json_graph",
-          "networkx.tests",
-          "networkx.testing",
-          "networkx.utils"],
-        package_dir      = {"networkx" : "ext/networkx"},
-        description = "Python package for creating and manipulating graphs and networks",
-        long_description = \
-        """
-        NetworkX is a Python package for the creation, manipulation, and
-        study of the structure, dynamics, and functions of complex networks.
-        """,
-        license = 'BSD',
-        authors = {'Hagberg' : ('Aric Hagberg','hagberg@lanl.gov'),
-                   'Schult' : ('Dan Schult','dschult@colgate.edu'),
-                   'Swart' : ('Pieter Swart','swart@lanl.gov')
-                   },
-        maintainer = "NetworkX Developers",
-        maintainer_email = "networkx-discuss@googlegroups.com",
-        url = 'http://networkx.lanl.gov/',
-        download_url="http://networkx.lanl.gov/download/networkx",
-        platforms = ['Linux','Mac OSX','Windows','Unix'],
-        keywords = ['Networks', 'Graph Theory', 'Mathematics', 'network', 'graph', 'discrete mathematics', 'math'],
-        classifiers = [
-                'Development Status :: 4 - Beta',
-                'Intended Audience :: Developers',
-                'Intended Audience :: Science/Research',
-                'License :: OSI Approved :: BSD License',
-                'Operating System :: OS Independent',
-                'Programming Language :: Python :: 2',
-                'Programming Language :: Python :: 2.6',
-                'Programming Language :: Python :: 2.7',
-                'Programming Language :: Python :: 3',
-                'Programming Language :: Python :: 3.1',
-                'Programming Language :: Python :: 3.2',
-                'Topic :: Software Development :: Libraries :: Python Modules',
-                'Topic :: Scientific/Engineering :: Bio-Informatics',
-                'Topic :: Scientific/Engineering :: Information Analysis',
-                'Topic :: Scientific/Engineering :: Mathematics',
-                'Topic :: Scientific/Engineering :: Physics'],
-      )
-      
-    try:
-        m = __import__("networkx")
-    except ImportError:
-        raw_input("Error installing networkx, press <Enter> to continue ForceBalance installation")
 
 def buildKeywordDictionary(args):
-    from distutils.core import Extension
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
-    setupKeywords["version"]           = __version__
+    # Don't create a separate installed version number for every commit
+    setupKeywords["version"]           = re.sub('-[0-9]*$','',__version__)
     setupKeywords["author"]            = "Lee-Ping Wang, Arthur Vigil"
     setupKeywords["author_email"]      = "leeping@stanford.edu"
     setupKeywords["license"]           = "GPL 3.0"
@@ -182,6 +112,7 @@ def buildKeywordDictionary(args):
     setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE, CONTACT]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
+    setupKeywords["install_requires"]  = ['networkx>=1.9', 'decorator>=3.4.0']
     setupKeywords["long_description"]  = """
 
     ForceBalance (https://simtk.org/home/forcebalance) is a library
@@ -240,16 +171,9 @@ def main():
     parser.add_argument('-t', '--test', action='store_true', help='install forcebalance test suite')
     parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)
-    
-    try:
-        __import__("networkx")
-    except ImportError:
-        print "Could not import networkx module! Topology tools will not work without this..."
-        if raw_input("Would you like to install it now (y/n)? ").lower() == 'y':
-            installNetworkX()
-            print "NetworkX module successfully installed!"
-    
     setupKeywords=buildKeywordDictionary(args)
+    ## Run setuptools command.
+    ## Refer to setup.cfg for customizing installation behavior
     setup(**setupKeywords)
 
     if os.path.exists('build'):

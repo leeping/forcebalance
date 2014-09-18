@@ -23,6 +23,8 @@ class TestImplemented(ForceBalanceTestCase):
                      if re.compile(".*\.py$").match(module)
                      and module not in ["__init__.py"]]
         for module in forcebalance_modules:
+            # LPW: I don't think dcdlib should be imported this way.
+            if module == "_dcdlib": continue
             m = __import__('forcebalance.' + module)
             objects = dir(eval('m.' + module))
             for object in objects:
@@ -41,6 +43,7 @@ class TestImplemented(ForceBalanceTestCase):
                                'LeastSquares',
                                'Vibration',
                                'Thermo',
+                               'Hydration',
                                'Moments']
                     if object not in implemented and object.__name__ not in exclude:
                         self.fail("Unknown class '%s' not listed in Implemented_Targets" % object.__name__)

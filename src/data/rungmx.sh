@@ -17,13 +17,16 @@ done
 COMMAND=$@
 
 # Load my environment variables. :)
-. /etc/profile
-. /etc/bashrc
-. ~/.bashrc
+if [ -f /etc/profile ] ; then . /etc/profile ; fi
+if [ -f /etc/bashrc ] ; then . /etc/bashrc ; fi
+if [ -f ~/.bash_profile ] ; then . ~/.bash_profile ; fi
+if [ -f ~/.bashrc ] ; then . ~/.bashrc ; fi
 
 # Load Gromacs environment variables if needed (e.g. Intel compiler variables)
 if [[ $HOSTNAME =~ "biox3" || $HOSTNAME =~ "cn" ]] ; then
     . ~/opt/intel/bin/compilervars.sh intel64
+elif [[ $HOSTNAME =~ "sh" ]] ; then
+    . /share/sw/licensed/intel-cluster-studio-2013.1.046/bin/compilervars.sh intel64
 fi
 
 # Backup folder

@@ -17,14 +17,15 @@ done
 COMMAND=$@
 
 # Load my environment variables. :)
-. /etc/profile
-. /etc/bashrc
-. ~/.bashrc
+if [ -f /etc/profile ] ; then . /etc/profile ; fi
+if [ -f /etc/bashrc ] ; then . /etc/bashrc ; fi
+if [ -f ~/.bash_profile ] ; then . ~/.bash_profile ; fi
+if [ -f ~/.bashrc ] ; then . ~/.bashrc ; fi
 
 # Load Gromacs environment variables if needed (e.g. Intel compiler variables)
 if [[ $HOSTNAME =~ "sh" ]] ; then
     . /share/sw/licensed/intel-cluster-studio-2013.1.046/composer_xe_2013_sp1.2.144/bin/compilervars.sh intel64
-elif [[ $HOSTNAME =~ "biox" ]] ; then
+elif [[ $HOSTNAME =~ "biox" || $HOSTNAME =~ "vsp-compute" ]] ; then
     . /home/leeping/opt/intel/bin/compilervars.sh intel64
 fi
 
