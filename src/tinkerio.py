@@ -27,7 +27,6 @@ from forcebalance.binding import BindingEnergy
 from forcebalance.interaction import Interaction
 from forcebalance.finite_difference import in_fd
 from collections import OrderedDict
-from forcebalance.optimizer import GoodStep
 
 # All TINKER force field parameter types, which should eventually go into pdict
 # at some point (for full compatibility).
@@ -159,7 +158,7 @@ class Tinker_Reader(BaseReader):
                 self.atom = [s[i] for i in pdict[self.itype]['Atom']]
             # The suffix of the parameter ID is built from the atom    #
             # types/classes involved in the interaction.
-            self.suffix = '.'.join(self.atom)
+            self.suffix = '/'+'.'.join(self.atom)
 
 def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, chk=[]):
     """
@@ -1037,7 +1036,7 @@ class Liquid_TINKER(Liquid):
 
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """
-        if GoodStep() and (temperature, pressure) in self.DynDict_New:
+        if self.goodstep and (temperature, pressure) in self.DynDict_New:
             self.DynDict[(temperature, pressure)] = self.DynDict_New[(temperature, pressure)]
         if (temperature, pressure) in self.DynDict:
             dynsrc = self.DynDict[(temperature, pressure)]

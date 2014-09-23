@@ -1,0 +1,96 @@
+<ForceField>
+ <AtomTypes>
+  <Type name="tip4p-O" class="OW" element="O" mass="15.99943"/>
+  <Type name="tip4p-H" class="HW" element="H" mass="1.007947"/>
+  <Type name="tip4p-M" class="MW" mass="0"/>
+  <Type name="tip4p-L" class="LW" mass="0"/>
+ </AtomTypes>
+ <Residues>
+  <Residue name="HOH">
+   <Atom name="O" type="tip4p-O"/>
+   <Atom name="H1" type="tip4p-H"/>
+   <Atom name="H2" type="tip4p-H"/>
+   <Atom name="M" type="tip4p-M"/>
+   <Atom name="L1" type="tip4p-L"/>
+   <Atom name="L2" type="tip4p-L"/>
+   <VirtualSite type="average3" index="3" atom1="0" atom2="1" atom3="2" weight1="9.550347275000e-01" weight2="2.248263625000e-02" weight3="2.248263625000e-02" parameterize="weight1" parameter_eval="weight2=0.5*(1.0-PARM['VirtualSite/weight1/HOH-3']), weight3=0.5*(1.0-PARM['VirtualSite/weight1/HOH-3'])"/>
+   <VirtualSite type="average2" index="4" atom1="0" atom2="1" weight1="-6.314133740000e-02" weight2="1.063141337400e+00" parameterize="weight1" parameter_eval="weight2=1.0-PARM['VirtualSite/weight1/HOH-4']"/>
+   <VirtualSite type="average2" index="5" atom1="0" atom2="2" weight1="-6.314133740000e-02" weight2="1.063141337400e+00" parameter_eval="weight1=PARM['VirtualSite/weight1/HOH-4'], weight2=1.0-PARM['VirtualSite/weight1/HOH-4']"/>
+   <Bond from="0" to="1"/>
+   <Bond from="0" to="2"/>
+  </Residue>
+ </Residues>
+ <HarmonicBondForce>
+  <Bond class1="OW" class2="HW" length="0.09572" k="462750.4"/>
+ </HarmonicBondForce>
+ <HarmonicAngleForce>
+  <Angle class1="HW" class2="OW" class3="HW" angle="1.82421813418" k="836.8"/>
+ </HarmonicAngleForce>
+ <NonbondedForce coulomb14scale="0.833333" lj14scale="0.5">
+  <Atom type="tip4p-O" charge="0" sigma="1" epsilon="0"/>
+  <Atom type="tip4p-H" charge="0" sigma="1" epsilon="0"/>
+  <Atom type="tip4p-L" charge="4.165821602150e-01" sigma="1" epsilon="0" parameterize="charge"/>
+  <Atom type="tip4p-M" charge="-8.331643204300e-01" sigma="3.171328416475e-01" epsilon="6.365328807230e-01" parameterize="sigma, epsilon" parameter_eval="charge=-2.0*PARM['Atom/charge/tip4p-L']"/>
+ </NonbondedForce>
+ <Script>
+
+# Create a CustomNonbondedForce to compute missing Gaussian chunk.
+
+from math import pi
+import numpy as np
+from simtk import openmm as mm
+from simtk.openmm import app
+from simtk import unit as u
+
+epsilon = 8.854187817620E-12*u.farad/u.meter
+COULOMB_CONSTANT = (u.AVOGADRO_CONSTANT_NA/(4.0*pi*epsilon)).value_in_unit_system(u.md_unit_system)
+
+N_PARTICLES = sys.getNumParticles()
+PME = sys.getForce(2)
+k = PME.getForceGroup()
+
+forceCustomNonBonded = mm.CustomNonbondedForce("-COULOMB_CONSTANT*q1*q2*erfc(p*r)/r; p=sqrt(w1*w2/(w1+w2))")
+if PME.getNonbondedMethod() in [2, 3, 4]:
+    forceCustomNonBonded.setNonbondedMethod(mm.CustomNonbondedForce.CutoffPeriodic)
+elif PME.getNonbondedMethod() in [1]:
+    forceCustomNonBonded.setNonbondedMethod(mm.CustomNonbondedForce.CutoffNonPeriodic)
+elif PME.getNonbondedMethod() in [0]:
+    forceCustomNonBonded.setNonbondedMethod(mm.CustomNonbondedForce.NoCutoff)
+forceCustomNonBonded.setForceGroup(k)
+coDist = PME.getCutoffDistance()
+forceCustomNonBonded.setCutoffDistance(coDist)
+
+width_H = 0.03 # PRM 2
+width_O = 0.03 # PRM 2
+ 
+forceCustomNonBonded.addGlobalParameter("COULOMB_CONSTANT", COULOMB_CONSTANT)
+forceCustomNonBonded.addPerParticleParameter("q")
+forceCustomNonBonded.addPerParticleParameter("w")
+
+# get max charge(hydrogen) and min charge(oxygen)
+chargeList = []
+for i in range(N_PARTICLES):
+    charge = PME.getParticleParameters(i)[0]
+    chargeList.append(charge)
+chargeMin = min(chargeList)
+chargeMax = max(chargeList)
+
+# create widthDict dictionary so widthDict['charge'] = width of that charge
+widthDict = {}
+widthDict[str(chargeMax)] = 1.0/((width_H*u.nanometer)**2)
+widthDict[str(chargeMin)] = 1.0/((width_O*u.nanometer)**2)
+widthDict['0.0 e'] = (widthDict[str(chargeMax)] + widthDict[str(chargeMin)]) / 2.0
+
+# copy charges into customForce and assign widths using dictionary
+for i in range(N_PARTICLES):
+    charge = PME.getParticleParameters(i)[0]
+    forceCustomNonBonded.addParticle([charge, widthDict[str(charge)]])
+
+# add exceptions from TIP3P
+
+for i in range(PME.getNumExceptions()):
+    Q1, Q2, QProd = PME.getExceptionParameters(i)[:3]
+    forceCustomNonBonded.addExclusion(Q1, Q2)
+sys.addForce(forceCustomNonBonded)
+  </Script>
+</ForceField>

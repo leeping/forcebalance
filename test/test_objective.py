@@ -43,6 +43,7 @@ class TestImplemented(ForceBalanceTestCase):
                                'LeastSquares',
                                'Vibration',
                                'Thermo',
+                               'Hydration',
                                'Moments']
                     if object not in implemented and object.__name__ not in exclude:
                         self.fail("Unknown class '%s' not listed in Implemented_Targets" % object.__name__)
