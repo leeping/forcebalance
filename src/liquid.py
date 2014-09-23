@@ -21,14 +21,14 @@ try:
 except: pass
 from pymbar import pymbar
 import itertools
+from forcebalance.optimizer import Counter
 from collections import defaultdict, namedtuple, OrderedDict
-from forcebalance.optimizer import Counter, First, GoodStep
 import csv
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
-def weight_info(W, PT, N_k, verbose=True):
+def weight_info(W, PT, N_k, verbose=True, PTS=None):
     C = []
     N = 0
     W += 1.0e-300
@@ -37,9 +37,43 @@ def weight_info(W, PT, N_k, verbose=True):
         C.append(sum(W[N:N+ns]))
         N += ns
     C = np.array(C)
+    if PTS != None:
+        if len(PTS) != len(N_k):
+            logger.error("PTS array (phase point labels) must equal length of N_k array (# of trajectories)\n")
+            raise RuntimeError
+        fs = max([len(i) for i in PTS])
+    else:
+        fs = 6
     if verbose:
-        logger.info("MBAR Results for Phase Point %s, Box, Contributions:\n" % str(PT))
-        logger.info(str(C) + '\n')
+        logger.info("MBAR Results for Phase Point %s, Contributions:\n" % str(PT))
+        line1 = ""
+        line2 = ""
+        tfl = 0
+        # If we have phase point labels, then presumably we can have less cluttered printout
+        # by printing only the lines with the largest contribution
+        pl = 0 if PTS != None else 1
+        for i, Ci in enumerate(C):
+            if PTS != None:
+                line1 += "%%%is " % fs % PTS[i]
+            if Ci == np.max(C):
+                line2 += "\x1b[91m%%%i.1f%%%%\x1b[0m " % (fs-1) % (Ci*100)
+                pl = 1
+            else:
+                line2 += "%%%i.1f%%%% " % (fs-1) % (Ci*100)
+            tfl += (fs+1)
+            if tfl >= 80: 
+                if len(line1) > 0:
+                    if pl: logger.info(line1+"\n")
+                if pl: logger.info(line2+"\n")
+                line1 = ""
+                line2 = ""
+                tfl = 0
+                pl = 0 if PTS != None else 1 
+        if tfl > 0 and pl: 
+            if len(line1) > 0:
+                logger.info(line1+"\n")
+            logger.info(line2+"\n")
+        logger.info("\n")
         logger.info("InfoContent: % .2f snapshots (%.2f %%)\n" % (I, 100*I/len(W)))
     return C
 
@@ -422,11 +456,11 @@ class Liquid(Target):
         lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
-        if Counter() == First() and self.manual:
+        if (not self.evaluated) and self.manual:
             warn_press_key("Now's our chance to fill the temp directory up with data!", timeout=7200)
 
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
-        if Counter() > First() and GoodStep() and self.save_traj < 2:
+        if self.evaluated and self.goodstep and self.save_traj < 2:
             for fn in self.last_traj:
                 if os.path.exists(fn):
                     os.remove(fn)

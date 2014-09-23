@@ -117,6 +117,32 @@ class TestXmlFF(ForceBalanceTestCase, FFTests):
         @override __init__.ForceBalanceTestCase.shortDescription()"""
         return super(TestXmlFF,self).shortDescription() + " (xml)"
 
+class TestXmlScriptFF(ForceBalanceTestCase):
+    """Test FF class with XmlScript using TIP3G2w.xml forcefield input"""
+    def setUp(self):
+        self.logger.debug("Setting up options...\n")
+        os.chdir('test/files')
+        # Load the base force field file
+        self.ff = forcefield.FF.fromfile('forcefield/TIP3G2w.xml')
+        # Load mathematical parameter values corresponding to a known output
+        self.mvals = np.loadtxt('XmlScript_out/mvals.txt')
+        # Load the known output force field
+        self.ff_ref = forcefield.FF.fromfile('XmlScript_out/TIP3G2w_out_ref.xml')
+
+    def tearDown(self):
+        os.system('rm -rf TIP3G2w.xml')
+        super(ForceBalanceTestCase,self).tearDown()
+
+    def test_make_function_output(self):
+        """Check make() function creates expected force field file containing XML Script"""
+        os.chdir('XmlScript_out')
+        # Create the force field with mathematical parameter values and
+        # make sure it matches the known reference
+        self.ff.make(self.mvals)
+        ff_out = forcefield.FF.fromfile('TIP3G2w.xml')
+        self.assertEqual(self.ff_ref, ff_out,
+                        msg = "make() produced a different output force field")
+
 class TestGbsFF(ForceBalanceTestCase, FFTests):
     """Test FF class using gbs forcefield input"""
     def setUp(self):

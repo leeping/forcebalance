@@ -28,7 +28,7 @@ except:
     logger.warning("Tinker module import failed\n")
 
 try:
-    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM
+    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM
 except:
     logger.warning(traceback.format_exc())
     logger.warning("OpenMM module import failed; check OpenMM package\n")
@@ -91,6 +91,7 @@ Implemented_Targets = {
     'MOMENTS_TINKER':Moments_TINKER,
     'MOMENTS_GMX':Moments_GMX,
     'MOMENTS_OPENMM':Moments_OpenMM,
+    'HYDRATION_OPENMM':Hydration_OpenMM,
     'REMOTE_TARGET':RemoteTarget,
     }
 
@@ -214,6 +215,9 @@ class Objective(forcebalance.BaseClass):
                     self.ObjDict[Tgt.name] = {'w' : Tgt.weight/self.WTot , 'x' : Ans['X']}
                 for i in range(3):
                     Objective[Letters[i]] += Ans[Letters[i]]*Tgt.weight/self.WTot
+        # The target has evaluated at least once.
+        for Tgt in self.Targets:
+            Tgt.evaluated = True
         # Safeguard to make sure we don't have exact zeros on Hessian diagonal
         for i in range(self.FF.np):
             if Objective['H'][i,i] == 0.0:
