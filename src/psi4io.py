@@ -351,7 +351,7 @@ class RDVR3_Psi4(Target):
         if wq == None:
             return
 
-        def submit_psi(this_apath, mname, these_mvals):
+        def submit_psi(this_apath, dname, these_mvals):
             """ Create a grid file and a psi4 input file in the absolute path and submit it to the work queue. """
             cwd = os.getcwd()
             if not os.path.exists(this_apath) : os.makedirs(this_apath)
@@ -374,10 +374,10 @@ class RDVR3_Psi4(Target):
                 sys.exit()
             else:
                 input_files = [(os.path.join(this_apath, i), i) for i in glob.glob("*")]
-                # input_files += [(os.path.join(self.tgtdir,d,"build.dat"), "build.dat")]
+                input_files += [(os.path.join(self.root, self.tgtdir, dname, "build.dat"), "build.dat")]
                 input_files += [(os.path.join(os.path.split(__file__)[0],"data","run_psi_rdvr3_objective.sh"), "run_psi_rdvr3_objective.sh")]
                 logger.info("\r")
-                queue_up_src_dest(wq,"sh run_psi_rdvr3_objective.sh %s &> run_psi_rdvr3_objective.log" % mname,
+                queue_up_src_dest(wq,"sh run_psi_rdvr3_objective.sh -c %s &> run_psi_rdvr3_objective.log" % os.path.join(self.root, self.tgtdir, dname),
                                   input_files=input_files,
                                   output_files=[(os.path.join(this_apath, i),i) for i in ["run_psi_rdvr3_objective.log", "output.dat"]], verbose=False)
             os.chdir(cwd)
