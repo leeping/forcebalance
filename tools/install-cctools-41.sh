@@ -33,8 +33,8 @@ sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
 # installed for the OS might be too old.
 #----
 prefix=$HOME/opt
-swgpath=$HOME/local
-pypath=$HOME/local
+swgpath=$(dirname $(dirname $(which swig)))
+pypath=$(dirname $(dirname $(which python)))
 
 # Create these directories if they don't exist.
 mkdir -p $prefix
