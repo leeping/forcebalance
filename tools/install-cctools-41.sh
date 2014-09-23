@@ -35,9 +35,6 @@ sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
 prefix=$HOME/opt
 swgpath=$(dirname $(dirname $(which swig)))
 pypath=$(dirname $(dirname $(which python)))
-echo $swgpath
-echo $pypath
-read
 
 # Create these directories if they don't exist.
 mkdir -p $prefix
