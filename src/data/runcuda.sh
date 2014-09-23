@@ -34,8 +34,8 @@ if [[ $HOSTNAME =~ "leeping" ]] ; then
     export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/lib:$LD_LIBRARY_PATH
     export INCLUDE=$CUDA_HOME/include:$INCLUDE
 elif [[ $HOSTNAME =~ "fire" ]] ; then
-    module load cuda/5.0
-    export OPENMM_CUDA_COMPILER=/opt/CUDA/cuda-5.0/bin/nvcc
+    module load cuda/6.5
+    export OPENMM_CUDA_COMPILER=/opt/CUDA/cuda-6.5/bin/nvcc
     #export CUDA_HOME=/opt/CUDA/4.0
     #export PATH=$CUDA_HOME/bin:$PATH
     #export LD_LIBRARY_PATH=$CUDA_HOME/lib64:$CUDA_HOME/lib:$LD_LIBRARY_PATH
