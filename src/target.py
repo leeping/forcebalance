@@ -719,7 +719,7 @@ class Target(forcebalance.BaseClass):
         makeffp = False
         if (os.path.exists("mvals.txt") and os.path.exists("forcefield.p")):
             mvalsf = np.loadtxt("mvals.txt")
-            if np.max(np.abs(mvals - mvalsf)) != 0.0:
+            if len(mvalsf) > 0 and np.max(np.abs(mvals - mvalsf)) != 0.0:
                 makeffp = True
         else:
             makeffp = True
