@@ -1028,7 +1028,7 @@ class Molecule(object):
         for key in self.AtomKeys:
             NewData[key] = list(np.array(M.Data[key])[unmangled])
         for key in self.FrameKeys:
-            if key in ['xyzs', 'qm_grads', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+            if key in ['xyzs', 'qm_grads', 'qm_mulliken_charges', 'qm_mulliken_spins']:
                 NewData[key] = list([self.Data[key][i][unmangled] for i in range(len(self))])
         for key in NewData:
             setattr(self, key, copy.deepcopy(NewData[key]))
@@ -1392,9 +1392,10 @@ class Molecule(object):
                 New.Data['tinkersuf'] = NewSuf[:]
             else:
                 New.Data[key] = list(np.array(self.Data[key])[atomslice])
-        if 'xyzs' in self.Data:
-            for i in range(self.ns):
-                New.xyzs[i] = self.xyzs[i][atomslice]
+       for key in self.FrameKeys:
+           if key in ['xyzs', 'qm_grads', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+               for i in range(self.ns):
+                   New.Data[key] = [self.Data[key][i][atomslice] for i in range(len(self))]
         if 'networkx' in sys.modules and hasattr(self, 'elem') and self.na > 0:
             New.top_settings = self.top_settings
             New.build_topology()

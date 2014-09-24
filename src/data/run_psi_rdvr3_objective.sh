@@ -1,5 +1,14 @@
 #!/bin/bash
 
+while [ $# -gt 0 ]
+do
+    case $1 in
+        -c | --cache) shift; cache=$1 ;;
+        *) break ;;
+    esac
+    shift
+done
+
 . /etc/profile
 . $HOME/.bashrc
 
@@ -21,14 +30,26 @@ echo "#=======================#"
 echo
 echo $@
 
-# Sara-specific hack.
-if [ $USER == "skokkila" ] ; then
-    export PSISCRATCH=/u/skokkila
-fi
+export PSISCRATCH=$PWD
+
+for mol in $(awk '/molecule/ {print $2}' objective.dat) ; do
+    if [ ! -f $PSISCRATCH/$mol.dat ] ; then
+        if [ -f $cache/$mol.dat ] ; then
+            cp $cache/$mol.dat .
+        else
+            echo "Running psi4 build.dat since $PSISCRATCH/$mol.dat does not exist"
+            psi4 build.dat
+        fi 
+    fi
+done 
 
 #if [ ! -f $PSISCRATCH/$1.dat ] ; then
-#    echo "Running psi4 build.dat since $PSISCRATCH/$1.dat does not exist"
-#    psi4 build.dat
+#    if [ -f $cache/$1.dat ] ; then
+#        cp $cache/$1.dat .
+#    else 
+#        echo "Running psi4 build.dat since $PSISCRATCH/$1.dat does not exist"
+#        psi4 build.dat
+#    fi
 #fi
 
 echo "--> objective.dat <--"
