@@ -10,7 +10,7 @@ from collections import OrderedDict
 import tarfile
 import forcebalance
 from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec
-from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd_srch
+from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -569,7 +569,7 @@ class Target(forcebalance.BaseClass):
         ## Save the force field files to this directory, so that it
         ## reflects the objective function and properties that were
         ## printed out.
-        if not in_fd_srch(): 
+        if not in_fd(): 
             self.FF.make(mvals)
 
         os.chdir(cwd)
@@ -607,7 +607,7 @@ class Target(forcebalance.BaseClass):
         os.chdir(absgetdir)
         self.link_from_tempdir(absgetdir)
         ## Write mathematical parameters to file; will be used to checkpoint calculation.
-        if not in_fd_srch():
+        if not in_fd():
             np.savetxt('mvals.txt', mvals)
         ## Read in file that specifies which derivatives may be skipped.
         if Counter() >= self.zerograd and self.zerograd >= 0: 
