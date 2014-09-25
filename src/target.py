@@ -391,7 +391,7 @@ class Target(forcebalance.BaseClass):
         """
         mvals1 = np.loadtxt('mvals.txt')
 
-        if (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+        if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from mvals.txt does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
         
         return forcebalance.nifty.lp_load('objective.p')
