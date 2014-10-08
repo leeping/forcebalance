@@ -92,7 +92,7 @@ class TestNifty(ForceBalanceTestCase):
             msg="\nUnexpected initialization of forcebalance.nifty.WORK_QUEUE to %s" % str(forcebalance.nifty.WORK_QUEUE))
         self.logger.info("\n")
 
-        createWorkQueue(30000, debug=False)
+        createWorkQueue(9191, debug=False)
         self.logger.debug("Created work queue, verifying...\n")
         self.assertEqual(type(forcebalance.nifty.WORK_QUEUE), work_queue.WorkQueue,
             msg="\nExpected forcebalance.nifty.WORK_QUEUE to be a WorkQueue object, but got a %s instead" % str(type(forcebalance.nifty.WORK_QUEUE)))

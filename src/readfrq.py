@@ -68,7 +68,6 @@ def read_frq_qc(qcout):
             elif 'TransDip' not in s:
                 for i in range(nfrq):
                     readmodes[i].append([float(s[j]) for j in range(1+3*i,4+3*i)])
-        # print VMode, line,
         if VModeNxt != None: VMode = VModeNxt
     unnorm = [np.array(i) for i in modes]
     return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm]

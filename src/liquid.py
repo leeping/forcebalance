@@ -485,7 +485,7 @@ class Liquid(Target):
         Read in time series for all previous iterations.
         """
 
-        unpack = forcebalance.nifty.lp_load('forcebalance.p')
+        unpack = lp_load('forcebalance.p')
         mvals1 = unpack[1]
         if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
@@ -590,7 +590,7 @@ class Liquid(Target):
         
         """
         
-        unpack = forcebalance.nifty.lp_load('forcebalance.p')
+        unpack = lp_load('forcebalance.p')
         mvals1 = unpack[1]
         if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
