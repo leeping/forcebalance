@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated September 13, 2014                   |#
+#|                   Last updated October 7, 2014                     |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -133,7 +133,7 @@ AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tink
 # mult       = The spin multiplicity of the molecule
 MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds', 'topology', 'molecules'])
 # Variable names relevant to quantum calculations explicitly
-QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost'])
+QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost', 'qm_bondorder'])
 # Superset of all variable names.
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
@@ -146,9 +146,15 @@ import itertools
 from collections import OrderedDict, namedtuple, Counter
 from ctypes import *
 from warnings import warn
-#import logging as logger
-import logging
-logger = logging.getLogger(__name__)
+
+#================================#
+#       Set up the logger        #
+#================================#
+try: 
+    from output import *
+except: 
+    from logging import *
+    logger.info("Imported the default logger\n")
 
 module_name = __name__.replace('.molecule','')
 
@@ -386,7 +392,19 @@ except:
 
 def TopEqual(mol1, mol2):
     """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
-    return mol1.topology == mol2.topology
+    # Checks to see if the two molecule objects have the same fragments.
+    GraphEqual = Counter(mol1.molecules) == Counter(mol2.molecules)
+    # Checks to see whether the molecule objects have the same atoms in each fragment.
+    AtomEqual = Counter([tuple(m.L()) for m in mol1.molecules]) == Counter([tuple(m.L()) for m in mol2.molecules])
+    return GraphEqual and AtomEqual
+
+def MolEqual(mol1, mol2):
+    """ 
+    Determine whether two Molecule objects have the same fragments by
+    looking at elements and connectivity graphs.  This is less strict
+    than TopEqual (i.e. more often returns True).
+    """
+    return Counter(mol1.molecules) == Counter(mol2.molecules)
 
 def format_xyz_coord(element,xyz,tinker=False):
     """ Print a line consisting of (element, x, y, z) in accordance with .xyz file format
@@ -689,10 +707,12 @@ def extract_int(arr, avgthre, limthre, label="value", verbose=True):
     rounded = round(average)
     passed = True
     if abs(average - rounded) > avgthre:
-        if verbose: print "Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre)
+        if verbose: 
+            logger.info("Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre))
         passed = False
     if abs(maximum - minimum) > limthre:
-        if verbose: print "Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre)
+        if verbose: 
+            logger.info("Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre))
         passed = False
     return int(rounded), passed
 
@@ -740,7 +760,7 @@ def extract_qsz(M, verbose=True):
     nproton = sum([Elements.index(i) for i in M.elem])
     nelectron = nproton + chg
     if not spnpass:
-        if verbose: print "Going with the minimum spin consistent with charge."
+        if verbose: logger.info("Going with the minimum spin consistent with charge.")
         if nelectron%2 == 0:
             spn = 0
         else:
@@ -748,14 +768,94 @@ def extract_qsz(M, verbose=True):
     
     # The number of electrons should be odd iff the spin is odd.
     if ((nelectron-spn)/2)*2 != (nelectron-spn):
-        print "\x1b[91mThe number of electrons (%i) is inconsistent with the spin-z (%i)\x1b[0m" % (nelectron, spn)
+        if verbose: logger.info("\x1b[91mThe number of electrons (%i) is inconsistent with the spin-z (%i)\x1b[0m" % (nelectron, spn))
         return -999, -999
 
-    if verbose:
-        print "Number of electrons:", nelectron
-        print "Net charge:", chg
-        print "Net spin:", spn
+    if verbose: logger.info("%i electrons; charge %i, spin %i" % (nelectron, chg, spn))
     return chg, spn
+
+def arc(Mol, begin=None, end=None, RMSD=True):
+    """
+    Get the arc-length for a trajectory segment.  
+    Uses RMSD or maximum displacement of any atom in the trajectory.
+
+    Parameters
+    ----------
+    Mol : Molecule
+        Molecule object for calculating the arc length.
+    begin : int
+        Starting frame, defaults to first frame
+    end : int
+        Ending frame, defaults to final frame
+    RMSD : bool
+        Set to True to use frame-to-frame RMSD; otherwise use the maximum displacement of any atom
+        
+    Returns
+    -------
+    Arc : np.ndarray
+        Arc length between frames in Angstrom, length is n_frames - 1
+    """
+    Mol.align()
+    if begin == None:
+        begin = 0
+    if end == None:
+        end = len(Mol)
+    if RMSD:
+        Arc = Mol.pathwise_rmsd()
+    else:
+        Arc = np.array([np.max([np.linalg.norm(Mol.xyzs[i+1][j]-Mol.xyzs[i][j]) for j in range(Mol.na)]) for i in range(begin, end-1)])
+    return Arc
+
+def EqualSpacing(Mol, frames=0, dx=0, RMSD=True):
+    """
+    Equalize the spacing of frames in a trajectory with linear interpolation.  
+    This is done in a very simple way, first calculating the arc length 
+    between frames, then creating an equally spaced array, and interpolating
+    all Cartesian coordinates along this equally spaced array.
+
+    This is intended to be used on trajectories with smooth transformations and
+    ensures that concatenated frames containing both optimization coordinates 
+    and dynamics trajectories don't have sudden changes in their derivatives.
+    
+    Parameters
+    ----------
+    Mol : Molecule
+        Molecule object for equalizing the spacing.
+    frames : int
+        Return a Molecule object with this number of frames.
+    RMSD : bool
+        Use RMSD in the arc length calculation.
+
+    Returns
+    -------
+    Mol1 : Molecule
+        New molecule object, either the same one (if frames > len(Mol))
+        or with equally spaced frames.
+    """
+    ArcMol = arc(Mol, RMSD=RMSD)
+    ArcMolCumul = np.insert(np.cumsum(ArcMol), 0, 0.0)
+    if frames != 0 and dx != 0:
+        logger.error("Provide dx or frames or neither")
+    elif dx != 0:
+        frames = int(float(max(ArcMolCumul))/dx)
+    elif frames == 0:
+        frames = len(ArcMolCumul)
+    
+    ArcMolEqual = np.linspace(0, max(ArcMolCumul), frames)
+    xyzold = np.array(Mol.xyzs)
+    xyznew = np.zeros((frames, Mol.na, 3))
+    for a in range(Mol.na):
+        for i in range(3):
+            xyznew[:,a,i] = np.interp(ArcMolEqual, ArcMolCumul, xyzold[:, a, i])
+    if len(xyzold) == len(xyznew):
+        Mol1 = copy.deepcopy(Mol)
+    else:
+        # If we changed the number of coordinates, then 
+        # do some integer interpolation of the comments and 
+        # other frame variables.
+        Mol1 = Mol[np.array([int(round(i)) for i in np.linspace(0, len(xyzold)-1, len(xyznew))])]
+    Mol1.xyzs = list(xyznew)
+    return Mol1
 
 class Molecule(object):
     """ Lee-Ping's general file format conversion class.
@@ -2134,6 +2234,7 @@ class Molecule(object):
             a2 = bond.target_atom_id - 1
             aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
             bonds.append((aL,aH))
+        self.top_settings["build"] = False
 
         Answer = {'xyzs' : [np.array(xyz)],
                   'partial_charge' : charge,
@@ -2644,6 +2745,8 @@ class Molecule(object):
 
         if len(bonds) > 0:
             Answer["bonds"] = bonds
+            self.top_settings["build"] = False
+
         if Box != None:
             Answer["boxes"] = [Box for i in range(len(XYZList))]
 
@@ -2691,8 +2794,11 @@ class Molecule(object):
         mkspn    = []
         mkchgThis= []
         mkspnThis= []
+        frqs     = []
+        modes    = []
         XMode    = 0
         MMode    = 0
+        VMode    = 0
         conv     = []
         convThis = 0
         readChargeMult = 0
@@ -2710,8 +2816,9 @@ class Molecule(object):
                         'gradient_scf'     :'Gradient of SCF Energy',
                         'gradient_mp2'     :'Gradient of MP2 Energy',
                         'gradient_dualbas' :'Gradient of the Dual-Basis Energy',
-                        'hessian_scf'      :'Hessian of the SCF Energy'
-                        }
+                        'hessian_scf'      :'Hessian of the SCF Energy',
+                        'mayer'            :'Mayer SCF Bond Order'
+                       }
         qcrem    = OrderedDict()
 
         matblank   = {'match' : '', 'All' : [], 'This' : [], 'Strip' : [], 'Mode' : 0}
@@ -2840,14 +2947,43 @@ class Molecule(object):
                 conv.append(0)
                 Floats['energy_scfThis'] = []
                 energy_scf.append(0.0)
+            #----- Vibrational stuff
+            VModeNxt = None
+            if 'VIBRATIONAL ANALYSIS' in line:
+                VMode = 1
+            if VMode > 0 and line.strip().startswith('Mode:'):
+                VMode = 2
+            if VMode == 2:
+                s = line.split()
+                if 'Frequency:' in line:
+                    nfrq = len(s) - 1
+                    frqs += [float(i) for i in s[1:]]
+                if re.match('^X +Y +Z', line):
+                    VModeNxt = 3
+                    readmodes = [[] for i in range(nfrq)]
+                if 'Imaginary Frequencies' in line:
+                    VMode = 0
+            if VMode == 3:
+                s = line.split()
+                if len(s) != nfrq*3+1:
+                    VMode = 2
+                    modes += readmodes[:]
+                elif 'TransDip' not in s:
+                    for i in range(nfrq):
+                        readmodes[i].append([float(s[j]) for j in range(1+3*i,4+3*i)])
+            if VModeNxt != None: VMode = VModeNxt
             for key, val in matrix_match.items():
                 if Mats[key]["Mode"] >= 1:
-                    if re.match("^[0-9]+( +[0-9]+)+$",line):
+                    # Match any number of integers on a line.  This signifies a column header to start the matrix
+                    if re.match("^[0-9]+( +[0-9]+)*$",line):
                         Mats[key]["This"] = add_strip_to_mat(Mats[key]["This"],Mats[key]["Strip"])
                         Mats[key]["Strip"] = []
+                        Mats[key]["Mode"] = 2
+                    # Match a single integer followed by any number of floats.  This is a strip of data to be added to the matrix
                     elif re.match("^[0-9]+( +[-+]?([0-9]*\.)?[0-9]+)+$",line):
                         Mats[key]["Strip"].append([float(i) for i in line.split()[1:]])
-                    else:
+                    # In any other case, the matrix is terminated.
+                    elif Mats[key]["Mode"] >= 2:
                         Mats[key]["This"] = add_strip_to_mat(Mats[key]["This"],Mats[key]["Strip"])
                         Mats[key]["Strip"] = []
                         Mats[key]["All"].append(np.array(Mats[key]["This"]))
@@ -2882,7 +3018,9 @@ class Molecule(object):
             Answer['qm_grads'] = Mats['gradient_dualbas']['All']
         elif len(Mats['gradient_scf']['All']) > 0:
             Answer['qm_grads'] = Mats['gradient_scf']['All']
-
+        # Mayer bond order matrix from SCF_FINAL_PRINT=1
+        if len(Mats['mayer']['All']) > 0:
+            Answer['qm_bondorder'] = Mats['mayer']['All'][-1]
         if len(Mats['hessian_scf']['All']) > 0:
             Answer['qm_hessians'] = Mats['hessian_scf']['All']
         #else:
@@ -2959,6 +3097,10 @@ class Molecule(object):
             Answer['qm_mulliken_spins'] = Answer['qm_mulliken_spins'][:len(Answer['qm_energies'])]
         
         Answer['Irc'] = IRCData
+        if len(modes) > 0:
+            unnorm = [np.array(i) for i in modes]
+            Answer['freqs'] = np.array(frqs)
+            Answer['modes'] = [i/np.linalg.norm(i) for i in unnorm]
 
         return Answer
     

@@ -9,7 +9,7 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec
+from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec, lp_load
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
@@ -394,7 +394,7 @@ class Target(forcebalance.BaseClass):
         if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from mvals.txt does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
         
-        return forcebalance.nifty.lp_load('objective.p')
+        return lp_load('objective.p')
 
     def absrd(self, inum=None):
 
@@ -798,7 +798,7 @@ class RemoteTarget(Target):
     def get(self,mvals,AGrad=False,AHess=False):
         with open('indicate.log', 'r') as f:
             self.remote_indicate = f.read()
-        return forcebalance.nifty.lp_load('objective.p')
+        return lp_load('objective.p')
         
     def indicate(self):
         logger.info(self.remote_indicate)

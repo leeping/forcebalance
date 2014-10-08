@@ -21,11 +21,22 @@ import filecmp
 import itertools
 import threading
 import pickle
+import tarfile
 import time
 import subprocess
-import forcebalance
-from forcebalance.output import *
-logger = getLogger(__name__)
+from shutil import copyfileobj
+from subprocess import PIPE, STDOUT
+from collections import OrderedDict, defaultdict
+
+#================================#
+#       Set up the logger        #
+#================================#
+try: 
+    from output import *
+except: 
+    from logging import *
+    logger.info("Imported the default logger\n")
+
 try:
     import bz2
     HaveBZ2 = True
@@ -39,13 +50,7 @@ try:
 except:
     logger.warning("gzip module import failed (used in compressing or decompressing pickle files)\n")
     HaveGZ = False
-    
-from shutil import copyfileobj
-from subprocess import PIPE, STDOUT
-from collections import OrderedDict, defaultdict
 
-
-# import IPython as ip # For debugging
 
 ## Boltzmann constant
 kb = 0.0083144100163
@@ -171,32 +176,14 @@ def uncommadash(s):
         raise RuntimeError
     return L
 
-def natural_sort(l):
-    """ From stack overflow: Natural sorting of a list (so 11 comes after 7) """ 
-    convert = lambda text: int(text) if text.isdigit() else text.lower() 
+def natural_sort(l): 
+    """ Return a natural sorted list. """
+    # Convert a character to a digit or a lowercase character
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    # Split string into "integer" and "noninteger" fields and convert each one
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
+    # Sort strings using these keys in descending order of importance, I guess.
     return sorted(l, key = alphanum_key)
-
-def extract_int(arr, avgthre, limthre, label="value", verbose=True):
-    """ Get the representative integer value from an array.
-    Sanity check: Make sure the value does not go through big excursions.
-    The integer value is the rounded value of the average.
-    thresh = A threshold to make sure we're not dealing with 
-    fluctuations that are too large. """
-    average = np.mean(arr)
-    maximum = np.max(arr)
-    minimum = np.min(arr)
-    rounded = round(average)
-    passed = True
-    if abs(average - rounded) > avgthre:
-        if verbose: print "Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre)
-        passed = False                                                                                        
-    if abs(maximum - minimum) > limthre:
-        if verbose: print "Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre)
-        passed = False
-    return int(rounded), passed
-
-#list(itertools.chain(*[range(*(int(w.split('-')[0])-1, int(w.split('-')[1]) if len(w.split('-')) == 2 else int(w.split('-')[0])))  for w in Mao.split(',')]))
 
 def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,center=True,sym2="="):
     """Cool-looking printout for slick formatting of output.
@@ -383,6 +370,54 @@ def monotonic(arr, start, end):
                 a0 = arr[i]
                 i0 = i
             i -= 1
+
+def monotonic_decreasing(arr, start=None, end=None, verbose=False):
+    """ 
+    Return the indices of an array corresponding to strictly monotonic
+    decreasing behavior.
+
+    Parameters
+    ----------
+    arr : numpy.ndarray
+        Input array
+    start : int
+        Starting index (first element if None)
+    end : int
+        Ending index (last element if None)
+    
+    Returns
+    -------
+    indices : numpy.ndarray
+        Selected indices
+    """
+    if start == None:
+        start = 0
+    if end == None:
+        end = len(arr) - 1
+    a0 = arr[start]
+    idx = [start]
+    if verbose: print "Starting @ %i : %.6f" % (start, arr[start])
+    if end > start:
+        i = start+1
+        while i < end:
+            if arr[i] < a0:
+                a0 = arr[i]
+                idx.append(i)
+                if verbose: print "Including  %i : %.6f" % (i, arr[i])
+            else:
+                if verbose: print "Excluding  %i : %.6f" % (i, arr[i])
+            i += 1
+    if end < start:
+        i = start-1
+        while i >= end:
+            if arr[i] < a0:
+                a0 = arr[i]
+                idx.append(i)
+                if verbose: print "Including  %i : %.6f" % (i, arr[i])
+            else:
+                if verbose: print "Excluding  %i : %.6f" % (i, arr[i])
+            i -= 1
+    return np.array(idx)
 
 #====================================#
 #| Math: Vectors and linear algebra |#
@@ -901,6 +936,7 @@ def bak(path, dest=None):
     newf = None
     if os.path.exists(path):
         dnm, fnm = os.path.split(path)
+        if dnm == '' : dnm = '.'
         base, ext = os.path.splitext(fnm)
         if dest == None:
             dest = dnm
@@ -1016,6 +1052,38 @@ def listfiles(fnms=None, ext=None, err=False):
                 shutil.copy2(fsrc, fdest)
                 answer[ifnm] = os.path.basename(fnm)
     return answer
+
+def extract_tar(tarfnm, fnms, force=False):
+    """ 
+    Extract a list of files from .tar archive with any compression.
+    The file is extracted to the base folder of the archive.
+    
+    Parameters
+    ----------
+    tarfnm : 
+        Name of the archive file.
+    fnms : str or list
+        File names to be extracted.
+    force : bool, optional
+        If true, then force extraction of file even if they already exist on disk.
+    """
+    # Get path of tar file.
+    fdir = os.path.abspath(os.path.dirname(tarfnm))
+    # If all files exist, then return - no need to extract.
+    if (not force) and all([os.path.exists(os.path.join(fdir, f)) for f in fnms]): return
+    # If the tar file doesn't exist or isn't valid, do nothing.
+    if not os.path.exists(tarfnm): return
+    if not tarfile.is_tarfile(tarfnm): return
+    # Check type of fnms argument.
+    if isinstance(fnms, str): fnms = [fnms]
+    # Load the tar file.
+    arch = tarfile.open(tarfnm, 'r')
+    # Extract only the files we have (to avoid an exception).
+    all_members = arch.getmembers()
+    all_names = [f.name for f in all_members]
+    members = [f for f in all_members if f.name in fnms]
+    # Extract files to the destination.
+    arch.extractall(fdir, members=members)
 
 def GoInto(Dir):
     if os.path.exists(Dir):
@@ -1171,7 +1239,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     """
 
     # Dictionary of options to be passed to the Popen object.
-    cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr}
+    cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr, 'cwd':cwd}
 
     # If the current working directory is provided, the outputs will be written to there as well.
     if cwd != None:
@@ -1204,8 +1272,6 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         wtf("Executing process: %s%s\n" % (command, (" Stdin: %s" % stdin.replace('\n','\\n')) if stdin else ""))
 
     cmd_options.update(kwargs)
-    if cwd != None:
-        cmd_options['cwd'] = cwd
     p = subprocess.Popen(command, **cmd_options)
 
     # Write the stdin stream to the process.
