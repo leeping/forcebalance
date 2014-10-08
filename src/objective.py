@@ -134,6 +134,10 @@ class Objective(forcebalance.BaseClass):
             if opts['type'] not in Implemented_Targets:
                 logger.error('The target type \x1b[1;91m%s\x1b[0m is not implemented!\n' % opts['type'])
                 raise RuntimeError
+            # Create a target object.  This is done by looking up the
+            # Target class from the Implemented_Targets dictionary
+            # using opts['type'] as the key.  The object is created by
+            # passing (options, opts, forcefield) to the constructor.
             if opts["remote"] and self.wq_port != 0: Tgt = forcebalance.target.RemoteTarget(options, opts, forcefield)
             else: Tgt = Implemented_Targets[opts['type']](options,opts,forcefield)
             self.Targets.append(Tgt)
