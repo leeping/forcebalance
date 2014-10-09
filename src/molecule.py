@@ -1494,8 +1494,7 @@ class Molecule(object):
                 New.Data[key] = list(np.array(self.Data[key])[atomslice])
         for key in self.FrameKeys:
            if key in ['xyzs', 'qm_grads', 'qm_mulliken_charges', 'qm_mulliken_spins']:
-               for i in range(self.ns):
-                   New.Data[key] = [self.Data[key][i][atomslice] for i in range(len(self))]
+               New.Data[key] = [self.Data[key][i][atomslice] for i in range(len(self))]
         if 'networkx' in sys.modules and hasattr(self, 'elem') and self.na > 0:
             New.top_settings = self.top_settings
             New.build_topology()
