@@ -2810,7 +2810,6 @@ class Molecule(object):
                         'energy_mp2'       : ("^(ri)*(-)*mp2 +total energy += +[-+]?([0-9]*\.)?[0-9]+ +au$",-2),
                         'energy_ccsd'      : ("^CCSD Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
                         'energy_ccsdt'     : ("^CCSD\(T\) Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
-                        'energy_opt'       : ("^Energy is +[-+]?([0-9]*\.)?[0-9]+$",-1)
                         }
         matrix_match = {'analytical_grad'  :'Full Analytical Gradient',
                         'gradient_scf'     :'Gradient of SCF Energy',
@@ -2829,8 +2828,8 @@ class Molecule(object):
         for key, val in float_match.items():
             Floats[key] = []
 
-        ## Detect whether output file is for a geometry optimization
-        Optimization = False
+        ## Detect freezing string
+        FSM = False
         ## Intrinsic reaction coordinate stuff
         IRCDir = 0
         RPLine = False
@@ -2920,7 +2919,6 @@ class Molecule(object):
             ## This is because my qchem.py script recovers IRC jobs
             ## that have failed from SCF convergence failures with geometry optimizations.
             if "GEOMETRY OPTIMIZATION" in line:
-                Optimization = True
                 IRCData[IRCDir]['X'].append(xyzs[-1])
                 IRCData[IRCDir]['E'].append(energy_scf[-1])
                 IRCData[IRCDir]['Q'].append(mkchg[-1])
@@ -2936,6 +2934,9 @@ class Molecule(object):
                 IRCData[IRCDir]['stat'] = 1
                 IRCDir = 1
             #----- End IRC stuff
+            # Look for SCF energy
+            # Note that COSMO has two SCF energies per calculation so this parser won't work.
+            # Need to think of a better way.
             if re.match(".*Convergence criterion met$".lower(), line.lower()):
                 conv.append(1)
                 energy_scf.append(Floats['energy_scfThis'][-1])
@@ -2947,6 +2948,9 @@ class Molecule(object):
                 conv.append(0)
                 Floats['energy_scfThis'] = []
                 energy_scf.append(0.0)
+            #----- If doing freezing string calculation, do NOT treat as a geometry optimization.
+            if 'Starting FSM Calculation' in line:
+                FSM = True
             #----- Vibrational stuff
             VModeNxt = None
             if 'VIBRATIONAL ANALYSIS' in line:
@@ -3026,9 +3030,7 @@ class Molecule(object):
         #else:
         #    raise RuntimeError('There are no forces in %s' % fnm)
         # Also work our way down with the energies.
-        if Optimization:
-            Answer['qm_energies'] = Floats['energy_opt']
-        elif len(Floats['energy_ccsdt']) > 0:
+        if len(Floats['energy_ccsdt']) > 0:
             Answer['qm_energies'] = Floats['energy_ccsdt']
         elif len(Floats['energy_ccsd']) > 0:
             Answer['qm_energies'] = Floats['energy_ccsd']
