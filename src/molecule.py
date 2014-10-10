@@ -1770,11 +1770,8 @@ class Molecule(object):
             self.Data['bonds'] = []
             for i, bi in enumerate(atom_bonds):
                 for j in bi:
-                    if i == j: continue
-                    elif i > j: bond = (j, i)
-                    else: bond = (i, j)
-                    if bond not in self.bonds:
-                        self.bonds.append(bond)
+                    if i >= j: continue
+                    self.bonds.append((i, j))
             self.built_bonds = True
         # Create a NetworkX graph object to hold the bonds.
         G = MyG()
