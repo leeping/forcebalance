@@ -1773,7 +1773,8 @@ class Molecule(object):
                     if i == j: continue
                     elif i > j: bond = (j, i)
                     else: bond = (i, j)
-                    self.bonds.append(bond)
+                    if bond not in self.bonds:
+                        self.bonds.append(bond)
             self.built_bonds = True
         # Create a NetworkX graph object to hold the bonds.
         G = MyG()
