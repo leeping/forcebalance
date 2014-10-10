@@ -13,7 +13,7 @@ from forcebalance.molecule import Molecule
 from re import match, sub
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from collections import defaultdict, OrderedDict
-from forcebalance.nifty import getWorkQueue, queue_up, LinkFile, printcool, link_dir_contents, lp_dump, lp_load, _exec, kb, col, flat, uncommadash, statisticalInefficiency
+from forcebalance.nifty import getWorkQueue, queue_up, LinkFile, printcool, link_dir_contents, lp_dump, lp_load, _exec, kb, col, flat, uncommadash, statisticalInefficiency, isfloat
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -103,17 +103,51 @@ class Hydration(Target):
 
     def read_reference_data(self):
         """ Read the reference hydrational data from a file. """
-        self.refdata = OrderedDict([(l.split()[0], float(l.split()[1])) for l in open(self.datafile).readlines()])
-        self.molecules = OrderedDict([(i, os.path.abspath(os.path.join(self.root, self.tgtdir, 'molecules', i+self.crdsfx))) for i in self.refdata.keys()])
+        # Read the HFE data file.  This is a very simple file format:
+        self.IDs = []
+        self.expval = OrderedDict()
+        self.experr = OrderedDict()
+        self.nicknames = OrderedDict()
+        # We don't need every single line to be the same.  This
+        # indicates whether *any* molecule has a nickname for printing
+        # out the nickname column.
+        self.have_nicks = False
+        # Again for experimental errors.  Note that we're NOT using them in the optimization at this time.
+        self.have_experr = False
+        for line in open(self.datafile).readlines():
+            s = line.expandtabs().strip().split('#')[0].split()
+            if len(s) == 0: continue
+            ID = s[0]
+            self.IDs.append(ID)
+            # Dynamic field number for the experimental data.
+            nxt = 1
+            # If the next field is a string, then it's the "nickname"
+            if not isfloat(s[1]):
+                self.have_nicks = True
+                self.nicknames[ID] = s[1]
+                nxt += 1
+            else:
+                # We don't need nicknames on every single line.
+                self.nicknames[ID] = ID
+            # Read the experimental value.
+            self.expval[ID] = float(s[nxt])
+            # Read the experimental error bar, or use a default value of 0.6 (from Mobley).
+            if len(s) > (nxt+1):
+                self.have_experr = True
+                self.experr[ID] = float(s[nxt+1])
+            else:
+                self.experr[ID] = 0.6
+        
+        self.molecules = OrderedDict([(i, os.path.abspath(os.path.join(self.root, self.tgtdir, 'molecules', i+self.crdsfx))) for i in self.IDs])
         for fnm, path in self.molecules.items():
             if not os.path.isfile(path):
                 logger.error('Coordinate file %s does not exist!\nMake sure coordinate files are in the right place\n' % path)
                 raise RuntimeError
         if self.subset != None:
             subset = uncommadash(self.subset)
-            self.whfe = np.array([1 if i in subset else 0 for i in range(len(self.refdata.keys()))])
+            self.whfe = np.array([1 if i in subset else 0 for i in range(len(self.IDs))])
         else:
-            self.whfe = np.ones(len(self.refdata.keys()))
+            self.whfe = np.ones(len(self.IDs))
 
     def run_simulation(self, label, liq, AGrad=True):
         """ 
@@ -184,7 +218,7 @@ class Hydration(Target):
         # It submits the jobs to the Work Queue and the stage() function will wait for jobs to complete.
         printcool("Target: %s - launching %i MD simulations\nTime steps (liq):" 
                   "%i (eq) + %i (md)\nTime steps (g): %i (eq) + %i (md)" % 
-                  (self.name, 2*len(self.refdata.keys()), self.liquid_eq_steps, self.liquid_md_steps,
+                  (self.name, 2*len(self.IDs), self.liquid_eq_steps, self.liquid_md_steps,
                    self.gas_eq_steps, self.gas_md_steps), color=0)
         # If self.save_traj == 1, delete the trajectory files from a previous good optimization step.
         if self.evaluated and self.goodstep and self.save_traj < 2:
@@ -196,7 +230,7 @@ class Hydration(Target):
         # Less fully featured than liquid simulation; NOT INCLUDED are
         # 1) Temperature and pressure
         # 2) Multiple initial conditions
-        for label in self.refdata.keys():
+        for label in self.IDs:
             if not os.path.exists(label):
                 os.makedirs(label)
             os.chdir(label)
@@ -221,7 +255,7 @@ class Hydration(Target):
         self.engines = OrderedDict()
         self.liq_engines = OrderedDict()
         self.gas_engines = OrderedDict()
-        for mnm in self.refdata.keys():
+        for mnm in self.IDs:
             pdbfnm = os.path.abspath(os.path.join(self.root,self.tgtdir, 'molecules', mnm+'.pdb'))
             self.liq_engines[mnm] = self.engine_(target=self, coords=pdbfnm, implicit_solvent=True, **self.engine_opts)
             self.gas_engines[mnm] = self.engine_(target=self, coords=pdbfnm, implicit_solvent=False, **self.engine_opts)
@@ -229,20 +263,39 @@ class Hydration(Target):
     def indicate(self):
         """ Print qualitative indicator. """
         banner = "Hydration free energies (kcal/mol)"
-        if hasattr(self, 'calc_err'):
-            headings = ["Molecule", "Reference", "Calculated", "StdErr(Calc)", "Difference", "Weight", "Residual"]
-            data = OrderedDict([(i, ["%.4f" % self.refdata[i], "%.4f" % self.calc[i], "%.4f" % self.calc_err[i], "%.4f" % (self.calc[i] - self.refdata[i]), 
-                                     "%.4f" % self.whfe[ii], "%.4f" % (self.whfe[ii]*(self.calc[i] - self.refdata[i])**2)]) for ii, i in enumerate(self.refdata.keys())])
+        headings = ["ID"]
+        data = OrderedDict([(ID, []) for ID in self.IDs])
+        if self.have_nicks:
+            headings.append("Nickname")
+            for ID in self.IDs:
+                data[ID].append(self.nicknames[ID])
+        if self.have_experr:
+            headings.append("Reference +- StdErr")
+            for ID in self.IDs:
+                data[ID].append("% 9.3f +- %6.3f" % (self.expval[ID], self.experr[ID]))
         else:
-            headings = ["Molecule", "Reference", "Calculated", "Difference", "Weight", "Residual"]
-            data = OrderedDict([(i, ["%.4f" % self.refdata[i], "%.4f" % self.calc[i], "%.4f" % (self.calc[i] - self.refdata[i]), 
-                                     "%.4f" % self.whfe[ii], "%.4f" % (self.whfe[ii]*(self.calc[i] - self.refdata[i])**2)]) for ii, i in enumerate(self.refdata.keys())])
+            headings.append("Reference")
+            for ID in self.IDs:
+                data[ID].append("% 9.3f" % self.expval[ID])
+        if hasattr(self, 'calc_err'):
+            headings.append("Calculated +- StdErr")
+            for ID in self.IDs:
+                data[ID].append("% 10.3f +- %6.3f" % (self.calc[ID], self.calc_err[ID]))
+        else:
+            headings.append("Calculated")
+            for ID in self.IDs:
+                data[ID].append("% 10.3f" % self.calc[ID])
+        headings += ["Calc-Ref", "Weight", "Residual"]
+        for iid, ID in enumerate(self.IDs):
+            data[ID].append("% 8.3f" % (self.calc[ID] - self.expval[ID]))
+            data[ID].append("%8.3f" % (self.whfe[iid]))
+            data[ID].append("%8.3f" % (self.whfe[iid]*(self.calc[ID] - self.expval[ID])**2))
         self.printcool_table(data, headings, banner)
 
     def hydration_driver_sp(self):
         """ Calculate HFEs using single point evaluation. """
         hfe = OrderedDict()
-        for mnm in self.refdata.keys():
+        for mnm in self.IDs:
             eliq, rmsdliq = self.liq_engines[mnm].optimize()
             egas, rmsdgas = self.gas_engines[mnm].optimize()
             hfe[mnm] = eliq - egas
@@ -255,8 +308,8 @@ class Hydration(Target):
             self.hfe_dict = self.hydration_driver_sp()
             return np.array(self.hfe_dict.values())
         calc_hfe = get_hfe(mvals)
-        D = calc_hfe - np.array(self.refdata.values())
-        dD = np.zeros((self.FF.np,len(self.refdata.keys())))
+        D = calc_hfe - np.array(self.expval.values())
+        dD = np.zeros((self.FF.np,len(self.IDs)))
         if AGrad or AHess:
             for p in self.pgrad:
                 dD[p,:], _ = f12d3p(fdwrap(get_hfe, mvals, p), h = self.h, f0 = calc_hfe)
@@ -266,10 +319,10 @@ class Hydration(Target):
         """ Get the hydration free energy using the Zwanzig formula.  We will obtain two different estimates along with their uncertainties. """
         self.hfe_dict = OrderedDict()
         self.hfe_err = OrderedDict()
-        dD = np.zeros((self.FF.np,len(self.refdata.keys())))
+        dD = np.zeros((self.FF.np,len(self.IDs)))
         kT = (kb * self.hfe_temperature)
         beta = 1. / (kb * self.hfe_temperature)
-        for ilabel, label in enumerate(self.refdata.keys()):
+        for ilabel, label in enumerate(self.IDs):
             os.chdir(label)
             # This dictionary contains observables keyed by each phase.
             data = defaultdict(dict)
@@ -326,15 +379,15 @@ class Hydration(Target):
                     dD[:, ilabel] = 0.5*self.whfe[ilabel]*(data['liq']['dHyd']+data['gas']['dHyd']) / 4.184
             os.chdir('..')
         calc_hfe = np.array(self.hfe_dict.values())
-        D = self.whfe*(calc_hfe - np.array(self.refdata.values()))
+        D = self.whfe*(calc_hfe - np.array(self.expval.values()))
         return D, dD
 
     def get_ti2(self, mvals, AGrad=False, AHess=False):
         """ Get the hydration free energy using two-point thermodynamic integration. """
         self.hfe_dict = OrderedDict()
-        dD = np.zeros((self.FF.np,len(self.refdata.keys())))
+        dD = np.zeros((self.FF.np,len(self.IDs)))
         beta = 1. / (kb * self.hfe_temperature)
-        for ilabel, label in enumerate(self.refdata.keys()):
+        for ilabel, label in enumerate(self.IDs):
             os.chdir(label)
             # This dictionary contains observables keyed by each phase.
             data = defaultdict(dict)
@@ -360,7 +413,7 @@ class Hydration(Target):
                 dD[:, ilabel] = 0.5*self.whfe[ilabel]*(data['liq']['dHyd']+data['gas']['dHyd']) / 4.184
             os.chdir('..')
         calc_hfe = np.array(self.hfe_dict.values())
-        D = self.whfe*(calc_hfe - np.array(self.refdata.values()))
+        D = self.whfe*(calc_hfe - np.array(self.expval.values()))
         return D, dD
 
     def get(self, mvals, AGrad=False, AHess=False):
