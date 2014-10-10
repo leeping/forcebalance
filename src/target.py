@@ -697,7 +697,11 @@ class Target(forcebalance.BaseClass):
         clines = [fline % (tuple(cblocks[j][i] for j in range(nc))) for i in range(max(crows))]
         tlines += clines
         PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
-        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=[i==0 for i in range(len(tlines))], leftpad=4, color=color)
+        if len(clines[0]) > len(tlines[0]):
+            centers = [0, 1]
+        else:
+            centers = [0]
+        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=[i in centers for i in range(len(tlines))], leftpad=4, color=color)
 
     def serialize_ff(self, mvals, outside=None):
         """ 
