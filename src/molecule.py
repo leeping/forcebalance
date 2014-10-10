@@ -1494,11 +1494,10 @@ class Molecule(object):
         for key in self.FrameKeys:
            if key in ['xyzs', 'qm_grads', 'qm_mulliken_charges', 'qm_mulliken_spins']:
                New.Data[key] = [self.Data[key][i][atomslice] for i in range(len(self))]
-        if 'networkx' in sys.modules and hasattr(self, 'elem') and self.na > 0:
-            New.top_settings = self.top_settings
-            New.build_topology()
         if 'bonds' in self.Data:
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
+        New.top_settings = self.top_settings
+        New.build_topology()
         return New
 
     def atom_stack(self, other):
@@ -1767,15 +1766,18 @@ class Molecule(object):
         # Build bonds from connectivity graph if not read from file.
         if 'bonds' not in self.Data:
             atom_bonds = self.build_bond_graph()
-            self.Data['bonds'] = []
+            bondlist = []
             for i, bi in enumerate(atom_bonds):
                 for j in bi:
-                    if i >= j: continue
-                    self.bonds.append((i, j))
+                    if i == j: continue
+                    elif i < j:
+                        bondlist.append((i, j))
+                    else:
+                        bondlist.append((j, i))
+            self.Data['bonds'] = sorted(list(set(bondlist)))
             self.built_bonds = True
         # Create a NetworkX graph object to hold the bonds.
         G = MyG()
-        bonds = [[] for i in range(self.na)]
         for i, a in enumerate(self.elem):
             G.add_node(i)
             if 'atomname' in self.Data:
