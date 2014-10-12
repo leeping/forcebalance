@@ -1235,10 +1235,10 @@ class Molecule(object):
         self.positive_resid = kwargs.get('positive_resid', 0)
         self.built_bonds = False
         ## Topology settings
-        self.top_settings = {'build' : kwargs.get('build_topology', True),
-                             'toppbc' : kwargs.get('toppbc', False),
+        self.top_settings = {'toppbc' : kwargs.get('toppbc', False),
                              'topframe' : kwargs.get('topframe', 0),
-                             'Fac' : kwargs.get('Fac', 1.2)}
+                             'Fac' : kwargs.get('Fac', 1.2),
+                             'read_bonds' : False}
 
         for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
             self.Funnel[i] = i
@@ -1265,8 +1265,8 @@ class Molecule(object):
             else:
                 self.comms = [i.expandtabs() for i in self.comms]
             ## Build the topology.
-            if hasattr(self, 'elem') and self.na > 0:
-                self.build_topology()
+            if kwargs.get('build_topology', True) and hasattr(self, 'elem') and self.na > 0:
+                self.build_topology(force_bonds=False)
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -1497,7 +1497,7 @@ class Molecule(object):
         if 'bonds' in self.Data:
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
         New.top_settings = self.top_settings
-        New.build_topology()
+        New.build_topology(force_bonds=False)
         return New
 
     def atom_stack(self, other):
@@ -1613,7 +1613,7 @@ class Molecule(object):
             xyz2 = np.dot(xyz2, rt) + tr
             self.xyzs[index2] = xyz2
 
-    def build_bond_graph(self):
+    def build_bonds(self):
         """ Build the bond connectivity graph. """
         sn = self.top_settings['topframe']
         toppbc = self.top_settings['toppbc']
@@ -1745,37 +1745,48 @@ class Molecule(object):
         self.top_settings['toppbc'] = toppbc
 
         # Create a list of atoms that each atom is bonded to.
-        bonds = [[] for i in range(self.na)]
+        atom_bonds = [[] for i in range(self.na)]
         bond_bool = dxij[0] < BondThresh
         for i, a in enumerate(bond_bool):
             if not a: continue
             (ii, jj) = AtomIterator[i]
             if ii == jj: continue
-            bonds[ii].append(jj)
-            bonds[jj].append(ii)
-        return bonds
+            atom_bonds[ii].append(jj)
+            atom_bonds[jj].append(ii)
+        bondlist = []
+        for i, bi in enumerate(atom_bonds):
+            for j in bi:
+                if i == j: continue
+                elif i < j:
+                    bondlist.append((i, j))
+                else:
+                    bondlist.append((j, i))
+        self.Data['bonds'] = sorted(list(set(bondlist)))
+        self.built_bonds = True
 
-    def build_topology(self):
-        ''' A bare-bones implementation of the bond graph capability in the nanoreactor code.  
-        Returns a NetworkX graph that depicts the molecular topology, which might be useful for stuff. 
-        Provide, optionally, the frame number used to compute the topology. '''
-        if not self.top_settings['build']: return
+    def build_topology(self, force_bonds=True):
+        ''' 
+
+        Create self.topology and self.molecules; these are graph
+        representations of the individual molecules (fragments)
+        contained in the Molecule object.
+
+        Parameters
+        ----------
+        force_bonds : bool
+            Build the bonds from interatomic distances.  If the user
+            calls build_topology from outside, assume this is the
+            default behavior.  If creating a Molecule object using
+            __init__, do not force the building of bonds by default
+            (only build bonds if not read from file.)
+
+        '''
         sn = self.top_settings['topframe']
         if self.na > 100000:
             print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
         # Build bonds from connectivity graph if not read from file.
-        if 'bonds' not in self.Data:
-            atom_bonds = self.build_bond_graph()
-            bondlist = []
-            for i, bi in enumerate(atom_bonds):
-                for j in bi:
-                    if i == j: continue
-                    elif i < j:
-                        bondlist.append((i, j))
-                    else:
-                        bondlist.append((j, i))
-            self.Data['bonds'] = sorted(list(set(bondlist)))
-            self.built_bonds = True
+        if (not self.top_settings['read_bonds']) or force_bonds:
+            self.build_bonds()
         # Create a NetworkX graph object to hold the bonds.
         G = MyG()
         for i, a in enumerate(self.elem):
@@ -2251,6 +2262,7 @@ class Molecule(object):
             aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
             bonds.append((aL,aH))
 
+        self.top_settings["read_bonds"] = True
         Answer = {'xyzs' : [np.array(xyz)],
                   'partial_charge' : charge,
                   'atomname' : atomname,
@@ -2759,6 +2771,7 @@ class Molecule(object):
                 "terminal" : PDBTerms}
 
         if len(bonds) > 0:
+            self.top_settings["read_bonds"] = True
             Answer["bonds"] = bonds
 
         if Box != None:
