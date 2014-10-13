@@ -418,9 +418,14 @@ def main():
     Rhos = prop_return['Rhos']
     Potentials = prop_return['Potentials']
     Kinetics = prop_return['Kinetics']
+    Cp_corrections = prop_return['Cp_corrections']
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
+    RPMD = False
+    # Have we run RPMD?
+    if len(Cp_corrections) > 0:
+        RPMD = True
     #getone = prop_return['One'] 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -445,6 +450,8 @@ def main():
     pV = atm_unit * pressure * Volumes
     pV_avg, pV_err = mean_stderr(pV)
     Rho_avg, Rho_err = mean_stderr(Rhos)
+    if RPMD:
+        Cp_corr_avg, Cp_corr_err = mean_stderr(Cp_corrections)
     PrintEDA(EDA, NMol)
 
     #==============================================#
@@ -637,22 +644,42 @@ def main():
         if b == None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
-        Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
+        if 'corrections' in kwargs:
+            corr = kwargs['corrections']
+        if 'RPMD' in kwargs:
+            Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2 + bzavg(corr,b))
+        else:
+            Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
         Cp_ *= 1000 / 4.184
         return Cp_
-    Cp = calc_cp(None,**{'h_':H})
+    if RPMD:
+        Cp = calc_cp(None,**{'h_':H, 'RPMD':True, 'corrections':Cp_corrections})
+    else:
+        Cp = calc_cp(None,**{'h_':H})
     Cpboot = []
-    for i in range(numboots):
-        boot = np.random.randint(L,size=L)
-        Cpboot.append(calc_cp(None,**{'h_':H[boot]}))
+    # Not 100 % sure about this
+    if not RPMD:
+        for i in range(numboots):
+            boot = np.random.randint(L,size=L)
+            Cpboot.append(calc_cp(None,**{'h_':H[boot]}))
+    else:
+        for i in range(numboots):
+            boot = np.random.randint(L,size=L)
+            Cpboot.append(calc_cp(None,**{'h_':H[boot], 'RPMD':True, 'corrections':Cp_corrections[boot]}))
     Cpboot = np.array(Cpboot)
     Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(H))
 
     # Isobaric heat capacity analytic derivative
-    GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
-    GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
-    GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
-    GCp  = GCp1 + GCp2 + GCp3
+    if not RPMD:
+        GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+        GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
+        GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+        GCp  = GCp1 + GCp2 + GCp3
+    else:
+        GCp1 = mBeta*covde(Cp_corrections) * 1000 / 4.184 / (NMol*kT*T) 
+        GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T) 
+        GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+        GCp  = GCp1 + GCp2 + GCp3
     Sep = printcool("Isobaric heat capacity:  % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:

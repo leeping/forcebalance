@@ -71,73 +71,144 @@ def evaluate_potential(Sim):
     if isinstance(Sim.integrator, RPMDIntegrator):
         PE = 0.0 * kilojoule/mole
         P = Sim.integrator.getNumCopies()
-        step = int(P/8)
+        step = int(P/16)
         for i in range(0,P,step):
             PE += Sim.integrator.getState(i,getEnergy=True).getPotentialEnergy() / float(P/step)
         return PE
     else:
         return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
 
-def evaluate_kinetic(Sim):
+#def evaluate_potential(Sim, States):
+#    # Calculate P.E., accouting for RPMD. This just amounts to calling getPotentialEnergy() for a classical simulation.
+#    if isinstance(Sim.integrator, RPMDIntegrator):
+#        PE = 0.0 * kilojoule/mole
+#        P = Sim.integrator.getNumCopies()
+#        step = int(P/16)
+#        for i in range(0,P,step):
+#            PE += States[i].getPotentialEnergy() / float(P/step)
+#        return PE
+#    else:
+#        return Sim.context.getState(getEnergy=True).getPotentialEnergy()
+
+#def evaluate_kinetic(Sim):
+#    # A primitive quantum K.E. estimator for RPMD simulation. Returns classical K.E. in a classical simulation. 
+#    if isinstance(Sim.integrator, RPMDIntegrator):
+#        KE_const = 0.0 * kilojoule/mole
+#        KE_spring = 0.0 * kilojoule/mole
+#        correction_spring = 0.0 * (kilojoule/mole)**2
+#        correction_const = 0.0 * (kilojoule/mole)**2
+#        hbar = 0.06350780 * nanometer**2*dalton/picosecond # 1 nm**2 * Da / ps**2 is 1 kJ/mol    
+#        kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin) # Verified
+#        T = Sim.integrator.getTemperature() # Note: this method call does NOT return instantaneous temp, but rather whatever the integrator was set to
+#        P = Sim.integrator.getNumCopies()
+#        N = Sim.system.getNumParticles() # Need correction bc OpenMM includes virtual sites in this count
+#        for i in range(P):
+#            copy_KE = Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()
+#            KE_const += copy_KE / P # First term of primitive K.E.
+#            correction_const += copy_KE**2 * (2.0/(3.0 * (N) * P**3)) # N-1000 for water
+#        mass_matrix = []
+#        for i in range(N):
+#            mass_matrix.append(Sim.system.getParticleMass(i))
+#        mass_matrix = np.array(mass_matrix)
+#        for i in range(P):
+#            j = (i+1) % P
+#            diff = np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())
+#            # Supress contributions from the virtual sites:
+#            for k in range(N):
+#                if Sim.system.isVirtualSite(k):
+#                    diff[k] = [0.0*nanometer, 0.0*nanometer, 0.0*nanometer]
+#            KE_spring -= np.sum((diff*diff).sum(axis=1) * mass_matrix * ((kb * T)**2 * P / (2.0 * hbar**2)))
+#            correction_spring -= np.sum((diff*diff).sum(axis=1) * mass_matrix * ((kb * T)**3 * P / hbar**2))
+#        return (KE_const, KE_spring, correction_const, correction_spring)
+#    else:
+#        return Sim.context.getState(getEnergy=True).getKineticEnergy()
+
+def evaluate_kinetic(Sim, props):
     # A primitive quantum K.E. estimator for RPMD simulation. Returns classical K.E. in a classical simulation. 
     if isinstance(Sim.integrator, RPMDIntegrator):
         KE_const = 0.0 * kilojoule/mole
-        KE_spring = 0.0 * kilojoule/mole
-        correction_spring = 0.0 * (kilojoule/mole)**2
+        KE_spring = 0.0
+        correction_spring = 0.0
         correction_const = 0.0 * (kilojoule/mole)**2
-        hbar = 0.06350780 * nanometer**2*dalton/picosecond # 1 nm**2 * Da / ps**2 is 1 kJ/mol    
+        hbar = 0.06350780 * nanometer**2*dalton/picosecond           # 1 nm**2 * Da / ps**2 is 1 kJ/mol    
         kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin) # Verified
-        T = Sim.integrator.getTemperature() # Note: this method call does NOT return instantaneous temp, but rather whatever the integrator was set to
-        P = Sim.integrator.getNumCopies()
-        N = Sim.system.getNumParticles() # Need correction bc OpenMM includes virtual sites in this count
+        T = props['T']                                               # Note: this method call does NOT return instantaneous temp, but rather whatever the integrator was set to
+        P = props['P']
+        N = props['N']                                               # Need correction bc OpenMM includes virtual sites in this count
+        const1 = (kb*T)**2*P/(2.0*hbar**2)
+        const2 = (kb*T)**3*P/hbar**2
         for i in range(P):
-            copy_KE = Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()
-            KE_const += copy_KE / P # First term of primitive K.E.
-            correction_const += copy_KE**2 * (2.0/(3.0 * (N) * P**3)) # N-1000 for water
-        mass_matrix = []
-        for i in range(N):
-            mass_matrix.append(Sim.system.getParticleMass(i))
-        mass_matrix = np.array(mass_matrix)
+            copy_KE = props['Inst_kinetics'][i]
+            KE_const += copy_KE / P
+            #correction_const += copy_KE**2 * 2.0/(3.0*(N)*P**3)
+            correction_const += copy_KE**2 * 2.0/(3.0*(N-216)*P**3)
         for i in range(P):
             j = (i+1) % P
-            diff = np.array(Sim.integrator.getState(j,getPositions=True).getPositions())-np.array(Sim.integrator.getState(i,getPositions=True).getPositions())
-            # Supress contributions from the virtual sites:
-            for k in range(N):
-                if Sim.system.isVirtualSite(k):
-                    diff[k] = [0.0*nanometer, 0.0*nanometer, 0.0*nanometer]
-            KE_spring -= np.sum((diff*diff).sum(axis=1) * mass_matrix * ((kb * T)**2 * P / (2.0 * hbar**2)))
-            correction_spring -= np.sum((diff*diff).sum(axis=1) * mass_matrix * ((kb * T)**3 * P / hbar**2))
-        return (KE_const, KE_spring, correction_const, correction_spring)
+            diff = np.array(props['Positions'][j])-np.array(props['Positions'][i])
+            diff[props['Vsites'],:] = 0.0
+            dot_prod = np.dot(((diff*diff).sum(axis=1)).T, props['Masses'])
+            KE_spring -= dot_prod
+            correction_spring -= dot_prod
+        KE_spring = Quantity(KE_spring, nanometer**2*dalton)
+        correction_spring = Quantity(correction_spring, nanometer**2*dalton)
+        return KE_const, KE_spring*const1, correction_const, correction_spring*const2
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
 
-def centroid_kinetic(Sim):
+#def centroid_kinetic(Sim):
+#    # Centroid quantum K.E. estimator for RPMD simulation. Returns classical K.E. in classical simulation.
+#    if isinstance(Sim.integrator, RPMDIntegrator):
+#        CV_const = 0.0 * kilojoule/mole
+#        CV_second = 0.0 * kilojoule/mole
+#        CV_correction_const = 0.0 * (kilojoule/mole)**2
+#        kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
+#        T = Sim.integrator.getTemperature()
+#        P = Sim.integrator.getNumCopies()
+#        N = Sim.system.getNumParticles()
+#        step = int(P/4)
+#        for i in range(P):
+#            copy_KE = Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()
+#            CV_const += copy_KE / float(P**2)
+#            CV_correction_const += copy_KE**2 * (2.0/(3.0 * (N) * P**4)) # (N-1000) for water
+#        centroid = np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*N)
+#        for i in range(0,P,step):
+#            centroid += np.array(Sim.integrator.getState(i,getPositions=True).getPositions()) / float(P/step) # Calculate centroid of the ring polymers
+#        for i in range(0,P,step):
+#            diff = np.array(Sim.integrator.getState(i,getPositions=True).getPositions()) - centroid
+#            # Supress contributions from the virtual sites:
+#            for j in range(N):
+#                if Sim.system.isVirtualSite(j):
+#                    diff[j] = [0.0*nanometer, 0.0*nanometer, 0.0*nanometer]
+#            derivative = -1.0*np.array(Sim.integrator.getState(i,getForces=True).getForces())
+#            CV_second += np.sum(diff*derivative) * 0.5 / float(P/step)
+#        return (CV_const, CV_second, CV_correction_const)
+#    else:
+#        Sim.context.getState(getEnergy=True).getKineticEnergy()
+
+def centroid_kinetic(Sim, props):
     # Centroid quantum K.E. estimator for RPMD simulation. Returns classical K.E. in classical simulation.
     if isinstance(Sim.integrator, RPMDIntegrator):
         CV_const = 0.0 * kilojoule/mole
         CV_second = 0.0 * kilojoule/mole
         CV_correction_const = 0.0 * (kilojoule/mole)**2
         kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
-        T = Sim.integrator.getTemperature()
-        P = Sim.integrator.getNumCopies()
-        N = Sim.system.getNumParticles()
-        step = int(P/4)
+        T = props['T']
+        P = props['P']
+        N = props['N']
+        step = int(P/16)
         for i in range(P):
-            copy_KE = Sim.integrator.getState(i,getEnergy=True).getKineticEnergy()
+            copy_KE = props['Inst_kinetics'][i]
             CV_const += copy_KE / float(P**2)
-            CV_correction_const += copy_KE**2 * (2.0/(3.0 * (N) * P**4)) # (N-1000) for water
+            CV_correction_const += copy_KE**2 * (2.0/(3.0*(N-216)*P**4))
         centroid = np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*N)
         for i in range(0,P,step):
-            centroid += np.array(Sim.integrator.getState(i,getPositions=True).getPositions()) / float(P/step) # Calculate centroid of the ring polymers
-        for i in range(0,P,step):
-            diff = np.array(Sim.integrator.getState(i,getPositions=True).getPositions()) - centroid
-            # Supress contributions from the virtual sites:
-            for j in range(N):
-                if Sim.system.isVirtualSite(j):
-                    diff[j] = [0.0*nanometer, 0.0*nanometer, 0.0*nanometer]
-            derivative = -1.0*np.array(Sim.integrator.getState(i,getForces=True).getForces())
-            CV_second += np.sum(diff*derivative) * 0.5 / float(P/step)
-        return (CV_const, CV_second, CV_correction_const)
+            centroid += np.array(props['Positions'][i]*nanometer) / float(P/step)        # Calculate centroids of ring polymers
+        for i in range(0,1):
+            diff = np.array(props['Positions'][i]*nanometer)-centroid
+            diff[props['Vsites'],:] = 0.0 * nanometer
+            derivative = -1.0*np.array(props['States'][i].getForces())
+            CV_second += np.sum(diff*derivative) * 0.5
+        return CV_const, CV_second, CV_correction_const
     else:
         Sim.context.getState(getEnergy=True).getKineticEnergy()
 
@@ -1041,8 +1112,8 @@ class OpenMM(Engine):
 
     def evaluate_one_(self, force=False, dipole=False):
         """ Perform a single point calculation on the current geometry. """
-        
-        State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
+        if not hasattr(self, 'xyz_rpmd'): 
+            State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = evaluate_potential(self.simulation) / kilojoules_per_mole
         if force: 
@@ -1309,10 +1380,29 @@ class OpenMM(Engine):
         Rhos = []
         Potentials = []
         Kinetics = []
-        Cv_corrections = []
+        Cp_corrections = []
         Volumes = []
         Dips = []
         Temps = []
+        rpmd_frame_props = {}
+        rpmd_frame_props['States'] = []
+        if self.rpmd:
+            vsites = []
+            # Build boolean array designating which particles are virtual
+            for i in range(self.simulation.system.getNumParticles()):
+                if self.simulation.system.isVirtualSite(i):
+                    vsites.append(True)
+                else:
+                    vsites.append(False)
+            # Build np array of particle masses. Stip of units to speed up function evaluation.
+            mass_matrix = np.array([])
+            for i in range(self.simulation.system.getNumParticles()):
+                mass_matrix = np.append(mass_matrix, self.simulation.system.getParticleMass(i).value_in_unit(dalton))
+            rpmd_frame_props['T']      = self.simulation.integrator.getTemperature()
+            rpmd_frame_props['P']      = self.simulation.integrator.getNumCopies()
+            rpmd_frame_props['N']      = self.simulation.system.getNumParticles()
+            rpmd_frame_props['Masses'] = mass_matrix
+            rpmd_frame_props['Vsites'] = vsites
         #========================#
         # Now run the simulation #
         #========================#
@@ -1333,15 +1423,24 @@ class OpenMM(Engine):
             if not self.rpmd:
                 state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
             else:
-                self.rpmd_states = []
+                self.rpmd_states     = []
+                self.inst_kinetics   = []
+                self.state_positions = []
                 for i in range(self.simulation.integrator.getNumCopies()):
-                    self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True))
+                    rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=True,
+                                                                        getParameters=False,enforcePeriodicBox=True,groups=-1)
+                    self.rpmd_states.append(rpmd_state)
+                    self.inst_kinetics.append(rpmd_state.getKineticEnergy())
+                    self.state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
                 state = self.rpmd_states[0]
+                rpmd_frame_props['States']        = self.rpmd_states
+                rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
+                rpmd_frame_props['Positions']     = self.state_positions
             if self.rpmd:
-                kinetic_tuple=evaluate_kinetic(self.simulation)
-                kinetic=kinetic_tuple[0]+kinetic_tuple[1]
+                kinetic_tuple=evaluate_kinetic(self.simulation, rpmd_frame_props)
+                kinetic=kinetic_tuple[0] + kinetic_tuple[1]
             else:
-                kinetic=evaluate_kinetic(self.simulation)
+                kinetic=evaluate_kinetic(self.simulation, rpmd_frame_props)
             potential=evaluate_potential(self.simulation)
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
@@ -1373,15 +1472,25 @@ class OpenMM(Engine):
             if not self.rpmd:
                 state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
             else:
-                self.rpmd_states = []
+                self.rpmd_states     = []
+                self.inst_kinetics   = []
+                self.state_positions = []
                 for i in range(self.simulation.integrator.getNumCopies()):
-                    self.rpmd_states.append(self.simulation.integrator.getState(i,getPositions=True))
+                    rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=True,
+                                                                        getParameters=False,enforcePeriodicBox=True,groups=-1)
+                    self.rpmd_states.append(rpmd_state)
+                    self.inst_kinetics.append(rpmd_state.getKineticEnergy())
+                    self.state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
                 state = self.rpmd_states[0]
+                rpmd_frame_props['States']        = self.rpmd_states
+                rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
+                rpmd_frame_props['Positions']     = self.state_positions
             if self.rpmd:
-                kinetic_tuple=evaluate_kinetic(self.simulation)
+                kinetic_tuple=evaluate_kinetic(self.simulation, rpmd_frame_props)
                 kinetic=kinetic_tuple[0]+kinetic_tuple[1]
+                Cp_correction=kinetic_tuple[2] + kinetic_tuple[3]
             else:
-                kinetic=evaluate_kinetic(self.simulation)
+                kinetic=evaluate_kinetic(self.simulation, rpmd_frame_props)
             potential=evaluate_potential(self.simulation)
             kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
@@ -1413,6 +1522,7 @@ class OpenMM(Engine):
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
             Kinetics.append(kinetic / kilojoules_per_mole)
+            Cp_corrections.append(Cp_correction / (kilojoules_per_mole)**2)
             Volumes.append(volume / nanometer**3)
             if not self.rpmd:
                 Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
@@ -1427,6 +1537,7 @@ class OpenMM(Engine):
         Rhos = np.array(Rhos)
         Potentials = np.array(Potentials)
         Kinetics = np.array(Kinetics)
+        Cp_corrections = np.array(Cp_corrections)
         Volumes = np.array(Volumes)
         Dips = np.array(Dips)
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
@@ -1436,7 +1547,8 @@ class OpenMM(Engine):
         Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
         # Initialized property dictionary.
         prop_return = OrderedDict()
-        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps,
+            'Cp_corrections': Cp_corrections})
         return prop_return
 
 class Liquid_OpenMM(Liquid):
