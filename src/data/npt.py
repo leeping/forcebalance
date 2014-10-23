@@ -418,6 +418,7 @@ def main():
     Rhos = prop_return['Rhos']
     Potentials = prop_return['Potentials']
     Kinetics = prop_return['Kinetics']
+    Centroid_virials = prop_return['Centroid_virials']
     Cp_corrections = prop_return['Cp_corrections']
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
@@ -468,7 +469,9 @@ def main():
     mKinetics = mprop_return['Kinetics']
     mEDA = mprop_return['Ecomps']
 
-    mEnergies = mPotentials + mKinetics
+    # Try out just using CV_KE for RPMD
+    mEnergies = mPotentials + mprop_return['Centroid_virials']
+    #mEnergies = mPotentials + mKinetics
     mEne_avg, mEne_err = mean_stderr(mEnergies)
     PrintEDA(mEDA, 1)
 

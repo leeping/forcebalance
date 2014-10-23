@@ -135,13 +135,20 @@ def evaluate_kinetic(Sim, props):
         T = props['T']                                               # Note: this method call does NOT return instantaneous temp, but rather whatever the integrator was set to
         P = props['P']
         N = props['N']                                               # Need correction bc OpenMM includes virtual sites in this count
+        N_correction = N / 4
         const1 = (kb*T)**2*P/(2.0*hbar**2)
         const2 = (kb*T)**3*P/hbar**2
-        for i in range(P):
-            copy_KE = props['Inst_kinetics'][i]
-            KE_const += copy_KE / P
-            #correction_const += copy_KE**2 * 2.0/(3.0*(N)*P**3)
-            correction_const += copy_KE**2 * 2.0/(3.0*(N-216)*P**3)
+        #-----------------------
+        total_inst_KE = sum(props['Inst_kinetics'])
+        KE_const += total_inst_KE / P
+        correction_const += total_inst_KE**2 * 2.0 / (3.0 * (N-N_correction) * P**3)
+        #-----------------------
+        #for i in range(P):
+        #    copy_KE = props['Inst_kinetics'][i]
+        #    instantaneous_KE += copy_KE / P
+        #    KE_const += copy_KE / P
+        #    #correction_const += copy_KE**2 * 2.0/(3.0*(N)*P**3)
+        #    correction_const += copy_KE**2 * 2.0/(3.0*(N-N_correction)*P**3)
         for i in range(P):
             j = (i+1) % P
             diff = np.array(props['Positions'][j])-np.array(props['Positions'][i])
@@ -151,7 +158,8 @@ def evaluate_kinetic(Sim, props):
             correction_spring -= dot_prod
         KE_spring = Quantity(KE_spring, nanometer**2*dalton)
         correction_spring = Quantity(correction_spring, nanometer**2*dalton)
-        return KE_const, KE_spring*const1, correction_const, correction_spring*const2
+        instantaneous_T = total_inst_KE * 2.0/3.0 / P / kb /(N-N_correction)
+        return KE_const, KE_spring*const1, correction_const, correction_spring*const2, instantaneous_T
     else:
         return Sim.context.getState(getEnergy=True).getKineticEnergy()
 
@@ -195,11 +203,15 @@ def centroid_kinetic(Sim, props):
         T = props['T']
         P = props['P']
         N = props['N']
+        N_correction = N / 4
         step = int(P/16)
-        for i in range(P):
-            copy_KE = props['Inst_kinetics'][i]
-            CV_const += copy_KE / float(P**2)
-            CV_correction_const += copy_KE**2 * (2.0/(3.0*(N-216)*P**4))
+        total_inst_KE = sum(props['Inst_kinetics'])
+        CV_const += total_inst_KE / P**2
+        CV_correction_const += total_inst_KE**2 * 2.0 / (3.0 * (N-N_correction) * P**4)
+        #for i in range(P):
+        #    copy_KE = props['Inst_kinetics'][i]
+        #    CV_const += copy_KE / float(P**2)
+        #    CV_correction_const += copy_KE**2 * (2.0/(3.0*(N-N_correction)*P**4))
         centroid = np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*N)
         for i in range(0,P,step):
             centroid += np.array(props['Positions'][i]*nanometer) / float(P/step)        # Calculate centroids of ring polymers
@@ -1380,6 +1392,7 @@ class OpenMM(Engine):
         Rhos = []
         Potentials = []
         Kinetics = []
+        Centroid_virials = []
         Cp_corrections = []
         Volumes = []
         Dips = []
@@ -1408,6 +1421,8 @@ class OpenMM(Engine):
         #========================#
         # Initialize velocities.
         #
+        print temperature
+        print self.simulation.system.getNumParticles()
         self.simulation.context.setVelocitiesToTemperature(temperature*kelvin)
         #print(XmlSerializer.serialize(self.simulation.system)) 
         # Equilibrate.
@@ -1439,6 +1454,8 @@ class OpenMM(Engine):
             if self.rpmd:
                 kinetic_tuple=evaluate_kinetic(self.simulation, rpmd_frame_props)
                 kinetic=kinetic_tuple[0] + kinetic_tuple[1]
+                centroid_virial_tuple=centroid_kinetic(self.simulation, rpmd_frame_props)
+                centroid_virial_kinetic=centroid_virial_tuple[0] + centroid_virial_tuple[1]
             else:
                 kinetic=evaluate_kinetic(self.simulation, rpmd_frame_props)
             potential=evaluate_potential(self.simulation)
@@ -1449,7 +1466,10 @@ class OpenMM(Engine):
             else:
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
+            if self.rpmd:
+                kinetic_temperature = kinetic_tuple[-1]
+            else:
+                kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
             if self.pbc:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                                      kinetic_temperature / kelvin, potential / kilojoules_per_mole,
@@ -1489,10 +1509,15 @@ class OpenMM(Engine):
                 kinetic_tuple=evaluate_kinetic(self.simulation, rpmd_frame_props)
                 kinetic=kinetic_tuple[0]+kinetic_tuple[1]
                 Cp_correction=kinetic_tuple[2] + kinetic_tuple[3]
+                centroid_virial_tuple=centroid_kinetic(self.simulation, rpmd_frame_props)
+                centroid_virial_kinetic=centroid_virial_tuple[0] + centroid_virial_tuple[1]
             else:
                 kinetic=evaluate_kinetic(self.simulation, rpmd_frame_props)
             potential=evaluate_potential(self.simulation)
-            kinetic_temperature = 2.0 * kinetic / kB / self.ndof
+            if self.rpmd:
+                kinetic_temperature = kinetic_tuple[-1]
+            else:
+                kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -1522,6 +1547,7 @@ class OpenMM(Engine):
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
             Kinetics.append(kinetic / kilojoules_per_mole)
+            Centroid_virials.append(centroid_virial_kinetic / kilojoules_per_mole)
             Cp_corrections.append(Cp_correction / (kilojoules_per_mole)**2)
             Volumes.append(volume / nanometer**3)
             if not self.rpmd:
@@ -1537,6 +1563,7 @@ class OpenMM(Engine):
         Rhos = np.array(Rhos)
         Potentials = np.array(Potentials)
         Kinetics = np.array(Kinetics)
+        Centroid_virials = np.array(Centroid_virials)
         Cp_corrections = np.array(Cp_corrections)
         Volumes = np.array(Volumes)
         Dips = np.array(Dips)
@@ -1548,7 +1575,7 @@ class OpenMM(Engine):
         # Initialized property dictionary.
         prop_return = OrderedDict()
         prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps,
-            'Cp_corrections': Cp_corrections})
+            'Cp_corrections': Cp_corrections, 'Centroid_virials': Centroid_virials})
         return prop_return
 
 class Liquid_OpenMM(Liquid):
