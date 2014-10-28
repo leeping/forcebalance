@@ -152,6 +152,7 @@ dftypes = [None, 'PDIHS', 'IDIHS', 'RBDIHS', 'PIMPDIHS', 'FOURDIHS', None, None,
 fdict = {
     'atomtypes'     : nftypes,
     'nonbond_params': pftypes,
+    'pairtypes'     : pftypes,
     'bonds'         : bftypes,
     'bondtypes'     : bftypes,
     'angles'        : aftypes,
@@ -401,6 +402,9 @@ class ITP_Reader(BaseReader):
                                                  'Charge'       : atype['chg'],
                                                  'ParticleType' : atype['ptp']}
         elif self.sec == 'nonbond_params':
+            atom = [s[0], s[1]]
+            self.itype = pftypes[self.nbtype]
+        elif self.sec == 'pairtypes':
             atom = [s[0], s[1]]
             self.itype = pftypes[self.nbtype]
         elif self.sec == 'atoms':
