@@ -100,8 +100,6 @@ class Liquid(Target):
         self.set_option(tgt_opts,'w_eps0',forceprint=True)
         # Normalize the contributions to the objective function
         self.set_option(tgt_opts,'w_normalize',forceprint=True)
-        if not self.w_normalize:
-            warn_press_key("As of July 17, 2014, the property weights are no longer normalized by default.\nSet w_normalize in $target to restore the old behavior.")
         # Optionally pause on the zeroth step
         self.set_option(tgt_opts,'manual')
         # Don't target the average enthalpy of vaporization and allow it to freely float (experimental)
@@ -487,7 +485,7 @@ class Liquid(Target):
         Read in time series for all previous iterations.
         """
 
-        unpack = forcebalance.nifty.lp_load('forcebalance.p')
+        unpack = lp_load('forcebalance.p')
         mvals1 = unpack[1]
         if mvals1.shape != mvals.shape:
             warn_press_key("mvals from forcebalance.p has different shape compared to internal values!\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
@@ -594,11 +592,12 @@ class Liquid(Target):
         
         """
         
-        unpack = forcebalance.nifty.lp_load('forcebalance.p')
+        unpack = lp_load('forcebalance.p')
         mvals1 = unpack[1]
         if mvals1.shape != mvals.shape:
             warn_press_key("mvals from forcebalance.p has different shape compared to internal values!\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
         elif len(mvals1) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+        if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
         mbar_verbose = False

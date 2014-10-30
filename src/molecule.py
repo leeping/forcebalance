@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                  Last updated September 13, 2014                   |#
+#|                   Last updated October 7, 2014                     |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -133,7 +133,7 @@ AtomVariableNames = set(['elem', 'partial_charge', 'atomname', 'atomtype', 'tink
 # mult       = The spin multiplicity of the molecule
 MetaVariableNames = set(['fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds', 'topology', 'molecules'])
 # Variable names relevant to quantum calculations explicitly
-QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost'])
+QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost', 'qm_bondorder'])
 # Superset of all variable names.
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
@@ -146,9 +146,15 @@ import itertools
 from collections import OrderedDict, namedtuple, Counter
 from ctypes import *
 from warnings import warn
-#import logging as logger
-import logging
-logger = logging.getLogger(__name__)
+
+#================================#
+#       Set up the logger        #
+#================================#
+try: 
+    from output import *
+except: 
+    from logging import *
+    logger.info("Imported the default logger\n")
 
 module_name = __name__.replace('.molecule','')
 
@@ -386,7 +392,21 @@ except:
 
 def TopEqual(mol1, mol2):
     """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
-    return mol1.topology == mol2.topology
+    # Checks to see if the two molecule objects have the same fragments.
+    GraphEqual = Counter(mol1.molecules) == Counter(mol2.molecules)
+    # Checks to see whether the molecule objects have the same atoms in each fragment.
+    AtomEqual = Counter([tuple(m.L()) for m in mol1.molecules]) == Counter([tuple(m.L()) for m in mol2.molecules])
+    return GraphEqual and AtomEqual
+
+def MolEqual(mol1, mol2):
+    """ 
+    Determine whether two Molecule objects have the same fragments by
+    looking at elements and connectivity graphs.  This is less strict
+    than TopEqual (i.e. more often returns True).
+    """
+    if mol1.na != mol2.na : return False
+    if Counter(mol1.elem) != Counter(mol2.elem) : return False
+    return Counter(mol1.molecules) == Counter(mol2.molecules)
 
 def format_xyz_coord(element,xyz,tinker=False):
     """ Print a line consisting of (element, x, y, z) in accordance with .xyz file format
@@ -689,10 +709,12 @@ def extract_int(arr, avgthre, limthre, label="value", verbose=True):
     rounded = round(average)
     passed = True
     if abs(average - rounded) > avgthre:
-        if verbose: print "Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre)
+        if verbose: 
+            logger.info("Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre))
         passed = False
     if abs(maximum - minimum) > limthre:
-        if verbose: print "Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre)
+        if verbose: 
+            logger.info("Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre))
         passed = False
     return int(rounded), passed
 
@@ -740,7 +762,7 @@ def extract_qsz(M, verbose=True):
     nproton = sum([Elements.index(i) for i in M.elem])
     nelectron = nproton + chg
     if not spnpass:
-        if verbose: print "Going with the minimum spin consistent with charge."
+        if verbose: logger.info("Going with the minimum spin consistent with charge.")
         if nelectron%2 == 0:
             spn = 0
         else:
@@ -748,14 +770,94 @@ def extract_qsz(M, verbose=True):
     
     # The number of electrons should be odd iff the spin is odd.
     if ((nelectron-spn)/2)*2 != (nelectron-spn):
-        print "\x1b[91mThe number of electrons (%i) is inconsistent with the spin-z (%i)\x1b[0m" % (nelectron, spn)
+        if verbose: logger.info("\x1b[91mThe number of electrons (%i) is inconsistent with the spin-z (%i)\x1b[0m" % (nelectron, spn))
         return -999, -999
 
-    if verbose:
-        print "Number of electrons:", nelectron
-        print "Net charge:", chg
-        print "Net spin:", spn
+    if verbose: logger.info("%i electrons; charge %i, spin %i" % (nelectron, chg, spn))
     return chg, spn
+
+def arc(Mol, begin=None, end=None, RMSD=True):
+    """
+    Get the arc-length for a trajectory segment.  
+    Uses RMSD or maximum displacement of any atom in the trajectory.
+
+    Parameters
+    ----------
+    Mol : Molecule
+        Molecule object for calculating the arc length.
+    begin : int
+        Starting frame, defaults to first frame
+    end : int
+        Ending frame, defaults to final frame
+    RMSD : bool
+        Set to True to use frame-to-frame RMSD; otherwise use the maximum displacement of any atom
+        
+    Returns
+    -------
+    Arc : np.ndarray
+        Arc length between frames in Angstrom, length is n_frames - 1
+    """
+    Mol.align()
+    if begin == None:
+        begin = 0
+    if end == None:
+        end = len(Mol)
+    if RMSD:
+        Arc = Mol.pathwise_rmsd()
+    else:
+        Arc = np.array([np.max([np.linalg.norm(Mol.xyzs[i+1][j]-Mol.xyzs[i][j]) for j in range(Mol.na)]) for i in range(begin, end-1)])
+    return Arc
+
+def EqualSpacing(Mol, frames=0, dx=0, RMSD=True):
+    """
+    Equalize the spacing of frames in a trajectory with linear interpolation.  
+    This is done in a very simple way, first calculating the arc length 
+    between frames, then creating an equally spaced array, and interpolating
+    all Cartesian coordinates along this equally spaced array.
+
+    This is intended to be used on trajectories with smooth transformations and
+    ensures that concatenated frames containing both optimization coordinates 
+    and dynamics trajectories don't have sudden changes in their derivatives.
+    
+    Parameters
+    ----------
+    Mol : Molecule
+        Molecule object for equalizing the spacing.
+    frames : int
+        Return a Molecule object with this number of frames.
+    RMSD : bool
+        Use RMSD in the arc length calculation.
+
+    Returns
+    -------
+    Mol1 : Molecule
+        New molecule object, either the same one (if frames > len(Mol))
+        or with equally spaced frames.
+    """
+    ArcMol = arc(Mol, RMSD=RMSD)
+    ArcMolCumul = np.insert(np.cumsum(ArcMol), 0, 0.0)
+    if frames != 0 and dx != 0:
+        logger.error("Provide dx or frames or neither")
+    elif dx != 0:
+        frames = int(float(max(ArcMolCumul))/dx)
+    elif frames == 0:
+        frames = len(ArcMolCumul)
+    
+    ArcMolEqual = np.linspace(0, max(ArcMolCumul), frames)
+    xyzold = np.array(Mol.xyzs)
+    xyznew = np.zeros((frames, Mol.na, 3))
+    for a in range(Mol.na):
+        for i in range(3):
+            xyznew[:,a,i] = np.interp(ArcMolEqual, ArcMolCumul, xyzold[:, a, i])
+    if len(xyzold) == len(xyznew):
+        Mol1 = copy.deepcopy(Mol)
+    else:
+        # If we changed the number of coordinates, then 
+        # do some integer interpolation of the comments and 
+        # other frame variables.
+        Mol1 = Mol[np.array([int(round(i)) for i in np.linspace(0, len(xyzold)-1, len(xyznew))])]
+    Mol1.xyzs = list(xyznew)
+    return Mol1
 
 class Molecule(object):
     """ Lee-Ping's general file format conversion class.
@@ -1028,7 +1130,7 @@ class Molecule(object):
         for key in self.AtomKeys:
             NewData[key] = list(np.array(M.Data[key])[unmangled])
         for key in self.FrameKeys:
-            if key in ['xyzs', 'qm_grads', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+            if key in ['xyzs', 'qm_grads', 'qm_mulliken_charges', 'qm_mulliken_spins']:
                 NewData[key] = list([self.Data[key][i][unmangled] for i in range(len(self))])
         for key in NewData:
             setattr(self, key, copy.deepcopy(NewData[key]))
@@ -1133,10 +1235,10 @@ class Molecule(object):
         self.positive_resid = kwargs.get('positive_resid', 0)
         self.built_bonds = False
         ## Topology settings
-        self.top_settings = {'build' : kwargs.get('build_topology', True),
-                             'toppbc' : kwargs.get('toppbc', False),
+        self.top_settings = {'toppbc' : kwargs.get('toppbc', False),
                              'topframe' : kwargs.get('topframe', 0),
-                             'Fac' : kwargs.get('Fac', 1.2)}
+                             'Fac' : kwargs.get('Fac', 1.2),
+                             'read_bonds' : False}
 
         for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
             self.Funnel[i] = i
@@ -1162,12 +1264,9 @@ class Molecule(object):
                 self.comms = ['Generated by ForceBalance from %s: Frame %i of %i' % (fnm, i+1, self.ns) for i in range(self.ns)]
             else:
                 self.comms = [i.expandtabs() for i in self.comms]
-            ## Make sure the comment line isn't too long
-            # for i in range(len(self.comms)):
-            #     self.comms[i] = self.comms[i][:100] if len(self.comms[i]) > 100 else self.comms[i]
-            # Attempt to build the topology for small systems. :)
-            if 'networkx' in sys.modules and hasattr(self, 'elem') and self.na > 0:
-                self.build_topology()
+            ## Build the topology.
+            if kwargs.get('build_topology', True) and hasattr(self, 'elem') and self.na > 0:
+                self.build_topology(force_bonds=False)
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -1392,14 +1491,13 @@ class Molecule(object):
                 New.Data['tinkersuf'] = NewSuf[:]
             else:
                 New.Data[key] = list(np.array(self.Data[key])[atomslice])
-        if 'xyzs' in self.Data:
-            for i in range(self.ns):
-                New.xyzs[i] = self.xyzs[i][atomslice]
-        if 'networkx' in sys.modules and hasattr(self, 'elem') and self.na > 0:
-            New.top_settings = self.top_settings
-            New.build_topology()
+        for key in self.FrameKeys:
+           if key in ['xyzs', 'qm_grads', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+               New.Data[key] = [self.Data[key][i][atomslice] for i in range(len(self))]
         if 'bonds' in self.Data:
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
+        New.top_settings = self.top_settings
+        New.build_topology(force_bonds=False)
         return New
 
     def atom_stack(self, other):
@@ -1515,13 +1613,8 @@ class Molecule(object):
             xyz2 = np.dot(xyz2, rt) + tr
             self.xyzs[index2] = xyz2
 
-    def build_topology(self):
-        ''' A bare-bones implementation of the bond graph capability in the nanoreactor code.  
-        Returns a NetworkX graph that depicts the molecular topology, which might be useful for stuff. 
-        Provide, optionally, the frame number used to compute the topology. '''
-        if not self.top_settings['build']: return
-        if self.na > 100000:
-            print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
+    def build_bonds(self):
+        """ Build the bond connectivity graph. """
         sn = self.top_settings['topframe']
         toppbc = self.top_settings['toppbc']
         Fac = self.top_settings['Fac']
@@ -1648,31 +1741,66 @@ class Molecule(object):
                 raise RuntimeError
             dxij = [np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator])]
 
-        # Create a NetworkX graph object.
+        # Update topology settings with what we learned
+        self.top_settings['toppbc'] = toppbc
+
+        # Create a list of atoms that each atom is bonded to.
+        atom_bonds = [[] for i in range(self.na)]
+        bond_bool = dxij[0] < BondThresh
+        for i, a in enumerate(bond_bool):
+            if not a: continue
+            (ii, jj) = AtomIterator[i]
+            if ii == jj: continue
+            atom_bonds[ii].append(jj)
+            atom_bonds[jj].append(ii)
+        bondlist = []
+        for i, bi in enumerate(atom_bonds):
+            for j in bi:
+                if i == j: continue
+                elif i < j:
+                    bondlist.append((i, j))
+                else:
+                    bondlist.append((j, i))
+        self.Data['bonds'] = sorted(list(set(bondlist)))
+        self.built_bonds = True
+
+    def build_topology(self, force_bonds=True):
+        ''' 
+
+        Create self.topology and self.molecules; these are graph
+        representations of the individual molecules (fragments)
+        contained in the Molecule object.
+
+        Parameters
+        ----------
+        force_bonds : bool
+            Build the bonds from interatomic distances.  If the user
+            calls build_topology from outside, assume this is the
+            default behavior.  If creating a Molecule object using
+            __init__, do not force the building of bonds by default
+            (only build bonds if not read from file.)
+
+        '''
+        sn = self.top_settings['topframe']
+        if self.na > 100000:
+            print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
+        # Build bonds from connectivity graph if not read from file.
+        if (not self.top_settings['read_bonds']) or force_bonds:
+            self.build_bonds()
+        # Create a NetworkX graph object to hold the bonds.
         G = MyG()
-        bonds = [[] for i in range(self.na)]
         for i, a in enumerate(self.elem):
             G.add_node(i)
             if 'atomname' in self.Data:
                 nx.set_node_attributes(G,'n',{i:self.atomname[i]})
             nx.set_node_attributes(G,'e',{i:a})
             nx.set_node_attributes(G,'x',{i:self.xyzs[sn][i]})
-        bond_bool = dxij[0] < BondThresh
-        for i, a in enumerate(bond_bool):
-            if not a: continue
-            (ii, jj) = AtomIterator[i]
-            if ii == jj: continue
-            bonds[ii].append(jj)
-            bonds[jj].append(ii)
-            G.add_edge(ii, jj)
-        # Update topology settings with what we learned
-        self.top_settings['toppbc'] = toppbc
-        # LPW: Molecule.molecules is an annoying misnomer... it should be fragments or substructures or something
+        for (i, j) in self.bonds:
+            G.add_edge(i, j)
+        # The Topology is simply the NetworkX graph object.
         self.topology = G
+        # LPW: Molecule.molecules is a funny misnomer... it should be fragments or substructures or something
         self.molecules = list(nx.connected_component_subgraphs(G))
-        if 'bonds' not in self.Data:
-            self.Data['bonds'] = list(G.edges())
-            self.built_bonds = True
 
     def distance_matrix(self):
         ''' Build a distance matrix between atoms. '''
@@ -2134,6 +2262,7 @@ class Molecule(object):
             aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
             bonds.append((aL,aH))
 
+        self.top_settings["read_bonds"] = True
         Answer = {'xyzs' : [np.array(xyz)],
                   'partial_charge' : charge,
                   'atomname' : atomname,
@@ -2642,7 +2771,9 @@ class Molecule(object):
                 "terminal" : PDBTerms}
 
         if len(bonds) > 0:
+            self.top_settings["read_bonds"] = True
             Answer["bonds"] = bonds
+
         if Box != None:
             Answer["boxes"] = [Box for i in range(len(XYZList))]
 
@@ -2690,8 +2821,11 @@ class Molecule(object):
         mkspn    = []
         mkchgThis= []
         mkspnThis= []
+        frqs     = []
+        modes    = []
         XMode    = 0
         MMode    = 0
+        VMode    = 0
         conv     = []
         convThis = 0
         readChargeMult = 0
@@ -2702,14 +2836,15 @@ class Molecule(object):
                         'mult'             : ("Sum of spin +charges", -1),
                         'energy_mp2'       : ("^(ri)*(-)*mp2 +total energy += +[-+]?([0-9]*\.)?[0-9]+ +au$",-2),
                         'energy_ccsd'      : ("^CCSD Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
-                        'energy_ccsdt'     : ("^CCSD\(T\) Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1)
+                        'energy_ccsdt'     : ("^CCSD\(T\) Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
                         }
         matrix_match = {'analytical_grad'  :'Full Analytical Gradient',
                         'gradient_scf'     :'Gradient of SCF Energy',
                         'gradient_mp2'     :'Gradient of MP2 Energy',
                         'gradient_dualbas' :'Gradient of the Dual-Basis Energy',
-                        'hessian_scf'      :'Hessian of the SCF Energy'
-                        }
+                        'hessian_scf'      :'Hessian of the SCF Energy',
+                        'mayer'            :'Mayer SCF Bond Order'
+                       }
         qcrem    = OrderedDict()
 
         matblank   = {'match' : '', 'All' : [], 'This' : [], 'Strip' : [], 'Mode' : 0}
@@ -2720,6 +2855,8 @@ class Molecule(object):
         for key, val in float_match.items():
             Floats[key] = []
 
+        ## Detect freezing string
+        FSM = False
         ## Intrinsic reaction coordinate stuff
         IRCDir = 0
         RPLine = False
@@ -2824,6 +2961,9 @@ class Molecule(object):
                 IRCData[IRCDir]['stat'] = 1
                 IRCDir = 1
             #----- End IRC stuff
+            # Look for SCF energy
+            # Note that COSMO has two SCF energies per calculation so this parser won't work.
+            # Need to think of a better way.
             if re.match(".*Convergence criterion met$".lower(), line.lower()):
                 conv.append(1)
                 energy_scf.append(Floats['energy_scfThis'][-1])
@@ -2835,14 +2975,46 @@ class Molecule(object):
                 conv.append(0)
                 Floats['energy_scfThis'] = []
                 energy_scf.append(0.0)
+            #----- If doing freezing string calculation, do NOT treat as a geometry optimization.
+            if 'Starting FSM Calculation' in line:
+                FSM = True
+            #----- Vibrational stuff
+            VModeNxt = None
+            if 'VIBRATIONAL ANALYSIS' in line:
+                VMode = 1
+            if VMode > 0 and line.strip().startswith('Mode:'):
+                VMode = 2
+            if VMode == 2:
+                s = line.split()
+                if 'Frequency:' in line:
+                    nfrq = len(s) - 1
+                    frqs += [float(i) for i in s[1:]]
+                if re.match('^X +Y +Z', line):
+                    VModeNxt = 3
+                    readmodes = [[] for i in range(nfrq)]
+                if 'Imaginary Frequencies' in line:
+                    VMode = 0
+            if VMode == 3:
+                s = line.split()
+                if len(s) != nfrq*3+1:
+                    VMode = 2
+                    modes += readmodes[:]
+                elif 'TransDip' not in s:
+                    for i in range(nfrq):
+                        readmodes[i].append([float(s[j]) for j in range(1+3*i,4+3*i)])
+            if VModeNxt != None: VMode = VModeNxt
             for key, val in matrix_match.items():
                 if Mats[key]["Mode"] >= 1:
-                    if re.match("^[0-9]+( +[0-9]+)+$",line):
+                    # Match any number of integers on a line.  This signifies a column header to start the matrix
+                    if re.match("^[0-9]+( +[0-9]+)*$",line):
                         Mats[key]["This"] = add_strip_to_mat(Mats[key]["This"],Mats[key]["Strip"])
                         Mats[key]["Strip"] = []
+                        Mats[key]["Mode"] = 2
+                    # Match a single integer followed by any number of floats.  This is a strip of data to be added to the matrix
                     elif re.match("^[0-9]+( +[-+]?([0-9]*\.)?[0-9]+)+$",line):
                         Mats[key]["Strip"].append([float(i) for i in line.split()[1:]])
-                    else:
+                    # In any other case, the matrix is terminated.
+                    elif Mats[key]["Mode"] >= 2:
                         Mats[key]["This"] = add_strip_to_mat(Mats[key]["This"],Mats[key]["Strip"])
                         Mats[key]["Strip"] = []
                         Mats[key]["All"].append(np.array(Mats[key]["This"]))
@@ -2877,7 +3049,9 @@ class Molecule(object):
             Answer['qm_grads'] = Mats['gradient_dualbas']['All']
         elif len(Mats['gradient_scf']['All']) > 0:
             Answer['qm_grads'] = Mats['gradient_scf']['All']
-
+        # Mayer bond order matrix from SCF_FINAL_PRINT=1
+        if len(Mats['mayer']['All']) > 0:
+            Answer['qm_bondorder'] = Mats['mayer']['All'][-1]
         if len(Mats['hessian_scf']['All']) > 0:
             Answer['qm_hessians'] = Mats['hessian_scf']['All']
         #else:
@@ -2952,6 +3126,10 @@ class Molecule(object):
             Answer['qm_mulliken_spins'] = Answer['qm_mulliken_spins'][:len(Answer['qm_energies'])]
         
         Answer['Irc'] = IRCData
+        if len(modes) > 0:
+            unnorm = [np.array(i) for i in modes]
+            Answer['freqs'] = np.array(frqs)
+            Answer['modes'] = [i/np.linalg.norm(i) for i in unnorm]
 
         return Answer
     
