@@ -9,8 +9,8 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec
-from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd_srch
+from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec, lp_load
+from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -396,7 +396,7 @@ class Target(forcebalance.BaseClass):
         elif len(mvals1) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
         
-        return forcebalance.nifty.lp_load('objective.p')
+        return lp_load('objective.p')
 
     def absrd(self, inum=None):
 
@@ -571,7 +571,7 @@ class Target(forcebalance.BaseClass):
         ## Save the force field files to this directory, so that it
         ## reflects the objective function and properties that were
         ## printed out.
-        if not in_fd_srch(): 
+        if not in_fd(): 
             self.FF.make(mvals)
 
         os.chdir(cwd)
@@ -609,7 +609,7 @@ class Target(forcebalance.BaseClass):
         os.chdir(absgetdir)
         self.link_from_tempdir(absgetdir)
         ## Write mathematical parameters to file; will be used to checkpoint calculation.
-        if not in_fd_srch():
+        if not in_fd():
             np.savetxt('mvals.txt', mvals)
         ## Read in file that specifies which derivatives may be skipped.
         if Counter() >= self.zerograd and self.zerograd >= 0: 
@@ -699,7 +699,11 @@ class Target(forcebalance.BaseClass):
         clines = [fline % (tuple(cblocks[j][i] for j in range(nc))) for i in range(max(crows))]
         tlines += clines
         PrintDict = OrderedDict([(key, vline % (tuple(val))) for key, val in data.items()])
-        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=[i==0 for i in range(len(tlines))], leftpad=4, color=color)
+        if len(clines[0]) > len(tlines[0]):
+            centers = [0, 1]
+        else:
+            centers = [0]
+        printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=[i in centers for i in range(len(tlines))], leftpad=4, color=color)
 
     def serialize_ff(self, mvals, outside=None):
         """ 
@@ -721,7 +725,7 @@ class Target(forcebalance.BaseClass):
         makeffp = False
         if (os.path.exists("mvals.txt") and os.path.exists("forcefield.p")):
             mvalsf = np.loadtxt("mvals.txt")
-            if np.max(np.abs(mvals - mvalsf)) != 0.0:
+            if len(mvalsf) > 0 and np.max(np.abs(mvals - mvalsf)) != 0.0:
                 makeffp = True
         else:
             makeffp = True
@@ -800,7 +804,7 @@ class RemoteTarget(Target):
     def get(self,mvals,AGrad=False,AHess=False):
         with open('indicate.log', 'r') as f:
             self.remote_indicate = f.read()
-        return forcebalance.nifty.lp_load('objective.p')
+        return lp_load('objective.p')
         
     def indicate(self):
         logger.info(self.remote_indicate)
