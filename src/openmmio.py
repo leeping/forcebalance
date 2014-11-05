@@ -104,7 +104,7 @@ def centroid_kinetic(Sim, props):
             diff = np.array(props['Positions'][i]*nanometer)-centroid
             diff[props['Vsites'],:] = 0.0 * nanometer
             derivative = -1.0*np.array(props['States'][i].getForces())
-            CV_second_term += np.sum(diff*derivative) * 0.5 / float(P)
+            Cv_second_term += np.sum(diff*derivative) * 0.5 / float(P)
         return Cv_second_term
     else:
         Sim.context.getState(getEnergy=True).getKineticEnergy()
@@ -369,12 +369,19 @@ def CopyCustomNonbondedParameters(src, dest):
     for i in range(src.getNumParticles()):
         dest.setParticleParameters(i, list(src.getParticleParameters(i)))
 
+def CopyCustomBondedParameters(src, dest):
+    '''
+    Copy whatever update parameters in context can 
+    '''
+    for i in range(src.getNumBonds()):
+        dest.setBondParameters(i, *src.getBondParameters(i))
+
 def do_nothing(src, dest):
     return
 
 def CopySystemParameters(src,dest):
     """Copy parameters from one system (i.e. that which is created by a new force field)
-    sto another system (i.e. the one stored inside the Target object).
+    to another system (i.e. the one stored inside the Target object).
     DANGER: These need to be implemented manually!!!"""
     Copiers = {'AmoebaBondForce':CopyAmoebaBondParameters,
                'AmoebaOutOfPlaneBendForce':CopyAmoebaOutOfPlaneBendParameters,
@@ -388,7 +395,8 @@ def CopySystemParameters(src,dest):
                'NonbondedForce':CopyNonbondedParameters,
                'CustomNonbondedForce':CopyCustomNonbondedParameters,
                'GBSAOBCForce':CopyGBSAOBCParameters,
-               'CMMotionRemover':do_nothing}
+               'CMMotionRemover':do_nothing,
+               'CustomBondForce':CopyCustomBondedParameters}
     for i in range(src.getNumForces()):
         nm = src.getForce(i).__class__.__name__
         if nm in Copiers:
@@ -1427,8 +1435,9 @@ class OpenMM(Engine):
             Rhos.append(density.value_in_unit(kilogram / meter**3))
             Potentials.append(potential / kilojoules_per_mole)
             Kinetics.append(kinetic / kilojoules_per_mole)
-            Primitive_kinetics.append(primitive_kinetic_tuple[0] / kilojoules_per_mole)
-            Cp_corrections.append(Cp_correction / (kilojoules_per_mole)**2)
+            if self.rpmd:
+                Primitive_kinetics.append(primitive_kinetic_tuple[0] / kilojoules_per_mole)
+                Cp_corrections.append(Cp_correction / (kilojoules_per_mole)**2)
             Volumes.append(volume / nanometer**3)
             if not self.rpmd:
                 Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
@@ -1466,7 +1475,7 @@ class OpenMM(Engine):
         # Initialized property dictionary.
         prop_return = OrderedDict()
         prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps,
-            'Cp_corrections': Cp_corrections, 'Primitive_kinetics': Centroid_virials})
+            'Cp_corrections': Cp_corrections, 'Primitive_kinetics':Primitive_kinetics})
         return prop_return
 
 class Liquid_OpenMM(Liquid):
