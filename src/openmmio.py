@@ -81,9 +81,7 @@ def evaluate_kinetic(Sim, props):
         for i in range(P):
             j = (i+1) % P
             diff = np.array(props['Positions'][j])-np.array(props['Positions'][i])
-            diff[props['Vsites'],:] = 0.0
-            dot_prod = np.dot(((diff*diff).sum(axis=1)).T, props['Masses'])
-            spring_term -= dot_prod
+            spring_term -= np.dot((diff*diff).sum(axis=1), props['Masses'])
         spring_term = Quantity(spring_term, nanometer**2*dalton)
         return spring_term*const1, spring_term*const2 
     else:
@@ -102,10 +100,10 @@ def centroid_kinetic(Sim, props):
             centroid += np.array(props['Positions'][i]*nanometer) / float(P)        # Calculate centroids of ring polymers
         for i in range(0,P):
             diff = np.array(props['Positions'][i]*nanometer)-centroid
-            diff[props['Vsites'],:] = 0.0 * nanometer
-            derivative = -1.0*np.array(props['States'][i].getForces())
-            Cv_second_term += np.sum(diff*derivative) * 0.5 / float(P)
-        return Cv_second_term
+            diff[np.where(props['Vsites'])[0],:] = 0.0 * nanometer
+            derivative = -np.array(props['States'][i].getForces())
+            Cv_second_term += np.sum(diff*derivative) 
+        return Cv_second_term*0.5/float(P)
     else:
         Sim.context.getState(getEnergy=True).getKineticEnergy()
 
