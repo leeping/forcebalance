@@ -95,15 +95,15 @@ def centroid_kinetic(Sim, props):
         T = props['T']
         P = props['P']
         N = props['N']
-        centroid = np.array([[0.0*nanometer,0.0*nanometer,0.0*nanometer]]*N)
+        centroid = np.array([[0.0,0.0,0.0]]*N)
         for i in range(0,P):
-            centroid += np.array(props['Positions'][i]*nanometer) / float(P)        # Calculate centroids of ring polymers
+            centroid += np.array(props['Positions'][i]) / float(P)        # Calculate centroids of ring polymers
         for i in range(0,P):
-            diff = np.array(props['Positions'][i]*nanometer)-centroid
-            diff[np.where(props['Vsites'])[0],:] = 0.0 * nanometer
-            derivative = -np.array(props['States'][i].getForces())
+            diff = np.array(props['Positions'][i])-centroid
+            diff[np.where(props['Vsites'])[0],:] = 0.0 
+            derivative = -np.array(props['States'][i].getForces().value_in_unit(kilojoules_per_mole / nanometer))
             Cv_second_term += np.sum(diff*derivative) 
-        return Cv_second_term*0.5/float(P)
+        return Quantity(Cv_second_term*0.5/float(P), kilojoules_per_mole)
     else:
         Sim.context.getState(getEnergy=True).getKineticEnergy()
 
@@ -1060,7 +1060,6 @@ class OpenMM(Engine):
                 self.rpmd_frame_props['States'] = self.rpmd_states
                 self.rpmd_frame_props['Positions'] = self.state_positions
                 cv_force_terms.append(centroid_kinetic(self.simulation, self.rpmd_frame_props).value_in_unit(kilojoules_per_mole))
-                potentials.append(evaluate_potential(self.simulation).value_in_unit(kilojoules_per_mole))
         Result = np.array(cv_force_terms) + np.array(potentials)
         return Result
 

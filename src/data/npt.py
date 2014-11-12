@@ -632,11 +632,18 @@ def main():
     Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(H))])
 
     # Thermal expansion coefficient analytic derivative
-    GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
-    GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
-    GAlpha3 = deprod(V)/avg(V) - Gbar
-    GAlpha4 = Beta * covde(H)
-    GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+    if RPMD:
+        GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2   
+        GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
+        GAlpha3 = deprod(V)/avg(V) - np.mean(RPMDG,axis=1)
+        GAlpha4 = Beta * covde(H)
+        GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)               
+    else:
+        GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
+        GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
+        GAlpha3 = deprod(V)/avg(V) - Gbar
+        GAlpha4 = Beta * covde(H)
+        GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
