@@ -186,6 +186,21 @@ def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True, dipole=F
             G[i,:]   = EDG[:]
     return G, GDx, GDy, GDz
 
+def rpmd_cv_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True):
+    RPMDG = np.zeros((FF.np,length))
+    if not AGrad:
+        return RPMDG
+    def rpmd_cv_driver(mvals_):
+        FF.make(mvals_)
+        return engine.rpmd_cv()
+
+    ED0     = rpmd_cv_driver(mvals)
+    for i in pgrad:
+        logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
+        ERPMDG, _   = f12d3p(fdwrap(rpmd_cv_driver,mvals,i),h,f0=ED0)
+        RPMDG[i,:] = ERPMDG[:]
+    return RPMDG
+
 def property_derivatives(engine, FF, mvals, h, pgrad, kT, property_driver, property_kwargs, AGrad=True):
 
     """ 
@@ -500,6 +515,20 @@ def main():
     logger.info("Gas phase energy derivatives took %.3f seconds\n" % click())
 
     #==============================================#
+    # Compute derivative of force term for RPMD    #
+    #        centroid virial estimator.            #
+    #==============================================#
+    if RPMD:
+        logger.info("Calculating derivatives of centroid virial term with finite difference step size: %f\n" % h)
+        printcool("Condensed phase rpmd cv term derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True) 
+        click()
+        RPMDG = rpmd_cv_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad)
+        logger.info("Condensed phase rpmd cv term derivatives took %.3f seconds\n" % click())  
+        click()
+        printcool("Gas phase rpmd cv term derivatives", color=4, bold=True)
+        RPMDmG = rpmd_cv_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
+        logger.info("Gas phase rpmd cv term derivatives took %.3f seconds\n" % click())
+    #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#
 
@@ -555,13 +584,22 @@ def main():
     Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
-    GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
-    GHvap /= NMol
-    GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
-    GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
+    if RPMD:
+        GHvap = np.mean(RPMDG,axis=1)
+        GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
+        GHvap /= NMol
+        GHvap -= np.mean(RPMDmG,axis=1)
+        GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
+        GHvap *= -1
+        GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
+    else:
+        GHvap = np.mean(G,axis=1)
+        GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
+        GHvap /= NMol
+        GHvap -= np.mean(mG,axis=1)
+        GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
+        GHvap *= -1
+        GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol\nAnalytic Derivative:" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)

@@ -1013,6 +1013,57 @@ class OpenMM(Engine):
             mass += system.getParticleMass(i)
         return mass
 
+    def rpmd_cv(self, traj=True):
+        self.update_simulation()
+        if not hasattr(self, 'rpmd_frame_props'):
+            rpmd_frame_props = {}
+            rpmd_frame_props['States'] = []
+            vsites = []
+            for i in range(self.simulation.system.getNumParticles()):
+                if self.simulation.system.isVirtualSite(i):
+                    vsites.append(True)
+                else:
+                    vsites.append(False)
+            mass_matrix = np.array([])
+            for i in range(self.simulation.system.getNumParticles()):
+                mass_matrix = np.append(mass_matrix, self.simulation.system.getParticleMass(i).value_in_unit(dalton))
+            rpmd_states     = []
+            state_positions = []
+            for i in range(self.simulation.integrator.getNumCopies()):
+                rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=False,
+                                getParameters=False,enforcePeriodicBox=True,groups=-1)
+                rpmd_states.append(rpmd_state)
+                state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
+            rpmd_frame_props['States']    = rpmd_states
+            rpmd_frame_props['Positions'] = state_positions
+            rpmd_frame_props['T']      = self.simulation.integrator.getTemperature() 
+            rpmd_frame_props['P']      = self.simulation.integrator.getNumCopies()
+            rpmd_frame_props['N']      = self.simulation.system.getNumParticles()
+            rpmd_frame_props['Masses'] = mass_matrix
+            rpmd_frame_props['Vsites'] = vsites
+        if not traj: 
+            Result = evaluate_potential(self.simulation).value_in_unit(kilojoules_per_mole) + \
+                        centroid_kinetic(self.simulation, rpmd_frame_props).value_in_unit(kilojoules_per_mole) 
+            return Result
+        cv_force_terms = []
+        potentials = []
+        if hasattr(self, 'xyz_rpmd'):
+            for I in range(len(self.xyz_rpmd)):                                                                          
+                self.set_positions(I) 
+                self.rpmd_states = []
+                self.state_positions = []
+                for i in range(self.simulation.integrator.getNumCopies()):
+                    rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=False,
+                                                                        getParameters=False,enforcePeriodicBox=True,groups=-1)
+                    self.rpmd_states.append(rpmd_state)
+                    self.state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
+                self.rpmd_frame_props['States'] = self.rpmd_states
+                self.rpmd_frame_props['Positions'] = self.state_positions
+                cv_force_terms.append(centroid_kinetic(self.simulation, self.rpmd_frame_props).value_in_unit(kilojoules_per_mole))
+                potentials.append(evaluate_potential(self.simulation).value_in_unit(kilojoules_per_mole))
+        Result = np.array(cv_force_terms) + np.array(potentials)
+        return Result
+
     def evaluate_one_(self, force=False, dipole=False):
         """ Perform a single point calculation on the current geometry. """
         if not hasattr(self, 'xyz_rpmd'): 
@@ -1286,8 +1337,8 @@ class OpenMM(Engine):
         Volumes = []
         Dips = []
         Temps = []
-        rpmd_frame_props = {}
-        rpmd_frame_props['States'] = []
+        self.rpmd_frame_props = {}
+        self.rpmd_frame_props['States'] = []
         if self.rpmd:
             vsites = []
             # Build boolean array indicating which particles are virtual
@@ -1300,13 +1351,13 @@ class OpenMM(Engine):
             mass_matrix = np.array([])
             for i in range(self.simulation.system.getNumParticles()):
                 mass_matrix = np.append(mass_matrix, self.simulation.system.getParticleMass(i).value_in_unit(dalton))
-            rpmd_frame_props['T']      = self.simulation.integrator.getTemperature()
-            rpmd_frame_props['P']      = self.simulation.integrator.getNumCopies()
-            rpmd_frame_props['N']      = self.simulation.system.getNumParticles()
-            rpmd_frame_props['Masses'] = mass_matrix
-            rpmd_frame_props['Vsites'] = vsites
-            N = rpmd_frame_props['N'] - rpmd_frame_props['N'] / 4
-            P = rpmd_frame_props['P']
+            self.rpmd_frame_props['T']      = self.simulation.integrator.getTemperature()
+            self.rpmd_frame_props['P']      = self.simulation.integrator.getNumCopies()
+            self.rpmd_frame_props['N']      = self.simulation.system.getNumParticles()
+            self.rpmd_frame_props['Masses'] = mass_matrix
+            self.rpmd_frame_props['Vsites'] = vsites
+            N = self.rpmd_frame_props['N'] - self.rpmd_frame_props['N'] / 4
+            P = self.rpmd_frame_props['P']
             k_b = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
         #========================#
         # Now run the simulation #
@@ -1338,14 +1389,14 @@ class OpenMM(Engine):
                     self.inst_kinetics.append(rpmd_state.getKineticEnergy())
                     self.state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
                 state = self.rpmd_states[0]
-                rpmd_frame_props['States']        = self.rpmd_states
-                rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
-                rpmd_frame_props['Positions']     = self.state_positions
+                self.rpmd_frame_props['States']        = self.rpmd_states
+                self.rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
+                self.rpmd_frame_props['Positions']     = self.state_positions
             if self.rpmd:
-                primitive_kinetic_tuple = evaluate_kinetic(self.simulation, rpmd_frame_props)
-                kinetic = centroid_kinetic(self.simulation, rpmd_frame_props) 
+                primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props)
+                kinetic = centroid_kinetic(self.simulation, self.rpmd_frame_props) 
             else:
-                kinetic=evaluate_kinetic(self.simulation, rpmd_frame_props)
+                kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
             potential=evaluate_potential(self.simulation)
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
@@ -1355,7 +1406,7 @@ class OpenMM(Engine):
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
             if self.rpmd:
-                kinetic_temperature = sum(rpmd_frame_props['Inst_kinetics']) * 2.0 / (N * k_b * P**2)
+                kinetic_temperature = sum(self.rpmd_frame_props['Inst_kinetics']) * 2.0 / (N * k_b * P**2)
             else:
                 kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
             if self.pbc:
@@ -1390,18 +1441,18 @@ class OpenMM(Engine):
                     self.inst_kinetics.append(rpmd_state.getKineticEnergy())
                     self.state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
                 state = self.rpmd_states[0]
-                rpmd_frame_props['States']        = self.rpmd_states
-                rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
-                rpmd_frame_props['Positions']     = self.state_positions
+                self.rpmd_frame_props['States']        = self.rpmd_states
+                self.rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
+                self.rpmd_frame_props['Positions']     = self.state_positions
             if self.rpmd:
-                kinetic = centroid_kinetic(self.simulation,rpmd_frame_props)
-                primitive_kinetic_tuple = evaluate_kinetic(self.simulation, rpmd_frame_props) 
+                kinetic = centroid_kinetic(self.simulation, self.rpmd_frame_props)
+                primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props) 
                 Cp_correction = primitive_kinetic_tuple[1]
             else:
-                kinetic=evaluate_kinetic(self.simulation, rpmd_frame_props)
+                kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
             potential=evaluate_potential(self.simulation)
             if self.rpmd:
-                kinetic_temperature = sum(rpmd_frame_props['Inst_kinetics']) * 2.0 / (N * k_b * P**2)
+                kinetic_temperature = sum(self.rpmd_frame_props['Inst_kinetics']) * 2.0 / (N * k_b * P**2)
             else:
                 kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
@@ -1447,9 +1498,9 @@ class OpenMM(Engine):
                 Dips.append(dip_avg)
         # Add RPMD constant terms
         if self.rpmd:
-            N = rpmd_frame_props['N'] - rpmd_frame_props['N'] / 4   # Exclude virtual sites
-            T = rpmd_frame_props['T']
-            P = rpmd_frame_props['P']
+            N = self.rpmd_frame_props['N'] - self.rpmd_frame_props['N'] / 4   # Exclude virtual sites
+            T = self.rpmd_frame_props['T']
+            P = self.rpmd_frame_props['P']
             kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
             beta = 1.0/(kb*T)
             primitive_kinetic_constant = (3.0 * N * P / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
