@@ -186,20 +186,43 @@ def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True, dipole=F
             G[i,:]   = EDG[:]
     return G, GDx, GDy, GDz
 
-def rpmd_cv_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True):
-    RPMDG = np.zeros((FF.np,length))
+def rpmd_energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True, dipole=False):
+    """
+    Compute the first and second derivatives of a set of snapshot
+    energies with respect to the force field parameters.
+ 
+    This is analagous to the energy_derivatives function above, but is 
+    specific for calculating derivatives for rpmd, which has 
+    an additional term.
+    """
+    G       = np.zeros((FF.np,length))
+    GDx     = np.zeros((FF.np,length))
+    GDy     = np.zeros((FF.np,length))
+    GDz     = np.zeros((FF.np,length))
+    RPMDG   = np.zeros((FF.np,length))
     if not AGrad:
-        return RPMDG
-    def rpmd_cv_driver(mvals_):
+        return G, GDx, GDy, GDz, RPMDG
+    def rpmd_energy_driver(mvals_):
         FF.make(mvals_)
-        return engine.rpmd_cv()
+        if dipole:
+            return engine.energy_dipole_rpmd()
+        else:
+            return engine.energy_rpmd()
 
-    ED0     = rpmd_cv_driver(mvals)
+    ED0     = rpmd_energy_driver(mvals)
     for i in pgrad:
         logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
-        ERPMDG, _   = f12d3p(fdwrap(rpmd_cv_driver,mvals,i),h,f0=ED0)
-        RPMDG[i,:] = ERPMDG[:]
-    return RPMDG
+        ERPMDG, _   = f12d3p(fdwrap(rpmd_energy_driver,mvals,i),h,f0=ED0)
+        if dipole:
+            G[i,:]     = ERPMDG[:,0] 
+            GDx[i,:]   = ERPMDG[:,1] 
+            GDy[i,:]   = ERPMDG[:,2]
+            GDz[i,:]   = ERPMDG[:,3]
+            RPMDG[i,:] = ERPMDG[:,4]    
+        else:
+            G[i,:]     = ERPMDG[:,0]
+            RPMDG[i,:] = ERPMDG[:,1]
+    return G, GDx, GDy, GDz, RPMDG
 
 def property_derivatives(engine, FF, mvals, h, pgrad, kT, property_driver, property_kwargs, AGrad=True):
 
@@ -438,10 +461,10 @@ def main():
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
-    RPMD = False
+    RPMD = True
     # Have we run RPMD?
-    if len(Cp_corrections) > 0:
-        RPMD = True
+    #if len(Cp_corrections) > 0:
+    #    RPMD = True
     #getone = prop_return['One'] 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -504,30 +527,31 @@ def main():
         Liquid = Engine(name="liquid", openmm_precision="double", **EngOpts["liquid"])
         Gas = Engine(name="gas", openmm_precision="double", **EngOpts["gas"])
 
-    # Compute the energy and dipole derivatives.
-    printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True)
-    click()
-    G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
-    logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
-    click()
-    printcool("Gas phase energy derivatives", color=4, bold=True)
-    mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad, dipole=False)
-    logger.info("Gas phase energy derivatives took %.3f seconds\n" % click())
-
-    #==============================================#
-    # Compute derivative of force term for RPMD    #
-    #        centroid virial estimator.            #
-    #==============================================#
-    if RPMD:
-        logger.info("Calculating derivatives of centroid virial term with finite difference step size: %f\n" % h)
-        printcool("Condensed phase rpmd cv term derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True) 
+    if not RPMD:
+        # Compute the energy and dipole derivatives.
+        printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True)
         click()
-        RPMDG = rpmd_cv_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad)
-        logger.info("Condensed phase rpmd cv term derivatives took %.3f seconds\n" % click())  
+        G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
+        logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
         click()
-        printcool("Gas phase rpmd cv term derivatives", color=4, bold=True)
-        RPMDmG = rpmd_cv_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
+        printcool("Gas phase energy derivatives", color=4, bold=True)
+        mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad, dipole=False)
+        logger.info("Gas phase energy derivatives took %.3f seconds\n" % click())
+    else:
+        #==============================================#
+        # Compute derivative of force term for RPMD    #
+        #        centroid virial estimator.            #
+        #==============================================#
+        logger.info("Calculating derivatives of RPMD energy terms with finite difference step size: %f\n" % h)
+        printcool("Condensed phase rpmd derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True) 
+        click()
+        G, GDx, GDy, GDz, RPMDG = rpmd_energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
+        logger.info("Condensed phase rpmd derivatives took %.3f seconds\n" % click())  
+        click()
+        printcool("Gas phase rpmd term derivatives", color=4, bold=True)
+        mG, _, __, ___, RPMDmG = rpmd_energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
         logger.info("Gas phase rpmd cv term derivatives took %.3f seconds\n" % click())
+
     #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#
