@@ -461,10 +461,12 @@ def main():
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
-    RPMD = True
+    #RPMD = True
     # Have we run RPMD?
-    #if len(Cp_corrections) > 0:
-    #    RPMD = True
+    if len(Cp_corrections) > 0:
+        RPMD = True
+    else:
+        RPMD = False
     #getone = prop_return['One'] 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -551,7 +553,35 @@ def main():
         printcool("Gas phase rpmd term derivatives", color=4, bold=True)
         mG, _, __, ___, RPMDmG = rpmd_energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
         logger.info("Gas phase rpmd cv term derivatives took %.3f seconds\n" % click())
-
+        #Test for gradient equivalence
+        left  = Beta * flat(np.mat(G) * col(PKE)) / L
+        right = Beta * flat(np.mat(G) * col(Energies)) / L
+        mean_cv_grad = np.mean(RPMDG, axis=1)
+        mean_G_grad  = np.mean(G, axis=1)
+        logger.info("Left gradient terms:\n")
+        logger.info(left)
+        logger.info("\n")
+        logger.info("Right gradient terms:\n")
+        logger.info(right)
+        logger.info("\n")
+        logger.info("Potential energy gradient:\n")
+        logger.info(mean_G_grad)
+        logger.info("\n")
+        logger.info("RPMD CV Grad:\n")
+        logger.info(mean_cv_grad)
+        logger.info("\n")
+        logger.info("P.E. gradient sum:\n")
+        logger.info(np.sum(mean_G_grad))
+        logger.info("\n")
+        logger.info("RPMD CV Grad sum:\n")
+        logger.info(np.sum(mean_cv_grad))
+        logger.info("\n")
+        logger.info("Sum left:\n")
+        logger.info(np.sum(left))
+        logger.info("\n")
+        logger.info("Sum right:\n")
+        logger.info(np.sum(right))
+        logger.info("\n")
     #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#
@@ -748,10 +778,13 @@ def main():
         GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
         GCp  = GCp1 + GCp2 + GCp3
     else:
-        GCp1 = mBeta*covde(Cp_corrections) * 1000 / 4.184 / (NMol*kT*T) 
-        GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T) 
-        GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
-        GCp  = GCp1 + GCp2 + GCp3
+        GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+        GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
+        GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)        
+        # One extra term due to the quantum correction from the
+        # primitive estimator.
+        GCp4 = mBeta*covde(Cp_corrections) * 1000 / 4.184 / (NMol*kT*T)
+        GCp  = GCp1 + GCp2 + GCp3 + GCp4
     Sep = printcool("Isobaric heat capacity:  % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:
@@ -810,7 +843,10 @@ def main():
     pvals = FF.make(mvals)
 
     logger.info("Writing all simulation data to disk.\n")
-    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),'npt_result.p')
+    if not RPMD:
+        lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol), 'npt_result.p')
+    else:
+        lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, RPMDG, RPMDmG, PKE_avg, PKE_err),'npt_result.p')
 
 if __name__ == "__main__":
     main()

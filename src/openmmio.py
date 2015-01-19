@@ -113,9 +113,8 @@ def centroid_kinetic(Sim, props):
         P = props['P']
         N = props['N']
         centroid = np.array([[0.0,0.0,0.0]]*N)
-        step = 4
-        for i in range(0,P,step):
-            centroid += np.array(props['Positions'][i]) / float(P/step)
+        for i in range(P):
+            centroid += np.array(props['Positions'][i]) / float(P)
         for i in range(1):
             diff = np.array(props['Positions'][i]) - centroid
             diff[np.where(props['Vsites'])[0],:] = 0.0
@@ -750,7 +749,7 @@ class OpenMM(Engine):
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
         if pbc:
-            self.mmopts.setdefault('nonbondedMethod', PME)
+            self.mmopts.setdefault('nonbondedMethod', CutoffPeriodic)
             if self.AMOEBA:
                 self.mmopts.setdefault('nonbondedCutoff', 0.7*nanometer)
                 self.mmopts.setdefault('vdwCutoff', 0.85)
@@ -942,6 +941,40 @@ class OpenMM(Engine):
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+                if not any([isinstance(fc, CustomNonbondedForce) for fc in self.system.getForces()]):
+                    i.setNonbondedMethod(4)
+        if any([isinstance(fc, NonbondedForce) for fc in self.system.getForces()]) and any([isinstance(fc, CustomNonbondedForce) for fc in self.system.getForces()]):
+        # Case of fitting the softer potential
+            for i in self.system.getForces():
+                if isinstance(i, NonbondedForce):
+                    i.setNonbondedMethod(4)
+                    i.setUseSwitchingFunction(False)
+                    #logger.info('NonbondedForce\n')
+                    #logger.info('Nonbonded method\n')
+                    #logger.info(i.getNonbondedMethod())
+                    #logger.info('Cutoff distance\n')
+                    #logger.info(i.getCutoffDistance())
+                    #logger.info('Use switching function\n')
+                    #logger.info(i.getUseSwitchingFunction())
+                    #logger.info('Switching distance\n')
+                    #logger.info(i.getSwitchingDistance())
+                    #logger.info('Dispersion Correction\n')
+                    #logger.info(i.getUseDispersionCorrection())
+                elif isinstance(i, CustomNonbondedForce):
+                    #logger.info('')
+                    i.setNonbondedMethod(4)
+                    i.setUseLongRangeCorrection(True)
+                    #logger.info('CustomNonbondedForce\n')
+                    #logger.info('Nonbonded method\n')
+                    #logger.info(i.getNonbondedMethod())
+                    #logger.info('Cutoff distance\n')
+                    #logger.info(i.getCutoffDistance())
+                    #logger.info('Use switching function\n')
+                    #logger.info(i.getUseSwitchingFunction())
+                    #logger.info('Switching distance\n')
+                    #logger.info(i.getSwitchingDistance())
+                    #logger.info('Correction\n')
+                    #logger.info(i.getUseLongRangeCorrection())
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
@@ -1460,7 +1493,7 @@ class OpenMM(Engine):
                 self.rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
                 self.rpmd_frame_props['Positions']     = self.state_positions
             if self.rpmd:
-                #primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props)
+                primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props)
                 kinetic=centroid_kinetic(self.simulation, self.rpmd_frame_props) 
             else:
                 kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
@@ -1513,8 +1546,8 @@ class OpenMM(Engine):
                 self.rpmd_frame_props['Positions']     = self.state_positions
             if self.rpmd:
                 kinetic = centroid_kinetic(self.simulation, self.rpmd_frame_props)
-                #primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props) 
-                #Cp_correction = primitive_kinetic_tuple[1]
+                primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props) 
+                Cp_correction = primitive_kinetic_tuple[1]
             else:
                 kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
             potential=evaluate_potential(self.simulation)
@@ -1552,8 +1585,8 @@ class OpenMM(Engine):
             Potentials.append(potential / kilojoules_per_mole)
             Kinetics.append(kinetic / kilojoules_per_mole)
             if self.rpmd:
-                Primitive_kinetics.append(0.0) #primitive_kinetic_tuple[0] / kilojoules_per_mole)
-                Cp_corrections.append(0.0) #Cp_correction / (kilojoules_per_mole)**2)
+                Primitive_kinetics.append(primitive_kinetic_tuple[0] / kilojoules_per_mole)
+                Cp_corrections.append(Cp_correction / (kilojoules_per_mole)**2)
             Volumes.append(volume / nanometer**3)
             if not self.rpmd:
                 Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
@@ -1570,9 +1603,9 @@ class OpenMM(Engine):
             P = self.rpmd_frame_props['P']
             kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
             beta = 1.0/(kb*T)
-            primitive_kinetic_constant = 0.0 #(3.0 * N * P / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
+            primitive_kinetic_constant = (3.0 * N * P / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
             centroid_kinetic_constant  = (3.0 * N / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
-            primitive_correction_constant = 0.0 #(3.0 * N * P / (2.0 * beta**2)).value_in_unit(kilojoule_per_mole**2)
+            primitive_correction_constant = (3.0 * N * P / (2.0 * beta**2)).value_in_unit(kilojoule_per_mole**2)
             centroid_correction_constant = (3.0 * N / (2.0 * beta**2)).value_in_unit(kilojoule_per_mole**2)
             Kinetics = np.array(Kinetics) + centroid_kinetic_constant
             Primitive_kinetics = np.array(Primitive_kinetics) + primitive_kinetic_constant 
