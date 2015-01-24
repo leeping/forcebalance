@@ -679,9 +679,9 @@ def main():
     if not RPMD:
         Alpha = calc_alpha(None, **{'h_':H, 'v_':V})
     else:
-        Alpha = calc_alpha(None, **{'h_':PKE+PV, 'v_':V}) 
+        Alpha = calc_alpha(None, **{'h_':PKE+pV, 'v_':V}) 
     Alphaboot = []
-    RPMDH = PKE + PV
+    RPMDH = PKE + pV
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
         if not RPMD:
@@ -757,7 +757,7 @@ def main():
         Cp_ *= 1000 / 4.184
         return Cp_
     if RPMD:
-        Cp = calc_cp(None,**{'h_':PKE+PV, 'RPMD':True, 'corrections':Cp_corrections})
+        Cp = calc_cp(None,**{'h_':PKE+pV, 'RPMD':True, 'corrections':Cp_corrections})
     else:
         Cp = calc_cp(None,**{'h_':H})
     Cpboot = []
