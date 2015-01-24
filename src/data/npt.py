@@ -461,7 +461,6 @@ def main():
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
-    #RPMD = True
     # Have we run RPMD?
     if len(Cp_corrections) > 0:
         RPMD = True
@@ -677,27 +676,30 @@ def main():
         if 'v_' in kwargs:
             v_ = kwargs['v_']
         return 1/(kT*T) * (bzavg(h_*v_,b)-bzavg(h_,b)*bzavg(v_,b))/bzavg(v_,b)
-    Alpha = calc_alpha(None, **{'h_':H, 'v_':V})
+    if not RPMD:
+        Alpha = calc_alpha(None, **{'h_':H, 'v_':V})
+    else:
+        Alpha = calc_alpha(None, **{'h_':PKE+PV, 'v_':V}) 
     Alphaboot = []
+    RPMDH = PKE + PV
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
-        Alphaboot.append(calc_alpha(None, **{'h_':H[boot], 'v_':V[boot]}))
+        if not RPMD:
+            Alphaboot.append(calc_alpha(None, **{'h_':H[boot], 'v_':V[boot]}))
+        else:   
+            Alphaboot.append(calc_alpha(None, **{'h_':RPMDH[boot], 'v_':V[boot]}))
     Alphaboot = np.array(Alphaboot)
-    Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(H))])
+    if not RPMD:
+        Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(H))])
+    else:
+        Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(RPMDH))])
 
     # Thermal expansion coefficient analytic derivative
-    if RPMD:
-        GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2   
-        GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
-        GAlpha3 = deprod(V)/avg(V) - np.mean(RPMDG,axis=1)
-        GAlpha4 = Beta * covde(H)
-        GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)               
-    else:
-        GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
-        GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
-        GAlpha3 = deprod(V)/avg(V) - Gbar
-        GAlpha4 = Beta * covde(H)
-        GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+    GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
+    GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
+    GAlpha3 = deprod(V)/avg(V) - Gbar
+    GAlpha4 = Beta * covde(H)
+    GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
@@ -755,11 +757,10 @@ def main():
         Cp_ *= 1000 / 4.184
         return Cp_
     if RPMD:
-        Cp = calc_cp(None,**{'h_':H, 'RPMD':True, 'corrections':Cp_corrections})
+        Cp = calc_cp(None,**{'h_':PKE+PV, 'RPMD':True, 'corrections':Cp_corrections})
     else:
         Cp = calc_cp(None,**{'h_':H})
     Cpboot = []
-    # Not 100 % sure about this
     if not RPMD:
         for i in range(numboots):
             boot = np.random.randint(L,size=L)
@@ -767,9 +768,12 @@ def main():
     else:
         for i in range(numboots):
             boot = np.random.randint(L,size=L)
-            Cpboot.append(calc_cp(None,**{'h_':H[boot], 'RPMD':True, 'corrections':Cp_corrections[boot]}))
+            Cpboot.append(calc_cp(None,**{'h_':RPMDH[boot], 'RPMD':True, 'corrections':Cp_corrections[boot]}))
     Cpboot = np.array(Cpboot)
-    Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(H))
+    if not RPMD:
+        Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(H))
+    else:   
+        Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(RPMDH))
 
     # Isobaric heat capacity analytic derivative
     if not RPMD:
@@ -778,9 +782,9 @@ def main():
         GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
         GCp  = GCp1 + GCp2 + GCp3
     else:
-        GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
-        GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
-        GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)        
+        GCp1 = 2*covde(RPMDH) * 1000 / 4.184 / (NMol*kT*T)
+        GCp2 = mBeta*covde(RPMDH**2) * 1000 / 4.184 / (NMol*kT*T)
+        GCp3 = 2*Beta*avg(RPMDH)*covde(RPMDH) * 1000 / 4.184 / (NMol*kT*T)        
         # One extra term due to the quantum correction from the
         # primitive estimator.
         GCp4 = mBeta*covde(Cp_corrections) * 1000 / 4.184 / (NMol*kT*T)
