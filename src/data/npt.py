@@ -494,6 +494,8 @@ def main():
         PKE = Potentials + Primitive_kinetics
         PKE_avg, PKE_err = mean_stderr(PKE)
         Cp_corr_avg, Cp_corr_err = mean_stderr(Cp_corrections)
+        # Define RPMDH using primitive estimator
+        RPMDH = PKE + pV
     PrintEDA(EDA, NMol)
 
     #==============================================#
@@ -637,19 +639,19 @@ def main():
     Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
-    if RPMD:
-        GHvap = np.mean(RPMDG,axis=1)
-        GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
-        GHvap /= NMol
-        GHvap -= np.mean(RPMDmG,axis=1)
-        GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
-        GHvap *= -1
-        GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
-    else:
+    if not RPMD:
         GHvap = np.mean(G,axis=1)
         GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
         GHvap /= NMol
         GHvap -= np.mean(mG,axis=1)
+        GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
+        GHvap *= -1
+        GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
+    else:                                                                                          
+        GHvap = np.mean(RPMDG,axis=1)
+        GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
+        GHvap /= NMol
+        GHvap -= np.mean(RPMDmG,axis=1)
         GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
         GHvap *= -1
         GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
@@ -679,9 +681,8 @@ def main():
     if not RPMD:
         Alpha = calc_alpha(None, **{'h_':H, 'v_':V})
     else:
-        Alpha = calc_alpha(None, **{'h_':PKE+pV, 'v_':V}) 
+        Alpha = calc_alpha(None, **{'h_':RPMDH, 'v_':V}) 
     Alphaboot = []
-    RPMDH = PKE + pV
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
         if not RPMD:
@@ -756,18 +757,16 @@ def main():
             Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
         Cp_ *= 1000 / 4.184
         return Cp_
-    if RPMD:
-        Cp = calc_cp(None,**{'h_':PKE+pV, 'RPMD':True, 'corrections':Cp_corrections})
-    else:
-        Cp = calc_cp(None,**{'h_':H})
-    Cpboot = []
     if not RPMD:
-        for i in range(numboots):
-            boot = np.random.randint(L,size=L)
-            Cpboot.append(calc_cp(None,**{'h_':H[boot]}))
+        Cp = calc_cp(None,**{'h_':H})
     else:
-        for i in range(numboots):
-            boot = np.random.randint(L,size=L)
+        Cp = calc_cp(None,**{'h_':RPMDH, 'RPMD':True, 'corrections':Cp_corrections})
+    Cpboot = []
+    for i in range(numboots):
+        boot = np.random.randint(L,size=L)
+        if not RPMD:
+            Cpboot.append(calc_cp(None,**{'h_':H[boot]}))
+        else:
             Cpboot.append(calc_cp(None,**{'h_':RPMDH[boot], 'RPMD':True, 'corrections':Cp_corrections[boot]}))
     Cpboot = np.array(Cpboot)
     if not RPMD:
