@@ -854,16 +854,17 @@ class Liquid(Target):
                 ii = mPoints.index(PT)
                 mW = flat(mW2[:,ii])
                 mGbar = flat(np.matrix(mG)*col(mW))
-                mRPMDG = flat(np.matrix(mRPMDG)*col(mW))
+                if RPMD:
+                    mRPMDGbar = flat(np.matrix(mRPMDG)*col(mW))
                 Hvap_calc[PT]  = np.dot(mW,mE) - np.dot(W,E)/NMol + kb*T - np.dot(W, PV)/NMol
                 if not RPMD:
                     Hvap_grad[PT]  = mGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
                     Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
                     Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
                 else:
-                    Hvap_grad[PT] = np.mean(mRPMDG,axis=1) + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*np.mean(mG,axis=1))
-                    Hvap_grad[PT] -= (np.mean(RPMDG,axis=1) + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*np.mean(G,axis=1)) / Nmol
-                    Hvap_grad[PT] -= mBeta *(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*np.mean(G,axis=1)) / NMol
+                    Hvap_grad[PT] = mRPMDGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
+                    Hvap_grad[PT] -= (RPMDGbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar) / NMol
+                    Hvap_grad[PT] -= mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar) / NMol
                 if self.do_self_pol:
                     Hvap_calc[PT] -= EPol
                     Hvap_grad[PT] -= GEPol
