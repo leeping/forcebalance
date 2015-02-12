@@ -519,7 +519,7 @@ class Liquid(Target):
             # Assign variable names to all the stuff in npt_result.p
             Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
                 Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, \
-                Grads_rpmd, mGrads_rpmd, PKEs, PKE_errs = ([Results[t][i] for t in range(len(Points))] for i in range(21))
+                Grads_rpmd, mGrads_rpmd, PKEs, PKE_errs, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(22))
             # Determine the number of molecules
             if len(set(NMols)) != 1:
                 logger.error(str(NMols))
@@ -635,7 +635,7 @@ class Liquid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols,           \ 
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, \ 
             Grads_rpmd, mGrads_rpmd, PKEs, PKE_errs, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(22))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
