@@ -635,8 +635,8 @@ class Liquid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, \ 
-            Grads_rpmd, mGrads_rpmd, PKEs, PKE_errs = ([Results[t][i] for t in range(len(Points))] for i in range(21))
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols,           \ 
+            Grads_rpmd, mGrads_rpmd, PKEs, PKE_errs, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(22))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -644,7 +644,15 @@ class Liquid(Target):
             raise RuntimeError
         else:
             NMol = list(set(NMols))[0]
-    
+        # Determine if RPMD was run
+        if len(set(RPMD_flags)) != 1:
+            logger.error('Error: RPMD simulations have been mixed with classical simulations. Simulations should be of uniform kind.\n')
+            raise RuntimeError
+        elif all(RPMD_flags):
+            RPMD = True   
+        else:           
+            RPMD = False
+
         if not self.adapt_errors:
             self.AllResults = defaultdict(lambda:defaultdict(list))
 
@@ -689,7 +697,6 @@ class Liquid(Target):
             self.gas_eq_steps *= 2
             self.gas_md_steps *= 2
 
-        # JOE TO-DO
         # Concatenate along the data-set axis (more than 1 element  if we've returned to these parameters.)
         E, V, R, Dx, Dy, Dz = \
             (np.hstack(tuple(self.AllResults[astrm][i])) for i in \
@@ -698,9 +705,15 @@ class Liquid(Target):
         G, GDx, GDy, GDz = \
             (np.hstack((np.concatenate(tuple(self.AllResults[astrm][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
 
+        if RPMD:
+            E_PKE = np.hstack(tuple(self.AllResults[astrm]['E_PKE']))
+            RPMDG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['RPMDG']), axis=2))) 
+
         if len(mPoints) > 0:
             mE = np.hstack(tuple(self.AllResults[astrm]['mE']))
             mG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['mG']), axis=2)))
+            if RPMD:
+                mRPMDG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['mRPMDG']), axis=2)))
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
         Rho_std  = OrderedDict([])
@@ -729,11 +742,6 @@ class Liquid(Target):
         N_k = np.ones(BSims)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([BSims,BSims,Shots])
-        for m, PT in enumerate(BPoints):
-            T = PT[0]
-            P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
-            beta = 1. / (kb * T)
-            for k in range(BSims):
         for m, PT in enumerate(BPoints):
             T = PT[0]
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
@@ -811,6 +819,8 @@ class Liquid(Target):
         Dx = Dx.flatten()
         Dy = Dy.flatten()
         Dz = Dz.flatten()
+        if RPMD:
+            E_PKE = E_PKE.flatten() 
         if len(mPoints) > 0: mE = mE.flatten()
             
         for i, PT in enumerate(Points):
@@ -818,10 +828,14 @@ class Liquid(Target):
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
             PV = P*V*pvkj
             H = E + PV
+            if RPMD:
+                RPMDH = E_PKE + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
             C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
             Gbar = flat(np.matrix(G)*col(W))
+            if RPMD:
+                RPMDGbar = flat(np.matrix(RPMDG)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
             kT    = kb*T
@@ -840,10 +854,16 @@ class Liquid(Target):
                 ii = mPoints.index(PT)
                 mW = flat(mW2[:,ii])
                 mGbar = flat(np.matrix(mG)*col(mW))
+                mRPMDG = flat(np.matrix(mRPMDG)*col(mW))
                 Hvap_calc[PT]  = np.dot(mW,mE) - np.dot(W,E)/NMol + kb*T - np.dot(W, PV)/NMol
-                Hvap_grad[PT]  = mGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
-                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
-                Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                if not RPMD:
+                    Hvap_grad[PT]  = mGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
+                    Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
+                    Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                else:
+                    Hvap_grad[PT] = np.mean(mRPMDG,axis=1) + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*np.mean(mG,axis=1))
+                    Hvap_grad[PT] -= (np.mean(RPMDG,axis=1) + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*np.mean(G,axis=1)) / Nmol
+                    Hvap_grad[PT] -= mBeta *(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*np.mean(G,axis=1)) / NMol
                 if self.do_self_pol:
                     Hvap_calc[PT] -= EPol
                     Hvap_grad[PT] -= GEPol
