@@ -493,6 +493,7 @@ def main():
     if RPMD:
         PKE = Potentials + Primitive_kinetics
         PKE_avg, PKE_err = mean_stderr(PKE)
+        Cp_corrections = Primitive_kinetics * 2.0 / Beta - 3.0 * 216 * 3 * 32 / 2 / Beta**2
         Cp_corr_avg, Cp_corr_err = mean_stderr(Cp_corrections)
         # Define RPMDH using primitive estimator
         RPMDH = PKE + pV
@@ -853,7 +854,7 @@ def main():
         PKE_avg = np.array([])
         PKE_err = np.array([])
 
-    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, RPMDG, RPMDmG, PKE_avg, PKE_err, RPMD),'npt_result.p')
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Cp_corrections, RPMDG, RPMDmG, PKE_avg, PKE_err, RPMD),'npt_result.p')
 
 if __name__ == "__main__":
     main()
