@@ -706,18 +706,9 @@ class Liquid(Target):
 
         G, GDx, GDy, GDz = \
             (np.hstack((np.concatenate(tuple(self.AllResults[astrm][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
-        logger.info('G\n')
-        logger.info(G)
-        logger.info('\n')
-        logger.info('E\n')
-        logger.info(E)
-        logger.info('\n')
-        logger.info('GDx\n')
-        logger.info(GDx)
-        logger.info('\n')
+
         if RPMD:
             E_PKE = np.hstack(tuple(self.AllResults[astrm]['E_PKE']))
-            logger.info(self.AllResults[astrm]['RPMDG'])
             RPMDG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['RPMDG']), axis=2))) 
             Cp_corr = np.hstack(tuple(self.AllResults[astrm]['Cp_corr']))
 

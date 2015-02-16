@@ -493,7 +493,6 @@ def main():
     if RPMD:
         PKE = Potentials + Primitive_kinetics
         PKE_avg, PKE_err = mean_stderr(PKE)
-        Cp_corrections = Primitive_kinetics * 2.0 / Beta - 3.0 * 216 * 3 * 32 / 2 / Beta**2
         Cp_corr_avg, Cp_corr_err = mean_stderr(Cp_corrections)
         # Define RPMDH using primitive estimator
         RPMDH = PKE + pV
@@ -542,10 +541,6 @@ def main():
         mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad, dipole=False)
         logger.info("Gas phase energy derivatives took %.3f seconds\n" % click())
     else:
-        #==============================================#
-        # Compute derivative of force term for RPMD    #
-        #        centroid virial estimator.            #
-        #==============================================#
         logger.info("Calculating derivatives of RPMD energy terms with finite difference step size: %f\n" % h)
         printcool("Condensed phase rpmd derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True) 
         click()
@@ -555,35 +550,6 @@ def main():
         printcool("Gas phase rpmd term derivatives", color=4, bold=True)
         mG, _, __, ___, RPMDmG = rpmd_energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
         logger.info("Gas phase rpmd cv term derivatives took %.3f seconds\n" % click())
-        #Test for gradient equivalence
-        #left  = Beta * flat(np.mat(G) * col(PKE)) / L
-        #right = Beta * flat(np.mat(G) * col(Energies)) / L
-        #mean_cv_grad = np.mean(RPMDG, axis=1)
-        #mean_G_grad  = np.mean(G, axis=1)
-        #logger.info("Left gradient terms:\n")
-        #logger.info(left)
-        #logger.info("\n")
-        #logger.info("Right gradient terms:\n")
-        #logger.info(right)
-        #logger.info("\n")
-        #logger.info("Potential energy gradient:\n")
-        #logger.info(mean_G_grad)
-        #logger.info("\n")
-        #logger.info("RPMD CV Grad:\n")
-        #logger.info(mean_cv_grad)
-        #logger.info("\n")
-        #logger.info("P.E. gradient sum:\n")
-        #logger.info(np.sum(mean_G_grad))
-        #logger.info("\n")
-        #logger.info("RPMD CV Grad sum:\n")
-        #logger.info(np.sum(mean_cv_grad))
-        #logger.info("\n")
-        #logger.info("Sum left:\n")
-        #logger.info(np.sum(left))
-        #logger.info("\n")
-        #logger.info("Sum right:\n")
-        #logger.info(np.sum(right))
-        #logger.info("\n")
     #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#

@@ -1439,7 +1439,10 @@ class OpenMM(Engine):
             self.rpmd_frame_props['N']      = self.simulation.system.getNumParticles()
             self.rpmd_frame_props['Masses'] = mass_matrix
             self.rpmd_frame_props['Vsites'] = vsites
-            N = self.rpmd_frame_props['N'] 
+            if any(vsites):
+                Natoms = int( 3 * self.rpmd_frame_props['N'] / 4)
+            else:
+                Natoms = self.rpmd_frame_props['N']
             P = self.rpmd_frame_props['P']
             k_b = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
         #========================#
@@ -1479,8 +1482,8 @@ class OpenMM(Engine):
                 kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
             else:
                 primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props)
-                kinetic=centroid_kinetic(self.simulation, self.rpmd_frame_props) 
-            potential=evaluate_potential(self.simulation)
+                kinetic = centroid_kinetic(self.simulation, self.rpmd_frame_props) 
+            potential = evaluate_potential(self.simulation)
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -1491,10 +1494,7 @@ class OpenMM(Engine):
             if not self.rpmd:
                 kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
             else:
-                # Note: N/4 term removes counting of virtual sites for
-                # water. This will need to be changed for simulations of
-                # systems other than water.
-                kinetic_temperature = sum(self.rpmd_frame_props['Inst_kinetics']) * 2.0 / (3.0 * (N-N/4) * k_b * P**2)
+                kinetic_temperature = sum(self.rpmd_frame_props['Inst_kinetics']) * 2.0 / (3.0 * Natoms * k_b * P**2)
             if self.pbc:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                                      kinetic_temperature / kelvin, potential / kilojoules_per_mole,
@@ -1535,12 +1535,11 @@ class OpenMM(Engine):
             else:
                 kinetic = centroid_kinetic(self.simulation, self.rpmd_frame_props)
                 primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props) 
-                Cp_correction = primitive_kinetic_tuple[1]
-            potential=evaluate_potential(self.simulation)
+            potential = evaluate_potential(self.simulation)
             if not self.rpmd:
                 kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             else:
-                kinetic_temperature =sum(self.rpmd_frame_props['Inst_kinetics']) * 2.0 / (3.0 * (N-N/4) * k_b * P**2)
+                kinetic_temperature = sum(self.rpmd_frame_props['Inst_kinetics']) * 2.0 / (3.0 * Natoms * k_b * P**2)
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -1572,7 +1571,6 @@ class OpenMM(Engine):
             Kinetics.append(kinetic / kilojoules_per_mole)
             if self.rpmd:
                 Primitive_kinetics.append(primitive_kinetic_tuple[0] / kilojoules_per_mole)
-                Cp_corrections.append(Cp_correction / (kilojoules_per_mole)**2)
             Volumes.append(volume / nanometer**3)
             if not self.rpmd:
                 Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
@@ -1586,18 +1584,16 @@ class OpenMM(Engine):
             Kinetics = np.array(Kinetics)
         else:
             # Add all constant terms to energy estimator time series
-            N = self.rpmd_frame_props['N'] - self.rpmd_frame_props['N'] / 4   # Exclude virtual sites
             T = self.rpmd_frame_props['T']
             P = self.rpmd_frame_props['P']
             kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
             beta = 1.0/(kb*T)
-            primitive_kinetic_constant = (3.0 * N * P / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
-            centroid_kinetic_constant  = (3.0 * N / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
-            primitive_correction_constant = (3.0 * N * P / (2.0 * beta**2)).value_in_unit(kilojoule_per_mole**2)
-            centroid_correction_constant = (3.0 * N / (2.0 * beta**2)).value_in_unit(kilojoule_per_mole**2)
+            kT = (kb * T).value_in_unit(kilojoule_per_mole)
+            primitive_kinetic_constant = (3.0 * Natoms * P / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
+            centroid_kinetic_constant  = (3.0 * Natoms / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
             Kinetics = np.array(Kinetics) + centroid_kinetic_constant
             Primitive_kinetics = np.array(Primitive_kinetics) + primitive_kinetic_constant 
-            Cp_corrections = np.array(Cp_corrections) + primitive_correction_constant
+            Cp_corrections = 2 * kT * Primitive_kinetics - 3 * Natoms * P * kT**2 / 2
         Rhos = np.array(Rhos)
         Potentials = np.array(Potentials)
         Volumes = np.array(Volumes)
