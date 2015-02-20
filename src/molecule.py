@@ -1645,10 +1645,14 @@ class Molecule(object):
             zmax = maxs[2]
             toppbc = False
 
+        xext = xmax-xmin
+        yext = ymax-ymin
+        zext = zmax-zmin
+
         if toppbc:
-            gszx = (xmax-xmin)/int((xmax-xmin)/gsz)
-            gszy = (ymax-ymin)/int((ymax-ymin)/gsz)
-            gszz = (zmax-zmin)/int((zmax-zmin)/gsz)
+            gszx = xext/int(xext/gsz)
+            gszy = yext/int(yext/gsz)
+            gszz = zext/int(zext/gsz)
         else:
             gszx = gsz
             gszy = gsz
@@ -1656,7 +1660,7 @@ class Molecule(object):
 
         # Run algorithm to determine bonds.
         # Decide if we want to use the grid algorithm.
-        use_grid = toppbc or (np.min([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
+        use_grid = toppbc or (np.min([xext, yext, zext]) > 2.0*gsz)
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.
@@ -1694,23 +1698,24 @@ class Molecule(object):
                 zidx = -1
                 for j in xgrd:
                     xi = self.xyzs[sn][i][0]
-                    while xi < 0: xi += xmax
-                    while xi > xmax: xi -= xmax
+                    while xi < xmin: xi += xext
+                    while xi > xmax: xi -= xext
                     if xi < j: break
                     xidx += 1
                 for j in ygrd:
                     yi = self.xyzs[sn][i][1]
-                    while yi < 0: yi += ymax
-                    while yi > ymax: yi -= ymax
+                    while yi < ymin: yi += yext
+                    while yi > ymax: yi -= yext
                     if yi < j: break
                     yidx += 1
                 for j in zgrd:
                     zi = self.xyzs[sn][i][2]
-                    while zi < 0: zi += zmax
-                    while zi > zmax: zi -= zmax
+                    while zi < zmin: zi += zext
+                    while zi > zmax: zi -= zext
                     if zi < j: break
                     zidx += 1
                 gasn[(xidx,yidx,zidx)].append(i)
+                    
             # 5) Create list of 2-tuples corresponding to combinations of atomic indices.
             # This is done by looping over pairs of neighboring grid cells and getting Cartesian products of atom indices inside.
             # It may be possible to get a 2x speedup by eliminating forward-reverse pairs (e.g. (5, 4) and (4, 5) and duplicates (5,5).)
