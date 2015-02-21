@@ -808,6 +808,15 @@ def main():
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GEps0,GEps0_fd)]
         FF.print_map(vals=absfrac)
+    #----------------------------#
+    # Fit centroid virial energy #
+    #----------------------------#
+    if RPMD:
+        RPMDGbar = np.mean(RPMDG,axis=1)
+        GCVE = mBeta * covde(Energies)
+        GCVE += RPMDGbar
+        Sep = printcool("Centroid virial energy:           % .4e +- %.4e\nAnalytic Derivative:" % (Ene_avg, Ene_err))
+        FF.print_map(vals=GCVE)
 
     logger.info("Writing final force field.\n")
     pvals = FF.make(mvals)
@@ -815,12 +824,12 @@ def main():
     logger.info("Writing all simulation data to disk.\n")
 
     if not RPMD:
-        RPMDG = np.array([])
-        RPMDmG = np.array([])
+        RPMDG = np.zeros(G.shape)
+        RPMDmG = np.zeros(mG.shape)
         PKE_avg = np.array([])
         PKE_err = np.array([])
 
-    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Cp_corrections, RPMDG, RPMDmG, PKE_avg, PKE_err, RPMD),'npt_result.p')
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Cp_corrections, RPMDG, RPMDmG, PKE_avg, PKE_err, Ene_err, RPMD),'npt_result.p')
 
 if __name__ == "__main__":
     main()
