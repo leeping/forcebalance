@@ -852,8 +852,7 @@ class Liquid(Target):
             W = flat(W2[:,i])
             C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
             Gbar = flat(np.matrix(G)*col(W))
-            if RPMD:
-                RPMDGbar = flat(np.matrix(RPMDG)*col(W))
+            RPMDGbar = flat(np.matrix(RPMDG)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
             kT    = kb*T
