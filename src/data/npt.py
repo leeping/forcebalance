@@ -819,17 +819,17 @@ def main():
         # Centroid virial
         RPMDGbar         = np.mean(RPMDG,axis=1)
         RPMDG_frc_bar    = np.mean(RPMDG_frc_term,axis=1)
-        kin_avg, kin_err = mean_stderr(Kinetics) / NMol
+        kin_avg, kin_err = mean_stderr(Kinetics) 
         GCVQKE           = mBeta * covde(Kinetics)
         GCVQKE          += RPMDG_frc_bar
         GCVQKE          /= NMol
-        Sep = printcool("Centroid virial QKE:           % .4e +- %.4e\nAnalytic Derivative:" % (kin_avg, kin_err))
+        Sep = printcool("Centroid virial QKE:           % .4e +- %.4e\nAnalytic Derivative:" % (kin_avg/NMol, kin_err/NMol))
         FF.print_map(vals=GCVQKE)
 
         # Primitive
-        pke_avg, pke_err = mean_stderr(Primitive_kinetics) / NMol
+        pke_avg, pke_err = mean_stderr(Primitive_kinetics) 
         GPQKE            = mBeta * covde(Primitive_kinetics) / NMol
-        Sep = printcool("Primitive QKE:           % .4e +- %.4e\nAnalytic Derivative:" % (pke_avg, pke_err))
+        Sep = printcool("Primitive QKE:           % .4e +- %.4e\nAnalytic Derivative:" % (pke_avg/NMol, pke_err/NMol))
         FF.print_map(vals=GPQKE)
 
     logger.info("Writing final force field.\n")
