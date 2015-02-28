@@ -98,8 +98,10 @@ class Liquid(Target):
         self.set_option(tgt_opts,'w_cp',forceprint=True)
         # Weight of the dielectric constant
         self.set_option(tgt_opts,'w_eps0',forceprint=True)
-        # Weight of the total energy with centroid virial QKE
-        self.set_option(tgt_opts,'w_ecvke',forceprint=True)
+        # Weight of centroid virial QKE
+        self.set_option(tgt_opts,'w_cvqke',forceprint=True)
+        # Weight of primitive QKE
+        self.set_option(tgt_opts,'w_pqke',forceprint=True)
         # Normalize the contributions to the objective function
         self.set_option(tgt_opts,'w_normalize',forceprint=True)
         # Optionally pause on the zeroth step
@@ -206,7 +208,7 @@ class Liquid(Target):
         global_opts = OrderedDict()
         found_headings = False
         known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
-                      'cvib_inter','cni','devib_intra','devib_inter','ecvke']
+                      'cvib_inter','cni','devib_intra','devib_inter','cvqke','pqke']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -361,7 +363,8 @@ class Liquid(Target):
         print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
-        print_item("Ecvke", "Total energy w. centroid virial QKE", "kJ mol^-1")
+        print_item("Cvqke", "Centroid Virial QKE", "kJ mol^-1")
+        print_item("Pqke", "Primitive QKE", "kJ mol^-1")
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
@@ -521,8 +524,8 @@ class Liquid(Target):
     
             # Assign variable names to all the stuff in npt_result.p
             Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, \
-                Cp_corrections, Grads_rpmd, mGrads_rpmd, PKEs, PKE_errs, Ene_errs, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(24))
+                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, Kin_errs, Pke_errs, NMols, \
+                Cp_corrections, Grads_rpmd, mGrads_rpmd, Grads_rpmd_frc_term, Kinetics, Primitive_kinetics, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(26))
             # Determine the number of molecules
             if len(set(NMols)) != 1:
                 logger.error(str(NMols))
@@ -562,8 +565,11 @@ class Liquid(Target):
             self.AllResults[astrm]['L'].append(len(Energies[0]))
             self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
             self.AllResults[astrm]['RPMDG'].append(np.array(Grads_rpmd))
-            self.AllResults[astrm]['E_PKE'].append(np.array(PKEs))
+            self.AllResults[astrm]['RPMDG_frc'].append(np.array(Grads_rpmd_frc_term))
+            self.AllResults[astrm]['E_PKE'].append(np.array(Primitive_kinetics) + np.array(Potentials))
             self.AllResults[astrm]['Cp_corr'].append(np.array(Cp_corrections))
+            self.AllResults[astrm]['Kinetics'].append(np.array(Kinetics))
+            self.AllResults[astrm]['Primitive_kinetics'].append(np.array(Primitive_kinetics))
            
             if len(mPoints) > 0:
                 self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
@@ -647,8 +653,8 @@ class Liquid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, \
-            Cp_corrections, Grads_rpmd, mGrads_rpmd, PKEs, PKE_errs, Ene_errs, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(24))
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, Kin_errs, Pke_errs, NMols, \
+            Cp_corrections, Grads_rpmd, mGrads_rpmd, Grads_rpmd_frc_term, Kinetics, Primitive_kinetics, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(26))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -672,8 +678,9 @@ class Liquid(Target):
         if len(Points) != len(self.Labels):
             logger.info("Data sets is not full, will not use for concatenation.")
             astrm += "_"*(Counter()+1)
-        self.AllResults[astrm]['Pts'].append(Points)
-        self.AllResults[astrm]['mPts'].append(Points)
+
+        self.AllResults[astrm]['Pts'].append(Points)                                        
+        self.AllResults[astrm]['mPts'].append(mPoints)
         self.AllResults[astrm]['E'].append(np.array(Energies))
         self.AllResults[astrm]['V'].append(np.array(Vols))
         self.AllResults[astrm]['R'].append(np.array(Rhos))
@@ -687,8 +694,11 @@ class Liquid(Target):
         self.AllResults[astrm]['L'].append(len(Energies[0]))
         self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
         self.AllResults[astrm]['RPMDG'].append(np.array(Grads_rpmd))
-        self.AllResults[astrm]['E_PKE'].append(np.array(PKEs))
+        self.AllResults[astrm]['RPMDG_frc'].append(np.array(Grads_rpmd_frc_term))
+        self.AllResults[astrm]['E_PKE'].append(np.array(Primitive_kinetics) + np.array(Potentials))
         self.AllResults[astrm]['Cp_corr'].append(np.array(Cp_corrections))
+        self.AllResults[astrm]['Kinetics'].append(np.array(Kinetics))
+        self.AllResults[astrm]['Primitive_kinetics'].append(np.array(Primitive_kinetics))
 
         if len(mPoints) > 0:
             self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
@@ -718,16 +728,19 @@ class Liquid(Target):
         G, GDx, GDy, GDz = \
             (np.hstack((np.concatenate(tuple(self.AllResults[astrm][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
 
-        E_PKE = np.hstack(tuple(self.AllResults[astrm]['E_PKE']))
-        RPMDG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['RPMDG']), axis=2))) 
-        if RPMD:
-            Cp_corr = np.hstack(tuple(self.AllResults[astrm]['Cp_corr']))
+        # These pertain to using RPMD and will not be used in classical
+        # optimizations.
+        E_PKE, Cp_corr, Kinetics, Primitive_kinetics = \
+            (np.hstack(tuple(self.AllResults[astrm][i])) for i in \
+            ['E_PKE', 'Cp_corr', 'Kinetics', 'Primitive_kinetics'])
+
+        RPMDG, RPMDG_frc = \
+            (np.hstack((np.concatenate(tuple(self.AllResults[astrm][i]), axis=2))) for i in ['RPMDG', 'RPMDG_frc']) 
 
         if len(mPoints) > 0:
             mE = np.hstack(tuple(self.AllResults[astrm]['mE']))
             mG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['mG']), axis=2)))
-            if RPMD:
-                mRPMDG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['mRPMDG']), axis=2)))
+            mRPMDG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['mRPMDG']), axis=2)))
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
         Rho_std  = OrderedDict([])
@@ -746,10 +759,13 @@ class Liquid(Target):
         Eps0_calc = OrderedDict([])
         Eps0_grad = OrderedDict([])
         Eps0_std  = OrderedDict([])
-        ECVKE_calc = OrderedDict([])
-        ECVKE_grad = OrderedDict([])
-        ECVKE_std = OrderedDict([])
-
+        Cvqke_calc = OrderedDict([])
+        Cvqke_grad = OrderedDict([])
+        Cvqke_std = OrderedDict([])
+        Pqke_calc = OrderedDict([])        
+        Pqke_grad = OrderedDict([])
+        Pqke_std = OrderedDict([])
+ 
         # The unit that converts atmospheres * nm**3 into kj/mol :)
         pvkj=0.061019351687175
 
@@ -836,9 +852,10 @@ class Liquid(Target):
         Dx = Dx.flatten()
         Dy = Dy.flatten()
         Dz = Dz.flatten()
-        if RPMD:
-            E_PKE = E_PKE.flatten() 
-            Cp_corr = Cp_corr.flatten()
+        E_PKE = E_PKE.flatten() 
+        Cp_corr = Cp_corr.flatten()
+        Kinetics = Kinetics.flatten()
+        Primitive_kinetics = Primitive_kinetics.flatten()
         if len(mPoints) > 0: mE = mE.flatten()
             
         for i, PT in enumerate(Points):
@@ -846,13 +863,13 @@ class Liquid(Target):
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
             PV = P*V*pvkj
             H = E + PV
-            if RPMD:
-                RPMDH = E_PKE + PV
+            RPMDH = E_PKE + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
             C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
             Gbar = flat(np.matrix(G)*col(W))
             RPMDGbar = flat(np.matrix(RPMDG)*col(W))
+            RPMDGbar_frc_term = flat(np.matrix(RPMDG_frc)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
             kT    = kb*T
@@ -957,11 +974,16 @@ class Liquid(Target):
             GD2 += 2*(flat(np.matrix(GDy)*col(W*Dy)) - avg(Dy)*flat(np.matrix(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
             GD2 += 2*(flat(np.matrix(GDz)*col(W*Dz)) - avg(Dz)*flat(np.matrix(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
             Eps0_grad[PT] = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
-            ## Centroid virial energy
-            ECVKE_calc[PT] = avg(E)
-            GECVKE = mBeta*covde(E)
-            GECVKE += RPMDGbar
-            ECVKE_grad[PT] = GECVKE  
+            ## Centroid virial QKE
+            Cvqke_calc[PT] = avg(Kinetics) / NMol
+            GCvqke = mBeta*covde(Kinetics)
+            GCvqke += RPMDGbar_frc_term
+            GCvqke /= NMol
+            Cvqke_grad[PT] = GCvqke
+            ## Primitive QKE  
+            Pqke_calc[PT] = avg(Primitive_kinetics) / NMol
+            GPqke = mBeta*covde(Primitive_kinetics) / NMol
+            Pqke_grad[PT] = GPqke
             ## Estimation of errors.
             Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             if PT in mPoints:
@@ -972,7 +994,8 @@ class Liquid(Target):
             Kappa_std[PT]   = np.sqrt(sum(C**2 * np.array(Kappa_errs)**2)) * 1e6
             Cp_std[PT]      = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
             Eps0_std[PT]    = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
-            ECVKE_std[PT]   = np.sqrt(sum(C**2 * np.array(Ene_errs)**2))
+            Cvqke_std[PT]   = np.sqrt(sum(C**2 * np.array(Kin_errs)**2))
+            Pqke_std[PT]    = np.sqrt(sum(C**2 * np.array(Pke_errs)**2))
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
@@ -981,16 +1004,18 @@ class Liquid(Target):
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Points, 'kappa', Kappa_calc, Kappa_std, Kappa_grad, name="Compressibility")
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
-        X_ECVKE, G_ECVKE, H_ECVKE, ECVKEPrint = self.objective_term(Points, 'ecvke', ECVKE_calc, ECVKE_std, ECVKE_grad, name="Centroid virial total energy")
+        X_Cvqke, G_Cvqke, H_Cvqke, CvqkePrint = self.objective_term(Points, 'cvqke', Cvqke_calc, Cvqke_std, Cvqke_grad, name="Centroid Virial QKE")
+        X_Pqke, G_Pqke, H_Pqke, PqkePrint = self.objective_term(Points, 'pqke', Pqke_calc, Pqke_std, Pqke_grad, name="Primitive QKE")
 
         if X_Alpha == 0: self.w_alpha = 0.0
         if X_Kappa == 0: self.w_kappa = 0.0
         if X_Cp == 0: self.w_cp = 0.0
         if X_Eps0 == 0: self.w_eps0 = 0.0
-        if X_ECVKE == 0: self.w_ecvke = 0.0
+        if X_Cvqke == 0: self.w_cvqke = 0.0
+        if X_Pqke == 0: self.w_pqke = 0.0
 
         if self.w_normalize:
-            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_ecvke
+            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_cvqke + self.w_pqke
         else:
             w_tot = 1.0
         w_1 = self.w_rho / w_tot
@@ -999,24 +1024,25 @@ class Liquid(Target):
         w_4 = self.w_kappa / w_tot
         w_5 = self.w_cp / w_tot
         w_6 = self.w_eps0 / w_tot
-        w_7 = self.w_ecvke / w_tot
+        w_7 = self.w_cvqke / w_tot
+        w_8 = self.w_pqke / w_tot
 
-        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_ECVKE
+        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Cvqke + w_8 * X_Pqke
         if AGrad:
-            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_ECVKE
+            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_Cvqke + w_8 * G_Pqke
         if AHess:
-            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_ECVKE
+            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_Cvqke + w_8 * H_Pqke
 
         if not in_fd():
             self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha, 
-                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Ecvke" : X_ECVKE}
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Cvqke" : X_Cvqke, "Pqke" : X_Pqke}
             self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3, 
-                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Ecvke" : w_7}
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Cvqke" : w_7, "Pqke" : w_8}
             self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint, 
-                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Ecvke" : ECVKEPrint}
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Cvqke" : CvqkePrint, "Pqke" : PqkePrint}
             if AGrad:
                 self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha, 
-                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Ecvke" : G_ECVKE}
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Cvqke" : G_Cvqke, "Pqke" : G_Pqke}
             self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}

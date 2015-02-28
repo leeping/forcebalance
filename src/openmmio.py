@@ -1099,9 +1099,9 @@ class OpenMM(Engine):
         return Result
 
     def calc_cv(self):
-        if not hasattr(self, 'rpmd_frame_props'):
-            rpmd_frame_props = {}
-            rpmd_frame_props['States'] = []
+        if not hasattr(self,'rpmd_frame_props'):
+            self.rpmd_frame_props = {}
+            self.rpmd_frame_props['States'] = []
             vsites = []
             for i in range(self.simulation.system.getNumParticles()):
                 if self.simulation.system.isVirtualSite(i):
@@ -1118,13 +1118,17 @@ class OpenMM(Engine):
                                 getParameters=False,enforcePeriodicBox=True,groups=-1)
                 rpmd_states.append(rpmd_state)
                 state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
-            rpmd_frame_props['States']    = rpmd_states
-            rpmd_frame_props['Positions'] = state_positions
-            rpmd_frame_props['T']         = self.simulation.integrator.getTemperature()
-            rpmd_frame_props['P']         = self.simulation.integrator.getNumCopies()
-            rpmd_frame_props['N']         = self.simulation.system.getNumParticles()
-            rpmd_frame_props['Masses']    = mass_matrix
-            rpmd_frame_props['Vsites']    = vsites
+            self.rpmd_frame_props['States']    = rpmd_states
+            self.rpmd_frame_props['Positions'] = state_positions
+            self.rpmd_frame_props['T']         = self.simulation.integrator.getTemperature()
+            self.rpmd_frame_props['P']         = self.simulation.integrator.getNumCopies()
+            if any(vsites):
+                total_N                        = self.simulation.system.getNumParticles()
+                self.rpmd_frame_props['N']     = total_N - total_N / 4
+            else:
+                self.rpmd_frame_props['N']     = self.simulation.system.getNumParticles()
+            self.rpmd_frame_props['Masses']    = mass_matrix
+            self.rpmd_frame_props['Vsites']    = vsites
         self.rpmd_states = []
         self.state_positions = []
         for i in range(self.simulation.integrator.getNumCopies()):
@@ -1195,7 +1199,9 @@ class OpenMM(Engine):
         Result["Energy"] = np.array(Energies)
         if force: Result["Force"] = np.array(Forces)
         if dipole: Result["Dipole"] = np.array(Dipoles)
-        if rpmd: Result["RPMD_CV_est"] = np.array(RPMD_CV_est) + np.array(Energies)
+        if rpmd: 
+            Result["RPMD_CV_est"] = np.array(RPMD_CV_est) + np.array(Energies)
+            Result["RPMD_CV_frc_term"] = np.array(RPMD_CV_est)
         return Result
 
     def energy_one(self, shot):
@@ -1224,11 +1230,11 @@ class OpenMM(Engine):
 
     def energy_dipole_rpmd(self):
         Result = self.evaluate_(dipole=True, traj=True, rpmd=True)
-        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"], Result["RPMD_CV_est"].reshape(-1,1)))
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"], Result["RPMD_CV_est"].reshape(-1,1), Result["RPMD_CV_frc_term"].reshape(-1,1)))
 
     def energy_rpmd(self, rpmd=True):
         Result = self.evaluate_(traj=True, rpmd=True)
-        return np.hstack((Result["Energy"].reshape(-1,1), Result["RPMD_CV_est"].reshape(-1,1)))
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["RPMD_CV_est"].reshape(-1,1), Result["RPMD_CV_frc_term"].reshape(-1,1)))
 
     def normal_modes(self, shot=0, optimize=True):
         logger.error("OpenMM cannot do normal mode analysis\n")

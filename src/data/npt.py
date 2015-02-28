@@ -193,15 +193,17 @@ def rpmd_energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True, dip
  
     This is analagous to the energy_derivatives function above, but is 
     specific for calculating derivatives for rpmd, which has 
-    an additional term.
+    an additional term due to the force term in the centroid virial
+    estimator.
     """
-    G       = np.zeros((FF.np,length))
-    GDx     = np.zeros((FF.np,length))
-    GDy     = np.zeros((FF.np,length))
-    GDz     = np.zeros((FF.np,length))
-    RPMDG   = np.zeros((FF.np,length))
+    G              = np.zeros((FF.np,length))
+    GDx            = np.zeros((FF.np,length))
+    GDy            = np.zeros((FF.np,length))
+    GDz            = np.zeros((FF.np,length))
+    RPMDG          = np.zeros((FF.np,length))
+    RPMDG_frc_term = np.zeros((FF.np,length))  
     if not AGrad:
-        return G, GDx, GDy, GDz, RPMDG
+        return G, GDx, GDy, GDz, RPMDG, RPMDG_frc_term
     def rpmd_energy_driver(mvals_):
         FF.make(mvals_)
         if dipole:
@@ -209,20 +211,22 @@ def rpmd_energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True, dip
         else:
             return engine.energy_rpmd()
 
-    ED0     = rpmd_energy_driver(mvals)
+    ED0 = rpmd_energy_driver(mvals)
     for i in pgrad:
         logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
         ERPMDG, _   = f12d3p(fdwrap(rpmd_energy_driver,mvals,i),h,f0=ED0)
         if dipole:
-            G[i,:]     = ERPMDG[:,0] 
-            GDx[i,:]   = ERPMDG[:,1] 
-            GDy[i,:]   = ERPMDG[:,2]
-            GDz[i,:]   = ERPMDG[:,3]
-            RPMDG[i,:] = ERPMDG[:,4]    
+            G[i,:]              = ERPMDG[:,0] 
+            GDx[i,:]            = ERPMDG[:,1] 
+            GDy[i,:]            = ERPMDG[:,2]
+            GDz[i,:]            = ERPMDG[:,3]
+            RPMDG[i,:]          = ERPMDG[:,4]    
+            RPMDG_frc_term[i,:] = ERPMDG[:,5]
         else:
-            G[i,:]     = ERPMDG[:,0]
-            RPMDG[i,:] = ERPMDG[:,1]
-    return G, GDx, GDy, GDz, RPMDG
+            G[i,:]              = ERPMDG[:,0]
+            RPMDG[i,:]          = ERPMDG[:,1]
+            RPMDG_frc_term[i,:] = ERPMDG[:,2]
+    return G, GDx, GDy, GDz, RPMDG, RPMDG_frc_term
 
 def property_derivatives(engine, FF, mvals, h, pgrad, kT, property_driver, property_kwargs, AGrad=True):
 
@@ -461,7 +465,6 @@ def main():
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
-    # Have we run RPMD?
     if len(Cp_corrections) > 0:
         RPMD = True
     else:
@@ -494,7 +497,8 @@ def main():
         PKE = Potentials + Primitive_kinetics
         PKE_avg, PKE_err = mean_stderr(PKE)
         Cp_corr_avg, Cp_corr_err = mean_stderr(Cp_corrections)
-        # Define RPMDH using primitive estimator
+        # Express RPMDH using primitive estimator. H expressed
+        # in terms of centroid virial estimator. 
         RPMDH = PKE + pV
     PrintEDA(EDA, NMol)
 
@@ -544,11 +548,11 @@ def main():
         logger.info("Calculating derivatives of RPMD energy terms with finite difference step size: %f\n" % h)
         printcool("Condensed phase rpmd derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True) 
         click()
-        G, GDx, GDy, GDz, RPMDG = rpmd_energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
+        G, GDx, GDy, GDz, RPMDG, RPMDG_frc_term = rpmd_energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
         logger.info("Condensed phase rpmd derivatives took %.3f seconds\n" % click())  
         click()
         printcool("Gas phase rpmd term derivatives", color=4, bold=True)
-        mG, _, __, ___, RPMDmG = rpmd_energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
+        mG, _, __, ___, RPMDmG, RPMDmG_frc_term = rpmd_energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
         logger.info("Gas phase rpmd cv term derivatives took %.3f seconds\n" % click())
     #==============================================#
     #  Condensed phase properties and derivatives. #
@@ -808,15 +812,25 @@ def main():
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GEps0,GEps0_fd)]
         FF.print_map(vals=absfrac)
-    #----------------------------#
-    # Fit centroid virial energy #
-    #----------------------------#
+    #------------------------------#
+    # Fit quantum kinetic energies #
+    #------------------------------#
     if RPMD:
-        RPMDGbar = np.mean(RPMDG,axis=1)
-        GCVE = mBeta * covde(Energies)
-        GCVE += RPMDGbar
-        Sep = printcool("Centroid virial energy:           % .4e +- %.4e\nAnalytic Derivative:" % (Ene_avg, Ene_err))
-        FF.print_map(vals=GCVE)
+        # Centroid virial
+        RPMDGbar         = np.mean(RPMDG,axis=1)
+        RPMDG_frc_bar    = np.mean(RPMDG_frc_term,axis=1)
+        kin_avg, kin_err = mean_stderr(Kinetics) / NMol
+        GCVQKE           = mBeta * covde(Kinetics)
+        GCVQKE          += RPMDG_frc_bar
+        GCVQKE          /= NMol
+        Sep = printcool("Centroid virial QKE:           % .4e +- %.4e\nAnalytic Derivative:" % (kin_avg, kin_err))
+        FF.print_map(vals=GCVQKE)
+
+        # Primitive
+        pke_avg, pke_err = mean_stderr(Primitive_kinetics) / NMol
+        GPQKE            = mBeta * covde(Primitive_kinetics) / NMol
+        Sep = printcool("Primitive QKE:           % .4e +- %.4e\nAnalytic Derivative:" % (pke_avg, pke_err))
+        FF.print_map(vals=GPQKE)
 
     logger.info("Writing final force field.\n")
     pvals = FF.make(mvals)
@@ -824,12 +838,15 @@ def main():
     logger.info("Writing all simulation data to disk.\n")
 
     if not RPMD:
-        RPMDG = np.zeros(G.shape)
-        RPMDmG = np.zeros(mG.shape)
-        PKE_avg = np.array([])
-        PKE_err = np.array([])
+        RPMDG              = np.zeros(G.shape)
+        RPMDmG             = np.zeros(mG.shape)
+        RPMDG_frc_term     = np.zeros(G.shape)
+        Cp_corrections     = np.zeros(np.array(Kinetics).shape)
+        Primitive_kinetics = np.zeros(np.array(Kinetics).shape)
+        pke_err            = 0.0   
+        kin_err            = 0.0
 
-    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol, Cp_corrections, RPMDG, RPMDmG, PKE_avg, PKE_err, Ene_err, RPMD),'npt_result.p')
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, kin_err, pke_err, NMol, Cp_corrections, RPMDG, RPMDmG, RPMDG_frc_term, Kinetics, Primitive_kinetics, RPMD),'npt_result.p')
 
 if __name__ == "__main__":
     main()
