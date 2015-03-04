@@ -341,7 +341,7 @@ def main():
     ML = Molecule(liquid_fnm, toppbc=True)
     MG = Molecule(gas_fnm)
     # Determine the number of molecules in the condensed phase coordinate file.
-    NMol = len(ML.molecules)
+    NMol = TgtOptions['n_molecules']
     logger.info("There are %i molecules in the liquid\n" % (NMol))
 
     #----

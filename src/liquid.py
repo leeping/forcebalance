@@ -134,6 +134,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'anisotropic_box',forceprint=True)
         # Whether to save trajectories (0 = never, 1 = delete after good step, 2 = keep all)
         self.set_option(tgt_opts,'save_traj')
+        # Set the number of molecules by hand (in case ForceBalance doesn't get the right number from the structure)
+        self.set_option(tgt_opts,'n_molecules')
 
         #======================================#
         #     Variables which are set here     #
@@ -143,6 +145,18 @@ class Liquid(Target):
             logger.error("%s doesn't exist; please provide liquid_coords option\n" % self.liquid_coords)
             raise RuntimeError
         self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.liquid_coords), toppbc=True)
+        if self.n_molecules >= 0:
+            if self.n_molecules == len(self.liquid_mol.molecules):
+                logger.info("User-provided number of molecules matches auto-detected value (%i)\n" % self.n_molecules)
+            else:
+                logger.info("User-provided number of molecules (%i) overrides auto-detected value (%i)\n" % (self.n_molecules, len(self.liquid_mol.molecules)))
+        else:
+            self.n_molecules = len(self.liquid_mol.molecules)
+            if len(set([len(m) for m in self.liquid_mol.molecules])) != 1:
+                warn_press_key("Possible issue because molecules are not all the same size! Sizes detected: %s" % str(set([len(m) for m in self.liquid_mol.molecules])), timeout=30)
+            else:
+                logger.info("Autodetected %i molecules with %i atoms each in liquid coordinates\n" % (self.n_molecules, len(self.liquid_mol.molecules[0])))
+                
         # Read in gas starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.gas_coords)): 
             logger.error("%s doesn't exist; please provide gas_coords option\n" % self.gas_coords)
