@@ -896,7 +896,7 @@ class Liquid(Target):
                     Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
                     Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
                 else:
-                    Hvap_grad[PT] = mRPMDGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
+                    Hvap_grad[PT]  = mRPMDGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
                     Hvap_grad[PT] -= (RPMDGbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
                     Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
                 if self.do_self_pol:
@@ -930,11 +930,18 @@ class Liquid(Target):
                 # RPMDH is the H timeseries calculaed with the primitive
                 # kinetic estimator.
                 Alpha_calc[PT] = 1e4 * (avg(RPMDH*V)-avg(RPMDH)*avg(V))/avg(V)/(kT*T)
-            GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
-            GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
-            GAlpha3 = deprod(V)/avg(V) - Gbar
-            GAlpha4 = Beta * covde(H)
-            Alpha_grad[PT] = 1e4 * (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+            if not RPMD:
+                GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
+                GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
+                GAlpha3 = deprod(V)/avg(V) - Gbar
+                GAlpha4 = Beta * covde(H)
+                Alpha_grad[PT] = 1e4 * (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+            else:
+                GAlpha1 = -1 * Beta * deprod(RPMDH*V) * avg(V) / avg(V)**2                               
+                GAlpha2 = +1 * Beta * avg(RPMDH*V) * deprod(V) / avg(V)**2
+                GAlpha3 = deprod(V)/avg(V) - Gbar
+                GAlpha4 = Beta * covde(RPMDH)
+                Alpha_grad[PT] = 1e4 * (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
             ## Isothermal compressibility.
             bar_unit = 0.06022141793 * 1e6
             Kappa_calc[PT] = bar_unit / kT * (avg(V**2)-avg(V)**2)/avg(V)
