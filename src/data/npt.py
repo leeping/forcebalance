@@ -396,7 +396,7 @@ def main():
     if engname == "openmm":
         # OpenMM-specific options
         EngOpts["liquid"]["platname"] = 'CUDA'
-        EngOpts["gas"]["platname"] = 'Reference'
+        EngOpts["gas"]["platname"] = 'CUDA'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')

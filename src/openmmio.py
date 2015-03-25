@@ -860,6 +860,8 @@ class OpenMM(Engine):
                 if len(rpmd_opts) == 0:
                     barostat = MonteCarloBarostat(pressure*atmospheres, temperature*kelvin, nbarostat)
                 else:
+                    logger.info("Creating RPMDMonteCarloBarostati\n")
+                    logger.info("Barostat stride: %d\n" % nbarostat)
                     barostat = RPMDMonteCarloBarostat(pressure*atmospheres, nbarostat)
         if self.pbc and pressure != None: self.system.addForce(barostat)
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
