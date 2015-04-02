@@ -54,6 +54,8 @@ material change ambient      Steel 0.0
 #            define drawing functions              #
 #==================================================#
 
+proc min {x y} {expr {$x<$y? $x: $y}}
+
 # draw a whole list of vectors. a convenience functions to draw a
 # lot of vectors easily.
 # field has to be a list of pairs of xyz triples (center and vector).
