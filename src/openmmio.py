@@ -936,7 +936,7 @@ class OpenMM(Engine):
             for i in self.system.getForces():
                 if isinstance(i, NonbondedForce):
                     i.setNonbondedMethod(4)
-                    i.setUseSwitchingFunction(False)
+                    i.setUseSwitchingFunction(True)
                     #logger.info('NonbondedForce\n')
                     #logger.info('Nonbonded method\n')
                     #logger.info(i.getNonbondedMethod())
@@ -950,8 +950,11 @@ class OpenMM(Engine):
                     #logger.info(i.getUseDispersionCorrection())
                 elif isinstance(i, CustomNonbondedForce):
                     #logger.info('')
-                    i.setNonbondedMethod(4)
+                    #i.setNonbondedMethod(4)
                     i.setUseLongRangeCorrection(True)
+                    i.setUseSwitchingFunction(True)
+                    i.setSwitchingDistance(0.75*nanometer)
+                    
                     #logger.info('CustomNonbondedForce\n')
                     #logger.info('Nonbonded method\n')
                     #logger.info(i.getNonbondedMethod())
@@ -1141,8 +1144,8 @@ class OpenMM(Engine):
                             getParameters=False,enforcePeriodicBox=True,groups=-1)
             self.rpmd_states.append(rpmd_state)
             self.state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
-            self.rpmd_frame_props['States'] = self.rpmd_states
-            self.rpmd_frame_props['Positions'] = self.state_positions
+        self.rpmd_frame_props['States'] = self.rpmd_states
+        self.rpmd_frame_props['Positions'] = self.state_positions
         return centroid_kinetic(self.simulation, self.rpmd_frame_props).value_in_unit(kilojoules_per_mole)
 
     def evaluate_one_(self, force=False, dipole=False):
