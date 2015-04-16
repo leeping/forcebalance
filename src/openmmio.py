@@ -936,7 +936,10 @@ class OpenMM(Engine):
             for i in self.system.getForces():
                 if isinstance(i, NonbondedForce):
                     i.setNonbondedMethod(4)
+                    i.setCutoffDistance(0.85*nanometer)
                     i.setUseSwitchingFunction(True)
+                    i.setSwitchingDistance(0.75*nanometer)
+                    i.setUseDispersionCorrection(True)
                     #logger.info('NonbondedForce\n')
                     #logger.info('Nonbonded method\n')
                     #logger.info(i.getNonbondedMethod())
@@ -951,10 +954,10 @@ class OpenMM(Engine):
                 elif isinstance(i, CustomNonbondedForce):
                     #logger.info('')
                     #i.setNonbondedMethod(4)
-                    i.setUseLongRangeCorrection(True)
+                    i.setCutoffDistance(0.85*nanometer)
                     i.setUseSwitchingFunction(True)
                     i.setSwitchingDistance(0.75*nanometer)
-                    
+                    i.setUseLongRangeCorrection(True)
                     #logger.info('CustomNonbondedForce\n')
                     #logger.info('Nonbonded method\n')
                     #logger.info(i.getNonbondedMethod())
