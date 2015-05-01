@@ -95,9 +95,12 @@ def centroid_kinetic(Sim, props):
         CV_second_term = 0.0
         P = props['P']
         N = props['N']
-        centroid = np.array([[0.0,0.0,0.0]]*N)
-        for i in range(P):
-            centroid += np.array(props['Positions'][i]) / P
+        if 'centroids' in props:
+            centroid = props['centroids']
+        else:
+            centroid = np.array([[0.0,0.0,0.0]]*N)
+            for i in range(P):
+                centroid += np.array(props['Positions'][i]) / P
         for i in range(P):
             diff = np.array(props['Positions'][i]) - centroid
             diff[np.where(props['Vsites'])[0],:] = 0.0
@@ -106,6 +109,14 @@ def centroid_kinetic(Sim, props):
         return Quantity(CV_second_term*0.5/P, kilojoules_per_mole)
     else:
         Sim.context.getState(getEnergy=True).getKineticEnergy()
+
+def compute_centroids(Sim, props):
+    N = props['N']
+    P = props['P']
+    centroids = np.array([[0.0,0.0,0.0]]*N)
+    for i in range(P):
+        centroids += np.array(props['Positions'][i]) / P
+    return centroids
 
 def get_forces(Sim):
     """Return forces on each atom or forces averaged over all copies in case of RPMD."""
@@ -1012,7 +1023,7 @@ class OpenMM(Engine):
         else:
             rpmdIntegrator = self.simulation.context.getIntegrator()
             for i in range(rpmdIntegrator.getNumCopies()):
-                temp_positions = self.xyz_rpmd[shot][0][i]
+                temp_positions = self.xyz_rpmd[shot][0][0]
                 rpmdIntegrator.setPositions(i,temp_positions)
     
     def get_charges(self):
@@ -1172,7 +1183,9 @@ class OpenMM(Engine):
                 Energies.append(R1["Energy"])
                 if force: Forces.append(R1["Force"])
                 if dipole: Dipoles.append(rpmd_dips(self.simulation, self.nbcharges, self.AtomLists['Mass']))
-                if rpmd: RPMD_CV_est.append(self.calc_cv())
+                if rpmd:
+                    self.rpmd_frame_props['centroids'] = self.centroids[I] 
+                    RPMD_CV_est.append(self.calc_cv())
         else:
             for I in range(len(self.xyz_omms)):
                 self.set_positions(I)
@@ -1415,6 +1428,7 @@ class OpenMM(Engine):
         Temps = []
         self.rpmd_frame_props = {}
         self.rpmd_frame_props['States'] = []
+        self.centroids = []
         if self.rpmd:
             vsites = []
             # Build boolean array indicating which particles are virtual
@@ -1528,6 +1542,7 @@ class OpenMM(Engine):
             else:
                 kinetic = centroid_kinetic(self.simulation, self.rpmd_frame_props)
                 primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props) 
+                self.centroids.append(compute_centroids(self.simulation, self.rpmd_frame_props))
             potential = evaluate_potential(self.simulation)
             if not self.rpmd:
                 kinetic_temperature = 2.0 * kinetic / kB / self.ndof
@@ -1544,7 +1559,7 @@ class OpenMM(Engine):
             if not self.rpmd:
                 self.xyz_omms.append([state.getPositions(), box_vectors])
             else:
-                self.xyz_rpmd.append([[self.rpmd_states[i].getPositions() for i in range(self.simulation.integrator.getNumCopies())], box_vectors])
+                self.xyz_rpmd.append([[self.rpmd_states[i].getPositions() for i in [0]], box_vectors])
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1570,7 +1585,7 @@ class OpenMM(Engine):
             else:
                 temp_dips = []
                 for i in range(self.simulation.integrator.getNumCopies()):
-                    temp_dips.append(get_dipole(self.simulation, positions=self.xyz_rpmd[-1][0][i]))
+                    temp_dips.append(get_dipole(self.simulation, positions=self.rpmd_states[i].getPositions()))
                 dip_avg = [sum(col) / float(len(col)) for col in zip(*temp_dips)]
                 Dips.append(dip_avg)
         if not self.rpmd:
