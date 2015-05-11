@@ -249,7 +249,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     botbar = ''.join([bottom for i in range(width + 8)])
     return botbar + '\n'
 
-def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidth=25,topwidth=50,center=True,leftpad=0):
+def printcool_dictionary(Dict,title="Dictionary Keys : Values",bold=False,color=2,keywidth=25,topwidth=50,center=True,leftpad=0):
     """See documentation for printcool; this is a nice way to print out keys/values in a dictionary.
 
     The keys in the dictionary are sorted before printing out.
