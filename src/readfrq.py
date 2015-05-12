@@ -36,7 +36,7 @@ def read_frq_gau(gauout):
             else:
                 for i in range(nfrq):
                     readmodes[i].append([float(s[j]) for j in range(2+3*i,5+3*i)])
-        if VModeNxt is not None: VMode = VModeNxt
+        if VModeNxt != None: VMode = VModeNxt
     unnorm = [np.array(i) for i in modes]
     return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm]
 
@@ -68,7 +68,7 @@ def read_frq_qc(qcout):
             elif 'TransDip' not in s:
                 for i in range(nfrq):
                     readmodes[i].append([float(s[j]) for j in range(1+3*i,4+3*i)])
-        if VModeNxt is not None: VMode = VModeNxt
+        if VModeNxt != None: VMode = VModeNxt
     unnorm = [np.array(i) for i in modes]
     return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm]
 
@@ -104,7 +104,7 @@ def read_frq_psi(psiout):
                 m = float(s[-1])
                 # Un-massweight the eigenvectors so that the output matches Q-Chem or Gaussian.
                 readmode.append([float(i)/np.sqrt(m) for i in s[1:4]])
-        if VModeNxt is not None: VMode = VModeNxt
+        if VModeNxt != None: VMode = VModeNxt
         if XMode == 1:
             s = line.split()
             if len(s) == 4 and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):

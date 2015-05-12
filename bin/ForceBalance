@@ -90,9 +90,7 @@ elif [ -e $output ] && [ $force -eq 0 ] ; then
       bnum=$(( bnum + 1 ))
   done
   cp $output $bakdir/${filename}_$bnum.$outext
-  if [ -e $error ] ; then
-      cp $error $bakdir/${filename}_$bnum.err
-  fi
+  cp $error $bakdir/${filename}_$bnum.err
 fi
 
 echo "Output will be written to $output"
@@ -120,13 +118,8 @@ else
     $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
 fi
 exitstat=$?
-if [ -f $error ] ; then
-    nerr=`wc -l $error | awk '{print $1}'`
-    errlines=`grep -i "error\|exception\|fatal" $error 2> /dev/null | wc -l | awk '{print $1}'`
-else
-    nerr=0
-    errlines=0
-fi
+nerr=`wc -l $error | awk '{print $1}'`
+errlines=`grep -i "error\|exception\|fatal" $error 2> /dev/null | wc -l | awk '{print $1}'`
 if [ $errlines -ne 0 ] || [ $exitstat -ne 0 ] ; then
     tail -50 $error
     echo
