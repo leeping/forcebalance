@@ -24,6 +24,7 @@ import pickle
 import tarfile
 import time
 import subprocess
+import math
 from shutil import copyfileobj
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
@@ -349,6 +350,27 @@ def flat(vec):
     @return answer The flattened data
     """
     return np.array(vec).reshape(-1)
+
+def est124(val):
+    """Given any positive floating point value, return a value [124]e+xx
+    that is closest to it in the log space.
+    """
+    log = np.log10(val)
+    logint = math.floor(log)
+    logfrac = log - logint
+    log1 = 0.0
+    log2 = 0.3010299956639812
+    log4 = 0.6020599913279624
+    log10 = 1.0
+    if logfrac < 0.5*(log1+log2):
+        fac = 1.0
+    elif logfrac < 0.5*(log2+log4):
+        fac = 2.0
+    elif logfrac < 0.5*(log4+log10):
+        fac = 4.0
+    else:
+        fac = 10.0
+    return fac*10**logint
 
 def monotonic(arr, start, end):
     # Make sure an array is monotonically decreasing from the start to the end.

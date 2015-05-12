@@ -14,7 +14,7 @@ import numpy as np
 from copy import deepcopy
 import forcebalance
 from forcebalance.parser import parse_inputs
-from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak
+from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak, est124
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
@@ -1332,7 +1332,7 @@ class Optimizer(forcebalance.BaseClass):
             optresult[i] = 0.0
         # We don't need any more than one significant digit of precision for the priors / scale factors.
         # The following values are the new scale factors themselves (i.e. not multiplying the old ones)
-        opt_rsord = OrderedDict([(k, float('%.0e' % (np.exp(optresult[i])*self.FF.rs_ord[k]))) for i, k in enumerate(self.FF.rs_ord.keys())])
+        opt_rsord = OrderedDict([(k, est124(np.exp(optresult[i])*self.FF.rs_ord[k])) for i, k in enumerate(self.FF.rs_ord.keys())])
         # Print the final answer
         answer = self.FF.make_rescale(opt_rsord, mvals=self.mvals0, H=H.copy(), multiply=False)
         logger.info("Condition Number after Rounding Factors -> %.3f\n" % (np.exp(newcond(np.log(opt_rsord.values()), multiply=False))))
