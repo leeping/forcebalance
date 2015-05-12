@@ -60,7 +60,7 @@ class LeastSquares(Target):
         # print mvals
         # print LAST_MVALS
         # print mvals == LAST_MVALS
-        if LAST_MVALS == None or not (mvals == LAST_MVALS).all():
+        if LAST_MVALS is None or not (mvals == LAST_MVALS).all():
             CHECK_BASIS = False
         else:
             CHECK_BASIS = False

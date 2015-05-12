@@ -173,14 +173,14 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
     @param[in] chk Crash if the key file does NOT have these options by the end.
     """
     # Make sure that the keys are lowercase, and the values are all strings.
-    options = OrderedDict([(key.lower(), str(val) if val != None else None) for key, val in options.items()])
-    if 'parameters' in options and prmfnm != None:
+    options = OrderedDict([(key.lower(), str(val) if val is not None else None) for key, val in options.items()])
+    if 'parameters' in options and prmfnm is not None:
         logger.error("Please pass prmfnm or 'parameters':'filename.prm' in options but not both.\n")
         raise RuntimeError
     elif 'parameters' in options:
         prmfnm = options['parameters']
     
-    if prmfnm != None:
+    if prmfnm is not None:
         # Account for both cases where the file name may end with .prm
         prms = [prmfnm]
         if prms[0].endswith('.prm'):
@@ -196,7 +196,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
     haveopts = []
     skip = 0
     prmflag = 0
-    if fin != None and os.path.isfile(fin):
+    if fin is not None and os.path.isfile(fin):
         for line0 in open(fin).readlines():
             line1   = line0.replace('\n','').expandtabs()
             line    = line0.strip().expandtabs()
@@ -237,7 +237,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
                     warn_press_key("Expected a parameter file name but got none")
                 # This is the case where "parameters" correctly corresponds to optimize.in
                 prmflag = 1
-                if prmfnm == None or val0 in prms or val0[:-4] in prms:
+                if prmfnm is None or val0 in prms or val0[:-4] in prms:
                     out.append(line1)
                     continue
                 else:
@@ -252,14 +252,14 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
                     logger.error("write_key tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
                     raise RuntimeError
                 # Passing None as the value causes the option to be deleted
-                if val == None: 
+                if val is None: 
                     continue
                 if len(val) < len(valf):
                     valf = ' ' + val + ' '*(len(valf) - len(val)-1)
                 else:
                     valf = ' ' + val + ' '
                 lout = [keyf, ' ', valf]
-                if comms != None:
+                if comms is not None:
                     lout += ['#',comms]
                 out.append(''.join(lout))
             else:
@@ -267,7 +267,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
     # Options that don't already exist are written at the bottom.
     for key, val in options.items():
         key = key.lower()
-        if val == None: continue
+        if val is None: continue
         if key not in haveopts:
             haveopts.append(key)
             out.append("%-20s %s" % (key, val))
@@ -279,7 +279,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
             haveopts.append(key)
             out.append("%-20s %s" % (key, val))
     # If parameters are not specified, they are printed at the top.
-    if not prmflag and prmfnm != None:
+    if not prmflag and prmfnm is not None:
         out.insert(0,"parameters %s" % prmfnm)
         options["parameters"] = prmfnm
     elif not prmflag:
@@ -406,7 +406,7 @@ class TINKER(Engine):
                 self.rigid = True
             if self.FF.amoeba_pol == 'mutual':
                 tk_opts['polarization'] = 'mutual'
-                if self.FF.amoeba_eps != None:
+                if self.FF.amoeba_eps is not None:
                     tk_opts['polar-eps'] = str(self.FF.amoeba_eps)
                 else:
                     tk_defs['polar-eps'] = '1e-6'
@@ -806,7 +806,7 @@ class TINKER(Engine):
         for line in o:
             if "Total Potential Energy" in line:
                 E = float(line.split()[-2].replace('D','e'))
-        if E == None:
+        if E is None:
             logger.error("Total potential energy wasn't encountered when calling analyze!\n")
             raise RuntimeError
         if optimize and abs(E-E_) > 0.1:
@@ -853,7 +853,7 @@ class TINKER(Engine):
         md_opts["printout"] = nsave
         md_opts["openmp-threads"] = threads
         # Langevin dynamics for temperature control.
-        if temperature != None:
+        if temperature is not None:
             md_defs["integrator"] = "stochastic"
         else:
             md_defs["integrator"] = "beeman"
@@ -861,16 +861,16 @@ class TINKER(Engine):
         # Periodic boundary conditions.
         if self.pbc:
             md_opts["vdw-correction"] = ''
-            if temperature != None and pressure != None: 
+            if temperature is not None and pressure is not None: 
                 md_defs["integrator"] = "beeman"
                 md_defs["thermostat"] = "bussi"
                 md_defs["barostat"] = "montecarlo"
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
-            elif pressure != None:
+            elif pressure is not None:
                 warn_once("Pressure is ignored because temperature is turned off.")
         else:
-            if pressure != None:
+            if pressure is not None:
                 warn_once("Pressure is ignored because pbc is set to False.")
             # Use stochastic dynamics for the gas phase molecule.
             # If we use the regular integrators it may miss
@@ -878,7 +878,7 @@ class TINKER(Engine):
             md_opts["barostat"] = None
 
         eq_opts = deepcopy(md_opts)
-        if self.pbc and temperature != None and pressure != None: 
+        if self.pbc and temperature is not None and pressure is not None: 
             eq_opts["integrator"] = "beeman"
             eq_opts["thermostat"] = "bussi"
             eq_opts["barostat"] = "berendsen"
@@ -893,7 +893,7 @@ class TINKER(Engine):
         if nequil > 0:
             write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
             if verbose: printcool("Running equilibration dynamics", color=0)
-            if self.pbc and pressure != None:
+            if self.pbc and pressure is not None:
                 self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 
                                                                           temperature, pressure), print_to_screen=verbose)
             else:
@@ -904,7 +904,7 @@ class TINKER(Engine):
         # Run production.
         if verbose: printcool("Running production dynamics", color=0)
         write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
-        if self.pbc and pressure != None:
+        if self.pbc and pressure is not None:
             odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
                                                                              temperature, pressure), print_to_screen=verbose)
         else:
