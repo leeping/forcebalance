@@ -451,7 +451,7 @@ def main():
     logger.info(Sep)
 
     def calc_rho(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'r_' in kwargs:
             r_ = kwargs['r_']
         return bzavg(r_,b)
@@ -491,7 +491,7 @@ def main():
     # Thermal expansion coefficient
     #----
     def calc_alpha(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         if 'v_' in kwargs:
@@ -526,7 +526,7 @@ def main():
     # Isothermal compressibility
     #----
     def calc_kappa(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'v_' in kwargs:
             v_ = kwargs['v_']
         return bar_unit / kT * (bzavg(v_**2,b)-bzavg(v_,b)**2)/bzavg(v_,b)
@@ -557,7 +557,7 @@ def main():
     # Isobaric heat capacity
     #----
     def calc_cp(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
@@ -590,7 +590,7 @@ def main():
     # Dielectric constant
     #----
     def calc_eps0(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'd_' in kwargs: # Dipole moment vector.
             d_ = kwargs['d_']
         if 'v_' in kwargs: # Volume.
@@ -642,7 +642,7 @@ def main():
     logger.info(Sep)
 
     def calc_al(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'a_' in kwargs:
             a_ = kwargs['a_']
         return bzavg(a_,b)
@@ -654,7 +654,7 @@ def main():
     #----
     kbT = 1.3806488e-23 * T
     def calc_lkappa(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'a_' in kwargs:
             a_ = kwargs['a_']
         al_var = bzavg(a_**2,b)-bzavg(a_,b)**2
@@ -706,7 +706,7 @@ def main():
     logger.info(Sep)
 
     def calc_scd(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 's_' in kwargs:
             s_ = kwargs['s_']
         return bzavg(s_,b)
