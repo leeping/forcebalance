@@ -1018,22 +1018,27 @@ class FF(forcebalance.BaseClass):
         # for line in os.popen("awk '/rsfactor/ {print $2,$3}' %s" % pkg.options).readlines():
         #     rsfactors[line.split()[0]] = float(line.split()[1])
         if printfacs:
-            bar = printcool("Rescaling Factors (Lower Takes Precedence):",color=1)
+            bar = printcool("Rescaling Factors by Type (Lower Takes Precedence):",color=1)
             logger.info(''.join(["   %-35s  : %.5e\n" % (i, rsfactors[i]) for i in rsfac_list]))
             logger.info(bar)
         self.rs_ord = OrderedDict([(i, rsfactors[i]) for i in rsfac_list])
         ## The array of rescaling factors
         self.rs = np.ones(len(self.pvals0))
+        self.rs_type = OrderedDict()
         have_rs = []
         for pnum in range(len(self.pvals0)):
             for termtype in rsfac_list:
                 if termtype in self.plist[pnum]:
                     if pnum not in have_rs:
                         self.rs[pnum] = rsfactors[termtype]
-                        have_rs.append(pnum)
-                    else:
-                        if rsfactors[termtype] != self.rs[pnum]:
-                            warn_press_key("Parameter %i (name %s) has conflicting rescaling factors!" % (pnum, self.plist[pnum]))
+                        self.rs_type[pnum] = termtype
+                    elif self.rs[pnum] != rsfactors[termtype]:
+                        self.rs[pnum] = rsfactors[termtype]
+                        self.rs_type[pnum] = termtype
+                    have_rs.append(pnum)
+        if printfacs:
+            bar = printcool("Rescaling Types / Factors by Parameter Number:",color=1)
+            self.print_map(vals=["   %-28s  : %.5e" % (self.rs_type[pnum], self.rs[pnum]) for pnum in range(len(self.pvals0))])
 
     def make_rescale(self, scales, mvals=None, G=None, H=None, multiply=True, verbose=False):
         """ Obtain rescaled versions of the inputs according to dictionary values 
@@ -1088,15 +1093,7 @@ class FF(forcebalance.BaseClass):
         answer = OrderedDict()
         answer['rs_ord'] = rsord_out
         # Make the new array of rescaling factors
-        rs_out = np.ones(self.np)
-        # Important note: When multiple parameters 
-        have_rs = []
-        for p in range(self.np):
-            for termtype in scales.keys():
-                if termtype in self.plist[p]:
-                    if p not in have_rs:
-                        rs_out[p] = rsord_out[termtype]
-                        have_rs.append(p)
+        rs_out = np.array([rsord_out[self.rs_type[p]] for p in range(self.np)])
         answer['rs'] = rs_out
         if type(mvals) != type(None):
             if mvals.shape != (self.np,):

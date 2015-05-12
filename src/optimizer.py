@@ -1243,7 +1243,7 @@ class Optimizer(forcebalance.BaseClass):
         """ An experimental method to determine the parameter scale factors
         that results in the best conditioned Hessian. """
         from scipy import optimize
-        data        = self.Objective.Full(self.mvals0,Order=2)
+        data        = self.Objective.Full(self.mvals0,Order=2,verbose=True)
         X, G, H = (data['X0'], data['G0'], data['H0']) if self.bhyp else (data['X'], data['G'], data['H'])
         bar = printcool("(Un-penalized) objective function: %.8f\nGradient below" % X)
         self.FF.print_map(vals=G,precision=8)
@@ -1256,6 +1256,9 @@ class Optimizer(forcebalance.BaseClass):
         H1 = np.delete(H1, self.excision, axis=1)
         Eig = np.linalg.eig(H1)[0]            # Diagonalize Hessian
         Cond = np.abs(np.max(Eig)/np.min(Eig))
+        # Spectral gap?
+        # eigsort = np.sort(np.abs(Eig))
+        # Cond = eigsort[-1]/eigsort[-2]
         logger.info("Initial condition number = %.3f\n" % Cond)
         def newcond(logrskeys, multiply=True):
             """ Condition number function to be optimized. 
@@ -1280,33 +1283,36 @@ class Optimizer(forcebalance.BaseClass):
             H_a = np.delete(H_a, self.excision, axis=0)
             H_a = np.delete(H_a, self.excision, axis=1)
             Eig_a = np.linalg.eig(H_a)[0]            # Diagonalize Hessian
-            Cond_a = np.abs(np.max(Eig_a)/np.min(Eig_a))
+            if np.min(Eig_a) < 1e-10:
+                Cond_a = 1e10
+            else:
+                Cond_a = np.abs(np.max(Eig_a)/np.min(Eig_a)) # Condition number
             dlog = logrskeys - newcond.prev_step
             nlog = np.sqrt(np.sum(dlog**2))
             if newcond.verbose and newcond.step_n % 1000 == 0: 
                 logger.info("\rEval# %6i: Step: %9.3f Along: %3i Condition: %12.3f\r" % (newcond.step_n, nlog, np.argmax(np.abs(dlog)), Cond_a))
             # "Regularize" using the log deviations
-            # Note: This breaks some stuff
-            # Cond_a += np.sum(logrskeys ** 2)
+            Reg = newcond.regularize * np.sum(logrskeys ** 2) / len(logrskeys)
             newcond.prev_step = logrskeys
             newcond.step_n += 1
-            return Cond_a
+            return np.log(Cond_a) + Reg
         newcond.prev_step = np.zeros(len(self.FF.rs_ord.keys()),dtype=float)
         newcond.step_n = 0
         newcond.verbose = True
+        newcond.regularize = 0.1
         logrsmult = np.zeros(len(self.FF.rs_ord.keys()),dtype=float)
         # Run the optimization algorithm.
         # optimized = optimize.fmin(newcond,logrsmult,ftol=0.1,xtol=0.1,maxiter=1000,maxfun=10000)
         logger.info("Basin-hopping optimization of condition number in the space of log rescaling factors\n")
-        optimized = optimize.basinhopping(newcond, logrsmult, stepsize=1.0, #disp=True,
+        optimized = optimize.basinhopping(newcond, logrsmult, stepsize=1.0, niter=self.maxstep, #disp=True,
                                           minimizer_kwargs={'method':'Powell','tol':0.1,'options':{'maxiter':1000}})
         optresult = optimized.x
         new_rsord = OrderedDict([(k, np.exp(optresult[i])) for i, k in enumerate(self.FF.rs_ord.keys())])
         answer = self.FF.make_rescale(new_rsord)
-        print answer
-        optval = newcond(optresult)
-        logger.info("\nOptimized condition number: %.3f\n" % optval)
+        newcond.regularize = 0.0
         newcond.verbose = False
+        optval = np.exp(newcond(optresult))
+        logger.info("\nOptimized condition number: %.3f\n" % optval)
         # The optimization algorithm may have changed some rescaling factors that had no effect.
         # Now we change them back.
         rezero = []
@@ -1329,7 +1335,7 @@ class Optimizer(forcebalance.BaseClass):
         opt_rsord = OrderedDict([(k, float('%.0e' % (np.exp(optresult[i])*self.FF.rs_ord[k]))) for i, k in enumerate(self.FF.rs_ord.keys())])
         # Print the final answer
         answer = self.FF.make_rescale(opt_rsord, mvals=self.mvals0, H=H.copy(), multiply=False)
-        logger.info("Condition Number after Rounding Factors -> %.3f\n" % (newcond(np.log(opt_rsord.values()), multiply=False)))
+        logger.info("Condition Number after Rounding Factors -> %.3f\n" % (np.exp(newcond(np.log(opt_rsord.values()), multiply=False))))
         bar = printcool("Previous values of the rescaling factors / prior widths:")
         logger.info(''.join(["   %-35s  : %.5e\n" % (i, self.FF.rs_ord[i]) for i in self.FF.rs_ord.keys()]))
         logger.info(bar)
