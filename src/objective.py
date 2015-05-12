@@ -202,7 +202,7 @@ class Objective(forcebalance.BaseClass):
                         pass
         else:
             wq = getWorkQueue()
-            if wq != None:
+            if wq is not None:
                 wq_wait(wq)
             for Tgt in self.Targets:
                 # The first call is always done at the midpoint.

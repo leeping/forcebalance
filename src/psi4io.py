@@ -348,7 +348,7 @@ class RDVR3_Psi4(Target):
         #
         self.tdir = os.getcwd()
         wq = getWorkQueue()
-        if wq == None:
+        if wq is None:
             return
 
         def submit_psi(this_apath, dname, these_mvals):
@@ -369,7 +369,7 @@ class RDVR3_Psi4(Target):
                     print >> o, line,
             o.close()
             os.system("rm -f objective.out")
-            if wq == None:
+            if wq is None:
                 logger.info("There is no Work Queue!!!\n")
                 sys.exit()
             else:
@@ -461,7 +461,7 @@ class RDVR3_Psi4(Target):
                 mvals[pidx] += arg1
                 mvals[qidx] += arg2
                 logger.info("\rfdwrap2:" + func.__name__ + "[%i] = % .1e , [%i] = % .1e" % (pidx, arg1, qidx, arg2) + ' '*50)
-                if key != None:
+                if key is not None:
                     return func(mvals,**kwargs)[key]
                 else:
                     return func(mvals,**kwargs)
@@ -473,7 +473,7 @@ class RDVR3_Psi4(Target):
             return fpp
 
         def f2d4p(f, h, f0 = None):
-            if f0 == None:
+            if f0 is None:
                 fpp, fp0, f0p, f0 = [f(i*h,j*h) for i,j in [(1,1),(1,0),(0,1),(0,0)]]
             else:
                 fpp, fp0, f0p = [f(i*h,j*h) for i,j in [(1,1),(1,0),(0,1)]]
@@ -482,7 +482,7 @@ class RDVR3_Psi4(Target):
 
         for d in self.objfiles:
             logger.info("\rNow working on" + str(d) + 50*' ' + '\r')
-            if wq == None:
+            if wq is None:
                 x = self.driver(mvals, d)
             grad  = np.zeros(n)
             hdiag = np.zeros(n)
@@ -496,7 +496,7 @@ class RDVR3_Psi4(Target):
                         answer = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
                         return answer
                     if AHess:
-                        if wq != None:
+                        if wq is not None:
                             apath = os.path.join(self.tdir, d, "current")
                             x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
                             grad[p], hdiag[p] = f12d3p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)
@@ -505,14 +505,14 @@ class RDVR3_Psi4(Target):
                         hess[p,p] = hdiag[p]
                     elif AGrad:
                         if self.bidirect:
-                            if wq != None:
+                            if wq is not None:
                                 apath = os.path.join(self.tdir, d, "current")
                                 x = float(open(os.path.join(apath,'objective.out')).readlines()[0].split()[1])*self.factor
                                 grad[p], _ = f12d3p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)
                             else:
                                 grad[p], _ = f12d3p(fdwrap(self.driver, mvals, p, d=d), h = self.h, f0 = x)
                         else:
-                            if wq != None:
+                            if wq is not None:
                                 # Since the calculations are submitted as 3-point finite difference, this part of the code
                                 # actually only reads from half of the completed calculations.
                                 grad[p] = f1d2p(fdwrap(reader, mvals, p, h=self.h), h = self.h, f0 = x)

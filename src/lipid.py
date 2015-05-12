@@ -303,7 +303,7 @@ class Lipid(Target):
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
             self.lipid_mol[simnum%len(self.lipid_mol)].write(self.lipid_coords, ftype='tinker' if self.engname == 'tinker' else None)
             cmdstr = '%s python npt_lipid.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
-            if wq == None:
+            if wq is None:
                 logger.info("Running condensed phase simulation locally.\n")
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')

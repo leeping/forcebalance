@@ -143,7 +143,7 @@ class Hydration(Target):
             if not os.path.isfile(path):
                 logger.error('Coordinate file %s does not exist!\nMake sure coordinate files are in the right place\n' % path)
                 raise RuntimeError
-        if self.subset != None:
+        if self.subset is not None:
             subset = uncommadash(self.subset)
             self.whfe = np.array([1 if i in subset else 0 for i in range(len(self.IDs))])
         else:
@@ -200,7 +200,7 @@ class Hydration(Target):
             lp_dump((self.OptionDict, eng_opts, md_opts), 'simulation.p')
             # Execute the script for running molecular dynamics.
             cmdstr = '%s python md_ism_hfe.py %s' % (self.prefix, "-g" if AGrad else "")
-            if wq == None:
+            if wq is None:
                 logger.info("Running condensed phase simulation locally.\n")
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='md.out')

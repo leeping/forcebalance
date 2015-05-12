@@ -165,7 +165,7 @@ def determine_fftype(ffname,verbose=False):
                 if verbose: logger.info("\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!\n" % (fsplit[0],', '.join(FF_IOModules.keys())))
         else:
             if verbose: logger.info("\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!\n" % (ffext,', '.join(FF_Extensions.keys())))
-    if fftype == None:
+    if fftype is None:
         if verbose: logger.warning("Force field type not determined!\n")
         #sys.exit(1)
     return fftype
@@ -538,11 +538,11 @@ class FF(forcebalance.BaseClass):
             marks['END'] = len(sline)
             
             pmark = marks.get('PRM',None)
-            if pmark == None: pmark = marks.get('PARM',None)
+            if pmark is None: pmark = marks.get('PARM',None)
             rmark = marks.get('RPT',None)
             emark = marks.get('EVAL',None)
             
-            if pmark != None:
+            if pmark is not None:
                 pstop = min([i for i in marks.values() if i > pmark])
                 pflds = [int(i) for i in sline[pmark+1:pstop]] # The integers that specify the parameter word positions
                 for pfld in pflds:
@@ -559,7 +559,7 @@ class FF(forcebalance.BaseClass):
                     self.assign_p0(self.np,float(sline[pfld]))
                     self.assign_field(self.np,pid,ffname,ln,pfld,1)
                     self.np += 1
-            if rmark != None:
+            if rmark is not None:
                 parse = rmark + 1
                 stopparse = min([i for i in marks.values() if i > rmark])
                 while parse < stopparse:
@@ -588,7 +588,7 @@ class FF(forcebalance.BaseClass):
                     self.patoms[prep].append(self.Readers[ffname].molatom)
                     self.assign_field(prep,pid,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
-            if emark != None:
+            if emark is not None:
                 parse = emark + 1
                 stopparse = min([i for i in marks.values() if i > emark])
                 while parse < stopparse:
@@ -752,7 +752,7 @@ class FF(forcebalance.BaseClass):
             # iterable representation of the tree and the
             # field number.
             # if type(newffdata[fnm]) is etree._ElementTree:
-            if cmd != None:
+            if cmd is not None:
                 try:
                     # Bobby Tables, anyone?
                     if any([x in cmd for x in "system", "subprocess", "import"]):
@@ -803,7 +803,7 @@ class FF(forcebalance.BaseClass):
                 # Replace the line in the new force field.
                 newffdata[fnm][ln] = ''.join([(whites[j] if (len(whites[j]) > 0 or j == 0) else ' ')+sline[j] for j in range(len(sline))])+'\n'
 
-        if printdir != None:
+        if printdir is not None:
             absprintdir = os.path.join(self.root,printdir)
         else:
             absprintdir = os.getcwd()
@@ -981,8 +981,8 @@ class FF(forcebalance.BaseClass):
         @param[in] printfacs List for printing out the resecaling factors
 
         """
-        typevals = {}
-        rsfactors = {}
+        typevals = OrderedDict()
+        rsfactors = OrderedDict()
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
@@ -1018,16 +1018,118 @@ class FF(forcebalance.BaseClass):
         # for line in os.popen("awk '/rsfactor/ {print $2,$3}' %s" % pkg.options).readlines():
         #     rsfactors[line.split()[0]] = float(line.split()[1])
         if printfacs:
-            bar = printcool("Rescaling Factors (Lower Takes Precedence):",color=1)
+            bar = printcool("Rescaling Factors by Type (Lower Takes Precedence):",color=1)
             logger.info(''.join(["   %-35s  : %.5e\n" % (i, rsfactors[i]) for i in rsfac_list]))
             logger.info(bar)
+        self.rs_ord = OrderedDict([(i, rsfactors[i]) for i in rsfac_list])
         ## The array of rescaling factors
         self.rs = np.ones(len(self.pvals0))
+        self.rs_type = OrderedDict()
+        have_rs = []
         for pnum in range(len(self.pvals0)):
             for termtype in rsfac_list:
                 if termtype in self.plist[pnum]:
-                    self.rs[pnum] = rsfactors[termtype]
-                    
+                    if pnum not in have_rs:
+                        self.rs[pnum] = rsfactors[termtype]
+                        self.rs_type[pnum] = termtype
+                    elif self.rs[pnum] != rsfactors[termtype]:
+                        self.rs[pnum] = rsfactors[termtype]
+                        self.rs_type[pnum] = termtype
+                    have_rs.append(pnum)
+        ## These parameter types have no rescaling factors defined, so they are just set to unity
+        for pnum in range(len(self.pvals0)):
+            if pnum not in have_rs:
+                self.rs_type[pnum] = self.plist[pnum][0]
+        if printfacs:
+            bar = printcool("Rescaling Types / Factors by Parameter Number:",color=1)
+            self.print_map(vals=["   %-28s  : %.5e" % (self.rs_type[pnum], self.rs[pnum]) for pnum in range(len(self.pvals0))])
+
+    def make_rescale(self, scales, mvals=None, G=None, H=None, multiply=True, verbose=False):
+        """ Obtain rescaled versions of the inputs according to dictionary values 
+        in "scales" (i.e. a replacement or multiplicative factor on self.rs_ord).
+        Note that self.rs and self.rs_ord are not updated in this function. You
+        need to do that outside.
+
+        The purpose of this function is to simulate the effect of changing the
+        parameter scale factors in the force field. If the scale factor is N,
+        then a unit change in the mathematical parameters produces a change of
+        N in the physical parameters. Thus, for a given point in the physical
+        parameter space, the mathematical parameters are proportional to 1/N,
+        the gradient is proportional to N, and the Hessian is proportional to N^2.
+        
+        Parameters
+        ----------
+        mvals : numpy.ndarray
+            Parameters to be transformed, if desired.  Must be same length as number of parameters.
+        G : numpy.ndarray 
+            Gradient to be transformed, if desired.  Must be same length as number of parameters.
+        H : numpy.ndarray
+            Hessian to be transformed, if desired.  Must be square matrix with side-length = number of parameters.
+        scales : OrderedDict
+            A dictionary with the same keys as self.rs_ord and floating point values.
+            These represent the values with which to multiply the existing scale factors 
+            (if multiply == True) or replace them (if multiply == False).  
+            Pro Tip: Create this variable from a copy of self.rs_ord
+        multiply : bool
+            When set to True, the new scale factors are the existing scale factors
+        verbose : bool
+            Loud and noisy
+
+        Returns
+        -------
+        answer : OrderedDict
+            Output dictionary containing : 
+            'rs' : New parameter scale factors (multiplied by scales if multiply=True, or replaced if multiply=False)
+            'rs_ord' : New parameter scale factor dictionary
+            'mvals' : New parameter values (if mvals is provided)
+            'G' : New gradient (if G is provided)
+            'H' : New Hessian (if H is provided)
+        """
+        if type(scales) != OrderedDict:
+            raise RuntimeError('scales must have type OrderedDict')
+        if scales.keys() != self.rs_ord.keys():
+            raise RuntimeError('scales should have same keys as self.rs_ord')
+        # Make the new dictionary of rescaling factors
+        if multiply == False:
+            rsord_out = deepcopy(scales)
+        else:
+            rsord_out = OrderedDict([(k, scales[k]*self.rs_ord[k]) for k in scales.keys()])
+        answer = OrderedDict()
+        answer['rs_ord'] = rsord_out
+        # Make the new array of rescaling factors
+        rs_out = np.array([rsord_out[self.rs_type[p]] for p in range(self.np)])
+        answer['rs'] = rs_out
+        if mvals is not None:
+            if mvals.shape != (self.np,):
+                raise RuntimeError('mvals has the wrong shape')
+            mvals_out = deepcopy(mvals)
+            for p in range(self.np):
+                # Remember that for the same physical parameters, the mathematical
+                # parameters are inversely proportional to scale factors
+                mvals_out[p] *= (float(self.rs[p])/float(rs_out[p]))
+            answer['mvals'] = mvals_out
+        if G is not None:
+            if G.shape != (self.np,):
+                raise RuntimeError('G has the wrong shape')
+            G_out = deepcopy(G)
+            for p in range(self.np):
+                # The gradient should be proportional to the scale factors
+                G_out[p] *= (float(rs_out[p])/float(self.rs[p]))
+            answer['G'] = G_out
+        if H is not None:
+            if H.shape != (self.np,self.np):
+                raise RuntimeError('H has the wrong shape')
+            H_out = deepcopy(H)
+            for p in range(self.np):
+                # The Hessian should be proportional to the product of two scale factors
+                H_out[p, :] *= (float(rs_out[p])/float(self.rs[p]))
+            for p in range(self.np):
+                H_out[:, p] *= (float(rs_out[p])/float(self.rs[p]))
+            answer['H'] = H_out
+        # The final parameters, gradient and Hessian should be consistent with the
+        # returned scale factors.
+        return answer
+                
     def mktransmat(self):
         """ Create the transformation matrix to rescale and rotate the mathematical parameters.
 
@@ -1207,6 +1309,7 @@ class FF(forcebalance.BaseClass):
         # print
 
         # There is a bad bug here .. this matrix multiplication operation doesn't work!!
+        # I will proceed using loops. This is unsettling.
         # Input matrices are qmat2 and self.rs (diagonal)
         transmat = np.matrix(qmat2) * np.matrix(np.diag(self.rs))
         transmat1 = np.zeros((self.np, self.np))
@@ -1248,14 +1351,14 @@ class FF(forcebalance.BaseClass):
             
     def print_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
-        if vals == None:
+        if vals is None:
             vals = self.pvals0
         logger.info('\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i.split()[0] for i in self.plist]))
         logger.info('\n')
 
     def sprint_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values to a string."""
-        if vals == None:
+        if vals is None:
             vals = self.pvals0
         out = '\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i.split()[0] for i in self.plist])
         return out
