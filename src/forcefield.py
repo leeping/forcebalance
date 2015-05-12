@@ -165,7 +165,7 @@ def determine_fftype(ffname,verbose=False):
                 if verbose: logger.info("\x1b[91m Warning: \x1b[0m %s not in supported types (%s)!\n" % (fsplit[0],', '.join(FF_IOModules.keys())))
         else:
             if verbose: logger.info("\x1b[91m Warning: \x1b[0m %s not in supported extensions (%s)!\n" % (ffext,', '.join(FF_Extensions.keys())))
-    if fftype == None:
+    if fftype is None:
         if verbose: logger.warning("Force field type not determined!\n")
         #sys.exit(1)
     return fftype
@@ -538,11 +538,11 @@ class FF(forcebalance.BaseClass):
             marks['END'] = len(sline)
             
             pmark = marks.get('PRM',None)
-            if pmark == None: pmark = marks.get('PARM',None)
+            if pmark is None: pmark = marks.get('PARM',None)
             rmark = marks.get('RPT',None)
             emark = marks.get('EVAL',None)
             
-            if pmark != None:
+            if pmark is not None:
                 pstop = min([i for i in marks.values() if i > pmark])
                 pflds = [int(i) for i in sline[pmark+1:pstop]] # The integers that specify the parameter word positions
                 for pfld in pflds:
@@ -559,7 +559,7 @@ class FF(forcebalance.BaseClass):
                     self.assign_p0(self.np,float(sline[pfld]))
                     self.assign_field(self.np,pid,ffname,ln,pfld,1)
                     self.np += 1
-            if rmark != None:
+            if rmark is not None:
                 parse = rmark + 1
                 stopparse = min([i for i in marks.values() if i > rmark])
                 while parse < stopparse:
@@ -588,7 +588,7 @@ class FF(forcebalance.BaseClass):
                     self.patoms[prep].append(self.Readers[ffname].molatom)
                     self.assign_field(prep,pid,ffname,ln,pfld,"MINUS_" in sline[parse+1] and -1 or 1)
                     parse += 2
-            if emark != None:
+            if emark is not None:
                 parse = emark + 1
                 stopparse = min([i for i in marks.values() if i > emark])
                 while parse < stopparse:
@@ -752,7 +752,7 @@ class FF(forcebalance.BaseClass):
             # iterable representation of the tree and the
             # field number.
             # if type(newffdata[fnm]) is etree._ElementTree:
-            if cmd != None:
+            if cmd is not None:
                 try:
                     # Bobby Tables, anyone?
                     if any([x in cmd for x in "system", "subprocess", "import"]):
@@ -803,7 +803,7 @@ class FF(forcebalance.BaseClass):
                 # Replace the line in the new force field.
                 newffdata[fnm][ln] = ''.join([(whites[j] if (len(whites[j]) > 0 or j == 0) else ' ')+sline[j] for j in range(len(sline))])+'\n'
 
-        if printdir != None:
+        if printdir is not None:
             absprintdir = os.path.join(self.root,printdir)
         else:
             absprintdir = os.getcwd()
@@ -1036,6 +1036,10 @@ class FF(forcebalance.BaseClass):
                         self.rs[pnum] = rsfactors[termtype]
                         self.rs_type[pnum] = termtype
                     have_rs.append(pnum)
+        ## These parameter types have no rescaling factors defined, so they are just set to unity
+        for pnum in range(len(self.pvals0)):
+            if pnum not in have_rs:
+                self.rs_type[pnum] = self.plist[pnum][0]
         if printfacs:
             bar = printcool("Rescaling Types / Factors by Parameter Number:",color=1)
             self.print_map(vals=["   %-28s  : %.5e" % (self.rs_type[pnum], self.rs[pnum]) for pnum in range(len(self.pvals0))])
@@ -1095,7 +1099,7 @@ class FF(forcebalance.BaseClass):
         # Make the new array of rescaling factors
         rs_out = np.array([rsord_out[self.rs_type[p]] for p in range(self.np)])
         answer['rs'] = rs_out
-        if type(mvals) != type(None):
+        if mvals is not None:
             if mvals.shape != (self.np,):
                 raise RuntimeError('mvals has the wrong shape')
             mvals_out = deepcopy(mvals)
@@ -1104,7 +1108,7 @@ class FF(forcebalance.BaseClass):
                 # parameters are inversely proportional to scale factors
                 mvals_out[p] *= (float(self.rs[p])/float(rs_out[p]))
             answer['mvals'] = mvals_out
-        if type(G) != type(None):
+        if G is not None:
             if G.shape != (self.np,):
                 raise RuntimeError('G has the wrong shape')
             G_out = deepcopy(G)
@@ -1112,7 +1116,7 @@ class FF(forcebalance.BaseClass):
                 # The gradient should be proportional to the scale factors
                 G_out[p] *= (float(rs_out[p])/float(self.rs[p]))
             answer['G'] = G_out
-        if type(H) != type(None):
+        if H is not None:
             if H.shape != (self.np,self.np):
                 raise RuntimeError('H has the wrong shape')
             H_out = deepcopy(H)
@@ -1347,14 +1351,14 @@ class FF(forcebalance.BaseClass):
             
     def print_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
-        if type(vals) == type(None):
+        if vals is None:
             vals = self.pvals0
         logger.info('\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i.split()[0] for i in self.plist]))
         logger.info('\n')
 
     def sprint_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values to a string."""
-        if type(vals) == type(None):
+        if vals is None:
             vals = self.pvals0
         out = '\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i.split()[0] for i in self.plist])
         return out

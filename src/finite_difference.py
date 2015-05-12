@@ -25,7 +25,7 @@ def f1d2p(f, h, f0 = None):
     Outputs:
     fp = The finite difference derivative of the function f(x) around x=0.
     """
-    if type(f0) == type(None):
+    if f0 is None:
         f0, f1 = [f(i*h) for i in [0, 1]]
     else:
         f1 = f(h)
@@ -102,7 +102,7 @@ def f12d3p(f, h, f0 = None):
     Outputs:
     fp = The finite difference derivative of the function f(x) around x=0.
     """
-    if type(f0) == type(None):
+    if f0 is None:
         fm1, f0, f1 = [f(i*h) for i in [-1, 0, 1]]
     else:
         fm1, f1 = [f(i*h) for i in [-1, 1]]
@@ -153,7 +153,7 @@ def fdwrap(func,mvals0,pidx,key=None,**kwargs):
         mvals = list(mvals0)
         mvals[pidx] += arg
         logger.info("\rfdwrap: " + func.__name__ + " [%i] = % .1e " % (pidx, arg) + ' '*50 + '\r')
-        if key != None:
+        if key is not None:
             return func(mvals,**kwargs)[key]
         else:
             return func(mvals,**kwargs)

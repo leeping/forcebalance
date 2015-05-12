@@ -79,7 +79,7 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], de
             # Adopt the AMBER molecule name from the loadpdb line.
             ambername = line.split('=')[0].strip()
             # If we pass in our own PDB, then this line is replaced.
-            if pdb != None:
+            if pdb is not None:
                 line = '%s = loadpdb %s\n' % (ambername, pdb)
         if len(s) >= 1 and ls[0] == 'check' and delcheck:
             # Skip over check steps if so decreed
@@ -140,7 +140,7 @@ class Mol2_Reader(BaseReader):
         elif line.strip().lower() == '@<tripos>molecule':
             self.itype = 'None'
             self.section = 'Molecule'
-        elif self.section == 'Molecule' and self.mol == None:
+        elif self.section == 'Molecule' and self.mol is None:
             self.mol = '_'.join(s)
         elif not is_mol2_atom(line):
             self.itype = 'None'
@@ -734,7 +734,7 @@ class AMBER(Engine):
         # copy over topology information (chain, atomname etc.).  If mol/coords
         # is not provided, then it will also provide the coordinates.
         pdbfnm = onefile(kwargs.get('pdb'), 'pdb' if reqpdb else None, err=reqpdb)
-        if pdbfnm != None:
+        if pdbfnm is not None:
             mpdb = Molecule(pdbfnm, build_topology=False)
             if hasattr(self, 'mol'):
                 for i in ["chain", "atomname", "resid", "resname", "elem"]:
@@ -771,7 +771,7 @@ class AMBER(Engine):
         pdb = os.path.basename(self.abspdb)
         if not os.path.exists(pdb):
             LinkFile(self.abspdb, pdb)
-        if name == None: name = self.name
+        if name is None: name = self.name
         write_leap(self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, pdb=pdb, prefix=name, spath=self.spath, delcheck=delcheck)
         self.callamber("tleap -f %s_" % self.leapcmd)
         if read_prmtop:
@@ -1198,7 +1198,7 @@ do_debugf = 1, dumpfrc = 1
         for line in o:
             if "Total Potential Energy" in line:
                 E = float(line.split()[-2].replace('D','e'))
-        if E == None:
+        if E is None:
             logger.error("Total potential energy wasn't encountered when calling analyze!\n")
             raise RuntimeError
         if optimize and abs(E-E_) > 0.1:
@@ -1248,7 +1248,7 @@ do_debugf = 1, dumpfrc = 1
         md_opts["printout"] = nsave
         md_opts["openmp-threads"] = threads
         # Langevin dynamics for temperature control.
-        if temperature != None:
+        if temperature is not None:
             md_defs["integrator"] = "stochastic"
         else:
             md_defs["integrator"] = "beeman"
@@ -1256,16 +1256,16 @@ do_debugf = 1, dumpfrc = 1
         # Periodic boundary conditions.
         if self.pbc:
             md_opts["vdw-correction"] = ''
-            if temperature != None and pressure != None: 
+            if temperature is not None and pressure is not None: 
                 md_defs["integrator"] = "beeman"
                 md_defs["thermostat"] = "bussi"
                 md_defs["barostat"] = "montecarlo"
                 if anisotropic:
                     md_opts["aniso-pressure"] = ''
-            elif pressure != None:
+            elif pressure is not None:
                 warn_once("Pressure is ignored because temperature is turned off.")
         else:
-            if pressure != None:
+            if pressure is not None:
                 warn_once("Pressure is ignored because pbc is set to False.")
             # Use stochastic dynamics for the gas phase molecule.
             # If we use the regular integrators it may miss
@@ -1273,7 +1273,7 @@ do_debugf = 1, dumpfrc = 1
             md_opts["barostat"] = None
 
         eq_opts = deepcopy(md_opts)
-        if self.pbc and temperature != None and pressure != None: 
+        if self.pbc and temperature is not None and pressure is not None: 
             eq_opts["integrator"] = "beeman"
             eq_opts["thermostat"] = "bussi"
             eq_opts["barostat"] = "berendsen"
@@ -1288,7 +1288,7 @@ do_debugf = 1, dumpfrc = 1
         if nequil > 0:
             write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
             if verbose: printcool("Running equilibration dynamics", color=0)
-            if self.pbc and pressure != None:
+            if self.pbc and pressure is not None:
                 self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 
                                                                           temperature, pressure), print_to_screen=verbose)
             else:
@@ -1299,7 +1299,7 @@ do_debugf = 1, dumpfrc = 1
         # Run production.
         if verbose: printcool("Running production dynamics", color=0)
         write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
-        if self.pbc and pressure != None:
+        if self.pbc and pressure is not None:
             odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
                                                                              temperature, pressure), print_to_screen=verbose)
         else:

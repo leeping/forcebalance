@@ -181,9 +181,9 @@ class Optimizer(forcebalance.BaseClass):
         self.np        = FF.np
 
         ## The original parameter values
-        if options['read_mvals'] != None:
+        if options['read_mvals'] is not None:
             self.mvals0    = np.array(options['read_mvals'])
-        elif options['read_pvals'] != None:
+        elif options['read_pvals'] is not None:
             self.mvals0    = FF.create_mvals(options['read_pvals'])
         else:
             self.mvals0    = np.zeros(self.FF.np)
@@ -246,7 +246,7 @@ class Optimizer(forcebalance.BaseClass):
         else:
             outfnm = base+ext
         ## Clone the input file to the output, 
-        if self.input_file != None and os.path.exists(self.input_file):
+        if self.input_file is not None and os.path.exists(self.input_file):
             fin = open(self.input_file).readlines()
             have_mvals = 0
             have_priors = 0
@@ -267,13 +267,13 @@ class Optimizer(forcebalance.BaseClass):
                         print >> fout, self.FF.sprint_map(mvals, precision=8)
                         print >> fout, "/read_mvals"
                         have_mvals = 1
-                    if not have_priors and priors != None:
+                    if not have_priors and priors is not None:
                         print >> fout, "priors"
                         print >> fout, '\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in priors.keys()])
                         print >> fout, "/priors"
                         have_priors = 1
                     in_options = 0
-                elif in_options and line1.startswith('jobtype') and jobtype != None:
+                elif in_options and line1.startswith('jobtype') and jobtype is not None:
                         print >> fout, "jobtype %s" % jobtype
                         continue
                 if line1.startswith("/read_mvals"):
@@ -290,7 +290,7 @@ class Optimizer(forcebalance.BaseClass):
                     have_mvals = 1
                     in_mvals = 1
                     print >> fout, self.FF.sprint_map(mvals, precision=8)
-                if line1.startswith("priors") and priors != None:
+                if line1.startswith("priors") and priors is not None:
                     if have_priors: 
                         logger.error("Encountered more than one priors section\n")
                         raise RuntimeError
@@ -308,10 +308,10 @@ class Optimizer(forcebalance.BaseClass):
         print_parameters = True
         ## The "precondition" job type takes care of its own output files.
         if self.jobtype.lower() == 'precondition': print_parameters=False
-        if xk == None and (self.mvals0 == np.zeros(self.FF.np)).all(): 
+        if xk is None and (self.mvals0 == np.zeros(self.FF.np)).all(): 
             logger.info("Parameter file same as original; will not be printed to results folder.\n")
             print_parameters = False
-        elif xk == None:
+        elif xk is None:
             xk = self.mvals0
 
         ## Check derivatives by finite difference after the optimization is over (for good measure)
@@ -926,7 +926,7 @@ class Optimizer(forcebalance.BaseClass):
                 fout.evals += 1
                 X, G, H = [Result[i] for i in ['X','G','H']]
                 if callback:
-                    if X <= self.x_best or self.x_best == None:
+                    if X <= self.x_best or self.x_best is None:
                         color = "\x1b[92m"
                         self.x_best = X
                         self.prev_bad = False
@@ -1083,8 +1083,8 @@ class Optimizer(forcebalance.BaseClass):
             def my_func(mvals):
                 if verbose: logger.info('\n')
                 Answer = func(mvals,Order=0,verbose=verbose)['X']
-                dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
-                if Answer < my_func.x_best or my_func.x_best == None:
+                dx = (my_func.x_best - Answer) if my_func.x_best is not None else 0.0
+                if Answer < my_func.x_best or my_func.x_best is None:
                     color = "\x1b[92m"
                     my_func.x_best = Answer
                 else:
@@ -1418,7 +1418,7 @@ class Optimizer(forcebalance.BaseClass):
     def readchk(self):
         """ Read the checkpoint file for the main optimizer. """
         self.chk = {}
-        if self.rchk_fnm != None:
+        if self.rchk_fnm is not None:
             absfnm = os.path.join(self.root,self.rchk_fnm)
             if os.path.exists(absfnm):
                 self.chk = pickle.load(open(absfnm))
@@ -1428,7 +1428,7 @@ class Optimizer(forcebalance.BaseClass):
 
     def writechk(self):
         """ Write the checkpoint file for the main optimizer. """
-        if self.wchk_fnm != None:
+        if self.wchk_fnm is not None:
             logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
             with wopen(os.path.join(self.root,self.wchk_fnm)) as f: pickle.dump(self.chk,f)
         

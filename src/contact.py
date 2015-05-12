@@ -58,7 +58,7 @@ def atom_distances(xyzlist, atom_contacts, box=None):
     
     results = np.zeros((traj_length, num_contacts), dtype=np.float32)
 
-    if box == None:
+    if box is None:
         _contact_wrap.atomic_contact_wrap(xyzlist, atom_contacts, results)
     else:
         if box.shape != (3,):
