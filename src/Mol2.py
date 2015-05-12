@@ -43,7 +43,7 @@ class mol2_atom:
         self.charge     = None
         self.status_bit = None
         
-        if data != None:
+        if data is not None:
             self.parse(data)
 
     def parse(self, data):
@@ -74,7 +74,7 @@ class mol2_atom:
         # print "mol2_atom.__repr__()"
         # print self.atom_id, self.atom_name, self.x, self.y, self.z, self.atom_type, self.subst_id, self.subst_name, self.charge
         rs = "%7d %-5s    %9.4f %9.4f %9.4f %-7s %2d %4s  %12.6f" % (self.atom_id, self.atom_name, self.x, self.y, self.z, self.atom_type, self.subst_id, self.subst_name, self.charge)
-        if self.status_bit != None:
+        if self.status_bit is not None:
             rs = rs + " %s" % self.status_bit
         return rs
 
@@ -82,7 +82,7 @@ class mol2_atom:
         """
         atom identifier (integer, starting from 1)
         """
-        if atom_id != None:
+        if atom_id is not None:
             self.atom_id = int(atom_id)
         return self.atom_id
 
@@ -90,7 +90,7 @@ class mol2_atom:
         """
         The name of the atom (string)
         """
-        if atom_name != None:
+        if atom_name is not None:
             self.atom_name = atom_name
         return self.atom_name
         
@@ -98,7 +98,7 @@ class mol2_atom:
         """
         the coordinates of the atom
         """
-        if (x != None) and (y != None) and (z != None):
+        if (x is not None) and (y is not None) and (z is not None):
             self.x = float(x)
             self.y = float(y)
             self.z = float(z)
@@ -108,7 +108,7 @@ class mol2_atom:
         """
         The mol2 type of the atom
         """
-        if atom_type != None:
+        if atom_type is not None:
             self.atom_type = atom_type
         return self.atom_type
         
@@ -116,7 +116,7 @@ class mol2_atom:
         """
         substructure identifier
         """
-        if subst_id != None:
+        if subst_id is not None:
             self.subst_id = int(subst_id)
         return self.subst_id
         
@@ -124,7 +124,7 @@ class mol2_atom:
         """
         substructure name
         """
-        if subst_name != None:
+        if subst_name is not None:
             self.subst_name = subst_name
         return self.subst_name
         
@@ -132,7 +132,7 @@ class mol2_atom:
         """
         atomic charge
         """
-        if charge != None:
+        if charge is not None:
             self.charge = float(charge)
         return self.charge
         
@@ -140,7 +140,7 @@ class mol2_atom:
         """
         Never to use (in theory)
         """
-        if status_bit != None:
+        if status_bit is not None:
             self.status_bit = status_bit
         return self.status_bit
         
@@ -165,13 +165,13 @@ class mol2_bond:
         self.target_atom_id  = None
         self.bond_type       = None
         
-        if data != None:
+        if data is not None:
             self.parse(data)
 
     def __repr__(self):
         # print "mol2_bond.__repr__()", self.bond_id, self.origin_atom_id, self.target_atom_id, self.bond_type
         rs = "%6d %5d %5d %4s" % (self.bond_id, self.origin_atom_id, self.target_atom_id, self.bond_type)
-        if self.status_bit != None:
+        if self.status_bit is not None:
             rs = rs + " %s" % self.status_bit
         return rs        
 
@@ -195,7 +195,7 @@ class mol2_bond:
         """
         bond identifier (integer, starting from 1)
         """
-        if bond_id != None:
+        if bond_id is not None:
             self.bond_id = bond_id
         return self.bond_id
 
@@ -203,7 +203,7 @@ class mol2_bond:
         """
         the origin atom identifier (integer)
         """
-        if origin_atom_id != None:
+        if origin_atom_id is not None:
             self.origin_atom_id = origin_atom_id
         return self.origin_atom_id
 
@@ -211,7 +211,7 @@ class mol2_bond:
         """
         the target atom identifier (integer)
         """
-        if target_atom_id != None:
+        if target_atom_id is not None:
             self.target_atom_id = target_atom_id
         return self.target_atom_id
 
@@ -228,7 +228,7 @@ class mol2_bond:
         un = unknown
         nc = not connected
         """
-        if bond_type != None:
+        if bond_type is not None:
             self.bond_type = bond_type
         return self.bond_type
 
@@ -236,7 +236,7 @@ class mol2_bond:
         """
         Never to use (in theory)
         """
-        if status_bit != None:
+        if status_bit is not None:
             self.status_bit = status_bit
         return self.status_bit
 
@@ -307,7 +307,7 @@ Energy = 0
         """
         bond identifier (integer, starting from 1)
         """
-        if mol_name != None:
+        if mol_name is not None:
             self.mol_name = mol_name
         return self.mol_name
 
@@ -315,7 +315,7 @@ Energy = 0
         """
         number of atoms (integer)
         """
-        if num_atoms != None:
+        if num_atoms is not None:
             self.num_atoms = int(num_atoms)
         return self.num_atoms
 
@@ -323,7 +323,7 @@ Energy = 0
         """
         number of bonds (integer)
         """
-        if num_bonds != None:
+        if num_bonds is not None:
             self.num_bonds = int(num_bonds)
         return self.num_bonds
 
@@ -331,7 +331,7 @@ Energy = 0
         """
         number of substructures (integer)
         """
-        if num_subst != None:
+        if num_subst is not None:
             self.num_subst = int(num_subst)
         return self.num_subst
 
@@ -339,7 +339,7 @@ Energy = 0
         """
         number of features (integer)
         """
-        if num_feat != None:
+        if num_feat is not None:
             self.num_feat = int(num_feat)
         return self.num_feat
 
@@ -347,7 +347,7 @@ Energy = 0
         """
         number of sets (integer)
         """
-        if num_sets != None:
+        if num_sets is not None:
             self.num_sets = int(num_sets)
         return self.num_sets
 
@@ -355,7 +355,7 @@ Energy = 0
         """
         bond identifier (integer, starting from 1)
         """
-        if mol_type != None:
+        if mol_type is not None:
             self.mol_type = mol_type
         return self.mol_type
 
@@ -363,7 +363,7 @@ Energy = 0
         """
         bond identifier (integer, starting from 1)
         """
-        if charge_type != None:
+        if charge_type is not None:
             self.charge_type = charge_type
         return self.charge_type
 
@@ -545,7 +545,7 @@ class mol2_set:
         self.compounds = OrderedDict()
         
         # subset management
-        if subset != None:
+        if subset is not None:
             if isinstance(subset,types.ListType):
                 pass
             elif isinstance(subset,types.StringType):
@@ -560,7 +560,7 @@ class mol2_set:
                     subset = None
 
         # data management
-        if data != None:
+        if data is not None:
             if isinstance(data,mol2_set):
                 self.num_compounds = data.num_compounds
                 self.compounds     = data.compounds
@@ -591,13 +591,13 @@ class mol2_set:
             if data[l].count("@<TRIPOS>MOLECULE"):
                 status = 1
                 if len(cmpnds):
-                    if (subset == None) or (cmpnd in subset):
+                    if (subset is None) or (cmpnd in subset):
                         cmpnds[cmpnd]["to"] = l
                 ffrom = l
                 cmpnd = data[l+1].split()[0]
-                if (subset == None) or (cmpnd in subset):
+                if (subset is None) or (cmpnd in subset):
                     cmpnds[cmpnd] = OrderedDict([("from", l)])
-            if (subset == None) or (cmpnd in subset):
+            if (subset is None) or (cmpnd in subset):
                 cmpnds[cmpnd]["to"] = len(data) 
         
         for cmpnd in cmpnds.keys():

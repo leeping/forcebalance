@@ -37,7 +37,7 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
         C.append(sum(W[N:N+ns]))
         N += ns
     C = np.array(C)
-    if PTS != None:
+    if PTS is not None:
         if len(PTS) != len(N_k):
             logger.error("PTS array (phase point labels) must equal length of N_k array (# of trajectories)\n")
             raise RuntimeError
@@ -51,9 +51,9 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
         tfl = 0
         # If we have phase point labels, then presumably we can have less cluttered printout
         # by printing only the lines with the largest contribution
-        pl = 0 if PTS != None else 1
+        pl = 0 if PTS is not None else 1
         for i, Ci in enumerate(C):
-            if PTS != None:
+            if PTS is not None:
                 line1 += "%%%is " % fs % PTS[i]
             if Ci == np.max(C):
                 line2 += "\x1b[91m%%%i.1f%%%%\x1b[0m " % (fs-1) % (Ci*100)
@@ -68,7 +68,7 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
                 line1 = ""
                 line2 = ""
                 tfl = 0
-                pl = 0 if PTS != None else 1 
+                pl = 0 if PTS is not None else 1 
         if tfl > 0 and pl: 
             if len(line1) > 0:
                 logger.info(line1+"\n")
@@ -327,7 +327,7 @@ class Liquid(Target):
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
             self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
             cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
-            if wq == None:
+            if wq is None:
                 logger.info("Running condensed phase simulation locally.\n")
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
