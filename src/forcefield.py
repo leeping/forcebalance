@@ -1043,6 +1043,7 @@ class FF(forcebalance.BaseClass):
         if printfacs:
             bar = printcool("Rescaling Types / Factors by Parameter Number:",color=1)
             self.print_map(vals=["   %-28s  : %.5e" % (self.rs_type[pnum], self.rs[pnum]) for pnum in range(len(self.pvals0))])
+            logger.info(bar)
 
     def make_rescale(self, scales, mvals=None, G=None, H=None, multiply=True, verbose=False):
         """ Obtain rescaled versions of the inputs according to dictionary values 
