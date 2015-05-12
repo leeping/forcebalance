@@ -53,7 +53,7 @@ def parse_interactions(input_file):
             if word == "END": # End of a section, time to reinitialize variables.
                 if section == "GLOBAL": pass
                 elif section == "SYSTEM":
-                    if SystemName is None:
+                    if SystemName == None:
                         warn_press_key("You need to specify a name for the system on line %i" % ln)
                     elif SystemName in Systems:
                         warn_press_key("A system named %s already exists in Systems" % SystemName)

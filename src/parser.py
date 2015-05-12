@@ -377,7 +377,7 @@ def printsection(heading,optdict,typedict):
         vartype = re.sub('s$','',i)
         for j in typedict[i]:
             Option = []
-            val = optdict[j] if optdict is not None else typedict[i][j][0]
+            val = optdict[j] if optdict != None else typedict[i][j][0]
             if firstentry:
                 firstentry = 0
             else:
@@ -464,7 +464,7 @@ def parse_inputs(input_file=None):
     tgt_opts = []
     this_tgt_opt = deepcopy(tgt_opts_defaults)
     # Give back a bunch of default options if input file isn't specified.
-    if input_file is None:
+    if input_file == None:
         return (options, [this_tgt_opt])
     fobj = open(input_file)
     for line in fobj:

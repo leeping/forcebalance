@@ -72,7 +72,6 @@ class Optimizer(forcebalance.BaseClass):
                           'SINGLE'            : self.SinglePoint,
                           'GRADIENT'          : self.Gradient,
                           'HESSIAN'           : self.Hessian,
-                          'PRECONDITION'      : self.Precondition,
                           'FDCHECKG'          : self.FDCheckG,
                           'FDCHECKH'          : self.FDCheckH
                           }
@@ -181,9 +180,9 @@ class Optimizer(forcebalance.BaseClass):
         self.np        = FF.np
 
         ## The original parameter values
-        if options['read_mvals'] is not None:
+        if options['read_mvals'] != None:
             self.mvals0    = np.array(options['read_mvals'])
-        elif options['read_pvals'] is not None:
+        elif options['read_pvals'] != None:
             self.mvals0    = FF.create_mvals(options['read_pvals'])
         else:
             self.mvals0    = np.zeros(self.FF.np)
@@ -237,7 +236,7 @@ class Optimizer(forcebalance.BaseClass):
         for T in self.Objective.Targets:
             T.goodstep = val
 
-    def save_mvals_to_input(self, mvals, priors=None, jobtype=None):
+    def save_mvals_to_input(self, mvals):
         """ Write a new input file (%s_save.in) containing the current mathematical parameters. """
         ## Determine the output file name.
         base, ext = os.path.splitext(self.input_file)
@@ -246,12 +245,10 @@ class Optimizer(forcebalance.BaseClass):
         else:
             outfnm = base+ext
         ## Clone the input file to the output, 
-        if self.input_file is not None and os.path.exists(self.input_file):
+        if self.input_file != None and os.path.exists(self.input_file):
             fin = open(self.input_file).readlines()
             have_mvals = 0
-            have_priors = 0
             in_mvals = 0
-            in_priors = 0
             in_options = 0
             if os.path.exists(outfnm) and self.mvals_bak: 
                 bak(outfnm, dest=self.bakdir)
@@ -267,21 +264,10 @@ class Optimizer(forcebalance.BaseClass):
                         print >> fout, self.FF.sprint_map(mvals, precision=8)
                         print >> fout, "/read_mvals"
                         have_mvals = 1
-                    if not have_priors and priors is not None:
-                        print >> fout, "priors"
-                        print >> fout, '\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in priors.keys()])
-                        print >> fout, "/priors"
-                        have_priors = 1
                     in_options = 0
-                elif in_options and line1.startswith('jobtype') and jobtype is not None:
-                        print >> fout, "jobtype %s" % jobtype
-                        continue
                 if line1.startswith("/read_mvals"):
                     in_mvals = 0
-                if line1.startswith("/priors"):
-                    in_priors = 0
                 if in_mvals: continue
-                if in_priors: continue
                 print >> fout, line,
                 if line1.startswith("read_mvals"):
                     if have_mvals: 
@@ -290,13 +276,6 @@ class Optimizer(forcebalance.BaseClass):
                     have_mvals = 1
                     in_mvals = 1
                     print >> fout, self.FF.sprint_map(mvals, precision=8)
-                if line1.startswith("priors") and priors is not None:
-                    if have_priors: 
-                        logger.error("Encountered more than one priors section\n")
-                        raise RuntimeError
-                    have_priors = 1
-                    in_priors = 1
-                    print >> fout, '\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in priors.keys()])
         return outfnm
             
     def Run(self):
@@ -306,12 +285,10 @@ class Optimizer(forcebalance.BaseClass):
 
         ## Don't print a "result" force field if it's the same as the input.
         print_parameters = True
-        ## The "precondition" job type takes care of its own output files.
-        if self.jobtype.lower() == 'precondition': print_parameters=False
-        if xk is None and (self.mvals0 == np.zeros(self.FF.np)).all(): 
+        if xk == None and (self.mvals0 == np.zeros(self.FF.np)).all(): 
             logger.info("Parameter file same as original; will not be printed to results folder.\n")
             print_parameters = False
-        elif xk is None:
+        elif xk == None:
             xk = self.mvals0
 
         ## Check derivatives by finite difference after the optimization is over (for good measure)
@@ -346,7 +323,7 @@ class Optimizer(forcebalance.BaseClass):
 
         ## Print out final message
         if self.failmsg:
-            bar = printcool("I have not failed.\nI've just found 10,000 ways that won't work.",ansi="40;97")
+            bar = printcool("It is hard to fail, but it is worse\nnever to have tried to succeed.",ansi="40;97")
         else:
             bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
@@ -926,7 +903,7 @@ class Optimizer(forcebalance.BaseClass):
                 fout.evals += 1
                 X, G, H = [Result[i] for i in ['X','G','H']]
                 if callback:
-                    if X <= self.x_best or self.x_best is None:
+                    if X <= self.x_best or self.x_best == None:
                         color = "\x1b[92m"
                         self.x_best = X
                         self.prev_bad = False
@@ -1083,8 +1060,8 @@ class Optimizer(forcebalance.BaseClass):
             def my_func(mvals):
                 if verbose: logger.info('\n')
                 Answer = func(mvals,Order=0,verbose=verbose)['X']
-                dx = (my_func.x_best - Answer) if my_func.x_best is not None else 0.0
-                if Answer < my_func.x_best or my_func.x_best is None:
+                dx = (my_func.x_best - Answer) if my_func.x_best != None else 0.0
+                if Answer < my_func.x_best or my_func.x_best == None:
                     color = "\x1b[92m"
                     my_func.x_best = Answer
                 else:
@@ -1239,118 +1216,6 @@ class Optimizer(forcebalance.BaseClass):
         pmat2d(data['H'], precision=8)
         logger.info(bar)
 
-    def Precondition(self):
-        """ An experimental method to determine the parameter scale factors
-        that results in the best conditioned Hessian. """
-        from scipy import optimize
-        data        = self.Objective.Full(self.mvals0,Order=2,verbose=True)
-        X, G, H = (data['X0'], data['G0'], data['H0']) if self.bhyp else (data['X'], data['G'], data['H'])
-        bar = printcool("(Un-penalized) objective function: %.8f\nGradient below" % X)
-        self.FF.print_map(vals=G,precision=8)
-        logger.info(bar)
-        printcool("Hessian matrix:")
-        pmat2d(H, precision=8)
-        logger.info(bar)
-        H1 = H.copy()
-        H1 = np.delete(H1, self.excision, axis=0)
-        H1 = np.delete(H1, self.excision, axis=1)
-        Eig = np.linalg.eig(H1)[0]            # Diagonalize Hessian
-        Cond = np.abs(np.max(Eig)/np.min(Eig))
-        # Spectral gap?
-        # eigsort = np.sort(np.abs(Eig))
-        # Cond = eigsort[-1]/eigsort[-2]
-        logger.info("Initial condition number = %.3f\n" % Cond)
-        def newcond(logrskeys, multiply=True):
-            """ Condition number function to be optimized. 
-            
-            Parameters
-            ----------
-            logrskeys : np.ndarray
-                Logarithms of the rescaling factor of each parameter type.
-                The optimization is done in the log space.
-            multiply : bool
-                If set to True, then the exponentiated logrskeys will
-                multiply the existing rescaling factors defined in the force field.
-
-            Returns
-            -------
-            float
-                Condition number of the Hessian matrix.
-            """
-            new_rsord = OrderedDict([(k, np.exp(logrskeys[i])) for i, k in enumerate(self.FF.rs_ord.keys())])
-            answer = self.FF.make_rescale(new_rsord, H=H.copy(), multiply=multiply)
-            H_a = answer['H'].copy()
-            H_a = np.delete(H_a, self.excision, axis=0)
-            H_a = np.delete(H_a, self.excision, axis=1)
-            Eig_a = np.linalg.eig(H_a)[0]            # Diagonalize Hessian
-            if np.min(Eig_a) < 1e-10:
-                Cond_a = 1e10
-            else:
-                Cond_a = np.abs(np.max(Eig_a)/np.min(Eig_a)) # Condition number
-            dlog = logrskeys - newcond.prev_step
-            nlog = np.sqrt(np.sum(dlog**2))
-            if newcond.verbose and newcond.step_n % 1000 == 0: 
-                logger.info("\rEval# %6i: Step: %9.3f Along: %3i Condition: %12.3f\r" % (newcond.step_n, nlog, np.argmax(np.abs(dlog)), Cond_a))
-            # "Regularize" using the log deviations
-            Reg = newcond.regularize * np.sum(logrskeys ** 2) / len(logrskeys)
-            newcond.prev_step = logrskeys
-            newcond.step_n += 1
-            return np.log(Cond_a) + Reg
-        newcond.prev_step = np.zeros(len(self.FF.rs_ord.keys()),dtype=float)
-        newcond.step_n = 0
-        newcond.verbose = True
-        newcond.regularize = 0.1
-        logrsmult = np.zeros(len(self.FF.rs_ord.keys()),dtype=float)
-        # Run the optimization algorithm.
-        # optimized = optimize.fmin(newcond,logrsmult,ftol=0.1,xtol=0.1,maxiter=1000,maxfun=10000)
-        logger.info("Basin-hopping optimization of condition number in the space of log rescaling factors\n")
-        optimized = optimize.basinhopping(newcond, logrsmult, stepsize=1.0, niter=self.maxstep, #disp=True,
-                                          minimizer_kwargs={'method':'Powell','tol':0.1,'options':{'maxiter':1000}})
-        optresult = optimized.x
-        new_rsord = OrderedDict([(k, np.exp(optresult[i])) for i, k in enumerate(self.FF.rs_ord.keys())])
-        answer = self.FF.make_rescale(new_rsord)
-        newcond.regularize = 0.0
-        newcond.verbose = False
-        optval = np.exp(newcond(optresult))
-        logger.info("\nOptimized condition number: %.3f\n" % optval)
-        # The optimization algorithm may have changed some rescaling factors that had no effect.
-        # Now we change them back.
-        rezero = []
-        nonzeros = []
-        printkeys = []
-        for i in range(len(optresult)):
-            trial = optresult.copy()
-            trial[i] = 1.0
-            if np.abs(newcond(trial)-newcond(optresult)) == 0.0:
-                rezero.append(i)
-            else:
-                nonzeros.append(optresult[i])
-                printkeys.append(self.FF.rs_ord.keys()[i])
-        # Now we make sure that the scale factors average to 1.0 in the log space. Otherwise they all grow larger / smaller.
-        optresult -= np.mean(nonzeros)
-        for i in rezero:
-            optresult[i] = 0.0
-        # We don't need any more than one significant digit of precision for the priors / scale factors.
-        # The following values are the new scale factors themselves (i.e. not multiplying the old ones)
-        opt_rsord = OrderedDict([(k, float('%.0e' % (np.exp(optresult[i])*self.FF.rs_ord[k]))) for i, k in enumerate(self.FF.rs_ord.keys())])
-        # Print the final answer
-        answer = self.FF.make_rescale(opt_rsord, mvals=self.mvals0, H=H.copy(), multiply=False)
-        logger.info("Condition Number after Rounding Factors -> %.3f\n" % (np.exp(newcond(np.log(opt_rsord.values()), multiply=False))))
-        bar = printcool("Previous values of the rescaling factors / prior widths:")
-        logger.info(''.join(["   %-35s  : %.5e\n" % (i, self.FF.rs_ord[i]) for i in self.FF.rs_ord.keys()]))
-        logger.info(bar)
-        opt_rsord = OrderedDict([(k, opt_rsord[k]) for k in opt_rsord.keys() if k in printkeys])
-        bar = printcool("Recommended values (may be slightly stochastic):")
-        logger.info(''.join(["   %-35s  : %.1e\n" % (k, opt_rsord[k]) for k in opt_rsord.keys()]))
-        logger.info(bar)
-        if np.linalg.norm(self.mvals0) != 0.0:
-            bar = printcool("Mathematical parameters in the new space:",color=4)
-            self.FF.print_map(answer['mvals'])
-            logger.info(bar)
-        outfnm = self.save_mvals_to_input(answer['mvals'], priors=opt_rsord, jobtype='optimize')
-        # logger.info("Input file with optimization parameters saved to %s.\n" % outfnm)
-        printcool("Input file with new priors/mvals saved to %s (jobtype set to optimize)." % (outfnm), color=0)
-
     def FDCheckG(self):
         """ Finite-difference checker for the objective function gradient.
 
@@ -1418,7 +1283,7 @@ class Optimizer(forcebalance.BaseClass):
     def readchk(self):
         """ Read the checkpoint file for the main optimizer. """
         self.chk = {}
-        if self.rchk_fnm is not None:
+        if self.rchk_fnm != None:
             absfnm = os.path.join(self.root,self.rchk_fnm)
             if os.path.exists(absfnm):
                 self.chk = pickle.load(open(absfnm))
@@ -1428,7 +1293,7 @@ class Optimizer(forcebalance.BaseClass):
 
     def writechk(self):
         """ Write the checkpoint file for the main optimizer. """
-        if self.wchk_fnm is not None:
+        if self.wchk_fnm != None:
             logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
             with wopen(os.path.join(self.root,self.wchk_fnm)) as f: pickle.dump(self.chk,f)
         

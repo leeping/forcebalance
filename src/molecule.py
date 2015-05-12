@@ -511,7 +511,7 @@ def pvec(vec):
 def grouper(n, iterable):
     """ Groups a big long iterable into groups of ten or what have you. """
     args = [iter(iterable)] * n
-    return list([e for e in t if e is not None] for t in itertools.izip_longest(*args))
+    return list([e for e in t if e != None] for t in itertools.izip_longest(*args))
 
 def even_list(totlen, splitsize):
     """ Creates a list of number sequences divided as evenly as possible.  """
@@ -608,7 +608,7 @@ def AlignToMoments(elem,xyz1,xyz2=None):
     If xyz2 is passed in, it will assume that xyz1 is already
     aligned to the moment of inertia, and it simply does 180-degree
     rotations to make sure nothing is inverted."""
-    xyz = xyz1 if xyz2 is None else xyz2
+    xyz = xyz1 if xyz2 == None else xyz2
     I = np.zeros((3,3))
     for i, xi in enumerate(xyz):
         I += (np.dot(xi,xi)*np.eye(3) - np.outer(xi,xi))
@@ -624,7 +624,7 @@ def AlignToMoments(elem,xyz1,xyz2=None):
             print "in AlignToMoments, determinant is % .3f" % determ
         BB[:,2] *= -1
     xyzr = np.array(np.matrix(BB).T * np.matrix(xyz).T).T.copy()
-    if xyz2 is not None:
+    if xyz2 != None:
         xyzrr = AlignToDensity(elem,xyz1,xyzr,binary=True)
         return xyzrr
     else:
@@ -798,9 +798,9 @@ def arc(Mol, begin=None, end=None, RMSD=True):
         Arc length between frames in Angstrom, length is n_frames - 1
     """
     Mol.align()
-    if begin is None:
+    if begin == None:
         begin = 0
-    if end is None:
+    if end == None:
         end = len(Mol)
     if RMSD:
         Arc = Mol.pathwise_rmsd()
@@ -1245,9 +1245,9 @@ class Molecule(object):
         # Data container.  All of the data is stored in here.
         self.Data = {}
         ## Read in stuff if we passed in a file name, otherwise return an empty instance.
-        if fnm is not None:
+        if fnm != None:
             self.Data['fnm'] = fnm
-            if ftype is None:
+            if ftype == None:
                 ## Try to determine from the file name using the extension.
                 ftype = os.path.splitext(fnm)[1][1:]
             if not os.path.exists(fnm):
@@ -1282,7 +1282,7 @@ class Molecule(object):
 
     # def read(self, fnm, ftype = None):
     #     """ Read in a file. """
-    #     if ftype is None:
+    #     if ftype == None:
     #         ## Try to determine from the file name using the extension.
     #         ftype = os.path.splitext(fnm)[1][1:]
     #     ## This calls the table of reader functions and prints out an error message if it fails.
@@ -1291,10 +1291,10 @@ class Molecule(object):
     #     return Answer
 
     def write(self,fnm=None,ftype=None,append=False,select=None,**kwargs):
-        if fnm is None and ftype is None:
+        if fnm == None and ftype == None:
             logger.error("Output file name and file type are not specified.\n")
             raise RuntimeError
-        elif ftype is None:
+        elif ftype == None:
             ftype = os.path.splitext(fnm)[1][1:]
         ## Fill in comments.
         if 'comms' not in self.Data:
@@ -1307,12 +1307,12 @@ class Molecule(object):
         self.fout = fnm
         if type(select) in [int, np.int64, np.int32]:
             select = [select]
-        if select is None:
+        if select == None:
             select = range(len(self))
         Answer = self.Write_Tab[self.Funnel[ftype.lower()]](select,**kwargs)
         ## Any method that returns text will give us a list of lines, which we then write to the file.
-        if Answer is not None:
-            if fnm is None or fnm == sys.stdout:
+        if Answer != None:
+            if fnm == None or fnm == sys.stdout:
                 outfile = sys.stdout
             elif append:
                 # Writing to symbolic links risks unintentionally overwriting the source file - 
@@ -1401,16 +1401,16 @@ class Molecule(object):
 
     def edit_qcrems(self, in_dict, subcalc = None):
         """ Edit Q-Chem rem variables with a dictionary.  Pass a value of None to delete a rem variable. """
-        if subcalc is None:
+        if subcalc == None:
             for qcrem in self.qcrems:
                 for key, val in in_dict.items():
-                    if val is None:
+                    if val == None:
                         qcrem.pop(key, None)
                     else:
                         qcrem[key] = val
         else:
             for key, val in in_dict.items():
-                if val is None:
+                if val == None:
                     self.qcrems[subcalc].pop(key, None)
                 else:
                     self.qcrems[subcalc][key] = val
@@ -1606,7 +1606,7 @@ class Molecule(object):
                 ref = index2-1
             else:
                 ref = 0
-            if select is not None:
+            if select != None:
                 tr, rt = get_rotate_translate(xyz2[select],self.xyzs[ref][select])
             else:
                 tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
@@ -2779,7 +2779,7 @@ class Molecule(object):
             self.top_settings["read_bonds"] = True
             Answer["bonds"] = bonds
 
-        if Box is not None:
+        if Box != None:
             Answer["boxes"] = [Box for i in range(len(XYZList))]
 
         return Answer
@@ -3007,7 +3007,7 @@ class Molecule(object):
                 elif 'TransDip' not in s:
                     for i in range(nfrq):
                         readmodes[i].append([float(s[j]) for j in range(1+3*i,4+3*i)])
-            if VModeNxt is not None: VMode = VModeNxt
+            if VModeNxt != None: VMode = VModeNxt
             for key, val in matrix_match.items():
                 if Mats[key]["Mode"] >= 1:
                     # Match any number of integers on a line.  This signifies a column header to start the matrix
@@ -3244,10 +3244,10 @@ class Molecule(object):
 
     def write_inpcrd(self, select, sn=None, **kwargs):
         self.require('xyzs')
-        if len(self.xyzs) != 1 and sn is None:
+        if len(self.xyzs) != 1 and sn == None:
             logger.error("inpcrd can only be written for a single-frame trajectory\n")
             raise RuntimeError
-        if sn is not None:
+        if sn != None:
             self.xyzs = [self.xyzs[sn]]
             self.comms = [self.comms[sn]]
         # In inp files, there is only one comment line

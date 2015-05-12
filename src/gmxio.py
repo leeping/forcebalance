@@ -43,12 +43,12 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
     """
     clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
-    options = OrderedDict([(key.lower().replace('-','_'), str(val) if val is not None else None) for key, val in options.items()])
+    options = OrderedDict([(key.lower().replace('-','_'), str(val) if val != None else None) for key, val in options.items()])
     # List of lines in the output file.
     out = []
     # List of options in the output file.
     haveopts = []
-    if fin is not None and os.path.isfile(fin):
+    if fin != None and os.path.isfile(fin):
         for line in open(fin).readlines():
             line    = line.strip().expandtabs()
             # The line structure should look something like this:
@@ -75,13 +75,13 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
                     logger.error("write_mdp tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
                     raise RuntimeError
                 # Passing None as the value causes the option to be deleted
-                if val is None: continue
+                if val == None: continue
                 if len(val) < len(valf):
                     valf = ' ' + val + ' '*(len(valf) - len(val)-1)
                 else:
                     valf = ' ' + val + ' '
                 lout = [keyf, '=', valf]
-                if comms is not None:
+                if comms != None:
                     lout += [';',comms]
                 out.append(''.join(lout))
             else:
@@ -114,7 +114,7 @@ def write_ndx(fout, grps, fin=None):
     ndxgrps = OrderedDict()
     atoms = []
     grp = None
-    if fin is not None and os.path.isfile(fin):
+    if fin != None and os.path.isfile(fin):
         for line in open(fin):
             s = line.split()
             if len(s) == 0: continue
@@ -475,7 +475,7 @@ class ITP_Reader(BaseReader):
         if type(atom) is list and (len(atom) > 1 and atom[0] > atom[-1]):
             # Enforce a canonical ordering of the atom labels in a parameter ID
             atom = atom[::-1]
-        if self.mol is None:
+        if self.mol == None:
             self.suffix = ':' + ''.join(["%s" % i for i in atom])
         elif self.sec == 'qtpie':
             self.suffix = ':' + '.'.join(["%s" % i for i in atom])
@@ -590,9 +590,9 @@ class GMX(Engine):
             self.gmx_defs["rvdw"] = "0.0"
         
         ## Link files into the temp directory.
-        if self.top is not None:
+        if self.top != None:
             LinkFile(os.path.join(self.srcdir, self.top), self.top, nosrcok=True)
-        if self.mdp is not None:
+        if self.mdp != None:
             LinkFile(os.path.join(self.srcdir, self.mdp), self.mdp, nosrcok=True)
 
         itptmp = False
@@ -612,7 +612,7 @@ class GMX(Engine):
             self.top = onefile(self.top, 'top')
             self.mdp = onefile(self.mdp, 'mdp')
             # Sanity check; the force fields should be referenced by the .top file.
-            if self.top is not None and os.path.exists(self.top):
+            if self.top != None and os.path.exists(self.top):
                 if self.top not in self.FF.fnms and (not any([any([fnm in line for fnm in self.FF.fnms]) for line in open(self.top)])):
                     logger.warning('Force field file is not referenced in the .top file\nAssuming the first .itp file is to be included\n')
                     for itpfnm in self.FF.fnms:
@@ -637,7 +637,7 @@ class GMX(Engine):
         ## At this point, we could have gotten a .mdp file from the
         ## target folder or as part of the force field.  If it still
         ## missing, then we may write a default.
-        if self.top is not None and os.path.exists(self.top):
+        if self.top != None and os.path.exists(self.top):
             LinkFile(self.top, '%s.top' % self.name)
         else:
             logger.error("No .top file found, cannot continue.\n")
@@ -766,7 +766,7 @@ class GMX(Engine):
 
         """ Get a list of energy term names from the .edr file by parsing a system call to g_energy. """
 
-        if edrfile is None:
+        if edrfile == None:
             edrfile = "%s.edr" % self.name
         if not os.path.exists(edrfile):
             logger.error('Cannot determine energy term names without an .edr file\n')
@@ -881,7 +881,7 @@ class GMX(Engine):
 
         """ Evaluate variables (energies, force and/or dipole) using GROMACS over a trajectory. """
 
-        if traj is None:
+        if traj == None:
             if hasattr(self, 'mdtraj'):
                 traj = self.mdtraj
             else:
@@ -1130,7 +1130,7 @@ class GMX(Engine):
         if verbose: logger.info("Molecular dynamics simulation with GROMACS engine.\n")
 
         # Set the number of threads.
-        if threads is None:
+        if threads == None:
             if "OMP_NUM_THREADS" in os.environ:
                 threads = int(os.environ["OMP_NUM_THREADS"])
             else:
@@ -1142,7 +1142,7 @@ class GMX(Engine):
         md_defs = OrderedDict()
 
         warnings = []
-        if temperature is not None:
+        if temperature != None:
             md_opts["ref_t"] = temperature
             md_opts["gen_vel"] = "no"
             md_defs["tc_grps"] = "System"
@@ -1150,7 +1150,7 @@ class GMX(Engine):
             md_defs["tau_t"] = 1.0
         if self.pbc:
             md_opts["comm_mode"] = "linear"
-            if pressure is not None:
+            if pressure != None:
                 md_opts["ref_p"] = pressure
                 md_defs["pcoupl"] = "parrinello-rahman"
                 md_defs["tau_p"] = 1.5

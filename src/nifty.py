@@ -120,7 +120,7 @@ def grouper(iterable, n):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
     args = [iter(iterable)] * n
-    lzip = [[j for j in i if j is not None] for i in list(itertools.izip_longest(*args))]
+    lzip = [[j for j in i if j != None] for i in list(itertools.izip_longest(*args))]
     return lzip
 
 def encode(l): 	
@@ -229,10 +229,10 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
         else:
             padleft = ''
         padright = ' '* (width - newlen(line) - len(padleft))
-        if ansi is not None:
+        if ansi != None:
             ansi = str(ansi)
             logger.info("%s| \x1b[%sm%s " % (sym, ansi, padleft)+line+" %s\x1b[0m |%s\n" % (padright, sym))
-        elif color is not None:
+        elif color != None:
             if color == 0 and bold:
                 logger.info("%s| \x1b[1m%s " % (sym, padleft) + line + " %s\x1b[0m |%s\n" % (padright, sym))
             elif color == 0:
@@ -249,7 +249,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     botbar = ''.join([bottom for i in range(width + 8)])
     return botbar + '\n'
 
-def printcool_dictionary(Dict,title="Dictionary Keys : Values",bold=False,color=2,keywidth=25,topwidth=50,center=True,leftpad=0):
+def printcool_dictionary(Dict,title="General options",bold=False,color=2,keywidth=25,topwidth=50,center=True,leftpad=0):
     """See documentation for printcool; this is a nice way to print out keys/values in a dictionary.
 
     The keys in the dictionary are sorted before printing out.
@@ -257,7 +257,7 @@ def printcool_dictionary(Dict,title="Dictionary Keys : Values",bold=False,color=
     @param[in] dict The dictionary to be printed
     @param[in] title The title of the printout
     """
-    if Dict is None: return
+    if Dict == None: return
     bar = printcool(title,bold=bold,color=color,minwidth=topwidth,center=center)
     def magic_string(str):
         # This cryptic command returns a string with the number of characters specified as a variable. :P
@@ -265,9 +265,9 @@ def printcool_dictionary(Dict,title="Dictionary Keys : Values",bold=False,color=
         # print "\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"'))
         return eval("\'%%-%is\' %% '%s'" % (keywidth,str.replace("'","\\'").replace('"','\\"')))
     if isinstance(Dict, OrderedDict): 
-        logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] is not None]))
+        logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in Dict if Dict[key] != None]))
     else:
-        logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] is not None]))
+        logger.info('\n'.join([' '*leftpad + "%s %s " % (magic_string(str(key)),str(Dict[key])) for key in sorted([i for i in Dict]) if Dict[key] != None]))
     logger.info("\n%s" % bar)
 
 #===============================#
@@ -390,9 +390,9 @@ def monotonic_decreasing(arr, start=None, end=None, verbose=False):
     indices : numpy.ndarray
         Selected indices
     """
-    if start is None:
+    if start == None:
         start = 0
-    if end is None:
+    if end == None:
         end = len(arr) - 1
     a0 = arr[start]
     idx = [start]
@@ -490,7 +490,7 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     if n_fit > n_x:
         logger.warning("Argh? It seems like this problem is underdetermined!\n")
     # Build the weight matrix.
-    if w is not None:
+    if w != None:
         if len(w) != n_x:
             warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
         w /= np.mean(w)
@@ -806,13 +806,13 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
         lf = os.path.join(cwd,f)
         task.specify_output_file(lf,f,cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-    if tag is None: tag = command
+    if tag == None: tag = command
     task.specify_tag(tag)
     task.print_time = print_time
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, %staskid %i\n" % (command, "tag %s, " % tag if tag != command else "", taskid))
-    if tgt is not None:
+    if tgt != None:
         WQIDS[tgt.name].append(taskid)
     else:
         WQIDS["None"].append(taskid)
@@ -838,13 +838,13 @@ def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None
         # print f[0], f[1]
         task.specify_output_file(f[0],f[1],cache=False)
     task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
-    if tag is None: tag = command
+    if tag == None: tag = command
     task.specify_tag(tag)
     task.print_time = print_time
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, taskid %i\n" % (command, taskid))
-    if tgt is not None:
+    if tgt != None:
         WQIDS[tgt.name].append(taskid)
     else:
         WQIDS["None"].append(taskid)
@@ -938,7 +938,7 @@ def bak(path, dest=None):
         dnm, fnm = os.path.split(path)
         if dnm == '' : dnm = '.'
         base, ext = os.path.splitext(fnm)
-        if dest is None:
+        if dest == None:
             dest = dnm
         if not os.path.isdir(dest): os.makedirs(dest)
         i = 1
@@ -957,13 +957,13 @@ def bak(path, dest=None):
 # the extension.  If so, return the file name.
 # 3) If list is still empty and err==True, then crash with an error.
 def onefile(fnm=None, ext=None, err=False):
-    if fnm is None and ext is None:
+    if fnm == None and ext == None:
         if err:
             logger.error("Must provide either filename or extension to onefile()")
             raise RuntimeError
         else:
             return None
-    if fnm is not None:
+    if fnm != None:
         if os.path.exists(fnm):
             if os.path.dirname(os.path.abspath(fnm)) != os.getcwd():
                 fsrc = os.path.abspath(fnm)
@@ -985,7 +985,7 @@ def onefile(fnm=None, ext=None, err=False):
         elif (err==True or ext==None):
             logger.error("File specified by %s does not exist!" % fnm)
             raise RuntimeError
-        elif ext is not None:
+        elif ext != None:
             warn_once("File specified by %s does not exist - will try to autodetect .%s extension" % (fnm, ext))
     answer = None
     cwd = os.getcwd()
@@ -1023,10 +1023,10 @@ def listfiles(fnms=None, ext=None, err=False):
             logger.error('Specified %s but it does not exist' % fnms)
             raise RuntimeError
         answer = [fnms]
-    elif fnms is not None:
+    elif fnms != None:
         logger.error('First argument to listfiles must be a list, a string, or None')
         raise RuntimeError
-    if answer == [] and ext is not None:
+    if answer == [] and ext != None:
         answer = [os.path.basename(i) for i in os.listdir(os.getcwd()) if i.endswith('.%s' % ext)]
     if answer == [] and err:
         logger.error('listfiles function failed to come up with a file! (fnms = %s ext = %s)' % (str(fnms), str(ext)))
@@ -1242,19 +1242,19 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr, 'cwd':cwd}
 
     # If the current working directory is provided, the outputs will be written to there as well.
-    if cwd is not None:
-        if outfnm is not None:
+    if cwd != None:
+        if outfnm != None:
             outfnm = os.path.abspath(os.path.join(cwd, outfnm))
-        if logfnm is not None:
+        if logfnm != None:
             logfnm = os.path.abspath(os.path.join(cwd, logfnm))
 
     # "write to file" : Function for writing some characters to the log and/or output files.
     def wtf(out):
-        if logfnm is not None: 
+        if logfnm != None: 
             with open(logfnm,'a+') as f: 
                 f.write(out)
                 f.flush()
-        if outfnm is not None: 
+        if outfnm != None: 
             with open(outfnm,'w+' if wtf.first else 'a+') as f: 
                 f.write(out)
                 f.flush()
@@ -1262,12 +1262,12 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     wtf.first = True
 
     # Preserve backwards compatibility; sometimes None gets passed to stdin.
-    if stdin is None: stdin = ""
+    if stdin == None: stdin = ""
 
     if print_command:
         logger.info("Executing process: \x1b[92m%-50s\x1b[0m%s%s%s\n" % (' '.join(command) if type(command) is list else command, 
-                                                               " Output: %s" % outfnm if outfnm is not None else "", 
-                                                               " Append: %s" % logfnm if logfnm is not None else "", 
+                                                               " Output: %s" % outfnm if outfnm != None else "", 
+                                                               " Append: %s" % logfnm if logfnm != None else "", 
                                                                (" Stdin: %s" % stdin.replace('\n','\\n')) if stdin else ""))
         wtf("Executing process: %s%s\n" % (command, (" Stdin: %s" % stdin.replace('\n','\\n')) if stdin else ""))
 
@@ -1363,7 +1363,7 @@ def warn_press_key(warning, timeout=10):
 
 def warn_once(warning, warnhash = None):
     """ Prints a warning but will only do so once in a given run. """
-    if warnhash is None:
+    if warnhash == None:
         warnhash = warning
     if warnhash in warn_once.already:
         return
