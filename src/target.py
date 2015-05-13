@@ -120,7 +120,7 @@ class Target(forcebalance.BaseClass):
         self.set_option(options, 'backup')
         ## Directory to read data from.
         self.set_option(tgt_opts, 'read', 'rd')
-        if self.rd != None: self.rd = self.rd.strip("/")
+        if self.rd is not None: self.rd = self.rd.strip("/")
         ## Iteration where we turn on zero-gradient skipping.
         self.set_option(options, 'zerograd')
         ## Gradient norm below which we skip.
@@ -151,7 +151,7 @@ class Target(forcebalance.BaseClass):
         self.set_option(None, None, 'tgtdir', os.path.join(tgtdir,self.name))
         ## Temporary (working) directory; it is temp/(target_name)
         ## Used for storing temporary variables that don't change through the course of the optimization
-        if 'input_file' in options and options['input_file'] != None:
+        if 'input_file' in options and options['input_file'] is not None:
             self.tempbase    = os.path.splitext(options['input_file'])[0]+'.tmp'
         else:
             self.tempbase    = "temp"
@@ -405,7 +405,7 @@ class Target(forcebalance.BaseClass):
         if self.evaluated:
             logger.error("Tried to read from disk, but not allowed because this target is evaluated already\n")
             raise RuntimeError
-        if self.rd == None:
+        if self.rd is None:
             logger.error("The directory for reading is not set\n")
             raise RuntimeError
 
@@ -453,7 +453,7 @@ class Target(forcebalance.BaseClass):
             logger.error("Did not find data to read in %s\n" % self.rd)
             raise RuntimeError
 
-        if inum != None:
+        if inum is not None:
             there = os.path.join(os.path.split(there)[0],'iter_%04i' % inum)
         return there
 
@@ -493,7 +493,7 @@ class Target(forcebalance.BaseClass):
         # Using the module level logger
         logger = getLogger(__name__)
         # Note that reading information is not supported for custom folders (e.g. microiterations during search)
-        if self.rd != None and (not self.evaluated) and self.read_indicate and customdir == None:
+        if self.rd is not None and (not self.evaluated) and self.read_indicate and customdir is None:
             # Move into the directory for reading data, 
             cwd = os.getcwd()
             os.chdir(self.absrd())
@@ -555,7 +555,7 @@ class Target(forcebalance.BaseClass):
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Read existing information from disk (i.e. when recovering an aborted run)
         # Note that reading information is not supported for custom folders (e.g. microiterations during search)
-        if self.rd != None and (not self.evaluated) and self.read_objective and customdir == None:
+        if self.rd is not None and (not self.evaluated) and self.read_objective and customdir is None:
             os.chdir(self.absrd())
             logger.info("Reading objective function information from %s\n" % os.getcwd())
             Answer = self.read(mvals, AGrad, AHess)
@@ -614,9 +614,9 @@ class Target(forcebalance.BaseClass):
             self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
-        if self.rd == None or (not firstIteration): 
+        if self.rd is None or (not firstIteration): 
             self.submit_jobs(mvals, AGrad, AHess)
-        elif customdir != None:
+        elif customdir is not None:
             # Allows us to submit micro-iteration jobs for remote targets
             self.submit_jobs(mvals, AGrad, AHess)
         os.chdir(cwd)
@@ -627,7 +627,7 @@ class Target(forcebalance.BaseClass):
         """ This method determines whether the Work Queue tasks for the current target have completed. """
         wq = getWorkQueue()
         WQIds = getWQIds()
-        if wq == None:
+        if wq is None:
             return True
         elif wq.empty():
             WQIds[self.name] = []
@@ -662,7 +662,7 @@ class Target(forcebalance.BaseClass):
         """
         tline="Target: %s  Type: %s  Objective = %.5e" % (self.name, self.__class__.__name__, self.objective)
         nc = len(headings)
-        if banner != None:
+        if banner is not None:
             tlines = [banner, tline]
         else:
             tlines = [tline]
@@ -714,7 +714,7 @@ class Target(forcebalance.BaseClass):
         outside = Write this file outside the targets directory
         """
         cwd = os.getcwd()
-        if outside != None:
+        if outside is not None:
             self.ffpd = cwd.replace(os.path.join(self.root, self.tempdir), os.path.join(self.root, self.tempbase, outside))
         else:
             self.ffpd = os.path.abspath(os.path.join(self.root, self.rundir))

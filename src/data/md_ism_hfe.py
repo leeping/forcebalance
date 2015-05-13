@@ -65,7 +65,7 @@ parser.add_argument('-o', '-out', '--output', dest='output', type=str, nargs='+'
 
 # Parse the command line options and save as a dictionary (don't save NoneTypes)
 parsed = parser.parse_args()
-args = OrderedDict([(i, j) for i, j in vars(parsed).items() if j != None])
+args = OrderedDict([(i, j) for i, j in vars(parsed).items() if j is not None])
 
 #----
 # Load the ForceBalance pickle file which contains:

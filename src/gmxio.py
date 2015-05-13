@@ -32,23 +32,44 @@ import random
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
-def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
+def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     """
-    Create or edit a Gromacs MDP file.  The MDP file contains GROMACS run parameters.
-    @param[in] fout Output file name, can be the same as input file name.
-    @param[in] options Dictionary containing mdp options. Existing options are replaced, new options are added at the end.
-    @param[in] fin Input file name.
-    @param[in] defaults Default options to add to the mdp only if they don't already exist.
-    @param[in] verbose Print out all modifications to the file.
+    Read, create or edit a Gromacs MDP file.  The MDP file contains GROMACS run parameters.
+    If the input file exists, it is parsed and options are replaced where "options" overrides them.
+    If the "options" dictionary contains more options, they are added at the end.
+    If the "defaults" dictionary contains more options, they are added at the end.
+    Keys and values are standardized to lower-case strings where all dashes are replaced by underscores.
+    The output file contains the same comments and "dressing" as the input.
+    Also returns a dictionary with the final key/value pairs.
+
+    Parameters
+    ----------
+    fin : str, optional
+        Input .mdp file name containing options that are more important than "defaults", but less important than "options"
+    fout : str, optional
+        Output .mdp file name.
+    options : dict, optional
+        Dictionary containing mdp options. Existing options are replaced, new options are added at the end, None values are deleted from output mdp.
+    defaults : dict, optional
+        defaults Dictionary containing "default" mdp options, added only if they don't already exist.
+    verbose : bool, optional
+        Print out additional information        
+
+    Returns
+    -------
+    OrderedDict
+        Key-value pairs combined from the input .mdp and the supplied options/defaults and equivalent to what's printed in the output mdp.
     """
     clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
-    options = OrderedDict([(key.lower().replace('-','_'), str(val) if val != None else None) for key, val in options.items()])
+    options = OrderedDict([(key.lower().replace('-','_'), str(val) if val is not None else None) for key, val in options.items()])
     # List of lines in the output file.
     out = []
     # List of options in the output file.
     haveopts = []
-    if fin != None and os.path.isfile(fin):
+    # List of all options in dictionary form, to be returned.
+    all_options = OrderedDict()
+    if fin is not None and os.path.isfile(fin):
         for line in open(fin).readlines():
             line    = line.strip().expandtabs()
             # The line structure should look something like this:
@@ -72,37 +93,43 @@ def write_mdp(fout, options, fin=None, defaults={}, verbose=False):
                 val = options[key]
                 val0 = valf.strip()
                 if key in clashes and val != val0:
-                    logger.error("write_mdp tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
+                    logger.error("edit_mdp tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
                     raise RuntimeError
                 # Passing None as the value causes the option to be deleted
-                if val == None: continue
+                if val is None: continue
                 if len(val) < len(valf):
                     valf = ' ' + val + ' '*(len(valf) - len(val)-1)
                 else:
                     valf = ' ' + val + ' '
                 lout = [keyf, '=', valf]
-                if comms != None:
+                if comms is not None:
                     lout += [';',comms]
                 out.append(''.join(lout))
             else:
                 out.append(line)
+                val = valf.strip()
+            all_options[key] = val
     for key, val in options.items():
         key = key.lower().replace('-','_')
         if key not in haveopts:
             haveopts.append(key)
             out.append("%-20s = %s" % (key, val))
+            all_options[key] = val
     # Fill in some default options.
     for key, val in defaults.items():
         key = key.lower().replace('-','_')
         options[key] = val
         if key not in haveopts:
             out.append("%-20s = %s" % (key, val))
-    file_out = wopen(fout) 
-    for line in out:
-        print >> file_out, line
+            all_options[key] = val
+    if fout != None:
+       file_out = wopen(fout) 
+       for line in out:
+           print >> file_out, line
+       file_out.close()
     if verbose:
         printcool_dictionary(options, title="%s -> %s with options:" % (fin, fout))
-    file_out.close()
+    return all_options
 
 def write_ndx(fout, grps, fin=None):
     """
@@ -114,7 +141,7 @@ def write_ndx(fout, grps, fin=None):
     ndxgrps = OrderedDict()
     atoms = []
     grp = None
-    if fin != None and os.path.isfile(fin):
+    if fin is not None and os.path.isfile(fin):
         for line in open(fin):
             s = line.split()
             if len(s) == 0: continue
@@ -475,7 +502,7 @@ class ITP_Reader(BaseReader):
         if type(atom) is list and (len(atom) > 1 and atom[0] > atom[-1]):
             # Enforce a canonical ordering of the atom labels in a parameter ID
             atom = atom[::-1]
-        if self.mol == None:
+        if self.mol is None:
             self.suffix = ':' + ''.join(["%s" % i for i in atom])
         elif self.sec == 'qtpie':
             self.suffix = ':' + '.'.join(["%s" % i for i in atom])
@@ -496,7 +523,7 @@ class GMX(Engine):
 
     def __init__(self, name="gmx", **kwargs):
         ## Valid GROMACS-specific keywords.
-        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx']
+        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx', 'gmx_eq_barostat']
         super(GMX,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -514,6 +541,10 @@ class GMX(Engine):
         else:
             warn_once("The 'gmxsuffix' option were not provided; using default.")
             self.gmxsuffix = ''
+        
+        ## Barostat keyword for equilibration
+        if 'gmx_eq_barostat' in kwargs:
+            self.gmx_eq_barostat = kwargs['gmx_eq_barostat']
 
         ## The directory containing GROMACS executables (e.g. mdrun)
         havegmx = False
@@ -590,10 +621,15 @@ class GMX(Engine):
             self.gmx_defs["rvdw"] = "0.0"
         
         ## Link files into the temp directory.
-        if self.top != None:
+        if self.top is not None:
             LinkFile(os.path.join(self.srcdir, self.top), self.top, nosrcok=True)
-        if self.mdp != None:
+        if self.mdp is not None:
             LinkFile(os.path.join(self.srcdir, self.mdp), self.mdp, nosrcok=True)
+
+        ## Read the .mdp file to determine if there are constraints.
+        mdp_dict = edit_mdp(fin=self.mdp)
+        if 'constraints' in mdp_dict.keys() and mdp_dict['constraints'] in ['h_bonds', 'all_bonds', 'h_angles', 'all_angles']:
+            self.have_constraints = True
 
         itptmp = False
 
@@ -603,7 +639,8 @@ class GMX(Engine):
             # This is because the .mdp and .top file can be force field files!
             # This bit affects how the geometry optimization is performed, but we should have
             # a more comprehensive way to pass constraint settings through.
-            self.have_constraints = self.FF.rigid_water
+            if self.FF.rigid_water:
+                self.have_constraints = True
             if not all([os.path.exists(f) for f in self.FF.fnms]):
                 # If the parameter files don't already exist, create them for the purpose of
                 # preparing the engine, but then delete them afterward.
@@ -612,7 +649,7 @@ class GMX(Engine):
             self.top = onefile(self.top, 'top')
             self.mdp = onefile(self.mdp, 'mdp')
             # Sanity check; the force fields should be referenced by the .top file.
-            if self.top != None and os.path.exists(self.top):
+            if self.top is not None and os.path.exists(self.top):
                 if self.top not in self.FF.fnms and (not any([any([fnm in line for fnm in self.FF.fnms]) for line in open(self.top)])):
                     logger.warning('Force field file is not referenced in the .top file\nAssuming the first .itp file is to be included\n')
                     for itpfnm in self.FF.fnms:
@@ -637,12 +674,12 @@ class GMX(Engine):
         ## At this point, we could have gotten a .mdp file from the
         ## target folder or as part of the force field.  If it still
         ## missing, then we may write a default.
-        if self.top != None and os.path.exists(self.top):
+        if self.top is not None and os.path.exists(self.top):
             LinkFile(self.top, '%s.top' % self.name)
         else:
             logger.error("No .top file found, cannot continue.\n")
             raise RuntimeError
-        write_mdp("%s.mdp" % self.name, gmx_opts, fin=self.mdp, defaults=self.gmx_defs)
+        edit_mdp(fin=self.mdp, fout="%s.mdp" % self.name, options=gmx_opts, defaults=self.gmx_defs)
 
         ## Call grompp followed by gmxdump to read the trajectory
         o = self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name), warnings=warnings)
@@ -766,7 +803,7 @@ class GMX(Engine):
 
         """ Get a list of energy term names from the .edr file by parsing a system call to g_energy. """
 
-        if edrfile == None:
+        if edrfile is None:
             edrfile = "%s.edr" % self.name
         if not os.path.exists(edrfile):
             logger.error('Cannot determine energy term names without an .edr file\n')
@@ -803,6 +840,7 @@ class GMX(Engine):
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
         else:
+            # algorithm = "steep"
             if self.have_constraints:
                 algorithm = "steep"
             else:
@@ -810,7 +848,7 @@ class GMX(Engine):
             # Arguments for running minimization.
             min_opts = {"integrator" : algorithm, "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
 
-        write_mdp("%s-min.mdp" % self.name, min_opts, fin="%s.mdp" % self.name)
+        edit_mdp(fin="%s.mdp" % self.name, fout="%s-min.mdp" % self.name, options=min_opts)
 
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
@@ -843,7 +881,7 @@ class GMX(Engine):
 
         shot_opts = OrderedDict([("nsteps", 0), ("nstxout", 0), ("nstxtcout", 0), ("nstenergy", 1)])
         shot_opts["nstfout"] = 1 if force else 0
-        write_mdp("%s-1.mdp" % self.name, shot_opts, fin="%s.mdp" % self.name)
+        edit_mdp(fin="%s.mdp" % self.name, fout="%s-1.mdp" % self.name, options=shot_opts)
 
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
@@ -881,7 +919,7 @@ class GMX(Engine):
 
         """ Evaluate variables (energies, force and/or dipole) using GROMACS over a trajectory. """
 
-        if traj == None:
+        if traj is None:
             if hasattr(self, 'mdtraj'):
                 traj = self.mdtraj
             else:
@@ -943,8 +981,8 @@ class GMX(Engine):
         write_ndx('%s.ndx' % self.name, OrderedDict([('A',[i+1 for i in fraga]),('B',[i+1 for i in fragb])]))
 
         ## .mdp files for fully interacting and interaction-excluded systems.
-        write_mdp('%s-i.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B'}, fin='%s.mdp' % self.name)
-        write_mdp('%s-x.mdp' % self.name, {'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'}, fin='%s.mdp' % self.name)
+        edit_mdp(fin='%s.mdp' % self.name, fout='%s-i.mdp' % self.name, options={'xtc_grps':'A B', 'energygrps':'A B'})
+        edit_mdp(fin='%s.mdp' % self.name, fout='%s-x.mdp' % self.name, options={'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'})
 
         ## Call grompp followed by mdrun for interacting system.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
@@ -993,7 +1031,7 @@ class GMX(Engine):
         #-----
         
         ea_debye = 4.803204255928332 # Conversion factor from e*nm to Debye
-        q = np.array(self.AtomLists['Charge'])
+        q = self.get_charges()
         x = M.xyzs[0] - M.center_of_mass()[0]
 
         xx, xy, xz, yy, yz, zz = (x[:,i]*x[:,j] for i, j in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
@@ -1025,7 +1063,7 @@ class GMX(Engine):
         if not self.double:
             warn_once("Single-precision GROMACS detected - recommend that you use double precision build.")
 
-        write_mdp('%s-nm.mdp' % self.name, {'integrator':'nm'}, fin='%s.mdp' % self.name)
+        edit_mdp(fin='%s.mdp' % self.name, fout='%s-nm.mdp' % self.name, options={'integrator':'nm'})
 
         if optimize:
             self.optimize(shot)
@@ -1130,7 +1168,7 @@ class GMX(Engine):
         if verbose: logger.info("Molecular dynamics simulation with GROMACS engine.\n")
 
         # Set the number of threads.
-        if threads == None:
+        if threads is None:
             if "OMP_NUM_THREADS" in os.environ:
                 threads = int(os.environ["OMP_NUM_THREADS"])
             else:
@@ -1142,7 +1180,7 @@ class GMX(Engine):
         md_defs = OrderedDict()
 
         warnings = []
-        if temperature != None:
+        if temperature is not None:
             md_opts["ref_t"] = temperature
             md_opts["gen_vel"] = "no"
             md_defs["tc_grps"] = "System"
@@ -1150,7 +1188,7 @@ class GMX(Engine):
             md_defs["tau_t"] = 1.0
         if self.pbc:
             md_opts["comm_mode"] = "linear"
-            if pressure != None:
+            if pressure is not None:
                 md_opts["ref_p"] = pressure
                 md_defs["pcoupl"] = "parrinello-rahman"
                 md_defs["tau_p"] = 1.5
@@ -1183,8 +1221,9 @@ class GMX(Engine):
             eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0,
                             "gen-vel": "yes", "gen-temp" : temperature, "gen-seed" : random.randrange(100000,999999)})
             eq_defs = deepcopy(md_defs)
-            if "pcoupl" in eq_defs: eq_opts["pcoupl"] = "berendsen"
-            write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
+            if "pcoupl" in eq_defs and hasattr(self, 'gmx_eq_barostat'):
+                eq_opts["pcoupl"] = self.gmx_eq_barostat
+            edit_mdp(fin='%s.mdp' % self.name, fout="%s-eq.mdp" % self.name, options=eq_opts, defaults=eq_defs)
             self.warngmx("grompp -c %s -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (gro1, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
             self.callgmx("mdrun -v -deffnm %s-eq -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
             gro2="%s-eq.gro" % self.name
@@ -1193,7 +1232,7 @@ class GMX(Engine):
 
         # Run production.
         if verbose: logger.info("Production run...\n")
-        write_mdp("%s-md.mdp" % self.name, md_opts, fin="%s.mdp" % self.name, defaults=md_defs)
+        edit_mdp(fin="%s.mdp" % self.name, fout="%s-md.mdp" % self.name, options=md_opts, defaults=md_defs)
         self.warngmx("grompp -c %s -p %s.top -f %s-md.mdp -o %s-md.tpr" % (gro2, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
         self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
 
@@ -1305,10 +1344,10 @@ class GMX(Engine):
             eq_opts = deepcopy(md_opts)
             eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0})
             eq_defs = deepcopy(md_defs)
-            write_mdp("%s-eq.mdp" % self.name,
-                      eq_opts,
-                      fin='%s.mdp' % self.name,
-                      defaults=eq_defs)
+            edit_mdp(fin='%s.mdp' % self.name,
+                     fout="%s-eq.mdp" % self.name,
+                     options=eq_opts,
+                     defaults=eq_defs)
 
             self.warngmx(("grompp " +
                           "-c %s " % gro1 +
@@ -1333,10 +1372,10 @@ class GMX(Engine):
         # Run production.
         if verbose:
             logger.info("Production run...\n")
-        write_mdp("%s-md.mdp" % self.name,
-                  md_opts,
-                  fin="%s.mdp" % self.name,
-                  defaults=md_defs)
+        edit_mdp(fin="%s.mdp" % self.name,
+                 fout="%s-md.mdp" % self.name,
+                 options=md_opts,
+                 defaults=md_defs)
         self.warngmx(("grompp " +
                       "-c %s " % gro2 + 
                       "-f %s-md.mdp " % self.name +
@@ -1367,6 +1406,8 @@ class Liquid_GMX(Liquid):
         self.set_option(tgt_opts,'liquid_coords',default='liquid.gro',forceprint=True)
         # Name of the gas coordinate file.
         self.set_option(tgt_opts,'gas_coords',default='gas.gro',forceprint=True)
+        # Whether to use a different barostat for equilibration (default berendsen)
+        self.set_option(tgt_opts,'gmx_eq_barostat',forceprint=True)
         # Class for creating engine object.
         self.engine_ = GMX
         # Name of the engine to pass to npt.py.
@@ -1423,6 +1464,8 @@ class Lipid_GMX(Lipid):
         self.set_option(tgt_opts,'md_threads')
         # Name of the lipid coordinate file.
         self.set_option(tgt_opts,'lipid_coords',default='lipid.gro',forceprint=True)
+        # Whether to use a different barostat for equilibration (default berendsen)
+        self.set_option(tgt_opts,'gmx_eq_barostat',forceprint=True)
         # Class for creating engine object.
         self.engine_ = GMX
         # Name of the engine to pass to npt.py.
