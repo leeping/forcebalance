@@ -348,6 +348,7 @@ def main():
         GenOpts["gmxsuffix"] = TgtOptions["gmxsuffix"]
         EngOpts["lipid"]["gmx_top"] = os.path.splitext(lipid_fnm)[0] + ".top"
         EngOpts["lipid"]["gmx_mdp"] = os.path.splitext(lipid_fnm)[0] + ".mdp"
+        EngOpts["lipid"]["gmx_eq_barostat"] = TgtOptions["gmx_eq_barostat"]
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
         if mts: logger.warn("Gromacs not configured for multiple timestep integrator.")
         if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")

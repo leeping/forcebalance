@@ -365,6 +365,7 @@ def main():
         GenOpts["gmxsuffix"] = TgtOptions["gmxsuffix"]
         EngOpts["liquid"]["gmx_top"] = os.path.splitext(liquid_fnm)[0] + ".top"
         EngOpts["liquid"]["gmx_mdp"] = os.path.splitext(liquid_fnm)[0] + ".mdp"
+        EngOpts["liquid"]["gmx_eq_barostat"] = TgtOptions["gmx_eq_barostat"]
         EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
         EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gas_fnm)[0] + ".mdp"
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
