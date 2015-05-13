@@ -496,7 +496,7 @@ class GMX(Engine):
 
     def __init__(self, name="gmx", **kwargs):
         ## Valid GROMACS-specific keywords.
-        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx']
+        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx', 'gmx_eq_barostat']
         super(GMX,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -514,6 +514,10 @@ class GMX(Engine):
         else:
             warn_once("The 'gmxsuffix' option were not provided; using default.")
             self.gmxsuffix = ''
+        
+        ## Barostat keyword for equilibration
+        if 'gmx_eq_barostat' in kwargs:
+            self.gmx_eq_barostat = kwargs['gmx_eq_barostat']
 
         ## The directory containing GROMACS executables (e.g. mdrun)
         havegmx = False
@@ -803,10 +807,11 @@ class GMX(Engine):
         if "min_opts" in kwargs:
             min_opts = kwargs["min_opts"]
         else:
-            if self.have_constraints:
-                algorithm = "steep"
-            else:
-                algorithm = "l-bfgs"
+            algorithm = "steep"
+            # if self.have_constraints:
+            #     algorithm = "steep"
+            # else:
+            #     algorithm = "l-bfgs"
             # Arguments for running minimization.
             min_opts = {"integrator" : algorithm, "emtol" : crit, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
 
@@ -993,7 +998,7 @@ class GMX(Engine):
         #-----
         
         ea_debye = 4.803204255928332 # Conversion factor from e*nm to Debye
-        q = np.array(self.AtomLists['Charge'])
+        q = self.get_charges()
         x = M.xyzs[0] - M.center_of_mass()[0]
 
         xx, xy, xz, yy, yz, zz = (x[:,i]*x[:,j] for i, j in [(0,0),(0,1),(0,2),(1,1),(1,2),(2,2)])
@@ -1183,7 +1188,8 @@ class GMX(Engine):
             eq_opts.update({"nsteps" : nequil, "nstenergy" : 0, "nstxout" : 0,
                             "gen-vel": "yes", "gen-temp" : temperature, "gen-seed" : random.randrange(100000,999999)})
             eq_defs = deepcopy(md_defs)
-            if "pcoupl" in eq_defs: eq_opts["pcoupl"] = "berendsen"
+            if "pcoupl" in eq_defs and hasattr(self, 'gmx_eq_barostat'):
+                eq_opts["pcoupl"] = self.gmx_eq_barostat
             write_mdp("%s-eq.mdp" % self.name, eq_opts, fin='%s.mdp' % self.name, defaults=eq_defs)
             self.warngmx("grompp -c %s -p %s.top -f %s-eq.mdp -o %s-eq.tpr" % (gro1, self.name, self.name, self.name), warnings=warnings, print_command=verbose)
             self.callgmx("mdrun -v -deffnm %s-eq -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
@@ -1367,6 +1373,8 @@ class Liquid_GMX(Liquid):
         self.set_option(tgt_opts,'liquid_coords',default='liquid.gro',forceprint=True)
         # Name of the gas coordinate file.
         self.set_option(tgt_opts,'gas_coords',default='gas.gro',forceprint=True)
+        # Whether to use a different barostat for equilibration (default berendsen)
+        self.set_option(tgt_opts,'gmx_eq_barostat',forceprint=True)
         # Class for creating engine object.
         self.engine_ = GMX
         # Name of the engine to pass to npt.py.
@@ -1423,6 +1431,8 @@ class Lipid_GMX(Lipid):
         self.set_option(tgt_opts,'md_threads')
         # Name of the lipid coordinate file.
         self.set_option(tgt_opts,'lipid_coords',default='lipid.gro',forceprint=True)
+        # Whether to use a different barostat for equilibration (default berendsen)
+        self.set_option(tgt_opts,'gmx_eq_barostat',forceprint=True)
         # Class for creating engine object.
         self.engine_ = GMX
         # Name of the engine to pass to npt.py.

@@ -338,6 +338,7 @@ class Liquid(Target):
 
     def polarization_correction(self,mvals):
         self.FF.make(mvals)
+        # print mvals
         ddict = self.gas_engine.multipole_moments(optimize=True)['dipole']
         d = np.array(ddict.values())
         if not in_fd():
