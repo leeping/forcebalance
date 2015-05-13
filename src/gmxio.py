@@ -107,7 +107,7 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
                 out.append(''.join(lout))
             else:
                 out.append(line)
-                val = valf.strip()
+                val = valf.strip().lower().replace('-','_')
             all_options[key] = val
     for key, val in options.items():
         key = key.lower().replace('-','_')
