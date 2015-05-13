@@ -365,6 +365,7 @@ def main():
         GenOpts["gmxsuffix"] = TgtOptions["gmxsuffix"]
         EngOpts["liquid"]["gmx_top"] = os.path.splitext(liquid_fnm)[0] + ".top"
         EngOpts["liquid"]["gmx_mdp"] = os.path.splitext(liquid_fnm)[0] + ".mdp"
+        EngOpts["liquid"]["gmx_eq_barostat"] = TgtOptions["gmx_eq_barostat"]
         EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
         EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gas_fnm)[0] + ".mdp"
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
@@ -504,7 +505,7 @@ def main():
     logger.info(Sep)
 
     def calc_rho(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'r_' in kwargs:
             r_ = kwargs['r_']
         return bzavg(r_,b)
@@ -565,7 +566,7 @@ def main():
     # Thermal expansion coefficient
     #----
     def calc_alpha(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         if 'v_' in kwargs:
@@ -599,7 +600,7 @@ def main():
     # Isothermal compressibility
     #----
     def calc_kappa(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'v_' in kwargs:
             v_ = kwargs['v_']
         return bar_unit / kT * (bzavg(v_**2,b)-bzavg(v_,b)**2)/bzavg(v_,b)
@@ -630,7 +631,7 @@ def main():
     # Isobaric heat capacity
     #----
     def calc_cp(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
@@ -663,7 +664,7 @@ def main():
     # Dielectric constant
     #----
     def calc_eps0(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'd_' in kwargs: # Dipole moment vector.
             d_ = kwargs['d_']
         if 'v_' in kwargs: # Volume.
