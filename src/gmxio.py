@@ -107,7 +107,7 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
                 out.append(''.join(lout))
             else:
                 out.append(line)
-                val = valf.strip().lower().replace('-','_')
+                val = valf.strip()
             all_options[key] = val
     for key, val in options.items():
         key = key.lower().replace('-','_')
@@ -628,7 +628,7 @@ class GMX(Engine):
 
         ## Read the .mdp file to determine if there are constraints.
         mdp_dict = edit_mdp(fin=self.mdp)
-        if 'constraints' in mdp_dict.keys() and mdp_dict['constraints'] in ['h_bonds', 'all_bonds', 'h_angles', 'all_angles']:
+        if 'constraints' in mdp_dict.keys() and mdp_dict['constraints'].replace('-','_').lower() in ['h_bonds', 'all_bonds', 'h_angles', 'all_angles']:
             self.have_constraints = True
 
         itptmp = False
