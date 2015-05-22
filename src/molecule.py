@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                   Last updated October 7, 2014                     |#
+#|                    Last updated May 22, 2015                       |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -1797,7 +1797,7 @@ class Molecule(object):
         self.Data['bonds'] = sorted(list(set(bondlist)))
         self.built_bonds = True
 
-    def build_topology(self, force_bonds=True):
+    def build_topology(self, force_bonds=True, **kwargs):
         ''' 
 
         Create self.topology and self.molecules; these are graph
@@ -1812,9 +1812,14 @@ class Molecule(object):
             default behavior.  If creating a Molecule object using
             __init__, do not force the building of bonds by default
             (only build bonds if not read from file.)
-
+        topframe : int, optional
+            Provide the frame number used for reading the bonds.  If
+            not provided, this will be taken from the top_settings
+            field.  If provided, this will take priority and write
+            the value into top_settings.
         '''
-        sn = self.top_settings['topframe']
+        sn = kwargs.get('topframe', self.top_settings['topframe'])
+        self.top_settings['topframe'] = sn
         if self.na > 100000:
             print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
         # Build bonds from connectivity graph if not read from file.
@@ -2893,6 +2898,8 @@ class Molecule(object):
         ## Intrinsic reaction coordinate stuff
         IRCDir = 0
         RPLine = False
+        ## Finite difference stuff
+        FDiff = False
         #---- Intrinsic reaction coordinate data.
         # stat: Status, X : Coordinates, E : Energies, Q : Charges, Sz: Spin-Z
         # Explanation of Status:
@@ -3011,6 +3018,8 @@ class Molecule(object):
             #----- If doing freezing string calculation, do NOT treat as a geometry optimization.
             if 'Starting FSM Calculation' in line:
                 FSM = True
+            if 'needFdiff: TRUE' in line:
+                FDiff = True
             #----- Vibrational stuff
             VModeNxt = None
             if 'VIBRATIONAL ANALYSIS' in line:
@@ -3128,6 +3137,9 @@ class Molecule(object):
                     Answer['qm_energies'].append(0.0)
                     mkchg.append([0.0 for j in mkchg[-1]])
                     mkspn.append([0.0 for j in mkchg[-1]])
+            if FDiff and (len(Answer['qm_energies']) == (len(Answer['xyzs'])+1)):
+                logger.info("Aligning energies because finite difference calculation prints one extra")
+                Answer['qm_energies'] = Answer['qm_energies'][:-1]
             lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
             if len(set(lens)) != 1:
                 logger.error('The number of energies and coordinates in %s are not the same : %s\n' % (fnm, str(lens)))
