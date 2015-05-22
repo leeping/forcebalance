@@ -372,6 +372,40 @@ def est124(val):
         fac = 10.0
     return fac*10**logint
 
+def est1234568(val):
+    """Given any positive floating point value, return a value [1234568]e+xx
+    that is closest to it in the log space.  Just because I don't like seven
+    and nine.  Call me a numberist?
+    """
+    log = np.log10(val)
+    logint = math.floor(log)
+    logfrac = log - logint
+    log1 = 0.0
+    log2 = 0.3010299956639812
+    log3 = np.log10(3)
+    log4 = 0.6020599913279624
+    log5 = np.log10(5)
+    log6 = np.log10(6)
+    log8 = np.log10(8)
+    log10 = 1.0
+    if logfrac < 0.5*(log1+log2):
+        fac = 1.0
+    elif logfrac < 0.5*(log2+log3):
+        fac = 2.0
+    elif logfrac < 0.5*(log3+log4):
+        fac = 3.0
+    elif logfrac < 0.5*(log4+log5):
+        fac = 4.0
+    elif logfrac < 0.5*(log5+log6):
+        fac = 5.0
+    elif logfrac < 0.5*(log6+log8):
+        fac = 6.0
+    elif logfrac < 0.5*(log8+log10):
+        fac = 8.0
+    else:
+        fac = 10.0
+    return fac*10**logint
+
 def monotonic(arr, start, end):
     # Make sure an array is monotonically decreasing from the start to the end.
     a0 = arr[start]
