@@ -1244,18 +1244,30 @@ class Optimizer(forcebalance.BaseClass):
         that results in the best conditioned Hessian. """
         from scipy import optimize
         data        = self.Objective.Full(self.mvals0,Order=2,verbose=True)
-        X, G, H = (data['X0'], data['G0'], data['H0']) if self.bhyp else (data['X'], data['G'], data['H'])
-        bar = printcool("(Un-penalized) objective function: %.8f\nGradient below" % X)
-        self.FF.print_map(vals=G,precision=8)
-        logger.info(bar)
-        printcool("Hessian matrix:")
-        pmat2d(H, precision=8)
-        logger.info(bar)
+        X, G, H = (data['X0'], data['G0'], data['H0'])
+        if len(G) < 30:
+            bar = printcool("(Un-penalized) objective function: %.8f\nGradient below" % X)
+            self.FF.print_map(vals=G,precision=8)
+            logger.info(bar)
+            printcool("Hessian matrix:")
+            pmat2d(H, precision=8)
+            logger.info(bar)
+        else:
+            bar = printcool("(Un-penalized) objective function: %.8f" % X)
+            logger.info("More than 30 parameters; gradient and Hessian written to grad.txt and hess.txt\n")
+            base, ext = os.path.splitext(self.input_file)
+            np.savetxt('%s-grad.txt' % base, G)
+            np.savetxt('%s-hess.txt' % base, H)
+            
         H1 = H.copy()
         H1 = np.delete(H1, self.excision, axis=0)
         H1 = np.delete(H1, self.excision, axis=1)
-        Eig = np.linalg.eig(H1)[0]            # Diagonalize Hessian
-        Cond = np.abs(np.max(Eig)/np.min(Eig))
+        try:
+            Cond = np.linalg.cond(H1)
+        except:
+            Cond = 1e100
+        # Eig = np.linalg.eig(H1)[0]            # Diagonalize Hessian
+        # Cond = np.abs(np.max(Eig)/np.min(Eig))
         # Spectral gap?
         # eigsort = np.sort(np.abs(Eig))
         # Cond = eigsort[-1]/eigsort[-2]
@@ -1282,31 +1294,88 @@ class Optimizer(forcebalance.BaseClass):
             H_a = answer['H'].copy()
             H_a = np.delete(H_a, self.excision, axis=0)
             H_a = np.delete(H_a, self.excision, axis=1)
-            Eig_a = np.linalg.eig(H_a)[0]            # Diagonalize Hessian
-            if np.min(Eig_a) < 1e-10:
-                Cond_a = 1e10
-            else:
-                Cond_a = np.abs(np.max(Eig_a)/np.min(Eig_a)) # Condition number
+            try:
+                Cond_a = np.linalg.cond(H_a)
+            except:
+                Cond_a = 1e100
+            if Cond_a > 1e100: Cond_a = 1e100
+            # Eig_a = np.linalg.eig(H_a)[0]            # Diagonalize Hessian
+            # if np.min(Eig_a) < 1e-10:
+            #     Cond_a = 1e100
+            # else:
+            #     Cond_a = np.abs(np.max(Eig_a)/np.min(Eig_a)) # Condition number
             dlog = logrskeys - newcond.prev_step
             nlog = np.sqrt(np.sum(dlog**2))
-            if newcond.verbose and newcond.step_n % 1000 == 0: 
-                logger.info("\rEval# %6i: Step: %9.3f Along: %3i Condition: %12.3f\r" % (newcond.step_n, nlog, np.argmax(np.abs(dlog)), Cond_a))
             # "Regularize" using the log deviations
             Reg = newcond.regularize * np.sum(logrskeys ** 2) / len(logrskeys)
+            Obj = np.log(Cond_a) + Reg
+            if newcond.verbose and newcond.step_n % 1000 == 0: 
+                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f\n" % max([len(k) for k in self.FF.rs_ord.keys()]) %
+                            (newcond.step_n, nlog, new_rsord.keys()[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
+                # printcool_dictionary(answer['rs_ord'])
+            elif newcond.verbose and Obj < newcond.best: 
+                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f (new minimum)\n" % max([len(k) for k in self.FF.rs_ord.keys()]) %
+                            (newcond.step_n, nlog, new_rsord.keys()[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
+                # logger.info("New multipliers:" + ' '.join(['% .3f' % np.exp(s) for s in logrskeys])+'\n')
+                newcond.best = Obj
             newcond.prev_step = logrskeys
             newcond.step_n += 1
-            return np.log(Cond_a) + Reg
+            return Obj
         newcond.prev_step = np.zeros(len(self.FF.rs_ord.keys()),dtype=float)
         newcond.step_n = 0
         newcond.verbose = True
         newcond.regularize = 0.1
+        newcond.best = np.inf
+        # printcool_dictionary(self.FF.rs_ord)
         logrsmult = np.zeros(len(self.FF.rs_ord.keys()),dtype=float)
+        # logrsmult[-1] = np.log(0.1)
         # Run the optimization algorithm.
         # optimized = optimize.fmin(newcond,logrsmult,ftol=0.1,xtol=0.1,maxiter=1000,maxfun=10000)
         logger.info("Basin-hopping optimization of condition number in the space of log rescaling factors\n")
-        optimized = optimize.basinhopping(newcond, logrsmult, stepsize=1.0, niter=self.maxstep, #disp=True,
-                                          minimizer_kwargs={'method':'Powell','tol':0.1,'options':{'maxiter':1000}})
-        optresult = optimized.x
+        optmethod = 'basin'
+        if optmethod == 'basin':
+            optimized = optimize.basinhopping(newcond, logrsmult, stepsize=1.0, niter=self.maxstep, #disp=True,
+                                              minimizer_kwargs={'method':'Powell','tol':0.1,'options':{'maxiter':1000}})
+            optresult = optimized.x
+        elif optmethod == 'seq':
+            optout = optimize.fmin_powell(newcond, logrsmult, xtol=0.01, ftol=0.01, maxfun=1000, disp=False, full_output=True)
+            bestval = optout[1]
+            bestsol = optout[0].copy()
+            logger.info("New multipliers:" + ' '.join(['% .3f' % np.exp(s) for s in bestsol])+'\n')
+            logger.info("Sequential grid-scan + Powell in the space of log rescaling factors\n")
+            outerval = bestval
+            outersol = bestsol.copy()
+            outeriter = 0
+            maxouter = 3
+            while True:
+                for i in range(len(logrsmult)):
+                    for j in [np.log(0.1), np.log(10), np.log(0.01), np.log(100)]:
+                    # for j in [np.log(0.1), np.log(10)]:
+                        logrsmult = outersol.copy()
+                        logrsmult[i] += j
+                        logger.info("Trying new initial guess with element %i changed by %.3f:\n" % (i, j))
+                        # logger.info("New guess:" + ' '.join(['% .3f' % np.exp(s) for s in logrsmult])+'\n')
+                        optout = optimize.fmin_powell(newcond, logrsmult, xtol=0.01, ftol=0.01, maxfun=1000, disp=False, full_output=True)
+                        if optout[1] < bestval:
+                            bestval = optout[1]
+                            bestsol = optout[0].copy()
+                            logger.info("New multipliers:" + ' '.join(['% .3f' % np.exp(s) for s in bestsol])+'\n')
+                logger.info("Done outer iteration %i\n" % outeriter)
+                outeriter += 1
+                if np.linalg.norm(outersol-bestsol) < 0.1:
+                    logger.info("Sequential optimization solution moved by less than 0.1 (%.3f)\n" % np.linalg.norm(outersol-bestsol))
+                    break
+                if np.abs(outerval-bestval) < 0.1:
+                    logger.info("Sequential optimization value improved by less than 0.1 (%.3f)" % (outerval-bestval))
+                    break
+                outerval = bestval
+                outersol = bestsol.copy()
+                if outeriter == maxouter:
+                    logger.info("Outer iterations reached maximum of %i\n" % maxouter)
+                    break
+            optresult = outersol.copy()
+        else:
+            raise RuntimeError
         new_rsord = OrderedDict([(k, np.exp(optresult[i])) for i, k in enumerate(self.FF.rs_ord.keys())])
         answer = self.FF.make_rescale(new_rsord)
         newcond.regularize = 0.0

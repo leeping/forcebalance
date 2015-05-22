@@ -53,7 +53,8 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], de
     aload = ['loadamberparams', 'source', 'loadoff']
     aload_eq = ['loadmol2']
     spath.append('.')
-             
+    # Default name for the "unit" that is written to prmtop/inpcrd
+    ambername = 'amber'
     for line in open(fnm):
         # Skip comment lines
         if line.strip().startswith('#') : continue
@@ -74,6 +75,8 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], de
         if len(s) >= 2 and ls[0] == 'loadamberparams':
             have_fmod.append(s[1])
         if len(s) >= 2 and 'loadmol2' in ll:
+            # Adopt the AMBER molecule name from the loadpdb line.
+            ambername = line.split('=')[0].strip()
             have_mol2.append(s[-1])
         if len(s) >= 2 and 'loadpdb' in ll:
             # Adopt the AMBER molecule name from the loadpdb line.
@@ -722,26 +725,34 @@ class AMBER(Engine):
         # Name of the molecule, currently just call it a default name.
         self.mname = 'molecule'
 
-        if 'mol' in kwargs:
-            self.mol = kwargs['mol']
-        elif 'coords' in kwargs:
-            crdfile = onefile(kwargs.get('coords'), None, err=True)
-            self.mol = Molecule(crdfile, build_topology=False)
+        # Whether to throw an error if a PDB file doesn't exist.
         reqpdb = kwargs.get('reqpdb', 1)
-
-        # Determine the PDB file name.
+        
+        # Determine the PDB file name.  Amber could use this in tleap if it wants.
         # If 'pdb' is provided to Engine initialization, it will be used to 
         # copy over topology information (chain, atomname etc.).  If mol/coords
         # is not provided, then it will also provide the coordinates.
         pdbfnm = onefile(kwargs.get('pdb'), 'pdb' if reqpdb else None, err=reqpdb)
-        if pdbfnm is not None:
-            mpdb = Molecule(pdbfnm, build_topology=False)
-            if hasattr(self, 'mol'):
-                for i in ["chain", "atomname", "resid", "resname", "elem"]:
-                    self.mol.Data[i] = mpdb.Data[i]
-            else:
-                self.mol = copy.deepcopy(mpdb)
+
+        # If the molecule object is provided as a keyword argument, it now
+        # becomes an Engine attribute as well.  Otherwise, we create the
+        # Engine.mol from the provided coordinates (if they exist).
+        if 'mol' in kwargs:
+            self.mol = kwargs['mol']
         else:
+            crdfile = None
+            if 'coords' in kwargs:
+                crdfile = onefile(kwargs.get('coords'), None, err=True)
+            elif pdbfnm is not None:
+                crdfile = pdbfnm
+            if crdfile is None:
+                logger.error("Cannot find a coordinate file to use\n")
+                raise RuntimeError
+            self.mol = Molecule(crdfile, top=pdbfnm, build_topology=False)
+
+            
+        # If a .pdb was not provided, we create one.
+        if pdbfnm is None:
             pdbfnm = self.name + ".pdb"
             # AMBER doesn't always like the CONECT records
             self.mol[0].write(pdbfnm, write_conect=False)
@@ -877,7 +888,7 @@ class AMBER(Engine):
 
         # I also need to write the trajectory
         if 'boxes' in self.mol.Data.keys():
-            warn_press_key("Writing %s-all.crd file with no periodic box information" % self.name)
+            logger.info("\x1b[91mWriting %s-all.crd file with no periodic box information\x1b[0m\n" % self.name)
             del self.mol.Data['boxes']
 
         if hasattr(self, 'target') and hasattr(self.target,'shots'):
