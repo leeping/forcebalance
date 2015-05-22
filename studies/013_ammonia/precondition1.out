@@ -1,0 +1,294 @@
+#======================================================================#
+#| [1m             Welcome to ForceBalance version 1.3! =D              [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Arthur Vigil, Keri McKiernan,                   [0m |#
+#| [1m                   Erik Brandt, Johnny Israeli                    [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: precondition1.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: ammonia.itp
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  3.4200e-01 ] : VDWS:N
+   1 [  7.1128e-01 ] : VDWT:N
+   2 [ -1.0200e+00 ] : COUL:AMM-1
+   3 [  3.4000e-01 ] : COUL:AMM-2
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   VDWS                                 : 1.00000e-01
+   VDWT                                 : 1.00000e-01
+   COUL                                 : 1.00000e-01
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    VDWS                          : 1.00000e-01 ] : VDWS:N
+   1 [    VDWT                          : 1.00000e-01 ] : VDWT:N
+   2 [    COUL                          : 1.00000e-01 ] : COUL:AMM-1
+   3 [    COUL                          : 1.00000e-01 ] : COUL:AMM-2
+----------------------------------------------------------
+Building charge constraints...
+Parameter 2 occurs 1 times in molecule AMM in locations [0] (COUL:AMM-1)
+Parameter 3 occurs 3 times in molecule AMM in locations [1, 2, 3] (COUL:AMM-2 COUL:AMM-3 COUL:AMM-4)
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['ammonia.itp'] 
+priors                    OrderedDict([('VDWS', 0.1), ('VDWT', 0.1), ('COUL', 0.1)]) 
+constrain_charge          True 
+----------------------------------------------------------
+Autodetected 216 molecules with 4 atoms each in liquid coordinates
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link gas.top, removing it first
+#========================================================#
+#| [92m             Setup for target Liquid :              [0m |#
+#========================================================#
+md_threads                4 
+liquid_coords             liquid.gro 
+gas_coords                gas.gro 
+gmx_eq_barostat           parrinello-rahman 
+name                      Liquid 
+type                      LIQUID_GMX 
+backup                    False 
+tgtdir                    targets/Liquid 
+w_rho                     1.0 
+w_hvap                    1.0 
+w_alpha                   1.0 
+w_kappa                   1.0 
+w_cp                      1.0 
+w_eps0                    1.0 
+w_normalize               0 
+liquid_eq_steps           100000 
+liquid_md_steps           1000000 
+gas_eq_steps              100000 
+gas_md_steps              1000000 
+liquid_timestep           1.0 
+liquid_interval           0.2 
+gas_timestep              1.0 
+gas_interval              0.2 
+adapt_errors              0 
+minimize_energy           1 
+self_pol_mu0              1.47 
+self_pol_alpha            2.103 
+anisotropic_box           0 
+rho_denom                 10.0 
+hvap_denom                1.0 
+eps0_denom                2.0 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          1.0 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   PRECONDITION 
+trust0                    0.25 
+mintrust                  0.05 
+convergence_objective     1.0 
+convergence_step          0.02 
+convergence_gradient      0.01 
+maxstep                   1000 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+print_hess                True 
+err_tol                   1.0 
+read_mvals                [0.0, 0.0, 0.0, 0.0] 
+backup                    False 
+input_file                precondition1.in 
+----------------------------------------------------------
+#========================================================#
+#|      Target: Liquid - launching MD simulations       |#
+#|        Time steps: 100000 (eq) + 1000000 (md)        |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/013_ammonia/precondition1.tmp/Liquid/iter_0000/273.15K-4.3bar/npt.out in another terminal window
+Executing process: [92mbash rungmx.sh python npt.py gromacs 273.150 4.238[0m Output: npt.out
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/013_ammonia/precondition1.tmp/Liquid/iter_0000/323.15K-20.3bar/npt.out in another terminal window
+Executing process: [92mbash rungmx.sh python npt.py gromacs 323.150 20.054[0m Output: npt.out
+Reading information from ./273.15K-4.3bar/npt_result.p
+Reading information from ./323.15K-20.3bar/npt_result.p
+Running MBAR analysis on 2 states...
+Done
+Single-precision GROMACS detected - recommend that you use double precision build.
+The molecular dipole moment is  1.793 debye
+#============================================================#
+#| [92m            Self-polarization correction to             [0m |#
+#| [92m enthalpy of vaporization is  1.497 kJ/mol, Derivative: [0m |#
+#============================================================#
+   0 [  0.0000e+00 ] : VDWS:N
+   1 [  0.0000e+00 ] : VDWT:N
+   2 [  0.0000e+00 ] : COUL:AMM-1
+   3 [  4.8844e-01 ] : COUL:AMM-2
+--------------------------------------------------------------
+Weights have been renormalized to 1.0
+Physical quantity Density uses denominator =  10.0000
+Weights have been renormalized to 1.0
+Physical quantity H_vap uses denominator =  1.0000
+Weights have been renormalized to 1.0
+Physical quantity Dielectric Constant uses denominator =  2.0000
+#==========================================================================================#
+#| [1;94m                              Liquid Density (kg m^-3)                                [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      273.15      4.3 bar   638.570      768.951 +- 1.378    130.381   0.50000  84.99576 
+      323.15     20.3 bar   562.870      646.128 +- 2.033    83.258   0.50000  34.65973 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m Density objective function:  119.655, Derivative:  [0m |#
+#========================================================#
+   0 [ -2.8587e+03 ] : VDWS:N
+   1 [ -3.1245e+01 ] : VDWT:N
+   2 [  0.0000e+00 ] : COUL:AMM-1
+   3 [  8.3838e+01 ] : COUL:AMM-2
+----------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                     Liquid Enthalpy of Vaporization (kJ mol^-1)                      [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      273.15      4.3 bar    21.510       19.945 +- 0.382    -1.565   0.50000   1.22495 
+      323.15     20.3 bar    17.920       15.973 +- 0.402    -1.947   0.50000   1.89490 
+--------------------------------------------------------------------------------------------
+#======================================================================#
+#| [92m Enthalpy of Vaporization objective function:  3.120, Derivative: [0m |#
+#======================================================================#
+   0 [  2.1202e+02 ] : VDWS:N
+   1 [  1.1816e+00 ] : VDWT:N
+   2 [  0.0000e+00 ] : COUL:AMM-1
+   3 [ -8.3351e+00 ] : COUL:AMM-2
+------------------------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                              Liquid Dielectric Constant                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      273.15      4.3 bar    18.560       37.171 +- 3.391    18.611   0.50000  43.29724 
+      323.15     20.3 bar    13.820       27.346 +- 1.414    13.526   0.50000  22.86979 
+--------------------------------------------------------------------------------------------
+#==================================================================#
+#| [92m Dielectric Constant objective function:  66.167, Derivative: [0m |#
+#==================================================================#
+   0 [ -1.2595e+03 ] : VDWS:N
+   1 [ -1.2803e+01 ] : VDWT:N
+   2 [  0.0000e+00 ] : COUL:AMM-1
+   3 [  4.1531e+01 ] : COUL:AMM-2
+--------------------------------------------------------------------
+#====================================================================#
+#| [94m               Liquid Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+Density                          119.65549    1.000    1.19655e+02 
+Enthalpy of Vaporization           3.11985    1.000    3.11985e+00 
+Dielectric Constant               66.16703    1.000    6.61670e+01 
+Total                                                  1.88942e+02 
+----------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+Liquid                       188.94238      1.000 [94m     1.88942e+02[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     1.88942e+02[0m 
+----------------------------------------------------------------------
+#========================================================#
+#| [92m  (Un-penalized) objective function: 188.94237885   [0m |#
+#| [92m                   Gradient below                   [0m |#
+#========================================================#
+   0 [ -3.90618935e+03 ] : VDWS:N
+   1 [ -4.28664649e+01 ] : VDWT:N
+   2 [  0.00000000e+00 ] : COUL:AMM-1
+   3 [  1.17034488e+02 ] : COUL:AMM-2
+----------------------------------------------------------
+#========================================================#
+#| [92m                  Hessian matrix:                   [0m |#
+#========================================================#
+ 5.80712764e+04  5.39585004e+02  0.00000000e+00 -1.85981536e+03 
+ 5.39585004e+02  7.97179220e+00  0.00000000e+00 -1.59886417e+01 
+ 0.00000000e+00  0.00000000e+00  3.00000000e+00  0.00000000e+00 
+-1.85981536e+03 -1.59886417e+01  0.00000000e+00  6.38341982e+01 
+----------------------------------------------------------
+Initial condition number = 26868.567
+Basin-hopping optimization of condition number in the space of log rescaling factors
+
+Optimized condition number: 91.142
+Condition Number after Rounding Factors -> 99.844
+#==============================================================#
+#| [92m Previous values of the rescaling factors / prior widths: [0m |#
+#==============================================================#
+   VDWS                                 : 1.00000e-01
+   VDWT                                 : 1.00000e-01
+   COUL                                 : 1.00000e-01
+----------------------------------------------------------------
+#========================================================#
+#| [92m  Recommended values (may be slightly stochastic):  [0m |#
+#========================================================#
+   VDWS                                 : 1.0e-02
+   VDWT                                 : 4.0e-01
+   COUL                                 : 2.0e-01
+----------------------------------------------------------
+#============================================================================================#
+#|  Input file with new priors/mvals saved to precondition1.sav (jobtype set to optimize).  |#
+#============================================================================================#
+Parameter file same as original; will not be printed to results folder.
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#

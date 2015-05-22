@@ -1,0 +1,31 @@
+[ defaults ]
+1    2    yes         0.5  0.5
+
+[ atomtypes ]
+H             1    1.0079    0.0000    A    0.0000e+00    0.0000e+00 ; 
+N             7   14.0067    0.0000    A    3.4200e-01    7.1128e-01 ; PRM 5 6
+
+[ bondtypes ]
+    H    N    1    1.0170e-01    3.6317e+05
+
+[ angletypes ]
+    H    N    H    1    1.0780e+02    3.6485e+02
+
+[ moleculetype ]
+AMM           3
+
+[ atoms ]
+    1         N    1       AMM     N1    1   -1.0200   14.0067 ; PRM 6
+    2         H    1       AMM     H2    2    0.3400    1.0079 ; PRM 6
+    3         H    1       AMM     H3    3    0.3400    1.0079 ; RPT 6 COUL:AMM-2 /RPT
+    4         H    1       AMM     H4    4    0.3400    1.0079 ; RPT 6 COUL:AMM-2 /RPT
+
+[ bonds ]
+    1    2    1
+    1    3    1
+    1    4    1
+
+[ angles ]
+    2    1    3    1
+    2    1    4    1
+    3    1    4    1
