@@ -1925,7 +1925,7 @@ class Molecule(object):
                 for a1 in sorted(list(nx.neighbors(mol, a2))):
                     if a1 != a3:
                         for a4 in sorted(list(nx.neighbors(mol, a3))):
-                            if a4 != a2:
+                            if a4 != a2 and len(set([a1, a2, a3, a4])) == 4:
                                 dihidx.append((a1, a2, a3, a4))
         return dihidx
 
