@@ -38,7 +38,7 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     If the input file exists, it is parsed and options are replaced where "options" overrides them.
     If the "options" dictionary contains more options, they are added at the end.
     If the "defaults" dictionary contains more options, they are added at the end.
-    Keys and values are standardized to lower-case strings where all dashes are replaced by underscores.
+    Keys are standardized to lower-case strings where all dashes are replaced by underscores.
     The output file contains the same comments and "dressing" as the input.
     Also returns a dictionary with the final key/value pairs.
 
