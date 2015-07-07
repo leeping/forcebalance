@@ -743,7 +743,7 @@ class OpenMM(Engine):
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
         if pbc:
-            self.mmopts.setdefault('nonbondedMethod', CutoffPeriodic)
+            self.mmopts.setdefault('nonbondedMethod', PME)
             if self.AMOEBA:
                 self.mmopts.setdefault('nonbondedCutoff', 0.7*nanometer)
                 self.mmopts.setdefault('vdwCutoff', 0.85)
@@ -937,25 +937,26 @@ class OpenMM(Engine):
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
+
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-                if (not any([isinstance(fc, CustomNonbondedForce) for fc in self.system.getForces()])) and self.pbc:
-                    i.setNonbondedMethod(4)
-        if any([isinstance(fc, NonbondedForce) for fc in self.system.getForces()]) and any([isinstance(fc, CustomNonbondedForce) for fc in self.system.getForces()]) and self.pbc:
-        # Case of fitting the softer potential
-            for i in self.system.getForces():
-                if isinstance(i,NonbondedForce):
-                    i.setNonbondedMethod(4)
-                    i.setCutoffDistance(0.85*nanometer)
-                    i.setUseSwitchingFunction(True)
-                    i.setSwitchingDistance(0.75*nanometer)
-                    i.setUseDispersionCorrection(True)
-                elif isinstance(i,CustomNonbondedForce):
-                    i.setCutoffDistance(0.85*nanometer)
-                    i.setUseSwitchingFunction(True)
-                    i.setSwitchingDistance(0.75*nanometer)
-                    i.setUseLongRangeCorrection(True)
+                #if (not any([isinstance(fc, CustomNonbondedForce) for fc in self.system.getForces()])) and self.pbc:
+                #    i.setNonbondedMethod(4)
+        #if any([isinstance(fc, NonbondedForce) for fc in self.system.getForces()]) and any([isinstance(fc, CustomNonbondedForce) for fc in self.system.getForces()]) and self.pbc:
+        ## Case of fitting the softer potential
+        #    for i in self.system.getForces():
+        #        if isinstance(i,NonbondedForce):
+        #            i.setNonbondedMethod(4)
+        #            i.setCutoffDistance(0.85*nanometer)
+        #            i.setUseSwitchingFunction(True)
+        #            i.setSwitchingDistance(0.75*nanometer)
+        #            i.setUseDispersionCorrection(True)
+        #        elif isinstance(i,CustomNonbondedForce):
+        #            i.setCutoffDistance(0.85*nanometer)
+        #            i.setUseSwitchingFunction(True)
+        #            i.setSwitchingDistance(0.75*nanometer)
+        #            i.setUseLongRangeCorrection(True)
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.

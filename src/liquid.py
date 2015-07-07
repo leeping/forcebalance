@@ -1014,6 +1014,9 @@ class Liquid(Target):
         X_Cvqke, G_Cvqke, H_Cvqke, CvqkePrint = self.objective_term(Points, 'cvqke', Cvqke_calc, Cvqke_std, Cvqke_grad, name="Centroid Virial QKE")
         X_Pqke, G_Pqke, H_Pqke, PqkePrint = self.objective_term(Points, 'pqke', Pqke_calc, Pqke_std, Pqke_grad, name="Primitive QKE")
 
+        Gradient = np.zeros(self.FF.np)
+        Hessian = np.zeros((self.FF.np,self.FF.np))
+
         if X_Alpha == 0: self.w_alpha = 0.0
         if X_Kappa == 0: self.w_kappa = 0.0
         if X_Cp == 0: self.w_cp = 0.0
