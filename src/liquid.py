@@ -640,6 +640,12 @@ class Liquid(Target):
             logger.error('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!\n')
             raise RuntimeError
 
+        # Having only one simulation for MBAR is the same as not doing MBAR at all.
+        if len(BPoints) == 1:
+            BPoints = []
+        if len(mBPoints) == 1:
+            mBPoints = []
+
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
             Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
@@ -749,8 +755,8 @@ class Liquid(Target):
             W1 = mbar.getWeights()
             logger.info("Done\n")
         elif len(BPoints) == 1:
-            W1 = np.ones((BPoints*Shots,BPoints))
-            W1 /= BPoints*Shots
+            W1 = np.ones((Shots,1))
+            W1 /= Shots
         
         def fill_weights(weights, phase_points, mbar_points, snapshots):
             """ Fill in the weight matrix with MBAR weights where MBAR was run, 
@@ -774,7 +780,7 @@ class Liquid(Target):
             # Run MBAR on the monomers.  This is barely necessary.
             mW1 = None
             mShots = len(mE[0])
-            if len(mBPoints) > 0:
+            if len(mBPoints) > 1:
                 mBSims = len(mBPoints)
                 mN_k = np.ones(mBSims)*mShots
                 mU_kln = np.zeros([mBSims,mBSims,mShots])
@@ -789,8 +795,8 @@ class Liquid(Target):
                     mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
                     mW1 = mmbar.getWeights()
             elif len(mBPoints) == 1:
-                mW1 = np.ones((mBSims*mShots,mSims))
-                mW1 /= mBSims*mShots
+                mW1 = np.ones((mShots,1))
+                mW1 /= mShots
             mW2 = fill_weights(mW1, mPoints, mBPoints, mShots)
          
         if self.do_self_pol:
