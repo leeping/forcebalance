@@ -647,18 +647,45 @@ class OpenMM(Engine):
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
         if pbc:
-            self.mmopts.setdefault('nonbondedMethod', PME)
+            minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
+            ## Here we will set the CutoffPeriodic so custom nonbonded forces may be used.
+            ## However, we will turn PME on for AmoebaMultipoleForce and NonbondedForce after the system is created.
+            self.SetPME = True
+            self.mmopts.setdefault('nonbondedMethod', CutoffPeriodic)
             if self.AMOEBA:
-                self.mmopts.setdefault('nonbondedCutoff', 0.7*nanometer)
-                self.mmopts.setdefault('vdwCutoff', 0.85)
+                nonbonded_cutoff = kwargs.get('nonbonded_cutoff', 7.0)
+                vdw_cutoff = kwargs.get('nonbonded_cutoff', 8.5)
+                vdw_cutoff = kwargs.get('vdw_cutoff', vdw_cutoff)
+                # Conversion to nanometers
+                nonbonded_cutoff /= 10
+                vdw_cutoff /= 10
+                if 'nonbonded_cutoff' in kwargs and 'vdw_cutoff' not in kwargs:
+                    warn_press_key('AMOEBA detected and nonbonded_cutoff is set, but not vdw_cutoff; it will be set equal to nonbonded_cutoff')
+                if nonbonded_cutoff > 0.05*(float(int(minbox - 1))):
+                    warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (nonbonded_cutoff*10, minbox))
+                if vdw_cutoff > 0.05*(float(int(minbox - 1))):
+                    warn_press_key("vdw_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (vdw_cutoff*10, minbox))
+                self.mmopts.setdefault('nonbondedCutoff', nonbonded_cutoff*nanometer)
+                self.mmopts.setdefault('vdwCutoff', vdw_cutoff*nanometer)
                 self.mmopts.setdefault('aEwald', 5.4459052)
                 self.mmopts.setdefault('pmeGridDimensions', [24,24,24])
             else:
-                self.mmopts.setdefault('nonbondedCutoff', 0.85*nanometer)
+                if 'vdw_cutoff' in kwargs:
+                    warn_press_key('AMOEBA not detected, your provided vdw_cutoff will not be used')
+                nonbonded_cutoff = kwargs.get('nonbonded_cutoff', 8.5)
+                # Conversion to nanometers
+                nonbonded_cutoff /= 10
+                if nonbonded_cutoff > 0.05*(float(int(minbox - 1))):
+                    warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (nonbonded_cutoff*10, minbox))
+
+                self.mmopts.setdefault('nonbondedCutoff', nonbonded_cutoff*nanometer)
                 self.mmopts.setdefault('useSwitchingFunction', True)
-                self.mmopts.setdefault('switchingDistance', 0.75*nanometer)
+                self.mmopts.setdefault('switchingDistance', (nonbonded_cutoff-0.1)*nanometer)
             self.mmopts.setdefault('useDispersionCorrection', True)
         else:
+            if 'nonbonded_cutoff' in kwargs or 'vdw_cutoff' in kwargs:
+                warn_press_key('No periodic boundary conditions, your provided nonbonded_cutoff and vdw_cutoff will not be used')
+            self.SetPME = False
             self.mmopts.setdefault('nonbondedMethod', NoCutoff)
             self.mmopts['removeCMMotion'] = False
 
@@ -804,7 +831,11 @@ class OpenMM(Engine):
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-
+                if self.SetPME:
+                    i.setNonbondedMethod(i.PME)
+            if isinstance(i, AmoebaMultipoleForce):
+                if self.SetPME:
+                    i.setNonbondedMethod(i.PME)
 
         #----
         # If the virtual site parameters have changed,
