@@ -443,6 +443,8 @@ class TINKER(Engine):
                 tk_opts['beta'] = None
                 tk_opts['gamma'] = None
         if pbc:
+            if 'boxes' in self.mol.Data:
+                minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
             if (not keypbc) and 'boxes' not in self.mol.Data:
                 logger.error("Periodic boundary conditions require either (1) a-axis to be in the .key file or (b) boxes to be in the coordinate file.\n")
                 raise RuntimeError
