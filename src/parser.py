@@ -256,6 +256,8 @@ tgt_opts_types = {
                  "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "epsgrad"         : (0.0, -150, 'Gradient below this threshold will be set to zero.', 'All targets'),
                  "energy_asymmetry": (1.0, -150, 'Snapshots with (E_MM - E_QM) < 0.0 will have their weights increased by this factor.', 'Ab initio targets'),
+                 "nonbonded_cutoff"  : (None, -1, 'Cutoff for nonbonded interactions (passed to engines).', 'Condensed phase property targets', 'liquid'),
+                 "vdw_cutoff"        : (None, -2, 'Cutoff for vdW interactions if different from other nonbonded interactions', 'Condensed phase property targets', 'liquid'),
                  },
     'sections': {}
     }
