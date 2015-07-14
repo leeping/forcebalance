@@ -597,6 +597,20 @@ class GMX(Engine):
                 rlist = 0.05*(float(int(minbox - 1)))
             else:
                 rlist = 1.0
+            # Override with user-provided nonbonded_cutoff if exist
+            # Since user provides in Angstrom, divide by a factor of 10.
+            if 'nonbonded_cutoff' in kwargs:
+                rlist = kwargs['nonbonded_cutoff'] / 10
+            # Gromacs likes rvdw to be a bit smaller than rlist
+            rvdw = rlist - 0.05
+            if rlist > 0.05*(float(int(minbox - 1))):
+                warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (rlist*10, minbox))
+            # Override with user-provided vdw_cutoff if exist
+            if 'vdw_cutoff' in kwargs:
+                rvdw = kwargs['vdw_cutoff'] / 10
+            if rvdw > 0.05*(float(int(minbox - 1))):
+                warn_press_key("vdw_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (rvdw*10, minbox))
+            rvdw_switch = rvdw-0.05
             gmx_opts["pbc"] = "xyz"
             self.gmx_defs["ns_type"] = "grid"
             self.gmx_defs["nstlist"] = 20
@@ -607,10 +621,14 @@ class GMX(Engine):
             # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
             # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
             self.gmx_defs["vdwtype"] = "switch"
-            self.gmx_defs["rvdw"] = "%.2f" % (rlist - 0.05)
-            self.gmx_defs["rvdw_switch"] = "%.2f" % (rlist - 0.1)
+            self.gmx_defs["rvdw"] = "%.2f" % rvdw
+            self.gmx_defs["rvdw_switch"] = "%.2f" % rvdw_switch
             self.gmx_defs["DispCorr"] = "EnerPres"
         else:
+            if 'nonbonded_cutoff' in kwargs:
+                warn_press_key("Not using PBC, your provided nonbonded_cutoff will not be used")
+            if 'vdw_cutoff' in kwargs:
+                warn_press_key("Not using PBC, your provided vdw_cutoff will not be used")
             gmx_opts["pbc"] = "no"
             self.gmx_defs["ns_type"] = "simple"
             self.gmx_defs["nstlist"] = 0

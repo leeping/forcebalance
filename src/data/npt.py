@@ -349,6 +349,10 @@ def main():
     #----
     EngOpts = OrderedDict()
     EngOpts["liquid"] = OrderedDict([("coords", liquid_fnm), ("mol", ML), ("pbc", True)])
+    if "nonbonded_cutoff" in TgtOptions:
+        EngOpts["liquid"]["nonbonded_cutoff"] = TgtOptions["nonbonded_cutoff"]
+    if "vdw_cutoff" in TgtOptions:
+        EngOpts["liquid"]["vdw_cutoff"] = TgtOptions["vdw_cutoff"]
     EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
     GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":

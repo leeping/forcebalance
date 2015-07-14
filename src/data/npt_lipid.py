@@ -334,6 +334,10 @@ def main():
     #----
     EngOpts = OrderedDict()
     EngOpts["lipid"] = OrderedDict([("coords", lipid_fnm), ("mol", ML), ("pbc", True)])
+    if "nonbonded_cutoff" in TgtOptions:
+        EngOpts["lipid"]["nonbonded_cutoff"] = TgtOptions["nonbonded_cutoff"]
+    if "vdw_cutoff" in TgtOptions:
+        EngOpts["lipid"]["vdw_cutoff"] = TgtOptions["vdw_cutoff"]
     GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":
         # OpenMM-specific options
