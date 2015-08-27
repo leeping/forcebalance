@@ -177,7 +177,7 @@ class LAMMPS(Engine):
                 e_d.append(self._lmp_main.get_V(coords.reshape((1,-1))[0]))
 
             e_m1, e_m2, e_d = np.array(e_m1), np.array(e_m2), np.array(e_d)
-            e_series = e_dimer - (e_m1 + e_m2)
+            e_series = e_d - (e_m1 + e_m2)
 
         else:
             Es_3B = []
@@ -240,7 +240,8 @@ class LAMMPS(Engine):
         self.create_interfaces()
 
         if hasattr(self, 'xyz_snapshots'): 
-            return self.evaluate_()['Energy']
+            # Convert calculated energies to kJ/mol
+            return self.evaluate_()['Energy'] * 4.184
         else:
             raise RuntimeError('Configuration snapshots \
                     not present for target.')

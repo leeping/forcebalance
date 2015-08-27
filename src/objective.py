@@ -16,6 +16,12 @@ from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
 try:
+    from forcebalance.lammpsio import AbInitio_LAMMPS
+except:
+    logger.warning(traceback.format_exc())
+    logger.warning("Lammps module import failed\n")
+
+try:
     from forcebalance.gmxio import AbInitio_GMX, BindingEnergy_GMX, Liquid_GMX, Lipid_GMX, Interaction_GMX, Moments_GMX, Vibration_GMX, Thermo_GMX
 except:
     logger.warning(traceback.format_exc())
@@ -70,6 +76,7 @@ Implemented_Targets = {
     'ABINITIO_OPENMM':AbInitio_OpenMM,
     'ABINITIO_AMBER':AbInitio_AMBER,
     'ABINITIO_INTERNAL':AbInitio_Internal,
+    'ABINITIO_LAMMPS':AbInitio_LAMMPS,
     'VIBRATION_TINKER':Vibration_TINKER,
     'VIBRATION_GMX':Vibration_GMX,
     'VIBRATION_AMBER':Vibration_AMBER,
