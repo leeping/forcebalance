@@ -45,8 +45,9 @@ class LAMMPS_INTERFACE(object):
 
         # Ctypes array for LAMMPS position data
         self._x_c = (N * ct.c_double)()
+        self._dV_dx = (N * ct.c_double)()
 
-    def get_V(self, x):
+    def get_V(self, x, force=False):
         # Our LAMMPS instance
         lmp = self._lmp
 
@@ -59,9 +60,12 @@ class LAMMPS_INTERFACE(object):
 
         # Get energy and forces from LAMMPS
         V = float(lmp.extract_compute('thermo_pe', 0, 0))
-        #F_c = lmp.gather_atoms('f', 1, 3)
-        #self._dV_dx[:]  = F_c[:]
-        #self._dV_dx[:] *= -1.0
+
+        if force:
+            #F_c = lmp.gather_atoms('f', 1, 3)
+            #self._dV_dx[:]  = F_c[:]
+            #self._dV_dx[:] *= -1.0
+            pass
         return V
 
 class LAMMPS(Engine):
@@ -113,10 +117,14 @@ class LAMMPS(Engine):
                 configuration coordinates.')
 
         ## Copy files for auxiliary lmp engines to be created
-        ## within tempdir
-        shutil.copytree(os.path.join(self.srcdir,'lammps_files'),
+        ## within tempdir. Note: lammps_files directory may already
+        ## exist in case of an optimization continuation.
+        try:
+            shutil.copytree(os.path.join(self.srcdir,'lammps_files'),
                 os.path.join(self.tempdir,'lammps_files'))
-
+        except OSError:
+            logger.info('lammps_files directory already exists in \
+                    the working directory. Continuing...\n')
         ## Create all necessary lammps interfaces according
         ## to the data contained in the target
         self.create_interfaces()
@@ -159,7 +167,7 @@ class LAMMPS(Engine):
             e_series = []
 
             for coords in self.xyz_snapshots:
-                e_series.append(self._lmp_main.get_V(coords.reshape((1,-1))[0]) + 248.739362825)
+                e_series.append(self._lmp_main.get_V(coords.reshape((1,-1))[0]) + 235.687591978)
 
         elif self.type == 'dimer':
             e_d  = []
@@ -213,7 +221,7 @@ class LAMMPS(Engine):
 
     def energy(self):
 
-        """ Computes the energy using AMBER over a trajectory. """
+        """ Computes the energy using LAMMPS over a trajectory. """
 
         # TODO: Think about this. 
         # Make sure the forcefield written to the iter_000d directory is
@@ -245,6 +253,23 @@ class LAMMPS(Engine):
         else:
             raise RuntimeError('Configuration snapshots \
                     not present for target.')
+
+#class Liquid_LAMMPS(Liquid):
+#
+#    """Condensed phase property matching using LAMMPS"""
+#
+#    def __init__(self,options,tgt_opts,forcefield):
+#        # Some potentially useful options
+#        # Name of the liquid coordinat file.
+#        self.set_option(tgt_opts,'liquid_coords',default='liquid.pdb',forceprint=True)
+#        # Set the number of steps between MC barostat adjustments.
+#        self.set_option(tgt_opts,'n_mcbarostat')
+#        self.engine_ = LAMMPS
+#        # Name of the engine to pass to npt.py
+#        self.engname = "lammps"
+#        # Initialize the base class.
+#        super(Liquid_LAMMPS,self).__init__(options,tgt_opts,forcefield)
+
 
 class AbInitio_LAMMPS(AbInitio):
 
