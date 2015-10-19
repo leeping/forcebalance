@@ -56,14 +56,18 @@ def energy_components(Sim, verbose=False):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
 
-def evaluate_potential(Sim):
+def evaluate_potential(Sim, postprocess_rpmd=False):
     # Returns potential averaged over copies for PIMD, potential energy
-    # otherwise. 
+    # otherwise. Speed up postprocessing of PIMD gradients by pulling
+    # only from first bead.
     if isinstance(Sim.integrator, RPMDIntegrator):
         PE = 0.0 * kilojoule/mole
         P = Sim.integrator.getNumCopies()
-        for i in range(P):
-            PE += Sim.integrator.getState(i,getEnergy=True).getPotentialEnergy() / P
+        if postprocess_rpmd:
+            PE += Sim.integrator.getState(0,getEnergy=True).getPotentialEnergy()
+        else:
+            for i in range(P):
+                PE += Sim.integrator.getState(i,getEnergy=True).getPotentialEnergy() / P
         return PE
     else:
         return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
@@ -130,13 +134,17 @@ def get_forces(Sim):
         State = Sim.context.getState(getPositions=True, getEnergy=True, getForces=True)
         return State.getForces() 
 
-def rpmd_dips(Sim, qvals, masses):
+def rpmd_dips(Sim, qvals, masses, postprocess_rpmd=False):
     """Return dipole moments averaged over all copies of the system."""
     rpmdIntegrator = Sim.context.getIntegrator()
     temp_dips = []
-    for i in range(rpmdIntegrator.getNumCopies()):
-        temp_positions = rpmdIntegrator.getState(i,getPositions=True).getPositions()
+    if postprocess_rpmd:
+        temp_positions = rpmdIntegrator.getState(0,getPositions=True).getPositions()
         temp_dips.append(get_dipole(Sim, q=qvals, mass=masses, positions=temp_positions))
+    else:
+        for i in range(rpmdIntegrator.getNumCopies()):
+            temp_positions = rpmdIntegrator.getState(i,getPositions=True).getPositions()
+            temp_dips.append(get_dipole(Sim, q=qvals, mass=masses, positions=temp_positions))
     dip_avg = [sum(col) / float(len(col)) for col in zip(*temp_dips)]
     return dip_avg
  
@@ -979,7 +987,7 @@ class OpenMM(Engine):
             UpdateSimulationParameters(self.system, self.simulation)
         else:
             self.create_simulation(**self.simkwargs)
-    def set_positions(self, shot=0, traj=None):
+    def set_positions(self, shot=0, traj=None, postprocess=False):
         
         """
         Set the positions and periodic box vectors to one of the
@@ -1023,9 +1031,15 @@ class OpenMM(Engine):
                     rpmdIntegrator.setPositions(i,posWithVsites)
         else:
             rpmdIntegrator = self.simulation.context.getIntegrator()
-            for i in range(rpmdIntegrator.getNumCopies()):
+            if postprocess:
+                # Try speeding up gradient calculation by 
+                # including data from just one bead. 
                 temp_positions = self.xyz_rpmd[shot][0][0]
-                rpmdIntegrator.setPositions(i,temp_positions)
+                rpmdIntegrator.setPositions(0,temp_positions)
+            else:
+                for i in range(rpmdIntegrator.getNumCopies()):
+                    temp_positions = self.xyz_rpmd[shot][0][0]
+                    rpmdIntegrator.setPositions(i,temp_positions)
     
     def get_charges(self):
         logger.error('OpenMM engine does not have get_charges (should be trivial to implement however.)')
@@ -1139,12 +1153,12 @@ class OpenMM(Engine):
         self.rpmd_frame_props['Positions'] = self.state_positions
         return centroid_kinetic(self.simulation, self.rpmd_frame_props).value_in_unit(kilojoules_per_mole)
 
-    def evaluate_one_(self, force=False, dipole=False):
+    def evaluate_one_(self, force=False, dipole=False, postprocess_rpmd=False):
         """ Perform a single point calculation on the current geometry. """
         if not hasattr(self, 'xyz_rpmd'): 
             State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
-        Result["Energy"] = evaluate_potential(self.simulation) / kilojoules_per_mole
+        Result["Energy"] = evaluate_potential(self.simulation, postprocess_rpmd=postprocess_rpmd) / kilojoules_per_mole
         if force: 
             Force = list(np.array(get_forces(self.simulation) / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
@@ -1179,11 +1193,11 @@ class OpenMM(Engine):
         RPMD_CV_est = []
         if hasattr(self, 'xyz_rpmd'):
             for I in range(len(self.xyz_rpmd)):
-                self.set_positions(I) 
-                R1 = self.evaluate_one_(force,dipole=False)
+                self.set_positions(I, postprocess=True) 
+                R1 = self.evaluate_one_(force,dipole=False,postprocess_rpmd=True)
                 Energies.append(R1["Energy"])
                 if force: Forces.append(R1["Force"])
-                if dipole: Dipoles.append(rpmd_dips(self.simulation, self.nbcharges, self.AtomLists['Mass']))
+                if dipole: Dipoles.append(rpmd_dips(self.simulation, self.nbcharges, self.AtomLists['Mass'], postprocess_rpmd=True))
                 if rpmd:
                     self.rpmd_frame_props['centroids'] = self.centroids[I] 
                     RPMD_CV_est.append(self.calc_cv())
