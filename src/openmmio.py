@@ -641,7 +641,7 @@ class OpenMM(Engine):
         self.platform = Platform.getPlatformByName(self.platname)
         if self.platname == 'CUDA':
             ## Set the device to the environment variable or zero otherwise
-            device = os.environ.get('CUDA_DEVICE',"0")
+            device = os.environ.get('CUDA_DEVICE',"7")
             if self.verbose: logger.info("Setting CUDA Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
             if self.verbose: logger.info("Setting CUDA Precision to %s\n" % self.precision)
