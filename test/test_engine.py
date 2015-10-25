@@ -3,7 +3,6 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy as np
-import inspect
 from __init__ import ForceBalanceTestCase
 from forcebalance.nifty import *
 from forcebalance.gmxio import GMX
@@ -96,10 +95,10 @@ class TestAmber99SB(ForceBalanceTestCase):
             Data[name] = eng.energy_force()
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            fout = os.path.join(datadir, 'test_energy_force.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, Data[self.engines.keys()[0]])
-        fin = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+        fin = os.path.join(datadir, 'test_energy_force.dat')
         RefData = np.loadtxt(fin)
         for n1 in self.engines.keys():
             self.assertNdArrayEqual(Data[n1][:,0], RefData[:,0], delta=0.01, 
@@ -115,10 +114,10 @@ class TestAmber99SB(ForceBalanceTestCase):
             Data[name] = eng.energy_rmsd(5)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            fout = os.path.join(datadir, 'test_optimized_geometries.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, Data[self.engines.keys()[0]])
-        fin = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+        fin = os.path.join(datadir, 'test_optimized_geometries.dat')
         RefData = np.loadtxt(fin)
         for n1 in self.engines.keys():
             self.assertAlmostEqual(Data[n1][0], RefData[0], delta=0.001,
@@ -134,10 +133,10 @@ class TestAmber99SB(ForceBalanceTestCase):
             Data[name] = eng.interaction_energy(fraga=range(22), fragb=range(22, 49))
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            fout = os.path.join(datadir, 'test_interaction_energies.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, Data[self.engines.keys()[0]])
-        fin = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+        fin = os.path.join(datadir, 'test_interaction_energies.dat')
         RefData = np.loadtxt(fin)
         for n1 in self.engines.keys():
             self.assertNdArrayEqual(Data[n1], RefData, delta=0.0001,
@@ -151,13 +150,13 @@ class TestAmber99SB(ForceBalanceTestCase):
             Data[name] = eng.multipole_moments(shot=5, optimize=False)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat')
+            fout = os.path.join(datadir, 'test_multipole_moments.dipole.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, np.array(Data[self.engines.keys()[0]]['dipole'].values()))
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat')
+            fout = os.path.join(datadir, 'test_multipole_moments.quadrupole.dat')
             np.savetxt(fout, np.array(Data[self.engines.keys()[0]]['quadrupole'].values()))
-        RefDip = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat'))
-        RefQuad = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat'))
+        RefDip = np.loadtxt(os.path.join(datadir, 'test_multipole_moments.dipole.dat'))
+        RefQuad = np.loadtxt(os.path.join(datadir, 'test_multipole_moments.quadrupole.dat'))
         for n1 in self.engines.keys():
             d1 = np.array(Data[n1]['dipole'].values())
             q1 = np.array(Data[n1]['quadrupole'].values())
@@ -176,13 +175,13 @@ class TestAmber99SB(ForceBalanceTestCase):
             Data[name] = eng.multipole_moments(shot=5, optimize=True)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat')
+            fout = os.path.join(datadir, 'test_multipole_moments_optimized.dipole.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, np.array(Data[self.engines.keys()[0]]['dipole'].values()))
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat')
+            fout = os.path.join(datadir, 'test_multipole_moments_optimized.quadrupole.dat')
             np.savetxt(fout, np.array(Data[self.engines.keys()[0]]['quadrupole'].values()))
-        RefDip = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat'))
-        RefQuad = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat'))
+        RefDip = np.loadtxt(os.path.join(datadir, 'test_multipole_moments_optimized.dipole.dat'))
+        RefQuad = np.loadtxt(os.path.join(datadir, 'test_multipole_moments_optimized.quadrupole.dat'))
         for n1 in self.engines.keys():
             d1 = np.array(Data[n1]['dipole'].values())
             q1 = np.array(Data[n1]['quadrupole'].values())
@@ -198,14 +197,14 @@ class TestAmber99SB(ForceBalanceTestCase):
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=False)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.freq.dat')
+            fout = os.path.join(datadir, 'test_normal_modes.freq.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, FreqT)
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.mode.dat')
+            fout = os.path.join(datadir, 'test_normal_modes.mode.dat')
             # Need to save as binary data since it's a multidimensional array
             np.save(fout, ModeT)
-        FreqRef = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.freq.dat'))
-        ModeRef = np.load(os.path.join(datadir, inspect.stack()[0][3]+'.mode.dat.npy'))
+        FreqRef = np.loadtxt(os.path.join(datadir, 'test_normal_modes.freq.dat'))
+        ModeRef = np.load(os.path.join(datadir, 'test_normal_modes.mode.dat.npy'))
         for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER')]:
             for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
                 if vr < 0: continue
@@ -226,14 +225,14 @@ class TestAmber99SB(ForceBalanceTestCase):
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=True)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.freq.dat')
+            fout = os.path.join(datadir, 'test_normal_modes_optimized.freq.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, FreqT)
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.mode.dat')
+            fout = os.path.join(datadir, 'test_normal_modes_optimized.mode.dat')
             # Need to save as binary data since it's a multidimensional array
             np.save(fout, ModeT)
-        FreqRef = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.freq.dat'))
-        ModeRef = np.load(os.path.join(datadir, inspect.stack()[0][3]+'.mode.dat.npy'))
+        FreqRef = np.loadtxt(os.path.join(datadir, 'test_normal_modes_optimized.freq.dat'))
+        ModeRef = np.load(os.path.join(datadir, 'test_normal_modes_optimized.mode.dat.npy'))
         for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER')]:
             for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
                 if vr < 0: continue
@@ -300,10 +299,10 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         os.chdir("..")
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            fout = os.path.join(datadir, 'test_energy_force.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, EF_T)
-        EF_R = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dat'))
+        EF_R = np.loadtxt(os.path.join(datadir, 'test_energy_force.dat'))
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct AMOEBA energy to within 0.001 kJ\n")
         self.assertAlmostEqual(EF_O[0], EF_R[0], msg="OpenMM energy does not match the reference", delta=0.001)
         self.assertAlmostEqual(EF_T[0], EF_R[0], msg="TINKER energy does not match the reference", delta=0.001)
@@ -323,10 +322,10 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         os.chdir("..")
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            fout = os.path.join(datadir, 'test_energy_rmsd.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, np.array([ET, RT]))
-        RefData = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+        RefData = os.path.join(datadir, 'test_energy_rmsd.dat')
         ERef = RefData[0]
         RRef = RefData[1]
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct minimized energy to within 0.0001 kcal\n")
@@ -347,10 +346,10 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         os.chdir("..")
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            fout = os.path.join(datadir, 'test_interaction_energy.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, np.array([IT]))
-        IR = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dat'))
+        IR = np.loadtxt(os.path.join(datadir, 'test_interaction_energy.dat'))
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct interaction energy\n")
         self.assertAlmostEqual(IO, IR, msg="OpenMM interaction energies do not match the reference", delta=0.0001)
         self.assertAlmostEqual(IT, IR, msg="TINKER interaction energies do not match the reference", delta=0.0001)
@@ -370,13 +369,13 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         os.chdir("..")
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat')
+            fout = os.path.join(datadir, 'test_multipole_moments.dipole.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, DT)
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat')
+            fout = os.path.join(datadir, 'test_multipole_moments.quadrupole.dat')
             np.savetxt(fout, QT)
-        DR = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat'))
-        QR = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat'))
+        DR = np.loadtxt(os.path.join(datadir, 'test_multipole_moments.dipole.dat'))
+        QR = np.loadtxt(os.path.join(datadir, 'test_multipole_moments.quadrupole.dat'))
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct dipole\n")
         self.assertNdArrayEqual(DO, DR, msg="OpenMM dipoles do not match the reference", delta=0.001)
         self.assertNdArrayEqual(DT, DR, msg="TINKER dipoles do not match the reference", delta=0.001)
@@ -400,13 +399,13 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         os.chdir("..")
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat')
+            fout = os.path.join(datadir, 'test_multipole_moments_optimized.dipole.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, DT1)
-            fout = os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat')
+            fout = os.path.join(datadir, 'test_multipole_moments_optimized.quadrupole.dat')
             np.savetxt(fout, QT1)
-        DR1 = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat'))
-        QR1 = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat'))
+        DR1 = np.loadtxt(os.path.join(datadir, 'test_multipole_moments_optimized.dipole.dat'))
+        QR1 = np.loadtxt(os.path.join(datadir, 'test_multipole_moments_optimized.quadrupole.dat'))
         self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct dipole when geometries are optimized\n")
         self.assertNdArrayEqual(DO1, DR1, msg="OpenMM dipoles do not match the reference when geometries are optimized", delta=0.001)
         self.assertNdArrayEqual(DT1, DR1, msg="TINKER dipoles do not match the reference when geometries are optimized", delta=0.001)
