@@ -3,12 +3,19 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy as np
+import inspect
 from __init__ import ForceBalanceTestCase
 from forcebalance.nifty import *
 from forcebalance.gmxio import GMX
 from forcebalance.tinkerio import TINKER
 from forcebalance.openmmio import OpenMM
 from collections import OrderedDict
+
+# Set SAVEDATA to True and run the tests in order to save data
+# to a file for future reference. This is easier to use for troubleshooting
+# vs. comparing multiple programs against each other, b/c we don't know
+# which one changed.
+SAVEDATA=False
 
 class TestAmber99SB(ForceBalanceTestCase):
 
@@ -82,117 +89,161 @@ class TestAmber99SB(ForceBalanceTestCase):
         self.addCleanup(os.system, 'cd .. ; rm -rf temp')
 
     def test_energy_force(self):
-        """ Compare GMX, OpenMM, and TINKER energy and forces using AMBER force field """
-        if len(self.engines) < 2:
-            self.skipTest("Don't have two engines to compare")
-        printcool("Compare GMX, OpenMM, and TINKER energy and forces using AMBER force field")
+        """ Test GMX, OpenMM, and TINKER energy and forces using AMBER force field """
+        printcool("Test GMX, OpenMM, and TINKER energy and forces using AMBER force field")
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.energy_force()
-        for i, n1 in enumerate(self.engines.keys()):
-            for n2 in self.engines.keys()[:i]:
-                self.assertNdArrayEqual(Data[n1][:,0], Data[n2][:,0], delta=0.01, msg="%s and %s energies are different" % (n1, n2))
-                self.assertNdArrayEqual(Data[n1][:,1:].flatten(), Data[n2][:,1:].flatten(), \
-                                            delta=0.1, msg="%s and %s forces are different" % (n1, n2))
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, Data[self.engines.keys()[0]])
+        fin = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+        RefData = np.loadtxt(fin)
+        for n1 in self.engines.keys():
+            self.assertNdArrayEqual(Data[n1][:,0], RefData[:,0], delta=0.01, 
+                                    msg="%s energies do not match the reference" % (n1))
+            self.assertNdArrayEqual(Data[n1][:,1:].flatten(), RefData[:,1:].flatten(), 
+                                    delta=0.1, msg="%s forces do not match the reference" % (n1))
 
     def test_optimized_geometries(self):
-        """ Compare GMX, OpenMM, and TINKER optimized geometries and RMSD using AMBER force field """
-        if len(self.engines) < 2:
-            self.skipTest("Don't have two engines to compare")
-        printcool("Compare GMX, OpenMM, and TINKER optimized geometries and RMSD using AMBER force field")
+        """ Test GMX, OpenMM, and TINKER optimized geometries and RMSD using AMBER force field """
+        printcool("Test GMX, OpenMM, and TINKER optimized geometries and RMSD using AMBER force field")
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.energy_rmsd(5)
-        for i, n1 in enumerate(self.engines.keys()):
-            for n2 in self.engines.keys()[:i]:
-                self.assertAlmostEqual(Data[n1][0], Data[n2][0], delta=0.001, \
-                                           msg="%s and %s optimized energies are different" % (n1, n2))
-                self.assertAlmostEqual(Data[n1][1], Data[n2][1], delta=0.001, \
-                                           msg="%s and %s RMSD from starting structure are different" % (n1, n2))
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, Data[self.engines.keys()[0]])
+        fin = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+        RefData = np.loadtxt(fin)
+        for n1 in self.engines.keys():
+            self.assertAlmostEqual(Data[n1][0], RefData[0], delta=0.001,
+                                   msg="%s optimized energies do not match the reference" % n1)
+            self.assertAlmostEqual(Data[n1][1], RefData[1], delta=0.001,
+                                   msg="%s RMSD from starting structure do not match the reference" % n1)
                 
     def test_interaction_energies(self):
-        """ Compare GMX, OpenMM, and TINKER interaction energies using AMBER force field """
-        if len(self.engines) < 2:
-            self.skipTest("Don't have two engines to compare")
-        printcool("Compare GMX, OpenMM, and TINKER interaction energies using AMBER force field")
+        """ Test GMX, OpenMM, and TINKER interaction energies using AMBER force field """
+        printcool("Test GMX, OpenMM, and TINKER interaction energies using AMBER force field")
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.interaction_energy(fraga=range(22), fragb=range(22, 49))
-        for i, n1 in enumerate(self.engines.keys()):
-            for n2 in self.engines.keys()[:i]:
-                self.assertNdArrayEqual(Data[n1], Data[n2], delta=0.0001, \
-                                           msg="%s and %s interaction energies are different" % (n1, n2))
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, Data[self.engines.keys()[0]])
+        fin = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+        RefData = np.loadtxt(fin)
+        for n1 in self.engines.keys():
+            self.assertNdArrayEqual(Data[n1], RefData, delta=0.0001,
+                                    msg="%s interaction energies do not match the reference" % n1)
         
     def test_multipole_moments(self):
-        """ Compare GMX, OpenMM, and TINKER multipole moments using AMBER force field """
-        if len(self.engines) < 2:
-            self.skipTest("Don't have two engines to compare")
-        printcool("Compare GMX, OpenMM, and TINKER multipole moments using AMBER force field")
+        """ Test GMX, OpenMM, and TINKER multipole moments using AMBER force field """
+        printcool("Test GMX, OpenMM, and TINKER multipole moments using AMBER force field")
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.multipole_moments(shot=5, optimize=False)
-        for i, n1 in enumerate(self.engines.keys()):
-            for n2 in self.engines.keys()[:i]:
-                d1 = np.array(Data[n1]['dipole'].values())
-                d2 = np.array(Data[n2]['dipole'].values())
-                q1 = np.array(Data[n1]['quadrupole'].values())
-                q2 = np.array(Data[n2]['quadrupole'].values())
-                self.assertNdArrayEqual(d1, d2, delta=0.001, msg="%s and %s dipole moments are different" % (n1, n2))
-                self.assertNdArrayEqual(q1, q2, delta=0.001, msg="%s and %s quadrupole moments are different" % (n1, n2))
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, np.array(Data[self.engines.keys()[0]]['dipole'].values()))
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat')
+            np.savetxt(fout, np.array(Data[self.engines.keys()[0]]['quadrupole'].values()))
+        RefDip = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat'))
+        RefQuad = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat'))
+        for n1 in self.engines.keys():
+            d1 = np.array(Data[n1]['dipole'].values())
+            q1 = np.array(Data[n1]['quadrupole'].values())
+            self.assertNdArrayEqual(d1, RefDip, delta=0.001, msg="%s dipole moments do not match the reference" % n1)
+            self.assertNdArrayEqual(q1, RefQuad, delta=0.001, msg="%s quadrupole moments do not match the reference" % n1)
 
     def test_multipole_moments_optimized(self):
-        """ Compare GMX, OpenMM, and TINKER multipole moments at optimized geometries """
+        """ Test GMX, OpenMM, and TINKER multipole moments at optimized geometries """
         #==================================================#
         #| Geometry-optimized multipole moments; requires |#
         #| double precision in order to pass!             |#
         #==================================================#
-        if len(self.engines) < 2:
-            self.skipTest("Don't have two engines to compare")
-        printcool("Compare GMX, OpenMM, and TINKER multipole moments at optimized geometries")
+        printcool("Test GMX, OpenMM, and TINKER multipole moments at optimized geometries")
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.multipole_moments(shot=5, optimize=True)
-        for i, n1 in enumerate(self.engines.keys()):
-            for n2 in self.engines.keys()[:i]:
-                d1 = np.array(Data[n1]['dipole'].values())
-                d2 = np.array(Data[n2]['dipole'].values())
-                q1 = np.array(Data[n1]['quadrupole'].values())
-                q2 = np.array(Data[n2]['quadrupole'].values())
-                self.assertNdArrayEqual(d1, d2, delta=0.02, msg="%s and %s dipole moments are different at optimized geometry" % (n1, n2))
-                self.assertNdArrayEqual(q1, q2, delta=0.02, msg="%s and %s quadrupole moments are different at optimized geometry" % (n1, n2))
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, np.array(Data[self.engines.keys()[0]]['dipole'].values()))
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat')
+            np.savetxt(fout, np.array(Data[self.engines.keys()[0]]['quadrupole'].values()))
+        RefDip = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat'))
+        RefQuad = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat'))
+        for n1 in self.engines.keys():
+            d1 = np.array(Data[n1]['dipole'].values())
+            q1 = np.array(Data[n1]['quadrupole'].values())
+            self.assertNdArrayEqual(d1, RefDip, delta=0.02, msg="%s dipole moments at optimized geometry do not match the reference" % n1)
+            self.assertNdArrayEqual(q1, RefQuad, delta=0.02, msg="%s quadrupole moments at optimized geometry do not match the reference" % n1)
         
     def test_normal_modes(self):
-        """ Compare GMX and TINKER normal modes """
+        """ Test GMX and TINKER normal modes """
         if 'TINKER' not in self.engines or 'GMX' not in self.engines:
-            self.skipTest("Need TINKER and GMX engines to compare")
-        printcool("Compare GMX and TINKER normal modes")
+            self.skipTest("Need TINKER and GMX engines")
+        printcool("Test GMX and TINKER normal modes")
         FreqG, ModeG = self.engines['GMX'].normal_modes(shot=5, optimize=False)
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=False)
-        for vg, vt, mg, mt in zip(FreqG, FreqT, ModeG, ModeT):
-            if vt < 0: continue
-            # Wavefunction tolerance is half a wavenumber.
-            self.assertAlmostEqual(vg, vt, delta=0.5, msg="GMX and TINKER vibrational frequencies are different")
-            for a in range(len(mg)):
-                try:
-                    self.assertNdArrayEqual(mg[a], mt[a], delta=0.01, msg="GMX and TINKER normal modes are different")
-                except:
-                    self.assertNdArrayEqual(mg[a], -1.0*mt[a], delta=0.01, msg="GMX and TINKER normal modes are different")
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.freq.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, FreqT)
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.mode.dat')
+            # Need to save as binary data since it's a multidimensional array
+            np.save(fout, ModeT)
+        FreqRef = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.freq.dat'))
+        ModeRef = np.load(os.path.join(datadir, inspect.stack()[0][3]+'.mode.dat.npy'))
+        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER')]:
+            for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
+                if vr < 0: continue
+                # Frequency tolerance is half a wavenumber.
+                self.assertAlmostEqual(v, vr, delta=0.5, msg="%s vibrational frequencies do not match the reference" % Name)
+                for a in range(len(m)):
+                    try:
+                        self.assertNdArrayEqual(m[a], mr[a], delta=0.01, msg="%s normal modes do not match the reference" % Name)
+                    except:
+                        self.assertNdArrayEqual(m[a], -1.0*mr[a], delta=0.01, msg="%s normal modes do not match the reference" % Name)
 
     def test_normal_modes_optimized(self):
-        """ Compare GMX and TINKER normal modes at optimized geometry """
+        """ Test GMX and TINKER normal modes at optimized geometry """
         if 'TINKER' not in self.engines or 'GMX' not in self.engines:
-            self.skipTest("Need TINKER and GMX engines to compare")
-        printcool("Compare GMX and TINKER normal modes at optimized geometry")
+            self.skipTest("Need TINKER and GMX engines")
+        printcool("Test GMX and TINKER normal modes at optimized geometry")
         FreqG, ModeG = self.engines['GMX'].normal_modes(shot=5, optimize=True)
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=True)
-        for vg, vt, mg, mt in zip(FreqG, FreqT, ModeG, ModeT):
-            self.assertAlmostEqual(vg, vt, delta=0.5, msg="GMX and TINKER vibrational frequencies are different at optimized geometry")
-            for a in range(len(mg)):
-                try:
-                    self.assertNdArrayEqual(mg[a], mt[a], delta=0.01, msg="GMX and TINKER normal modes are different at optimized geometry")
-                except:
-                    self.assertNdArrayEqual(mg[a], -1.0*mt[a], delta=0.01, msg="GMX and TINKER normal modes are different at optimized geometry")
-            
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.freq.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, FreqT)
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.mode.dat')
+            # Need to save as binary data since it's a multidimensional array
+            np.save(fout, ModeT)
+        FreqRef = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.freq.dat'))
+        ModeRef = np.load(os.path.join(datadir, inspect.stack()[0][3]+'.mode.dat.npy'))
+        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER')]:
+            for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
+                if vr < 0: continue
+                # Frequency tolerance is half a wavenumber.
+                self.assertAlmostEqual(v, vr, delta=0.5, msg="%s vibrational frequencies at optimized geometry do not match the reference" % Name)
+                for a in range(len(m)):
+                    try:
+                        self.assertNdArrayEqual(m[a], mr[a], delta=0.01, msg="%s normal modes at optimized geometry do not match the reference" % Name)
+                    except:
+                        self.assertNdArrayEqual(m[a], -1.0*mr[a], delta=0.01, msg="%s normal modes at optimized geometry do not match the reference" % Name)
 
 
 class TestAmoebaWater6(ForceBalanceTestCase):
@@ -239,49 +290,74 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         self.addCleanup(os.system, 'rm -rf temp')
 
     def test_energy_force(self):
-        """ Compare OpenMM vs. TINKER energy and forces with AMOEBA force field """
-        printcool("Testing OpenMM vs. TINKER energy and force with AMOEBA")
+        """ Test OpenMM and TINKER energy and forces with AMOEBA force field """
+        printcool("Testing OpenMM and TINKER energy and force with AMOEBA")
         os.chdir("temp")
         if not hasattr(self, 'T'):
             self.skipTest("TINKER programs are not in the PATH.")
         EF_O = self.O.energy_force()[0]
         EF_T = self.T.energy_force()[0]
         os.chdir("..")
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same AMOEBA energy to within 0.001 kJ\n")
-        self.assertAlmostEqual(EF_O[0], EF_T[0], msg="OpenMM and TINKER energies are different", delta=0.001)
-        self.logger.debug(">ASSERT OpenMM and TINKER Forces give the same AMOEBA energy to within 0.01 kJ/mol/nm\n")
-        self.assertNdArrayEqual(EF_O[1:], EF_T[1:], msg="OpenMM and TINKER forces are different", delta=0.01)
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, EF_T)
+        EF_R = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dat'))
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct AMOEBA energy to within 0.001 kJ\n")
+        self.assertAlmostEqual(EF_O[0], EF_R[0], msg="OpenMM energy does not match the reference", delta=0.001)
+        self.assertAlmostEqual(EF_T[0], EF_R[0], msg="TINKER energy does not match the reference", delta=0.001)
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct AMOEBA force to within 0.01 kJ/mol/nm\n")
+        self.assertNdArrayEqual(EF_O[1:], EF_R[1:], msg="OpenMM forces do not match the reference", delta=0.01)
+        self.assertNdArrayEqual(EF_T[1:], EF_R[1:], msg="TINKER forces do not match the reference", delta=0.01)
 
     def test_energy_rmsd(self):
-        """ Compare OpenMM vs. TINKER optimized geometries with AMOEBA force field """
+        """ Test OpenMM and TINKER optimized geometries with AMOEBA force field """
         self.skipTest("Need to reduce dependence on the TINKER build")
-        printcool("Testing OpenMM vs. TINKER optimized geometry with AMOEBA")
+        printcool("Testing OpenMM and TINKER optimized geometry with AMOEBA")
         os.chdir("temp")
         if not hasattr(self, 'T'):
             self.skipTest("TINKER programs are not in the PATH.")
         EO, RO = self.O.energy_rmsd()
         ET, RT = self.T.energy_rmsd()
         os.chdir("..")
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same minimized energy to within 0.0001 kcal\n")
-        self.assertAlmostEqual(EO, ET, msg="OpenMM and TINKER minimized energies are different", delta=0.0001)
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same RMSD to starting structure\n")
-        self.assertAlmostEqual(RO, RT, msg="OpenMM and TINKER structures are different", delta=0.001)
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, np.array([ET, RT]))
+        RefData = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+        ERef = RefData[0]
+        RRef = RefData[1]
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct minimized energy to within 0.0001 kcal\n")
+        self.assertAlmostEqual(EO, ERef, msg="OpenMM minimized energy does not match the reference", delta=0.0001)
+        self.assertAlmostEqual(ET, ERef, msg="TINKER minimized energy does not match the reference", delta=0.0001)
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct RMSD to starting structure\n")
+        self.assertAlmostEqual(RO, RRef, msg="OpenMM RMSD does not match the reference", delta=0.001)
+        self.assertAlmostEqual(RT, RRef, msg="TINKER RMSD does not match the reference", delta=0.001)
 
     def test_interaction_energy(self):
-        """ Compare OpenMM vs. TINKER interaction energies with AMOEBA force field """
-        printcool("Testing OpenMM vs. TINKER interaction energy with AMOEBA")
+        """ Test OpenMM and TINKER interaction energies with AMOEBA force field """
+        printcool("Testing OpenMM and TINKER interaction energy with AMOEBA")
         os.chdir("temp")
         if not hasattr(self, 'T'):
             self.skipTest("TINKER programs are not in the PATH.")
         IO = self.O.interaction_energy(fraga=range(9), fragb=range(9, 18))
         IT = self.T.interaction_energy(fraga=range(9), fragb=range(9, 18))
         os.chdir("..")
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same interaction energy\n")
-        self.assertAlmostEqual(IO, IT, msg="OpenMM and TINKER interaction energies are different", delta=0.0001)
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, np.array([IT]))
+        IR = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dat'))
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct interaction energy\n")
+        self.assertAlmostEqual(IO, IR, msg="OpenMM interaction energies do not match the reference", delta=0.0001)
+        self.assertAlmostEqual(IT, IR, msg="TINKER interaction energies do not match the reference", delta=0.0001)
 
     def test_multipole_moments(self):
-        """ Compare OpenMM vs. TINKER multipole moments with AMOEBA force field """
-        printcool("Testing OpenMM vs. TINKER multipole moments with AMOEBA")
+        """ Test OpenMM and TINKER multipole moments with AMOEBA force field """
+        printcool("Testing OpenMM and TINKER multipole moments with AMOEBA")
         os.chdir("temp")
         if not hasattr(self, 'T'):
             self.skipTest("TINKER programs are not in the PATH.")
@@ -292,15 +368,26 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         DT = np.array(MT['dipole'].values())
         QT = np.array(MT['quadrupole'].values())
         os.chdir("..")
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same dipole\n")
-        self.assertNdArrayEqual(DO, DT, msg="OpenMM and TINKER dipoles are different", delta=0.001)
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same quadrupole\n")
-        self.assertNdArrayEqual(QO, QT, msg="OpenMM and TINKER quadrupoles are different", delta=0.001)
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, DT)
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat')
+            np.savetxt(fout, QT)
+        DR = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat'))
+        QR = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat'))
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct dipole\n")
+        self.assertNdArrayEqual(DO, DR, msg="OpenMM dipoles do not match the reference", delta=0.001)
+        self.assertNdArrayEqual(DT, DR, msg="TINKER dipoles do not match the reference", delta=0.001)
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct quadrupole\n")
+        self.assertNdArrayEqual(QO, QR, msg="OpenMM quadrupoles do not match the reference", delta=0.001)
+        self.assertNdArrayEqual(QT, QR, msg="TINKER quadrupoles do not match the reference", delta=0.001)
 
     def test_multipole_moments_optimized(self):
-        """ Compare OpenMM vs. TINKER multipole moments with AMOEBA force field """
+        """ Test OpenMM and TINKER multipole moments with AMOEBA force field """
         self.skipTest("Need to reduce dependence on the TINKER build")
-        printcool("Testing OpenMM vs. TINKER multipole moments with AMOEBA")
+        printcool("Testing OpenMM and TINKER multipole moments with AMOEBA")
         os.chdir("temp")
         if not hasattr(self, 'T'):
             self.skipTest("TINKER programs are not in the PATH.")
@@ -311,10 +398,21 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         DT1 = np.array(MT1['dipole'].values())
         QT1 = np.array(MT1['quadrupole'].values())
         os.chdir("..")
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same dipole when geometries are optimized\n")
-        self.assertNdArrayEqual(DO1, DT1, msg="OpenMM and TINKER dipoles are different when geometries are optimized", delta=0.001)
-        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the same quadrupole when geometries are optimized\n")
-        self.assertNdArrayEqual(QO1, QT1, msg="OpenMM and TINKER quadrupoles are different when geometries are optimized", delta=0.01)
+        datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+        if SAVEDATA:
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat')
+            if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            np.savetxt(fout, DT1)
+            fout = os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat')
+            np.savetxt(fout, QT1)
+        DR1 = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.dipole.dat'))
+        QR1 = np.loadtxt(os.path.join(datadir, inspect.stack()[0][3]+'.quadrupole.dat'))
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct dipole when geometries are optimized\n")
+        self.assertNdArrayEqual(DO1, DR1, msg="OpenMM dipoles do not match the reference when geometries are optimized", delta=0.001)
+        self.assertNdArrayEqual(DT1, DR1, msg="TINKER dipoles do not match the reference when geometries are optimized", delta=0.001)
+        self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct quadrupole when geometries are optimized\n")
+        self.assertNdArrayEqual(QO1, QR1, msg="OpenMM quadrupoles do not match the reference when geometries are optimized", delta=0.01)
+        self.assertNdArrayEqual(QT1, QR1, msg="TINKER quadrupoles do not match the reference when geometries are optimized", delta=0.01)
 
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""
