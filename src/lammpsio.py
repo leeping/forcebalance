@@ -62,10 +62,8 @@ class LAMMPS_INTERFACE(object):
         V = float(lmp.extract_compute('thermo_pe', 0, 0))
 
         if force:
-            #F_c = lmp.gather_atoms('f', 1, 3)
-            #self._dV_dx[:]  = F_c[:]
-            #self._dV_dx[:] *= -1.0
-            pass
+            F_c = lmp.gather_atoms('f', 1, 3)
+            return V, F_c[:]
         return V
 
 class LAMMPS(Engine):
@@ -228,12 +226,13 @@ class LAMMPS(Engine):
         # copied over to the lammps_files directories and instantiate 
         # new lammps interfaces.
         # cwd at this point is the iter_000d directory
+        tempdir = self.tempdir
         abs_run_dir = os.getcwd()
         fn_ff = self.target.FF.fnms[0]
         abs_path_ff = os.path.join(abs_run_dir,fn_ff)
-        abs_path_monomer = os.path.join(abs_run_dir,'..','lammps_files','monomer',fn_ff)
-        abs_path_dimer = os.path.join(abs_run_dir,'..','lammps_files','dimer',fn_ff)
-        abs_path_trimer = os.path.join(abs_run_dir,'..','lammps_files','trimer',fn_ff)
+        abs_path_monomer = os.path.join(tempdir,'lammps_files','monomer',fn_ff)
+        abs_path_dimer = os.path.join(tempdir,'lammps_files','dimer',fn_ff)
+        abs_path_trimer = os.path.join(tempdir,'lammps_files','trimer',fn_ff)
 
         if self.type == 'trimer':
             shutil.copy(abs_path_ff,abs_path_trimer)
