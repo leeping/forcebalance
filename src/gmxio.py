@@ -550,21 +550,33 @@ class GMX(Engine):
         havegmx = False
         if 'gmxpath' in kwargs:
             self.gmxpath = kwargs['gmxpath']
-            if not os.path.exists(os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix)):
-                warn_press_key("The mdrun executable indicated by %s doesn't exist! (Check gmxpath and gmxsuffix)" \
+
+            if type(self.gmxpath) is str and len(self.gmxpath) > 0:
+                ## Figure out the GROMACS version - it will determine how programs are called.
+                if os.path.exists(os.path.join(self.gmxpath,"gmx"+self.gmxsuffix)):
+                    self.gmxversion = 5
+                    havegmx = True
+                elif os.path.exists(os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix)):
+                    self.gmxversion = 4
+                    havegmx = True
+                else:
+                    warn_press_key("The mdrun executable indicated by %s doesn't exist! (Check gmxpath and gmxsuffix)" \
                                    % os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix))
-            else:
-                havegmx = True
 
         if not havegmx:
             warn_once("The 'gmxpath' option was not specified; using default.")
-            if which('mdrun'+self.gmxsuffix) == '':
+            if which('gmx'+self.gmxsuffix) != '':
+                self.gmxpath = which('gmx'+self.gmxsuffix)
+                self.gmxversion = 5
+                havegmx = True
+            elif which('mdrun'+self.gmxsuffix) != '':
+                self.gmxpath = which('mdrun'+self.gmxsuffix)
+                self.gmxversion = 4
+                havegmx = True
+            else:
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
                 logger.error("Cannot find the GROMACS executables!\n")
                 raise RuntimeError
-            else:
-                self.gmxpath = which('mdrun'+self.gmxsuffix)
-                havegmx = True
 
     def readsrc(self, **kwargs):
         """ Called by __init__ ; read files from the source directory. """
@@ -582,7 +594,7 @@ class GMX(Engine):
 
         self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
                                      ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"), 
-                                     ("nstxtcout", "0"), ("constraints", "none")])
+                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "group")])
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
@@ -773,7 +785,13 @@ class GMX(Engine):
         ## Call a GROMACS program as you would from the command line.
         csplit = command.split()
         prog = os.path.join(self.gmxpath, csplit[0])
-        csplit[0] = prog + self.gmxsuffix
+        if self.gmxversion == 5:
+            csplit[0] = csplit[0].replace('g_','').replace('gmxdump','dump')
+            csplit = ['gmx' + self.gmxsuffix] + csplit
+        elif self.gmxversion == 4:
+            csplit[0] = prog + self.gmxsuffix
+        else:
+            raise RuntimeError('gmxversion can only be 4 or 5')
         return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
 
     def warngmx(self, command, warnings=[], maxwarn=1, **kwargs):
@@ -1223,6 +1241,9 @@ class GMX(Engine):
             md_opts["comm_mode"] = "None"
             md_opts["nstcomm"] = 0
 
+        # In gromacs version 5, default cutoff scheme becomes verlet. 
+        # Need to set to group for backwards compatibility
+        md_defs["cutoff-scheme"] = 'group'
         md_opts["nstenergy"] = nsave
         md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
