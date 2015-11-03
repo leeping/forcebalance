@@ -523,7 +523,7 @@ class GMX(Engine):
 
     def __init__(self, name="gmx", **kwargs):
         ## Valid GROMACS-specific keywords.
-        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx', 'gmx_eq_barostat']
+        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx', 'gmx_eq_barostat', 'gmx_pme_order']
         super(GMX,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -944,6 +944,15 @@ class GMX(Engine):
                 traj = "%s-all.gro" % self.name
         self.mol[0].write("%s.gro" % self.name)
         return self.evaluate_(force, dipole, traj)
+
+    def make_gro_trajectory(self, fout=None):
+        """ Return the MD trajectory as a Molecule object. """
+        if fout is None:
+            fout = "%s-mdtraj.gro" % self.name
+        if not hasattr(self, 'mdtraj'):
+            raise RuntimeError('Engine does not have an associated trajectory.')
+        self.callgmx("trjconv -f %s -o %s -ndec 9 -pbc mol -novel -noforce" % (self.mdtraj, fout), stdin='System')
+        return fout
 
     def energy_one(self, shot):
 
