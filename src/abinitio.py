@@ -59,7 +59,6 @@ class AbInitio(Target):
         #======================================#
         # Options that are given by the parser #
         #======================================#
-        
         ## Number of snapshots
         self.set_option(tgt_opts,'shots','ns')
         ## Whether to use WHAM Boltzmann weights

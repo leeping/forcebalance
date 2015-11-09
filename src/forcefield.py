@@ -713,7 +713,7 @@ class FF(forcebalance.BaseClass):
 
         OMMFormat = "%%.%ie" % precision
         def TXTFormat(number, precision):
-            SciNot = "%% .%ie" % precision
+            SciNot = "%% .%if" % precision
             if abs(number) < 1000 and abs(number) > 0.001:
                 Decimal = "%% .%if" % precision
                 Num = Decimal % number
@@ -786,7 +786,7 @@ class FF(forcebalance.BaseClass):
                     whites[fld] = whites[fld][:-1]
                 # Actually replace the field with the physical parameter value.
                 if precision == 12:
-                    newrd  = "% 17.12e" % (wval)
+                    newrd  = "% 17.4f" % (wval)
                 else:
                     newrd  = TXTFormat(wval, precision)
                 # The new word might be longer than the old word.
