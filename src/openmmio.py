@@ -641,7 +641,8 @@ class OpenMM(Engine):
         self.platform = Platform.getPlatformByName(self.platname)
         if self.platname == 'CUDA':
             ## Set the device to the environment variable or zero otherwise
-            device = os.environ.get('CUDA_DEVICE',"7")
+            device = os.environ.get('CUDA_DEVICE',"0")
+            logger.info("Using CUDA device " + str(device) + "\n") 
             if self.verbose: logger.info("Setting CUDA Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
             if self.verbose: logger.info("Setting CUDA Precision to %s\n" % self.precision)
@@ -879,8 +880,6 @@ class OpenMM(Engine):
                 if len(rpmd_opts) == 0:
                     barostat = MonteCarloBarostat(pressure*atmospheres, temperature*kelvin, nbarostat)
                 else:
-                    logger.info("Creating RPMDMonteCarloBarostati\n")
-                    logger.info("Barostat stride: %d\n" % nbarostat)
                     barostat = RPMDMonteCarloBarostat(pressure*atmospheres, nbarostat)
         if self.pbc and pressure != None: self.system.addForce(barostat)
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
