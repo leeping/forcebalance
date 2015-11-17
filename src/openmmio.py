@@ -110,17 +110,9 @@ def centroid_kinetic(Sim, props):
             diff[np.where(props['Vsites'])[0],:] = 0.0
             derivative = -np.array(props['States'][i].getForces().value_in_unit(kilojoules_per_mole/nanometer))
             CV_second_term += np.sum(np.multiply(diff,derivative))
-        return Quantity(CV_second_term*0.5/P, kilojoules_per_mole)
+        return Quantity(CV_second_term*0.5/P, kilojoules_per_mole), centroid
     else:
         Sim.context.getState(getEnergy=True).getKineticEnergy()
-
-def compute_centroids(Sim, props):
-    N = props['N']
-    P = props['P']
-    centroids = np.array([[0.0,0.0,0.0]]*N)
-    for i in range(P):
-        centroids += np.array(props['Positions'][i]) / P
-    return centroids
 
 def get_forces(Sim):
     """Return forces on each atom or forces averaged over all copies in case of RPMD."""
@@ -641,7 +633,8 @@ class OpenMM(Engine):
         self.platform = Platform.getPlatformByName(self.platname)
         if self.platname == 'CUDA':
             ## Set the device to the environment variable or zero otherwise
-            device = os.environ.get('CUDA_DEVICE',"7")
+            device = os.environ.get('CUDA_DEVICE',"0")
+            logger.info("Using CUDA device " + str(device) + "\n") 
             if self.verbose: logger.info("Setting CUDA Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
             if self.verbose: logger.info("Setting CUDA Precision to %s\n" % self.precision)
@@ -812,7 +805,7 @@ class OpenMM(Engine):
         self.tdiv = 1
         
         # Boolean flag indicating an RPMD simulation
-        self.rpmd = len(rpmd_opts)>0
+        self.rpmd = len(rpmd_opts) > 0
         rpmd_opts = [int(i) for i in rpmd_opts]
 
         ## Determine the integrator.
@@ -824,11 +817,11 @@ class OpenMM(Engine):
                 integrator = MTSVVVRIntegrator(temperature*kelvin, collision/picosecond,
                                                timestep*femtosecond, self.system, ninnersteps=int(timestep/faststep))
             else:
-                if len(rpmd_opts) > 0:
-                    self.tdiv = int(rpmd_opts[0])
+                if self.rpmd:
+                    self.tdiv = rpmd_opts[0]
                     if len(rpmd_opts) == 1:
-                        logger.info("Creating RPMD integrator with %i beads.\n" % int(rpmd_opts[0]))
-                        integrator = RPMDIntegrator(int(rpmd_opts[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                        logger.info("Creating RPMD integrator with %i beads.\n" % (rpmd_opts[0]))
+                        integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
                     elif len(rpmd_opts) == 2:
                         contract = False
                         for frc in self.system.getForces():
@@ -836,11 +829,11 @@ class OpenMM(Engine):
                                 contract = True
                                 frc.setForceGroup(1)
                         if contract:
-                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i).\n" % (int(rpmd_opts[0]), int(rpmd_opts[1])))
-                            integrator = RPMDIntegrator(int(rpmd_opts[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:int(rpmd_opts[1])})
+                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i).\n" % (rpmd_opts[0], rpmd_opts[1]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_opts[1]})
                         else:
-                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (int(rpmd_opts[0])))
-                            integrator = RPMDIntegrator(int(rpmd_opts[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (rpmd_opts[0]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
                     elif len(rpmd_opts) == 3:
                         contract = False
                         contract_recip = False
@@ -852,21 +845,21 @@ class OpenMM(Engine):
                                     contract_recip = True
                                     frc.setReciprocalSpaceForceGroup(2)
                         if contract_recip:
-                            logger.info("Creating RPMD integrator with %i beads (NB/Recip forces contracted to %i/%i).\n" % (int(rpmd_opts[0]), int(rpmd_opts[1]), int(rpmd_opts[2])))
-                            integrator = RPMDIntegrator(int(rpmd_opts[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:int(rpmd_opts[1]), 2:int(rpmd_opts[2])})
+                            logger.info("Creating RPMD integrator with %i beads (NB/Recip forces contracted to %i/%i).\n" % (rpmd_opts[0], rpmd_opts[1], rpmd_opts[2]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_opts[1], 2:rpmd_opts[2]})
                         elif contract:
-                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i, no Recip).\n" % (int(rpmd_opts[0]), int(rpmd_opts[1])))
-                            integrator = RPMDIntegrator(int(rpmd_opts[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:int(rpmd_opts[1])})
+                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i, no Recip).\n" % (rpmd_opts[0], rpmd_opts[1]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_opts[1]})
                         else:
-                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (int(rpmd_opts[0])))
-                            integrator = RPMDIntegrator(int(rpmd_opts[0]), temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (rpmd_opts[0]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
                     else:
                         raise RuntimeError("Please provide a list of length 1, 2, or 3 to rpmd_opts")
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
         else:
             ## If no temperature control, default to the Verlet integrator.
-            if len(rpmd_opts) > 0:
+            if self.rpmd:
                 raise RuntimeError("No RPMD integrator without temperature control.")
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
@@ -876,11 +869,9 @@ class OpenMM(Engine):
                 barostat = MonteCarloAnisotropicBarostat([pressure, pressure, pressure]*atmospheres,
                                                          temperature*kelvin, nbarostat)
             else:
-                if len(rpmd_opts) == 0:
+                if not self.rpmd:
                     barostat = MonteCarloBarostat(pressure*atmospheres, temperature*kelvin, nbarostat)
                 else:
-                    logger.info("Creating RPMDMonteCarloBarostati\n")
-                    logger.info("Barostat stride: %d\n" % nbarostat)
                     barostat = RPMDMonteCarloBarostat(pressure*atmospheres, nbarostat)
         if self.pbc and pressure != None: self.system.addForce(barostat)
         elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
@@ -1021,6 +1012,7 @@ class OpenMM(Engine):
             # compute virtual sites by processing each copy via the context. We should NOT redo this each 
             # time set_positions() is called, as by then the virtual sites are already contained in xyz_rpmd.
             #-----------------
+            # EDIT: Is this even necessary?
             if isinstance(self.simulation.integrator, RPMDIntegrator):
                 rpmdIntegrator = self.simulation.context.getIntegrator()
                 for i in range(rpmdIntegrator.getNumCopies()):
@@ -1060,67 +1052,14 @@ class OpenMM(Engine):
             mass += system.getParticleMass(i)
         return mass
 
-    def rpmd_cv(self, traj=True):
-        self.update_simulation()
-        if not hasattr(self, 'rpmd_frame_props'):
-            rpmd_frame_props = {}
-            rpmd_frame_props['States'] = []
-            vsites = []
-            for i in range(self.simulation.system.getNumParticles()):
-                if self.simulation.system.isVirtualSite(i):
-                    vsites.append(True)
-                else:
-                    vsites.append(False)
-            mass_matrix = np.array([])
-            for i in range(self.simulation.system.getNumParticles()):
-                mass_matrix = np.append(mass_matrix, self.simulation.system.getParticleMass(i).value_in_unit(dalton))
-            rpmd_states     = []
-            state_positions = []
-            for i in range(self.simulation.integrator.getNumCopies()):
-                rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=False,
-                                getParameters=False,enforcePeriodicBox=True,groups=-1)
-                rpmd_states.append(rpmd_state)
-                state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
-            rpmd_frame_props['States']    = rpmd_states
-            rpmd_frame_props['Positions'] = state_positions
-            rpmd_frame_props['T']      = self.simulation.integrator.getTemperature() 
-            rpmd_frame_props['P']      = self.simulation.integrator.getNumCopies()
-            rpmd_frame_props['N']      = self.simulation.system.getNumParticles()
-            rpmd_frame_props['Masses'] = mass_matrix
-            rpmd_frame_props['Vsites'] = vsites
-        if not traj: 
-            Result = evaluate_potential(self.simulation).value_in_unit(kilojoules_per_mole) + \
-                        centroid_kinetic(self.simulation, rpmd_frame_props).value_in_unit(kilojoules_per_mole) 
-            return Result
-        cv_force_terms = []
-        potentials = []
-        if hasattr(self, 'xyz_rpmd'):
-            for I in range(len(self.xyz_rpmd)):                                                                          
-                self.set_positions(I) 
-                self.rpmd_states = []
-                self.state_positions = []
-                for i in range(self.simulation.integrator.getNumCopies()):
-                    rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=False,
-                                                                        getParameters=False,enforcePeriodicBox=True,groups=-1)
-                    self.rpmd_states.append(rpmd_state)
-                    self.state_positions.append(rpmd_state.getPositions().value_in_unit(nanometer))
-                self.rpmd_frame_props['States'] = self.rpmd_states
-                self.rpmd_frame_props['Positions'] = self.state_positions
-                cv_force_terms.append(centroid_kinetic(self.simulation, self.rpmd_frame_props).value_in_unit(kilojoules_per_mole))
-                potentials.append(evaluate_potential(self.simulation).value_in_unit(kilojoules_per_mole))
-        Result = np.array(cv_force_terms) + np.array(potentials)
-        return Result
-
     def calc_cv(self):
         if not hasattr(self,'rpmd_frame_props'):
             self.rpmd_frame_props = {}
             self.rpmd_frame_props['States'] = []
             vsites = []
             for i in range(self.simulation.system.getNumParticles()):
-                if self.simulation.system.isVirtualSite(i):
-                    vsites.append(True)
-                else:
-                    vsites.append(False)
+                if self.simulation.system.isVirtualSite(i): vsites.append(True)
+                else: vsites.append(False)
             mass_matrix = np.array([])
             for i in range(self.simulation.system.getNumParticles()):
                 mass_matrix = np.append(mass_matrix, self.simulation.system.getParticleMass(i).value_in_unit(dalton))
@@ -1427,7 +1366,7 @@ class OpenMM(Engine):
             self.xyz_omms = []
         else:
             if not isinstance(self.simulation.integrator, RPMDIntegrator):
-                logger.error('Specified an RPMD simulation but the integrator is wrong!')
+                logger.error('Specified an RPMD simulation but the integrator is wrong!\n')
                 raise RuntimeError
             # Structure of xyz_rpmd is [step][i], where index i=0 contains a list of coordinates for each copy
 	        # of the system and index i=1 contains box vectors. 
@@ -1448,10 +1387,8 @@ class OpenMM(Engine):
             vsites = []
             # Build boolean array indicating which particles are virtual
             for i in range(self.simulation.system.getNumParticles()):
-                if self.simulation.system.isVirtualSite(i):
-                    vsites.append(True)
-                else:
-                    vsites.append(False)
+                if self.simulation.system.isVirtualSite(i): vsites.append(True)
+                else: vsites.append(False)
             # Build np array of particle masses. Strip units to speed up function evaluation.
             mass_matrix = np.array([])
             for i in range(self.simulation.system.getNumParticles()):
@@ -1504,7 +1441,7 @@ class OpenMM(Engine):
                 kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
             else:
                 primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props)
-                kinetic = centroid_kinetic(self.simulation, self.rpmd_frame_props) 
+                kinetic, centroids_tmp = centroid_kinetic(self.simulation, self.rpmd_frame_props) 
             potential = evaluate_potential(self.simulation)
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
@@ -1555,9 +1492,9 @@ class OpenMM(Engine):
             if not self.rpmd:
                 kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
             else:
-                kinetic = centroid_kinetic(self.simulation, self.rpmd_frame_props)
+                kinetic, centroids_tmp = centroid_kinetic(self.simulation, self.rpmd_frame_props)
                 primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props) 
-                self.centroids.append(compute_centroids(self.simulation, self.rpmd_frame_props))
+                self.centroids.append(centroids_tmp)
             potential = evaluate_potential(self.simulation)
             if not self.rpmd:
                 kinetic_temperature = 2.0 * kinetic / kB / self.ndof
