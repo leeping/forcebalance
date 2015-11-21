@@ -453,22 +453,24 @@ def main():
 
     printcool("Condensed phase molecular dynamics", color=4, bold=True)
 
+    run_pimd = len(rpmd_opts) > 0
+
     # This line runs the condensed phase simulation.
     click()
-    prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    if not run_pimd:
+        prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    else:
+        prop_return = Liquid.run_pimd(**MDOpts["liquid"])
     logger.info("Liquid phase MD simulation took %.3f seconds\n" % click())
     Rhos = prop_return['Rhos']
     Potentials = prop_return['Potentials']
     Kinetics = prop_return['Kinetics']
-    Primitive_kinetics = prop_return['Primitive_kinetics']
-    Cp_corrections = prop_return['Cp_corrections']
+    if 'Primitive_kinetics' in prop_return:
+        Primitive_kinetics = prop_return['Primitive_kinetics']
+        Cp_corrections = prop_return['Cp_corrections']
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
-    if len(Cp_corrections) > 0:
-        RPMD = True
-    else:
-        RPMD = False
     #getone = prop_return['One'] 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -493,7 +495,7 @@ def main():
     pV = atm_unit * pressure * Volumes
     pV_avg, pV_err = mean_stderr(pV)
     Rho_avg, Rho_err = mean_stderr(Rhos)
-    if RPMD:
+    if run_pimd:
         PKE = Potentials + Primitive_kinetics
         PKE_avg, PKE_err = mean_stderr(PKE)
         Cp_corr_avg, Cp_corr_err = mean_stderr(Cp_corrections)
@@ -510,7 +512,10 @@ def main():
 
     printcool("Gas phase molecular dynamics", color=4, bold=True)
     click()
-    mprop_return = Gas.molecular_dynamics(**MDOpts["gas"])
+    if not run_pimd:
+        mprop_return = Gas.molecular_dynamics(**MDOpts["gas"])
+    else:
+        mprop_return = Gas.run_pimd(**MDOpts["gas"])
     logger.info("Gas phase MD simulation took %.3f seconds\n" % click())
     mPotentials = mprop_return['Potentials']
     mKinetics = mprop_return['Kinetics']
@@ -534,7 +539,7 @@ def main():
         Liquid = Engine(name="liquid", openmm_precision="double", **EngOpts["liquid"])
         Gas = Engine(name="gas", openmm_precision="double", **EngOpts["gas"])
 
-    if not RPMD:
+    if not run_pimd:
         # Compute the energy and dipole derivatives.
         printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True)
         click()
@@ -610,7 +615,7 @@ def main():
     Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
-    if not RPMD:
+    if not run_pimd:
         GHvap = np.mean(G,axis=1)
         GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
         GHvap /= NMol
@@ -649,25 +654,25 @@ def main():
         if 'v_' in kwargs:
             v_ = kwargs['v_']
         return 1/(kT*T) * (bzavg(h_*v_,b)-bzavg(h_,b)*bzavg(v_,b))/bzavg(v_,b)
-    if not RPMD:
+    if not run_pimd:
         Alpha = calc_alpha(None, **{'h_':H, 'v_':V})
     else:
         Alpha = calc_alpha(None, **{'h_':RPMDH, 'v_':V}) 
     Alphaboot = []
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
-        if not RPMD:
+        if not run_pimd:
             Alphaboot.append(calc_alpha(None, **{'h_':H[boot], 'v_':V[boot]}))
         else:   
             Alphaboot.append(calc_alpha(None, **{'h_':RPMDH[boot], 'v_':V[boot]}))
     Alphaboot = np.array(Alphaboot)
-    if not RPMD:
+    if not run_pimd:
         Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(H))])
     else:
         Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(RPMDH))])
 
     # Thermal expansion coefficient analytic derivative
-    if not RPMD:
+    if not run_pimd:
         GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
         GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
         GAlpha3 = deprod(V)/avg(V) - Gbar
@@ -729,31 +734,31 @@ def main():
             h_ = kwargs['h_']
         if 'corrections' in kwargs:
             corr = kwargs['corrections']
-        if 'RPMD' in kwargs:
+        if 'PIMD' in kwargs:
             Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2 + bzavg(corr,b))
         else:
             Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
         Cp_ *= 1000 / 4.184
         return Cp_
-    if not RPMD:
+    if not run_pimd:
         Cp = calc_cp(None,**{'h_':H})
     else:
-        Cp = calc_cp(None,**{'h_':RPMDH, 'RPMD':True, 'corrections':Cp_corrections})
+        Cp = calc_cp(None,**{'h_':RPMDH, 'PIMD':True, 'corrections':Cp_corrections})
     Cpboot = []
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
-        if not RPMD:
+        if not run_pimd:
             Cpboot.append(calc_cp(None,**{'h_':H[boot]}))
         else:
             Cpboot.append(calc_cp(None,**{'h_':RPMDH[boot], 'RPMD':True, 'corrections':Cp_corrections[boot]}))
     Cpboot = np.array(Cpboot)
-    if not RPMD:
+    if not run_pimd:
         Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(H))
     else:   
         Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(RPMDH))
 
     # Isobaric heat capacity analytic derivative
-    if not RPMD:
+    if not run_pimd:
         GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
         GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
         GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
@@ -822,7 +827,7 @@ def main():
     #------------------------------#
     # Fit quantum kinetic energies #
     #------------------------------#
-    if RPMD:
+    if run_pimd:
         # Centroid virial
         RPMDGbar         = np.mean(RPMDG,axis=1)
         RPMDG_frc_bar    = np.mean(RPMDG_frc_term,axis=1)
@@ -844,7 +849,7 @@ def main():
 
     logger.info("Writing all simulation data to disk.\n")
 
-    if not RPMD:
+    if not run_pimd:
         RPMDG              = np.zeros(G.shape)
         RPMDmG             = np.zeros(mG.shape)
         RPMDG_frc_term     = np.zeros(G.shape)
@@ -853,7 +858,7 @@ def main():
         pke_err            = 0.0
         kin_err            = 0.0
 
-    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, kin_err, pke_err, NMol, Cp_corrections, RPMDG, RPMDmG, RPMDG_frc_term, Kinetics, Primitive_kinetics, RPMD),'npt_result.p')
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, kin_err, pke_err, NMol, Cp_corrections, RPMDG, RPMDmG, RPMDG_frc_term, Kinetics, Primitive_kinetics, run_pimd),'npt_result.p')
 
 if __name__ == "__main__":
     main()
