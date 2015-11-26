@@ -1094,7 +1094,6 @@ class OpenMM(Engine):
                 pimd_state_tmp = self.simulation.integrator.getState(0,getPositions=dipole,getEnergy=True,getForces=True)
                 R1 = self.evaluate_one_(force,dipole=False,pimd_state=pimd_state_tmp)
                 Energies.append(R1["Energy"])
-                if force: Forces.append(R1["Force"])
                 if dipole:
                     # Use the stored centroid coordinates to calculate
                     # the dipole moment (MUCH faster).
