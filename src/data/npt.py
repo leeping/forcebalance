@@ -396,7 +396,7 @@ def main():
     if engname == "openmm":
         # OpenMM-specific options
         EngOpts["liquid"]["platname"] = 'CUDA'
-        EngOpts["gas"]["platname"] = 'Reference'
+        EngOpts["gas"]["platname"] = 'CUDA'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
@@ -461,6 +461,10 @@ def main():
         prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
     else:
         prop_return = Liquid.run_pimd(**MDOpts["liquid"])
+        # Note: simulation will crash on xstream unless I delete
+        # the existing simulation here. Probably has to do with 
+        # a device pointer.
+        del Liquid.simulation
     logger.info("Liquid phase MD simulation took %.3f seconds\n" % click())
     Rhos = prop_return['Rhos']
     Potentials = prop_return['Potentials']
@@ -516,6 +520,7 @@ def main():
         mprop_return = Gas.molecular_dynamics(**MDOpts["gas"])
     else:
         mprop_return = Gas.run_pimd(**MDOpts["gas"])
+        del Gas.simulation
     logger.info("Gas phase MD simulation took %.3f seconds\n" % click())
     mPotentials = mprop_return['Potentials']
     mKinetics = mprop_return['Kinetics']
@@ -555,10 +560,12 @@ def main():
         click()
         G, GDx, GDy, GDz, RPMDG, RPMDG_frc_term = rpmd_energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
         logger.info("Condensed phase rpmd derivatives took %.3f seconds\n" % click())  
+        del Liquid.simulation
         click()
         printcool("Gas phase rpmd term derivatives", color=4, bold=True)
         mG, _, __, ___, RPMDmG, RPMDmG_frc_term = rpmd_energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
         logger.info("Gas phase rpmd cv term derivatives took %.3f seconds\n" % click())
+        del Gas.simulation
     #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#
