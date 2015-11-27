@@ -396,7 +396,7 @@ def main():
     if engname == "openmm":
         # OpenMM-specific options
         EngOpts["liquid"]["platname"] = 'CUDA'
-        EngOpts["gas"]["platname"] = 'CUDA'
+        EngOpts["gas"]["platname"] = 'Reference'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
@@ -560,12 +560,12 @@ def main():
         click()
         G, GDx, GDy, GDz, RPMDG, RPMDG_frc_term = rpmd_energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
         logger.info("Condensed phase rpmd derivatives took %.3f seconds\n" % click())  
-        del Liquid.simulation
+        del Liquid
         click()
         printcool("Gas phase rpmd term derivatives", color=4, bold=True)
         mG, _, __, ___, RPMDmG, RPMDmG_frc_term = rpmd_energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
         logger.info("Gas phase rpmd cv term derivatives took %.3f seconds\n" % click())
-        del Gas.simulation
+        del Gas
     #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#

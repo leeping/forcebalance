@@ -1091,7 +1091,7 @@ class OpenMM(Engine):
         if hasattr(self, 'xyz_rpmd'):
             for I in range(len(self.xyz_rpmd)):
                 self.set_positions(I, postprocess=True) 
-                pimd_state_tmp = self.simulation.integrator.getState(0,getPositions=dipole,getEnergy=True,getForces=True)
+                pimd_state_tmp = self.simulation.integrator.getState(0,getPositions=True,getEnergy=True,getForces=True)
                 R1 = self.evaluate_one_(force,dipole=False,pimd_state=pimd_state_tmp)
                 Energies.append(R1["Energy"])
                 if dipole:
@@ -1103,7 +1103,7 @@ class OpenMM(Engine):
                     Dipoles.append([dx,dy,dz])
                 if rpmd:
                     centroids = self.centroids[I]
-                    x = np.array(pimd_state_tmp.getPositions.value_in_unit(nanometer))
+                    x = np.array(pimd_state_tmp.getPositions().value_in_unit(nanometer))
                     forces = np.array(pimd_state_tmp.getForces().value_in_unit(kilojoules_per_mole/nanometer))
                     cv_qke = 1.5 * self.natoms / self.beta
                     d_c = x - centroids
@@ -1507,7 +1507,7 @@ class OpenMM(Engine):
         self.vsite_idxs = self.simulation.reporters[0].vsite_idxs
         kT = 0.0083144621 * self.pimd_integrator.getTemperature().value_in_unit(kelvin) 
         self.beta = 1. / kT
-        Cp_corrections = 2. * kT * Primitive_kinetics - 3. * natoms * P * kT**2 / 2. 
+        Cp_corrections = 2. * kT * Primitive_kinetics - 3. * self.natoms * P * kT**2 / 2. 
         Ecomps = {}
         Ecomps["Potential Energy"] = Potentials
         Ecomps["CV Kinetic Energy"] = Kinetics
