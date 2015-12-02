@@ -1621,58 +1621,23 @@ class OpenMM(Engine):
         # Determine number of degrees of freedom.
         self.ndof = 3*(self.system.getNumParticles() - sum([self.system.isVirtualSite(i) for i in range(self.system.getNumParticles())])) \
             - self.system.getNumConstraints() - 3*self.pbc
+
         # Initialize statistics.
         edecomp = OrderedDict()
-        # Stored coordinates, box vectors for RPMD and classical
-        if not self.rpmd:
-            self.xyz_omms = []
-        else:
-            if not isinstance(self.simulation.integrator, RPMDIntegrator):
-                logger.error('Specified an RPMD simulation but the integrator is wrong!\n')
-                raise RuntimeError
-            # Structure of xyz_rpmd is [step][i], where index i=0 contains a list of coordinates for each copy
-	        # of the system and index i=1 contains box vectors. 
-            self.xyz_rpmd = []
+        # Stored coordinates, box vectors
+        self.xyz_omms = []
         # Densities, potential and kinetic energies, box volumes, dipole moments
         Rhos = []
         Potentials = []
         Kinetics = []
-        Primitive_kinetics = []
-        Cp_corrections = []
         Volumes = []
         Dips = []
         Temps = []
-        self.rpmd_frame_props = {}
-        self.rpmd_frame_props['States'] = []
-        self.centroids = []
-        if self.rpmd:
-            vsites = []
-            # Build boolean array indicating which particles are virtual
-            for i in range(self.simulation.system.getNumParticles()):
-                if self.simulation.system.isVirtualSite(i): vsites.append(True)
-                else: vsites.append(False)
-            # Build np array of particle masses. Strip units to speed up function evaluation.
-            mass_matrix = np.array([])
-            for i in range(self.simulation.system.getNumParticles()):
-                mass_matrix = np.append(mass_matrix, self.simulation.system.getParticleMass(i).value_in_unit(dalton))
-            self.rpmd_frame_props['T']      = self.simulation.integrator.getTemperature()
-            self.rpmd_frame_props['P']      = self.simulation.integrator.getNumCopies()
-            self.rpmd_frame_props['N']      = self.simulation.system.getNumParticles()
-            self.rpmd_frame_props['Masses'] = mass_matrix
-            self.rpmd_frame_props['Vsites'] = vsites
-            if any(vsites):
-                Natoms = int( 3 * self.rpmd_frame_props['N'] / 4)
-            else:
-                Natoms = self.rpmd_frame_props['N']
-            P = self.rpmd_frame_props['P']
-            k_b = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
         #========================#
         # Now run the simulation #
         #========================#
         # Initialize velocities.
-        #
         self.simulation.context.setVelocitiesToTemperature(temperature*kelvin)
-        #print(XmlSerializer.serialize(self.simulation.system)) 
         # Equilibrate.
         if iequil > 0: 
             if verbose: logger.info("Equilibrating...\n")
@@ -1680,31 +1645,12 @@ class OpenMM(Engine):
                 if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
             else:
                 if verbose: logger.info("%6s %9s %9s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)"))
-        for iteration in range(-1 if self.tdiv == 1 else 0, iequil):
+        for iteration in range(-1, iequil):
             if iteration >= 0:
                 self.simulation.step(nsave)
-            if not self.rpmd:
-                state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-            else:
-                self.rpmd_states     = []
-                self.inst_kinetics   = []
-                self.state_positions = []
-                for i in range(self.simulation.integrator.getNumCopies()):
-                    rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=True,
-                                                                        getParameters=False,enforcePeriodicBox=True,groups=-1)
-                    self.rpmd_states.append(rpmd_state)
-                    self.inst_kinetics.append(rpmd_state.getKineticEnergy())
-                    self.state_positions.append(np.array(rpmd_state.getPositions().value_in_unit(nanometer)))
-                state = self.rpmd_states[0]
-                self.rpmd_frame_props['States']        = self.rpmd_states
-                self.rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
-                self.rpmd_frame_props['Positions']     = self.state_positions
-            if not self.rpmd:
-                kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
-            else:
-                primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props)
-                kinetic, centroids_tmp = centroid_kinetic(self.simulation, self.rpmd_frame_props) 
-            potential = evaluate_potential(self.simulation, self.rpmd_frame_props)
+            state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
+            kinetic = state.getKineticEnergy()/self.tdiv
+            potential = state.getPotentialEnergy()
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -1712,17 +1658,15 @@ class OpenMM(Engine):
             else:
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            if not self.rpmd:
-                kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
-            else:
-                kinetic_temperature = sum(self.rpmd_frame_props['Inst_kinetics']) * 2.0 / (3.0 * Natoms * k_b * P**2)
+            kinetic_temperature = 2.0 * kinetic / kB / self.ndof # (1/2) ndof * kB * T = KE
             if self.pbc:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration+1, state.getTime() / picoseconds,
-                                                                                     kinetic_temperature / kelvin, potential,
+                                                                                     kinetic_temperature / kelvin, potential / kilojoules_per_mole,
                                                                                      volume / nanometers**3, density / (kilogram / meter**3)))
             else:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                        kinetic_temperature / kelvin, potential / kilojoules_per_mole))
+        # Collect production data.
         if verbose: logger.info("Production...\n")
         if self.pbc:
             if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
@@ -1731,42 +1675,14 @@ class OpenMM(Engine):
         if save_traj:
             self.simulation.reporters.append(PDBReporter('%s-md.pdb' % self.name, nsteps))
             self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave))
-        for iteration in range(-1 if self.tdiv == 1 else 0, isteps):
+        for iteration in range(-1, isteps):
             # Propagate dynamics.
-            if iteration >= 0:
-                t0 = time.time()
-                self.simulation.step(nsave)
-                t1 = time.time()
-                elapsed = t1 - t0
-                logger.info("Seconds for production: %.3f\n" % elapsed)
+            if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
-            if not self.rpmd:
-                state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
-            else:
-                self.rpmd_states     = []
-                self.inst_kinetics   = []
-                self.state_positions = []
-                for i in range(self.simulation.integrator.getNumCopies()):
-                    rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=True,
-                                                                        getParameters=False,enforcePeriodicBox=True,groups=-1)
-                    self.rpmd_states.append(rpmd_state)
-                    self.inst_kinetics.append(rpmd_state.getKineticEnergy())
-                    self.state_positions.append(np.array(rpmd_state.getPositions().value_in_unit(nanometer)))
-                state = self.rpmd_states[0]
-                self.rpmd_frame_props['States']        = self.rpmd_states
-                self.rpmd_frame_props['Inst_kinetics'] = self.inst_kinetics
-                self.rpmd_frame_props['Positions']     = self.state_positions
-            if not self.rpmd:
-                kinetic=evaluate_kinetic(self.simulation, self.rpmd_frame_props)
-            else:
-                kinetic, centroids_tmp = centroid_kinetic(self.simulation, self.rpmd_frame_props)
-                primitive_kinetic_tuple = evaluate_kinetic(self.simulation, self.rpmd_frame_props) 
-                self.centroids.append(centroids_tmp)
-            potential = evaluate_potential(self.simulation, self.rpmd_frame_props)
-            if not self.rpmd:
-                kinetic_temperature = 2.0 * kinetic / kB / self.ndof
-            else:
-                kinetic_temperature = sum(self.rpmd_frame_props['Inst_kinetics']) * 2.0 / (3.0 * Natoms * k_b * P**2)
+            state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
+            kinetic = state.getKineticEnergy()/self.tdiv
+            potential = state.getPotentialEnergy()
+            kinetic_temperature = 2.0 * kinetic / kB / self.ndof
             if self.pbc:
                 box_vectors = state.getPeriodicBoxVectors()
                 volume = self.compute_volume(box_vectors)
@@ -1775,10 +1691,7 @@ class OpenMM(Engine):
                 box_vectors = None
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            if not self.rpmd:
-                self.xyz_omms.append([state.getPositions(), box_vectors])
-            else:
-                self.xyz_rpmd.append([[self.rpmd_states[i].getPositions() for i in [0]], box_vectors])
+            self.xyz_omms.append([state.getPositions(), box_vectors])
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1786,48 +1699,21 @@ class OpenMM(Engine):
                 else:
                     edecomp[comp] = [val]
             if self.pbc:
-                if verbose: logger.info("%6d %9.3f %9.3f %13.3f %10.4f %13.4f\n" % (iteration+1, state.getTime() / picoseconds,
-                                                                                     kinetic_temperature / kelvin, potential,
+                if verbose: logger.info("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f\n" % (iteration+1, state.getTime() / picoseconds,
+                                                                                     kinetic_temperature / kelvin, potential / kilojoules_per_mole,
                                                                                      volume / nanometers**3, density / (kilogram / meter**3)))
             else:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
                                                                        kinetic_temperature / kelvin, potential / kilojoules_per_mole))
             Temps.append(kinetic_temperature / kelvin)
             Rhos.append(density.value_in_unit(kilogram / meter**3))
+            Potentials.append(potential / kilojoules_per_mole)
             Kinetics.append(kinetic / kilojoules_per_mole)
-            if self.rpmd:
-                Primitive_kinetics.append(primitive_kinetic_tuple[0] / kilojoules_per_mole)
             Volumes.append(volume / nanometer**3)
-            if not self.rpmd:
-                Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
-                Potentials.append(potential / kilojoules_per_mole)
-            else:
-                temp_dips = []
-                for i in range(self.simulation.integrator.getNumCopies()):
-                    temp_dips.append(get_dipole(self.simulation, positions=self.rpmd_states[i].getPositions()))
-                dip_avg = [sum(col) / float(len(col)) for col in zip(*temp_dips)]
-                Dips.append(dip_avg)
-                Potentials.append(potential)
-                if iteration >= 0: 
-                    t2 = time.time()
-                    elapsed = t2 - t1
-                    logger.info("Processing time: %.3f\n" % elapsed)
-        if not self.rpmd:
-            Kinetics = np.array(Kinetics)
-        else:
-            # Add all constant terms to energy estimator time series
-            T = self.rpmd_frame_props['T']
-            P = self.rpmd_frame_props['P']
-            kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
-            beta = 1.0/(kb*T)
-            kT = (kb * T).value_in_unit(kilojoule_per_mole)
-            primitive_kinetic_constant = (3.0 * Natoms * P / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
-            centroid_kinetic_constant  = (3.0 * Natoms / (2.0 * beta)).value_in_unit(kilojoule_per_mole)
-            Kinetics = np.array(Kinetics) + centroid_kinetic_constant
-            Primitive_kinetics = np.array(Primitive_kinetics) + primitive_kinetic_constant 
-            Cp_corrections = 2 * kT * Primitive_kinetics - 3 * Natoms * P * kT**2 / 2
+            Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
         Rhos = np.array(Rhos)
         Potentials = np.array(Potentials)
+        Kinetics = np.array(Kinetics)
         Volumes = np.array(Volumes)
         Dips = np.array(Dips)
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
@@ -1837,8 +1723,7 @@ class OpenMM(Engine):
         Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
         # Initialized property dictionary.
         prop_return = OrderedDict()
-        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps,
-            'Cp_corrections': Cp_corrections, 'Primitive_kinetics':Primitive_kinetics})
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
         return prop_return
 
 class Liquid_OpenMM(Liquid):
