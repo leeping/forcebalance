@@ -79,12 +79,12 @@ class Interaction(Target):
         self.e_err = 0.0
         self.e_err_pct = None
         ## Read in the trajectory file
-        if self.ns == -1:
-            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))
-            self.ns = len(self.mol)
-        else:
-            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))[:self.ns]
-        if self.select2 == None:
+        self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords), 
+                            top=(os.path.join(self.root,self.tgtdir,self.pdb) if hasattr(self, 'pdb') else None))
+        if self.ns != -1:
+            self.mol = self.mol[:self.ns]
+        self.ns = len(self.mol)
+        if self.select2 is None:
             self.select2 = [i for i in range(self.mol.na) if i not in self.select1]
             logger.info('Fragment 2 is the complement of fragment 1 : %s\n' % (commadash(self.select2)))
         ## Build keyword dictionaries to pass to engine.

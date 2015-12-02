@@ -3,7 +3,7 @@
 import os, sys, re
 import numpy as np
 from forcebalance.molecule import Molecule
-from readfrq import read_frq_psi
+from forcebalance.readfrq import read_frq_psi
 
 # Psi4 output file.
 psiout = sys.argv[1]

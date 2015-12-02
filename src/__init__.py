@@ -41,18 +41,18 @@ class BaseClass(object):
     def set_option(self, in_dict, src_key, dest_key = None, val = None, default = None, forceprint=False):
         if not hasattr(self, 'PrintOptionDict'):
             self.PrintOptionDict  = OrderedDict()
-        if dest_key == None:
+        if dest_key is None:
             dest_key = src_key
-        if val == None:
-            if src_key in in_dict and in_dict[src_key] != None:
+        if val is None:
+            if src_key in in_dict and in_dict[src_key] is not None:
                 val = in_dict[src_key]
-            elif default != None:
+            elif default is not None:
                 val = default
             elif src_key in gen_opts_defaults: 
                 val = gen_opts_defaults[src_key]
             elif src_key in tgt_opts_defaults:
                 val = tgt_opts_defaults[src_key]
-        if default == None:
+        if default is None:
             if src_key in gen_opts_defaults: 
                 default = gen_opts_defaults[src_key]
             elif src_key in tgt_opts_defaults:

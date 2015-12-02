@@ -383,7 +383,7 @@ def main():
     ML = Molecule(liquid_fnm, toppbc=True)
     MG = Molecule(gas_fnm)
     # Determine the number of molecules in the condensed phase coordinate file.
-    NMol = len(ML.molecules)
+    NMol = TgtOptions['n_molecules']
     logger.info("There are %i molecules in the liquid\n" % (NMol))
 
     #----
@@ -391,15 +391,21 @@ def main():
     #----
     EngOpts = OrderedDict()
     EngOpts["liquid"] = OrderedDict([("coords", liquid_fnm), ("mol", ML), ("pbc", True)])
+    if "nonbonded_cutoff" in TgtOptions:
+        EngOpts["liquid"]["nonbonded_cutoff"] = TgtOptions["nonbonded_cutoff"]
+    if "vdw_cutoff" in TgtOptions:
+        EngOpts["liquid"]["vdw_cutoff"] = TgtOptions["vdw_cutoff"]
     EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
     GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":
         # OpenMM-specific options
-        EngOpts["liquid"]["platname"] = 'CUDA'
+        EngOpts["liquid"]["platname"] = TgtOptions.get("platname", 'CUDA')
+        # For now, always run gas phase calculations on the reference platform
         EngOpts["gas"]["platname"] = 'Reference'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
+            EngOpts["liquid"]["platname"] = 'CUDA'
         if threads > 1: logger.warn("Setting the number of threads will have no effect on OpenMM engine.\n")
     elif engname == "gromacs":
         # Gromacs-specific options
@@ -407,6 +413,7 @@ def main():
         GenOpts["gmxsuffix"] = TgtOptions["gmxsuffix"]
         EngOpts["liquid"]["gmx_top"] = os.path.splitext(liquid_fnm)[0] + ".top"
         EngOpts["liquid"]["gmx_mdp"] = os.path.splitext(liquid_fnm)[0] + ".mdp"
+        EngOpts["liquid"]["gmx_eq_barostat"] = TgtOptions["gmx_eq_barostat"]
         EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
         EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gas_fnm)[0] + ".mdp"
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
@@ -585,7 +592,7 @@ def main():
     logger.info(Sep)
 
     def calc_rho(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'r_' in kwargs:
             r_ = kwargs['r_']
         return bzavg(r_,b)
@@ -655,7 +662,7 @@ def main():
     # Thermal expansion coefficient
     #----
     def calc_alpha(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         if 'v_' in kwargs:
@@ -705,7 +712,7 @@ def main():
     # Isothermal compressibility
     #----
     def calc_kappa(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'v_' in kwargs:
             v_ = kwargs['v_']
         return bar_unit / kT * (bzavg(v_**2,b)-bzavg(v_,b)**2)/bzavg(v_,b)
@@ -736,7 +743,7 @@ def main():
     # Isobaric heat capacity
     #----
     def calc_cp(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         if 'corrections' in kwargs:
@@ -792,7 +799,7 @@ def main():
     # Dielectric constant
     #----
     def calc_eps0(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'd_' in kwargs: # Dipole moment vector.
             d_ = kwargs['d_']
         if 'v_' in kwargs: # Volume.

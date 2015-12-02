@@ -1,0 +1,38 @@
+$options
+jobtype optimize
+forcefield water.itp             # Specify names of force field files (files with tunable constants).  Try changing the PARM tags on the ITP file.
+penalty_additive 0.01            # Regularization prefactor.
+trust0 1.0                       # Trust radius.
+backup false                     # Don't back up any files.
+read_mvals
+   0 [  0.00000000e+00 ] : VDWS:OW
+   1 [  0.00000000e+00 ] : VDWT:OW
+   2 [  0.00000000e+00 ] : BONDSB:HWOW
+   3 [  0.00000000e+00 ] : BONDSK:HWOW
+   4 [  0.00000000e+00 ] : ANGLESB:HWOWHW
+   5 [  0.00000000e+00 ] : ANGLESK:HWOWHW
+   6 [  0.00000000e+00 ] : COUL:SOL-2
+   7 [  0.00000000e+00 ] : COUL:SOL-4
+   8 [  0.00000000e+00 ] : VSITE3A:SOL-4
+/read_mvals
+priors
+   BONDSB                               : 1.0e-02
+   BONDSK                               : 1.0e+06
+   VSITE3A                              : 4.0e-01
+   VDWS                                 : 2.0e-01
+   VDWT                                 : 4.0e+00
+   ANGLESB                              : 2.0e+01
+   ANGLESK                              : 1.0e+03
+   COUL                                 : 4.0e-01
+/priors
+$end
+
+$target
+simtype abinitio_gmx             # The target type; fitting ab initio data using GROMACS
+name cluster-06                  # Also the subdirectory containing data within "targets"
+$end
+
+$target                          # ForceBalance supports multiple targets
+simtype abinitio_gmx
+name cluster-12
+$end

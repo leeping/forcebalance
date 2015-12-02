@@ -164,6 +164,7 @@ tgt_opts_types = {
                  "remote_prefix"         : ('', 50, 'Specify an optional prefix script to run in front of rtarget.py, for loading environment variables', 'Remote targets', 'Remote'),
                  "fitatoms"              : ('0', 0, 'Number of fitting atoms; defaults to all of them.  Use a comma and dash style list (1,2-5), atoms numbered from one, inclusive', 'Energy + Force Matching', 'AbInitio'),
                  "subset"                : (None, 0, 'Specify a subset of molecules to fit.  The rest are used for cross-validation.', 'Hydration free energy target', 'Hydration'),
+                 "gmx_eq_barostat"       : ('berendsen', 0, 'Name of the barostat to use for equilibration.', 'Condensed phase property targets, Gromacs only', 'liquid, lipid'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
@@ -187,6 +188,7 @@ tgt_opts_types = {
                  "eq_steps"           : (20000, 0, 'Number of time steps for the equilibration run.', 'Thermodynamic property targets', 'thermo'),
                  "md_steps"           : (50000, 0, 'Number of time steps for the production run.', 'Thermodynamic property targets', 'thermo'),
                  "n_sim_chain"        : (1, 0, 'Number of simulations required to calculate quantities.', 'Thermodynamic property targets', 'thermo'),
+                 "n_molecules"        : (-1, 0, 'Provide the number of molecules in the structure (defaults to auto-detect).', 'Condensed phase properties', 'Liquid'),
                  },
     'bools'   : {"whamboltz"        : (0, -100, 'Whether to use WHAM Boltzmann Weights', 'Ab initio targets with Boltzmann weights (advanced usage)', 'AbInitio'),
                  "sampcorr"         : (0, -150, 'Whether to use the archaic sampling correction', 'Energy + Force Matching, very old option, do not use', 'AbInitio'),
@@ -257,6 +259,8 @@ tgt_opts_types = {
                  "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "epsgrad"         : (0.0, -150, 'Gradient below this threshold will be set to zero.', 'All targets'),
                  "energy_asymmetry": (1.0, -150, 'Snapshots with (E_MM - E_QM) < 0.0 will have their weights increased by this factor.', 'Ab initio targets'),
+                 "nonbonded_cutoff"  : (None, -1, 'Cutoff for nonbonded interactions (passed to engines).', 'Condensed phase property targets', 'liquid'),
+                 "vdw_cutoff"        : (None, -2, 'Cutoff for vdW interactions if different from other nonbonded interactions', 'Condensed phase property targets', 'liquid'),
                  },
     'sections': {}
     }
@@ -379,7 +383,7 @@ def printsection(heading,optdict,typedict):
         vartype = re.sub('s$','',i)
         for j in typedict[i]:
             Option = []
-            val = optdict[j] if optdict != None else typedict[i][j][0]
+            val = optdict[j] if optdict is not None else typedict[i][j][0]
             if firstentry:
                 firstentry = 0
             else:
@@ -466,7 +470,7 @@ def parse_inputs(input_file=None):
     tgt_opts = []
     this_tgt_opt = deepcopy(tgt_opts_defaults)
     # Give back a bunch of default options if input file isn't specified.
-    if input_file == None:
+    if input_file is None:
         return (options, [this_tgt_opt])
     fobj = open(input_file)
     for line in fobj:

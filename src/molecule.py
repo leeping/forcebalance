@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                   Last updated October 7, 2014                     |#
+#|                    Last updated May 22, 2015                       |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -154,7 +154,21 @@ try:
     from output import *
 except: 
     from logging import *
-    logger.info("Imported the default logger\n")
+    class RawStreamHandler(StreamHandler):
+        """Exactly like output.StreamHandler except it does no extra formatting
+        before sending logging messages to the stream. This is more compatible with
+        how output has been displayed in ForceBalance. Default stream has also been
+        changed from stderr to stdout"""
+        def __init__(self, stream = sys.stdout):
+            super(RawStreamHandler, self).__init__(stream)
+        
+        def emit(self, record):
+            message = record.getMessage()
+            self.stream.write(message)
+            self.flush()
+    logger=getLogger()
+    logger.handlers = [RawStreamHandler(sys.stdout)]
+    logger.setLevel(INFO)
 
 module_name = __name__.replace('.molecule','')
 
@@ -511,7 +525,7 @@ def pvec(vec):
 def grouper(n, iterable):
     """ Groups a big long iterable into groups of ten or what have you. """
     args = [iter(iterable)] * n
-    return list([e for e in t if e != None] for t in itertools.izip_longest(*args))
+    return list([e for e in t if e is not None] for t in itertools.izip_longest(*args))
 
 def even_list(totlen, splitsize):
     """ Creates a list of number sequences divided as evenly as possible.  """
@@ -608,7 +622,7 @@ def AlignToMoments(elem,xyz1,xyz2=None):
     If xyz2 is passed in, it will assume that xyz1 is already
     aligned to the moment of inertia, and it simply does 180-degree
     rotations to make sure nothing is inverted."""
-    xyz = xyz1 if xyz2 == None else xyz2
+    xyz = xyz1 if xyz2 is None else xyz2
     I = np.zeros((3,3))
     for i, xi in enumerate(xyz):
         I += (np.dot(xi,xi)*np.eye(3) - np.outer(xi,xi))
@@ -624,7 +638,7 @@ def AlignToMoments(elem,xyz1,xyz2=None):
             print "in AlignToMoments, determinant is % .3f" % determ
         BB[:,2] *= -1
     xyzr = np.array(np.matrix(BB).T * np.matrix(xyz).T).T.copy()
-    if xyz2 != None:
+    if xyz2 is not None:
         xyzrr = AlignToDensity(elem,xyz1,xyzr,binary=True)
         return xyzrr
     else:
@@ -798,9 +812,9 @@ def arc(Mol, begin=None, end=None, RMSD=True):
         Arc length between frames in Angstrom, length is n_frames - 1
     """
     Mol.align()
-    if begin == None:
+    if begin is None:
         begin = 0
-    if end == None:
+    if end is None:
         end = len(Mol)
     if RMSD:
         Arc = Mol.pathwise_rmsd()
@@ -1153,7 +1167,7 @@ class Molecule(object):
     def append(self,other):
         self += other
 
-    def __init__(self, fnm = None, ftype = None, **kwargs):
+    def __init__(self, fnm = None, ftype = None, top = None, ttype = None, **kwargs):
         """ 
         Create a Molecule object.
         
@@ -1169,6 +1183,11 @@ class Molecule(object):
             File type, corresponding to an entry in the internal table of known
             file types.  Provide this if you have a nonstandard file extension
             or if you wish to force to invoke a particular parser.
+        top : str, optional
+            "Topology" file name.  If provided, will build the Molecule 
+            using this file name, then "fnm" will load frames instead.
+        ttype : str, optional
+            "Typology" file type.
         build_topology : bool, optional
             Build the molecular topology consisting of: topology (overall connectivity graph),
             molecules (list of connected subgraphs), bonds (if not explicitly read in), default True
@@ -1183,6 +1202,15 @@ class Molecule(object):
         positive_resid : bool, optional
             If provided, enforce all positive resIDs.
         """
+        # If we passed in a "topology" file, read it in first, and then load the frames
+        if top is not None:
+            load_fnm = fnm
+            load_type = ftype
+            fnm = top
+            ftype = ttype
+        else:
+            load_fnm = None
+            load_type = None
         #=========================================#
         #|           File type tables            |#
         #|    Feel free to edit these as more    |#
@@ -1245,9 +1273,9 @@ class Molecule(object):
         # Data container.  All of the data is stored in here.
         self.Data = {}
         ## Read in stuff if we passed in a file name, otherwise return an empty instance.
-        if fnm != None:
+        if fnm is not None:
             self.Data['fnm'] = fnm
-            if ftype == None:
+            if ftype is None:
                 ## Try to determine from the file name using the extension.
                 ftype = os.path.splitext(fnm)[1][1:]
             if not os.path.exists(fnm):
@@ -1267,6 +1295,8 @@ class Molecule(object):
             ## Build the topology.
             if kwargs.get('build_topology', True) and hasattr(self, 'elem') and self.na > 0:
                 self.build_topology(force_bonds=False)
+        if load_fnm is not None:
+            self.load_frames(load_fnm, ftype=load_type, **kwargs)
 
     #=====================================#
     #|     Core read/write functions     |#
@@ -1276,13 +1306,19 @@ class Molecule(object):
 
     def require(self, *args):
         for arg in args:
+            if arg == 'na': # The 'na' attribute is the number of atoms.
+                if hasattr(self, 'na'):
+                    continue
+            if arg == 'qm_forces':
+                warn('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
+                arg = 'qm_grads'
             if arg not in self.Data:
                 logger.error("%s is a required attribute for writing this type of file but it's not present\n" % arg)
                 raise RuntimeError
 
     # def read(self, fnm, ftype = None):
     #     """ Read in a file. """
-    #     if ftype == None:
+    #     if ftype is None:
     #         ## Try to determine from the file name using the extension.
     #         ftype = os.path.splitext(fnm)[1][1:]
     #     ## This calls the table of reader functions and prints out an error message if it fails.
@@ -1291,10 +1327,10 @@ class Molecule(object):
     #     return Answer
 
     def write(self,fnm=None,ftype=None,append=False,select=None,**kwargs):
-        if fnm == None and ftype == None:
+        if fnm is None and ftype is None:
             logger.error("Output file name and file type are not specified.\n")
             raise RuntimeError
-        elif ftype == None:
+        elif ftype is None:
             ftype = os.path.splitext(fnm)[1][1:]
         ## Fill in comments.
         if 'comms' not in self.Data:
@@ -1307,12 +1343,12 @@ class Molecule(object):
         self.fout = fnm
         if type(select) in [int, np.int64, np.int32]:
             select = [select]
-        if select == None:
+        if select is None:
             select = range(len(self))
         Answer = self.Write_Tab[self.Funnel[ftype.lower()]](select,**kwargs)
         ## Any method that returns text will give us a list of lines, which we then write to the file.
-        if Answer != None:
-            if fnm == None or fnm == sys.stdout:
+        if Answer is not None:
+            if fnm is None or fnm == sys.stdout:
                 outfile = sys.stdout
             elif append:
                 # Writing to symbolic links risks unintentionally overwriting the source file - 
@@ -1378,39 +1414,45 @@ class Molecule(object):
                     rig = np.array([o, h1, h2]) + com
                     self.xyzs[i][a:a+3] = rig
 
-#        if center:
-#            xyz1 -= xyz1.mean(0)
-#        for index2, xyz2 in enumerate(self.xyzs):
-#            if index2 == 0: continue
-#            xyz2 -= xyz2.mean(0)
-#            if smooth:
-#                ref = index2-1
-#            else:
-#                ref = 0
-#            tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
-#            xyz2 = np.dot(xyz2, rt) + tr
-#            self.xyzs[index2] = xyz2
-
-    def load_frames(self, fnm):
-        NewMol = Molecule(fnm)
-        if NewMol.na != self.na:
-            logger.error('When loading frames, don\'t change the number of atoms.\n')
-            raise RuntimeError
-        for key in NewMol.FrameKeys:
-            self.Data[key] = NewMol.Data[key]
+    def load_frames(self, fnm, ftype=None, **kwargs):
+        ## Read in stuff if we passed in a file name, otherwise return an empty instance.
+        if fnm is not None:
+            if ftype is None:
+                ## Try to determine from the file name using the extension.
+                ftype = os.path.splitext(fnm)[1][1:]
+            if not os.path.exists(fnm):
+                logger.error('Tried to create Molecule object from a file that does not exist: %s\n' % fnm)
+                raise IOError
+            ## Actually read the file.
+            Parsed = self.Read_Tab[self.Funnel[ftype.lower()]](fnm, **kwargs)
+            if 'xyzs' not in Parsed:
+                logger.error('Did not get any coordinates from the new file %s\n' % fnm)
+                raise RuntimeError
+            if Parsed['xyzs'][0].shape[0] != self.na:
+                logger.error('When loading frames, don\'t change the number of atoms\n')
+                raise RuntimeError
+            ## Set member variables.
+            for key, val in Parsed.items():
+                if key in FrameVariableNames:
+                    self.Data[key] = val
+            ## Create a list of comment lines if we don't already have them from reading the file.
+            if 'comms' not in self.Data:
+                self.comms = ['Generated by ForceBalance from %s: Frame %i of %i' % (fnm, i+1, self.ns) for i in range(self.ns)]
+            else:
+                self.comms = [i.expandtabs() for i in self.comms]
 
     def edit_qcrems(self, in_dict, subcalc = None):
         """ Edit Q-Chem rem variables with a dictionary.  Pass a value of None to delete a rem variable. """
-        if subcalc == None:
+        if subcalc is None:
             for qcrem in self.qcrems:
                 for key, val in in_dict.items():
-                    if val == None:
+                    if val is None:
                         qcrem.pop(key, None)
                     else:
                         qcrem[key] = val
         else:
             for key, val in in_dict.items():
-                if val == None:
+                if val is None:
                     self.qcrems[subcalc].pop(key, None)
                 else:
                     self.qcrems[subcalc][key] = val
@@ -1606,7 +1648,7 @@ class Molecule(object):
                 ref = index2-1
             else:
                 ref = 0
-            if select != None:
+            if select is not None:
                 tr, rt = get_rotate_translate(xyz2[select],self.xyzs[ref][select])
             else:
                 tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
@@ -1645,10 +1687,14 @@ class Molecule(object):
             zmax = maxs[2]
             toppbc = False
 
+        xext = xmax-xmin
+        yext = ymax-ymin
+        zext = zmax-zmin
+
         if toppbc:
-            gszx = (xmax-xmin)/int((xmax-xmin)/gsz)
-            gszy = (ymax-ymin)/int((ymax-ymin)/gsz)
-            gszz = (zmax-zmin)/int((zmax-zmin)/gsz)
+            gszx = xext/int(xext/gsz)
+            gszy = yext/int(yext/gsz)
+            gszz = zext/int(zext/gsz)
         else:
             gszx = gsz
             gszy = gsz
@@ -1656,7 +1702,7 @@ class Molecule(object):
 
         # Run algorithm to determine bonds.
         # Decide if we want to use the grid algorithm.
-        use_grid = toppbc or (np.min([xmax-xmin, ymax-ymin, zmax-zmin]) > 2.0*gsz)
+        use_grid = toppbc or (np.min([xext, yext, zext]) > 2.0*gsz)
         if use_grid:
             # Inside the grid algorithm.
             # 1) Determine the left edges of the grid cells.
@@ -1694,23 +1740,24 @@ class Molecule(object):
                 zidx = -1
                 for j in xgrd:
                     xi = self.xyzs[sn][i][0]
-                    while xi < 0: xi += xmax
-                    while xi > xmax: xi -= xmax
+                    while xi < xmin: xi += xext
+                    while xi > xmax: xi -= xext
                     if xi < j: break
                     xidx += 1
                 for j in ygrd:
                     yi = self.xyzs[sn][i][1]
-                    while yi < 0: yi += ymax
-                    while yi > ymax: yi -= ymax
+                    while yi < ymin: yi += yext
+                    while yi > ymax: yi -= yext
                     if yi < j: break
                     yidx += 1
                 for j in zgrd:
                     zi = self.xyzs[sn][i][2]
-                    while zi < 0: zi += zmax
-                    while zi > zmax: zi -= zmax
+                    while zi < zmin: zi += zext
+                    while zi > zmax: zi -= zext
                     if zi < j: break
                     zidx += 1
                 gasn[(xidx,yidx,zidx)].append(i)
+                    
             # 5) Create list of 2-tuples corresponding to combinations of atomic indices.
             # This is done by looping over pairs of neighboring grid cells and getting Cartesian products of atom indices inside.
             # It may be possible to get a 2x speedup by eliminating forward-reverse pairs (e.g. (5, 4) and (4, 5) and duplicates (5,5).)
@@ -1764,7 +1811,7 @@ class Molecule(object):
         self.Data['bonds'] = sorted(list(set(bondlist)))
         self.built_bonds = True
 
-    def build_topology(self, force_bonds=True):
+    def build_topology(self, force_bonds=True, **kwargs):
         ''' 
 
         Create self.topology and self.molecules; these are graph
@@ -1779,9 +1826,14 @@ class Molecule(object):
             default behavior.  If creating a Molecule object using
             __init__, do not force the building of bonds by default
             (only build bonds if not read from file.)
-
+        topframe : int, optional
+            Provide the frame number used for reading the bonds.  If
+            not provided, this will be taken from the top_settings
+            field.  If provided, this will take priority and write
+            the value into top_settings.
         '''
-        sn = self.top_settings['topframe']
+        sn = kwargs.get('topframe', self.top_settings['topframe'])
+        self.top_settings['topframe'] = sn
         if self.na > 100000:
             print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
         # Build bonds from connectivity graph if not read from file.
@@ -1887,7 +1939,7 @@ class Molecule(object):
                 for a1 in sorted(list(nx.neighbors(mol, a2))):
                     if a1 != a3:
                         for a4 in sorted(list(nx.neighbors(mol, a3))):
-                            if a4 != a2:
+                            if a4 != a2 and len(set([a1, a2, a3, a4])) == 4:
                                 dihidx.append((a1, a2, a3, a4))
         return dihidx
 
@@ -2774,7 +2826,7 @@ class Molecule(object):
             self.top_settings["read_bonds"] = True
             Answer["bonds"] = bonds
 
-        if Box != None:
+        if Box is not None:
             Answer["boxes"] = [Box for i in range(len(XYZList))]
 
         return Answer
@@ -2860,6 +2912,8 @@ class Molecule(object):
         ## Intrinsic reaction coordinate stuff
         IRCDir = 0
         RPLine = False
+        ## Finite difference stuff
+        FDiff = False
         #---- Intrinsic reaction coordinate data.
         # stat: Status, X : Coordinates, E : Energies, Q : Charges, Sz: Spin-Z
         # Explanation of Status:
@@ -2978,6 +3032,8 @@ class Molecule(object):
             #----- If doing freezing string calculation, do NOT treat as a geometry optimization.
             if 'Starting FSM Calculation' in line:
                 FSM = True
+            if 'needFdiff: TRUE' in line:
+                FDiff = True
             #----- Vibrational stuff
             VModeNxt = None
             if 'VIBRATIONAL ANALYSIS' in line:
@@ -3002,7 +3058,7 @@ class Molecule(object):
                 elif 'TransDip' not in s:
                     for i in range(nfrq):
                         readmodes[i].append([float(s[j]) for j in range(1+3*i,4+3*i)])
-            if VModeNxt != None: VMode = VModeNxt
+            if VModeNxt is not None: VMode = VModeNxt
             for key, val in matrix_match.items():
                 if Mats[key]["Mode"] >= 1:
                     # Match any number of integers on a line.  This signifies a column header to start the matrix
@@ -3095,6 +3151,9 @@ class Molecule(object):
                     Answer['qm_energies'].append(0.0)
                     mkchg.append([0.0 for j in mkchg[-1]])
                     mkspn.append([0.0 for j in mkchg[-1]])
+            if FDiff and (len(Answer['qm_energies']) == (len(Answer['xyzs'])+1)):
+                logger.info("Aligning energies because finite difference calculation prints one extra")
+                Answer['qm_energies'] = Answer['qm_energies'][:-1]
             lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
             if len(set(lens)) != 1:
                 logger.error('The number of energies and coordinates in %s are not the same : %s\n' % (fnm, str(lens)))
@@ -3239,10 +3298,10 @@ class Molecule(object):
 
     def write_inpcrd(self, select, sn=None, **kwargs):
         self.require('xyzs')
-        if len(self.xyzs) != 1 and sn == None:
+        if len(self.xyzs) != 1 and sn is None:
             logger.error("inpcrd can only be written for a single-frame trajectory\n")
             raise RuntimeError
-        if sn != None:
+        if sn is not None:
             self.xyzs = [self.xyzs[sn]]
             self.comms = [self.comms[sn]]
         # In inp files, there is only one comment line

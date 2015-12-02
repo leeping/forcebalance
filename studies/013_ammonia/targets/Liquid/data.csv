@@ -1,0 +1,71 @@
+# This is documentation for the ForceBalance condensed phase reference data file,,,,,,,,
+"# Lines beginning with octothorpe are comments, empty lines are ignored",,,,,,,,
+"# A line can either be a comment, a global parameter, a single line with column headings, or a data line (after the column heading line)",,,,,,,,
+# This file should be saved as .xlsx (to preserve formatting) but exported to .csv for ForceBalance to use.,,,,,,,,
+,,,,,,,,
+"# Global parameters are defined here; they have ""Global"" in the first column.",,,,,,,,
+# rho_denom : least squares denominator for the density objective function,,,,,,,,
+"# Note: w_rho, w_hvap etc. is set in the input file.  This is because it's considered an adjustable option rather than a property of the data set.",,,,,,,,
+# The overall prefactor for an observable is w_obs / obs_denom^2 ,,,,,,,,
+"# We expect the force field to fit the density better (1/8 of the T-dep, 1/60 of the avg) better than the heat of vaporization (1/2 of the stdev, 1/20 of the avg)",,,,,,,,
+Global,rho_denom,10,,,,,,
+Global,hvap_denom,1,,,,,,
+Global,eps0_denom,2,,,,,,
+,,,,,,,,
+"# Before entering the data, there must be one line with column headings.",,,,,,,,
+# Allowed column headings are: (not case sensitive),,,,,,,,
+# T : Temperature in Kelvin,,,,,,,,
+"# P : Pressure in specified unit (append atm or bar), default is atm",,,,,,,,
+# MBAR : Include this state in multistate Bennett acceptance ratio calculation (more extreme states are not included),,,,,,,,
+# Rho : Density in kg m^-3,,,,,,,,
+# Hvap : Enthalpy of vaporization in kJ/mol.  Note: simulating liquid at 1 atm is an acceptable approximation for the vapor pressure.,,,,,,,,
+# Alpha : Thermal expansion coefficient in 10^-4 K^-1.,,,,,,,,
+# Kappa: Isothermal compressibility in 10^-6 bar^-1.,,,,,,,,
+# Cp: Isobaric heat capacity in kJ/mol K^-1.,,,,,,,,
+# Eps0: Static dielectric constant.,,,,,,,,
+# Rho_wt : Weight to use for this phase point. Analogous for Hvap etc. If column is missing then all weights are 1.,,,,,,,,
+# Cvib_intra : To be ADDED to the calculated enthalpy of vaporization ; energy difference due to intramolecular vibrational frequency shifts in going from gas to liquid,,,,,,,,
+# Cvib_inter : To be ADDED to the calculated enthalpy of vaporization ; energy difference due to intermolecular vibrational frequency shifts in going from gas to liquid,,,,,,,,
+# Cni : To be ADDED to the calculated enthalpy of vaporization ; accounts for the nonideality of the gas phase (more relevant close to critical point),,,,,,,,
+# dEvib : To be ADDED to the calculated heat capacity.  Note that these values are slightly different from the TIP4P-Ew paper for some reason.,,,,,,,,
+"# Density and Hvap come from: Wikipedia Ammonia data page via Lange's Handbook of Chemistry, 10 Ed. http://en.wikipedia.org/wiki/Ammonia_(data_page) ",,,,,,,,
+"# Dielectric constant comes from: Billaud G. and Demortier A., J. Phys. Chem. 1975, 79, 3053. DOI: 10.1021/j100593a053",,,,,,,,
+,,,,,,,,
+T,P,MBAR,Rho,Rho_wt,Hvap,Hvap_wt,Eps0,Eps0_wt
+#195.15,0.059 bar,TRUE,730.94,0.0,24.13,0.0,28.11,0.0
+#198.15,0.0793 bar,TRUE,730.94,1.0,24.13,0.0,28.11,1.0
+#203.15,0.1092 bar,TRUE,725.27,1.0,24.13,0.0,27.38,1.0
+#208.15,0.1561 bar,TRUE,719.53,1.0,24.13,0.0,26.66,1.0
+#213.15,0.219 bar,TRUE,713.78,1.0,24.13,0.0,25.96,1.0
+#218.15,0.3016 bar,TRUE,707.91,1.0,24.13,0.0,25.27,1.0
+#223.15,0.4087 bar,TRUE,702.00,1.0,24.13,1.0,24.60,1.0
+#228.15,0.5454 bar,TRUE,696.04,1.0,23.91,1.0,23.94,1.0
+#233.15,0.7177 bar,TRUE,689.99,1.0,23.67,1.0,23.29,1.0
+#238.15,0.9319 bar,TRUE,683.85,1.0,23.42,1.0,22.65,1.0
+#243.15,1.196 bar,TRUE,677.64,1.0,23.18,1.0,22.03,1.0
+#248.15,1.516 bar,TRUE,671.37,1.0,22.91,1.0,21.42,1.0
+#253.15,1.902 bar,TRUE,665.03,1.0,22.65,1.0,20.82,1.0
+#258.15,2.363 bar,TRUE,658.54,1.0,22.38,1.0,20.23,1.0
+#263.15,2.908 bar,TRUE,651.98,1.0,22.09,1.0,19.66,1.0
+#268.15,3.548 bar,TRUE,645.33,1.0,21.80,1.0,19.10,1.0
+273.15,4.294 bar,TRUE,638.57,1.0,21.51,1.0,18.56,1.0
+#278.15,5.157 bar,TRUE,631.67,1.0,21.20,1.0,18.02,1.0
+#283.15,6.149 bar,TRUE,624.69,1.0,20.88,1.0,17.50,1.0
+#288.15,7.283 bar,TRUE,617.55,1.0,20.56,1.0,17.00,1.0
+#293.15,8.571 bar,TRUE,610.28,1.0,20.22,1.0,16.50,1.0
+#298.15,10.03 bar,TRUE,602.85,1.0,19.88,1.0,16.02,1.0
+#303.15,11.66 bar,TRUE,595.24,1.0,19.52,1.0,15.56,1.0
+#308.15,13.5 bar,TRUE,588.16,1.0,19.14,1.0,15.10,1.0
+#313.15,15.54 bar,TRUE,579.48,1.0,18.75,1.0,14.66,1.0
+#318.15,17.81 bar,TRUE,571.30,1.0,18.44,1.0,14.23,1.0
+323.15,20.32 bar,TRUE,562.87,1.0,17.92,1.0,13.82,1.0
+#328.15,23.1 bar,TRUE,554.20,1.0,17.92,0.0,13.82,0.0
+#333.15,26.13 bar,TRUE,545.23,1.0,17.92,0.0,13.82,0.0
+#338.15,29.47 bar,TRUE,535.96,1.0,17.92,0.0,13.82,0.0
+#343.15,33.12 bar,TRUE,526.32,1.0,17.92,0.0,13.82,0.0
+#348.15,37.11 bar,TRUE,516.26,1.0,17.92,0.0,13.82,0.0
+#353.15,41.44 bar,TRUE,505.71,1.0,17.92,0.0,13.82,0.0
+#358.15,46.14 bar,TRUE,494.63,1.0,17.92,0.0,13.82,0.0
+#363.15,51.23 bar,TRUE,482.90,1.0,17.92,0.0,13.82,0.0
+#368.15,56.72 bar,TRUE,470.41,1.0,17.92,0.0,13.82,0.0
+#373.15,62.64 bar,TRUE,456.93,1.0,17.92,0.0,13.82,0.0

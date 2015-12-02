@@ -37,7 +37,7 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
         C.append(sum(W[N:N+ns]))
         N += ns
     C = np.array(C)
-    if PTS != None:
+    if PTS is not None:
         if len(PTS) != len(N_k):
             logger.error("PTS array (phase point labels) must equal length of N_k array (# of trajectories)\n")
             raise RuntimeError
@@ -51,9 +51,9 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
         tfl = 0
         # If we have phase point labels, then presumably we can have less cluttered printout
         # by printing only the lines with the largest contribution
-        pl = 0 if PTS != None else 1
+        pl = 0 if PTS is not None else 1
         for i, Ci in enumerate(C):
-            if PTS != None:
+            if PTS is not None:
                 line1 += "%%%is " % fs % PTS[i]
             if Ci == np.max(C):
                 line2 += "\x1b[91m%%%i.1f%%%%\x1b[0m " % (fs-1) % (Ci*100)
@@ -68,7 +68,7 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
                 line1 = ""
                 line2 = ""
                 tfl = 0
-                pl = 0 if PTS != None else 1 
+                pl = 0 if PTS is not None else 1 
         if tfl > 0 and pl: 
             if len(line1) > 0:
                 logger.info(line1+"\n")
@@ -116,6 +116,12 @@ class Liquid(Target):
         self.set_option(tgt_opts,'gas_eq_steps',forceprint=True)
         # Number of time steps in the gas "production" run
         self.set_option(tgt_opts,'gas_md_steps',forceprint=True)
+        # Cutoff for nonbonded interactions in the liquid
+        if tgt_opts['nonbonded_cutoff'] is not None:
+            self.set_option(tgt_opts,'nonbonded_cutoff')
+        # Cutoff for vdW interactions if different from other nonbonded interactions
+        if tgt_opts['vdw_cutoff'] is not None:
+            self.set_option(tgt_opts,'vdw_cutoff')
         # Time step length (in fs) for the liquid production run
         self.set_option(tgt_opts,'liquid_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates
@@ -138,6 +144,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'anisotropic_box',forceprint=True)
         # Whether to save trajectories (0 = never, 1 = delete after good step, 2 = keep all)
         self.set_option(tgt_opts,'save_traj')
+        # Set the number of molecules by hand (in case ForceBalance doesn't get the right number from the structure)
+        self.set_option(tgt_opts,'n_molecules')
 
         #======================================#
         #     Variables which are set here     #
@@ -147,6 +155,18 @@ class Liquid(Target):
             logger.error("%s doesn't exist; please provide liquid_coords option\n" % self.liquid_coords)
             raise RuntimeError
         self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.liquid_coords), toppbc=True)
+        if self.n_molecules >= 0:
+            if self.n_molecules == len(self.liquid_mol.molecules):
+                logger.info("User-provided number of molecules matches auto-detected value (%i)\n" % self.n_molecules)
+            else:
+                logger.info("User-provided number of molecules (%i) overrides auto-detected value (%i)\n" % (self.n_molecules, len(self.liquid_mol.molecules)))
+        else:
+            self.n_molecules = len(self.liquid_mol.molecules)
+            if len(set([len(m) for m in self.liquid_mol.molecules])) != 1:
+                warn_press_key("Possible issue because molecules are not all the same size! Sizes detected: %s" % str(set([len(m) for m in self.liquid_mol.molecules])), timeout=30)
+            else:
+                logger.info("Autodetected %i molecules with %i atoms each in liquid coordinates\n" % (self.n_molecules, len(self.liquid_mol.molecules[0])))
+                
         # Read in gas starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.gas_coords)): 
             logger.error("%s doesn't exist; please provide gas_coords option\n" % self.gas_coords)
@@ -317,7 +337,7 @@ class Liquid(Target):
             self.last_traj += [os.path.join(os.getcwd(), i) for i in self.extra_output]
             self.liquid_mol[simnum%len(self.liquid_mol)].write(self.liquid_coords, ftype='tinker' if self.engname == 'tinker' else None)
             cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
-            if wq == None:
+            if wq is None:
                 logger.info("Running condensed phase simulation locally.\n")
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
@@ -328,6 +348,7 @@ class Liquid(Target):
 
     def polarization_correction(self,mvals):
         self.FF.make(mvals)
+        # print mvals
         ddict = self.gas_engine.multipole_moments(optimize=True)['dipole']
         d = np.array(ddict.values())
         if not in_fd():
@@ -651,6 +672,12 @@ class Liquid(Target):
             logger.error('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!\n')
             raise RuntimeError
 
+        # Having only one simulation for MBAR is the same as not doing MBAR at all.
+        if len(BPoints) == 1:
+            BPoints = []
+        if len(mBPoints) == 1:
+            mBPoints = []
+
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
             Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, Kin_errs, Pke_errs, NMols, \
@@ -793,8 +820,8 @@ class Liquid(Target):
             W1 = mbar.getWeights()
             logger.info("Done\n")
         elif len(BPoints) == 1:
-            W1 = np.ones((BPoints*Shots,BPoints))
-            W1 /= BPoints*Shots
+            W1 = np.ones((Shots,1))
+            W1 /= Shots
         
         def fill_weights(weights, phase_points, mbar_points, snapshots):
             """ Fill in the weight matrix with MBAR weights where MBAR was run, 
@@ -818,7 +845,7 @@ class Liquid(Target):
             # Run MBAR on the monomers.  This is barely necessary.
             mW1 = None
             mShots = len(mE[0])
-            if len(mBPoints) > 0:
+            if len(mBPoints) > 1:
                 mBSims = len(mBPoints)
                 mN_k = np.ones(mBSims)*mShots
                 mU_kln = np.zeros([mBSims,mBSims,mShots])
@@ -833,8 +860,8 @@ class Liquid(Target):
                     mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
                     mW1 = mmbar.getWeights()
             elif len(mBPoints) == 1:
-                mW1 = np.ones((mBSims*mShots,mSims))
-                mW1 /= mBSims*mShots
+                mW1 = np.ones((mShots,1))
+                mW1 /= mShots
             mW2 = fill_weights(mW1, mPoints, mBPoints, mShots)
          
         if self.do_self_pol:

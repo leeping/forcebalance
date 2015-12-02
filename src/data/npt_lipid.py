@@ -334,13 +334,20 @@ def main():
     #----
     EngOpts = OrderedDict()
     EngOpts["lipid"] = OrderedDict([("coords", lipid_fnm), ("mol", ML), ("pbc", True)])
+    if "nonbonded_cutoff" in TgtOptions:
+        EngOpts["lipid"]["nonbonded_cutoff"] = TgtOptions["nonbonded_cutoff"]
+    if "vdw_cutoff" in TgtOptions:
+        EngOpts["lipid"]["vdw_cutoff"] = TgtOptions["vdw_cutoff"]
     GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":
         # OpenMM-specific options
-        EngOpts["lipid"]["openmm_platform"] = 'CUDA'
+        EngOpts["liquid"]["platname"] = TgtOptions.get("platname", 'CUDA')
+        # For now, always run gas phase calculations on the reference platform
+        EngOpts["gas"]["platname"] = 'Reference'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
+            EngOpts["liquid"]["platname"] = 'CUDA'
         if threads > 1: logger.warn("Setting the number of threads will have no effect on OpenMM engine.\n")
     elif engname == "gromacs":
         # Gromacs-specific options
@@ -348,6 +355,7 @@ def main():
         GenOpts["gmxsuffix"] = TgtOptions["gmxsuffix"]
         EngOpts["lipid"]["gmx_top"] = os.path.splitext(lipid_fnm)[0] + ".top"
         EngOpts["lipid"]["gmx_mdp"] = os.path.splitext(lipid_fnm)[0] + ".mdp"
+        EngOpts["lipid"]["gmx_eq_barostat"] = TgtOptions["gmx_eq_barostat"]
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
         if mts: logger.warn("Gromacs not configured for multiple timestep integrator.")
         if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")
@@ -451,7 +459,7 @@ def main():
     logger.info(Sep)
 
     def calc_rho(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'r_' in kwargs:
             r_ = kwargs['r_']
         return bzavg(r_,b)
@@ -491,7 +499,7 @@ def main():
     # Thermal expansion coefficient
     #----
     def calc_alpha(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         if 'v_' in kwargs:
@@ -526,7 +534,7 @@ def main():
     # Isothermal compressibility
     #----
     def calc_kappa(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'v_' in kwargs:
             v_ = kwargs['v_']
         return bar_unit / kT * (bzavg(v_**2,b)-bzavg(v_,b)**2)/bzavg(v_,b)
@@ -557,7 +565,7 @@ def main():
     # Isobaric heat capacity
     #----
     def calc_cp(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
         Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
@@ -590,7 +598,7 @@ def main():
     # Dielectric constant
     #----
     def calc_eps0(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'd_' in kwargs: # Dipole moment vector.
             d_ = kwargs['d_']
         if 'v_' in kwargs: # Volume.
@@ -642,7 +650,7 @@ def main():
     logger.info(Sep)
 
     def calc_al(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'a_' in kwargs:
             a_ = kwargs['a_']
         return bzavg(a_,b)
@@ -654,7 +662,7 @@ def main():
     #----
     kbT = 1.3806488e-23 * T
     def calc_lkappa(b=None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 'a_' in kwargs:
             a_ = kwargs['a_']
         al_var = bzavg(a_**2,b)-bzavg(a_,b)**2
@@ -706,7 +714,7 @@ def main():
     logger.info(Sep)
 
     def calc_scd(b = None, **kwargs):
-        if b == None: b = np.ones(L,dtype=float)
+        if b is None: b = np.ones(L,dtype=float)
         if 's_' in kwargs:
             s_ = kwargs['s_']
         return bzavg(s_,b)

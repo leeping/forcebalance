@@ -209,7 +209,7 @@ class Objective(forcebalance.BaseClass):
                         pass
         else:
             wq = getWorkQueue()
-            if wq != None:
+            if wq is not None:
                 wq_wait(wq)
             for Tgt in self.Targets:
                 # The first call is always done at the midpoint.
@@ -274,10 +274,13 @@ class Objective(forcebalance.BaseClass):
         printcool_dictionary(PrintDict,color=4,title=Title)
         return
 
-    def Full(self, mvals, Order=0, verbose=False, customdir=None):
-        Objective = self.Target_Terms(mvals, Order, verbose, customdir)
+    def Full(self, vals, Order=0, verbose=False, customdir=None):
+        Objective = self.Target_Terms(vals, Order, verbose, customdir)
         ## Compute the penalty function.
-        Extra = self.Penalty.compute(mvals,Objective)
+        if self.FF.use_pvals:
+            Extra = self.Penalty.compute(self.FF.create_mvals(vals),Objective)
+        else:
+            Extra = self.Penalty.compute(vals,Objective)
         Objective['X0'] = Objective['X']
         Objective['G0'] = Objective['G'].copy()
         Objective['H0'] = Objective['H'].copy()

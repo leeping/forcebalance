@@ -138,12 +138,12 @@ def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
             qzz += mm[12]
         if isinstance(i, NonbondedForce):
             # Get array of charges.
-            if q == None:
+            if q is None:
                 q = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
             # Get array of positions in nanometers.
-            if positions == None:
+            if positions is None:
                 positions = simulation.context.getState(getPositions=True).getPositions()
-            if mass == None:
+            if mass is None:
                 mass = np.array([simulation.context.getSystem().getParticleMass(k).value_in_unit(dalton) \
                                      for k in range(simulation.context.getSystem().getNumParticles())])
             x = np.array(positions.value_in_unit(nanometer))
@@ -643,7 +643,7 @@ class OpenMM(Engine):
             self.mol = kwargs['mol']
         elif 'coords' in kwargs:
             self.mol = Molecule(kwargs['coords'])
-            if pdbfnm == None and kwargs['coords'].endswith('.pdb'):
+            if pdbfnm is None and kwargs['coords'].endswith('.pdb'):
                 pdbfnm = kwargs['coords']
         else:
             logger.error('Must provide either a molecule object or coordinate file.\n')
@@ -652,7 +652,7 @@ class OpenMM(Engine):
         # If the PDB file exists, then it is copied directly to create
         # the OpenMM pdb object rather than being written by the
         # Molecule class.
-        if pdbfnm != None:
+        if pdbfnm is not None:
             self.abspdb = os.path.abspath(pdbfnm)
             mpdb = Molecule(pdbfnm)
             for i in ["chain", "atomname", "resid", "resname", "elem"]:
@@ -702,12 +702,12 @@ class OpenMM(Engine):
         ## Set system options from ForceBalance force field options.
         if hasattr(self,'FF'):
             if self.AMOEBA:
-                if self.FF.amoeba_pol == None:
+                if self.FF.amoeba_pol is None:
                     logger.error('You must specify amoeba_pol if there are any AMOEBA forces.\n')
                     raise RuntimeError
                 if self.FF.amoeba_pol == 'mutual':
                     self.mmopts['polarization'] = 'mutual'
-                    self.mmopts.setdefault('mutualInducedTargetEpsilon', self.FF.amoeba_eps if self.FF.amoeba_eps != None else 1e-6)
+                    self.mmopts.setdefault('mutualInducedTargetEpsilon', self.FF.amoeba_eps if self.FF.amoeba_eps is not None else 1e-6)
                     self.mmopts['mutualInducedMaxIterations'] = 500
                 elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
@@ -716,18 +716,45 @@ class OpenMM(Engine):
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
         if pbc:
-            self.mmopts.setdefault('nonbondedMethod', PME)
+            minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
+            ## Here we will set the CutoffPeriodic so custom nonbonded forces may be used.
+            ## However, we will turn PME on for AmoebaMultipoleForce and NonbondedForce after the system is created.
+            self.SetPME = True
+            self.mmopts.setdefault('nonbondedMethod', CutoffPeriodic)
             if self.AMOEBA:
-                self.mmopts.setdefault('nonbondedCutoff', 0.7*nanometer)
-                self.mmopts.setdefault('vdwCutoff', 0.85)
+                nonbonded_cutoff = kwargs.get('nonbonded_cutoff', 7.0)
+                vdw_cutoff = kwargs.get('nonbonded_cutoff', 8.5)
+                vdw_cutoff = kwargs.get('vdw_cutoff', vdw_cutoff)
+                # Conversion to nanometers
+                nonbonded_cutoff /= 10
+                vdw_cutoff /= 10
+                if 'nonbonded_cutoff' in kwargs and 'vdw_cutoff' not in kwargs:
+                    warn_press_key('AMOEBA detected and nonbonded_cutoff is set, but not vdw_cutoff; it will be set equal to nonbonded_cutoff')
+                if nonbonded_cutoff > 0.05*(float(int(minbox - 1))):
+                    warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (nonbonded_cutoff*10, minbox))
+                if vdw_cutoff > 0.05*(float(int(minbox - 1))):
+                    warn_press_key("vdw_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (vdw_cutoff*10, minbox))
+                self.mmopts.setdefault('nonbondedCutoff', nonbonded_cutoff*nanometer)
+                self.mmopts.setdefault('vdwCutoff', vdw_cutoff*nanometer)
                 self.mmopts.setdefault('aEwald', 5.4459052)
                 self.mmopts.setdefault('pmeGridDimensions', [24,24,24])
             else:
-                self.mmopts.setdefault('nonbondedCutoff', 0.85*nanometer)
+                if 'vdw_cutoff' in kwargs:
+                    warn_press_key('AMOEBA not detected, your provided vdw_cutoff will not be used')
+                nonbonded_cutoff = kwargs.get('nonbonded_cutoff', 8.5)
+                # Conversion to nanometers
+                nonbonded_cutoff /= 10
+                if nonbonded_cutoff > 0.05*(float(int(minbox - 1))):
+                    warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (nonbonded_cutoff*10, minbox))
+
+                self.mmopts.setdefault('nonbondedCutoff', nonbonded_cutoff*nanometer)
                 self.mmopts.setdefault('useSwitchingFunction', True)
-                self.mmopts.setdefault('switchingDistance', 0.75*nanometer)
+                self.mmopts.setdefault('switchingDistance', (nonbonded_cutoff-0.1)*nanometer)
             self.mmopts.setdefault('useDispersionCorrection', True)
         else:
+            if 'nonbonded_cutoff' in kwargs or 'vdw_cutoff' in kwargs:
+                warn_press_key('No periodic boundary conditions, your provided nonbonded_cutoff and vdw_cutoff will not be used')
+            self.SetPME = False
             self.mmopts.setdefault('nonbondedMethod', NoCutoff)
             self.mmopts['removeCMMotion'] = False
 
@@ -761,7 +788,7 @@ class OpenMM(Engine):
         #            for i in range(system.getNumParticles()) if system.isVirtualSite(i)]
         self.AtomMask = []
         self.AtomLists = defaultdict(list)
-        self.AtomLists['Mass'] = [a.element.mass.value_in_unit(dalton) if a.element != None else 0 for a in Atoms]
+        self.AtomLists['Mass'] = [a.element.mass.value_in_unit(dalton) if a.element is not None else 0 for a in Atoms]
         self.AtomLists['ParticleType'] = ['A' if m >= 1.0 else 'D' for m in self.AtomLists['Mass']]
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
@@ -836,7 +863,7 @@ class OpenMM(Engine):
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
         ## Add the barostat.
-        if pressure != None:
+        if pressure is not None:
             if anisotropic:
                 barostat = MonteCarloAnisotropicBarostat([pressure, pressure, pressure]*atmospheres,
                                                          temperature*kelvin, nbarostat)
@@ -888,7 +915,7 @@ class OpenMM(Engine):
         # OpenMM classes for force generators
         ismgens = [forcefield.AmoebaGeneralizedKirkwoodGenerator, forcefield.AmoebaWcaDispersionGenerator,
                      forcefield.CustomGBGenerator, forcefield.GBSAOBCGenerator, forcefield.GBVIGenerator]
-        if self.ism != None:
+        if self.ism is not None:
             if self.ism == False:
                 self.forcefield._forces = [f for f in self.forcefield._forces if not any([isinstance(f, f_) for f_ in ismgens])]
             elif self.ism == True:
@@ -912,6 +939,11 @@ class OpenMM(Engine):
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
+                if self.SetPME:
+                    i.setNonbondedMethod(i.PME)
+            if isinstance(i, AmoebaMultipoleForce):
+                if self.SetPME:
+                    i.setNonbondedMethod(i.PME)
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
@@ -1204,7 +1236,12 @@ class OpenMM(Engine):
             logger.error("Polarizability calculation is available in TINKER only.\n")
             raise NotImplementedError
 
-        if optimize: self.optimize(shot)
+        if self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']:
+            crit = 1e-4
+        else:
+            crit = 1e-6
+
+        if optimize: self.optimize(shot, crit=crit)
         else: self.set_positions(shot)
 
         moments = get_multipoles(self.simulation)
