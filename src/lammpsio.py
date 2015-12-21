@@ -15,9 +15,19 @@ logger = getLogger(__name__)
 
 # LAMMPS SPECIFIC IMPORTS
 import ctypes as ct
-import lammps, shutil
+import lammps, shutil, time
 from pprint import pprint
 from forcebalance.optimizer import Counter
+
+PS_minimum = np.array([-1.556,
+                       -0.111,
+                        0.0,
+                       -1.947,
+                        0.764,
+                        0.0,
+                       -0.611,
+                        0.049,
+                        0.0])
 
 class LAMMPS_INTERFACE(object):
 
@@ -103,12 +113,12 @@ class LAMMPS(Engine):
         for I in range(len(self.mol)):
             self.xyz_snapshots.append(self.mol.xyzs[I])
 
-        num_atoms = len(self.xyz_snapshots[0])
-        if num_atoms == 9:
+        n_atoms = len(self.xyz_snapshots[0])
+        if n_atoms == 9:
             self.type = 'trimer'
-        elif num_atoms == 6:
+        elif n_atoms == 6:
             self.type = 'dimer'
-        elif num_atoms == 3:
+        elif n_atoms == 3:
             self.type = 'monomer'
         else:
             raise RuntimeError('Something went wrong in loading the \
@@ -160,59 +170,50 @@ class LAMMPS(Engine):
         Utility function for computing energy and forces using LAMMPS
         """
         Result = {}
+        snaps = self.xyz_snapshots
+        e_primary = np.array([self._lmp_main.get_V(coords.reshape((1,-1))[0]) \
+                              for coords in snaps])
 
         if self.type == 'monomer':
-            e_series = []
-
-            for coords in self.xyz_snapshots:
-                e_series.append(self._lmp_main.get_V(coords.reshape((1,-1))[0]) + 235.687591978)
+            # '1-body' energy. we subtract the energy of the structure
+            # minimized in the Partridge-Schwenke potential.
+            e_series_final = e_primary - self.PS_energy
 
         elif self.type == 'dimer':
-            e_d  = []
-            e_m1 = []
-            e_m2 = []
-
-            for coords in self.xyz_snapshots:
-                h2o1_coords = coords[:3]
-                h2o2_coords = coords[3:]
-                # Energy we want is the 2-body energy, so compute
-                # each monomer separately.
-                e_m1.append(self._lmp_monomer.get_V(h2o1_coords.reshape((1,-1))[0]))
-                e_m2.append(self._lmp_monomer.get_V(h2o2_coords.reshape((1,-1))[0]))
-                # Dimer
-                e_d.append(self._lmp_main.get_V(coords.reshape((1,-1))[0]))
-
-            e_m1, e_m2, e_d = np.array(e_m1), np.array(e_m2), np.array(e_d)
-            e_series = e_d - (e_m1 + e_m2)
+            lmp_m = self._lmp_monomer
+            e_m1 = np.array([lmp_m.get_V(coords[:3].reshape((1,-1))[0]) \
+                             for coords in snaps])
+            e_m2 = np.array([lmp_m.get_V(coords[3:].reshape((1,-1))[0]) \
+                             for coords in snaps]) 
+            # 2-body energy
+            e_series_final = e_primary - (e_m1 + e_m2)
 
         else:
-            Es_3B = []
- 
-            def calc_two_body(dim_eng, dim_coords, E_tot_1_body):
-                e_dimer = dim_eng.get_V(dim_coords)
-                return e_dimer - E_tot_1_body
-            
-            for coords in self.xyz_snapshots:
-                E_2_body_total = 0.0
-                h2o_1_coords = coords[:3].reshape((1,-1))[0]
-                h2o_2_coords = coords[3:6].reshape((1,-1))[0]
-                h2o_3_coords = coords[6:].reshape((1,-1))[0]
-                pair_1 = coords[:6].reshape((1,-1))[0]
-                pair_2 = coords[3:].reshape((1,-1))[0]
-                pair_3 = np.vstack((coords[:3],coords[6:])).reshape((1,-1))[0]
-                Es_1_body = []
-                Es_1_body.append(self._lmp_monomer.get_V(h2o_1_coords))
-                Es_1_body.append(self._lmp_monomer.get_V(h2o_2_coords))
-                Es_1_body.append(self._lmp_monomer.get_V(h2o_3_coords))
-                E_2_body_total += calc_two_body(self._lmp_dimer, pair_1, sum(Es_1_body[:2])) + \
-                                  calc_two_body(self._lmp_dimer, pair_2, sum(Es_1_body[1:])) + \
-                                  calc_two_body(self._lmp_dimer, pair_3, sum([Es_1_body[i] for i in [0,2]]))  
-                E_trimer = self._lmp_main.get_V(coords.reshape((1,-1))[0])
-                E_3_body = (E_trimer - E_2_body_total) - sum(Es_1_body)
-                Es_3B.append(E_3_body)
-            e_series = Es_3B
-        
-        Result['Energy'] = np.array(e_series)
+            lmp_m = self._lmp_monomer
+            lmp_d = self._lmp_dimer
+            e_m1 = np.array([lmp_m.get_V(coords[:3].reshape((1,-1))[0]) \
+                             for coords in snaps])
+            e_m2 = np.array([lmp_m.get_V(coords[3:6].reshape((1,-1))[0]) \
+                             for coords in snaps])
+            e_m3 = np.array([lmp_m.get_V(coords[6:].reshape((1,-1))[0]) \
+                             for coords in snaps]) 
+
+            def two_body_series(lmp_d, e_m1, e_m2, dimer_snaps):
+                e_pair = np.array([lmp_d.get_V(coords.reshape((1,-1))[0]) \
+                                   for coords in dimer_snaps])
+                return e_pair - (e_m1 + e_m2)
+
+            d_snaps_1_2 = [coords[:6] for coords in snaps] 
+            d_snaps_2_3 = [coords[3:] for coords in snaps]
+            d_snaps_1_3 = [np.vstack((coords[:3],coords[6:])) for coords in snaps]
+            e_2b_1 = two_body_series(lmp_d, e_m1, e_m2, d_snaps_1_2)
+            e_2b_2 = two_body_series(lmp_d, e_m2, e_m3, d_snaps_2_3)
+            e_2b_3 = two_body_series(lmp_d, e_m1, e_m3, d_snaps_1_3)
+            # 3-body energy
+            e_series_final = e_primary - (e_2b_1 + e_2b_2 + e_2b_3 + e_m1 + e_m2 + e_m3)
+
+        KCAL_MOL_TO_KJ_MOL = 4.184 
+        Result['Energy'] = e_series_final * KCAL_MOL_TO_KJ_MOL
         if force:
             pass
         return Result
@@ -246,29 +247,17 @@ class LAMMPS(Engine):
 
         self.create_interfaces()
 
+        # Need to calculate a new offset each time 
+        # we write a new force field file. 
+        if self.type == 'monomer':
+            self.PS_energy = self._lmp_main.get_V(PS_minimum)
+
         if hasattr(self, 'xyz_snapshots'): 
             # Convert calculated energies to kJ/mol
-            return self.evaluate_()['Energy'] * 4.184
+            return self.evaluate_()['Energy'] 
         else:
             raise RuntimeError('Configuration snapshots \
                     not present for target.')
-
-#class Liquid_LAMMPS(Liquid):
-#
-#    """Condensed phase property matching using LAMMPS"""
-#
-#    def __init__(self,options,tgt_opts,forcefield):
-#        # Some potentially useful options
-#        # Name of the liquid coordinat file.
-#        self.set_option(tgt_opts,'liquid_coords',default='liquid.pdb',forceprint=True)
-#        # Set the number of steps between MC barostat adjustments.
-#        self.set_option(tgt_opts,'n_mcbarostat')
-#        self.engine_ = LAMMPS
-#        # Name of the engine to pass to npt.py
-#        self.engname = "lammps"
-#        # Initialize the base class.
-#        super(Liquid_LAMMPS,self).__init__(options,tgt_opts,forcefield)
-
 
 class AbInitio_LAMMPS(AbInitio):
 
