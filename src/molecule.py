@@ -154,7 +154,21 @@ try:
     from output import *
 except: 
     from logging import *
-    logger.info("Imported the default logger\n")
+    class RawStreamHandler(StreamHandler):
+        """Exactly like output.StreamHandler except it does no extra formatting
+        before sending logging messages to the stream. This is more compatible with
+        how output has been displayed in ForceBalance. Default stream has also been
+        changed from stderr to stdout"""
+        def __init__(self, stream = sys.stdout):
+            super(RawStreamHandler, self).__init__(stream)
+        
+        def emit(self, record):
+            message = record.getMessage()
+            self.stream.write(message)
+            self.flush()
+    logger=getLogger()
+    logger.handlers = [RawStreamHandler(sys.stdout)]
+    logger.setLevel(INFO)
 
 module_name = __name__.replace('.molecule','')
 
@@ -1930,7 +1944,7 @@ class Molecule(object):
                 for a1 in sorted(list(nx.neighbors(mol, a2))):
                     if a1 != a3:
                         for a4 in sorted(list(nx.neighbors(mol, a3))):
-                            if a4 != a2:
+                            if a4 != a2 and len(set([a1, a2, a3, a4])) == 4:
                                 dihidx.append((a1, a2, a3, a4))
         return dihidx
 

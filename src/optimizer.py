@@ -237,8 +237,12 @@ class Optimizer(forcebalance.BaseClass):
         for T in self.Objective.Targets:
             T.goodstep = val
 
-    def save_mvals_to_input(self, mvals, priors=None, jobtype=None):
+    def save_mvals_to_input(self, vals, priors=None, jobtype=None):
         """ Write a new input file (%s_save.in) containing the current mathematical parameters. """
+        if self.FF.use_pvals:
+            mvals = self.FF.create_mvals(vals)
+        else:
+            mvals = vals.copy()
         ## Determine the output file name.
         base, ext = os.path.splitext(self.input_file)
         if not base.endswith(".sav"):
@@ -317,15 +321,21 @@ class Optimizer(forcebalance.BaseClass):
         ## Check derivatives by finite difference after the optimization is over (for good measure)
         check_after = False
         if check_after:
-            self.mvals0 = xk.copy()
+            self.mvals0 = self.FF.create_pvals(xk) if self.FF.use_pvals else xk.copy()
             self.FDCheckG()
 
         ## Print out final answer
         if print_parameters:
-            bar = printcool("Final optimization parameters:",color=4)
-            self.FF.print_map(xk)
-            bar = printcool("Final physical parameters:",color=4)
-            self.FF.print_map(self.FF.create_pvals(xk))
+            if self.FF.use_pvals:
+                bar = printcool("Final optimization parameters:",color=4)
+                self.FF.print_map(self.FF.create_mvals(xk))
+                bar = printcool("Final physical parameters:",color=4)
+                self.FF.print_map(xk)
+            else:
+                bar = printcool("Final optimization parameters:",color=4)
+                self.FF.print_map(xk)
+                bar = printcool("Final physical parameters:",color=4)
+                self.FF.print_map(self.FF.create_pvals(xk))
             logger.info(bar)
             if self.backup:
                 for fnm in self.FF.fnms:
@@ -1194,8 +1204,12 @@ class Optimizer(forcebalance.BaseClass):
             idx += [self.FF.map[i] for i in self.FF.map if j in i]
         idx = set(idx)
         scanvals = np.linspace(vals_in[0],vals_in[1],vals_in[2])
+        logger.info('User input for %s parameter values to scan over:\n' % ("mathematical" if MathPhys else "physical"))
         logger.info(str(vals_in) + '\n')
+        logger.info('These parameter values will be used:\n')
         logger.info(str(scanvals) + '\n')
+        minvals = None
+        minobj = 1e100
         for pidx in idx:
             if MathPhys:
                 logger.info("Scanning parameter %i (%s) in the mathematical space\n" % (pidx,self.FF.plist[pidx]))
@@ -1207,15 +1221,19 @@ class Optimizer(forcebalance.BaseClass):
             for i in scanvals:
                 vals[pidx] = i
                 data        = self.Objective.Full(vals,Order=0)
+                if data['X'] < minobj:
+                    minobj = data['X']
+                    minvals = vals.copy()
                 logger.info("Value = % .4e Objective = % .4e\n" % (i, data['X']))
+        return minvals
 
     def ScanMVals(self):
         """ Scan through the mathematical parameter space. @see Optimizer::ScanValues """
-        self.Scan_Values(1)
+        return self.Scan_Values(1)
 
     def ScanPVals(self):
         """ Scan through the physical parameter space. @see Optimizer::ScanValues """
-        self.Scan_Values(0)
+        return self.Scan_Values(0)
 
     def SinglePoint(self):
         """ A single-point objective function computation. """

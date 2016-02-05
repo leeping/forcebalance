@@ -349,15 +349,21 @@ def main():
     #----
     EngOpts = OrderedDict()
     EngOpts["liquid"] = OrderedDict([("coords", liquid_fnm), ("mol", ML), ("pbc", True)])
+    if "nonbonded_cutoff" in TgtOptions:
+        EngOpts["liquid"]["nonbonded_cutoff"] = TgtOptions["nonbonded_cutoff"]
+    if "vdw_cutoff" in TgtOptions:
+        EngOpts["liquid"]["vdw_cutoff"] = TgtOptions["vdw_cutoff"]
     EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
     GenOpts = OrderedDict([('FF', FF)])
     if engname == "openmm":
         # OpenMM-specific options
-        EngOpts["liquid"]["platname"] = 'CUDA'
+        EngOpts["liquid"]["platname"] = TgtOptions.get("platname", 'CUDA')
+        # For now, always run gas phase calculations on the reference platform
         EngOpts["gas"]["platname"] = 'Reference'
         if force_cuda:
             try: Platform.getPlatformByName('CUDA')
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
+            EngOpts["liquid"]["platname"] = 'CUDA'
         if threads > 1: logger.warn("Setting the number of threads will have no effect on OpenMM engine.\n")
     elif engname == "gromacs":
         # Gromacs-specific options

@@ -443,6 +443,8 @@ class TINKER(Engine):
                 tk_opts['beta'] = None
                 tk_opts['gamma'] = None
         if pbc:
+            if 'boxes' in self.mol.Data:
+                minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
             if (not keypbc) and 'boxes' not in self.mol.Data:
                 logger.error("Periodic boundary conditions require either (1) a-axis to be in the .key file or (b) boxes to be in the coordinate file.\n")
                 raise RuntimeError
@@ -452,16 +454,29 @@ class TINKER(Engine):
             if minbox <= 10:
                 warn_press_key("Periodic box is set to less than 10 Angstroms across")
             # TINKER likes to use up to 7.0 Angstrom for PME cutoffs
-            rpme = 0.05*(float(int(minbox - 1))) if minbox <= 15 else 7.0
+            rpme = 0.5*(float(int(minbox - 1))) if minbox <= 15 else 7.0
+            if 'nonbonded_cutoff' in kwargs:
+                rpme = kwargs['nonbonded_cutoff']
+            if rpme > 0.5*(float(int(minbox - 1))):
+                warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (rpme, minbox))
             tk_defs['ewald-cutoff'] = "%f" % rpme
             # TINKER likes to use up to 9.0 Angstrom for vdW cutoffs
-            rvdw = 0.05*(float(int(minbox - 1))) if minbox <= 19 else 9.0
+            rvdw = 0.5*(float(int(minbox - 1))) if minbox <= 19 else 9.0
+            if 'nonbonded_cutoff' in kwargs and 'vdw_cutoff' not in kwargs:
+                warn_press_key('AMOEBA detected and nonbonded_cutoff is set, but not vdw_cutoff (so it will be set equal to nonbonded_cutoff)')
+                rvdw = kwargs['nonbonded_cutoff']
+            if 'vdw_cutoff' in kwargs:
+                rvdw = kwargs['vdw_cutoff']
+            if rvdw > 0.5*(float(int(minbox - 1))):
+                warn_press_key("vdw_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (rvdw, minbox))
             tk_defs['vdw-cutoff'] = "%f" % rvdw
             if (minbox*0.5 - rpme) > 2.5 and (minbox*0.5 - rvdw) > 2.5:
                 tk_defs['neighbor-list'] = ''
             elif (minbox*0.5 - rpme) > 2.5:
                 tk_defs['mpole-list'] = ''
         else:
+            if 'nonbonded_cutoff' in kwargs or 'vdw_cutoff' in kwargs:
+                warn_press_key('No periodic boundary conditions, your provided nonbonded_cutoff and vdw_cutoff will not be used')
             tk_opts['ewald'] = None
             tk_opts['ewald-cutoff'] = None
             tk_opts['vdw-cutoff'] = None
