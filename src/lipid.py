@@ -79,6 +79,12 @@ class Lipid(Target):
         self.set_option(tgt_opts,'gas_eq_steps',forceprint=False)
         # Number of time steps in the gas "production" run
         self.set_option(tgt_opts,'gas_md_steps',forceprint=False)
+        # Cutoff for nonbonded interactions in the liquid
+        if tgt_opts['nonbonded_cutoff'] is not None:
+            self.set_option(tgt_opts,'nonbonded_cutoff')
+        # Cutoff for vdW interactions if different from other nonbonded interactions
+        if tgt_opts['vdw_cutoff'] is not None:
+            self.set_option(tgt_opts,'vdw_cutoff')
         # Time step length (in fs) for the lipid production run
         self.set_option(tgt_opts,'lipid_timestep',forceprint=True)
         # Time interval (in ps) for writing coordinates

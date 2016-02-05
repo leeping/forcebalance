@@ -38,7 +38,7 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     If the input file exists, it is parsed and options are replaced where "options" overrides them.
     If the "options" dictionary contains more options, they are added at the end.
     If the "defaults" dictionary contains more options, they are added at the end.
-    Keys and values are standardized to lower-case strings where all dashes are replaced by underscores.
+    Keys are standardized to lower-case strings where all dashes are replaced by underscores.
     The output file contains the same comments and "dressing" as the input.
     Also returns a dictionary with the final key/value pairs.
 
@@ -523,7 +523,7 @@ class GMX(Engine):
 
     def __init__(self, name="gmx", **kwargs):
         ## Valid GROMACS-specific keywords.
-        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx', 'gmx_eq_barostat']
+        self.valkwd = ['gmxsuffix', 'gmxpath', 'gmx_top', 'gmx_mdp', 'gmx_ndx', 'gmx_eq_barostat', 'gmx_pme_order']
         super(GMX,self).__init__(name=name, **kwargs)
 
     def setopts(self, **kwargs):
@@ -550,21 +550,33 @@ class GMX(Engine):
         havegmx = False
         if 'gmxpath' in kwargs:
             self.gmxpath = kwargs['gmxpath']
-            if not os.path.exists(os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix)):
-                warn_press_key("The mdrun executable indicated by %s doesn't exist! (Check gmxpath and gmxsuffix)" \
+
+            if type(self.gmxpath) is str and len(self.gmxpath) > 0:
+                ## Figure out the GROMACS version - it will determine how programs are called.
+                if os.path.exists(os.path.join(self.gmxpath,"gmx"+self.gmxsuffix)):
+                    self.gmxversion = 5
+                    havegmx = True
+                elif os.path.exists(os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix)):
+                    self.gmxversion = 4
+                    havegmx = True
+                else:
+                    warn_press_key("The mdrun executable indicated by %s doesn't exist! (Check gmxpath and gmxsuffix)" \
                                    % os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix))
-            else:
-                havegmx = True
 
         if not havegmx:
             warn_once("The 'gmxpath' option was not specified; using default.")
-            if which('mdrun'+self.gmxsuffix) == '':
+            if which('gmx'+self.gmxsuffix) != '':
+                self.gmxpath = which('gmx'+self.gmxsuffix)
+                self.gmxversion = 5
+                havegmx = True
+            elif which('mdrun'+self.gmxsuffix) != '':
+                self.gmxpath = which('mdrun'+self.gmxsuffix)
+                self.gmxversion = 4
+                havegmx = True
+            else:
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
                 logger.error("Cannot find the GROMACS executables!\n")
                 raise RuntimeError
-            else:
-                self.gmxpath = which('mdrun'+self.gmxsuffix)
-                havegmx = True
 
     def readsrc(self, **kwargs):
         """ Called by __init__ ; read files from the source directory. """
@@ -582,7 +594,7 @@ class GMX(Engine):
 
         self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
                                      ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"), 
-                                     ("nstxtcout", "0"), ("constraints", "none")])
+                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "group")])
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
@@ -597,6 +609,20 @@ class GMX(Engine):
                 rlist = 0.05*(float(int(minbox - 1)))
             else:
                 rlist = 1.0
+            # Override with user-provided nonbonded_cutoff if exist
+            # Since user provides in Angstrom, divide by a factor of 10.
+            if 'nonbonded_cutoff' in kwargs:
+                rlist = kwargs['nonbonded_cutoff'] / 10
+            # Gromacs likes rvdw to be a bit smaller than rlist
+            rvdw = rlist - 0.05
+            if rlist > 0.05*(float(int(minbox - 1))):
+                warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (rlist*10, minbox))
+            # Override with user-provided vdw_cutoff if exist
+            if 'vdw_cutoff' in kwargs:
+                rvdw = kwargs['vdw_cutoff'] / 10
+            if rvdw > 0.05*(float(int(minbox - 1))):
+                warn_press_key("vdw_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (rvdw*10, minbox))
+            rvdw_switch = rvdw-0.05
             gmx_opts["pbc"] = "xyz"
             self.gmx_defs["ns_type"] = "grid"
             self.gmx_defs["nstlist"] = 20
@@ -607,10 +633,14 @@ class GMX(Engine):
             # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
             # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
             self.gmx_defs["vdwtype"] = "switch"
-            self.gmx_defs["rvdw"] = "%.2f" % (rlist - 0.05)
-            self.gmx_defs["rvdw_switch"] = "%.2f" % (rlist - 0.1)
+            self.gmx_defs["rvdw"] = "%.2f" % rvdw
+            self.gmx_defs["rvdw_switch"] = "%.2f" % rvdw_switch
             self.gmx_defs["DispCorr"] = "EnerPres"
         else:
+            if 'nonbonded_cutoff' in kwargs:
+                warn_press_key("Not using PBC, your provided nonbonded_cutoff will not be used")
+            if 'vdw_cutoff' in kwargs:
+                warn_press_key("Not using PBC, your provided vdw_cutoff will not be used")
             gmx_opts["pbc"] = "no"
             self.gmx_defs["ns_type"] = "simple"
             self.gmx_defs["nstlist"] = 0
@@ -755,7 +785,13 @@ class GMX(Engine):
         ## Call a GROMACS program as you would from the command line.
         csplit = command.split()
         prog = os.path.join(self.gmxpath, csplit[0])
-        csplit[0] = prog + self.gmxsuffix
+        if self.gmxversion == 5:
+            csplit[0] = csplit[0].replace('g_','').replace('gmxdump','dump')
+            csplit = ['gmx' + self.gmxsuffix] + csplit
+        elif self.gmxversion == 4:
+            csplit[0] = prog + self.gmxsuffix
+        else:
+            raise RuntimeError('gmxversion can only be 4 or 5')
         return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
 
     def warngmx(self, command, warnings=[], maxwarn=1, **kwargs):
@@ -926,6 +962,15 @@ class GMX(Engine):
                 traj = "%s-all.gro" % self.name
         self.mol[0].write("%s.gro" % self.name)
         return self.evaluate_(force, dipole, traj)
+
+    def make_gro_trajectory(self, fout=None):
+        """ Return the MD trajectory as a Molecule object. """
+        if fout is None:
+            fout = "%s-mdtraj.gro" % self.name
+        if not hasattr(self, 'mdtraj'):
+            raise RuntimeError('Engine does not have an associated trajectory.')
+        self.callgmx("trjconv -f %s -o %s -ndec 9 -pbc mol -novel -noforce" % (self.mdtraj, fout), stdin='System')
+        return fout
 
     def energy_one(self, shot):
 
@@ -1196,6 +1241,9 @@ class GMX(Engine):
             md_opts["comm_mode"] = "None"
             md_opts["nstcomm"] = 0
 
+        # In gromacs version 5, default cutoff scheme becomes verlet. 
+        # Need to set to group for backwards compatibility
+        md_defs["cutoff-scheme"] = 'group'
         md_opts["nstenergy"] = nsave
         md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
