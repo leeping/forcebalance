@@ -1013,7 +1013,12 @@ class OpenMM(Engine):
             logger.error("Polarizability calculation is available in TINKER only.\n")
             raise NotImplementedError
 
-        if optimize: self.optimize(shot)
+        if self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']:
+            crit = 1e-4
+        else:
+            crit = 1e-6
+
+        if optimize: self.optimize(shot, crit=crit)
         else: self.set_positions(shot)
 
         moments = get_multipoles(self.simulation)

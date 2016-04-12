@@ -1266,7 +1266,9 @@ class Molecule(object):
         self.top_settings = {'toppbc' : kwargs.get('toppbc', False),
                              'topframe' : kwargs.get('topframe', 0),
                              'Fac' : kwargs.get('Fac', 1.2),
-                             'read_bonds' : False}
+                             'read_bonds' : False,
+                             'fragment' : kwargs.get('fragment', False),
+                             'radii' : kwargs.get('radii', {})}
 
         for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
             self.Funnel[i] = i
@@ -1663,7 +1665,8 @@ class Molecule(object):
         Fac = self.top_settings['Fac']
         mindist = 1.0 # Any two atoms that are closer than this distance are bonded.
         # Create an atom-wise list of covalent radii.
-        R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
+        # Molecule object can have its own set of radii that overrides the global ones
+        R = np.array([self.top_settings['radii'].get(i, (Radii[Elements.index(i)-1] if i in Elements else 0.0)) for i in self.elem])
         # Create a list of 2-tuples corresponding to combinations of atomic indices using a grid algorithm.
         mins = np.min(self.xyzs[sn],axis=0)
         maxs = np.max(self.xyzs[sn],axis=0)
@@ -1805,6 +1808,8 @@ class Molecule(object):
         for i, bi in enumerate(atom_bonds):
             for j in bi:
                 if i == j: continue
+                # Do not add a bond between resids if fragment is set to True.
+                if self.top_settings['fragment'] and 'resid' in self.Data.keys() and self.resid[i] != self.resid[j] : continue
                 elif i < j:
                     bondlist.append((i, j))
                 else:
@@ -1855,18 +1860,18 @@ class Molecule(object):
         # LPW: Molecule.molecules is a funny misnomer... it should be fragments or substructures or something
         self.molecules = list(nx.connected_component_subgraphs(G))
 
-    def distance_matrix(self):
+    def distance_matrix(self, pbc=True):
         ''' Build a distance matrix between atoms. '''
         AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
         dxij = []
         if 'nanoreactor.contact' in sys.modules:
-            if hasattr(self, 'boxes'):
+            if hasattr(self, 'boxes') and pbc:
                 dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
             else:
                 dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator)
         else:
             # Inefficient implementation if importing contact doesn't work.
-            if hasattr(self, 'boxes'):
+            if hasattr(self, 'boxes') and pbc:
                 logger.error("No minimum image convention available (import 'nanoreactor.contact' if you need it).")
                 raise RuntimeError
             for sn in range(len(self)):

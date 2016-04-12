@@ -84,7 +84,7 @@ class TestAmber99SB(ForceBalanceTestCase):
             import simtk.openmm 
             openmm = True
         except: logger.warn("OpenMM cannot be imported, skipping OpenMM tests.")
-        if openmm: self.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="CUDA", precision="double")
+        if openmm: self.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="Reference", precision="double")
         self.addCleanup(os.system, 'cd .. ; rm -rf temp')
 
     def test_energy_force(self):
