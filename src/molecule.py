@@ -1507,7 +1507,7 @@ class Molecule(object):
             logger.error('Either the comparison or replacement key (%s, %s) doesn\'t exist.\n' % (key1, key2))
             raise RuntimeError
 
-    def atom_select(self,atomslice):
+    def atom_select(self,atomslice,build_topology=True):
         """ Return a copy of the object with certain atoms selected.  Takes an integer, list or array as argument. """
         if isinstance(atomslice, int):
             atomslice = [atomslice]
@@ -1539,7 +1539,8 @@ class Molecule(object):
         if 'bonds' in self.Data:
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
         New.top_settings = self.top_settings
-        New.build_topology(force_bonds=False)
+        if build_topology:
+            New.build_topology(force_bonds=False)
         return New
 
     def atom_stack(self, other):
@@ -2044,7 +2045,7 @@ class Molecule(object):
         """
         
         self.require('boxes')
-        return [(Vec3(box.A)/10.0, Vec3(box.B)/10.0, Vec3(box.C)/10.0) * nanometer for box in self.boxes]
+        return [(Vec3(*box.A)/10.0, Vec3(*box.B)/10.0, Vec3(*box.C)/10.0) * nanometer for box in self.boxes]
 
     def split(self, fnm=None, ftype=None, method="chunks", num=None):
 
